@@ -1,5 +1,5 @@
 {
-  "name": "quidproquo-root",
+  "name": "quid-pro-quo",
   "version": "0.0.3",
   "description": "JS Library for building web servers using pure functions and generators.",
   "main": "index.js",
