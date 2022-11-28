@@ -1,0 +1,23 @@
+{
+  "name": "quidproquo-tsconfig",
+  "version": "0.0.3",
+  "description": "",
+  "main": "tsconfig.json",
+  "scripts": {
+    "build": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joe-coady/quidproquo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/joe-coady/quidproquo/issues"
+  },
+  "homepage": "https://github.com/joe-coady/quidproquo#readme",
+  "devDependencies": {
+    "typescript": "^4.9.3"
+  }
+}
