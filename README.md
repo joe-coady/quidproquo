@@ -7,6 +7,7 @@ JS Library for building web servers using pure functions and generators.
 - [quidproquo](https://www.npmjs.com/package/quidproquo)
 - [quidproquo-core](https://www.npmjs.com/package/quidproquo-core)
 - [quidproquo-tsconfig](https://www.npmjs.com/package/quidproquo-tsconfig)
+- [quidproquo-webserver](https://www.npmjs.com/package/quidproquo-webserver)
 
 ### Note
 
