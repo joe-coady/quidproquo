@@ -1,5 +1,6 @@
 export { defineRoute } from "./serviceInfrastructureDefinitions/route";
 export { defineDns } from "./serviceInfrastructureDefinitions/dns";
+export { defineServiceName } from "./serviceInfrastructureDefinitions/serviceName";
 
 export {
   ServiceInfrastructureConfig,
