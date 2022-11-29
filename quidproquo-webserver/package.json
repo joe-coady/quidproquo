@@ -1,8 +1,9 @@
 {
   "name": "quidproquo-webserver",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "",
   "main": "./lib/index.js",
+  "types": "./lib/index.d.js",
   "files": [
     "lib/**/*"
   ],
@@ -22,7 +23,7 @@
   },
   "homepage": "https://github.com/joe-coady/quidproquo#readme",
   "devDependencies": {
-    "quidproquo-tsconfig": "^0.0.1",
+    "quidproquo-tsconfig": "*",
     "typescript": "^4.9.3"
   }
 }
