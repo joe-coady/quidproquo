@@ -4,6 +4,7 @@
   "description": "JS Library for building web servers using pure functions and generators.",
   "main": "index.js",
   "scripts": {
+    "build": "npm run build --ws",
     "login": "npm login",
     "publish": "npm publish --ws",
     "patch": "npm version patch --ws"
