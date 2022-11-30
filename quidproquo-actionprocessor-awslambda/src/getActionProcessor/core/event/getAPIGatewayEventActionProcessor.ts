@@ -1,34 +1,45 @@
-import { EventActionTypeEnum, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import {
+  EventActionTypeEnum,
+  QPQConfig,
+  qpqCoreUtils,
+  EventTransformEventParamsActionPayload,
+  StorySession,
+} from 'quidproquo-core';
+
 import {
   RouteQPQWebServerConfigSetting,
   HTTPEventParams,
   qpqWebServerUtils,
 } from 'quidproquo-webserver';
 
-import { randomGuid, matchUrl } from '../../../awsLambdaUtils';
+import { APIGatewayEvent, Context } from 'aws-lambda';
+
+import { matchUrl } from '../../../awsLambdaUtils';
 
 const getProcessTransformEventParams = (appName: string) => {
-  return async (payload: any, session: any): Promise<HTTPEventParams<any>> => {
-    const {
-      params: [event],
-    } = payload;
-    const path = (event.path || '').replace(new RegExp(`^(\/${appName})/`), '/');
+  return async (
+    actionPayload: EventTransformEventParamsActionPayload<[APIGatewayEvent, Context]>,
+    session: StorySession,
+  ): Promise<HTTPEventParams<any>> => {
+    const [apiGatewayEvent, context] = actionPayload.payload.eventParams;
+
+    const path = (apiGatewayEvent.path || '').replace(new RegExp(`^(\/${appName})/`), '/');
     return {
       path,
       query: {
-        ...(event.multiValueQueryStringParameters || {}),
-        ...(event.queryStringParameters || {}),
+        ...(apiGatewayEvent.multiValueQueryStringParameters || {}),
+        ...(apiGatewayEvent.queryStringParameters || {}),
       } as { [key: string]: undefined | string | string[] },
-      body: event.body ? JSON.parse(event.body) : undefined,
-      headers: event.headers || {},
-      method: event.httpMethod as 'GET' | 'POST',
-      correlation: randomGuid(),
+      body: apiGatewayEvent.body ? JSON.parse(apiGatewayEvent.body) : undefined,
+      headers: apiGatewayEvent.headers,
+      method: apiGatewayEvent.httpMethod as 'GET' | 'POST',
+      correlation: context.awsRequestId,
     };
   };
 };
 
 const getProcessTransformResponseResult = (domainName: string) => {
-  return async (payload: any, session: any) => ({
+  return async (payload: any, session: StorySession) => ({
     statusCode: payload.response.result.statusCode,
     body: payload.response.result.body,
     headers: {
@@ -41,7 +52,7 @@ const getProcessTransformResponseResult = (domainName: string) => {
 };
 
 const getProcessAutoRespond = (domainName: string) => {
-  return async (payload: any, session: any) => {
+  return async (payload: any, session: StorySession) => {
     if (payload.http === 'OPTIONS') {
       return {
         statusCode: 200,
@@ -60,7 +71,10 @@ const getProcessAutoRespond = (domainName: string) => {
 
 const getProcessMatchStory =
   (routes: RouteQPQWebServerConfigSetting[]) =>
-  async (payload: any, session: any): Promise<RouteQPQWebServerConfigSetting | undefined> => {
+  async (
+    payload: any,
+    session: StorySession,
+  ): Promise<RouteQPQWebServerConfigSetting | undefined> => {
     // Sort the routes by string length
     // Note: We may need to filter variable routes out {} as the variables are length independent
     const sortedRoutes = routes

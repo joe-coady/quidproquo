@@ -14,3 +14,7 @@ export * as qpqCoreUtils from './qpqCoreUtils';
 export * from './stories';
 
 export { resolveStory } from './actionProcessor';
+
+export * from './types/StorySession';
+
+export { EventTransformEventParamsActionPayload } from './actions/event/EventActionRequester';

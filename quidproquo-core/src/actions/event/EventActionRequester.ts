@@ -1,17 +1,18 @@
 import EventActionTypeEnum from './EventActionTypeEnum';
 import { ActionPayload } from '../../types/ActionPayload';
 
-export interface EventTransformEventParamsActionPayload extends ActionPayload {
+export interface EventTransformEventParamsActionPayload<T extends Array<unknown>>
+  extends ActionPayload {
   type: EventActionTypeEnum.TransformEventParams;
   payload: {
     // Any event from any source
-    eventParams: any[];
+    eventParams: T;
   };
 }
 
-export function* askEventTransformEventParams(
-  ...eventParams: any
-): Generator<EventTransformEventParamsActionPayload> {
+export function* askEventTransformEventParams<T extends Array<unknown>>(
+  ...eventParams: T
+): Generator<EventTransformEventParamsActionPayload<T>> {
   return yield {
     type: EventActionTypeEnum.TransformEventParams,
     payload: { eventParams },
