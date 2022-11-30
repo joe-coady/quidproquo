@@ -11,4 +11,6 @@ export { QPQCoreConfigSettingType, QPQConfigSetting, QPQConfig } from './config/
 
 export * as qpqCoreUtils from './qpqCoreUtils';
 
+export * from './stories';
+
 export { resolveStory } from './actionProcessor';
