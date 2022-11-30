@@ -22,6 +22,9 @@
     "url": "https://github.com/joe-coady/quidproquo/issues"
   },
   "homepage": "https://github.com/joe-coady/quidproquo#readme",
+  "dependencies": {
+    "quidproquo-core": "*"
+  },
   "devDependencies": {
     "quidproquo-tsconfig": "*",
     "typescript": "^4.9.3"

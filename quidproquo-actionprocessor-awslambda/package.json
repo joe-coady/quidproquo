@@ -23,11 +23,9 @@
   },
   "homepage": "https://github.com/joe-coady/quidproquo#readme",
   "dependencies": {
-    "quidproquo-core": "*",
-    "uuid": "^9.0.0"
+    "quidproquo-core": "*"
   },
   "devDependencies": {
-    "@types/uuid": "^9.0.0",
     "quidproquo-tsconfig": "*",
     "typescript": "^4.9.3"
   }
