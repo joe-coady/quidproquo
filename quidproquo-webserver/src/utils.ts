@@ -4,6 +4,10 @@ import {
   ServiceInfrastructureConfigs,
 } from "./serviceInfrastructureDefinitions/ServiceInfrastructureConfig";
 
+import { RouteInfrastructureConfig } from "./serviceInfrastructureDefinitions/route";
+
+import { SrcPathname } from "./types/srcFileTypes";
+
 const getServiceInfrastructureDefinitions = <
   T extends ServiceInfrastructureConfig
 >(
@@ -27,7 +31,18 @@ const getServiceInfrastructureDefinition = <
   )[0] as T;
 };
 
+export const getAllSrcEntries = (
+  configs: ServiceInfrastructureConfigs
+): SrcPathname[] => {
+  const routes = getServiceInfrastructureDefinitions<RouteInfrastructureConfig>(
+    configs,
+    ServiceInfrastructureConfigType.ROUTE
+  );
+  return routes.map((r) => r.src);
+};
+
 export default {
   getServiceInfrastructureDefinitions,
   getServiceInfrastructureDefinition,
+  getAllSrcEntries,
 };

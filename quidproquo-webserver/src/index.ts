@@ -12,4 +12,6 @@ export { DnsServiceInfrastructureConfig } from "./serviceInfrastructureDefinitio
 export { RouteInfrastructureConfig } from "./serviceInfrastructureDefinitions/route";
 export { ServiceNameInfrastructureConfig } from "./serviceInfrastructureDefinitions/serviceName";
 
+export { SrcPathname } from "./types/srcFileTypes";
+
 export { default as utils } from "./utils";
