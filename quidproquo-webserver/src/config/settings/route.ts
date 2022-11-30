@@ -1,16 +1,7 @@
-import { QPQConfigSetting } from "quidproquo-core";
+import { QPQConfigSetting } from 'quidproquo-core';
 
-import { QPQWebServerConfigSettingType } from "../QPQConfig";
-
-export type HTTPMethod =
-  | "GET"
-  | "HEAD"
-  | "POST"
-  | "PUT"
-  | "DELETE"
-  | "CONNECT"
-  | "OPTIONS"
-  | "PATCH";
+import { HTTPMethod } from '../../types/HTTPEvent';
+import { QPQWebServerConfigSettingType } from '../QPQConfig';
 
 export type RouteOptions = {};
 
@@ -27,7 +18,7 @@ export const defineRoute = (
   path: string,
   src: string,
   runtime: string,
-  options: RouteOptions = {}
+  options: RouteOptions = {},
 ): RouteQPQWebServerConfigSetting => ({
   configSettingType: QPQWebServerConfigSettingType.Route,
 

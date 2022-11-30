@@ -1,66 +1,41 @@
 import EventActionTypeEnum from './EventActionTypeEnum';
-import { ActionPayload } from '../../types/ActionPayload';
-
-export interface EventTransformEventParamsActionPayload<T extends Array<unknown>>
-  extends ActionPayload {
-  type: EventActionTypeEnum.TransformEventParams;
-  payload: {
-    // Any event from any source
-    eventParams: T;
-  };
-}
+import {
+  EventTransformEventParamsAction,
+  EventTransformResponseResultAction,
+  EventMatchStoryAction,
+  EventAutoRespondAction,
+} from './EventActionTypes';
 
 export function* askEventTransformEventParams<T extends Array<unknown>>(
   ...eventParams: T
-): Generator<EventTransformEventParamsActionPayload<T>> {
+): Generator<EventTransformEventParamsAction<T>> {
   return yield {
     type: EventActionTypeEnum.TransformEventParams,
     payload: { eventParams },
   };
 }
 
-export interface EventTransformResponseResultActionPayload extends ActionPayload {
-  type: EventActionTypeEnum.TransformResponseResult;
-  payload: {
-    response: any;
-  };
-}
-
 export function* askEventTransformResponseResult(
   response: any,
-): Generator<EventTransformResponseResultActionPayload> {
+): Generator<EventTransformResponseResultAction> {
   return yield {
     type: EventActionTypeEnum.TransformResponseResult,
     payload: { response },
   };
 }
 
-export interface EventMatchStoryActionPayload extends ActionPayload {
-  type: EventActionTypeEnum.MatchStory;
-  payload: {
-    transformedEventParams: any;
-  };
-}
-
-export function* askEventMatchStory(
+export function* askEventMatchStory<T>(
   transformedEventParams: any,
-): Generator<EventMatchStoryActionPayload> {
+): Generator<EventMatchStoryAction<T>> {
   return yield {
     type: EventActionTypeEnum.MatchStory,
     payload: { transformedEventParams },
   };
 }
 
-export interface EventAutoRespondActionPayload extends ActionPayload {
-  type: EventActionTypeEnum.AutoRespond;
-  payload: {
-    transformedEventParams: any;
-  };
-}
-
-export function* askEventAutoRespond(
+export function* askEventAutoRespond<T>(
   transformedEventParams: any,
-): Generator<EventAutoRespondActionPayload> {
+): Generator<EventAutoRespondAction<T>> {
   return yield {
     type: EventActionTypeEnum.AutoRespond,
     payload: { transformedEventParams },
