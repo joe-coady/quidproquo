@@ -13,7 +13,3 @@ export const getAllSrcEntries = (configs: QPQConfig): string[] => {
 
   return routes.map((r) => r.src);
 };
-
-export default {
-  getAllSrcEntries: () => {},
-};

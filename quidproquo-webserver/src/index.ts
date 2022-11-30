@@ -6,4 +6,4 @@ export {
 
 export { QPQWebServerConfigSettingType } from "./config/QPQConfig";
 
-export { default as utils } from "./utils";
+export * as qpqWebServerUtils from "./qpqWebServerUtils";
