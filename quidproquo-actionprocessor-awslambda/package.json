@@ -23,9 +23,13 @@
   },
   "homepage": "https://github.com/joe-coady/quidproquo#readme",
   "dependencies": {
-    "quidproquo-core": "*"
+    "aws-sdk": "^2.1264.0",
+    "node-match-path": "^0.6.3",
+    "quidproquo-core": "*",
+    "quidproquo-webserver": "*"
   },
   "devDependencies": {
+    "@types/node": "^18.11.9",
     "quidproquo-tsconfig": "*",
     "typescript": "^4.9.3"
   }
