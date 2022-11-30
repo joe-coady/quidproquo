@@ -37,9 +37,3 @@ export const getAppName = (configs: QPQConfig): string => {
 
   return appName;
 };
-
-export default {
-  getConfigSettings,
-  getConfigSetting,
-  getAppName,
-};

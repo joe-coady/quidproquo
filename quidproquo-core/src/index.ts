@@ -6,9 +6,14 @@ export { PlatformActionTypeEnum } from "./actions/platform/PlatformActionTypeEnu
 export { SystemActionTypeEnum } from "./actions/system/SystemActionTypeEnum";
 
 export {
+  defineAppName,
+  AppNameQPQConfigSetting,
+} from "./config/settings/appName";
+
+export {
   QPQCoreConfigSettingType,
   QPQConfigSetting,
   QPQConfig,
 } from "./config/QPQConfig";
 
-export { default as qpqCoreUtils } from "./qpqCoreUtils";
+export * as qpqCoreUtils from "./qpqCoreUtils";
