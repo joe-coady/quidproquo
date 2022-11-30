@@ -24,6 +24,7 @@ export interface SystemExecuteStoryActionPayload extends ActionPayload {
     actions: ActionPayload[];
   };
 }
+
 export function* askExecuteStory(
   type: string,
   src: string,

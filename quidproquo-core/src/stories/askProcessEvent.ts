@@ -3,11 +3,11 @@ import {
   askEventAutoRespond,
   askEventTransformResponseResult,
   askEventMatchStory,
-} from "../actions/event/EventActionRequester";
+} from '../actions/event/EventActionRequester';
 
-import { askExecuteStory } from "../actions/system/SystemActionRequester";
+import { askExecuteStory } from '../actions/system/SystemActionRequester';
 
-function* askProcessEvent(...args: any) {
+export function* askProcessEvent(...args: any) {
   // Transform event params
   const http = yield* askEventTransformEventParams(...args);
 
@@ -22,10 +22,8 @@ function* askProcessEvent(...args: any) {
   const { src, runtime } = yield* askEventMatchStory(http);
 
   // Execute the story
-  const result = yield* askExecuteStory("route", src, runtime, [http]);
+  const result = yield* askExecuteStory('route', src, runtime, [http]);
 
   // return the result of the story back to the event caller
   return yield* askEventTransformResponseResult(result);
 }
-
-export default askProcessEvent;
