@@ -1,1 +1,1 @@
-export { default as coreActionProcessor } from "./core";
+export * from './core';

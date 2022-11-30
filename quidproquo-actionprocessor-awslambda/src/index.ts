@@ -1,1 +1,1 @@
-export * from "./getActionProcessor";
+export * from './getActionProcessor';

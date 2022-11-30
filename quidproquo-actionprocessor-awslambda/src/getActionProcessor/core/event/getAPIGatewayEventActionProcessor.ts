@@ -1,5 +1,9 @@
 import { EventActionTypeEnum, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
-import { RouteQPQWebServerConfigSetting, HTTPEventParams, qpqWebServerUtils } from 'quidproquo-webserver';
+import {
+  RouteQPQWebServerConfigSetting,
+  HTTPEventParams,
+  qpqWebServerUtils,
+} from 'quidproquo-webserver';
 
 import { randomGuid, matchUrl } from '../../../awsLambdaUtils';
 
@@ -54,22 +58,22 @@ const getProcessAutoRespond = (domainName: string) => {
   };
 };
 
-const getProcessMatch = (routes: RouteQPQWebServerConfigSetting[]) => async (payload: any, session: any) => {
-  // Sort the routes by string length
-  // Note: We may need to filter variable routes out {} as the variables are length independent
-  const sortedRoutes = routes
-    .filter((r: any) => r.method === payload.method)
-    .sort((a: any, b: any) => {
-      if (a.path.length < b.path.length) return -1;
-      if (a.path.length > b.path.length) return 1;
-      return 0;
-    });
+const getProcessMatchStory =
+  (routes: RouteQPQWebServerConfigSetting[]) =>
+  async (payload: any, session: any): Promise<RouteQPQWebServerConfigSetting | undefined> => {
+    // Sort the routes by string length
+    // Note: We may need to filter variable routes out {} as the variables are length independent
+    const sortedRoutes = routes
+      .filter((r: any) => r.method === payload.method)
+      .sort((a: any, b: any) => {
+        if (a.path.length < b.path.length) return -1;
+        if (a.path.length > b.path.length) return 1;
+        return 0;
+      });
 
-  // Find the most relevant match
-  const route = sortedRoutes.find((r) => matchUrl(r.path, payload.path).matches)?.route;
-
-  return route;
-};
+    // Find the most relevant match
+    return sortedRoutes.find((r) => matchUrl(r.path, payload.path).didMatch);
+  };
 
 export default (config: QPQConfig) => {
   const routes = qpqWebServerUtils.getAllRoutes(config);
@@ -80,6 +84,6 @@ export default (config: QPQConfig) => {
     [EventActionTypeEnum.TransformEventParams]: getProcessTransformEventParams(appName),
     [EventActionTypeEnum.TransformResponseResult]: getProcessTransformResponseResult(domainName),
     [EventActionTypeEnum.AutoRespond]: getProcessAutoRespond(domainName),
-    [EventActionTypeEnum.MatchStory]: getProcessMatch(routes),
+    [EventActionTypeEnum.MatchStory]: getProcessMatchStory(routes),
   };
 };
