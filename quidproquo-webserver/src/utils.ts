@@ -5,6 +5,7 @@ import {
 } from "./serviceInfrastructureDefinitions/ServiceInfrastructureConfig";
 
 import { RouteInfrastructureConfig } from "./serviceInfrastructureDefinitions/route";
+import { ServiceNameInfrastructureConfig } from "./serviceInfrastructureDefinitions/serviceName";
 
 import { SrcPathname } from "./types/srcFileTypes";
 
@@ -41,8 +42,25 @@ export const getAllSrcEntries = (
   return routes.map((r) => r.src);
 };
 
+export const getServiceName = (
+  configs: ServiceInfrastructureConfigs
+): string => {
+  const serviceName =
+    getServiceInfrastructureDefinition<ServiceNameInfrastructureConfig>(
+      configs,
+      ServiceInfrastructureConfigType.SERVICE_NAME
+    )?.serviceName;
+
+  if (!serviceName) {
+    throw new Error("please use defineServiceName in your QPQ config");
+  }
+
+  return serviceName;
+};
+
 export default {
   getServiceInfrastructureDefinitions,
   getServiceInfrastructureDefinition,
   getAllSrcEntries,
+  getServiceName,
 };
