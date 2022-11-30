@@ -1,17 +1,9 @@
-export { defineRoute } from "./serviceInfrastructureDefinitions/route";
-export { defineDns } from "./serviceInfrastructureDefinitions/dns";
-export { defineServiceName } from "./serviceInfrastructureDefinitions/serviceName";
-
+export { defineDns, DnsQPQWebServerConfigSetting } from "./config/settings/dns";
 export {
-  ServiceInfrastructureConfig,
-  ServiceInfrastructureConfigs,
-  ServiceInfrastructureConfigType,
-} from "./serviceInfrastructureDefinitions/ServiceInfrastructureConfig";
+  defineRoute,
+  RouteQPQWebServerConfigSetting,
+} from "./config/settings/route";
 
-export { DnsServiceInfrastructureConfig } from "./serviceInfrastructureDefinitions/dns";
-export { RouteInfrastructureConfig } from "./serviceInfrastructureDefinitions/route";
-export { ServiceNameInfrastructureConfig } from "./serviceInfrastructureDefinitions/serviceName";
-
-export { SrcPathname } from "./types/srcFileTypes";
+export { QPQWebServerConfigSettingType } from "./config/QPQConfig";
 
 export { default as utils } from "./utils";

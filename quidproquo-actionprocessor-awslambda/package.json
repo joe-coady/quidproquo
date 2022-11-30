@@ -1,5 +1,5 @@
 {
-  "name": "quidproquo-core",
+  "name": "quidproquo-actionprocessor-awslambda",
   "version": "0.0.11",
   "description": "",
   "main": "./lib/index.js",
@@ -22,7 +22,12 @@
     "url": "https://github.com/joe-coady/quidproquo/issues"
   },
   "homepage": "https://github.com/joe-coady/quidproquo#readme",
+  "dependencies": {
+    "quidproquo-core": "*",
+    "uuid": "^9.0.0"
+  },
   "devDependencies": {
+    "@types/uuid": "^9.0.0",
     "quidproquo-tsconfig": "*",
     "typescript": "^4.9.3"
   }

@@ -4,7 +4,9 @@
 import SystemActionTypeEnum from "./SystemActionTypeEnum";
 
 // TODO: fix typing
-export function* askBatch(actions: Array<object>): Generator<any, Array<any>, Array<any>> {
+export function* askBatch(
+  actions: Array<object>
+): Generator<any, Array<any>, Array<any>> {
   return yield { type: SystemActionTypeEnum.Batch, payload: { actions } };
 }
 
@@ -14,15 +16,15 @@ export function* askBatch(actions: Array<object>): Generator<any, Array<any>, Ar
 export function* askParallel(stories: Array<any>): Generator<any, any, any> {
   const itt = stories.map((s: any) => s[0](...s.slice(1)));
   let actions = itt.map((i: any) => i.next());
-  let values: Array<any> = actions.map(a => a.value);
+  let values: Array<any> = actions.map((a) => a.value);
 
   while (true) {
     // Batch any actions that we have not processed yet
-    const actionsToBatch = actions.map(a => !a.done ? a.value : null);
-    
+    const actionsToBatch = actions.map((a) => (!a.done ? a.value : null));
+
     // Only batch actions when there are some to batch
     // People may batch stories together that actually dont have actions in them!?
-    if (actionsToBatch.filter(atb => !!atb).length) {
+    if (actionsToBatch.filter((atb) => !!atb).length) {
       values = yield* askBatch(actionsToBatch);
     }
 
@@ -38,7 +40,24 @@ export function* askParallel(stories: Array<any>): Generator<any, any, any> {
     }
 
     if (done) {
-      return actions.map(a => a.value);
+      return actions.map((a) => a.value);
     }
-  }  
+  }
+}
+
+export function* askExecuteStory(
+  type: string,
+  src: string,
+  runtime: string,
+  ...params: any
+): Generator<any, any, any> {
+  return yield {
+    type: SystemActionTypeEnum.ExecuteStory,
+    payload: {
+      type,
+      src,
+      runtime,
+      params,
+    },
+  };
 }

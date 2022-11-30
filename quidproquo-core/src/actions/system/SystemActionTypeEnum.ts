@@ -3,6 +3,7 @@
 
 export enum SystemActionTypeEnum {
   Batch = "@quidproquo-core/System/Batch",
+  ExecuteStory = "@quidproquo-core/System/ExecuteStory",
 }
 
 export default SystemActionTypeEnum;
