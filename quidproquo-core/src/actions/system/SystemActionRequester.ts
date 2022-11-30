@@ -1,13 +1,44 @@
 // NOTE: System actions have no platform specific processors and/or requestors
 // and therefore do not need to implement a SystemActionProcessor.ts
 
-import SystemActionTypeEnum from "./SystemActionTypeEnum";
+import SystemActionTypeEnum from './SystemActionTypeEnum';
+import { ActionPayload } from '../../types/ActionPayload';
+
+export interface SystemBatchActionPayload extends ActionPayload {
+  type: SystemActionTypeEnum.Batch;
+  payload: {
+    actions: ActionPayload[];
+  };
+}
 
 // TODO: fix typing
 export function* askBatch(
-  actions: Array<object>
-): Generator<any, Array<any>, Array<any>> {
+  actions: ActionPayload[],
+): Generator<SystemBatchActionPayload, any[], any[]> {
   return yield { type: SystemActionTypeEnum.Batch, payload: { actions } };
+}
+
+export interface SystemExecuteStoryActionPayload extends ActionPayload {
+  type: SystemActionTypeEnum.Batch;
+  payload: {
+    actions: ActionPayload[];
+  };
+}
+export function* askExecuteStory(
+  type: string,
+  src: string,
+  runtime: string,
+  ...params: any
+): Generator<any, any, any> {
+  return yield {
+    type: SystemActionTypeEnum.ExecuteStory,
+    payload: {
+      type,
+      src,
+      runtime,
+      params,
+    },
+  };
 }
 
 // TODO: Make this faster?
@@ -43,21 +74,4 @@ export function* askParallel(stories: Array<any>): Generator<any, any, any> {
       return actions.map((a) => a.value);
     }
   }
-}
-
-export function* askExecuteStory(
-  type: string,
-  src: string,
-  runtime: string,
-  ...params: any
-): Generator<any, any, any> {
-  return yield {
-    type: SystemActionTypeEnum.ExecuteStory,
-    payload: {
-      type,
-      src,
-      runtime,
-      params,
-    },
-  };
 }

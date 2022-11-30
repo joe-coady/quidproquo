@@ -1,5 +1,10 @@
 import MathActionTypeEnum from './MathActionTypeEnum';
+import { ActionPayload } from '../../types/ActionPayload';
 
-export function* askRandomNumber(): Generator<any, number, number> {
-  return yield { type: MathActionTypeEnum.RandomNumber }
+export interface MathRandomNumberActionPayload extends ActionPayload {
+  type: MathActionTypeEnum.RandomNumber;
+}
+
+export function* askRandomNumber(): Generator<MathRandomNumberActionPayload, number, number> {
+  return yield { type: MathActionTypeEnum.RandomNumber };
 }
