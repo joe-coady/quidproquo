@@ -2,35 +2,20 @@
 // and therefore do not need to implement a SystemActionProcessor.ts
 
 import SystemActionTypeEnum from './SystemActionTypeEnum';
-import { ActionPayload } from '../../types/ActionPayload';
-
-export interface SystemBatchActionPayload extends ActionPayload {
-  type: SystemActionTypeEnum.Batch;
-  payload: {
-    actions: ActionPayload[];
-  };
-}
+import { SystemBatchAction, SystemExecuteStoryAction } from './SystemActionTypes';
+import { Action } from '../../types/Action';
 
 // TODO: fix typing
-export function* askBatch(
-  actions: ActionPayload[],
-): Generator<SystemBatchActionPayload, any[], any[]> {
+export function* askBatch(actions: Action[]): Generator<SystemBatchAction, any[], any[]> {
   return yield { type: SystemActionTypeEnum.Batch, payload: { actions } };
 }
 
-export interface SystemExecuteStoryActionPayload extends ActionPayload {
-  type: SystemActionTypeEnum.Batch;
-  payload: {
-    actions: ActionPayload[];
-  };
-}
-
-export function* askExecuteStory(
+export function* askExecuteStory<T extends Array<any>>(
   type: string,
   src: string,
   runtime: string,
-  ...params: any
-): Generator<any, any, any> {
+  params: T,
+): Generator<SystemExecuteStoryAction<T>, any, any> {
   return yield {
     type: SystemActionTypeEnum.ExecuteStory,
     payload: {

@@ -1,13 +1,6 @@
 import PlatformActionTypeEnum from './PlatformActionTypeEnum';
-import { ActionPayload } from '../../types/ActionPayload';
+import { PlatformDelayAction } from './PlatformActionRequesterTypes';
 
-export interface PlatformDelayActionPayload extends ActionPayload {
-  type: PlatformActionTypeEnum.Delay;
-  payload: {
-    timeMs: number;
-  };
-}
-
-export function* askDelay(timeMs: number): Generator<PlatformDelayActionPayload, void, void> {
+export function* askDelay(timeMs: number): Generator<PlatformDelayAction, void, void> {
   yield { type: PlatformActionTypeEnum.Delay, payload: { timeMs } };
 }

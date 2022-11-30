@@ -1,10 +1,6 @@
 import GuidActionTypeEnum from './GuidActionTypeEnum';
-import { ActionPayload } from '../../types/ActionPayload';
+import { GuidNewAction } from './GuidActionRequesterTypes';
 
-export interface GuidNewActionPayload extends ActionPayload {
-  type: GuidActionTypeEnum.New;
-}
-
-export function* askNewGuid(): Generator<GuidNewActionPayload, string, string> {
+export function* askNewGuid(): Generator<GuidNewAction, string, string> {
   return yield { type: GuidActionTypeEnum.New };
 }

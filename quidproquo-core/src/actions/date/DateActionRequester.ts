@@ -1,9 +1,5 @@
 import DateActionTypeEnum from './DateActionTypeEnum';
-import { ActionPayload } from '../../types/ActionPayload';
-
-export interface DateNowActionPayload extends ActionPayload {
-  type: DateActionTypeEnum.Now;
-}
+import { DateNowAction } from './DateActionTypes';
 
 // Generator<
 //  Thing you are giving to QPQ,
@@ -14,6 +10,6 @@ export interface DateNowActionPayload extends ActionPayload {
 // We give DateNowActionPayload to QPQ
 // QPQ gives us back a string ('2022-11-30T11:49:19.768Z')
 // Then we return the same string back to the calling method
-export function* askDateNow(): Generator<DateNowActionPayload, string, string> {
+export function* askDateNow(): Generator<DateNowAction, string, string> {
   return yield { type: DateActionTypeEnum.Now };
 }
