@@ -1,4 +1,5 @@
-import { ErrorThrowErrorActionRequester, ErrorActionTypeEnum } from './ErrorActionRequesterTypes';
+import { ErrorThrowErrorActionRequester } from './ErrorThrowErrorActionRequesterTypes';
+import { ErrorActionType } from './ErrorActionType';
 import { ErrorTypeEnum } from '../../types/ErrorTypeEnum';
 
 export function* askThrowError(
@@ -7,7 +8,7 @@ export function* askThrowError(
   errorStack: string,
 ): ErrorThrowErrorActionRequester {
   yield {
-    type: ErrorActionTypeEnum.ThrowError,
+    type: ErrorActionType.ThrowError,
     payload: { errorType, errorText, errorStack },
   };
 }

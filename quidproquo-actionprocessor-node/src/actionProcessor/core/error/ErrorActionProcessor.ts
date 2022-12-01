@@ -1,5 +1,5 @@
 import {
-  ErrorActionTypeEnum,
+  ErrorActionType,
   ErrorThrowErrorActionProcessor,
   actionResultError,
 } from 'quidproquo-core';
@@ -13,5 +13,5 @@ const processThrowError: ErrorThrowErrorActionProcessor = async ({
 };
 
 export default {
-  [ErrorActionTypeEnum.ThrowError]: processThrowError,
+  [ErrorActionType.ThrowError]: processThrowError,
 };

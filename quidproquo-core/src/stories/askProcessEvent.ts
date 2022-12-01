@@ -1,4 +1,4 @@
-import { askThrowError } from '../actions/error/ErrorActionRequester';
+import { askThrowError } from '../actions/error';
 import { ErrorTypeEnum } from '../types/ErrorTypeEnum';
 import {
   askEventTransformEventParams,

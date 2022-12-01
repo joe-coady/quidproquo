@@ -1,2 +1,4 @@
-export * from './ErrorActionRequester';
-export * from './ErrorActionRequesterTypes';
+export * from './ErrorActionType';
+
+export * from './ErrorThrowErrorActionRequester';
+export * from './ErrorThrowErrorActionRequesterTypes';

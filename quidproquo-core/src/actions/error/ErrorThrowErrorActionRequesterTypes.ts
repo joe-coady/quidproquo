@@ -1,10 +1,6 @@
+import { ErrorActionType } from './ErrorActionType';
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
 import { ErrorTypeEnum } from '../../types/ErrorTypeEnum';
-
-// Enum
-export enum ErrorActionTypeEnum {
-  ThrowError = '@quidproquo-core/error/ThrowError',
-}
 
 // Payload
 export interface ErrorThrowErrorActionPayload {
@@ -15,7 +11,7 @@ export interface ErrorThrowErrorActionPayload {
 
 // Action
 export interface ErrorThrowErrorAction extends Action<ErrorThrowErrorActionPayload> {
-  type: ErrorActionTypeEnum.ThrowError;
+  type: ErrorActionType.ThrowError;
   payload: ErrorThrowErrorActionPayload;
 }
 
