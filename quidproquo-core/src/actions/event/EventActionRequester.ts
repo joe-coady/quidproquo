@@ -4,6 +4,7 @@ import {
   EventTransformResponseResultAction,
   EventMatchStoryAction,
   EventAutoRespondAction,
+  MatchStoryResult,
 } from './EventActionTypes';
 
 export function* askEventTransformEventParams<T extends Array<unknown>>(
@@ -26,7 +27,7 @@ export function* askEventTransformResponseResult(
 
 export function* askEventMatchStory<T>(
   transformedEventParams: any,
-): Generator<EventMatchStoryAction<T>> {
+): Generator<EventMatchStoryAction<T>, MatchStoryResult, MatchStoryResult> {
   return yield {
     type: EventActionTypeEnum.MatchStory,
     payload: { transformedEventParams },

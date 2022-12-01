@@ -9,7 +9,8 @@
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npx rimraf lib && tsc"
+    "build": "npx rimraf lib && tsc",
+    "watch": "tsc -w"
   },
   "repository": {
     "type": "git",

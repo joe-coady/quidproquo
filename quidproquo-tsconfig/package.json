@@ -4,7 +4,8 @@
   "description": "",
   "main": "tsconfig.json",
   "scripts": {
-    "build": ""
+    "build": "",
+    "watch": ""
   },
   "repository": {
     "type": "git",

@@ -53,6 +53,7 @@ export async function resolveStory(
 
     while (!action.done) {
       const executionTime = resolveNow();
+      console.log(action.value);
       const actionResult: any = await processAction(action.value, actionProcessors, session);
       history.push({
         act: action.value,
@@ -64,7 +65,7 @@ export async function resolveStory(
       action = reader.next(actionResult);
     }
   } catch (err) {
-    console.log('story Error: ', err);
+    console.log('story Error!!!: ', err);
 
     if (err instanceof Error) {
       return {

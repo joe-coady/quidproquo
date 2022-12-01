@@ -18,39 +18,33 @@ const getProcessExecuteStory = <T extends Array<any>>(appName: string) => {
     payload: SystemExecuteStoryActionPayload<T>,
     session: StorySession,
   ): Promise<any> => {
-    // const module = require(payload.src);
-    // const story = module[payload.runtime];
+    const module = require(payload.src);
+    const story = module[payload.runtime];
 
-    // const logger = async (result: any) => {
-    //   // return await addResult(service, getDateNow(), payload.params[0][0].path, 'user-route', payload.src, payload.runtime, result);
-    // };
+    const logger = async (result: any) => {
+      // return await addResult(service, getDateNow(), payload.params[0][0].path, 'user-route', payload.src, payload.runtime, result);
+    };
 
-    // const actionProcessors = {
-    //   ...coreActionProcessor,
-    //   ...webserverActionProcessor,
-    // };
+    const actionProcessors = {
+      ...coreActionProcessor,
+      ...webserverActionProcessor,
+    };
 
-    // const result = await resolveStory(
-    //   story,
-    //   payload.params,
-    //   session,
-    //   actionProcessors,
-    //   getDateNow,
-    //   logger,
-    //   randomGuid,
-    // );
+    const result = await resolveStory(
+      story,
+      payload.params,
+      session,
+      actionProcessors,
+      getDateNow,
+      logger,
+      randomGuid,
+    );
 
-    // return {
-    //   result: result.result,
-    //   session: result.session,
-    // };
-
-    // statusCode: payload.response.result.statusCode,
-    // body: payload.response.result.body,
+    console.log('result from getProcessExecuteStory');
 
     return {
-      result: { statusCode: 200, body: { omg: 'wtf bbq' } },
-      session: {},
+      result: result.result,
+      session: result.session,
     };
   };
 };

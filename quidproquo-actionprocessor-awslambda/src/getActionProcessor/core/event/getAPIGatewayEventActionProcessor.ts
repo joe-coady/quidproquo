@@ -7,6 +7,7 @@ import {
   EventMatchStoryActionPayload,
   EventAutoRespondActionPayload,
   StorySession,
+  MatchStoryResult,
 } from 'quidproquo-core';
 
 import {
@@ -42,16 +43,18 @@ const getProcessTransformEventParams = (appName: string) => {
 };
 
 const getProcessTransformResponseResult = (domainName: string) => {
-  return async (payload: EventTransformResponseResultActionPayload, session: StorySession) => ({
-    statusCode: payload.response.result.statusCode,
-    body: payload.response.result.body,
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Headers': '*',
-      'Access-Control-Allow-Methods': '*',
-      'Access-Control-Allow-Origin': `https://${domainName}`,
-    },
-  });
+  return async (payload: EventTransformResponseResultActionPayload, session: StorySession) => {
+    return {
+      statusCode: payload.response.result.statusCode,
+      body: payload.response.result.body,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Headers': '*',
+        'Access-Control-Allow-Methods': '*',
+        'Access-Control-Allow-Origin': `https://${domainName}`,
+      },
+    };
+  };
 };
 
 const getProcessAutoRespond = (domainName: string) => {
@@ -80,7 +83,7 @@ const getProcessMatchStory =
   async (
     payload: EventMatchStoryActionPayload<HTTPEventParams<any>>,
     session: StorySession,
-  ): Promise<RouteQPQWebServerConfigSetting | undefined> => {
+  ): Promise<MatchStoryResult> => {
     // Sort the routes by string length
     // Note: We may need to filter variable routes out {} as the variables are length independent
     const sortedRoutes = routes
@@ -92,7 +95,17 @@ const getProcessMatchStory =
       });
 
     // Find the most relevant match
-    return sortedRoutes.find((r) => matchUrl(r.path, payload.transformedEventParams.path).didMatch);
+    const route = sortedRoutes.find(
+      (r) => matchUrl(r.path, payload.transformedEventParams.path).didMatch,
+    );
+
+    if (!route) {
+      return {
+        errorResourceNotFound: `route: ${payload.transformedEventParams.path}`,
+      };
+    }
+
+    return route;
   };
 
 export default (config: QPQConfig) => {

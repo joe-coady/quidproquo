@@ -18,6 +18,12 @@ export interface EventTransformResponseResultAction extends Action {
   payload: EventTransformResponseResultActionPayload;
 }
 
+export type MatchStoryResult = {
+  src?: string;
+  runtime?: string;
+  errorResourceNotFound?: string;
+};
+
 export interface EventMatchStoryActionPayload<T> {
   transformedEventParams: T;
 }
