@@ -1,3 +1,4 @@
-export * from './GuidActionRequester';
-export * from './GuidActionTypeEnum';
-export * from './GuidActionRequesterTypes';
+export * from './GuidActionType';
+
+export * from './GuidNewActionRequester';
+export * from './GuidNewActionRequesterTypes';
