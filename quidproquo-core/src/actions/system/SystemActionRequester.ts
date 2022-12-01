@@ -6,7 +6,7 @@ import { SystemBatchAction, SystemExecuteStoryAction } from './SystemActionTypes
 import { Action } from '../../types/Action';
 
 // TODO: fix typing
-export function* askBatch(actions: Action[]): Generator<SystemBatchAction, any[], any[]> {
+export function* askBatch(actions: Action<any>[]): Generator<SystemBatchAction, any[], any[]> {
   return yield { type: SystemActionTypeEnum.Batch, payload: { actions } };
 }
 

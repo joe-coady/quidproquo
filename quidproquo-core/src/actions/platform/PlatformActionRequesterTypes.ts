@@ -5,7 +5,6 @@ export interface PlatformDelayActionPayload {
   timeMs: number;
 }
 
-export interface PlatformDelayAction extends Action {
+export interface PlatformDelayAction extends Action<PlatformDelayActionPayload> {
   type: PlatformActionTypeEnum.Delay;
-  payload: PlatformDelayActionPayload;
 }

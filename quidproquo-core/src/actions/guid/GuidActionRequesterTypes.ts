@@ -3,7 +3,6 @@ import { Action } from '../../types/Action';
 
 export interface GuidNewActionPayload {}
 
-export interface GuidNewAction extends Action {
+export interface GuidNewAction extends Action<GuidNewActionPayload> {
   type: GuidActionTypeEnum.New;
-  payload?: GuidNewActionPayload;
 }

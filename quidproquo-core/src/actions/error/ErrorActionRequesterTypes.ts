@@ -8,7 +8,6 @@ export interface ErrorThrowErrorActionPayload {
   errorStack: string;
 }
 
-export interface ErrorThrowErrorAction extends Action {
+export interface ErrorThrowErrorAction extends Action<ErrorThrowErrorActionPayload> {
   type: ErrorActionTypeEnum.ThrowError;
-  payload?: ErrorThrowErrorActionPayload;
 }

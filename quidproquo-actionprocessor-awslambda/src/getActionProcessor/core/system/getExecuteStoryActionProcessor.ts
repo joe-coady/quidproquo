@@ -4,7 +4,7 @@ import {
   qpqCoreUtils,
   SystemExecuteStoryActionPayload,
   StorySession,
-  resolveStory,
+  createRuntime,
 } from 'quidproquo-core';
 
 import { coreActionProcessor, webserverActionProcessor } from 'quidproquo-actionprocessor-node';
@@ -21,6 +21,10 @@ const getProcessExecuteStory = <T extends Array<any>>(appName: string) => {
     const module = require(payload.src);
     const story = module[payload.runtime];
 
+    if (!story) {
+      throw new Error(`Unable to process ${payload.src}::${payload.runtime}`);
+    }
+
     const logger = async (result: any) => {
       // return await addResult(service, getDateNow(), payload.params[0][0].path, 'user-route', payload.src, payload.runtime, result);
     };
@@ -30,21 +34,18 @@ const getProcessExecuteStory = <T extends Array<any>>(appName: string) => {
       ...webserverActionProcessor,
     };
 
-    const result = await resolveStory(
-      story,
-      payload.params,
-      session,
-      actionProcessors,
-      getDateNow,
-      logger,
-      randomGuid,
-    );
+    const resolveStory = createRuntime(session, actionProcessors, getDateNow, logger, randomGuid);
+    const storyResult = await resolveStory(story, payload.params);
 
-    console.log('result from getProcessExecuteStory');
+    if (storyResult.error) {
+      throw new Error(
+        `story error! ${storyResult.error.errorType} in ${payload.src}::${payload.runtime}`,
+      );
+    }
 
     return {
-      result: result.result,
-      session: result.session,
+      result: storyResult.result,
+      session: storyResult.session,
     };
   };
 };

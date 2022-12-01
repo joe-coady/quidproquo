@@ -2,12 +2,11 @@ import SystemActionTypeEnum from './SystemActionTypeEnum';
 import { Action } from '../../types/Action';
 
 export interface SystemBatchActionPayload {
-  actions: Action[];
+  actions: Action<any>[];
 }
 
-export interface SystemBatchAction extends Action {
+export interface SystemBatchAction extends Action<SystemBatchActionPayload> {
   type: SystemActionTypeEnum.Batch;
-  payload: SystemBatchActionPayload;
 }
 
 export interface SystemExecuteStoryActionPayload<T extends Array<any>> {
@@ -17,7 +16,7 @@ export interface SystemExecuteStoryActionPayload<T extends Array<any>> {
   params: T;
 }
 
-export interface SystemExecuteStoryAction<T extends Array<any>> extends Action {
+export interface SystemExecuteStoryAction<T extends Array<any>>
+  extends Action<SystemExecuteStoryActionPayload<T>> {
   type: SystemActionTypeEnum.ExecuteStory;
-  payload: SystemExecuteStoryActionPayload<T>;
 }

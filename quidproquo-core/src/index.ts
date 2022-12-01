@@ -8,6 +8,6 @@ export * as qpqCoreUtils from './qpqCoreUtils';
 
 export * from './stories';
 
-export { resolveStory } from './actionProcessor';
+export { createRuntime } from './qpqRuntime';
 
 export * from './types/StorySession';
