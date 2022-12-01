@@ -1,5 +1,5 @@
 import {
-  EventActionTypeEnum,
+  EventActionType,
   QPQConfig,
   qpqCoreUtils,
   EventTransformEventParamsActionPayload,
@@ -122,9 +122,9 @@ export default (config: QPQConfig) => {
   const domainName = qpqWebServerUtils.getDomainName(config);
 
   return {
-    [EventActionTypeEnum.TransformEventParams]: getProcessTransformEventParams(appName),
-    [EventActionTypeEnum.TransformResponseResult]: getProcessTransformResponseResult(domainName),
-    [EventActionTypeEnum.AutoRespond]: getProcessAutoRespond(domainName),
-    [EventActionTypeEnum.MatchStory]: getProcessMatchStory(routes),
+    [EventActionType.TransformEventParams]: getProcessTransformEventParams(appName),
+    [EventActionType.TransformResponseResult]: getProcessTransformResponseResult(domainName),
+    [EventActionType.AutoRespond]: getProcessAutoRespond(domainName),
+    [EventActionType.MatchStory]: getProcessMatchStory(routes),
   };
 };

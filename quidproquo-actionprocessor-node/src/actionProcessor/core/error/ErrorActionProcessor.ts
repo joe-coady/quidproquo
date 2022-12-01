@@ -1,7 +1,15 @@
-import { ErrorActionTypeEnum, ErrorThrowErrorActionPayload, StorySession } from 'quidproquo-core';
+import {
+  ErrorActionTypeEnum,
+  ErrorThrowErrorActionProcessor,
+  actionResultError,
+} from 'quidproquo-core';
 
-const processThrowError = async (payload: ErrorThrowErrorActionPayload, session: StorySession) => {
-  throw new Error(`${payload.errorType}: ${payload.errorText || 'unknown error'}`);
+const processThrowError: ErrorThrowErrorActionProcessor = async ({
+  errorStack,
+  errorText,
+  errorType,
+}) => {
+  return actionResultError(errorType, errorText, errorStack);
 };
 
 export default {

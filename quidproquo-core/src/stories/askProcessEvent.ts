@@ -5,7 +5,7 @@ import {
   askEventAutoRespond,
   askEventTransformResponseResult,
   askEventMatchStory,
-} from '../actions/event/EventActionRequester';
+} from '../actions/event';
 
 import { askExecuteStory } from '../actions/system/SystemActionRequester';
 

@@ -10,4 +10,8 @@ export * from './stories';
 
 export { createRuntime } from './qpqRuntime';
 
+export * from './types/Action';
 export * from './types/StorySession';
+export * from './types/ErrorTypeEnum';
+
+export * from './logic/actionLogic';

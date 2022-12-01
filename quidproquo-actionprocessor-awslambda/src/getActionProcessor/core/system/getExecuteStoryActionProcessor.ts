@@ -30,8 +30,8 @@ const getProcessExecuteStory = <T extends Array<any>>(appName: string) => {
     };
 
     const actionProcessors = {
-      ...coreActionProcessor,
-      ...webserverActionProcessor,
+      // ...coreActionProcessor,
+      // ...webserverActionProcessor,
     };
 
     const resolveStory = createRuntime(session, actionProcessors, getDateNow, logger, randomGuid);

@@ -12,7 +12,19 @@ export interface Action<T> {
 export type ActionProcessorResult<T> = [T?, QPQError?];
 
 // A function type ~ Processes an action and returns an ActionProcessorResult
-export type ActionProcessor<TPayload, TReturn> = (
-  payload: TPayload,
-  session: StorySession,
-) => Promise<ActionProcessorResult<TReturn>>;
+export type ActionProcessor<
+  TAction extends Action<any>,
+  TReturn = undefined,
+  TActionPayload = TAction['payload'],
+> = (payload: TActionPayload, session: StorySession) => Promise<ActionProcessorResult<TReturn>>;
+
+// Generator<
+//  Thing you are giving to QPQ,
+//  Thing the function returns to the regular logic,
+//  the thing QPQ gives us
+// >
+export type ActionRequester<
+  TAction extends Action<any>,
+  TReturn = undefined,
+  TQPQReturn = TReturn,
+> = Generator<TAction, TReturn, TQPQReturn>;

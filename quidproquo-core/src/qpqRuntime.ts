@@ -1,6 +1,6 @@
-import { Action } from './types/Action';
+import { Action, ActionProcessor } from './types/Action';
 import { ErrorTypeEnum } from './types/ErrorTypeEnum';
-import { StoryResult, ActionProcessor, StorySession, ActionHistory } from './types/StorySession';
+import { StoryResult, StorySession, ActionHistory } from './types/StorySession';
 import SystemActionTypeEnum from './actions/system/SystemActionTypeEnum';
 
 async function processAction(action: Action<any>, actionProcessors: any, session: any) {
@@ -23,7 +23,7 @@ async function processAction(action: Action<any>, actionProcessors: any, session
 
 export const createRuntime = (
   session: StorySession,
-  actionProcessors: { [key: string]: ActionProcessor },
+  actionProcessors: { [key: string]: ActionProcessor<any> },
   getTimeNow: () => string,
   logger: (res: StoryResult<any>) => void,
   newGuid: () => string,
