@@ -63,11 +63,8 @@ export const createRuntime = (
         action = reader.next(actionResult);
       }
     } catch (err) {
-      console.log('story Error!!!: ', err);
-
       // Dev Only ~ Todo
       if (err instanceof Error) {
-        console.log('Instance of here!');
         return {
           ...response,
           finishedAt: getTimeNow(),
@@ -79,7 +76,6 @@ export const createRuntime = (
       }
 
       // Prod
-      console.log('returning erroeroeroreo');
       return {
         ...response,
         finishedAt: getTimeNow(),
