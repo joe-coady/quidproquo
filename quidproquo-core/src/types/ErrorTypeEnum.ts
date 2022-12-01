@@ -29,3 +29,9 @@ export enum ErrorTypeEnum {
   // Resource or action not yet implemented
   NotImplemented = 'NotImplemented',
 }
+
+export interface QPQError {
+  errorType: ErrorTypeEnum;
+  errorText: string;
+  errorStack?: string;
+}

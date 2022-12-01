@@ -42,5 +42,3 @@ export interface StoryResult<TArgs extends Array<any>, TResult = any> {
   result?: TResult;
   error?: StoryError;
 }
-
-export type ActionProcessor = (payload: any, session: StorySession) => Promise<any>;
