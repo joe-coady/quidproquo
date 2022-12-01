@@ -22,6 +22,7 @@ export type MatchStoryResult = {
   src?: string;
   runtime?: string;
   errorResourceNotFound?: string;
+  options?: { [key: string]: string };
 };
 
 export interface EventMatchStoryActionPayload<T> {

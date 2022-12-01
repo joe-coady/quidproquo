@@ -22,7 +22,11 @@ export function* askProcessEvent(...eventArguments: any) {
   }
 
   // Try and match a story to execute
-  const { src, runtime, errorResourceNotFound } = yield* askEventMatchStory(transformedEventParams);
+  const { src, runtime, errorResourceNotFound, options } = yield* askEventMatchStory(
+    transformedEventParams,
+  );
+
+  // If we cant find the story to execute ~ Throw a not found error!
   if (errorResourceNotFound) {
     yield* askThrowError(
       ErrorTypeEnum.NotFound,
@@ -32,7 +36,7 @@ export function* askProcessEvent(...eventArguments: any) {
   }
 
   // Execute the story
-  const result = yield* askExecuteStory('route', src!, runtime!, [transformedEventParams]);
+  const result = yield* askExecuteStory('route', src!, runtime!, [transformedEventParams, options]);
 
   // return the result of the story back to the event caller
   return yield* askEventTransformResponseResult(result);

@@ -95,17 +95,25 @@ const getProcessMatchStory =
       });
 
     // Find the most relevant match
-    const route = sortedRoutes.find(
-      (r) => matchUrl(r.path, payload.transformedEventParams.path).didMatch,
-    );
 
-    if (!route) {
+    const matchedRoute = sortedRoutes
+      .map((r) => ({
+        match: matchUrl(r.path, payload.transformedEventParams.path),
+        route: r,
+      }))
+      .find((m) => m.match.didMatch);
+
+    if (!matchedRoute) {
       return {
         errorResourceNotFound: `route: ${payload.transformedEventParams.path}`,
       };
     }
 
-    return route;
+    return {
+      src: matchedRoute.route.src,
+      runtime: matchedRoute.route.runtime,
+      options: matchedRoute.match.params || {},
+    };
   };
 
 export default (config: QPQConfig) => {
