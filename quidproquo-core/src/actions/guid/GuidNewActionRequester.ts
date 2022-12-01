@@ -1,4 +1,4 @@
-import GuidActionType from './GuidActionType';
+import { GuidActionType } from './GuidActionType';
 import { GuidNewActionRequester } from './GuidNewActionRequesterTypes';
 
 export function* askNewGuid(): GuidNewActionRequester {

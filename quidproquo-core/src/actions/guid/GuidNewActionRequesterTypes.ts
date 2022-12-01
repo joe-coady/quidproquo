@@ -1,4 +1,4 @@
-import GuidActionType from './GuidActionType';
+import { GuidActionType } from './GuidActionType';
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
 
 // Payload

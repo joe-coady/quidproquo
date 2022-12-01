@@ -1,4 +1,4 @@
-import MathActionType from './MathActionType';
+import { MathActionType } from './MathActionType';
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
 
 // Payload
