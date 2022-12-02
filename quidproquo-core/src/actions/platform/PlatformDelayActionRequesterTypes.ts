@@ -9,6 +9,7 @@ export interface PlatformDelayActionPayload {
 // Action
 export interface PlatformDelayAction extends Action<PlatformDelayActionPayload> {
   type: PlatformActionType.Delay;
+  payload: PlatformDelayActionPayload;
 }
 
 // Functions

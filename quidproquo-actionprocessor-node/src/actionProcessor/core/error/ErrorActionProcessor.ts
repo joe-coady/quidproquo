@@ -4,7 +4,7 @@ import {
   actionResultError,
 } from 'quidproquo-core';
 
-const processThrowError: ErrorThrowErrorActionProcessor = async ({
+const processErrorThrowError: ErrorThrowErrorActionProcessor = async ({
   errorStack,
   errorText,
   errorType,
@@ -13,5 +13,5 @@ const processThrowError: ErrorThrowErrorActionProcessor = async ({
 };
 
 export default {
-  [ErrorActionType.ThrowError]: processThrowError,
+  [ErrorActionType.ThrowError]: processErrorThrowError,
 };

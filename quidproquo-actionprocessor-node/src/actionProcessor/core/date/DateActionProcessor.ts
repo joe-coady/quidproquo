@@ -1,9 +1,9 @@
-import { DateActionType } from 'quidproquo-core';
+import { DateNowActionProcessor, actionResult, DateActionType } from 'quidproquo-core';
 
-const processNow = async (payload: any, session: any) => {
-  return new Date().toISOString();
+const processDateNow: DateNowActionProcessor = async () => {
+  return actionResult(new Date().toISOString());
 };
 
 export default {
-  [DateActionType.Now]: processNow,
+  [DateActionType.Now]: processDateNow,
 };

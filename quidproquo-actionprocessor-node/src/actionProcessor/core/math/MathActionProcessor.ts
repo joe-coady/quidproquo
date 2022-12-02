@@ -1,9 +1,9 @@
-import { MathActionType } from 'quidproquo-core';
+import { MathActionType, MathRandomNumberActionProcessor, actionResult } from 'quidproquo-core';
 
-const processRandomNumber = async (payload: any, session: any) => {
-  return Math.random();
+const processMathRandomNumber: MathRandomNumberActionProcessor = async () => {
+  return actionResult(Math.random());
 };
 
 export default {
-  [MathActionType.RandomNumber]: processRandomNumber,
+  [MathActionType.RandomNumber]: processMathRandomNumber,
 };

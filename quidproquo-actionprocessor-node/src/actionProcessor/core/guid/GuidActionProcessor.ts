@@ -1,11 +1,11 @@
 import { v4 as uuidV4 } from 'uuid';
 
-import { GuidActionType } from 'quidproquo-core';
+import { GuidActionType, GuidNewActionProcessor, actionResult } from 'quidproquo-core';
 
-const processNew = async (payload: any, session: any) => {
-  return uuidV4();
+const processGuidNew: GuidNewActionProcessor = async () => {
+  return actionResult(uuidV4());
 };
 
 export default {
-  [GuidActionType.New]: processNew,
+  [GuidActionType.New]: processGuidNew,
 };

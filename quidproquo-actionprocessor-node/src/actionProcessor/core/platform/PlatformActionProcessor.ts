@@ -1,9 +1,9 @@
-import { PlatformActionType } from 'quidproquo-core';
+import { PlatformActionType, PlatformDelayActionProcessor, actionResult } from 'quidproquo-core';
 
-const processDelay = async (payload: any, session: any) => {
-  return new Promise((resolve) => setTimeout(() => resolve(undefined), payload.timeMs as number));
+const processPlatformDelay: PlatformDelayActionProcessor = async ({ timeMs }) => {
+  return new Promise((resolve) => setTimeout(() => resolve(actionResult(undefined)), timeMs));
 };
 
 export default {
-  [PlatformActionType.Delay]: processDelay,
+  [PlatformActionType.Delay]: processPlatformDelay,
 };
