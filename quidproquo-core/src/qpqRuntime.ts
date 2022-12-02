@@ -1,11 +1,11 @@
 import { Action, ActionProcessor } from './types/Action';
 import { ErrorTypeEnum } from './types/ErrorTypeEnum';
 import { StoryResult, StorySession, ActionHistory } from './types/StorySession';
-import SystemActionTypeEnum from './actions/system/SystemActionTypeEnum';
+import { SystemActionType } from './actions/system/SystemActionType';
 
 async function processAction(action: Action<any>, actionProcessors: any, session: any) {
   // Special action ~ batch - needs access to the processAction / actionProcessor context
-  if (action.type === SystemActionTypeEnum.Batch) {
+  if (action.type === SystemActionType.Batch) {
     return await Promise.all(
       action.payload.actions.map((a: any) => {
         return a ? processAction(a, actionProcessors, session) : null;

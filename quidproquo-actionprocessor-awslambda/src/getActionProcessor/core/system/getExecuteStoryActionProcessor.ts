@@ -1,5 +1,5 @@
 import {
-  SystemActionTypeEnum,
+  SystemActionType,
   QPQConfig,
   qpqCoreUtils,
   SystemExecuteStoryActionPayload,
@@ -54,6 +54,6 @@ export default (config: QPQConfig) => {
   const appName = qpqCoreUtils.getAppName(config);
 
   return {
-    [SystemActionTypeEnum.ExecuteStory]: getProcessExecuteStory(appName),
+    [SystemActionType.ExecuteStory]: getProcessExecuteStory(appName),
   };
 };

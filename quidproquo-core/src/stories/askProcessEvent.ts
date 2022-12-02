@@ -7,7 +7,7 @@ import {
   askEventMatchStory,
 } from '../actions/event';
 
-import { askExecuteStory } from '../actions/system/SystemActionRequester';
+import { askExecuteStory } from '../actions/system';
 
 export function* askProcessEvent(...eventArguments: any) {
   // Transform event params

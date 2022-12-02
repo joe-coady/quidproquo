@@ -1,36 +1,13 @@
 // NOTE: System actions have no platform specific processors and/or requestors
 // and therefore do not need to implement a SystemActionProcessor.ts
 
-import SystemActionTypeEnum from './SystemActionTypeEnum';
-import { SystemBatchAction, SystemExecuteStoryAction } from './SystemActionTypes';
-import { Action } from '../../types/Action';
-
-// TODO: fix typing
-export function* askBatch(actions: Action<any>[]): Generator<SystemBatchAction, any[], any[]> {
-  return yield { type: SystemActionTypeEnum.Batch, payload: { actions } };
-}
-
-export function* askExecuteStory<T extends Array<any>>(
-  type: string,
-  src: string,
-  runtime: string,
-  params: T,
-): Generator<SystemExecuteStoryAction<T>, any, any> {
-  return yield {
-    type: SystemActionTypeEnum.ExecuteStory,
-    payload: {
-      type,
-      src,
-      runtime,
-      params,
-    },
-  };
-}
+import { askBatch } from './SystemBatchActionRequester';
+import { SystemRunParallelActionRequester } from './SystemRunParallelActionTypes';
 
 // TODO: Make this faster?
 // TODO: Type support
 // Runs n number of stories in parallel
-export function* askParallel(stories: Array<any>): Generator<any, any, any> {
+export function* askParallel(stories: Array<any>): SystemRunParallelActionRequester {
   const itt = stories.map((s: any) => s[0](...s.slice(1)));
   let actions = itt.map((i: any) => i.next());
   let values: Array<any> = actions.map((a) => a.value);
