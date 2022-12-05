@@ -1,7 +1,12 @@
-import { Action, ActionProcessor } from './types/Action';
+import { Action, ActionProcessor, ActionProcessorResult } from './types/Action';
 import { ErrorTypeEnum } from './types/ErrorTypeEnum';
 import { StoryResult, StorySession, ActionHistory } from './types/StorySession';
 import { SystemActionType } from './actions/system/SystemActionType';
+import {
+  resolveActionResult,
+  resolveActionResultError,
+  isErroredActionResult,
+} from './logic/actionLogic';
 
 async function processAction(action: Action<any>, actionProcessors: any, session: any) {
   // Special action ~ batch - needs access to the processAction / actionProcessor context
@@ -52,7 +57,14 @@ export const createRuntime = (
       while (!action.done) {
         const executionTime = getTimeNow();
         console.log(action.value);
-        const actionResult: any = await processAction(action.value, actionProcessors, session);
+        const actionResult: ActionProcessorResult<any> = await processAction(
+          action.value,
+          actionProcessors,
+          session,
+        );
+
+        console.log(actionResult);
+
         response.history.push({
           act: action.value,
           res: actionResult,
@@ -60,7 +72,15 @@ export const createRuntime = (
           finishedAt: getTimeNow(),
         });
 
-        action = reader.next(actionResult);
+        if (isErroredActionResult(actionResult)) {
+          return {
+            ...response,
+            finishedAt: getTimeNow(),
+            error: resolveActionResultError(actionResult),
+          };
+        }
+
+        action = reader.next(resolveActionResult(actionResult));
       }
     } catch (err) {
       // Dev Only ~ Todo

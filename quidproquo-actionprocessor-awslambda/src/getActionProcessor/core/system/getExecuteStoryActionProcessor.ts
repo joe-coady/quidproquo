@@ -7,7 +7,9 @@ import {
   createRuntime,
   SystemExecuteStoryActionProcessor,
   actionResultError,
+  ErrorTypeEnum,
   actionResult,
+  ErrorActionType,
 } from 'quidproquo-core';
 
 import { coreActionProcessor, webserverActionProcessor } from 'quidproquo-actionprocessor-node';
@@ -16,18 +18,24 @@ import { randomGuid } from './../../../awsLambdaUtils';
 
 export const getDateNow = () => new Date().toISOString();
 
-const getProcessExecuteStory = <T extends Array<any>>(
-  appName: string,
-): SystemExecuteStoryActionProcessor<T> => {
+const getProcessExecuteStory = <T extends Array<any>>(): SystemExecuteStoryActionProcessor<T> => {
   return async (
     payload: SystemExecuteStoryActionPayload<T>,
     session: StorySession,
   ): Promise<any> => {
-    const module = require(payload.src);
-    const story = module[payload.runtime];
+    let module = null;
+    let story = null;
+
+    try {
+      module = require(payload.src);
+      story = module[payload.runtime];
+    } catch {}
 
     if (!story) {
-      throw new Error(`Unable to process ${payload.src}::${payload.runtime}`);
+      return actionResultError(
+        ErrorTypeEnum.NotFound,
+        `Module not found [${payload.src}::${payload.runtime}]`,
+      );
     }
 
     const logger = async (result: any) => {
@@ -57,9 +65,9 @@ const getProcessExecuteStory = <T extends Array<any>>(
 };
 
 export default (config: QPQConfig) => {
-  const appName = qpqCoreUtils.getAppName(config);
+  // const appName = qpqCoreUtils.getAppName(config);
 
   return {
-    [SystemActionType.ExecuteStory]: getProcessExecuteStory(appName),
+    [SystemActionType.ExecuteStory]: getProcessExecuteStory(),
   };
 };

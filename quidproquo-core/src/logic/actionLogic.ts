@@ -1,5 +1,6 @@
 import { ActionProcessorResult } from '../types/Action';
 import { ErrorTypeEnum } from '../types/ErrorTypeEnum';
+import { QPQError } from '../types/ErrorTypeEnum';
 
 export const actionResultError = (
   errorType: ErrorTypeEnum,
@@ -11,4 +12,16 @@ export const actionResultError = (
 
 export const actionResult = <T>(result: T): ActionProcessorResult<T> => {
   return [result];
+};
+
+export const isErroredActionResult = <T>(actionResult: ActionProcessorResult<T>): boolean => {
+  return !!actionResult[1];
+};
+
+export const resolveActionResult = <T>(actionResult: ActionProcessorResult<T>) => {
+  return actionResult[0];
+};
+
+export const resolveActionResultError = <T>(actionResult: ActionProcessorResult<T>): QPQError => {
+  return actionResult[1] as QPQError;
 };
