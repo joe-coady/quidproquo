@@ -16,24 +16,17 @@ export function* askProcessEvent(...eventArguments: any) {
   //  See if we want to exit early (validation / auth etc)
   const earlyExitResponse = yield* askEventAutoRespond(transformedEventParams);
 
+  console.log(earlyExitResponse);
+
   if (earlyExitResponse) {
     // Transform the early exit response if needed
     return yield* askEventTransformResponseResult(earlyExitResponse);
   }
 
-  // Try and match a story to execute
-  const { src, runtime, errorResourceNotFound, options } = yield* askEventMatchStory(
-    transformedEventParams,
-  );
+  console.log('Here');
 
-  // If we cant find the story to execute ~ Throw a not found error!
-  if (errorResourceNotFound) {
-    yield* askThrowError(
-      ErrorTypeEnum.NotFound,
-      errorResourceNotFound,
-      'the specified resource could not be found',
-    );
-  }
+  // Try and match a story to execute
+  const { src, runtime, options } = yield* askEventMatchStory(transformedEventParams);
 
   // Execute the story
   const result = yield* askExecuteStory('route', src!, runtime!, [transformedEventParams, options]);
