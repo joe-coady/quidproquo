@@ -5,6 +5,9 @@ import {
   SystemExecuteStoryActionPayload,
   StorySession,
   createRuntime,
+  SystemExecuteStoryActionProcessor,
+  actionResultError,
+  actionResult,
 } from 'quidproquo-core';
 
 import { coreActionProcessor, webserverActionProcessor } from 'quidproquo-actionprocessor-node';
@@ -13,7 +16,9 @@ import { randomGuid } from './../../../awsLambdaUtils';
 
 export const getDateNow = () => new Date().toISOString();
 
-const getProcessExecuteStory = <T extends Array<any>>(appName: string) => {
+const getProcessExecuteStory = <T extends Array<any>>(
+  appName: string,
+): SystemExecuteStoryActionProcessor<T> => {
   return async (
     payload: SystemExecuteStoryActionPayload<T>,
     session: StorySession,
@@ -30,23 +35,24 @@ const getProcessExecuteStory = <T extends Array<any>>(appName: string) => {
     };
 
     const actionProcessors = {
-      // ...coreActionProcessor,
-      // ...webserverActionProcessor,
+      ...coreActionProcessor,
+      ...webserverActionProcessor,
     };
 
     const resolveStory = createRuntime(session, actionProcessors, getDateNow, logger, randomGuid);
     const storyResult = await resolveStory(story, payload.params);
 
     if (storyResult.error) {
-      throw new Error(
-        `story error! ${storyResult.error.errorType} in ${payload.src}::${payload.runtime}`,
+      return actionResultError(
+        storyResult.error.errorType,
+        `story error! in ${payload.src}::${payload.runtime}`,
       );
     }
 
-    return {
+    return actionResult({
       result: storyResult.result,
       session: storyResult.session,
-    };
+    });
   };
 };
 

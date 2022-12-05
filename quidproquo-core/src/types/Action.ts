@@ -14,7 +14,7 @@ export type ActionProcessorResult<T> = [T?, QPQError?];
 // A function type ~ Processes an action and returns an ActionProcessorResult
 export type ActionProcessor<
   TAction extends Action<any>,
-  TReturn = undefined,
+  TReturn = any,
   TActionPayload = TAction['payload'],
 > = (payload: TActionPayload, session: StorySession) => Promise<ActionProcessorResult<TReturn>>;
 
