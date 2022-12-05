@@ -9,6 +9,7 @@ export interface EventAutoRespondActionPayload<T> {
 // action
 export interface EventAutoRespondAction<T> extends Action<EventAutoRespondActionPayload<T>> {
   type: EventActionType.AutoRespond;
+  payload: EventAutoRespondActionPayload<T>;
 }
 
 // Functions

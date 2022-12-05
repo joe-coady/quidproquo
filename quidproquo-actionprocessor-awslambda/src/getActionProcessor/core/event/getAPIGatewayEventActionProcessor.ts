@@ -2,12 +2,15 @@ import {
   EventActionType,
   QPQConfig,
   qpqCoreUtils,
-  EventTransformEventParamsActionPayload,
-  EventTransformResponseResultActionPayload,
-  EventMatchStoryActionPayload,
   EventAutoRespondActionPayload,
-  StorySession,
   MatchStoryResult,
+  EventMatchStoryActionProcessor,
+  EventTransformEventParamsActionProcessor,
+  EventTransformResponseResultActionProcessor,
+  EventAutoRespondActionProcessor,
+  actionResult,
+  actionResultError,
+  ErrorTypeEnum,
 } from 'quidproquo-core';
 
 import {
@@ -16,19 +19,16 @@ import {
   qpqWebServerUtils,
 } from 'quidproquo-webserver';
 
-import { APIGatewayEvent, Context } from 'aws-lambda';
+import { APIGatewayEvent, Context, APIGatewayProxyResult } from 'aws-lambda';
 
 import { matchUrl } from '../../../awsLambdaUtils';
 
-const getProcessTransformEventParams = (appName: string) => {
-  return async (
-    payload: EventTransformEventParamsActionPayload<[APIGatewayEvent, Context]>,
-    session: StorySession,
-  ): Promise<HTTPEventParams<any>> => {
-    const [apiGatewayEvent, context] = payload.eventParams;
-
+const getProcessTransformEventParams = (
+  appName: string,
+): EventTransformEventParamsActionProcessor<[APIGatewayEvent, Context], HTTPEventParams<any>> => {
+  return async ({ eventParams: [apiGatewayEvent, context] }) => {
     const path = (apiGatewayEvent.path || '').replace(new RegExp(`^(\/${appName})/`), '/');
-    return {
+    return actionResult({
       path,
       query: {
         ...(apiGatewayEvent.multiValueQueryStringParameters || {}),
@@ -38,32 +38,37 @@ const getProcessTransformEventParams = (appName: string) => {
       headers: apiGatewayEvent.headers,
       method: apiGatewayEvent.httpMethod as 'GET' | 'POST',
       correlation: context.awsRequestId,
-    };
+    });
   };
 };
 
-const getProcessTransformResponseResult = (domainName: string) => {
-  return async (payload: EventTransformResponseResultActionPayload, session: StorySession) => {
-    return {
-      statusCode: payload.response.result.statusCode,
-      body: payload.response.result.body,
+const getProcessTransformResponseResult = (
+  domainName: string,
+): EventTransformResponseResultActionProcessor<APIGatewayProxyResult> => {
+  // We might need to JSON.stringify the body.
+  return async ({ response }) => {
+    // Validate response
+    // if !valid actionResultError
+
+    return actionResult<APIGatewayProxyResult>({
+      statusCode: response.result.statusCode,
+      body: response.result.body,
       headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Headers': '*',
         'Access-Control-Allow-Methods': '*',
         'Access-Control-Allow-Origin': `https://${domainName}`,
       },
-    };
+    });
   };
 };
 
-const getProcessAutoRespond = (domainName: string) => {
-  return async (
-    payload: EventAutoRespondActionPayload<HTTPEventParams<any>>,
-    session: StorySession,
-  ) => {
+const getProcessAutoRespond = (
+  domainName: string,
+): EventAutoRespondActionProcessor<HTTPEventParams<any>> => {
+  return async (payload) => {
     if (payload.transformedEventParams.method === 'OPTIONS') {
-      return {
+      return actionResult({
         statusCode: 200,
         headers: {
           'Content-Type': 'application/json',
@@ -71,19 +76,17 @@ const getProcessAutoRespond = (domainName: string) => {
           'Access-Control-Allow-Methods': '*',
           'Access-Control-Allow-Origin': `https://${domainName}`,
         },
-      };
+      });
     }
 
-    return null;
+    return actionResult(null);
   };
 };
 
-const getProcessMatchStory =
-  (routes: RouteQPQWebServerConfigSetting[]) =>
-  async (
-    payload: EventMatchStoryActionPayload<HTTPEventParams<any>>,
-    session: StorySession,
-  ): Promise<MatchStoryResult> => {
+const getProcessMatchStory = (
+  routes: RouteQPQWebServerConfigSetting[],
+): EventMatchStoryActionProcessor<HTTPEventParams<any>> => {
+  return async (payload) => {
     // Sort the routes by string length
     // Note: We may need to filter variable routes out {} as the variables are length independent
     const sortedRoutes = routes
@@ -95,7 +98,6 @@ const getProcessMatchStory =
       });
 
     // Find the most relevant match
-
     const matchedRoute = sortedRoutes
       .map((r) => ({
         match: matchUrl(r.path, payload.transformedEventParams.path),
@@ -104,17 +106,16 @@ const getProcessMatchStory =
       .find((m) => m.match.didMatch);
 
     if (!matchedRoute) {
-      return {
-        errorResourceNotFound: `route: ${payload.transformedEventParams.path}`,
-      };
+      return actionResultError(ErrorTypeEnum.NotFound, 'route not found');
     }
 
-    return {
+    return actionResult<MatchStoryResult>({
       src: matchedRoute.route.src,
       runtime: matchedRoute.route.runtime,
       options: matchedRoute.match.params || {},
-    };
+    });
   };
+};
 
 export default (config: QPQConfig) => {
   const routes = qpqWebServerUtils.getAllRoutes(config);

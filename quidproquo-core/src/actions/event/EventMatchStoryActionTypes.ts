@@ -17,6 +17,7 @@ export interface EventMatchStoryActionPayload<T> {
 // Action
 export interface EventMatchStoryAction<T> extends Action<EventMatchStoryActionPayload<T>> {
   type: EventActionType.MatchStory;
+  payload: EventMatchStoryActionPayload<T>;
 }
 
 // Functions

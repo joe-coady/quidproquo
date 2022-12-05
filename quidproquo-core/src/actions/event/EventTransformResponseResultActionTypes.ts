@@ -10,6 +10,7 @@ export interface EventTransformResponseResultActionPayload {
 export interface EventTransformResponseResultAction
   extends Action<EventTransformResponseResultActionPayload> {
   type: EventActionType.TransformResponseResult;
+  payload: EventTransformResponseResultActionPayload;
 }
 
 // Functions
