@@ -56,14 +56,12 @@ export const createRuntime = (
 
       while (!action.done) {
         const executionTime = getTimeNow();
-        console.log(action.value);
+
         const actionResult: ActionProcessorResult<any> = await processAction(
           action.value,
           actionProcessors,
           session,
         );
-
-        console.log(actionResult);
 
         response.history.push({
           act: action.value,

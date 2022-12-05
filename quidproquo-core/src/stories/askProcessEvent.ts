@@ -16,14 +16,10 @@ export function* askProcessEvent(...eventArguments: any) {
   //  See if we want to exit early (validation / auth etc)
   const earlyExitResponse = yield* askEventAutoRespond(transformedEventParams);
 
-  console.log(earlyExitResponse);
-
   if (earlyExitResponse) {
     // Transform the early exit response if needed
     return yield* askEventTransformResponseResult(earlyExitResponse);
   }
-
-  console.log('Here');
 
   // Try and match a story to execute
   const { src, runtime, options } = yield* askEventMatchStory(transformedEventParams);
