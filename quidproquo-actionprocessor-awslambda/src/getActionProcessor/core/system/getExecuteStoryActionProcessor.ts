@@ -14,7 +14,7 @@ import {
 
 import { coreActionProcessor, webserverActionProcessor } from 'quidproquo-actionprocessor-node';
 
-import { randomGuid } from './../../../awsLambdaUtils';
+import { randomGuid, loadModule } from './../../../awsLambdaUtils';
 
 export const getDateNow = () => new Date().toISOString();
 
@@ -23,18 +23,16 @@ const getProcessExecuteStory = <T extends Array<any>>(): SystemExecuteStoryActio
     payload: SystemExecuteStoryActionPayload<T>,
     session: StorySession,
   ): Promise<any> => {
-    let module = null;
-    let story = null;
+    let module = await loadModule(payload.src);
+    if (module === null) {
+      return actionResultError(ErrorTypeEnum.NotFound, `Module not found [${payload.src}]`);
+    }
 
-    try {
-      module = require(payload.src);
-      story = module[payload.runtime];
-    } catch {}
-
+    const story = module[payload.runtime];
     if (!story) {
       return actionResultError(
         ErrorTypeEnum.NotFound,
-        `Module not found [${payload.src}::${payload.runtime}]`,
+        `[${payload.runtime}] not found in module [${payload.src}]`,
       );
     }
 

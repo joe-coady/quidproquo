@@ -4,7 +4,7 @@
     "moduleResolution": "node", // How imports are resolved
     "esModuleInterop": true, // module imports are ES6 complient
     "target": "ES6", // Modern browsers support all ES6 features
-    "lib": ["ES6", "dom"], // Type definitions for ES6 and browser features
+    "lib": ["es2021", "ES6", "dom"], // Type definitions for ES6 and browser features
     "allowSyntheticDefaultImports": true, // import React from "react"; vs import * as React from "react";
 
     "strict": true, // strict mode for better type checking

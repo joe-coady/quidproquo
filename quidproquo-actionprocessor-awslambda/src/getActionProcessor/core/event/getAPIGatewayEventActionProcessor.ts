@@ -2,7 +2,6 @@ import {
   EventActionType,
   QPQConfig,
   qpqCoreUtils,
-  EventAutoRespondActionPayload,
   MatchStoryResult,
   EventMatchStoryActionProcessor,
   EventTransformEventParamsActionProcessor,

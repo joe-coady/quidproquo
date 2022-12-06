@@ -2,6 +2,7 @@ import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
 import { RouteQPQWebServerConfigSetting } from './config/settings/route';
 import { DnsQPQWebServerConfigSetting } from './config/settings/dns';
+import { OpenApiQPQWebServerConfigSetting } from './config/settings/openApi';
 import { QPQWebServerConfigSettingType } from './config/QPQConfig';
 
 export const getAllRoutes = (configs: QPQConfig): RouteQPQWebServerConfigSetting[] => {
@@ -13,10 +14,22 @@ export const getAllRoutes = (configs: QPQConfig): RouteQPQWebServerConfigSetting
   return routes;
 };
 
+export const getAllOpenApiSpecs = (configs: QPQConfig): OpenApiQPQWebServerConfigSetting[] => {
+  const openApiSpecs = qpqCoreUtils.getConfigSettings<OpenApiQPQWebServerConfigSetting>(
+    configs,
+    QPQWebServerConfigSettingType.OpenApi,
+  );
+
+  return openApiSpecs;
+};
+
 // Used in bundlers to know where and what to build and index
 // Events, routes, etc
 export const getAllSrcEntries = (configs: QPQConfig): string[] => {
-  return getAllRoutes(configs).map((r) => r.src);
+  return [
+    ...getAllRoutes(configs).map((r) => r.src),
+    ...getAllOpenApiSpecs(configs).map((r) => r.openApiSpecPath),
+  ];
 };
 
 // Used in bundlers to know where and what to build and index
