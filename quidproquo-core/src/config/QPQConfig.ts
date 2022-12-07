@@ -1,5 +1,6 @@
 export enum QPQCoreConfigSettingType {
-  appName = "@quidproquo-core/config/AppName",
+  appName = '@quidproquo-core/config/AppName',
+  storageDrive = '@quidproquo-core/config/storageDrive',
 }
 
 export interface QPQConfigSetting {

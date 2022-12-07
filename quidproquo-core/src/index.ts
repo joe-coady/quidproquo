@@ -1,8 +1,6 @@
 export * from './actions';
 
-export { defineAppName, AppNameQPQConfigSetting } from './config/settings/appName';
-
-export { QPQCoreConfigSettingType, QPQConfigSetting, QPQConfig } from './config/QPQConfig';
+export * from './config';
 
 export * as qpqCoreUtils from './qpqCoreUtils';
 
