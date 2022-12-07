@@ -9,7 +9,9 @@ import { filePathDelimiter, FileInfo } from 'quidproquo-core';
 const s3Client = new S3Client({ region: 'ap-southeast-2' });
 
 export const listFiles = async (drive: string, folder: string = ''): Promise<FileInfo[]> => {
-  const validatedPrefix = `${folder}${folder.endsWith(filePathDelimiter) ? '' : filePathDelimiter}`;
+  const validatedPrefix = `${folder}${
+    folder.endsWith(filePathDelimiter) || !folder ? '' : filePathDelimiter
+  }`;
   const bucketParams: ListObjectsV2CommandInput = {
     Bucket: drive,
     Delimiter: filePathDelimiter,
