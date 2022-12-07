@@ -15,7 +15,7 @@ export const actionResult = <T>(result: T): ActionProcessorResult<T> => {
 };
 
 export const isErroredActionResult = <T>(actionResult: ActionProcessorResult<T>): boolean => {
-  return !!actionResult[1];
+  return !actionResult || !!actionResult[1];
 };
 
 export const resolveActionResult = <T>(actionResult: ActionProcessorResult<T>) => {
@@ -23,5 +23,12 @@ export const resolveActionResult = <T>(actionResult: ActionProcessorResult<T>) =
 };
 
 export const resolveActionResultError = <T>(actionResult: ActionProcessorResult<T>): QPQError => {
+  if (!actionResult) {
+    return {
+      errorText: 'no idea' + JSON.stringify(actionResult),
+      errorType: ErrorTypeEnum.GenericError,
+    };
+  }
+
   return actionResult[1] as QPQError;
 };

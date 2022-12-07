@@ -20,7 +20,9 @@ async function processAction(action: Action<any>, actionProcessors: any, session
 
   const processor = actionProcessors?.[action?.type];
   if (!processor) {
-    return;
+    throw new Error(
+      `Unable to process action: ${action?.type} from ${Object.keys(actionProcessors).join(', ')}`,
+    );
   }
 
   return await processor(action.payload, session);

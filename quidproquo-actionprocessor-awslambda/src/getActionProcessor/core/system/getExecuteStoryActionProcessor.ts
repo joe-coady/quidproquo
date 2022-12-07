@@ -14,6 +14,8 @@ import {
 
 import { coreActionProcessor, webserverActionProcessor } from 'quidproquo-actionprocessor-node';
 
+import actionProcessors from '../../../actionProcessors';
+
 import { randomGuid, loadModule } from './../../../awsLambdaUtils';
 
 export const getDateNow = () => new Date().toISOString();
@@ -40,18 +42,26 @@ const getProcessExecuteStory = <T extends Array<any>>(): SystemExecuteStoryActio
       // return await addResult(service, getDateNow(), payload.params[0][0].path, 'user-route', payload.src, payload.runtime, result);
     };
 
-    const actionProcessors = {
+    const allActionProcessors = {
       ...coreActionProcessor,
       ...webserverActionProcessor,
+      ...actionProcessors,
     };
 
-    const resolveStory = createRuntime(session, actionProcessors, getDateNow, logger, randomGuid);
+    const resolveStory = createRuntime(
+      session,
+      allActionProcessors,
+      getDateNow,
+      logger,
+      randomGuid,
+    );
     const storyResult = await resolveStory(story, payload.params);
 
     if (storyResult.error) {
       return actionResultError(
         storyResult.error.errorType,
-        `story error! in ${payload.src}::${payload.runtime}`,
+        `story error! in ${payload.src}::${payload.runtime} -> [${storyResult.error.errorText}]`,
+        storyResult.error.errorStack,
       );
     }
 

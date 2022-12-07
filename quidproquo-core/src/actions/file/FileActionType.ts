@@ -8,5 +8,6 @@ export const filePathDelimiter = `/`;
 export interface FileInfo {
   filepath: string;
   drive: string;
-  key?: string;
+  isDir: boolean;
+  hashMd5?: string;
 }
