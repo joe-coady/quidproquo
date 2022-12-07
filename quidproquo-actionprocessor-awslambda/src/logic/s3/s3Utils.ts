@@ -4,11 +4,17 @@ import {
   ListObjectsV2CommandInput,
   GetObjectCommand,
 } from '@aws-sdk/client-s3';
-import { filePathDelimiter, FileInfo } from 'quidproquo-core';
+import { filePathDelimiter } from 'quidproquo-core';
 
 const s3Client = new S3Client({ region: 'ap-southeast-2' });
 
-export const listFiles = async (drive: string, folder: string = ''): Promise<FileInfo[]> => {
+export interface S3FileInfo {
+  filepath: string;
+  isDir: boolean;
+  hashMd5?: string;
+}
+
+export const listFiles = async (drive: string, folder: string = ''): Promise<S3FileInfo[]> => {
   const validatedPrefix = `${folder}${
     folder.endsWith(filePathDelimiter) || !folder ? '' : filePathDelimiter
   }`;
@@ -20,7 +26,7 @@ export const listFiles = async (drive: string, folder: string = ''): Promise<Fil
 
   // Declare truncated as a flag that the while loop is based on.
   let truncated = true;
-  let files: FileInfo[] = [];
+  let files: S3FileInfo[] = [];
 
   while (truncated) {
     const response = await s3Client.send(new ListObjectsV2Command(bucketParams));
@@ -41,9 +47,8 @@ export const listFiles = async (drive: string, folder: string = ''): Promise<Fil
       ...(response.Contents || [])
         .filter((c) => !!c.Key && c.Key != folder)
         .map(
-          (item): FileInfo => ({
+          (item): S3FileInfo => ({
             filepath: item.Key!,
-            drive: drive,
             isDir: item.Key!.endsWith(filePathDelimiter),
             hashMd5: item.ETag,
           }),

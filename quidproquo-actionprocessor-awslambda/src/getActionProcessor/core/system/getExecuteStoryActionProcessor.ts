@@ -12,15 +12,18 @@ import {
   ErrorActionType,
 } from 'quidproquo-core';
 
-import { coreActionProcessor, webserverActionProcessor } from 'quidproquo-actionprocessor-node';
+import { QPQAWSLambdaConfig } from '../../../runtimeConfig/QPQAWSLambdaConfig';
+import getFileActionProcessors from '../file';
 
-import actionProcessors from '../../../actionProcessors';
+import { coreActionProcessor, webserverActionProcessor } from 'quidproquo-actionprocessor-node';
 
 import { randomGuid, loadModule } from './../../../awsLambdaUtils';
 
 export const getDateNow = () => new Date().toISOString();
 
-const getProcessExecuteStory = <T extends Array<any>>(): SystemExecuteStoryActionProcessor<T> => {
+const getProcessExecuteStory = <T extends Array<any>>(
+  runtimeConfig: QPQAWSLambdaConfig,
+): SystemExecuteStoryActionProcessor<T> => {
   return async (
     payload: SystemExecuteStoryActionPayload<T>,
     session: StorySession,
@@ -45,7 +48,7 @@ const getProcessExecuteStory = <T extends Array<any>>(): SystemExecuteStoryActio
     const allActionProcessors = {
       ...coreActionProcessor,
       ...webserverActionProcessor,
-      ...actionProcessors,
+      ...getFileActionProcessors(runtimeConfig),
     };
 
     const resolveStory = createRuntime(
@@ -72,10 +75,10 @@ const getProcessExecuteStory = <T extends Array<any>>(): SystemExecuteStoryActio
   };
 };
 
-export default (config: QPQConfig) => {
+export default (runtimeConfig: QPQAWSLambdaConfig) => {
   // const appName = qpqCoreUtils.getAppName(config);
 
   return {
-    [SystemActionType.ExecuteStory]: getProcessExecuteStory(),
+    [SystemActionType.ExecuteStory]: getProcessExecuteStory(runtimeConfig),
   };
 };
