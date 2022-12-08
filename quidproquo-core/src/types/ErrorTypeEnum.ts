@@ -28,6 +28,12 @@ export enum ErrorTypeEnum {
 
   // Resource or action not yet implemented
   NotImplemented = 'NotImplemented',
+
+  // No Content ~ a success but content couldn't legitimately be found
+  NoContent = 'NoContent',
+
+  // Bad data from client
+  BadRequest = 'BadRequest',
 }
 
 export interface QPQError {
