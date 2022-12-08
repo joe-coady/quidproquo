@@ -3,6 +3,7 @@ import {
   ListObjectsV2Command,
   ListObjectsV2CommandInput,
   GetObjectCommand,
+  PutObjectCommand,
 } from '@aws-sdk/client-s3';
 import { filePathDelimiter } from 'quidproquo-core';
 
@@ -73,4 +74,18 @@ export const readTextFile = async (bucketName: string, key: string): Promise<str
   );
 
   return (await response.Body?.transformToString()) || '';
+};
+
+export const writeTextFile = async (
+  bucketName: string,
+  key: string,
+  data: string,
+): Promise<void> => {
+  await s3Client.send(
+    new PutObjectCommand({
+      Key: key,
+      Bucket: bucketName,
+      Body: Buffer.from(data),
+    }),
+  );
 };
