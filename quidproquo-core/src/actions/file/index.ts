@@ -1,5 +1,8 @@
 export * from './FileActionType';
 
+export * from './FileExistsActionRequester';
+export * from './FileExistsActionTypes';
+
 export * from './FileListDirectoryActionRequester';
 export * from './FileListDirectoryActionTypes';
 

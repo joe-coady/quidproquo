@@ -11,6 +11,8 @@ export interface StoryError {
   errorStack?: string;
 }
 
+export type AskResponse<T> = Generator<any, T, any>;
+
 export interface ActionHistory<T = any> {
   act: Action<T>;
   res: any;
