@@ -1,5 +1,9 @@
 import { QPQConfig, QPQConfigSetting, QPQCoreConfigSettingType } from './config/QPQConfig';
-import { AppNameQPQConfigSetting, StorageDriveQPQConfigSetting } from './config/settings';
+import {
+  AppNameQPQConfigSetting,
+  StorageDriveQPQConfigSetting,
+  ScheduleQPQConfigSetting,
+} from './config/settings';
 
 export const getConfigSettings = <T extends QPQConfigSetting>(
   configs: QPQConfig,
@@ -36,4 +40,18 @@ export const getStorageDriveNames = (configs: QPQConfig): string[] => {
   ).map((sd) => sd.storageDrive);
 
   return storageDriveNames;
+};
+
+export const getScheduleEvents = (configs: QPQConfig): ScheduleQPQConfigSetting[] => {
+  const scheduleEvents = getConfigSettings<ScheduleQPQConfigSetting>(
+    configs,
+    QPQCoreConfigSettingType.schedule,
+  );
+
+  return scheduleEvents;
+};
+
+// Used in bundlers to know where and what to build and index
+export const getAllSrcEntries = (configs: QPQConfig): string[] => {
+  return [...getScheduleEvents(configs).map((r) => r.src)];
 };
