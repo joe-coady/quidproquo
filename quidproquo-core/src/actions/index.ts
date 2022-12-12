@@ -3,6 +3,7 @@ export * from './error';
 export * from './event';
 export * from './file';
 export * from './guid';
+export * from './log';
 export * from './math';
 export * from './platform';
 export * from './system';
