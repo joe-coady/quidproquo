@@ -3,6 +3,7 @@ export enum FileActionType {
   WriteTextContents = '@quidproquo-core/File/WriteTextContents',
   ListDirectory = '@quidproquo-core/File/ListDirectory',
   Exists = '@quidproquo-core/File/Exists',
+  Delete = '@quidproquo-core/File/Delete',
 }
 
 export const filePathDelimiter = `/`;
