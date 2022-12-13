@@ -6,15 +6,19 @@ import {
   resolveActionResult,
   resolveActionResultError,
   isErroredActionResult,
+  actionResult,
 } from './logic/actionLogic';
 
+// Make this type safe omg.
 async function processAction(action: Action<any>, actionProcessors: any, session: any) {
   // Special action ~ batch - needs access to the processAction / actionProcessor context
   if (action.type === SystemActionType.Batch) {
-    return await Promise.all(
-      action.payload.actions.map((a: any) => {
-        return a ? processAction(a, actionProcessors, session) : null;
-      }),
+    return actionResult(
+      await Promise.all(
+        action.payload.actions.map((a: any) => {
+          return a ? processAction(a, actionProcessors, session) : null;
+        }),
+      ),
     );
   }
 
