@@ -8,7 +8,17 @@ export interface S3FileInfo {
   hashMd5?: string;
 }
 
-export const listFiles = async (drive: string, folder: string = ''): Promise<S3FileInfo[]> => {
+export interface S3FileList {
+  fileInfos: S3FileInfo[];
+  pageToken?: string;
+}
+
+export const listFiles = async (
+  drive: string,
+  folder: string = '',
+  maxKeys: number = 1000,
+  pageToken?: string,
+): Promise<S3FileList> => {
   const validatedPrefix = `${folder}${
     folder.endsWith(filePathDelimiter) || !folder ? '' : filePathDelimiter
   }`;
@@ -16,44 +26,41 @@ export const listFiles = async (drive: string, folder: string = ''): Promise<S3F
     Bucket: drive,
     Delimiter: filePathDelimiter,
     Prefix: validatedPrefix,
+    ContinuationToken: pageToken,
+    MaxKeys: maxKeys,
   };
 
   // Declare truncated as a flag that the while loop is based on.
-  let truncated = true;
   let files: S3FileInfo[] = [];
 
-  while (truncated) {
-    const response = await s3Client.send(new ListObjectsV2Command(bucketParams));
+  const response = await s3Client.send(new ListObjectsV2Command(bucketParams));
 
-    if (response.CommonPrefixes && !bucketParams.ContinuationToken) {
-      files = [
-        ...files,
-        ...response.CommonPrefixes.filter((cp) => !!cp.Prefix).map((cp) => ({
-          filepath: cp.Prefix!,
-          drive: drive,
-          isDir: true,
-        })),
-      ];
-    }
-
+  if (response.CommonPrefixes && !bucketParams.ContinuationToken) {
     files = [
       ...files,
-      ...(response.Contents || [])
-        .filter((c) => !!c.Key && c.Key != folder)
-        .map(
-          (item): S3FileInfo => ({
-            filepath: item.Key!,
-            isDir: item.Key!.endsWith(filePathDelimiter),
-            hashMd5: item.ETag,
-          }),
-        ),
+      ...response.CommonPrefixes.filter((cp) => !!cp.Prefix).map((cp) => ({
+        filepath: cp.Prefix!,
+        drive: drive,
+        isDir: true,
+      })),
     ];
-
-    truncated = !!response.IsTruncated;
-    if (truncated) {
-      bucketParams.ContinuationToken = response.NextContinuationToken;
-    }
   }
 
-  return files;
+  files = [
+    ...files,
+    ...(response.Contents || [])
+      .filter((c) => !!c.Key && c.Key != folder)
+      .map(
+        (item): S3FileInfo => ({
+          filepath: item.Key!,
+          isDir: item.Key!.endsWith(filePathDelimiter),
+          hashMd5: item.ETag,
+        }),
+      ),
+  ];
+
+  return {
+    fileInfos: files,
+    pageToken: response.NextContinuationToken,
+  };
 };

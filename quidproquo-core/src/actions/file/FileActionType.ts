@@ -14,3 +14,8 @@ export interface FileInfo {
   isDir: boolean;
   hashMd5?: string;
 }
+
+export interface DirectoryList {
+  fileInfos: FileInfo[];
+  pageToken?: string;
+}

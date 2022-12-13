@@ -6,15 +6,20 @@ import { listFiles } from '../../../logic/s3/s3Utils';
 const getProcessFileListDirectory = (
   runtimeConfig: QPQAWSLambdaConfig,
 ): FileListDirectoryActionProcessor => {
-  return async ({ drive, folderPath }) => {
+  return async ({ drive, folderPath, maxFiles, pageToken }) => {
     const s3BucketName = resolveResourceName(drive, runtimeConfig);
-    const s3FileInfos = await listFiles(s3BucketName, folderPath);
-    const fileInfos = s3FileInfos.map((s3fi) => ({
+    const s3FileList = await listFiles(s3BucketName, folderPath, maxFiles, pageToken);
+
+    // Add the drive onto the list
+    const fileInfos = s3FileList.fileInfos.map((s3fi) => ({
       ...s3fi,
       drive: drive,
     }));
 
-    return actionResult(fileInfos);
+    return actionResult({
+      fileInfos,
+      pageToken: s3FileList.pageToken,
+    });
   };
 };
 

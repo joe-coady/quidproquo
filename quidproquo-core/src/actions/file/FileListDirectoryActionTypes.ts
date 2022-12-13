@@ -1,10 +1,12 @@
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
-import { FileActionType, FileInfo } from './FileActionType';
+import { FileActionType, DirectoryList } from './FileActionType';
 
 // Payload
 export interface FileListDirectoryActionPayload {
   drive: string;
   folderPath: string;
+  maxFiles: number;
+  pageToken?: string;
 }
 
 // Action
@@ -14,5 +16,11 @@ export interface FileListDirectoryAction extends Action<FileListDirectoryActionP
 }
 
 // Function Types
-export type FileListDirectoryActionProcessor = ActionProcessor<FileListDirectoryAction, FileInfo[]>;
-export type FileListDirectoryActionRequester = ActionRequester<FileListDirectoryAction, FileInfo[]>;
+export type FileListDirectoryActionProcessor = ActionProcessor<
+  FileListDirectoryAction,
+  DirectoryList
+>;
+export type FileListDirectoryActionRequester = ActionRequester<
+  FileListDirectoryAction,
+  DirectoryList
+>;
