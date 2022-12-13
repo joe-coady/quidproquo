@@ -1,3 +1,4 @@
+export * from './config';
 export * from './date';
 export * from './error';
 export * from './event';
