@@ -3,6 +3,7 @@ import {
   AppNameQPQConfigSetting,
   StorageDriveQPQConfigSetting,
   ScheduleQPQConfigSetting,
+  SecretQPQConfigSetting,
 } from './config/settings';
 
 export const getConfigSettings = <T extends QPQConfigSetting>(
@@ -54,4 +55,22 @@ export const getScheduleEvents = (configs: QPQConfig): ScheduleQPQConfigSetting[
 // Used in bundlers to know where and what to build and index
 export const getAllSrcEntries = (configs: QPQConfig): string[] => {
   return [...getScheduleEvents(configs).map((r) => r.src)];
+};
+
+export const getOwnedSecrets = (configs: QPQConfig): SecretQPQConfigSetting[] => {
+  const secrets = getConfigSettings<SecretQPQConfigSetting>(
+    configs,
+    QPQCoreConfigSettingType.secret,
+  );
+
+  return secrets.filter((s) => s.owned);
+};
+
+export const getSharedSecrets = (configs: QPQConfig): SecretQPQConfigSetting[] => {
+  const secrets = getConfigSettings<SecretQPQConfigSetting>(
+    configs,
+    QPQCoreConfigSettingType.secret,
+  );
+
+  return secrets.filter((s) => !s.owned);
 };

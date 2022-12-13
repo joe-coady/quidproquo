@@ -14,6 +14,7 @@ import {
 
 import { QPQAWSLambdaConfig } from '../../../runtimeConfig/QPQAWSLambdaConfig';
 import getFileActionProcessors from '../file';
+import getConfigActionProcessors from '../config';
 
 import { coreActionProcessor, webserverActionProcessor } from 'quidproquo-actionprocessor-node';
 
@@ -49,6 +50,7 @@ const getProcessExecuteStory = <T extends Array<any>>(
       ...coreActionProcessor,
       ...webserverActionProcessor,
       ...getFileActionProcessors(runtimeConfig),
+      ...getConfigActionProcessors(runtimeConfig),
     };
 
     const resolveStory = createRuntime(
