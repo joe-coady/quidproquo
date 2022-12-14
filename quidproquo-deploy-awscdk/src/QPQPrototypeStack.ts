@@ -1,3 +1,5 @@
+import * as path from 'path';
+
 import {
   Stack,
   StackProps,
@@ -20,11 +22,6 @@ import { QPQAWSLambdaConfig } from 'quidproquo-actionprocessor-awslambda';
 import { qpqCoreUtils, QPQConfig } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
-export interface LambdaEntry {
-  src: string;
-  runtime: string;
-}
-
 export interface QPQPrototypeStackProps extends StackProps {
   environment: string;
   serviceBuildPath: string;
@@ -32,9 +29,6 @@ export interface QPQPrototypeStackProps extends StackProps {
 
   account: string;
   region: string;
-
-  routeEntry: LambdaEntry;
-  eventEntry: LambdaEntry;
 }
 
 const createApiDomainName = (stack: cdk.Stack, id: string, qpqConfig: QPQConfig) => {
@@ -136,7 +130,8 @@ export class QPQPrototypeStack extends Stack {
 
     // This should be all resource names
     const runtimeConfigLambdaConfig: QPQAWSLambdaConfig = {
-      secrectNameMap: ownedSecrets.reduce(
+      qpqConfig: props.qpqConfig,
+      secretNameMap: ownedSecrets.reduce(
         (acc, os) => ({
           ...acc,
           [os.secretName]: os.realName,
@@ -157,8 +152,8 @@ export class QPQPrototypeStack extends Stack {
       `${settings.environment}-${settings.service}-lambda-rest`,
       {
         functionName: `lambda-rest-${settings.service}-${settings.environment}`,
-        entry: props.routeEntry.src,
-        handler: props.routeEntry.runtime,
+        entry: path.resolve(__dirname, 'lambdas', 'lambdaAPIGatewayEvent.js'),
+        handler: 'execute',
         timeout: cdk.Duration.seconds(25),
 
         runtime: aws_lambda.Runtime.NODEJS_16_X,
@@ -214,8 +209,8 @@ export class QPQPrototypeStack extends Stack {
         `${settings.environment}-${settings.service}-SE-${index}`,
         {
           functionName: `SE-${index}-${se.runtime}-${settings.environment}-${settings.service}`,
-          entry: props.eventEntry.src,
-          handler: props.eventEntry.runtime,
+          entry: path.resolve(__dirname, 'lambdas', 'lambdaEventBridgeEvent.js'),
+          handler: 'execute',
           timeout: cdk.Duration.minutes(15),
 
           runtime: aws_lambda.Runtime.NODEJS_16_X,

@@ -8,5 +8,5 @@ export const resolveResourceName = (
 };
 
 export const resolveSecretKey = (secretName: string, qpqAwsLambdaConfig: QPQAWSLambdaConfig) => {
-  return qpqAwsLambdaConfig.secrectNameMap[secretName] || secretName;
+  return qpqAwsLambdaConfig.secretNameMap[secretName] || secretName;
 };
