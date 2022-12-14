@@ -27,6 +27,7 @@ const getProcessTransformEventParams = (
 ): EventTransformEventParamsActionProcessor<[APIGatewayEvent, Context], HTTPEventParams<any>> => {
   return async ({ eventParams: [apiGatewayEvent, context] }) => {
     const path = (apiGatewayEvent.path || '').replace(new RegExp(`^(\/${appName})/`), '/');
+
     return actionResult({
       path,
       query: {
@@ -37,6 +38,7 @@ const getProcessTransformEventParams = (
       headers: apiGatewayEvent.headers,
       method: apiGatewayEvent.httpMethod as 'GET' | 'POST',
       correlation: context.awsRequestId,
+      sourceIp: apiGatewayEvent.requestContext.identity.sourceIp,
     });
   };
 };

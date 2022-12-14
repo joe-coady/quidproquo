@@ -25,6 +25,8 @@
     "quidproquo-tsconfig",
     "quidproquo-webserver",
     "quidproquo-actionprocessor-awslambda",
+    "quidproquo-deploy-webpack",
+    "quidproquo-deploy-awscdk",
     "quidproquo-actionprocessor-node"
   ]
 }

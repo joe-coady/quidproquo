@@ -6,4 +6,5 @@ export interface HTTPEventParams<T> {
   headers: { [key: string]: undefined | string };
   method: HTTPMethod;
   correlation: string;
+  sourceIp: string;
 }

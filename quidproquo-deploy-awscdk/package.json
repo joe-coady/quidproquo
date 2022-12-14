@@ -1,0 +1,45 @@
+{
+  "name": "quidproquo-deploy-awscdk",
+  "version": "0.0.18",
+  "description": "",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.js",
+  "files": [
+    "lib/**/*"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npx rimraf lib && tsc",
+    "watch": "tsc -w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joe-coady/quidproquo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/joe-coady/quidproquo/issues"
+  },
+  "homepage": "https://github.com/joe-coady/quidproquo#readme",
+  "dependencies": {
+    "aws-cdk-lib": "2.52.1",
+    "aws-cdk": "2.52.1",
+    "constructs": "^10.0.0",
+    "esbuild": "^0.15.16",
+    "quidproquo-actionprocessor-awslambda": "*",
+    "quidproquo-actionprocessor-node": "*",
+    "quidproquo-core": "*",
+    "quidproquo-webserver": "*"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.109",
+    "@types/babel__traverse": "7.18.2",
+    "@types/node": "^10.17.60",
+    "@types/prettier": "2.6.0",
+    "ts-node": "^10.9.1",
+    "quidproquo-tsconfig": "*",
+    "typescript": "^4.9.3"
+  }
+}
