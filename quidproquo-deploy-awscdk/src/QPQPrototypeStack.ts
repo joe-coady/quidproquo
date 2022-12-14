@@ -1,5 +1,3 @@
-import * as path from 'path';
-
 import {
   Stack,
   StackProps,
@@ -10,6 +8,9 @@ import {
   aws_events,
   aws_events_targets,
   aws_secretsmanager,
+  aws_route53,
+  aws_certificatemanager,
+  aws_route53_targets,
 } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
@@ -17,6 +18,7 @@ import { Construct } from 'constructs';
 import { QPQAWSLambdaConfig } from 'quidproquo-actionprocessor-awslambda';
 
 import { qpqCoreUtils, QPQConfig } from 'quidproquo-core';
+import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 export interface LambdaEntry {
   src: string;
@@ -24,51 +26,98 @@ export interface LambdaEntry {
 }
 
 export interface QPQPrototypeStackProps extends StackProps {
+  environment: string;
   serviceBuildPath: string;
   qpqConfig: QPQConfig;
+
+  account: string;
+  region: string;
 
   routeEntry: LambdaEntry;
   eventEntry: LambdaEntry;
 }
 
+const createApiDomainName = (stack: cdk.Stack, id: string, qpqConfig: QPQConfig) => {
+  const serviceName = qpqCoreUtils.getAppName(qpqConfig);
+  const apexDomain = qpqWebServerUtils.getDomainName(qpqConfig);
+
+  const apiDomainName = `api.${serviceName}.${apexDomain}`;
+
+  const apexHostedZone = aws_route53.HostedZone.fromLookup(stack, `${id}-apex-hostedZone`, {
+    domainName: apexDomain,
+  });
+
+  const certificate = new aws_certificatemanager.Certificate(stack, `${id}-api-certificate`, {
+    domainName: apiDomainName,
+    validation: aws_certificatemanager.CertificateValidation.fromDns(apexHostedZone),
+  });
+
+  const domainName = new aws_apigateway.DomainName(stack, `${id}-api-custom-domain`, {
+    domainName: apiDomainName,
+    certificate,
+    securityPolicy: aws_apigateway.SecurityPolicy.TLS_1_2,
+    endpointType: aws_apigateway.EndpointType.REGIONAL,
+  });
+
+  new aws_route53.ARecord(stack, `${id}-a-record`, {
+    zone: apexHostedZone,
+    recordName: apiDomainName,
+    target: aws_route53.RecordTarget.fromAlias(
+      new aws_route53_targets.ApiGatewayDomain(domainName),
+    ),
+  });
+
+  return domainName;
+};
+
 export class QPQPrototypeStack extends Stack {
-  constructor(scope: Construct, id: string, props: QPQPrototypeStackProps) {
-    super(scope, id, props);
-
+  constructor(scope: Construct, props: QPQPrototypeStackProps) {
     const settings = {
-      environment: process.env.ENVIRONMENT || 'dev',
+      environment: props.environment,
       service: qpqCoreUtils.getAppName(props.qpqConfig),
-
-      aws: {
-        account: process.env.CDK_DEPLOY_ACCOUNT || process.env.CDK_DEFAULT_ACCOUNT,
-        region: process.env.CDK_DEPLOY_REGION || process.env.CDK_DEFAULT_REGION,
-      },
+      id: `${qpqCoreUtils.getAppName(props.qpqConfig)}-${props.environment}`,
     };
+
+    super(scope, settings.id, {
+      ...props,
+
+      env: {
+        account: props.account,
+        region: props.region,
+      },
+    });
+
+    const domainName = createApiDomainName(this, settings.id, props.qpqConfig);
 
     const resourceName = (name: string) => {
       return `${settings.service}-${settings.environment}-${name}`;
     };
 
-    const BLLayer = new aws_lambda.LayerVersion(this, `${id}-BLLayer`, {
-      layerVersionName: `${id}-BLLayer`,
+    const BLLayer = new aws_lambda.LayerVersion(this, `${settings.id}-BLLayer`, {
+      layerVersionName: `${settings.id}-BLLayer`,
       code: new aws_lambda.AssetCode(props.serviceBuildPath),
       compatibleRuntimes: [aws_lambda.Runtime.NODEJS_16_X],
     });
 
-    const ownedSecrets = qpqCoreUtils.getOwnedSecrets(props.qpqConfig).map(
-      (secret) =>
-        new aws_secretsmanager.Secret(this, `secret-${secret.key}`, {
-          secretName: secret.key,
+    const ownedSecrets = qpqCoreUtils.getOwnedSecrets(props.qpqConfig).map((secret) => {
+      const realSecretName = `${secret.key}-${settings.service}-${settings.environment}`;
+      return {
+        secretName: secret.key,
+        realName: realSecretName,
+        secret: new aws_secretsmanager.Secret(this, `${settings.id}-secret-${secret.key}`, {
+          secretName: realSecretName,
           removalPolicy: cdk.RemovalPolicy.DESTROY,
           description: `${settings.environment}-${settings.service}`,
         }),
-    );
+      };
+    });
 
     const buckets = qpqCoreUtils.getStorageDriveNames(props.qpqConfig).map((driveName) => {
       const bucketName = resourceName(driveName);
 
       const bucket = new aws_s3.Bucket(this, bucketName, {
         bucketName: resourceName(driveName),
+
         // Disable public access to this bucket, CloudFront will do that
         publicReadAccess: false,
         blockPublicAccess: aws_s3.BlockPublicAccess.BLOCK_ALL,
@@ -87,6 +136,13 @@ export class QPQPrototypeStack extends Stack {
 
     // This should be all resource names
     const runtimeConfigLambdaConfig: QPQAWSLambdaConfig = {
+      secrectNameMap: ownedSecrets.reduce(
+        (acc, os) => ({
+          ...acc,
+          [os.secretName]: os.realName,
+        }),
+        {},
+      ),
       resourceNameMap: buckets.reduce(
         (acc, b) => ({
           ...acc,
@@ -126,7 +182,7 @@ export class QPQPrototypeStack extends Stack {
 
     // Grant access to the lambda
     buckets.forEach((b) => b.bucket.grantReadWrite(lambdaHandler));
-    ownedSecrets.forEach((os) => os.grantRead(lambdaHandler));
+    ownedSecrets.forEach((os) => os.secret.grantRead(lambdaHandler));
 
     // Create a rest api
     const api = new aws_apigateway.LambdaRestApi(
@@ -142,6 +198,15 @@ export class QPQPrototypeStack extends Stack {
         proxy: true,
       },
     );
+
+    // Map all requests to this service to /serviceName/*
+    new aws_apigateway.BasePathMapping(this, `${settings.id}-rest-bpm`, {
+      domainName: domainName,
+      restApi: api,
+
+      // the properties below are optional
+      // basePath: settings.service,
+    });
 
     qpqCoreUtils.getScheduleEvents(props.qpqConfig).forEach((se, index) => {
       const schedulerFunction = new aws_lambda_nodejs.NodejsFunction(
@@ -181,10 +246,10 @@ export class QPQPrototypeStack extends Stack {
       );
 
       buckets.forEach((b) => b.bucket.grantReadWrite(schedulerFunction));
-      ownedSecrets.forEach((os) => os.grantRead(schedulerFunction));
+      ownedSecrets.forEach((os) => os.secret.grantRead(schedulerFunction));
 
       // EventBridge rule which runs every five minutes
-      const cronRule = new aws_events.Rule(this, `se-cronrule-${index}`, {
+      const cronRule = new aws_events.Rule(this, `${settings.id}-se-cronrule-${index}`, {
         schedule: aws_events.Schedule.expression(`cron(${se.cronExpression})`),
       });
 
