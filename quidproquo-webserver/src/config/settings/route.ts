@@ -1,6 +1,5 @@
-import { QPQConfigSetting } from 'quidproquo-core';
+import { QPQConfigSetting, HTTPMethod } from 'quidproquo-core';
 
-import { HTTPMethod } from '../../types/HTTPEvent';
 import { QPQWebServerConfigSettingType } from '../QPQConfig';
 
 export type RouteOptions = {};

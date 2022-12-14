@@ -4,6 +4,7 @@ import EventActionProcessor from './event/EventActionProcessor';
 import GuidActionProcessor from './guid/GuidActionProcessor';
 import LogActionProcessor from './log/LogActionProcessor';
 import MathActionProcessor from './math/MathActionProcessor';
+import NetworkActionProcessor from './network/NetworkActionProcessor';
 import PlatformActionProcessor from './platform/PlatformActionProcessor';
 import SystemActionProcessor from './system/SystemActionProcessor';
 
@@ -14,6 +15,7 @@ export default {
   ...GuidActionProcessor,
   ...LogActionProcessor,
   ...MathActionProcessor,
+  ...NetworkActionProcessor,
   ...PlatformActionProcessor,
   ...SystemActionProcessor,
 };

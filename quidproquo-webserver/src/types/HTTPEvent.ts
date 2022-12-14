@@ -1,13 +1,4 @@
-export type HTTPMethod =
-  | 'GET'
-  | 'HEAD'
-  | 'POST'
-  | 'PUT'
-  | 'DELETE'
-  | 'CONNECT'
-  | 'OPTIONS'
-  | 'PATCH';
-
+import { HTTPMethod } from 'quidproquo-core';
 export interface HTTPEventParams<T> {
   path: string;
   query: { [key: string]: undefined | string | string[] };

@@ -6,5 +6,6 @@ export * from './file';
 export * from './guid';
 export * from './log';
 export * from './math';
+export * from './network';
 export * from './platform';
 export * from './system';
