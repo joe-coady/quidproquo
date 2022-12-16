@@ -17,6 +17,7 @@ import {
   aws_cloudfront,
 } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
+
 import { Construct } from 'constructs';
 
 import { QPQAWSLambdaConfig } from 'quidproquo-actionprocessor-awslambda';
@@ -31,6 +32,9 @@ export interface QPQPrototypeStackProps extends DeploymentSettings {
 
   apiBuildPath: string;
   webBuildPath: string;
+
+  lambdaAPIGatewayEventPath?: string;
+  lambdaEventBridgeEventPath?: string;
 }
 
 const getEnvironmentDomain = (stackProps: QPQPrototypeStackProps) => {
@@ -266,8 +270,10 @@ export class QPQPrototypeSingleServiceStack extends Stack {
       `${settings.environment}-${settings.service}-lambda-rest`,
       {
         functionName: `lambda-rest-${settings.service}-${settings.environment}`,
-        entry: path.resolve(__dirname, 'lambdas', 'lambdaAPIGatewayEvent.js'),
-        handler: 'execute',
+        entry:
+          props.lambdaAPIGatewayEventPath ||
+          path.resolve(__dirname, 'lambdas', 'lambdaAPIGatewayEvent.js'),
+        handler: 'executeAPIGatewayEvent',
         timeout: cdk.Duration.seconds(25),
 
         runtime: aws_lambda.Runtime.NODEJS_16_X,
@@ -323,7 +329,9 @@ export class QPQPrototypeSingleServiceStack extends Stack {
         `${settings.environment}-${settings.service}-SE-${index}`,
         {
           functionName: `SE-${index}-${se.runtime}-${settings.environment}-${settings.service}`,
-          entry: path.resolve(__dirname, 'lambdas', 'lambdaEventBridgeEvent.js'),
+          entry:
+            props.lambdaEventBridgeEventPath ||
+            path.resolve(__dirname, 'lambdas', 'lambdaEventBridgeEvent.js'),
           handler: 'execute',
           timeout: cdk.Duration.minutes(15),
 

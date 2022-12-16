@@ -16,7 +16,11 @@ export type ActionProcessor<
   TAction extends Action<any>,
   TReturn = any,
   TActionPayload = TAction['payload'],
-> = (payload: TActionPayload, session: StorySession) => Promise<ActionProcessorResult<TReturn>>;
+> = (
+  payload: TActionPayload,
+  session: StorySession,
+  actionProcessors: ActionProcessorList,
+) => Promise<ActionProcessorResult<TReturn>>;
 
 // Generator<
 //  Thing you are giving to QPQ,

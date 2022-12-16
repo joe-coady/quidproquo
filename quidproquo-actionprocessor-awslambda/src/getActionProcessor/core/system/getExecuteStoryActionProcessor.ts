@@ -9,12 +9,10 @@ import {
   actionResultError,
   ErrorTypeEnum,
   actionResult,
-  ErrorActionType,
+  ActionProcessorList,
 } from 'quidproquo-core';
 
 import { QPQAWSLambdaConfig } from '../../../runtimeConfig/QPQAWSLambdaConfig';
-import getFileActionProcessors from '../file';
-import getConfigActionProcessors from '../config';
 
 import { coreActionProcessor, webserverActionProcessor } from 'quidproquo-actionprocessor-node';
 
@@ -28,6 +26,7 @@ const getProcessExecuteStory = <T extends Array<any>>(
   return async (
     payload: SystemExecuteStoryActionPayload<T>,
     session: StorySession,
+    actionProcessors: ActionProcessorList,
   ): Promise<any> => {
     let module = await loadModule(payload.src);
     if (module === null) {
@@ -46,20 +45,7 @@ const getProcessExecuteStory = <T extends Array<any>>(
       // return await addResult(service, getDateNow(), payload.params[0][0].path, 'user-route', payload.src, payload.runtime, result);
     };
 
-    const allActionProcessors = {
-      ...coreActionProcessor,
-      ...webserverActionProcessor,
-      ...getFileActionProcessors(runtimeConfig),
-      ...getConfigActionProcessors(runtimeConfig),
-    };
-
-    const resolveStory = createRuntime(
-      session,
-      allActionProcessors,
-      getDateNow,
-      logger,
-      randomGuid,
-    );
+    const resolveStory = createRuntime(session, actionProcessors, getDateNow, logger, randomGuid);
     const storyResult = await resolveStory(story, payload.params);
 
     if (storyResult.error) {

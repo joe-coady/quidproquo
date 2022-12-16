@@ -24,9 +24,9 @@
   },
   "homepage": "https://github.com/joe-coady/quidproquo#readme",
   "dependencies": {
-    "aws-cdk-lib": "2.52.1",
-    "aws-cdk": "2.52.1",
-    "constructs": "^10.0.0",
+    "aws-cdk-lib": "^2.55.1",
+    "aws-cdk": "^2.55.1",
+    "constructs": "^10.1.191",
     "esbuild": "^0.15.16",
     "quidproquo-actionprocessor-awslambda": "*",
     "quidproquo-actionprocessor-node": "*",

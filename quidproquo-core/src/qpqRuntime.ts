@@ -10,7 +10,11 @@ import {
 } from './logic/actionLogic';
 
 // Make this type safe omg.
-async function processAction(action: Action<any>, actionProcessors: any, session: any) {
+async function processAction(
+  action: Action<any>,
+  actionProcessors: ActionProcessorList,
+  session: any,
+) {
   // Special action ~ batch - needs access to the processAction / actionProcessor context
   if (action.type === SystemActionType.Batch) {
     return actionResult(
@@ -29,7 +33,7 @@ async function processAction(action: Action<any>, actionProcessors: any, session
     );
   }
 
-  return await processor(action.payload, session);
+  return await processor(action.payload, session, actionProcessors);
 }
 
 export const createRuntime = (
