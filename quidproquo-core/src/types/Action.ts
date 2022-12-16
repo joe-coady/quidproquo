@@ -28,3 +28,7 @@ export type ActionRequester<
   TReturn = undefined,
   TQPQReturn = TReturn,
 > = Generator<TAction, TReturn, TQPQReturn>;
+
+export type ActionProcessorList = {
+  [key: string]: ActionProcessor<any, any, any>;
+};
