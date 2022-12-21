@@ -125,14 +125,19 @@ const processNetworkRequest: NetworkRequestActionProcessor<any, any> = async (pa
     return actionResultError(ErrorTypeEnum.NotImplemented, `${payload.method}: Not implemented`);
   }
 
-  const response = await requestMethod(payload);
+  try {
+    const response = await requestMethod(payload);
 
-  return actionResult({
-    headers: response.headers,
-    status: response.status,
-    statusText: response.statusText,
-    data: response.data,
-  });
+    return actionResult({
+      headers: response.headers,
+      status: response.status,
+      statusText: response.statusText,
+      data: response.data,
+    });
+  } catch (err: any) {
+    console.log(err);
+    return actionResultError(ErrorTypeEnum.GenericError, err.stack);
+  }
 };
 
 export default {

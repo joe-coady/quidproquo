@@ -4,6 +4,7 @@ import {
   StorageDriveQPQConfigSetting,
   ScheduleQPQConfigSetting,
   SecretQPQConfigSetting,
+  ParameterQPQConfigSetting,
 } from './config/settings';
 
 export const getConfigSettings = <T extends QPQConfigSetting>(
@@ -61,6 +62,15 @@ export const getOwnedSecrets = (configs: QPQConfig): SecretQPQConfigSetting[] =>
   const secrets = getConfigSettings<SecretQPQConfigSetting>(
     configs,
     QPQCoreConfigSettingType.secret,
+  );
+
+  return secrets.filter((s) => s.owned);
+};
+
+export const getOwnedParameters = (configs: QPQConfig): ParameterQPQConfigSetting[] => {
+  const secrets = getConfigSettings<ParameterQPQConfigSetting>(
+    configs,
+    QPQCoreConfigSettingType.parameter,
   );
 
   return secrets.filter((s) => s.owned);

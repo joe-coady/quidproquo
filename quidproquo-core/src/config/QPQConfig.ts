@@ -3,6 +3,7 @@ export enum QPQCoreConfigSettingType {
   storageDrive = '@quidproquo-core/config/storageDrive',
   schedule = '@quidproquo-core/config/schedule',
   secret = '@quidproquo-core/config/secret',
+  parameter = '@quidproquo-core/config/parameter',
 }
 
 export interface QPQConfigSetting {

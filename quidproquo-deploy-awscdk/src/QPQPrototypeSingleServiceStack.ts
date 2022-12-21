@@ -15,6 +15,7 @@ import {
   aws_certificatemanager,
   aws_route53_targets,
   aws_cloudfront,
+  aws_ssm,
 } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 
@@ -224,6 +225,22 @@ export class QPQPrototypeSingleServiceStack extends Stack {
       };
     });
 
+    const ownedParameters = qpqCoreUtils.getOwnedParameters(props.qpqConfig).map((parameter) => {
+      const realParameterName = `${parameter.key}-${settings.service}-${settings.environment}`;
+      return {
+        parameterName: parameter.key,
+        realName: realParameterName,
+        parameter: new aws_ssm.StringParameter(this, `${id}-parameter-${parameter.key}`, {
+          parameterName: realParameterName,
+          description: `${settings.environment}-${settings.service}`,
+          stringValue: '',
+
+          // No additional costs ~ 4k max size
+          tier: aws_ssm.ParameterTier.STANDARD,
+        }),
+      };
+    });
+
     const buckets = qpqCoreUtils.getStorageDriveNames(props.qpqConfig).map((driveName) => {
       const bucketName = resourceName(driveName);
 
@@ -253,6 +270,13 @@ export class QPQPrototypeSingleServiceStack extends Stack {
         (acc, os) => ({
           ...acc,
           [os.secretName]: os.realName,
+        }),
+        {},
+      ),
+      parameterNameMap: ownedParameters.reduce(
+        (acc, os) => ({
+          ...acc,
+          [os.parameterName]: os.realName,
         }),
         {},
       ),
@@ -298,6 +322,7 @@ export class QPQPrototypeSingleServiceStack extends Stack {
     // Grant access to the lambda
     buckets.forEach((b) => b.bucket.grantReadWrite(lambdaHandler));
     ownedSecrets.forEach((os) => os.secret.grantRead(lambdaHandler));
+    ownedParameters.forEach((os) => os.parameter.grantRead(lambdaHandler));
 
     // Create a rest api
     const api = new aws_apigateway.LambdaRestApi(
@@ -364,6 +389,7 @@ export class QPQPrototypeSingleServiceStack extends Stack {
 
       buckets.forEach((b) => b.bucket.grantReadWrite(schedulerFunction));
       ownedSecrets.forEach((os) => os.secret.grantRead(schedulerFunction));
+      ownedParameters.forEach((os) => os.parameter.grantRead(schedulerFunction));
 
       // EventBridge rule which runs every five minutes
       const cronRule = new aws_events.Rule(this, `${id}-se-cronrule-${index}`, {
