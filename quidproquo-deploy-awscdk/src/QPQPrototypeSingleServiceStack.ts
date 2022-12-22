@@ -233,7 +233,7 @@ export class QPQPrototypeSingleServiceStack extends Stack {
         parameter: new aws_ssm.StringParameter(this, `${id}-parameter-${parameter.key}`, {
           parameterName: realParameterName,
           description: `${settings.environment}-${settings.service}`,
-          stringValue: '',
+          stringValue: parameter.value,
 
           // No additional costs ~ 4k max size
           tier: aws_ssm.ParameterTier.STANDARD,

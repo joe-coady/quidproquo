@@ -5,6 +5,7 @@ import {
   getSystemActionProcessor,
   getFileActionProcessor,
   getConfigGetSecretActionProcessor,
+  getConfigGetParameterActionProcessor,
   awsLambdaUtils,
 } from 'quidproquo-actionprocessor-awslambda';
 
@@ -43,6 +44,7 @@ export const getAPIGatewayEventExecutor = (
 
       ...getAPIGatewayEventActionProcessor(lambdaRuntimeConfig.qpqConfig),
       ...getConfigGetSecretActionProcessor(lambdaRuntimeConfig),
+      ...getConfigGetParameterActionProcessor(lambdaRuntimeConfig),
       ...getSystemActionProcessor(lambdaRuntimeConfig),
       ...getFileActionProcessor(lambdaRuntimeConfig),
 

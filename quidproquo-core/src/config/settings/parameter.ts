@@ -6,14 +6,10 @@ export interface ParameterQPQConfigSetting extends QPQConfigSetting {
   owned: boolean;
 }
 
-export const defineParameter = (
-  key: string,
-  owned: boolean = true,
-  value: string = '',
-): ParameterQPQConfigSetting => ({
+export const defineParameter = (key: string, value: string = ''): ParameterQPQConfigSetting => ({
   configSettingType: QPQCoreConfigSettingType.parameter,
 
   key,
   value,
-  owned,
+  owned: !!value,
 });

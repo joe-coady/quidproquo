@@ -1,4 +1,4 @@
-import { S3Client, ListObjectsV2Command, ListObjectsV2CommandInput } from '@aws-sdk/client-s3';
+import { ListObjectsV2Command, ListObjectsV2CommandInput } from '@aws-sdk/client-s3';
 import { filePathDelimiter } from 'quidproquo-core';
 import s3Client from './s3Client';
 

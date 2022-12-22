@@ -5,6 +5,7 @@ import {
   getSystemActionProcessor,
   getFileActionProcessor,
   getConfigGetSecretActionProcessor,
+  getConfigGetParameterActionProcessor,
   awsLambdaUtils,
 } from 'quidproquo-actionprocessor-awslambda';
 import { createRuntime, askProcessEvent } from 'quidproquo-core';
@@ -21,7 +22,7 @@ export const getEventBridgeEventExecutor = (
 ) => {
   return async (event: EventBridgeEvent<string, void>, context: Context) => {
     // Build a processor for the session and stuff
-    // Remove the non event ones
+    // Remove the  non event ones
     const storyActionProcessor = {
       ...coreActionProcessor,
       ...webserverActionProcessor,
@@ -30,6 +31,7 @@ export const getEventBridgeEventExecutor = (
       ...getSystemActionProcessor(lambdaRuntimeConfig),
       ...getFileActionProcessor(lambdaRuntimeConfig),
       ...getConfigGetSecretActionProcessor(lambdaRuntimeConfig),
+      ...getConfigGetParameterActionProcessor(lambdaRuntimeConfig),
 
       ...getCustomActionProcessors(lambdaRuntimeConfig),
     };
