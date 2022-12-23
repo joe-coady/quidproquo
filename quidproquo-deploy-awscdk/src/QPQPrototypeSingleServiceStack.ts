@@ -206,11 +206,11 @@ export class QPQPrototypeSingleServiceStack extends Stack {
       return `${settings.service}-${settings.environment}-${name}`;
     };
 
-    const BLLayer = new aws_lambda.LayerVersion(this, `${id}-BLLayer`, {
-      layerVersionName: `${id}-BLLayer`,
-      code: new aws_lambda.AssetCode(props.apiBuildPath),
-      compatibleRuntimes: [aws_lambda.Runtime.NODEJS_16_X],
-    });
+    // const BLLayer = new aws_lambda.LayerVersion(this, `${id}-BLLayer`, {
+    //   layerVersionName: `${id}-BLLayer`,
+    //   code: new aws_lambda.AssetCode(props.apiBuildPath),
+    //   compatibleRuntimes: [aws_lambda.Runtime.NODEJS_16_X],
+    // });
 
     const ownedSecrets = qpqCoreUtils.getOwnedSecrets(props.qpqConfig).map((secret) => {
       const realSecretName = `${secret.key}-${settings.service}-${settings.environment}`;
@@ -302,7 +302,8 @@ export class QPQPrototypeSingleServiceStack extends Stack {
 
         runtime: aws_lambda.Runtime.NODEJS_16_X,
 
-        layers: [BLLayer],
+        // layers: [BLLayer],
+        memorySize: 1024,
 
         bundling: {
           tsconfig: './tsconfig.json',
@@ -362,9 +363,8 @@ export class QPQPrototypeSingleServiceStack extends Stack {
 
           runtime: aws_lambda.Runtime.NODEJS_16_X,
 
-          memorySize: 400,
-
-          layers: [BLLayer],
+          // layers: [BLLayer],
+          memorySize: 1024,
 
           bundling: {
             tsconfig: './tsconfig.json',

@@ -30,6 +30,7 @@ const ErrorTypeHttpResponseMap = {
   [ErrorTypeEnum.GenericError]: 500,
   [ErrorTypeEnum.NotImplemented]: 501,
   [ErrorTypeEnum.NoContent]: 204,
+  [ErrorTypeEnum.Invalid]: 422,
 };
 
 export const getAPIGatewayEventExecutor = (

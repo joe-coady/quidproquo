@@ -73,12 +73,20 @@ export const createRuntime = (
           session,
         );
 
-        response.history.push({
+        const history = {
           act: action.value,
           res: actionResult,
           startedAt: executionTime,
           finishedAt: getTimeNow(),
-        });
+        };
+
+        console.log(
+          `${action.value.type}: took ${
+            new Date(history.finishedAt).getTime() - new Date(history.startedAt).getTime()
+          }ms`,
+        );
+
+        response.history.push(history);
 
         if (isErroredActionResult(actionResult)) {
           return {
@@ -121,6 +129,12 @@ export const createRuntime = (
     };
 
     await logger(storyResult);
+
+    console.log(
+      `story took took ${
+        new Date(storyResult.finishedAt).getTime() - new Date(storyResult.startedAt).getTime()
+      }ms`,
+    );
 
     return storyResult;
   }

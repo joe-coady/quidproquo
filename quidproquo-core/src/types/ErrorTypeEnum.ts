@@ -34,6 +34,9 @@ export enum ErrorTypeEnum {
 
   // Bad data from client
   BadRequest = 'BadRequest',
+
+  // Bad data from client / invalid payload?
+  Invalid = 'Invalid',
 }
 
 export interface QPQError {

@@ -12,6 +12,10 @@ import axios, { AxiosResponse } from 'axios';
 
 const axiosInstance = axios.create({
   timeout: 10000,
+  headers: {
+    // Fixes: https://github.com/axios/axios/issues/5346
+    'Accept-Encoding': 'gzip,deflate,compress',
+  },
 });
 
 const processNetworkRequestGet = async (
