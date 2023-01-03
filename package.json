@@ -21,12 +21,12 @@
   },
   "homepage": "https://github.com/joe-coady/quidproquo#readme",
   "workspaces": [
-    "quidproquo-core",
     "quidproquo-tsconfig",
+    "quidproquo-core",
     "quidproquo-webserver",
+    "quidproquo-actionprocessor-node",
     "quidproquo-actionprocessor-awslambda",
     "quidproquo-deploy-webpack",
-    "quidproquo-deploy-awscdk",
-    "quidproquo-actionprocessor-node"
+    "quidproquo-deploy-awscdk"
   ]
 }

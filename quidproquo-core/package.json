@@ -1,6 +1,6 @@
 {
   "name": "quidproquo-core",
-  "version": "0.0.24",
+  "version": "0.0.25",
   "description": "",
   "main": "./lib/index.js",
   "types": "./lib/index.d.js",
@@ -9,8 +9,9 @@
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npx rimraf lib && tsc",
-    "watch": "tsc -w"
+    "clean": "npx rimraf lib",
+    "build": "npm run clean && tsc",
+    "watch": "npm run clean && tsc -w"
   },
   "repository": {
     "type": "git",
