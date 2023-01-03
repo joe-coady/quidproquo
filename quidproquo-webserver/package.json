@@ -1,6 +1,6 @@
 {
   "name": "quidproquo-webserver",
-  "version": "0.0.25",
+  "version": "0.0.26",
   "description": "",
   "main": "./lib/index.js",
   "types": "./lib/index.d.js",
