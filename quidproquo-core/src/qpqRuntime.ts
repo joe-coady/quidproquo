@@ -89,6 +89,7 @@ export const createRuntime = (
         response.history.push(history);
 
         if (isErroredActionResult(actionResult)) {
+          console.log('Caught Error: ', JSON.stringify(resolveActionResultError(actionResult)));
           return {
             ...response,
             finishedAt: getTimeNow(),
@@ -101,6 +102,7 @@ export const createRuntime = (
     } catch (err) {
       // Dev Only ~ Todo
       if (err instanceof Error) {
+        console.log('Uncaught Error: ', err.message.toString());
         return {
           ...response,
           finishedAt: getTimeNow(),

@@ -42,6 +42,8 @@ const getProcessMatchStory = (
   lambdaRuntimeConfig?: LambdaRuntimeConfig,
 ): EventMatchStoryActionProcessor<ScheduledEventParams<any>> => {
   return async (payload) => {
+    console.log('Trying to match story');
+    console.log(JSON.stringify(lambdaRuntimeConfig));
     if (!lambdaRuntimeConfig) {
       return actionResultError(ErrorTypeEnum.NotFound, 'event runtime not found');
     }
