@@ -27,6 +27,7 @@ const getProcessTransformEventParams = (
 ): EventTransformEventParamsActionProcessor<[APIGatewayEvent, Context], HTTPEventParams<any>> => {
   return async ({ eventParams: [apiGatewayEvent, context] }) => {
     const path = (apiGatewayEvent.path || '').replace(new RegExp(`^(\/${appName})/`), '/');
+    console.log('getProcessTransformEventParams', JSON.stringify(apiGatewayEvent));
 
     return actionResult({
       path,
@@ -44,38 +45,40 @@ const getProcessTransformEventParams = (
 };
 
 const getProcessTransformResponseResult = (
-  domainName: string,
+  configs: QPQConfig,
 ): EventTransformResponseResultActionProcessor<APIGatewayProxyResult> => {
   // We might need to JSON.stringify the body.
-  return async ({ response }) => {
+  return async (payload) => {
     // Validate response
     // if !valid actionResultError
 
+    console.log('getProcessTransformResponseResult', JSON.stringify(payload));
+
     return actionResult<APIGatewayProxyResult>({
-      statusCode: response.result.statusCode,
-      body: response.result.body,
+      statusCode: payload.response.result.statusCode,
+      body: payload.response.result.body,
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Headers': '*',
-        'Access-Control-Allow-Methods': '*',
-        'Access-Control-Allow-Origin': `https://${domainName}`,
+        ...qpqWebServerUtils.getCorsHeaders(configs, {}, payload.transformedEventParams.headers),
+        ...(payload.response.headers || {}),
       },
     });
   };
 };
 
 const getProcessAutoRespond = (
-  domainName: string,
+  configs: QPQConfig,
 ): EventAutoRespondActionProcessor<HTTPEventParams<any>> => {
   return async (payload) => {
     if (payload.transformedEventParams.method === 'OPTIONS') {
       return actionResult({
-        statusCode: 200,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Headers': '*',
-          'Access-Control-Allow-Methods': '*',
-          'Access-Control-Allow-Origin': `https://${domainName}`,
+        result: {
+          statusCode: 200,
+          headers: qpqWebServerUtils.getCorsHeaders(
+            configs,
+            {},
+            payload.transformedEventParams.headers,
+          ),
         },
       });
     }
@@ -121,12 +124,11 @@ const getProcessMatchStory = (
 export default (config: QPQConfig) => {
   const routes = qpqWebServerUtils.getAllRoutes(config);
   const appName = qpqCoreUtils.getAppName(config);
-  const domainName = qpqWebServerUtils.getDomainName(config);
 
   return {
     [EventActionType.TransformEventParams]: getProcessTransformEventParams(appName),
-    [EventActionType.TransformResponseResult]: getProcessTransformResponseResult(domainName),
-    [EventActionType.AutoRespond]: getProcessAutoRespond(domainName),
+    [EventActionType.TransformResponseResult]: getProcessTransformResponseResult(config),
+    [EventActionType.AutoRespond]: getProcessAutoRespond(config),
     [EventActionType.MatchStory]: getProcessMatchStory(routes),
   };
 };

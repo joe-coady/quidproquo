@@ -78,6 +78,7 @@ export const getAPIGatewayEventExecutor = (
 
     // // Run the callback
     if (!result.error) {
+      console.log(result.result);
       return {
         statusCode: result.result.statusCode,
         body: JSON.stringify(result.result.body),

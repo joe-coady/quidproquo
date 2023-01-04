@@ -1,5 +1,3 @@
-import { askThrowError } from '../actions/error';
-import { ErrorTypeEnum } from '../types/ErrorTypeEnum';
 import {
   askEventTransformEventParams,
   askEventAutoRespond,
@@ -18,7 +16,7 @@ export function* askProcessEvent(...eventArguments: any) {
 
   if (earlyExitResponse) {
     // Transform the early exit response if needed
-    return yield* askEventTransformResponseResult(earlyExitResponse);
+    return yield* askEventTransformResponseResult(earlyExitResponse, transformedEventParams);
   }
 
   // Try and match a story to execute
@@ -28,5 +26,5 @@ export function* askProcessEvent(...eventArguments: any) {
   const result = yield* askExecuteStory('route', src!, runtime!, [transformedEventParams, options]);
 
   // return the result of the story back to the event caller
-  return yield* askEventTransformResponseResult(result);
+  return yield* askEventTransformResponseResult(result, transformedEventParams);
 }

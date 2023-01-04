@@ -1,6 +1,16 @@
 import { qpqCoreUtils, QPQConfig } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
+const getWebpackBuildMode = (qpqConfig: QPQConfig): string => {
+  const feature = qpqCoreUtils.getAppFeature(qpqConfig);
+
+  if (['development', 'production'].indexOf(feature) >= 0) {
+    return feature;
+  }
+
+  return 'production';
+};
+
 export const getWebpackConfig = (qpqConfig: QPQConfig, buildPath: string, outputPrefix: string) => {
   const allSrcEntries = [
     ...qpqCoreUtils.getAllSrcEntries(qpqConfig),
@@ -16,7 +26,7 @@ export const getWebpackConfig = (qpqConfig: QPQConfig, buildPath: string, output
       {},
     ),
 
-    mode: 'production',
+    mode: getWebpackBuildMode(qpqConfig),
 
     // We should: sort out how to split the bundles and get it to work on aws
     // optimization: {

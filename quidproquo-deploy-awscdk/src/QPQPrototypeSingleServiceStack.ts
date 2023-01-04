@@ -25,7 +25,6 @@ import { QPQAWSLambdaConfig } from 'quidproquo-actionprocessor-awslambda';
 
 import { qpqCoreUtils } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
-import { DeploymentType } from './DeploymentType';
 
 export interface QPQPrototypeStackProps extends DeploymentSettings {
   account: string;
@@ -38,17 +37,8 @@ export interface QPQPrototypeStackProps extends DeploymentSettings {
   lambdaEventBridgeEventPath?: string;
 }
 
-const getEnvironmentDomain = (stackProps: QPQPrototypeStackProps) => {
-  const apexDomain = qpqWebServerUtils.getDomainName(stackProps.qpqConfig);
-  if (stackProps.environment === DeploymentType.Prod) {
-    return apexDomain;
-  }
-
-  return `${stackProps.environment}.${apexDomain}`;
-};
-
 const createApiDomainName = (stack: cdk.Stack, id: string, stackProps: QPQPrototypeStackProps) => {
-  const apexDomain = getEnvironmentDomain(stackProps);
+  const apexDomain = qpqWebServerUtils.getFeatureDomainName(stackProps.qpqConfig);
 
   const apiDomainName = `api.${apexDomain}`;
 
@@ -85,12 +75,13 @@ const createWebDistribution = (
   id: string,
   stackProps: QPQPrototypeStackProps,
 ) => {
-  const apexDomain = getEnvironmentDomain(stackProps);
+  const environment = qpqCoreUtils.getAppFeature(stackProps.qpqConfig);
+  const apexDomain = qpqWebServerUtils.getFeatureDomainName(stackProps.qpqConfig);
   const serviceName = qpqCoreUtils.getAppName(stackProps.qpqConfig);
 
   // create an s3 bucket
   const staticWebFilesBucket = new aws_s3.Bucket(stack, `${id}-web`, {
-    bucketName: `${serviceName}-${stackProps.environment}-web`,
+    bucketName: `${serviceName}-${environment}-web`,
     // Disable public access to this bucket, CloudFront will do that
     publicReadAccess: false,
     blockPublicAccess: aws_s3.BlockPublicAccess.BLOCK_ALL,
@@ -194,7 +185,7 @@ export class QPQPrototypeSingleServiceStack extends Stack {
     });
 
     const settings = {
-      environment: props.environment,
+      environment: qpqCoreUtils.getAppFeature(props.qpqConfig),
       service: qpqCoreUtils.getAppName(props.qpqConfig),
     };
 

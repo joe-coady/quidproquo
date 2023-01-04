@@ -2,7 +2,9 @@ import { QPQConfigSetting, HTTPMethod } from 'quidproquo-core';
 
 import { QPQWebServerConfigSettingType } from '../QPQConfig';
 
-export type RouteOptions = {};
+export type RouteOptions = {
+  allowedOrigins?: string[];
+};
 
 export interface RouteQPQWebServerConfigSetting extends QPQConfigSetting {
   method: HTTPMethod;

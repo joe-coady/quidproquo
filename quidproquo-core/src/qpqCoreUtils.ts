@@ -35,6 +35,14 @@ export const getAppName = (configs: QPQConfig): string => {
   return appName;
 };
 
+export const getAppFeature = (configs: QPQConfig): string => {
+  const featureName =
+    getConfigSetting<AppNameQPQConfigSetting>(configs, QPQCoreConfigSettingType.appName)
+      ?.featureName || 'production';
+
+  return featureName;
+};
+
 export const getStorageDriveNames = (configs: QPQConfig): string[] => {
   const storageDriveNames = getConfigSettings<StorageDriveQPQConfigSetting>(
     configs,

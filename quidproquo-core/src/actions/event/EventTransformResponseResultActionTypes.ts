@@ -4,6 +4,7 @@ import { EventActionType } from './EventActionType';
 // Payload
 export interface EventTransformResponseResultActionPayload {
   response: any;
+  transformedEventParams: any;
 }
 
 // Action
