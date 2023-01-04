@@ -349,7 +349,7 @@ export class QPQPrototypeSingleServiceStack extends Stack {
           entry:
             props.lambdaEventBridgeEventPath ||
             path.resolve(__dirname, 'lambdas', 'lambdaEventBridgeEvent.js'),
-          handler: 'execute',
+          handler: 'executeEventBridgeEvent',
           timeout: cdk.Duration.minutes(15),
 
           runtime: aws_lambda.Runtime.NODEJS_16_X,

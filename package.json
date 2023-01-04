@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "npm run build --ws",
+    "clean": "npm run clean --ws",
     "login": "npm login",
     "publish": "npm publish --ws",
     "patch": "npm version patch --ws"
