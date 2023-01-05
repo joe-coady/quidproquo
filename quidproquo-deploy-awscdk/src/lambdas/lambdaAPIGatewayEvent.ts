@@ -9,6 +9,8 @@ import {
   awsLambdaUtils,
 } from 'quidproquo-actionprocessor-awslambda';
 
+import { qpqWebServerUtils } from 'quidproquo-webserver';
+
 import { createRuntime, askProcessEvent, ErrorTypeEnum } from 'quidproquo-core';
 
 import { APIGatewayEvent, Context } from 'aws-lambda';
@@ -90,7 +92,7 @@ export const getAPIGatewayEventExecutor = (
     return {
       statusCode: code || 500,
       body: JSON.stringify(result.error),
-      headers: {},
+      headers: qpqWebServerUtils.getCorsHeaders(lambdaRuntimeConfig.qpqConfig, {}, event.headers),
     };
   };
 };
