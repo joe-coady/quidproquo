@@ -6,6 +6,7 @@ import {
   getFileActionProcessor,
   getConfigGetSecretActionProcessor,
   getConfigGetParameterActionProcessor,
+  getConfigGetParametersActionProcessor,
   awsLambdaUtils,
 } from 'quidproquo-actionprocessor-awslambda';
 import { createRuntime, askProcessEvent } from 'quidproquo-core';
@@ -32,6 +33,7 @@ export const getEventBridgeEventExecutor = (
       ...getFileActionProcessor(lambdaRuntimeConfig),
       ...getConfigGetSecretActionProcessor(lambdaRuntimeConfig),
       ...getConfigGetParameterActionProcessor(lambdaRuntimeConfig),
+      ...getConfigGetParametersActionProcessor(lambdaRuntimeConfig),
 
       ...getCustomActionProcessors(lambdaRuntimeConfig),
     };

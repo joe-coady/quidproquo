@@ -6,6 +6,7 @@ import {
   getFileActionProcessor,
   getConfigGetSecretActionProcessor,
   getConfigGetParameterActionProcessor,
+  getConfigGetParametersActionProcessor,
   awsLambdaUtils,
 } from 'quidproquo-actionprocessor-awslambda';
 
@@ -48,6 +49,7 @@ export const getAPIGatewayEventExecutor = (
       ...getAPIGatewayEventActionProcessor(lambdaRuntimeConfig.qpqConfig),
       ...getConfigGetSecretActionProcessor(lambdaRuntimeConfig),
       ...getConfigGetParameterActionProcessor(lambdaRuntimeConfig),
+      ...getConfigGetParametersActionProcessor(lambdaRuntimeConfig),
       ...getSystemActionProcessor(lambdaRuntimeConfig),
       ...getFileActionProcessor(lambdaRuntimeConfig),
 
@@ -80,7 +82,6 @@ export const getAPIGatewayEventExecutor = (
 
     // // Run the callback
     if (!result.error) {
-      console.log(result.result);
       return {
         statusCode: result.result.statusCode,
         body: JSON.stringify(result.result.body),
@@ -88,6 +89,7 @@ export const getAPIGatewayEventExecutor = (
       };
     }
 
+    console.log(JSON.stringify(result));
     const code = ErrorTypeHttpResponseMap[result.error.errorType];
     return {
       statusCode: code || 500,
