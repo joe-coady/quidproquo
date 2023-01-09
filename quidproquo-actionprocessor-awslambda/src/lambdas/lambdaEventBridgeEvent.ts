@@ -1,5 +1,9 @@
+import { EventBridgeEvent, Context } from 'aws-lambda';
+import { createRuntime, askProcessEvent } from 'quidproquo-core';
 import { coreActionProcessor, webserverActionProcessor } from 'quidproquo-actionprocessor-node';
 
+import { DynamicModuleLoader } from '../types/DynamicLoader';
+import * as awsLambdaUtils from '../awsLambdaUtils';
 import {
   getEventBridgeEventActionProcessor,
   getSystemActionProcessor,
@@ -7,12 +11,7 @@ import {
   getConfigGetSecretActionProcessor,
   getConfigGetParameterActionProcessor,
   getConfigGetParametersActionProcessor,
-  awsLambdaUtils,
-  DynamicModuleLoader,
-} from 'quidproquo-actionprocessor-awslambda';
-import { createRuntime, askProcessEvent } from 'quidproquo-core';
-
-import { EventBridgeEvent, Context } from 'aws-lambda';
+} from '../getActionProcessor';
 
 import { lambdaRuntimeConfig, ActionProcessorListResolver } from './lambdaConfig';
 

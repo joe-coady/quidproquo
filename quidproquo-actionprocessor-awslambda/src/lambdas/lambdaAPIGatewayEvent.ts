@@ -1,5 +1,10 @@
+import { APIGatewayEvent, Context } from 'aws-lambda';
+import { qpqWebServerUtils } from 'quidproquo-webserver';
+import { createRuntime, askProcessEvent, ErrorTypeEnum } from 'quidproquo-core';
 import { coreActionProcessor, webserverActionProcessor } from 'quidproquo-actionprocessor-node';
 
+import { DynamicModuleLoader } from '../types/DynamicLoader';
+import * as awsLambdaUtils from '../awsLambdaUtils';
 import {
   getAPIGatewayEventActionProcessor,
   getSystemActionProcessor,
@@ -7,15 +12,7 @@ import {
   getConfigGetSecretActionProcessor,
   getConfigGetParameterActionProcessor,
   getConfigGetParametersActionProcessor,
-  awsLambdaUtils,
-  DynamicModuleLoader,
-} from 'quidproquo-actionprocessor-awslambda';
-
-import { qpqWebServerUtils } from 'quidproquo-webserver';
-
-import { createRuntime, askProcessEvent, ErrorTypeEnum } from 'quidproquo-core';
-
-import { APIGatewayEvent, Context } from 'aws-lambda';
+} from '../getActionProcessor';
 
 import { lambdaRuntimeConfig, ActionProcessorListResolver } from './lambdaConfig';
 

@@ -5,7 +5,8 @@
   "main": "./lib/index.js",
   "types": "./lib/index.d.js",
   "files": [
-    "lib/**/*"
+    "lib/**/*",
+    "src/**/*"
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
