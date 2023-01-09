@@ -27,16 +27,8 @@ export const getWebpackConfig = (qpqConfig: QPQConfig, buildPath: string, output
   });
 
   return {
-    // entry: allSrcEntries.reduce(
-    //   (entry, path) => ({
-    //     ...entry,
-    //     [`./${outputPrefix}/${path}`]: `./${path}`,
-    //   }),
-    //   {},
-    // ),
-
     entry: {
-      lambdaAPIGatewayEvent: 'quidproquo-deploy-awscdk/src/lambdas/LambdaAPIGatewayEvent.ts',
+      lambdaAPIGatewayEvent: 'quidproquo-deploy-awscdk/src/lambdas/lambdaAPIGatewayEvent.ts',
       lambdaEventBridgeEvent: 'quidproquo-deploy-awscdk/src/lambdas/lambdaEventBridgeEvent.ts',
     },
 
@@ -44,16 +36,7 @@ export const getWebpackConfig = (qpqConfig: QPQConfig, buildPath: string, output
       modules: [path.resolve(__dirname, 'loaders'), 'node_modules'],
     },
 
-    // mode: getWebpackBuildMode(qpqConfig),
-    mode: 'production',
-
-    // We should: sort out how to split the bundles and get it to work on aws
-    // optimization: {
-    //   splitChunks: {
-    //     // include all types of chunks
-    //     chunks: "all",
-    //   },
-    // },
+    mode: getWebpackBuildMode(qpqConfig),
 
     target: 'node',
     output: {
@@ -82,7 +65,7 @@ export const getWebpackConfig = (qpqConfig: QPQConfig, buildPath: string, output
             // without additional settings, this will reference .babelrc
             presets: ['@babel/preset-typescript'],
           },
-          exclude: /node_modules/,
+          // exclude: /node_modules/,
         },
         {
           test: /\.(yaml|json)$/,
