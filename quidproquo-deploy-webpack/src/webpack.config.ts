@@ -1,5 +1,8 @@
+import path from 'path';
+
 import { qpqCoreUtils, QPQConfig } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
+import webpack from 'webpack';
 
 const getWebpackBuildMode = (qpqConfig: QPQConfig): string => {
   const feature = qpqCoreUtils.getAppFeature(qpqConfig);
@@ -17,16 +20,32 @@ export const getWebpackConfig = (qpqConfig: QPQConfig, buildPath: string, output
     ...qpqWebServerUtils.getAllSrcEntries(qpqConfig),
   ];
 
-  return {
-    entry: allSrcEntries.reduce(
-      (entry, path) => ({
-        ...entry,
-        [`./${outputPrefix}/${path}`]: `./${path}`,
-      }),
-      {},
-    ),
+  // set the qpq config env for loaders
+  process.env.QPQLoaderConfig = JSON.stringify({
+    allSrcEntries,
+    rootDir: path.resolve(buildPath, '..'),
+  });
 
-    mode: getWebpackBuildMode(qpqConfig),
+  return {
+    // entry: allSrcEntries.reduce(
+    //   (entry, path) => ({
+    //     ...entry,
+    //     [`./${outputPrefix}/${path}`]: `./${path}`,
+    //   }),
+    //   {},
+    // ),
+
+    entry: {
+      lambdaAPIGatewayEvent: 'quidproquo-deploy-awscdk/src/lambdas/LambdaAPIGatewayEvent.ts',
+      lambdaEventBridgeEvent: 'quidproquo-deploy-awscdk/src/lambdas/lambdaEventBridgeEvent.ts',
+    },
+
+    resolveLoader: {
+      modules: [path.resolve(__dirname, 'loaders'), 'node_modules'],
+    },
+
+    // mode: getWebpackBuildMode(qpqConfig),
+    mode: 'production',
 
     // We should: sort out how to split the bundles and get it to work on aws
     // optimization: {
@@ -36,17 +55,22 @@ export const getWebpackConfig = (qpqConfig: QPQConfig, buildPath: string, output
     //   },
     // },
 
+    target: 'node',
     output: {
       // Output path
       path: buildPath,
+      filename: '[name].js',
 
       // Allow compiling as a lib ~ don't tree shake my exports plz
       globalObject: 'this',
-      libraryTarget: 'umd',
+      libraryTarget: 'commonjs2',
     },
 
     resolve: {
       extensions: ['.ts', '.tsx', '.js', '.json'],
+      fallback: {
+        crypto: false,
+      },
     },
 
     module: {

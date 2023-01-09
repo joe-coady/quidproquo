@@ -4,5 +4,3 @@ export * from './DeploymentSettings';
 
 export * from './QPQApp';
 export * from './QPQPrototypeSingleServiceStack';
-
-export * from './lambdas';

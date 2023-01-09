@@ -197,12 +197,6 @@ export class QPQPrototypeSingleServiceStack extends Stack {
       return `${settings.service}-${settings.environment}-${name}`;
     };
 
-    // const BLLayer = new aws_lambda.LayerVersion(this, `${id}-BLLayer`, {
-    //   layerVersionName: `${id}-BLLayer`,
-    //   code: new aws_lambda.AssetCode(props.apiBuildPath),
-    //   compatibleRuntimes: [aws_lambda.Runtime.NODEJS_16_X],
-    // });
-
     const ownedSecrets = qpqCoreUtils.getOwnedSecrets(props.qpqConfig).map((secret) => {
       const realSecretName = `${secret.key}-${settings.service}-${settings.environment}`;
       return {
@@ -280,33 +274,22 @@ export class QPQPrototypeSingleServiceStack extends Stack {
       ),
     };
 
-    const lambdaHandler = new aws_lambda_nodejs.NodejsFunction(
+    const lambdaHandler = new aws_lambda.Function(
       this,
       `${settings.environment}-${settings.service}-lambda-rest`,
       {
         functionName: `lambda-rest-${settings.service}-${settings.environment}`,
-        entry:
-          props.lambdaAPIGatewayEventPath ||
-          path.resolve(__dirname, 'lambdas', 'lambdaAPIGatewayEvent.js'),
-        handler: 'executeAPIGatewayEvent',
         timeout: cdk.Duration.seconds(25),
 
         runtime: aws_lambda.Runtime.NODEJS_16_X,
-
-        // layers: [BLLayer],
         memorySize: 1024,
 
-        bundling: {
-          tsconfig: './tsconfig.json',
-          define: {
-            'process.env.lambdaRuntimeConfig': JSON.stringify(
-              JSON.stringify(runtimeConfigLambdaConfig),
-            ),
-          },
-        },
+        code: aws_lambda.Code.fromAsset(props.apiBuildPath),
+        handler: 'lambdaAPIGatewayEvent.executeAPIGatewayEvent',
 
         environment: {
           TABLES: JSON.stringify([]),
+          lambdaRuntimeConfig: JSON.stringify(runtimeConfigLambdaConfig),
         },
       },
     );
@@ -341,39 +324,28 @@ export class QPQPrototypeSingleServiceStack extends Stack {
     });
 
     qpqCoreUtils.getScheduleEvents(props.qpqConfig).forEach((se, index) => {
-      const schedulerFunction = new aws_lambda_nodejs.NodejsFunction(
+      const schedulerFunction = new aws_lambda.Function(
         this,
         `${settings.environment}-${settings.service}-SE-${index}`,
         {
           functionName: `SE-${index}-${se.runtime}-${settings.environment}-${settings.service}`,
-          entry:
-            props.lambdaEventBridgeEventPath ||
-            path.resolve(__dirname, 'lambdas', 'lambdaEventBridgeEvent.js'),
-          handler: 'executeEventBridgeEvent',
           timeout: cdk.Duration.minutes(15),
 
           runtime: aws_lambda.Runtime.NODEJS_16_X,
-
-          // layers: [BLLayer],
           memorySize: 1024,
 
-          bundling: {
-            tsconfig: './tsconfig.json',
-            define: {
-              'process.env.lambdaRuntimeConfig': JSON.stringify(
-                JSON.stringify({
-                  ...runtimeConfigLambdaConfig,
-                  lambdaRuntimeConfig: {
-                    src: se.src,
-                    runtime: se.runtime,
-                  },
-                }),
-              ),
-            },
-          },
+          code: aws_lambda.Code.fromAsset(props.apiBuildPath),
+          handler: 'lambdaEventBridgeEvent.executeEventBridgeEvent',
 
           environment: {
             TABLES: JSON.stringify([]),
+            lambdaRuntimeConfig: JSON.stringify({
+              ...runtimeConfigLambdaConfig,
+              lambdaRuntimeConfig: {
+                src: se.src,
+                runtime: se.runtime,
+              },
+            }),
           },
         },
       );

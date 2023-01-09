@@ -12,23 +12,20 @@ import {
   ActionProcessorList,
 } from 'quidproquo-core';
 
-import { QPQAWSLambdaConfig } from '../../../runtimeConfig/QPQAWSLambdaConfig';
-
-import { coreActionProcessor, webserverActionProcessor } from 'quidproquo-actionprocessor-node';
-
-import { randomGuid, loadModule } from './../../../awsLambdaUtils';
+import { randomGuid } from './../../../awsLambdaUtils';
+import { DynamicModuleLoader } from '../../../types/DynamicLoader';
 
 export const getDateNow = () => new Date().toISOString();
 
 const getProcessExecuteStory = <T extends Array<any>>(
-  runtimeConfig: QPQAWSLambdaConfig,
+  dynamicModuleLoader: DynamicModuleLoader,
 ): SystemExecuteStoryActionProcessor<T> => {
   return async (
     payload: SystemExecuteStoryActionPayload<T>,
     session: StorySession,
     actionProcessors: ActionProcessorList,
   ): Promise<any> => {
-    let module = await loadModule(payload.src);
+    let module = await dynamicModuleLoader(payload.src);
     if (module === null) {
       return actionResultError(ErrorTypeEnum.NotFound, `Module not found [${payload.src}]`);
     }
@@ -63,10 +60,8 @@ const getProcessExecuteStory = <T extends Array<any>>(
   };
 };
 
-export default (runtimeConfig: QPQAWSLambdaConfig) => {
-  // const appName = qpqCoreUtils.getAppName(config);
-
+export default (dynamicModuleLoader: DynamicModuleLoader) => {
   return {
-    [SystemActionType.ExecuteStory]: getProcessExecuteStory(runtimeConfig),
+    [SystemActionType.ExecuteStory]: getProcessExecuteStory(dynamicModuleLoader),
   };
 };

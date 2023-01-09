@@ -32,7 +32,8 @@
     "quidproquo-actionprocessor-awslambda": "*",
     "quidproquo-actionprocessor-node": "*",
     "quidproquo-core": "*",
-    "quidproquo-webserver": "*"
+    "quidproquo-webserver": "*",
+    "webpack": "^5.75.0"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.109",

@@ -8,6 +8,7 @@ import {
   getConfigGetParameterActionProcessor,
   getConfigGetParametersActionProcessor,
   awsLambdaUtils,
+  DynamicModuleLoader,
 } from 'quidproquo-actionprocessor-awslambda';
 
 import { qpqWebServerUtils } from 'quidproquo-webserver';
@@ -17,6 +18,9 @@ import { createRuntime, askProcessEvent, ErrorTypeEnum } from 'quidproquo-core';
 import { APIGatewayEvent, Context } from 'aws-lambda';
 
 import { lambdaRuntimeConfig, ActionProcessorListResolver } from './lambdaConfig';
+
+// @ts-ignore - Special webpack loader
+import qpqDynamicModuleLoader from 'qpq-dynamic-loader!';
 
 // TODO: Make this a util or something based on server time or something..
 const getDateNow = () => new Date().toISOString();
@@ -37,6 +41,7 @@ const ErrorTypeHttpResponseMap = {
 };
 
 export const getAPIGatewayEventExecutor = (
+  dynamicModuleLoader: DynamicModuleLoader,
   getCustomActionProcessors: ActionProcessorListResolver = () => ({}),
 ) => {
   return async (event: APIGatewayEvent, context: Context) => {
@@ -50,7 +55,7 @@ export const getAPIGatewayEventExecutor = (
       ...getConfigGetSecretActionProcessor(lambdaRuntimeConfig),
       ...getConfigGetParameterActionProcessor(lambdaRuntimeConfig),
       ...getConfigGetParametersActionProcessor(lambdaRuntimeConfig),
-      ...getSystemActionProcessor(lambdaRuntimeConfig),
+      ...getSystemActionProcessor(dynamicModuleLoader),
       ...getFileActionProcessor(lambdaRuntimeConfig),
 
       ...getCustomActionProcessors(lambdaRuntimeConfig),
@@ -80,7 +85,7 @@ export const getAPIGatewayEventExecutor = (
 
     const result = await resolveStory(askProcessEvent, [event, context]);
 
-    // // Run the callback
+    // Run the callback
     if (!result.error) {
       return {
         statusCode: result.result.statusCode,
@@ -100,4 +105,4 @@ export const getAPIGatewayEventExecutor = (
 };
 
 // Default executor
-export const executeAPIGatewayEvent = getAPIGatewayEventExecutor();
+export const executeAPIGatewayEvent = getAPIGatewayEventExecutor(qpqDynamicModuleLoader);

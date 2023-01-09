@@ -20,11 +20,3 @@ export const matchUrl = (path: string, url: string): UrlMatch => {
     params: matchResult.params,
   };
 };
-
-export const loadModule = async (src: string): Promise<any> => {
-  try {
-    return require(src);
-  } catch {}
-
-  return null;
-};

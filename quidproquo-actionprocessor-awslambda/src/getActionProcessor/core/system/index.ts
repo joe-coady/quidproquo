@@ -1,6 +1,6 @@
-import { QPQAWSLambdaConfig } from '../../../runtimeConfig/QPQAWSLambdaConfig';
 import getExecuteStoryActionProcessor from './getExecuteStoryActionProcessor';
+import { DynamicModuleLoader } from '../../../types/DynamicLoader';
 
-export default (runtimeConfig: QPQAWSLambdaConfig) => ({
-  ...getExecuteStoryActionProcessor(runtimeConfig),
+export default (dynamicModuleLoader: DynamicModuleLoader) => ({
+  ...getExecuteStoryActionProcessor(dynamicModuleLoader),
 });
