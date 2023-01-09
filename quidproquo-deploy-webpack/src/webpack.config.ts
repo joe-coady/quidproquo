@@ -36,8 +36,8 @@ export const getWebpackConfig = (qpqConfig: QPQConfig, buildPath: string, output
     // ),
 
     entry: {
-      lambdaAPIGatewayEvent: 'quidproquo-deploy-awscdk/src/lambdas/LambdaAPIGatewayEvent.ts',
-      lambdaEventBridgeEvent: 'quidproquo-deploy-awscdk/src/lambdas/lambdaEventBridgeEvent.ts',
+      lambdaAPIGatewayEvent: 'quidproquo-deploy-awslambda/src/lambdas/lambdaAPIGatewayEvent.ts',
+      lambdaEventBridgeEvent: 'quidproquo-deploy-awslambda/src/lambdas/lambdaEventBridgeEvent.ts',
     },
 
     resolveLoader: {
