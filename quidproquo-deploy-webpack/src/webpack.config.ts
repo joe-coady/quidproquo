@@ -1,3 +1,5 @@
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
+
 import path from 'path';
 
 import { qpqCoreUtils, QPQConfig } from 'quidproquo-core';
@@ -24,25 +26,49 @@ export const getWebpackConfig = (qpqConfig: QPQConfig, buildPath: string, output
   process.env.QPQLoaderConfig = JSON.stringify({
     allSrcEntries,
     rootDir: path.resolve(buildPath, '..'),
+    qpqConfig,
   });
 
   return {
     entry: {
       lambdaAPIGatewayEvent: 'quidproquo-deploy-awscdk/src/lambdas/lambdaAPIGatewayEvent.ts',
       lambdaEventBridgeEvent: 'quidproquo-deploy-awscdk/src/lambdas/lambdaEventBridgeEvent.ts',
+      lambdaEventOriginRequest: 'quidproquo-deploy-awscdk/src/lambdas/lambdaEventOriginRequest.ts',
+      lambdaEventViewerRequest: 'quidproquo-deploy-awscdk/src/lambdas/lambdaEventViewerRequest.ts',
     },
 
     resolveLoader: {
       modules: [path.resolve(__dirname, 'loaders'), 'node_modules'],
     },
 
-    mode: getWebpackBuildMode(qpqConfig),
+    // mode: getWebpackBuildMode(qpqConfig),
+    mode: 'production',
+
+    // externals: ({ request }: { request: string }, callback: any) => {
+    //   if (/^@aws-sdk\//.test(request)) {
+    //     return callback(null, `commonjs ${request}`);
+    //   }
+    //   callback();
+    // },
+
+    optimization: {
+      splitChunks: {
+        chunks: 'all',
+        automaticNameDelimiter: '.',
+        cacheGroups: {
+          vendors: {
+            test: /[\\/]node_modules[\\/]/,
+            priority: -10,
+          },
+        },
+      },
+    },
 
     target: 'node',
     output: {
       // Output path
       path: buildPath,
-      filename: '[name].js',
+      filename: '[name]/index.js',
 
       // Allow compiling as a lib ~ don't tree shake my exports plz
       globalObject: 'this',
@@ -74,5 +100,6 @@ export const getWebpackConfig = (qpqConfig: QPQConfig, buildPath: string, output
         },
       ],
     },
+    // plugins: [new BundleAnalyzerPlugin()],
   };
 };

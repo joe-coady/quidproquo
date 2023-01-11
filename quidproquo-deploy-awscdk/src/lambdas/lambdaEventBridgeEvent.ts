@@ -14,7 +14,8 @@ import { createRuntime, askProcessEvent } from 'quidproquo-core';
 
 import { EventBridgeEvent, Context } from 'aws-lambda';
 
-import { lambdaRuntimeConfig, ActionProcessorListResolver } from './lambdaConfig';
+import { lambdaRuntimeConfig } from './lambdaConfig';
+import { ActionProcessorListResolver } from './actionProcessorListResolver';
 
 // @ts-ignore - Special webpack loader
 import qpqDynamicModuleLoader from 'qpq-dynamic-loader!';

@@ -4,7 +4,7 @@ import { EventTransformResponseResultActionRequester } from './EventTransformRes
 export function* askEventTransformResponseResult<TOutputRes, TInputRes, TTransformedEventParams>(
   response: TInputRes,
   transformedEventParams: TTransformedEventParams,
-): EventTransformResponseResultActionRequester<TOutputRes> {
+): EventTransformResponseResultActionRequester<TInputRes, TTransformedEventParams, TOutputRes> {
   return yield {
     type: EventActionType.TransformResponseResult,
     payload: { response, transformedEventParams },

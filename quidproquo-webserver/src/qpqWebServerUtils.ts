@@ -2,13 +2,16 @@ import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
 import { RouteQPQWebServerConfigSetting } from './config/settings/route';
 import { DnsQPQWebServerConfigSetting } from './config/settings/dns';
+import { SeoQPQWebServerConfigSetting } from './config/settings/seo';
 import { OpenApiQPQWebServerConfigSetting } from './config/settings/openApi';
 import { DefaultRouteOptionsQPQWebServerConfigSetting } from './config/settings/defaultRouteOptions';
 import { QPQWebServerConfigSettingType } from './config/QPQConfig';
 import { getAppFeature } from 'quidproquo-core/lib/qpqCoreUtils';
 
 import { HttpEventHeaders } from './types/HTTPEvent';
+import { SeoEventHeaders } from './types/SEOEvent';
 import { RouteOptions } from './config/settings/route';
+import { DeployRegionQPQWebServerConfigSetting } from './config';
 
 export const getAllRoutes = (configs: QPQConfig): RouteQPQWebServerConfigSetting[] => {
   const routes = qpqCoreUtils.getConfigSettings<RouteQPQWebServerConfigSetting>(
@@ -17,6 +20,24 @@ export const getAllRoutes = (configs: QPQConfig): RouteQPQWebServerConfigSetting
   );
 
   return routes;
+};
+
+export const getAllSeo = (configs: QPQConfig): SeoQPQWebServerConfigSetting[] => {
+  const seoConfigs = qpqCoreUtils.getConfigSettings<SeoQPQWebServerConfigSetting>(
+    configs,
+    QPQWebServerConfigSettingType.Seo,
+  );
+
+  return seoConfigs;
+};
+
+export const getDeployRegion = (configs: QPQConfig): string => {
+  const deployRegions = qpqCoreUtils.getConfigSettings<DeployRegionQPQWebServerConfigSetting>(
+    configs,
+    QPQWebServerConfigSettingType.DeployRegion,
+  );
+
+  return deployRegions[0]?.deployRegion || 'ap-southeast-2';
 };
 
 export const getAllOpenApiSpecs = (configs: QPQConfig): OpenApiQPQWebServerConfigSetting[] => {
@@ -34,6 +55,7 @@ export const getAllSrcEntries = (configs: QPQConfig): string[] => {
   return [
     ...getAllRoutes(configs).map((r) => r.src),
     ...getAllOpenApiSpecs(configs).map((r) => r.openApiSpecPath),
+    ...getAllSeo(configs).map((seo) => seo.src),
   ];
 };
 

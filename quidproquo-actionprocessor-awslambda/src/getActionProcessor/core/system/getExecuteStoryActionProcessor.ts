@@ -53,10 +53,7 @@ const getProcessExecuteStory = <T extends Array<any>>(
       );
     }
 
-    return actionResult({
-      result: storyResult.result,
-      session: storyResult.session,
-    });
+    return actionResult(storyResult.result);
   };
 };
 

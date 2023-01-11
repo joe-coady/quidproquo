@@ -17,7 +17,8 @@ import { createRuntime, askProcessEvent, ErrorTypeEnum } from 'quidproquo-core';
 
 import { APIGatewayEvent, Context } from 'aws-lambda';
 
-import { lambdaRuntimeConfig, ActionProcessorListResolver } from './lambdaConfig';
+import { lambdaRuntimeConfig } from './lambdaConfig';
+import { ActionProcessorListResolver } from './actionProcessorListResolver';
 
 // @ts-ignore - Special webpack loader
 import qpqDynamicModuleLoader from 'qpq-dynamic-loader!';
@@ -94,7 +95,6 @@ export const getAPIGatewayEventExecutor = (
       };
     }
 
-    console.log(JSON.stringify(result));
     const code = ErrorTypeHttpResponseMap[result.error.errorType];
     return {
       statusCode: code || 500,

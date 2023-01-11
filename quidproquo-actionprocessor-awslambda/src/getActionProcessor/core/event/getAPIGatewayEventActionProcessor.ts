@@ -27,7 +27,6 @@ const getProcessTransformEventParams = (
 ): EventTransformEventParamsActionProcessor<[APIGatewayEvent, Context], HTTPEventParams<any>> => {
   return async ({ eventParams: [apiGatewayEvent, context] }) => {
     const path = (apiGatewayEvent.path || '').replace(new RegExp(`^(\/${appName})/`), '/');
-    console.log('getProcessTransformEventParams', JSON.stringify(apiGatewayEvent));
 
     return actionResult({
       path,
@@ -46,21 +45,17 @@ const getProcessTransformEventParams = (
 
 const getProcessTransformResponseResult = (
   configs: QPQConfig,
-): EventTransformResponseResultActionProcessor<APIGatewayProxyResult> => {
+  // TODO: Remove the anys here for a HttpResponse type
+): EventTransformResponseResultActionProcessor<any, any, APIGatewayProxyResult> => {
   // We might need to JSON.stringify the body.
   return async (payload) => {
-    // Validate response
-    // if !valid actionResultError
-
-    console.log('getProcessTransformResponseResult', JSON.stringify(payload));
-
     return actionResult<APIGatewayProxyResult>({
-      statusCode: payload.response.result.statusCode,
-      body: payload.response.result.body,
+      statusCode: payload.response.statusCode,
+      body: payload.response.body,
       headers: {
         'Content-Type': 'application/json',
         ...qpqWebServerUtils.getCorsHeaders(configs, {}, payload.transformedEventParams.headers),
-        ...(payload.response.headers || {}),
+        ...(payload?.response?.headers || {}),
       },
     });
   };

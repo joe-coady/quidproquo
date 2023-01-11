@@ -11,7 +11,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "npx rimraf lib",
     "build": "npm run clean && tsc",
-    "watch": "npm run clean && tsc -w"
+    "watch": "tsc -w"
   },
   "repository": {
     "type": "git",

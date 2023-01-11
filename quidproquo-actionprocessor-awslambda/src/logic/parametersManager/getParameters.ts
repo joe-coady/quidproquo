@@ -1,8 +1,11 @@
 import { SSMClient, GetParametersCommand } from '@aws-sdk/client-ssm';
 
-const smClient = new SSMClient({});
+export const getParameters = async (
+  parameterNames: string[],
+  region: string,
+): Promise<string[]> => {
+  const smClient = new SSMClient({ region });
 
-export const getParameters = async (parameterNames: string[]): Promise<string[]> => {
   const response = await smClient.send(
     new GetParametersCommand({
       Names: parameterNames,

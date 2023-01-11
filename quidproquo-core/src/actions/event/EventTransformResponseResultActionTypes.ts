@@ -2,24 +2,24 @@ import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
 import { EventActionType } from './EventActionType';
 
 // Payload
-export interface EventTransformResponseResultActionPayload {
-  response: any;
-  transformedEventParams: any;
+export interface EventTransformResponseResultActionPayload<R, T> {
+  response: R;
+  transformedEventParams: T;
 }
 
 // Action
-export interface EventTransformResponseResultAction
-  extends Action<EventTransformResponseResultActionPayload> {
+export interface EventTransformResponseResultAction<R, T>
+  extends Action<EventTransformResponseResultActionPayload<R, T>> {
   type: EventActionType.TransformResponseResult;
-  payload: EventTransformResponseResultActionPayload;
+  payload: EventTransformResponseResultActionPayload<R, T>;
 }
 
 // Functions
-export type EventTransformResponseResultActionProcessor<TRes> = ActionProcessor<
-  EventTransformResponseResultAction,
+export type EventTransformResponseResultActionProcessor<R, T, TRes> = ActionProcessor<
+  EventTransformResponseResultAction<R, T>,
   TRes
 >;
-export type EventTransformResponseResultActionRequester<TRes> = ActionRequester<
-  EventTransformResponseResultAction,
+export type EventTransformResponseResultActionRequester<R, T, TRes> = ActionRequester<
+  EventTransformResponseResultAction<R, T>,
   TRes
 >;

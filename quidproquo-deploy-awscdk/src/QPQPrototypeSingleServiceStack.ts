@@ -28,7 +28,6 @@ import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 export interface QPQPrototypeStackProps extends DeploymentSettings {
   account: string;
-  region: string;
 
   apiBuildPath: string;
   webBuildPath: string;
@@ -36,6 +35,65 @@ export interface QPQPrototypeStackProps extends DeploymentSettings {
   lambdaAPIGatewayEventPath?: string;
   lambdaEventBridgeEventPath?: string;
 }
+
+interface OwnedBucket {
+  driveName: string;
+  bucketName: string;
+  bucket: aws_s3.Bucket;
+}
+
+interface OwnedSecret {
+  secretName: string;
+  realName: string;
+  secret: aws_secretsmanager.Secret;
+}
+
+interface OwnedParameter {
+  parameterName: string;
+  realName: string;
+  parameter: aws_ssm.StringParameter;
+}
+
+interface OwnedResourceSettings {
+  ownedBuckets: OwnedBucket[];
+  ownedSecrets: OwnedSecret[];
+  ownedParameters: OwnedParameter[];
+}
+
+const grantReadToOwnedResources = (
+  ownedResourceSettings: OwnedResourceSettings,
+  identity: cdk.aws_iam.IGrantable,
+) => {
+  ownedResourceSettings.ownedBuckets.forEach((b) => b.bucket.grantReadWrite(identity));
+  ownedResourceSettings.ownedSecrets.forEach((os) => os.secret.grantRead(identity));
+  ownedResourceSettings.ownedParameters.forEach((os) => os.parameter.grantRead(identity));
+};
+
+const getParameterName = (parameterKey: string, service: string, environment: string) =>
+  `${parameterKey}-${service}-${environment}`;
+
+const createServiceParameter = (
+  stack: cdk.Stack,
+  id: string,
+  service: string,
+  environment: string,
+  parameterKey: string,
+  value: string,
+) => {
+  const realParameterName = getParameterName(parameterKey, service, environment);
+  return {
+    parameterName: parameterKey,
+    realName: realParameterName,
+    parameter: new aws_ssm.StringParameter(stack, `${id}-parameter-${parameterKey}`, {
+      parameterName: realParameterName,
+      description: `${environment}-${service}`,
+      stringValue: value,
+
+      // No additional costs ~ 4k max size
+      tier: aws_ssm.ParameterTier.STANDARD,
+    }),
+  };
+};
 
 const createApiDomainName = (stack: cdk.Stack, id: string, stackProps: QPQPrototypeStackProps) => {
   const apexDomain = qpqWebServerUtils.getFeatureDomainName(stackProps.qpqConfig);
@@ -74,6 +132,7 @@ const createWebDistribution = (
   stack: cdk.Stack,
   id: string,
   stackProps: QPQPrototypeStackProps,
+  ownedResourceSettings: OwnedResourceSettings,
 ) => {
   const environment = qpqCoreUtils.getAppFeature(stackProps.qpqConfig);
   const apexDomain = qpqWebServerUtils.getFeatureDomainName(stackProps.qpqConfig);
@@ -127,8 +186,74 @@ const createWebDistribution = (
     destinationBucket: staticWebFilesBucket,
   });
 
+  const cloudFrontBehaviors = qpqWebServerUtils
+    .getAllSeo(stackProps.qpqConfig)
+    .map((seo, index) => {
+      const edgeFunctionVR = new aws_cloudfront.experimental.EdgeFunction(
+        stack,
+        `${id}-SEO-${index}-${seo.runtime}-VR`,
+        {
+          functionName: `SEO-VR-${index}-${seo.runtime}-${environment}-${serviceName}`,
+          timeout: cdk.Duration.seconds(5),
+          runtime: aws_lambda.Runtime.NODEJS_16_X,
+
+          code: aws_lambda.Code.fromAsset(
+            path.join(stackProps.apiBuildPath, 'lambdaEventViewerRequest'),
+          ),
+          handler: 'index.executeEventViewerRequest',
+        },
+      );
+
+      const edgeFunctionOR = new aws_cloudfront.experimental.EdgeFunction(
+        stack,
+        `${id}-SEO-${index}-${seo.runtime}-OR`,
+        {
+          functionName: `SEO-OR-${index}-${seo.runtime}-${environment}-${serviceName}`,
+          timeout: cdk.Duration.seconds(30),
+          runtime: aws_lambda.Runtime.NODEJS_16_X,
+
+          memorySize: 1024,
+
+          code: aws_lambda.Code.fromAsset(
+            path.join(stackProps.apiBuildPath, 'lambdaEventOriginRequest'),
+          ),
+          handler: 'index.executeEventOriginRequest',
+        },
+      );
+
+      // We don't need access to anything in the VR
+      grantReadToOwnedResources(ownedResourceSettings, edgeFunctionOR);
+
+      const wildcardPath = seo.path.replaceAll(/{(.+?)}/g, '*');
+
+      return {
+        pathPattern: wildcardPath,
+
+        // Update this to 24 hours
+        maxTtl: cdk.Duration.seconds(0),
+        minTtl: cdk.Duration.seconds(0),
+        defaultTtl: cdk.Duration.seconds(0),
+
+        lambdaFunctionAssociations: [
+          {
+            includeBody: true,
+            eventType: aws_cloudfront.LambdaEdgeEventType.ORIGIN_REQUEST,
+            lambdaFunction: edgeFunctionOR.currentVersion,
+          },
+          {
+            includeBody: false,
+            eventType: aws_cloudfront.LambdaEdgeEventType.VIEWER_REQUEST,
+            lambdaFunction: edgeFunctionVR.currentVersion,
+          },
+        ],
+      };
+    });
+
   // Create a cloud front distribution
   // TODO: use aws_cloudfront.Distribution
+  // TODO: Somehow expose query strings: Note ~
+  // (Lambda@Edge only) To access the query string in an origin request or origin response function,
+  // your cache policy or origin request policy must be set to All for Query strings.
   const distribution = new aws_cloudfront.CloudFrontWebDistribution(stack, 'cf-distribution', {
     originConfigs: [
       {
@@ -137,16 +262,7 @@ const createWebDistribution = (
           originAccessIdentity: websiteOAI,
         },
         behaviors: [
-          ...[
-            '/remoteEntry.js',
-            '/index.js', // Add this if we need it
-            '/index.html', // Add this if we need it
-          ].map((pp) => ({
-            pathPattern: pp,
-            maxTtl: cdk.Duration.seconds(0),
-            minTtl: cdk.Duration.seconds(0),
-            defaultTtl: cdk.Duration.seconds(0),
-          })),
+          ...cloudFrontBehaviors,
           {
             isDefaultBehavior: true,
           },
@@ -180,7 +296,7 @@ export class QPQPrototypeSingleServiceStack extends Stack {
     super(scope, id, {
       env: {
         account: props.account,
-        region: props.region,
+        region: qpqWebServerUtils.getDeployRegion(props.qpqConfig),
       },
     });
 
@@ -190,8 +306,6 @@ export class QPQPrototypeSingleServiceStack extends Stack {
     };
 
     const domainName = createApiDomainName(this, id, props);
-
-    createWebDistribution(this, `${id}-web-dist`, props);
 
     const resourceName = (name: string) => {
       return `${settings.service}-${settings.environment}-${name}`;
@@ -210,23 +324,20 @@ export class QPQPrototypeSingleServiceStack extends Stack {
       };
     });
 
-    const ownedParameters = qpqCoreUtils.getOwnedParameters(props.qpqConfig).map((parameter) => {
-      const realParameterName = `${parameter.key}-${settings.service}-${settings.environment}`;
-      return {
-        parameterName: parameter.key,
-        realName: realParameterName,
-        parameter: new aws_ssm.StringParameter(this, `${id}-parameter-${parameter.key}`, {
-          parameterName: realParameterName,
-          description: `${settings.environment}-${settings.service}`,
-          stringValue: parameter.value,
+    const ownedParameters = qpqCoreUtils
+      .getOwnedParameters(props.qpqConfig)
+      .map((parameter) =>
+        createServiceParameter(
+          this,
+          id,
+          settings.service,
+          settings.environment,
+          parameter.key,
+          parameter.value,
+        ),
+      );
 
-          // No additional costs ~ 4k max size
-          tier: aws_ssm.ParameterTier.STANDARD,
-        }),
-      };
-    });
-
-    const buckets = qpqCoreUtils.getStorageDriveNames(props.qpqConfig).map((driveName) => {
+    const ownedBuckets = qpqCoreUtils.getStorageDriveNames(props.qpqConfig).map((driveName) => {
       const bucketName = resourceName(driveName);
 
       const bucket = new aws_s3.Bucket(this, bucketName, {
@@ -258,14 +369,21 @@ export class QPQPrototypeSingleServiceStack extends Stack {
         }),
         {},
       ),
-      parameterNameMap: ownedParameters.reduce(
-        (acc, os) => ({
-          ...acc,
-          [os.parameterName]: os.realName,
-        }),
-        {},
-      ),
-      resourceNameMap: buckets.reduce(
+      parameterNameMap: {
+        ...ownedParameters.reduce(
+          (acc, os) => ({
+            ...acc,
+            [os.parameterName]: os.realName,
+          }),
+          {},
+        ),
+        ['qpqRuntimeConfig']: getParameterName(
+          'qpqRuntimeConfig',
+          settings.service,
+          settings.environment,
+        ),
+      },
+      resourceNameMap: ownedBuckets.reduce(
         (acc, b) => ({
           ...acc,
           [b.driveName]: b.bucketName,
@@ -273,6 +391,31 @@ export class QPQPrototypeSingleServiceStack extends Stack {
         {},
       ),
     };
+
+    // Build the param that stores the config
+    // Note: The mapping was done manually previously inside the value
+    ownedParameters.push(
+      createServiceParameter(
+        this,
+        id,
+        settings.service,
+        settings.environment,
+        'qpqRuntimeConfig',
+        JSON.stringify(runtimeConfigLambdaConfig),
+      ),
+    );
+
+    const ownedResourceSettings: OwnedResourceSettings = {
+      ownedBuckets,
+      ownedParameters,
+      ownedSecrets,
+    };
+
+    ////////////////////////////////////////////////////////////////////////////////////
+    // Finished building resources, now we can build the lambdas
+    ////////////////////////////////////////////////////////////////////////////////////
+
+    createWebDistribution(this, `${id}-web-dist`, props, ownedResourceSettings);
 
     const lambdaHandler = new aws_lambda.Function(
       this,
@@ -284,8 +427,8 @@ export class QPQPrototypeSingleServiceStack extends Stack {
         runtime: aws_lambda.Runtime.NODEJS_16_X,
         memorySize: 1024,
 
-        code: aws_lambda.Code.fromAsset(props.apiBuildPath),
-        handler: 'lambdaAPIGatewayEvent.executeAPIGatewayEvent',
+        code: aws_lambda.Code.fromAsset(path.join(props.apiBuildPath, 'lambdaAPIGatewayEvent')),
+        handler: 'index.executeAPIGatewayEvent',
 
         environment: {
           TABLES: JSON.stringify([]),
@@ -295,9 +438,7 @@ export class QPQPrototypeSingleServiceStack extends Stack {
     );
 
     // Grant access to the lambda
-    buckets.forEach((b) => b.bucket.grantReadWrite(lambdaHandler));
-    ownedSecrets.forEach((os) => os.secret.grantRead(lambdaHandler));
-    ownedParameters.forEach((os) => os.parameter.grantRead(lambdaHandler));
+    grantReadToOwnedResources(ownedResourceSettings, lambdaHandler);
 
     // Create a rest api
     const api = new aws_apigateway.LambdaRestApi(
@@ -334,8 +475,8 @@ export class QPQPrototypeSingleServiceStack extends Stack {
           runtime: aws_lambda.Runtime.NODEJS_16_X,
           memorySize: 1024,
 
-          code: aws_lambda.Code.fromAsset(props.apiBuildPath),
-          handler: 'lambdaEventBridgeEvent.executeEventBridgeEvent',
+          code: aws_lambda.Code.fromAsset(path.join(props.apiBuildPath, 'lambdaEventBridgeEvent')),
+          handler: 'index.executeEventBridgeEvent',
 
           environment: {
             TABLES: JSON.stringify([]),
@@ -350,9 +491,7 @@ export class QPQPrototypeSingleServiceStack extends Stack {
         },
       );
 
-      buckets.forEach((b) => b.bucket.grantReadWrite(schedulerFunction));
-      ownedSecrets.forEach((os) => os.secret.grantRead(schedulerFunction));
-      ownedParameters.forEach((os) => os.parameter.grantRead(schedulerFunction));
+      grantReadToOwnedResources(ownedResourceSettings, schedulerFunction);
 
       // EventBridge rule which runs every five minutes
       const cronRule = new aws_events.Rule(this, `${id}-se-cronrule-${index}`, {

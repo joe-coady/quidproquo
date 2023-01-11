@@ -1,4 +1,5 @@
 import { ConfigActionType, ConfigGetParameterActionProcessor, actionResult } from 'quidproquo-core';
+import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { QPQAWSLambdaConfig } from '../../../runtimeConfig/QPQAWSLambdaConfig';
 import { resolveParameterKey } from '../../../runtimeConfig/qpqAwsLambdaRuntimeConfigUtils';
@@ -10,7 +11,10 @@ const getProcessConfigGetParameter = (
 ): ConfigGetParameterActionProcessor => {
   return async ({ parameterName }) => {
     const awsParameterKey = resolveParameterKey(parameterName, runtimeConfig);
-    const parameterValue = await getParameter(awsParameterKey);
+    const parameterValue = await getParameter(
+      awsParameterKey,
+      qpqWebServerUtils.getDeployRegion(runtimeConfig.qpqConfig),
+    );
 
     return actionResult(parameterValue);
   };

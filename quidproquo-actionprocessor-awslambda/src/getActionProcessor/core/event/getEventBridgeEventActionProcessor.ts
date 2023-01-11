@@ -29,7 +29,12 @@ const getProcessTransformEventParams = (): EventTransformEventParamsActionProces
 };
 
 // No transform
-const getProcessTransformResponseResult = (): EventTransformResponseResultActionProcessor<any> => {
+const getProcessTransformResponseResult = (): EventTransformResponseResultActionProcessor<
+  // TODO: Fix types - look at getCloudFrontOriginRequestEventActionProcessor
+  any,
+  any,
+  any
+> => {
   return async ({ response }) => actionResult<any>(response);
 };
 
@@ -42,8 +47,6 @@ const getProcessMatchStory = (
   lambdaRuntimeConfig?: LambdaRuntimeConfig,
 ): EventMatchStoryActionProcessor<ScheduledEventParams<any>> => {
   return async (payload) => {
-    console.log('Trying to match story');
-    console.log(JSON.stringify(lambdaRuntimeConfig));
     if (!lambdaRuntimeConfig) {
       return actionResultError(ErrorTypeEnum.NotFound, 'event runtime not found');
     }
