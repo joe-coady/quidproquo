@@ -1,6 +1,8 @@
+import { FileReadTextContentsActionProcessor, actionResult, FileActionType } from 'quidproquo-core';
+import { qpqWebServerUtils } from 'quidproquo-webserver';
+
 import { QPQAWSLambdaConfig } from '../../../runtimeConfig/QPQAWSLambdaConfig';
 import { resolveResourceName } from '../../../runtimeConfig/qpqAwsLambdaRuntimeConfigUtils';
-import { FileReadTextContentsActionProcessor, actionResult, FileActionType } from 'quidproquo-core';
 import { readTextFile } from '../../../logic/s3/s3Utils';
 
 const getProcessFileReadTextContents = (
@@ -9,7 +11,13 @@ const getProcessFileReadTextContents = (
   return async ({ drive, filepath }) => {
     const s3BucketName = resolveResourceName(drive, runtimeConfig);
 
-    return actionResult(await readTextFile(s3BucketName, filepath));
+    return actionResult(
+      await readTextFile(
+        s3BucketName,
+        filepath,
+        qpqWebServerUtils.getDeployRegion(runtimeConfig.qpqConfig),
+      ),
+    );
   };
 };
 

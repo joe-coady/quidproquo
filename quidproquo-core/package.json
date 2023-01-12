@@ -1,6 +1,6 @@
 {
   "name": "quidproquo-core",
-  "version": "0.0.43",
+  "version": "0.0.46",
   "description": "",
   "main": "./lib/index.js",
   "types": "./lib/index.d.js",

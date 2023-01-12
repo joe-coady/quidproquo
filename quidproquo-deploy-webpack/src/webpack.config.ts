@@ -51,18 +51,18 @@ export const getWebpackConfig = (qpqConfig: QPQConfig, buildPath: string, output
     //   callback();
     // },
 
-    optimization: {
-      splitChunks: {
-        chunks: 'all',
-        automaticNameDelimiter: '.',
-        cacheGroups: {
-          vendors: {
-            test: /[\\/]node_modules[\\/]/,
-            priority: -10,
-          },
-        },
-      },
-    },
+    // optimization: {
+    //   splitChunks: {
+    //     chunks: 'all',
+    //     automaticNameDelimiter: '.',
+    //     cacheGroups: {
+    //       vendors: {
+    //         test: /[\\/]node_modules[\\/]/,
+    //         priority: -10,
+    //       },
+    //     },
+    //   },
+    // },
 
     target: 'node',
     output: {

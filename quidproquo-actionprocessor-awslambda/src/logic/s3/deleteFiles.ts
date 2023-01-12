@@ -1,8 +1,13 @@
+import { S3Client } from '@aws-sdk/client-s3';
 import { DeleteObjectsCommand, DeleteObjectsCommandInput } from '@aws-sdk/client-s3';
 
-import s3Client from './s3Client';
+export const deleteFiles = async (
+  drive: string,
+  filepaths: string[],
+  region: string,
+): Promise<string[]> => {
+  const s3Client = new S3Client({ region });
 
-export const deleteFiles = async (drive: string, filepaths: string[]): Promise<string[]> => {
   const bucketParams: DeleteObjectsCommandInput = {
     Bucket: drive,
     Delete: {

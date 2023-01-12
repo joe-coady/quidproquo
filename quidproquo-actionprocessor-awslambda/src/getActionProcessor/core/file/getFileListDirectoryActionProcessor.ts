@@ -1,6 +1,8 @@
+import { FileListDirectoryActionProcessor, actionResult, FileActionType } from 'quidproquo-core';
+import { qpqWebServerUtils } from 'quidproquo-webserver';
+
 import { QPQAWSLambdaConfig } from '../../../runtimeConfig/QPQAWSLambdaConfig';
 import { resolveResourceName } from '../../../runtimeConfig/qpqAwsLambdaRuntimeConfigUtils';
-import { FileListDirectoryActionProcessor, actionResult, FileActionType } from 'quidproquo-core';
 import { listFiles } from '../../../logic/s3/s3Utils';
 
 const getProcessFileListDirectory = (
@@ -8,7 +10,13 @@ const getProcessFileListDirectory = (
 ): FileListDirectoryActionProcessor => {
   return async ({ drive, folderPath, maxFiles, pageToken }) => {
     const s3BucketName = resolveResourceName(drive, runtimeConfig);
-    const s3FileList = await listFiles(s3BucketName, folderPath, maxFiles, pageToken);
+    const s3FileList = await listFiles(
+      s3BucketName,
+      qpqWebServerUtils.getDeployRegion(runtimeConfig.qpqConfig),
+      folderPath,
+      maxFiles,
+      pageToken,
+    );
 
     // Add the drive onto the list
     const fileInfos = s3FileList.fileInfos.map((s3fi) => ({

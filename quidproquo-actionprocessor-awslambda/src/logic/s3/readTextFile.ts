@@ -1,8 +1,12 @@
-import { GetObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 
-import s3Client from './s3Client';
+export const readTextFile = async (
+  bucketName: string,
+  key: string,
+  region: string,
+): Promise<string> => {
+  const s3Client = new S3Client({ region });
 
-export const readTextFile = async (bucketName: string, key: string): Promise<string> => {
   const response = await s3Client.send(
     new GetObjectCommand({
       Key: key,

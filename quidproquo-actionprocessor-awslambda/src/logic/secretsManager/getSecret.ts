@@ -1,8 +1,10 @@
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 
-const smClient = new SecretsManagerClient({});
+export const getSecret = async (secretName: string, region: string): Promise<string> => {
+  const smClient = new SecretsManagerClient({
+    region,
+  });
 
-export const getSecret = async (secretName: string): Promise<string> => {
   const response = await smClient.send(
     new GetSecretValueCommand({
       SecretId: secretName,

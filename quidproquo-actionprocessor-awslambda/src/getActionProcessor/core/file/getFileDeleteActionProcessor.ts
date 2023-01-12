@@ -1,3 +1,4 @@
+import { qpqWebServerUtils } from 'quidproquo-webserver';
 import { QPQAWSLambdaConfig } from '../../../runtimeConfig/QPQAWSLambdaConfig';
 import { resolveResourceName } from '../../../runtimeConfig/qpqAwsLambdaRuntimeConfigUtils';
 import {
@@ -12,7 +13,11 @@ import { deleteFiles } from '../../../logic/s3/s3Utils';
 const getProcessFileDelete = (runtimeConfig: QPQAWSLambdaConfig): FileDeleteActionProcessor => {
   return async ({ drive, filepaths }) => {
     const s3BucketName = resolveResourceName(drive, runtimeConfig);
-    const errored = await deleteFiles(s3BucketName, filepaths);
+    const errored = await deleteFiles(
+      s3BucketName,
+      filepaths,
+      qpqWebServerUtils.getDeployRegion(runtimeConfig.qpqConfig),
+    );
 
     // errored deletes are a graceful success ~ Retry
     // if (errored.length > 0) {
