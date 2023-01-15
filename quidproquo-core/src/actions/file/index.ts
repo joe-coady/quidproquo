@@ -14,3 +14,9 @@ export * from './FileReadTextContentsActionTypes';
 
 export * from './FileWriteTextContentsActionRequester';
 export * from './FileWriteTextContentsActionTypes';
+
+export * from './FileReadBinaryContentsActionRequester';
+export * from './FileReadBinaryContentsActionTypes';
+
+export * from './FileWriteBinaryContentsActionRequester';
+export * from './FileWriteBinaryContentsActionTypes';

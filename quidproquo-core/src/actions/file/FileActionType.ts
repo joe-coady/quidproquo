@@ -4,6 +4,8 @@ export enum FileActionType {
   ListDirectory = '@quidproquo-core/File/ListDirectory',
   Exists = '@quidproquo-core/File/Exists',
   Delete = '@quidproquo-core/File/Delete',
+  ReadBinaryContents = '@quidproquo-core/File/ReadBinaryContents',
+  WriteBinaryContents = '@quidproquo-core/File/WriteBinaryContents',
 }
 
 export const filePathDelimiter = `/`;

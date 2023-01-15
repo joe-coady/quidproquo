@@ -17,7 +17,7 @@ import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { createRuntime, askProcessEvent, ErrorTypeEnum, qpqCoreUtils } from 'quidproquo-core';
 
-import { CloudFrontRequestEvent, Context } from 'aws-lambda';
+import { CloudFrontRequestEvent, CloudFrontRequestResult, Context } from 'aws-lambda';
 
 import { ActionProcessorListResolver } from './actionProcessorListResolver';
 
@@ -100,7 +100,8 @@ export const getOriginRequestEventExecutor = (
         statusDescription: 'OK',
         body: result.result.body,
         headers: responseHeaders,
-      };
+        bodyEncoding: result.result.bodyEncoding,
+      } as CloudFrontRequestResult;
     }
 
     // CloudFront seems to throw an error when you send back a 404 or something, so we will just hit the normal origin

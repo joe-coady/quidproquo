@@ -19,4 +19,5 @@ export interface SeoEventResponse {
   status: number;
   body?: string;
   headers?: SeoEventHeaders;
+  bodyEncoding?: 'binary' | 'base64';
 }
