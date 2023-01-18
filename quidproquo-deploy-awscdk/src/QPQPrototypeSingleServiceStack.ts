@@ -36,6 +36,8 @@ export interface QPQPrototypeStackProps extends DeploymentSettings {
 
   lambdaAPIGatewayEventPath?: string;
   lambdaEventBridgeEventPath?: string;
+
+  layers?: string[];
 }
 
 interface OwnedBucket {
@@ -418,10 +420,15 @@ export class QPQPrototypeSingleServiceStack extends Stack {
 
     createWebDistribution(this, `${id}-web-dist`, props, ownedResourceSettings);
 
-    const BLLayer = new aws_lambda.LayerVersion(this, `${id}-some-layer`, {
-      layerVersionName: `${id}-some-layer`,
-      code: new aws_lambda.AssetCode(path.join(props.apiBuildPath, '../../layers')),
-      compatibleRuntimes: [aws_lambda.Runtime.NODEJS_16_X],
+    const customLayers = (props.layers || []).map((layer, index) => {
+      const layerName = `${layer.split('/').pop()}-${index}-${settings.environment}-${
+        settings.service
+      }`;
+      return new aws_lambda.LayerVersion(this, `${id}-${layerName}`, {
+        layerVersionName: `${layerName}`,
+        code: new aws_lambda.AssetCode(layer),
+        compatibleRuntimes: [aws_lambda.Runtime.NODEJS_16_X],
+      });
     });
 
     const lambdaHandler = new aws_lambda.Function(
@@ -433,7 +440,7 @@ export class QPQPrototypeSingleServiceStack extends Stack {
 
         runtime: aws_lambda.Runtime.NODEJS_16_X,
         memorySize: 1024,
-        layers: [BLLayer],
+        layers: customLayers,
 
         code: aws_lambda.Code.fromAsset(path.join(props.apiBuildPath, 'lambdaAPIGatewayEvent')),
         handler: 'index.executeAPIGatewayEvent',
@@ -483,6 +490,7 @@ export class QPQPrototypeSingleServiceStack extends Stack {
 
           runtime: aws_lambda.Runtime.NODEJS_16_X,
           memorySize: 1024,
+          layers: customLayers,
 
           code: aws_lambda.Code.fromAsset(path.join(props.apiBuildPath, 'lambdaEventBridgeEvent')),
           handler: 'index.executeEventBridgeEvent',

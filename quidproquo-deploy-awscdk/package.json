@@ -1,6 +1,6 @@
 {
   "name": "quidproquo-deploy-awscdk",
-  "version": "0.0.47",
+  "version": "0.0.49",
   "description": "",
   "main": "./lib/index.js",
   "types": "./lib/index.d.js",
@@ -11,7 +11,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "npx rimraf lib",
-    "build": "",
+    "build": "npm run clean && tsc",
     "watch": "tsc -w"
   },
   "repository": {
