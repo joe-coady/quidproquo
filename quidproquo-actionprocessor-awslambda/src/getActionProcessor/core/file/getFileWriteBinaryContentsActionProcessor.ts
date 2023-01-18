@@ -2,29 +2,34 @@ import {
   FileWriteBinaryContentsActionProcessor,
   actionResult,
   FileActionType,
+  QPQConfig,
 } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
-import { QPQAWSLambdaConfig } from '../../../runtimeConfig/QPQAWSLambdaConfig';
+import { QPQAWSResourceMap } from '../../../runtimeConfig/QPQAWSResourceMap';
 import { resolveResourceName } from '../../../runtimeConfig/qpqAwsLambdaRuntimeConfigUtils';
 import { writeBinaryFile } from '../../../logic/s3/s3Utils';
 
 const getProcessFileWriteBinaryContents = (
-  runtimeConfig: QPQAWSLambdaConfig,
+  qpqConfig: QPQConfig,
+  awsResourceMap: QPQAWSResourceMap,
 ): FileWriteBinaryContentsActionProcessor => {
   return async ({ drive, filepath, data }) => {
-    const s3BucketName = resolveResourceName(drive, runtimeConfig);
+    const s3BucketName = resolveResourceName(drive, awsResourceMap);
     await writeBinaryFile(
       s3BucketName,
       filepath,
       data,
-      qpqWebServerUtils.getDeployRegion(runtimeConfig.qpqConfig),
+      qpqWebServerUtils.getDeployRegion(qpqConfig),
     );
 
     return actionResult(void 0);
   };
 };
 
-export default (runtimeConfig: QPQAWSLambdaConfig) => ({
-  [FileActionType.WriteBinaryContents]: getProcessFileWriteBinaryContents(runtimeConfig),
+export default (qpqConfig: QPQConfig, awsResourceMap: QPQAWSResourceMap) => ({
+  [FileActionType.WriteBinaryContents]: getProcessFileWriteBinaryContents(
+    qpqConfig,
+    awsResourceMap,
+  ),
 });

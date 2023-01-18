@@ -1,4 +1,4 @@
-import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
+// import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 
 import path from 'path';
 
@@ -16,26 +16,34 @@ const getWebpackBuildMode = (qpqConfig: QPQConfig): string => {
   return 'production';
 };
 
+export const getWebpackEntryNames = () => [
+  'lambdaAPIGatewayEvent',
+  'lambdaEventBridgeEvent',
+  'lambdaEventOriginRequest',
+  'lambdaEventViewerRequest',
+];
+
 export const getWebpackConfig = (qpqConfig: QPQConfig, buildPath: string, outputPrefix: string) => {
   const allSrcEntries = [
     ...qpqCoreUtils.getAllSrcEntries(qpqConfig),
     ...qpqWebServerUtils.getAllSrcEntries(qpqConfig),
   ];
 
+  const customActionProcessorSources = qpqCoreUtils.getActionProcessorSources(qpqConfig);
+
   // set the qpq config env for loaders
   process.env.QPQLoaderConfig = JSON.stringify({
     allSrcEntries,
     rootDir: path.resolve(buildPath, '..'),
     qpqConfig,
+    customActionProcessorSources,
   });
 
   return {
-    entry: {
-      lambdaAPIGatewayEvent: 'quidproquo-deploy-awscdk/src/lambdas/lambdaAPIGatewayEvent.ts',
-      lambdaEventBridgeEvent: 'quidproquo-deploy-awscdk/src/lambdas/lambdaEventBridgeEvent.ts',
-      lambdaEventOriginRequest: 'quidproquo-deploy-awscdk/src/lambdas/lambdaEventOriginRequest.ts',
-      lambdaEventViewerRequest: 'quidproquo-deploy-awscdk/src/lambdas/lambdaEventViewerRequest.ts',
-    },
+    entry: getWebpackEntryNames().reduce(
+      (acc, name) => ({ ...acc, [name]: `quidproquo-deploy-awscdk/src/lambdas/${name}.ts` }),
+      {},
+    ),
 
     resolveLoader: {
       modules: [path.resolve(__dirname, 'loaders'), 'node_modules'],
@@ -43,26 +51,6 @@ export const getWebpackConfig = (qpqConfig: QPQConfig, buildPath: string, output
 
     // mode: getWebpackBuildMode(qpqConfig),
     mode: 'production',
-
-    // externals: ({ request }: { request: string }, callback: any) => {
-    //   if (/^@aws-sdk\//.test(request)) {
-    //     return callback(null, `commonjs ${request}`);
-    //   }
-    //   callback();
-    // },
-
-    // optimization: {
-    //   splitChunks: {
-    //     chunks: 'all',
-    //     automaticNameDelimiter: '.',
-    //     cacheGroups: {
-    //       vendors: {
-    //         test: /[\\/]node_modules[\\/]/,
-    //         priority: -10,
-    //       },
-    //     },
-    //   },
-    // },
 
     target: 'node',
     output: {

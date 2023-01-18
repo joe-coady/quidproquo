@@ -8,7 +8,7 @@ import { DefaultRouteOptionsQPQWebServerConfigSetting } from './config/settings/
 import { QPQWebServerConfigSettingType } from './config/QPQConfig';
 import { getAppFeature } from 'quidproquo-core/lib/qpqCoreUtils';
 
-import { HttpEventHeaders } from './types/HTTPEvent';
+import { HttpEventHeaders, HTTPEventParams, HTTPEventResponse } from './types/HTTPEvent';
 import { SeoEventHeaders } from './types/SEOEvent';
 import { RouteOptions } from './config/settings/route';
 import { DeployRegionQPQWebServerConfigSetting } from './config';
@@ -125,5 +125,26 @@ export const getCorsHeaders = (
     'Access-Control-Allow-Methods': '*',
     'Access-Control-Allow-Origin': allowOrigin,
     Vary: 'Origin',
+  };
+};
+
+export const fromJsonEventRequest = <T>(httpJsonEvent: HTTPEventParams): T => {
+  const item: T = JSON.parse(
+    httpJsonEvent.isBase64Encoded
+      ? Buffer.from(httpJsonEvent.body, 'base64').toString()
+      : httpJsonEvent.body,
+  );
+
+  return item;
+};
+
+export const toJsonEventResponse = (item: any, status: number = 200): HTTPEventResponse => {
+  return {
+    status,
+    body: JSON.stringify(item),
+    isBase64Encoded: false,
+    headers: {
+      'content-type': 'application/json',
+    },
   };
 };

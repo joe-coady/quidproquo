@@ -1,19 +1,13 @@
-import { QPQAWSLambdaConfig } from './QPQAWSLambdaConfig';
+import { QPQAWSResourceMap } from './QPQAWSResourceMap';
 
-export const resolveResourceName = (
-  resourceName: string,
-  qpqAwsLambdaConfig: QPQAWSLambdaConfig,
-) => {
-  return qpqAwsLambdaConfig.resourceNameMap[resourceName] || resourceName;
+export const resolveResourceName = (resourceName: string, awsResourceMap: QPQAWSResourceMap) => {
+  return awsResourceMap.resourceNameMap[resourceName] || resourceName;
 };
 
-export const resolveSecretKey = (secretName: string, qpqAwsLambdaConfig: QPQAWSLambdaConfig) => {
-  return qpqAwsLambdaConfig.secretNameMap[secretName] || secretName;
+export const resolveSecretKey = (secretName: string, awsResourceMap: QPQAWSResourceMap) => {
+  return awsResourceMap.secretNameMap[secretName] || secretName;
 };
 
-export const resolveParameterKey = (
-  parameterName: string,
-  qpqAwsLambdaConfig: QPQAWSLambdaConfig,
-) => {
-  return qpqAwsLambdaConfig.parameterNameMap[parameterName] || parameterName;
+export const resolveParameterKey = (parameterName: string, awsResourceMap: QPQAWSResourceMap) => {
+  return awsResourceMap.parameterNameMap[parameterName] || parameterName;
 };

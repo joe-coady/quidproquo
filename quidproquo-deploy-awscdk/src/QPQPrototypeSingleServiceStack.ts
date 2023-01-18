@@ -21,10 +21,12 @@ import * as cdk from 'aws-cdk-lib';
 
 import { Construct } from 'constructs';
 
-import { QPQAWSLambdaConfig } from 'quidproquo-actionprocessor-awslambda';
+import { QPQAWSResourceMap, LambdaRuntimeConfig } from 'quidproquo-actionprocessor-awslambda';
 
 import { qpqCoreUtils } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
+
+const qpqResourceMapConfigName = 'qpq-aws-resource-map';
 
 export interface QPQPrototypeStackProps extends DeploymentSettings {
   account: string;
@@ -360,8 +362,7 @@ export class QPQPrototypeSingleServiceStack extends Stack {
     });
 
     // This should be all resource names
-    const runtimeConfigLambdaConfig: QPQAWSLambdaConfig = {
-      qpqConfig: props.qpqConfig,
+    const runtimeConfigLambdaConfig: QPQAWSResourceMap = {
       secretNameMap: ownedSecrets.reduce(
         (acc, os) => ({
           ...acc,
@@ -377,8 +378,8 @@ export class QPQPrototypeSingleServiceStack extends Stack {
           }),
           {},
         ),
-        ['qpqRuntimeConfig']: getParameterName(
-          'qpqRuntimeConfig',
+        [qpqResourceMapConfigName]: getParameterName(
+          qpqResourceMapConfigName,
           settings.service,
           settings.environment,
         ),
@@ -400,7 +401,7 @@ export class QPQPrototypeSingleServiceStack extends Stack {
         id,
         settings.service,
         settings.environment,
-        'qpqRuntimeConfig',
+        qpqResourceMapConfigName,
         JSON.stringify(runtimeConfigLambdaConfig),
       ),
     );
@@ -417,6 +418,12 @@ export class QPQPrototypeSingleServiceStack extends Stack {
 
     createWebDistribution(this, `${id}-web-dist`, props, ownedResourceSettings);
 
+    const BLLayer = new aws_lambda.LayerVersion(this, `${id}-some-layer`, {
+      layerVersionName: `${id}-some-layer`,
+      code: new aws_lambda.AssetCode(path.join(props.apiBuildPath, '../../layers')),
+      compatibleRuntimes: [aws_lambda.Runtime.NODEJS_16_X],
+    });
+
     const lambdaHandler = new aws_lambda.Function(
       this,
       `${settings.environment}-${settings.service}-lambda-rest`,
@@ -426,6 +433,7 @@ export class QPQPrototypeSingleServiceStack extends Stack {
 
         runtime: aws_lambda.Runtime.NODEJS_16_X,
         memorySize: 1024,
+        layers: [BLLayer],
 
         code: aws_lambda.Code.fromAsset(path.join(props.apiBuildPath, 'lambdaAPIGatewayEvent')),
         handler: 'index.executeAPIGatewayEvent',
@@ -451,6 +459,7 @@ export class QPQPrototypeSingleServiceStack extends Stack {
           loggingLevel: aws_apigateway.MethodLoggingLevel.INFO,
           dataTraceEnabled: true,
         },
+        binaryMediaTypes: ['*/*'],
         proxy: true,
       },
     );
@@ -479,14 +488,10 @@ export class QPQPrototypeSingleServiceStack extends Stack {
           handler: 'index.executeEventBridgeEvent',
 
           environment: {
-            TABLES: JSON.stringify([]),
             lambdaRuntimeConfig: JSON.stringify({
-              ...runtimeConfigLambdaConfig,
-              lambdaRuntimeConfig: {
-                src: se.src,
-                runtime: se.runtime,
-              },
-            }),
+              src: se.src,
+              runtime: se.runtime,
+            } as LambdaRuntimeConfig),
           },
         },
       );

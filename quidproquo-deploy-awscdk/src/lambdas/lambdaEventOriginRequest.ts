@@ -8,12 +8,13 @@ import {
   getConfigGetParameterActionProcessor,
   getConfigGetParametersActionProcessor,
   awsLambdaUtils,
-  QPQAWSLambdaConfig,
   DynamicModuleLoader,
   getParameter,
 } from 'quidproquo-actionprocessor-awslambda';
 
 import { qpqWebServerUtils } from 'quidproquo-webserver';
+
+import { getLambdaConfigs } from './lambdaConfig';
 
 import { createRuntime, askProcessEvent, ErrorTypeEnum, qpqCoreUtils } from 'quidproquo-core';
 
@@ -25,7 +26,7 @@ import { ActionProcessorListResolver } from './actionProcessorListResolver';
 import qpqDynamicModuleLoader from 'qpq-dynamic-loader!';
 
 // @ts-ignore - Special webpack loader
-import qpqConfig from 'qpq-config-loader!';
+import qpqCustomActionProcessors from 'qpq-custom-action-processors-loader!';
 
 // TODO: Make this a util or something based on server time or something..
 const getDateNow = () => new Date().toISOString();
@@ -35,20 +36,17 @@ export const getOriginRequestEventExecutor = (
   getCustomActionProcessors: ActionProcessorListResolver = () => ({}),
 ) => {
   return async (event: CloudFrontRequestEvent, context: Context) => {
+    console.log(JSON.stringify(event));
+
     // Don't run the lambda if we are not a bot
-    if (event.Records[0].cf.request.headers['x-qpq-is-bot'][0].value !== 'true') {
+    if (
+      !event.Records[0].cf.request.headers['x-qpq-is-bot'] ||
+      event.Records[0].cf.request.headers['x-qpq-is-bot'][0].value !== 'true'
+    ) {
       return event.Records[0].cf.request;
     }
 
-    // TODO: Make this error safe
-    const service = qpqCoreUtils.getAppName(qpqConfig);
-    const environment = qpqCoreUtils.getAppFeature(qpqConfig);
-    const param = await getParameter(
-      `qpqRuntimeConfig-${service}-${environment}`,
-      qpqWebServerUtils.getDeployRegion(qpqConfig),
-    );
-    const lambdaRuntimeConfig: QPQAWSLambdaConfig = JSON.parse(param);
-    // //////////////////////////
+    const cdkConfig = await getLambdaConfigs();
 
     // Build a processor for the session and stuff
     // Remove the non route ones ~ let the story execute action add them
@@ -56,14 +54,15 @@ export const getOriginRequestEventExecutor = (
       ...coreActionProcessor,
       ...webserverActionProcessor,
 
-      ...getCloudFrontOriginRequestEventActionProcessor(lambdaRuntimeConfig.qpqConfig),
-      ...getConfigGetSecretActionProcessor(lambdaRuntimeConfig),
-      ...getConfigGetParameterActionProcessor(lambdaRuntimeConfig),
-      ...getConfigGetParametersActionProcessor(lambdaRuntimeConfig),
+      ...getCloudFrontOriginRequestEventActionProcessor(cdkConfig.qpqConfig),
+      ...getConfigGetSecretActionProcessor(cdkConfig.qpqConfig, cdkConfig.awsResourceMap),
+      ...getConfigGetParameterActionProcessor(cdkConfig.qpqConfig, cdkConfig.awsResourceMap),
+      ...getConfigGetParametersActionProcessor(cdkConfig.qpqConfig, cdkConfig.awsResourceMap),
       ...getSystemActionProcessor(dynamicModuleLoader),
-      ...getFileActionProcessor(lambdaRuntimeConfig),
+      ...getFileActionProcessor(cdkConfig.qpqConfig, cdkConfig.awsResourceMap),
 
-      ...getCustomActionProcessors(lambdaRuntimeConfig),
+      ...getCustomActionProcessors(cdkConfig.qpqConfig, cdkConfig.awsResourceMap),
+      ...qpqCustomActionProcessors(),
     };
 
     const logger = async (result: any) => {};
@@ -106,6 +105,12 @@ export const getOriginRequestEventExecutor = (
 
     // CloudFront seems to throw an error when you send back a 404 or something, so we will just hit the normal origin
     return event.Records[0].cf.request;
+
+    /*return {
+      status: `200`,
+      statusDescription: 'OK',
+      body: `<pre>${JSON.stringify(result.error, null, 2)}</pre>`,
+    } as CloudFrontRequestResult;*/
 
     // const code = ErrorTypeHttpResponseMap[result.error.errorType];
     // return {

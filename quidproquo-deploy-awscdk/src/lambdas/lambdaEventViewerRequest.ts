@@ -2,6 +2,8 @@ import { CloudFrontRequestEvent, Context } from 'aws-lambda';
 
 export const getViewerRequestEventExecutor = () => {
   return async (event: CloudFrontRequestEvent, context: Context) => {
+    console.log(JSON.stringify(event));
+
     const request = event.Records[0].cf.request;
     const headers = request.headers;
     const customUserAgentHeaderName = 'x-qpq-is-bot';

@@ -2,31 +2,33 @@ import {
   ConfigActionType,
   ConfigGetParametersActionProcessor,
   actionResult,
+  QPQConfig,
 } from 'quidproquo-core';
 
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
-import { QPQAWSLambdaConfig } from '../../../runtimeConfig/QPQAWSLambdaConfig';
+import { QPQAWSResourceMap } from '../../../runtimeConfig/QPQAWSResourceMap';
 import { resolveParameterKey } from '../../../runtimeConfig/qpqAwsLambdaRuntimeConfigUtils';
 
 import { getParameters } from '../../../logic/parametersManager/getParameters';
 
 const getProcessConfigGetParameters = (
-  runtimeConfig: QPQAWSLambdaConfig,
+  qpqConfig: QPQConfig,
+  awsResourceMap: QPQAWSResourceMap,
 ): ConfigGetParametersActionProcessor => {
   return async ({ parameterNames }) => {
-    const awsParameterKeys = parameterNames.map((pn) => resolveParameterKey(pn, runtimeConfig));
+    const awsParameterKeys = parameterNames.map((pn) => resolveParameterKey(pn, awsResourceMap));
     const parameterValues = await getParameters(
       awsParameterKeys,
-      qpqWebServerUtils.getDeployRegion(runtimeConfig.qpqConfig),
+      qpqWebServerUtils.getDeployRegion(qpqConfig),
     );
 
     return actionResult(parameterValues);
   };
 };
 
-export default (runtimeConfig: QPQAWSLambdaConfig) => {
+export default (qpqConfig: QPQConfig, awsResourceMap: QPQAWSResourceMap) => {
   return {
-    [ConfigActionType.GetParameters]: getProcessConfigGetParameters(runtimeConfig),
+    [ConfigActionType.GetParameters]: getProcessConfigGetParameters(qpqConfig, awsResourceMap),
   };
 };

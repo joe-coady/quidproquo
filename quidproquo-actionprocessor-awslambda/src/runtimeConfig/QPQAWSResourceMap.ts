@@ -4,12 +4,8 @@ export interface LambdaRuntimeConfig {
   runtime: string;
 }
 
-export interface QPQAWSLambdaConfig {
-  qpqConfig: QPQConfig;
-
+export interface QPQAWSResourceMap {
   resourceNameMap: Record<string, string>;
   secretNameMap: Record<string, string>;
   parameterNameMap: Record<string, string>;
-
-  lambdaRuntimeConfig?: LambdaRuntimeConfig;
 }

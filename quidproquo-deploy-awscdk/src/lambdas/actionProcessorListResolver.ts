@@ -1,6 +1,7 @@
-import { ActionProcessorList } from 'quidproquo-core';
-import { QPQAWSLambdaConfig } from 'quidproquo-actionprocessor-awslambda';
+import { ActionProcessorList, QPQConfig } from 'quidproquo-core';
+import { QPQAWSResourceMap } from 'quidproquo-actionprocessor-awslambda';
 
 export type ActionProcessorListResolver = (
-  lambdaRuntimeConfig: QPQAWSLambdaConfig,
+  qpqConfig: QPQConfig,
+  awsResourceMap: QPQAWSResourceMap,
 ) => ActionProcessorList;

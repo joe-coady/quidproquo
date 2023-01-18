@@ -4,6 +4,7 @@ export enum QPQCoreConfigSettingType {
   schedule = '@quidproquo-core/config/schedule',
   secret = '@quidproquo-core/config/secret',
   parameter = '@quidproquo-core/config/parameter',
+  actionProcessors = '@quidproquo-core/config/actionProcessors',
 }
 
 export interface QPQConfigSetting {

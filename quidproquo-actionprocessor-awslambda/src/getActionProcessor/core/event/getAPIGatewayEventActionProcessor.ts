@@ -34,11 +34,12 @@ const getProcessTransformEventParams = (
         ...(apiGatewayEvent.multiValueQueryStringParameters || {}),
         ...(apiGatewayEvent.queryStringParameters || {}),
       } as { [key: string]: undefined | string | string[] },
-      body: apiGatewayEvent.body ? JSON.parse(apiGatewayEvent.body) : undefined,
+      body: apiGatewayEvent.body,
       headers: apiGatewayEvent.headers,
       method: apiGatewayEvent.httpMethod as 'GET' | 'POST',
       correlation: context.awsRequestId,
       sourceIp: apiGatewayEvent.requestContext.identity.sourceIp,
+      isBase64Encoded: apiGatewayEvent.isBase64Encoded,
     });
   };
 };
@@ -50,10 +51,10 @@ const getProcessTransformResponseResult = (
   // We might need to JSON.stringify the body.
   return async (payload) => {
     return actionResult<APIGatewayProxyResult>({
-      statusCode: payload.response.statusCode,
+      statusCode: payload.response.status,
       body: payload.response.body,
+      isBase64Encoded: payload.response.isBase64Encoded,
       headers: {
-        'Content-Type': 'application/json',
         ...qpqWebServerUtils.getCorsHeaders(configs, {}, payload.transformedEventParams.headers),
         ...(payload?.response?.headers || {}),
       },

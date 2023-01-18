@@ -1,24 +1,28 @@
-import { FileExistsActionProcessor, actionResult, FileActionType } from 'quidproquo-core';
+import {
+  FileExistsActionProcessor,
+  actionResult,
+  FileActionType,
+  QPQConfig,
+} from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
-import { QPQAWSLambdaConfig } from '../../../runtimeConfig/QPQAWSLambdaConfig';
+import { QPQAWSResourceMap } from '../../../runtimeConfig/QPQAWSResourceMap';
 import { resolveResourceName } from '../../../runtimeConfig/qpqAwsLambdaRuntimeConfigUtils';
 import { objectExists } from '../../../logic/s3/s3Utils';
 
-const getProcessFileExists = (runtimeConfig: QPQAWSLambdaConfig): FileExistsActionProcessor => {
+const getProcessFileExists = (
+  qpqConfig: QPQConfig,
+  awsResourceMap: QPQAWSResourceMap,
+): FileExistsActionProcessor => {
   return async ({ drive, filepath }) => {
-    const s3BucketName = resolveResourceName(drive, runtimeConfig);
+    const s3BucketName = resolveResourceName(drive, awsResourceMap);
 
     return actionResult(
-      await objectExists(
-        s3BucketName,
-        filepath,
-        qpqWebServerUtils.getDeployRegion(runtimeConfig.qpqConfig),
-      ),
+      await objectExists(s3BucketName, filepath, qpqWebServerUtils.getDeployRegion(qpqConfig)),
     );
   };
 };
 
-export default (runtimeConfig: QPQAWSLambdaConfig) => ({
-  [FileActionType.Exists]: getProcessFileExists(runtimeConfig),
+export default (qpqConfig: QPQConfig, awsResourceMap: QPQAWSResourceMap) => ({
+  [FileActionType.Exists]: getProcessFileExists(qpqConfig, awsResourceMap),
 });

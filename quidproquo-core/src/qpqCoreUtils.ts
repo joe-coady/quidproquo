@@ -5,6 +5,7 @@ import {
   ScheduleQPQConfigSetting,
   SecretQPQConfigSetting,
   ParameterQPQConfigSetting,
+  ActionProcessorsQPQConfigSetting,
 } from './config/settings';
 
 export const getConfigSettings = <T extends QPQConfigSetting>(
@@ -50,6 +51,15 @@ export const getStorageDriveNames = (configs: QPQConfig): string[] => {
   ).map((sd) => sd.storageDrive);
 
   return storageDriveNames;
+};
+
+export const getActionProcessorSources = (configs: QPQConfig): string[] => {
+  const sources = getConfigSettings<ActionProcessorsQPQConfigSetting>(
+    configs,
+    QPQCoreConfigSettingType.actionProcessors,
+  ).map((ap) => ap.src);
+
+  return sources;
 };
 
 export const getScheduleEvents = (configs: QPQConfig): ScheduleQPQConfigSetting[] => {

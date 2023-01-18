@@ -9,16 +9,20 @@ import {
   getConfigGetParametersActionProcessor,
   awsLambdaUtils,
   DynamicModuleLoader,
+  LambdaRuntimeConfig,
 } from 'quidproquo-actionprocessor-awslambda';
 import { createRuntime, askProcessEvent } from 'quidproquo-core';
 
 import { EventBridgeEvent, Context } from 'aws-lambda';
 
-import { lambdaRuntimeConfig } from './lambdaConfig';
+import { getLambdaConfigs } from './lambdaConfig';
 import { ActionProcessorListResolver } from './actionProcessorListResolver';
 
 // @ts-ignore - Special webpack loader
 import qpqDynamicModuleLoader from 'qpq-dynamic-loader!';
+
+// @ts-ignore - Special webpack loader
+import qpqCustomActionProcessors from 'qpq-custom-action-processors-loader!';
 
 // TODO: Make this a util or something based on server time or something..
 const getDateNow = () => new Date().toISOString();
@@ -28,6 +32,12 @@ export const getEventBridgeEventExecutor = (
   getCustomActionProcessors: ActionProcessorListResolver = () => ({}),
 ) => {
   return async (event: EventBridgeEvent<string, void>, context: Context) => {
+    const cdkConfig = await getLambdaConfigs();
+
+    const lambdaRuntimeConfig: LambdaRuntimeConfig = JSON.parse(
+      process.env.lambdaRuntimeConfig || '{}',
+    );
+
     // Build a processor for the session and stuff
     // Remove the  non event ones
     const storyActionProcessor = {
@@ -36,12 +46,13 @@ export const getEventBridgeEventExecutor = (
 
       ...getEventBridgeEventActionProcessor(lambdaRuntimeConfig),
       ...getSystemActionProcessor(dynamicModuleLoader),
-      ...getFileActionProcessor(lambdaRuntimeConfig),
-      ...getConfigGetSecretActionProcessor(lambdaRuntimeConfig),
-      ...getConfigGetParameterActionProcessor(lambdaRuntimeConfig),
-      ...getConfigGetParametersActionProcessor(lambdaRuntimeConfig),
+      ...getFileActionProcessor(cdkConfig.qpqConfig, cdkConfig.awsResourceMap),
+      ...getConfigGetSecretActionProcessor(cdkConfig.qpqConfig, cdkConfig.awsResourceMap),
+      ...getConfigGetParameterActionProcessor(cdkConfig.qpqConfig, cdkConfig.awsResourceMap),
+      ...getConfigGetParametersActionProcessor(cdkConfig.qpqConfig, cdkConfig.awsResourceMap),
 
-      ...getCustomActionProcessors(lambdaRuntimeConfig),
+      ...getCustomActionProcessors(cdkConfig.qpqConfig, cdkConfig.awsResourceMap),
+      ...qpqCustomActionProcessors(),
     };
 
     const logger = async (result: any) => {};

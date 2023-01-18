@@ -1,11 +1,12 @@
-import { QPQAWSLambdaConfig } from '../../../runtimeConfig/QPQAWSLambdaConfig';
+import { QPQConfig } from 'quidproquo-core';
+import { QPQAWSResourceMap } from '../../../runtimeConfig/QPQAWSResourceMap';
 
 import getConfigGetParameterActionProcessor from './getConfigGetParameterActionProcessor';
 import getConfigGetParametersActionProcessor from './getConfigGetParametersActionProcessor';
 import getConfigGetSecretActionProcessor from './getConfigGetSecretActionProcessor';
 
-export default (runtimeConfig: QPQAWSLambdaConfig) => ({
-  ...getConfigGetParameterActionProcessor(runtimeConfig),
-  ...getConfigGetParametersActionProcessor(runtimeConfig),
-  ...getConfigGetSecretActionProcessor(runtimeConfig),
+export default (qpqConfig: QPQConfig, awsResourceMap: QPQAWSResourceMap) => ({
+  ...getConfigGetParameterActionProcessor(qpqConfig, awsResourceMap),
+  ...getConfigGetParametersActionProcessor(qpqConfig, awsResourceMap),
+  ...getConfigGetSecretActionProcessor(qpqConfig, awsResourceMap),
 });

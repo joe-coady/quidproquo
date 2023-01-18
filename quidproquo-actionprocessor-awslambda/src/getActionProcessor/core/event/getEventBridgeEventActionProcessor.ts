@@ -11,9 +11,9 @@ import {
   ScheduledEventParams,
 } from 'quidproquo-core';
 
-import { QPQAWSLambdaConfig, LambdaRuntimeConfig } from '../../../runtimeConfig/QPQAWSLambdaConfig';
+import { LambdaRuntimeConfig } from '../../../runtimeConfig/QPQAWSResourceMap';
 
-import { EventBridgeEvent, Context, APIGatewayProxyResult } from 'aws-lambda';
+import { EventBridgeEvent, Context } from 'aws-lambda';
 
 const getProcessTransformEventParams = (): EventTransformEventParamsActionProcessor<
   [EventBridgeEvent<any, any>, Context],
@@ -59,11 +59,11 @@ const getProcessMatchStory = (
   };
 };
 
-export default (runtimeConfig: QPQAWSLambdaConfig) => {
+export default (runtimeConfig: LambdaRuntimeConfig) => {
   return {
     [EventActionType.TransformEventParams]: getProcessTransformEventParams(),
     [EventActionType.TransformResponseResult]: getProcessTransformResponseResult(),
     [EventActionType.AutoRespond]: getProcessAutoRespond(),
-    [EventActionType.MatchStory]: getProcessMatchStory(runtimeConfig.lambdaRuntimeConfig),
+    [EventActionType.MatchStory]: getProcessMatchStory(runtimeConfig),
   };
 };

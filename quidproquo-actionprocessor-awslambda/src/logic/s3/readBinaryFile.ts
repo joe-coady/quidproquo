@@ -17,5 +17,7 @@ export const readBinaryFile = async (
 
   return {
     base64Data: await response.Body?.transformToString('base64')!,
+    mimetype: response.ContentType,
+    filename: key.split('/').pop()!,
   };
 };

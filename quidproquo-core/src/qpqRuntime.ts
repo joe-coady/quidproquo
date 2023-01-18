@@ -102,7 +102,9 @@ export const createRuntime = (
     } catch (err) {
       // Dev Only ~ Todo
       if (err instanceof Error) {
-        console.log('Uncaught Error: ', err.message.toString());
+        console.log(
+          `Uncaught Error: [${JSON.stringify(action?.value?.type)}] ${err.message.toString()}`,
+        );
         return {
           ...response,
           finishedAt: getTimeNow(),
