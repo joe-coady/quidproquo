@@ -420,10 +420,11 @@ export class QPQPrototypeSingleServiceStack extends Stack {
 
     createWebDistribution(this, `${id}-web-dist`, props, ownedResourceSettings);
 
-    const customLayers = (props.layers || []).map((layer, index) => {
-      const layerName = `${layer.split('/').pop()}-${index}-${settings.environment}-${
+    const customLayers = (props.layers || []).map((layer) => {
+      const layerName = `${layer.replace(/\\/g, '/').split('/').pop()}-${settings.environment}-${
         settings.service
       }`;
+
       return new aws_lambda.LayerVersion(this, `${id}-${layerName}`, {
         layerVersionName: `${layerName}`,
         code: new aws_lambda.AssetCode(layer),
