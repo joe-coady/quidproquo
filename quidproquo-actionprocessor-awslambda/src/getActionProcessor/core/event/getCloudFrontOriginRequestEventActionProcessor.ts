@@ -24,7 +24,9 @@ import { matchUrl } from '../../../awsLambdaUtils';
 
 import { CloudFrontRequestEvent, Context, CloudFrontRequestResult } from 'aws-lambda';
 
-const getProcessTransformEventParams = (): EventTransformEventParamsActionProcessor<
+const getProcessTransformEventParams = (
+  qpqConfig: QPQConfig,
+): EventTransformEventParamsActionProcessor<
   [CloudFrontRequestEvent, Context],
   SeoEventParams<any>
 > => {
@@ -37,6 +39,7 @@ const getProcessTransformEventParams = (): EventTransformEventParamsActionProces
     );
 
     return actionResult({
+      domain: qpqWebServerUtils.getFeatureDomainName(qpqConfig),
       body: cfRecordRequest.body,
       correlation: context.awsRequestId,
       method: cfRecordRequest.method as HTTPMethod,
@@ -103,7 +106,7 @@ export default (config: QPQConfig) => {
   const seoConfigs = qpqWebServerUtils.getAllSeo(config);
 
   return {
-    [EventActionType.TransformEventParams]: getProcessTransformEventParams(),
+    [EventActionType.TransformEventParams]: getProcessTransformEventParams(config),
     [EventActionType.TransformResponseResult]: getProcessTransformResponseResult(config),
     [EventActionType.AutoRespond]: getProcessAutoRespond(),
     [EventActionType.MatchStory]: getProcessMatchStory(seoConfigs),

@@ -12,6 +12,7 @@ export interface SeoEventParams<T = null> {
   method: HTTPMethod;
   correlation: string;
   sourceIp: string;
+  domain: string;
 }
 
 export interface SeoEventResponse {
