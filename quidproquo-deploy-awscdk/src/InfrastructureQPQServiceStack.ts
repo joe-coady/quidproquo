@@ -1,4 +1,5 @@
 import { Construct } from 'constructs';
+import { QPQCoreConfigSettingType } from 'quidproquo-core';
 import { QPQWebServerConfigSettingType } from 'quidproquo-webserver';
 
 import { QpqServiceStack, QpqServiceStackProps } from './constructs/core/QPQServiceStack';
@@ -8,7 +9,10 @@ import { createConstructs } from './utils';
 
 export interface InfrastructureQPQServiceStackProps extends QpqServiceStackProps {}
 
-const infrastructureQPQServiceStackOwnedSettings: string[] = [QPQWebServerConfigSettingType.Dns];
+const infrastructureQPQServiceStackOwnedSettings: string[] = [
+  QPQWebServerConfigSettingType.Dns,
+  QPQCoreConfigSettingType.storageDrive,
+];
 
 export class InfrastructureQPQServiceStack extends QpqServiceStack {
   constructor(scope: Construct, id: string, props: InfrastructureQPQServiceStackProps) {
