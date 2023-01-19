@@ -18,6 +18,7 @@ const getWebpackBuildMode = (qpqConfig: QPQConfig): string => {
 
 export const getWebpackEntryNames = () => [
   'lambdaAPIGatewayEvent',
+  'lambdaAPIGatewayEvent_redirect',
   'lambdaEventBridgeEvent',
   'lambdaEventOriginRequest',
   'lambdaEventViewerRequest',

@@ -3,6 +3,7 @@ import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 import { RouteQPQWebServerConfigSetting } from './config/settings/route';
 import { DnsQPQWebServerConfigSetting } from './config/settings/dns';
 import { SeoQPQWebServerConfigSetting } from './config/settings/seo';
+import { SubdomainRedirectQPQWebServerConfigSetting } from './config/settings/subdomainRedirect';
 import { OpenApiQPQWebServerConfigSetting } from './config/settings/openApi';
 import { DefaultRouteOptionsQPQWebServerConfigSetting } from './config/settings/defaultRouteOptions';
 import { QPQWebServerConfigSettingType } from './config/QPQConfig';
@@ -66,6 +67,18 @@ export const getDomainName = (configs: QPQConfig): string => {
   );
 
   return dnsSettings?.dnsBase || '';
+};
+
+export const getSubdomainRedirects = (
+  configs: QPQConfig,
+): SubdomainRedirectQPQWebServerConfigSetting[] => {
+  const subdomainRedirects =
+    qpqCoreUtils.getConfigSettings<SubdomainRedirectQPQWebServerConfigSetting>(
+      configs,
+      QPQWebServerConfigSettingType.SubdomainRedirect,
+    );
+
+  return subdomainRedirects;
 };
 
 export const getFeatureDomainName = (configs: QPQConfig): string => {

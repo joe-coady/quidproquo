@@ -99,29 +99,38 @@ const createServiceParameter = (
   };
 };
 
-const createApiDomainName = (stack: cdk.Stack, id: string, stackProps: QPQPrototypeStackProps) => {
+const createApiDomainName = (
+  stack: cdk.Stack,
+  id: string,
+  stackProps: QPQPrototypeStackProps,
+  subdomain: string,
+) => {
   const apexDomain = qpqWebServerUtils.getFeatureDomainName(stackProps.qpqConfig);
 
-  const apiDomainName = `api.${apexDomain}`;
+  const apiDomainName = `${subdomain}.${apexDomain}`;
 
-  const apexHostedZone = aws_route53.HostedZone.fromLookup(stack, `${id}-apex-hostedZone`, {
+  const apexHostedZone = aws_route53.HostedZone.fromLookup(stack, `${id}-hostedZone-${subdomain}`, {
     domainName: apexDomain,
   });
 
-  const certificate = new aws_certificatemanager.Certificate(stack, `${id}-api-certificate`, {
-    domainName: apiDomainName,
-    certificateName: `api-cert-${qpqCoreUtils.getAppName(stackProps.qpqConfig)}`,
-    validation: aws_certificatemanager.CertificateValidation.fromDns(apexHostedZone),
-  });
+  const certificate = new aws_certificatemanager.Certificate(
+    stack,
+    `${id}-${subdomain}-certificate`,
+    {
+      domainName: apiDomainName,
+      certificateName: `${subdomain}-cert-${qpqCoreUtils.getAppName(stackProps.qpqConfig)}`,
+      validation: aws_certificatemanager.CertificateValidation.fromDns(apexHostedZone),
+    },
+  );
 
-  const domainName = new aws_apigateway.DomainName(stack, `${id}-api-custom-domain`, {
+  const domainName = new aws_apigateway.DomainName(stack, `${id}-${subdomain}-custom-domain`, {
     domainName: apiDomainName,
     certificate,
     securityPolicy: aws_apigateway.SecurityPolicy.TLS_1_2,
     endpointType: aws_apigateway.EndpointType.REGIONAL,
   });
 
-  new aws_route53.ARecord(stack, `${id}-a-record`, {
+  new aws_route53.ARecord(stack, `${id}-a-record-${subdomain}`, {
     zone: apexHostedZone,
     recordName: apiDomainName,
     target: aws_route53.RecordTarget.fromAlias(
@@ -309,7 +318,7 @@ export class QPQPrototypeSingleServiceStack extends Stack {
       service: qpqCoreUtils.getAppName(props.qpqConfig),
     };
 
-    const domainName = createApiDomainName(this, id, props);
+    const domainName = createApiDomainName(this, id, props, 'api');
 
     const resourceName = (name: string) => {
       return `${settings.service}-${settings.environment}-${name}`;
@@ -455,6 +464,53 @@ export class QPQPrototypeSingleServiceStack extends Stack {
 
     // Grant access to the lambda
     grantReadToOwnedResources(ownedResourceSettings, lambdaHandler);
+
+    qpqWebServerUtils.getSubdomainRedirects(props.qpqConfig).forEach((redirect) => {
+      const redirectLambda = new aws_lambda.Function(
+        this,
+        `${settings.environment}-${settings.service}-lambda-redirect-${redirect.subdomain}`,
+        {
+          functionName: `redirect-${redirect.subdomain}-${settings.service}-${settings.environment}`,
+          timeout: cdk.Duration.seconds(25),
+
+          runtime: aws_lambda.Runtime.NODEJS_16_X,
+          memorySize: 128,
+
+          code: aws_lambda.Code.fromAsset(
+            path.join(props.apiBuildPath, 'lambdaAPIGatewayEvent_redirect'),
+          ),
+          handler: 'index.executeAPIGatewayEvent',
+
+          environment: {
+            redirectConfig: JSON.stringify(redirect),
+            environment: JSON.stringify(settings.environment),
+          },
+        },
+      );
+
+      const restApi = new aws_apigateway.LambdaRestApi(
+        this,
+        `${id}-redirect-${redirect.subdomain}`,
+        {
+          restApiName: `subdomain-redirect-${redirect.subdomain}-${settings.environment}-${settings.service}`,
+          handler: redirectLambda,
+          deployOptions: {
+            loggingLevel: aws_apigateway.MethodLoggingLevel.INFO,
+            dataTraceEnabled: true,
+          },
+          proxy: true,
+        },
+      );
+
+      // Map all requests to this service to /serviceName/*
+      new aws_apigateway.BasePathMapping(this, `${id}-subdomain-bpm-${redirect.subdomain}`, {
+        domainName: createApiDomainName(this, id, props, redirect.subdomain),
+        restApi: restApi,
+
+        // the properties below are optional
+        // basePath: settings.service,
+      });
+    });
 
     // Create a rest api
     const api = new aws_apigateway.LambdaRestApi(
