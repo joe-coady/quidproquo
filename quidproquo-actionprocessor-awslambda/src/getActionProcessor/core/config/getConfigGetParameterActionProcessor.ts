@@ -3,8 +3,8 @@ import {
   ConfigGetParameterActionProcessor,
   actionResult,
   QPQConfig,
+  qpqCoreUtils,
 } from 'quidproquo-core';
-import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { QPQAWSResourceMap } from '../../../runtimeConfig/QPQAWSResourceMap';
 import { resolveParameterKey } from '../../../runtimeConfig/qpqAwsLambdaRuntimeConfigUtils';
@@ -19,7 +19,7 @@ const getProcessConfigGetParameter = (
     const awsParameterKey = resolveParameterKey(parameterName, awsResourceMap);
     const parameterValue = await getParameter(
       awsParameterKey,
-      qpqWebServerUtils.getDeployRegion(qpqConfig),
+      qpqCoreUtils.getDeployRegion(qpqConfig),
     );
 
     return actionResult(parameterValue);

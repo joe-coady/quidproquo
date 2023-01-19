@@ -3,8 +3,8 @@ import {
   actionResult,
   FileActionType,
   QPQConfig,
+  qpqCoreUtils,
 } from 'quidproquo-core';
-import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { QPQAWSResourceMap } from '../../../runtimeConfig/QPQAWSResourceMap';
 import { resolveResourceName } from '../../../runtimeConfig/qpqAwsLambdaRuntimeConfigUtils';
@@ -18,7 +18,7 @@ const getProcessFileReadBinaryContents = (
     const s3BucketName = resolveResourceName(drive, awsResourceMap);
 
     return actionResult(
-      await readBinaryFile(s3BucketName, filepath, qpqWebServerUtils.getDeployRegion(qpqConfig)),
+      await readBinaryFile(s3BucketName, filepath, qpqCoreUtils.getDeployRegion(qpqConfig)),
     );
   };
 };

@@ -10,9 +10,7 @@ import { QPQWebServerConfigSettingType } from './config/QPQConfig';
 import { getAppFeature } from 'quidproquo-core/lib/qpqCoreUtils';
 
 import { HttpEventHeaders, HTTPEventParams, HTTPEventResponse } from './types/HTTPEvent';
-import { SeoEventHeaders } from './types/SEOEvent';
 import { RouteOptions } from './config/settings/route';
-import { DeployRegionQPQWebServerConfigSetting } from './config';
 
 export const getAllRoutes = (configs: QPQConfig): RouteQPQWebServerConfigSetting[] => {
   const routes = qpqCoreUtils.getConfigSettings<RouteQPQWebServerConfigSetting>(
@@ -30,15 +28,6 @@ export const getAllSeo = (configs: QPQConfig): SeoQPQWebServerConfigSetting[] =>
   );
 
   return seoConfigs;
-};
-
-export const getDeployRegion = (configs: QPQConfig): string => {
-  const deployRegions = qpqCoreUtils.getConfigSettings<DeployRegionQPQWebServerConfigSetting>(
-    configs,
-    QPQWebServerConfigSettingType.DeployRegion,
-  );
-
-  return deployRegions[0]?.deployRegion || 'ap-southeast-2';
 };
 
 export const getAllOpenApiSpecs = (configs: QPQConfig): OpenApiQPQWebServerConfigSetting[] => {

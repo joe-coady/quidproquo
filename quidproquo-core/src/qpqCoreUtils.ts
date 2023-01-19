@@ -30,7 +30,7 @@ export const getAppName = (configs: QPQConfig): string => {
   )?.appName;
 
   if (!appName) {
-    throw new Error('please use defineAppName in your QPQ config');
+    throw new Error('please use defineApplication in your QPQ config');
   }
 
   return appName;
@@ -42,6 +42,14 @@ export const getAppFeature = (configs: QPQConfig): string => {
       ?.featureName || 'production';
 
   return featureName;
+};
+
+export const getDeployRegion = (configs: QPQConfig): string => {
+  const deployRegion =
+    getConfigSetting<AppNameQPQConfigSetting>(configs, QPQCoreConfigSettingType.appName)
+      ?.deployRegion || 'us-east-1';
+
+  return deployRegion;
 };
 
 export const getStorageDriveNames = (configs: QPQConfig): string[] => {

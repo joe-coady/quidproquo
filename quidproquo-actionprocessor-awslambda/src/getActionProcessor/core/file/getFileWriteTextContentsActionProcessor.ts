@@ -3,8 +3,8 @@ import {
   actionResult,
   FileActionType,
   QPQConfig,
+  qpqCoreUtils,
 } from 'quidproquo-core';
-import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { QPQAWSResourceMap } from '../../../runtimeConfig/QPQAWSResourceMap';
 import { resolveResourceName } from '../../../runtimeConfig/qpqAwsLambdaRuntimeConfigUtils';
@@ -16,7 +16,7 @@ const getProcessFileWriteTextContents = (
 ): FileWriteTextContentsActionProcessor => {
   return async ({ drive, filepath, data }) => {
     const s3BucketName = resolveResourceName(drive, awsResourceMap);
-    await writeTextFile(s3BucketName, filepath, data, qpqWebServerUtils.getDeployRegion(qpqConfig));
+    await writeTextFile(s3BucketName, filepath, data, qpqCoreUtils.getDeployRegion(qpqConfig));
 
     return actionResult(void 0);
   };

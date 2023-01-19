@@ -309,7 +309,7 @@ export class QPQPrototypeSingleServiceStack extends Stack {
     super(scope, id, {
       env: {
         account: props.account,
-        region: qpqWebServerUtils.getDeployRegion(props.qpqConfig),
+        region: qpqCoreUtils.getDeployRegion(props.qpqConfig),
       },
     });
 

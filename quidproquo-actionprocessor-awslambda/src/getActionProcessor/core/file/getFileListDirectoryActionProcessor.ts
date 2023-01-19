@@ -3,8 +3,8 @@ import {
   actionResult,
   FileActionType,
   QPQConfig,
+  qpqCoreUtils,
 } from 'quidproquo-core';
-import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { QPQAWSResourceMap } from '../../../runtimeConfig/QPQAWSResourceMap';
 import { resolveResourceName } from '../../../runtimeConfig/qpqAwsLambdaRuntimeConfigUtils';
@@ -18,7 +18,7 @@ const getProcessFileListDirectory = (
     const s3BucketName = resolveResourceName(drive, awsResourceMap);
     const s3FileList = await listFiles(
       s3BucketName,
-      qpqWebServerUtils.getDeployRegion(qpqConfig),
+      qpqCoreUtils.getDeployRegion(qpqConfig),
       folderPath,
       maxFiles,
       pageToken,

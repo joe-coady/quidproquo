@@ -1,5 +1,4 @@
-import { QPQConfig } from 'quidproquo-core';
-import { qpqWebServerUtils } from 'quidproquo-webserver';
+import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 import { QPQAWSResourceMap } from '../../../runtimeConfig/QPQAWSResourceMap';
 import { resolveResourceName } from '../../../runtimeConfig/qpqAwsLambdaRuntimeConfigUtils';
 import {
@@ -20,7 +19,7 @@ const getProcessFileDelete = (
     const errored = await deleteFiles(
       s3BucketName,
       filepaths,
-      qpqWebServerUtils.getDeployRegion(qpqConfig),
+      qpqCoreUtils.getDeployRegion(qpqConfig),
     );
 
     // errored deletes are a graceful success ~ Retry
