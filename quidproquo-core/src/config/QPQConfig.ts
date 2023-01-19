@@ -5,6 +5,7 @@ export enum QPQCoreConfigSettingType {
   secret = '@quidproquo-core/config/secret',
   parameter = '@quidproquo-core/config/parameter',
   actionProcessors = '@quidproquo-core/config/actionProcessors',
+  buildPath = '@quidproquo-core/config/buildPath',
 }
 
 export interface QPQConfigSetting {
