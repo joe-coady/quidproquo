@@ -7,6 +7,10 @@ import * as cdk from 'aws-cdk-lib';
 export interface QpqCoreSecretConstructProps extends QpqConstructProps<SecretQPQConfigSetting> {}
 
 export class QpqCoreSecretConstruct extends QpqConstruct<SecretQPQConfigSetting> {
+  static getUniqueId(setting: SecretQPQConfigSetting) {
+    return setting.key;
+  }
+
   constructor(scope: Construct, id: string, props: QpqCoreSecretConstructProps) {
     super(scope, id, props);
 

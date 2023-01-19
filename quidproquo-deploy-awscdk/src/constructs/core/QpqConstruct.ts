@@ -10,6 +10,10 @@ export class QpqConstruct<T extends QPQConfigSetting> extends Construct {
   qpqConfig: QPQConfig;
   id: string;
 
+  static getUniqueId(setting: QPQConfigSetting): string {
+    throw new Error('Implement getUniqueId in config: ' + setting.configSettingType);
+  }
+
   constructor(scope: Construct, id: string, props: QpqConstructProps<T>) {
     super(scope, id);
 
