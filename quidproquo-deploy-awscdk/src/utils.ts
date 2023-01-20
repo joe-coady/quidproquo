@@ -18,6 +18,13 @@ export const getInfrastructureStackName = (qpqConfig: QPQConfig) => {
   return `${appName}-${environment}-inf`;
 };
 
+export const getWebStackName = (qpqConfig: QPQConfig) => {
+  const appName = qpqCoreUtils.getAppName(qpqConfig);
+  const environment = qpqCoreUtils.getAppFeature(qpqConfig);
+
+  return `${appName}-${environment}-web`;
+};
+
 export const createConstructs = (
   owner: QpqServiceStack,
   qpqConfig: QPQConfig,

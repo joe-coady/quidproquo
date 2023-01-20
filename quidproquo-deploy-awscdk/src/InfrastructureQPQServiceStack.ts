@@ -11,8 +11,10 @@ export interface InfrastructureQPQServiceStackProps extends QpqServiceStackProps
 
 const infrastructureQPQServiceStackOwnedSettings: string[] = [
   QPQWebServerConfigSettingType.Dns,
+  QPQWebServerConfigSettingType.SubdomainRedirect,
   QPQCoreConfigSettingType.storageDrive,
   QPQCoreConfigSettingType.parameter,
+  QPQCoreConfigSettingType.secret,
 ];
 
 export class InfrastructureQPQServiceStack extends QpqServiceStack {
