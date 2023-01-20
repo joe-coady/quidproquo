@@ -11,6 +11,7 @@ import { getAppFeature } from 'quidproquo-core/lib/qpqCoreUtils';
 
 import { HttpEventHeaders, HTTPEventParams, HTTPEventResponse } from './types/HTTPEvent';
 import { RouteOptions } from './config/settings/route';
+import { WebEntryQPQWebServerConfigSetting } from './config';
 
 export const getAllRoutes = (configs: QPQConfig): RouteQPQWebServerConfigSetting[] => {
   const routes = qpqCoreUtils.getConfigSettings<RouteQPQWebServerConfigSetting>(
@@ -56,6 +57,19 @@ export const getDomainName = (configs: QPQConfig): string => {
   );
 
   return dnsSettings?.dnsBase || '';
+};
+
+export const getWebEntry = (configs: QPQConfig): string => {
+  const webEntry = qpqCoreUtils.getConfigSetting<WebEntryQPQWebServerConfigSetting>(
+    configs,
+    QPQWebServerConfigSettingType.WebEntry,
+  );
+
+  if (!webEntry?.buildPath) {
+    throw new Error('please use defineWebEntry in your qpq config');
+  }
+
+  return webEntry?.buildPath;
 };
 
 export const getSubdomainRedirects = (

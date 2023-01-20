@@ -5,4 +5,5 @@ export enum QPQWebServerConfigSettingType {
   OpenApi = '@quidproquo-webserver/config/OpenApi',
   Seo = '@quidproquo-webserver/config/Seo',
   SubdomainRedirect = '@quidproquo-webserver/config/SubdomainRedirect',
+  WebEntry = '@quidproquo-webserver/config/WebEntry',
 }
