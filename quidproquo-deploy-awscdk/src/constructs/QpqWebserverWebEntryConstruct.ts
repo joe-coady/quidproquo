@@ -27,10 +27,8 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
   constructor(scope: Construct, id: string, props: QpqWebserverWebEntryConstructProps) {
     super(scope, id, props);
 
-    console.log('QpqWebserverWebEntryConstruct');
-
     const apexDomain = qpqWebServerUtils.getFeatureDomainName(props.qpqConfig);
-    const webEntry = qpqWebServerUtils.getWebEntry(props.qpqConfig);
+    // const webEntry = qpqWebServerUtils.getWebEntry(props.qpqConfig);
 
     // create an s3 bucket
     const staticWebFilesBucket = new aws_s3.Bucket(scope, this.childId('bucket'), {
@@ -79,10 +77,12 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
       aliases: [apexDomain],
     });
 
-    new aws_s3_deployment.BucketDeployment(scope, this.childId(`deploy-website`), {
-      sources: [aws_s3_deployment.Source.asset(webEntry)],
-      destinationBucket: staticWebFilesBucket,
-    });
+    // We will deploy manually
+    // TODO: This with an option
+    // new aws_s3_deployment.BucketDeployment(scope, this.childId(`deploy-website`), {
+    //   sources: [aws_s3_deployment.Source.asset(webEntry)],
+    //   destinationBucket: staticWebFilesBucket,
+    // });
 
     const grantables = qpqDeployAwsCdkUtils.getQqpGrantableResources(
       scope,

@@ -15,12 +15,10 @@ export abstract class QpqCoreParameterConstructBase
   abstract stringParameter: aws_ssm.IStringParameter;
 
   public grantRead(grantee: aws_iam.IGrantable): aws_iam.Grant {
-    console.log('grantRead');
     return this.stringParameter.grantRead(grantee);
   }
 
   public grantWrite(grantee: aws_iam.IGrantable): aws_iam.Grant {
-    console.log('grantWrite');
     return this.stringParameter.grantWrite(grantee);
   }
 
