@@ -1,3 +1,5 @@
+import path from 'path';
+
 import {
   aws_lambda,
   aws_s3,
@@ -13,6 +15,7 @@ import { WebEntryQPQWebServerConfigSetting, qpqWebServerUtils } from 'quidproquo
 import { QpqConstruct, QpqConstructProps } from './core/QpqConstruct';
 import { Construct } from 'constructs';
 
+import * as qpqDeployAwsCdkUtils from '../qpqDeployAwsCdkUtils';
 export interface QpqWebserverWebEntryConstructProps
   extends QpqConstructProps<WebEntryQPQWebServerConfigSetting> {}
 
@@ -24,10 +27,10 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
   constructor(scope: Construct, id: string, props: QpqWebserverWebEntryConstructProps) {
     super(scope, id, props);
 
+    console.log('QpqWebserverWebEntryConstruct');
+
     const apexDomain = qpqWebServerUtils.getFeatureDomainName(props.qpqConfig);
     const webEntry = qpqWebServerUtils.getWebEntry(props.qpqConfig);
-
-    console.log(webEntry);
 
     // create an s3 bucket
     const staticWebFilesBucket = new aws_s3.Bucket(scope, this.childId('bucket'), {
@@ -81,66 +84,74 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
       destinationBucket: staticWebFilesBucket,
     });
 
-    // const cloudFrontBehaviors = qpqWebServerUtils.getAllSeo(props.qpqConfig).map((seo, index) => {
-    //   const edgeFunctionVR = new aws_cloudfront.experimental.EdgeFunction(
-    //     scope,
-    //     this.childId(`$SEO-${seo.runtime}-${index}-VR`),
-    //     {
-    //       functionName: this.resourceName(`SEO-VR-${seo.runtime}-${index}`),
-    //       timeout: cdk.Duration.seconds(5),
-    //       runtime: aws_lambda.Runtime.NODEJS_16_X,
+    const grantables = qpqDeployAwsCdkUtils.getQqpGrantableResources(
+      scope,
+      this.childId('grantable'),
+      this.qpqConfig,
+    );
 
-    //       code: aws_lambda.Code.fromAsset(
-    //         path.join(stackProps.apiBuildPath, 'lambdaEventViewerRequest'),
-    //       ),
-    //       handler: 'index.executeEventViewerRequest',
-    //     },
-    //   );
+    console.log('Num Grantables: ', grantables.length);
 
-    //   const edgeFunctionOR = new aws_cloudfront.experimental.EdgeFunction(
-    //     stack,
-    //     `${id}-SEO-${index}-${seo.runtime}-OR`,
-    //     {
-    //       functionName: `SEO-OR-${index}-${seo.runtime}-${environment}-${serviceName}`,
-    //       timeout: cdk.Duration.seconds(30),
-    //       runtime: aws_lambda.Runtime.NODEJS_16_X,
+    const cloudFrontBehaviors = qpqWebServerUtils.getAllSeo(props.qpqConfig).map((seo, index) => {
+      const seoBuildPath = qpqWebServerUtils.getWebEntrySeoFullPath(props.qpqConfig);
 
-    //       memorySize: 1024,
+      const edgeFunctionVR = new aws_cloudfront.experimental.EdgeFunction(
+        scope,
+        this.childId(`$SEO-${seo.runtime}-${index}-VR`),
+        {
+          functionName: this.resourceName(`SEO-VR-${seo.runtime}-${index}`),
+          timeout: cdk.Duration.seconds(5),
+          runtime: aws_lambda.Runtime.NODEJS_16_X,
 
-    //       code: aws_lambda.Code.fromAsset(
-    //         path.join(stackProps.apiBuildPath, 'lambdaEventOriginRequest'),
-    //       ),
-    //       handler: 'index.executeEventOriginRequest',
-    //     },
-    //   );
+          code: aws_lambda.Code.fromAsset(path.join(seoBuildPath, 'lambdaEventViewerRequest')),
+          handler: 'index.executeEventViewerRequest',
+        },
+      );
 
-    //   // We don't need access to anything in the VR
-    //   grantReadToOwnedResources(ownedResourceSettings, edgeFunctionOR);
+      const edgeFunctionOR = new aws_cloudfront.experimental.EdgeFunction(
+        scope,
+        this.childId(`$SEO-${seo.runtime}-${index}-OR`),
+        {
+          functionName: this.resourceName(`SEO-OR-${seo.runtime}-${index}`),
+          timeout: cdk.Duration.seconds(30),
+          runtime: aws_lambda.Runtime.NODEJS_16_X,
 
-    //   const wildcardPath = seo.path.replaceAll(/{(.+?)}/g, '*');
+          memorySize: 1024,
 
-    //   return {
-    //     pathPattern: wildcardPath,
+          code: aws_lambda.Code.fromAsset(path.join(seoBuildPath, 'lambdaEventOriginRequest')),
+          handler: 'index.executeEventOriginRequest',
+        },
+      );
 
-    //     // Update this to 24 hours
-    //     maxTtl: cdk.Duration.seconds(0),
-    //     minTtl: cdk.Duration.seconds(0),
-    //     defaultTtl: cdk.Duration.seconds(0),
+      grantables.forEach((g) => {
+        g.grantAll(edgeFunctionVR);
+        g.grantAll(edgeFunctionOR);
+      });
 
-    //     lambdaFunctionAssociations: [
-    //       {
-    //         includeBody: true,
-    //         eventType: aws_cloudfront.LambdaEdgeEventType.ORIGIN_REQUEST,
-    //         lambdaFunction: edgeFunctionOR.currentVersion,
-    //       },
-    //       {
-    //         includeBody: false,
-    //         eventType: aws_cloudfront.LambdaEdgeEventType.VIEWER_REQUEST,
-    //         lambdaFunction: edgeFunctionVR.currentVersion,
-    //       },
-    //     ],
-    //   };
-    // });
+      const wildcardPath = seo.path.replaceAll(/{(.+?)}/g, '*');
+
+      return {
+        pathPattern: wildcardPath,
+
+        // Update this to 24 hours
+        maxTtl: cdk.Duration.seconds(0),
+        minTtl: cdk.Duration.seconds(0),
+        defaultTtl: cdk.Duration.seconds(0),
+
+        lambdaFunctionAssociations: [
+          {
+            includeBody: true,
+            eventType: aws_cloudfront.LambdaEdgeEventType.ORIGIN_REQUEST,
+            lambdaFunction: edgeFunctionOR.currentVersion,
+          },
+          {
+            includeBody: false,
+            eventType: aws_cloudfront.LambdaEdgeEventType.VIEWER_REQUEST,
+            lambdaFunction: edgeFunctionVR.currentVersion,
+          },
+        ],
+      };
+    });
 
     // Create a cloud front distribution
     // TODO: use aws_cloudfront.Distribution
@@ -158,6 +169,7 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
               originAccessIdentity: websiteOAI,
             },
             behaviors: [
+              ...cloudFrontBehaviors,
               {
                 isDefaultBehavior: true,
               },

@@ -6,6 +6,7 @@ export interface BuildPathQPQConfigSetting extends QPQConfigSetting {
 
 export const defineBuildPath = (buildPath: string): BuildPathQPQConfigSetting => ({
   configSettingType: QPQCoreConfigSettingType.buildPath,
+  uniqueKey: buildPath,
 
   buildPath,
 });

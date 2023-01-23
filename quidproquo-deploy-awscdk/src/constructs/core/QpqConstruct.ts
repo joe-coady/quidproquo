@@ -40,4 +40,6 @@ export class QpqConstruct<T extends QPQConfigSetting> extends Construct {
   childId(uniqueName: string) {
     return `${uniqueName}-${this.id}`;
   }
+
+  fromOtherStack() {}
 }

@@ -9,6 +9,7 @@ export interface OpenApiQPQWebServerConfigSetting extends QPQConfigSetting {
 export const defineOpenApi = (openApiSpecPath: string): OpenApiQPQWebServerConfigSetting => {
   return {
     configSettingType: QPQWebServerConfigSettingType.OpenApi,
+    uniqueKey: openApiSpecPath,
 
     openApiSpecPath,
   };

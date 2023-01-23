@@ -8,6 +8,7 @@ export interface ParameterQPQConfigSetting extends QPQConfigSetting {
 
 export const defineParameter = (key: string, value: string = ''): ParameterQPQConfigSetting => ({
   configSettingType: QPQCoreConfigSettingType.parameter,
+  uniqueKey: key,
 
   key,
   value,

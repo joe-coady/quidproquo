@@ -8,9 +8,11 @@ export interface DefaultRouteOptionsQPQWebServerConfigSetting extends QPQConfigS
 }
 
 export const defineDefaultRouteOptions = (
+  groupName: string,
   routeOptions: RouteOptions,
 ): DefaultRouteOptionsQPQWebServerConfigSetting => ({
   configSettingType: QPQWebServerConfigSettingType.DefaultRouteOptions,
+  uniqueKey: groupName,
 
   routeOptions,
 });

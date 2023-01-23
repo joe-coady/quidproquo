@@ -1,5 +1,6 @@
 import { randomUUID } from 'crypto';
 import { match } from 'node-match-path';
+import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
 export const randomGuid = () => {
   return randomUUID();
@@ -19,4 +20,15 @@ export const matchUrl = (path: string, url: string): UrlMatch => {
     didMatch: matchResult.matches,
     params: matchResult.params,
   };
+};
+
+export const getRuntimeResourceName = (
+  resourceName: string,
+  qpqConfig: QPQConfig,
+  resourceType: string = '',
+) => {
+  const service = qpqCoreUtils.getAppName(qpqConfig);
+  const environment = qpqCoreUtils.getAppFeature(qpqConfig);
+
+  return `${resourceName}-${service}-${environment}${resourceType}`;
 };

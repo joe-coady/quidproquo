@@ -22,6 +22,7 @@ export const defineRoute = (
   options: RouteOptions = {},
 ): RouteQPQWebServerConfigSetting => ({
   configSettingType: QPQWebServerConfigSettingType.Route,
+  uniqueKey: `${method}${path}`,
 
   method,
   path,

@@ -8,6 +8,7 @@ export interface WebEntryQPQWebServerConfigSetting extends QPQConfigSetting {
 
 export const defineWebEntry = (buildPath: string): WebEntryQPQWebServerConfigSetting => ({
   configSettingType: QPQWebServerConfigSettingType.WebEntry,
+  uniqueKey: buildPath,
 
   buildPath,
 });

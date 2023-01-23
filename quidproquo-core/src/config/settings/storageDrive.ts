@@ -6,6 +6,7 @@ export interface StorageDriveQPQConfigSetting extends QPQConfigSetting {
 
 export const defineStorageDrive = (storageDrive: string): StorageDriveQPQConfigSetting => ({
   configSettingType: QPQCoreConfigSettingType.storageDrive,
+  uniqueKey: storageDrive,
 
   storageDrive,
 });

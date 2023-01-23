@@ -15,8 +15,6 @@ module.exports = function (source) {
 
   const result = `${imports}
 
-console.log(customActionProcessorImport0.default);
-
 module.exports = () => ({
   ${exports}
 })`;

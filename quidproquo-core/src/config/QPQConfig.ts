@@ -10,6 +10,7 @@ export enum QPQCoreConfigSettingType {
 
 export interface QPQConfigSetting {
   configSettingType: string;
+  uniqueKey: string;
 }
 
 export type QPQConfig = QPQConfigSetting[];

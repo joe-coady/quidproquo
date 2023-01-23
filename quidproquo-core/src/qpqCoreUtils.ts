@@ -53,6 +53,19 @@ export const getDeployRegion = (configs: QPQConfig): string => {
   return deployRegion;
 };
 
+export const getConfigRoot = (configs: QPQConfig): string => {
+  const configRoot = getConfigSetting<AppNameQPQConfigSetting>(
+    configs,
+    QPQCoreConfigSettingType.appName,
+  )?.configRoot;
+
+  if (!configRoot) {
+    throw new Error('please use defineApplication in your QPQ config');
+  }
+
+  return configRoot;
+};
+
 export const getStorageDriveNames = (configs: QPQConfig): string[] => {
   const storageDriveNames = getConfigSettings<StorageDriveQPQConfigSetting>(
     configs,
@@ -123,4 +136,11 @@ export const getBuildPath = (configs: QPQConfig): string => {
   }
 
   return buildPath;
+};
+
+export const getUniqueKeyForSetting = (setting: QPQConfigSetting) => {
+  const type = setting.configSettingType.split('/').pop();
+  const key = setting.uniqueKey;
+
+  return `${type}${key}`;
 };

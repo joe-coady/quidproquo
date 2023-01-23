@@ -12,6 +12,7 @@ export const defineSecret = (
   value: string = '',
 ): SecretQPQConfigSetting => ({
   configSettingType: QPQCoreConfigSettingType.secret,
+  uniqueKey: key,
 
   key,
   value,

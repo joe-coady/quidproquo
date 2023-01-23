@@ -1,3 +1,5 @@
+import * as path from 'path';
+
 import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
 import { RouteQPQWebServerConfigSetting } from './config/settings/route';
@@ -70,6 +72,23 @@ export const getWebEntry = (configs: QPQConfig): string => {
   }
 
   return webEntry?.buildPath;
+};
+
+export const getWebEntryFullPath = (qpqConfig: QPQConfig): string => {
+  const webEntry = qpqCoreUtils.getConfigSetting<WebEntryQPQWebServerConfigSetting>(
+    qpqConfig,
+    QPQWebServerConfigSettingType.WebEntry,
+  )?.buildPath;
+
+  if (!webEntry) {
+    throw new Error('please use defineWebEntry in your qpq config');
+  }
+
+  return path.join(qpqCoreUtils.getConfigRoot(qpqConfig), webEntry);
+};
+
+export const getWebEntrySeoFullPath = (qpqConfig: QPQConfig): string => {
+  return getWebEntryFullPath(qpqConfig) + '-seo';
 };
 
 export const getSubdomainRedirects = (

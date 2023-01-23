@@ -39,12 +39,12 @@ export const getOriginRequestEventExecutor = (
     console.log(JSON.stringify(event));
 
     // Don't run the lambda if we are not a bot
-    if (
-      !event.Records[0].cf.request.headers['x-qpq-is-bot'] ||
-      event.Records[0].cf.request.headers['x-qpq-is-bot'][0].value !== 'true'
-    ) {
-      return event.Records[0].cf.request;
-    }
+    // if (
+    //   !event.Records[0].cf.request.headers['x-qpq-is-bot'] ||
+    //   event.Records[0].cf.request.headers['x-qpq-is-bot'][0].value !== 'true'
+    // ) {
+    //   return event.Records[0].cf.request;
+    // }
 
     const cdkConfig = await getLambdaConfigs();
 

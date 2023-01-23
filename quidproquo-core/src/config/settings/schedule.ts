@@ -17,6 +17,7 @@ export const defineRecurringSchedule = (
   runtime: string,
 ): ScheduleQPQConfigSetting => ({
   configSettingType: QPQCoreConfigSettingType.schedule,
+  uniqueKey: `${src}-${runtime}`,
 
   scheduleType: ScheduleTypeEnum.Recurring,
 

@@ -16,15 +16,11 @@ const getWebpackBuildMode = (qpqConfig: QPQConfig): string => {
   return 'production';
 };
 
-export const getWebpackEntryNames = () => [
-  'lambdaAPIGatewayEvent',
-  'lambdaAPIGatewayEvent_redirect',
-  'lambdaEventBridgeEvent',
-  'lambdaEventOriginRequest',
-  'lambdaEventViewerRequest',
-];
-
-export const getWebpackConfig = (qpqConfig: QPQConfig, buildPath: string, outputPrefix: string) => {
+export const getWebpackConfig = (
+  qpqConfig: QPQConfig,
+  buildPath: string,
+  awsLambdasToBuild: string[],
+) => {
   const allSrcEntries = [
     ...qpqCoreUtils.getAllSrcEntries(qpqConfig),
     ...qpqWebServerUtils.getAllSrcEntries(qpqConfig),
@@ -38,10 +34,11 @@ export const getWebpackConfig = (qpqConfig: QPQConfig, buildPath: string, output
     rootDir: path.resolve(buildPath, '..'),
     qpqConfig,
     customActionProcessorSources,
+    projectRoot: qpqCoreUtils.getConfigRoot(qpqConfig),
   });
 
   return {
-    entry: getWebpackEntryNames().reduce(
+    entry: awsLambdasToBuild.reduce(
       (acc, name) => ({ ...acc, [name]: `quidproquo-deploy-awscdk/src/lambdas/${name}.ts` }),
       {},
     ),
@@ -92,3 +89,24 @@ export const getWebpackConfig = (qpqConfig: QPQConfig, buildPath: string, output
     // plugins: [new BundleAnalyzerPlugin()],
   };
 };
+
+export const getWebpackEntryNames = () => [
+  'lambdaAPIGatewayEvent',
+  'lambdaAPIGatewayEvent_redirect',
+  'lambdaEventBridgeEvent',
+  'lambdaEventOriginRequest',
+  'lambdaEventViewerRequest',
+];
+
+export const getSeoWebpackConfig = (qpqConfig: QPQConfig) =>
+  getWebpackConfig(qpqConfig, qpqWebServerUtils.getWebEntrySeoFullPath(qpqConfig), [
+    'lambdaEventOriginRequest',
+    'lambdaEventViewerRequest',
+  ]);
+
+export const getAllWebpackConfig = (qpqConfig: QPQConfig) =>
+  getWebpackConfig(
+    qpqConfig,
+    qpqWebServerUtils.getWebEntrySeoFullPath(qpqConfig),
+    getWebpackEntryNames(),
+  );

@@ -14,6 +14,7 @@ export const defineSubdomainRedirect = (
   addFeatureEnvironment: boolean = false,
 ): SubdomainRedirectQPQWebServerConfigSetting => ({
   configSettingType: QPQWebServerConfigSettingType.SubdomainRedirect,
+  uniqueKey: subdomain,
 
   subdomain,
   redirectUrl,

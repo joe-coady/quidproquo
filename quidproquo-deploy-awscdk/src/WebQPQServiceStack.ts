@@ -1,5 +1,4 @@
 import { Construct } from 'constructs';
-import { QPQCoreConfigSettingType } from 'quidproquo-core';
 import { QPQWebServerConfigSettingType } from 'quidproquo-webserver';
 
 import { QpqServiceStack, QpqServiceStackProps } from './constructs/core/QPQServiceStack';
@@ -17,6 +16,8 @@ const webQPQServiceStackOwnedSettings: string[] = [
 export class WebQPQServiceStack extends QpqServiceStack {
   constructor(scope: Construct, id: string, props: WebQPQServiceStackProps) {
     super(scope, id, props);
+
+    console.log('Creating: WebQPQServiceStack');
 
     createConstructs(
       this,

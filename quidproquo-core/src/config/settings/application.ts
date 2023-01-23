@@ -14,6 +14,7 @@ export const defineApplication = (
   deployRegion?: string,
 ): AppNameQPQConfigSetting => ({
   configSettingType: QPQCoreConfigSettingType.appName,
+  uniqueKey: appName,
 
   appName,
   configRoot,
