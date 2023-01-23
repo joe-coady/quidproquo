@@ -6,25 +6,21 @@ import {
   qpqCoreUtils,
 } from 'quidproquo-core';
 
-import { QPQAWSResourceMap } from '../../../runtimeConfig/QPQAWSResourceMap';
 import { resolveSecretKey } from '../../../runtimeConfig/qpqAwsLambdaRuntimeConfigUtils';
 
 import { getSecret } from '../../../logic/secretsManager/getSecret';
 
-const getProcessConfigActionType = (
-  qpqConfig: QPQConfig,
-  awsResourceMap: QPQAWSResourceMap,
-): ConfigGetSecretActionProcessor => {
+const getProcessConfigActionType = (qpqConfig: QPQConfig): ConfigGetSecretActionProcessor => {
   return async ({ secretName }) => {
-    const awsSecretKey = resolveSecretKey(secretName, awsResourceMap);
+    const awsSecretKey = resolveSecretKey(secretName, qpqConfig);
     const secretValue = await getSecret(awsSecretKey, qpqCoreUtils.getDeployRegion(qpqConfig));
 
     return actionResult(secretValue);
   };
 };
 
-export default (qpqConfig: QPQConfig, awsResourceMap: QPQAWSResourceMap) => {
+export default (qpqConfig: QPQConfig) => {
   return {
-    [ConfigActionType.GetSecret]: getProcessConfigActionType(qpqConfig, awsResourceMap),
+    [ConfigActionType.GetSecret]: getProcessConfigActionType(qpqConfig),
   };
 };

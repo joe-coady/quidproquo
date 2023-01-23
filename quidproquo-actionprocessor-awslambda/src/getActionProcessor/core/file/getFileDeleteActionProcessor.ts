@@ -1,5 +1,5 @@
 import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
-import { QPQAWSResourceMap } from '../../../runtimeConfig/QPQAWSResourceMap';
+
 import { resolveResourceName } from '../../../runtimeConfig/qpqAwsLambdaRuntimeConfigUtils';
 import {
   FileDeleteActionProcessor,
@@ -10,12 +10,9 @@ import {
 } from 'quidproquo-core';
 import { deleteFiles } from '../../../logic/s3/s3Utils';
 
-const getProcessFileDelete = (
-  qpqConfig: QPQConfig,
-  awsResourceMap: QPQAWSResourceMap,
-): FileDeleteActionProcessor => {
+const getProcessFileDelete = (qpqConfig: QPQConfig): FileDeleteActionProcessor => {
   return async ({ drive, filepaths }) => {
-    const s3BucketName = resolveResourceName(drive, awsResourceMap);
+    const s3BucketName = resolveResourceName(drive, qpqConfig);
     const errored = await deleteFiles(
       s3BucketName,
       filepaths,
@@ -34,6 +31,6 @@ const getProcessFileDelete = (
   };
 };
 
-export default (qpqConfig: QPQConfig, awsResourceMap: QPQAWSResourceMap) => ({
-  [FileActionType.Delete]: getProcessFileDelete(qpqConfig, awsResourceMap),
+export default (qpqConfig: QPQConfig) => ({
+  [FileActionType.Delete]: getProcessFileDelete(qpqConfig),
 });

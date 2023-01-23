@@ -46,12 +46,12 @@ export const getEventBridgeEventExecutor = (
 
       ...getEventBridgeEventActionProcessor(lambdaRuntimeConfig),
       ...getSystemActionProcessor(dynamicModuleLoader),
-      ...getFileActionProcessor(cdkConfig.qpqConfig, cdkConfig.awsResourceMap),
-      ...getConfigGetSecretActionProcessor(cdkConfig.qpqConfig, cdkConfig.awsResourceMap),
-      ...getConfigGetParameterActionProcessor(cdkConfig.qpqConfig, cdkConfig.awsResourceMap),
-      ...getConfigGetParametersActionProcessor(cdkConfig.qpqConfig, cdkConfig.awsResourceMap),
+      ...getFileActionProcessor(cdkConfig.qpqConfig),
+      ...getConfigGetSecretActionProcessor(cdkConfig.qpqConfig),
+      ...getConfigGetParameterActionProcessor(cdkConfig.qpqConfig),
+      ...getConfigGetParametersActionProcessor(cdkConfig.qpqConfig),
 
-      ...getCustomActionProcessors(cdkConfig.qpqConfig, cdkConfig.awsResourceMap),
+      ...getCustomActionProcessors(cdkConfig.qpqConfig),
       ...qpqCustomActionProcessors(),
     };
 

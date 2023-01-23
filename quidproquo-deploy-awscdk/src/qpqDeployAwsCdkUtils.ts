@@ -29,11 +29,7 @@ export const getQqpGrantableResources = (
       qpqConfig,
       QPQCoreConfigSettingType.parameter,
     ),
-
-    defineParameter('qpq-aws-resource-map'),
   ];
-
-  console.log(JSON.stringify(parameterSettings, null, 2));
 
   const parameterResources = parameterSettings.map((parameterSetting) => {
     return QpqCoreParameterConstruct.fromOtherStack(

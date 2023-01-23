@@ -6,16 +6,14 @@ import {
   qpqCoreUtils,
 } from 'quidproquo-core';
 
-import { QPQAWSResourceMap } from '../../../runtimeConfig/QPQAWSResourceMap';
 import { resolveResourceName } from '../../../runtimeConfig/qpqAwsLambdaRuntimeConfigUtils';
 import { readTextFile } from '../../../logic/s3/s3Utils';
 
 const getProcessFileReadTextContents = (
   qpqConfig: QPQConfig,
-  awsResourceMap: QPQAWSResourceMap,
 ): FileReadTextContentsActionProcessor => {
   return async ({ drive, filepath }) => {
-    const s3BucketName = resolveResourceName(drive, awsResourceMap);
+    const s3BucketName = resolveResourceName(drive, qpqConfig);
 
     return actionResult(
       await readTextFile(s3BucketName, filepath, qpqCoreUtils.getDeployRegion(qpqConfig)),
@@ -23,6 +21,6 @@ const getProcessFileReadTextContents = (
   };
 };
 
-export default (qpqConfig: QPQConfig, awsResourceMap: QPQAWSResourceMap) => ({
-  [FileActionType.ReadTextContents]: getProcessFileReadTextContents(qpqConfig, awsResourceMap),
+export default (qpqConfig: QPQConfig) => ({
+  [FileActionType.ReadTextContents]: getProcessFileReadTextContents(qpqConfig),
 });

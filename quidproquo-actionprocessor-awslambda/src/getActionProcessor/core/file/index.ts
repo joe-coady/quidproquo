@@ -1,5 +1,4 @@
 import { QPQConfig } from 'quidproquo-core';
-import { QPQAWSResourceMap } from '../../../runtimeConfig/QPQAWSResourceMap';
 
 import getFileDeleteActionProcessor from './getFileDeleteActionProcessor';
 import getFileExistsActionProcessor from './getFileExistsActionProcessor';
@@ -9,12 +8,12 @@ import getFileWriteTextContentsActionProcessor from './getFileWriteTextContentsA
 import getFileReadBinaryContentsActionProcessor from './getFileReadBinaryContentsActionProcessor';
 import getFileWriteBinaryContentsActionProcessor from './getFileWriteBinaryContentsActionProcessor';
 
-export default (qpqConfig: QPQConfig, awsResourceMap: QPQAWSResourceMap) => ({
-  ...getFileDeleteActionProcessor(qpqConfig, awsResourceMap),
-  ...getFileExistsActionProcessor(qpqConfig, awsResourceMap),
-  ...getFileListDirectoryActionProcessor(qpqConfig, awsResourceMap),
-  ...getFileReadTextContentsActionProcessor(qpqConfig, awsResourceMap),
-  ...getFileWriteTextContentsActionProcessor(qpqConfig, awsResourceMap),
-  ...getFileReadBinaryContentsActionProcessor(qpqConfig, awsResourceMap),
-  ...getFileWriteBinaryContentsActionProcessor(qpqConfig, awsResourceMap),
+export default (qpqConfig: QPQConfig) => ({
+  ...getFileDeleteActionProcessor(qpqConfig),
+  ...getFileExistsActionProcessor(qpqConfig),
+  ...getFileListDirectoryActionProcessor(qpqConfig),
+  ...getFileReadTextContentsActionProcessor(qpqConfig),
+  ...getFileWriteTextContentsActionProcessor(qpqConfig),
+  ...getFileReadBinaryContentsActionProcessor(qpqConfig),
+  ...getFileWriteBinaryContentsActionProcessor(qpqConfig),
 });

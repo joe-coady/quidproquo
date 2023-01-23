@@ -6,16 +6,12 @@ import {
   qpqCoreUtils,
 } from 'quidproquo-core';
 
-import { QPQAWSResourceMap } from '../../../runtimeConfig/QPQAWSResourceMap';
 import { resolveResourceName } from '../../../runtimeConfig/qpqAwsLambdaRuntimeConfigUtils';
 import { listFiles } from '../../../logic/s3/s3Utils';
 
-const getProcessFileListDirectory = (
-  qpqConfig: QPQConfig,
-  awsResourceMap: QPQAWSResourceMap,
-): FileListDirectoryActionProcessor => {
+const getProcessFileListDirectory = (qpqConfig: QPQConfig): FileListDirectoryActionProcessor => {
   return async ({ drive, folderPath, maxFiles, pageToken }) => {
-    const s3BucketName = resolveResourceName(drive, awsResourceMap);
+    const s3BucketName = resolveResourceName(drive, qpqConfig);
     const s3FileList = await listFiles(
       s3BucketName,
       qpqCoreUtils.getDeployRegion(qpqConfig),
@@ -37,6 +33,6 @@ const getProcessFileListDirectory = (
   };
 };
 
-export default (qpqConfig: QPQConfig, awsResourceMap: QPQAWSResourceMap) => ({
-  [FileActionType.ListDirectory]: getProcessFileListDirectory(qpqConfig, awsResourceMap),
+export default (qpqConfig: QPQConfig) => ({
+  [FileActionType.ListDirectory]: getProcessFileListDirectory(qpqConfig),
 });

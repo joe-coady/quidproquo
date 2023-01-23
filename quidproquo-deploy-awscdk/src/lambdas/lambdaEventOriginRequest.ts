@@ -55,13 +55,13 @@ export const getOriginRequestEventExecutor = (
       ...webserverActionProcessor,
 
       ...getCloudFrontOriginRequestEventActionProcessor(cdkConfig.qpqConfig),
-      ...getConfigGetSecretActionProcessor(cdkConfig.qpqConfig, cdkConfig.awsResourceMap),
-      ...getConfigGetParameterActionProcessor(cdkConfig.qpqConfig, cdkConfig.awsResourceMap),
-      ...getConfigGetParametersActionProcessor(cdkConfig.qpqConfig, cdkConfig.awsResourceMap),
+      ...getConfigGetSecretActionProcessor(cdkConfig.qpqConfig),
+      ...getConfigGetParameterActionProcessor(cdkConfig.qpqConfig),
+      ...getConfigGetParametersActionProcessor(cdkConfig.qpqConfig),
       ...getSystemActionProcessor(dynamicModuleLoader),
-      ...getFileActionProcessor(cdkConfig.qpqConfig, cdkConfig.awsResourceMap),
+      ...getFileActionProcessor(cdkConfig.qpqConfig),
 
-      ...getCustomActionProcessors(cdkConfig.qpqConfig, cdkConfig.awsResourceMap),
+      ...getCustomActionProcessors(cdkConfig.qpqConfig),
       ...qpqCustomActionProcessors(),
     };
 

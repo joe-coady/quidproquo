@@ -21,12 +21,10 @@ import * as cdk from 'aws-cdk-lib';
 
 import { Construct } from 'constructs';
 
-import { QPQAWSResourceMap, LambdaRuntimeConfig } from 'quidproquo-actionprocessor-awslambda';
+import { LambdaRuntimeConfig } from 'quidproquo-actionprocessor-awslambda';
 
 import { qpqCoreUtils } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
-
-const qpqResourceMapConfigName = 'qpq-aws-resource-map';
 
 export interface QPQPrototypeStackProps extends DeploymentSettings {
   account: string;
@@ -373,49 +371,49 @@ export class QPQPrototypeSingleServiceStack extends Stack {
     });
 
     // This should be all resource names
-    const runtimeConfigLambdaConfig: QPQAWSResourceMap = {
-      secretNameMap: ownedSecrets.reduce(
-        (acc, os) => ({
-          ...acc,
-          [os.secretName]: os.realName,
-        }),
-        {},
-      ),
-      parameterNameMap: {
-        ...ownedParameters.reduce(
-          (acc, os) => ({
-            ...acc,
-            [os.parameterName]: os.realName,
-          }),
-          {},
-        ),
-        [qpqResourceMapConfigName]: getParameterName(
-          qpqResourceMapConfigName,
-          settings.service,
-          settings.environment,
-        ),
-      },
-      resourceNameMap: ownedBuckets.reduce(
-        (acc, b) => ({
-          ...acc,
-          [b.driveName]: b.bucketName,
-        }),
-        {},
-      ),
-    };
+    // const runtimeConfigLambdaConfig: QPQAWSResourceMap = {
+    //   secretNameMap: ownedSecrets.reduce(
+    //     (acc, os) => ({
+    //       ...acc,
+    //       [os.secretName]: os.realName,
+    //     }),
+    //     {},
+    //   ),
+    //   parameterNameMap: {
+    //     ...ownedParameters.reduce(
+    //       (acc, os) => ({
+    //         ...acc,
+    //         [os.parameterName]: os.realName,
+    //       }),
+    //       {},
+    //     ),
+    //     [qpqResourceMapConfigName]: getParameterName(
+    //       qpqResourceMapConfigName,
+    //       settings.service,
+    //       settings.environment,
+    //     ),
+    //   },
+    //   resourceNameMap: ownedBuckets.reduce(
+    //     (acc, b) => ({
+    //       ...acc,
+    //       [b.driveName]: b.bucketName,
+    //     }),
+    //     {},
+    //   ),
+    // };
 
     // Build the param that stores the config
     // Note: The mapping was done manually previously inside the value
-    ownedParameters.push(
-      createServiceParameter(
-        this,
-        id,
-        settings.service,
-        settings.environment,
-        qpqResourceMapConfigName,
-        JSON.stringify(runtimeConfigLambdaConfig),
-      ),
-    );
+    // ownedParameters.push(
+    //   createServiceParameter(
+    //     this,
+    //     id,
+    //     settings.service,
+    //     settings.environment,
+    //     qpqResourceMapConfigName,
+    //     JSON.stringify(runtimeConfigLambdaConfig),
+    //   ),
+    // );
 
     const ownedResourceSettings: OwnedResourceSettings = {
       ownedBuckets,
@@ -457,7 +455,7 @@ export class QPQPrototypeSingleServiceStack extends Stack {
 
         environment: {
           TABLES: JSON.stringify([]),
-          lambdaRuntimeConfig: JSON.stringify(runtimeConfigLambdaConfig),
+          // lambdaRuntimeConfig: JSON.stringify(runtimeConfigLambdaConfig),
         },
       },
     );
