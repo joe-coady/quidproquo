@@ -5,19 +5,19 @@ import { QpqServiceStack, QpqServiceStackProps } from './constructs/core/QPQServ
 
 import qpqSettingConstructMap from './QpqSettingConstructMap';
 import { createConstructs } from './utils';
+import { InfrastructureQPQServiceStack } from './InfrastructureQPQServiceStack';
 
-export interface WebQPQServiceStackProps extends QpqServiceStackProps {}
+export interface WebQPQServiceStackProps extends QpqServiceStackProps {
+  infrastructureQPQServiceStack: InfrastructureQPQServiceStack;
+}
 
-const webQPQServiceStackOwnedSettings: string[] = [
-  QPQWebServerConfigSettingType.WebEntry,
-  QPQWebServerConfigSettingType.WebEntry,
-];
+const webQPQServiceStackOwnedSettings: string[] = [QPQWebServerConfigSettingType.WebEntry];
 
 export class WebQPQServiceStack extends QpqServiceStack {
   constructor(scope: Construct, id: string, props: WebQPQServiceStackProps) {
     super(scope, id, props);
 
-    console.log('Creating: WebQPQServiceStack');
+    this.addDependency(props.infrastructureQPQServiceStack);
 
     createConstructs(
       this,
