@@ -25,6 +25,13 @@ export const getWebStackName = (qpqConfig: QPQConfig) => {
   return `${appName}-${environment}-web`;
 };
 
+export const getApiStackName = (qpqConfig: QPQConfig) => {
+  const appName = qpqCoreUtils.getAppName(qpqConfig);
+  const environment = qpqCoreUtils.getAppFeature(qpqConfig);
+
+  return `${appName}-${environment}-api`;
+};
+
 export const createConstructs = (
   owner: QpqServiceStack,
   qpqConfig: QPQConfig,

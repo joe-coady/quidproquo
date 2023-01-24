@@ -6,7 +6,7 @@ import { QpqConstruct, QpqConstructProps } from './core/QpqConstruct';
 import { Construct } from 'constructs';
 import { aws_lambda, aws_apigateway } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
-import { ServiceSubdomainName } from './basic/ServiceSubdomainName';
+import { SubdomainName } from './basic/SubdomainName';
 
 export interface QpqWebserverSubdomainRedirectConstructProps
   extends QpqConstructProps<SubdomainRedirectQPQWebServerConfigSetting> {}
@@ -48,10 +48,12 @@ export class QpqWebserverSubdomainRedirectConstruct extends QpqConstruct<Subdoma
       proxy: true,
     });
 
-    const serviceDomainName = new ServiceSubdomainName(scope, this.childId('service-domain-name'), {
-      qpqConfig: props.qpqConfig,
+    // TODO: Fix this
+    const serviceDomainName = new SubdomainName(scope, this.childId('service-domain-name'), {
       subdomain: props.setting.subdomain,
+      apexDomain: '',
       setting: props.setting,
+      qpqConfig: props.qpqConfig,
     });
 
     // Map all requests to this service to /serviceName/*

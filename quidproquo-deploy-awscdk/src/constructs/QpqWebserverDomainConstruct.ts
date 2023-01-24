@@ -2,7 +2,9 @@ import { aws_route53 } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { qpqCoreUtils, QPQConfig } from 'quidproquo-core';
-import { DnsQPQWebServerConfigSetting } from 'quidproquo-webserver';
+
+import { qpqWebServerUtils, DnsQPQWebServerConfigSetting } from 'quidproquo-webserver';
+import { serviceNeedsServiceHostedZone } from '../qpqDeployAwsCdkUtils';
 
 import { QpqConstruct, QpqConstructProps } from './core/QpqConstruct';
 
@@ -27,7 +29,10 @@ export class QpqWebserverDomainConstruct extends QpqConstruct<DnsQPQWebServerCon
   constructor(scope: Construct, id: string, props: QpqWebserverDomainConstructProps) {
     super(scope, id, props);
 
-    const appName = qpqCoreUtils.getAppName(props.qpqConfig);
+    // Only create a shared hosted zone if we need to
+    if (!serviceNeedsServiceHostedZone(this.qpqConfig)) {
+      return;
+    }
 
     // example.com
     // dev.example.com
@@ -41,7 +46,7 @@ export class QpqWebserverDomainConstruct extends QpqConstruct<DnsQPQWebServerCon
     // Root domain name for our service
     // search.example.com
     // search.dev.example.com
-    const serviceDomainName = `${appName}.${featureDomain}`;
+    const serviceDomainName = qpqWebServerUtils.getServiceDomainName(props.qpqConfig);
 
     // Create the root hosted zone for our service
     const serviceHostedZone = new aws_route53.HostedZone(

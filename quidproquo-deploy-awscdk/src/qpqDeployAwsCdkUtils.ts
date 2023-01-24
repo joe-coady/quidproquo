@@ -6,9 +6,11 @@ import {
   ParameterQPQConfigSetting,
   StorageDriveQPQConfigSetting,
   SecretQPQConfigSetting,
+  QPQConfig,
 } from 'quidproquo-core';
 
-import { QPQConfig } from 'quidproquo-core';
+import { ApiQPQWebServerConfigSetting, QPQWebServerConfigSettingType } from 'quidproquo-webserver';
+
 import { QpqResource } from './constructs/core/QpqResource';
 import { QpqCoreParameterConstruct } from './constructs/QpqCoreParameterConstruct';
 import { QpqCoreSecretConstruct } from './constructs/QpqCoreSecretConstruct';
@@ -91,6 +93,14 @@ export const getQqpStorageDriveGrantables = (
   });
 
   return storageDriveResources;
+};
+
+export const serviceNeedsServiceHostedZone = (qpqConfig: QPQConfig) => {
+  const apiConfigs = qpqCoreUtils
+    .getConfigSettings<ApiQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.Api)
+    .filter((config) => !config.onRootDomain);
+
+  return apiConfigs.length > 0;
 };
 
 // Get resources that we can use to grant permissions to lambdas etc

@@ -13,4 +13,8 @@ export interface QPQConfigSetting {
   uniqueKey: string;
 }
 
+export interface QPQConfigAdvancedSettings {
+  deprecated?: boolean;
+}
+
 export type QPQConfig = QPQConfigSetting[];

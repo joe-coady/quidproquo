@@ -6,4 +6,5 @@ export enum QPQWebServerConfigSettingType {
   Seo = '@quidproquo-webserver/config/Seo',
   SubdomainRedirect = '@quidproquo-webserver/config/SubdomainRedirect',
   WebEntry = '@quidproquo-webserver/config/WebEntry',
+  Api = '@quidproquo-webserver/config/Api',
 }

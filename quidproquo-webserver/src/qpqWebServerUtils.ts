@@ -13,7 +13,7 @@ import { getAppFeature } from 'quidproquo-core/lib/qpqCoreUtils';
 
 import { HttpEventHeaders, HTTPEventParams, HTTPEventResponse } from './types/HTTPEvent';
 import { RouteOptions } from './config/settings/route';
-import { WebEntryQPQWebServerConfigSetting } from './config';
+import { WebEntryQPQWebServerConfigSetting, ApiQPQWebServerConfigSetting } from './config';
 
 export const getAllRoutes = (configs: QPQConfig): RouteQPQWebServerConfigSetting[] => {
   const routes = qpqCoreUtils.getConfigSettings<RouteQPQWebServerConfigSetting>(
@@ -87,6 +87,19 @@ export const getWebEntryFullPath = (qpqConfig: QPQConfig): string => {
   return path.join(qpqCoreUtils.getConfigRoot(qpqConfig), webEntry);
 };
 
+export const getApiEntryFullPath = (
+  qpqConfig: QPQConfig,
+  apiConfig: ApiQPQWebServerConfigSetting,
+): string => {
+  const apiEntry = apiConfig.buildPath;
+
+  if (!apiEntry) {
+    throw new Error('please use defineWebEntry in your qpq config');
+  }
+
+  return path.join(qpqCoreUtils.getConfigRoot(qpqConfig), apiEntry);
+};
+
 export const getWebEntrySeoFullPath = (qpqConfig: QPQConfig): string => {
   return getWebEntryFullPath(qpqConfig) + '-seo';
 };
@@ -112,6 +125,13 @@ export const getFeatureDomainName = (configs: QPQConfig): string => {
   }
 
   return `${feature}.${apexDomainName}`;
+};
+
+export const getServiceDomainName = (qpqConfig: QPQConfig): string => {
+  const appName = qpqCoreUtils.getAppName(qpqConfig);
+  const featureDomain = getFeatureDomainName(qpqConfig);
+
+  return `${appName}.${featureDomain}`;
 };
 
 export const getHeaderValue = (header: string, headers: HttpEventHeaders): string | null => {
