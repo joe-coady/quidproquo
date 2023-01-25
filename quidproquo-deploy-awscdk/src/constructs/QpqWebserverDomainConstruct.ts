@@ -22,10 +22,6 @@ export const getFeatureDomainName = (qpqConfig: QPQConfig, domain: string): stri
 };
 
 export class QpqWebserverDomainConstruct extends QpqConstruct<DnsQPQWebServerConfigSetting> {
-  static getUniqueId(setting: DnsQPQWebServerConfigSetting) {
-    return setting.dnsBase;
-  }
-
   constructor(scope: Construct, id: string, props: QpqWebserverDomainConstructProps) {
     super(scope, id, props);
 

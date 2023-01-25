@@ -48,14 +48,10 @@ export class QpqCoreParameterConstruct extends QpqCoreParameterConstructBase {
     return new Import(scope, id, { qpqConfig, setting });
   }
 
-  static getUniqueId(setting: ParameterQPQConfigSetting) {
-    return setting.key;
-  }
-
   constructor(scope: Construct, id: string, props: QpqCoreParameterConstructProps) {
     super(scope, id, props);
 
-    this.stringParameter = new aws_ssm.StringParameter(scope, this.childId('param'), {
+    this.stringParameter = new aws_ssm.StringParameter(this, this.childId('param'), {
       parameterName: this.resourceName(props.setting.key),
       description: props.setting.key,
       stringValue: props.setting.value,

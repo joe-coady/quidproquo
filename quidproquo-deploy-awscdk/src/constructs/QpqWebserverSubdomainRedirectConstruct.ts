@@ -12,10 +12,6 @@ export interface QpqWebserverSubdomainRedirectConstructProps
   extends QpqConstructProps<SubdomainRedirectQPQWebServerConfigSetting> {}
 
 export class QpqWebserverSubdomainRedirectConstruct extends QpqConstruct<SubdomainRedirectQPQWebServerConfigSetting> {
-  static getUniqueId(setting: SubdomainRedirectQPQWebServerConfigSetting) {
-    return `${setting.subdomain}-${setting.addFeatureEnvironment}`;
-  }
-
   constructor(scope: Construct, id: string, props: QpqWebserverSubdomainRedirectConstructProps) {
     super(scope, id, props);
 
@@ -49,7 +45,7 @@ export class QpqWebserverSubdomainRedirectConstruct extends QpqConstruct<Subdoma
     });
 
     // TODO: Fix this
-    const serviceDomainName = new SubdomainName(scope, this.childId('service-domain-name'), {
+    const serviceDomainName = new SubdomainName(this, this.childId('service-domain-name'), {
       subdomain: props.setting.subdomain,
       apexDomain: '',
       setting: props.setting,

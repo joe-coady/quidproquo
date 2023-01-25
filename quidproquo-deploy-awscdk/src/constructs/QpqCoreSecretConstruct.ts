@@ -30,10 +30,6 @@ export abstract class QpqCoreSecretConstructBase
 export class QpqCoreSecretConstruct extends QpqCoreSecretConstructBase {
   secret: aws_secretsmanager.ISecret;
 
-  static getUniqueId(setting: SecretQPQConfigSetting) {
-    return setting.key;
-  }
-
   static fromOtherStack(
     scope: Construct,
     id: string,

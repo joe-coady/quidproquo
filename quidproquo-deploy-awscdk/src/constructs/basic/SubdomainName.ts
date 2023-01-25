@@ -20,24 +20,24 @@ export class SubdomainName extends QpqConstruct<any> {
 
     const newDomainName = `${props.subdomain}.${props.apexDomain}`;
 
-    const apexHostedZone = aws_route53.HostedZone.fromLookup(scope, this.childId('hosted-zone'), {
+    const apexHostedZone = aws_route53.HostedZone.fromLookup(this, this.childId('hosted-zone'), {
       domainName: props.apexDomain,
     });
 
-    const certificate = new aws_certificatemanager.Certificate(scope, this.childId('certificate'), {
+    const certificate = new aws_certificatemanager.Certificate(this, this.childId('certificate'), {
       domainName: newDomainName,
       certificateName: this.resourceName(props.subdomain),
       validation: aws_certificatemanager.CertificateValidation.fromDns(apexHostedZone),
     });
 
-    this.domainName = new aws_apigateway.DomainName(scope, this.childId('domain-name'), {
+    this.domainName = new aws_apigateway.DomainName(this, this.childId('domain-name'), {
       domainName: newDomainName,
       certificate,
       securityPolicy: aws_apigateway.SecurityPolicy.TLS_1_2,
       endpointType: aws_apigateway.EndpointType.REGIONAL,
     });
 
-    new aws_route53.ARecord(scope, this.childId('a-record'), {
+    new aws_route53.ARecord(this, this.childId('a-record'), {
       zone: apexHostedZone,
       recordName: newDomainName,
       target: aws_route53.RecordTarget.fromAlias(

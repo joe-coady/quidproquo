@@ -31,10 +31,6 @@ export abstract class QpqCoreStorageDriveConstructBase
 export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBase {
   bucket: aws_s3.IBucket;
 
-  static getUniqueId(setting: StorageDriveQPQConfigSetting) {
-    return setting.storageDrive;
-  }
-
   static fromOtherStack(
     scope: Construct,
     id: string,

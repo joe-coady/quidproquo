@@ -24,7 +24,7 @@ export class QpqWebserverApiConstruct extends QpqConstruct<ApiQPQWebServerConfig
       : qpqWebServerUtils.getServiceDomainName(props.qpqConfig);
 
     // Create subdomain
-    const subdomain = new SubdomainName(scope, this.childId('subdomain'), {
+    const subdomain = new SubdomainName(this, this.childId('subdomain'), {
       apexDomain,
       subdomain: props.setting.apiSubdomain,
       qpqConfig: props.qpqConfig,
@@ -32,7 +32,7 @@ export class QpqWebserverApiConstruct extends QpqConstruct<ApiQPQWebServerConfig
     });
 
     // Build Function
-    const func = new Function(scope, this.childId('api-function'), {
+    const func = new Function(this, this.childId('api-function'), {
       buildPath: qpqWebServerUtils.getApiEntryFullPath(props.qpqConfig, props.setting),
       functionName: this.resourceName(`${props.setting.apiName}-route`),
       functionType: 'lambdaAPIGatewayEvent',
@@ -45,7 +45,7 @@ export class QpqWebserverApiConstruct extends QpqConstruct<ApiQPQWebServerConfig
     });
 
     const grantables = qpqDeployAwsCdkUtils.getQqpGrantableResources(
-      scope,
+      this,
       this.childId('grantable'),
       this.qpqConfig,
     );

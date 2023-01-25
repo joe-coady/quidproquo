@@ -48,7 +48,8 @@ export class QpqServiceStack extends Stack {
   }
 
   childId(uniqueName: string) {
-    return `${uniqueName}-${this.id}`;
+    // return `${uniqueName}-${this.id}`;
+    return uniqueName;
   }
 
   childProps(setting: QPQConfigSetting): QpqConstructProps<any> {

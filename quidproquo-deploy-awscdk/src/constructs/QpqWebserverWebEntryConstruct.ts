@@ -21,12 +21,10 @@ export interface QpqWebserverWebEntryConstructProps
   extends QpqConstructProps<WebEntryQPQWebServerConfigSetting> {}
 
 export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebServerConfigSetting> {
-  static getUniqueId(setting: WebEntryQPQWebServerConfigSetting) {
-    return setting.buildPath.replaceAll('.', '').replaceAll('\\', '').replaceAll('/', '');
-  }
-
   constructor(scope: Construct, id: string, props: QpqWebserverWebEntryConstructProps) {
     super(scope, id, props);
+
+    console.log(JSON.stringify(props.setting));
 
     const apexDomain = qpqWebServerUtils.getFeatureDomainName(props.qpqConfig);
     const webEntryBuildPath = qpqWebServerUtils.getWebEntryFullPath(props.qpqConfig, props.setting);
@@ -36,7 +34,7 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
     );
 
     // create an s3 bucket
-    const staticWebFilesBucket = new aws_s3.Bucket(scope, this.childId('bucket'), {
+    const staticWebFilesBucket = new aws_s3.Bucket(this, this.childId('bucket'), {
       bucketName: this.resourceName('web-files'),
       // Disable public access to this bucket, CloudFront will do that
       publicReadAccess: false,
@@ -51,17 +49,13 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
     });
 
     // Create OriginAccessIdentity for the bucket.
-    const websiteOAI = new aws_cloudfront.OriginAccessIdentity(scope, this.childId('website-oai'));
+    const websiteOAI = new aws_cloudfront.OriginAccessIdentity(this, this.childId('website-oai'));
     staticWebFilesBucket.grantRead(websiteOAI);
 
     // Grab the hosted zone we want to add
-    const serviceHostedZone = aws_route53.HostedZone.fromLookup(
-      scope,
-      this.childId('hosted-zone'),
-      {
-        domainName: apexDomain,
-      },
-    );
+    const serviceHostedZone = aws_route53.HostedZone.fromLookup(this, this.childId('hosted-zone'), {
+      domainName: apexDomain,
+    });
 
     // Create a certificate for the distribution - Seems to a bug where Route 53 records not cleaned up
     // after removing the DNS Validated certificate see: https://github.com/aws/aws-cdk/issues/3333
@@ -69,7 +63,7 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
     const validationCertificate =
       aws_certificatemanager.CertificateValidation.fromDns(serviceHostedZone);
     const certificate = new aws_certificatemanager.DnsValidatedCertificate(
-      scope,
+      this,
       this.childId('viewer-cert'),
       {
         hostedZone: serviceHostedZone,
@@ -85,20 +79,20 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
     console.log('\n\n\n webEntryBuildPath: ', webEntryBuildPath, '\n\n\n');
     console.log('\n\n\n this.childId: ', this.childId('deploy'), '\n\n\n');
     // TODO: This with an option
-    new aws_s3_deployment.BucketDeployment(scope, this.childId('deploy'), {
+    new aws_s3_deployment.BucketDeployment(this, this.childId('deploy'), {
       sources: [aws_s3_deployment.Source.asset(webEntryBuildPath)],
       destinationBucket: staticWebFilesBucket,
     });
 
     const grantables = qpqDeployAwsCdkUtils.getQqpGrantableResources(
-      scope,
+      this,
       this.childId('grantable'),
       this.qpqConfig,
     );
 
     const cloudFrontBehaviors = qpqWebServerUtils.getAllSeo(props.qpqConfig).map((seo) => {
       const edgeFunctionVR = new aws_cloudfront.experimental.EdgeFunction(
-        scope,
+        this,
         this.childId(`SEO-${seo.uniqueKey}-VR`),
         {
           functionName: this.resourceName(`SEO-VR-${seo.uniqueKey}`),
@@ -111,7 +105,7 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
       );
 
       const edgeFunctionOR = new aws_cloudfront.experimental.EdgeFunction(
-        scope,
+        this,
         this.childId(`SEO-${seo.uniqueKey}-OR`),
         {
           functionName: this.resourceName(`SEO-OR-${seo.uniqueKey}`),
@@ -161,7 +155,7 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
     // (Lambda@Edge only) To access the query string in an origin request or origin response function,
     // your cache policy or origin request policy must be set to All for Query strings.
     const distribution = new aws_cloudfront.CloudFrontWebDistribution(
-      scope,
+      this,
       this.childId('cf-distribution'),
       {
         originConfigs: [
@@ -195,7 +189,7 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
     );
 
     // Create a cdn link
-    new aws_route53.ARecord(scope, this.childId(`web-alias`), {
+    new aws_route53.ARecord(this, this.childId(`web-alias`), {
       zone: serviceHostedZone,
       recordName: apexDomain,
       target: aws_route53.RecordTarget.fromAlias(

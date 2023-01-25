@@ -38,6 +38,7 @@ export class QpqConstructBase extends Construct {
   }
 
   childId(uniqueName: string) {
-    return `${uniqueName}-${this.id}`;
+    // return `${uniqueName}-${this.id}`;
+    return uniqueName;
   }
 }
