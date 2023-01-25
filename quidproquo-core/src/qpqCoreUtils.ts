@@ -1,3 +1,5 @@
+import * as path from 'path';
+
 import { QPQConfig, QPQConfigSetting, QPQCoreConfigSettingType } from './config/QPQConfig';
 import {
   AppNameQPQConfigSetting,
@@ -143,4 +145,11 @@ export const getUniqueKeyForSetting = (setting: QPQConfigSetting) => {
   const key = setting.uniqueKey;
 
   return `${type}${key}`;
+};
+
+export const getScheduleEntryFullPath = (
+  qpqConfig: QPQConfig,
+  scheduleConfig: ScheduleQPQConfigSetting,
+): string => {
+  return path.join(getConfigRoot(qpqConfig), scheduleConfig.buildPath);
 };

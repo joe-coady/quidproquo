@@ -23,17 +23,6 @@ export class QpqWebserverApiConstruct extends QpqConstruct<ApiQPQWebServerConfig
       ? qpqWebServerUtils.getFeatureDomainName(props.qpqConfig)
       : qpqWebServerUtils.getServiceDomainName(props.qpqConfig);
 
-    console.log(
-      'qpqWebServerUtils.getDomainName(props.qpqConfig)' +
-        qpqWebServerUtils.getDomainName(props.qpqConfig),
-    );
-    console.log(
-      'qpqWebServerUtils.getFeatureDomainName(props.qpqConfig)' +
-        qpqWebServerUtils.getFeatureDomainName(props.qpqConfig),
-    );
-
-    console.log(`wants to deploy ${props.setting.apiSubdomain} on ${apexDomain}`);
-
     // Create subdomain
     const subdomain = new SubdomainName(scope, this.childId('subdomain'), {
       apexDomain,
@@ -52,7 +41,7 @@ export class QpqWebserverApiConstruct extends QpqConstruct<ApiQPQWebServerConfig
       qpqConfig: props.qpqConfig,
       setting: props.setting,
 
-      layers: this.apiLayers,
+      apiLayerVersions: props.apiLayerVersions,
     });
 
     const grantables = qpqDeployAwsCdkUtils.getQqpGrantableResources(

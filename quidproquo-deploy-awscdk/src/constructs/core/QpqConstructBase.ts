@@ -1,23 +1,24 @@
-import { QPQConfig, QPQConfigSetting, qpqCoreUtils } from 'quidproquo-core';
+import { aws_lambda } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { ApiLayer } from '../../layers/ApiLayer';
+
+import { QPQConfig, QPQConfigSetting, qpqCoreUtils } from 'quidproquo-core';
 
 export interface QpqConstructBaseProps {
   qpqConfig: QPQConfig;
-  apiLayers?: ApiLayer[];
+  apiLayerVersions?: aws_lambda.ILayerVersion[];
 }
 
 export class QpqConstructBase extends Construct {
   id: string;
   qpqConfig: QPQConfig;
-  apiLayers?: ApiLayer[];
+  apiLayerVersions?: aws_lambda.ILayerVersion[];
 
   constructor(scope: Construct, id: string, props: QpqConstructBaseProps) {
     super(scope, id);
 
     this.id = id;
     this.qpqConfig = props.qpqConfig;
-    this.apiLayers = props.apiLayers;
+    this.apiLayerVersions = props.apiLayerVersions;
   }
 
   environment() {
@@ -33,7 +34,6 @@ export class QpqConstructBase extends Construct {
   }
 
   resourceName(name: string, maxLength: number = 60) {
-    console.log(`resource name for [${name}] - [${name}-${this.service()}-${this.environment()}]`);
     return `${name}-${this.service()}-${this.environment()}`;
   }
 

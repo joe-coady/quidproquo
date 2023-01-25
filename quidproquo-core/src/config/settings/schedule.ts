@@ -9,12 +9,14 @@ export interface ScheduleQPQConfigSetting extends QPQConfigSetting {
   src: string;
   runtime: string;
   cronExpression: string;
+  buildPath: string;
 }
 
 export const defineRecurringSchedule = (
   cronExpression: string,
   src: string,
   runtime: string,
+  buildPath: string,
 ): ScheduleQPQConfigSetting => ({
   configSettingType: QPQCoreConfigSettingType.schedule,
   uniqueKey: runtime,
@@ -25,4 +27,6 @@ export const defineRecurringSchedule = (
   runtime,
 
   cronExpression,
+
+  buildPath,
 });

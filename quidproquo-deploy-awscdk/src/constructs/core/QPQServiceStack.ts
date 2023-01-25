@@ -1,4 +1,4 @@
-import { Stack, StackProps } from 'aws-cdk-lib';
+import { Stack, StackProps, aws_lambda } from 'aws-cdk-lib';
 
 import { Construct } from 'constructs';
 
@@ -15,7 +15,7 @@ export interface QpqServiceStackProps extends StackProps {
 export class QpqServiceStack extends Stack {
   id: string;
   qpqConfig: QPQConfig;
-  apiLayers?: ApiLayer[];
+  apiLayerVersions?: aws_lambda.ILayerVersion[];
 
   constructor(
     scope: Construct,
@@ -31,7 +31,20 @@ export class QpqServiceStack extends Stack {
 
     this.id = id;
     this.qpqConfig = qpqConfig;
-    this.apiLayers = apiLayers;
+    this.apiLayerVersions = (apiLayers || []).map((layer) => {
+      return new aws_lambda.LayerVersion(this, this.childId(`${layer.name}-layer`), {
+        layerVersionName: this.resourceName(layer.name),
+        code: new aws_lambda.AssetCode(layer.buildPath),
+        compatibleRuntimes: [aws_lambda.Runtime.NODEJS_16_X],
+      });
+    });
+  }
+
+  resourceName(name: string, maxLength: number = 60) {
+    const app = qpqCoreUtils.getAppName(this.qpqConfig);
+    const env = qpqCoreUtils.getAppFeature(this.qpqConfig);
+
+    return `${name}-${app}-${env}`;
   }
 
   childId(uniqueName: string) {
@@ -41,7 +54,7 @@ export class QpqServiceStack extends Stack {
   childProps(setting: QPQConfigSetting): QpqConstructProps<any> {
     return {
       qpqConfig: this.qpqConfig,
-      apiLayers: this.apiLayers,
+      apiLayerVersions: this.apiLayerVersions,
       setting,
     };
   }

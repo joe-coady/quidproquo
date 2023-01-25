@@ -82,8 +82,10 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
       aliases: [apexDomain],
     });
 
+    console.log('\n\n\n webEntryBuildPath: ', webEntryBuildPath, '\n\n\n');
+    console.log('\n\n\n this.childId: ', this.childId('deploy'), '\n\n\n');
     // TODO: This with an option
-    new aws_s3_deployment.BucketDeployment(scope, this.childId(`deploy-website`), {
+    new aws_s3_deployment.BucketDeployment(scope, this.childId('deploy'), {
       sources: [aws_s3_deployment.Source.asset(webEntryBuildPath)],
       destinationBucket: staticWebFilesBucket,
     });
@@ -93,8 +95,6 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
       this.childId('grantable'),
       this.qpqConfig,
     );
-
-    console.log('Num Grantables: ', grantables.length);
 
     const cloudFrontBehaviors = qpqWebServerUtils.getAllSeo(props.qpqConfig).map((seo) => {
       const edgeFunctionVR = new aws_cloudfront.experimental.EdgeFunction(
