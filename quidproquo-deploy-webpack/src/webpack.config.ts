@@ -99,7 +99,7 @@ export const getWebpackEntryNames = () => [
 ];
 
 export const getSeoWebpackConfig = (qpqConfig: QPQConfig, outputPath?: string) =>
-  getWebpackConfig(qpqConfig, outputPath || qpqWebServerUtils.getWebEntrySeoFullPath(qpqConfig), [
+  getWebpackConfig(qpqConfig, outputPath || 'build', [
     'lambdaEventOriginRequest',
     'lambdaEventViewerRequest',
     'lambdaAPIGatewayEvent_redirect',
@@ -111,9 +111,5 @@ export const getApiWebpackConfig = (qpqConfig: QPQConfig, outputPath?: string) =
     'lambdaAPIGatewayEvent',
   ]);
 
-export const getAllWebpackConfig = (qpqConfig: QPQConfig) =>
-  getWebpackConfig(
-    qpqConfig,
-    qpqWebServerUtils.getWebEntrySeoFullPath(qpqConfig),
-    getWebpackEntryNames(),
-  );
+export const getAllWebpackConfig = (qpqConfig: QPQConfig, outputPath: string) =>
+  getWebpackConfig(qpqConfig, outputPath, getWebpackEntryNames());

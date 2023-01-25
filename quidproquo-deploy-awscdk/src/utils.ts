@@ -41,13 +41,10 @@ export const createConstructs = (
   for (var setting of qpqConfig) {
     const qpqCoreConfigSettingType = setting.configSettingType;
 
-    console.log(`Trying: ${setting.configSettingType}`);
-
     if (
       settingsToCreate.indexOf(qpqCoreConfigSettingType) >= 0 &&
       qpqSettingConstructMap[qpqCoreConfigSettingType]
     ) {
-      console.log(`Building: ${setting.configSettingType}`);
       const ConstructClass = qpqSettingConstructMap[qpqCoreConfigSettingType];
       new ConstructClass(
         owner,

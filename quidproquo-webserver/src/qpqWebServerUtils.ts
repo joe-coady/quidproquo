@@ -74,17 +74,24 @@ export const getWebEntry = (configs: QPQConfig): string => {
   return webEntry?.buildPath;
 };
 
-export const getWebEntryFullPath = (qpqConfig: QPQConfig): string => {
-  const webEntry = qpqCoreUtils.getConfigSetting<WebEntryQPQWebServerConfigSetting>(
-    qpqConfig,
-    QPQWebServerConfigSettingType.WebEntry,
-  )?.buildPath;
+export const getWebEntryFullPath = (
+  qpqConfig: QPQConfig,
+  webEntryQPQWebServerConfigSetting: WebEntryQPQWebServerConfigSetting,
+): string => {
+  return path.join(
+    qpqCoreUtils.getConfigRoot(qpqConfig),
+    webEntryQPQWebServerConfigSetting.buildPath,
+  );
+};
 
-  if (!webEntry) {
-    throw new Error('please use defineWebEntry in your qpq config');
-  }
-
-  return path.join(qpqCoreUtils.getConfigRoot(qpqConfig), webEntry);
+export const getWebEntrySeoFullPath = (
+  qpqConfig: QPQConfig,
+  webEntryQPQWebServerConfigSetting: WebEntryQPQWebServerConfigSetting,
+): string => {
+  return path.join(
+    qpqCoreUtils.getConfigRoot(qpqConfig),
+    webEntryQPQWebServerConfigSetting.seoBuildPath || webEntryQPQWebServerConfigSetting.buildPath,
+  );
 };
 
 export const getApiEntryFullPath = (
@@ -98,10 +105,6 @@ export const getApiEntryFullPath = (
   }
 
   return path.join(qpqCoreUtils.getConfigRoot(qpqConfig), apiEntry);
-};
-
-export const getWebEntrySeoFullPath = (qpqConfig: QPQConfig): string => {
-  return getWebEntryFullPath(qpqConfig) + '-seo';
 };
 
 export const getSubdomainRedirects = (

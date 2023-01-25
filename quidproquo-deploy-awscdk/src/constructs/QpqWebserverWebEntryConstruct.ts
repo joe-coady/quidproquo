@@ -29,7 +29,14 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
     super(scope, id, props);
 
     const apexDomain = qpqWebServerUtils.getFeatureDomainName(props.qpqConfig);
-    const webEntry = qpqWebServerUtils.getWebEntryFullPath(props.qpqConfig);
+    const webEntryBuildPath = qpqWebServerUtils.getWebEntryFullPath(props.qpqConfig, props.setting);
+    const seoEntryBuildPath = qpqWebServerUtils.getWebEntrySeoFullPath(
+      props.qpqConfig,
+      props.setting,
+    );
+
+    console.log('webEntryBuildPath', webEntryBuildPath);
+    console.log('seoEntryBuildPath', seoEntryBuildPath);
 
     // create an s3 bucket
     const staticWebFilesBucket = new aws_s3.Bucket(scope, this.childId('bucket'), {
@@ -80,10 +87,10 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
 
     // We will deploy manually
     // TODO: This with an option
-    new aws_s3_deployment.BucketDeployment(scope, this.childId(`deploy-website`), {
-      sources: [aws_s3_deployment.Source.asset(webEntry)],
-      destinationBucket: staticWebFilesBucket,
-    });
+    // new aws_s3_deployment.BucketDeployment(scope, this.childId(`deploy-website`), {
+    //   sources: [aws_s3_deployment.Source.asset(webEntryBuildPath)],
+    //   destinationBucket: staticWebFilesBucket,
+    // });
 
     const grantables = qpqDeployAwsCdkUtils.getQqpGrantableResources(
       scope,
@@ -94,8 +101,6 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
     console.log('Num Grantables: ', grantables.length);
 
     const cloudFrontBehaviors = qpqWebServerUtils.getAllSeo(props.qpqConfig).map((seo, index) => {
-      const seoBuildPath = qpqWebServerUtils.getWebEntrySeoFullPath(props.qpqConfig);
-
       const edgeFunctionVR = new aws_cloudfront.experimental.EdgeFunction(
         scope,
         this.childId(`$SEO-${seo.runtime}-${index}-VR`),
@@ -104,7 +109,7 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
           timeout: cdk.Duration.seconds(5),
           runtime: aws_lambda.Runtime.NODEJS_16_X,
 
-          code: aws_lambda.Code.fromAsset(path.join(seoBuildPath, 'lambdaEventViewerRequest')),
+          code: aws_lambda.Code.fromAsset(path.join(seoEntryBuildPath, 'lambdaEventViewerRequest')),
           handler: 'index.executeEventViewerRequest',
         },
       );
@@ -119,7 +124,7 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
 
           memorySize: 1024,
 
-          code: aws_lambda.Code.fromAsset(path.join(seoBuildPath, 'lambdaEventOriginRequest')),
+          code: aws_lambda.Code.fromAsset(path.join(seoEntryBuildPath, 'lambdaEventOriginRequest')),
           handler: 'index.executeEventOriginRequest',
         },
       );
