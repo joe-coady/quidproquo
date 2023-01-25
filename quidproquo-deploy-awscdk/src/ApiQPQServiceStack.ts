@@ -6,6 +6,7 @@ import { QpqServiceStack, QpqServiceStackProps } from './constructs/core/QPQServ
 import qpqSettingConstructMap from './QpqSettingConstructMap';
 import { createConstructs } from './utils';
 import { InfrastructureQPQServiceStack } from './InfrastructureQPQServiceStack';
+import { ApiLayer } from './layers/ApiLayer';
 
 export interface ApiQPQServiceStackProps extends QpqServiceStackProps {
   infrastructureQPQServiceStack: InfrastructureQPQServiceStack;
@@ -24,6 +25,7 @@ export class ApiQPQServiceStack extends QpqServiceStack {
       props.qpqConfig,
       apiQPQServiceStackOwnedSettings,
       qpqSettingConstructMap,
+      props.apiLayers,
     );
   }
 }

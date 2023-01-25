@@ -20,13 +20,9 @@ export class SubdomainName extends QpqConstruct<any> {
 
     const newDomainName = `${props.subdomain}.${props.apexDomain}`;
 
-    console.log(`SubdomainName: ${newDomainName}`);
-
     const apexHostedZone = aws_route53.HostedZone.fromLookup(scope, this.childId('hosted-zone'), {
       domainName: props.apexDomain,
     });
-
-    console.log('Cert Name: ' + this.resourceName(props.subdomain));
 
     const certificate = new aws_certificatemanager.Certificate(scope, this.childId('certificate'), {
       domainName: newDomainName,

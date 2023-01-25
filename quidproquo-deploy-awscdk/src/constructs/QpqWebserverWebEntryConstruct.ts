@@ -35,9 +35,6 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
       props.setting,
     );
 
-    console.log('webEntryBuildPath', webEntryBuildPath);
-    console.log('seoEntryBuildPath', seoEntryBuildPath);
-
     // create an s3 bucket
     const staticWebFilesBucket = new aws_s3.Bucket(scope, this.childId('bucket'), {
       bucketName: this.resourceName('web-files'),

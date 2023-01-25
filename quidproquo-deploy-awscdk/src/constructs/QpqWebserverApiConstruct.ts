@@ -53,6 +53,8 @@ export class QpqWebserverApiConstruct extends QpqConstruct<ApiQPQWebServerConfig
 
       qpqConfig: props.qpqConfig,
       setting: props.setting,
+
+      layers: this.apiLayers,
     });
 
     const grantables = qpqDeployAwsCdkUtils.getQqpGrantableResources(

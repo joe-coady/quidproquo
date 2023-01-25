@@ -3,6 +3,7 @@ import { qpqCoreUtils, QPQConfig } from 'quidproquo-core';
 import { DeploymentSettings } from './DeploymentSettings';
 import { QpqSettingConstructMap } from './QpqSettingConstructMap';
 import { QpqServiceStack } from './constructs/core/QPQServiceStack';
+import { ApiLayer } from './layers/ApiLayer';
 
 export const getStackName = (deploymentSettings: DeploymentSettings) => {
   const appName = qpqCoreUtils.getAppName(deploymentSettings.qpqConfig);
@@ -37,6 +38,7 @@ export const createConstructs = (
   qpqConfig: QPQConfig,
   settingsToCreate: string[],
   qpqSettingConstructMap: QpqSettingConstructMap,
+  apiLayers?: ApiLayer[],
 ) => {
   for (var setting of qpqConfig) {
     const qpqCoreConfigSettingType = setting.configSettingType;

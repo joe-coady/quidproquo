@@ -38,14 +38,6 @@ export const getOriginRequestEventExecutor = (
   return async (event: CloudFrontRequestEvent, context: Context) => {
     console.log(JSON.stringify(event));
 
-    // Don't run the lambda if we are not a bot
-    // if (
-    //   !event.Records[0].cf.request.headers['x-qpq-is-bot'] ||
-    //   event.Records[0].cf.request.headers['x-qpq-is-bot'][0].value !== 'true'
-    // ) {
-    //   return event.Records[0].cf.request;
-    // }
-
     const cdkConfig = await getLambdaConfigs();
 
     // Build a processor for the session and stuff
