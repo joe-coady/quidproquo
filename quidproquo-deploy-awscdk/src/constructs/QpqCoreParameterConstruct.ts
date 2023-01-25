@@ -37,7 +37,6 @@ export class QpqCoreParameterConstruct extends QpqCoreParameterConstructBase {
     qpqConfig: QPQConfig,
     setting: ParameterQPQConfigSetting,
   ): QpqResource {
-    console.log('fromOtherStack', setting.key);
     class Import extends QpqCoreParameterConstructBase {
       stringParameter = aws_ssm.StringParameter.fromStringParameterName(
         scope,

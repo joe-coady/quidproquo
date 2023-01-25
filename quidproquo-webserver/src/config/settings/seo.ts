@@ -18,7 +18,7 @@ export const defineSeo = (
   options: SeoOptions = {},
 ): SeoQPQWebServerConfigSetting => ({
   configSettingType: QPQWebServerConfigSettingType.Seo,
-  uniqueKey: path,
+  uniqueKey: runtime,
 
   path,
   src,

@@ -4,9 +4,12 @@ export interface ActionProcessorsQPQConfigSetting extends QPQConfigSetting {
   src: string;
 }
 
-export const defineActionProcessors = (src: string): ActionProcessorsQPQConfigSetting => ({
+export const defineActionProcessors = (
+  name: string,
+  src: string,
+): ActionProcessorsQPQConfigSetting => ({
   configSettingType: QPQCoreConfigSettingType.actionProcessors,
-  uniqueKey: src,
+  uniqueKey: name,
 
   src,
 });

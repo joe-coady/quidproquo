@@ -45,9 +45,7 @@ export class QpqWebserverApiConstruct extends QpqConstruct<ApiQPQWebServerConfig
     // Build Function
     const func = new Function(scope, this.childId('api-function'), {
       buildPath: qpqWebServerUtils.getApiEntryFullPath(props.qpqConfig, props.setting),
-      functionName: this.resourceName(
-        `${props.setting.apiSubdomain}-${props.setting.apiName}-rest`,
-      ),
+      functionName: this.resourceName(`${props.setting.apiName}-route`),
       functionType: 'lambdaAPIGatewayEvent',
       executorName: 'executeAPIGatewayEvent',
 
@@ -69,9 +67,7 @@ export class QpqWebserverApiConstruct extends QpqConstruct<ApiQPQWebServerConfig
 
     // Create a rest api
     const api = new aws_apigateway.LambdaRestApi(this, this.childId('lambda-rest-api'), {
-      restApiName: this.resourceName(
-        `${props.setting.apiSubdomain}-${props.setting.apiName}-rest-api`,
-      ),
+      restApiName: this.resourceName(`${props.setting.apiName}-rest-api`),
       handler: func.lambdaFunction,
       deployOptions: {
         loggingLevel: aws_apigateway.MethodLoggingLevel.INFO,

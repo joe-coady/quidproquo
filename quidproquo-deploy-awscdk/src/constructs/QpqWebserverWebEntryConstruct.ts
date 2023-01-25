@@ -82,12 +82,11 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
       aliases: [apexDomain],
     });
 
-    // We will deploy manually
     // TODO: This with an option
-    // new aws_s3_deployment.BucketDeployment(scope, this.childId(`deploy-website`), {
-    //   sources: [aws_s3_deployment.Source.asset(webEntryBuildPath)],
-    //   destinationBucket: staticWebFilesBucket,
-    // });
+    new aws_s3_deployment.BucketDeployment(scope, this.childId(`deploy-website`), {
+      sources: [aws_s3_deployment.Source.asset(webEntryBuildPath)],
+      destinationBucket: staticWebFilesBucket,
+    });
 
     const grantables = qpqDeployAwsCdkUtils.getQqpGrantableResources(
       scope,
@@ -97,12 +96,12 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
 
     console.log('Num Grantables: ', grantables.length);
 
-    const cloudFrontBehaviors = qpqWebServerUtils.getAllSeo(props.qpqConfig).map((seo, index) => {
+    const cloudFrontBehaviors = qpqWebServerUtils.getAllSeo(props.qpqConfig).map((seo) => {
       const edgeFunctionVR = new aws_cloudfront.experimental.EdgeFunction(
         scope,
-        this.childId(`$SEO-${seo.runtime}-${index}-VR`),
+        this.childId(`SEO-${seo.uniqueKey}-VR`),
         {
-          functionName: this.resourceName(`SEO-VR-${seo.runtime}-${index}`),
+          functionName: this.resourceName(`SEO-VR-${seo.uniqueKey}`),
           timeout: cdk.Duration.seconds(5),
           runtime: aws_lambda.Runtime.NODEJS_16_X,
 
@@ -113,9 +112,9 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
 
       const edgeFunctionOR = new aws_cloudfront.experimental.EdgeFunction(
         scope,
-        this.childId(`$SEO-${seo.runtime}-${index}-OR`),
+        this.childId(`SEO-${seo.uniqueKey}-OR`),
         {
-          functionName: this.resourceName(`SEO-OR-${seo.runtime}-${index}`),
+          functionName: this.resourceName(`SEO-OR-${seo.uniqueKey}`),
           timeout: cdk.Duration.seconds(30),
           runtime: aws_lambda.Runtime.NODEJS_16_X,
 
@@ -175,6 +174,11 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
               ...cloudFrontBehaviors,
               {
                 isDefaultBehavior: true,
+
+                // Update this to 24 hours
+                maxTtl: cdk.Duration.seconds(0),
+                minTtl: cdk.Duration.seconds(0),
+                defaultTtl: cdk.Duration.seconds(0),
               },
             ],
           },

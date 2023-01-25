@@ -35,7 +35,6 @@ export class QpqServiceStack extends Stack {
   }
 
   childId(uniqueName: string) {
-    console.log(`child id for ${uniqueName} - [${uniqueName}-${this.id}]`);
     return `${uniqueName}-${this.id}`;
   }
 
