@@ -22,7 +22,7 @@ export class QpqConstructBase extends Construct {
   }
 
   environment() {
-    return qpqCoreUtils.getAppFeature(this.qpqConfig);
+    return qpqCoreUtils.getApplicationEnvironment(this.qpqConfig);
   }
 
   service() {

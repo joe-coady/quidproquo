@@ -145,7 +145,7 @@ const createWebDistribution = (
   stackProps: QPQPrototypeStackProps,
   ownedResourceSettings: OwnedResourceSettings,
 ) => {
-  const environment = qpqCoreUtils.getAppFeature(stackProps.qpqConfig);
+  const environment = qpqCoreUtils.getApplicationEnvironment(stackProps.qpqConfig);
   const apexDomain = qpqWebServerUtils.getFeatureDomainName(stackProps.qpqConfig);
   const serviceName = qpqCoreUtils.getAppName(stackProps.qpqConfig);
 
@@ -312,7 +312,7 @@ export class QPQPrototypeSingleServiceStack extends Stack {
     });
 
     const settings = {
-      environment: qpqCoreUtils.getAppFeature(props.qpqConfig),
+      environment: qpqCoreUtils.getApplicationEnvironment(props.qpqConfig),
       service: qpqCoreUtils.getAppName(props.qpqConfig),
     };
 

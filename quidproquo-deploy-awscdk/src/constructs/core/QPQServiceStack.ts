@@ -42,7 +42,7 @@ export class QpqServiceStack extends Stack {
 
   resourceName(name: string, maxLength: number = 60) {
     const app = qpqCoreUtils.getAppName(this.qpqConfig);
-    const env = qpqCoreUtils.getAppFeature(this.qpqConfig);
+    const env = qpqCoreUtils.getApplicationEnvironment(this.qpqConfig);
 
     return `${name}-${app}-${env}`;
   }

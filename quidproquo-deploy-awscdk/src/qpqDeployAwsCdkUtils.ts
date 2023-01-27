@@ -18,7 +18,7 @@ import { QpqCoreStorageDriveConstruct } from './constructs/QpqCoreStorageDriveCo
 
 export const getResourceName = (name: string, qpqConfig: QPQConfig) => {
   const service = qpqCoreUtils.getAppName(qpqConfig);
-  const environment = qpqCoreUtils.getAppFeature(qpqConfig);
+  const environment = qpqCoreUtils.getApplicationEnvironment(qpqConfig);
 
   return `${name}-${service}-${environment}`;
 };

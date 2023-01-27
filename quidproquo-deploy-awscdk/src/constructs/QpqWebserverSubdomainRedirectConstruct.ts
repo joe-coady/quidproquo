@@ -16,7 +16,7 @@ export class QpqWebserverSubdomainRedirectConstruct extends QpqConstruct<Subdoma
     super(scope, id, props);
 
     const buildPath = qpqCoreUtils.getBuildPath(props.qpqConfig);
-    const environment = qpqCoreUtils.getAppFeature(props.qpqConfig);
+    const environment = qpqCoreUtils.getApplicationEnvironment(props.qpqConfig);
 
     const redirectLambda = new aws_lambda.Function(this, this.childId('lambda'), {
       functionName: this.resourceName(`redirect-${props.setting.subdomain}`),

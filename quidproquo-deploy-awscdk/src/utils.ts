@@ -6,28 +6,28 @@ import { QpqServiceStack } from './constructs/core/QPQServiceStack';
 
 export const getStackName = (deploymentSettings: DeploymentSettings) => {
   const appName = qpqCoreUtils.getAppName(deploymentSettings.qpqConfig);
-  const environment = qpqCoreUtils.getAppFeature(deploymentSettings.qpqConfig);
+  const environment = qpqCoreUtils.getApplicationEnvironment(deploymentSettings.qpqConfig);
 
   return `${appName}-${environment}`;
 };
 
 export const getInfrastructureStackName = (qpqConfig: QPQConfig) => {
   const appName = qpqCoreUtils.getAppName(qpqConfig);
-  const environment = qpqCoreUtils.getAppFeature(qpqConfig);
+  const environment = qpqCoreUtils.getApplicationEnvironment(qpqConfig);
 
   return `${appName}-${environment}-inf`;
 };
 
 export const getWebStackName = (qpqConfig: QPQConfig) => {
   const appName = qpqCoreUtils.getAppName(qpqConfig);
-  const environment = qpqCoreUtils.getAppFeature(qpqConfig);
+  const environment = qpqCoreUtils.getApplicationEnvironment(qpqConfig);
 
   return `${appName}-${environment}-web`;
 };
 
 export const getApiStackName = (qpqConfig: QPQConfig) => {
   const appName = qpqCoreUtils.getAppName(qpqConfig);
-  const environment = qpqCoreUtils.getAppFeature(qpqConfig);
+  const environment = qpqCoreUtils.getApplicationEnvironment(qpqConfig);
 
   return `${appName}-${environment}-api`;
 };

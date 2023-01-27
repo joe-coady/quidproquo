@@ -39,12 +39,12 @@ export const getAppName = (configs: QPQConfig): string => {
   return appName;
 };
 
-export const getAppFeature = (configs: QPQConfig): string => {
-  const featureName =
+export const getApplicationEnvironment = (configs: QPQConfig): string => {
+  const environment =
     getConfigSetting<AppNameQPQConfigSetting>(configs, QPQCoreConfigSettingType.appName)
-      ?.featureName || 'production';
+      ?.environment || 'production';
 
-  return featureName;
+  return environment;
 };
 
 export const getDeployRegion = (configs: QPQConfig): string => {

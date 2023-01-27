@@ -12,13 +12,13 @@ export interface QpqWebserverDomainConstructProps
   extends QpqConstructProps<DnsQPQWebServerConfigSetting> {}
 
 export const getFeatureDomainName = (qpqConfig: QPQConfig, domain: string): string => {
-  const feature = qpqCoreUtils.getAppFeature(qpqConfig);
+  const environment = qpqCoreUtils.getApplicationEnvironment(qpqConfig);
 
-  if (feature === 'production') {
+  if (environment === 'production') {
     return domain;
   }
 
-  return `${feature}.${domain}`;
+  return `${environment}.${domain}`;
 };
 
 export class QpqWebserverDomainConstruct extends QpqConstruct<DnsQPQWebServerConfigSetting> {

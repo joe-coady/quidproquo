@@ -28,7 +28,7 @@ export const getRuntimeResourceName = (
   resourceType: string = '',
 ) => {
   const service = qpqCoreUtils.getAppName(qpqConfig);
-  const environment = qpqCoreUtils.getAppFeature(qpqConfig);
+  const environment = qpqCoreUtils.getApplicationEnvironment(qpqConfig);
 
   return `${resourceName}-${service}-${environment}${resourceType}`;
 };

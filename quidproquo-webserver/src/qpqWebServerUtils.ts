@@ -9,7 +9,7 @@ import { SubdomainRedirectQPQWebServerConfigSetting } from './config/settings/su
 import { OpenApiQPQWebServerConfigSetting } from './config/settings/openApi';
 import { DefaultRouteOptionsQPQWebServerConfigSetting } from './config/settings/defaultRouteOptions';
 import { QPQWebServerConfigSettingType } from './config/QPQConfig';
-import { getAppFeature } from 'quidproquo-core/lib/qpqCoreUtils';
+import { getApplicationEnvironment } from 'quidproquo-core/lib/qpqCoreUtils';
 
 import { HttpEventHeaders, HTTPEventParams, HTTPEventResponse } from './types/HTTPEvent';
 import { RouteOptions } from './config/settings/route';
@@ -120,14 +120,14 @@ export const getSubdomainRedirects = (
 };
 
 export const getFeatureDomainName = (configs: QPQConfig): string => {
-  const feature = getAppFeature(configs);
+  const environment = getApplicationEnvironment(configs);
   const apexDomainName = getDomainName(configs);
 
-  if (feature === 'production') {
+  if (environment === 'production') {
     return apexDomainName;
   }
 
-  return `${feature}.${apexDomainName}`;
+  return `${environment}.${apexDomainName}`;
 };
 
 export const getServiceDomainName = (qpqConfig: QPQConfig): string => {
