@@ -24,8 +24,6 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
   constructor(scope: Construct, id: string, props: QpqWebserverWebEntryConstructProps) {
     super(scope, id, props);
 
-    console.log(JSON.stringify(props.setting));
-
     const apexDomain = qpqWebServerUtils.getFeatureDomainName(props.qpqConfig);
     const webEntryBuildPath = qpqWebServerUtils.getWebEntryFullPath(props.qpqConfig, props.setting);
     const seoEntryBuildPath = qpqWebServerUtils.getWebEntrySeoFullPath(
@@ -76,8 +74,6 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
       aliases: [apexDomain],
     });
 
-    console.log('\n\n\n webEntryBuildPath: ', webEntryBuildPath, '\n\n\n');
-    console.log('\n\n\n this.childId: ', this.childId('deploy'), '\n\n\n');
     // TODO: This with an option
     new aws_s3_deployment.BucketDeployment(this, this.childId('deploy'), {
       sources: [aws_s3_deployment.Source.asset(webEntryBuildPath)],
