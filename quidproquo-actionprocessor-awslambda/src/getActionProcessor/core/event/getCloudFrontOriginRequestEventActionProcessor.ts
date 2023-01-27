@@ -39,7 +39,7 @@ const getProcessTransformEventParams = (
     );
 
     return actionResult({
-      domain: qpqWebServerUtils.getFeatureDomainName(qpqConfig),
+      domain: qpqWebServerUtils.getEnvironmentDomainName(qpqConfig),
       body: cfRecordRequest.body,
       correlation: context.awsRequestId,
       method: cfRecordRequest.method as HTTPMethod,

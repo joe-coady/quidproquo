@@ -103,7 +103,7 @@ const createApiDomainName = (
   stackProps: QPQPrototypeStackProps,
   subdomain: string,
 ) => {
-  const apexDomain = qpqWebServerUtils.getFeatureDomainName(stackProps.qpqConfig);
+  const apexDomain = qpqWebServerUtils.getEnvironmentDomainName(stackProps.qpqConfig);
 
   const apiDomainName = `${subdomain}.${apexDomain}`;
 
@@ -146,7 +146,7 @@ const createWebDistribution = (
   ownedResourceSettings: OwnedResourceSettings,
 ) => {
   const environment = qpqCoreUtils.getApplicationEnvironment(stackProps.qpqConfig);
-  const apexDomain = qpqWebServerUtils.getFeatureDomainName(stackProps.qpqConfig);
+  const apexDomain = qpqWebServerUtils.getEnvironmentDomainName(stackProps.qpqConfig);
   const serviceName = qpqCoreUtils.getAppName(stackProps.qpqConfig);
 
   // create an s3 bucket

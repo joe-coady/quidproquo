@@ -11,7 +11,7 @@ import { QpqConstruct, QpqConstructProps } from './core/QpqConstruct';
 export interface QpqWebserverDomainConstructProps
   extends QpqConstructProps<DnsQPQWebServerConfigSetting> {}
 
-export const getFeatureDomainName = (qpqConfig: QPQConfig, domain: string): string => {
+export const getEnvironmentDomainName = (qpqConfig: QPQConfig, domain: string): string => {
   const environment = qpqCoreUtils.getApplicationEnvironment(qpqConfig);
 
   if (environment === 'production') {
@@ -32,7 +32,7 @@ export class QpqWebserverDomainConstruct extends QpqConstruct<DnsQPQWebServerCon
 
     // example.com
     // dev.example.com
-    const featureDomain = getFeatureDomainName(props.qpqConfig, props.setting.dnsBase);
+    const featureDomain = getEnvironmentDomainName(props.qpqConfig, props.setting.dnsBase);
 
     // The hosted zone already setup
     const apexHostedZone = aws_route53.HostedZone.fromLookup(this, this.childId('hosted-zone'), {

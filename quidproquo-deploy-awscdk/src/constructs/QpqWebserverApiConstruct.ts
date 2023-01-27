@@ -20,7 +20,7 @@ export class QpqWebserverApiConstruct extends QpqConstruct<ApiQPQWebServerConfig
 
     // api.service.domain.com or api.domain.com
     const apexDomain = props.setting.onRootDomain
-      ? qpqWebServerUtils.getFeatureDomainName(props.qpqConfig)
+      ? qpqWebServerUtils.getEnvironmentDomainName(props.qpqConfig)
       : qpqWebServerUtils.getServiceDomainName(props.qpqConfig);
 
     // Create subdomain

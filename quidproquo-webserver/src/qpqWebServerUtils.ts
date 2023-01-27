@@ -119,7 +119,7 @@ export const getSubdomainRedirects = (
   return subdomainRedirects;
 };
 
-export const getFeatureDomainName = (configs: QPQConfig): string => {
+export const getEnvironmentDomainName = (configs: QPQConfig): string => {
   const environment = getApplicationEnvironment(configs);
   const apexDomainName = getDomainName(configs);
 
@@ -132,9 +132,9 @@ export const getFeatureDomainName = (configs: QPQConfig): string => {
 
 export const getServiceDomainName = (qpqConfig: QPQConfig): string => {
   const appName = qpqCoreUtils.getAppName(qpqConfig);
-  const featureDomain = getFeatureDomainName(qpqConfig);
+  const environmentDomain = getEnvironmentDomainName(qpqConfig);
 
-  return `${appName}.${featureDomain}`;
+  return `${appName}.${environmentDomain}`;
 };
 
 export const getHeaderValue = (header: string, headers: HttpEventHeaders): string | null => {
@@ -150,7 +150,7 @@ export const getHeaderValue = (header: string, headers: HttpEventHeaders): strin
 
 export const getAllowedOrigins = (configs: QPQConfig, route: RouteOptions): string[] => {
   // Root domain
-  const rootDomain = `https://${getFeatureDomainName(configs)}`;
+  const rootDomain = `https://${getEnvironmentDomainName(configs)}`;
 
   // generic settings
   const defaultRouteSettings =
