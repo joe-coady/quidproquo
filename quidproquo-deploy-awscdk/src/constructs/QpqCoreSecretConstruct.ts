@@ -50,7 +50,7 @@ export class QpqCoreSecretConstruct extends QpqCoreSecretConstructBase {
   constructor(scope: Construct, id: string, props: QpqCoreSecretConstructProps) {
     super(scope, id, props);
 
-    this.secret = new aws_secretsmanager.Secret(this, this.childId('secret'), {
+    this.secret = new aws_secretsmanager.Secret(this, 'secret', {
       secretName: this.resourceName(props.setting.key),
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       description: props.setting.key,

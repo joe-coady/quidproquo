@@ -51,7 +51,7 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
   constructor(scope: Construct, id: string, props: QpqCoreStorageDriveConstructProps) {
     super(scope, id, props);
 
-    this.bucket = new aws_s3.Bucket(this, this.childId('bucket'), {
+    this.bucket = new aws_s3.Bucket(this, 'bucket', {
       bucketName: this.resourceName(props.setting.storageDrive),
 
       // Disable public access to this bucket, CloudFront will do that

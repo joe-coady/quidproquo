@@ -48,7 +48,7 @@ export const createConstructs = (
       const ConstructClass = qpqSettingConstructMap[qpqCoreConfigSettingType];
       new ConstructClass(
         owner,
-        owner.childId(qpqCoreUtils.getUniqueKeyForSetting(setting)),
+        qpqCoreUtils.getUniqueKeyForSetting(setting),
         owner.childProps(setting),
       );
     }

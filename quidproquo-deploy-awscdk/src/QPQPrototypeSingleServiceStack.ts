@@ -352,7 +352,7 @@ export class QPQPrototypeSingleServiceStack extends Stack {
       const bucketName = resourceName(driveName);
 
       const bucket = new aws_s3.Bucket(this, bucketName, {
-        bucketName: resourceName(driveName),
+        bucketName: bucketName,
 
         // Disable public access to this bucket, CloudFront will do that
         publicReadAccess: false,

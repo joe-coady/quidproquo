@@ -24,7 +24,7 @@ export class QpqWebserverApiConstruct extends QpqConstruct<ApiQPQWebServerConfig
       : qpqWebServerUtils.getServiceDomainName(props.qpqConfig);
 
     // Create subdomain
-    const subdomain = new SubdomainName(this, this.childId('subdomain'), {
+    const subdomain = new SubdomainName(this, 'subdomain', {
       apexDomain,
       subdomain: props.setting.apiSubdomain,
       qpqConfig: props.qpqConfig,
@@ -32,7 +32,7 @@ export class QpqWebserverApiConstruct extends QpqConstruct<ApiQPQWebServerConfig
     });
 
     // Build Function
-    const func = new Function(this, this.childId('api-function'), {
+    const func = new Function(this, 'api-function', {
       buildPath: qpqWebServerUtils.getApiEntryFullPath(props.qpqConfig, props.setting),
       functionName: this.resourceName(`${props.setting.apiName}-route`),
       functionType: 'lambdaAPIGatewayEvent',
@@ -46,7 +46,7 @@ export class QpqWebserverApiConstruct extends QpqConstruct<ApiQPQWebServerConfig
 
     const grantables = qpqDeployAwsCdkUtils.getQqpGrantableResources(
       this,
-      this.childId('grantable'),
+      'grantable',
       this.qpqConfig,
     );
 
@@ -55,7 +55,7 @@ export class QpqWebserverApiConstruct extends QpqConstruct<ApiQPQWebServerConfig
     });
 
     // Create a rest api
-    const api = new aws_apigateway.LambdaRestApi(this, this.childId('lambda-rest-api'), {
+    const api = new aws_apigateway.LambdaRestApi(this, 'lambda-rest-api', {
       restApiName: this.resourceName(`${props.setting.apiName}-rest-api`),
       handler: func.lambdaFunction,
       deployOptions: {
@@ -67,7 +67,7 @@ export class QpqWebserverApiConstruct extends QpqConstruct<ApiQPQWebServerConfig
     });
 
     // Map all requests to this service to /serviceName/*
-    new aws_apigateway.BasePathMapping(this, this.childId('rest-bpm'), {
+    new aws_apigateway.BasePathMapping(this, 'rest-bpm', {
       domainName: subdomain.domainName,
       restApi: api,
 

@@ -51,7 +51,7 @@ export class QpqCoreParameterConstruct extends QpqCoreParameterConstructBase {
   constructor(scope: Construct, id: string, props: QpqCoreParameterConstructProps) {
     super(scope, id, props);
 
-    this.stringParameter = new aws_ssm.StringParameter(this, this.childId('param'), {
+    this.stringParameter = new aws_ssm.StringParameter(this, 'param', {
       parameterName: this.resourceName(props.setting.key),
       description: props.setting.key,
       stringValue: props.setting.value,

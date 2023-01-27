@@ -47,6 +47,15 @@ export const getApplicationEnvironment = (configs: QPQConfig): string => {
   return environment;
 };
 
+export const getApplicationFeature = (configs: QPQConfig): string | undefined => {
+  const feature = getConfigSetting<AppNameQPQConfigSetting>(
+    configs,
+    QPQCoreConfigSettingType.appName,
+  )?.feature;
+
+  return feature;
+};
+
 export const getDeployRegion = (configs: QPQConfig): string => {
   const deployRegion =
     getConfigSetting<AppNameQPQConfigSetting>(configs, QPQCoreConfigSettingType.appName)

@@ -18,7 +18,7 @@ export class QpqWebserverSubdomainRedirectConstruct extends QpqConstruct<Subdoma
     const buildPath = qpqCoreUtils.getBuildPath(props.qpqConfig);
     const environment = qpqCoreUtils.getApplicationEnvironment(props.qpqConfig);
 
-    const redirectLambda = new aws_lambda.Function(this, this.childId('lambda'), {
+    const redirectLambda = new aws_lambda.Function(this, 'lambda', {
       functionName: this.resourceName(`redirect-${props.setting.subdomain}`),
       timeout: cdk.Duration.seconds(25),
 
@@ -34,7 +34,7 @@ export class QpqWebserverSubdomainRedirectConstruct extends QpqConstruct<Subdoma
       },
     });
 
-    const restApi = new aws_apigateway.LambdaRestApi(this, this.childId('rest-api'), {
+    const restApi = new aws_apigateway.LambdaRestApi(this, 'rest-api', {
       restApiName: this.resourceName(`${props.setting.subdomain}-redirect`),
       handler: redirectLambda,
       deployOptions: {
@@ -45,7 +45,7 @@ export class QpqWebserverSubdomainRedirectConstruct extends QpqConstruct<Subdoma
     });
 
     // TODO: Fix this
-    const serviceDomainName = new SubdomainName(this, this.childId('service-domain-name'), {
+    const serviceDomainName = new SubdomainName(this, 'service-domain-name', {
       subdomain: props.setting.subdomain,
       apexDomain: '',
       setting: props.setting,
@@ -53,7 +53,7 @@ export class QpqWebserverSubdomainRedirectConstruct extends QpqConstruct<Subdoma
     });
 
     // Map all requests to this service to /serviceName/*
-    new aws_apigateway.BasePathMapping(this, this.childId('base-path-mapping'), {
+    new aws_apigateway.BasePathMapping(this, 'base-path-mapping', {
       domainName: serviceDomainName.domainName,
       restApi: restApi,
 

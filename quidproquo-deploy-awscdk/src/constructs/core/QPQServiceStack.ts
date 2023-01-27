@@ -3,6 +3,7 @@ import { Stack, StackProps, aws_lambda } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { QPQConfig, qpqCoreUtils, QPQConfigSetting } from 'quidproquo-core';
+import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { QpqConstructProps } from './QpqConstruct';
 import { ApiLayer } from '../../layers/ApiLayer';
 
@@ -32,24 +33,12 @@ export class QpqServiceStack extends Stack {
     this.id = id;
     this.qpqConfig = qpqConfig;
     this.apiLayerVersions = (apiLayers || []).map((layer) => {
-      return new aws_lambda.LayerVersion(this, this.childId(`${layer.name}-layer`), {
-        layerVersionName: this.resourceName(layer.name),
+      return new aws_lambda.LayerVersion(this, `${layer.name}-layer`, {
+        layerVersionName: awsNamingUtils.getQpqRuntimeResourceName(layer.name, qpqConfig),
         code: new aws_lambda.AssetCode(layer.buildPath),
         compatibleRuntimes: [aws_lambda.Runtime.NODEJS_16_X],
       });
     });
-  }
-
-  resourceName(name: string, maxLength: number = 60) {
-    const app = qpqCoreUtils.getAppName(this.qpqConfig);
-    const env = qpqCoreUtils.getApplicationEnvironment(this.qpqConfig);
-
-    return `${name}-${app}-${env}`;
-  }
-
-  childId(uniqueName: string) {
-    // return `${uniqueName}-${this.id}`;
-    return uniqueName;
   }
 
   childProps(setting: QPQConfigSetting): QpqConstructProps<any> {

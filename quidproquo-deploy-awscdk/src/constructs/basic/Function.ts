@@ -29,7 +29,7 @@ export class Function extends QpqConstruct<any> {
   constructor(scope: Construct, id: string, props: FunctionProps) {
     super(scope, id, props);
 
-    this.lambdaFunction = new aws_lambda.Function(this, this.childId('function'), {
+    this.lambdaFunction = new aws_lambda.Function(this, 'function', {
       functionName: props.functionName,
       timeout: cdk.Duration.seconds(props.timeoutInSeconds || 25),
 

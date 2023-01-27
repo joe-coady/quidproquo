@@ -21,14 +21,3 @@ export const matchUrl = (path: string, url: string): UrlMatch => {
     params: matchResult.params,
   };
 };
-
-export const getRuntimeResourceName = (
-  resourceName: string,
-  qpqConfig: QPQConfig,
-  resourceType: string = '',
-) => {
-  const service = qpqCoreUtils.getAppName(qpqConfig);
-  const environment = qpqCoreUtils.getApplicationEnvironment(qpqConfig);
-
-  return `${resourceName}-${service}-${environment}${resourceType}`;
-};

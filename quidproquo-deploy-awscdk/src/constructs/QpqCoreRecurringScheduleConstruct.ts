@@ -15,7 +15,7 @@ export class QpqCoreRecurringScheduleConstruct extends QpqConstruct<ScheduleQPQC
   constructor(scope: Construct, id: string, props: QpqCoreRecurringScheduleConstructProps) {
     super(scope, id, props);
 
-    const schedulerFunction = new Function(this, this.childId(props.setting.uniqueKey), {
+    const schedulerFunction = new Function(this, props.setting.uniqueKey, {
       buildPath: qpqCoreUtils.getScheduleEntryFullPath(props.qpqConfig, props.setting),
       functionName: this.resourceName(`${props.setting.uniqueKey}-SE`),
       functionType: 'lambdaEventBridgeEvent',
@@ -37,7 +37,7 @@ export class QpqCoreRecurringScheduleConstruct extends QpqConstruct<ScheduleQPQC
     // TODO: Make this a utility function
     const grantables = qpqDeployAwsCdkUtils.getQqpGrantableResources(
       this,
-      this.childId('grantable'),
+      'grantable',
       this.qpqConfig,
     );
 
@@ -47,7 +47,7 @@ export class QpqCoreRecurringScheduleConstruct extends QpqConstruct<ScheduleQPQC
     // ///////// end todo
 
     // EventBridge rule which runs every five minutes
-    const cronRule = new aws_events.Rule(this, this.childId('cron'), {
+    const cronRule = new aws_events.Rule(this, 'cron', {
       schedule: aws_events.Schedule.expression(`cron(${props.setting.cronExpression})`),
     });
 

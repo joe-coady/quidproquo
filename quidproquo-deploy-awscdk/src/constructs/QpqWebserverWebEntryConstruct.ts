@@ -32,8 +32,8 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
     );
 
     // create an s3 bucket
-    const staticWebFilesBucket = new aws_s3.Bucket(this, this.childId('bucket'), {
-      bucketName: this.resourceName('web-files'),
+    const staticWebFilesBucket = new aws_s3.Bucket(this, 'bucket', {
+      bucketName: this.qpqResourceName('web-files'),
       // Disable public access to this bucket, CloudFront will do that
       publicReadAccess: false,
       blockPublicAccess: aws_s3.BlockPublicAccess.BLOCK_ALL,
@@ -47,11 +47,11 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
     });
 
     // Create OriginAccessIdentity for the bucket.
-    const websiteOAI = new aws_cloudfront.OriginAccessIdentity(this, this.childId('website-oai'));
+    const websiteOAI = new aws_cloudfront.OriginAccessIdentity(this, 'website-oai');
     staticWebFilesBucket.grantRead(websiteOAI);
 
     // Grab the hosted zone we want to add
-    const serviceHostedZone = aws_route53.HostedZone.fromLookup(this, this.childId('hosted-zone'), {
+    const serviceHostedZone = aws_route53.HostedZone.fromLookup(this, 'hosted-zone', {
       domainName: apexDomain,
     });
 
@@ -60,36 +60,32 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
     // `switch over to using the Certificate with the new built-in (CloudFormation-based) DNS validation`
     const validationCertificate =
       aws_certificatemanager.CertificateValidation.fromDns(serviceHostedZone);
-    const certificate = new aws_certificatemanager.DnsValidatedCertificate(
-      this,
-      this.childId('viewer-cert'),
-      {
-        hostedZone: serviceHostedZone,
-        domainName: apexDomain,
-        region: 'us-east-1', // AWS certificates can only exist in the us-east-1 region
-        validation: validationCertificate,
-      },
-    );
+    const certificate = new aws_certificatemanager.DnsValidatedCertificate(this, 'viewer-cert', {
+      hostedZone: serviceHostedZone,
+      domainName: apexDomain,
+      region: 'us-east-1', // AWS certificates can only exist in the us-east-1 region
+      validation: validationCertificate,
+    });
     const viewerCertificate = aws_cloudfront.ViewerCertificate.fromAcmCertificate(certificate, {
       aliases: [apexDomain],
     });
 
     // TODO: This with an option
-    new aws_s3_deployment.BucketDeployment(this, this.childId('deploy'), {
+    new aws_s3_deployment.BucketDeployment(this, 'deploy', {
       sources: [aws_s3_deployment.Source.asset(webEntryBuildPath)],
       destinationBucket: staticWebFilesBucket,
     });
 
     const grantables = qpqDeployAwsCdkUtils.getQqpGrantableResources(
       this,
-      this.childId('grantable'),
+      'grantable',
       this.qpqConfig,
     );
 
     const cloudFrontBehaviors = qpqWebServerUtils.getAllSeo(props.qpqConfig).map((seo) => {
       const edgeFunctionVR = new aws_cloudfront.experimental.EdgeFunction(
         this,
-        this.childId(`SEO-${seo.uniqueKey}-VR`),
+        `SEO-${seo.uniqueKey}-VR`,
         {
           functionName: this.resourceName(`SEO-VR-${seo.uniqueKey}`),
           timeout: cdk.Duration.seconds(5),
@@ -102,7 +98,7 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
 
       const edgeFunctionOR = new aws_cloudfront.experimental.EdgeFunction(
         this,
-        this.childId(`SEO-${seo.uniqueKey}-OR`),
+        `SEO-${seo.uniqueKey}-OR`,
         {
           functionName: this.resourceName(`SEO-OR-${seo.uniqueKey}`),
           timeout: cdk.Duration.seconds(30),
@@ -150,42 +146,38 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
     // TODO: Somehow expose query strings: Note ~
     // (Lambda@Edge only) To access the query string in an origin request or origin response function,
     // your cache policy or origin request policy must be set to All for Query strings.
-    const distribution = new aws_cloudfront.CloudFrontWebDistribution(
-      this,
-      this.childId('cf-distribution'),
-      {
-        originConfigs: [
-          {
-            s3OriginSource: {
-              s3BucketSource: staticWebFilesBucket,
-              originAccessIdentity: websiteOAI,
-            },
-            behaviors: [
-              ...cloudFrontBehaviors,
-              {
-                isDefaultBehavior: true,
+    const distribution = new aws_cloudfront.CloudFrontWebDistribution(this, 'cf-distribution', {
+      originConfigs: [
+        {
+          s3OriginSource: {
+            s3BucketSource: staticWebFilesBucket,
+            originAccessIdentity: websiteOAI,
+          },
+          behaviors: [
+            ...cloudFrontBehaviors,
+            {
+              isDefaultBehavior: true,
 
-                // Update this to 24 hours
-                maxTtl: cdk.Duration.seconds(0),
-                minTtl: cdk.Duration.seconds(0),
-                defaultTtl: cdk.Duration.seconds(0),
-              },
-            ],
-          },
-        ],
-        viewerCertificate: viewerCertificate,
-        errorConfigurations: [
-          {
-            errorCode: 404,
-            responseCode: 200,
-            responsePagePath: '/',
-          },
-        ],
-      },
-    );
+              // Update this to 24 hours
+              maxTtl: cdk.Duration.seconds(0),
+              minTtl: cdk.Duration.seconds(0),
+              defaultTtl: cdk.Duration.seconds(0),
+            },
+          ],
+        },
+      ],
+      viewerCertificate: viewerCertificate,
+      errorConfigurations: [
+        {
+          errorCode: 404,
+          responseCode: 200,
+          responsePagePath: '/',
+        },
+      ],
+    });
 
     // Create a cdn link
-    new aws_route53.ARecord(this, this.childId(`web-alias`), {
+    new aws_route53.ARecord(this, 'web-alias', {
       zone: serviceHostedZone,
       recordName: apexDomain,
       target: aws_route53.RecordTarget.fromAlias(

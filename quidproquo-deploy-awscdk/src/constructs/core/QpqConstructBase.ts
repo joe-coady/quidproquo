@@ -2,6 +2,7 @@ import { aws_lambda } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { QPQConfig, QPQConfigSetting, qpqCoreUtils } from 'quidproquo-core';
+import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 
 export interface QpqConstructBaseProps {
   qpqConfig: QPQConfig;
@@ -21,24 +22,11 @@ export class QpqConstructBase extends Construct {
     this.apiLayerVersions = props.apiLayerVersions;
   }
 
-  environment() {
-    return qpqCoreUtils.getApplicationEnvironment(this.qpqConfig);
+  resourceName(name: string) {
+    return awsNamingUtils.getConfigRuntimeResourceName(name, this.qpqConfig);
   }
 
-  service() {
-    return qpqCoreUtils.getAppName(this.qpqConfig);
-  }
-
-  deploymentPrefix() {
-    return `${this.service()}-${this.environment()}`;
-  }
-
-  resourceName(name: string, maxLength: number = 60) {
-    return `${name}-${this.service()}-${this.environment()}`;
-  }
-
-  childId(uniqueName: string) {
-    // return `${uniqueName}-${this.id}`;
-    return uniqueName;
+  qpqResourceName(name: string) {
+    return awsNamingUtils.getQpqRuntimeResourceName(name, this.qpqConfig);
   }
 }

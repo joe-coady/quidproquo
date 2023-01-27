@@ -35,7 +35,7 @@ export class QpqWebserverDomainConstruct extends QpqConstruct<DnsQPQWebServerCon
     const featureDomain = getEnvironmentDomainName(props.qpqConfig, props.setting.dnsBase);
 
     // The hosted zone already setup
-    const apexHostedZone = aws_route53.HostedZone.fromLookup(this, this.childId('hosted-zone'), {
+    const apexHostedZone = aws_route53.HostedZone.fromLookup(this, 'hosted-zone', {
       domainName: featureDomain,
     });
 
@@ -45,16 +45,12 @@ export class QpqWebserverDomainConstruct extends QpqConstruct<DnsQPQWebServerCon
     const serviceDomainName = qpqWebServerUtils.getServiceDomainName(props.qpqConfig);
 
     // Create the root hosted zone for our service
-    const serviceHostedZone = new aws_route53.HostedZone(
-      this,
-      this.childId('service-hosted-zone'),
-      {
-        zoneName: serviceDomainName,
-      },
-    );
+    const serviceHostedZone = new aws_route53.HostedZone(this, 'service-hosted-zone', {
+      zoneName: serviceDomainName,
+    });
 
     // Add the new NS Records to the root hosted zone so subdomains can be resolved
-    new aws_route53.NsRecord(this, this.childId('ns-records'), {
+    new aws_route53.NsRecord(this, 'ns-records', {
       zone: apexHostedZone,
       recordName: serviceDomainName,
       values: serviceHostedZone.hostedZoneNameServers || [],

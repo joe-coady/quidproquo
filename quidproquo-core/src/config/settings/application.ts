@@ -5,6 +5,7 @@ export interface AppNameQPQConfigSetting extends QPQConfigSetting {
   configRoot: string;
   environment?: string;
   deployRegion?: string;
+  feature?: string;
 }
 
 export const defineApplication = (
@@ -12,6 +13,7 @@ export const defineApplication = (
   environment: string,
   configRoot: string,
   deployRegion?: string,
+  feature?: string,
 ): AppNameQPQConfigSetting => ({
   configSettingType: QPQCoreConfigSettingType.appName,
   uniqueKey: appName,
@@ -20,4 +22,5 @@ export const defineApplication = (
   configRoot,
   environment,
   deployRegion,
+  feature,
 });
