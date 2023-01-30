@@ -1,35 +1,30 @@
 import { qpqCoreUtils, QPQConfig } from 'quidproquo-core';
 
-import { DeploymentSettings } from './DeploymentSettings';
 import { QpqSettingConstructMap } from './QpqSettingConstructMap';
 import { QpqServiceStack } from './constructs/core/QPQServiceStack';
 
-export const getStackName = (deploymentSettings: DeploymentSettings) => {
-  const appName = qpqCoreUtils.getAppName(deploymentSettings.qpqConfig);
-  const environment = qpqCoreUtils.getApplicationEnvironment(deploymentSettings.qpqConfig);
+export const getBaseStackName = (qpqConfig: QPQConfig) => {
+  const appName = qpqCoreUtils.getAppName(qpqConfig);
+  const environment = qpqCoreUtils.getApplicationEnvironment(qpqConfig);
+  const feature = qpqCoreUtils.getApplicationFeature(qpqConfig);
+
+  if (feature) {
+    return `${appName}-${environment}-${feature}`;
+  }
 
   return `${appName}-${environment}`;
 };
 
 export const getInfrastructureStackName = (qpqConfig: QPQConfig) => {
-  const appName = qpqCoreUtils.getAppName(qpqConfig);
-  const environment = qpqCoreUtils.getApplicationEnvironment(qpqConfig);
-
-  return `${appName}-${environment}-inf`;
+  return `${getBaseStackName(qpqConfig)}-inf`;
 };
 
 export const getWebStackName = (qpqConfig: QPQConfig) => {
-  const appName = qpqCoreUtils.getAppName(qpqConfig);
-  const environment = qpqCoreUtils.getApplicationEnvironment(qpqConfig);
-
-  return `${appName}-${environment}-web`;
+  return `${getBaseStackName(qpqConfig)}-web`;
 };
 
 export const getApiStackName = (qpqConfig: QPQConfig) => {
-  const appName = qpqCoreUtils.getAppName(qpqConfig);
-  const environment = qpqCoreUtils.getApplicationEnvironment(qpqConfig);
-
-  return `${appName}-${environment}-api`;
+  return `${getBaseStackName(qpqConfig)}-api`;
 };
 
 export const createConstructs = (

@@ -1,10 +1,11 @@
 import { aws_route53 } from 'aws-cdk-lib';
+import { IHostedZone } from 'aws-cdk-lib/aws-route53';
 import { Construct } from 'constructs';
 
 import { qpqCoreUtils, QPQConfig } from 'quidproquo-core';
 
 import { qpqWebServerUtils, DnsQPQWebServerConfigSetting } from 'quidproquo-webserver';
-import { serviceNeedsServiceHostedZone } from '../qpqDeployAwsCdkUtils';
+import * as qpqDeployAwsCdkUtils from '../qpqDeployAwsCdkUtils';
 
 import { QpqConstruct, QpqConstructProps } from './core/QpqConstruct';
 
@@ -25,19 +26,45 @@ export class QpqWebserverDomainConstruct extends QpqConstruct<DnsQPQWebServerCon
   constructor(scope: Construct, id: string, props: QpqWebserverDomainConstructProps) {
     super(scope, id, props);
 
-    // Only create a shared hosted zone if we need to
-    if (!serviceNeedsServiceHostedZone(this.qpqConfig)) {
-      return;
-    }
-
     // example.com
     // dev.example.com
-    const featureDomain = getEnvironmentDomainName(props.qpqConfig, props.setting.dnsBase);
+    const feature = qpqCoreUtils.getApplicationFeature(props.qpqConfig);
+    const environmentDomain = getEnvironmentDomainName(props.qpqConfig, props.setting.dnsBase);
+    const featureDomainName = qpqWebServerUtils.getBaseDomainName(props.qpqConfig);
 
     // The hosted zone already setup
-    const apexHostedZone = aws_route53.HostedZone.fromLookup(this, 'hosted-zone', {
-      domainName: featureDomain,
+    // development.example.com
+    // staging.example.com
+    // example.com
+    let apexHostedZone: IHostedZone = aws_route53.HostedZone.fromLookup(this, 'hosted-zone', {
+      domainName: feature ? featureDomainName : environmentDomain,
     });
+
+    // const feature = qpqCoreUtils.getApplicationFeature(props.qpqConfig);
+    // if (feature) {
+    //   const featureDomainName = qpqWebServerUtils.getBaseDomainName(props.qpqConfig);
+
+    //   console.log('featureDomainName', featureDomainName);
+
+    //   // Create the root hosted zone for our service
+    //   const featureHostedZone = new aws_route53.HostedZone(this, 'feature-hosted-zone', {
+    //     zoneName: featureDomainName,
+    //   });
+
+    //   // Add the new NS Records to the root hosted zone so subdomains can be resolved
+    //   new aws_route53.NsRecord(this, 'feature-ns-records', {
+    //     zone: apexHostedZone,
+    //     recordName: featureDomainName,
+    //     values: featureHostedZone.hostedZoneNameServers || [],
+    //   });
+
+    //   apexHostedZone = featureHostedZone;
+    // }
+
+    // Only create a shared hosted zone if we need to
+    if (!qpqDeployAwsCdkUtils.serviceNeedsServiceHostedZone(props.qpqConfig)) {
+      return;
+    }
 
     // Root domain name for our service
     // search.example.com
@@ -50,7 +77,7 @@ export class QpqWebserverDomainConstruct extends QpqConstruct<DnsQPQWebServerCon
     });
 
     // Add the new NS Records to the root hosted zone so subdomains can be resolved
-    new aws_route53.NsRecord(this, 'ns-records', {
+    new aws_route53.NsRecord(this, 'service-ns-records', {
       zone: apexHostedZone,
       recordName: serviceDomainName,
       values: serviceHostedZone.hostedZoneNameServers || [],

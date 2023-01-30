@@ -24,7 +24,7 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
   constructor(scope: Construct, id: string, props: QpqWebserverWebEntryConstructProps) {
     super(scope, id, props);
 
-    const apexDomain = qpqWebServerUtils.getEnvironmentDomainName(props.qpqConfig);
+    const apexDomain = qpqWebServerUtils.getBaseDomainName(props.qpqConfig);
     const webEntryBuildPath = qpqWebServerUtils.getWebEntryFullPath(props.qpqConfig, props.setting);
     const seoEntryBuildPath = qpqWebServerUtils.getWebEntrySeoFullPath(
       props.qpqConfig,

@@ -130,11 +130,22 @@ export const getEnvironmentDomainName = (configs: QPQConfig): string => {
   return `${environment}.${apexDomainName}`;
 };
 
-export const getServiceDomainName = (qpqConfig: QPQConfig): string => {
-  const appName = qpqCoreUtils.getAppName(qpqConfig);
+export const getBaseDomainName = (qpqConfig: QPQConfig): string => {
   const environmentDomain = getEnvironmentDomainName(qpqConfig);
+  const feature = qpqCoreUtils.getApplicationFeature(qpqConfig);
 
-  return `${appName}.${environmentDomain}`;
+  if (feature) {
+    return `${feature}.${environmentDomain}`;
+  }
+
+  return environmentDomain;
+};
+
+export const getServiceDomainName = (qpqConfig: QPQConfig): string => {
+  const service = qpqCoreUtils.getAppName(qpqConfig);
+  const domainBase = getBaseDomainName(qpqConfig);
+
+  return `${service}.${domainBase}`;
 };
 
 export const getHeaderValue = (header: string, headers: HttpEventHeaders): string | null => {
@@ -150,7 +161,7 @@ export const getHeaderValue = (header: string, headers: HttpEventHeaders): strin
 
 export const getAllowedOrigins = (configs: QPQConfig, route: RouteOptions): string[] => {
   // Root domain
-  const rootDomain = `https://${getEnvironmentDomainName(configs)}`;
+  const rootDomain = `https://${getBaseDomainName(configs)}`;
 
   // generic settings
   const defaultRouteSettings =
