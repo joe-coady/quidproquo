@@ -1,24 +1,27 @@
 import { QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
 
-export interface AppNameQPQConfigSetting extends QPQConfigSetting {
-  appName: string;
+export interface ApplicationModuleQPQConfigSetting extends QPQConfigSetting {
+  applicationName: string;
+  moduleName: string;
   configRoot: string;
   environment?: string;
   deployRegion?: string;
   feature?: string;
 }
 
-export const defineApplication = (
-  appName: string,
+export const defineApplicationModule = (
+  applicationName: string,
+  moduleName: string,
   environment: string,
   configRoot: string,
   deployRegion?: string,
   feature?: string,
-): AppNameQPQConfigSetting => ({
+): ApplicationModuleQPQConfigSetting => ({
   configSettingType: QPQCoreConfigSettingType.appName,
-  uniqueKey: appName,
+  uniqueKey: `${applicationName}-${moduleName}`,
 
-  appName,
+  applicationName,
+  moduleName,
   configRoot,
   environment,
   deployRegion,

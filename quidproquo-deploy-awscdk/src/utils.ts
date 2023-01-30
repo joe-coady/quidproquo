@@ -4,15 +4,18 @@ import { QpqSettingConstructMap } from './QpqSettingConstructMap';
 import { QpqServiceStack } from './constructs/core/QPQServiceStack';
 
 export const getBaseStackName = (qpqConfig: QPQConfig) => {
-  const appName = qpqCoreUtils.getAppName(qpqConfig);
-  const environment = qpqCoreUtils.getApplicationEnvironment(qpqConfig);
-  const feature = qpqCoreUtils.getApplicationFeature(qpqConfig);
+  const appName = qpqCoreUtils.getApplicationName(qpqConfig);
+  const moduleName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
+  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
+  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+
+  const baseName = `${appName}-${moduleName}-${environment}`;
 
   if (feature) {
-    return `${appName}-${environment}-${feature}`;
+    return `${baseName}-${feature}`;
   }
 
-  return `${appName}-${environment}`;
+  return baseName;
 };
 
 export const getInfrastructureStackName = (qpqConfig: QPQConfig) => {

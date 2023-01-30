@@ -26,7 +26,7 @@ export class QpqServiceStack extends Stack {
     super(scope, id, {
       env: {
         account: account,
-        region: qpqCoreUtils.getDeployRegion(qpqConfig),
+        region: qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig),
       },
     });
 

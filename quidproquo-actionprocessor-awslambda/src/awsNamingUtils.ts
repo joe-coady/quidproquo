@@ -5,9 +5,9 @@ export const getConfigRuntimeResourceName = (
   qpqConfig: QPQConfig,
   resourceType: string = '',
 ) => {
-  const service = qpqCoreUtils.getAppName(qpqConfig);
-  const environment = qpqCoreUtils.getApplicationEnvironment(qpqConfig);
-  const feature = qpqCoreUtils.getApplicationFeature(qpqConfig);
+  const service = qpqCoreUtils.getApplicationModuleName(qpqConfig);
+  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
+  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
 
   if (feature) {
     return `${resourceName}-${service}-${environment}-${feature}`;

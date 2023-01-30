@@ -16,7 +16,7 @@ const getProcessFileDelete = (qpqConfig: QPQConfig): FileDeleteActionProcessor =
     const errored = await deleteFiles(
       s3BucketName,
       filepaths,
-      qpqCoreUtils.getDeployRegion(qpqConfig),
+      qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig),
     );
 
     // errored deletes are a graceful success ~ Retry

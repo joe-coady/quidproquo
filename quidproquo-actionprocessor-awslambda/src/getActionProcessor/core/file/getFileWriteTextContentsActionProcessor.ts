@@ -14,7 +14,12 @@ const getProcessFileWriteTextContents = (
 ): FileWriteTextContentsActionProcessor => {
   return async ({ drive, filepath, data }) => {
     const s3BucketName = resolveResourceName(drive, qpqConfig);
-    await writeTextFile(s3BucketName, filepath, data, qpqCoreUtils.getDeployRegion(qpqConfig));
+    await writeTextFile(
+      s3BucketName,
+      filepath,
+      data,
+      qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig),
+    );
 
     return actionResult(void 0);
   };

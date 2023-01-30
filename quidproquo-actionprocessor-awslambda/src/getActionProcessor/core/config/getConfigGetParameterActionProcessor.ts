@@ -15,7 +15,7 @@ const getProcessConfigGetParameter = (qpqConfig: QPQConfig): ConfigGetParameterA
     const awsParameterKey = resolveParameterKey(parameterName, qpqConfig);
     const parameterValue = await getParameter(
       awsParameterKey,
-      qpqCoreUtils.getDeployRegion(qpqConfig),
+      qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig),
     );
 
     return actionResult(parameterValue);

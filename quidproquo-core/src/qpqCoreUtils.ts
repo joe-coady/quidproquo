@@ -2,7 +2,7 @@ import * as path from 'path';
 
 import { QPQConfig, QPQConfigSetting, QPQCoreConfigSettingType } from './config/QPQConfig';
 import {
-  AppNameQPQConfigSetting,
+  ApplicationModuleQPQConfigSetting,
   BuildPathQPQConfigSetting,
   StorageDriveQPQConfigSetting,
   ScheduleQPQConfigSetting,
@@ -26,55 +26,43 @@ export const getConfigSetting = <T extends QPQConfigSetting>(
   return setting;
 };
 
-export const getAppName = (configs: QPQConfig): string => {
-  const appName = getConfigSetting<AppNameQPQConfigSetting>(
-    configs,
+export const getApplicationModuleSetting = (
+  qpqConfig: QPQConfig,
+): ApplicationModuleQPQConfigSetting => {
+  const applicationModuleSetting = getConfigSetting<ApplicationModuleQPQConfigSetting>(
+    qpqConfig,
     QPQCoreConfigSettingType.appName,
-  )?.appName;
+  );
 
-  if (!appName) {
-    throw new Error('please use defineApplication in your QPQ config');
+  if (!applicationModuleSetting) {
+    throw new Error('please use defineApplicationModule in your QPQ config');
   }
 
-  return appName;
+  return applicationModuleSetting;
 };
 
-export const getApplicationEnvironment = (configs: QPQConfig): string => {
-  const environment =
-    getConfigSetting<AppNameQPQConfigSetting>(configs, QPQCoreConfigSettingType.appName)
-      ?.environment || 'production';
-
-  return environment;
+export const getApplicationName = (qpqConfig: QPQConfig): string => {
+  return getApplicationModuleSetting(qpqConfig).applicationName;
 };
 
-export const getApplicationFeature = (configs: QPQConfig): string | undefined => {
-  const feature = getConfigSetting<AppNameQPQConfigSetting>(
-    configs,
-    QPQCoreConfigSettingType.appName,
-  )?.feature;
-
-  return feature;
+export const getApplicationModuleName = (qpqConfig: QPQConfig): string => {
+  return getApplicationModuleSetting(qpqConfig).moduleName;
 };
 
-export const getDeployRegion = (configs: QPQConfig): string => {
-  const deployRegion =
-    getConfigSetting<AppNameQPQConfigSetting>(configs, QPQCoreConfigSettingType.appName)
-      ?.deployRegion || 'us-east-1';
-
-  return deployRegion;
+export const getApplicationModuleFeature = (qpqConfig: QPQConfig): string | undefined => {
+  return getApplicationModuleSetting(qpqConfig).feature;
 };
 
-export const getConfigRoot = (configs: QPQConfig): string => {
-  const configRoot = getConfigSetting<AppNameQPQConfigSetting>(
-    configs,
-    QPQCoreConfigSettingType.appName,
-  )?.configRoot;
+export const getConfigRoot = (qpqConfig: QPQConfig): string => {
+  return getApplicationModuleSetting(qpqConfig).configRoot;
+};
 
-  if (!configRoot) {
-    throw new Error('please use defineApplication in your QPQ config');
-  }
+export const getApplicationModuleEnvironment = (qpqConfig: QPQConfig): string => {
+  return getApplicationModuleSetting(qpqConfig).environment || 'production';
+};
 
-  return configRoot;
+export const getApplicationModuleDeployRegion = (qpqConfig: QPQConfig): string => {
+  return getApplicationModuleSetting(qpqConfig).deployRegion || 'us-east-1';
 };
 
 export const getStorageDriveNames = (configs: QPQConfig): string[] => {

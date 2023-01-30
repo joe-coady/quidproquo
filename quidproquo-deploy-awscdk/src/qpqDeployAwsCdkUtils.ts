@@ -17,8 +17,8 @@ import { QpqCoreSecretConstruct } from './constructs/QpqCoreSecretConstruct';
 import { QpqCoreStorageDriveConstruct } from './constructs/QpqCoreStorageDriveConstruct';
 
 export const getResourceName = (name: string, qpqConfig: QPQConfig) => {
-  const service = qpqCoreUtils.getAppName(qpqConfig);
-  const environment = qpqCoreUtils.getApplicationEnvironment(qpqConfig);
+  const service = qpqCoreUtils.getApplicationModuleName(qpqConfig);
+  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
 
   return `${name}-${service}-${environment}`;
 };
@@ -102,7 +102,7 @@ export const serviceNeedsServiceHostedZone = (qpqConfig: QPQConfig) => {
     .filter((config) => !config.onRootDomain);
 
   // // Or if we are deploying to a feature env ~ like joecoady
-  // const hasFeatureName = !!qpqCoreUtils.getApplicationFeature(qpqConfig);
+  // const hasFeatureName = !!qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
 
   return apiConfigs.length > 0; // || hasFeatureName;
 };

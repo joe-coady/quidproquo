@@ -14,7 +14,7 @@ const getProcessFileListDirectory = (qpqConfig: QPQConfig): FileListDirectoryAct
     const s3BucketName = resolveResourceName(drive, qpqConfig);
     const s3FileList = await listFiles(
       s3BucketName,
-      qpqCoreUtils.getDeployRegion(qpqConfig),
+      qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig),
       folderPath,
       maxFiles,
       pageToken,

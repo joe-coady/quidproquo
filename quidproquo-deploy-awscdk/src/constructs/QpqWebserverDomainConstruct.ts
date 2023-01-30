@@ -13,7 +13,7 @@ export interface QpqWebserverDomainConstructProps
   extends QpqConstructProps<DnsQPQWebServerConfigSetting> {}
 
 export const getEnvironmentDomainName = (qpqConfig: QPQConfig, domain: string): string => {
-  const environment = qpqCoreUtils.getApplicationEnvironment(qpqConfig);
+  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
 
   if (environment === 'production') {
     return domain;
@@ -28,7 +28,7 @@ export class QpqWebserverDomainConstruct extends QpqConstruct<DnsQPQWebServerCon
 
     // example.com
     // dev.example.com
-    const feature = qpqCoreUtils.getApplicationFeature(props.qpqConfig);
+    const feature = qpqCoreUtils.getApplicationModuleFeature(props.qpqConfig);
     const environmentDomain = getEnvironmentDomainName(props.qpqConfig, props.setting.dnsBase);
     const featureDomainName = qpqWebServerUtils.getBaseDomainName(props.qpqConfig);
 
@@ -40,7 +40,7 @@ export class QpqWebserverDomainConstruct extends QpqConstruct<DnsQPQWebServerCon
       domainName: feature ? featureDomainName : environmentDomain,
     });
 
-    // const feature = qpqCoreUtils.getApplicationFeature(props.qpqConfig);
+    // const feature = qpqCoreUtils.getApplicationModuleFeature(props.qpqConfig);
     // if (feature) {
     //   const featureDomainName = qpqWebServerUtils.getBaseDomainName(props.qpqConfig);
 

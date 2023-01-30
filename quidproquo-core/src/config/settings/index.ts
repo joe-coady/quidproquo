@@ -1,5 +1,5 @@
 export * from './actionProcessors';
-export * from './application';
+export * from './applicationModule';
 export * from './buildPath';
 export * from './parameter';
 export * from './schedule';

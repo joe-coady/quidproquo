@@ -16,7 +16,11 @@ const getProcessFileReadBinaryContents = (
     const s3BucketName = resolveResourceName(drive, qpqConfig);
 
     return actionResult(
-      await readBinaryFile(s3BucketName, filepath, qpqCoreUtils.getDeployRegion(qpqConfig)),
+      await readBinaryFile(
+        s3BucketName,
+        filepath,
+        qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig),
+      ),
     );
   };
 };

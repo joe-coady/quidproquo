@@ -23,10 +23,10 @@ import { APIGatewayEvent, Context, APIGatewayProxyResult } from 'aws-lambda';
 import { matchUrl } from '../../../awsLambdaUtils';
 
 const getProcessTransformEventParams = (
-  appName: string,
+  serviceName: string,
 ): EventTransformEventParamsActionProcessor<[APIGatewayEvent, Context], HTTPEventParams<any>> => {
   return async ({ eventParams: [apiGatewayEvent, context] }) => {
-    const path = (apiGatewayEvent.path || '').replace(new RegExp(`^(\/${appName})/`), '/');
+    const path = (apiGatewayEvent.path || '').replace(new RegExp(`^(\/${serviceName})/`), '/');
 
     return actionResult({
       path,
@@ -119,10 +119,10 @@ const getProcessMatchStory = (
 
 export default (config: QPQConfig) => {
   const routes = qpqWebServerUtils.getAllRoutes(config);
-  const appName = qpqCoreUtils.getAppName(config);
+  const serviceName = qpqCoreUtils.getApplicationModuleName(config);
 
   return {
-    [EventActionType.TransformEventParams]: getProcessTransformEventParams(appName),
+    [EventActionType.TransformEventParams]: getProcessTransformEventParams(serviceName),
     [EventActionType.TransformResponseResult]: getProcessTransformResponseResult(config),
     [EventActionType.AutoRespond]: getProcessAutoRespond(config),
     [EventActionType.MatchStory]: getProcessMatchStory(routes),

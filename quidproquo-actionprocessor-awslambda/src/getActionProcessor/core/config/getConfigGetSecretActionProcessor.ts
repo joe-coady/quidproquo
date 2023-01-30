@@ -13,7 +13,10 @@ import { getSecret } from '../../../logic/secretsManager/getSecret';
 const getProcessConfigActionType = (qpqConfig: QPQConfig): ConfigGetSecretActionProcessor => {
   return async ({ secretName }) => {
     const awsSecretKey = resolveSecretKey(secretName, qpqConfig);
-    const secretValue = await getSecret(awsSecretKey, qpqCoreUtils.getDeployRegion(qpqConfig));
+    const secretValue = await getSecret(
+      awsSecretKey,
+      qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig),
+    );
 
     return actionResult(secretValue);
   };

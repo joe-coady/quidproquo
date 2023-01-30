@@ -7,7 +7,7 @@ import { qpqWebServerUtils } from 'quidproquo-webserver';
 import webpack from 'webpack';
 
 const getWebpackBuildMode = (qpqConfig: QPQConfig): string => {
-  const feature = qpqCoreUtils.getApplicationEnvironment(qpqConfig);
+  const feature = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
 
   if (['development', 'production'].indexOf(feature) >= 0) {
     return feature;

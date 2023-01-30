@@ -14,7 +14,11 @@ const getProcessFileExists = (qpqConfig: QPQConfig): FileExistsActionProcessor =
     const s3BucketName = resolveResourceName(drive, qpqConfig);
 
     return actionResult(
-      await objectExists(s3BucketName, filepath, qpqCoreUtils.getDeployRegion(qpqConfig)),
+      await objectExists(
+        s3BucketName,
+        filepath,
+        qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig),
+      ),
     );
   };
 };

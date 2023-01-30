@@ -9,7 +9,7 @@ import { SubdomainRedirectQPQWebServerConfigSetting } from './config/settings/su
 import { OpenApiQPQWebServerConfigSetting } from './config/settings/openApi';
 import { DefaultRouteOptionsQPQWebServerConfigSetting } from './config/settings/defaultRouteOptions';
 import { QPQWebServerConfigSettingType } from './config/QPQConfig';
-import { getApplicationEnvironment } from 'quidproquo-core/lib/qpqCoreUtils';
+import { getApplicationModuleEnvironment } from 'quidproquo-core/lib/qpqCoreUtils';
 
 import { HttpEventHeaders, HTTPEventParams, HTTPEventResponse } from './types/HTTPEvent';
 import { RouteOptions } from './config/settings/route';
@@ -120,7 +120,7 @@ export const getSubdomainRedirects = (
 };
 
 export const getEnvironmentDomainName = (configs: QPQConfig): string => {
-  const environment = getApplicationEnvironment(configs);
+  const environment = getApplicationModuleEnvironment(configs);
   const apexDomainName = getDomainName(configs);
 
   if (environment === 'production') {
@@ -132,7 +132,7 @@ export const getEnvironmentDomainName = (configs: QPQConfig): string => {
 
 export const getBaseDomainName = (qpqConfig: QPQConfig): string => {
   const environmentDomain = getEnvironmentDomainName(qpqConfig);
-  const feature = qpqCoreUtils.getApplicationFeature(qpqConfig);
+  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
 
   if (feature) {
     return `${feature}.${environmentDomain}`;
@@ -142,7 +142,7 @@ export const getBaseDomainName = (qpqConfig: QPQConfig): string => {
 };
 
 export const getServiceDomainName = (qpqConfig: QPQConfig): string => {
-  const service = qpqCoreUtils.getAppName(qpqConfig);
+  const service = qpqCoreUtils.getApplicationModuleName(qpqConfig);
   const domainBase = getBaseDomainName(qpqConfig);
 
   return `${service}.${domainBase}`;

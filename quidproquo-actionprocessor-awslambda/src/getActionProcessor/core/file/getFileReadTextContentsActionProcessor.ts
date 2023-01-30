@@ -16,7 +16,11 @@ const getProcessFileReadTextContents = (
     const s3BucketName = resolveResourceName(drive, qpqConfig);
 
     return actionResult(
-      await readTextFile(s3BucketName, filepath, qpqCoreUtils.getDeployRegion(qpqConfig)),
+      await readTextFile(
+        s3BucketName,
+        filepath,
+        qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig),
+      ),
     );
   };
 };
