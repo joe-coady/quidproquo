@@ -17,6 +17,7 @@ export function* askNetworkRequest<T, R>(
       headers: httpRequestOptions?.headers,
       basePath: httpRequestOptions?.basePath,
       params: httpRequestOptions?.params,
+      responseType: httpRequestOptions?.responseType || 'json',
     },
   };
 }
