@@ -3,7 +3,7 @@ import {
   NetworkActionType,
   HTTPNetworkResponse,
   HTTPMethod,
-  ResponseTypes,
+  ResponseType,
 } from './NetworkActionType';
 
 // Payload
@@ -15,7 +15,7 @@ export interface NetworkRequestActionPayload<T> {
   basePath?: string;
   params?: Record<string, string>;
   headers?: Record<string, string>;
-  responseType: ResponseTypes;
+  responseType: ResponseType;
 }
 
 // Action

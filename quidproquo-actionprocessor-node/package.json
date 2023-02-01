@@ -1,6 +1,6 @@
 {
   "name": "quidproquo-actionprocessor-node",
-  "version": "0.0.55",
+  "version": "0.0.58",
   "description": "",
   "main": "./lib/index.js",
   "types": "./lib/index.d.js",
@@ -26,10 +26,12 @@
   "homepage": "https://github.com/joe-coady/quidproquo#readme",
   "dependencies": {
     "axios": "^1.2.1",
+    "mime-types": "^2.1.35",
     "quidproquo-core": "*",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
+    "@types/mime-types": "^2.1.1",
     "@types/uuid": "^9.0.0",
     "quidproquo-tsconfig": "*",
     "typescript": "^4.9.3"

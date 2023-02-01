@@ -7,6 +7,7 @@ import {
   resolveActionResultError,
   isErroredActionResult,
   actionResult,
+  actionResultError,
 } from './logic/actionLogic';
 
 // Make this type safe omg.
@@ -17,13 +18,21 @@ async function processAction(
 ) {
   // Special action ~ batch - needs access to the processAction / actionProcessor context
   if (action.type === SystemActionType.Batch) {
-    return actionResult(
-      await Promise.all(
-        action.payload.actions.map((a: any) => {
-          return a ? processAction(a, actionProcessors, session) : null;
-        }),
-      ),
+    const batchRes = await Promise.all(
+      action.payload.actions.map((a: any) => {
+        return a ? processAction(a, actionProcessors, session) : null;
+      }),
     );
+
+    // If there was an error, throw that error back
+    const erroredBatchItem = batchRes.find((br) => isErroredActionResult(br));
+    if (erroredBatchItem) {
+      const error = resolveActionResultError(erroredBatchItem);
+      return actionResultError(ErrorTypeEnum.GenericError, error.errorText, error.errorStack);
+    }
+
+    // unwrap the values
+    return actionResult(batchRes.map((br) => resolveActionResult(br)));
   }
 
   const processor = actionProcessors?.[action?.type];

@@ -6,9 +6,43 @@ import {
   NetworkRequestActionPayload,
   actionResultError,
   ErrorTypeEnum,
+  ResponseType,
+  QPQBinaryData,
 } from 'quidproquo-core';
 
+import { extension } from 'mime-types';
+
 import axios, { AxiosResponse } from 'axios';
+
+const getAxiosResponseType = (responseType: ResponseType) => {
+  if (responseType === 'binary') {
+    return 'arraybuffer';
+  }
+
+  return 'json';
+};
+
+const transformResponse = (
+  payload: NetworkRequestActionPayload<any>,
+  response: AxiosResponse<any, any>,
+): AxiosResponse<any, QPQBinaryData> => {
+  if (payload.responseType === 'binary') {
+    const mimeType = (payload.headers || {})['content-type'] || 'application/octet-stream';
+
+    return {
+      ...response,
+      data: {
+        base64Data: Buffer.from(response.data).toString('base64'),
+        mimetype: mimeType,
+
+        // TODO: We could get a filename from Content-Disposition header
+        filename: `file.${extension(mimeType)}`,
+      } as QPQBinaryData,
+    };
+  }
+
+  return response;
+};
 
 const axiosInstance = axios.create({
   timeout: 10000,
@@ -25,9 +59,10 @@ const processNetworkRequestGet = async (
     baseURL: payload.basePath,
     headers: payload.headers,
     params: payload.params,
+    responseType: getAxiosResponseType(payload.responseType),
   });
 
-  return response;
+  return transformResponse(payload, response);
 };
 
 const processNetworkRequestPost = async (
@@ -37,9 +72,10 @@ const processNetworkRequestPost = async (
     baseURL: payload.basePath,
     headers: payload.headers,
     params: payload.params,
+    responseType: getAxiosResponseType(payload.responseType),
   });
 
-  return response;
+  return transformResponse(payload, response);
 };
 
 const processNetworkRequestDelete = async (
@@ -49,9 +85,10 @@ const processNetworkRequestDelete = async (
     baseURL: payload.basePath,
     headers: payload.headers,
     params: payload.params,
+    responseType: getAxiosResponseType(payload.responseType),
   });
 
-  return response;
+  return transformResponse(payload, response);
 };
 
 const processNetworkRequestHead = async (
@@ -61,9 +98,10 @@ const processNetworkRequestHead = async (
     baseURL: payload.basePath,
     headers: payload.headers,
     params: payload.params,
+    responseType: getAxiosResponseType(payload.responseType),
   });
 
-  return response;
+  return transformResponse(payload, response);
 };
 
 const processNetworkRequestOptions = async (
@@ -73,9 +111,10 @@ const processNetworkRequestOptions = async (
     baseURL: payload.basePath,
     headers: payload.headers,
     params: payload.params,
+    responseType: getAxiosResponseType(payload.responseType),
   });
 
-  return response;
+  return transformResponse(payload, response);
 };
 
 const processNetworkRequestPut = async (
@@ -85,9 +124,10 @@ const processNetworkRequestPut = async (
     baseURL: payload.basePath,
     headers: payload.headers,
     params: payload.params,
+    responseType: getAxiosResponseType(payload.responseType),
   });
 
-  return response;
+  return transformResponse(payload, response);
 };
 
 const processNetworkRequestPatch = async (
@@ -97,9 +137,10 @@ const processNetworkRequestPatch = async (
     baseURL: payload.basePath,
     headers: payload.headers,
     params: payload.params,
+    responseType: getAxiosResponseType(payload.responseType),
   });
 
-  return response;
+  return transformResponse(payload, response);
 };
 
 const processNetworkRequestConnect = async (
