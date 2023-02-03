@@ -62,5 +62,20 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
     });
+
+    const statement = new aws_iam.PolicyStatement({
+      sid: 'AllowCloudFrontServicePrincipal',
+      effect: aws_iam.Effect.ALLOW,
+      principals: [new aws_iam.ServicePrincipal('cloudfront.amazonaws.com')],
+      actions: ['s3:GetObject'],
+      resources: [this.bucket.arnForObjects(`arn:aws:s3:::${this.bucket.bucketName}/*`)],
+      conditions: {
+        StringLike: {
+          'AWS:SourceArn': 'arn:aws:cloudfront::868688464629:distribution/*',
+        },
+      },
+    });
+
+    this.bucket.addToResourcePolicy(statement);
   }
 }

@@ -80,7 +80,7 @@ export const getWebEntryFullPath = (
 ): string => {
   return path.join(
     qpqCoreUtils.getConfigRoot(qpqConfig),
-    webEntryQPQWebServerConfigSetting.buildPath,
+    webEntryQPQWebServerConfigSetting.buildPath || '',
   );
 };
 
@@ -90,7 +90,9 @@ export const getWebEntrySeoFullPath = (
 ): string => {
   return path.join(
     qpqCoreUtils.getConfigRoot(qpqConfig),
-    webEntryQPQWebServerConfigSetting.seoBuildPath || webEntryQPQWebServerConfigSetting.buildPath,
+    webEntryQPQWebServerConfigSetting.seoBuildPath ||
+      webEntryQPQWebServerConfigSetting.buildPath ||
+      '',
   );
 };
 
