@@ -74,6 +74,17 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
       );
     }
 
+    if (this.setting.storageDrive.autoUpload) {
+      const webEntryBuildPath = qpqWebServerUtils.getWebEntryFullPath(
+        props.qpqConfig,
+        props.setting,
+      );
+      new aws_s3_deployment.BucketDeployment(this, 'bucket-deploy', {
+        sources: [aws_s3_deployment.Source.asset(webEntryBuildPath)],
+        destinationBucket: originBucket,
+      });
+    }
+
     const hostedZone = aws_route53.HostedZone.fromLookup(this, 'MyHostedZone', {
       domainName: apexDomain,
     });
@@ -100,20 +111,24 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
     );
 
     // Create a CloudFront distribution using the S3 bucket as the origin
+    const distributionOrigin = new aws_cloudfront_origins.S3Origin(originBucket);
     const distribution = new aws_cloudfront.Distribution(this, 'MyDistribution', {
       defaultBehavior: {
-        origin: new aws_cloudfront_origins.S3Origin(originBucket),
+        origin: distributionOrigin,
       },
       domainNames: [deployDomain],
       certificate: myCertificate,
       defaultRootObject: this.setting.indexRoot,
+      errorResponses: [
+        {
+          httpStatus: 404,
+          responseHttpStatus: 200,
+          responsePagePath: '/',
+        },
+      ],
     });
 
-    // const cfnDistribution = distribution.node.defaultChild as aws_cloudfront.CfnDistribution;
-    // const distributionConfig =
-    //   cfnDistribution.distributionConfig as aws_cloudfront.CfnDistribution.DistributionConfigProperty;
-    // const origins = distributionConfig.origins as aws_cloudfront.CfnDistribution.OriginProperty[];
-    // origins[0].originAccessControlId = originAccessControl.attrId;
+    // TODO: Fix this when they add l2 support for origin access control settings
 
     // Currently distribution don't have support for origin access control settings
     // So we manually add it.
@@ -138,153 +153,78 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
       ),
     });
 
-    // // Create OriginAccessIdentity for the bucket.
-    // const websiteOAI = new aws_cloudfront.OriginAccessIdentity(this, 'website-oac');
-    // staticWebFilesBucket.grantRead(websiteOAI);
+    // All seos that are for this web entry
+    const seos = qpqWebServerUtils
+      .getAllSeo(props.qpqConfig)
+      .filter((seo) => !seo.webEntry || seo.webEntry === props.setting.name);
 
-    // // Grab the hosted zone we want to add
-    // const serviceHostedZone = aws_route53.HostedZone.fromLookup(this, 'hosted-zone', {
-    //   domainName: apexDomain,
-    // });
+    // if we have some ~ Build the edge lambdas and deploy
+    if (seos.length > 0) {
+      const seoEntryBuildPath = qpqWebServerUtils.getWebEntrySeoFullPath(
+        props.qpqConfig,
+        props.setting,
+      );
 
-    // // Create a certificate for the distribution - Seems to a bug where Route 53 records not cleaned up
-    // // after removing the DNS Validated certificate see: https://github.com/aws/aws-cdk/issues/3333
-    // // `switch over to using the Certificate with the new built-in (CloudFormation-based) DNS validation`
-    // const validationCertificate =
-    //   aws_certificatemanager.CertificateValidation.fromDns(serviceHostedZone);
-    // const certificate = new aws_certificatemanager.DnsValidatedCertificate(this, 'viewer-cert', {
-    //   hostedZone: serviceHostedZone,
-    //   domainName: deployDomain,
-    //   region: 'us-east-1', // AWS certificates can only exist in the us-east-1 region
-    //   validation: validationCertificate,
-    // });
-    // const viewerCertificate = aws_cloudfront.ViewerCertificate.fromAcmCertificate(certificate, {
-    //   aliases: [deployDomain],
-    // });
+      const edgeFunctionVR = new aws_cloudfront.experimental.EdgeFunction(
+        this,
+        `SEO-${props.setting.name}-VR`,
+        {
+          functionName: this.resourceName(`SEO-VR-${props.setting.name}`),
+          timeout: cdk.Duration.seconds(5),
+          runtime: aws_lambda.Runtime.NODEJS_16_X,
 
-    // if (this.setting.storageDrive.autoUpload) {
-    //   const webEntryBuildPath = qpqWebServerUtils.getWebEntryFullPath(
-    //     props.qpqConfig,
-    //     props.setting,
-    //   );
-    //   new aws_s3_deployment.BucketDeployment(this, 'bucket-deploy', {
-    //     sources: [aws_s3_deployment.Source.asset(webEntryBuildPath)],
-    //     destinationBucket: staticWebFilesBucket,
-    //   });
-    // }
+          code: aws_lambda.Code.fromAsset(path.join(seoEntryBuildPath, 'lambdaEventViewerRequest')),
+          handler: 'index.executeEventViewerRequest',
+        },
+      );
 
-    // const grantables = qpqDeployAwsCdkUtils.getQqpGrantableResources(
-    //   this,
-    //   'grantable',
-    //   this.qpqConfig,
-    // );
+      const edgeFunctionOR = new aws_cloudfront.experimental.EdgeFunction(
+        this,
+        `SEO-${props.setting.name}-OR`,
+        {
+          functionName: this.resourceName(`SEO-OR-${props.setting.name}`),
+          timeout: cdk.Duration.seconds(30),
+          runtime: aws_lambda.Runtime.NODEJS_16_X,
 
-    // const cloudFrontBehaviors = qpqWebServerUtils.getAllSeo(props.qpqConfig).map((seo) => {
-    //   const seoEntryBuildPath = qpqWebServerUtils.getWebEntrySeoFullPath(
-    //     props.qpqConfig,
-    //     props.setting,
-    //   );
+          memorySize: 1024,
 
-    //   const edgeFunctionVR = new aws_cloudfront.experimental.EdgeFunction(
-    //     this,
-    //     `SEO-${seo.uniqueKey}-VR`,
-    //     {
-    //       functionName: this.resourceName(`SEO-VR-${seo.uniqueKey}`),
-    //       timeout: cdk.Duration.seconds(5),
-    //       runtime: aws_lambda.Runtime.NODEJS_16_X,
+          code: aws_lambda.Code.fromAsset(path.join(seoEntryBuildPath, 'lambdaEventOriginRequest')),
+          handler: 'index.executeEventOriginRequest',
+        },
+      );
 
-    //       code: aws_lambda.Code.fromAsset(path.join(seoEntryBuildPath, 'lambdaEventViewerRequest')),
-    //       handler: 'index.executeEventViewerRequest',
-    //     },
-    //   );
+      const grantables = qpqDeployAwsCdkUtils.getQqpGrantableResources(
+        this,
+        'grantable',
+        this.qpqConfig,
+      );
 
-    //   const edgeFunctionOR = new aws_cloudfront.experimental.EdgeFunction(
-    //     this,
-    //     `SEO-${seo.uniqueKey}-OR`,
-    //     {
-    //       functionName: this.resourceName(`SEO-OR-${seo.uniqueKey}`),
-    //       timeout: cdk.Duration.seconds(30),
-    //       runtime: aws_lambda.Runtime.NODEJS_16_X,
+      grantables.forEach((g) => {
+        g.grantAll(edgeFunctionVR);
+        g.grantAll(edgeFunctionOR);
+      });
 
-    //       memorySize: 1024,
+      for (var seo of seos) {
+        // Deprecated edge lambdas are not added as a behavior, but they are still built
+        if (seo.deprecated) {
+          continue;
+        }
 
-    //       code: aws_lambda.Code.fromAsset(path.join(seoEntryBuildPath, 'lambdaEventOriginRequest')),
-    //       handler: 'index.executeEventOriginRequest',
-    //     },
-    //   );
+        const wildcardPath = seo.path.replaceAll(/{(.+?)}/g, '*');
 
-    //   grantables.forEach((g) => {
-    //     g.grantAll(edgeFunctionVR);
-    //     g.grantAll(edgeFunctionOR);
-    //   });
-
-    //   const wildcardPath = seo.path.replaceAll(/{(.+?)}/g, '*');
-
-    //   return {
-    //     pathPattern: wildcardPath,
-
-    //     // Update this to 24 hours
-    //     maxTtl: cdk.Duration.seconds(0),
-    //     minTtl: cdk.Duration.seconds(0),
-    //     defaultTtl: cdk.Duration.seconds(0),
-
-    //     lambdaFunctionAssociations: [
-    //       {
-    //         includeBody: true,
-    //         eventType: aws_cloudfront.LambdaEdgeEventType.ORIGIN_REQUEST,
-    //         lambdaFunction: edgeFunctionOR.currentVersion,
-    //       },
-    //       {
-    //         includeBody: false,
-    //         eventType: aws_cloudfront.LambdaEdgeEventType.VIEWER_REQUEST,
-    //         lambdaFunction: edgeFunctionVR.currentVersion,
-    //       },
-    //     ],
-    //   };
-    // });
-
-    // // Create a cloud front distribution
-    // // TODO: use aws_cloudfront.Distribution
-    // // TODO: Somehow expose query strings: Note ~
-    // // (Lambda@Edge only) To access the query string in an origin request or origin response function,
-    // // your cache policy or origin request policy must be set to All for Query strings.
-    // const distribution = new aws_cloudfront.CloudFrontWebDistribution(this, 'cf-distribution', {
-    //   originConfigs: [
-    //     {
-    //       s3OriginSource: {
-    //         s3BucketSource: staticWebFilesBucket,
-    //         originAccessIdentity: websiteOAI,
-    //       },
-    //       behaviors: [
-    //         ...cloudFrontBehaviors,
-    //         {
-    //           isDefaultBehavior: true,
-
-    //           // Update this to 24 hours
-    //           maxTtl: cdk.Duration.seconds(0),
-    //           minTtl: cdk.Duration.seconds(0),
-    //           defaultTtl: cdk.Duration.seconds(0),
-    //         },
-    //       ],
-    //     },
-    //   ],
-    //   viewerCertificate: viewerCertificate,
-    //   errorConfigurations: [
-    //     {
-    //       errorCode: 404,
-    //       responseCode: 200,
-    //       responsePagePath: '/',
-    //     },
-    //   ],
-    // });
-
-    // // Create a cdn link
-    // new aws_route53.ARecord(this, 'web-alias', {
-    //   zone: serviceHostedZone,
-    //   recordName: deployDomain,
-    //   target: aws_route53.RecordTarget.fromAlias(
-    //     new aws_route53_targets.CloudFrontTarget(distribution),
-    //   ),
-    // });
+        distribution.addBehavior(wildcardPath, distributionOrigin, {
+          edgeLambdas: [
+            {
+              functionVersion: edgeFunctionVR.currentVersion,
+              eventType: aws_cloudfront.LambdaEdgeEventType.VIEWER_REQUEST,
+            },
+            {
+              functionVersion: edgeFunctionOR.currentVersion,
+              eventType: aws_cloudfront.LambdaEdgeEventType.ORIGIN_REQUEST,
+            },
+          ],
+        });
+      }
+    }
   }
 }

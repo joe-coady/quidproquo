@@ -1,21 +1,24 @@
-import { QPQConfigSetting } from 'quidproquo-core';
+import { QPQConfigSetting, QPQConfigAdvancedSettings } from 'quidproquo-core';
 
 import { QPQWebServerConfigSettingType } from '../QPQConfig';
 
-export type SeoOptions = {};
+export interface QPQConfigAdvancedSeoSettings extends QPQConfigAdvancedSettings {
+  webEntry?: string;
+}
 
 export interface SeoQPQWebServerConfigSetting extends QPQConfigSetting {
   path: string;
   src: string;
   runtime: string;
-  options: SeoOptions;
+  deprecated: boolean;
+  webEntry?: string;
 }
 
 export const defineSeo = (
   path: string,
   src: string,
   runtime: string,
-  options: SeoOptions = {},
+  options?: QPQConfigAdvancedSeoSettings,
 ): SeoQPQWebServerConfigSetting => ({
   configSettingType: QPQWebServerConfigSettingType.Seo,
   uniqueKey: runtime,
@@ -23,5 +26,6 @@ export const defineSeo = (
   path,
   src,
   runtime,
-  options,
+
+  deprecated: options?.deprecated || false,
 });
