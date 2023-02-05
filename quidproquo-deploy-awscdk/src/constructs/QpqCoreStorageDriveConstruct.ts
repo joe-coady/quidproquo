@@ -68,7 +68,7 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
       effect: aws_iam.Effect.ALLOW,
       principals: [new aws_iam.ServicePrincipal('cloudfront.amazonaws.com')],
       actions: ['s3:GetObject'],
-      resources: [this.bucket.arnForObjects(`arn:aws:s3:::${this.bucket.bucketName}/*`)],
+      resources: [this.bucket.arnForObjects('*')],
       conditions: {
         StringLike: {
           'AWS:SourceArn': 'arn:aws:cloudfront::868688464629:distribution/*',
