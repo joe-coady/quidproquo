@@ -111,5 +111,5 @@ export const getApiWebpackConfig = (qpqConfig: QPQConfig, outputPath?: string) =
     'lambdaAPIGatewayEvent',
   ]);
 
-export const getAllWebpackConfig = (qpqConfig: QPQConfig, outputPath: string) =>
-  getWebpackConfig(qpqConfig, outputPath, getWebpackEntryNames());
+export const getAllWebpackConfig = (qpqConfig: QPQConfig, outputPath?: string) =>
+  getWebpackConfig(qpqConfig, outputPath || 'build', getWebpackEntryNames());
