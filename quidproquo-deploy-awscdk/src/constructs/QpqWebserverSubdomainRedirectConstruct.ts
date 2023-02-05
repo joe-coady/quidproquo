@@ -50,6 +50,7 @@ export class QpqWebserverSubdomainRedirectConstruct extends QpqConstruct<Subdoma
       apexDomain: '',
       setting: props.setting,
       qpqConfig: props.qpqConfig,
+      awsAccountId: props.awsAccountId,
     });
 
     // Map all requests to this service to /serviceName/*

@@ -29,6 +29,8 @@ export class QpqWebserverApiConstruct extends QpqConstruct<ApiQPQWebServerConfig
       subdomain: props.setting.apiSubdomain,
       qpqConfig: props.qpqConfig,
       setting: props.setting,
+
+      awsAccountId: props.awsAccountId,
     });
 
     // Build Function
@@ -42,6 +44,8 @@ export class QpqWebserverApiConstruct extends QpqConstruct<ApiQPQWebServerConfig
       setting: props.setting,
 
       apiLayerVersions: props.apiLayerVersions,
+
+      awsAccountId: props.awsAccountId,
     });
 
     const grantables = qpqDeployAwsCdkUtils.getQqpGrantableResources(

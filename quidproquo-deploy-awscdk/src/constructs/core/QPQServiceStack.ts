@@ -8,33 +8,31 @@ import { QpqConstructProps } from './QpqConstruct';
 import { ApiLayer } from '../../layers/ApiLayer';
 
 export interface QpqServiceStackProps extends StackProps {
-  account: string;
+  awsAccountId: string;
   qpqConfig: QPQConfig;
   apiLayers?: ApiLayer[];
 }
 
 export class QpqServiceStack extends Stack {
   id: string;
+  awsAccountId: string;
   qpqConfig: QPQConfig;
   apiLayerVersions?: aws_lambda.ILayerVersion[];
 
-  constructor(
-    scope: Construct,
-    id: string,
-    { account, qpqConfig, apiLayers }: QpqServiceStackProps,
-  ) {
+  constructor(scope: Construct, id: string, props: QpqServiceStackProps) {
     super(scope, id, {
       env: {
-        account: account,
-        region: qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig),
+        account: props.awsAccountId,
+        region: qpqCoreUtils.getApplicationModuleDeployRegion(props.qpqConfig),
       },
     });
 
     this.id = id;
-    this.qpqConfig = qpqConfig;
-    this.apiLayerVersions = (apiLayers || []).map((layer) => {
+    this.awsAccountId = props.awsAccountId;
+    this.qpqConfig = props.qpqConfig;
+    this.apiLayerVersions = (props.apiLayers || []).map((layer) => {
       return new aws_lambda.LayerVersion(this, `${layer.name}-layer`, {
-        layerVersionName: awsNamingUtils.getQpqRuntimeResourceName(layer.name, qpqConfig),
+        layerVersionName: awsNamingUtils.getQpqRuntimeResourceName(layer.name, props.qpqConfig),
         code: new aws_lambda.AssetCode(layer.buildPath),
         compatibleRuntimes: [aws_lambda.Runtime.NODEJS_16_X],
       });
@@ -46,6 +44,7 @@ export class QpqServiceStack extends Stack {
       qpqConfig: this.qpqConfig,
       apiLayerVersions: this.apiLayerVersions,
       setting,
+      awsAccountId: this.awsAccountId,
     };
   }
 }

@@ -32,6 +32,8 @@ export class QpqCoreRecurringScheduleConstruct extends QpqConstruct<ScheduleQPQC
           runtime: props.setting.runtime,
         } as LambdaRuntimeConfig),
       },
+
+      awsAccountId: props.awsAccountId,
     });
 
     // TODO: Make this a utility function

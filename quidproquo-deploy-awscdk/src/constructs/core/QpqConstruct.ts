@@ -5,6 +5,7 @@ import { QpqConstructBaseProps, QpqConstructBase } from './QpqConstructBase';
 
 export interface QpqConstructProps<T extends QPQConfigSetting> extends QpqConstructBaseProps {
   setting: T;
+  awsAccountId: string;
 }
 
 export class QpqConstruct<T extends QPQConfigSetting> extends QpqConstructBase {

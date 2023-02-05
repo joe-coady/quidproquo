@@ -61,7 +61,7 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
           resources: [originBucket.arnForObjects('*')],
           conditions: {
             StringLike: {
-              'AWS:SourceArn': 'arn:aws:cloudfront::868688464629:distribution/*',
+              'AWS:SourceArn': `arn:aws:cloudfront::${props.awsAccountId}:distribution/*`,
             },
           },
         }),
@@ -106,6 +106,7 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
       },
       domainNames: [deployDomain],
       certificate: myCertificate,
+      defaultRootObject: this.setting.indexRoot,
     });
 
     // const cfnDistribution = distribution.node.defaultChild as aws_cloudfront.CfnDistribution;

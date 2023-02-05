@@ -19,10 +19,13 @@ export interface QPQConfigAdvancedWebEntrySettings extends QPQConfigAdvancedSett
   storageDrive?: StorageDriveOptions;
 
   domain?: WebDomainOptions;
+
+  indexRoot?: string;
 }
 
 export interface WebEntryQPQWebServerConfigSetting extends QPQConfigSetting {
   name: string;
+  indexRoot: string;
 
   storageDrive: StorageDriveOptions;
   domain: WebDomainOptions;
@@ -39,6 +42,7 @@ export const defineWebEntry = (
   uniqueKey: name,
 
   name,
+  indexRoot: options?.indexRoot || 'index.html',
 
   storageDrive: options?.storageDrive || {
     autoUpload: true,

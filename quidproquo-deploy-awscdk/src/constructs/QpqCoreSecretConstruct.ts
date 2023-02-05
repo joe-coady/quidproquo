@@ -35,6 +35,7 @@ export class QpqCoreSecretConstruct extends QpqCoreSecretConstructBase {
     id: string,
     qpqConfig: QPQConfig,
     setting: SecretQPQConfigSetting,
+    awsAccountId: string,
   ): QpqResource {
     class Import extends QpqCoreSecretConstructBase {
       secret = aws_secretsmanager.Secret.fromSecretNameV2(
@@ -44,7 +45,7 @@ export class QpqCoreSecretConstruct extends QpqCoreSecretConstructBase {
       );
     }
 
-    return new Import(scope, id, { qpqConfig, setting });
+    return new Import(scope, id, { qpqConfig, setting, awsAccountId });
   }
 
   constructor(scope: Construct, id: string, props: QpqCoreSecretConstructProps) {

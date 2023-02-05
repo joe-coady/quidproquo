@@ -36,6 +36,7 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
     id: string,
     qpqConfig: QPQConfig,
     setting: StorageDriveQPQConfigSetting,
+    awsAccountId: string,
   ): QpqResource {
     class Import extends QpqCoreStorageDriveConstructBase {
       bucket = aws_s3.Bucket.fromBucketName(
@@ -45,7 +46,7 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
       );
     }
 
-    return new Import(scope, id, { qpqConfig, setting });
+    return new Import(scope, id, { qpqConfig, setting, awsAccountId });
   }
 
   constructor(scope: Construct, id: string, props: QpqCoreStorageDriveConstructProps) {
@@ -71,7 +72,7 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
       resources: [this.bucket.arnForObjects('*')],
       conditions: {
         StringLike: {
-          'AWS:SourceArn': 'arn:aws:cloudfront::868688464629:distribution/*',
+          'AWS:SourceArn': `arn:aws:cloudfront::${props.awsAccountId}:distribution/*`,
         },
       },
     });

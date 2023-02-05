@@ -36,6 +36,7 @@ export class QpqCoreParameterConstruct extends QpqCoreParameterConstructBase {
     id: string,
     qpqConfig: QPQConfig,
     setting: ParameterQPQConfigSetting,
+    awsAccountId: string,
   ): QpqResource {
     class Import extends QpqCoreParameterConstructBase {
       stringParameter = aws_ssm.StringParameter.fromStringParameterName(
@@ -45,7 +46,7 @@ export class QpqCoreParameterConstruct extends QpqCoreParameterConstructBase {
       );
     }
 
-    return new Import(scope, id, { qpqConfig, setting });
+    return new Import(scope, id, { qpqConfig, setting, awsAccountId });
   }
 
   constructor(scope: Construct, id: string, props: QpqCoreParameterConstructProps) {
