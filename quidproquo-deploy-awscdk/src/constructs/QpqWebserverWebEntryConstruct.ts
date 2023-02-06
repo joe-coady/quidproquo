@@ -119,13 +119,13 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
       domainNames: [deployDomain],
       certificate: myCertificate,
       defaultRootObject: this.setting.indexRoot,
-      errorResponses: [
-        {
-          httpStatus: 404,
-          responseHttpStatus: 200,
-          responsePagePath: '/',
-        },
-      ],
+
+      // redirect errors to root page and let spa sort it
+      errorResponses: [404, 403].map((code) => ({
+        httpStatus: code,
+        responseHttpStatus: 200,
+        responsePagePath: '/',
+      })),
     });
 
     // TODO: Fix this when they add l2 support for origin access control settings
