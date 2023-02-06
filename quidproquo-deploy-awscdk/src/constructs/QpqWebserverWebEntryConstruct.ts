@@ -99,7 +99,7 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
       `oac-${props.setting.name}${props.setting.domain.subDomainName}`,
       {
         originAccessControlConfig: {
-          name: props.setting.name,
+          name: this.resourceName(props.setting.name),
           originAccessControlOriginType: 's3',
           signingBehavior: 'always',
           signingProtocol: 'sigv4',
