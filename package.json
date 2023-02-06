@@ -8,7 +8,8 @@
     "clean": "npm run clean --ws",
     "login": "npm login",
     "publish": "npm publish --ws",
-    "patch": "npm version patch --ws"
+    "patch": "npm version patch --ws",
+    "go": "npm run patch && npm run build && npm run publish"
   },
   "repository": {
     "type": "git",
