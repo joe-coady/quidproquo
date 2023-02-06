@@ -1,5 +1,8 @@
 export * from './ConfigActionType';
 
+export * from './ConfigGetApplicationInfoActionRequester';
+export * from './ConfigGetApplicationInfoActionTypes';
+
 export * from './ConfigGetParameterActionRequester';
 export * from './ConfigGetParameterActionTypes';
 

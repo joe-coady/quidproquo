@@ -9,10 +9,9 @@ import {
   getConfigGetParametersActionProcessor,
   awsLambdaUtils,
   DynamicModuleLoader,
-  getParameter,
 } from 'quidproquo-actionprocessor-awslambda';
 
-import { qpqWebServerUtils } from 'quidproquo-webserver';
+import { getConfigActionProcessor } from 'quidproquo-actionprocessor-node';
 
 import { getLambdaConfigs } from './lambdaConfig';
 
@@ -52,6 +51,7 @@ export const getOriginRequestEventExecutor = (
       ...getConfigGetParametersActionProcessor(cdkConfig.qpqConfig),
       ...getSystemActionProcessor(dynamicModuleLoader),
       ...getFileActionProcessor(cdkConfig.qpqConfig),
+      ...getConfigActionProcessor(cdkConfig.qpqConfig),
 
       ...getCustomActionProcessors(cdkConfig.qpqConfig),
       ...qpqCustomActionProcessors(),

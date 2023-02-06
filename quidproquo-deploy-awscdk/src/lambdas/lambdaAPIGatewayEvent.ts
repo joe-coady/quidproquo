@@ -11,6 +11,8 @@ import {
   DynamicModuleLoader,
 } from 'quidproquo-actionprocessor-awslambda';
 
+import { getConfigActionProcessor } from 'quidproquo-actionprocessor-node';
+
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { createRuntime, askProcessEvent, ErrorTypeEnum } from 'quidproquo-core';
@@ -63,6 +65,7 @@ export const getAPIGatewayEventExecutor = (
       ...getConfigGetParametersActionProcessor(cdkConfig.qpqConfig),
       ...getSystemActionProcessor(dynamicModuleLoader),
       ...getFileActionProcessor(cdkConfig.qpqConfig),
+      ...getConfigActionProcessor(cdkConfig.qpqConfig),
 
       ...getCustomActionProcessors(cdkConfig.qpqConfig),
       ...qpqCustomActionProcessors(),

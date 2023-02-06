@@ -11,6 +11,9 @@ import {
   DynamicModuleLoader,
   LambdaRuntimeConfig,
 } from 'quidproquo-actionprocessor-awslambda';
+
+import { getConfigActionProcessor } from 'quidproquo-actionprocessor-node';
+
 import { createRuntime, askProcessEvent } from 'quidproquo-core';
 
 import { EventBridgeEvent, Context } from 'aws-lambda';
@@ -50,6 +53,7 @@ export const getEventBridgeEventExecutor = (
       ...getConfigGetSecretActionProcessor(cdkConfig.qpqConfig),
       ...getConfigGetParameterActionProcessor(cdkConfig.qpqConfig),
       ...getConfigGetParametersActionProcessor(cdkConfig.qpqConfig),
+      ...getConfigActionProcessor(cdkConfig.qpqConfig),
 
       ...getCustomActionProcessors(cdkConfig.qpqConfig),
       ...qpqCustomActionProcessors(),
