@@ -197,6 +197,7 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
         this,
         'grantable',
         this.qpqConfig,
+        props.awsAccountId,
       );
 
       grantables.forEach((g) => {

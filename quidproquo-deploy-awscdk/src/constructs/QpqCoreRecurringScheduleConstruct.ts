@@ -41,6 +41,7 @@ export class QpqCoreRecurringScheduleConstruct extends QpqConstruct<ScheduleQPQC
       this,
       'grantable',
       this.qpqConfig,
+      props.awsAccountId,
     );
 
     grantables.forEach((g) => {

@@ -52,6 +52,7 @@ export class QpqWebserverApiConstruct extends QpqConstruct<ApiQPQWebServerConfig
       this,
       'grantable',
       this.qpqConfig,
+      props.awsAccountId,
     );
 
     grantables.forEach((g) => {

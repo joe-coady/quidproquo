@@ -27,6 +27,7 @@ export const getQqpSecretGrantables = (
   scope: Construct,
   id: string,
   qpqConfig: QPQConfig,
+  awsAccountId: string,
 ): QpqResource[] => {
   const secretSettings = [
     ...qpqCoreUtils.getConfigSettings<SecretQPQConfigSetting>(
@@ -41,6 +42,7 @@ export const getQqpSecretGrantables = (
       `${id}-${qpqCoreUtils.getUniqueKeyForSetting(secretSetting)}-grantable`,
       qpqConfig,
       secretSetting,
+      awsAccountId,
     );
   });
 
@@ -51,6 +53,7 @@ export const getQqpParameterGrantables = (
   scope: Construct,
   id: string,
   qpqConfig: QPQConfig,
+  awsAccountId: string,
 ): QpqResource[] => {
   const parameterSettings = [
     ...qpqCoreUtils.getConfigSettings<ParameterQPQConfigSetting>(
@@ -65,6 +68,7 @@ export const getQqpParameterGrantables = (
       `${id}-${qpqCoreUtils.getUniqueKeyForSetting(parameterSetting)}-grantable`,
       qpqConfig,
       parameterSetting,
+      awsAccountId,
     );
   });
 
@@ -75,6 +79,7 @@ export const getQqpStorageDriveGrantables = (
   scope: Construct,
   id: string,
   qpqConfig: QPQConfig,
+  awsAccountId: string,
 ): QpqResource[] => {
   const storageDriveSettings = [
     ...qpqCoreUtils.getConfigSettings<StorageDriveQPQConfigSetting>(
@@ -89,6 +94,7 @@ export const getQqpStorageDriveGrantables = (
       `${id}-${qpqCoreUtils.getUniqueKeyForSetting(storageDriveSetting)}-grantable`,
       qpqConfig,
       storageDriveSetting,
+      awsAccountId,
     );
   });
 
@@ -112,10 +118,11 @@ export const getQqpGrantableResources = (
   scope: Construct,
   id: string,
   qpqConfig: QPQConfig,
+  awsAccountId: string,
 ): QpqResource[] => {
   return [
-    ...getQqpParameterGrantables(scope, id, qpqConfig),
-    ...getQqpSecretGrantables(scope, id, qpqConfig),
-    ...getQqpStorageDriveGrantables(scope, id, qpqConfig),
+    ...getQqpParameterGrantables(scope, id, qpqConfig, awsAccountId),
+    ...getQqpSecretGrantables(scope, id, qpqConfig, awsAccountId),
+    ...getQqpStorageDriveGrantables(scope, id, qpqConfig, awsAccountId),
   ];
 };
