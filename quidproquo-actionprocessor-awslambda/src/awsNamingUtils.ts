@@ -25,5 +25,5 @@ export const getQpqRuntimeResourceName = (
   resourceType: string = '',
 ) => {
   const name = getConfigRuntimeResourceName(resourceName, qpqConfig, resourceType);
-  return `${name}-qpq`;
+  return `${name}-qpq${resourceType}`;
 };

@@ -39,7 +39,7 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
 
     if (!this.setting.storageDrive.sourceStorageDrive) {
       originBucket = new aws_s3.Bucket(this, 'bucket', {
-        bucketName: this.qpqResourceName(`${props.setting.name}-web-entry`),
+        bucketName: this.qpqResourceName(`${props.setting.name}`, 'we'),
         // Disable public access to this bucket, CloudFront will do that
         publicReadAccess: false,
         blockPublicAccess: aws_s3.BlockPublicAccess.BLOCK_ALL,

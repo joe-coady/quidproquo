@@ -26,7 +26,7 @@ export class SubdomainName extends QpqConstruct<any> {
 
     const certificate = new aws_certificatemanager.Certificate(this, 'certificate', {
       domainName: newDomainName,
-      certificateName: this.qpqResourceName(props.subdomain),
+      certificateName: this.qpqResourceName(props.subdomain, 'cert'),
       validation: aws_certificatemanager.CertificateValidation.fromDns(apexHostedZone),
     });
 

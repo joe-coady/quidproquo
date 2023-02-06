@@ -26,7 +26,7 @@ export class QpqConstructBase extends Construct {
     return awsNamingUtils.getConfigRuntimeResourceName(name, this.qpqConfig);
   }
 
-  qpqResourceName(name: string) {
-    return awsNamingUtils.getQpqRuntimeResourceName(name, this.qpqConfig);
+  qpqResourceName(name: string, resourceType: string) {
+    return awsNamingUtils.getQpqRuntimeResourceName(name, this.qpqConfig, resourceType);
   }
 }
