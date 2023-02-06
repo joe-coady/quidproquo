@@ -27,5 +27,6 @@ export const defineSeo = (
   src,
   runtime,
 
+  webEntry: options?.webEntry,
   deprecated: options?.deprecated || false,
 });
