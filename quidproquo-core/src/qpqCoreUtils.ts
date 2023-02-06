@@ -150,3 +150,10 @@ export const getScheduleEntryFullPath = (
 ): string => {
   return path.join(getConfigRoot(qpqConfig), scheduleConfig.buildPath);
 };
+
+export const getStorageDriveUploadFullPath = (
+  qpqConfig: QPQConfig,
+  storageDriveConfig: StorageDriveQPQConfigSetting,
+): string => {
+  return path.join(getConfigRoot(qpqConfig), storageDriveConfig.copyPath || '');
+};

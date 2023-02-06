@@ -1,8 +1,8 @@
-import { StorageDriveQPQConfigSetting, QPQConfig } from 'quidproquo-core';
+import { StorageDriveQPQConfigSetting, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 import { QpqConstruct, QpqConstructProps } from './core/QpqConstruct';
 import { QpqResource } from './core/QpqResource';
 import { Construct } from 'constructs';
-import { aws_s3, aws_iam } from 'aws-cdk-lib';
+import { aws_s3, aws_iam, aws_s3_deployment } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 
 export interface QpqCoreStorageDriveConstructProps
@@ -64,19 +64,28 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
       autoDeleteObjects: true,
     });
 
-    const statement = new aws_iam.PolicyStatement({
-      sid: 'AllowCloudFrontServicePrincipal',
-      effect: aws_iam.Effect.ALLOW,
-      principals: [new aws_iam.ServicePrincipal('cloudfront.amazonaws.com')],
-      actions: ['s3:GetObject'],
-      resources: [this.bucket.arnForObjects('*')],
-      conditions: {
-        StringLike: {
-          'AWS:SourceArn': `arn:aws:cloudfront::${props.awsAccountId}:distribution/*`,
+    this.bucket.addToResourcePolicy(
+      new aws_iam.PolicyStatement({
+        sid: 'AllowCloudFrontServicePrincipal',
+        effect: aws_iam.Effect.ALLOW,
+        principals: [new aws_iam.ServicePrincipal('cloudfront.amazonaws.com')],
+        actions: ['s3:GetObject'],
+        resources: [this.bucket.arnForObjects('*')],
+        conditions: {
+          StringLike: {
+            'AWS:SourceArn': `arn:aws:cloudfront::${props.awsAccountId}:distribution/*`,
+          },
         },
-      },
-    });
+      }),
+    );
 
-    this.bucket.addToResourcePolicy(statement);
+    if (props.setting.copyPath) {
+      const srcDir = qpqCoreUtils.getStorageDriveUploadFullPath(props.qpqConfig, props.setting);
+
+      new aws_s3_deployment.BucketDeployment(this, 'bucket-deploy', {
+        sources: [aws_s3_deployment.Source.asset(srcDir)],
+        destinationBucket: this.bucket,
+      });
+    }
   }
 }
