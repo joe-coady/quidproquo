@@ -13,7 +13,11 @@ import {
 } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 
-import { WebEntryQPQWebServerConfigSetting, qpqWebServerUtils } from 'quidproquo-webserver';
+import {
+  WebEntryQPQWebServerConfigSetting,
+  qpqWebServerUtils,
+  qpqHeaderIsBot,
+} from 'quidproquo-webserver';
 import { QpqConstruct, QpqConstructProps } from './core/QpqConstruct';
 import { Construct } from 'constructs';
 
@@ -110,11 +114,22 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
       },
     );
 
+    const cachePolicy = new aws_cloudfront.CachePolicy(this, `dist-cp`, {
+      cachePolicyName: this.resourceName(props.setting.name),
+      defaultTtl: cdk.Duration.seconds(props.setting.cache.defaultTTLInSeconds),
+      minTtl: cdk.Duration.seconds(props.setting.cache.minTTLInSeconds),
+      maxTtl: cdk.Duration.seconds(props.setting.cache.maxTTLInSeconds),
+
+      enableAcceptEncodingGzip: true,
+      enableAcceptEncodingBrotli: true,
+    });
+
     // Create a CloudFront distribution using the S3 bucket as the origin
     const distributionOrigin = new aws_cloudfront_origins.S3Origin(originBucket);
     const distribution = new aws_cloudfront.Distribution(this, 'MyDistribution', {
       defaultBehavior: {
         origin: distributionOrigin,
+        cachePolicy: cachePolicy,
       },
       domainNames: [deployDomain],
       certificate: myCertificate,
@@ -211,9 +226,22 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
           continue;
         }
 
-        const wildcardPath = seo.path.replaceAll(/{(.+?)}/g, '*');
+        const seoCachePolicy = new aws_cloudfront.CachePolicy(this, `seo-cp-${seo.uniqueKey}`, {
+          cachePolicyName: this.resourceName(`${props.setting.name}-${seo.uniqueKey}`),
+          headerBehavior: aws_cloudfront.CacheHeaderBehavior.allowList(
+            qpqHeaderIsBot,
+            ...seo.cache.headers,
+          ),
+          defaultTtl: cdk.Duration.seconds(seo.cache.defaultTTLInSeconds),
+          minTtl: cdk.Duration.seconds(seo.cache.minTTLInSeconds),
+          maxTtl: cdk.Duration.seconds(seo.cache.maxTTLInSeconds),
+          enableAcceptEncodingGzip: true,
+          enableAcceptEncodingBrotli: true,
+        });
 
+        const wildcardPath = seo.path.replaceAll(/{(.+?)}/g, '*');
         distribution.addBehavior(wildcardPath, distributionOrigin, {
+          cachePolicy: seoCachePolicy,
           edgeLambdas: [
             {
               functionVersion: edgeFunctionVR.currentVersion,

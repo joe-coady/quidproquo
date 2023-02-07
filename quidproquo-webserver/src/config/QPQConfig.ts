@@ -8,3 +8,9 @@ export enum QPQWebServerConfigSettingType {
   WebEntry = '@quidproquo-webserver/config/WebEntry',
   Api = '@quidproquo-webserver/config/Api',
 }
+
+export interface CacheSettings {
+  minTTLInSeconds: number;
+  maxTTLInSeconds: number;
+  defaultTTLInSeconds: number;
+}

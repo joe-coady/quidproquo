@@ -1,6 +1,6 @@
 import { QPQConfigSetting, QPQConfigAdvancedSettings } from 'quidproquo-core';
 
-import { QPQWebServerConfigSettingType } from '../QPQConfig';
+import { QPQWebServerConfigSettingType, CacheSettings } from '../QPQConfig';
 
 export interface WebDomainOptions {
   subDomainName?: string;
@@ -12,11 +12,14 @@ export interface StorageDriveOptions {
   autoUpload: boolean;
 }
 
+export interface CacheOptions extends CacheSettings {}
+
 export interface QPQConfigAdvancedWebEntrySettings extends QPQConfigAdvancedSettings {
   buildPath?: string;
   seoBuildPath?: string;
 
   storageDrive?: StorageDriveOptions;
+  cache?: CacheOptions;
 
   domain?: WebDomainOptions;
 
@@ -29,6 +32,7 @@ export interface WebEntryQPQWebServerConfigSetting extends QPQConfigSetting {
 
   storageDrive: StorageDriveOptions;
   domain: WebDomainOptions;
+  cache: CacheOptions;
 
   buildPath?: string;
   seoBuildPath?: string;
@@ -50,6 +54,12 @@ export const defineWebEntry = (
 
   domain: options?.domain || {
     onRootDomain: true,
+  },
+
+  cache: options?.cache || {
+    defaultTTLInSeconds: 86400,
+    minTTLInSeconds: 900,
+    maxTTLInSeconds: 172800,
   },
 
   buildPath: options?.buildPath,
