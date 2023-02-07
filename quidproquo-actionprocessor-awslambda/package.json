@@ -1,6 +1,6 @@
 {
   "name": "quidproquo-actionprocessor-awslambda",
-  "version": "0.0.69",
+  "version": "0.0.70",
   "description": "",
   "main": "./lib/index.js",
   "types": "./lib/index.d.js",

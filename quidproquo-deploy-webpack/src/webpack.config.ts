@@ -79,7 +79,7 @@ export const getWebpackConfig = (
             // without additional settings, this will reference .babelrc
             presets: ['@babel/preset-typescript'],
           },
-          exclude: /node_modules/,
+          // exclude: /node_modules/,
         },
         {
           test: /\.(yaml|json)$/,
@@ -88,7 +88,7 @@ export const getWebpackConfig = (
         },
       ],
     },
-    plugins: [],
+    // plugins: [new BundleAnalyzerPlugin()],
   };
 };
 
