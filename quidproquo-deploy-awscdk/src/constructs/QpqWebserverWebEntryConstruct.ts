@@ -186,7 +186,7 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
         {
           functionName: this.resourceName(`SEO-VR-${props.setting.name}`),
           timeout: cdk.Duration.seconds(5),
-          runtime: aws_lambda.Runtime.NODEJS_16_X,
+          runtime: aws_lambda.Runtime.NODEJS_18_X,
 
           code: aws_lambda.Code.fromAsset(path.join(seoEntryBuildPath, 'lambdaEventViewerRequest')),
           handler: 'index.executeEventViewerRequest',
@@ -199,7 +199,7 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
         {
           functionName: this.resourceName(`SEO-OR-${props.setting.name}`),
           timeout: cdk.Duration.seconds(30),
-          runtime: aws_lambda.Runtime.NODEJS_16_X,
+          runtime: aws_lambda.Runtime.NODEJS_18_X,
 
           memorySize: 1024,
 

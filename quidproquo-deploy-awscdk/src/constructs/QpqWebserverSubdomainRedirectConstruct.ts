@@ -22,7 +22,7 @@ export class QpqWebserverSubdomainRedirectConstruct extends QpqConstruct<Subdoma
       functionName: this.resourceName(`redirect-${props.setting.subdomain}`),
       timeout: cdk.Duration.seconds(25),
 
-      runtime: aws_lambda.Runtime.NODEJS_16_X,
+      runtime: aws_lambda.Runtime.NODEJS_18_X,
       memorySize: 128,
 
       code: aws_lambda.Code.fromAsset(path.join(buildPath, 'lambdaAPIGatewayEvent_redirect')),

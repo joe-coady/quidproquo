@@ -34,7 +34,7 @@ export class QpqServiceStack extends Stack {
       return new aws_lambda.LayerVersion(this, `${layer.name}-layer`, {
         layerVersionName: awsNamingUtils.getQpqRuntimeResourceName(layer.name, props.qpqConfig),
         code: new aws_lambda.AssetCode(layer.buildPath),
-        compatibleRuntimes: [aws_lambda.Runtime.NODEJS_16_X],
+        compatibleRuntimes: [aws_lambda.Runtime.NODEJS_18_X],
       });
     });
   }

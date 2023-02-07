@@ -20,7 +20,7 @@ export const getWebpackConfig = (
   qpqConfig: QPQConfig,
   buildPath: string,
   awsLambdasToBuild: string[],
-) => {
+): webpack.Configuration => {
   const allSrcEntries = [
     ...qpqCoreUtils.getAllSrcEntries(qpqConfig),
     ...qpqWebServerUtils.getAllSrcEntries(qpqConfig),
@@ -50,6 +50,8 @@ export const getWebpackConfig = (
     // mode: getWebpackBuildMode(qpqConfig),
     mode: 'production',
 
+    externals: [/aws-sdk/],
+
     target: 'node',
     output: {
       // Output path
@@ -77,7 +79,7 @@ export const getWebpackConfig = (
             // without additional settings, this will reference .babelrc
             presets: ['@babel/preset-typescript'],
           },
-          // exclude: /node_modules/,
+          exclude: /node_modules/,
         },
         {
           test: /\.(yaml|json)$/,
@@ -86,7 +88,7 @@ export const getWebpackConfig = (
         },
       ],
     },
-    // plugins: [new BundleAnalyzerPlugin()],
+    plugins: [],
   };
 };
 

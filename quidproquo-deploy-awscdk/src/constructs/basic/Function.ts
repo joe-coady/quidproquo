@@ -33,7 +33,7 @@ export class Function extends QpqConstruct<any> {
       functionName: props.functionName,
       timeout: cdk.Duration.seconds(props.timeoutInSeconds || 25),
 
-      runtime: aws_lambda.Runtime.NODEJS_16_X,
+      runtime: aws_lambda.Runtime.NODEJS_18_X,
       memorySize: props.memoryInBytes || 1024,
       layers: props.apiLayerVersions,
 
