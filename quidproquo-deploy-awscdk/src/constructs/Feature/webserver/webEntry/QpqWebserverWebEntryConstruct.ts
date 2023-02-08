@@ -21,7 +21,7 @@ import {
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { Construct } from 'constructs';
 
-import * as qpqDeployAwsCdkUtils from '../../../../qpqDeployAwsCdkUtils';
+import * as qpqDeployAwsCdkUtils from '../../../../utils';
 
 export interface QpqWebserverWebEntryConstructProps extends QpqConstructBlockProps {
   webEntryConfig: WebEntryQPQWebServerConfigSetting;

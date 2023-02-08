@@ -8,7 +8,7 @@ import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqCons
 import { SubdomainName } from '../../../basic/SubdomainName';
 import { Function } from '../../../basic/Function';
 
-import * as qpqDeployAwsCdkUtils from '../../../../qpqDeployAwsCdkUtils';
+import * as qpqDeployAwsCdkUtils from '../../../../utils';
 
 export interface QpqWebserverApiConstructProps extends QpqConstructBlockProps {
   apiConfig: ApiQPQWebServerConfigSetting;

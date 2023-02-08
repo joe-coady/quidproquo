@@ -8,7 +8,7 @@ import { Construct } from 'constructs';
 import { aws_events, aws_events_targets, aws_lambda } from 'aws-cdk-lib';
 
 import { Function } from '../../../basic/Function';
-import * as qpqDeployAwsCdkUtils from '../../../../qpqDeployAwsCdkUtils';
+import * as qpqDeployAwsCdkUtils from '../../../../utils';
 
 export interface QpqCoreRecurringScheduleConstructProps extends QpqConstructBlockProps {
   scheduleConfig: ScheduleQPQConfigSetting;

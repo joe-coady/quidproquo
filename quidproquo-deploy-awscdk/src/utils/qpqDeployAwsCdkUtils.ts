@@ -18,7 +18,7 @@ import {
   QpqCoreSecretConstruct,
   QpqCoreStorageDriveConstruct,
   QpqCoreQueueConstruct,
-} from './constructs';
+} from '../constructs';
 
 export const getResourceName = (name: string, qpqConfig: QPQConfig) => {
   const service = qpqCoreUtils.getApplicationModuleName(qpqConfig);

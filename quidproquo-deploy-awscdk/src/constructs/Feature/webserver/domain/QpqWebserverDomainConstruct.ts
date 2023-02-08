@@ -7,7 +7,7 @@ import { qpqCoreUtils, QPQConfig } from 'quidproquo-core';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
 import { qpqWebServerUtils, DnsQPQWebServerConfigSetting } from 'quidproquo-webserver';
-import * as qpqDeployAwsCdkUtils from '../../../../qpqDeployAwsCdkUtils';
+import * as qpqDeployAwsCdkUtils from '../../../../utils';
 
 export interface QpqWebserverDomainConstructProps extends QpqConstructBlockProps {
   dnsConfig: DnsQPQWebServerConfigSetting;
