@@ -8,6 +8,8 @@ import {
   ScheduleQPQConfigSetting,
   SecretQPQConfigSetting,
   ParameterQPQConfigSetting,
+  QueueQPQConfigSetting,
+  // QpqQueueProcessors,
   ActionProcessorsQPQConfigSetting,
 } from './config/settings';
 
@@ -92,9 +94,23 @@ export const getScheduleEvents = (configs: QPQConfig): ScheduleQPQConfigSetting[
   return scheduleEvents;
 };
 
+export const getQueueSrcEntries = (configs: QPQConfig): string[] => {
+  // const queueConfigs = getConfigSettings<QueueQPQConfigSetting>(
+  //   configs,
+  //   QPQCoreConfigSettingType.queue,
+  // );
+
+  // return queueConfigs.reduce(
+  //   (acc, qc) => [...acc, ...Object.values(qc.qpqQueueProcessors).map((q) => q.src)],
+  //   [] as string[],
+  // );
+
+  return [];
+};
+
 // Used in bundlers to know where and what to build and index
-export const getAllSrcEntries = (configs: QPQConfig): string[] => {
-  return [...getScheduleEvents(configs).map((r) => r.src)];
+export const getAllSrcEntries = (qpqConfig: QPQConfig): string[] => {
+  return [...getScheduleEvents(qpqConfig).map((r) => r.src), ...getQueueSrcEntries(qpqConfig)];
 };
 
 export const getOwnedSecrets = (configs: QPQConfig): SecretQPQConfigSetting[] => {
@@ -157,3 +173,21 @@ export const getStorageDriveUploadFullPath = (
 ): string => {
   return path.join(getConfigRoot(qpqConfig), storageDriveConfig.copyPath || '');
 };
+
+// export const getQueueEntryFullPath = (
+//   qpqConfig: QPQConfig,
+//   queueConfig: QueueQPQConfigSetting,
+// ): string => {
+//   return path.join(getConfigRoot(qpqConfig), queueConfig.buildPath);
+// };
+
+// export const getQueueQueueProcessors = (name: string, qpqConfig: QPQConfig): QpqQueueProcessors => {
+//   const seoConfigs = getConfigSettings<QueueQPQConfigSetting>(
+//     qpqConfig,
+//     QPQCoreConfigSettingType.queue,
+//   );
+
+//   const queueConfig = seoConfigs.find((c) => c.name === name);
+
+//   return queueConfig?.qpqQueueProcessors || {};
+// };

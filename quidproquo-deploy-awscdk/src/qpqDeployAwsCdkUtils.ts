@@ -7,6 +7,7 @@ import {
   StorageDriveQPQConfigSetting,
   SecretQPQConfigSetting,
   QPQConfig,
+  QueueQPQConfigSetting,
 } from 'quidproquo-core';
 
 import { ApiQPQWebServerConfigSetting, QPQWebServerConfigSettingType } from 'quidproquo-webserver';
@@ -15,6 +16,7 @@ import { QpqResource } from './constructs/core/QpqResource';
 import { QpqCoreParameterConstruct } from './constructs/QpqCoreParameterConstruct';
 import { QpqCoreSecretConstruct } from './constructs/QpqCoreSecretConstruct';
 import { QpqCoreStorageDriveConstruct } from './constructs/QpqCoreStorageDriveConstruct';
+import { QpqCoreQueueConstruct } from './constructs/QpqCoreQueueConstruct';
 
 export const getResourceName = (name: string, qpqConfig: QPQConfig) => {
   const service = qpqCoreUtils.getApplicationModuleName(qpqConfig);
@@ -101,6 +103,32 @@ export const getQqpStorageDriveGrantables = (
   return storageDriveResources;
 };
 
+export const getQqpQueueGrantables = (
+  scope: Construct,
+  id: string,
+  qpqConfig: QPQConfig,
+  awsAccountId: string,
+): QpqResource[] => {
+  const queueSettings = [
+    ...qpqCoreUtils.getConfigSettings<QueueQPQConfigSetting>(
+      qpqConfig,
+      QPQCoreConfigSettingType.queue,
+    ),
+  ];
+
+  const queueResources = queueSettings.map((queueSetting) => {
+    return QpqCoreQueueConstruct.fromOtherStack(
+      scope,
+      `${id}-${qpqCoreUtils.getUniqueKeyForSetting(queueSetting)}-grantable`,
+      qpqConfig,
+      queueSetting,
+      awsAccountId,
+    );
+  });
+
+  return queueResources;
+};
+
 export const serviceNeedsServiceHostedZone = (qpqConfig: QPQConfig) => {
   // We need it if we are deploying our api to a service domain
   const apiConfigs = qpqCoreUtils
@@ -124,5 +152,6 @@ export const getQqpGrantableResources = (
     ...getQqpParameterGrantables(scope, id, qpqConfig, awsAccountId),
     ...getQqpSecretGrantables(scope, id, qpqConfig, awsAccountId),
     ...getQqpStorageDriveGrantables(scope, id, qpqConfig, awsAccountId),
+    ...getQqpQueueGrantables(scope, id, qpqConfig, awsAccountId),
   ];
 };

@@ -15,6 +15,7 @@ const infrastructureQPQServiceStackOwnedSettings: string[] = [
   QPQCoreConfigSettingType.storageDrive,
   QPQCoreConfigSettingType.parameter,
   QPQCoreConfigSettingType.secret,
+  QPQCoreConfigSettingType.queue,
 ];
 
 export class InfrastructureQPQServiceStack extends QpqServiceStack {

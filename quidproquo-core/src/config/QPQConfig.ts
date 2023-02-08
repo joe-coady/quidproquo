@@ -6,6 +6,7 @@ export enum QPQCoreConfigSettingType {
   parameter = '@quidproquo-core/config/parameter',
   actionProcessors = '@quidproquo-core/config/actionProcessors',
   buildPath = '@quidproquo-core/config/buildPath',
+  queue = '@quidproquo-core/config/Queue',
 }
 
 export interface QPQConfigSetting {

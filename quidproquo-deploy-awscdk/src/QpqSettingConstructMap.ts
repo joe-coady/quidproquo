@@ -10,6 +10,7 @@ import { QpqWebserverApiConstruct } from './constructs/QpqWebserverApiConstruct'
 import { QpqWebserverDomainConstruct } from './constructs/QpqWebserverDomainConstruct';
 import { QpqWebserverSubdomainRedirectConstruct } from './constructs/QpqWebserverSubdomainRedirectConstruct';
 import { QpqWebserverWebEntryConstruct } from './constructs/QpqWebserverWebEntryConstruct';
+import { QpqCoreQueueConstruct } from './constructs/QpqCoreQueueConstruct';
 
 export type QpqSettingConstructMap = Record<string, typeof QpqConstruct>;
 
@@ -18,6 +19,7 @@ export default {
   [QPQCoreConfigSettingType.secret]: QpqCoreSecretConstruct as typeof QpqConstruct,
   [QPQCoreConfigSettingType.storageDrive]: QpqCoreStorageDriveConstruct as typeof QpqConstruct,
   [QPQCoreConfigSettingType.schedule]: QpqCoreRecurringScheduleConstruct as typeof QpqConstruct,
+  [QPQCoreConfigSettingType.queue]: QpqCoreQueueConstruct as typeof QpqConstruct,
 
   [QPQWebServerConfigSettingType.Api]: QpqWebserverApiConstruct as typeof QpqConstruct,
   [QPQWebServerConfigSettingType.Dns]: QpqWebserverDomainConstruct as typeof QpqConstruct,
