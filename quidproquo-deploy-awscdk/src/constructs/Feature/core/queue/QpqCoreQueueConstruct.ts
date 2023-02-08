@@ -44,7 +44,7 @@ export class QpqCoreQueueConstruct extends QpqCoreQueueConstructBase {
     qpqConfig: QPQConfig,
     queueConfig: QueueQPQConfigSetting,
     awsAccountId: string,
-  ): QpqResource {
+  ): QpqCoreQueueConstructBase {
     class Import extends QpqCoreQueueConstructBase {
       queue = aws_sqs.Queue.fromQueueAttributes(scope, `${id}-${queueConfig.uniqueKey}`, {
         queueArn: `arn:aws:sqs:${qpqCoreUtils.getApplicationModuleDeployRegion(
@@ -72,54 +72,5 @@ export class QpqCoreQueueConstruct extends QpqCoreQueueConstructBase {
         }),
       },
     });
-
-    // const queueFunction = new Function(this, props.setting.uniqueKey, {
-    //   buildPath: qpqCoreUtils.getQueueEntryFullPath(props.qpqConfig, props.setting),
-    //   functionName: this.resourceName(`${props.setting.uniqueKey}-queue`),
-    //   functionType: 'lambdaSQSEvent',
-    //   executorName: 'executeSQSEvent',
-
-    //   qpqConfig: props.qpqConfig,
-    //   setting: props.setting,
-
-    //   apiLayerVersions: props.apiLayerVersions,
-
-    //   awsAccountId: props.awsAccountId,
-    // });
-
-    // // TODO: Make this a utility function
-    // const grantables = qpqDeployAwsCdkUtils.getQqpGrantableResources(
-    //   this,
-    //   'grantable',
-    //   this.qpqConfig,
-    //   props.awsAccountId,
-    // );
-
-    // grantables.forEach((g) => {
-    //   g.grantAll(queueFunction.lambdaFunction);
-    // });
-    // // ///////// end todo
-
-    // const mainQueue = new aws_sqs.Queue(this, 'MainQueue', {
-    //   queueName: this.resourceName(`${props.setting.name}`),
-    //   visibilityTimeout: cdk.Duration.seconds(props.setting.ttRetryInSeconds),
-    //   removalPolicy: cdk.RemovalPolicy.DESTROY,
-
-    //   deadLetterQueue: {
-    //     maxReceiveCount: props.setting.maxRetry,
-    //     queue: new aws_sqs.Queue(this, 'DeadLetterQueue', {
-    //       queueName: this.resourceName(`${props.setting.name}-dead`),
-    //       removalPolicy: cdk.RemovalPolicy.DESTROY,
-    //     }),
-    //   },
-    // });
-
-    // queueFunction.lambdaFunction.addEventSource(
-    //   new aws_lambda_event_sources.SqsEventSource(mainQueue, {
-    //     batchSize: props.setting.batchSize,
-    //     maxBatchingWindow: cdk.Duration.seconds(props.setting.batchWindowInSeconds),
-    //     reportBatchItemFailures: true,
-    //   }),
-    // );
   }
 }

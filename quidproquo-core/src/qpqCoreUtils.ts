@@ -9,7 +9,7 @@ import {
   SecretQPQConfigSetting,
   ParameterQPQConfigSetting,
   QueueQPQConfigSetting,
-  // QpqQueueProcessors,
+  QpqQueueProcessors,
   ActionProcessorsQPQConfigSetting,
 } from './config/settings';
 
@@ -101,17 +101,15 @@ export const getScheduleEvents = (configs: QPQConfig): ScheduleQPQConfigSetting[
 };
 
 export const getQueueSrcEntries = (configs: QPQConfig): string[] => {
-  // const queueConfigs = getConfigSettings<QueueQPQConfigSetting>(
-  //   configs,
-  //   QPQCoreConfigSettingType.queue,
-  // );
+  const queueConfigs = getConfigSettings<QueueQPQConfigSetting>(
+    configs,
+    QPQCoreConfigSettingType.queue,
+  );
 
-  // return queueConfigs.reduce(
-  //   (acc, qc) => [...acc, ...Object.values(qc.qpqQueueProcessors).map((q) => q.src)],
-  //   [] as string[],
-  // );
-
-  return [];
+  return queueConfigs.reduce(
+    (acc, qc) => [...acc, ...Object.values(qc.qpqQueueProcessors).map((q) => q.src)],
+    [] as string[],
+  );
 };
 
 // Used in bundlers to know where and what to build and index
@@ -180,20 +178,20 @@ export const getStorageDriveUploadFullPath = (
   return path.join(getConfigRoot(qpqConfig), storageDriveConfig.copyPath || '');
 };
 
-// export const getQueueEntryFullPath = (
-//   qpqConfig: QPQConfig,
-//   queueConfig: QueueQPQConfigSetting,
-// ): string => {
-//   return path.join(getConfigRoot(qpqConfig), queueConfig.buildPath);
-// };
+export const getQueueEntryFullPath = (
+  qpqConfig: QPQConfig,
+  queueConfig: QueueQPQConfigSetting,
+): string => {
+  return path.join(getConfigRoot(qpqConfig), queueConfig.buildPath);
+};
 
-// export const getQueueQueueProcessors = (name: string, qpqConfig: QPQConfig): QpqQueueProcessors => {
-//   const seoConfigs = getConfigSettings<QueueQPQConfigSetting>(
-//     qpqConfig,
-//     QPQCoreConfigSettingType.queue,
-//   );
+export const getQueueQueueProcessors = (name: string, qpqConfig: QPQConfig): QpqQueueProcessors => {
+  const seoConfigs = getConfigSettings<QueueQPQConfigSetting>(
+    qpqConfig,
+    QPQCoreConfigSettingType.queue,
+  );
 
-//   const queueConfig = seoConfigs.find((c) => c.name === name);
+  const queueConfig = seoConfigs.find((c) => c.name === name);
 
-//   return queueConfig?.qpqQueueProcessors || {};
-// };
+  return queueConfig?.qpqQueueProcessors || {};
+};

@@ -10,6 +10,7 @@ import {
   LambdaLayers,
   QpqCoreRecurringScheduleConstruct,
   QpqWebserverApiConstruct,
+  QpqApiCoreQueueConstruct,
 } from '../constructs';
 
 export interface ApiQpqServiceStackProps extends QpqServiceStackProps {
@@ -52,6 +53,18 @@ export class ApiQpqServiceStack extends QpqServiceStack {
           qpqConfig: props.qpqConfig,
 
           apiConfig: setting,
+          apiLayerVersions: layers.layers,
+        }),
+    );
+
+    // Queues
+    const queues = qpqCoreUtils.getQueues(props.qpqConfig).map(
+      (setting) =>
+        new QpqApiCoreQueueConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
+          awsAccountId: props.awsAccountId,
+          qpqConfig: props.qpqConfig,
+
+          queueConfig: setting,
           apiLayerVersions: layers.layers,
         }),
     );

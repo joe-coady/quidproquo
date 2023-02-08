@@ -19,15 +19,15 @@ export class WebQpqServiceStack extends QpqServiceStack {
     // Add the inf stack as a dependency so it builds first
     this.addDependency(props.infQpqServiceStack);
 
-    // // Web entries
-    // const webEntries = qpqWebServerUtils.getWebEntryConfigs(props.qpqConfig).map(
-    //   (setting) =>
-    //     new QpqWebserverWebEntryConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
-    //       awsAccountId: props.awsAccountId,
-    //       qpqConfig: props.qpqConfig,
+    // Web entries
+    const webEntries = qpqWebServerUtils.getWebEntryConfigs(props.qpqConfig).map(
+      (setting) =>
+        new QpqWebserverWebEntryConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
+          awsAccountId: props.awsAccountId,
+          qpqConfig: props.qpqConfig,
 
-    //       webEntryConfig: setting,
-    //     }),
-    // );
+          webEntryConfig: setting,
+        }),
+    );
   }
 }

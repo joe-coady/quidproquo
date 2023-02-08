@@ -110,7 +110,7 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
           signingProtocol: 'sigv4',
 
           // the properties below are optional
-          description: `access to s3 bucket ${this.resourceName(originBucket.bucketName)}`,
+          description: `access to s3 bucket ${originBucket.bucketName}`,
         },
       },
     );

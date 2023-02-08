@@ -4,14 +4,14 @@ import {
   QPQConfigAdvancedSettings,
 } from '../QPQConfig';
 
-// export interface QpqSourceEntry {
-//   src: string;
-//   runtime: string;
-// }
+export interface QpqSourceEntry {
+  src: string;
+  runtime: string;
+}
 
-// export interface QpqQueueProcessors {
-//   [type: string]: QpqSourceEntry;
-// }
+export interface QpqQueueProcessors {
+  [type: string]: QpqSourceEntry;
+}
 
 export interface QPQConfigAdvancedQueueSettings extends QPQConfigAdvancedSettings {
   batchSize?: number;
@@ -25,7 +25,7 @@ export interface QPQConfigAdvancedQueueSettings extends QPQConfigAdvancedSetting
 export interface QueueQPQConfigSetting extends QPQConfigSetting {
   name: string;
 
-  // buildPath: string;
+  buildPath: string;
 
   batchSize: number;
   batchWindowInSeconds: number;
@@ -36,20 +36,20 @@ export interface QueueQPQConfigSetting extends QPQConfigSetting {
   ttRetryInSeconds: number;
 
   hasDeadLetterQueue: boolean;
-  // qpqQueueProcessors: QpqQueueProcessors;
+  qpqQueueProcessors: QpqQueueProcessors;
 }
 
 export const defineQueue = (
   name: string,
-  // buildPath: string,
-  // processors: QpqQueueProcessors,
+  buildPath: string,
+  processors: QpqQueueProcessors,
   options?: QPQConfigAdvancedQueueSettings,
 ): QueueQPQConfigSetting => ({
   configSettingType: QPQCoreConfigSettingType.queue,
   uniqueKey: name,
 
   name,
-  // buildPath,
+  buildPath,
 
   batchSize: options?.batchSize || 1,
   batchWindowInSeconds: options?.batchWindowInSeconds || 5,
@@ -61,5 +61,5 @@ export const defineQueue = (
 
   hasDeadLetterQueue: options?.hasDeadLetterQueue || true,
 
-  // qpqQueueProcessors: processors,
+  qpqQueueProcessors: processors,
 });

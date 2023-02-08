@@ -22,13 +22,7 @@ export class QpqConstructBlock extends Construct implements QpqResource {
   }
 
   resourceName(name: string) {
-    const resourceName = awsNamingUtils.getConfigRuntimeResourceName(name, this.qpqConfig);
-
-    console.log('');
-    console.log('resourceName', resourceName);
-    console.log('');
-
-    return resourceName;
+    return awsNamingUtils.getConfigRuntimeResourceName(name, this.qpqConfig);
   }
 
   qpqResourceName(name: string, resourceType: string) {
