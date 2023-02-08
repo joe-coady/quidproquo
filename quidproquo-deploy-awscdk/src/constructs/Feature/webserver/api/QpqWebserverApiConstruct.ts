@@ -1,47 +1,46 @@
-import path from 'path';
-
-import { aws_apigateway } from 'aws-cdk-lib';
+import { aws_apigateway, aws_lambda } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { ApiQPQWebServerConfigSetting, qpqWebServerUtils } from 'quidproquo-webserver';
 
-import { QpqConstruct, QpqConstructProps } from './core/QpqConstruct';
-import { SubdomainName } from './basic/SubdomainName';
-import { Function } from './basic/Function';
+import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
-import * as qpqDeployAwsCdkUtils from '../qpqDeployAwsCdkUtils';
+import { SubdomainName } from '../../../basic/SubdomainName';
+import { Function } from '../../../basic/Function';
 
-export interface QpqWebserverApiConstructProps
-  extends QpqConstructProps<ApiQPQWebServerConfigSetting> {}
+import * as qpqDeployAwsCdkUtils from '../../../../qpqDeployAwsCdkUtils';
 
-export class QpqWebserverApiConstruct extends QpqConstruct<ApiQPQWebServerConfigSetting> {
+export interface QpqWebserverApiConstructProps extends QpqConstructBlockProps {
+  apiConfig: ApiQPQWebServerConfigSetting;
+  apiLayerVersions?: aws_lambda.ILayerVersion[];
+}
+
+export class QpqWebserverApiConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: QpqWebserverApiConstructProps) {
     super(scope, id, props);
 
     // api.service.domain.com or api.domain.com
-    const apexDomain = props.setting.onRootDomain
+    const apexDomain = props.apiConfig.onRootDomain
       ? qpqWebServerUtils.getBaseDomainName(props.qpqConfig)
       : qpqWebServerUtils.getServiceDomainName(props.qpqConfig);
 
     // Create subdomain
     const subdomain = new SubdomainName(this, 'subdomain', {
       apexDomain,
-      subdomain: props.setting.apiSubdomain,
+      subdomain: props.apiConfig.apiSubdomain,
       qpqConfig: props.qpqConfig,
-      setting: props.setting,
 
       awsAccountId: props.awsAccountId,
     });
 
     // Build Function
     const func = new Function(this, 'api-function', {
-      buildPath: qpqWebServerUtils.getApiEntryFullPath(props.qpqConfig, props.setting),
-      functionName: this.resourceName(`${props.setting.apiName}-route`),
+      buildPath: qpqWebServerUtils.getApiEntryFullPath(props.qpqConfig, props.apiConfig),
+      functionName: this.resourceName(`${props.apiConfig.apiName}-route`),
       functionType: 'lambdaAPIGatewayEvent',
       executorName: 'executeAPIGatewayEvent',
 
       qpqConfig: props.qpqConfig,
-      setting: props.setting,
 
       apiLayerVersions: props.apiLayerVersions,
 
@@ -61,7 +60,7 @@ export class QpqWebserverApiConstruct extends QpqConstruct<ApiQPQWebServerConfig
 
     // Create a rest api
     const api = new aws_apigateway.LambdaRestApi(this, 'lambda-rest-api', {
-      restApiName: this.resourceName(`${props.setting.apiName}-rest-api`),
+      restApiName: this.resourceName(`${props.apiConfig.apiName}-rest-api`),
       handler: func.lambdaFunction,
       deployOptions: {
         loggingLevel: aws_apigateway.MethodLoggingLevel.INFO,

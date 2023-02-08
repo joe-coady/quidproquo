@@ -12,11 +12,13 @@ import {
 
 import { ApiQPQWebServerConfigSetting, QPQWebServerConfigSettingType } from 'quidproquo-webserver';
 
-import { QpqResource } from './constructs/core/QpqResource';
-import { QpqCoreParameterConstruct } from './constructs/QpqCoreParameterConstruct';
-import { QpqCoreSecretConstruct } from './constructs/QpqCoreSecretConstruct';
-import { QpqCoreStorageDriveConstruct } from './constructs/QpqCoreStorageDriveConstruct';
-import { QpqCoreQueueConstruct } from './constructs/QpqCoreQueueConstruct';
+import {
+  QpqResource,
+  QpqCoreParameterConstruct,
+  QpqCoreSecretConstruct,
+  QpqCoreStorageDriveConstruct,
+  QpqCoreQueueConstruct,
+} from './constructs';
 
 export const getResourceName = (name: string, qpqConfig: QPQConfig) => {
   const service = qpqCoreUtils.getApplicationModuleName(qpqConfig);

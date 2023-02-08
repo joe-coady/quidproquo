@@ -1,15 +1,18 @@
 import { StorageDriveQPQConfigSetting, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
-import { QpqConstruct, QpqConstructProps } from './core/QpqConstruct';
-import { QpqResource } from './core/QpqResource';
+
+import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
+import { QpqResource } from '../../../base/QpqResource';
+
 import { Construct } from 'constructs';
 import { aws_s3, aws_iam, aws_s3_deployment } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 
-export interface QpqCoreStorageDriveConstructProps
-  extends QpqConstructProps<StorageDriveQPQConfigSetting> {}
+export interface QpqCoreStorageDriveConstructProps extends QpqConstructBlockProps {
+  storageDriveConfig: StorageDriveQPQConfigSetting;
+}
 
 export abstract class QpqCoreStorageDriveConstructBase
-  extends QpqConstruct<StorageDriveQPQConfigSetting>
+  extends QpqConstructBlock
   implements QpqResource
 {
   abstract bucket: aws_s3.IBucket;
@@ -35,25 +38,25 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
     scope: Construct,
     id: string,
     qpqConfig: QPQConfig,
-    setting: StorageDriveQPQConfigSetting,
+    storageDriveConfig: StorageDriveQPQConfigSetting,
     awsAccountId: string,
   ): QpqResource {
     class Import extends QpqCoreStorageDriveConstructBase {
       bucket = aws_s3.Bucket.fromBucketName(
         scope,
-        `${id}-${setting.uniqueKey}`,
-        this.resourceName(setting.storageDrive),
+        `${id}-${storageDriveConfig.uniqueKey}`,
+        this.resourceName(storageDriveConfig.storageDrive),
       );
     }
 
-    return new Import(scope, id, { qpqConfig, setting, awsAccountId });
+    return new Import(scope, id, { qpqConfig, awsAccountId });
   }
 
   constructor(scope: Construct, id: string, props: QpqCoreStorageDriveConstructProps) {
     super(scope, id, props);
 
     this.bucket = new aws_s3.Bucket(this, 'bucket', {
-      bucketName: this.resourceName(props.setting.storageDrive),
+      bucketName: this.resourceName(props.storageDriveConfig.storageDrive),
 
       // Disable public access to this bucket, CloudFront will do that
       publicReadAccess: false,
@@ -79,8 +82,11 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
       }),
     );
 
-    if (props.setting.copyPath) {
-      const srcDir = qpqCoreUtils.getStorageDriveUploadFullPath(props.qpqConfig, props.setting);
+    if (props.storageDriveConfig.copyPath) {
+      const srcDir = qpqCoreUtils.getStorageDriveUploadFullPath(
+        props.qpqConfig,
+        props.storageDriveConfig,
+      );
 
       new aws_s3_deployment.BucketDeployment(this, 'bucket-deploy', {
         sources: [aws_s3_deployment.Source.asset(srcDir)],

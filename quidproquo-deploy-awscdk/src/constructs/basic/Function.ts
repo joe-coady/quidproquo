@@ -1,12 +1,11 @@
 import path from 'path';
 
-import { QpqConstruct, QpqConstructProps } from '../core/QpqConstruct';
+import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
 import { Construct } from 'constructs';
 import { aws_lambda } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
-import { ApiLayer } from '../../layers/ApiLayer';
 
-export interface FunctionProps extends QpqConstructProps<any> {
+export interface FunctionProps extends QpqConstructBlockProps {
   functionName: string;
 
   buildPath: string;
@@ -23,7 +22,7 @@ export interface FunctionProps extends QpqConstructProps<any> {
   apiLayerVersions?: aws_lambda.ILayerVersion[];
 }
 
-export class Function extends QpqConstruct<any> {
+export class Function extends QpqConstructBlock {
   public readonly lambdaFunction: aws_lambda.Function;
 
   constructor(scope: Construct, id: string, props: FunctionProps) {

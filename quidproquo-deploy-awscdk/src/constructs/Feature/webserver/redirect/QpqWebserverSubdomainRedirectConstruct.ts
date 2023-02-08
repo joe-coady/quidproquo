@@ -1,17 +1,20 @@
 import path from 'path';
+import * as cdk from 'aws-cdk-lib';
 
 import { qpqCoreUtils } from 'quidproquo-core';
 import { SubdomainRedirectQPQWebServerConfigSetting } from 'quidproquo-webserver';
-import { QpqConstruct, QpqConstructProps } from './core/QpqConstruct';
+
+import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
+
 import { Construct } from 'constructs';
 import { aws_lambda, aws_apigateway } from 'aws-cdk-lib';
-import * as cdk from 'aws-cdk-lib';
-import { SubdomainName } from './basic/SubdomainName';
+import { SubdomainName } from '../../../basic/SubdomainName';
 
-export interface QpqWebserverSubdomainRedirectConstructProps
-  extends QpqConstructProps<SubdomainRedirectQPQWebServerConfigSetting> {}
+export interface QpqWebserverSubdomainRedirectConstructProps extends QpqConstructBlockProps {
+  subdomainRedirectConfig: SubdomainRedirectQPQWebServerConfigSetting;
+}
 
-export class QpqWebserverSubdomainRedirectConstruct extends QpqConstruct<SubdomainRedirectQPQWebServerConfigSetting> {
+export class QpqWebserverSubdomainRedirectConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: QpqWebserverSubdomainRedirectConstructProps) {
     super(scope, id, props);
 
@@ -19,7 +22,7 @@ export class QpqWebserverSubdomainRedirectConstruct extends QpqConstruct<Subdoma
     const environment = qpqCoreUtils.getApplicationModuleEnvironment(props.qpqConfig);
 
     const redirectLambda = new aws_lambda.Function(this, 'lambda', {
-      functionName: this.resourceName(`redirect-${props.setting.subdomain}`),
+      functionName: this.resourceName(`redirect-${props.subdomainRedirectConfig.subdomain}`),
       timeout: cdk.Duration.seconds(25),
 
       runtime: aws_lambda.Runtime.NODEJS_18_X,
@@ -29,13 +32,13 @@ export class QpqWebserverSubdomainRedirectConstruct extends QpqConstruct<Subdoma
       handler: 'index.executeAPIGatewayEvent',
 
       environment: {
-        redirectConfig: JSON.stringify(props.setting),
+        redirectConfig: JSON.stringify(props.subdomainRedirectConfig),
         environment: JSON.stringify(environment),
       },
     });
 
     const restApi = new aws_apigateway.LambdaRestApi(this, 'rest-api', {
-      restApiName: this.resourceName(`${props.setting.subdomain}-redirect`),
+      restApiName: this.resourceName(`${props.subdomainRedirectConfig.subdomain}-redirect`),
       handler: redirectLambda,
       deployOptions: {
         loggingLevel: aws_apigateway.MethodLoggingLevel.INFO,
@@ -46,9 +49,8 @@ export class QpqWebserverSubdomainRedirectConstruct extends QpqConstruct<Subdoma
 
     // TODO: Fix this
     const serviceDomainName = new SubdomainName(this, 'service-domain-name', {
-      subdomain: props.setting.subdomain,
+      subdomain: props.subdomainRedirectConfig.subdomain,
       apexDomain: '',
-      setting: props.setting,
       qpqConfig: props.qpqConfig,
       awsAccountId: props.awsAccountId,
     });

@@ -6,14 +6,14 @@ export interface QpqResource {
    *
    * @param grantee the role to be granted read-only access to the resource.
    */
-  grantRead(grantee: aws_iam.IGrantable): aws_iam.Grant;
+  grantRead(grantee: aws_iam.IGrantable): void;
 
   /**
    * Grants write permissions on the resource.
    *
    * @param grantee the role to be granted write access to the resource.
    */
-  grantWrite(grantee: aws_iam.IGrantable): aws_iam.Grant;
+  grantWrite(grantee: aws_iam.IGrantable): void;
 
   /**
    * Grants read/write permissions on the resource.

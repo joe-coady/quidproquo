@@ -18,33 +18,34 @@ import {
   qpqWebServerUtils,
   qpqHeaderIsBot,
 } from 'quidproquo-webserver';
-import { QpqConstruct, QpqConstructProps } from './core/QpqConstruct';
+import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { Construct } from 'constructs';
 
-import * as qpqDeployAwsCdkUtils from '../qpqDeployAwsCdkUtils';
+import * as qpqDeployAwsCdkUtils from '../../../../qpqDeployAwsCdkUtils';
 
-export interface QpqWebserverWebEntryConstructProps
-  extends QpqConstructProps<WebEntryQPQWebServerConfigSetting> {}
+export interface QpqWebserverWebEntryConstructProps extends QpqConstructBlockProps {
+  webEntryConfig: WebEntryQPQWebServerConfigSetting;
+}
 
-export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebServerConfigSetting> {
+export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: QpqWebserverWebEntryConstructProps) {
     super(scope, id, props);
 
-    const apexDomain = this.setting.domain.onRootDomain
+    const apexDomain = props.webEntryConfig.domain.onRootDomain
       ? qpqWebServerUtils.getBaseDomainName(props.qpqConfig)
       : qpqWebServerUtils.getServiceDomainName(props.qpqConfig);
 
-    const deployDomain = this.setting.domain.subDomainName
-      ? `${this.setting.domain.subDomainName}.${apexDomain}`
+    const deployDomain = props.webEntryConfig.domain.subDomainName
+      ? `${props.webEntryConfig.domain.subDomainName}.${apexDomain}`
       : apexDomain;
 
     // create / reference an s3 bucket
     let originBucket = null;
 
-    if (!this.setting.storageDrive.sourceStorageDrive) {
+    if (!props.webEntryConfig.storageDrive.sourceStorageDrive) {
       originBucket = new aws_s3.Bucket(this, 'bucket', {
-        bucketName: this.qpqResourceName(`${props.setting.name}`, 'we'),
-        // Disable public access to this bucket, CloudFront will do that
+        bucketName: this.qpqResourceName(`${props.webEntryConfig.name}`, 'we'),
+        // Disable public access to this bucket, Clou+dFront will do that
         publicReadAccess: false,
         blockPublicAccess: aws_s3.BlockPublicAccess.BLOCK_ALL,
 
@@ -74,14 +75,14 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
       originBucket = aws_s3.Bucket.fromBucketName(
         this,
         'src-bucket-lookup',
-        this.resourceName(this.setting.storageDrive.sourceStorageDrive),
+        this.resourceName(props.webEntryConfig.storageDrive.sourceStorageDrive),
       );
     }
 
-    if (this.setting.storageDrive.autoUpload) {
+    if (props.webEntryConfig.storageDrive.autoUpload) {
       const webEntryBuildPath = qpqWebServerUtils.getWebEntryFullPath(
         props.qpqConfig,
-        props.setting,
+        props.webEntryConfig,
       );
       new aws_s3_deployment.BucketDeployment(this, 'bucket-deploy', {
         sources: [aws_s3_deployment.Source.asset(webEntryBuildPath)],
@@ -100,10 +101,10 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
 
     const originAccessControl = new aws_cloudfront.CfnOriginAccessControl(
       this,
-      `oac-${props.setting.name}${props.setting.domain.subDomainName}`,
+      `oac-${props.webEntryConfig.name}${props.webEntryConfig.domain.subDomainName}`,
       {
         originAccessControlConfig: {
-          name: this.resourceName(props.setting.name),
+          name: this.resourceName(props.webEntryConfig.name),
           originAccessControlOriginType: 's3',
           signingBehavior: 'always',
           signingProtocol: 'sigv4',
@@ -115,10 +116,10 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
     );
 
     const cachePolicy = new aws_cloudfront.CachePolicy(this, `dist-cp`, {
-      cachePolicyName: this.resourceName(props.setting.name),
-      defaultTtl: cdk.Duration.seconds(props.setting.cache.defaultTTLInSeconds),
-      minTtl: cdk.Duration.seconds(props.setting.cache.minTTLInSeconds),
-      maxTtl: cdk.Duration.seconds(props.setting.cache.maxTTLInSeconds),
+      cachePolicyName: this.resourceName(props.webEntryConfig.name),
+      defaultTtl: cdk.Duration.seconds(props.webEntryConfig.cache.defaultTTLInSeconds),
+      minTtl: cdk.Duration.seconds(props.webEntryConfig.cache.minTTLInSeconds),
+      maxTtl: cdk.Duration.seconds(props.webEntryConfig.cache.maxTTLInSeconds),
 
       enableAcceptEncodingGzip: true,
       enableAcceptEncodingBrotli: true,
@@ -133,7 +134,7 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
       },
       domainNames: [deployDomain],
       certificate: myCertificate,
-      defaultRootObject: this.setting.indexRoot,
+      defaultRootObject: props.webEntryConfig.indexRoot,
 
       // redirect errors to root page and let spa sort it
       errorResponses: [404, 403].map((code) => ({
@@ -171,20 +172,20 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
     // All seos that are for this web entry
     const seos = qpqWebServerUtils
       .getAllSeo(props.qpqConfig)
-      .filter((seo) => !seo.webEntry || seo.webEntry === props.setting.name);
+      .filter((seo) => !seo.webEntry || seo.webEntry === props.webEntryConfig.name);
 
     // if we have some ~ Build the edge lambdas and deploy
     if (seos.length > 0) {
       const seoEntryBuildPath = qpqWebServerUtils.getWebEntrySeoFullPath(
         props.qpqConfig,
-        props.setting,
+        props.webEntryConfig,
       );
 
       const edgeFunctionVR = new aws_cloudfront.experimental.EdgeFunction(
         this,
-        `SEO-${props.setting.name}-VR`,
+        `SEO-${props.webEntryConfig.name}-VR`,
         {
-          functionName: this.resourceName(`SEO-VR-${props.setting.name}`),
+          functionName: this.resourceName(`SEO-VR-${props.webEntryConfig.name}`),
           timeout: cdk.Duration.seconds(5),
           runtime: aws_lambda.Runtime.NODEJS_18_X,
 
@@ -195,9 +196,9 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
 
       const edgeFunctionOR = new aws_cloudfront.experimental.EdgeFunction(
         this,
-        `SEO-${props.setting.name}-OR`,
+        `SEO-${props.webEntryConfig.name}-OR`,
         {
-          functionName: this.resourceName(`SEO-OR-${props.setting.name}`),
+          functionName: this.resourceName(`SEO-OR-${props.webEntryConfig.name}`),
           timeout: cdk.Duration.seconds(30),
           runtime: aws_lambda.Runtime.NODEJS_18_X,
 
@@ -227,7 +228,7 @@ export class QpqWebserverWebEntryConstruct extends QpqConstruct<WebEntryQPQWebSe
         }
 
         const seoCachePolicy = new aws_cloudfront.CachePolicy(this, `seo-cp-${seo.uniqueKey}`, {
-          cachePolicyName: this.resourceName(`${props.setting.name}-${seo.uniqueKey}`),
+          cachePolicyName: this.resourceName(`${props.webEntryConfig.name}-${seo.uniqueKey}`),
           headerBehavior: aws_cloudfront.CacheHeaderBehavior.allowList(
             qpqHeaderIsBot,
             ...seo.cache.headers,

@@ -4,13 +4,14 @@ import { Construct } from 'constructs';
 
 import { qpqCoreUtils, QPQConfig } from 'quidproquo-core';
 
+import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
+
 import { qpqWebServerUtils, DnsQPQWebServerConfigSetting } from 'quidproquo-webserver';
-import * as qpqDeployAwsCdkUtils from '../qpqDeployAwsCdkUtils';
+import * as qpqDeployAwsCdkUtils from '../../../../qpqDeployAwsCdkUtils';
 
-import { QpqConstruct, QpqConstructProps } from './core/QpqConstruct';
-
-export interface QpqWebserverDomainConstructProps
-  extends QpqConstructProps<DnsQPQWebServerConfigSetting> {}
+export interface QpqWebserverDomainConstructProps extends QpqConstructBlockProps {
+  dnsConfig: DnsQPQWebServerConfigSetting;
+}
 
 export const getEnvironmentDomainName = (qpqConfig: QPQConfig, domain: string): string => {
   const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
@@ -22,14 +23,14 @@ export const getEnvironmentDomainName = (qpqConfig: QPQConfig, domain: string): 
   return `${environment}.${domain}`;
 };
 
-export class QpqWebserverDomainConstruct extends QpqConstruct<DnsQPQWebServerConfigSetting> {
+export class QpqWebserverDomainConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: QpqWebserverDomainConstructProps) {
     super(scope, id, props);
 
     // example.com
     // dev.example.com
     const feature = qpqCoreUtils.getApplicationModuleFeature(props.qpqConfig);
-    const environmentDomain = getEnvironmentDomainName(props.qpqConfig, props.setting.dnsBase);
+    const environmentDomain = getEnvironmentDomainName(props.qpqConfig, props.dnsConfig.dnsBase);
     const featureDomainName = qpqWebServerUtils.getBaseDomainName(props.qpqConfig);
 
     // The hosted zone already setup
@@ -39,27 +40,6 @@ export class QpqWebserverDomainConstruct extends QpqConstruct<DnsQPQWebServerCon
     let apexHostedZone: IHostedZone = aws_route53.HostedZone.fromLookup(this, 'hosted-zone', {
       domainName: feature ? featureDomainName : environmentDomain,
     });
-
-    // const feature = qpqCoreUtils.getApplicationModuleFeature(props.qpqConfig);
-    // if (feature) {
-    //   const featureDomainName = qpqWebServerUtils.getBaseDomainName(props.qpqConfig);
-
-    //   console.log('featureDomainName', featureDomainName);
-
-    //   // Create the root hosted zone for our service
-    //   const featureHostedZone = new aws_route53.HostedZone(this, 'feature-hosted-zone', {
-    //     zoneName: featureDomainName,
-    //   });
-
-    //   // Add the new NS Records to the root hosted zone so subdomains can be resolved
-    //   new aws_route53.NsRecord(this, 'feature-ns-records', {
-    //     zone: apexHostedZone,
-    //     recordName: featureDomainName,
-    //     values: featureHostedZone.hostedZoneNameServers || [],
-    //   });
-
-    //   apexHostedZone = featureHostedZone;
-    // }
 
     // Only create a shared hosted zone if we need to
     if (!qpqDeployAwsCdkUtils.serviceNeedsServiceHostedZone(props.qpqConfig)) {

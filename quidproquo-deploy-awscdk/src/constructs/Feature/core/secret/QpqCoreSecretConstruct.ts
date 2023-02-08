@@ -1,16 +1,17 @@
 import { SecretQPQConfigSetting, QPQConfig } from 'quidproquo-core';
-import { QpqConstruct, QpqConstructProps } from './core/QpqConstruct';
-import { QpqResource } from './core/QpqResource';
+
+import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
+import { QpqResource } from '../../../base/QpqResource';
+
 import { Construct } from 'constructs';
 import { aws_secretsmanager, aws_iam } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 
-export interface QpqCoreSecretConstructProps extends QpqConstructProps<SecretQPQConfigSetting> {}
+export interface QpqCoreSecretConstructProps extends QpqConstructBlockProps {
+  secretConfig: SecretQPQConfigSetting;
+}
 
-export abstract class QpqCoreSecretConstructBase
-  extends QpqConstruct<SecretQPQConfigSetting>
-  implements QpqResource
-{
+export abstract class QpqCoreSecretConstructBase extends QpqConstructBlock implements QpqResource {
   abstract secret: aws_secretsmanager.ISecret;
 
   public grantRead(grantee: aws_iam.IGrantable): aws_iam.Grant {
@@ -34,27 +35,27 @@ export class QpqCoreSecretConstruct extends QpqCoreSecretConstructBase {
     scope: Construct,
     id: string,
     qpqConfig: QPQConfig,
-    setting: SecretQPQConfigSetting,
+    secretConfig: SecretQPQConfigSetting,
     awsAccountId: string,
   ): QpqResource {
     class Import extends QpqCoreSecretConstructBase {
       secret = aws_secretsmanager.Secret.fromSecretNameV2(
         scope,
-        `${id}-${setting.uniqueKey}`,
-        this.resourceName(setting.key),
+        `${id}-${secretConfig.uniqueKey}`,
+        this.resourceName(secretConfig.key),
       );
     }
 
-    return new Import(scope, id, { qpqConfig, setting, awsAccountId });
+    return new Import(scope, id, { qpqConfig, awsAccountId });
   }
 
   constructor(scope: Construct, id: string, props: QpqCoreSecretConstructProps) {
     super(scope, id, props);
 
     this.secret = new aws_secretsmanager.Secret(this, 'secret', {
-      secretName: this.resourceName(props.setting.key),
+      secretName: this.resourceName(props.secretConfig.key),
       removalPolicy: cdk.RemovalPolicy.DESTROY,
-      description: props.setting.key,
+      description: props.secretConfig.key,
     });
   }
 }

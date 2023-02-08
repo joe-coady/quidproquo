@@ -1,4 +1,4 @@
-import { QpqConstruct, QpqConstructProps } from '../core/QpqConstruct';
+import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
 import { Construct } from 'constructs';
 import {
   aws_route53,
@@ -7,12 +7,12 @@ import {
   aws_route53_targets,
 } from 'aws-cdk-lib';
 
-export interface SubdomainNameProps extends QpqConstructProps<any> {
+export interface SubdomainNameProps extends QpqConstructBlockProps {
   subdomain: string;
   apexDomain: string;
 }
 
-export class SubdomainName extends QpqConstruct<any> {
+export class SubdomainName extends QpqConstructBlock {
   public readonly domainName: aws_apigateway.DomainName;
 
   constructor(scope: Construct, id: string, props: SubdomainNameProps) {

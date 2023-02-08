@@ -1,35 +1,38 @@
 import { ScheduleQPQConfigSetting, qpqCoreUtils } from 'quidproquo-core';
 import { LambdaRuntimeConfig } from 'quidproquo-actionprocessor-awslambda';
-import { QpqConstruct, QpqConstructProps } from './core/QpqConstruct';
+
+import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
+import { QpqResource } from '../../../base/QpqResource';
 
 import { Construct } from 'constructs';
-import { aws_events, aws_events_targets } from 'aws-cdk-lib';
+import { aws_events, aws_events_targets, aws_lambda } from 'aws-cdk-lib';
 
-import { Function } from './basic/Function';
-import * as qpqDeployAwsCdkUtils from '../qpqDeployAwsCdkUtils';
+import { Function } from '../../../basic/Function';
+import * as qpqDeployAwsCdkUtils from '../../../../qpqDeployAwsCdkUtils';
 
-export interface QpqCoreRecurringScheduleConstructProps
-  extends QpqConstructProps<ScheduleQPQConfigSetting> {}
+export interface QpqCoreRecurringScheduleConstructProps extends QpqConstructBlockProps {
+  scheduleConfig: ScheduleQPQConfigSetting;
+  apiLayerVersions?: aws_lambda.ILayerVersion[];
+}
 
-export class QpqCoreRecurringScheduleConstruct extends QpqConstruct<ScheduleQPQConfigSetting> {
+export class QpqCoreRecurringScheduleConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: QpqCoreRecurringScheduleConstructProps) {
     super(scope, id, props);
 
-    const schedulerFunction = new Function(this, props.setting.uniqueKey, {
-      buildPath: qpqCoreUtils.getScheduleEntryFullPath(props.qpqConfig, props.setting),
-      functionName: this.resourceName(`${props.setting.uniqueKey}-SE`),
+    const schedulerFunction = new Function(this, props.scheduleConfig.uniqueKey, {
+      buildPath: qpqCoreUtils.getScheduleEntryFullPath(props.qpqConfig, props.scheduleConfig),
+      functionName: this.resourceName(`${props.scheduleConfig.uniqueKey}-SE`),
       functionType: 'lambdaEventBridgeEvent',
       executorName: 'executeEventBridgeEvent',
 
       qpqConfig: props.qpqConfig,
-      setting: props.setting,
 
       apiLayerVersions: props.apiLayerVersions,
 
       environment: {
         lambdaRuntimeConfig: JSON.stringify({
-          src: props.setting.src,
-          runtime: props.setting.runtime,
+          src: props.scheduleConfig.src,
+          runtime: props.scheduleConfig.runtime,
         } as LambdaRuntimeConfig),
       },
 
@@ -51,7 +54,7 @@ export class QpqCoreRecurringScheduleConstruct extends QpqConstruct<ScheduleQPQC
 
     // EventBridge rule which runs every five minutes
     const cronRule = new aws_events.Rule(this, 'cron', {
-      schedule: aws_events.Schedule.expression(`cron(${props.setting.cronExpression})`),
+      schedule: aws_events.Schedule.expression(`cron(${props.scheduleConfig.cronExpression})`),
     });
 
     // Set the target as lambda function

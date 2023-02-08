@@ -1,18 +1,17 @@
 import { QueueQPQConfigSetting, qpqCoreUtils, QPQConfig } from 'quidproquo-core';
 
-import { QpqConstruct, QpqConstructProps } from './core/QpqConstruct';
-import { QpqResource } from './core/QpqResource';
+import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
+import { QpqResource } from '../../../base/QpqResource';
 
 import { Construct } from 'constructs';
 import { aws_sqs, aws_iam } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 
-export interface QpqCoreQueueConstructProps extends QpqConstructProps<QueueQPQConfigSetting> {}
+export interface QpqCoreQueueConstructProps extends QpqConstructBlockProps {
+  queueConfig: QueueQPQConfigSetting;
+}
 
-export abstract class QpqCoreQueueConstructBase
-  extends QpqConstruct<QueueQPQConfigSetting>
-  implements QpqResource
-{
+export abstract class QpqCoreQueueConstructBase extends QpqConstructBlock {
   abstract queue: aws_sqs.IQueue;
 
   public grantRead(grantee: aws_iam.IGrantable): aws_iam.Grant {
@@ -43,32 +42,32 @@ export class QpqCoreQueueConstruct extends QpqCoreQueueConstructBase {
     scope: Construct,
     id: string,
     qpqConfig: QPQConfig,
-    setting: QueueQPQConfigSetting,
+    queueConfig: QueueQPQConfigSetting,
     awsAccountId: string,
   ): QpqResource {
     class Import extends QpqCoreQueueConstructBase {
-      queue = aws_sqs.Queue.fromQueueAttributes(scope, `${id}-${setting.uniqueKey}`, {
+      queue = aws_sqs.Queue.fromQueueAttributes(scope, `${id}-${queueConfig.uniqueKey}`, {
         queueArn: `arn:aws:sqs:${qpqCoreUtils.getApplicationModuleDeployRegion(
           qpqConfig,
-        )}:${awsAccountId}:${this.resourceName(setting.name)}`,
+        )}:${awsAccountId}:${this.resourceName(queueConfig.name)}`,
       });
     }
 
-    return new Import(scope, id, { qpqConfig, setting, awsAccountId });
+    return new Import(scope, id, { qpqConfig, awsAccountId });
   }
 
   constructor(scope: Construct, id: string, props: QpqCoreQueueConstructProps) {
     super(scope, id, props);
 
     this.queue = new aws_sqs.Queue(this, 'MainQueue', {
-      queueName: this.resourceName(props.setting.name),
-      visibilityTimeout: cdk.Duration.seconds(props.setting.ttRetryInSeconds),
+      queueName: this.resourceName(props.queueConfig.name),
+      visibilityTimeout: cdk.Duration.seconds(props.queueConfig.ttRetryInSeconds),
       removalPolicy: cdk.RemovalPolicy.DESTROY,
 
       deadLetterQueue: {
-        maxReceiveCount: props.setting.maxRetry,
+        maxReceiveCount: props.queueConfig.maxRetry,
         queue: new aws_sqs.Queue(this, 'DeadLetterQueue', {
-          queueName: this.resourceName(`${props.setting.name}-dead`),
+          queueName: this.resourceName(`${props.queueConfig.name}-dead`),
           removalPolicy: cdk.RemovalPolicy.DESTROY,
         }),
       },
