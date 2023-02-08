@@ -1,5 +1,5 @@
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-import { QPQConfig, QPQConfigSetting } from 'quidproquo-core';
+import { QPQConfig } from 'quidproquo-core';
 import { Construct } from 'constructs';
 
 import { QpqResource } from './QpqResource';
@@ -22,7 +22,13 @@ export class QpqConstructBlock extends Construct implements QpqResource {
   }
 
   resourceName(name: string) {
-    return awsNamingUtils.getConfigRuntimeResourceName(name, this.qpqConfig);
+    const resourceName = awsNamingUtils.getConfigRuntimeResourceName(name, this.qpqConfig);
+
+    console.log('');
+    console.log('resourceName', resourceName);
+    console.log('');
+
+    return resourceName;
   }
 
   qpqResourceName(name: string, resourceType: string) {

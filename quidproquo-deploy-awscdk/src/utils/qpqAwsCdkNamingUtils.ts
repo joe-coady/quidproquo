@@ -15,7 +15,7 @@ export const getBaseStackName = (qpqConfig: QPQConfig) => {
   return baseName;
 };
 
-export const getInfrastructureStackName = (qpqConfig: QPQConfig) => {
+export const getInfStackName = (qpqConfig: QPQConfig) => {
   return `${getBaseStackName(qpqConfig)}-inf`;
 };
 

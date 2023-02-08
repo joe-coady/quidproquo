@@ -20,13 +20,6 @@ import {
   QpqCoreQueueConstruct,
 } from '../constructs';
 
-export const getResourceName = (name: string, qpqConfig: QPQConfig) => {
-  const service = qpqCoreUtils.getApplicationModuleName(qpqConfig);
-  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
-
-  return `${name}-${service}-${environment}`;
-};
-
 export const getQqpSecretGrantables = (
   scope: Construct,
   id: string,

@@ -67,6 +67,17 @@ export const getApplicationModuleDeployRegion = (qpqConfig: QPQConfig): string =
   return getApplicationModuleSetting(qpqConfig).deployRegion || 'us-east-1';
 };
 
+export const getStorageDrives = (configs: QPQConfig): StorageDriveQPQConfigSetting[] => {
+  return getConfigSettings<StorageDriveQPQConfigSetting>(
+    configs,
+    QPQCoreConfigSettingType.storageDrive,
+  );
+};
+
+export const getQueues = (configs: QPQConfig): QueueQPQConfigSetting[] => {
+  return getConfigSettings<QueueQPQConfigSetting>(configs, QPQCoreConfigSettingType.queue);
+};
+
 export const getStorageDriveNames = (configs: QPQConfig): string[] => {
   const storageDriveNames = getConfigSettings<StorageDriveQPQConfigSetting>(
     configs,
@@ -86,12 +97,7 @@ export const getActionProcessorSources = (configs: QPQConfig): string[] => {
 };
 
 export const getScheduleEvents = (configs: QPQConfig): ScheduleQPQConfigSetting[] => {
-  const scheduleEvents = getConfigSettings<ScheduleQPQConfigSetting>(
-    configs,
-    QPQCoreConfigSettingType.schedule,
-  );
-
-  return scheduleEvents;
+  return getConfigSettings<ScheduleQPQConfigSetting>(configs, QPQCoreConfigSettingType.schedule);
 };
 
 export const getQueueSrcEntries = (configs: QPQConfig): string[] => {

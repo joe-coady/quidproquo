@@ -121,6 +121,27 @@ export const getSubdomainRedirects = (
   return subdomainRedirects;
 };
 
+export const getApiConfigs = (configs: QPQConfig): ApiQPQWebServerConfigSetting[] => {
+  return qpqCoreUtils.getConfigSettings<ApiQPQWebServerConfigSetting>(
+    configs,
+    QPQWebServerConfigSettingType.Api,
+  );
+};
+
+export const getDnsConfigs = (configs: QPQConfig): DnsQPQWebServerConfigSetting[] => {
+  return qpqCoreUtils.getConfigSettings<DnsQPQWebServerConfigSetting>(
+    configs,
+    QPQWebServerConfigSettingType.Dns,
+  );
+};
+
+export const getWebEntryConfigs = (configs: QPQConfig): WebEntryQPQWebServerConfigSetting[] => {
+  return qpqCoreUtils.getConfigSettings<WebEntryQPQWebServerConfigSetting>(
+    configs,
+    QPQWebServerConfigSettingType.WebEntry,
+  );
+};
+
 export const getEnvironmentDomainName = (configs: QPQConfig): string => {
   const environment = getApplicationModuleEnvironment(configs);
   const apexDomainName = getDomainName(configs);
