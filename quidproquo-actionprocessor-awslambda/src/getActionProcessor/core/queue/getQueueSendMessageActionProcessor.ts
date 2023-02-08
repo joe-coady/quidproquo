@@ -10,7 +10,10 @@ const getProcessQueueSendMessage = (qpqConfig: QPQConfig): QueueSendMessageActio
     await sendMessage(
       sqsQueueName,
       qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig),
-      JSON.stringify({ type, payload }),
+      JSON.stringify({
+        type,
+        payload,
+      }),
     );
 
     return actionResult(void 0);
