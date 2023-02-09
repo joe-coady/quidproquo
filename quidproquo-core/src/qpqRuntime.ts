@@ -106,6 +106,7 @@ export const createRuntime = (
           };
         }
 
+        // TODO: Catch errors here ~ business logic
         action = reader.next(resolveActionResult(actionResult));
       }
     } catch (err) {
