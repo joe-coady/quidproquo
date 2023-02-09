@@ -82,6 +82,9 @@ export const getSQSEventExecutor = (
   getCustomActionProcessors: ActionProcessorListResolver = () => ({}),
 ) => {
   return async (event: SQSEvent, context: Context): Promise<SQSBatchResponse> => {
+    // const queueQPQConfigSetting = getQueueConfigSetting();
+    // TODO: Check settings / concurrency and such to make sure we can processes
+    // in parallel
     console.log('num batch: ', event.Records.length);
 
     const results = event.Records.map(async (record) => {

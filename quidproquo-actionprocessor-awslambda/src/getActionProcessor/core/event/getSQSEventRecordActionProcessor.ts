@@ -12,6 +12,7 @@ import {
   ErrorTypeEnum,
   QpqQueueProcessors,
   QueueMessage,
+  QueueQPQConfigSetting,
 } from 'quidproquo-core';
 
 import { QueueEventParams, QueueEventResponse, qpqWebServerUtils } from 'quidproquo-webserver';
@@ -21,6 +22,16 @@ import { matchUrl } from '../../../awsLambdaUtils';
 import { Context, SQSRecord } from 'aws-lambda';
 
 type AnyQueueEventParams = QueueEventParams<QueueMessage<any>>;
+
+export const getQueueConfigSetting = (): QueueQPQConfigSetting => {
+  const queueQPQConfigSetting: QueueQPQConfigSetting = JSON.parse(
+    process.env.queueQPQConfigSetting as string,
+  );
+
+  // TODO: Validate here
+
+  return queueQPQConfigSetting;
+};
 
 const getProcessTransformEventParams = (
   qpqConfig: QPQConfig,
@@ -56,9 +67,16 @@ const getProcessAutoRespond = (): EventAutoRespondActionProcessor<AnyQueueEventP
 };
 
 const getProcessMatchStory = (
-  queueQueueProcessors: QpqQueueProcessors,
+  qpqConfig: QPQConfig,
 ): EventMatchStoryActionProcessor<AnyQueueEventParams> => {
+  const queueQPQConfigSetting = getQueueConfigSetting();
+
   return async (payload) => {
+    const queueQueueProcessors = qpqCoreUtils.getQueueQueueProcessors(
+      queueQPQConfigSetting.name,
+      qpqConfig,
+    );
+
     const queueTypes = Object.keys(queueQueueProcessors).sort();
 
     // Find the most relevant match
@@ -86,13 +104,11 @@ const getProcessMatchStory = (
   };
 };
 
-export default (config: QPQConfig) => {
-  const queueQueueProcessors = qpqCoreUtils.getQueueQueueProcessors('airtable', config);
-
+export default (qpqConfig: QPQConfig) => {
   return {
-    [EventActionType.TransformEventParams]: getProcessTransformEventParams(config),
-    [EventActionType.TransformResponseResult]: getProcessTransformResponseResult(config),
+    [EventActionType.TransformEventParams]: getProcessTransformEventParams(qpqConfig),
+    [EventActionType.TransformResponseResult]: getProcessTransformResponseResult(qpqConfig),
     [EventActionType.AutoRespond]: getProcessAutoRespond(),
-    [EventActionType.MatchStory]: getProcessMatchStory(queueQueueProcessors),
+    [EventActionType.MatchStory]: getProcessMatchStory(qpqConfig),
   };
 };

@@ -8,7 +8,7 @@ import { Function } from '../../../basic/Function';
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
 
 import { Construct } from 'constructs';
-import { aws_sqs, aws_lambda_event_sources, aws_lambda } from 'aws-cdk-lib';
+import { aws_lambda_event_sources, aws_lambda } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 
 export interface QpqApiCoreQueueConstructProps extends QpqConstructBlockProps {
@@ -31,6 +31,10 @@ export class QpqApiCoreQueueConstruct extends QpqConstructBlock {
       apiLayerVersions: props.apiLayerVersions,
 
       awsAccountId: props.awsAccountId,
+
+      environment: {
+        queueQPQConfigSetting: JSON.stringify(props.queueConfig),
+      },
     });
 
     // TODO: Make this a utility function
