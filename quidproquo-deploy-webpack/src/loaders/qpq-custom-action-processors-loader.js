@@ -2,10 +2,12 @@ const path = require('path');
 
 module.exports = function (source) {
   const config = JSON.parse(process.env.QPQLoaderConfig);
+  const root = config.projectRoot;
 
   const imports = config.customActionProcessorSources
     .map((src, i) => {
-      return `const customActionProcessorImport${i} = require('./${src}');`;
+      const srcPath = path.join(root, src).replace(/\\/g, '/');
+      return `const customActionProcessorImport${i} = require('${srcPath}');`;
     })
     .join('\n');
 
