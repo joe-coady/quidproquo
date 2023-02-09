@@ -1,3 +1,3 @@
 export enum QueueActionType {
-  SendMessage = '@quidproquo-core/Queue/SendMessage',
+  SendMessages = '@quidproquo-core/Queue/SendMessage',
 }

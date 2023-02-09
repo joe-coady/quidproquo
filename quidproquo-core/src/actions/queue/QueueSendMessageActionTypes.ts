@@ -1,16 +1,20 @@
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
 import { QueueActionType } from './QueueActionType';
 
-// Payload
-export interface QueueSendMessageActionPayload<T> {
-  queueName: string;
+export interface QueueMessage<T = null> {
   type: string;
   payload: T;
 }
 
+// Payload
+export interface QueueSendMessageActionPayload<T> {
+  queueName: string;
+  queueMessages: QueueMessage<T>[];
+}
+
 // Action
 export interface QueueSendMessageAction<T> extends Action<QueueSendMessageActionPayload<T>> {
-  type: QueueActionType.SendMessage;
+  type: QueueActionType.SendMessages;
   payload: QueueSendMessageActionPayload<T>;
 }
 

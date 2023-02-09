@@ -2,18 +2,16 @@ import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
 import { resolveResourceName } from '../../../runtimeConfig/qpqAwsLambdaRuntimeConfigUtils';
 import { QueueSendMessageActionProcessor, actionResult, QueueActionType } from 'quidproquo-core';
-import { sendMessage } from '../../../logic/sqs/sendMessage';
+import { sendMessages } from '../../../logic/sqs/sendMessages';
 
 const getProcessQueueSendMessage = (qpqConfig: QPQConfig): QueueSendMessageActionProcessor<any> => {
-  return async ({ queueName, type, payload }) => {
+  return async ({ queueName, queueMessages }) => {
+    // While we have some uuids
     const sqsQueueName = resolveResourceName(queueName, qpqConfig);
-    await sendMessage(
+    await sendMessages(
       sqsQueueName,
       qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig),
-      JSON.stringify({
-        type,
-        payload,
-      }),
+      queueMessages.map((message) => JSON.stringify(message)),
     );
 
     return actionResult(void 0);
@@ -21,5 +19,5 @@ const getProcessQueueSendMessage = (qpqConfig: QPQConfig): QueueSendMessageActio
 };
 
 export default (qpqConfig: QPQConfig) => ({
-  [QueueActionType.SendMessage]: getProcessQueueSendMessage(qpqConfig),
+  [QueueActionType.SendMessages]: getProcessQueueSendMessage(qpqConfig),
 });
