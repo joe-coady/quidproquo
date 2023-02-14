@@ -3,6 +3,8 @@ import { UserDirectoryActionType } from './UserDirectoryActionType';
 
 // Payload
 export interface UserDirectoryCreateUserActionPayload {
+  userDirectoryName: string;
+
   email?: string;
   phone?: string;
 }
@@ -17,9 +19,9 @@ export interface UserDirectoryCreateUserAction
 // Function Types
 export type UserDirectoryCreateUserActionProcessor = ActionProcessor<
   UserDirectoryCreateUserAction,
-  boolean
+  string
 >;
 export type UserDirectoryCreateUserActionRequester = ActionRequester<
   UserDirectoryCreateUserAction,
-  boolean
+  string
 >;
