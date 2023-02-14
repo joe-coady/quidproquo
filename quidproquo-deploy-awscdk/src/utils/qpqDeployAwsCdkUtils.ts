@@ -1,4 +1,5 @@
 import { Construct } from 'constructs';
+import * as cdk from 'aws-cdk-lib';
 
 import {
   QPQCoreConfigSettingType,
@@ -18,6 +19,7 @@ import {
   QpqCoreSecretConstruct,
   QpqCoreStorageDriveConstruct,
   QpqCoreQueueConstruct,
+  QpqCoreUserDirectoryConstruct,
 } from '../constructs';
 
 export const getQqpSecretGrantables = (
@@ -124,6 +126,27 @@ export const getQqpQueueGrantables = (
   return queueResources;
 };
 
+export const getQqpUserPoolGrantables = (
+  scope: Construct,
+  id: string,
+  qpqConfig: QPQConfig,
+  awsAccountId: string,
+): QpqResource[] => {
+  const userDirectoryConfigs = qpqCoreUtils.getUserDirectories(qpqConfig);
+
+  const userDirectoryResources = userDirectoryConfigs.map((userDirectoryConfig) => {
+    return QpqCoreUserDirectoryConstruct.fromOtherStack(
+      scope,
+      `${id}-${qpqCoreUtils.getUniqueKeyForSetting(userDirectoryConfig)}-grantable`,
+      qpqConfig,
+      userDirectoryConfig,
+      awsAccountId,
+    );
+  });
+
+  return userDirectoryResources;
+};
+
 export const serviceNeedsServiceHostedZone = (qpqConfig: QPQConfig) => {
   // We need it if we are deploying our api to a service domain
   const apiConfigs = qpqCoreUtils
@@ -148,5 +171,21 @@ export const getQqpGrantableResources = (
     ...getQqpSecretGrantables(scope, id, qpqConfig, awsAccountId),
     ...getQqpStorageDriveGrantables(scope, id, qpqConfig, awsAccountId),
     ...getQqpQueueGrantables(scope, id, qpqConfig, awsAccountId),
+    ...getQqpUserPoolGrantables(scope, id, qpqConfig, awsAccountId),
   ];
+};
+
+export const exportStackValue = (
+  scope: Construct,
+  uniqueKey: string,
+  value: string,
+): cdk.CfnOutput => {
+  return new cdk.CfnOutput(scope, uniqueKey, {
+    exportName: uniqueKey,
+    value,
+  });
+};
+
+export const importStackValue = (uniqueKey: string): string => {
+  return cdk.Fn.importValue(uniqueKey);
 };

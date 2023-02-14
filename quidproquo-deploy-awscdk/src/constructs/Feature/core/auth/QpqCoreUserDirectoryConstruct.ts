@@ -1,14 +1,23 @@
-import {
-  ParameterQPQConfigSetting,
-  QPQConfig,
-  UserDirectoryQPQConfigSetting,
-} from 'quidproquo-core';
+import { QPQConfig, UserDirectoryQPQConfigSetting } from 'quidproquo-core';
+import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { QpqResource } from '../../../base/QpqResource';
 
 import { Construct } from 'constructs';
 import { aws_ssm, aws_iam, aws_cognito } from 'aws-cdk-lib';
+
+import * as qpqDeployAwsCdkUtils from '../../../../utils';
+
+const getUserPoolArnNameExport = (
+  userDirectoryConfig: UserDirectoryQPQConfigSetting,
+  qpqConfig: QPQConfig,
+) =>
+  awsNamingUtils.getQpqRuntimeResourceName(
+    userDirectoryConfig.name,
+    qpqConfig,
+    'user-pool-arn-export',
+  );
 
 export interface QpqCoreUserDirectoryConstructProps extends QpqConstructBlockProps {
   userDirectoryConfig: UserDirectoryQPQConfigSetting;
@@ -49,23 +58,23 @@ export abstract class QpqCoreUserDirectoryConstructBase extends QpqConstructBloc
 export class QpqCoreUserDirectoryConstruct extends QpqCoreUserDirectoryConstructBase {
   userPool: aws_cognito.IUserPool;
 
-  // static fromOtherStack(
-  //   scope: Construct,
-  //   id: string,
-  //   qpqConfig: QPQConfig,
-  //   parameterConfig: ParameterQPQConfigSetting,
-  //   awsAccountId: string,
-  // ): QpqResource {
-  //   class Import extends QpqCoreUserDirectoryConstructBase {
-  //     stringParameter = aws_cognito.UserPool.from(
-  //       scope,
-  //       `${id}-${parameterConfig.uniqueKey}`,
-  //       this.resourceName(parameterConfig.key),
-  //     );
-  //   }
+  static fromOtherStack(
+    scope: Construct,
+    id: string,
+    qpqConfig: QPQConfig,
+    userDirectoryConfig: UserDirectoryQPQConfigSetting,
+    awsAccountId: string,
+  ): QpqResource {
+    const userPoolArn = qpqDeployAwsCdkUtils.importStackValue(
+      getUserPoolArnNameExport(userDirectoryConfig, qpqConfig),
+    );
 
-  //   return new Import(scope, id, { qpqConfig, awsAccountId });
-  // }
+    class Import extends QpqCoreUserDirectoryConstructBase {
+      userPool = aws_cognito.UserPool.fromUserPoolArn(this, 'pool-arn', userPoolArn);
+    }
+
+    return new Import(scope, id, { qpqConfig, awsAccountId });
+  }
 
   constructor(scope: Construct, id: string, props: QpqCoreUserDirectoryConstructProps) {
     super(scope, id, props);
@@ -78,6 +87,12 @@ export class QpqCoreUserDirectoryConstruct extends QpqCoreUserDirectoryConstruct
         phone: props.userDirectoryConfig.phoneRequired,
       },
     });
+
+    qpqDeployAwsCdkUtils.exportStackValue(
+      this,
+      getUserPoolArnNameExport(props.userDirectoryConfig, props.qpqConfig),
+      this.userPool.userPoolArn,
+    );
 
     // const userPoolClient = new aws_cognito.UserPoolClient(this, 'user-pool-client', {
     //   userPoolClientName: this.qpqResourceName(props.userDirectoryConfig.name, 'upc'),
