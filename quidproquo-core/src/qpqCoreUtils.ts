@@ -11,6 +11,7 @@ import {
   QueueQPQConfigSetting,
   QpqQueueProcessors,
   ActionProcessorsQPQConfigSetting,
+  UserDirectoryQPQConfigSetting,
 } from './config/settings';
 
 export const getConfigSettings = <T extends QPQConfigSetting>(
@@ -124,6 +125,15 @@ export const getOwnedSecrets = (configs: QPQConfig): SecretQPQConfigSetting[] =>
   );
 
   return secrets.filter((s) => s.owned);
+};
+
+export const getUserDirectories = (configs: QPQConfig): UserDirectoryQPQConfigSetting[] => {
+  const userDirectories = getConfigSettings<UserDirectoryQPQConfigSetting>(
+    configs,
+    QPQCoreConfigSettingType.userDirectory,
+  );
+
+  return userDirectories;
 };
 
 export const getOwnedParameters = (configs: QPQConfig): ParameterQPQConfigSetting[] => {
