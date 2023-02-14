@@ -4,6 +4,7 @@ import {
   getCloudFrontOriginRequestEventActionProcessor,
   getSystemActionProcessor,
   getFileActionProcessor,
+  getUserDirectoryActionProcessor,
   getConfigGetSecretActionProcessor,
   getConfigGetParameterActionProcessor,
   getConfigGetParametersActionProcessor,
@@ -52,6 +53,9 @@ export const getOriginRequestEventExecutor = (
       ...getSystemActionProcessor(dynamicModuleLoader),
       ...getFileActionProcessor(cdkConfig.qpqConfig),
       ...getConfigActionProcessor(cdkConfig.qpqConfig),
+
+      // We probably don't want this?
+      ...getUserDirectoryActionProcessor(cdkConfig.qpqConfig),
 
       ...getCustomActionProcessors(cdkConfig.qpqConfig),
       ...qpqCustomActionProcessors(),

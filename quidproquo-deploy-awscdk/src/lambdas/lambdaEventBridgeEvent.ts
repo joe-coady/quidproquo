@@ -5,6 +5,7 @@ import {
   getSystemActionProcessor,
   getFileActionProcessor,
   getQueueActionProcessor,
+  getUserDirectoryActionProcessor,
   getConfigGetSecretActionProcessor,
   getConfigGetParameterActionProcessor,
   getConfigGetParametersActionProcessor,
@@ -56,6 +57,7 @@ export const getEventBridgeEventExecutor = (
       ...getConfigGetParametersActionProcessor(cdkConfig.qpqConfig),
       ...getConfigActionProcessor(cdkConfig.qpqConfig),
       ...getQueueActionProcessor(cdkConfig.qpqConfig),
+      ...getUserDirectoryActionProcessor(cdkConfig.qpqConfig),
 
       ...getCustomActionProcessors(cdkConfig.qpqConfig),
       ...qpqCustomActionProcessors(),
