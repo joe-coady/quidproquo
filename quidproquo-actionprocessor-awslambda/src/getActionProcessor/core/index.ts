@@ -8,3 +8,4 @@ export { default as getEventBridgeEventActionProcessor } from './event/getEventB
 export { default as getSystemActionProcessor } from './system';
 export { default as getFileActionProcessor } from './file';
 export { default as getQueueActionProcessor } from './queue';
+export { default as getUserDirectoryActionProcessor } from './userDirectory';

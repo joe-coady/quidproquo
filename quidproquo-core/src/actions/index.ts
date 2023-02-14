@@ -10,3 +10,4 @@ export * from './network';
 export * from './platform';
 export * from './queue';
 export * from './system';
+export * from './userDirectory';
