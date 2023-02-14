@@ -7,6 +7,8 @@ import {
 export interface QPQConfigAdvancedUserDirectorySettings extends QPQConfigAdvancedSettings {
   phoneRequired?: boolean;
   emailRequired?: boolean;
+
+  selfSignUpEnabled?: boolean;
 }
 
 export interface UserDirectoryQPQConfigSetting extends QPQConfigSetting {
@@ -14,6 +16,8 @@ export interface UserDirectoryQPQConfigSetting extends QPQConfigSetting {
 
   phoneRequired: boolean;
   emailRequired: boolean;
+
+  selfSignUpEnabled: boolean;
 }
 
 export const defineUserDirectory = (
@@ -27,4 +31,6 @@ export const defineUserDirectory = (
 
   phoneRequired: options?.phoneRequired || false,
   emailRequired: options?.emailRequired || true,
+
+  selfSignUpEnabled: options?.selfSignUpEnabled || true,
 });

@@ -10,6 +10,7 @@ import {
   QpqCoreQueueConstruct,
   QpqCoreSecretConstruct,
   QpqWebserverDomainConstruct,
+  QpqCoreUserDirectoryConstruct,
 } from '../constructs';
 
 export interface InfQpqServiceStackProps extends QpqServiceStackProps {}
@@ -70,6 +71,17 @@ export class InfQpqServiceStack extends QpqServiceStack {
           qpqConfig: props.qpqConfig,
 
           dnsConfig: setting,
+        }),
+    );
+
+    // User Directories
+    const userDirectories = qpqCoreUtils.getUserDirectories(props.qpqConfig).map(
+      (setting) =>
+        new QpqCoreUserDirectoryConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
+          awsAccountId: props.awsAccountId,
+          qpqConfig: props.qpqConfig,
+
+          userDirectoryConfig: setting,
         }),
     );
   }
