@@ -1,11 +1,18 @@
 import {
   UserDirectoryCreateUserActionRequester,
-  UserDirectoryCreateUserActionPayload,
+  CreateUserRequest,
 } from './UserDirectoryCreateUserActionTypes';
 import { UserDirectoryActionType } from './UserDirectoryActionType';
 
 export function* askUserDirectoryCreateUser(
-  options: UserDirectoryCreateUserActionPayload,
+  userDirectoryName: string,
+  createUserRequest: CreateUserRequest,
 ): UserDirectoryCreateUserActionRequester {
-  return yield { type: UserDirectoryActionType.CreateUser, payload: options };
+  return yield {
+    type: UserDirectoryActionType.CreateUser,
+    payload: {
+      userDirectoryName,
+      createUserRequest,
+    },
+  };
 }

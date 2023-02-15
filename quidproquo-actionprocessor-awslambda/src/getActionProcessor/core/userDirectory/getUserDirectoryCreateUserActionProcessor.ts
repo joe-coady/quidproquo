@@ -23,9 +23,8 @@ const getUserDirectoryCreateUserActionProcessor = (
 
     const username = await createUser(
       userPoolId,
-      payload.email || '',
-      payload.phone || '',
       qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig),
+      payload.createUserRequest,
     );
 
     return actionResult(username);

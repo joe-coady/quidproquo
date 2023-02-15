@@ -1,12 +1,18 @@
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
 import { UserDirectoryActionType } from './UserDirectoryActionType';
 
+export interface CreateUserRequest {
+  email: string;
+  phone?: string;
+
+  password: string;
+}
+
 // Payload
 export interface UserDirectoryCreateUserActionPayload {
   userDirectoryName: string;
 
-  email?: string;
-  phone?: string;
+  createUserRequest: CreateUserRequest;
 }
 
 // Action

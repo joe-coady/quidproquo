@@ -6,6 +6,7 @@ import { QpqResource } from '../../../base/QpqResource';
 
 import { Construct } from 'constructs';
 import { aws_iam, aws_cognito } from 'aws-cdk-lib';
+import * as cdk from 'aws-cdk-lib';
 
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
 
@@ -44,6 +45,7 @@ export abstract class QpqCoreUserDirectoryConstructBase extends QpqConstructBloc
       'cognito-idp:AdminDeleteUser',
       'cognito-idp:AdminUpdateUserAttributes',
       'cognito-idp:AdminDeleteUserAttributes',
+      'cognito-idp:AdminSetUserPassword',
     );
   }
 
@@ -78,10 +80,21 @@ export class QpqCoreUserDirectoryConstruct extends QpqCoreUserDirectoryConstruct
     super(scope, id, props);
 
     this.userPool = new aws_cognito.UserPool(this, 'user-pool', {
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
       userPoolName: this.resourceName(props.userDirectoryConfig.name),
       selfSignUpEnabled: props.userDirectoryConfig.selfSignUpEnabled,
+      standardAttributes: {
+        email: {
+          required: true,
+          mutable: true,
+        },
+        phoneNumber: {
+          required: props.userDirectoryConfig.phoneRequired,
+          mutable: true,
+        },
+      },
       autoVerify: {
-        email: props.userDirectoryConfig.emailRequired,
+        email: true,
         phone: props.userDirectoryConfig.phoneRequired,
       },
     });
