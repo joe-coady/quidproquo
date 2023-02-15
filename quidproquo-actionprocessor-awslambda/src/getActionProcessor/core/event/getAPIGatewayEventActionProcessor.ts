@@ -106,7 +106,10 @@ const getProcessMatchStory = (
       .find((m) => m.match.didMatch);
 
     if (!matchedRoute) {
-      return actionResultError(ErrorTypeEnum.NotFound, 'route not found');
+      return actionResultError(
+        ErrorTypeEnum.NotFound,
+        `route not found [${payload.transformedEventParams.path}] - [${payload.transformedEventParams.headers['user-agent']}]`,
+      );
     }
 
     return actionResult<MatchStoryResult>({

@@ -27,3 +27,9 @@ export const getQpqRuntimeResourceName = (
   const name = getConfigRuntimeResourceName(resourceName, qpqConfig, resourceType);
   return `${name}-qpq${resourceType}`;
 };
+
+export const getCFExportNameUserPoolId = (userDirectoryName: string, qpqConfig: QPQConfig) =>
+  getQpqRuntimeResourceName(userDirectoryName, qpqConfig, 'user-pool-id-export');
+
+export const getCFExportNameUserPoolClientId = (userDirectoryName: string, qpqConfig: QPQConfig) =>
+  getQpqRuntimeResourceName(userDirectoryName, qpqConfig, 'user-pool-client-id-export');

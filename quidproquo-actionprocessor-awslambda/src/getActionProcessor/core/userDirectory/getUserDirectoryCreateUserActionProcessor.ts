@@ -5,17 +5,24 @@ import {
   qpqCoreUtils,
   UserDirectoryActionType,
 } from 'quidproquo-core';
-import { resolveResourceName } from '../../../runtimeConfig/qpqAwsLambdaRuntimeConfigUtils';
+import { getCFExportNameUserPoolId } from '../../../awsNamingUtils';
 
 import { createUser } from '../../../logic/cognito/createUser';
+import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 
 const getUserDirectoryCreateUserActionProcessor = (
   qpqConfig: QPQConfig,
 ): UserDirectoryCreateUserActionProcessor => {
   return async (payload) => {
-    const userPoolName = resolveResourceName(payload.userDirectoryName, qpqConfig);
+    const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
+
+    const userPoolId = await getExportedValue(
+      getCFExportNameUserPoolId(payload.userDirectoryName, qpqConfig),
+      region,
+    );
+
     const username = await createUser(
-      userPoolName,
+      userPoolId,
       payload.email || '',
       payload.phone || '',
       qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig),

@@ -2,7 +2,7 @@ import path from 'path';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
 import { Construct } from 'constructs';
-import { aws_lambda } from 'aws-cdk-lib';
+import { aws_lambda, aws_iam } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 
 export interface FunctionProps extends QpqConstructBlockProps {
@@ -41,5 +41,13 @@ export class Function extends QpqConstructBlock {
 
       environment: props.environment,
     });
+
+    // Let lambdas read from the exported variables in cloudformation
+    this.lambdaFunction.addToRolePolicy(
+      new aws_iam.PolicyStatement({
+        actions: ['cloudformation:ListExports'],
+        resources: ['*'],
+      }),
+    );
   }
 }

@@ -4,21 +4,19 @@ import {
   DeliveryMediumType,
 } from '@aws-sdk/client-cognito-identity-provider';
 
-import { getUserPoolId } from './getUserPoolId';
-
 export const createUser = async (
-  userPoolName: string,
+  userPoolId: string,
   email: string,
   phone: string,
   region: string,
 ): Promise<string> => {
   const cognitoClient = new CognitoIdentityProviderClient({ region });
-  const userPoolId = await getUserPoolId(userPoolName, region);
 
   const response = await cognitoClient.send(
     new AdminCreateUserCommand({
       UserPoolId: userPoolId,
       Username: email,
+      TemporaryPassword: '4!ShadowBlog!23',
       DesiredDeliveryMediums: [
         email && DeliveryMediumType.EMAIL,
         phone && DeliveryMediumType.SMS,
@@ -31,5 +29,7 @@ export const createUser = async (
     }),
   );
 
-  return response.User?.Username || '';
+  const username = response.User?.Username || '';
+
+  return username;
 };
