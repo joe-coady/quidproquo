@@ -30,9 +30,5 @@
     "quidproquo-actionprocessor-awslambda",
     "quidproquo-deploy-webpack",
     "quidproquo-deploy-awscdk"
-  ],
-  "dependencies": {
-    "jsonwebtoken": "^9.0.0",
-    "jwk-to-pem": "^2.0.5"
-  }
+  ]
 }
