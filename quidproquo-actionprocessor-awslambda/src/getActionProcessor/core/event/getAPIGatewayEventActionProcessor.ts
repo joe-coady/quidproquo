@@ -22,6 +22,13 @@ import {
   RouteOptions,
 } from 'quidproquo-webserver';
 
+import { getUserPoolClientSecret } from '../../../logic/cognito/getUserPoolClientSecret';
+import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
+import {
+  getCFExportNameUserPoolIdFromConfig,
+  getCFExportNameUserPoolClientIdFromConfig,
+} from '../../../awsNamingUtils';
+
 import { APIGatewayEvent, Context, APIGatewayProxyResult } from 'aws-lambda';
 
 import { matchUrl } from '../../../awsLambdaUtils';
@@ -45,7 +52,7 @@ const getProcessTransformEventParams = (
   return async ({ eventParams: [apiGatewayEvent, context] }) => {
     const path = (apiGatewayEvent.path || '').replace(new RegExp(`^(\/${serviceName})/`), '/');
 
-    return actionResult({
+    const transformedEventParams: HTTPEvent<any> = {
       path,
       query: {
         ...(apiGatewayEvent.multiValueQueryStringParameters || {}),
@@ -57,7 +64,11 @@ const getProcessTransformEventParams = (
       correlation: context.awsRequestId,
       sourceIp: apiGatewayEvent.requestContext.identity.sourceIp,
       isBase64Encoded: apiGatewayEvent.isBase64Encoded,
-    });
+    };
+
+    console.log(JSON.stringify(transformedEventParams, null, 2));
+
+    return actionResult(transformedEventParams);
   };
 };
 
@@ -85,7 +96,7 @@ const getProcessTransformResponseResult = (
 };
 
 const getProcessAutoRespond = (
-  configs: QPQConfig,
+  qpqConfig: QPQConfig,
 ): EventAutoRespondActionProcessor<
   HTTPEvent<any>,
   HttpRouteMatchStoryResult,
@@ -100,26 +111,67 @@ const getProcessAutoRespond = (
         isBase64Encoded: false,
         body: '',
         headers: qpqWebServerUtils.getCorsHeaders(
-          configs,
+          qpqConfig,
           payload.matchResult.config || {},
           payload.transformedEventParams.headers,
         ),
       });
     }
 
-    console.log(
-      '!!payload.matchResult.config?.routeAuthSettings',
-      !!payload.matchResult.config?.routeAuthSettings,
-    );
     if (!!payload.matchResult.config?.routeAuthSettings) {
-      console.log('Returning ~ ~ ');
+      const userDirectoryName =
+        payload.matchResult.config?.routeAuthSettings.userDirectoryName || '';
+      const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
+
+      const userPoolId = await getExportedValue(
+        getCFExportNameUserPoolIdFromConfig(
+          userDirectoryName,
+          qpqConfig,
+          payload.matchResult.config?.routeAuthSettings.serviceName,
+          payload.matchResult.config?.routeAuthSettings.applicationName,
+        ),
+        region,
+      );
+
+      const userPoolClientId = await getExportedValue(
+        getCFExportNameUserPoolClientIdFromConfig(
+          userDirectoryName,
+          qpqConfig,
+          payload.matchResult.config?.routeAuthSettings.serviceName,
+          payload.matchResult.config?.routeAuthSettings.applicationName,
+        ),
+        region,
+      );
+
+      console.log(
+        JSON.stringify(
+          {
+            userPoolId,
+            userPoolClientId,
+          },
+          null,
+          2,
+        ),
+      );
+
+      const clientSecret = await getUserPoolClientSecret(userPoolId, userPoolClientId, region);
+
+      console.log(
+        JSON.stringify(
+          {
+            clientSecret,
+          },
+          null,
+          2,
+        ),
+      );
 
       return actionResult({
         status: 401,
         isBase64Encoded: false,
         body: JSON.stringify({ message: 'You are Unauthorized to access this resource' }),
         headers: qpqWebServerUtils.getCorsHeaders(
-          configs,
+          qpqConfig,
           payload.matchResult.config || {},
           payload.transformedEventParams.headers,
         ),

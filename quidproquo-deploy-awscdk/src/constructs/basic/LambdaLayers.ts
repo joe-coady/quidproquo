@@ -22,7 +22,10 @@ export class LambdaLayers extends QpqConstructBlock {
     this.layers = (props.apiLayers || []).map((layer) => {
       return layer.buildPath
         ? new aws_lambda.LayerVersion(this, `${layer.name}-layer`, {
-            layerVersionName: awsNamingUtils.getQpqRuntimeResourceName(layer.name, props.qpqConfig),
+            layerVersionName: awsNamingUtils.getQpqRuntimeResourceNameFromConfig(
+              layer.name,
+              props.qpqConfig,
+            ),
             code: new aws_lambda.AssetCode(layer.buildPath),
             compatibleRuntimes: [aws_lambda.Runtime.NODEJS_18_X],
           })

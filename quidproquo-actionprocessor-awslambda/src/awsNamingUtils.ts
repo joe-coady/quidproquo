@@ -2,14 +2,11 @@ import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
 export const getConfigRuntimeResourceName = (
   resourceName: string,
-  qpqConfig: QPQConfig,
-  resourceType: string = '',
+  application: string,
+  service: string,
+  environment: string,
+  feature?: string,
 ) => {
-  const application = qpqCoreUtils.getApplicationName(qpqConfig);
-  const service = qpqCoreUtils.getApplicationModuleName(qpqConfig);
-  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
-  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
-
   const baseName = `${resourceName}-${application}-${service}-${environment}`;
 
   if (feature) {
@@ -19,17 +16,96 @@ export const getConfigRuntimeResourceName = (
   return baseName;
 };
 
+export const getConfigRuntimeResourceNameFromConfig = (
+  resourceName: string,
+  qpqConfig: QPQConfig,
+) => {
+  const application = qpqCoreUtils.getApplicationName(qpqConfig);
+  const service = qpqCoreUtils.getApplicationModuleName(qpqConfig);
+  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
+  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+
+  return getConfigRuntimeResourceName(resourceName, application, service, environment, feature);
+};
+
 export const getQpqRuntimeResourceName = (
+  resourceName: string,
+  application: string,
+  service: string,
+  environment: string,
+  feature?: string,
+  resourceType: string = '',
+) => {
+  const name = getConfigRuntimeResourceName(
+    resourceName,
+    application,
+    service,
+    environment,
+    feature,
+  );
+  return `${name}-qpq${resourceType}`;
+};
+
+export const getQpqRuntimeResourceNameFromConfig = (
   resourceName: string,
   qpqConfig: QPQConfig,
   resourceType: string = '',
 ) => {
-  const name = getConfigRuntimeResourceName(resourceName, qpqConfig, resourceType);
-  return `${name}-qpq${resourceType}`;
+  const application = qpqCoreUtils.getApplicationName(qpqConfig);
+  const service = qpqCoreUtils.getApplicationModuleName(qpqConfig);
+  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
+  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+
+  return getQpqRuntimeResourceName(
+    resourceName,
+    application,
+    service,
+    environment,
+    feature,
+    resourceType,
+  );
 };
 
-export const getCFExportNameUserPoolId = (userDirectoryName: string, qpqConfig: QPQConfig) =>
-  getQpqRuntimeResourceName(userDirectoryName, qpqConfig, 'user-pool-id-export');
+export const getCFExportNameUserPoolIdFromConfig = (
+  userDirectoryName: string,
+  qpqConfig: QPQConfig,
 
-export const getCFExportNameUserPoolClientId = (userDirectoryName: string, qpqConfig: QPQConfig) =>
-  getQpqRuntimeResourceName(userDirectoryName, qpqConfig, 'user-pool-client-id-export');
+  serviceOverride?: string,
+  applicationOverride?: string,
+) => {
+  const application = applicationOverride || qpqCoreUtils.getApplicationName(qpqConfig);
+  const service = serviceOverride || qpqCoreUtils.getApplicationModuleName(qpqConfig);
+  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
+  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+
+  return getQpqRuntimeResourceName(
+    userDirectoryName,
+    application,
+    service,
+    environment,
+    feature,
+    'user-pool-id-export',
+  );
+};
+
+export const getCFExportNameUserPoolClientIdFromConfig = (
+  userDirectoryName: string,
+  qpqConfig: QPQConfig,
+
+  serviceOverride?: string,
+  applicationOverride?: string,
+) => {
+  const application = applicationOverride || qpqCoreUtils.getApplicationName(qpqConfig);
+  const service = serviceOverride || qpqCoreUtils.getApplicationModuleName(qpqConfig);
+  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
+  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+
+  return getQpqRuntimeResourceName(
+    userDirectoryName,
+    application,
+    service,
+    environment,
+    feature,
+    'user-pool-client-id-export',
+  );
+};

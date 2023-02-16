@@ -1,14 +1,14 @@
 import { QPQConfig } from 'quidproquo-core';
-import { getConfigRuntimeResourceName } from '../awsNamingUtils';
+import { getConfigRuntimeResourceNameFromConfig } from '../awsNamingUtils';
 
 export const resolveResourceName = (resourceName: string, qpqConfig: QPQConfig) => {
-  return getConfigRuntimeResourceName(resourceName, qpqConfig);
+  return getConfigRuntimeResourceNameFromConfig(resourceName, qpqConfig);
 };
 
 export const resolveSecretKey = (secretName: string, qpqConfig: QPQConfig) => {
-  return getConfigRuntimeResourceName(secretName, qpqConfig);
+  return getConfigRuntimeResourceNameFromConfig(secretName, qpqConfig);
 };
 
 export const resolveParameterKey = (parameterName: string, qpqConfig: QPQConfig) => {
-  return getConfigRuntimeResourceName(parameterName, qpqConfig);
+  return getConfigRuntimeResourceNameFromConfig(parameterName, qpqConfig);
 };

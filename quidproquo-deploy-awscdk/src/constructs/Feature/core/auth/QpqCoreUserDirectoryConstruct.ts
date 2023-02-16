@@ -66,7 +66,7 @@ export class QpqCoreUserDirectoryConstruct extends QpqCoreUserDirectoryConstruct
     awsAccountId: string,
   ): QpqResource {
     const userPoolId = qpqDeployAwsCdkUtils.importStackValue(
-      awsNamingUtils.getCFExportNameUserPoolId(userDirectoryConfig.name, qpqConfig),
+      awsNamingUtils.getCFExportNameUserPoolIdFromConfig(userDirectoryConfig.name, qpqConfig),
     );
 
     class Import extends QpqCoreUserDirectoryConstructBase {
@@ -101,7 +101,10 @@ export class QpqCoreUserDirectoryConstruct extends QpqCoreUserDirectoryConstruct
 
     qpqDeployAwsCdkUtils.exportStackValue(
       this,
-      awsNamingUtils.getCFExportNameUserPoolId(props.userDirectoryConfig.name, props.qpqConfig),
+      awsNamingUtils.getCFExportNameUserPoolIdFromConfig(
+        props.userDirectoryConfig.name,
+        props.qpqConfig,
+      ),
       this.userPool.userPoolId,
     );
 
@@ -116,7 +119,7 @@ export class QpqCoreUserDirectoryConstruct extends QpqCoreUserDirectoryConstruct
 
     qpqDeployAwsCdkUtils.exportStackValue(
       this,
-      awsNamingUtils.getCFExportNameUserPoolClientId(
+      awsNamingUtils.getCFExportNameUserPoolClientIdFromConfig(
         props.userDirectoryConfig.name,
         props.qpqConfig,
       ),

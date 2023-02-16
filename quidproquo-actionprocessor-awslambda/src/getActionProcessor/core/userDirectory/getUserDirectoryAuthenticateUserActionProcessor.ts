@@ -8,8 +8,8 @@ import {
 } from 'quidproquo-core';
 
 import {
-  getCFExportNameUserPoolId,
-  getCFExportNameUserPoolClientId,
+  getCFExportNameUserPoolIdFromConfig,
+  getCFExportNameUserPoolClientIdFromConfig,
 } from '../../../awsNamingUtils';
 
 import { authenticateUser } from '../../../logic/cognito/authenticateUser';
@@ -22,12 +22,12 @@ const getUserDirectoryAuthenticateUserActionProcessor = (
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const userPoolId = await getExportedValue(
-      getCFExportNameUserPoolId(payload.userDirectoryName, qpqConfig),
+      getCFExportNameUserPoolIdFromConfig(payload.userDirectoryName, qpqConfig),
       region,
     );
 
     const userPoolClientId = await getExportedValue(
-      getCFExportNameUserPoolClientId(payload.userDirectoryName, qpqConfig),
+      getCFExportNameUserPoolClientIdFromConfig(payload.userDirectoryName, qpqConfig),
       region,
     );
 
