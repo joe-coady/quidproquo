@@ -47,11 +47,12 @@ export class QpqWebserverApiConstruct extends QpqConstructBlock {
       awsAccountId: props.awsAccountId,
     });
 
-    const grantables = qpqDeployAwsCdkUtils.getQqpGrantableResources(
+    const grantables = qpqDeployAwsCdkUtils.getQqpGrantableResourcesForApiConfig(
       this,
       'grantable',
       this.qpqConfig,
       props.awsAccountId,
+      props.apiConfig,
     );
 
     grantables.forEach((g) => {

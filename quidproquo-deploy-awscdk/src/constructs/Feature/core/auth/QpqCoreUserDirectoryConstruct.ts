@@ -62,11 +62,18 @@ export class QpqCoreUserDirectoryConstruct extends QpqCoreUserDirectoryConstruct
     scope: Construct,
     id: string,
     qpqConfig: QPQConfig,
-    userDirectoryConfig: UserDirectoryQPQConfigSetting,
     awsAccountId: string,
+    userDirectoryName: string,
+    serviceOverride?: string,
+    applicationOverride?: string,
   ): QpqResource {
     const userPoolId = qpqDeployAwsCdkUtils.importStackValue(
-      awsNamingUtils.getCFExportNameUserPoolIdFromConfig(userDirectoryConfig.name, qpqConfig),
+      awsNamingUtils.getCFExportNameUserPoolIdFromConfig(
+        userDirectoryName,
+        qpqConfig,
+        serviceOverride,
+        applicationOverride,
+      ),
     );
 
     class Import extends QpqCoreUserDirectoryConstructBase {

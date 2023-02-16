@@ -11,7 +11,11 @@ import {
   QueueQPQConfigSetting,
 } from 'quidproquo-core';
 
-import { ApiQPQWebServerConfigSetting, QPQWebServerConfigSettingType } from 'quidproquo-webserver';
+import {
+  ApiQPQWebServerConfigSetting,
+  QPQWebServerConfigSettingType,
+  qpqWebServerUtils,
+} from 'quidproquo-webserver';
 
 import {
   QpqResource,
@@ -139,8 +143,38 @@ export const getQqpUserPoolGrantables = (
       scope,
       `${id}-${qpqCoreUtils.getUniqueKeyForSetting(userDirectoryConfig)}-grantable`,
       qpqConfig,
-      userDirectoryConfig,
       awsAccountId,
+      userDirectoryConfig.name,
+    );
+  });
+
+  return userDirectoryResources;
+};
+
+export const getQqpUserPoolGrantablesForApiConfig = (
+  scope: Construct,
+  id: string,
+  qpqConfig: QPQConfig,
+  awsAccountId: string,
+  config: ApiQPQWebServerConfigSetting,
+): QpqResource[] => {
+  const routesWithAuth = qpqWebServerUtils
+    .getAllRoutesForApi(config.apiName, qpqConfig)
+    .filter(
+      (r) =>
+        r.options.routeAuthSettings?.userDirectoryName &&
+        (r.options.routeAuthSettings?.applicationName || r.options.routeAuthSettings?.serviceName),
+    );
+
+  const userDirectoryResources = routesWithAuth.map((route) => {
+    return QpqCoreUserDirectoryConstruct.fromOtherStack(
+      scope,
+      `${id}-${qpqCoreUtils.getUniqueKeyForSetting(route)}-grantable-xserver`,
+      qpqConfig,
+      awsAccountId,
+      route.options.routeAuthSettings?.userDirectoryName!,
+      route.options.routeAuthSettings?.serviceName,
+      route.options.routeAuthSettings?.applicationName,
     );
   });
 
@@ -172,6 +206,22 @@ export const getQqpGrantableResources = (
     ...getQqpStorageDriveGrantables(scope, id, qpqConfig, awsAccountId),
     ...getQqpQueueGrantables(scope, id, qpqConfig, awsAccountId),
     ...getQqpUserPoolGrantables(scope, id, qpqConfig, awsAccountId),
+  ];
+};
+
+export const getQqpGrantableResourcesForApiConfig = (
+  scope: Construct,
+  id: string,
+  qpqConfig: QPQConfig,
+  awsAccountId: string,
+  config: ApiQPQWebServerConfigSetting,
+): QpqResource[] => {
+  return [
+    // All the normal grantables
+    ...getQqpGrantableResources(scope, id, qpqConfig, awsAccountId),
+
+    // Then special grantables just for this config.
+    ...getQqpUserPoolGrantablesForApiConfig(scope, id, qpqConfig, awsAccountId, config),
   ];
 };
 

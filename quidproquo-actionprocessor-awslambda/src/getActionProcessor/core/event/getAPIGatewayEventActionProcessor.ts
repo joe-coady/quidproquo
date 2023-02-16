@@ -226,14 +226,15 @@ const getProcessMatchStory = (
   };
 };
 
-export default (config: QPQConfig) => {
-  const routes = qpqWebServerUtils.getAllRoutes(config);
-  const serviceName = qpqCoreUtils.getApplicationModuleName(config);
+export default (qpqConfig: QPQConfig) => {
+  // TODO: Make this aware of the API that we are eventing
+  const routes = qpqWebServerUtils.getAllRoutes(qpqConfig);
+  const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
 
   return {
     [EventActionType.TransformEventParams]: getProcessTransformEventParams(serviceName),
-    [EventActionType.TransformResponseResult]: getProcessTransformResponseResult(config),
-    [EventActionType.AutoRespond]: getProcessAutoRespond(config),
+    [EventActionType.TransformResponseResult]: getProcessTransformResponseResult(qpqConfig),
+    [EventActionType.AutoRespond]: getProcessAutoRespond(qpqConfig),
     [EventActionType.MatchStory]: getProcessMatchStory(routes),
   };
 };

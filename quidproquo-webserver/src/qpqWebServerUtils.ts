@@ -15,18 +15,27 @@ import { HttpEventHeaders, HTTPEvent, HTTPEventResponse } from './types/HTTPEven
 import { RouteOptions } from './config/settings/route';
 import { WebEntryQPQWebServerConfigSetting, ApiQPQWebServerConfigSetting } from './config';
 
-export const getAllRoutes = (configs: QPQConfig): RouteQPQWebServerConfigSetting[] => {
+export const getAllRoutes = (qpqConfig: QPQConfig): RouteQPQWebServerConfigSetting[] => {
   const routes = qpqCoreUtils.getConfigSettings<RouteQPQWebServerConfigSetting>(
-    configs,
+    qpqConfig,
     QPQWebServerConfigSettingType.Route,
   );
 
   return routes;
 };
 
-export const getAllSeo = (configs: QPQConfig): SeoQPQWebServerConfigSetting[] => {
+export const getAllRoutesForApi = (
+  apiName: string,
+  qpqConfig: QPQConfig,
+): RouteQPQWebServerConfigSetting[] => {
+  const routes = getAllRoutes(qpqConfig);
+
+  return routes;
+};
+
+export const getAllSeo = (qpqConfig: QPQConfig): SeoQPQWebServerConfigSetting[] => {
   const seoConfigs = qpqCoreUtils.getConfigSettings<SeoQPQWebServerConfigSetting>(
-    configs,
+    qpqConfig,
     QPQWebServerConfigSettingType.Seo,
   );
 
