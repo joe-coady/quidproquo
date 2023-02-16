@@ -5,7 +5,7 @@ import { EventActionType } from './EventActionType';
 export type MatchStoryResult<MatchOptions> = {
   src?: string;
   runtime?: string;
-  options?: MatchOptions;
+  runtimeOptions?: MatchOptions;
 };
 
 // Payload

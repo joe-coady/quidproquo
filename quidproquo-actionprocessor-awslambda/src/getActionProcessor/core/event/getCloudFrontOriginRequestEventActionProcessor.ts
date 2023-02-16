@@ -95,7 +95,7 @@ const getProcessMatchStory = (
     return actionResult<MatchStoryResult<SeoEventRouteParams>>({
       src: matchedSeoConfig.route.src,
       runtime: matchedSeoConfig.route.runtime,
-      options: matchedSeoConfig.match.params || {},
+      runtimeOptions: matchedSeoConfig.match.params || {},
     });
   };
 };

@@ -20,10 +20,13 @@ export function* askProcessEvent(...eventArguments: any) {
   }
 
   // Try and match a story to execute
-  const { src, runtime, options } = yield* askEventMatchStory(transformedEventParams);
+  const { src, runtime, runtimeOptions } = yield* askEventMatchStory(transformedEventParams);
 
   // Execute the story
-  const result = yield* askExecuteStory('route', src!, runtime!, [transformedEventParams, options]);
+  const result = yield* askExecuteStory('route', src!, runtime!, [
+    transformedEventParams,
+    runtimeOptions,
+  ]);
 
   // return the result of the story back to the event caller
   return yield* askEventTransformResponseResult(result, transformedEventParams);

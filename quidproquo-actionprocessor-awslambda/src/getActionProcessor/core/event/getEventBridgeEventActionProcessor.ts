@@ -55,7 +55,7 @@ const getProcessMatchStory = (
     return actionResult<MatchStoryResult<{}>>({
       src: lambdaRuntimeConfig.src,
       runtime: lambdaRuntimeConfig.runtime,
-      options: {},
+      runtimeOptions: {},
     });
   };
 };

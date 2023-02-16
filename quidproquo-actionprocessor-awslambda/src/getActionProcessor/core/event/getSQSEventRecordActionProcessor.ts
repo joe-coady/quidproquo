@@ -104,7 +104,7 @@ const getProcessMatchStory = (
     return actionResult<MatchStoryResult<QueueEventTypeParams>>({
       src: sourceEntry.src,
       runtime: sourceEntry.runtime,
-      options: matchedQueueType.match.params || {},
+      runtimeOptions: matchedQueueType.match.params || {},
     });
   };
 };

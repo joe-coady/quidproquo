@@ -116,7 +116,7 @@ const getProcessMatchStory = (
     return actionResult<MatchStoryResult<HttpEventRouteParams>>({
       src: matchedRoute.route.src,
       runtime: matchedRoute.route.runtime,
-      options: matchedRoute.match.params || {},
+      runtimeOptions: matchedRoute.match.params || {},
     });
   };
 };
