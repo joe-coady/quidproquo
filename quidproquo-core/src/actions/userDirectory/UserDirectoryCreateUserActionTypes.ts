@@ -3,9 +3,9 @@ import { UserDirectoryActionType } from './UserDirectoryActionType';
 
 export interface CreateUserRequest {
   email: string;
-  phone?: string;
-
   password: string;
+
+  phone?: string;
 }
 
 // Payload

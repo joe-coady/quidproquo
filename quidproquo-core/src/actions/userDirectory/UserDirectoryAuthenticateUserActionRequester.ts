@@ -1,11 +1,19 @@
 import {
   UserDirectoryAuthenticateUserActionRequester,
-  UserDirectoryAuthenticateUserActionPayload,
+  AuthenticateUserRequest,
 } from './UserDirectoryAuthenticateUserActionTypes';
 import { UserDirectoryActionType } from './UserDirectoryActionType';
 
 export function* askUserDirectoryAuthenticateUser(
-  options: UserDirectoryAuthenticateUserActionPayload,
+  userDirectoryName: string,
+  authenticateUserRequest: AuthenticateUserRequest,
 ): UserDirectoryAuthenticateUserActionRequester {
-  return yield { type: UserDirectoryActionType.AuthenticateUser, payload: options };
+  return yield {
+    type: UserDirectoryActionType.AuthenticateUser,
+    payload: {
+      userDirectoryName,
+
+      authenticateUserRequest,
+    },
+  };
 }

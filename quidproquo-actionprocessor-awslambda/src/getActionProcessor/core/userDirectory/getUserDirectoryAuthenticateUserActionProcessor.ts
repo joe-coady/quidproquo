@@ -4,8 +4,7 @@ import {
   QPQConfig,
   qpqCoreUtils,
   UserDirectoryActionType,
-  actionResultError,
-  ErrorTypeEnum,
+  AuthenticateUserChallenge,
 } from 'quidproquo-core';
 
 import {
@@ -32,15 +31,14 @@ const getUserDirectoryAuthenticateUserActionProcessor = (
       region,
     );
 
-    const username = await authenticateUser(
+    const authResponse = await authenticateUser(
       userPoolId,
       userPoolClientId,
-      payload.username,
-      payload.password,
       qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig),
+      payload.authenticateUserRequest,
     );
 
-    return actionResult(username);
+    return actionResult(authResponse);
   };
 };
 
