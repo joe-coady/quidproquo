@@ -70,7 +70,11 @@ const getProcessAutoRespond = (): EventAutoRespondActionProcessor<SeoEvent<any>>
 
 const getProcessMatchStory = (
   seoConfigs: SeoQPQWebServerConfigSetting[],
-): EventMatchStoryActionProcessor<SeoEvent<any>, SeoEventRouteParams> => {
+): EventMatchStoryActionProcessor<
+  SeoEvent<any>,
+  SeoEventRouteParams,
+  SeoQPQWebServerConfigSetting
+> => {
   return async (payload) => {
     /// Sort the routes by string length
     // Note: We may need to filter variable routes out {} as the variables are length independent
@@ -92,10 +96,11 @@ const getProcessMatchStory = (
       return actionResultError(ErrorTypeEnum.NotFound, 'seo not found');
     }
 
-    return actionResult<MatchStoryResult<SeoEventRouteParams>>({
+    return actionResult<MatchStoryResult<SeoEventRouteParams, SeoQPQWebServerConfigSetting>>({
       src: matchedSeoConfig.route.src,
       runtime: matchedSeoConfig.route.runtime,
       runtimeOptions: matchedSeoConfig.match.params || {},
+      config: matchedSeoConfig.route,
     });
   };
 };

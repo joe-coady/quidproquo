@@ -2,10 +2,11 @@ import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
 import { EventActionType } from './EventActionType';
 
 // Custom return result
-export type MatchStoryResult<MatchOptions> = {
+export type MatchStoryResult<MatchOptions, Config> = {
   src?: string;
   runtime?: string;
   runtimeOptions?: MatchOptions;
+  config?: Config;
 };
 
 // Payload
@@ -20,11 +21,11 @@ export interface EventMatchStoryAction<T> extends Action<EventMatchStoryActionPa
 }
 
 // Functions
-export type EventMatchStoryActionProcessor<T, MatchOptions> = ActionProcessor<
+export type EventMatchStoryActionProcessor<T, MatchOptions, Config> = ActionProcessor<
   EventMatchStoryAction<T>,
-  MatchStoryResult<MatchOptions>
+  MatchStoryResult<MatchOptions, Config>
 >;
-export type EventMatchStoryActionRequester<T, MatchOptions> = ActionRequester<
+export type EventMatchStoryActionRequester<T, MatchOptions, Config> = ActionRequester<
   EventMatchStoryAction<T>,
-  MatchStoryResult<MatchOptions>
+  MatchStoryResult<MatchOptions, Config>
 >;

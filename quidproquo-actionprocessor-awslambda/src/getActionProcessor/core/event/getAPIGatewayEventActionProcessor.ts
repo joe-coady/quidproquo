@@ -17,6 +17,7 @@ import {
   HTTPEvent,
   qpqWebServerUtils,
   HttpEventRouteParams,
+  RouteOptions,
 } from 'quidproquo-webserver';
 
 import { APIGatewayEvent, Context, APIGatewayProxyResult } from 'aws-lambda';
@@ -86,7 +87,7 @@ const getProcessAutoRespond = (
 
 const getProcessMatchStory = (
   routes: RouteQPQWebServerConfigSetting[],
-): EventMatchStoryActionProcessor<HTTPEvent<any>, HttpEventRouteParams> => {
+): EventMatchStoryActionProcessor<HTTPEvent<any>, HttpEventRouteParams, RouteOptions> => {
   return async (payload) => {
     // Sort the routes by string length
     // Note: We may need to filter variable routes out {} as the variables are length independent
@@ -113,10 +114,13 @@ const getProcessMatchStory = (
       );
     }
 
-    return actionResult<MatchStoryResult<HttpEventRouteParams>>({
+    return actionResult<MatchStoryResult<HttpEventRouteParams, RouteOptions>>({
       src: matchedRoute.route.src,
       runtime: matchedRoute.route.runtime,
       runtimeOptions: matchedRoute.match.params || {},
+
+      // TODO: Merge this with the default options.
+      config: matchedRoute.route.options,
     });
   };
 };

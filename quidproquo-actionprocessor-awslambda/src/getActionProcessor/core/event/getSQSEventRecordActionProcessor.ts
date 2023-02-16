@@ -73,7 +73,7 @@ const getProcessAutoRespond = (): EventAutoRespondActionProcessor<AnyQueueEvent>
 
 const getProcessMatchStory = (
   qpqConfig: QPQConfig,
-): EventMatchStoryActionProcessor<AnyQueueEvent, QueueEventTypeParams> => {
+): EventMatchStoryActionProcessor<AnyQueueEvent, QueueEventTypeParams, string> => {
   const queueQPQConfigSetting = getQueueConfigSetting();
 
   return async (payload) => {
@@ -101,10 +101,11 @@ const getProcessMatchStory = (
 
     const sourceEntry = queueQueueProcessors[matchedQueueType.queueType];
 
-    return actionResult<MatchStoryResult<QueueEventTypeParams>>({
+    return actionResult<MatchStoryResult<QueueEventTypeParams, string>>({
       src: sourceEntry.src,
       runtime: sourceEntry.runtime,
       runtimeOptions: matchedQueueType.match.params || {},
+      config: matchedQueueType.queueType,
     });
   };
 };

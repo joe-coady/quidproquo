@@ -46,13 +46,13 @@ const getProcessAutoRespond = (): EventAutoRespondActionProcessor<ScheduledEvent
 const getProcessMatchStory = (
   lambdaRuntimeConfig?: LambdaRuntimeConfig,
   // TODO: Get rid of type {}
-): EventMatchStoryActionProcessor<ScheduledEventParams<any>, {}> => {
+): EventMatchStoryActionProcessor<ScheduledEventParams<any>, {}, any> => {
   return async (payload) => {
     if (!lambdaRuntimeConfig) {
       return actionResultError(ErrorTypeEnum.NotFound, 'event runtime not found');
     }
 
-    return actionResult<MatchStoryResult<{}>>({
+    return actionResult<MatchStoryResult<{}, any>>({
       src: lambdaRuntimeConfig.src,
       runtime: lambdaRuntimeConfig.runtime,
       runtimeOptions: {},
