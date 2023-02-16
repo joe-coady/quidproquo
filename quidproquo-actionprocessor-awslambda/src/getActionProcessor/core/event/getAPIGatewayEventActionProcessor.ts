@@ -86,20 +86,24 @@ const getProcessTransformResponseResult = (
 
 const getProcessAutoRespond = (
   configs: QPQConfig,
-): EventAutoRespondActionProcessor<HTTPEvent<any>, HttpRouteMatchStoryResult> => {
+): EventAutoRespondActionProcessor<
+  HTTPEvent<any>,
+  HttpRouteMatchStoryResult,
+  HTTPEventResponse | null
+> => {
   return async (payload) => {
     console.log('getProcessAutoRespond payload', JSON.stringify(payload));
 
     if (payload.transformedEventParams.method === 'OPTIONS') {
       return actionResult({
-        result: {
-          status: 200,
-          headers: qpqWebServerUtils.getCorsHeaders(
-            configs,
-            payload.matchResult.config || {},
-            payload.transformedEventParams.headers,
-          ),
-        },
+        status: 200,
+        isBase64Encoded: false,
+        body: '',
+        headers: qpqWebServerUtils.getCorsHeaders(
+          configs,
+          payload.matchResult.config || {},
+          payload.transformedEventParams.headers,
+        ),
       });
     }
 
@@ -111,15 +115,14 @@ const getProcessAutoRespond = (
       console.log('Returning ~ ~ ');
 
       return actionResult({
-        result: {
-          status: 401,
-          body: JSON.stringify({ message: 'You are Unauthorized to access this resource' }),
-          headers: qpqWebServerUtils.getCorsHeaders(
-            configs,
-            payload.matchResult.config || {},
-            payload.transformedEventParams.headers,
-          ),
-        },
+        status: 401,
+        isBase64Encoded: false,
+        body: JSON.stringify({ message: 'You are Unauthorized to access this resource' }),
+        headers: qpqWebServerUtils.getCorsHeaders(
+          configs,
+          payload.matchResult.config || {},
+          payload.transformedEventParams.headers,
+        ),
       });
     }
 

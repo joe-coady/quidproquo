@@ -69,7 +69,8 @@ const getProcessTransformResponseResult = (
 
 const getProcessAutoRespond = (): EventAutoRespondActionProcessor<
   SeoEvent<any>,
-  CloudFrontOriginMatchStoryResult
+  CloudFrontOriginMatchStoryResult,
+  null
 > => {
   return async (payload) => {
     return actionResult(null);

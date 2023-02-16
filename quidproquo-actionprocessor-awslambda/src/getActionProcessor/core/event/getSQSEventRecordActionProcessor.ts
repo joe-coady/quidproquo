@@ -62,7 +62,8 @@ const getProcessTransformResponseResult = (
 
 const getProcessAutoRespond = (): EventAutoRespondActionProcessor<
   AnyQueueEvent,
-  SqsEventMatchStoryResult
+  SqsEventMatchStoryResult,
+  null
 > => {
   return async (payload) => {
     return actionResult(null);

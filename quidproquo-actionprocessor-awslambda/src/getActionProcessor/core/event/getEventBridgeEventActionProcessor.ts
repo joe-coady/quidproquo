@@ -46,7 +46,8 @@ const getProcessTransformResponseResult = (): EventTransformResponseResultAction
 // never early exit (maybe add validation?)
 const getProcessAutoRespond = (): EventAutoRespondActionProcessor<
   ScheduledEventParams<any>,
-  EventBridgeEventMatchStoryResult
+  EventBridgeEventMatchStoryResult,
+  null
 > => {
   return async () => actionResult(null);
 };

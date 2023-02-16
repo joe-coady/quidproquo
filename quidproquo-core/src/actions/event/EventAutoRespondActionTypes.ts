@@ -15,11 +15,13 @@ export interface EventAutoRespondAction<T, MSR extends AnyMatchStoryResult>
 }
 
 // Functions  - // TODO: Remove anys here
-export type EventAutoRespondActionProcessor<T, MSR extends AnyMatchStoryResult> = ActionProcessor<
-  EventAutoRespondAction<T, MSR>,
-  any
->;
-export type EventAutoRespondActionRequester<T, MSR extends AnyMatchStoryResult> = ActionRequester<
-  EventAutoRespondAction<T, MSR>,
-  any
->;
+export type EventAutoRespondActionProcessor<
+  T,
+  MSR extends AnyMatchStoryResult,
+  TRes,
+> = ActionProcessor<EventAutoRespondAction<T, MSR>, TRes>;
+export type EventAutoRespondActionRequester<
+  T,
+  MSR extends AnyMatchStoryResult,
+  TRes,
+> = ActionRequester<EventAutoRespondAction<T, MSR>, TRes>;
