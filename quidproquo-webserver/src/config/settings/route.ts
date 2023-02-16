@@ -2,8 +2,19 @@ import { QPQConfigSetting, HTTPMethod } from 'quidproquo-core';
 
 import { QPQWebServerConfigSettingType } from '../QPQConfig';
 
+export interface RouteAuthSettings {
+  userDirectoryName?: string;
+
+  applicationName?: string;
+  serviceName?: string;
+
+  scopes?: string[];
+}
+
 export type RouteOptions = {
   allowedOrigins?: string[];
+
+  routeAuthSettings?: RouteAuthSettings;
 };
 
 export interface RouteQPQWebServerConfigSetting extends QPQConfigSetting {
