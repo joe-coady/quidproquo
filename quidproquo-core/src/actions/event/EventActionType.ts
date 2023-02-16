@@ -4,3 +4,10 @@ export enum EventActionType {
   AutoRespond = '@quidproquo-core/event/AutoRespond',
   MatchStory = '@quidproquo-core/event/MatchStory',
 }
+
+export type MatchStoryResult<MatchOptions, Config> = {
+  src?: string;
+  runtime?: string;
+  runtimeOptions?: MatchOptions;
+  config?: Config;
+};

@@ -62,7 +62,11 @@ const getProcessTransformResponseResult = (
   };
 };
 
-const getProcessAutoRespond = (): EventAutoRespondActionProcessor<SeoEvent<any>> => {
+const getProcessAutoRespond = (): EventAutoRespondActionProcessor<
+  SeoEvent<any>,
+  SeoEventRouteParams,
+  SeoQPQWebServerConfigSetting
+> => {
   return async (payload) => {
     return actionResult(null);
   };

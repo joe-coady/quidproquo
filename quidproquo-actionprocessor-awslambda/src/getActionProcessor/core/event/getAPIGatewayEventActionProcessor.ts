@@ -66,7 +66,7 @@ const getProcessTransformResponseResult = (
 
 const getProcessAutoRespond = (
   configs: QPQConfig,
-): EventAutoRespondActionProcessor<HTTPEvent<any>> => {
+): EventAutoRespondActionProcessor<HTTPEvent<any>, HttpEventRouteParams, RouteOptions> => {
   return async (payload) => {
     if (payload.transformedEventParams.method === 'OPTIONS') {
       return actionResult({

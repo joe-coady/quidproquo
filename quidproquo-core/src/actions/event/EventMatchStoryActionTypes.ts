@@ -1,13 +1,5 @@
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
-import { EventActionType } from './EventActionType';
-
-// Custom return result
-export type MatchStoryResult<MatchOptions, Config> = {
-  src?: string;
-  runtime?: string;
-  runtimeOptions?: MatchOptions;
-  config?: Config;
-};
+import { EventActionType, MatchStoryResult } from './EventActionType';
 
 // Payload
 export interface EventMatchStoryActionPayload<T> {

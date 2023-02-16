@@ -11,16 +11,18 @@ export function* askProcessEvent(...eventArguments: any) {
   // Transform event params
   const transformedEventParams = yield* askEventTransformEventParams(...eventArguments);
 
+  // Try and match a story to execute
+  const { src, runtime, runtimeOptions, config } = yield* askEventMatchStory<any, any, any>(
+    transformedEventParams,
+  );
+
   //  See if we want to exit early (validation / auth etc)
-  const earlyExitResponse = yield* askEventAutoRespond(transformedEventParams);
+  const earlyExitResponse = yield* askEventAutoRespond(transformedEventParams, config);
 
   if (earlyExitResponse) {
     // Transform the early exit response if needed
     return yield* askEventTransformResponseResult(earlyExitResponse, transformedEventParams);
   }
-
-  // Try and match a story to execute
-  const { src, runtime, runtimeOptions } = yield* askEventMatchStory(transformedEventParams);
 
   // Execute the story
   const result = yield* askExecuteStory('route', src!, runtime!, [

@@ -65,7 +65,11 @@ const getProcessTransformResponseResult = (
   };
 };
 
-const getProcessAutoRespond = (): EventAutoRespondActionProcessor<AnyQueueEvent> => {
+const getProcessAutoRespond = (): EventAutoRespondActionProcessor<
+  AnyQueueEvent,
+  QueueEventTypeParams,
+  string
+> => {
   return async (payload) => {
     return actionResult(null);
   };

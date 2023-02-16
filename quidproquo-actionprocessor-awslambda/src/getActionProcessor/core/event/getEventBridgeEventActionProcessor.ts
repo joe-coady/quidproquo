@@ -15,6 +15,11 @@ import { LambdaRuntimeConfig } from '../../../runtimeConfig/QPQAWSResourceMap';
 
 import { EventBridgeEvent, Context } from 'aws-lambda';
 
+// TODO: Get rid of {} and any types
+type MatchOptions = {};
+type MatchConfig = any;
+type MatchStoryResultRuntimeOptions = MatchStoryResult<MatchOptions, MatchConfig>;
+
 const getProcessTransformEventParams = (): EventTransformEventParamsActionProcessor<
   [EventBridgeEvent<any, any>, Context],
   ScheduledEventParams<any>
@@ -39,20 +44,24 @@ const getProcessTransformResponseResult = (): EventTransformResponseResultAction
 };
 
 // never early exit (maybe add validation?)
-const getProcessAutoRespond = (): EventAutoRespondActionProcessor<ScheduledEventParams<any>> => {
+const getProcessAutoRespond = (): EventAutoRespondActionProcessor<
+  ScheduledEventParams<any>,
+  MatchOptions,
+  MatchConfig
+> => {
   return async () => actionResult(null);
 };
 
 const getProcessMatchStory = (
   lambdaRuntimeConfig?: LambdaRuntimeConfig,
   // TODO: Get rid of type {}
-): EventMatchStoryActionProcessor<ScheduledEventParams<any>, {}, any> => {
+): EventMatchStoryActionProcessor<ScheduledEventParams<any>, MatchOptions, MatchConfig> => {
   return async (payload) => {
     if (!lambdaRuntimeConfig) {
       return actionResultError(ErrorTypeEnum.NotFound, 'event runtime not found');
     }
 
-    return actionResult<MatchStoryResult<{}, any>>({
+    return actionResult<MatchStoryResultRuntimeOptions>({
       src: lambdaRuntimeConfig.src,
       runtime: lambdaRuntimeConfig.runtime,
       runtimeOptions: {},
