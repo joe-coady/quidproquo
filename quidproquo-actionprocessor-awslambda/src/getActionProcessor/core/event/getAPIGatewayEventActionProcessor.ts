@@ -15,6 +15,8 @@ import {
 import {
   RouteQPQWebServerConfigSetting,
   HTTPEvent,
+  HTTPEventResponse,
+  HttpEventHeaders,
   qpqWebServerUtils,
   HttpEventRouteParams,
   RouteOptions,
@@ -26,6 +28,16 @@ import { matchUrl } from '../../../awsLambdaUtils';
 
 export type HttpRouteMatchStoryResult = MatchStoryResult<HttpEventRouteParams, RouteOptions>;
 export type ApiGatewayEventParams = [APIGatewayEvent, Context];
+
+const transformHttpEventHeadersToAPIGatewayProxyResultHeaders = (
+  headers: HttpEventHeaders,
+): {
+  [header: string]: boolean | number | string;
+} => {
+  return Object.keys(headers)
+    .filter((header) => !!headers[header])
+    .reduce((acc, header) => ({ ...acc, [header]: headers[header] }), {});
+};
 
 const getProcessTransformEventParams = (
   serviceName: string,
@@ -51,18 +63,23 @@ const getProcessTransformEventParams = (
 
 const getProcessTransformResponseResult = (
   qpqConfig: QPQConfig,
-  // TODO: Remove the anys here for a HttpResponse type
-): EventTransformResponseResultActionProcessor<any, any, APIGatewayProxyResult> => {
+): EventTransformResponseResultActionProcessor<
+  HTTPEventResponse<string>,
+  HTTPEvent,
+  APIGatewayProxyResult
+> => {
   // We might need to JSON.stringify the body.
   return async (payload) => {
+    const headers: HttpEventHeaders = {
+      ...qpqWebServerUtils.getCorsHeaders(qpqConfig, {}, payload.transformedEventParams.headers),
+      ...(payload?.response?.headers || {}),
+    };
+
     return actionResult<APIGatewayProxyResult>({
       statusCode: payload.response.status,
-      body: payload.response.body,
+      body: payload.response.body || '',
       isBase64Encoded: payload.response.isBase64Encoded,
-      headers: {
-        ...qpqWebServerUtils.getCorsHeaders(qpqConfig, {}, payload.transformedEventParams.headers),
-        ...(payload?.response?.headers || {}),
-      },
+      headers: transformHttpEventHeadersToAPIGatewayProxyResultHeaders(headers),
     });
   };
 };
