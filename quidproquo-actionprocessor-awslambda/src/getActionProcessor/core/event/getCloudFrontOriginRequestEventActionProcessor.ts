@@ -25,6 +25,11 @@ import { matchUrl } from '../../../awsLambdaUtils';
 
 import { CloudFrontRequestEvent, Context, CloudFrontRequestResult } from 'aws-lambda';
 
+export type CloudFrontOriginMatchStoryResult = MatchStoryResult<
+  SeoEventRouteParams,
+  SeoQPQWebServerConfigSetting
+>;
+
 const getProcessTransformEventParams = (
   qpqConfig: QPQConfig,
 ): EventTransformEventParamsActionProcessor<[CloudFrontRequestEvent, Context], SeoEvent<any>> => {
@@ -64,8 +69,7 @@ const getProcessTransformResponseResult = (
 
 const getProcessAutoRespond = (): EventAutoRespondActionProcessor<
   SeoEvent<any>,
-  SeoEventRouteParams,
-  SeoQPQWebServerConfigSetting
+  CloudFrontOriginMatchStoryResult
 > => {
   return async (payload) => {
     return actionResult(null);
@@ -74,11 +78,7 @@ const getProcessAutoRespond = (): EventAutoRespondActionProcessor<
 
 const getProcessMatchStory = (
   seoConfigs: SeoQPQWebServerConfigSetting[],
-): EventMatchStoryActionProcessor<
-  SeoEvent<any>,
-  SeoEventRouteParams,
-  SeoQPQWebServerConfigSetting
-> => {
+): EventMatchStoryActionProcessor<SeoEvent<any>, CloudFrontOriginMatchStoryResult> => {
   return async (payload) => {
     /// Sort the routes by string length
     // Note: We may need to filter variable routes out {} as the variables are length independent
@@ -100,7 +100,7 @@ const getProcessMatchStory = (
       return actionResultError(ErrorTypeEnum.NotFound, 'seo not found');
     }
 
-    return actionResult<MatchStoryResult<SeoEventRouteParams, SeoQPQWebServerConfigSetting>>({
+    return actionResult<CloudFrontOriginMatchStoryResult>({
       src: matchedSeoConfig.route.src,
       runtime: matchedSeoConfig.route.runtime,
       runtimeOptions: matchedSeoConfig.match.params || {},

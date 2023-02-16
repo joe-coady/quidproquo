@@ -1,10 +1,10 @@
 import { EventAutoRespondActionRequester } from './EventAutoRespondActionTypes';
-import { EventActionType, MatchStoryResult } from './EventActionType';
+import { EventActionType, AnyMatchStoryResult } from './EventActionType';
 
-export function* askEventAutoRespond<T, MatchOptions, Config>(
-  transformedEventParams: any,
-  matchResult: MatchStoryResult<MatchOptions, Config>,
-): EventAutoRespondActionRequester<T, MatchOptions, Config> {
+export function* askEventAutoRespond<T, MSR extends AnyMatchStoryResult>(
+  transformedEventParams: T,
+  matchResult: MSR,
+): EventAutoRespondActionRequester<T, MSR> {
   return yield {
     type: EventActionType.AutoRespond,
     payload: { transformedEventParams, matchResult },

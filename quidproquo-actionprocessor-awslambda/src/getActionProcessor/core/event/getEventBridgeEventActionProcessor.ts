@@ -18,7 +18,7 @@ import { EventBridgeEvent, Context } from 'aws-lambda';
 // TODO: Get rid of {} and any types
 type MatchOptions = {};
 type MatchConfig = any;
-type MatchStoryResultRuntimeOptions = MatchStoryResult<MatchOptions, MatchConfig>;
+type EventBridgeEventMatchStoryResult = MatchStoryResult<MatchOptions, MatchConfig>;
 
 const getProcessTransformEventParams = (): EventTransformEventParamsActionProcessor<
   [EventBridgeEvent<any, any>, Context],
@@ -46,8 +46,7 @@ const getProcessTransformResponseResult = (): EventTransformResponseResultAction
 // never early exit (maybe add validation?)
 const getProcessAutoRespond = (): EventAutoRespondActionProcessor<
   ScheduledEventParams<any>,
-  MatchOptions,
-  MatchConfig
+  EventBridgeEventMatchStoryResult
 > => {
   return async () => actionResult(null);
 };
@@ -55,13 +54,13 @@ const getProcessAutoRespond = (): EventAutoRespondActionProcessor<
 const getProcessMatchStory = (
   lambdaRuntimeConfig?: LambdaRuntimeConfig,
   // TODO: Get rid of type {}
-): EventMatchStoryActionProcessor<ScheduledEventParams<any>, MatchOptions, MatchConfig> => {
+): EventMatchStoryActionProcessor<ScheduledEventParams<any>, EventBridgeEventMatchStoryResult> => {
   return async (payload) => {
     if (!lambdaRuntimeConfig) {
       return actionResultError(ErrorTypeEnum.NotFound, 'event runtime not found');
     }
 
-    return actionResult<MatchStoryResultRuntimeOptions>({
+    return actionResult<EventBridgeEventMatchStoryResult>({
       src: lambdaRuntimeConfig.src,
       runtime: lambdaRuntimeConfig.runtime,
       runtimeOptions: {},

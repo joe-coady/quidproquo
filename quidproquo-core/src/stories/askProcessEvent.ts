@@ -3,6 +3,7 @@ import {
   askEventAutoRespond,
   askEventTransformResponseResult,
   askEventMatchStory,
+  MatchStoryResult,
 } from '../actions/event';
 
 import { askExecuteStory } from '../actions/system';
@@ -12,7 +13,7 @@ export function* askProcessEvent(...eventArguments: any) {
   const transformedEventParams = yield* askEventTransformEventParams(...eventArguments);
 
   // Try and match a story to execute
-  const { src, runtime, runtimeOptions, config } = yield* askEventMatchStory<any, any, any>(
+  const { src, runtime, runtimeOptions, config } = yield* askEventMatchStory(
     transformedEventParams,
   );
 

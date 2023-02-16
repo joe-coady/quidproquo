@@ -1,9 +1,9 @@
-import { EventActionType } from './EventActionType';
-
 import { EventMatchStoryActionRequester } from './EventMatchStoryActionTypes';
-export function* askEventMatchStory<T, MatchOptions, Config>(
-  transformedEventParams: any,
-): EventMatchStoryActionRequester<T, MatchOptions, Config> {
+import { EventActionType, AnyMatchStoryResult } from './EventActionType';
+
+export function* askEventMatchStory<T, MSR extends AnyMatchStoryResult>(
+  transformedEventParams: T,
+): EventMatchStoryActionRequester<T, MSR> {
   return yield {
     type: EventActionType.MatchStory,
     payload: { transformedEventParams },

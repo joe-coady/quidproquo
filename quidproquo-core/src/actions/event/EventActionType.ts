@@ -11,3 +11,5 @@ export type MatchStoryResult<MatchOptions, Config> = {
   runtimeOptions?: MatchOptions;
   config?: Config;
 };
+
+export type AnyMatchStoryResult = MatchStoryResult<any, any>;

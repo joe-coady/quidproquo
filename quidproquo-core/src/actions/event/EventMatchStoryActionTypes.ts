@@ -1,5 +1,5 @@
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
-import { EventActionType, MatchStoryResult } from './EventActionType';
+import { EventActionType, AnyMatchStoryResult } from './EventActionType';
 
 // Payload
 export interface EventMatchStoryActionPayload<T> {
@@ -13,11 +13,11 @@ export interface EventMatchStoryAction<T> extends Action<EventMatchStoryActionPa
 }
 
 // Functions
-export type EventMatchStoryActionProcessor<T, MatchOptions, Config> = ActionProcessor<
+export type EventMatchStoryActionProcessor<T, MSR extends AnyMatchStoryResult> = ActionProcessor<
   EventMatchStoryAction<T>,
-  MatchStoryResult<MatchOptions, Config>
+  MSR
 >;
-export type EventMatchStoryActionRequester<T, MatchOptions, Config> = ActionRequester<
+export type EventMatchStoryActionRequester<T, MSR extends AnyMatchStoryResult> = ActionRequester<
   EventMatchStoryAction<T>,
-  MatchStoryResult<MatchOptions, Config>
+  MSR
 >;

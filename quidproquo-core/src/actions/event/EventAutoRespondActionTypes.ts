@@ -1,25 +1,25 @@
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
-import { EventActionType, MatchStoryResult } from './EventActionType';
+import { EventActionType, AnyMatchStoryResult } from './EventActionType';
 
 // payload
-export interface EventAutoRespondActionPayload<T, MatchOptions, Config> {
+export interface EventAutoRespondActionPayload<T, MSR extends AnyMatchStoryResult> {
   transformedEventParams: T;
-  matchResult: MatchStoryResult<MatchOptions, Config>;
+  matchResult: MSR;
 }
 
 // action
-export interface EventAutoRespondAction<T, MatchOptions, Config>
-  extends Action<EventAutoRespondActionPayload<T, MatchOptions, Config>> {
+export interface EventAutoRespondAction<T, MSR extends AnyMatchStoryResult>
+  extends Action<EventAutoRespondActionPayload<T, MSR>> {
   type: EventActionType.AutoRespond;
-  payload: EventAutoRespondActionPayload<T, MatchOptions, Config>;
+  payload: EventAutoRespondActionPayload<T, MSR>;
 }
 
-// Functions
-export type EventAutoRespondActionProcessor<T, MatchOptions, Config> = ActionProcessor<
-  EventAutoRespondAction<T, MatchOptions, Config>,
+// Functions  - // TODO: Remove anys here
+export type EventAutoRespondActionProcessor<T, MSR extends AnyMatchStoryResult> = ActionProcessor<
+  EventAutoRespondAction<T, MSR>,
   any
 >;
-export type EventAutoRespondActionRequester<T, MatchOptions, Config> = ActionRequester<
-  EventAutoRespondAction<T, MatchOptions, Config>,
+export type EventAutoRespondActionRequester<T, MSR extends AnyMatchStoryResult> = ActionRequester<
+  EventAutoRespondAction<T, MSR>,
   any
 >;

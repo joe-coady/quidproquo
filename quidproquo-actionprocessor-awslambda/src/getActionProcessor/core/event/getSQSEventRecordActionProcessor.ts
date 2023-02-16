@@ -10,23 +10,18 @@ import {
   actionResult,
   actionResultError,
   ErrorTypeEnum,
-  QpqQueueProcessors,
   QueueMessage,
   QueueQPQConfigSetting,
 } from 'quidproquo-core';
 
-import {
-  QueueEvent,
-  QueueEventResponse,
-  qpqWebServerUtils,
-  QueueEventTypeParams,
-} from 'quidproquo-webserver';
+import { QueueEvent, QueueEventResponse, QueueEventTypeParams } from 'quidproquo-webserver';
 
 import { matchUrl } from '../../../awsLambdaUtils';
 
 import { Context, SQSRecord } from 'aws-lambda';
 
 type AnyQueueEvent = QueueEvent<QueueMessage<any>>;
+export type SqsEventMatchStoryResult = MatchStoryResult<QueueEventTypeParams, string>;
 
 export const getQueueConfigSetting = (): QueueQPQConfigSetting => {
   const queueQPQConfigSetting: QueueQPQConfigSetting = JSON.parse(
@@ -67,8 +62,7 @@ const getProcessTransformResponseResult = (
 
 const getProcessAutoRespond = (): EventAutoRespondActionProcessor<
   AnyQueueEvent,
-  QueueEventTypeParams,
-  string
+  SqsEventMatchStoryResult
 > => {
   return async (payload) => {
     return actionResult(null);
@@ -77,7 +71,7 @@ const getProcessAutoRespond = (): EventAutoRespondActionProcessor<
 
 const getProcessMatchStory = (
   qpqConfig: QPQConfig,
-): EventMatchStoryActionProcessor<AnyQueueEvent, QueueEventTypeParams, string> => {
+): EventMatchStoryActionProcessor<AnyQueueEvent, SqsEventMatchStoryResult> => {
   const queueQPQConfigSetting = getQueueConfigSetting();
 
   return async (payload) => {
@@ -105,7 +99,7 @@ const getProcessMatchStory = (
 
     const sourceEntry = queueQueueProcessors[matchedQueueType.queueType];
 
-    return actionResult<MatchStoryResult<QueueEventTypeParams, string>>({
+    return actionResult<SqsEventMatchStoryResult>({
       src: sourceEntry.src,
       runtime: sourceEntry.runtime,
       runtimeOptions: matchedQueueType.match.params || {},
