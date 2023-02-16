@@ -216,6 +216,7 @@ export const getCorsHeaders = (
     'Access-Control-Allow-Headers': '*',
     'Access-Control-Allow-Methods': '*',
     'Access-Control-Allow-Origin': allowOrigin,
+    'Access-Control-Allow-Credentials': `${!!route.routeAuthSettings}`,
     Vary: 'Origin',
   };
 };

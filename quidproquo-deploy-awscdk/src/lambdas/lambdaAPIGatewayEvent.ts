@@ -107,6 +107,8 @@ export const getAPIGatewayEventExecutor = (
         headers: result.result.headers,
         isBase64Encoded: result.result.isBase64Encoded,
       };
+
+      console.log('Response: ', response);
       return response;
     }
 

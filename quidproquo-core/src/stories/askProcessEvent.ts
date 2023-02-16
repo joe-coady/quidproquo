@@ -13,12 +13,17 @@ export function* askProcessEvent(...eventArguments: any) {
   const transformedEventParams = yield* askEventTransformEventParams(...eventArguments);
 
   // Try and match a story to execute
-  const { src, runtime, runtimeOptions, config } = yield* askEventMatchStory(
-    transformedEventParams,
-  );
+  const matchResult = yield* askEventMatchStory(transformedEventParams);
+
+  console.log(matchResult.src);
+  console.log(matchResult.runtime);
+  console.log(matchResult.runtimeOptions);
+  console.log(matchResult.config);
 
   //  See if we want to exit early (validation / auth etc)
-  const earlyExitResponse = yield* askEventAutoRespond(transformedEventParams, config);
+  const earlyExitResponse = yield* askEventAutoRespond(transformedEventParams, matchResult);
+
+  console.log('earlyExitResponse', earlyExitResponse);
 
   if (earlyExitResponse) {
     // Transform the early exit response if needed
@@ -26,9 +31,9 @@ export function* askProcessEvent(...eventArguments: any) {
   }
 
   // Execute the story
-  const result = yield* askExecuteStory('route', src!, runtime!, [
+  const result = yield* askExecuteStory('route', matchResult.src!, matchResult.runtime!, [
     transformedEventParams,
-    runtimeOptions,
+    matchResult.runtimeOptions,
   ]);
 
   // return the result of the story back to the event caller
