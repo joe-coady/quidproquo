@@ -1,6 +1,10 @@
 import { QueueMessage } from 'quidproquo-core';
 
-export interface QueueEventParams<T extends QueueMessage<any>> {
+export interface QueueEventTypeParams {
+  [key: string]: string;
+}
+
+export interface QueueEvent<T extends QueueMessage<any>> {
   message: T;
 }
 

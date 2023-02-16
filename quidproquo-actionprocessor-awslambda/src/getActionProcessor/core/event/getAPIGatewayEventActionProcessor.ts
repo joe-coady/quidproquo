@@ -14,8 +14,9 @@ import {
 
 import {
   RouteQPQWebServerConfigSetting,
-  HTTPEventParams,
+  HTTPEvent,
   qpqWebServerUtils,
+  HttpEventRouteParams,
 } from 'quidproquo-webserver';
 
 import { APIGatewayEvent, Context, APIGatewayProxyResult } from 'aws-lambda';
@@ -24,7 +25,7 @@ import { matchUrl } from '../../../awsLambdaUtils';
 
 const getProcessTransformEventParams = (
   serviceName: string,
-): EventTransformEventParamsActionProcessor<[APIGatewayEvent, Context], HTTPEventParams<any>> => {
+): EventTransformEventParamsActionProcessor<[APIGatewayEvent, Context], HTTPEvent<any>> => {
   return async ({ eventParams: [apiGatewayEvent, context] }) => {
     const path = (apiGatewayEvent.path || '').replace(new RegExp(`^(\/${serviceName})/`), '/');
 
@@ -64,7 +65,7 @@ const getProcessTransformResponseResult = (
 
 const getProcessAutoRespond = (
   configs: QPQConfig,
-): EventAutoRespondActionProcessor<HTTPEventParams<any>> => {
+): EventAutoRespondActionProcessor<HTTPEvent<any>> => {
   return async (payload) => {
     if (payload.transformedEventParams.method === 'OPTIONS') {
       return actionResult({
@@ -85,7 +86,7 @@ const getProcessAutoRespond = (
 
 const getProcessMatchStory = (
   routes: RouteQPQWebServerConfigSetting[],
-): EventMatchStoryActionProcessor<HTTPEventParams<any>> => {
+): EventMatchStoryActionProcessor<HTTPEvent<any>, HttpEventRouteParams> => {
   return async (payload) => {
     // Sort the routes by string length
     // Note: We may need to filter variable routes out {} as the variables are length independent
@@ -112,7 +113,7 @@ const getProcessMatchStory = (
       );
     }
 
-    return actionResult<MatchStoryResult>({
+    return actionResult<MatchStoryResult<HttpEventRouteParams>>({
       src: matchedRoute.route.src,
       runtime: matchedRoute.route.runtime,
       options: matchedRoute.match.params || {},

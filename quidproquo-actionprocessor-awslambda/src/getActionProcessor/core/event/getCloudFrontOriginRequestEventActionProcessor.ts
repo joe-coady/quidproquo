@@ -15,9 +15,10 @@ import {
 
 import {
   SeoQPQWebServerConfigSetting,
-  SeoEventParams,
+  SeoEvent,
   SeoEventResponse,
   qpqWebServerUtils,
+  SeoEventRouteParams,
 } from 'quidproquo-webserver';
 
 import { matchUrl } from '../../../awsLambdaUtils';
@@ -26,10 +27,7 @@ import { CloudFrontRequestEvent, Context, CloudFrontRequestResult } from 'aws-la
 
 const getProcessTransformEventParams = (
   qpqConfig: QPQConfig,
-): EventTransformEventParamsActionProcessor<
-  [CloudFrontRequestEvent, Context],
-  SeoEventParams<any>
-> => {
+): EventTransformEventParamsActionProcessor<[CloudFrontRequestEvent, Context], SeoEvent<any>> => {
   return async ({ eventParams: [cloudFrontRequestEvent, context] }) => {
     const cfRecordRequest = cloudFrontRequestEvent.Records[0].cf.request;
 
@@ -56,7 +54,7 @@ const getProcessTransformResponseResult = (
   configs: QPQConfig,
 ): EventTransformResponseResultActionProcessor<
   SeoEventResponse,
-  SeoEventParams<any>,
+  SeoEvent<any>,
   SeoEventResponse
 > => {
   return async ({ response }) => {
@@ -64,7 +62,7 @@ const getProcessTransformResponseResult = (
   };
 };
 
-const getProcessAutoRespond = (): EventAutoRespondActionProcessor<SeoEventParams<any>> => {
+const getProcessAutoRespond = (): EventAutoRespondActionProcessor<SeoEvent<any>> => {
   return async (payload) => {
     return actionResult(null);
   };
@@ -72,7 +70,7 @@ const getProcessAutoRespond = (): EventAutoRespondActionProcessor<SeoEventParams
 
 const getProcessMatchStory = (
   seoConfigs: SeoQPQWebServerConfigSetting[],
-): EventMatchStoryActionProcessor<SeoEventParams<any>> => {
+): EventMatchStoryActionProcessor<SeoEvent<any>, SeoEventRouteParams> => {
   return async (payload) => {
     /// Sort the routes by string length
     // Note: We may need to filter variable routes out {} as the variables are length independent
@@ -94,7 +92,7 @@ const getProcessMatchStory = (
       return actionResultError(ErrorTypeEnum.NotFound, 'seo not found');
     }
 
-    return actionResult<MatchStoryResult>({
+    return actionResult<MatchStoryResult<SeoEventRouteParams>>({
       src: matchedSeoConfig.route.src,
       runtime: matchedSeoConfig.route.runtime,
       options: matchedSeoConfig.match.params || {},

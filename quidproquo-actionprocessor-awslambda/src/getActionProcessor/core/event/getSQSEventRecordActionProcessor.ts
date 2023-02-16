@@ -15,13 +15,18 @@ import {
   QueueQPQConfigSetting,
 } from 'quidproquo-core';
 
-import { QueueEventParams, QueueEventResponse, qpqWebServerUtils } from 'quidproquo-webserver';
+import {
+  QueueEvent,
+  QueueEventResponse,
+  qpqWebServerUtils,
+  QueueEventTypeParams,
+} from 'quidproquo-webserver';
 
 import { matchUrl } from '../../../awsLambdaUtils';
 
 import { Context, SQSRecord } from 'aws-lambda';
 
-type AnyQueueEventParams = QueueEventParams<QueueMessage<any>>;
+type AnyQueueEvent = QueueEvent<QueueMessage<any>>;
 
 export const getQueueConfigSetting = (): QueueQPQConfigSetting => {
   const queueQPQConfigSetting: QueueQPQConfigSetting = JSON.parse(
@@ -35,7 +40,7 @@ export const getQueueConfigSetting = (): QueueQPQConfigSetting => {
 
 const getProcessTransformEventParams = (
   qpqConfig: QPQConfig,
-): EventTransformEventParamsActionProcessor<[SQSRecord, Context], AnyQueueEventParams> => {
+): EventTransformEventParamsActionProcessor<[SQSRecord, Context], AnyQueueEvent> => {
   return async ({ eventParams: [record, context] }) => {
     const parsedRecord = JSON.parse(record.body) as QueueMessage<any>;
 
@@ -52,7 +57,7 @@ const getProcessTransformResponseResult = (
   configs: QPQConfig,
 ): EventTransformResponseResultActionProcessor<
   QueueEventResponse,
-  AnyQueueEventParams,
+  AnyQueueEvent,
   QueueEventResponse
 > => {
   return async ({ response }) => {
@@ -60,7 +65,7 @@ const getProcessTransformResponseResult = (
   };
 };
 
-const getProcessAutoRespond = (): EventAutoRespondActionProcessor<AnyQueueEventParams> => {
+const getProcessAutoRespond = (): EventAutoRespondActionProcessor<AnyQueueEvent> => {
   return async (payload) => {
     return actionResult(null);
   };
@@ -68,7 +73,7 @@ const getProcessAutoRespond = (): EventAutoRespondActionProcessor<AnyQueueEventP
 
 const getProcessMatchStory = (
   qpqConfig: QPQConfig,
-): EventMatchStoryActionProcessor<AnyQueueEventParams> => {
+): EventMatchStoryActionProcessor<AnyQueueEvent, QueueEventTypeParams> => {
   const queueQPQConfigSetting = getQueueConfigSetting();
 
   return async (payload) => {
@@ -96,7 +101,7 @@ const getProcessMatchStory = (
 
     const sourceEntry = queueQueueProcessors[matchedQueueType.queueType];
 
-    return actionResult<MatchStoryResult>({
+    return actionResult<MatchStoryResult<QueueEventTypeParams>>({
       src: sourceEntry.src,
       runtime: sourceEntry.runtime,
       options: matchedQueueType.match.params || {},

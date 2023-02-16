@@ -11,7 +11,7 @@ import { DefaultRouteOptionsQPQWebServerConfigSetting } from './config/settings/
 import { QPQWebServerConfigSettingType } from './config/QPQConfig';
 import { getApplicationModuleEnvironment } from 'quidproquo-core/lib/qpqCoreUtils';
 
-import { HttpEventHeaders, HTTPEventParams, HTTPEventResponse } from './types/HTTPEvent';
+import { HttpEventHeaders, HTTPEvent, HTTPEventResponse } from './types/HTTPEvent';
 import { RouteOptions } from './config/settings/route';
 import { WebEntryQPQWebServerConfigSetting, ApiQPQWebServerConfigSetting } from './config';
 
@@ -220,7 +220,7 @@ export const getCorsHeaders = (
   };
 };
 
-export const fromJsonEventRequest = <T>(httpJsonEvent: HTTPEventParams): T => {
+export const fromJsonEventRequest = <T>(httpJsonEvent: HTTPEvent): T => {
   const item: T = JSON.parse(
     httpJsonEvent.isBase64Encoded
       ? Buffer.from(httpJsonEvent.body, 'base64').toString()

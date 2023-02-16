@@ -4,7 +4,11 @@ export interface SeoEventHeaders {
   [key: string]: undefined | string;
 }
 
-export interface SeoEventParams<T = null> {
+export interface SeoEventRouteParams {
+  [key: string]: string;
+}
+
+export interface SeoEvent<T = null> {
   path: string;
   query: { [key: string]: undefined | string | string[] };
   body: T;

@@ -4,7 +4,11 @@ export interface HttpEventHeaders {
   [key: string]: undefined | string;
 }
 
-export interface HTTPEventParams<T = string> {
+export interface HttpEventRouteParams {
+  [key: string]: string;
+}
+
+export interface HTTPEvent<T = string> {
   path: string;
   query: { [key: string]: undefined | string | string[] };
   body: T;
