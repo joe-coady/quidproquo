@@ -137,8 +137,10 @@ const getProcessAutoRespond = (
 };
 
 const getProcessMatchStory = (
-  routes: RouteQPQWebServerConfigSetting[],
+  qpqConfig: QPQConfig,
 ): EventMatchStoryActionProcessor<HTTPEvent<any>, HttpRouteMatchStoryResult> => {
+  const routes: RouteQPQWebServerConfigSetting[] = qpqWebServerUtils.getAllRoutes(qpqConfig);
+
   return async (payload) => {
     // Sort the routes by string length
     // Note: We may need to filter variable routes out {} as the variables are length independent
@@ -165,7 +167,12 @@ const getProcessMatchStory = (
     if (!matchedRoute) {
       return actionResultError(
         ErrorTypeEnum.NotFound,
-        `route not found [${payload.transformedEventParams.path}] - [${payload.transformedEventParams.headers['user-agent']}]`,
+        `route not found [${
+          payload.transformedEventParams.path
+        }] - [${qpqWebServerUtils.getHeaderValue(
+          'user-agent',
+          payload.transformedEventParams.headers,
+        )}]`,
       );
     }
 
@@ -174,21 +181,20 @@ const getProcessMatchStory = (
       runtime: matchedRoute.route.runtime,
       runtimeOptions: matchedRoute.match.params || {},
 
-      // TODO: Merge this with the default options.
-      config: matchedRoute.route.options,
+      // TODO: Make this aware of the API that we are eventing
+      config: qpqWebServerUtils.mergeAllRouteOptions('api', matchedRoute.route, qpqConfig),
     });
   };
 };
 
 export default (qpqConfig: QPQConfig) => {
   // TODO: Make this aware of the API that we are eventing
-  const routes = qpqWebServerUtils.getAllRoutes(qpqConfig);
   const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
 
   return {
     [EventActionType.TransformEventParams]: getProcessTransformEventParams(serviceName),
     [EventActionType.TransformResponseResult]: getProcessTransformResponseResult(qpqConfig),
     [EventActionType.AutoRespond]: getProcessAutoRespond(qpqConfig),
-    [EventActionType.MatchStory]: getProcessMatchStory(routes),
+    [EventActionType.MatchStory]: getProcessMatchStory(qpqConfig),
   };
 };
