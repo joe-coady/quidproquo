@@ -65,7 +65,7 @@ export class QpqCoreQueueConstruct extends QpqCoreQueueConstructBase {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
 
       deadLetterQueue: {
-        maxReceiveCount: props.queueConfig.maxRetry,
+        maxReceiveCount: props.queueConfig.maxTries,
         queue: new aws_sqs.Queue(this, 'DeadLetterQueue', {
           queueName: this.resourceName(`${props.queueConfig.name}-dead`),
           removalPolicy: cdk.RemovalPolicy.DESTROY,

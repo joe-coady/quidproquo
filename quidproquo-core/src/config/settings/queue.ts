@@ -17,7 +17,7 @@ export interface QPQConfigAdvancedQueueSettings extends QPQConfigAdvancedSetting
   batchSize?: number;
   batchWindowInSeconds?: number;
   concurrency?: number;
-  maxRetry?: number;
+  maxTries?: number;
   ttRetryInSeconds?: number;
   hasDeadLetterQueue?: boolean;
 }
@@ -32,7 +32,7 @@ export interface QueueQPQConfigSetting extends QPQConfigSetting {
 
   concurrency: number;
 
-  maxRetry: number;
+  maxTries: number;
   ttRetryInSeconds: number;
 
   hasDeadLetterQueue: boolean;
@@ -56,7 +56,7 @@ export const defineQueue = (
 
   concurrency: options?.concurrency || 1,
 
-  maxRetry: options?.maxRetry || 3,
+  maxTries: options?.maxTries || 1,
   ttRetryInSeconds: Math.min(options?.ttRetryInSeconds || 300, 30),
 
   hasDeadLetterQueue: options?.hasDeadLetterQueue || true,
