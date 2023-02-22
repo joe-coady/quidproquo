@@ -8,13 +8,13 @@ import {
   getCFExportNameUserPoolClientIdFromConfig,
 } from '../../../../awsNamingUtils';
 
-export const isAuthValid = async (
+const isAuthValidForCognito = async (
   qpqConfig: QPQConfig,
+  authSettings: RouteAuthSettings,
   authHeader?: string | null,
-  authSettings?: RouteAuthSettings,
 ) => {
   // If there are no auth settings ~ Its valid.
-  if (!authSettings || !authSettings.userDirectoryName) {
+  if (!authSettings.userDirectoryName) {
     return true;
   }
 
@@ -57,4 +57,35 @@ export const isAuthValid = async (
 
   // Verify the token
   return await verifyJwt(accessToken, userPoolId, userPoolClientId, 'access');
+};
+
+const isAuthValidForApiKeys = async (
+  authSettings: RouteAuthSettings,
+  apiKeyHeader?: string | null,
+): Promise<boolean> => {
+  const apiKeys = authSettings.apiKeys || [];
+  if (apiKeys.length === 0) {
+    return true;
+  }
+
+  const index = apiKeys.findIndex((apiKey) => apiKey.value === apiKeyHeader);
+
+  return index >= 0;
+};
+
+export const isAuthValid = async (
+  qpqConfig: QPQConfig,
+  authHeader?: string | null,
+  apiKeyHeader?: string | null,
+  authSettings?: RouteAuthSettings,
+) => {
+  // If there are no auth settings ~ Its valid.
+  if (!authSettings) {
+    return true;
+  }
+
+  const cognitoValid = await isAuthValidForCognito(qpqConfig, authSettings, authHeader);
+  const authKeysValid = await isAuthValidForApiKeys(authSettings, apiKeyHeader);
+
+  return cognitoValid && authKeysValid;
 };

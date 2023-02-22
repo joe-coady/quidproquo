@@ -114,6 +114,7 @@ const getProcessAutoRespond = (
     const authValid = await isAuthValid(
       qpqConfig,
       qpqWebServerUtils.getHeaderValue('Authorization', payload.transformedEventParams.headers),
+      qpqWebServerUtils.getHeaderValue('x-api-key', payload.transformedEventParams.headers),
       payload.matchResult.config?.routeAuthSettings,
     );
 

@@ -2,6 +2,10 @@ import { QPQConfigSetting, HTTPMethod } from 'quidproquo-core';
 
 import { QPQWebServerConfigSettingType } from '../QPQConfig';
 
+export interface ApiKey {
+  name: string;
+  value: string;
+}
 export interface RouteAuthSettings {
   userDirectoryName?: string;
 
@@ -9,6 +13,8 @@ export interface RouteAuthSettings {
   serviceName?: string;
 
   scopes?: string[];
+
+  apiKeys?: ApiKey[];
 }
 
 export type RouteOptions = {

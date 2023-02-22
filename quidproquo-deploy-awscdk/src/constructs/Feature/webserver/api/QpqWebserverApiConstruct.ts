@@ -59,6 +59,11 @@ export class QpqWebserverApiConstruct extends QpqConstructBlock {
       g.grantAll(func.lambdaFunction);
     });
 
+    // const routes = qpqWebServerUtils.getAllRoutesForApi(props.apiConfig.apiName, props.qpqConfig);
+    // const apiKeys = routes.reduce((acc, r) => {
+    //   return [...acc, ...(r.options.routeAuthSettings?.apiKeys || [])];
+    // }, [] as ApiKey[]);
+
     // Create a rest api
     const api = new aws_apigateway.LambdaRestApi(this, 'lambda-rest-api', {
       restApiName: this.resourceName(`${props.apiConfig.apiName}-rest-api`),
@@ -69,7 +74,29 @@ export class QpqWebserverApiConstruct extends QpqConstructBlock {
       },
       binaryMediaTypes: ['*/*'],
       proxy: true,
+      // defaultMethodOptions: {
+      //   apiKeyRequired: apiKeys.length > 0,
+      // },
     });
+
+    // const usagePlan = api.addUsagePlan(this.qpqResourceName(props.apiConfig.apiName, 'usagePlan'), {
+    //   apiStages: [
+    //     {
+    //       api,
+    //       stage: api.deploymentStage,
+    //     },
+    //   ],
+    // });
+
+    // apiKeys.forEach((apiKey) => {
+    //   const name = `${props.apiConfig.apiName}-${apiKey.name}`;
+    //   usagePlan.addApiKey(
+    //     api.addApiKey(this.qpqResourceName(name, 'apiKey'), {
+    //       description: apiKey.description,
+    //       apiKeyName: this.resourceName(name),
+    //     }),
+    //   );
+    // });
 
     // Map all requests to this service to /serviceName/*
     new aws_apigateway.BasePathMapping(this, 'rest-bpm', {

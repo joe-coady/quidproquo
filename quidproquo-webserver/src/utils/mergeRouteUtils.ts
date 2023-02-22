@@ -16,7 +16,11 @@ export const mergeRouteAuthSettings = (
     userDirectoryName:
       routeAuthSettingsB?.userDirectoryName || routeAuthSettingsA?.userDirectoryName,
     scopes: [
-      ...new Set([...(routeAuthSettingsB?.scopes || []), ...(routeAuthSettingsB?.scopes || [])]),
+      ...new Set([...(routeAuthSettingsB?.scopes || []), ...(routeAuthSettingsA?.scopes || [])]),
+    ],
+
+    apiKeys: [
+      ...new Set([...(routeAuthSettingsB?.apiKeys || []), ...(routeAuthSettingsA?.apiKeys || [])]),
     ],
   };
 };
