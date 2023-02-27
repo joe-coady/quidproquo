@@ -3,9 +3,12 @@ import { RouteAuthSettings, qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { verifyJwt } from '../../../../logic/cognito/verifyJwt';
 import { getExportedValue } from '../../../../logic/cloudformation/getExportedValue';
+import { getApiKeys } from '../../../../logic/apiGateway/getApiKeys';
 import {
   getCFExportNameUserPoolIdFromConfig,
   getCFExportNameUserPoolClientIdFromConfig,
+  getCFExportNameApiKeyIdFromConfig,
+  getConfigRuntimeResourceName,
 } from '../../../../awsNamingUtils';
 
 const isAuthValidForCognito = async (
@@ -60,6 +63,7 @@ const isAuthValidForCognito = async (
 };
 
 const isAuthValidForApiKeys = async (
+  qpqConfig: QPQConfig,
   authSettings: RouteAuthSettings,
   apiKeyHeader?: string | null,
 ): Promise<boolean> => {
@@ -68,10 +72,31 @@ const isAuthValidForApiKeys = async (
     return true;
   }
 
-  // const index = apiKeys.findIndex((apiKey) => apiKey.value === apiKeyHeader);
-  // return index >= 0;
+  const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
-  return true;
+  const application = qpqCoreUtils.getApplicationName(qpqConfig);
+  const service = qpqCoreUtils.getApplicationModuleName(qpqConfig);
+  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
+  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+
+  const realApiKeys = await getApiKeys(
+    region,
+    ...apiKeys.map((apiKey) => {
+      const apiKeyApplication = apiKey.applicationName || application;
+      const apiKeyService = apiKey.serviceName || service;
+
+      return getConfigRuntimeResourceName(
+        apiKey.name,
+        apiKeyApplication,
+        apiKeyService,
+        environment,
+        feature,
+      );
+    }),
+  );
+
+  const index = realApiKeys.findIndex((apiKey) => apiKey.value === apiKeyHeader);
+  return index >= 0;
 };
 
 export const isAuthValid = async (
@@ -86,7 +111,7 @@ export const isAuthValid = async (
   }
 
   const cognitoValid = await isAuthValidForCognito(qpqConfig, authSettings, authHeader);
-  const authKeysValid = await isAuthValidForApiKeys(authSettings, apiKeyHeader);
+  const authKeysValid = await isAuthValidForApiKeys(qpqConfig, authSettings, apiKeyHeader);
 
   return cognitoValid && authKeysValid;
 };

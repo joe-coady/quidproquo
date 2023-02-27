@@ -18,7 +18,7 @@ export const getApiKeys = async (region: string, ...keyNames: string[]): Promise
 
   return (
     res.items
-      ?.filter((i) => keyNames.indexOf(i.name!))
+      ?.filter((i) => keyNames.indexOf(i.name!) >= 0)
       .map((i) => ({ name: i.name, value: i.value, description: i.description } as ApiKey)) || []
   );
 };

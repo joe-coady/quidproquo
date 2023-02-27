@@ -49,5 +49,13 @@ export class Function extends QpqConstructBlock {
         resources: ['*'],
       }),
     );
+
+    // Let lambdas read from api keys in api gateway
+    this.lambdaFunction.addToRolePolicy(
+      new aws_iam.PolicyStatement({
+        actions: ['apigateway:GET'],
+        resources: ['*'],
+      }),
+    );
   }
 }
