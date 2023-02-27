@@ -90,12 +90,13 @@ export class QpqWebserverApiConstruct extends QpqConstructBlock {
 
     // apiKeys.forEach((apiKey) => {
     //   const name = `${props.apiConfig.apiName}-${apiKey.name}`;
-    //   usagePlan.addApiKey(
-    //     api.addApiKey(this.qpqResourceName(name, 'apiKey'), {
-    //       description: apiKey.description,
-    //       apiKeyName: this.resourceName(name),
-    //     }),
-    //   );
+    //   const newApiKey = api.addApiKey(this.qpqResourceName(name, 'apiKey'), {
+    //     description: apiKey.description,
+    //     apiKeyName: this.resourceName(name),
+    //     value: apiKey.value,
+    //   });
+
+    //   // usagePlan.addApiKey(newApiKey);
     // });
 
     // Map all requests to this service to /serviceName/*

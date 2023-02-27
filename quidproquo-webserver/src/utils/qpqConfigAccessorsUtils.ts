@@ -3,6 +3,8 @@ import * as path from 'path';
 import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
 import {
+  ApiKey,
+  ApiKeyQPQWebServerConfigSetting,
   RouteQPQWebServerConfigSetting,
   DnsQPQWebServerConfigSetting,
   SeoQPQWebServerConfigSetting,
@@ -30,6 +32,15 @@ export const getAllRoutesForApi = (
   const routes = getAllRoutes(qpqConfig);
 
   return routes;
+};
+
+export const getAllApiKeyConfigs = (qpqConfig: QPQConfig): ApiKeyQPQWebServerConfigSetting[] => {
+  const apiKeyConfigs = qpqCoreUtils.getConfigSettings<ApiKeyQPQWebServerConfigSetting>(
+    qpqConfig,
+    QPQWebServerConfigSettingType.ApiKey,
+  );
+
+  return apiKeyConfigs;
 };
 
 export const getAllSeo = (qpqConfig: QPQConfig): SeoQPQWebServerConfigSetting[] => {

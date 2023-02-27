@@ -1,4 +1,5 @@
 export * from './api';
+export * from './apiKey';
 export * from './defaultRouteOptions';
 export * from './dns';
 export * from './openApi';

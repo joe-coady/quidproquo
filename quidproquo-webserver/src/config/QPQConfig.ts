@@ -7,6 +7,7 @@ export enum QPQWebServerConfigSettingType {
   SubdomainRedirect = '@quidproquo-webserver/config/SubdomainRedirect',
   WebEntry = '@quidproquo-webserver/config/WebEntry',
   Api = '@quidproquo-webserver/config/Api',
+  ApiKey = '@quidproquo-webserver/config/ApiKey',
 }
 
 export interface CacheSettings {

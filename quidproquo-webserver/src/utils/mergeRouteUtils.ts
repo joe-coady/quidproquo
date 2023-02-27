@@ -20,8 +20,17 @@ export const mergeRouteAuthSettings = (
     ],
 
     apiKeys: [
-      ...new Set([...(routeAuthSettingsB?.apiKeys || []), ...(routeAuthSettingsA?.apiKeys || [])]),
-    ],
+      ...(routeAuthSettingsB?.apiKeys || []),
+      ...(routeAuthSettingsA?.apiKeys || []),
+    ].filter(
+      (apiKeyRef, index, arr) =>
+        arr.findIndex(
+          (item) =>
+            item.name === apiKeyRef.name &&
+            item.applicationName === apiKeyRef.applicationName &&
+            item.serviceName === apiKeyRef.serviceName,
+        ) === index,
+    ),
   };
 };
 

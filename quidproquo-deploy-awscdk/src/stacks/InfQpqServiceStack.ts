@@ -11,6 +11,7 @@ import {
   QpqCoreSecretConstruct,
   QpqWebserverDomainConstruct,
   QpqCoreUserDirectoryConstruct,
+  QpqWebserverApiKeyConstruct,
 } from '../constructs';
 
 export interface InfQpqServiceStackProps extends QpqServiceStackProps {}
@@ -82,6 +83,17 @@ export class InfQpqServiceStack extends QpqServiceStack {
           qpqConfig: props.qpqConfig,
 
           userDirectoryConfig: setting,
+        }),
+    );
+
+    // Api Keys
+    const apiKeys = qpqWebServerUtils.getAllApiKeyConfigs(props.qpqConfig).map(
+      (setting) =>
+        new QpqWebserverApiKeyConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
+          awsAccountId: props.awsAccountId,
+          qpqConfig: props.qpqConfig,
+
+          apiKeyConfig: setting,
         }),
     );
   }

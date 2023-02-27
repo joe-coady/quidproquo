@@ -109,3 +109,25 @@ export const getCFExportNameUserPoolClientIdFromConfig = (
     'user-pool-client-id-export',
   );
 };
+
+export const getCFExportNameApiKeyIdFromConfig = (
+  apiKeyName: string,
+  qpqConfig: QPQConfig,
+
+  serviceOverride?: string,
+  applicationOverride?: string,
+) => {
+  const application = applicationOverride || qpqCoreUtils.getApplicationName(qpqConfig);
+  const service = serviceOverride || qpqCoreUtils.getApplicationModuleName(qpqConfig);
+  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
+  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+
+  return getQpqRuntimeResourceName(
+    apiKeyName,
+    application,
+    service,
+    environment,
+    feature,
+    'api-key-id-export',
+  );
+};
