@@ -4,7 +4,7 @@ import { QPQWebServerConfigSettingType } from '../QPQConfig';
 
 import { ApiKeyReference } from './apiKey';
 
-export interface RouteAuthSettings {
+interface GenericRouteAuthSettings<T> {
   userDirectoryName?: string;
 
   applicationName?: string;
@@ -12,14 +12,20 @@ export interface RouteAuthSettings {
 
   scopes?: string[];
 
-  apiKeys?: ApiKeyReference[];
+  apiKeys?: T[];
 }
 
-export type RouteOptions = {
+interface GenericRouteOptions<T> {
   allowedOrigins?: string[];
 
-  routeAuthSettings?: RouteAuthSettings;
-};
+  routeAuthSettings?: GenericRouteAuthSettings<T>;
+}
+
+// TODO: Probably clean up the types here
+// The idea is just so we can let the user define apiKeys as strings not objects
+// But let the internal logic always use objects
+export type RouteAuthSettings = GenericRouteAuthSettings<ApiKeyReference>;
+export type RouteOptions = GenericRouteOptions<ApiKeyReference>;
 
 export interface RouteQPQWebServerConfigSetting extends QPQConfigSetting {
   method: HTTPMethod;
@@ -34,14 +40,26 @@ export const defineRoute = (
   path: string,
   src: string,
   runtime: string,
-  options: RouteOptions = {},
-): RouteQPQWebServerConfigSetting => ({
-  configSettingType: QPQWebServerConfigSettingType.Route,
-  uniqueKey: runtime,
+  options: GenericRouteOptions<ApiKeyReference | string> = {},
+): RouteQPQWebServerConfigSetting => {
+  const routeAuthSettings = options.routeAuthSettings || {};
+  const apiKeys = routeAuthSettings.apiKeys || [];
+  const newOptions = {
+    ...options,
+    routeAuthSettings: {
+      ...routeAuthSettings,
+      apiKeys: apiKeys.map((apiKey) => (typeof apiKey === 'string' ? { name: apiKey } : apiKey)),
+    },
+  };
 
-  method,
-  path,
-  src,
-  runtime,
-  options,
-});
+  return {
+    configSettingType: QPQWebServerConfigSettingType.Route,
+    uniqueKey: runtime,
+
+    method,
+    path,
+    src,
+    runtime,
+    options: newOptions,
+  };
+};
