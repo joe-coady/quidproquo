@@ -7,6 +7,7 @@ export enum QPQCoreConfigSettingType {
   actionProcessors = '@quidproquo-core/config/actionProcessors',
   buildPath = '@quidproquo-core/config/buildPath',
   queue = '@quidproquo-core/config/Queue',
+  eventBus = '@quidproquo-core/config/EventBus',
   userDirectory = '@quidproquo-core/config/UserDirectory',
 }
 

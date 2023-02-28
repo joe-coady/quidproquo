@@ -3,7 +3,6 @@ import * as path from 'path';
 import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
 import {
-  ApiKey,
   ApiKeyQPQWebServerConfigSetting,
   RouteQPQWebServerConfigSetting,
   DnsQPQWebServerConfigSetting,

@@ -9,6 +9,7 @@ import {
   QpqCoreParameterConstruct,
   QpqCoreQueueConstruct,
   QpqCoreSecretConstruct,
+  QpqCoreEventBusConstruct,
   QpqWebserverDomainConstruct,
   QpqCoreUserDirectoryConstruct,
   QpqWebserverApiKeyConstruct,
@@ -94,6 +95,17 @@ export class InfQpqServiceStack extends QpqServiceStack {
           qpqConfig: props.qpqConfig,
 
           apiKeyConfig: setting,
+        }),
+    );
+
+    // Event Busses
+    const busses = qpqCoreUtils.getAllEventBusConfigs(props.qpqConfig).map(
+      (setting) =>
+        new QpqCoreEventBusConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
+          awsAccountId: props.awsAccountId,
+          qpqConfig: props.qpqConfig,
+
+          eventBusConfig: setting,
         }),
     );
   }

@@ -5,6 +5,7 @@ import {
   ApplicationModuleQPQConfigSetting,
   BuildPathQPQConfigSetting,
   StorageDriveQPQConfigSetting,
+  EventBusQPQConfigSetting,
   ScheduleQPQConfigSetting,
   SecretQPQConfigSetting,
   ParameterQPQConfigSetting,
@@ -86,6 +87,15 @@ export const getStorageDriveNames = (configs: QPQConfig): string[] => {
   ).map((sd) => sd.storageDrive);
 
   return storageDriveNames;
+};
+
+export const getAllEventBusConfigs = (qpqConfig: QPQConfig): EventBusQPQConfigSetting[] => {
+  const eventBuses = getConfigSettings<EventBusQPQConfigSetting>(
+    qpqConfig,
+    QPQCoreConfigSettingType.eventBus,
+  );
+
+  return eventBuses;
 };
 
 export const getActionProcessorSources = (configs: QPQConfig): string[] => {
