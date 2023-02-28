@@ -2,18 +2,59 @@ import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { EventBusQPQConfigSetting, qpqCoreUtils, QPQConfig } from 'quidproquo-core';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
+import { QpqResource } from '../../../base/QpqResource';
 
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
 
 import { Construct } from 'constructs';
-import { aws_sns } from 'aws-cdk-lib';
+import { aws_sns, aws_iam } from 'aws-cdk-lib';
 
 export interface QpqCoreEventBusConstructProps extends QpqConstructBlockProps {
   eventBusConfig: EventBusQPQConfigSetting;
 }
 
-export class QpqCoreEventBusConstruct extends QpqConstructBlock {
-  topic: aws_sns.Topic;
+export abstract class QpqCoreEventBusConstructBase extends QpqConstructBlock {
+  abstract topic: aws_sns.ITopic;
+
+  public grantRead(grantee: aws_iam.IGrantable) {}
+
+  public grantWrite(grantee: aws_iam.IGrantable): void {
+    this.topic.grantPublish(grantee);
+  }
+
+  public grantAll(grantee: aws_iam.IGrantable): void {
+    this.grantRead(grantee);
+    this.grantWrite(grantee);
+  }
+}
+
+export class QpqCoreEventBusConstruct extends QpqCoreEventBusConstructBase {
+  topic: aws_sns.ITopic;
+
+  static fromOtherStack(
+    scope: Construct,
+    id: string,
+    qpqConfig: QPQConfig,
+    awsAccountId: string,
+    eventBusName: string,
+    serviceOverride?: string,
+    applicationOverride?: string,
+  ): QpqResource {
+    const topicArn = qpqDeployAwsCdkUtils.importStackValue(
+      awsNamingUtils.getCFExportNameUserPoolIdFromConfig(
+        eventBusName,
+        qpqConfig,
+        serviceOverride,
+        applicationOverride,
+      ),
+    );
+
+    class Import extends QpqCoreEventBusConstructBase {
+      topic = aws_sns.Topic.fromTopicArn(this, 'topic-arn', topicArn);
+    }
+
+    return new Import(scope, id, { qpqConfig, awsAccountId });
+  }
 
   constructor(scope: Construct, id: string, props: QpqCoreEventBusConstructProps) {
     super(scope, id, props);

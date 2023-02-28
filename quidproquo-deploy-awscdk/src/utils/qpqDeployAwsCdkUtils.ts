@@ -24,6 +24,7 @@ import {
   QpqCoreStorageDriveConstruct,
   QpqCoreQueueConstruct,
   QpqCoreUserDirectoryConstruct,
+  QpqCoreEventBusConstruct,
 } from '../constructs';
 
 export const getQqpSecretGrantables = (
@@ -151,6 +152,27 @@ export const getQqpUserPoolGrantables = (
   return userDirectoryResources;
 };
 
+export const getQqpTopicGrantables = (
+  scope: Construct,
+  id: string,
+  qpqConfig: QPQConfig,
+  awsAccountId: string,
+): QpqResource[] => {
+  const eventBusses = qpqCoreUtils.getAllEventBusConfigs(qpqConfig);
+
+  const userDirectoryResources = eventBusses.map((eventBus) => {
+    return QpqCoreEventBusConstruct.fromOtherStack(
+      scope,
+      `${id}-${qpqCoreUtils.getUniqueKeyForSetting(eventBus)}-grantable`,
+      qpqConfig,
+      awsAccountId,
+      eventBus.name,
+    );
+  });
+
+  return userDirectoryResources;
+};
+
 export const getQqpUserPoolGrantablesForApiConfig = (
   scope: Construct,
   id: string,
@@ -206,6 +228,7 @@ export const getQqpGrantableResources = (
     ...getQqpStorageDriveGrantables(scope, id, qpqConfig, awsAccountId),
     ...getQqpQueueGrantables(scope, id, qpqConfig, awsAccountId),
     ...getQqpUserPoolGrantables(scope, id, qpqConfig, awsAccountId),
+    ...getQqpTopicGrantables(scope, id, qpqConfig, awsAccountId),
   ];
 };
 
