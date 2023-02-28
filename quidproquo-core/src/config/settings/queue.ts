@@ -20,6 +20,7 @@ export interface QPQConfigAdvancedQueueSettings extends QPQConfigAdvancedSetting
   maxTries?: number;
   ttRetryInSeconds?: number;
   hasDeadLetterQueue?: boolean;
+  eventBusSubscriptions?: string[];
 }
 
 export interface QueueQPQConfigSetting extends QPQConfigSetting {
@@ -37,6 +38,8 @@ export interface QueueQPQConfigSetting extends QPQConfigSetting {
 
   hasDeadLetterQueue: boolean;
   qpqQueueProcessors: QpqQueueProcessors;
+
+  eventBusSubscriptions: string[];
 }
 
 export const defineQueue = (
@@ -62,4 +65,6 @@ export const defineQueue = (
   hasDeadLetterQueue: options?.hasDeadLetterQueue || true,
 
   qpqQueueProcessors: processors,
+
+  eventBusSubscriptions: options?.eventBusSubscriptions || [],
 });

@@ -2,13 +2,14 @@ import { QueueQPQConfigSetting, qpqCoreUtils, QPQConfig } from 'quidproquo-core'
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { QpqCoreQueueConstruct } from './QpqCoreQueueConstruct';
+import { QpqCoreEventBusConstruct } from '../eventBus/QpqCoreEventBusConstruct';
 
 import { Function } from '../../../basic/Function';
 
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
 
 import { Construct } from 'constructs';
-import { aws_lambda_event_sources, aws_lambda } from 'aws-cdk-lib';
+import { aws_lambda_event_sources, aws_lambda, aws_sns, aws_sns_subscriptions } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 
 export interface QpqApiCoreQueueConstructProps extends QpqConstructBlockProps {
@@ -57,6 +58,22 @@ export class QpqApiCoreQueueConstruct extends QpqConstructBlock {
       props.queueConfig,
       props.awsAccountId,
     );
+
+    props.queueConfig.eventBusSubscriptions.forEach((eventBusName) => {
+      const eventBus = QpqCoreEventBusConstruct.fromOtherStack(
+        this,
+        `event-bus-${eventBusName}`,
+        props.qpqConfig,
+        props.awsAccountId,
+        eventBusName,
+      );
+
+      eventBus.topic.addSubscription(
+        new aws_sns_subscriptions.SqsSubscription(queueResource.queue, {
+          rawMessageDelivery: true,
+        }),
+      );
+    });
 
     queueFunction.lambdaFunction.addEventSource(
       new aws_lambda_event_sources.SqsEventSource(queueResource.queue, {

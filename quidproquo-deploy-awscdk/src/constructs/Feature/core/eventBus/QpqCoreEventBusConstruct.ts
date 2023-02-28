@@ -37,14 +37,12 @@ export class QpqCoreEventBusConstruct extends QpqCoreEventBusConstructBase {
     qpqConfig: QPQConfig,
     awsAccountId: string,
     eventBusName: string,
-    serviceOverride?: string,
     applicationOverride?: string,
-  ): QpqResource {
+  ): QpqCoreEventBusConstructBase {
     const topicArn = qpqDeployAwsCdkUtils.importStackValue(
-      awsNamingUtils.getCFExportNameUserPoolIdFromConfig(
+      awsNamingUtils.getCFExportNameSnsTopicArnFromConfig(
         eventBusName,
         qpqConfig,
-        serviceOverride,
         applicationOverride,
       ),
     );
