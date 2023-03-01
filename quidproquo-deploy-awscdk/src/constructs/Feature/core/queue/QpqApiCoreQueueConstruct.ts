@@ -71,6 +71,15 @@ export class QpqApiCoreQueueConstruct extends QpqConstructBlock {
       eventBus.topic.addSubscription(
         new aws_sns_subscriptions.SqsSubscription(queueResource.queue, {
           rawMessageDelivery: true,
+
+          // No wildcard support :(
+          // filterPolicy: {
+          //   type: aws_sns.SubscriptionFilter.stringFilter({
+          //     allowlist: Object.keys(props.queueConfig.qpqQueueProcessors).map((type) =>
+          //       type.replaceAll(/{(.+?)}/g, '*'),
+          //     ),
+          //   }),
+          // },
         }),
       );
     });

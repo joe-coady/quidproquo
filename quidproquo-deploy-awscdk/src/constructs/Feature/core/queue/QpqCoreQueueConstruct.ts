@@ -72,5 +72,22 @@ export class QpqCoreQueueConstruct extends QpqCoreQueueConstructBase {
         }),
       },
     });
+
+    // This has to be any topic arn as we want other services / apps to be able
+    // to publish to this queue
+    this.queue.addToResourcePolicy(
+      new aws_iam.PolicyStatement({
+        sid: 'AllowSNSServicePrincipal',
+        effect: aws_iam.Effect.ALLOW,
+        principals: [new aws_iam.ServicePrincipal('sns.amazonaws.com')],
+        actions: ['sqs:SendMessage'],
+        resources: [this.queue.queueArn],
+        conditions: {
+          ArnEquals: {
+            'aws:SourceArn': `arn:aws:sns:*:${props.awsAccountId}:*`,
+          },
+        },
+      }),
+    );
   }
 }

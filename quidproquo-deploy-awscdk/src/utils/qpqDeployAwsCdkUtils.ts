@@ -158,9 +158,11 @@ export const getQqpTopicGrantables = (
   qpqConfig: QPQConfig,
   awsAccountId: string,
 ): QpqResource[] => {
-  const eventBusses = qpqCoreUtils.getAllEventBusConfigs(qpqConfig);
+  const eventBusConfigs = qpqCoreUtils
+    .getAllEventBusConfigs(qpqConfig)
+    .filter((ebc) => !ebc.deprecated);
 
-  const userDirectoryResources = eventBusses.map((eventBus) => {
+  const eventBuses = eventBusConfigs.map((eventBus) => {
     return QpqCoreEventBusConstruct.fromOtherStack(
       scope,
       `${id}-${qpqCoreUtils.getUniqueKeyForSetting(eventBus)}-grantable`,
@@ -170,7 +172,7 @@ export const getQqpTopicGrantables = (
     );
   });
 
-  return userDirectoryResources;
+  return eventBuses;
 };
 
 export const getQqpUserPoolGrantablesForApiConfig = (

@@ -67,6 +67,7 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
       autoDeleteObjects: true,
     });
 
+    // TODO: Only do this IF a cloud front dist wants to use it
     this.bucket.addToResourcePolicy(
       new aws_iam.PolicyStatement({
         sid: 'AllowCloudFrontServicePrincipal',

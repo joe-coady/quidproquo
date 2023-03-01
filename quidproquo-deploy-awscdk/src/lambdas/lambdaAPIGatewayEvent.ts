@@ -5,6 +5,7 @@ import {
   getSystemActionProcessor,
   getFileActionProcessor,
   getQueueActionProcessor,
+  getEventBusActionProcessor,
   getConfigGetSecretActionProcessor,
   getConfigGetParameterActionProcessor,
   getConfigGetParametersActionProcessor,
@@ -70,6 +71,7 @@ export const getAPIGatewayEventExecutor = (
       ...getFileActionProcessor(cdkConfig.qpqConfig),
       ...getConfigActionProcessor(cdkConfig.qpqConfig),
       ...getQueueActionProcessor(cdkConfig.qpqConfig),
+      ...getEventBusActionProcessor(cdkConfig.qpqConfig),
       ...getUserDirectoryActionProcessor(cdkConfig.qpqConfig),
 
       ...getCustomActionProcessors(cdkConfig.qpqConfig),

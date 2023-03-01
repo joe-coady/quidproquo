@@ -63,10 +63,11 @@ const getProcessTransformResponseResult = (
 const getProcessAutoRespond = (): EventAutoRespondActionProcessor<
   AnyQueueEvent,
   SqsEventMatchStoryResult,
-  null
+  boolean
 > => {
   return async (payload) => {
-    return actionResult(null);
+    // If we couldn't match and hasn't thrown error, we will just gracefully exit.
+    return actionResult(!payload.matchResult.src);
   };
 };
 
@@ -92,6 +93,12 @@ const getProcessMatchStory = (
       .find((m) => m.match.didMatch);
 
     if (!matchedQueueType) {
+      // If we have event bus subscriptions then we don't want to error if we can't match
+      // early exit will just exit gracefully
+      if (queueQPQConfigSetting.eventBusSubscriptions.length > 0) {
+        return actionResult<SqsEventMatchStoryResult>({});
+      }
+
       return actionResultError(
         ErrorTypeEnum.NotFound,
         `queue type not found ${payload.transformedEventParams.message.type}`,
