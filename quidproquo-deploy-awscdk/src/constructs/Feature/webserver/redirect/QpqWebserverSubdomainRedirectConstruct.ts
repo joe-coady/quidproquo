@@ -2,13 +2,19 @@ import path from 'path';
 import * as cdk from 'aws-cdk-lib';
 
 import { qpqCoreUtils } from 'quidproquo-core';
-import { SubdomainRedirectQPQWebServerConfigSetting } from 'quidproquo-webserver';
+import {
+  SubdomainRedirectQPQWebServerConfigSetting,
+  qpqWebServerUtils,
+} from 'quidproquo-webserver';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
 import { Construct } from 'constructs';
 import { aws_lambda, aws_apigateway } from 'aws-cdk-lib';
 import { SubdomainName } from '../../../basic/SubdomainName';
+
+import { Function } from '../../../basic/Function';
+import * as qpqDeployAwsCdkUtils from '../../../../utils';
 
 export interface QpqWebserverSubdomainRedirectConstructProps extends QpqConstructBlockProps {
   subdomainRedirectConfig: SubdomainRedirectQPQWebServerConfigSetting;
@@ -18,28 +24,32 @@ export class QpqWebserverSubdomainRedirectConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: QpqWebserverSubdomainRedirectConstructProps) {
     super(scope, id, props);
 
-    const buildPath = qpqCoreUtils.getBuildPath(props.qpqConfig);
     const environment = qpqCoreUtils.getApplicationModuleEnvironment(props.qpqConfig);
+    const feature = qpqCoreUtils.getApplicationModuleFeature(props.qpqConfig);
 
-    const redirectLambda = new aws_lambda.Function(this, 'lambda', {
-      functionName: this.resourceName(`redirect-${props.subdomainRedirectConfig.subdomain}`),
-      timeout: cdk.Duration.seconds(25),
+    const func = new Function(this, 'redirect', {
+      buildPath: qpqWebServerUtils.getRedirectApiBuildFullPath(
+        props.qpqConfig,
+        props.subdomainRedirectConfig,
+      ),
+      functionName: this.resourceName(`${props.subdomainRedirectConfig.subdomain}-redirect`),
+      functionType: 'lambdaAPIGatewayEvent_redirect',
+      executorName: 'executeAPIGatewayEvent',
 
-      runtime: aws_lambda.Runtime.NODEJS_18_X,
-      memorySize: 128,
-
-      code: aws_lambda.Code.fromAsset(path.join(buildPath, 'lambdaAPIGatewayEvent_redirect')),
-      handler: 'index.executeAPIGatewayEvent',
+      qpqConfig: props.qpqConfig,
 
       environment: {
         redirectConfig: JSON.stringify(props.subdomainRedirectConfig),
         environment: JSON.stringify(environment),
+        featureEnvironment: JSON.stringify(feature),
       },
+
+      awsAccountId: props.awsAccountId,
     });
 
     const restApi = new aws_apigateway.LambdaRestApi(this, 'rest-api', {
       restApiName: this.resourceName(`${props.subdomainRedirectConfig.subdomain}-redirect`),
-      handler: redirectLambda,
+      handler: func.lambdaFunction,
       deployOptions: {
         loggingLevel: aws_apigateway.MethodLoggingLevel.INFO,
         dataTraceEnabled: true,
@@ -47,10 +57,14 @@ export class QpqWebserverSubdomainRedirectConstruct extends QpqConstructBlock {
       proxy: true,
     });
 
-    // TODO: Fix this
+    // www.service.domain.com or www.domain.com
+    const apexDomain = props.subdomainRedirectConfig.onRootDomain
+      ? qpqWebServerUtils.getBaseDomainName(props.qpqConfig)
+      : qpqWebServerUtils.getServiceDomainName(props.qpqConfig);
+
     const serviceDomainName = new SubdomainName(this, 'service-domain-name', {
       subdomain: props.subdomainRedirectConfig.subdomain,
-      apexDomain: '',
+      apexDomain,
       qpqConfig: props.qpqConfig,
       awsAccountId: props.awsAccountId,
     });

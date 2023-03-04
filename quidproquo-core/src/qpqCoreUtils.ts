@@ -164,19 +164,6 @@ export const getSharedSecrets = (configs: QPQConfig): SecretQPQConfigSetting[] =
   return secrets.filter((s) => !s.owned);
 };
 
-export const getBuildPath = (configs: QPQConfig): string => {
-  const buildPath = getConfigSetting<BuildPathQPQConfigSetting>(
-    configs,
-    QPQCoreConfigSettingType.buildPath,
-  )?.buildPath;
-
-  if (!buildPath) {
-    throw new Error('please use defineBuildPath in your QPQ config');
-  }
-
-  return buildPath;
-};
-
 export const getUniqueKeyForSetting = (setting: QPQConfigSetting) => {
   const type = setting.configSettingType.split('/').pop();
   const key = setting.uniqueKey;

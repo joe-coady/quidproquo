@@ -7,31 +7,33 @@ export const executeAPIGatewayEvent = async (event: APIGatewayEvent, context: Co
   );
 
   // For direct urls ~ Go straight to the url
-  if (redirectConfig.redirectUrl.startsWith('http')) {
-    return {
-      statusCode: 301,
-      body: '',
-      headers: {
-        Location: redirectConfig.redirectUrl,
-      },
-    };
-  }
+  let redirectUrl = redirectConfig.redirectUrl;
 
   // Otherwise it must be a domain redirect
-  const environment: SubdomainRedirectQPQWebServerConfigSetting = JSON.parse(
-    process.env.environment as string,
-  );
-  const baseDomain = redirectConfig.addFeatureEnvironment
-    ? `${environment}.${redirectConfig.redirectUrl}`
-    : redirectConfig.redirectUrl;
+  if (!redirectConfig.redirectUrl.startsWith('http')) {
+    const environment: SubdomainRedirectQPQWebServerConfigSetting = JSON.parse(
+      process.env.environment as string,
+    );
+    const featureEnvironment: SubdomainRedirectQPQWebServerConfigSetting = JSON.parse(
+      process.env.featureEnvironment as string,
+    );
 
-  const fullUrl = `https://${baseDomain}${event.path}`;
+    let baseDomain = redirectConfig.redirectUrl;
+    if (redirectConfig.addEnvironment) {
+      baseDomain = `${environment}.${baseDomain}`;
+    }
+    if (redirectConfig.addFeatureEnvironment && featureEnvironment) {
+      baseDomain = `${featureEnvironment}.${baseDomain}`;
+    }
+
+    redirectUrl = `https://${baseDomain}${event.path}`;
+  }
 
   return {
     statusCode: 301,
     body: '',
     headers: {
-      Location: fullUrl,
+      Location: redirectUrl,
     },
   };
 };

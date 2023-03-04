@@ -127,6 +127,15 @@ export const getApiEntryFullPath = (
   return path.join(qpqCoreUtils.getConfigRoot(qpqConfig), apiEntry);
 };
 
+export const getRedirectApiBuildFullPath = (
+  qpqConfig: QPQConfig,
+  redirectConfig: SubdomainRedirectQPQWebServerConfigSetting,
+): string => {
+  const apiEntry = redirectConfig.apiBuildPath;
+
+  return path.join(qpqCoreUtils.getConfigRoot(qpqConfig), apiEntry);
+};
+
 export const getSubdomainRedirects = (
   configs: QPQConfig,
 ): SubdomainRedirectQPQWebServerConfigSetting[] => {

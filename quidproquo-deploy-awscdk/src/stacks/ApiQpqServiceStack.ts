@@ -11,6 +11,7 @@ import {
   QpqCoreRecurringScheduleConstruct,
   QpqWebserverApiConstruct,
   QpqApiCoreQueueConstruct,
+  QpqWebserverSubdomainRedirectConstruct,
 } from '../constructs';
 
 export interface ApiQpqServiceStackProps extends QpqServiceStackProps {
@@ -67,6 +68,21 @@ export class ApiQpqServiceStack extends QpqServiceStack {
           queueConfig: setting,
           apiLayerVersions: layers.layers,
         }),
+    );
+
+    // Queues
+    const redirects = qpqWebServerUtils.getSubdomainRedirects(props.qpqConfig).map(
+      (setting) =>
+        new QpqWebserverSubdomainRedirectConstruct(
+          this,
+          qpqCoreUtils.getUniqueKeyForSetting(setting),
+          {
+            awsAccountId: props.awsAccountId,
+            qpqConfig: props.qpqConfig,
+
+            subdomainRedirectConfig: setting,
+          },
+        ),
     );
   }
 }
