@@ -131,6 +131,7 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
       defaultBehavior: {
         origin: distributionOrigin,
         cachePolicy: cachePolicy,
+        viewerProtocolPolicy: aws_cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
       },
       domainNames: [deployDomain],
       certificate: myCertificate,
