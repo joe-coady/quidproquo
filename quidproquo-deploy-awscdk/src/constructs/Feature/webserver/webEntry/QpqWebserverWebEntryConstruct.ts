@@ -145,6 +145,12 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
       })),
     });
 
+    props.webEntryConfig.ignoreCache.forEach((pathPattern) => {
+      distribution.addBehavior(pathPattern, distributionOrigin, {
+        cachePolicy: aws_cloudfront.CachePolicy.CACHING_DISABLED,
+      });
+    });
+
     // TODO: Fix this when they add l2 support for origin access control settings
 
     // Currently distribution don't have support for origin access control settings

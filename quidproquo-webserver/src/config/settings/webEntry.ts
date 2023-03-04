@@ -24,6 +24,7 @@ export interface QPQConfigAdvancedWebEntrySettings extends QPQConfigAdvancedSett
   domain?: WebDomainOptions;
 
   indexRoot?: string;
+  ignoreCache?: string[];
 }
 
 export interface WebEntryQPQWebServerConfigSetting extends QPQConfigSetting {
@@ -36,6 +37,7 @@ export interface WebEntryQPQWebServerConfigSetting extends QPQConfigSetting {
 
   buildPath?: string;
   seoBuildPath?: string;
+  ignoreCache: string[];
 }
 
 export const defineWebEntry = (
@@ -64,4 +66,5 @@ export const defineWebEntry = (
 
   buildPath: options?.buildPath,
   seoBuildPath: options?.seoBuildPath,
+  ignoreCache: options?.ignoreCache || [],
 });
