@@ -50,6 +50,7 @@ const axiosInstance = axios.create({
     // Fixes: https://github.com/axios/axios/issues/5346
     'Accept-Encoding': 'gzip,deflate,compress',
   },
+  validateStatus: () => true,
 });
 
 const processNetworkRequestGet = async (
