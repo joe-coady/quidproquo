@@ -1,4 +1,4 @@
-export * from './qpqApp';
+export * from './QPQApp';
 export * from './constructs';
 export * from './stacks';
 
