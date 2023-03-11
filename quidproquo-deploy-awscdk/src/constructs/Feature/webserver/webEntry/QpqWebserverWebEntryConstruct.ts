@@ -18,6 +18,9 @@ import {
   qpqWebServerUtils,
   qpqHeaderIsBot,
 } from 'quidproquo-webserver';
+
+import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
+
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { Construct } from 'constructs';
 
@@ -150,6 +153,15 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
         cachePolicy: aws_cloudfront.CachePolicy.CACHING_DISABLED,
       });
     });
+
+    qpqDeployAwsCdkUtils.exportStackValue(
+      this,
+      awsNamingUtils.getCFExportNameDistributionIdArnFromConfig(
+        props.webEntryConfig.name,
+        props.qpqConfig,
+      ),
+      distribution.distributionId,
+    );
 
     // TODO: Fix this when they add l2 support for origin access control settings
 

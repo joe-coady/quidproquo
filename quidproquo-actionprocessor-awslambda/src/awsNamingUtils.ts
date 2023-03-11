@@ -176,3 +176,25 @@ export const getCFExportNameSnsTopicArnFromConfig = (
     'sns-topic-arn-export',
   );
 };
+
+export const getCFExportNameDistributionIdArnFromConfig = (
+  webEntryName: string,
+  qpqConfig: QPQConfig,
+
+  serviceOverride?: string,
+  applicationOverride?: string,
+) => {
+  const application = applicationOverride || qpqCoreUtils.getApplicationName(qpqConfig);
+  const service = serviceOverride || qpqCoreUtils.getApplicationModuleName(qpqConfig);
+  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
+  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+
+  return getQpqRuntimeResourceName(
+    webEntryName,
+    application,
+    service,
+    environment,
+    feature,
+    'distribution-id-export',
+  );
+};

@@ -57,5 +57,13 @@ export class Function extends QpqConstructBlock {
         resources: ['*'],
       }),
     );
+
+    // Let lambdas invalidate cache for cloud front
+    this.lambdaFunction.addToRolePolicy(
+      new aws_iam.PolicyStatement({
+        actions: ['cloudfront:CreateInvalidation'],
+        resources: ['*'],
+      }),
+    );
   }
 }
