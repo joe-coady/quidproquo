@@ -12,6 +12,7 @@ import {
   getConfigGetParameterActionProcessor,
   getConfigGetParametersActionProcessor,
   getUserDirectoryActionProcessor,
+  getWebEntryActionProcessor,
   awsLambdaUtils,
   DynamicModuleLoader,
 } from 'quidproquo-actionprocessor-awslambda';
@@ -61,6 +62,7 @@ export const getStoryActionRuntime = async (
     ...getQueueActionProcessor(cdkConfig.qpqConfig),
     ...getEventBusActionProcessor(cdkConfig.qpqConfig),
     ...getUserDirectoryActionProcessor(cdkConfig.qpqConfig),
+    ...getWebEntryActionProcessor(cdkConfig.qpqConfig),
 
     ...getCustomActionProcessors(cdkConfig.qpqConfig),
     ...qpqCustomActionProcessors(),
