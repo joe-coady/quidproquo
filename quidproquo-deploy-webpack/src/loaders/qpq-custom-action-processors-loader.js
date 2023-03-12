@@ -13,7 +13,7 @@ module.exports = function (source) {
 
   const exports = config.customActionProcessorSources
     .map((_, i) => `  ...customActionProcessorImport${i}.default()`)
-    .join('\n');
+    .join(',\n');
 
   const result = `${imports}
 
