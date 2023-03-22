@@ -148,12 +148,6 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
       })),
     });
 
-    props.webEntryConfig.ignoreCache.forEach((pathPattern) => {
-      distribution.addBehavior(pathPattern, distributionOrigin, {
-        cachePolicy: aws_cloudfront.CachePolicy.CACHING_DISABLED,
-      });
-    });
-
     qpqDeployAwsCdkUtils.exportStackValue(
       this,
       awsNamingUtils.getCFExportNameDistributionIdArnFromConfig(
@@ -262,6 +256,7 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
         const wildcardPath = seo.path.replaceAll(/{(.+?)}/g, '*');
         distribution.addBehavior(wildcardPath, distributionOrigin, {
           cachePolicy: seoCachePolicy,
+          viewerProtocolPolicy: aws_cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
           edgeLambdas: [
             {
               functionVersion: edgeFunctionVR.currentVersion,
@@ -275,5 +270,12 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
         });
       }
     }
+
+    props.webEntryConfig.ignoreCache.forEach((pathPattern) => {
+      distribution.addBehavior(pathPattern, distributionOrigin, {
+        cachePolicy: aws_cloudfront.CachePolicy.CACHING_DISABLED,
+        viewerProtocolPolicy: aws_cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+      });
+    });
   }
 }
