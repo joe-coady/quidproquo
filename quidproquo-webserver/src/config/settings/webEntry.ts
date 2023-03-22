@@ -25,6 +25,8 @@ export interface QPQConfigAdvancedWebEntrySettings extends QPQConfigAdvancedSett
 
   indexRoot?: string;
   ignoreCache?: string[];
+
+  compressFiles?: boolean;
 }
 
 export interface WebEntryQPQWebServerConfigSetting extends QPQConfigSetting {
@@ -38,6 +40,8 @@ export interface WebEntryQPQWebServerConfigSetting extends QPQConfigSetting {
   buildPath?: string;
   seoBuildPath?: string;
   ignoreCache: string[];
+
+  compressFiles: boolean;
 }
 
 export const defineWebEntry = (
@@ -59,12 +63,15 @@ export const defineWebEntry = (
   },
 
   cache: options?.cache || {
-    defaultTTLInSeconds: 86400,
-    minTTLInSeconds: 900,
-    maxTTLInSeconds: 172800,
+    defaultTTLInSeconds: 7 * 24 * 60 * 60,
+    minTTLInSeconds: 3 * 24 * 60 * 60,
+    maxTTLInSeconds: 2 * 7 * 24 * 60 * 60,
+    mustRevalidate: options?.cache?.mustRevalidate ?? false,
   },
 
   buildPath: options?.buildPath,
   seoBuildPath: options?.seoBuildPath,
   ignoreCache: options?.ignoreCache || [],
+
+  compressFiles: options?.compressFiles ?? true,
 });

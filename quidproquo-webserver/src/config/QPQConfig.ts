@@ -14,4 +14,5 @@ export interface CacheSettings {
   minTTLInSeconds: number;
   maxTTLInSeconds: number;
   defaultTTLInSeconds: number;
+  mustRevalidate: boolean;
 }

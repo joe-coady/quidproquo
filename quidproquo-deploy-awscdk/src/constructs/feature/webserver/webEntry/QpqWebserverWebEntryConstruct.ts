@@ -128,6 +128,23 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
       enableAcceptEncodingBrotli: true,
     });
 
+    const mustRevalidate = false;
+
+    const responseHeaderPolicy = new aws_cloudfront.ResponseHeadersPolicy(this, `dist-rhp`, {
+      responseHeadersPolicyName: this.resourceName(props.webEntryConfig.name),
+      customHeadersBehavior: {
+        customHeaders: [
+          {
+            header: 'Cache-Control',
+            value: `max-age=${props.webEntryConfig.cache.maxTTLInSeconds}${
+              props.webEntryConfig.cache.mustRevalidate ? ', must-revalidate' : ''
+            }`,
+            override: true,
+          },
+        ],
+      },
+    });
+
     // Create a CloudFront distribution using the S3 bucket as the origin
     const distributionOrigin = new aws_cloudfront_origins.S3Origin(originBucket);
     const distribution = new aws_cloudfront.Distribution(this, 'MyDistribution', {
@@ -135,7 +152,10 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
         origin: distributionOrigin,
         cachePolicy: cachePolicy,
         viewerProtocolPolicy: aws_cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+        compress: props.webEntryConfig.compressFiles,
+        responseHeadersPolicy: responseHeaderPolicy,
       },
+
       domainNames: [deployDomain],
       certificate: myCertificate,
       defaultRootObject: props.webEntryConfig.indexRoot,
@@ -257,6 +277,8 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
         distribution.addBehavior(wildcardPath, distributionOrigin, {
           cachePolicy: seoCachePolicy,
           viewerProtocolPolicy: aws_cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+          compress: props.webEntryConfig.compressFiles,
+          responseHeadersPolicy: responseHeaderPolicy,
           edgeLambdas: [
             {
               functionVersion: edgeFunctionVR.currentVersion,
@@ -271,10 +293,29 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
       }
     }
 
+    const ignoreCacheResponseHeaderPolicy = new aws_cloudfront.ResponseHeadersPolicy(
+      this,
+      `dist-rhp-ignore`,
+      {
+        responseHeadersPolicyName: this.qpqResourceName(props.webEntryConfig.name, 'ignore'),
+        customHeadersBehavior: {
+          customHeaders: [
+            {
+              header: 'Cache-Control',
+              value: `max-age=300, must-revalidate`,
+              override: true,
+            },
+          ],
+        },
+      },
+    );
+
     props.webEntryConfig.ignoreCache.forEach((pathPattern) => {
       distribution.addBehavior(pathPattern, distributionOrigin, {
         cachePolicy: aws_cloudfront.CachePolicy.CACHING_DISABLED,
         viewerProtocolPolicy: aws_cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+        compress: props.webEntryConfig.compressFiles,
+        responseHeadersPolicy: ignoreCacheResponseHeaderPolicy,
       });
     });
   }
