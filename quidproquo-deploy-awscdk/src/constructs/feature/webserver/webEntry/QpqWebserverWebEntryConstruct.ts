@@ -19,6 +19,8 @@ import {
   qpqHeaderIsBot,
 } from 'quidproquo-webserver';
 
+import { convertSecurityHeadersFromQpqSecurityHeaders } from './utils/securityHeaders';
+
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
@@ -128,8 +130,6 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
       enableAcceptEncodingBrotli: true,
     });
 
-    const mustRevalidate = false;
-
     const responseHeaderPolicy = new aws_cloudfront.ResponseHeadersPolicy(this, `dist-rhp`, {
       responseHeadersPolicyName: this.resourceName(props.webEntryConfig.name),
       customHeadersBehavior: {
@@ -143,6 +143,10 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
           },
         ],
       },
+      securityHeadersBehavior: convertSecurityHeadersFromQpqSecurityHeaders(
+        qpqWebServerUtils.getBaseDomainName(props.qpqConfig),
+        props.webEntryConfig.securityHeaders,
+      ),
     });
 
     // Create a CloudFront distribution using the S3 bucket as the origin
@@ -307,6 +311,10 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
             },
           ],
         },
+        securityHeadersBehavior: convertSecurityHeadersFromQpqSecurityHeaders(
+          qpqWebServerUtils.getBaseDomainName(props.qpqConfig),
+          props.webEntryConfig.securityHeaders,
+        ),
       },
     );
 

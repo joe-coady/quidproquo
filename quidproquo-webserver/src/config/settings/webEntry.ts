@@ -2,6 +2,8 @@ import { QPQConfigSetting, QPQConfigAdvancedSettings } from 'quidproquo-core';
 
 import { QPQWebServerConfigSettingType, CacheSettings } from '../QPQConfig';
 
+import { ResponseSecurityHeaders } from '../types/ResponseSecurityHeaders';
+
 export interface WebDomainOptions {
   subDomainName?: string;
   onRootDomain: boolean;
@@ -27,6 +29,8 @@ export interface QPQConfigAdvancedWebEntrySettings extends QPQConfigAdvancedSett
   ignoreCache?: string[];
 
   compressFiles?: boolean;
+
+  securityHeaders?: ResponseSecurityHeaders;
 }
 
 export interface WebEntryQPQWebServerConfigSetting extends QPQConfigSetting {
@@ -42,6 +46,8 @@ export interface WebEntryQPQWebServerConfigSetting extends QPQConfigSetting {
   ignoreCache: string[];
 
   compressFiles: boolean;
+
+  securityHeaders?: ResponseSecurityHeaders;
 }
 
 export const defineWebEntry = (
@@ -74,4 +80,6 @@ export const defineWebEntry = (
   ignoreCache: options?.ignoreCache || [],
 
   compressFiles: options?.compressFiles ?? true,
+
+  securityHeaders: options?.securityHeaders,
 });
