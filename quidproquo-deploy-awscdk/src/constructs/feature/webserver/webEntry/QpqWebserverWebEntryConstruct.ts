@@ -218,33 +218,25 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
         props.webEntryConfig,
       );
 
-      const edgeFunctionVR = new aws_cloudfront.experimental.EdgeFunction(
-        this,
-        `SEO-${props.webEntryConfig.name}-VR`,
-        {
-          functionName: this.resourceName(`SEO-VR-${props.webEntryConfig.name}`),
-          timeout: cdk.Duration.seconds(5),
-          runtime: aws_lambda.Runtime.NODEJS_18_X,
+      const edgeFunctionVR = new aws_cloudfront.experimental.EdgeFunction(this, `SEO-VR`, {
+        functionName: this.qpqResourceName(props.webEntryConfig.name, 'SEO-VR'),
+        timeout: cdk.Duration.seconds(5),
+        runtime: aws_lambda.Runtime.NODEJS_18_X,
 
-          code: aws_lambda.Code.fromAsset(path.join(seoEntryBuildPath, 'lambdaEventViewerRequest')),
-          handler: 'index.executeEventViewerRequest',
-        },
-      );
+        code: aws_lambda.Code.fromAsset(path.join(seoEntryBuildPath, 'lambdaEventViewerRequest')),
+        handler: 'index.executeEventViewerRequest',
+      });
 
-      const edgeFunctionOR = new aws_cloudfront.experimental.EdgeFunction(
-        this,
-        `SEO-${props.webEntryConfig.name}-OR`,
-        {
-          functionName: this.resourceName(`SEO-OR-${props.webEntryConfig.name}`),
-          timeout: cdk.Duration.seconds(30),
-          runtime: aws_lambda.Runtime.NODEJS_18_X,
+      const edgeFunctionOR = new aws_cloudfront.experimental.EdgeFunction(this, `SEO-OR`, {
+        functionName: this.qpqResourceName(props.webEntryConfig.name, 'SEO-OR'),
+        timeout: cdk.Duration.seconds(30),
+        runtime: aws_lambda.Runtime.NODEJS_18_X,
 
-          memorySize: 1024,
+        memorySize: 1024,
 
-          code: aws_lambda.Code.fromAsset(path.join(seoEntryBuildPath, 'lambdaEventOriginRequest')),
-          handler: 'index.executeEventOriginRequest',
-        },
-      );
+        code: aws_lambda.Code.fromAsset(path.join(seoEntryBuildPath, 'lambdaEventOriginRequest')),
+        handler: 'index.executeEventOriginRequest',
+      });
 
       const grantables = qpqDeployAwsCdkUtils.getQqpGrantableResources(
         this,

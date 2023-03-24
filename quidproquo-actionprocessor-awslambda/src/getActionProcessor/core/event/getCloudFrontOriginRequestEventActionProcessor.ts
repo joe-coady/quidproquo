@@ -98,7 +98,10 @@ const getProcessMatchStory = (
       .find((m) => m.match.didMatch);
 
     if (!matchedSeoConfig) {
-      return actionResultError(ErrorTypeEnum.NotFound, 'seo not found');
+      return actionResultError(
+        ErrorTypeEnum.NotFound,
+        `seo not found [${payload.transformedEventParams.path}]`,
+      );
     }
 
     return actionResult<CloudFrontOriginMatchStoryResult>({
