@@ -33,3 +33,7 @@ Currently under development ~ Not for production
 - Move into @quidproquo/\* packaged namespace
 - Environment config support ~ Specifically dev / prod config parameters.
 - OpenApi support for controllers (validation)
+
+#### Must haves
+
+- AWS Migration scripts to copy resources between accounts / services

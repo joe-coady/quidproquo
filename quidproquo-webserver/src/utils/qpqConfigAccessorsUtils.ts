@@ -139,6 +139,19 @@ export const getApiEntryFullPath = (
   return path.join(qpqCoreUtils.getConfigRoot(qpqConfig), apiEntry);
 };
 
+export const getServiceFunctionFullPath = (
+  qpqConfig: QPQConfig,
+  serviceFunctionConfig: ServiceFunctionQPQWebServerConfigSetting,
+): string => {
+  const buildPath = serviceFunctionConfig.buildPath;
+
+  if (!buildPath) {
+    throw new Error('please use defineWebEntry in your qpq config');
+  }
+
+  return path.join(qpqCoreUtils.getConfigRoot(qpqConfig), buildPath);
+};
+
 export const getRedirectApiBuildFullPath = (
   qpqConfig: QPQConfig,
   redirectConfig: SubdomainRedirectQPQWebServerConfigSetting,
