@@ -37,5 +37,6 @@ Currently under development ~ Not for production
 
 #### Must haves
 
-- (if !fedmod logic) - create dynamic loaders for each lambda type to reduce lambda build sizes
+- key value store powered by dynamo / s3
 - AWS Migration scripts to copy resources between accounts / services
+- (if !fedmod logic) - create dynamic loaders for each lambda type to reduce lambda build sizes

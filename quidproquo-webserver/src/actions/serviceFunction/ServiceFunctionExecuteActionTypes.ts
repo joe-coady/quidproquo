@@ -2,24 +2,25 @@ import { Action, ActionProcessor, ActionRequester } from 'quidproquo-core';
 import { ServiceFunctionActionType } from './ServiceFunctionActionType';
 
 // Payload
-export interface ServiceFunctionExecuteActionPayload {
+export interface ServiceFunctionExecuteActionPayload<T> {
   service: string;
   functionName: string;
-  args: any[];
+  payload: T;
 }
 
 // Action
-export interface ServiceFunctionExecuteAction extends Action<ServiceFunctionExecuteActionPayload> {
+export interface ServiceFunctionExecuteAction<T>
+  extends Action<ServiceFunctionExecuteActionPayload<T>> {
   type: ServiceFunctionActionType.Execute;
-  payload: ServiceFunctionExecuteActionPayload;
+  payload: ServiceFunctionExecuteActionPayload<T>;
 }
 
 // Function Types
-export type ServiceFunctionExecuteActionProcessor<R> = ActionProcessor<
-  ServiceFunctionExecuteAction,
+export type ServiceFunctionExecuteActionProcessor<R, T> = ActionProcessor<
+  ServiceFunctionExecuteAction<T>,
   R
 >;
-export type ServiceFunctionExecuteActionRequester<R> = ActionRequester<
-  ServiceFunctionExecuteAction,
+export type ServiceFunctionExecuteActionRequester<R, T> = ActionRequester<
+  ServiceFunctionExecuteAction<T>,
   R
 >;

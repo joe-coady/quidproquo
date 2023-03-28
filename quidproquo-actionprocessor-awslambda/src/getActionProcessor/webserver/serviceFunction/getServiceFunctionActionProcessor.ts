@@ -18,8 +18,8 @@ import { getConfigRuntimeResourceName } from '../../../awsNamingUtils';
 
 const getServiceFunctionExecuteActionProcessor = (
   qpqConfig: QPQConfig,
-): ServiceFunctionExecuteActionProcessor<any> => {
-  return async ({ functionName, service, args }) => {
+): ServiceFunctionExecuteActionProcessor<any, any> => {
+  return async ({ functionName, service, payload }) => {
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const appName = qpqCoreUtils.getApplicationName(qpqConfig);
@@ -36,7 +36,7 @@ const getServiceFunctionExecuteActionProcessor = (
 
     const serviceFunctionEvent: ExecuteServiceFunctionEvent<any[]> = {
       functionName: functionName,
-      payload: args,
+      payload: payload,
     };
 
     const result = await executeLambdaByName<StoryResult<any[], any>>(
