@@ -11,6 +11,7 @@ import {
   getConfigGetParametersActionProcessor,
   getUserDirectoryActionProcessor,
   getWebEntryActionProcessor,
+  getServiceFunctionActionProcessor,
   awsLambdaUtils,
   DynamicModuleLoader,
 } from 'quidproquo-actionprocessor-awslambda';
@@ -75,6 +76,7 @@ export const getAPIGatewayEventExecutor = (
       ...getEventBusActionProcessor(cdkConfig.qpqConfig),
       ...getUserDirectoryActionProcessor(cdkConfig.qpqConfig),
       ...getWebEntryActionProcessor(cdkConfig.qpqConfig),
+      ...getServiceFunctionActionProcessor(cdkConfig.qpqConfig),
 
       ...getCustomActionProcessors(cdkConfig.qpqConfig),
       ...qpqCustomActionProcessors(),

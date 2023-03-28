@@ -73,5 +73,13 @@ export class Function extends QpqConstructBlock {
         resources: ['*'],
       }),
     );
+
+    // Let lambdas publish sns messages.
+    this.lambdaFunction.addToRolePolicy(
+      new aws_iam.PolicyStatement({
+        actions: ['lambda:InvokeFunction'],
+        resources: ['arn:aws:lambda:*:*:function:*sfunc*'],
+      }),
+    );
   }
 }
