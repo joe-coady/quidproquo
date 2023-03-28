@@ -11,6 +11,7 @@ import {
   OpenApiQPQWebServerConfigSetting,
   QPQWebServerConfigSettingType,
   DefaultRouteOptionsQPQWebServerConfigSetting,
+  ServiceFunctionQPQWebServerConfigSetting,
 } from '../config';
 
 import { WebEntryQPQWebServerConfigSetting, ApiQPQWebServerConfigSetting } from '../config';
@@ -22,6 +23,17 @@ export const getAllRoutes = (qpqConfig: QPQConfig): RouteQPQWebServerConfigSetti
   );
 
   return routes;
+};
+
+export const getAllServiceFunctions = (
+  qpqConfig: QPQConfig,
+): ServiceFunctionQPQWebServerConfigSetting[] => {
+  const serviceFunctions = qpqCoreUtils.getConfigSettings<ServiceFunctionQPQWebServerConfigSetting>(
+    qpqConfig,
+    QPQWebServerConfigSettingType.ServiceFunction,
+  );
+
+  return serviceFunctions;
 };
 
 export const getAllRoutesForApi = (

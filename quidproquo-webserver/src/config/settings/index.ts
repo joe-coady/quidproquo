@@ -2,6 +2,7 @@ export * from './api';
 export * from './apiKey';
 export * from './defaultRouteOptions';
 export * from './dns';
+export * from './serviceFunction';
 export * from './openApi';
 export * from './route';
 export * from './seo';
