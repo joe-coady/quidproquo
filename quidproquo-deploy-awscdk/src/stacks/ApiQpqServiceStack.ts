@@ -97,6 +97,7 @@ export class ApiQpqServiceStack extends QpqServiceStack {
             qpqConfig: props.qpqConfig,
 
             serviceFunctionConfig: setting,
+            apiLayerVersions: layers.layers,
           },
         ),
     );

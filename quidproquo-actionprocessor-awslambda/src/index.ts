@@ -4,6 +4,6 @@ export * as awsNamingUtils from './awsNamingUtils';
 
 export * from './runtimeConfig/QPQAWSResourceMap';
 
-export * from './types/DynamicLoader';
+export * from './types';
 
 export * from './logic/parametersManager/getParameter';

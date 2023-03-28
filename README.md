@@ -33,7 +33,9 @@ Currently under development ~ Not for production
 - Move into @quidproquo/\* packaged namespace
 - Environment config support ~ Specifically dev / prod config parameters.
 - OpenApi support for controllers (validation)
+- share the action processor logic between lambdas (+ general cleanup)
 
 #### Must haves
 
+- (if !fedmod logic) - create dynamic loaders for each lambda type to reduce lambda build sizes
 - AWS Migration scripts to copy resources between accounts / services

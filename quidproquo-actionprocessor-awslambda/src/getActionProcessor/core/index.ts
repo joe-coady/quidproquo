@@ -5,6 +5,7 @@ export { default as getConfigGetParametersActionProcessor } from './config/getCo
 export { default as getAPIGatewayEventActionProcessor } from './event/getAPIGatewayEventActionProcessor';
 export { default as getCloudFrontOriginRequestEventActionProcessor } from './event/getCloudFrontOriginRequestEventActionProcessor';
 export { default as getSQSEventRecordActionProcessor } from './event/getSQSEventRecordActionProcessor';
+export { default as getServiceFunctionExecuteEventActionProcessor } from './event/getServiceFunctionExecuteEventActionProcessor';
 export { default as getEventBridgeEventActionProcessor } from './event/getEventBridgeEventActionProcessor';
 
 export { default as getSystemActionProcessor } from './system';

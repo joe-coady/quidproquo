@@ -25,17 +25,6 @@ export const getAllRoutes = (qpqConfig: QPQConfig): RouteQPQWebServerConfigSetti
   return routes;
 };
 
-export const getAllServiceFunctions = (
-  qpqConfig: QPQConfig,
-): ServiceFunctionQPQWebServerConfigSetting[] => {
-  const serviceFunctions = qpqCoreUtils.getConfigSettings<ServiceFunctionQPQWebServerConfigSetting>(
-    qpqConfig,
-    QPQWebServerConfigSettingType.ServiceFunction,
-  );
-
-  return serviceFunctions;
-};
-
 export const getAllRoutesForApi = (
   apiName: string,
   qpqConfig: QPQConfig,
@@ -63,6 +52,17 @@ export const getAllSeo = (qpqConfig: QPQConfig): SeoQPQWebServerConfigSetting[] 
   return seoConfigs;
 };
 
+export const getAllServiceFunctions = (
+  qpqConfig: QPQConfig,
+): ServiceFunctionQPQWebServerConfigSetting[] => {
+  const serviceFunctions = qpqCoreUtils.getConfigSettings<ServiceFunctionQPQWebServerConfigSetting>(
+    qpqConfig,
+    QPQWebServerConfigSettingType.ServiceFunction,
+  );
+
+  return serviceFunctions;
+};
+
 export const getAllOpenApiSpecs = (configs: QPQConfig): OpenApiQPQWebServerConfigSetting[] => {
   const openApiSpecs = qpqCoreUtils.getConfigSettings<OpenApiQPQWebServerConfigSetting>(
     configs,
@@ -79,6 +79,7 @@ export const getAllSrcEntries = (configs: QPQConfig): string[] => {
     ...getAllRoutes(configs).map((r) => r.src),
     ...getAllOpenApiSpecs(configs).map((r) => r.openApiSpecPath),
     ...getAllSeo(configs).map((seo) => seo.src),
+    ...getAllServiceFunctions(configs).map((sf) => sf.src),
   ];
 };
 

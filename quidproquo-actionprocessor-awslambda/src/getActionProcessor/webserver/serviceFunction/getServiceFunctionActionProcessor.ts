@@ -1,8 +1,15 @@
-import { actionResult, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import {
+  actionResult,
+  actionResultError,
+  QPQConfig,
+  qpqCoreUtils,
+  StoryResult,
+} from 'quidproquo-core';
 
 import {
   ServiceFunctionExecuteActionProcessor,
   ServiceFunctionActionType,
+  ExecuteServiceFunctionEvent,
 } from 'quidproquo-webserver';
 
 import { executeLambdaByName } from '../../../logic/lambda/executeLambdaByName';
@@ -12,7 +19,7 @@ import { getConfigRuntimeResourceName } from '../../../awsNamingUtils';
 const getServiceFunctionExecuteActionProcessor = (
   qpqConfig: QPQConfig,
 ): ServiceFunctionExecuteActionProcessor<any> => {
-  return async ({ functionName, service, arg }) => {
+  return async ({ functionName, service, args }) => {
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const appName = qpqCoreUtils.getApplicationName(qpqConfig);
@@ -27,9 +34,26 @@ const getServiceFunctionExecuteActionProcessor = (
       feature,
     );
 
-    const result = await executeLambdaByName(awsFunctionName, region, arg);
+    const serviceFunctionEvent: ExecuteServiceFunctionEvent<any[]> = {
+      functionName: functionName,
+      payload: args,
+    };
 
-    return actionResult(result);
+    const result = await executeLambdaByName<StoryResult<any[], any>>(
+      awsFunctionName,
+      region,
+      serviceFunctionEvent,
+    );
+
+    if (result?.error) {
+      return actionResultError(
+        result?.error.errorType,
+        result?.error.errorText,
+        result?.error.errorStack,
+      );
+    }
+
+    return actionResult(result?.result);
   };
 };
 

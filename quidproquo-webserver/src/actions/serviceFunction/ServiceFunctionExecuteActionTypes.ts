@@ -5,7 +5,7 @@ import { ServiceFunctionActionType } from './ServiceFunctionActionType';
 export interface ServiceFunctionExecuteActionPayload {
   service: string;
   functionName: string;
-  arg: any;
+  args: any[];
 }
 
 // Action
