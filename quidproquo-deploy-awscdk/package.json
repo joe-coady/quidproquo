@@ -1,6 +1,6 @@
 {
   "name": "quidproquo-deploy-awscdk",
-  "version": "0.0.80",
+  "version": "0.0.87",
   "description": "",
   "main": "./lib/index.js",
   "types": "./lib/index.d.js",

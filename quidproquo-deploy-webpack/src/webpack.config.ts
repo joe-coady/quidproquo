@@ -98,6 +98,7 @@ export const getWebpackEntryNames = () => [
   'lambdaEventBridgeEvent',
   'lambdaEventOriginRequest',
   'lambdaEventViewerRequest',
+  'lambdaServiceFunctionExecute',
   'lambdaSQSEvent',
 ];
 
@@ -112,6 +113,7 @@ export const getApiWebpackConfig = (qpqConfig: QPQConfig, outputPath?: string) =
   getWebpackConfig(qpqConfig, outputPath || 'build', [
     'lambdaEventBridgeEvent',
     'lambdaAPIGatewayEvent',
+    'lambdaServiceFunctionExecute',
     'lambdaSQSEvent',
   ]);
 

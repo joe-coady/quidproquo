@@ -11,6 +11,7 @@ import {
   OpenApiQPQWebServerConfigSetting,
   QPQWebServerConfigSettingType,
   DefaultRouteOptionsQPQWebServerConfigSetting,
+  ServiceFunctionQPQWebServerConfigSetting,
 } from '../config';
 
 import { WebEntryQPQWebServerConfigSetting, ApiQPQWebServerConfigSetting } from '../config';
@@ -51,6 +52,17 @@ export const getAllSeo = (qpqConfig: QPQConfig): SeoQPQWebServerConfigSetting[] 
   return seoConfigs;
 };
 
+export const getAllServiceFunctions = (
+  qpqConfig: QPQConfig,
+): ServiceFunctionQPQWebServerConfigSetting[] => {
+  const serviceFunctions = qpqCoreUtils.getConfigSettings<ServiceFunctionQPQWebServerConfigSetting>(
+    qpqConfig,
+    QPQWebServerConfigSettingType.ServiceFunction,
+  );
+
+  return serviceFunctions;
+};
+
 export const getAllOpenApiSpecs = (configs: QPQConfig): OpenApiQPQWebServerConfigSetting[] => {
   const openApiSpecs = qpqCoreUtils.getConfigSettings<OpenApiQPQWebServerConfigSetting>(
     configs,
@@ -67,6 +79,7 @@ export const getAllSrcEntries = (configs: QPQConfig): string[] => {
     ...getAllRoutes(configs).map((r) => r.src),
     ...getAllOpenApiSpecs(configs).map((r) => r.openApiSpecPath),
     ...getAllSeo(configs).map((seo) => seo.src),
+    ...getAllServiceFunctions(configs).map((sf) => sf.src),
   ];
 };
 
@@ -125,6 +138,19 @@ export const getApiEntryFullPath = (
   }
 
   return path.join(qpqCoreUtils.getConfigRoot(qpqConfig), apiEntry);
+};
+
+export const getServiceFunctionFullPath = (
+  qpqConfig: QPQConfig,
+  serviceFunctionConfig: ServiceFunctionQPQWebServerConfigSetting,
+): string => {
+  const buildPath = serviceFunctionConfig.buildPath;
+
+  if (!buildPath) {
+    throw new Error('please use defineWebEntry in your qpq config');
+  }
+
+  return path.join(qpqCoreUtils.getConfigRoot(qpqConfig), buildPath);
 };
 
 export const getRedirectApiBuildFullPath = (

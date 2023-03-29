@@ -1,6 +1,6 @@
 {
   "name": "quidproquo-actionprocessor-awslambda",
-  "version": "0.0.80",
+  "version": "0.0.87",
   "description": "",
   "main": "./lib/index.js",
   "types": "./lib/index.d.js",
@@ -29,6 +29,7 @@
     "@aws-sdk/client-cloudformation": "^3.278.0",
     "@aws-sdk/client-cloudfront": "^3.289.0",
     "@aws-sdk/client-cognito-identity-provider": "^3.278.0",
+    "@aws-sdk/client-lambda": "^3.278.0",
     "@aws-sdk/client-s3": "^3.278.0",
     "@aws-sdk/client-secrets-manager": "^3.278.0",
     "@aws-sdk/client-sns": "^3.279.0",

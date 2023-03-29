@@ -12,6 +12,7 @@ import {
   QpqWebserverApiConstruct,
   QpqApiCoreQueueConstruct,
   QpqWebserverSubdomainRedirectConstruct,
+  QpqWebserverServiceFunctionConstruct,
 } from '../constructs';
 
 export interface ApiQpqServiceStackProps extends QpqServiceStackProps {
@@ -81,6 +82,22 @@ export class ApiQpqServiceStack extends QpqServiceStack {
             qpqConfig: props.qpqConfig,
 
             subdomainRedirectConfig: setting,
+          },
+        ),
+    );
+
+    // Service Functions
+    const serviceFunctions = qpqWebServerUtils.getAllServiceFunctions(props.qpqConfig).map(
+      (setting) =>
+        new QpqWebserverServiceFunctionConstruct(
+          this,
+          qpqCoreUtils.getUniqueKeyForSetting(setting),
+          {
+            awsAccountId: props.awsAccountId,
+            qpqConfig: props.qpqConfig,
+
+            serviceFunctionConfig: setting,
+            apiLayerVersions: layers.layers,
           },
         ),
     );

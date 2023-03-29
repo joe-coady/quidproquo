@@ -18,6 +18,11 @@ import {
   qpqWebServerUtils,
   qpqHeaderIsBot,
 } from 'quidproquo-webserver';
+
+import { convertSecurityHeadersFromQpqSecurityHeaders } from './utils/securityHeaders';
+
+import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
+
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { Construct } from 'constructs';
 
@@ -125,6 +130,25 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
       enableAcceptEncodingBrotli: true,
     });
 
+    const responseHeaderPolicy = new aws_cloudfront.ResponseHeadersPolicy(this, `dist-rhp`, {
+      responseHeadersPolicyName: this.resourceName(props.webEntryConfig.name),
+      customHeadersBehavior: {
+        customHeaders: [
+          {
+            header: 'Cache-Control',
+            value: `max-age=${props.webEntryConfig.cache.maxTTLInSeconds}${
+              props.webEntryConfig.cache.mustRevalidate ? ', must-revalidate' : ''
+            }`,
+            override: true,
+          },
+        ],
+      },
+      securityHeadersBehavior: convertSecurityHeadersFromQpqSecurityHeaders(
+        qpqWebServerUtils.getBaseDomainName(props.qpqConfig),
+        props.webEntryConfig.securityHeaders,
+      ),
+    });
+
     // Create a CloudFront distribution using the S3 bucket as the origin
     const distributionOrigin = new aws_cloudfront_origins.S3Origin(originBucket);
     const distribution = new aws_cloudfront.Distribution(this, 'MyDistribution', {
@@ -132,7 +156,10 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
         origin: distributionOrigin,
         cachePolicy: cachePolicy,
         viewerProtocolPolicy: aws_cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+        compress: props.webEntryConfig.compressFiles,
+        responseHeadersPolicy: responseHeaderPolicy,
       },
+
       domainNames: [deployDomain],
       certificate: myCertificate,
       defaultRootObject: props.webEntryConfig.indexRoot,
@@ -145,11 +172,14 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
       })),
     });
 
-    props.webEntryConfig.ignoreCache.forEach((pathPattern) => {
-      distribution.addBehavior(pathPattern, distributionOrigin, {
-        cachePolicy: aws_cloudfront.CachePolicy.CACHING_DISABLED,
-      });
-    });
+    qpqDeployAwsCdkUtils.exportStackValue(
+      this,
+      awsNamingUtils.getCFExportNameDistributionIdArnFromConfig(
+        props.webEntryConfig.name,
+        props.qpqConfig,
+      ),
+      distribution.distributionId,
+    );
 
     // TODO: Fix this when they add l2 support for origin access control settings
 
@@ -188,33 +218,25 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
         props.webEntryConfig,
       );
 
-      const edgeFunctionVR = new aws_cloudfront.experimental.EdgeFunction(
-        this,
-        `SEO-${props.webEntryConfig.name}-VR`,
-        {
-          functionName: this.resourceName(`SEO-VR-${props.webEntryConfig.name}`),
-          timeout: cdk.Duration.seconds(5),
-          runtime: aws_lambda.Runtime.NODEJS_18_X,
+      const edgeFunctionVR = new aws_cloudfront.experimental.EdgeFunction(this, `SEO-VR`, {
+        functionName: this.qpqResourceName(props.webEntryConfig.name, 'SEO-VR'),
+        timeout: cdk.Duration.seconds(5),
+        runtime: aws_lambda.Runtime.NODEJS_18_X,
 
-          code: aws_lambda.Code.fromAsset(path.join(seoEntryBuildPath, 'lambdaEventViewerRequest')),
-          handler: 'index.executeEventViewerRequest',
-        },
-      );
+        code: aws_lambda.Code.fromAsset(path.join(seoEntryBuildPath, 'lambdaEventViewerRequest')),
+        handler: 'index.executeEventViewerRequest',
+      });
 
-      const edgeFunctionOR = new aws_cloudfront.experimental.EdgeFunction(
-        this,
-        `SEO-${props.webEntryConfig.name}-OR`,
-        {
-          functionName: this.resourceName(`SEO-OR-${props.webEntryConfig.name}`),
-          timeout: cdk.Duration.seconds(30),
-          runtime: aws_lambda.Runtime.NODEJS_18_X,
+      const edgeFunctionOR = new aws_cloudfront.experimental.EdgeFunction(this, `SEO-OR`, {
+        functionName: this.qpqResourceName(props.webEntryConfig.name, 'SEO-OR'),
+        timeout: cdk.Duration.seconds(30),
+        runtime: aws_lambda.Runtime.NODEJS_18_X,
 
-          memorySize: 1024,
+        memorySize: 1024,
 
-          code: aws_lambda.Code.fromAsset(path.join(seoEntryBuildPath, 'lambdaEventOriginRequest')),
-          handler: 'index.executeEventOriginRequest',
-        },
-      );
+        code: aws_lambda.Code.fromAsset(path.join(seoEntryBuildPath, 'lambdaEventOriginRequest')),
+        handler: 'index.executeEventOriginRequest',
+      });
 
       const grantables = qpqDeployAwsCdkUtils.getQqpGrantableResources(
         this,
@@ -250,6 +272,9 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
         const wildcardPath = seo.path.replaceAll(/{(.+?)}/g, '*');
         distribution.addBehavior(wildcardPath, distributionOrigin, {
           cachePolicy: seoCachePolicy,
+          viewerProtocolPolicy: aws_cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+          compress: props.webEntryConfig.compressFiles,
+          responseHeadersPolicy: responseHeaderPolicy,
           edgeLambdas: [
             {
               functionVersion: edgeFunctionVR.currentVersion,
@@ -263,5 +288,35 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
         });
       }
     }
+
+    const ignoreCacheResponseHeaderPolicy = new aws_cloudfront.ResponseHeadersPolicy(
+      this,
+      `dist-rhp-ignore`,
+      {
+        responseHeadersPolicyName: this.qpqResourceName(props.webEntryConfig.name, 'ignore'),
+        customHeadersBehavior: {
+          customHeaders: [
+            {
+              header: 'Cache-Control',
+              value: `max-age=300, must-revalidate`,
+              override: true,
+            },
+          ],
+        },
+        securityHeadersBehavior: convertSecurityHeadersFromQpqSecurityHeaders(
+          qpqWebServerUtils.getBaseDomainName(props.qpqConfig),
+          props.webEntryConfig.securityHeaders,
+        ),
+      },
+    );
+
+    props.webEntryConfig.ignoreCache.forEach((pathPattern) => {
+      distribution.addBehavior(pathPattern, distributionOrigin, {
+        cachePolicy: aws_cloudfront.CachePolicy.CACHING_DISABLED,
+        viewerProtocolPolicy: aws_cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+        compress: props.webEntryConfig.compressFiles,
+        responseHeadersPolicy: ignoreCacheResponseHeaderPolicy,
+      });
+    });
   }
 }

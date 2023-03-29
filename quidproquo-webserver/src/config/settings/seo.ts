@@ -42,5 +42,6 @@ export const defineSeo = (
     minTTLInSeconds: 900,
     maxTTLInSeconds: 172800,
     headers: [],
+    mustRevalidate: false,
   },
 });

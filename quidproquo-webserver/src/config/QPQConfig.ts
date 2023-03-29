@@ -8,10 +8,12 @@ export enum QPQWebServerConfigSettingType {
   WebEntry = '@quidproquo-webserver/config/WebEntry',
   Api = '@quidproquo-webserver/config/Api',
   ApiKey = '@quidproquo-webserver/config/ApiKey',
+  ServiceFunction = '@quidproquo-webserver/config/ServiceFunction',
 }
 
 export interface CacheSettings {
   minTTLInSeconds: number;
   maxTTLInSeconds: number;
   defaultTTLInSeconds: number;
+  mustRevalidate: boolean;
 }
