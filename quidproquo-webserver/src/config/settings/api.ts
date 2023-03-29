@@ -13,6 +13,8 @@ export interface ApiQPQWebServerConfigSetting extends QPQConfigSetting {
   onRootDomain: boolean;
   apiName: string;
   buildPath: string;
+
+  deprecated: boolean;
 }
 
 export const defineApi = (
@@ -30,5 +32,7 @@ export const defineApi = (
     // advanced
     onRootDomain: options?.onRootDomain || false,
     apiName: options?.apiName || 'api',
+
+    deprecated: options?.deprecated || false,
   };
 };

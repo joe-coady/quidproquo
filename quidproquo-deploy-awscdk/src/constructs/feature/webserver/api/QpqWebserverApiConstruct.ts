@@ -19,20 +19,6 @@ export class QpqWebserverApiConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: QpqWebserverApiConstructProps) {
     super(scope, id, props);
 
-    // api.service.domain.com or api.domain.com
-    const apexDomain = props.apiConfig.onRootDomain
-      ? qpqWebServerUtils.getBaseDomainName(props.qpqConfig)
-      : qpqWebServerUtils.getServiceDomainName(props.qpqConfig);
-
-    // Create subdomain
-    const subdomain = new SubdomainName(this, 'subdomain', {
-      apexDomain,
-      subdomain: props.apiConfig.apiSubdomain,
-      qpqConfig: props.qpqConfig,
-
-      awsAccountId: props.awsAccountId,
-    });
-
     // Build Function
     const func = new Function(this, 'api-function', {
       buildPath: qpqWebServerUtils.getApiEntryFullPath(props.qpqConfig, props.apiConfig),
@@ -59,11 +45,6 @@ export class QpqWebserverApiConstruct extends QpqConstructBlock {
       g.grantAll(func.lambdaFunction);
     });
 
-    // const routes = qpqWebServerUtils.getAllRoutesForApi(props.apiConfig.apiName, props.qpqConfig);
-    // const apiKeys = routes.reduce((acc, r) => {
-    //   return [...acc, ...(r.options.routeAuthSettings?.apiKeys || [])];
-    // }, [] as ApiKey[]);
-
     // Create a rest api
     const api = new aws_apigateway.LambdaRestApi(this, 'lambda-rest-api', {
       restApiName: this.resourceName(`${props.apiConfig.apiName}-rest-api`),
@@ -74,38 +55,32 @@ export class QpqWebserverApiConstruct extends QpqConstructBlock {
       },
       binaryMediaTypes: ['*/*'],
       proxy: true,
-      // defaultMethodOptions: {
-      //   apiKeyRequired: apiKeys.length > 0,
-      // },
     });
 
-    // const usagePlan = api.addUsagePlan(this.qpqResourceName(props.apiConfig.apiName, 'usagePlan'), {
-    //   apiStages: [
-    //     {
-    //       api,
-    //       stage: api.deploymentStage,
-    //     },
-    //   ],
-    // });
+    // If we have not deprecated this api, then we need to create a subdomain for it
+    if (!props.apiConfig.deprecated) {
+      // api.service.domain.com or api.domain.com
+      const apexDomain = props.apiConfig.onRootDomain
+        ? qpqWebServerUtils.getBaseDomainName(props.qpqConfig)
+        : qpqWebServerUtils.getServiceDomainName(props.qpqConfig);
 
-    // apiKeys.forEach((apiKey) => {
-    //   const name = `${props.apiConfig.apiName}-${apiKey.name}`;
-    //   const newApiKey = api.addApiKey(this.qpqResourceName(name, 'apiKey'), {
-    //     description: apiKey.description,
-    //     apiKeyName: this.resourceName(name),
-    //     value: apiKey.value,
-    //   });
+      // Create subdomain
+      const subdomain = new SubdomainName(this, 'subdomain', {
+        apexDomain,
+        subdomain: props.apiConfig.apiSubdomain,
+        qpqConfig: props.qpqConfig,
 
-    //   // usagePlan.addApiKey(newApiKey);
-    // });
+        awsAccountId: props.awsAccountId,
+      });
 
-    // Map all requests to this service to /serviceName/*
-    new aws_apigateway.BasePathMapping(this, 'rest-bpm', {
-      domainName: subdomain.domainName,
-      restApi: api,
+      // Map all requests to this service to /serviceName/*
+      new aws_apigateway.BasePathMapping(this, 'rest-bpm', {
+        domainName: subdomain.domainName,
+        restApi: api,
 
-      // the properties below are optional
-      // basePath: settings.service,
-    });
+        // the properties below are optional
+        // basePath: settings.service,
+      });
+    }
   }
 }

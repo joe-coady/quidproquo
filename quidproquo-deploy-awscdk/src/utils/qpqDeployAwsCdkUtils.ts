@@ -15,6 +15,7 @@ import {
   ApiQPQWebServerConfigSetting,
   QPQWebServerConfigSettingType,
   qpqWebServerUtils,
+  WebEntryQPQWebServerConfigSetting,
 } from 'quidproquo-webserver';
 
 import {
@@ -211,10 +212,17 @@ export const serviceNeedsServiceHostedZone = (qpqConfig: QPQConfig) => {
     .getConfigSettings<ApiQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.Api)
     .filter((config) => !config.onRootDomain);
 
+  const webEntryConfigs = qpqCoreUtils
+    .getConfigSettings<WebEntryQPQWebServerConfigSetting>(
+      qpqConfig,
+      QPQWebServerConfigSettingType.WebEntry,
+    )
+    .filter((config) => !config.domain.onRootDomain);
+
   // // Or if we are deploying to a feature env ~ like joecoady
   // const hasFeatureName = !!qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
 
-  return apiConfigs.length > 0; // || hasFeatureName;
+  return apiConfigs.length > 0 || webEntryConfigs.length > 0; // || hasFeatureName;
 };
 
 // Get resources that we can use to grant permissions to lambdas etc
