@@ -134,6 +134,10 @@ export class QpqCoreUserDirectoryConstruct extends QpqCoreUserDirectoryConstruct
 
       qpqConfig: props.qpqConfig,
 
+      environment: {
+        userDirectoryName: props.userDirectoryConfig.name,
+      },
+
       awsAccountId: props.awsAccountId,
     });
 

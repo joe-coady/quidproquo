@@ -14,6 +14,7 @@ import {
   ActionProcessorsQPQConfigSetting,
   UserDirectoryQPQConfigSetting,
 } from './config/settings';
+import { EmailTemplates } from './config/settings/emailTemplates/types';
 
 export const getConfigSettings = <T extends QPQConfigSetting>(
   configs: QPQConfig,
@@ -105,6 +106,25 @@ export const getActionProcessorSources = (configs: QPQConfig): string[] => {
   ).map((ap) => ap.src);
 
   return sources;
+};
+
+export const getUserDirectoryEmailTemplates = (
+  qpqConfig: QPQConfig,
+): Record<string, EmailTemplates> => {
+  const userDirectories = getConfigSettings<UserDirectoryQPQConfigSetting>(
+    qpqConfig,
+    QPQCoreConfigSettingType.userDirectory,
+  );
+
+  const record = userDirectories.reduce(
+    (acc, ud) => ({
+      ...acc,
+      [ud.name]: ud.emailTemplates,
+    }),
+    {} as Record<string, EmailTemplates>,
+  );
+
+  return record;
 };
 
 export const getScheduleEvents = (configs: QPQConfig): ScheduleQPQConfigSetting[] => {

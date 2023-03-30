@@ -4,10 +4,15 @@ import {
   QPQConfigAdvancedSettings,
 } from '../QPQConfig';
 
+import { EmailTemplates } from './emailTemplates/types';
+import { verifyEmailTemplate } from './emailTemplates';
+
 export interface QPQConfigAdvancedUserDirectorySettings extends QPQConfigAdvancedSettings {
   phoneRequired?: boolean;
 
   selfSignUpEnabled?: boolean;
+
+  emailTemplates?: EmailTemplates;
 }
 
 export interface UserDirectoryQPQConfigSetting extends QPQConfigSetting {
@@ -17,6 +22,8 @@ export interface UserDirectoryQPQConfigSetting extends QPQConfigSetting {
   phoneRequired: boolean;
 
   selfSignUpEnabled: boolean;
+
+  emailTemplates: EmailTemplates;
 }
 
 export const defineUserDirectory = (
@@ -33,4 +40,8 @@ export const defineUserDirectory = (
   phoneRequired: options?.phoneRequired || false,
 
   selfSignUpEnabled: options?.selfSignUpEnabled || true,
+
+  emailTemplates: {
+    verifyEmail: options?.emailTemplates?.verifyEmail || verifyEmailTemplate,
+  },
 });

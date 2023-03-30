@@ -6,8 +6,10 @@ import { qpqCoreUtils, QPQConfig } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 import webpack from 'webpack';
 
-const getWebpackBuildMode = (qpqConfig: QPQConfig): string => {
-  const feature = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
+type WebpackBuildMode = 'none' | 'development' | 'production';
+
+const getWebpackBuildMode = (qpqConfig: QPQConfig): WebpackBuildMode => {
+  const feature = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig) as WebpackBuildMode;
 
   if (['development', 'production'].indexOf(feature) >= 0) {
     return feature;
@@ -35,6 +37,7 @@ export const getWebpackConfig = (
     qpqConfig,
     customActionProcessorSources,
     projectRoot: qpqCoreUtils.getConfigRoot(qpqConfig),
+    userDirectoryEmailTemplates: qpqCoreUtils.getUserDirectoryEmailTemplates(qpqConfig),
   });
 
   return {
@@ -47,8 +50,8 @@ export const getWebpackConfig = (
       modules: [path.resolve(__dirname, 'loaders'), 'node_modules'],
     },
 
-    // mode: getWebpackBuildMode(qpqConfig),
-    mode: 'production',
+    mode: getWebpackBuildMode(qpqConfig),
+    // mode: 'production',
 
     externals: [/aws-sdk/],
 

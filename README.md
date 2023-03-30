@@ -38,6 +38,7 @@ Currently under development ~ Not for production
 #### Must haves
 
 - Finish auth
+- import html file as strings for email templates
 - eslint
   - import order
   - linting
