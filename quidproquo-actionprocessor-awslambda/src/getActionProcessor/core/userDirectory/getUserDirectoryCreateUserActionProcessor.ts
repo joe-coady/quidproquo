@@ -4,6 +4,7 @@ import {
   QPQConfig,
   qpqCoreUtils,
   UserDirectoryActionType,
+  AuthenticateUserResponse,
 } from 'quidproquo-core';
 import {
   getCFExportNameUserPoolIdFromConfig,
@@ -29,14 +30,14 @@ const getUserDirectoryCreateUserActionProcessor = (
       region,
     );
 
-    const username = await createUser(
+    const authResponse: AuthenticateUserResponse = await createUser(
       userPoolId,
       qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig),
       userPoolClientId,
       payload.createUserRequest,
     );
 
-    return actionResult(username);
+    return actionResult(authResponse);
   };
 };
 

@@ -1,4 +1,4 @@
-import { CreateUserRequest } from 'quidproquo-core';
+import { CreateUserRequest, AuthenticateUserResponse } from 'quidproquo-core';
 import {
   CognitoIdentityProviderClient,
   AdminCreateUserCommand,
@@ -8,7 +8,6 @@ import {
 } from '@aws-sdk/client-cognito-identity-provider';
 
 import { authenticateUser } from './authenticateUser';
-import { requestEmailVerificationCode } from './requestEmailVerificationCode';
 import { setUserPassword } from './setUserPassword';
 
 export const createUser = async (
@@ -16,7 +15,7 @@ export const createUser = async (
   region: string,
   clientId: string,
   createUserRequest: CreateUserRequest,
-): Promise<string> => {
+): Promise<AuthenticateUserResponse> => {
   const cognitoClient = new CognitoIdentityProviderClient({ region });
 
   const params: AdminCreateUserCommandInput = {
@@ -44,7 +43,7 @@ export const createUser = async (
   await setUserPassword(region, userPoolId, username, createUserRequest.password);
 
   // Authenticate the user
-  const authResponse = await authenticateUser(
+  const authResponse: AuthenticateUserResponse = await authenticateUser(
     userPoolId,
     clientId,
     region,
@@ -52,7 +51,5 @@ export const createUser = async (
     createUserRequest.password,
   );
 
-  await requestEmailVerificationCode(region, authResponse.authenticationInfo?.accessToken!);
-
-  return username;
+  return authResponse;
 };

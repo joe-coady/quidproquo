@@ -1,5 +1,5 @@
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
-import { UserDirectoryActionType } from './UserDirectoryActionType';
+import { UserDirectoryActionType, AuthenticateUserResponse } from './UserDirectoryActionType';
 
 export interface CreateUserRequest {
   email: string;
@@ -25,9 +25,9 @@ export interface UserDirectoryCreateUserAction
 // Function Types
 export type UserDirectoryCreateUserActionProcessor = ActionProcessor<
   UserDirectoryCreateUserAction,
-  string
+  AuthenticateUserResponse
 >;
 export type UserDirectoryCreateUserActionRequester = ActionRequester<
   UserDirectoryCreateUserAction,
-  string
+  AuthenticateUserResponse
 >;
