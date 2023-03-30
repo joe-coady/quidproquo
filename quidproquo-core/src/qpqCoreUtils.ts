@@ -192,6 +192,13 @@ export const getQueueEntryFullPath = (
   return path.join(getConfigRoot(qpqConfig), queueConfig.buildPath);
 };
 
+export const getUserDirectoryEntryFullPath = (
+  qpqConfig: QPQConfig,
+  userDirectoryConfig: UserDirectoryQPQConfigSetting,
+): string => {
+  return path.join(getConfigRoot(qpqConfig), userDirectoryConfig.buildPath);
+};
+
 export const getQueueQueueProcessors = (name: string, qpqConfig: QPQConfig): QpqQueueProcessors => {
   const seoConfigs = getConfigSettings<QueueQPQConfigSetting>(
     qpqConfig,

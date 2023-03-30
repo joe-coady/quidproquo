@@ -35,7 +35,8 @@ const getUserDirectoryAuthenticateUserActionProcessor = (
       userPoolId,
       userPoolClientId,
       qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig),
-      payload.authenticateUserRequest,
+      payload.authenticateUserRequest.email,
+      payload.authenticateUserRequest.password,
     );
 
     return actionResult(authResponse);

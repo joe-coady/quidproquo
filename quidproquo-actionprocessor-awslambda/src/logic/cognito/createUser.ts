@@ -5,13 +5,16 @@ import {
   AdminCreateUserCommandInput,
   DeliveryMediumType,
   MessageActionType,
-  AdminSetUserPasswordCommand,
-  AdminSetUserPasswordCommandInput,
 } from '@aws-sdk/client-cognito-identity-provider';
+
+import { authenticateUser } from './authenticateUser';
+import { requestEmailVerificationCode } from './requestEmailVerificationCode';
+import { setUserPassword } from './setUserPassword';
 
 export const createUser = async (
   userPoolId: string,
   region: string,
+  clientId: string,
   createUserRequest: CreateUserRequest,
 ): Promise<string> => {
   const cognitoClient = new CognitoIdentityProviderClient({ region });
@@ -19,9 +22,12 @@ export const createUser = async (
   const params: AdminCreateUserCommandInput = {
     UserPoolId: userPoolId,
     Username: createUserRequest.email,
-    MessageAction: MessageActionType.SUPPRESS,
+    MessageAction: MessageActionType.SUPPRESS, // Don't contact the user
     DesiredDeliveryMediums: [DeliveryMediumType.EMAIL],
-    UserAttributes: [{ Name: 'email', Value: createUserRequest.email }],
+    UserAttributes: [
+      { Name: 'email', Value: createUserRequest.email },
+      { Name: 'email_verified', Value: 'false' },
+    ],
     ForceAliasCreation: false,
   };
 
@@ -34,16 +40,19 @@ export const createUser = async (
 
   const username = response.User?.Username || '';
 
-  // There has to be a better way than this?
-  const passwordParams: AdminSetUserPasswordCommandInput = {
-    Password: createUserRequest.password,
-    Username: username,
-    UserPoolId: userPoolId,
-    Permanent: true,
-  };
+  // Set the user's password
+  await setUserPassword(region, userPoolId, username, createUserRequest.password);
 
-  await cognitoClient.send(new AdminSetUserPasswordCommand(passwordParams));
-  // ///////////////////////
+  // Authenticate the user
+  const authResponse = await authenticateUser(
+    userPoolId,
+    clientId,
+    region,
+    username,
+    createUserRequest.password,
+  );
+
+  await requestEmailVerificationCode(region, authResponse.authenticationInfo?.accessToken!);
 
   return username;
 };

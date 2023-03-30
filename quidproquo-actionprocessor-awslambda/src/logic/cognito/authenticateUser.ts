@@ -30,12 +30,13 @@ export const authenticateUser = async (
   userPoolId: string,
   clientId: string,
   region: string,
-  authenticateUserRequest: AuthenticateUserRequest,
+  username: string,
+  password: string,
 ): Promise<AuthenticateUserResponse> => {
   const cognitoClient = new CognitoIdentityProviderClient({ region });
 
   const clientSecret = await getUserPoolClientSecret(userPoolId, clientId, region);
-  const secretHash = calculateSecretHash(authenticateUserRequest.email, clientId, clientSecret);
+  const secretHash = calculateSecretHash(username, clientId, clientSecret);
 
   const params: AdminInitiateAuthCommandInput = {
     AuthFlow: AuthFlowType.ADMIN_USER_PASSWORD_AUTH,
@@ -43,8 +44,8 @@ export const authenticateUser = async (
     ClientId: clientId,
 
     AuthParameters: {
-      USERNAME: authenticateUserRequest.email,
-      PASSWORD: authenticateUserRequest.password,
+      USERNAME: username,
+      PASSWORD: password,
       SECRET_HASH: secretHash,
     },
   };

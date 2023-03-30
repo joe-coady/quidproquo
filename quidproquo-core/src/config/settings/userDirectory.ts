@@ -12,6 +12,7 @@ export interface QPQConfigAdvancedUserDirectorySettings extends QPQConfigAdvance
 
 export interface UserDirectoryQPQConfigSetting extends QPQConfigSetting {
   name: string;
+  buildPath: string;
 
   phoneRequired: boolean;
 
@@ -20,12 +21,14 @@ export interface UserDirectoryQPQConfigSetting extends QPQConfigSetting {
 
 export const defineUserDirectory = (
   name: string,
+  buildPath: string,
   options?: QPQConfigAdvancedUserDirectorySettings,
 ): UserDirectoryQPQConfigSetting => ({
   configSettingType: QPQCoreConfigSettingType.userDirectory,
   uniqueKey: name,
 
   name,
+  buildPath,
 
   phoneRequired: options?.phoneRequired || false,
 

@@ -100,6 +100,8 @@ export const getWebpackEntryNames = () => [
   'lambdaEventViewerRequest',
   'lambdaServiceFunctionExecute',
   'lambdaSQSEvent',
+
+  'lambdaCognitoTriggerEvent_CustomMessage',
 ];
 
 export const getSeoWebpackConfig = (qpqConfig: QPQConfig, outputPath?: string) =>
@@ -115,6 +117,8 @@ export const getApiWebpackConfig = (qpqConfig: QPQConfig, outputPath?: string) =
     'lambdaAPIGatewayEvent',
     'lambdaServiceFunctionExecute',
     'lambdaSQSEvent',
+
+    'lambdaCognitoTriggerEvent_CustomMessage',
   ]);
 
 export const getAllWebpackConfig = (qpqConfig: QPQConfig, outputPath?: string) =>

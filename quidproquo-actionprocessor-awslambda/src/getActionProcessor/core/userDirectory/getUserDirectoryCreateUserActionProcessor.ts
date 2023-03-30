@@ -5,7 +5,10 @@ import {
   qpqCoreUtils,
   UserDirectoryActionType,
 } from 'quidproquo-core';
-import { getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
+import {
+  getCFExportNameUserPoolIdFromConfig,
+  getCFExportNameUserPoolClientIdFromConfig,
+} from '../../../awsNamingUtils';
 
 import { createUser } from '../../../logic/cognito/createUser';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
@@ -21,9 +24,15 @@ const getUserDirectoryCreateUserActionProcessor = (
       region,
     );
 
+    const userPoolClientId = await getExportedValue(
+      getCFExportNameUserPoolClientIdFromConfig(payload.userDirectoryName, qpqConfig),
+      region,
+    );
+
     const username = await createUser(
       userPoolId,
       qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig),
+      userPoolClientId,
       payload.createUserRequest,
     );
 
