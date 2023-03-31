@@ -42,13 +42,19 @@ export const getCorsHeaders = (
 ): HttpEventHeaders => {
   const origin = getHeaderValue('origin', reqHeaders) || '';
   const allowedOrigins = getAllowedOrigins(qpqConfig, route);
-  const allowOrigin = allowedOrigins.find((ao) => ao === origin) || allowedOrigins[0];
+  const allowCredentials = Object.keys(route.routeAuthSettings || {}).length > 0;
+
+  // If we have an auth endpoint, then we don't let wildcard origins access the API for security reasons
+  const allowOrigin =
+    (!allowCredentials
+      ? allowedOrigins.find((ao) => origin === ao || ao === '*')
+      : allowedOrigins.find((ao) => origin === ao)) || allowedOrigins[0];
 
   return {
     'Access-Control-Allow-Headers': '*',
     'Access-Control-Allow-Methods': '*',
     'Access-Control-Allow-Origin': allowOrigin,
-    'Access-Control-Allow-Credentials': `${!!route.routeAuthSettings}`,
+    'Access-Control-Allow-Credentials': `${allowCredentials}`,
     Vary: 'Origin',
   };
 };

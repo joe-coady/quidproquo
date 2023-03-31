@@ -52,8 +52,6 @@ export const authenticateUser = async (
 
   const response = await cognitoClient.send(new AdminInitiateAuthCommand(params));
 
-  console.log(JSON.stringify(response, null, 2));
-
   const authenticateUserResponse: AuthenticateUserResponse = {
     session: response.Session,
     challenge: AuthenticateUserChallenge.NONE,
