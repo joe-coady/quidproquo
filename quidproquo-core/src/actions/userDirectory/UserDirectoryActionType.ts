@@ -3,6 +3,7 @@ export enum UserDirectoryActionType {
   AuthenticateUser = '@quidproquo-core/UserDirectory/AuthenticateUser',
   ForgotPassword = '@quidproquo-core/UserDirectory/ForgotPassword',
   ConfirmForgotPassword = '@quidproquo-core/UserDirectory/ConfirmForgotPassword',
+  RefreshToken = '@quidproquo-core/UserDirectory/RefreshToken',
 }
 
 export enum AuthenticateUserChallenge {
