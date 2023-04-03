@@ -40,11 +40,13 @@ Currently under development ~ Not for production
 - Finish auth
 - Local Dev
 - import html file as strings for email templates
+- key value store powered by dynamo / s3
+- Add monad support to actions (allow return with error info)
 - eslint
   - import order
   - linting
   - prettier
-- key value store powered by dynamo / s3
 - AWS Migration scripts to copy resources between accounts / services
 - (if !fedmod logic) - create dynamic loaders for each lambda type to reduce lambda build sizes
 - ESLint plugin to make sure user yield\* before an askGenerator
+- keep lambda's warm by adding a polling event every x mins
