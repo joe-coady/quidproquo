@@ -1,4 +1,4 @@
-import { AuthenticateUserResponse, AuthenticateUserChallenge } from 'quidproquo-core';
+import { AuthenticateUserResponse } from 'quidproquo-core';
 
 import {
   CognitoIdentityProviderClient,
@@ -12,14 +12,12 @@ import { getUserPoolClientSecret } from './getUserPoolClientSecret';
 
 import { cognitoAdminInitiateAuthResponseToQpqAuthenticationInfo } from './utils/transformCognitoResponse';
 
-// TODO: retry for TooManyRequestsException
-
-export const authenticateUser = async (
+export const refreshToken = async (
   userPoolId: string,
   clientId: string,
   region: string,
   username: string,
-  password: string,
+  refreshToken: string,
 ): Promise<AuthenticateUserResponse> => {
   const cognitoClient = new CognitoIdentityProviderClient({ region });
 
@@ -27,34 +25,17 @@ export const authenticateUser = async (
   const secretHash = calculateSecretHash(username, clientId, clientSecret);
 
   const params: AdminInitiateAuthCommandInput = {
-    AuthFlow: AuthFlowType.ADMIN_USER_PASSWORD_AUTH,
+    AuthFlow: AuthFlowType.REFRESH_TOKEN_AUTH,
     UserPoolId: userPoolId,
     ClientId: clientId,
 
     AuthParameters: {
-      USERNAME: username,
-      PASSWORD: password,
+      REFRESH_TOKEN: refreshToken,
       SECRET_HASH: secretHash,
     },
   };
 
-  try {
-    const response = await cognitoClient.send(new AdminInitiateAuthCommand(params));
-    return cognitoAdminInitiateAuthResponseToQpqAuthenticationInfo(response);
-  } catch (e) {
-    if (e instanceof Error) {
-      switch (e.name) {
-        case 'PasswordResetRequiredException':
-          return {
-            challenge: AuthenticateUserChallenge.RESET_PASSWORD,
-          };
-      }
+  const response = await cognitoClient.send(new AdminInitiateAuthCommand(params));
 
-      throw new Error(`${e.name}: ${e.message}`);
-    }
-
-    console.log('authenticateUser Error: ', e);
-
-    throw new Error(`Unknown error has occurred in authenticateUser`);
-  }
+  return cognitoAdminInitiateAuthResponseToQpqAuthenticationInfo(response);
 };
