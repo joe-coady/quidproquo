@@ -1,6 +1,7 @@
 export enum UserDirectoryActionType {
   CreateUser = '@quidproquo-core/UserDirectory/CreateUser',
   AuthenticateUser = '@quidproquo-core/UserDirectory/AuthenticateUser',
+  ForgotPassword = '@quidproquo-core/UserDirectory/ForgotPassword',
 }
 
 export enum AuthenticateUserChallenge {
