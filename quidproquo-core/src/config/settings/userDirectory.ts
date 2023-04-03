@@ -5,7 +5,7 @@ import {
 } from '../QPQConfig';
 
 import { EmailTemplates } from './emailTemplates/types';
-import { verifyEmailTemplate } from './emailTemplates';
+import { verifyEmailTemplate, resetPassword } from './emailTemplates';
 
 export interface QPQConfigAdvancedUserDirectorySettings extends QPQConfigAdvancedSettings {
   phoneRequired?: boolean;
@@ -43,5 +43,6 @@ export const defineUserDirectory = (
 
   emailTemplates: {
     verifyEmail: options?.emailTemplates?.verifyEmail || verifyEmailTemplate,
+    resetPassword: options?.emailTemplates?.resetPassword || resetPassword,
   },
 });

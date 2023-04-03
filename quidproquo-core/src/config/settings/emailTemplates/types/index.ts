@@ -5,4 +5,5 @@ export interface EmailTemplate {
 
 export interface EmailTemplates {
   verifyEmail?: EmailTemplate;
+  resetPassword?: EmailTemplate;
 }

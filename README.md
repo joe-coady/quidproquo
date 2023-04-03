@@ -38,6 +38,7 @@ Currently under development ~ Not for production
 #### Must haves
 
 - Finish auth
+- Local Dev
 - import html file as strings for email templates
 - eslint
   - import order
@@ -46,3 +47,4 @@ Currently under development ~ Not for production
 - key value store powered by dynamo / s3
 - AWS Migration scripts to copy resources between accounts / services
 - (if !fedmod logic) - create dynamic loaders for each lambda type to reduce lambda build sizes
+- ESLint plugin to make sure user yield\* before an askGenerator

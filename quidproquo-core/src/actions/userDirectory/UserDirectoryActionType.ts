@@ -16,6 +16,12 @@ export interface AuthenticationInfo {
   tokenType?: string;
 }
 
+export interface AuthenticationDeliveryDetails {
+  attributeName: string;
+  deliveryMedium: 'EMAIL' | 'SMS';
+  destination: string;
+}
+
 export interface AuthenticateUserResponse {
   challenge: AuthenticateUserChallenge;
 

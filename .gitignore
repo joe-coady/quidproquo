@@ -9,3 +9,9 @@ node_modules/
 
 # Don't commit lib files
 **/lib/**/*
+
+# Don't commit env powershell scripts
+.envrc.ps1
+
+# Don't commit test files
+tests/**/*

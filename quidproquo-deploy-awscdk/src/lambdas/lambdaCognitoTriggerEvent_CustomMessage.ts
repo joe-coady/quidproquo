@@ -33,6 +33,11 @@ export const executeCognitoTriggerEvent = async (
   event: CustomMessageTriggerEvent,
   context: Context,
 ) => {
+  console.log(
+    `executeCognitoTriggerEvent: Started [${event.triggerSource}]`,
+    JSON.stringify(event, null, 2),
+  );
+
   const params = {
     baseDomain: 'joecoady.development.kitted.app',
     code: event.request.codeParameter,
@@ -41,8 +46,20 @@ export const executeCognitoTriggerEvent = async (
   };
 
   const templates = getTemplates();
-  event.response.emailMessage = await renderTemplate(templates.verifyEmail!.body, params);
-  event.response.emailSubject = await renderTemplate(templates.verifyEmail!.subject, params);
+
+  switch (event.triggerSource) {
+    case 'CustomMessage_ForgotPassword':
+      event.response.emailMessage = await renderTemplate(templates.resetPassword!.body, params);
+      event.response.emailSubject = await renderTemplate(templates.resetPassword!.subject, params);
+      break;
+
+    case 'CustomMessage_VerifyUserAttribute':
+      event.response.emailMessage = await renderTemplate(templates.verifyEmail!.body, params);
+      event.response.emailSubject = await renderTemplate(templates.verifyEmail!.subject, params);
+      break;
+  }
+
+  console.log('executeCognitoTriggerEvent: Ended');
 
   return event;
 };
