@@ -3,6 +3,9 @@ export * from './UserDirectoryActionType';
 export * from './UserDirectoryAuthenticateUserActionRequester';
 export * from './UserDirectoryAuthenticateUserActionTypes';
 
+export * from './UserDirectoryConfirmEmailVerificationActionRequester';
+export * from './UserDirectoryConfirmEmailVerificationActionTypes';
+
 export * from './UserDirectoryConfirmForgotPasswordActionRequester';
 export * from './UserDirectoryConfirmForgotPasswordActionTypes';
 

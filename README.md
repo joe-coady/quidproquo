@@ -37,6 +37,7 @@ Currently under development ~ Not for production
 
 #### Must haves
 
+- Reduce the log lifetime for lambda to a week or two by default
 - Finish auth
 - Local Dev
 - import html file as strings for email templates
@@ -46,6 +47,7 @@ Currently under development ~ Not for production
   - import order
   - linting
   - prettier
+- Set secrets script
 - AWS Migration scripts to copy resources between accounts / services
 - (if !fedmod logic) - create dynamic loaders for each lambda type to reduce lambda build sizes
 - ESLint plugin to make sure user yield\* before an askGenerator
