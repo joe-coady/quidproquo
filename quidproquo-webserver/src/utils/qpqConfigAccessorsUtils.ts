@@ -235,3 +235,16 @@ export const getDefaultRouteSettings = (
 
   return defaultRouteSettings;
 };
+
+export const getDomainRoot = (
+  rootDomain: string,
+  environment: string,
+  feature?: string,
+): string => {
+  let domainPrefix = environment !== 'production' ? `${environment}.` : '';
+  if (feature) {
+    domainPrefix = `${feature}.${domainPrefix}`;
+  }
+
+  return `${domainPrefix}${rootDomain}`;
+};

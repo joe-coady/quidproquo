@@ -15,8 +15,6 @@ export function* askProcessEvent(...eventArguments: any) {
   // Try and match a story to execute
   const matchResult = yield* askEventMatchStory(transformedEventParams);
 
-  console.log('matchResult', JSON.stringify(matchResult, null, 2));
-
   //  See if we want to exit early (validation / auth etc)
   const earlyExitResponse = yield* askEventAutoRespond(transformedEventParams, matchResult);
 

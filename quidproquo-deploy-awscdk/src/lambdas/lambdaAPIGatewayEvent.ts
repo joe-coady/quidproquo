@@ -1,4 +1,8 @@
-import { coreActionProcessor, webserverActionProcessor } from 'quidproquo-actionprocessor-node';
+import {
+  coreActionProcessor,
+  webserverActionProcessor,
+  getConfigActionProcessor,
+} from 'quidproquo-actionprocessor-node';
 
 import {
   getAPIGatewayEventActionProcessor,
@@ -15,8 +19,6 @@ import {
   awsLambdaUtils,
   DynamicModuleLoader,
 } from 'quidproquo-actionprocessor-awslambda';
-
-import { getConfigActionProcessor } from 'quidproquo-actionprocessor-node';
 
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 

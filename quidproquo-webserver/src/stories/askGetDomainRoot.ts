@@ -1,12 +1,8 @@
 import { AskResponse, askConfigGetApplicationInfo } from 'quidproquo-core';
+import { getDomainRoot } from '../utils';
 
 export function* askGetDomainRoot(rootDomain: string): AskResponse<string> {
   const appInfo = yield* askConfigGetApplicationInfo();
 
-  let domainPrefix = appInfo.environment !== 'production' ? `${appInfo.environment}.` : '';
-  if (appInfo.feature) {
-    domainPrefix = `${appInfo.feature}.${domainPrefix}`;
-  }
-
-  return `${domainPrefix}${rootDomain}`;
+  return getDomainRoot(rootDomain, appInfo.environment, appInfo.feature);
 }
