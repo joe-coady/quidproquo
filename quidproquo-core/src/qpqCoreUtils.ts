@@ -13,6 +13,7 @@ import {
   QpqQueueProcessors,
   ActionProcessorsQPQConfigSetting,
   UserDirectoryQPQConfigSetting,
+  KeyValueStoreQPQConfigSetting,
 } from './config/settings';
 import { EmailTemplates } from './config/settings/emailTemplates/types';
 
@@ -97,6 +98,15 @@ export const getAllEventBusConfigs = (qpqConfig: QPQConfig): EventBusQPQConfigSe
   );
 
   return eventBuses;
+};
+
+export const getAllKeyValueStores = (qpqConfig: QPQConfig): KeyValueStoreQPQConfigSetting[] => {
+  const keyValueStores = getConfigSettings<KeyValueStoreQPQConfigSetting>(
+    qpqConfig,
+    QPQCoreConfigSettingType.keyValueStore,
+  );
+
+  return keyValueStores;
 };
 
 export const getActionProcessorSources = (configs: QPQConfig): string[] => {

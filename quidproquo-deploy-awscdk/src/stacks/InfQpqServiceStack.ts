@@ -13,6 +13,7 @@ import {
   QpqWebserverDomainConstruct,
   QpqCoreUserDirectoryConstruct,
   QpqWebserverApiKeyConstruct,
+  QpqCoreKeyValueStoreConstruct,
 } from '../constructs';
 
 export interface InfQpqServiceStackProps extends QpqServiceStackProps {}
@@ -106,6 +107,17 @@ export class InfQpqServiceStack extends QpqServiceStack {
           qpqConfig: props.qpqConfig,
 
           eventBusConfig: setting,
+        }),
+    );
+
+    // key value store
+    const keyValueStores = qpqCoreUtils.getAllKeyValueStores(props.qpqConfig).map(
+      (setting) =>
+        new QpqCoreKeyValueStoreConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
+          awsAccountId: props.awsAccountId,
+          qpqConfig: props.qpqConfig,
+
+          keyValueStoreConfig: setting,
         }),
     );
   }
