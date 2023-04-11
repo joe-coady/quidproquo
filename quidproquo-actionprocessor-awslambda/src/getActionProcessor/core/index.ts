@@ -10,6 +10,7 @@ export { default as getEventBridgeEventActionProcessor } from './event/getEventB
 
 export { default as getSystemActionProcessor } from './system';
 export { default as getFileActionProcessor } from './file';
+export { default as getKeyValueStoreActionProcessor } from './keyValueStore';
 export { default as getQueueActionProcessor } from './queue';
 export { default as getUserDirectoryActionProcessor } from './userDirectory';
 export { default as getEventBusActionProcessor } from './eventBus';

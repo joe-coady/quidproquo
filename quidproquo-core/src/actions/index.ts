@@ -5,6 +5,7 @@ export * from './event';
 export * from './eventBus';
 export * from './file';
 export * from './guid';
+export * from './keyValueStore';
 export * from './log';
 export * from './math';
 export * from './network';
