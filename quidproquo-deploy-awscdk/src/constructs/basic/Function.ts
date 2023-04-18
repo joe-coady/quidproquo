@@ -20,6 +20,8 @@ export interface FunctionProps extends QpqConstructBlockProps {
   };
 
   apiLayerVersions?: aws_lambda.ILayerVersion[];
+
+  reservedConcurrentExecutions?: number;
 }
 
 export class Function extends QpqConstructBlock {
@@ -40,6 +42,8 @@ export class Function extends QpqConstructBlock {
       handler: `index.${props.executorName}`,
 
       environment: props.environment,
+
+      reservedConcurrentExecutions: props.reservedConcurrentExecutions,
     });
 
     // Let lambdas read from the exported variables in cloudformation

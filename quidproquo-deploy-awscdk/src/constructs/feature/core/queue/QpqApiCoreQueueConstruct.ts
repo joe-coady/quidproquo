@@ -36,6 +36,9 @@ export class QpqApiCoreQueueConstruct extends QpqConstructBlock {
       environment: {
         queueQPQConfigSetting: JSON.stringify(props.queueConfig),
       },
+
+      // TODO: Expose this as a config option
+      reservedConcurrentExecutions: 1,
     });
 
     // TODO: Make this a utility function
