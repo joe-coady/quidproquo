@@ -27,7 +27,12 @@ const transformResponse = (
   response: AxiosResponse<any, any>,
 ): AxiosResponse<any, QPQBinaryData> => {
   if (payload.responseType === 'binary') {
-    const mimeType = (payload.headers || {})['content-type'] || 'application/octet-stream';
+    const headers = response.headers || {};
+    const mimeType = headers['content-type'] || 'application/octet-stream';
+
+    const filename =
+      headers['content-disposition']?.match(/filename="([^"]+)"/)?.[1] ||
+      `file.${extension(mimeType)}`;
 
     return {
       ...response,
@@ -36,7 +41,7 @@ const transformResponse = (
         mimetype: mimeType,
 
         // TODO: We could get a filename from Content-Disposition header
-        filename: `file.${extension(mimeType)}`,
+        filename,
       } as QPQBinaryData,
     };
   }
@@ -170,6 +175,8 @@ const processNetworkRequest: NetworkRequestActionProcessor<any, any> = async (pa
   if (!requestMethod) {
     return actionResultError(ErrorTypeEnum.NotImplemented, `${payload.method}: Not implemented`);
   }
+
+  console.log(payload.url);
 
   try {
     const response = await requestMethod(payload);
