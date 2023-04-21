@@ -2,14 +2,16 @@ import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
 import { getQpqRuntimeResourceNameFromConfig } from '../../../awsNamingUtils';
 import {
-  KeyValueStoreGetActionProcessor,
+  KeyValueStoreGetAllActionProcessor,
   actionResult,
   KeyValueStoreActionType,
 } from 'quidproquo-core';
-import { getItem } from '../../../logic/dynamo';
+import { getAllItems } from '../../../logic/dynamo';
 
-const getProcessKeyValueStoreGet = (qpqConfig: QPQConfig): KeyValueStoreGetActionProcessor<any> => {
-  return async ({ keyValueStoreName, key }) => {
+const getProcessKeyValueStoreGetAll = (
+  qpqConfig: QPQConfig,
+): KeyValueStoreGetAllActionProcessor<any> => {
+  return async ({ keyValueStoreName }) => {
     const dynamoTableName = getQpqRuntimeResourceNameFromConfig(
       keyValueStoreName,
       qpqConfig,
@@ -17,12 +19,12 @@ const getProcessKeyValueStoreGet = (qpqConfig: QPQConfig): KeyValueStoreGetActio
     );
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
-    const result = await getItem(dynamoTableName, key, region);
+    const result = await getAllItems(dynamoTableName, region);
 
     return actionResult(result);
   };
 };
 
 export default (qpqConfig: QPQConfig) => ({
-  [KeyValueStoreActionType.Get]: getProcessKeyValueStoreGet(qpqConfig),
+  [KeyValueStoreActionType.GetAll]: getProcessKeyValueStoreGetAll(qpqConfig),
 });

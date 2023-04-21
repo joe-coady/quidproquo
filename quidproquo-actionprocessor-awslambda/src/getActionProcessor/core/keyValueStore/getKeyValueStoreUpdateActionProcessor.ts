@@ -6,7 +6,7 @@ import {
   actionResult,
   KeyValueStoreActionType,
 } from 'quidproquo-core';
-import { updateItem } from '../../../logic/dynamo/updateItem';
+import { updateItem } from '../../../logic/dynamo';
 
 const getProcessKeyValueStoreUpdate = (
   qpqConfig: QPQConfig,

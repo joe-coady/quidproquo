@@ -9,7 +9,6 @@ export interface KeyValueStoreGetAllOptions {
 // Payload
 export interface KeyValueStoreGetAllActionPayload {
   keyValueStoreName: string;
-  key: string;
   options?: KeyValueStoreGetAllOptions;
 }
 

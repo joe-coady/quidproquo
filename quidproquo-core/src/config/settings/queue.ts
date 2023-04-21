@@ -21,6 +21,7 @@ export interface QPQConfigAdvancedQueueSettings extends QPQConfigAdvancedSetting
   ttRetryInSeconds?: number;
   hasDeadLetterQueue?: boolean;
   eventBusSubscriptions?: string[];
+  maxConcurrentExecutions?: number;
 }
 
 export interface QueueQPQConfigSetting extends QPQConfigSetting {
@@ -40,6 +41,8 @@ export interface QueueQPQConfigSetting extends QPQConfigSetting {
   qpqQueueProcessors: QpqQueueProcessors;
 
   eventBusSubscriptions: string[];
+
+  maxConcurrentExecutions?: number;
 }
 
 export const defineQueue = (
@@ -67,4 +70,6 @@ export const defineQueue = (
   qpqQueueProcessors: processors,
 
   eventBusSubscriptions: options?.eventBusSubscriptions || [],
+
+  maxConcurrentExecutions: options?.maxConcurrentExecutions,
 });

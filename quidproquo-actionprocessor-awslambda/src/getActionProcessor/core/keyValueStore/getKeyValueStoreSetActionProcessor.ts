@@ -6,7 +6,7 @@ import {
   actionResult,
   KeyValueStoreActionType,
 } from 'quidproquo-core';
-import { putItem } from '../../../logic/dynamo/putItem';
+import { putItem } from '../../../logic/dynamo';
 
 const getProcessKeyValueStoreSet = (qpqConfig: QPQConfig): KeyValueStoreSetActionProcessor<any> => {
   return async ({ keyValueStoreName, key, value, options }) => {

@@ -6,7 +6,7 @@ import {
   actionResult,
   KeyValueStoreActionType,
 } from 'quidproquo-core';
-import { deleteItem } from '../../../logic/dynamo/deleteItem';
+import { deleteItem } from '../../../logic/dynamo';
 
 const getProcessKeyValueStoreDelete = (
   qpqConfig: QPQConfig,

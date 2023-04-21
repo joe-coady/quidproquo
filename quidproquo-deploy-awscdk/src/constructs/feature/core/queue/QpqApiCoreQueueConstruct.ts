@@ -38,7 +38,7 @@ export class QpqApiCoreQueueConstruct extends QpqConstructBlock {
       },
 
       // TODO: Expose this as a config option
-      reservedConcurrentExecutions: 1,
+      reservedConcurrentExecutions: props.queueConfig.maxConcurrentExecutions,
     });
 
     // TODO: Make this a utility function
