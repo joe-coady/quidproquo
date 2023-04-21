@@ -22,15 +22,10 @@ import { getConfigActionProcessor } from 'quidproquo-actionprocessor-node';
 
 import { getLambdaConfigs } from './lambdaConfig';
 
-import {
-  createRuntime,
-  askProcessEvent,
-  ErrorTypeEnum,
-  qpqCoreUtils,
-  isErroredActionResult,
-} from 'quidproquo-core';
+import { createRuntime, askProcessEvent, QpqRuntimeType } from 'quidproquo-core';
 
 import { ActionProcessorListResolver } from './actionProcessorListResolver';
+import { getLogger } from './logger/logger';
 
 // @ts-ignore - Special webpack loader
 import qpqDynamicModuleLoader from 'qpq-dynamic-loader!';
@@ -70,16 +65,13 @@ export const getStoryActionRuntime = async (
     ...qpqCustomActionProcessors(),
   };
 
-  const logger = async (result: any) => {};
-
-  // Run the callback
-
   const resolveStory = createRuntime(
     {},
     storyActionProcessor,
     getDateNow,
-    logger,
+    getLogger(cdkConfig.qpqConfig),
     awsLambdaUtils.randomGuid,
+    QpqRuntimeType.QUEUE_EVENT,
   );
 
   return resolveStory;

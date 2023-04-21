@@ -19,12 +19,13 @@ import {
 
 import { getConfigActionProcessor } from 'quidproquo-actionprocessor-node';
 
-import { createRuntime, askProcessEvent } from 'quidproquo-core';
+import { createRuntime, askProcessEvent, QpqRuntimeType } from 'quidproquo-core';
 
 import { Context } from 'aws-lambda';
 
 import { getLambdaConfigs } from './lambdaConfig';
 import { ActionProcessorListResolver } from './actionProcessorListResolver';
+import { getLogger } from './logger/logger';
 
 // @ts-ignore - Special webpack loader
 import qpqDynamicModuleLoader from 'qpq-dynamic-loader!';
@@ -66,24 +67,13 @@ export const getServiceFunctionExecuteEventExecutor = (
       ...qpqCustomActionProcessors(),
     };
 
-    const logger = async (result: any) => {
-      // addResult(
-      //   envConfig.appName,
-      //   getDateNow(),
-      //   doWeCarePath,
-      //   "route-infrastructure",
-      //   "infrastructure",
-      //   "askRoute",
-      //   result
-      // );
-    };
-
     const resolveStory = createRuntime(
       {},
       storyActionProcessor,
       getDateNow,
-      logger,
+      getLogger(cdkConfig.qpqConfig),
       awsLambdaUtils.randomGuid,
+      QpqRuntimeType.SERVICE_FUNCTION_EXE,
     );
 
     const result = await resolveStory(askProcessEvent, [event, context]);

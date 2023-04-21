@@ -19,12 +19,13 @@ import {
 
 import { getConfigActionProcessor } from 'quidproquo-actionprocessor-node';
 
-import { createRuntime, askProcessEvent } from 'quidproquo-core';
+import { createRuntime, askProcessEvent, QpqRuntimeType } from 'quidproquo-core';
 
 import { EventBridgeEvent, Context } from 'aws-lambda';
 
 import { getLambdaConfigs } from './lambdaConfig';
 import { ActionProcessorListResolver } from './actionProcessorListResolver';
+import { getLogger } from './logger/logger';
 
 // @ts-ignore - Special webpack loader
 import qpqDynamicModuleLoader from 'qpq-dynamic-loader!';
@@ -69,15 +70,13 @@ export const getEventBridgeEventExecutor = (
       ...qpqCustomActionProcessors(),
     };
 
-    const logger = async (result: any) => {};
-
-    // Run the callback
     const resolveStory = createRuntime(
       {},
       storyActionProcessor,
       getDateNow,
-      logger,
+      getLogger(cdkConfig.qpqConfig),
       awsLambdaUtils.randomGuid,
+      QpqRuntimeType.EVENT_BRIDGE_EVENT,
     );
 
     await resolveStory(askProcessEvent, [event, context]);

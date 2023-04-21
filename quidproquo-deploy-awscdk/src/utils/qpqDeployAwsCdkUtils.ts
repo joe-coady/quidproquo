@@ -1,5 +1,6 @@
 import { Construct } from 'constructs';
 import * as cdk from 'aws-cdk-lib';
+import { QPQ_LOG_BUCKET_NAME } from '../constants';
 
 import {
   QPQCoreConfigSettingType,
@@ -26,6 +27,7 @@ import {
   QpqCoreQueueConstruct,
   QpqCoreUserDirectoryConstruct,
   QpqCoreEventBusConstruct,
+  LogStorage,
 } from '../constructs';
 
 export const getQqpSecretGrantables = (
@@ -176,6 +178,23 @@ export const getQqpTopicGrantables = (
   return eventBuses;
 };
 
+export const getQqpServiceLogGrantables = (
+  scope: Construct,
+  id: string,
+  qpqConfig: QPQConfig,
+  awsAccountId: string,
+): QpqResource[] => {
+  return [
+    LogStorage.fromOtherStack(
+      scope,
+      `${id}-service-logs`,
+      qpqConfig,
+      awsAccountId,
+      QPQ_LOG_BUCKET_NAME,
+    ),
+  ];
+};
+
 export const getQqpUserPoolGrantablesForApiConfig = (
   scope: Construct,
   id: string,
@@ -239,6 +258,7 @@ export const getQqpGrantableResources = (
     ...getQqpQueueGrantables(scope, id, qpqConfig, awsAccountId),
     ...getQqpUserPoolGrantables(scope, id, qpqConfig, awsAccountId),
     ...getQqpTopicGrantables(scope, id, qpqConfig, awsAccountId),
+    ...getQqpServiceLogGrantables(scope, id, qpqConfig, awsAccountId),
   ];
 };
 

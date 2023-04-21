@@ -22,12 +22,14 @@ import {
 
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
-import { createRuntime, askProcessEvent, ErrorTypeEnum } from 'quidproquo-core';
+import { createRuntime, askProcessEvent, ErrorTypeEnum, QpqRuntimeType } from 'quidproquo-core';
 
 import { APIGatewayEvent, Context } from 'aws-lambda';
 
 import { getLambdaConfigs } from './lambdaConfig';
 import { ActionProcessorListResolver } from './actionProcessorListResolver';
+
+import { getLogger } from './logger/logger';
 
 // @ts-ignore - Special webpack loader
 import qpqDynamicModuleLoader from 'qpq-dynamic-loader!';
@@ -84,26 +86,13 @@ export const getAPIGatewayEventExecutor = (
       ...qpqCustomActionProcessors(),
     };
 
-    const logger = async (result: any) => {
-      // addResult(
-      //   envConfig.appName,
-      //   getDateNow(),
-      //   doWeCarePath,
-      //   "route-infrastructure",
-      //   "infrastructure",
-      //   "askRoute",
-      //   result
-      // );
-    };
-
-    //   // Run the callback
-
     const resolveStory = createRuntime(
       {},
       storyActionProcessor,
       getDateNow,
-      logger,
+      getLogger(cdkConfig.qpqConfig),
       awsLambdaUtils.randomGuid,
+      QpqRuntimeType.API,
     );
 
     const result = await resolveStory(askProcessEvent, [event, context]);

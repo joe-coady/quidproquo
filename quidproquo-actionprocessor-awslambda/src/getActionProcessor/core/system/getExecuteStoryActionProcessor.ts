@@ -10,6 +10,7 @@ import {
   ErrorTypeEnum,
   actionResult,
   ActionProcessorList,
+  QpqRuntimeType,
 } from 'quidproquo-core';
 
 import { randomGuid } from './../../../awsLambdaUtils';
@@ -42,7 +43,14 @@ const getProcessExecuteStory = <T extends Array<any>>(
       // return await addResult(service, getDateNow(), payload.params[0][0].path, 'user-route', payload.src, payload.runtime, result);
     };
 
-    const resolveStory = createRuntime(session, actionProcessors, getDateNow, logger, randomGuid);
+    const resolveStory = createRuntime(
+      session,
+      actionProcessors,
+      getDateNow,
+      logger,
+      randomGuid,
+      QpqRuntimeType.EXECUTE_STORY,
+    );
     const storyResult = await resolveStory(story, payload.params);
 
     if (storyResult.error) {

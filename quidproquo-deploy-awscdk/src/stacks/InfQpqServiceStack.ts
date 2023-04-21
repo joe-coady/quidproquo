@@ -14,6 +14,7 @@ import {
   QpqCoreUserDirectoryConstruct,
   QpqWebserverApiKeyConstruct,
   QpqCoreKeyValueStoreConstruct,
+  LogStorage,
 } from '../constructs';
 
 export interface InfQpqServiceStackProps extends QpqServiceStackProps {}
@@ -21,6 +22,12 @@ export interface InfQpqServiceStackProps extends QpqServiceStackProps {}
 export class InfQpqServiceStack extends QpqServiceStack {
   constructor(scope: Construct, id: string, props: InfQpqServiceStackProps) {
     super(scope, id, props);
+
+    // Build the log storage drive
+    const logBucket = new LogStorage(this, 'logStorage', {
+      awsAccountId: props.awsAccountId,
+      qpqConfig: props.qpqConfig,
+    }).bucket;
 
     // Build the storage drives
     const storageDrives = qpqCoreUtils.getStorageDrives(props.qpqConfig).map(

@@ -1,6 +1,6 @@
 import { Action, ActionProcessorList, ActionProcessorResult } from './types/Action';
 import { ErrorTypeEnum } from './types/ErrorTypeEnum';
-import { StoryResult, StorySession, ActionHistory } from './types/StorySession';
+import { StoryResult, StorySession, QpqRuntimeType } from './types/StorySession';
 import { SystemActionType } from './actions/system/SystemActionType';
 import {
   resolveActionResult,
@@ -51,6 +51,7 @@ export const createRuntime = (
   getTimeNow: () => string,
   logger: (res: StoryResult<any>) => void,
   newGuid: () => string,
+  runtimeType: QpqRuntimeType,
 ) => {
   async function resolveStory<TArgs extends Array<any>>(
     story: (...args: TArgs) => Generator<any, any, Action<any>>,
@@ -68,6 +69,7 @@ export const createRuntime = (
 
       fromCorrelation: session.correlation,
       correlation: newGuid(),
+      runtimeType: runtimeType,
     };
 
     try {

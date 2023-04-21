@@ -20,6 +20,15 @@ export interface ActionHistory<T = any> {
   finishedAt: string;
 }
 
+export enum QpqRuntimeType {
+  API = 'API',
+  EXECUTE_STORY = 'EXECUTE_STORY',
+  EVENT_BRIDGE_EVENT = 'EVENT_BRIDGE_EVENT',
+  QUEUE_EVENT = 'QUEUE_EVENT',
+  EVENT_SEO_OR = 'EVENT_SEO_OR',
+  SERVICE_FUNCTION_EXE = 'SERVICE_FUNCTION_EXE',
+}
+
 export interface StoryResult<TArgs extends Array<any>, TResult = any> {
   // Params to story
   input: TArgs;
@@ -43,4 +52,7 @@ export interface StoryResult<TArgs extends Array<any>, TResult = any> {
   // Result of the story result or error not both
   result?: TResult;
   error?: StoryError;
+
+  // User specified runtime type
+  runtimeType: QpqRuntimeType;
 }
