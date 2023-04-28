@@ -21,4 +21,6 @@ export interface QPQConfigAdvancedSettings {
   deprecated?: boolean;
 }
 
-export type QPQConfig = QPQConfigSetting[];
+export type QPQConfigSettings = QPQConfigSetting[];
+export type QPQConfigItem = QPQConfigSetting | QPQConfigSettings;
+export type QPQConfig = QPQConfigItem[];

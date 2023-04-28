@@ -1,9 +1,13 @@
 import * as path from 'path';
 
-import { QPQConfig, QPQConfigSetting, QPQCoreConfigSettingType } from './config/QPQConfig';
+import {
+  QPQConfig,
+  QPQConfigSetting,
+  QPQCoreConfigSettingType,
+  QPQConfigItem,
+} from './config/QPQConfig';
 import {
   ApplicationModuleQPQConfigSetting,
-  BuildPathQPQConfigSetting,
   StorageDriveQPQConfigSetting,
   EventBusQPQConfigSetting,
   ScheduleQPQConfigSetting,
@@ -17,21 +21,75 @@ import {
 } from './config/settings';
 import { EmailTemplates } from './config/settings/emailTemplates/types';
 
-export const getConfigSettings = <T extends QPQConfigSetting>(
-  configs: QPQConfig,
-  configSettingType: string,
-): T[] => {
-  return configs.filter((c) => c.configSettingType === configSettingType) as T[];
+/**
+ * Flattens a QPQConfig array into a single array of QPQConfigSetting objects.
+ * @function
+ * @param {QPQConfig} qpqConfig - The input QPQConfig array to be flattened.
+ * @returns {QPQConfigSetting[]} - The flattened array of QPQConfigSetting objects.
+ */
+export const flattenQpqConfig = (qpqConfig: QPQConfig): QPQConfigSetting[] => {
+  /**
+   * A recursive helper function that flattens an array of QPQConfigItem objects.
+   * @function
+   * @param {QPQConfigItem[]} configItems - An array of QPQConfigItem objects to be flattened.
+   * @param {QPQConfigSetting[]} accumulator - An accumulator array for storing the flattened QPQConfigSetting objects.
+   * @returns {QPQConfigSetting[]} - The flattened array of QPQConfigSetting objects.
+   */
+  const flatten = (
+    configItems: QPQConfigItem[],
+    accumulator: QPQConfigSetting[] = [],
+  ): QPQConfigSetting[] => {
+    return configItems.reduce<QPQConfigSetting[]>((acc, item) => {
+      if (Array.isArray(item)) {
+        return flatten(item, acc);
+      } else {
+        return [...acc, item];
+      }
+    }, accumulator);
+  };
+
+  return flatten(qpqConfig);
 };
 
+/**
+ * Filters and returns the config settings of a specific type from a QPQConfig array.
+ * @function
+ * @template T - The specific type of QPQConfigSetting to filter.
+ * @param {QPQConfig} qpqConfig - The input QPQConfig array.
+ * @param {string} configSettingType - The specific config setting type to filter.
+ * @returns {T[]} - An array of filtered config settings of the specified type.
+ */
+export const getConfigSettings = <T extends QPQConfigSetting>(
+  qpqConfig: QPQConfig,
+  configSettingType: string,
+): T[] => {
+  const flatConfig = flattenQpqConfig(qpqConfig);
+  return flatConfig.filter((c) => c.configSettingType === configSettingType) as T[];
+};
+
+/**
+ * Retrieves a single config setting of a specific type from a QPQConfig array.
+ * @function
+ * @template T - The specific type of QPQConfigSetting to retrieve.
+ * @param {QPQConfig} qpqConfig - The input QPQConfig array.
+ * @param {string} serviceInfrastructureConfigType - The specific config setting type to retrieve.
+ * @returns {T | undefined} - The found config setting of the specified type or undefined if not found.
+ */
 export const getConfigSetting = <T extends QPQConfigSetting>(
-  configs: QPQConfig,
+  qpqConfig: QPQConfig,
   serviceInfrastructureConfigType: string,
 ): T | undefined => {
-  const [setting] = getConfigSettings<T>(configs, serviceInfrastructureConfigType);
+  const [setting] = getConfigSettings<T>(qpqConfig, serviceInfrastructureConfigType);
   return setting;
 };
 
+/**
+ * Retrieves the ApplicationModuleSetting from a QPQConfig array.
+ * @function
+ * @param {QPQConfig} qpqConfig - The input QPQConfig array.
+ * @returns {ApplicationModuleQPQConfigSetting} - The ApplicationModuleQPQConfigSetting from the QPQConfig array.
+ * @throws {Error} - If the ApplicationModuleQPQConfigSetting is not found in the QPQConfig array.
+ */
 export const getApplicationModuleSetting = (
   qpqConfig: QPQConfig,
 ): ApplicationModuleQPQConfigSetting => {
