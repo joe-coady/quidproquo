@@ -28,6 +28,8 @@ export class QpqWebserverServiceFunctionConstruct extends QpqConstructBlock {
       functionType: 'lambdaServiceFunctionExecute',
       executorName: 'executeServiceFunctionExecuteEvent',
 
+      timeoutInSeconds: 14.5 * 60,
+
       qpqConfig: props.qpqConfig,
 
       apiLayerVersions: props.apiLayerVersions,
