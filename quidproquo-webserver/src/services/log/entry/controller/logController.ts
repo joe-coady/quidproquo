@@ -4,5 +4,5 @@ import { HTTPEvent } from '../../../../types';
 import { toJsonEventResponse } from '../../../../utils/httpEventUtils';
 
 export function* getLogs(event: HTTPEvent, params: {}) {
-  return toJsonEventResponse({ hello: 'world!' });
+  return toJsonEventResponse([]);
 }

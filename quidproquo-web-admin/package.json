@@ -26,9 +26,17 @@
   },
   "homepage": "https://github.com/joe-coady/quidproquo#readme",
   "dependencies": {
+    "@emotion/react": "^11.10.8",
+    "@emotion/styled": "^11.10.8",
+    "@mui/icons-material": "^5.11.16",
+    "@mui/lab": "^5.0.0-alpha.128",
+    "@mui/material": "^5.12.2",
+    "@mui/x-data-grid": "^6.3.0",
+    "javascript-time-ago": "^2.5.9",
     "quidproquo-core": "*",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-time-ago": "^7.2.1"
   },
   "devDependencies": {
     "@babel/core": "^7.21.5",
@@ -36,8 +44,6 @@
     "@babel/preset-env": "^7.21.5",
     "@babel/preset-react": "^7.18.6",
     "@babel/preset-typescript": "^7.21.5",
-    "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.1",
     "babel-loader": "^9.1.2",
     "html-webpack-plugin": "^5.5.1",
     "quidproquo-tsconfig": "*",
