@@ -3,8 +3,11 @@ const path = require('path');
 module.exports = function (source) {
   const config = JSON.parse(process.env.QPQLoaderConfig);
   const root = config.projectRoot;
-  const ifStatements = config.allSrcEntries.map((e) => {
-    const srcPath = path.join(root, e).replace(/\\/g, '/');
+  const uniqueSrcFiles = [...new Set(config.allSrcEntries)];
+
+  const ifStatements = uniqueSrcFiles.map((e) => {
+    const fullPath = path.isAbsolute(e) ? e : path.join(root, e);
+    const srcPath = fullPath.replace(/\\/g, '/');
 
     return `if (moduleName === '${e}') {
       return await require('${srcPath}');
@@ -19,7 +22,7 @@ module.exports = function (source) {
     return null;
   }`;
 
-  // console.log(result);
+  console.log(result);
 
   return result;
 };

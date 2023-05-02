@@ -17,7 +17,6 @@ import {
   getWebEntryActionProcessor,
   getServiceFunctionActionProcessor,
   awsLambdaUtils,
-  DynamicModuleLoader,
 } from 'quidproquo-actionprocessor-awslambda';
 
 import { qpqWebServerUtils } from 'quidproquo-webserver';
@@ -31,8 +30,7 @@ import { ActionProcessorListResolver } from './actionProcessorListResolver';
 
 import { getLogger } from './logger/logger';
 
-// @ts-ignore - Special webpack loader
-import qpqDynamicModuleLoader from 'qpq-dynamic-loader!';
+import { dynamicModuleLoader } from './dynamicModuleLoader';
 
 // @ts-ignore - Special webpack loader
 import qpqCustomActionProcessors from 'qpq-custom-action-processors-loader!';
@@ -57,7 +55,6 @@ const ErrorTypeHttpResponseMap = {
 };
 
 export const getAPIGatewayEventExecutor = (
-  dynamicModuleLoader: DynamicModuleLoader,
   getCustomActionProcessors: ActionProcessorListResolver = () => ({}),
 ) => {
   return async (event: APIGatewayEvent, context: Context) => {
@@ -120,4 +117,4 @@ export const getAPIGatewayEventExecutor = (
 };
 
 // Default executor
-export const executeAPIGatewayEvent = getAPIGatewayEventExecutor(qpqDynamicModuleLoader);
+export const executeAPIGatewayEvent = getAPIGatewayEventExecutor();

@@ -25,8 +25,7 @@ import { CloudFrontRequestEvent, CloudFrontRequestResult, Context } from 'aws-la
 import { ActionProcessorListResolver } from './actionProcessorListResolver';
 import { getLogger } from './logger/logger';
 
-// @ts-ignore - Special webpack loader
-import qpqDynamicModuleLoader from 'qpq-dynamic-loader!';
+import { dynamicModuleLoader } from './dynamicModuleLoader';
 
 // @ts-ignore - Special webpack loader
 import qpqCustomActionProcessors from 'qpq-custom-action-processors-loader!';
@@ -121,4 +120,4 @@ export const getOriginRequestEventExecutor = (
 };
 
 // Default executor
-export const executeEventOriginRequest = getOriginRequestEventExecutor(qpqDynamicModuleLoader);
+export const executeEventOriginRequest = getOriginRequestEventExecutor(dynamicModuleLoader);

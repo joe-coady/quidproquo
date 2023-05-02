@@ -27,8 +27,7 @@ import { createRuntime, askProcessEvent, QpqRuntimeType } from 'quidproquo-core'
 import { ActionProcessorListResolver } from './actionProcessorListResolver';
 import { getLogger } from './logger/logger';
 
-// @ts-ignore - Special webpack loader
-import qpqDynamicModuleLoader from 'qpq-dynamic-loader!';
+import { dynamicModuleLoader } from './dynamicModuleLoader';
 
 // @ts-ignore - Special webpack loader
 import qpqCustomActionProcessors from 'qpq-custom-action-processors-loader!';
@@ -113,4 +112,4 @@ export const getSQSEventExecutor = (
 };
 
 // Default executor
-export const executeSQSEvent = getSQSEventExecutor(qpqDynamicModuleLoader);
+export const executeSQSEvent = getSQSEventExecutor(dynamicModuleLoader);
