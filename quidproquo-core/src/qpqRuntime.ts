@@ -144,8 +144,6 @@ export const createRuntime = (
       result: action.value,
     };
 
-    await logger(storyResult);
-
     console.log(
       `story took took ${
         new Date(storyResult.finishedAt).getTime() - new Date(storyResult.startedAt).getTime()
@@ -155,5 +153,16 @@ export const createRuntime = (
     return storyResult;
   }
 
-  return resolveStory;
+  async function resolveStoryWithLogs<TArgs extends Array<any>>(
+    story: (...args: TArgs) => Generator<any, any, Action<any>>,
+    args: TArgs,
+  ): Promise<StoryResult<any>> {
+    const storyResult = await resolveStory(story, args);
+
+    await logger(storyResult);
+
+    return storyResult;
+  }
+
+  return resolveStoryWithLogs;
 };

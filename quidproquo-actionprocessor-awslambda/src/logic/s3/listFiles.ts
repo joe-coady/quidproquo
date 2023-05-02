@@ -14,7 +14,7 @@ export interface S3FileList {
 }
 
 export const listFiles = async (
-  drive: string,
+  bucketName: string,
   region: string,
   folder: string = '',
   maxKeys: number = 1000,
@@ -24,7 +24,7 @@ export const listFiles = async (
     folder.endsWith(filePathDelimiter) || !folder ? '' : filePathDelimiter
   }`;
   const bucketParams: ListObjectsV2CommandInput = {
-    Bucket: drive,
+    Bucket: bucketName,
     Delimiter: filePathDelimiter,
     Prefix: validatedPrefix,
     ContinuationToken: pageToken,
@@ -43,7 +43,7 @@ export const listFiles = async (
       ...files,
       ...response.CommonPrefixes.filter((cp) => !!cp.Prefix).map((cp) => ({
         filepath: cp.Prefix!,
-        drive: drive,
+        drive: bucketName,
         isDir: true,
       })),
     ];

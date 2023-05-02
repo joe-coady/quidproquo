@@ -21,7 +21,7 @@ export const storyLogger = async (
 
   await s3Client.send(
     new PutObjectCommand({
-      Key: `${result.runtimeType}/${result.correlation}.json`,
+      Key: `${result.correlation}.json`,
       Bucket: bucketName,
       Body: JSON.stringify(result),
     }),

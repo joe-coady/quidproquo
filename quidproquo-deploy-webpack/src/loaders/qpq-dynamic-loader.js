@@ -8,7 +8,7 @@ module.exports = function (source) {
   );
 
   const ifStatements = uniqueSrcFiles.map((e) => {
-    const fullPath = path.isAbsolute(e) ? e : path.join(root, e);
+    const fullPath = path.join(root, e);
     const srcPath = fullPath.replace(/\\/g, '/');
 
     return `if (moduleName === '${e}') {

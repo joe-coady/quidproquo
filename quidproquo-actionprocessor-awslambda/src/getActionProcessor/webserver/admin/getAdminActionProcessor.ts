@@ -10,44 +10,28 @@ import { AdminGetLogsActionProcessor, AdminActionType } from 'quidproquo-webserv
 
 import { executeLambdaByName } from '../../../logic/lambda/executeLambdaByName';
 
-import { getConfigRuntimeResourceName } from '../../../awsNamingUtils';
+import { getQpqRuntimeResourceNameFromConfig } from '../../../awsNamingUtils';
+
+import { listFiles } from '../../../logic/s3/listFiles';
+import { readTextFile } from '../../../logic/s3/readTextFile';
 
 const getAdminGetLogsActionProcessor = (qpqConfig: QPQConfig): AdminGetLogsActionProcessor => {
   return async ({}) => {
-    // const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
+    // TODO: Centralize this
+    const QPQ_LOG_BUCKET_NAME = 'logs';
 
-    // const appName = qpqCoreUtils.getApplicationName(qpqConfig);
-    // const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
-    // const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+    const bucketName = getQpqRuntimeResourceNameFromConfig(QPQ_LOG_BUCKET_NAME, qpqConfig, 'log');
+    const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
-    // const awsFunctionName = getConfigRuntimeResourceName(
-    //   `${functionName}-sfunc`,
-    //   appName,
-    //   service,
-    //   environment,
-    //   feature,
-    // );
+    const files = await listFiles(bucketName, region);
 
-    // const serviceFunctionEvent: GetLogsAdminEvent<any[]> = {
-    //   functionName: functionName,
-    //   payload: payload,
-    // };
+    const contentsJson = await Promise.all(
+      files.fileInfos.map((f) => readTextFile(bucketName, f.filepath, region)),
+    );
 
-    // const result = await executeLambdaByName<StoryResult<any[], any>>(
-    //   awsFunctionName,
-    //   region,
-    //   serviceFunctionEvent,
-    // );
+    const actionResults = contentsJson.map((cj) => JSON.parse(cj) as StoryResult<any>);
 
-    // if (result?.error) {
-    //   return actionResultError(
-    //     result?.error.errorType,
-    //     result?.error.errorText,
-    //     result?.error.errorStack,
-    //   );
-    // }
-
-    return actionResult([]);
+    return actionResult(actionResults);
   };
 };
 
