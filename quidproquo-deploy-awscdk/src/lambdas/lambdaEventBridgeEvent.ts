@@ -12,6 +12,7 @@ import {
   getConfigGetParameterActionProcessor,
   getConfigGetParametersActionProcessor,
   getServiceFunctionActionProcessor,
+  getAdminActionProcessor,
   awsLambdaUtils,
   DynamicModuleLoader,
   LambdaRuntimeConfig,
@@ -63,6 +64,7 @@ export const getEventBridgeEventExecutor = (
       ...getEventBusActionProcessor(cdkConfig.qpqConfig),
       ...getWebEntryActionProcessor(cdkConfig.qpqConfig),
       ...getServiceFunctionActionProcessor(cdkConfig.qpqConfig),
+      ...getAdminActionProcessor(cdkConfig.qpqConfig),
       ...getUserDirectoryActionProcessor(cdkConfig.qpqConfig),
 
       ...getCustomActionProcessors(cdkConfig.qpqConfig),

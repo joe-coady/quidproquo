@@ -10,6 +10,7 @@ import {
   getConfigGetParametersActionProcessor,
   getWebEntryActionProcessor,
   getServiceFunctionActionProcessor,
+  getAdminActionProcessor,
   awsLambdaUtils,
   DynamicModuleLoader,
 } from 'quidproquo-actionprocessor-awslambda';
@@ -57,6 +58,7 @@ export const getOriginRequestEventExecutor = (
       ...getConfigActionProcessor(cdkConfig.qpqConfig),
       ...getWebEntryActionProcessor(cdkConfig.qpqConfig),
       ...getServiceFunctionActionProcessor(cdkConfig.qpqConfig),
+      ...getAdminActionProcessor(cdkConfig.qpqConfig),
 
       // We probably don't want this?
       ...getUserDirectoryActionProcessor(cdkConfig.qpqConfig),
