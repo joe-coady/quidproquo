@@ -29,6 +29,7 @@
     "quidproquo-actionprocessor-node",
     "quidproquo-actionprocessor-awslambda",
     "quidproquo-deploy-webpack",
-    "quidproquo-deploy-awscdk"
+    "quidproquo-deploy-awscdk",
+    "quidproquo-web-admin"
   ]
 }
