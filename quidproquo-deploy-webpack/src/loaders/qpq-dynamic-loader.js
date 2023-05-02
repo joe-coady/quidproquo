@@ -3,7 +3,9 @@ const path = require('path');
 module.exports = function (source) {
   const config = JSON.parse(process.env.QPQLoaderConfig);
   const root = config.projectRoot;
-  const uniqueSrcFiles = [...new Set(config.allSrcEntries)];
+  const uniqueSrcFiles = [...new Set(config.allSrcEntries)].filter(
+    (sf) => !sf.startsWith('@QpqService/'),
+  );
 
   const ifStatements = uniqueSrcFiles.map((e) => {
     const fullPath = path.isAbsolute(e) ? e : path.join(root, e);
