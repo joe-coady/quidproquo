@@ -4,7 +4,6 @@ import path from 'path';
 
 import { qpqCoreUtils, QPQConfig } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
-import webpack from 'webpack';
 
 type WebpackBuildMode = 'none' | 'development' | 'production';
 
@@ -22,7 +21,7 @@ export const getWebpackConfig = (
   qpqConfig: QPQConfig,
   buildPath: string,
   awsLambdasToBuild: string[],
-): webpack.Configuration => {
+) => {
   const allSrcEntries = [
     ...qpqCoreUtils.getAllSrcEntries(qpqConfig),
     ...qpqWebServerUtils.getAllSrcEntries(qpqConfig),
