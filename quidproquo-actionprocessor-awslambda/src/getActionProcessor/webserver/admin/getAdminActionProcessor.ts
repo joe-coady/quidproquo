@@ -3,7 +3,9 @@ import {
   actionResultError,
   QPQConfig,
   qpqCoreUtils,
+  QpqRuntimeType,
   StoryResult,
+  StoryResultMetadata,
 } from 'quidproquo-core';
 
 import { AdminGetLogsActionProcessor, AdminActionType } from 'quidproquo-webserver';
@@ -29,9 +31,19 @@ const getAdminGetLogsActionProcessor = (qpqConfig: QPQConfig): AdminGetLogsActio
       files.fileInfos.map((f) => readTextFile(bucketName, f.filepath, region)),
     );
 
-    const actionResults = contentsJson.map((cj) => JSON.parse(cj) as StoryResult<any>);
+    const actionResultMetadata = contentsJson
+      .map((cj) => JSON.parse(cj) as StoryResult<any>)
+      .map(
+        (sr, i) =>
+          ({
+            filePath: files.fileInfos[i].filepath,
+            generic: '',
+            runtimeType: sr.runtimeType,
+            startedAt: sr.startedAt,
+          } as StoryResultMetadata),
+      );
 
-    return actionResult(actionResults);
+    return actionResult(actionResultMetadata);
   };
 };
 

@@ -32,22 +32,32 @@ function CustomPagination() {
 }
 
 const getColumns = (viewLog: (x: any) => void) => [
-  { field: 'id', hide: false },
-  { field: 'service', headerName: 'service', width: 150 },
-  { field: 'type', headerName: 'type', width: 150 },
+  // { field: 'id', hide: false },
+  // { field: 'service', headerName: 'service', width: 150 },
+  // { field: 'type', headerName: 'type', width: 150 },
+  // {
+  //   field: 'createdDateTime',
+  //   headerName: 'when',
+  //   width: 250,
+  //   renderCell: (params: GridRenderCellParams<Date>) => (
+  //     <LastSeen isoTime={params.value} timeStyle="twitter" />
+  //   ),
+  // },
+  // { field: 'path', headerName: 'route', width: 180, editable: false },
+  // { field: 'src', headerName: 'source', width: 180, editable: false },
+  // { field: 'runtime', headerName: 'method', width: 150, editable: false },
+  { field: 'filePath', headerName: 'filePath', width: 250 },
+  { field: 'runtimeType', headerName: 'runtimeType', width: 250 },
   {
-    field: 'createdDateTime',
-    headerName: 'when',
+    field: 'startedAt',
+    headerName: 'startedAt',
     width: 250,
     renderCell: (params: GridRenderCellParams<Date>) => (
       <LastSeen isoTime={params.value} timeStyle="twitter" />
     ),
   },
-  { field: 'path', headerName: 'route', width: 180, editable: false },
-  { field: 'src', headerName: 'source', width: 180, editable: false },
-  { field: 'runtime', headerName: 'method', width: 150, editable: false },
   {
-    field: 'execute',
+    field: 'generic',
     headerName: 'Execute',
     width: 140,
     renderCell: (params: GridRenderCellParams<Date>) => (
@@ -77,8 +87,8 @@ export default function CustomPaginationGrid() {
   const [loading, setLoading] = useState<any>(false);
 
   const getLogs = async () => {
-    const logs = await apiRequestGet('/api/card/log/list');
-    setLogs(logs);
+    const newLogs = await apiRequestGet('/api/card/log/list');
+    setLogs(newLogs.map((x: any) => ({ ...x, id: x.filePath })));
   };
 
   useEffect(() => {

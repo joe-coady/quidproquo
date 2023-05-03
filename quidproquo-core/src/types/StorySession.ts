@@ -56,3 +56,15 @@ export interface StoryResult<TArgs extends Array<any>, TResult = any> {
   // User specified runtime type
   runtimeType: QpqRuntimeType;
 }
+
+export interface StoryResultMetadata {
+  filePath: string;
+
+  runtimeType: QpqRuntimeType;
+
+  startedAt: string;
+
+  generic: string;
+
+  error?: string;
+}

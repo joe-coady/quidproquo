@@ -1,4 +1,4 @@
-import { Action, ActionProcessor, ActionRequester, StoryResult } from 'quidproquo-core';
+import { Action, ActionProcessor, ActionRequester, StoryResultMetadata } from 'quidproquo-core';
 import { AdminActionType } from './AdminActionType';
 
 // Payload
@@ -11,5 +11,11 @@ export interface AdminGetLogsAction extends Action<AdminGetLogsActionPayload> {
 }
 
 // Function Types
-export type AdminGetLogsActionProcessor = ActionProcessor<AdminGetLogsAction, StoryResult<any>[]>;
-export type AdminGetLogsActionRequester = ActionRequester<AdminGetLogsAction, StoryResult<any>[]>;
+export type AdminGetLogsActionProcessor = ActionProcessor<
+  AdminGetLogsAction,
+  StoryResultMetadata[]
+>;
+export type AdminGetLogsActionRequester = ActionRequester<
+  AdminGetLogsAction,
+  StoryResultMetadata[]
+>;
