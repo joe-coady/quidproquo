@@ -15,12 +15,13 @@ async function processAction(
   action: Action<any>,
   actionProcessors: ActionProcessorList,
   session: any,
+  logger: (res: StoryResult<any>) => Promise<void>,
 ) {
   // Special action ~ batch - needs access to the processAction / actionProcessor context
   if (action.type === SystemActionType.Batch) {
     const batchRes = await Promise.all(
       action.payload.actions.map((a: any) => {
-        return a ? processAction(a, actionProcessors, session) : null;
+        return a ? processAction(a, actionProcessors, session, logger) : null;
       }),
     );
 
@@ -42,16 +43,17 @@ async function processAction(
     );
   }
 
-  return await processor(action.payload, session, actionProcessors);
+  return await processor(action.payload, session, actionProcessors, logger);
 }
 
 export const createRuntime = (
   session: StorySession,
   actionProcessors: ActionProcessorList,
   getTimeNow: () => string,
-  logger: (res: StoryResult<any>) => void,
+  logger: (res: StoryResult<any>) => Promise<void>,
   newGuid: () => string,
   runtimeType: QpqRuntimeType,
+  initialTags?: string[],
 ) => {
   async function resolveStory<TArgs extends Array<any>>(
     story: (...args: TArgs) => Generator<any, any, Action<any>>,
@@ -67,8 +69,10 @@ export const createRuntime = (
       history: [],
       startedAt: getTimeNow(),
 
-      fromCorrelation: session.correlation,
+      tags: initialTags || [],
+
       correlation: newGuid(),
+      fromCorrelation: session.correlation,
       runtimeType: runtimeType,
     };
 
@@ -82,6 +86,7 @@ export const createRuntime = (
           action.value,
           actionProcessors,
           session,
+          logger,
         );
 
         const history = {

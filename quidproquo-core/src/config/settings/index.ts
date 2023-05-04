@@ -3,6 +3,7 @@ export * from './emailTemplates';
 export * from './actionProcessors';
 export * from './applicationModule';
 export * from './buildPath';
+export * from './configValue';
 export * from './eventBus';
 export * from './keyValueStore';
 export * from './parameter';

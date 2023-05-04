@@ -49,6 +49,9 @@ export interface StoryResult<TArgs extends Array<any>, TResult = any> {
   // correlation for this story (correlates all actions together)
   correlation: string;
 
+  // For logging, tags to help identify the story
+  tags: string[];
+
   // Result of the story result or error not both
   result?: TResult;
   error?: StoryError;

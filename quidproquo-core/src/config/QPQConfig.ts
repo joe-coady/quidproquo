@@ -10,6 +10,7 @@ export enum QPQCoreConfigSettingType {
   eventBus = '@quidproquo-core/config/EventBus',
   userDirectory = '@quidproquo-core/config/UserDirectory',
   keyValueStore = '@quidproquo-core/config/KeyValueStore',
+  configValue = '@quidproquo-core/config/ConfigValue',
 }
 
 export interface QPQConfigSetting {

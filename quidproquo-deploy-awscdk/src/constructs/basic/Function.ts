@@ -9,8 +9,9 @@ export interface FunctionProps extends QpqConstructBlockProps {
   functionName: string;
 
   buildPath: string;
-  functionType: string;
-  executorName: string;
+  srcFilename?: string;
+  functionType: string; // TODO: Rename this to subFolder / folder or something
+  executorName: string; // TODO: Rename this to handlerName or something maybe?
 
   timeoutInSeconds?: number;
   memoryInBytes?: number;
@@ -30,6 +31,8 @@ export class Function extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: FunctionProps) {
     super(scope, id, props);
 
+    const handlerFile = props.srcFilename || 'index';
+
     this.lambdaFunction = new aws_lambda.Function(this, 'function', {
       functionName: props.functionName,
       timeout: cdk.Duration.seconds(props.timeoutInSeconds || 25),
@@ -39,7 +42,7 @@ export class Function extends QpqConstructBlock {
       layers: props.apiLayerVersions,
 
       code: aws_lambda.Code.fromAsset(path.join(props.buildPath, props.functionType)),
-      handler: `index.${props.executorName}`,
+      handler: `${handlerFile}.${props.executorName}`,
 
       environment: props.environment,
 

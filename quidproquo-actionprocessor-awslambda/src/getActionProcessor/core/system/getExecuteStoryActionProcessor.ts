@@ -25,6 +25,7 @@ const getProcessExecuteStory = <T extends Array<any>>(
     payload: SystemExecuteStoryActionPayload<T>,
     session: StorySession,
     actionProcessors: ActionProcessorList,
+    logger: (result: any) => Promise<void>,
   ): Promise<any> => {
     let module = await dynamicModuleLoader(payload.src);
     if (module === null) {
@@ -39,10 +40,6 @@ const getProcessExecuteStory = <T extends Array<any>>(
       );
     }
 
-    const logger = async (result: any) => {
-      // return await addResult(service, getDateNow(), payload.params[0][0].path, 'user-route', payload.src, payload.runtime, result);
-    };
-
     const resolveStory = createRuntime(
       session,
       actionProcessors,
@@ -50,6 +47,7 @@ const getProcessExecuteStory = <T extends Array<any>>(
       logger,
       randomGuid,
       QpqRuntimeType.EXECUTE_STORY,
+      [`${payload.src}::${payload.runtime}`],
     );
     const storyResult = await resolveStory(story, payload.params);
 
