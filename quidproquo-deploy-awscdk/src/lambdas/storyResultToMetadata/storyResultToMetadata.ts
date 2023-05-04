@@ -20,7 +20,7 @@ export const storyResultToMetadata = (
 
   // Base metadata
   const metadata: StoryResultMetadata = {
-    filePath: filepath,
+    correlation: storyResult.correlation,
     runtimeType: storyResult.runtimeType,
     startedAt: storyResult.startedAt,
     generic: tags.filter((t) => !!t).join(', '),

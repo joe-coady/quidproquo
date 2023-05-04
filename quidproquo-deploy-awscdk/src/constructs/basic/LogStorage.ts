@@ -75,20 +75,13 @@ export class LogStorage extends QpqConstructBlock {
       autoDeleteObjects: true,
     });
 
-    const storyResultsTable = new aws_dynamodb.Table(this, 'StoryResultsTable', {
+    const storyResultsTable = new aws_dynamodb.Table(this, 'table', {
       tableName: this.qpqResourceName(QPQ_LOG_BUCKET_NAME, 'log'),
-      partitionKey: { name: 'filePath', type: aws_dynamodb.AttributeType.STRING },
-      sortKey: { name: 'startedAt', type: aws_dynamodb.AttributeType.STRING },
+      partitionKey: { name: 'runtimeType', type: aws_dynamodb.AttributeType.STRING },
+      sortKey: { name: 'startedAtWithCorrelation', type: aws_dynamodb.AttributeType.STRING },
       billingMode: aws_dynamodb.BillingMode.PAY_PER_REQUEST,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
-
-    // storyResultsTable.addGlobalSecondaryIndex({
-    //   indexName: 'ErrorIndex',
-    //   partitionKey: { name: 'error', type: aws_dynamodb.AttributeType.STRING },
-    //   sortKey: { name: 'startedAt', type: aws_dynamodb.AttributeType.STRING },
-    //   projectionType: aws_dynamodb.ProjectionType.ALL,
-    // });
 
     this.table = storyResultsTable;
 

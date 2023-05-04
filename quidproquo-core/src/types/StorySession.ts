@@ -61,7 +61,7 @@ export interface StoryResult<TArgs extends Array<any>, TResult = any> {
 }
 
 export interface StoryResultMetadata {
-  filePath: string;
+  correlation: string;
 
   runtimeType: QpqRuntimeType;
 

@@ -41,11 +41,12 @@ const writeStoryResultMetadataToDynamo = async (
   const putItemCommand = new PutItemCommand({
     TableName: tableName,
     Item: {
-      filePath: { S: storyResultMetadata.filePath },
-      startedAt: { S: storyResultMetadata.startedAt },
+      startedAtWithCorrelation: {
+        S: `${storyResultMetadata.startedAt}#${storyResultMetadata.correlation}`,
+      },
+      runtimeType: { S: storyResultMetadata.runtimeType },
       error: { S: storyResultMetadata.error || '' },
       generic: { S: storyResultMetadata.generic },
-      runtimeType: { S: storyResultMetadata.runtimeType },
     },
   });
 
