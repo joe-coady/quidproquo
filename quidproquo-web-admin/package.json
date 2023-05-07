@@ -10,7 +10,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "npx rimraf lib",
-    "start": "npx webpack serve --config webpack.config.ts --mode=development",
+    "start": "npx webpack serve --config webpack.config.ts --mode=development --port 3001",
     "build": "npx webpack --config webpack.config.ts",
     "watch": "npx webpack --config webpack.config.ts --watch"
   },
@@ -32,6 +32,8 @@
     "@mui/lab": "^5.0.0-alpha.128",
     "@mui/material": "^5.12.2",
     "@mui/x-data-grid": "^6.3.0",
+    "@mui/x-date-pickers": "^6.3.0",
+    "dayjs": "^1.11.7",
     "javascript-time-ago": "^2.5.9",
     "quidproquo-core": "*",
     "react": "^18.2.0",

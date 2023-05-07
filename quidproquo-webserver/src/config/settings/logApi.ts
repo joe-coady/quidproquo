@@ -7,7 +7,7 @@ export const defineLogApi = (): QPQConfigSettings => {
   // comment
   const configs = [
     defineRoute(
-      'GET',
+      'POST',
       '/log/list',
       getServiceEntry('log', 'controller', 'logController'),
       'getLogs',

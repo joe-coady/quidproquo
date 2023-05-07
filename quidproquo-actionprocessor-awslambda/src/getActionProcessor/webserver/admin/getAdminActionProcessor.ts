@@ -10,40 +10,29 @@ import {
 
 import { AdminGetLogsActionProcessor, AdminActionType } from 'quidproquo-webserver';
 
-import { executeLambdaByName } from '../../../logic/lambda/executeLambdaByName';
-
 import { getQpqRuntimeResourceNameFromConfig } from '../../../awsNamingUtils';
 
-import { listFiles } from '../../../logic/s3/listFiles';
-import { readTextFile } from '../../../logic/s3/readTextFile';
+import { getPagedItemsOverRange } from '../../../logic/dynamo/getPagedItemsOverRange';
 
 const getAdminGetLogsActionProcessor = (qpqConfig: QPQConfig): AdminGetLogsActionProcessor => {
-  return async ({}) => {
+  return async ({ runtimeType, nextPageKey, startIsoDateTime, endIsoDateTime }) => {
     // TODO: Centralize this
     const QPQ_LOG_BUCKET_NAME = 'logs';
-
-    const bucketName = getQpqRuntimeResourceNameFromConfig(QPQ_LOG_BUCKET_NAME, qpqConfig, 'log');
+    const tableName = getQpqRuntimeResourceNameFromConfig(QPQ_LOG_BUCKET_NAME, qpqConfig, 'log');
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
-    const files = await listFiles(bucketName, region);
-
-    const contentsJson = await Promise.all(
-      files.fileInfos.map((f) => readTextFile(bucketName, f.filepath, region)),
+    const response = await getPagedItemsOverRange(
+      tableName,
+      region,
+      runtimeType,
+      startIsoDateTime,
+      endIsoDateTime,
+      nextPageKey,
     );
 
-    const actionResultMetadata = contentsJson
-      .map((cj) => JSON.parse(cj) as StoryResult<any>)
-      .map(
-        (sr, i) =>
-          ({
-            filePath: files.fileInfos[i].filepath,
-            generic: '',
-            runtimeType: sr.runtimeType,
-            startedAt: sr.startedAt,
-          } as StoryResultMetadata),
-      );
+    console.log(JSON.stringify(response, null, 2));
 
-    return actionResult(actionResultMetadata);
+    return actionResult(response);
   };
 };
 

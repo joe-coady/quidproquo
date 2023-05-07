@@ -42,7 +42,7 @@ export const getCorsHeaders = (
 ): HttpEventHeaders => {
   const origin = getHeaderValue('origin', reqHeaders) || '';
   const allowedOrigins = getAllowedOrigins(qpqConfig, route);
-  const allowCredentials = Object.keys(route.routeAuthSettings || {}).length > 0;
+  const allowCredentials = !!route.routeAuthSettings?.userDirectoryName;
 
   // If we have an auth endpoint, then we don't let wildcard origins access the API for security reasons
   const allowOrigin =
