@@ -55,7 +55,7 @@ export const getServiceFunctionExecuteEventExecutor = (
       ...getConfigGetSecretActionProcessor(cdkConfig.qpqConfig),
       ...getConfigGetParameterActionProcessor(cdkConfig.qpqConfig),
       ...getConfigGetParametersActionProcessor(cdkConfig.qpqConfig),
-      ...getSystemActionProcessor(dynamicModuleLoader),
+      ...getSystemActionProcessor(cdkConfig.qpqConfig, dynamicModuleLoader),
       ...getFileActionProcessor(cdkConfig.qpqConfig),
       ...getConfigActionProcessor(cdkConfig.qpqConfig),
       ...getQueueActionProcessor(cdkConfig.qpqConfig),
@@ -70,6 +70,7 @@ export const getServiceFunctionExecuteEventExecutor = (
     };
 
     const resolveStory = createRuntime(
+      cdkConfig.qpqConfig,
       {},
       storyActionProcessor,
       getDateNow,

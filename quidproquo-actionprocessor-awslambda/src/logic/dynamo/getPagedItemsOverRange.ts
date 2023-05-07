@@ -48,6 +48,7 @@ export async function getPagedItemsOverRange(
         error: i.error?.S,
         startedAt: startedAt,
         correlation,
+        moduleName: i.moduleName.S || '',
       };
 
       return metaData;

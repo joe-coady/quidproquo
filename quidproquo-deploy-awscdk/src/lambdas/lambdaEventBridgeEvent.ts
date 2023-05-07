@@ -54,7 +54,7 @@ export const getEventBridgeEventExecutor = (
       ...webserverActionProcessor,
 
       ...getEventBridgeEventActionProcessor(lambdaRuntimeConfig),
-      ...getSystemActionProcessor(dynamicModuleLoader),
+      ...getSystemActionProcessor(cdkConfig.qpqConfig, dynamicModuleLoader),
       ...getFileActionProcessor(cdkConfig.qpqConfig),
       ...getConfigGetSecretActionProcessor(cdkConfig.qpqConfig),
       ...getConfigGetParameterActionProcessor(cdkConfig.qpqConfig),
@@ -72,6 +72,7 @@ export const getEventBridgeEventExecutor = (
     };
 
     const resolveStory = createRuntime(
+      cdkConfig.qpqConfig,
       {},
       storyActionProcessor,
       getDateNow,

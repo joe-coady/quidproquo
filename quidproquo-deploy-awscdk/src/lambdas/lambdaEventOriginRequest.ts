@@ -53,7 +53,7 @@ export const getOriginRequestEventExecutor = (
       ...getConfigGetSecretActionProcessor(cdkConfig.qpqConfig),
       ...getConfigGetParameterActionProcessor(cdkConfig.qpqConfig),
       ...getConfigGetParametersActionProcessor(cdkConfig.qpqConfig),
-      ...getSystemActionProcessor(dynamicModuleLoader),
+      ...getSystemActionProcessor(cdkConfig.qpqConfig, dynamicModuleLoader),
       ...getFileActionProcessor(cdkConfig.qpqConfig),
       ...getConfigActionProcessor(cdkConfig.qpqConfig),
       ...getWebEntryActionProcessor(cdkConfig.qpqConfig),
@@ -68,6 +68,7 @@ export const getOriginRequestEventExecutor = (
     };
 
     const resolveStory = createRuntime(
+      cdkConfig.qpqConfig,
       {},
       storyActionProcessor,
       getDateNow,

@@ -47,6 +47,7 @@ const writeStoryResultMetadataToDynamo = async (
       runtimeType: { S: storyResultMetadata.runtimeType },
       error: { S: storyResultMetadata.error || '' },
       generic: { S: storyResultMetadata.generic },
+      moduleName: { S: storyResultMetadata.moduleName },
     },
   });
 

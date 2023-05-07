@@ -9,6 +9,9 @@ import {
   actionResult,
   actionResultError,
 } from './logic/actionLogic';
+import { QPQConfig } from './config';
+
+import { getApplicationModuleName } from './qpqCoreUtils';
 
 // Make this type safe omg.
 async function processAction(
@@ -47,6 +50,7 @@ async function processAction(
 }
 
 export const createRuntime = (
+  qpqConfig: QPQConfig,
   session: StorySession,
   actionProcessors: ActionProcessorList,
   getTimeNow: () => string,
@@ -70,6 +74,7 @@ export const createRuntime = (
       startedAt: getTimeNow(),
 
       tags: initialTags || [],
+      moduleName: getApplicationModuleName(qpqConfig),
 
       correlation: newGuid(),
       fromCorrelation: session.correlation,

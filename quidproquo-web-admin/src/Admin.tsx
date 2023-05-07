@@ -37,6 +37,7 @@ function CustomPagination() {
 
 const getColumns = (viewLog: (x: any) => void): GridColDef[] => [
   // { field: 'correlation', headerName: 'Correlation', width: 250 },
+  { field: 'moduleName', headerName: 'Service', width: 150 },
   { field: 'runtimeType', headerName: 'Type', width: 150 },
   {
     field: 'startedAt',

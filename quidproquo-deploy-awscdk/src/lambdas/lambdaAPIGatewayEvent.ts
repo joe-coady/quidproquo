@@ -71,7 +71,7 @@ export const getAPIGatewayEventExecutor = (
       ...getConfigGetSecretActionProcessor(cdkConfig.qpqConfig),
       ...getConfigGetParameterActionProcessor(cdkConfig.qpqConfig),
       ...getConfigGetParametersActionProcessor(cdkConfig.qpqConfig),
-      ...getSystemActionProcessor(dynamicModuleLoader),
+      ...getSystemActionProcessor(cdkConfig.qpqConfig, dynamicModuleLoader),
       ...getFileActionProcessor(cdkConfig.qpqConfig),
       ...getConfigActionProcessor(cdkConfig.qpqConfig),
       ...getQueueActionProcessor(cdkConfig.qpqConfig),
@@ -86,6 +86,7 @@ export const getAPIGatewayEventExecutor = (
     };
 
     const resolveStory = createRuntime(
+      cdkConfig.qpqConfig,
       {},
       storyActionProcessor,
       getDateNow,

@@ -51,6 +51,7 @@ export interface StoryResult<TArgs extends Array<any>, TResult = any> {
 
   // For logging, tags to help identify the story
   tags: string[];
+  moduleName: string;
 
   // Result of the story result or error not both
   result?: TResult;
@@ -62,6 +63,8 @@ export interface StoryResult<TArgs extends Array<any>, TResult = any> {
 
 export interface StoryResultMetadata {
   correlation: string;
+
+  moduleName: string;
 
   runtimeType: QpqRuntimeType;
 

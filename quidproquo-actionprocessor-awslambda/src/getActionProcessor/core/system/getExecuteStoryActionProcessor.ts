@@ -1,7 +1,6 @@
 import {
   SystemActionType,
   QPQConfig,
-  qpqCoreUtils,
   SystemExecuteStoryActionPayload,
   StorySession,
   createRuntime,
@@ -19,6 +18,7 @@ import { DynamicModuleLoader } from '../../../types/DynamicLoader';
 export const getDateNow = () => new Date().toISOString();
 
 const getProcessExecuteStory = <T extends Array<any>>(
+  qpqConfig: QPQConfig,
   dynamicModuleLoader: DynamicModuleLoader,
 ): SystemExecuteStoryActionProcessor<T> => {
   return async (
@@ -41,6 +41,7 @@ const getProcessExecuteStory = <T extends Array<any>>(
     }
 
     const resolveStory = createRuntime(
+      qpqConfig,
       session,
       actionProcessors,
       getDateNow,
@@ -63,8 +64,8 @@ const getProcessExecuteStory = <T extends Array<any>>(
   };
 };
 
-export default (dynamicModuleLoader: DynamicModuleLoader) => {
+export default (qpqConfig: QPQConfig, dynamicModuleLoader: DynamicModuleLoader) => {
   return {
-    [SystemActionType.ExecuteStory]: getProcessExecuteStory(dynamicModuleLoader),
+    [SystemActionType.ExecuteStory]: getProcessExecuteStory(qpqConfig, dynamicModuleLoader),
   };
 };
