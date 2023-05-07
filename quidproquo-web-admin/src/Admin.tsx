@@ -36,23 +36,22 @@ function CustomPagination() {
 }
 
 const getColumns = (viewLog: (x: any) => void): GridColDef[] => [
-  // { field: 'correlation', headerName: 'Correlation', width: 250 },
-  { field: 'moduleName', headerName: 'Service', width: 150 },
-  { field: 'runtimeType', headerName: 'Type', width: 150 },
+  { field: 'moduleName', headerName: 'Service', flex: 1 },
+  { field: 'runtimeType', headerName: 'Type', flex: 1 },
   {
     field: 'startedAt',
     headerName: 'Started at',
-    width: 150,
+    flex: 1,
     renderCell: (params: GridRenderCellParams) => (
       <LastSeen isoTime={params.value as Date} timeStyle="twitter" />
     ),
   },
-  { field: 'generic', headerName: 'Info', width: 450 },
-  { field: 'error', headerName: 'Error', width: 450 },
+  { field: 'generic', headerName: 'Info', flex: 3 },
+  { field: 'error', headerName: 'Error', flex: 4 },
   {
     field: '',
     headerName: 'Execute',
-    width: 140,
+    flex: 1,
     renderCell: (params: GridRenderCellParams) => (
       <>
         <IconButton color="primary" aria-label="Run Logs">
@@ -75,7 +74,7 @@ const initialState = {
 };
 
 export default function CustomPaginationGrid() {
-  const [logToView, setLogToView] = useState<any>(null);
+  const [viewLogId, setViewLogId] = useState<string>('');
   const [loading, setLoading] = useState<any>(false);
   const [logs, setLogs] = useState<any>([]);
   const [serviceLogEndpoints, setServiceLogEndpoints] = useState([]);
@@ -139,7 +138,7 @@ export default function CustomPaginationGrid() {
   };
 
   const columns = getColumns((x: any) => {
-    setLogToView(x);
+    setViewLogId(x.correlation);
   });
 
   return (
@@ -166,7 +165,7 @@ export default function CustomPaginationGrid() {
           loading={loading}
         />
       </Box>
-      {/* <LogDialog open={!!logToView} handleClose={() => setLogToView(null)} logFile={logToView} /> */}
+      <LogDialog open={!!viewLogId} handleClose={() => setViewLogId('')} logFileId={viewLogId} />
     </Box>
   );
 }

@@ -21,6 +21,7 @@ export const storyResultToMetadata = (
   // Base metadata
   const metadata: StoryResultMetadata = {
     correlation: storyResult.correlation,
+    fromCorrelation: storyResult.fromCorrelation,
     moduleName: storyResult.moduleName,
     runtimeType: storyResult.runtimeType,
     startedAt: storyResult.startedAt,

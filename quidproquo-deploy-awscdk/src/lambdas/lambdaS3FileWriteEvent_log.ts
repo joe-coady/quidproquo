@@ -48,6 +48,7 @@ const writeStoryResultMetadataToDynamo = async (
       error: { S: storyResultMetadata.error || '' },
       generic: { S: storyResultMetadata.generic },
       moduleName: { S: storyResultMetadata.moduleName },
+      fromCorrelation: { S: storyResultMetadata.fromCorrelation || '' },
     },
   });
 

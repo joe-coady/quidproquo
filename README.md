@@ -37,6 +37,7 @@ Currently under development ~ Not for production
 
 #### Must haves
 
+- QPQ Types package ~ Web / Node
 - Reduce the log lifetime for lambda to a week or two by default
 - Finish auth
 - Local Dev
