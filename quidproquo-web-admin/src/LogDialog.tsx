@@ -2,14 +2,7 @@ import { useEffect, useState } from 'react';
 
 import TimelineDot from '@mui/lab/TimelineDot';
 
-import InputIcon from '@mui/icons-material/Input';
-import TagIcon from '@mui/icons-material/Tag';
-import ElevenMpIcon from '@mui/icons-material/ElevenMp';
-import StorageIcon from '@mui/icons-material/Storage';
-import KeyboardReturnIcon from '@mui/icons-material/KeyboardReturn';
 import NotListedLocationIcon from '@mui/icons-material/NotListedLocation';
-import ScannerIcon from '@mui/icons-material/Scanner';
-import LanguageIcon from '@mui/icons-material/Language';
 
 import TruncatedText from './TruncatedText'; // Adjust the path as needed
 
@@ -28,7 +21,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 
-import { apiRequestGet } from './logic';
+import { apiRequestGet, apiRequestPost } from './logic';
 
 interface LogDialogProps {
   open: boolean;
@@ -88,6 +81,7 @@ const processLog = (logFile: any) => {
 const LogDialog = ({ logUrl, open, handleClose }: LogDialogProps) => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [logFile, setLogFile] = useState(null);
 
   useEffect(() => {
     if (!open || !logUrl) {
@@ -96,8 +90,9 @@ const LogDialog = ({ logUrl, open, handleClose }: LogDialogProps) => {
     } else {
       setLoading(true);
       apiRequestGet(logUrl)
-        .then((logFile) => {
-          setEvents(processLog(logFile));
+        .then((log) => {
+          setEvents(processLog(log));
+          setLogFile(log);
         })
         .finally(() => {
           setLoading(false);
@@ -105,9 +100,11 @@ const LogDialog = ({ logUrl, open, handleClose }: LogDialogProps) => {
     }
   }, [logUrl, open]);
 
-  if (!open) {
-    return null;
-  }
+  const handleExecute = async () => {
+    if (logFile) {
+      await apiRequestPost('/admin/service/log/execute', logFile);
+    }
+  };
 
   return (
     <Dialog
@@ -188,6 +185,9 @@ const LogDialog = ({ logUrl, open, handleClose }: LogDialogProps) => {
         )}
       </DialogContent>
       <DialogActions>
+        {!loading && logFile && logFile.runtimeType === 'EXECUTE_STORY' && (
+          <Button onClick={handleExecute}>Execute</Button>
+        )}
         <Button onClick={handleClose}>Close</Button>
       </DialogActions>
     </Dialog>
