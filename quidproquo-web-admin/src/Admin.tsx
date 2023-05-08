@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import LinearProgress from '@mui/material/LinearProgress';
@@ -11,9 +11,8 @@ import {
   GridRenderCellParams,
   GridColDef,
 } from '@mui/x-data-grid';
-import { DirectionsRunOutlined, InfoOutlined } from '@mui/icons-material';
+
 import Pagination from '@mui/material/Pagination';
-import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import LastSeen from './components/LastSeen/LastSeen';
 import LogDialog from './LogDialog';
@@ -68,16 +67,6 @@ const getColumns = (viewLog: (x: any) => void): GridColDef[] => [
   },
   { field: 'generic', headerName: 'Info', flex: 3 },
   { field: 'error', headerName: 'Error', flex: 4 },
-  // {
-  //   field: '',
-  //   headerName: 'Execute',
-  //   flex: 1,
-  //   renderCell: (params: GridRenderCellParams) => (
-  //     <IconButton color="primary" aria-label="upload picture" onClick={() => viewLog(params.row)}>
-  //       <InfoOutlined />
-  //     </IconButton>
-  //   ),
-  // },
 ];
 
 const initialState = {
@@ -123,6 +112,18 @@ export default function CustomPaginationGrid() {
     };
   }, []);
 
+  const filteredLogs = useMemo(() => {
+    if (!searchParams.errorFilter) {
+      return logs;
+    }
+
+    const filterWords = searchParams.errorFilter.trim().toLowerCase().split(' ');
+    return logs.filter((log: any) => {
+      const lowerLogError = (log.error || '').toLowerCase();
+      return filterWords.every((word) => lowerLogError && lowerLogError.includes(word));
+    });
+  }, [searchParams.errorFilter, logs]);
+
   const onSearch = () => {
     setLoading(true);
 
@@ -159,7 +160,7 @@ export default function CustomPaginationGrid() {
       (se: string) => se.indexOf(logStory.moduleName) >= 0,
     );
 
-    setLogUrl(`${serviceEndpoint}/log/${logStory.correlation}`);
+    setLogUrl(`/${serviceEndpoint}/log/${logStory.correlation}`);
   };
 
   const columns = getColumns(viewLog);
@@ -183,7 +184,7 @@ export default function CustomPaginationGrid() {
           }}
           columns={columns}
           initialState={initialState}
-          rows={logs}
+          rows={filteredLogs}
           autoPageSize={true}
           loading={loading}
           onRowClick={viewLog}

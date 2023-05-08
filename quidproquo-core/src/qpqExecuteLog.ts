@@ -6,19 +6,13 @@ export const qpqExecuteLog = async (
   storyResult: StoryResult<any>,
   runtime: any,
 ): Promise<StoryResult<any>> => {
+  // Create a proxy that just resolves all actions to reading from the history
   var logIndex = 0;
-  const getLogResultAction = async () => {
-    const result = storyResult.history[logIndex++].res;
-    console.log(result);
-    return result;
-  };
-
-  // Create a proxy that just resolves all actions to the getLogResultAction
   const storyActionProcessor = new Proxy(
     {},
     {
       get: (target: any, property: any) => {
-        return getLogResultAction;
+        return async () => storyResult.history[logIndex++].res;
       },
     },
   );

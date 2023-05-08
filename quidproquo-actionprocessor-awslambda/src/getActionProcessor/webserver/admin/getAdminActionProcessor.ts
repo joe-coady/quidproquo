@@ -28,8 +28,6 @@ const getAdminGetLogsActionProcessor = (qpqConfig: QPQConfig): AdminGetLogsActio
       nextPageKey,
     );
 
-    console.log(JSON.stringify(response, null, 2));
-
     return actionResult(response);
   };
 };

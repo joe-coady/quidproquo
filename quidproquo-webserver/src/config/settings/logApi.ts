@@ -20,7 +20,5 @@ export const defineLogApi = (): QPQConfigSettings => {
     ),
   ];
 
-  console.log(JSON.stringify(configs, null, 2));
-
   return configs;
 };
