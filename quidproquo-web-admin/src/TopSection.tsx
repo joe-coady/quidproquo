@@ -12,6 +12,7 @@ import { LocalizationProvider, DateTimePicker } from '@mui/x-date-pickers';
 
 // Object.keys(QpqRuntimeType)
 export const RuntimeTypes = [
+  'ALL',
   'API',
   'EXECUTE_STORY',
   'EVENT_BRIDGE_EVENT',

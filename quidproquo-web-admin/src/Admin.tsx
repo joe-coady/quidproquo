@@ -17,7 +17,7 @@ import Typography from '@mui/material/Typography';
 import LastSeen from './components/LastSeen/LastSeen';
 import LogDialog from './LogDialog';
 import { getLogs } from './logic';
-import { TopSection, SearchParams } from './TopSection';
+import { TopSection, SearchParams, RuntimeTypes } from './TopSection';
 import { apiRequestGet } from './logic/apiRequest';
 
 function CustomPagination() {
@@ -127,13 +127,20 @@ export default function CustomPaginationGrid() {
   const onSearch = () => {
     setLoading(true);
 
+    const effectiveRuntimeTypes =
+      searchParams.runtimeType === 'ALL'
+        ? RuntimeTypes.filter((type) => type !== 'ALL')
+        : [searchParams.runtimeType];
+
     Promise.all(
-      serviceLogEndpoints.map((x) =>
-        getLogs(
-          `/${x}/log/list`,
-          searchParams.runtimeType,
-          searchParams.startIsoDateTime,
-          searchParams.endIsoDateTime,
+      effectiveRuntimeTypes.flatMap((type) =>
+        serviceLogEndpoints.map((x) =>
+          getLogs(
+            `/${x}/log/list`,
+            type,
+            searchParams.startIsoDateTime,
+            searchParams.endIsoDateTime,
+          ),
         ),
       ),
     )
@@ -156,8 +163,8 @@ export default function CustomPaginationGrid() {
   const viewLog = (event: any) => {
     const logStory = event.row;
 
-    const serviceEndpoint = serviceLogEndpoints.find(
-      (se: string) => se.indexOf(logStory.moduleName) >= 0,
+    const serviceEndpoint = serviceLogEndpoints.find((se: string) =>
+      se.endsWith(logStory.moduleName),
     );
 
     setLogUrl(`/${serviceEndpoint}/log/${logStory.correlation}`);
