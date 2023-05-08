@@ -32,44 +32,9 @@ import { apiRequestGet } from './logic';
 
 interface LogDialogProps {
   open: boolean;
-  logFileId: string;
+  logUrl: string;
   handleClose: () => void;
 }
-
-const actionMap = {
-  '@Inf/Guid/New': {
-    Dot: (
-      <TimelineDot>
-        <TagIcon />
-      </TimelineDot>
-    ),
-    title: 'Generated new guid',
-  },
-  '@Inf/Math/RandomNumber': {
-    Dot: (
-      <TimelineDot>
-        <ElevenMpIcon />
-      </TimelineDot>
-    ),
-    title: 'Generated random number',
-  },
-  '@inf/GenericDataResource/Put': {
-    Dot: (
-      <TimelineDot>
-        <StorageIcon />
-      </TimelineDot>
-    ),
-    title: 'Wrote to database',
-  },
-  '@inf/GenericDataResource/Scan': {
-    Dot: (
-      <TimelineDot>
-        <ScannerIcon />
-      </TimelineDot>
-    ),
-    title: 'Full scan of database',
-  },
-};
 
 const processLog = (logFile: any) => {
   if (!logFile) {
@@ -80,11 +45,6 @@ const processLog = (logFile: any) => {
     dateTime: logFile.startedAt,
     title: `${logFile.runtimeType} - ${logFile.moduleName}`,
     subText: logFile.tags.join(','),
-    Dot: (
-      <TimelineDot>
-        <LanguageIcon />
-      </TimelineDot>
-    ),
     key: logFile.id,
   };
 
@@ -92,11 +52,6 @@ const processLog = (logFile: any) => {
     dateTime: logFile.startedAt,
     title: 'Executed with input params of',
     subText: JSON.stringify(logFile.input, null, 1),
-    Dot: (
-      <TimelineDot>
-        <InputIcon />
-      </TimelineDot>
-    ),
     key: logFile.id + 'part_2',
   };
 
@@ -106,11 +61,6 @@ const processLog = (logFile: any) => {
     subText: logFile.error
       ? JSON.stringify(logFile.error, null, 1)
       : JSON.stringify(logFile.result, null, 1),
-    Dot: (
-      <TimelineDot>
-        <KeyboardReturnIcon />
-      </TimelineDot>
-    ),
     key: logFile.id + 'return',
   };
 
@@ -119,13 +69,12 @@ const processLog = (logFile: any) => {
       subText: `${h.act.payload ? `Input: ${JSON.stringify(h.act.payload, null, 2)}\n` : ''}${
         h.res ? `Output: ${JSON.stringify(h.res, null, 2)}` : ''
       }`,
-      title: `Action: ${h.act.type}`,
+      title: `Action: ${h.act.type.split('/').pop()}`,
       Dot: (
         <TimelineDot>
           <NotListedLocationIcon />
         </TimelineDot>
       ),
-      ...((actionMap as any)[h.act.type as string] || {}),
       key: logFile.id + i,
       dateTime: h.startedAt,
       timeMs: new Date(h.finishedAt).getTime() - new Date(h.startedAt).getTime(),
@@ -136,17 +85,17 @@ const processLog = (logFile: any) => {
   return [firstEvent, secondEvent, ...history, finalEvent];
 };
 
-const LogDialog = ({ logFileId, open, handleClose }: LogDialogProps) => {
+const LogDialog = ({ logUrl, open, handleClose }: LogDialogProps) => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!open || !logFileId) {
+    if (!open || !logUrl) {
       setEvents([]);
       setLoading(false);
     } else {
       setLoading(true);
-      apiRequestGet(`/api/card/log/${logFileId}`)
+      apiRequestGet(logUrl)
         .then((logFile) => {
           setEvents(processLog(logFile));
         })
@@ -154,7 +103,7 @@ const LogDialog = ({ logFileId, open, handleClose }: LogDialogProps) => {
           setLoading(false);
         });
     }
-  }, [logFileId, open]);
+  }, [logUrl, open]);
 
   if (!open) {
     return null;

@@ -14,6 +14,7 @@ import {
 import { DirectionsRunOutlined, InfoOutlined } from '@mui/icons-material';
 import Pagination from '@mui/material/Pagination';
 import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
 import LastSeen from './components/LastSeen/LastSeen';
 import LogDialog from './LogDialog';
 import { getLogs } from './logic';
@@ -42,27 +43,41 @@ const getColumns = (viewLog: (x: any) => void): GridColDef[] => [
     field: 'startedAt',
     headerName: 'Started at',
     flex: 1,
-    renderCell: (params: GridRenderCellParams) => (
-      <LastSeen isoTime={params.value as Date} timeStyle="twitter" />
-    ),
+    renderCell: (params: GridRenderCellParams) => {
+      const isoTime = params.value as Date;
+      const date = new Date(isoTime);
+      const formattedTime = date.toLocaleTimeString('en-AU', {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+      const formattedDate = date.toLocaleDateString('en-AU', {
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit',
+      });
+
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <Typography variant="body2" component="span">
+            {formattedDate} {formattedTime}
+          </Typography>
+          <LastSeen isoTime={isoTime} timeStyle="twitter" />
+        </div>
+      );
+    },
   },
   { field: 'generic', headerName: 'Info', flex: 3 },
   { field: 'error', headerName: 'Error', flex: 4 },
-  {
-    field: '',
-    headerName: 'Execute',
-    flex: 1,
-    renderCell: (params: GridRenderCellParams) => (
-      <>
-        <IconButton color="primary" aria-label="Run Logs">
-          <DirectionsRunOutlined />
-        </IconButton>
-        <IconButton color="primary" aria-label="upload picture" onClick={() => viewLog(params.row)}>
-          <InfoOutlined />
-        </IconButton>
-      </>
-    ),
-  },
+  // {
+  //   field: '',
+  //   headerName: 'Execute',
+  //   flex: 1,
+  //   renderCell: (params: GridRenderCellParams) => (
+  //     <IconButton color="primary" aria-label="upload picture" onClick={() => viewLog(params.row)}>
+  //       <InfoOutlined />
+  //     </IconButton>
+  //   ),
+  // },
 ];
 
 const initialState = {
@@ -74,7 +89,7 @@ const initialState = {
 };
 
 export default function CustomPaginationGrid() {
-  const [viewLogId, setViewLogId] = useState<string>('');
+  const [logUrl, setLogUrl] = useState<string>('');
   const [loading, setLoading] = useState<any>(false);
   const [logs, setLogs] = useState<any>([]);
   const [serviceLogEndpoints, setServiceLogEndpoints] = useState([]);
@@ -114,7 +129,7 @@ export default function CustomPaginationGrid() {
     Promise.all(
       serviceLogEndpoints.map((x) =>
         getLogs(
-          `/${x}`,
+          `/${x}/log/list`,
           searchParams.runtimeType,
           searchParams.startIsoDateTime,
           searchParams.endIsoDateTime,
@@ -137,9 +152,17 @@ export default function CustomPaginationGrid() {
       });
   };
 
-  const columns = getColumns((x: any) => {
-    setViewLogId(x.correlation);
-  });
+  const viewLog = (event: any) => {
+    const logStory = event.row;
+
+    const serviceEndpoint = serviceLogEndpoints.find(
+      (se: string) => se.indexOf(logStory.moduleName) >= 0,
+    );
+
+    setLogUrl(`${serviceEndpoint}/log/${logStory.correlation}`);
+  };
+
+  const columns = getColumns(viewLog);
 
   return (
     <Box sx={{ height: '100vh', width: '100%', p: 2, display: 'flex', flexDirection: 'column' }}>
@@ -163,9 +186,10 @@ export default function CustomPaginationGrid() {
           rows={logs}
           autoPageSize={true}
           loading={loading}
+          onRowClick={viewLog}
         />
       </Box>
-      <LogDialog open={!!viewLogId} handleClose={() => setViewLogId('')} logFileId={viewLogId} />
+      <LogDialog open={!!logUrl} handleClose={() => setLogUrl('')} logUrl={logUrl} />
     </Box>
   );
 }
