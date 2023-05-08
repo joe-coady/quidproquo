@@ -256,22 +256,24 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
           continue;
         }
 
-        const seoCachePolicy = new aws_cloudfront.CachePolicy(this, `seo-cp-${seo.uniqueKey}`, {
-          cachePolicyName: this.resourceName(`${props.webEntryConfig.name}-${seo.uniqueKey}`),
-          headerBehavior: aws_cloudfront.CacheHeaderBehavior.allowList(
-            qpqHeaderIsBot,
-            ...seo.cache.headers,
-          ),
-          defaultTtl: cdk.Duration.seconds(seo.cache.defaultTTLInSeconds),
-          minTtl: cdk.Duration.seconds(seo.cache.minTTLInSeconds),
-          maxTtl: cdk.Duration.seconds(seo.cache.maxTTLInSeconds),
-          enableAcceptEncodingGzip: true,
-          enableAcceptEncodingBrotli: true,
-        });
+        // TODO: Find a better solution for this.
+        // Removed this because aws limits for the number of AWS CloudFront Cache Policies in your account
+        // const seoCachePolicy = new aws_cloudfront.CachePolicy(this, `seo-cp-${seo.uniqueKey}`, {
+        //   cachePolicyName: this.resourceName(`${props.webEntryConfig.name}-${seo.uniqueKey}`),
+        //   headerBehavior: aws_cloudfront.CacheHeaderBehavior.allowList(
+        //     qpqHeaderIsBot,
+        //     ...seo.cache.headers,
+        //   ),
+        //   defaultTtl: cdk.Duration.seconds(seo.cache.defaultTTLInSeconds),
+        //   minTtl: cdk.Duration.seconds(seo.cache.minTTLInSeconds),
+        //   maxTtl: cdk.Duration.seconds(seo.cache.maxTTLInSeconds),
+        //   enableAcceptEncodingGzip: true,
+        //   enableAcceptEncodingBrotli: true,
+        // });
 
         const wildcardPath = seo.path.replaceAll(/{(.+?)}/g, '*');
         distribution.addBehavior(wildcardPath, distributionOrigin, {
-          cachePolicy: seoCachePolicy,
+          // cachePolicy: seoCachePolicy,
           viewerProtocolPolicy: aws_cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
           compress: props.webEntryConfig.compressFiles,
           responseHeadersPolicy: responseHeaderPolicy,
@@ -289,33 +291,34 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
       }
     }
 
-    const ignoreCacheResponseHeaderPolicy = new aws_cloudfront.ResponseHeadersPolicy(
-      this,
-      `dist-rhp-ignore`,
-      {
-        responseHeadersPolicyName: this.qpqResourceName(props.webEntryConfig.name, 'ignore'),
-        customHeadersBehavior: {
-          customHeaders: [
-            {
-              header: 'Cache-Control',
-              value: `max-age=300, must-revalidate`,
-              override: true,
-            },
-          ],
-        },
-        securityHeadersBehavior: convertSecurityHeadersFromQpqSecurityHeaders(
-          qpqWebServerUtils.getBaseDomainName(props.qpqConfig),
-          props.webEntryConfig.securityHeaders,
-        ),
-      },
-    );
+    // Removed this because aws limits for the number of AWS CloudFront Cache Policies in your account
+    // const ignoreCacheResponseHeaderPolicy = new aws_cloudfront.ResponseHeadersPolicy(
+    //   this,
+    //   `dist-rhp-ignore`,
+    //   {
+    //     responseHeadersPolicyName: this.qpqResourceName(props.webEntryConfig.name, 'ignore'),
+    //     customHeadersBehavior: {
+    //       customHeaders: [
+    //         {
+    //           header: 'Cache-Control',
+    //           value: `max-age=300, must-revalidate`,
+    //           override: true,
+    //         },
+    //       ],
+    //     },
+    //     securityHeadersBehavior: convertSecurityHeadersFromQpqSecurityHeaders(
+    //       qpqWebServerUtils.getBaseDomainName(props.qpqConfig),
+    //       props.webEntryConfig.securityHeaders,
+    //     ),
+    //   },
+    // );
 
     props.webEntryConfig.ignoreCache.forEach((pathPattern) => {
       distribution.addBehavior(pathPattern, distributionOrigin, {
         cachePolicy: aws_cloudfront.CachePolicy.CACHING_DISABLED,
         viewerProtocolPolicy: aws_cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
         compress: props.webEntryConfig.compressFiles,
-        responseHeadersPolicy: ignoreCacheResponseHeaderPolicy,
+        // responseHeadersPolicy: ignoreCacheResponseHeaderPolicy,
       });
     });
   }
