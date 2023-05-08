@@ -1,11 +1,5 @@
 import { useEffect, useState } from 'react';
 
-import Timeline from '@mui/lab/Timeline';
-import TimelineItem from '@mui/lab/TimelineItem';
-import TimelineSeparator from '@mui/lab/TimelineSeparator';
-import TimelineConnector from '@mui/lab/TimelineConnector';
-import TimelineContent from '@mui/lab/TimelineContent';
-import TimelineOppositeContent from '@mui/lab/TimelineOppositeContent';
 import TimelineDot from '@mui/lab/TimelineDot';
 
 import InputIcon from '@mui/icons-material/Input';
@@ -16,7 +10,6 @@ import KeyboardReturnIcon from '@mui/icons-material/KeyboardReturn';
 import NotListedLocationIcon from '@mui/icons-material/NotListedLocation';
 import ScannerIcon from '@mui/icons-material/Scanner';
 import LanguageIcon from '@mui/icons-material/Language';
-import Typography from '@mui/material/Typography';
 
 import TruncatedText from './TruncatedText'; // Adjust the path as needed
 
@@ -109,8 +102,10 @@ const processLog = (logFile: any) => {
 
   const finalEvent = {
     dateTime: logFile.finishedAt,
-    title: 'Returned',
-    subText: JSON.stringify(logFile.result, null, 1),
+    title: logFile.error ? 'Thrown Error' : 'Returned',
+    subText: logFile.error
+      ? JSON.stringify(logFile.error, null, 1)
+      : JSON.stringify(logFile.result, null, 1),
     Dot: (
       <TimelineDot>
         <KeyboardReturnIcon />
@@ -144,7 +139,6 @@ const processLog = (logFile: any) => {
 const LogDialog = ({ logFileId, open, handleClose }: LogDialogProps) => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(false);
-  // const events: any[] = []; // processLog(logFile);
 
   useEffect(() => {
     if (!open || !logFileId) {
@@ -232,7 +226,7 @@ const LogDialog = ({ logFileId, open, handleClose }: LogDialogProps) => {
                       >
                         <TruncatedText
                           title={e.title as string}
-                          subText={e.subText as string}
+                          subText={(e.subText || '') as string}
                           maxLength={128}
                         />
                       </TableCell>
