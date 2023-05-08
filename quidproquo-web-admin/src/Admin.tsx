@@ -95,7 +95,7 @@ export default function CustomPaginationGrid() {
 
   useEffect(() => {
     setLoading(true);
-    apiRequestGet('http://localhost:8080/admin/service/log/list')
+    apiRequestGet('/admin/service/log/list')
       .then((newServiceLogEndpoints) => {
         setServiceLogEndpoints(newServiceLogEndpoints);
       })
@@ -114,7 +114,7 @@ export default function CustomPaginationGrid() {
     Promise.all(
       serviceLogEndpoints.map((x) =>
         getLogs(
-          `http://localhost:8080/${x}`,
+          `/${x}`,
           searchParams.runtimeType,
           searchParams.startIsoDateTime,
           searchParams.endIsoDateTime,

@@ -12,6 +12,12 @@ export const defineLogApi = (): QPQConfigSettings => {
       getServiceEntry('log', 'controller', 'logController'),
       'getLogs',
     ),
+    defineRoute(
+      'GET',
+      '/log/{correlationId}',
+      getServiceEntry('log', 'controller', 'logController'),
+      'getLog',
+    ),
   ];
 
   console.log(JSON.stringify(configs, null, 2));

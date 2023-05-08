@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const getAxiosInstance = () => {
   const instance = axios.create({
-    baseURL: document.location.origin.replace('www.', 'api.'),
+    // baseURL: `http://localhost:8080`,
   });
 
   return instance;
