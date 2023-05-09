@@ -12,13 +12,14 @@ import {
   ErrorTypeEnum,
   QueueMessage,
   QueueQPQConfigSetting,
+  StorySession,
 } from 'quidproquo-core';
 
 import { QueueEvent, QueueEventResponse, QueueEventTypeParams } from 'quidproquo-webserver';
 
 import { matchUrl } from '../../../awsLambdaUtils';
 
-import { Context, SQSRecord } from 'aws-lambda';
+import { Context } from 'aws-lambda';
 
 type AnyQueueEvent = QueueEvent<QueueMessage<any>>;
 export type SqsEventMatchStoryResult = MatchStoryResult<QueueEventTypeParams, string>;
@@ -35,14 +36,12 @@ export const getQueueConfigSetting = (): QueueQPQConfigSetting => {
 
 const getProcessTransformEventParams = (
   qpqConfig: QPQConfig,
-): EventTransformEventParamsActionProcessor<[SQSRecord, Context], AnyQueueEvent> => {
+): EventTransformEventParamsActionProcessor<[QueueMessage<any>, Context], AnyQueueEvent> => {
   return async ({ eventParams: [record, context] }) => {
-    const parsedRecord = JSON.parse(record.body) as QueueMessage<any>;
-
     return actionResult({
       message: {
-        type: parsedRecord.type,
-        payload: parsedRecord.payload,
+        type: record.type,
+        payload: record.payload,
       },
     });
   };

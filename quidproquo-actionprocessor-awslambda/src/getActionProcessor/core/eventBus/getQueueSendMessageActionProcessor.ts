@@ -1,4 +1,4 @@
-import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { QPQConfig, qpqCoreUtils, EventBusMessage, StorySession } from 'quidproquo-core';
 
 import {
   EventBusSendMessageActionProcessor,
@@ -10,10 +10,15 @@ import { publishMessage } from '../../../logic/sns/publishMessage';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { getCFExportNameSnsTopicArnFromConfig } from '../../../awsNamingUtils';
 
+// TODO: Unify this once the lambda code moves from CDK to awslambda
+type AnyEventBusMessageWithSession = EventBusMessage<any> & {
+  storySession: StorySession;
+};
+
 const getProcessEventBusSendMessage = (
   qpqConfig: QPQConfig,
 ): EventBusSendMessageActionProcessor<any> => {
-  return async ({ eventBusName, eventBusMessages }) => {
+  return async ({ eventBusName, eventBusMessages }, session) => {
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const topicArn = await getExportedValue(
@@ -24,7 +29,14 @@ const getProcessEventBusSendMessage = (
     await publishMessage(
       topicArn,
       region,
-      eventBusMessages.map((message) => JSON.stringify(message)),
+      eventBusMessages.map((message) => {
+        const eventBusMessageWithSession: AnyEventBusMessageWithSession = {
+          ...message,
+          storySession: session,
+        };
+
+        return JSON.stringify(eventBusMessageWithSession);
+      }),
     );
 
     return actionResult(void 0);

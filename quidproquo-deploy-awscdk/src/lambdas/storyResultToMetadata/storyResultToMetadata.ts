@@ -4,7 +4,7 @@ import { apiGenericTextExtractor, unknownGenericTextExtractor } from './genericT
 // These have to be strings and not enum due to how the lambda is packaged
 const extractors: Record<string, (sr: StoryResult<any>) => string> = {
   ['API']: apiGenericTextExtractor,
-  ['EVENT_BRIDGE_EVENT']: unknownGenericTextExtractor,
+  ['RECURRING_SCHEDULE']: unknownGenericTextExtractor,
   ['EVENT_SEO_OR']: unknownGenericTextExtractor,
   ['EXECUTE_STORY']: unknownGenericTextExtractor,
   ['QUEUE_EVENT']: unknownGenericTextExtractor,

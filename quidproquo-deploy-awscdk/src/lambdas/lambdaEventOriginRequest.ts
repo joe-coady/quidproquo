@@ -1,4 +1,8 @@
-import { coreActionProcessor, webserverActionProcessor } from 'quidproquo-actionprocessor-node';
+import {
+  coreActionProcessor,
+  webserverActionProcessor,
+  getConfigActionProcessor,
+} from 'quidproquo-actionprocessor-node';
 
 import {
   getCloudFrontOriginRequestEventActionProcessor,
@@ -14,8 +18,6 @@ import {
   awsLambdaUtils,
   DynamicModuleLoader,
 } from 'quidproquo-actionprocessor-awslambda';
-
-import { getConfigActionProcessor } from 'quidproquo-actionprocessor-node';
 
 import { getLambdaConfigs } from './lambdaConfig';
 
@@ -69,11 +71,13 @@ export const getOriginRequestEventExecutor = (
 
     const resolveStory = createRuntime(
       cdkConfig.qpqConfig,
-      {},
+      {
+        depth: 0,
+      },
       storyActionProcessor,
       getDateNow,
       getLogger(cdkConfig.qpqConfig),
-      awsLambdaUtils.randomGuid,
+      awsLambdaUtils.randomGuid(),
       QpqRuntimeType.EVENT_SEO_OR,
     );
 

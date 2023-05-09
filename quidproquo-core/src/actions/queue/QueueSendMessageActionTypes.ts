@@ -1,10 +1,7 @@
-import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
+import { Action, ActionProcessor, ActionRequester, CrossModuleMessage } from '../../types';
 import { QueueActionType } from './QueueActionType';
 
-export interface QueueMessage<T = null> {
-  type: string;
-  payload: T;
-}
+export type QueueMessage<T> = CrossModuleMessage<T>;
 
 // Payload
 export interface QueueSendMessageActionPayload<T> {

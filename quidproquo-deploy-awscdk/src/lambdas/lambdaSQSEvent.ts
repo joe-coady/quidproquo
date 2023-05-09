@@ -23,7 +23,13 @@ import { getConfigActionProcessor } from 'quidproquo-actionprocessor-node';
 
 import { getLambdaConfigs } from './lambdaConfig';
 
-import { createRuntime, askProcessEvent, QpqRuntimeType } from 'quidproquo-core';
+import {
+  createRuntime,
+  askProcessEvent,
+  QpqRuntimeType,
+  StorySession,
+  QueueMessage,
+} from 'quidproquo-core';
 
 import { ActionProcessorListResolver } from './actionProcessorListResolver';
 import { getLogger } from './logger/logger';
@@ -36,9 +42,15 @@ import qpqCustomActionProcessors from 'qpq-custom-action-processors-loader!';
 // TODO: Make this a util or something based on server time or something..
 const getDateNow = () => new Date().toISOString();
 
+// TODO: Unify this once the lambda code moves from CDK to awslambda
+type AnyQueueMessageWithSession = QueueMessage<any> & {
+  storySession: StorySession;
+};
+
 export const getStoryActionRuntime = async (
   dynamicModuleLoader: DynamicModuleLoader,
   getCustomActionProcessors: ActionProcessorListResolver = () => ({}),
+  callerStorySession: StorySession,
 ) => {
   const cdkConfig = await getLambdaConfigs();
 
@@ -68,17 +80,18 @@ export const getStoryActionRuntime = async (
 
   const resolveStory = createRuntime(
     cdkConfig.qpqConfig,
-    {},
+    callerStorySession,
     storyActionProcessor,
     getDateNow,
     getLogger(cdkConfig.qpqConfig),
-    awsLambdaUtils.randomGuid,
+    awsLambdaUtils.randomGuid(),
     QpqRuntimeType.QUEUE_EVENT,
   );
 
   return resolveStory;
 };
 
+// TODO: We could make this entire function a story, that spawns an execute story for each record
 export const getSQSEventExecutor = (
   dynamicModuleLoader: DynamicModuleLoader,
   getCustomActionProcessors: ActionProcessorListResolver = () => ({}),
@@ -90,13 +103,22 @@ export const getSQSEventExecutor = (
     console.log('num batch: ', event.Records.length);
 
     const results = event.Records.map(async (record) => {
+      const runtimeData = JSON.parse(record.body) as AnyQueueMessageWithSession;
+
       const resolveStory = await getStoryActionRuntime(
         dynamicModuleLoader,
         getCustomActionProcessors,
+        runtimeData.storySession,
       );
+
+      const queueMessage: QueueMessage<any> = {
+        type: runtimeData.type,
+        payload: runtimeData.payload,
+      };
+
       return {
         id: record.messageId,
-        result: await resolveStory(askProcessEvent, [record, context]),
+        result: await resolveStory(askProcessEvent, [queueMessage, context]),
       };
     });
 

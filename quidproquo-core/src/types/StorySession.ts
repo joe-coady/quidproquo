@@ -3,6 +3,8 @@ import { Action } from './Action';
 
 export interface StorySession {
   correlation?: string;
+  depth: number;
+  jwt?: string;
 }
 
 export interface StoryError {
@@ -23,7 +25,7 @@ export interface ActionHistory<T = any> {
 export enum QpqRuntimeType {
   API = 'API',
   EXECUTE_STORY = 'EXECUTE_STORY',
-  EVENT_BRIDGE_EVENT = 'EVENT_BRIDGE_EVENT',
+  RECURRING_SCHEDULE = 'RECURRING_SCHEDULE',
   QUEUE_EVENT = 'QUEUE_EVENT',
   EVENT_SEO_OR = 'EVENT_SEO_OR',
   SERVICE_FUNCTION_EXE = 'SERVICE_FUNCTION_EXE',
@@ -33,7 +35,7 @@ export interface StoryResult<TArgs extends Array<any>, TResult = any> {
   // Params to story
   input: TArgs;
 
-  // Story Session Data (mutates over time)
+  // Story Session Data
   session: StorySession;
 
   // History of actions

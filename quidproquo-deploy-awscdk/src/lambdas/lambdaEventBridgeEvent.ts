@@ -1,4 +1,8 @@
-import { coreActionProcessor, webserverActionProcessor } from 'quidproquo-actionprocessor-node';
+import {
+  coreActionProcessor,
+  webserverActionProcessor,
+  getConfigActionProcessor,
+} from 'quidproquo-actionprocessor-node';
 
 import {
   getEventBridgeEventActionProcessor,
@@ -17,8 +21,6 @@ import {
   DynamicModuleLoader,
   LambdaRuntimeConfig,
 } from 'quidproquo-actionprocessor-awslambda';
-
-import { getConfigActionProcessor } from 'quidproquo-actionprocessor-node';
 
 import { createRuntime, askProcessEvent, QpqRuntimeType } from 'quidproquo-core';
 
@@ -73,12 +75,14 @@ export const getEventBridgeEventExecutor = (
 
     const resolveStory = createRuntime(
       cdkConfig.qpqConfig,
-      {},
+      {
+        depth: 0,
+      },
       storyActionProcessor,
       getDateNow,
       getLogger(cdkConfig.qpqConfig),
-      awsLambdaUtils.randomGuid,
-      QpqRuntimeType.EVENT_BRIDGE_EVENT,
+      awsLambdaUtils.randomGuid(),
+      QpqRuntimeType.RECURRING_SCHEDULE,
     );
 
     await resolveStory(askProcessEvent, [event, context]);

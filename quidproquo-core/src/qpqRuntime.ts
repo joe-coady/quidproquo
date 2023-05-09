@@ -51,11 +51,11 @@ async function processAction(
 
 export const createRuntime = (
   qpqConfig: QPQConfig,
-  session: StorySession,
+  callerSession: StorySession,
   actionProcessors: ActionProcessorList,
   getTimeNow: () => string,
   logger: (res: StoryResult<any>) => Promise<void>,
-  newGuid: () => string,
+  runtimeCorrelation: string,
   runtimeType: QpqRuntimeType,
   initialTags?: string[],
 ) => {
@@ -67,17 +67,24 @@ export const createRuntime = (
 
     let action = null;
 
+    const storySession: StorySession = {
+      correlation: runtimeCorrelation,
+      depth: callerSession.depth + 1,
+      jwt: callerSession.jwt,
+    };
+
     const response: StoryResult<any> = {
       input: args,
-      session: { ...session },
+      session: storySession,
+
       history: [],
       startedAt: getTimeNow(),
 
       tags: initialTags || [],
       moduleName: getApplicationModuleName(qpqConfig),
 
-      correlation: newGuid(),
-      fromCorrelation: session.correlation,
+      correlation: storySession.correlation!,
+      fromCorrelation: callerSession.correlation,
       runtimeType: runtimeType,
     };
 
@@ -90,7 +97,7 @@ export const createRuntime = (
         const actionResult: ActionProcessorResult<any> = await processAction(
           action.value,
           actionProcessors,
-          session,
+          storySession,
           logger,
         );
 

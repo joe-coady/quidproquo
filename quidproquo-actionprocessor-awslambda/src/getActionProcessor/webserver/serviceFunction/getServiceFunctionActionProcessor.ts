@@ -4,6 +4,7 @@ import {
   QPQConfig,
   qpqCoreUtils,
   StoryResult,
+  StorySession,
 } from 'quidproquo-core';
 
 import {
@@ -16,10 +17,14 @@ import { executeLambdaByName } from '../../../logic/lambda/executeLambdaByName';
 
 import { getConfigRuntimeResourceName } from '../../../awsNamingUtils';
 
+type AnyExecuteServiceFunctionEventWithSession = ExecuteServiceFunctionEvent<any[]> & {
+  storySession: StorySession;
+};
+
 const getServiceFunctionExecuteActionProcessor = (
   qpqConfig: QPQConfig,
 ): ServiceFunctionExecuteActionProcessor<any, any> => {
-  return async ({ functionName, service, payload }) => {
+  return async ({ functionName, service, payload }, session) => {
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const appName = qpqCoreUtils.getApplicationName(qpqConfig);
@@ -34,9 +39,10 @@ const getServiceFunctionExecuteActionProcessor = (
       feature,
     );
 
-    const serviceFunctionEvent: ExecuteServiceFunctionEvent<any[]> = {
+    const serviceFunctionEvent: AnyExecuteServiceFunctionEventWithSession = {
       functionName: functionName,
       payload: payload,
+      storySession: session,
     };
 
     const result = await executeLambdaByName<StoryResult<any[], any>>(

@@ -15,7 +15,7 @@ export const RuntimeTypes = [
   'ALL',
   'API',
   'EXECUTE_STORY',
-  'EVENT_BRIDGE_EVENT',
+  'RECURRING_SCHEDULE',
   'QUEUE_EVENT',
   'EVENT_SEO_OR',
   'SERVICE_FUNCTION_EXE',

@@ -1,10 +1,7 @@
-import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
+import { Action, ActionProcessor, ActionRequester, CrossModuleMessage } from '../../types';
 import { EventBusActionType } from './EventBusActionType';
 
-export interface EventBusMessage<T = null> {
-  type: string;
-  payload: T;
-}
+export type EventBusMessage<T> = CrossModuleMessage<T>;
 
 // Payload
 export interface EventBusSendMessageActionPayload<T> {

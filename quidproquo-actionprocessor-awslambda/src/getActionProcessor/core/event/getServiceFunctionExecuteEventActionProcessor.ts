@@ -25,16 +25,6 @@ export type ServiceFunctionExecuteEventParams = [ExecuteServiceFunctionEvent<any
 export type TransformedServiceFunctionExecuteEventParams = ExecuteServiceFunctionEvent<any>;
 export type ServiceFunctionExecuteEventResponse = any;
 
-const transformHttpEventHeadersToAPIGatewayProxyResultHeaders = (
-  headers: HttpEventHeaders,
-): {
-  [header: string]: boolean | number | string;
-} => {
-  return Object.keys(headers)
-    .filter((header) => !!headers[header])
-    .reduce((acc, header) => ({ ...acc, [header]: headers[header] }), {});
-};
-
 const getProcessTransformEventParams = (
   qpqConfig: QPQConfig,
 ): EventTransformEventParamsActionProcessor<

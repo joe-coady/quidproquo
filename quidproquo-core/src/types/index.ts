@@ -1,4 +1,5 @@
 export * from './Action';
+export * from './CrossModuleMessage';
 export * from './StorySession';
 export * from './ErrorTypeEnum';
 export * from './ScheduledEvent';

@@ -1,4 +1,8 @@
-import { coreActionProcessor, webserverActionProcessor } from 'quidproquo-actionprocessor-node';
+import {
+  coreActionProcessor,
+  webserverActionProcessor,
+  getConfigActionProcessor,
+} from 'quidproquo-actionprocessor-node';
 import { ExecuteServiceFunctionEvent } from 'quidproquo-webserver';
 
 import {
@@ -18,9 +22,7 @@ import {
   DynamicModuleLoader,
 } from 'quidproquo-actionprocessor-awslambda';
 
-import { getConfigActionProcessor } from 'quidproquo-actionprocessor-node';
-
-import { createRuntime, askProcessEvent, QpqRuntimeType } from 'quidproquo-core';
+import { createRuntime, askProcessEvent, QpqRuntimeType, StorySession } from 'quidproquo-core';
 
 import { Context } from 'aws-lambda';
 
@@ -37,11 +39,16 @@ import qpqCustomActionProcessors from 'qpq-custom-action-processors-loader!';
 // TODO: Make this a util or something based on server time or something..
 const getDateNow = () => new Date().toISOString();
 
+// TODO: Unify this once the lambda code moves from CDK to awslambda
+type AnyExecuteServiceFunctionEventWithSession = ExecuteServiceFunctionEvent<any[]> & {
+  storySession: StorySession;
+};
+
 export const getServiceFunctionExecuteEventExecutor = (
   dynamicModuleLoader: DynamicModuleLoader,
   getCustomActionProcessors: ActionProcessorListResolver = () => ({}),
 ) => {
-  return async (event: ExecuteServiceFunctionEvent<any>, context: Context) => {
+  return async (event: AnyExecuteServiceFunctionEventWithSession, context: Context) => {
     const cdkConfig = await getLambdaConfigs();
 
     // Build a processor for the session and stuff
@@ -71,15 +78,20 @@ export const getServiceFunctionExecuteEventExecutor = (
 
     const resolveStory = createRuntime(
       cdkConfig.qpqConfig,
-      {},
+      event.storySession,
       storyActionProcessor,
       getDateNow,
       getLogger(cdkConfig.qpqConfig),
-      awsLambdaUtils.randomGuid,
+      awsLambdaUtils.randomGuid(),
       QpqRuntimeType.SERVICE_FUNCTION_EXE,
     );
 
-    const result = await resolveStory(askProcessEvent, [event, context]);
+    const eventWithNoSession: ExecuteServiceFunctionEvent<any[]> = {
+      functionName: event.functionName,
+      payload: event.payload,
+    };
+
+    const result = await resolveStory(askProcessEvent, [eventWithNoSession, context]);
 
     // just return the story result
     return result;

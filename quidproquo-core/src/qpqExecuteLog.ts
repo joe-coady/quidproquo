@@ -20,11 +20,14 @@ export const qpqExecuteLog = async (
   // Generate an empty story resolver
   const resolveStory = createRuntime(
     [defineApplicationModule('Debugger', storyResult.moduleName, 'development', __dirname)],
-    {},
+    {
+      correlation: storyResult.fromCorrelation,
+      depth: 0,
+    },
     storyActionProcessor,
     () => new Date().toISOString(),
     async () => {},
-    () => '',
+    storyResult.correlation,
     storyResult.runtimeType,
   );
 

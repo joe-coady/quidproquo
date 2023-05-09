@@ -87,11 +87,13 @@ export const getAPIGatewayEventExecutor = (
 
     const resolveStory = createRuntime(
       cdkConfig.qpqConfig,
-      {},
+      {
+        depth: 0,
+      },
       storyActionProcessor,
       getDateNow,
       getLogger(cdkConfig.qpqConfig),
-      awsLambdaUtils.randomGuid,
+      awsLambdaUtils.randomGuid(),
       QpqRuntimeType.API,
     );
 

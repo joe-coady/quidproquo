@@ -46,7 +46,7 @@ const getProcessExecuteStory = <T extends Array<any>>(
       actionProcessors,
       getDateNow,
       logger,
-      randomGuid,
+      randomGuid(),
       QpqRuntimeType.EXECUTE_STORY,
       [`${payload.src}::${payload.runtime}`],
     );
