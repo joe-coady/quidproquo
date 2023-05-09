@@ -14,11 +14,11 @@ import {
 
 import Pagination from '@mui/material/Pagination';
 import Typography from '@mui/material/Typography';
-import LastSeen from './components/LastSeen/LastSeen';
-import LogDialog from './LogDialog';
-import { getLogs } from './logic';
-import { TopSection, SearchParams, RuntimeTypes } from './TopSection';
-import { apiRequestGet } from './logic/apiRequest';
+import LastSeen from '../components/LastSeen/LastSeen';
+import LogDialog from '../LogDialog';
+import { getLogs } from '../logic';
+import { TopSection, SearchParams, RuntimeTypes } from '../TopSection';
+import { apiRequestGet } from '../logic/apiRequest';
 
 function CustomPagination() {
   const apiRef = useGridApiContext();
@@ -36,6 +36,8 @@ function CustomPagination() {
 }
 
 const getColumns = (viewLog: (x: any) => void): GridColDef[] => [
+  // { field: 'correlation', headerName: 'correlation', flex: 3 },
+  // { field: 'fromCorrelation', headerName: 'fromCorrelation', flex: 3 },
   { field: 'moduleName', headerName: 'Service', flex: 1 },
   { field: 'runtimeType', headerName: 'Type', flex: 1 },
   {
@@ -77,7 +79,7 @@ const initialState = {
   },
 };
 
-export default function CustomPaginationGrid() {
+export function Admin() {
   const [logUrl, setLogUrl] = useState<string>('');
   const [loading, setLoading] = useState<any>(false);
   const [logs, setLogs] = useState<any>([]);

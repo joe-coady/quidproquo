@@ -1,5 +1,5 @@
-import CustomPaginationGrid from './Admin';
+import { Admin } from './Admin';
 
 export const App = () => {
-  return <CustomPaginationGrid />;
+  return <Admin />;
 };
