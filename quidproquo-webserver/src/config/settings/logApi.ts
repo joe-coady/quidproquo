@@ -1,9 +1,9 @@
-import { QPQConfigSettings } from 'quidproquo-core';
+import { QPQConfig } from 'quidproquo-core';
 
 import { defineRoute } from './route';
 import { getServiceEntry } from '../../utils/serviceConfig';
 
-export const defineLogApi = (): QPQConfigSettings => {
+export const defineLogApi = (): QPQConfig => {
   // comment
   const configs = [
     defineRoute(

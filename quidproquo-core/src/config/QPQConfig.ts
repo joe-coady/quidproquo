@@ -11,6 +11,7 @@ export enum QPQCoreConfigSettingType {
   userDirectory = '@quidproquo-core/config/UserDirectory',
   keyValueStore = '@quidproquo-core/config/KeyValueStore',
   configValue = '@quidproquo-core/config/ConfigValue',
+  environmentSettings = '@quidproquo-core/config/EnvironmentSettings',
 }
 
 export interface QPQConfigSetting {
@@ -22,6 +23,5 @@ export interface QPQConfigAdvancedSettings {
   deprecated?: boolean;
 }
 
-export type QPQConfigSettings = QPQConfigSetting[];
-export type QPQConfigItem = QPQConfigSetting | QPQConfigSettings;
+export type QPQConfigItem = QPQConfigSetting | QPQConfigItem[];
 export type QPQConfig = QPQConfigItem[];

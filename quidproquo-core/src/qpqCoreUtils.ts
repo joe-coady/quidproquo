@@ -18,16 +18,21 @@ import {
   ActionProcessorsQPQConfigSetting,
   UserDirectoryQPQConfigSetting,
   KeyValueStoreQPQConfigSetting,
+  EnvironmentSettingsQPQConfigSetting,
 } from './config/settings';
 import { EmailTemplates } from './config/settings/emailTemplates/types';
 
 /**
  * Flattens a QPQConfig array into a single array of QPQConfigSetting objects.
+ * If a QPQConfigItem has a configSettingType of QPQCoreConfigSettingType.environmentSettings,
+ * and its environment matches the current environment, its settings will be added to the flattened array.
  * @function
  * @param {QPQConfig} qpqConfig - The input QPQConfig array to be flattened.
- * @returns {QPQConfigSetting[]} - The flattened array of QPQConfigSetting objects.
+ * @returns {QPQConfigSetting[]} - The flattened array of QPQConfigSetting objects
  */
 export const flattenQpqConfig = (qpqConfig: QPQConfig): QPQConfigSetting[] => {
+  var environment = 'development';
+
   /**
    * A recursive helper function that flattens an array of QPQConfigItem objects.
    * @function
@@ -43,6 +48,20 @@ export const flattenQpqConfig = (qpqConfig: QPQConfig): QPQConfigSetting[] => {
       if (Array.isArray(item)) {
         return flatten(item, acc);
       } else {
+        // If its a appName config item, update the environment variable
+        if (item.configSettingType === QPQCoreConfigSettingType.appName) {
+          environment = (item as ApplicationModuleQPQConfigSetting).environment || 'development';
+        }
+
+        // Otherwise if its an environmentSettings config item, flatten out the child settings
+        else if (item.configSettingType === QPQCoreConfigSettingType.environmentSettings) {
+          const envSetting = item as EnvironmentSettingsQPQConfigSetting;
+          const settings = envSetting.environment === environment ? envSetting.settings : [];
+
+          return flatten(settings, acc);
+        }
+
+        // Otherwise its just a regular config item, add it to the list
         return [...acc, item];
       }
     }, accumulator);
