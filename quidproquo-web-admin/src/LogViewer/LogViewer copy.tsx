@@ -11,7 +11,6 @@ import {
   GridColDef,
 } from '@mui/x-data-grid';
 
-import Pagination from '@mui/material/Pagination';
 import Typography from '@mui/material/Typography';
 import LastSeen from '../components/LastSeen/LastSeen';
 import LogDialog from '../LogDialog';
@@ -57,7 +56,7 @@ const getColumns = (viewLog: (x: any) => void): GridColDef[] => [
   { field: 'error', headerName: 'Error', flex: 4 },
 ];
 
-export function Admin() {
+export function LogViewer() {
   const {
     selectedLogCorrelation,
     logs,
