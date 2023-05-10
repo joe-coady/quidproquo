@@ -1,4 +1,4 @@
-import { apiRequestPost } from './apiRequest';
+import { apiRequestPost } from '../../logic';
 
 export const getLogs = async (
   url: string,

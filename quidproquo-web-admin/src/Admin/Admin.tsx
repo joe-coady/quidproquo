@@ -1,4 +1,3 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import LinearProgress from '@mui/material/LinearProgress';
@@ -16,25 +15,11 @@ import Pagination from '@mui/material/Pagination';
 import Typography from '@mui/material/Typography';
 import LastSeen from '../components/LastSeen/LastSeen';
 import LogDialog from '../LogDialog';
-import { getLogs } from '../logic';
-import { TopSection, SearchParams, RuntimeTypes } from '../TopSection';
-import { apiRequestGet } from '../logic/apiRequest';
-import { useAsyncLoading, useIsLoading, usePlatformApiGet } from '../view';
 
-function CustomPagination() {
-  const apiRef = useGridApiContext();
-  const page = useGridSelector(apiRef, gridPageSelector);
-  const pageCount = useGridSelector(apiRef, gridPageCountSelector);
-
-  return (
-    <Pagination
-      color="primary"
-      count={pageCount}
-      page={page + 1}
-      onChange={(event, value) => apiRef.current.setPage(value - 1)}
-    />
-  );
-}
+import { TopSection } from '../TopSection';
+import { useIsLoading } from '../view';
+import { useLogManagement, useLogViewGridColumns } from './hooks';
+import { DataGridPagination } from '../components';
 
 const getColumns = (viewLog: (x: any) => void): GridColDef[] => [
   // { field: 'correlation', headerName: 'correlation', flex: 3 },
@@ -72,121 +57,20 @@ const getColumns = (viewLog: (x: any) => void): GridColDef[] => [
   { field: 'error', headerName: 'Error', flex: 4 },
 ];
 
-const initialState = {
-  columns: {
-    columnVisibilityModel: {
-      id: false,
-    },
-  },
-};
-
-export const useServiceLogEndpoints = (): string[] => {
-  const [serviceLogEndpoints, setServiceLogEndpoints] = useState<string[]>([]);
-  const loadServiceList = usePlatformApiGet<string[]>('/admin/service/log/list');
-
-  useEffect(() => {
-    loadServiceList().then((newServiceLogEndpoints) => {
-      setServiceLogEndpoints(newServiceLogEndpoints);
-    });
-  }, []);
-
-  return serviceLogEndpoints;
-};
-
-const searchLogs = async (searchParams: SearchParams, serviceLogEndpoints: string[]) => {
-  const effectiveRuntimeTypes =
-    searchParams.runtimeType === 'ALL'
-      ? RuntimeTypes.filter((type) => type !== 'ALL')
-      : [searchParams.runtimeType];
-
-  const allLogs: any[][] = await Promise.all(
-    effectiveRuntimeTypes.flatMap((type) =>
-      serviceLogEndpoints.map((x) =>
-        getLogs(`/${x}/log/list`, type, searchParams.startIsoDateTime, searchParams.endIsoDateTime),
-      ),
-    ),
-  );
-
-  const sortedLogs = allLogs.flat().sort((a, b) => {
-    const dateA = new Date(a.startedAt);
-    const dateB = new Date(b.startedAt);
-    // For descending order, use dateB - dateA
-    // For ascending order, use dateA - dateB
-    return dateB.getTime() - dateA.getTime();
-  });
-
-  return sortedLogs;
-};
-
-const useOnSearch = (
-  searchParams: SearchParams,
-  serviceLogEndpoints: string[],
-  setLogs: (logs: any) => void,
-) => {
-  const onSearch = useCallback(async () => {
-    const newLogs = await searchLogs(searchParams, serviceLogEndpoints);
-    setLogs(newLogs);
-  }, [setLogs, searchLogs, searchParams, serviceLogEndpoints]);
-
-  const onSearchWithLoading = useAsyncLoading(onSearch);
-
-  return onSearchWithLoading;
-};
-
-const filterLogs = (filter: string, logs: any[]): any[] => {
-  if (!filter) {
-    return logs;
-  }
-
-  const filterWords = filter.trim().toLowerCase().split(' ');
-  return logs.filter((log: any) => {
-    const lowerLogError = (log.error || '').toLowerCase();
-    return filterWords.every((word) => lowerLogError && lowerLogError.includes(word));
-  });
-};
-
-const getOnRowClick =
-  (setSelectedLogCorrelation: (correlation: string) => void, serviceLogEndpoints: string[]) =>
-  ({ row: logStory }: any) => {
-    setSelectedLogCorrelation(logStory.correlation);
-  };
-
-const useLogViewGridColumns = (onRowClick: (event: any) => void) => {
-  const columns = useMemo(() => getColumns(onRowClick), [onRowClick]);
-  return columns;
-};
-
 export function Admin() {
+  const {
+    selectedLogCorrelation,
+    logs,
+    searchParams,
+    setSearchParams,
+    onSearch,
+    filteredLogs,
+    onRowClick,
+    clearSelectedLogCorrelation,
+    serviceLogEndpoints,
+  } = useLogManagement();
   const isLoading = useIsLoading();
-
-  const serviceLogEndpoints = useServiceLogEndpoints();
-  const [selectedLogCorrelation, setSelectedLogCorrelation] = useState<string>('');
-  const [logs, setLogs] = useState<any>([]);
-
-  const [searchParams, setSearchParams] = useState<SearchParams>(() => {
-    const currentDate = new Date();
-    const isoDateNow = currentDate.toISOString();
-
-    const threeHoursAgo = new Date(currentDate.getTime() - 30000 * 60 * 60 * 1000);
-    const isoDateSevenDaysAgo = threeHoursAgo.toISOString();
-
-    return {
-      runtimeType: 'EXECUTE_STORY',
-      startIsoDateTime: isoDateSevenDaysAgo,
-      endIsoDateTime: isoDateNow,
-      errorFilter: '',
-    };
-  });
-
-  const onSearch = useOnSearch(searchParams, serviceLogEndpoints, setLogs);
-
-  const filteredLogs = useMemo(
-    () => filterLogs(searchParams.errorFilter, logs),
-    [searchParams.errorFilter, logs],
-  );
-
-  const onRowClick = getOnRowClick(setSelectedLogCorrelation, serviceLogEndpoints);
-  const columns = useLogViewGridColumns(onRowClick);
+  const columns = useLogViewGridColumns(getColumns, onRowClick);
 
   return (
     <Box sx={{ height: '100vh', width: '100%', p: 2, display: 'flex', flexDirection: 'column' }}>
@@ -202,11 +86,10 @@ export function Admin() {
       <Box sx={{ flex: 1 }}>
         <DataGrid
           components={{
-            Pagination: CustomPagination,
+            Pagination: DataGridPagination,
             LoadingOverlay: LinearProgress,
           }}
           columns={columns}
-          initialState={initialState}
           rows={filteredLogs}
           autoPageSize={true}
           loading={isLoading}
@@ -215,7 +98,7 @@ export function Admin() {
       </Box>
       <LogDialog
         open={!!selectedLogCorrelation}
-        handleClose={() => setSelectedLogCorrelation('')}
+        handleClose={clearSelectedLogCorrelation}
         logCorrelation={selectedLogCorrelation}
         serviceLogEndpoints={serviceLogEndpoints}
         logStoryResultMetadatas={logs}
