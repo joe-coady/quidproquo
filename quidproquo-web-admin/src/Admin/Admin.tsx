@@ -145,38 +145,30 @@ const filterLogs = (filter: string, logs: any[]): any[] => {
   });
 };
 
-const findServiceEndpointByModuleName = (
-  serviceLogEndpoints: string[],
-  moduleName: string,
-): string | undefined => {
-  const serviceEndpoint = serviceLogEndpoints.find((se: string) => se.endsWith(moduleName));
-
-  return serviceEndpoint;
-};
-
 const getOnRowClick =
-  (setLogUrl: (url: string) => void, serviceLogEndpoints: string[]) =>
+  (setSelectedLogCorrelation: (correlation: string) => void, serviceLogEndpoints: string[]) =>
   ({ row: logStory }: any) => {
-    const serviceEndpoint = findServiceEndpointByModuleName(
-      serviceLogEndpoints,
-      logStory.moduleName,
-    );
-
-    setLogUrl(`/${serviceEndpoint}/log/${logStory.correlation}`);
+    setSelectedLogCorrelation(logStory.correlation);
   };
 
-export function Admin() {
-  const serviceLogEndpoints = useServiceLogEndpoints();
+const useLogViewGridColumns = (onRowClick: (event: any) => void) => {
+  const columns = useMemo(() => getColumns(onRowClick), [onRowClick]);
+  return columns;
+};
 
-  const [logUrl, setLogUrl] = useState<string>('');
+export function Admin() {
+  const isLoading = useIsLoading();
+
+  const serviceLogEndpoints = useServiceLogEndpoints();
+  const [selectedLogCorrelation, setSelectedLogCorrelation] = useState<string>('');
   const [logs, setLogs] = useState<any>([]);
 
   const [searchParams, setSearchParams] = useState<SearchParams>(() => {
     const currentDate = new Date();
     const isoDateNow = currentDate.toISOString();
 
-    const sevenDaysAgo = new Date(currentDate.getTime() - 3 * 60 * 60 * 1000);
-    const isoDateSevenDaysAgo = sevenDaysAgo.toISOString();
+    const threeHoursAgo = new Date(currentDate.getTime() - 30000 * 60 * 60 * 1000);
+    const isoDateSevenDaysAgo = threeHoursAgo.toISOString();
 
     return {
       runtimeType: 'EXECUTE_STORY',
@@ -186,7 +178,6 @@ export function Admin() {
     };
   });
 
-  const isLoading = useIsLoading();
   const onSearch = useOnSearch(searchParams, serviceLogEndpoints, setLogs);
 
   const filteredLogs = useMemo(
@@ -194,8 +185,8 @@ export function Admin() {
     [searchParams.errorFilter, logs],
   );
 
-  const onRowClick = getOnRowClick(setLogUrl, serviceLogEndpoints);
-  const columns = getColumns(onRowClick);
+  const onRowClick = getOnRowClick(setSelectedLogCorrelation, serviceLogEndpoints);
+  const columns = useLogViewGridColumns(onRowClick);
 
   return (
     <Box sx={{ height: '100vh', width: '100%', p: 2, display: 'flex', flexDirection: 'column' }}>
@@ -222,7 +213,13 @@ export function Admin() {
           onRowClick={onRowClick}
         />
       </Box>
-      <LogDialog open={!!logUrl} handleClose={() => setLogUrl('')} logUrl={logUrl} />
+      <LogDialog
+        open={!!selectedLogCorrelation}
+        handleClose={() => setSelectedLogCorrelation('')}
+        logCorrelation={selectedLogCorrelation}
+        serviceLogEndpoints={serviceLogEndpoints}
+        logStoryResultMetadatas={logs}
+      />
     </Box>
   );
 }

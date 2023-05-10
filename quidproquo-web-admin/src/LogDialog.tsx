@@ -25,8 +25,10 @@ import { apiRequestGet, apiRequestPost } from './logic';
 
 interface LogDialogProps {
   open: boolean;
-  logUrl: string;
+  logCorrelation: string;
   handleClose: () => void;
+  serviceLogEndpoints: string[];
+  logStoryResultMetadatas: any[];
 }
 
 const processLog = (logFile: any) => {
@@ -78,10 +80,37 @@ const processLog = (logFile: any) => {
   return [firstEvent, secondEvent, ...history, finalEvent];
 };
 
-const LogDialog = ({ logUrl, open, handleClose }: LogDialogProps) => {
+const findServiceEndpointByLogCorrelation = (
+  serviceLogEndpoints: string[],
+  logStoryResultMetadatas: any[],
+  logCorrelation: string,
+): string | undefined => {
+  const moduleName = logStoryResultMetadatas.find(
+    (log: any) => log.correlation === logCorrelation,
+  )?.moduleName;
+  const serviceEndpoint =
+    moduleName && serviceLogEndpoints.find((se: string) => se.endsWith(moduleName));
+
+  return serviceEndpoint;
+};
+
+const LogDialog = ({
+  logCorrelation,
+  open,
+  handleClose,
+  serviceLogEndpoints,
+  logStoryResultMetadatas,
+}: LogDialogProps) => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(false);
   const [logFile, setLogFile] = useState(null);
+
+  const serviceEndpoint = findServiceEndpointByLogCorrelation(
+    serviceLogEndpoints,
+    logStoryResultMetadatas,
+    logCorrelation,
+  );
+  const logUrl = `/${serviceEndpoint}/log/${logCorrelation}`;
 
   useEffect(() => {
     if (!open || !logUrl) {
