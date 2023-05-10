@@ -1,5 +1,10 @@
 import { Admin } from './Admin';
+import { LoadingProvider } from './view';
 
 export const App = () => {
-  return <Admin />;
+  return (
+    <LoadingProvider>
+      <Admin />
+    </LoadingProvider>
+  );
 };

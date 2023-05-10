@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import LinearProgress from '@mui/material/LinearProgress';
@@ -19,6 +19,7 @@ import LogDialog from '../LogDialog';
 import { getLogs } from '../logic';
 import { TopSection, SearchParams, RuntimeTypes } from '../TopSection';
 import { apiRequestGet } from '../logic/apiRequest';
+import { useAsyncLoading, useIsLoading, usePlatformApiGet } from '../view';
 
 function CustomPagination() {
   const apiRef = useGridApiContext();
@@ -79,11 +80,97 @@ const initialState = {
   },
 };
 
+export const useServiceLogEndpoints = (): string[] => {
+  const [serviceLogEndpoints, setServiceLogEndpoints] = useState<string[]>([]);
+  const loadServiceList = usePlatformApiGet<string[]>('/admin/service/log/list');
+
+  useEffect(() => {
+    loadServiceList().then((newServiceLogEndpoints) => {
+      setServiceLogEndpoints(newServiceLogEndpoints);
+    });
+  }, []);
+
+  return serviceLogEndpoints;
+};
+
+const searchLogs = async (searchParams: SearchParams, serviceLogEndpoints: string[]) => {
+  const effectiveRuntimeTypes =
+    searchParams.runtimeType === 'ALL'
+      ? RuntimeTypes.filter((type) => type !== 'ALL')
+      : [searchParams.runtimeType];
+
+  const allLogs: any[][] = await Promise.all(
+    effectiveRuntimeTypes.flatMap((type) =>
+      serviceLogEndpoints.map((x) =>
+        getLogs(`/${x}/log/list`, type, searchParams.startIsoDateTime, searchParams.endIsoDateTime),
+      ),
+    ),
+  );
+
+  const sortedLogs = allLogs.flat().sort((a, b) => {
+    const dateA = new Date(a.startedAt);
+    const dateB = new Date(b.startedAt);
+    // For descending order, use dateB - dateA
+    // For ascending order, use dateA - dateB
+    return dateB.getTime() - dateA.getTime();
+  });
+
+  return sortedLogs;
+};
+
+const useOnSearch = (
+  searchParams: SearchParams,
+  serviceLogEndpoints: string[],
+  setLogs: (logs: any) => void,
+) => {
+  const onSearch = useCallback(async () => {
+    const newLogs = await searchLogs(searchParams, serviceLogEndpoints);
+    setLogs(newLogs);
+  }, [setLogs, searchLogs, searchParams, serviceLogEndpoints]);
+
+  const onSearchWithLoading = useAsyncLoading(onSearch);
+
+  return onSearchWithLoading;
+};
+
+const filterLogs = (filter: string, logs: any[]): any[] => {
+  if (!filter) {
+    return logs;
+  }
+
+  const filterWords = filter.trim().toLowerCase().split(' ');
+  return logs.filter((log: any) => {
+    const lowerLogError = (log.error || '').toLowerCase();
+    return filterWords.every((word) => lowerLogError && lowerLogError.includes(word));
+  });
+};
+
+const findServiceEndpointByModuleName = (
+  serviceLogEndpoints: string[],
+  moduleName: string,
+): string | undefined => {
+  const serviceEndpoint = serviceLogEndpoints.find((se: string) => se.endsWith(moduleName));
+
+  return serviceEndpoint;
+};
+
+const getOnRowClick =
+  (setLogUrl: (url: string) => void, serviceLogEndpoints: string[]) =>
+  ({ row: logStory }: any) => {
+    const serviceEndpoint = findServiceEndpointByModuleName(
+      serviceLogEndpoints,
+      logStory.moduleName,
+    );
+
+    setLogUrl(`/${serviceEndpoint}/log/${logStory.correlation}`);
+  };
+
 export function Admin() {
+  const serviceLogEndpoints = useServiceLogEndpoints();
+
   const [logUrl, setLogUrl] = useState<string>('');
-  const [loading, setLoading] = useState<any>(false);
   const [logs, setLogs] = useState<any>([]);
-  const [serviceLogEndpoints, setServiceLogEndpoints] = useState([]);
+
   const [searchParams, setSearchParams] = useState<SearchParams>(() => {
     const currentDate = new Date();
     const isoDateNow = currentDate.toISOString();
@@ -99,80 +186,16 @@ export function Admin() {
     };
   });
 
-  useEffect(() => {
-    setLoading(true);
-    apiRequestGet('/admin/service/log/list')
-      .then((newServiceLogEndpoints) => {
-        setServiceLogEndpoints(newServiceLogEndpoints);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+  const isLoading = useIsLoading();
+  const onSearch = useOnSearch(searchParams, serviceLogEndpoints, setLogs);
 
-    return () => {
-      setLoading(false);
-    };
-  }, []);
+  const filteredLogs = useMemo(
+    () => filterLogs(searchParams.errorFilter, logs),
+    [searchParams.errorFilter, logs],
+  );
 
-  const filteredLogs = useMemo(() => {
-    if (!searchParams.errorFilter) {
-      return logs;
-    }
-
-    const filterWords = searchParams.errorFilter.trim().toLowerCase().split(' ');
-    return logs.filter((log: any) => {
-      const lowerLogError = (log.error || '').toLowerCase();
-      return filterWords.every((word) => lowerLogError && lowerLogError.includes(word));
-    });
-  }, [searchParams.errorFilter, logs]);
-
-  const onSearch = () => {
-    setLoading(true);
-
-    const effectiveRuntimeTypes =
-      searchParams.runtimeType === 'ALL'
-        ? RuntimeTypes.filter((type) => type !== 'ALL')
-        : [searchParams.runtimeType];
-
-    Promise.all(
-      effectiveRuntimeTypes.flatMap((type) =>
-        serviceLogEndpoints.map((x) =>
-          getLogs(
-            `/${x}/log/list`,
-            type,
-            searchParams.startIsoDateTime,
-            searchParams.endIsoDateTime,
-          ),
-        ),
-      ),
-    )
-      .then((allLogs: any[][]) => {
-        const sortedLogs = allLogs.flat().sort((a, b) => {
-          const dateA = new Date(a.startedAt);
-          const dateB = new Date(b.startedAt);
-          // For descending order, use dateB - dateA
-          // For ascending order, use dateA - dateB
-          return dateB.getTime() - dateA.getTime();
-        });
-
-        setLogs(sortedLogs);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  };
-
-  const viewLog = (event: any) => {
-    const logStory = event.row;
-
-    const serviceEndpoint = serviceLogEndpoints.find((se: string) =>
-      se.endsWith(logStory.moduleName),
-    );
-
-    setLogUrl(`/${serviceEndpoint}/log/${logStory.correlation}`);
-  };
-
-  const columns = getColumns(viewLog);
+  const onRowClick = getOnRowClick(setLogUrl, serviceLogEndpoints);
+  const columns = getColumns(onRowClick);
 
   return (
     <Box sx={{ height: '100vh', width: '100%', p: 2, display: 'flex', flexDirection: 'column' }}>
@@ -195,8 +218,8 @@ export function Admin() {
           initialState={initialState}
           rows={filteredLogs}
           autoPageSize={true}
-          loading={loading}
-          onRowClick={viewLog}
+          loading={isLoading}
+          onRowClick={onRowClick}
         />
       </Box>
       <LogDialog open={!!logUrl} handleClose={() => setLogUrl('')} logUrl={logUrl} />

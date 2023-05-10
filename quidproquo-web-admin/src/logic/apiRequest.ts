@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const getAxiosInstance = () => {
   const instance = axios.create({
-    // baseURL: `http://localhost:8080`,
+    baseURL: `http://localhost:8080`,
   });
 
   return instance;
@@ -18,12 +18,12 @@ export const apiRequestPost = async (path: string, body: object) => {
   return res.data;
 };
 
-export const apiRequestGet = async (path: string) => {
+export const apiRequestGet = async <T = any>(path: string): Promise<T> => {
   const res = await getAxiosInstance().get(path, {
     headers: {
       'Content-Type': 'application/json',
     },
   });
 
-  return res.data;
+  return res.data as T;
 };
