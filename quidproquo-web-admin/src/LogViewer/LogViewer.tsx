@@ -3,9 +3,9 @@ import Grid from '@mui/material/Grid';
 import LinearProgress from '@mui/material/LinearProgress';
 import { DataGrid, GridRenderCellParams, GridColDef } from '@mui/x-data-grid';
 
-import LogDialog from '../LogDialog';
+import LogDialog from './LogDialog';
 
-import { TopSection } from '../TopSection';
+import { TopSection } from './TopSection';
 import { useIsLoading } from '../view';
 import { useLogManagement, useLogViewGridColumns } from './hooks';
 import { DataGridPagination } from '../components';

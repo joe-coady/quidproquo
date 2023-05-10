@@ -21,7 +21,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 
-import { apiRequestGet, apiRequestPost } from './logic';
+import { apiRequestGet, apiRequestPost } from '../logic';
 
 interface LogDialogProps {
   open: boolean;

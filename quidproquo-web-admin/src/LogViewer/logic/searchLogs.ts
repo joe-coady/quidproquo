@@ -1,5 +1,6 @@
 import { getLogs } from './getLogs';
-import { SearchParams, RuntimeTypes } from '../../TopSection';
+import { SearchParams } from '../types';
+import { RuntimeTypes } from '../constants';
 
 export const searchLogs = async (searchParams: SearchParams, serviceLogEndpoints: string[]) => {
   const effectiveRuntimeTypes =

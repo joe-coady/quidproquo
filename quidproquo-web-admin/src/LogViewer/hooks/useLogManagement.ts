@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { SearchParams } from '../../TopSection';
+import { SearchParams } from '../types';
 
 import { useServiceLogEndpoints } from './useServiceLogEndpoints';
 import { useOnSearch } from './useOnSearch';
