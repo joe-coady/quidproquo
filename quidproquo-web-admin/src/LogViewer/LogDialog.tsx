@@ -10,7 +10,7 @@ interface LogDialogProps {
   logCorrelation: string;
   handleClose: () => void;
   serviceLogEndpoints: string[];
-  logStoryResultMetadatas: any[];
+  storyResultMetadatas: any[];
 }
 
 const LogDialog = ({
@@ -18,9 +18,9 @@ const LogDialog = ({
   open,
   handleClose,
   serviceLogEndpoints,
-  logStoryResultMetadatas,
+  storyResultMetadatas,
 }: LogDialogProps) => {
-  const logUrl = getLogUrl(serviceLogEndpoints, logStoryResultMetadatas, logCorrelation);
+  const logUrl = getLogUrl(serviceLogEndpoints, storyResultMetadatas, logCorrelation);
 
   return (
     <Dialog
@@ -34,7 +34,13 @@ const LogDialog = ({
     >
       <LoadingBox
         path={logUrl}
-        renderItem={(item) => <LogDialogContent log={item} handleClose={handleClose} />}
+        renderItem={(item) => (
+          <LogDialogContent
+            log={item}
+            handleClose={handleClose}
+            storyResultMetadatas={storyResultMetadatas}
+          />
+        )}
       />
     </Dialog>
   );

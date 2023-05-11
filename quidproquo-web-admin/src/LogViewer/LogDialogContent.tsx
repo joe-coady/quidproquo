@@ -5,9 +5,14 @@ import { apiRequestPost } from '../logic';
 interface LogDialogContentProps {
   log: any;
   handleClose: () => void;
+  storyResultMetadatas: any[];
 }
 
-export const LogDialogContent = ({ log, handleClose }: LogDialogContentProps) => {
+export const LogDialogContent = ({
+  log,
+  handleClose,
+  storyResultMetadatas,
+}: LogDialogContentProps) => {
   const handleExecute = async () => {
     if (log) {
       await apiRequestPost('/admin/service/log/execute', log);
@@ -24,7 +29,7 @@ export const LogDialogContent = ({ log, handleClose }: LogDialogContentProps) =>
           overflowY: 'scroll',
         }}
       >
-        <LogDetails log={log} />
+        <LogDetails log={log} storyResultMetadatas={storyResultMetadatas} />
       </DialogContent>
       <DialogActions>
         {log && log.runtimeType === 'EXECUTE_STORY' && (

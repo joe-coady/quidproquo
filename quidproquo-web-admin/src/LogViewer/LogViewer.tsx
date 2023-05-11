@@ -67,7 +67,7 @@ export function LogViewer() {
         handleClose={clearSelectedLogCorrelation}
         logCorrelation={selectedLogCorrelation}
         serviceLogEndpoints={serviceLogEndpoints}
-        logStoryResultMetadatas={logs}
+        storyResultMetadatas={logs}
       />
     </Box>
   );

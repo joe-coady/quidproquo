@@ -1,9 +1,9 @@
 export const findServiceEndpointByLogCorrelation = (
   serviceLogEndpoints: string[],
-  logStoryResultMetadatas: any[],
+  storyResultMetadatas: any[],
   logCorrelation: string,
 ): string | undefined => {
-  const moduleName = logStoryResultMetadatas.find(
+  const moduleName = storyResultMetadatas.find(
     (log: any) => log.correlation === logCorrelation,
   )?.moduleName;
   const serviceEndpoint =

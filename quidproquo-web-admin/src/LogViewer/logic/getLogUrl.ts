@@ -2,12 +2,12 @@ import { findServiceEndpointByLogCorrelation } from './findServiceEndpointByLogC
 
 export const getLogUrl = (
   serviceLogEndpoints: string[],
-  logStoryResultMetadatas: any[],
+  storyResultMetadatas: any[],
   logCorrelation: string,
 ): string => {
   const serviceEndpoint = findServiceEndpointByLogCorrelation(
     serviceLogEndpoints,
-    logStoryResultMetadatas,
+    storyResultMetadatas,
     logCorrelation,
   );
 
