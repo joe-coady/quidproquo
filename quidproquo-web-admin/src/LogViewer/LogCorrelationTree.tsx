@@ -1,4 +1,13 @@
-import { Table, TableBody, TableCell, TableContainer, TableRow, Box } from '@mui/material';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+  Box,
+  IconButton,
+} from '@mui/material';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import { StoryResultMetadataLog } from '../types';
 import { findLogDirectChildren } from './logic';
 
@@ -7,6 +16,7 @@ interface LogCorrelationTreeProps {
   allStoryResultMetadatas: StoryResultMetadataLog[];
   highlightCorrelation: string;
   setSelectedLogCorrelation: (logCorrelation: string) => void;
+  renderCustom?: () => React.ReactNode;
 }
 
 export const LogCorrelationTree = ({
@@ -14,6 +24,7 @@ export const LogCorrelationTree = ({
   allStoryResultMetadatas,
   highlightCorrelation,
   setSelectedLogCorrelation,
+  renderCustom,
 }: LogCorrelationTreeProps) => {
   const childrenLogs: StoryResultMetadataLog[] = findLogDirectChildren(
     rootStoryResultMetadata,
@@ -44,10 +55,13 @@ export const LogCorrelationTree = ({
           <TableBody>
             <TableRow>
               <TableCell>
-                <div>
-                  {rootStoryResultMetadata.moduleName}::{rootStoryResultMetadata.runtimeType}
+                <div style={{ position: 'relative' }}>
+                  <div>
+                    {rootStoryResultMetadata.moduleName}::{rootStoryResultMetadata.runtimeType}
+                  </div>
+                  <div>{rootStoryResultMetadata.generic}</div>
+                  {renderCustom && renderCustom()}
                 </div>
-                <div>{rootStoryResultMetadata.generic}</div>
               </TableCell>
             </TableRow>
           </TableBody>

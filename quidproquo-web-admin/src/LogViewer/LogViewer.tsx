@@ -70,6 +70,7 @@ export function LogViewer() {
         serviceLogEndpoints={serviceLogEndpoints}
         storyResultMetadatas={logs}
         setSelectedLogCorrelation={setSelectedLogCorrelation}
+        onSearch={onSearch}
       />
     </Box>
   );

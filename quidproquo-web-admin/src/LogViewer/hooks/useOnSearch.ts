@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { SearchParams } from '../../TopSection';
+import { SearchParams } from '../types';
 import { useAsyncLoading } from '../../view';
 import { searchLogs } from '../logic';
 
@@ -8,10 +8,17 @@ export const useOnSearch = (
   serviceLogEndpoints: string[],
   setLogs: (logs: any) => void,
 ) => {
-  const onSearch = useCallback(async () => {
-    const newLogs = await searchLogs(searchParams, serviceLogEndpoints);
-    setLogs(newLogs);
-  }, [setLogs, searchLogs, searchParams, serviceLogEndpoints]);
+  const onSearch = useCallback(
+    async (newSearchParams?: SearchParams, shouldSetLogs: boolean = true) => {
+      const newLogs = await searchLogs(newSearchParams || searchParams, serviceLogEndpoints);
+      if (shouldSetLogs) {
+        setLogs(newLogs);
+      }
+
+      return newLogs;
+    },
+    [setLogs, searchLogs, searchParams, serviceLogEndpoints],
+  );
 
   const onSearchWithLoading = useAsyncLoading(onSearch);
 

@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogTitle, LinearProgress } from '@mui/materia
 import { LogDialogContent } from './LogDialogContent';
 import { LoadingBox } from '../components/LoadingBox/LoadingBox';
 import { LogCorrelations } from './LogCorrelations';
+import { SearchParams } from './types';
 
 interface LogDialogProps {
   open: boolean;
@@ -13,6 +14,7 @@ interface LogDialogProps {
   serviceLogEndpoints: string[];
   storyResultMetadatas: any[];
   setSelectedLogCorrelation: (logCorrelation: string) => void;
+  onSearch: (searchParams?: SearchParams) => Promise<void>;
 }
 
 const LogDialog = ({
@@ -22,6 +24,7 @@ const LogDialog = ({
   serviceLogEndpoints,
   storyResultMetadatas,
   setSelectedLogCorrelation,
+  onSearch,
 }: LogDialogProps) => {
   const logUrl = getLogUrl(serviceLogEndpoints, storyResultMetadatas, logCorrelation);
 
@@ -52,6 +55,7 @@ const LogDialog = ({
             handleClose={handleClose}
             storyResultMetadatas={storyResultMetadatas}
             setSelectedLogCorrelation={setSelectedLogCorrelation}
+            onSearch={onSearch}
           />
         )}
         renderLoading={() => (
@@ -66,8 +70,9 @@ const LogDialog = ({
               logCorrelation={logCorrelation}
               storyResultMetadatas={storyResultMetadatas}
               setSelectedLogCorrelation={setSelectedLogCorrelation}
+              onSearch={onSearch}
             />
-            <LinearProgress loading={true} />
+            <LinearProgress />
           </DialogContent>
         )}
       />
