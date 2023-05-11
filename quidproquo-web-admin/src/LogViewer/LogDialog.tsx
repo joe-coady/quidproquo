@@ -1,9 +1,10 @@
 import { getLogUrl } from './logic';
 
-import { Dialog } from '@mui/material';
+import { Dialog, DialogContent, DialogTitle, LinearProgress } from '@mui/material';
 
 import { LogDialogContent } from './LogDialogContent';
 import { LoadingBox } from '../components/LoadingBox/LoadingBox';
+import { LogCorrelations } from './LogCorrelations';
 
 interface LogDialogProps {
   open: boolean;
@@ -30,10 +31,19 @@ const LogDialog = ({
       scroll={'paper'}
       aria-labelledby="scroll-dialog-title"
       aria-describedby="scroll-dialog-description"
-      maxWidth={'xl'}
-      fullWidth={true}
       onClose={handleClose}
+      maxWidth={false}
+      fullWidth={true}
+      PaperProps={{
+        style: {
+          width: '90%', // adjust the width percentage as needed
+          height: '90%', // adjust the height percentage as needed
+          maxHeight: '90%',
+          maxWidth: '90%',
+        },
+      }}
     >
+      <DialogTitle id="scroll-dialog-title">Log Details</DialogTitle>
       <LoadingBox
         path={logUrl}
         renderItem={(item) => (
@@ -43,6 +53,22 @@ const LogDialog = ({
             storyResultMetadatas={storyResultMetadatas}
             setSelectedLogCorrelation={setSelectedLogCorrelation}
           />
+        )}
+        renderLoading={() => (
+          <DialogContent
+            dividers={true}
+            sx={{
+              minHeight: '150px',
+              overflowY: 'scroll',
+            }}
+          >
+            <LogCorrelations
+              logCorrelation={logCorrelation}
+              storyResultMetadatas={storyResultMetadatas}
+              setSelectedLogCorrelation={setSelectedLogCorrelation}
+            />
+            <LinearProgress loading={true} />
+          </DialogContent>
         )}
       />
     </Dialog>

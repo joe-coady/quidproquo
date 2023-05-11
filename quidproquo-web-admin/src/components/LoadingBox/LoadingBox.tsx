@@ -9,16 +9,19 @@ import { Box, CircularProgress } from '@mui/material';
 interface LoadingBoxProps {
   path: string;
   renderItem: (item: any) => React.ReactNode;
+  renderLoading?: () => React.ReactNode;
 }
 
-const LoadingBoxInternal: React.FC<LoadingBoxProps> = ({ path, renderItem }) => {
+const LoadingBoxInternal: React.FC<LoadingBoxProps> = ({ path, renderItem, renderLoading }) => {
   const isLoading = useIsLoading();
   const data = useDataFromPath(path);
 
   var reactNode: JSX.Element = <div>Error: Data could not be loaded</div>;
 
   if (isLoading) {
-    reactNode = (
+    reactNode = renderLoading ? (
+      <>{renderLoading()}</>
+    ) : (
       <Box
         sx={{
           display: 'flex',
@@ -39,10 +42,10 @@ const LoadingBoxInternal: React.FC<LoadingBoxProps> = ({ path, renderItem }) => 
   return <LoadingProvider>{reactNode}</LoadingProvider>;
 };
 
-export const LoadingBox: React.FC<LoadingBoxProps> = ({ path, renderItem }) => {
+export const LoadingBox: React.FC<LoadingBoxProps> = ({ path, renderItem, renderLoading }) => {
   return (
     <LoadingProvider>
-      <LoadingBoxInternal path={path} renderItem={renderItem} />
+      <LoadingBoxInternal path={path} renderItem={renderItem} renderLoading={renderLoading} />
     </LoadingProvider>
   );
 };

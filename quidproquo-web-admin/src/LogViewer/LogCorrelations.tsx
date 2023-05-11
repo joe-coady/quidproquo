@@ -1,23 +1,28 @@
 import { Box, Typography } from '@mui/material';
-import { StoryResultLog, StoryResultMetadataLog } from '../types';
+import { StoryResultMetadataLog } from '../types';
 import { findRootLog } from './logic';
 import { LogCorrelationTree } from './LogCorrelationTree';
 
 interface LogCorrelationsProps {
-  log: StoryResultLog;
+  logCorrelation: string;
   storyResultMetadatas: StoryResultMetadataLog[];
   setSelectedLogCorrelation: (logCorrelation: string) => void;
 }
 
 export const LogCorrelations = ({
-  log,
+  logCorrelation,
   storyResultMetadatas,
   setSelectedLogCorrelation,
 }: LogCorrelationsProps) => {
+  console.log(logCorrelation);
   const rootLog = findRootLog(
-    storyResultMetadatas.find((l) => l.correlation === log.correlation)!,
     storyResultMetadatas,
+    storyResultMetadatas.find((l) => l.correlation === logCorrelation)!,
   );
+
+  if (!rootLog) {
+    return null;
+  }
 
   return (
     <Box
@@ -29,13 +34,10 @@ export const LogCorrelations = ({
         justifyContent: 'center',
       }}
     >
-      <Typography variant="h6" gutterBottom>
-        Correlation
-      </Typography>
       <LogCorrelationTree
         rootStoryResultMetadata={rootLog}
         allStoryResultMetadatas={storyResultMetadatas}
-        highlightCorrelation={log.correlation}
+        highlightCorrelation={logCorrelation}
         setSelectedLogCorrelation={setSelectedLogCorrelation}
       />
     </Box>

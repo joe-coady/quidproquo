@@ -1,6 +1,7 @@
 import { DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 import { LogDetails } from './LogDetails';
 import { apiRequestPost } from '../logic';
+import { LogCorrelations } from './LogCorrelations';
 
 interface LogDialogContentProps {
   log: any;
@@ -23,7 +24,6 @@ export const LogDialogContent = ({
 
   return (
     <>
-      <DialogTitle id="scroll-dialog-title">Log Details</DialogTitle>
       <DialogContent
         dividers={true}
         sx={{
@@ -31,6 +31,11 @@ export const LogDialogContent = ({
           overflowY: 'scroll',
         }}
       >
+        <LogCorrelations
+          logCorrelation={log.correlation}
+          storyResultMetadatas={storyResultMetadatas}
+          setSelectedLogCorrelation={setSelectedLogCorrelation}
+        />
         <LogDetails
           log={log}
           storyResultMetadatas={storyResultMetadatas}

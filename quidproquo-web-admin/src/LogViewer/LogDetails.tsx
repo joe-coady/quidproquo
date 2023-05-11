@@ -3,8 +3,6 @@ import { useLogEvents } from './hooks';
 
 import { Table, TableBody, TableCell, TableContainer, TableRow, Box } from '@mui/material';
 
-import { LogCorrelations } from './LogCorrelations';
-
 interface LogDetailsProps {
   log: any;
   storyResultMetadatas: any[];
@@ -20,11 +18,6 @@ export const LogDetails = ({
 
   return (
     <Box sx={{ width: 1 }}>
-      <LogCorrelations
-        log={log}
-        storyResultMetadatas={storyResultMetadatas}
-        setSelectedLogCorrelation={setSelectedLogCorrelation}
-      />
       <TableContainer sx={{ overflowX: 'hidden' }}>
         <Table sx={{ tableLayout: 'fixed' }}>
           <TableBody>

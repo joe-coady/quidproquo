@@ -1,11 +1,11 @@
 import { StoryResultMetadataLog } from '../../types';
 
 export function findRootLog(
-  log: StoryResultMetadataLog,
   logArray: StoryResultMetadataLog[],
-): StoryResultMetadataLog {
+  log?: StoryResultMetadataLog,
+): StoryResultMetadataLog | undefined {
   // Base case: if the log does not have a fromCorrelation field, return the log
-  if (!log.fromCorrelation) {
+  if (!log || !log.fromCorrelation) {
     return log;
   }
 
@@ -13,5 +13,5 @@ export function findRootLog(
   const parentLog = logArray.find((l) => l.correlation === log.fromCorrelation);
 
   // If a parent log is found, make a recursive call with the parent log; otherwise, return the current log
-  return parentLog ? findRootLog(parentLog, logArray) : log;
+  return parentLog ? findRootLog(logArray, parentLog) : log;
 }
