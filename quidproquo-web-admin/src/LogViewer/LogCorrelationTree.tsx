@@ -1,13 +1,6 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableRow,
-  Box,
-  IconButton,
-} from '@mui/material';
-import RefreshIcon from '@mui/icons-material/Refresh';
+import { Box, IconButton, Typography } from '@mui/material';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import { StoryResultMetadataLog } from '../types';
 import { findLogDirectChildren } from './logic';
 
@@ -16,7 +9,7 @@ interface LogCorrelationTreeProps {
   allStoryResultMetadatas: StoryResultMetadataLog[];
   highlightCorrelation: string;
   setSelectedLogCorrelation: (logCorrelation: string) => void;
-  renderCustom?: () => React.ReactNode;
+  depth?: number;
 }
 
 export const LogCorrelationTree = ({
@@ -24,7 +17,7 @@ export const LogCorrelationTree = ({
   allStoryResultMetadatas,
   highlightCorrelation,
   setSelectedLogCorrelation,
-  renderCustom,
+  depth = 0,
 }: LogCorrelationTreeProps) => {
   const childrenLogs: StoryResultMetadataLog[] = findLogDirectChildren(
     rootStoryResultMetadata,
@@ -44,45 +37,35 @@ export const LogCorrelationTree = ({
       style={{
         border: 'thin solid black',
         backgroundColor: rootBackgroundColor,
+        paddingLeft: `${depth * 20}px`,
       }}
       onClick={(event) => {
         event.stopPropagation();
         setSelectedLogCorrelation(rootStoryResultMetadata.correlation);
       }}
     >
-      <TableContainer sx={{ overflowX: 'hidden' }}>
-        <Table sx={{ tableLayout: 'fixed' }}>
-          <TableBody>
-            <TableRow>
-              <TableCell>
-                <div style={{ position: 'relative' }}>
-                  <div>
-                    {rootStoryResultMetadata.moduleName}::{rootStoryResultMetadata.runtimeType}
-                  </div>
-                  <div>{rootStoryResultMetadata.generic}</div>
-                  {renderCustom && renderCustom()}
-                </div>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-        <Table sx={{ tableLayout: 'fixed' }}>
-          <TableBody>
-            <TableRow>
-              {childrenLogs.map((storyResultMetadata, i) => (
-                <TableCell key={storyResultMetadata.correlation}>
-                  <LogCorrelationTree
-                    rootStoryResultMetadata={storyResultMetadata}
-                    allStoryResultMetadatas={allStoryResultMetadatas}
-                    highlightCorrelation={highlightCorrelation}
-                    setSelectedLogCorrelation={setSelectedLogCorrelation}
-                  />
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <Box display="flex" alignItems="center">
+        <IconButton size="small">
+          <FolderOpenIcon />
+        </IconButton>
+        <Typography>
+          {rootStoryResultMetadata.moduleName}::{rootStoryResultMetadata.runtimeType}
+        </Typography>
+      </Box>
+      {childrenLogs.map((storyResultMetadata, i) => (
+        <Box display="flex" alignItems="center">
+          <IconButton size="small">
+            <ArrowForwardIosIcon />
+          </IconButton>
+          <LogCorrelationTree
+            rootStoryResultMetadata={storyResultMetadata}
+            allStoryResultMetadatas={allStoryResultMetadatas}
+            highlightCorrelation={highlightCorrelation}
+            setSelectedLogCorrelation={setSelectedLogCorrelation}
+            depth={depth + 1}
+          />
+        </Box>
+      ))}
     </Box>
   );
 };
