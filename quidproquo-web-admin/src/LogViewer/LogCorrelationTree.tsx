@@ -6,26 +6,37 @@ interface LogCorrelationTreeProps {
   rootStoryResultMetadata: StoryResultMetadataLog;
   allStoryResultMetadatas: StoryResultMetadataLog[];
   highlightCorrelation: string;
+  setSelectedLogCorrelation: (logCorrelation: string) => void;
 }
 
 export const LogCorrelationTree = ({
   rootStoryResultMetadata,
   allStoryResultMetadatas,
   highlightCorrelation,
+  setSelectedLogCorrelation,
 }: LogCorrelationTreeProps) => {
   const childrenLogs: StoryResultMetadataLog[] = findLogDirectChildren(
     rootStoryResultMetadata,
     allStoryResultMetadatas,
   );
 
-  const highlightRoot = rootStoryResultMetadata.correlation === highlightCorrelation;
+  const rootBackgroundColor =
+    rootStoryResultMetadata.correlation === highlightCorrelation
+      ? '#e1e1e1'
+      : !!rootStoryResultMetadata.error
+      ? '#ffb1b1'
+      : 'white';
 
   return (
     <Box
       sx={{ width: 1 }}
       style={{
         border: 'thin solid black',
-        backgroundColor: highlightRoot ? '#e1e1e1' : 'white',
+        backgroundColor: rootBackgroundColor,
+      }}
+      onClick={(event) => {
+        event.stopPropagation();
+        setSelectedLogCorrelation(rootStoryResultMetadata.correlation);
       }}
     >
       <TableContainer sx={{ overflowX: 'hidden' }}>
@@ -50,6 +61,7 @@ export const LogCorrelationTree = ({
                     rootStoryResultMetadata={storyResultMetadata}
                     allStoryResultMetadatas={allStoryResultMetadatas}
                     highlightCorrelation={highlightCorrelation}
+                    setSelectedLogCorrelation={setSelectedLogCorrelation}
                   />
                 </TableCell>
               ))}

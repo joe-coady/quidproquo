@@ -11,6 +11,7 @@ interface LogDialogProps {
   handleClose: () => void;
   serviceLogEndpoints: string[];
   storyResultMetadatas: any[];
+  setSelectedLogCorrelation: (logCorrelation: string) => void;
 }
 
 const LogDialog = ({
@@ -19,6 +20,7 @@ const LogDialog = ({
   handleClose,
   serviceLogEndpoints,
   storyResultMetadatas,
+  setSelectedLogCorrelation,
 }: LogDialogProps) => {
   const logUrl = getLogUrl(serviceLogEndpoints, storyResultMetadatas, logCorrelation);
 
@@ -39,6 +41,7 @@ const LogDialog = ({
             log={item}
             handleClose={handleClose}
             storyResultMetadatas={storyResultMetadatas}
+            setSelectedLogCorrelation={setSelectedLogCorrelation}
           />
         )}
       />

@@ -35,6 +35,7 @@ export function LogViewer() {
     onRowClick,
     clearSelectedLogCorrelation,
     serviceLogEndpoints,
+    setSelectedLogCorrelation,
   } = useLogManagement();
   const isLoading = useIsLoading();
 
@@ -68,6 +69,7 @@ export function LogViewer() {
         logCorrelation={selectedLogCorrelation}
         serviceLogEndpoints={serviceLogEndpoints}
         storyResultMetadatas={logs}
+        setSelectedLogCorrelation={setSelectedLogCorrelation}
       />
     </Box>
   );

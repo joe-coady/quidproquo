@@ -6,12 +6,14 @@ interface LogDialogContentProps {
   log: any;
   handleClose: () => void;
   storyResultMetadatas: any[];
+  setSelectedLogCorrelation: (logCorrelation: string) => void;
 }
 
 export const LogDialogContent = ({
   log,
   handleClose,
   storyResultMetadatas,
+  setSelectedLogCorrelation,
 }: LogDialogContentProps) => {
   const handleExecute = async () => {
     if (log) {
@@ -29,7 +31,11 @@ export const LogDialogContent = ({
           overflowY: 'scroll',
         }}
       >
-        <LogDetails log={log} storyResultMetadatas={storyResultMetadatas} />
+        <LogDetails
+          log={log}
+          storyResultMetadatas={storyResultMetadatas}
+          setSelectedLogCorrelation={setSelectedLogCorrelation}
+        />
       </DialogContent>
       <DialogActions>
         {log && log.runtimeType === 'EXECUTE_STORY' && (

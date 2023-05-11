@@ -8,14 +8,23 @@ import { LogCorrelations } from './LogCorrelations';
 interface LogDetailsProps {
   log: any;
   storyResultMetadatas: any[];
+  setSelectedLogCorrelation: (logCorrelation: string) => void;
 }
 
-export const LogDetails = ({ log, storyResultMetadatas }: LogDetailsProps) => {
+export const LogDetails = ({
+  log,
+  storyResultMetadatas,
+  setSelectedLogCorrelation,
+}: LogDetailsProps) => {
   const events = useLogEvents(log);
 
   return (
     <Box sx={{ width: 1 }}>
-      <LogCorrelations log={log} storyResultMetadatas={storyResultMetadatas} />
+      <LogCorrelations
+        log={log}
+        storyResultMetadatas={storyResultMetadatas}
+        setSelectedLogCorrelation={setSelectedLogCorrelation}
+      />
       <TableContainer sx={{ overflowX: 'hidden' }}>
         <Table sx={{ tableLayout: 'fixed' }}>
           <TableBody>

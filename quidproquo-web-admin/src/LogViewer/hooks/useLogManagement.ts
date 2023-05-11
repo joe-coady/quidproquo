@@ -44,6 +44,7 @@ export const useLogManagement = () => {
     filteredLogs,
     onRowClick,
     clearSelectedLogCorrelation,
+    setSelectedLogCorrelation,
     serviceLogEndpoints,
   };
 };
