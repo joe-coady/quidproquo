@@ -26,7 +26,6 @@ interface LogDialogProps {
   serviceLogEndpoints: string[];
   storyResultMetadatas: any[];
   setSelectedLogCorrelation: (logCorrelation: string) => void;
-  onSearch: (searchParams?: SearchParams) => Promise<void>;
 }
 
 function downloadJson(json: string, filename: string): void {

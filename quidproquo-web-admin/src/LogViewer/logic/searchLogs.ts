@@ -2,16 +2,40 @@ import { getLogs } from './getLogs';
 import { SearchParams } from '../types';
 import { RuntimeTypes } from '../constants';
 
-export const searchLogs = async (searchParams: SearchParams, serviceLogEndpoints: string[]) => {
+export const searchLogs = async (
+  searchParams: SearchParams,
+  serviceLogEndpoints: string[],
+  callback?: (progress: number) => void,
+) => {
+  const updateProgress = (progress: number) => {
+    if (callback) {
+      callback(progress);
+    }
+  };
+
   const effectiveRuntimeTypes =
     searchParams.runtimeType === 'ALL'
       ? RuntimeTypes.filter((type) => type !== 'ALL')
       : [searchParams.runtimeType];
 
+  var progress = 0;
+  const totalCount = effectiveRuntimeTypes.length * serviceLogEndpoints.length;
+
+  updateProgress(0);
+
   const allLogs: any[][] = await Promise.all(
     effectiveRuntimeTypes.flatMap((type) =>
       serviceLogEndpoints.map((x) =>
-        getLogs(`/${x}/log/list`, type, searchParams.startIsoDateTime, searchParams.endIsoDateTime),
+        getLogs(
+          `/${x}/log/list`,
+          type,
+          searchParams.startIsoDateTime,
+          searchParams.endIsoDateTime,
+        ).finally(() => {
+          progress = progress + 1;
+
+          updateProgress((progress / totalCount) * 100);
+        }),
       ),
     ),
   );

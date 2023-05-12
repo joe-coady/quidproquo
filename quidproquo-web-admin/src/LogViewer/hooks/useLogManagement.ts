@@ -25,7 +25,7 @@ export const useLogManagement = () => {
     };
   });
 
-  const onSearch = useOnSearch(searchParams, serviceLogEndpoints, setLogs);
+  const [searchProgress, onSearch] = useOnSearch(searchParams, serviceLogEndpoints, setLogs);
 
   const filteredLogs = useMemo(
     () => filterLogs(searchParams.errorFilter, logs),
@@ -46,5 +46,6 @@ export const useLogManagement = () => {
     clearSelectedLogCorrelation,
     setSelectedLogCorrelation,
     serviceLogEndpoints,
+    searchProgress,
   };
 };

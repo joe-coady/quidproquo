@@ -36,6 +36,7 @@ export function LogViewer() {
     clearSelectedLogCorrelation,
     serviceLogEndpoints,
     setSelectedLogCorrelation,
+    searchProgress,
   } = useLogManagement();
   const isLoading = useIsLoading();
 
@@ -54,7 +55,7 @@ export function LogViewer() {
         <DataGrid
           components={{
             Pagination: DataGridPagination,
-            LoadingOverlay: LinearProgress,
+            LoadingOverlay: () => <LinearProgress variant="determinate" value={searchProgress} />,
           }}
           columns={columns}
           rows={filteredLogs}
@@ -70,7 +71,6 @@ export function LogViewer() {
         serviceLogEndpoints={serviceLogEndpoints}
         storyResultMetadatas={logs}
         setSelectedLogCorrelation={setSelectedLogCorrelation}
-        onSearch={onSearch}
       />
     </Box>
   );
