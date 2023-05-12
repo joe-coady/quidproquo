@@ -5,6 +5,10 @@ export const getLogUrl = (
   storyResultMetadatas: any[],
   logCorrelation: string,
 ): string => {
+  if (!logCorrelation) {
+    return '';
+  }
+
   const serviceEndpoint = findServiceEndpointByLogCorrelation(
     serviceLogEndpoints,
     storyResultMetadatas,

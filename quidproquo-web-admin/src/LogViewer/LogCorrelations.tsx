@@ -1,25 +1,26 @@
 import { useState } from 'react';
 import { Box, IconButton } from '@mui/material';
-import RefreshIcon from '@mui/icons-material/Refresh';
+
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 
 import { StoryResultMetadataLog } from '../types';
 import { findRootLog } from './logic';
 import { LogCorrelationTree } from './LogCorrelationTree';
-import { SearchParams } from './types';
 
 interface LogCorrelationsProps {
   logCorrelation: string;
   storyResultMetadatas: StoryResultMetadataLog[];
   setSelectedLogCorrelation: (logCorrelation: string) => void;
-  onSearch: () => Promise<void>;
 }
 
 export const LogCorrelations = ({
   logCorrelation,
   storyResultMetadatas,
   setSelectedLogCorrelation,
-  onSearch,
 }: LogCorrelationsProps) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
   const rootLog = findRootLog(
     storyResultMetadatas,
     storyResultMetadatas.find((l) => l.correlation === logCorrelation)!,
@@ -29,6 +30,10 @@ export const LogCorrelations = ({
     return null;
   }
 
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
+
   return (
     <Box
       sx={{
@@ -37,6 +42,8 @@ export const LogCorrelations = ({
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
+        height: isExpanded ? '80%' : '120px',
+        position: 'relative',
       }}
     >
       <LogCorrelationTree
@@ -44,26 +51,17 @@ export const LogCorrelations = ({
         allStoryResultMetadatas={storyResultMetadatas}
         highlightCorrelation={logCorrelation}
         setSelectedLogCorrelation={setSelectedLogCorrelation}
-        renderCustom={() => (
-          <IconButton
-            sx={{
-              position: 'absolute',
-              top: '0',
-              right: '0',
-              color: 'primary.main', // Change color as you need
-            }}
-            onClick={(event) => {
-              /* Your click handler function */
-
-              onSearch();
-
-              event.stopPropagation();
-            }}
-          >
-            <RefreshIcon />
-          </IconButton>
-        )}
       />
+      <IconButton
+        onClick={toggleExpand}
+        style={{
+          position: 'absolute',
+          bottom: '10px',
+          right: '10px',
+        }}
+      >
+        {isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+      </IconButton>
     </Box>
   );
 };

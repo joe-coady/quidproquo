@@ -7,6 +7,10 @@ export const useDataFromPath = <T>(path: string): T | null => {
   const cache = useRef<Record<string, T>>({});
 
   useEffect(() => {
+    if (!path) {
+      return;
+    }
+
     if (cache.current[path]) {
       setData(cache.current[path]);
       return;

@@ -1,11 +1,23 @@
 import { getLogUrl } from './logic';
 
-import { Dialog, DialogContent, DialogTitle, LinearProgress } from '@mui/material';
+import {
+  Dialog,
+  LinearProgress,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+} from '@mui/material';
 
-import { LogDialogContent } from './LogDialogContent';
 import { LoadingBox } from '../components/LoadingBox/LoadingBox';
 import { LogCorrelations } from './LogCorrelations';
 import { SearchParams } from './types';
+import { LogDetails } from './LogDetails';
+
+import { StoryResultMetadataLog } from '../types';
+import { useDataFromPath } from '../components/LoadingBox/hooks';
+import { useIsLoading } from '../view';
+import { apiRequestPost } from '../logic';
 
 interface LogDialogProps {
   open: boolean;
@@ -17,6 +29,19 @@ interface LogDialogProps {
   onSearch: (searchParams?: SearchParams) => Promise<void>;
 }
 
+function downloadJson(json: string, filename: string): void {
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+
+  link.href = url;
+  link.download = filename;
+  link.click();
+
+  // The URL.revokeObjectURL() method releases an existing object URL
+  URL.revokeObjectURL(url);
+}
+
 const LogDialog = ({
   logCorrelation,
   open,
@@ -24,9 +49,16 @@ const LogDialog = ({
   serviceLogEndpoints,
   storyResultMetadatas,
   setSelectedLogCorrelation,
-  onSearch,
 }: LogDialogProps) => {
   const logUrl = getLogUrl(serviceLogEndpoints, storyResultMetadatas, logCorrelation);
+  const log = useDataFromPath<StoryResultMetadataLog>(logUrl);
+  const isLoading = useIsLoading();
+
+  const handleExecute = async () => {
+    if (log) {
+      await apiRequestPost('/admin/service/log/execute', log);
+    }
+  };
 
   return (
     <Dialog
@@ -39,43 +71,53 @@ const LogDialog = ({
       fullWidth={true}
       PaperProps={{
         style: {
-          width: '90%', // adjust the width percentage as needed
-          height: '90%', // adjust the height percentage as needed
+          width: '90%',
+          height: '90%',
           maxHeight: '90%',
           maxWidth: '90%',
         },
       }}
     >
       <DialogTitle id="scroll-dialog-title">Log Details</DialogTitle>
-      <LoadingBox
-        path={logUrl}
-        renderItem={(item) => (
-          <LogDialogContent
-            log={item}
-            handleClose={handleClose}
+      <DialogContent
+        dividers={true}
+        sx={{
+          minHeight: '150px',
+          overflowY: 'scroll',
+        }}
+      >
+        <LogCorrelations
+          logCorrelation={logCorrelation}
+          storyResultMetadatas={storyResultMetadatas}
+          setSelectedLogCorrelation={setSelectedLogCorrelation}
+        />
+        {!isLoading && (
+          <LogDetails
+            log={log}
             storyResultMetadatas={storyResultMetadatas}
             setSelectedLogCorrelation={setSelectedLogCorrelation}
-            onSearch={onSearch}
           />
         )}
-        renderLoading={() => (
-          <DialogContent
-            dividers={true}
-            sx={{
-              minHeight: '150px',
-              overflowY: 'scroll',
-            }}
-          >
-            <LogCorrelations
-              logCorrelation={logCorrelation}
-              storyResultMetadatas={storyResultMetadatas}
-              setSelectedLogCorrelation={setSelectedLogCorrelation}
-              onSearch={onSearch}
-            />
-            <LinearProgress />
-          </DialogContent>
+        {isLoading && <LinearProgress />}
+      </DialogContent>
+
+      <DialogActions>
+        <Button
+          onClick={(event) => {
+            downloadJson(JSON.stringify(log, null, 2), `${log.correlation}.json`);
+            event.stopPropagation();
+          }}
+          disabled={isLoading}
+        >
+          Download
+        </Button>
+        {log && log.runtimeType === 'EXECUTE_STORY' && (
+          <Button onClick={handleExecute} disabled={isLoading}>
+            Execute
+          </Button>
         )}
-      />
+        <Button onClick={handleClose}>Close</Button>
+      </DialogActions>
     </Dialog>
   );
 };

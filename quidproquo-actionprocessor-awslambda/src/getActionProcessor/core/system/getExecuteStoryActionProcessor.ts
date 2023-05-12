@@ -55,8 +55,8 @@ const getProcessExecuteStory = <T extends Array<any>>(
     if (storyResult.error) {
       return actionResultError(
         storyResult.error.errorType,
-        `story error! in ${payload.src}::${payload.runtime} -> [${storyResult.error.errorText}]`,
-        storyResult.error.errorStack,
+        storyResult.error.errorText,
+        `story error! in ${payload.src}::${payload.runtime} -> [${storyResult.error.errorStack}]`,
       );
     }
 

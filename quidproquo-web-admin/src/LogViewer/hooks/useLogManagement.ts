@@ -14,7 +14,7 @@ export const useLogManagement = () => {
     const currentDate = new Date();
     const isoDateNow = currentDate.toISOString();
 
-    const threeHoursAgo = new Date(currentDate.getTime() - 3 * 60 * 60 * 1000);
+    const threeHoursAgo = new Date(currentDate.getTime() - 30 * 60 * 60 * 1000);
     const isoDateThreeHoursAgo = threeHoursAgo.toISOString();
 
     return {
