@@ -59,6 +59,34 @@ const writeStoryResultMetadataToDynamo = async (
   }
 };
 
+export const getFromCorrelationBucketNameFromLog = (
+  storyResultMetadata: StoryResultMetadata,
+  localBucketName: string,
+): string => {
+  if (!storyResultMetadata.fromCorrelation) {
+    return '';
+  }
+
+  // Get the module name of the service that wants the log
+  const fromModuleName = storyResultMetadata.fromCorrelation.split('::')[0];
+
+  // Get the name of the current module where we are executing this code
+  const currentModuleName = storyResultMetadata.moduleName;
+
+  // Split up the bucket / module names into parts
+  const bucketParts = localBucketName.split('-');
+  const moduleParts = fromModuleName.split('-');
+  const currentModuleNameParts = currentModuleName.split('-');
+
+  // Replace the current module name with the module name of the service that wants the log
+  bucketParts.splice(2, currentModuleNameParts.length, ...moduleParts);
+
+  // rebuild the new bucket name
+  const newBucketName = bucketParts.join('-');
+
+  return newBucketName;
+};
+
 export const executeS3FileWriteEvent: S3Handler = async (event: S3Event) => {
   for (const record of event.Records) {
     const bucketName = record.s3.bucket.name;
@@ -67,6 +95,13 @@ export const executeS3FileWriteEvent: S3Handler = async (event: S3Event) => {
 
     const storyResultMetadata = await readLogFromBucket(bucketName, awsRegion, key);
 
+    // Write the main log to the service table
     await writeStoryResultMetadataToDynamo(bucketName, storyResultMetadata, awsRegion);
+
+    // Write the same log to the table of the from service, so it can query links on the fromGuid GSI
+    const fromBucketName = getFromCorrelationBucketNameFromLog(storyResultMetadata, bucketName);
+    if (fromBucketName) {
+      await writeStoryResultMetadataToDynamo(fromBucketName, storyResultMetadata, awsRegion);
+    }
   }
 };

@@ -75,12 +75,26 @@ export class LogStorage extends QpqConstructBlock {
       autoDeleteObjects: true,
     });
 
+    // Time based query over all logs for a given runtimeType
     const storyResultsTable = new aws_dynamodb.Table(this, 'table', {
       tableName: this.qpqResourceName(QPQ_LOG_BUCKET_NAME, 'log'),
       partitionKey: { name: 'runtimeType', type: aws_dynamodb.AttributeType.STRING },
       sortKey: { name: 'startedAtWithCorrelation', type: aws_dynamodb.AttributeType.STRING },
       billingMode: aws_dynamodb.BillingMode.PAY_PER_REQUEST,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+
+    // Query by correlation
+    storyResultsTable.addGlobalSecondaryIndex({
+      indexName: 'CorrelationIndex',
+      partitionKey: { name: 'correlation', type: aws_dynamodb.AttributeType.STRING },
+    });
+
+    // Scan by fromCorrelation
+    storyResultsTable.addGlobalSecondaryIndex({
+      indexName: 'FromCorrelationIndex',
+      partitionKey: { name: 'fromCorrelation', type: aws_dynamodb.AttributeType.STRING },
+      sortKey: { name: 'startedAtWithCorrelation', type: aws_dynamodb.AttributeType.STRING },
     });
 
     this.table = storyResultsTable;
