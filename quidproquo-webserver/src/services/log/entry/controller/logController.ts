@@ -1,7 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { HTTPEvent } from '../../../../types';
 import { toJsonEventResponse, fromJsonEventRequest } from '../../../../utils/httpEventUtils';
-import { askAdminGetLogs, askAdminGetLog } from '../../../../actions';
+import {
+  askAdminGetLogs,
+  askAdminGetLog,
+  askAdminGetLogMetadata,
+  askAdminGetLogMetadataChildren,
+} from '../../../../actions';
 
 export interface GetLogsParams {
   nextPageKey?: string;
@@ -27,6 +32,28 @@ export function* getLog(
   },
 ) {
   const log = yield* askAdminGetLog(params.correlationId);
+
+  return toJsonEventResponse(log);
+}
+
+export function* getLogMetadata(
+  event: HTTPEvent,
+  params: {
+    correlationId: string;
+  },
+) {
+  const log = yield* askAdminGetLogMetadata(params.correlationId);
+
+  return toJsonEventResponse(log);
+}
+
+export function* getLogMetadataChildren(
+  event: HTTPEvent,
+  params: {
+    correlationId: string;
+  },
+) {
+  const log = yield* askAdminGetLogMetadataChildren(params.correlationId);
 
   return toJsonEventResponse(log);
 }

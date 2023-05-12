@@ -18,6 +18,18 @@ export const defineLogApi = (): QPQConfig => {
       getServiceEntry('log', 'controller', 'logController'),
       'getLog',
     ),
+    defineRoute(
+      'GET',
+      '/log/metadata/{correlationId}',
+      getServiceEntry('log', 'controller', 'logController'),
+      'getLogMetadata',
+    ),
+    defineRoute(
+      'GET',
+      '/log/children/{correlationId}',
+      getServiceEntry('log', 'controller', 'logController'),
+      'getLogMetadataChildren',
+    ),
   ];
 
   return configs;
