@@ -32,7 +32,7 @@ import {
 } from 'quidproquo-core';
 
 import { ActionProcessorListResolver } from './actionProcessorListResolver';
-import { getLogger } from './logger/logger';
+import { getLogger, getRuntimeCorrelation } from './lambda-utils';
 
 import { dynamicModuleLoader } from './dynamicModuleLoader';
 
@@ -84,7 +84,7 @@ export const getStoryActionRuntime = async (
     storyActionProcessor,
     getDateNow,
     getLogger(cdkConfig.qpqConfig),
-    awsLambdaUtils.randomGuid(),
+    getRuntimeCorrelation(cdkConfig.qpqConfig),
     QpqRuntimeType.QUEUE_EVENT,
   );
 

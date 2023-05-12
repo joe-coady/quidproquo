@@ -29,7 +29,7 @@ import { APIGatewayEvent, Context } from 'aws-lambda';
 import { getLambdaConfigs } from './lambdaConfig';
 import { ActionProcessorListResolver } from './actionProcessorListResolver';
 
-import { getLogger } from './logger/logger';
+import { getLogger, getRuntimeCorrelation } from './lambda-utils';
 
 import { dynamicModuleLoader } from './dynamicModuleLoader';
 
@@ -93,7 +93,7 @@ export const getAPIGatewayEventExecutor = (
       storyActionProcessor,
       getDateNow,
       getLogger(cdkConfig.qpqConfig),
-      awsLambdaUtils.randomGuid(),
+      getRuntimeCorrelation(cdkConfig.qpqConfig),
       QpqRuntimeType.API,
     );
 

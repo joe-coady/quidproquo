@@ -28,7 +28,7 @@ import { Context } from 'aws-lambda';
 
 import { getLambdaConfigs } from './lambdaConfig';
 import { ActionProcessorListResolver } from './actionProcessorListResolver';
-import { getLogger } from './logger/logger';
+import { getLogger, getRuntimeCorrelation } from './lambda-utils';
 
 // @ts-ignore - Special webpack loader
 import { dynamicModuleLoader } from './dynamicModuleLoader';
@@ -82,7 +82,7 @@ export const getServiceFunctionExecuteEventExecutor = (
       storyActionProcessor,
       getDateNow,
       getLogger(cdkConfig.qpqConfig),
-      awsLambdaUtils.randomGuid(),
+      getRuntimeCorrelation(cdkConfig.qpqConfig),
       QpqRuntimeType.SERVICE_FUNCTION_EXE,
     );
 

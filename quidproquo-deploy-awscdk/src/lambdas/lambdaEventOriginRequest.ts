@@ -26,7 +26,7 @@ import { createRuntime, askProcessEvent, QpqRuntimeType } from 'quidproquo-core'
 import { CloudFrontRequestEvent, CloudFrontRequestResult, Context } from 'aws-lambda';
 
 import { ActionProcessorListResolver } from './actionProcessorListResolver';
-import { getLogger } from './logger/logger';
+import { getLogger, getRuntimeCorrelation } from './lambda-utils';
 
 import { dynamicModuleLoader } from './dynamicModuleLoader';
 
@@ -77,7 +77,7 @@ export const getOriginRequestEventExecutor = (
       storyActionProcessor,
       getDateNow,
       getLogger(cdkConfig.qpqConfig),
-      awsLambdaUtils.randomGuid(),
+      getRuntimeCorrelation(cdkConfig.qpqConfig),
       QpqRuntimeType.EVENT_SEO_OR,
     );
 
