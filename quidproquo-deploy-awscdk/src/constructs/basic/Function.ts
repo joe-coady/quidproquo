@@ -88,5 +88,29 @@ export class Function extends QpqConstructBlock {
         resources: ['arn:aws:lambda:*:*:function:*sfunc*'],
       }),
     );
+
+    // Let lambdas write to dynamo logs
+    this.lambdaFunction.addToRolePolicy(
+      new aws_iam.PolicyStatement({
+        actions: ['lambda:InvokeFunction'],
+        resources: ['arn:aws:lambda:*:*:function:*sfunc*'],
+      }),
+    );
+
+    // We need access to dynamo log tables
+    this.lambdaFunction.addToRolePolicy(
+      new aws_iam.PolicyStatement({
+        actions: ['dynamodb:GetItem', 'dynamodb:Scan', 'dynamodb:Query'],
+
+        // TODO: Revisit this, the user can make logs tables them selves... ~ Slight security risk here
+        // Consider making tags to identify logs tables, all qpq resourses
+        // conditions: {
+        //   'ForAllValues:StringLike': {
+        //     'aws:ResourceTag/Name': '*qpqlog',
+        //   },
+        // },
+        resources: ['arn:aws:dynamodb:*:*:table/logs-*'],
+      }),
+    );
   }
 }

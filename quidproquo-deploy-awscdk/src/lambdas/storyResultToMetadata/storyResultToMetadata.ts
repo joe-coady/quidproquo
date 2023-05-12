@@ -1,14 +1,20 @@
 import { StoryResult, StoryResultMetadata } from 'quidproquo-core';
-import { apiGenericTextExtractor, unknownGenericTextExtractor } from './genericTextExtractors';
+import {
+  apiGenericTextExtractor,
+  unknownGenericTextExtractor,
+  queueEventGenericTextExtractor,
+  serviceFunctionExeGenericTextExtractor,
+} from './genericTextExtractors';
 
 // These have to be strings and not enum due to how the lambda is packaged
 const extractors: Record<string, (sr: StoryResult<any>) => string> = {
   ['API']: apiGenericTextExtractor,
+  ['QUEUE_EVENT']: queueEventGenericTextExtractor,
+  ['SERVICE_FUNCTION_EXE']: serviceFunctionExeGenericTextExtractor,
+
   ['RECURRING_SCHEDULE']: unknownGenericTextExtractor,
   ['EVENT_SEO_OR']: unknownGenericTextExtractor,
   ['EXECUTE_STORY']: unknownGenericTextExtractor,
-  ['QUEUE_EVENT']: unknownGenericTextExtractor,
-  ['SERVICE_FUNCTION_EXE']: unknownGenericTextExtractor,
 };
 
 export const storyResultToMetadata = (

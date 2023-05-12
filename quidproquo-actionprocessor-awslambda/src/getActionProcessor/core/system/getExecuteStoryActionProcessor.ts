@@ -10,6 +10,7 @@ import {
   actionResult,
   ActionProcessorList,
   QpqRuntimeType,
+  qpqCoreUtils,
 } from 'quidproquo-core';
 
 import { randomGuid } from './../../../awsLambdaUtils';
@@ -21,6 +22,7 @@ const getProcessExecuteStory = <T extends Array<any>>(
   qpqConfig: QPQConfig,
   dynamicModuleLoader: DynamicModuleLoader,
 ): SystemExecuteStoryActionProcessor<T> => {
+  const moduleName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
   return async (
     payload: SystemExecuteStoryActionPayload<T>,
     session: StorySession,
@@ -46,7 +48,8 @@ const getProcessExecuteStory = <T extends Array<any>>(
       actionProcessors,
       getDateNow,
       logger,
-      randomGuid(),
+      // TODO: Share this logic.
+      `${moduleName}-${randomGuid()}`,
       QpqRuntimeType.EXECUTE_STORY,
       [`${payload.src}::${payload.runtime}`],
     );
