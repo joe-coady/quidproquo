@@ -6,7 +6,7 @@ import { aws_s3, aws_iam, aws_dynamodb, aws_s3_notifications } from 'aws-cdk-lib
 import * as cdk from 'aws-cdk-lib';
 import { QpqResource } from '../base';
 import { QPQConfig } from 'quidproquo-core/lib';
-import { QPQ_LOG_BUCKET_NAME } from '../../constants';
+import { QPQ_LOG_BUCKET_NAME, QPQ_FROM_LOG_BUCKET_NAME } from '../../constants';
 import { Function } from './Function';
 // import { qpqWebServerUtils } from '../../utils';
 
@@ -90,11 +90,15 @@ export class LogStorage extends QpqConstructBlock {
       partitionKey: { name: 'correlation', type: aws_dynamodb.AttributeType.STRING },
     });
 
-    // Scan by fromCorrelation
-    storyResultsTable.addGlobalSecondaryIndex({
-      indexName: 'FromCorrelationIndex',
+    // Second table for the from logs ~ Second table because a GSI will dupe the data more then needed
+    // Also, we cant have a GSI on keys that can be undefined, this table will only contain
+    // logs with a fromCorrelation
+    const fromStoryResultsTable = new aws_dynamodb.Table(this, 'from-table', {
+      tableName: this.qpqResourceName(QPQ_FROM_LOG_BUCKET_NAME, 'flog'),
       partitionKey: { name: 'fromCorrelation', type: aws_dynamodb.AttributeType.STRING },
       sortKey: { name: 'startedAtWithCorrelation', type: aws_dynamodb.AttributeType.STRING },
+      billingMode: aws_dynamodb.BillingMode.PAY_PER_REQUEST,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
     this.table = storyResultsTable;
