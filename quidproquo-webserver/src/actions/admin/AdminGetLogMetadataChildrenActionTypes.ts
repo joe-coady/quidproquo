@@ -1,9 +1,11 @@
 import { Action, ActionProcessor, ActionRequester, StoryResultMetadata } from 'quidproquo-core';
-import { AdminActionType } from './AdminActionType';
+import { AdminActionType, QpqLogList } from './AdminActionType';
 
 // Payload
 export interface AdminGetLogMetadataChildrenActionPayload {
   correlationId: string;
+
+  nextPageKey?: string;
 }
 
 // Action
@@ -16,9 +18,9 @@ export interface AdminGetLogMetadataChildrenAction
 // Function Types
 export type AdminGetLogMetadataChildrenActionProcessor = ActionProcessor<
   AdminGetLogMetadataChildrenAction,
-  StoryResultMetadata[]
+  QpqLogList
 >;
 export type AdminGetLogMetadataChildrenActionRequester = ActionRequester<
   AdminGetLogMetadataChildrenAction,
-  StoryResultMetadata[]
+  QpqLogList
 >;

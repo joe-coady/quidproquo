@@ -1,13 +1,14 @@
 import { apiRequestPost } from '../../logic';
+import { QpqLogListLog, StoryResultMetadataLog } from '../../types';
 
 export const getLogs = async (
   url: string,
   runtimeType: string,
   startIsoDateTime: string,
   endIsoDateTime: string,
-) => {
-  var logs: any = [];
-  var newLogs = null;
+): Promise<StoryResultMetadataLog[]> => {
+  var logs: StoryResultMetadataLog[] = [];
+  var newLogs: QpqLogListLog;
   var nextPageKey = undefined;
 
   const requestSpan = {
@@ -17,13 +18,12 @@ export const getLogs = async (
   };
 
   do {
-    newLogs = await apiRequestPost(url, {
+    newLogs = await apiRequestPost<QpqLogListLog>(url, {
       ...requestSpan,
       nextPageKey: nextPageKey,
     });
-    const cleanLogs = newLogs.items.map((x: any) => ({ ...x, id: x.correlation }));
 
-    logs = [...logs, ...cleanLogs];
+    logs = [...logs, ...newLogs.items];
 
     nextPageKey = newLogs.nextPageKey;
   } while (nextPageKey);

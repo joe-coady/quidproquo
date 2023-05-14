@@ -3,12 +3,14 @@ import { actionResult, QPQConfig, qpqCoreUtils, StoryResult } from 'quidproquo-c
 import {
   AdminGetLogsActionProcessor,
   AdminGetLogActionProcessor,
+  AdminGetLogMetadataChildrenActionProcessor,
   AdminActionType,
 } from 'quidproquo-webserver';
 
 import { getQpqRuntimeResourceNameFromConfig } from '../../../awsNamingUtils';
 
 import { getPagedItemsOverRange } from '../../../logic/dynamo/getPagedItemsOverRange';
+import { getLogChildrenByFromCorrelation } from '../../../logic/dynamo/getLogChildrenByFromCorrelation';
 import { readTextFile } from '../../../logic/s3/readTextFile';
 
 // TODO: Centralize this
@@ -32,6 +34,19 @@ const getAdminGetLogsActionProcessor = (qpqConfig: QPQConfig): AdminGetLogsActio
   };
 };
 
+const getLogMetadataChildrenActionProcessor = (
+  qpqConfig: QPQConfig,
+): AdminGetLogMetadataChildrenActionProcessor => {
+  return async ({ correlationId }) => {
+    const tableName = getQpqRuntimeResourceNameFromConfig(QPQ_LOG_BUCKET_NAME, qpqConfig, 'log');
+    const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
+
+    const response = await getLogChildrenByFromCorrelation(tableName, region, correlationId);
+
+    return actionResult(response);
+  };
+};
+
 const getAdminGetLogActionProcessor = (qpqConfig: QPQConfig): AdminGetLogActionProcessor => {
   return async ({ correlationId }) => {
     const bucketName = getQpqRuntimeResourceNameFromConfig(QPQ_LOG_BUCKET_NAME, qpqConfig, 'log');
@@ -49,5 +64,6 @@ export default (qpqConfig: QPQConfig) => {
   return {
     [AdminActionType.GetLogs]: getAdminGetLogsActionProcessor(qpqConfig),
     [AdminActionType.GetLog]: getAdminGetLogActionProcessor(qpqConfig),
+    [AdminActionType.GetLogMetadataChildren]: getLogMetadataChildrenActionProcessor(qpqConfig),
   };
 };

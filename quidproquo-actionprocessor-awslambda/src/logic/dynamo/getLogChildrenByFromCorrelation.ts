@@ -1,30 +1,25 @@
 import { DynamoDBClient, QueryCommand, QueryCommandInput } from '@aws-sdk/client-dynamodb';
-import { QpqRuntimeType, StoryResultMetadata } from 'quidproquo-core';
 
+import { QpqRuntimeType, StoryResultMetadata } from 'quidproquo-core';
 import { QpqLogList } from 'quidproquo-webserver';
 
 import { lastEvaluatedKeyToString, stringToLastEvaluatedKey } from './logs';
 
-export async function getPagedItemsOverRange(
+export async function getLogChildrenByFromCorrelation(
   tableName: string,
   region: string,
-  runtimeType: string,
-  startIsoDateTime: string,
-  endIsoDateTime: string,
+  fromCorrelation: string,
   pageKey?: string,
 ): Promise<QpqLogList> {
   const dynamoDBClient = new DynamoDBClient({ region });
 
   const queryParams: QueryCommandInput = {
     TableName: tableName,
-    KeyConditionExpression:
-      'runtimeType = :runtimeType AND startedAtWithCorrelation BETWEEN :startIsoDateTime AND :endIsoDateTime',
+    IndexName: 'FromCorrelationIndex', // use the GSI
+    KeyConditionExpression: 'fromCorrelation = :fromCorrelation',
     ExpressionAttributeValues: {
-      ':runtimeType': { S: runtimeType },
-      ':startIsoDateTime': { S: startIsoDateTime + '#00000000-0000-0000-0000-000000000000' },
-      ':endIsoDateTime': { S: endIsoDateTime + '#ffffffff-ffff-ffff-ffff-ffffffffffff' },
+      ':fromCorrelation': { S: fromCorrelation },
     },
-    ScanIndexForward: false,
   };
 
   if (pageKey) {
@@ -57,7 +52,7 @@ export async function getPagedItemsOverRange(
       return { items };
     }
   } catch (err) {
-    console.error(`Failed to query items in the specified date range: ${err}`);
+    console.error(`Failed to query items with the specified fromCorrelation: ${err}`);
     throw err;
   }
 }

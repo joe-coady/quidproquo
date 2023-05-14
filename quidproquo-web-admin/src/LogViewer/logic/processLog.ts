@@ -3,6 +3,8 @@ export const processLog = (logFile: any) => {
     return [];
   }
 
+  console.log(logFile);
+
   const firstEvent = {
     dateTime: logFile.startedAt,
     title: `${logFile.runtimeType} - ${logFile.moduleName}`,

@@ -1,10 +1,5 @@
 import { Action, ActionProcessor, ActionRequester, StoryResultMetadata } from 'quidproquo-core';
-import { AdminActionType } from './AdminActionType';
-
-export interface QpqLogList {
-  items: StoryResultMetadata[];
-  nextPageKey?: string;
-}
+import { AdminActionType, QpqLogList } from './AdminActionType';
 
 // Payload
 export interface AdminGetLogsActionPayload {

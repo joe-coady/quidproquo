@@ -17,6 +17,8 @@ export interface GetLogsParams {
 }
 
 export function* getLogs(event: HTTPEvent, params: {}) {
+  console.log('getLogs');
+
   const { nextPageKey, startIsoDateTime, endIsoDateTime, runtimeType } =
     fromJsonEventRequest<GetLogsParams>(event);
 
@@ -31,6 +33,7 @@ export function* getLog(
     correlationId: string;
   },
 ) {
+  console.log('getLog');
   const log = yield* askAdminGetLog(params.correlationId);
 
   return toJsonEventResponse(log);
@@ -42,6 +45,7 @@ export function* getLogMetadata(
     correlationId: string;
   },
 ) {
+  console.log('getLogMetadata');
   const log = yield* askAdminGetLogMetadata(params.correlationId);
 
   return toJsonEventResponse(log);
@@ -53,6 +57,7 @@ export function* getLogMetadataChildren(
     correlationId: string;
   },
 ) {
+  console.log('getLogMetadataChildren');
   const log = yield* askAdminGetLogMetadataChildren(params.correlationId);
 
   return toJsonEventResponse(log);

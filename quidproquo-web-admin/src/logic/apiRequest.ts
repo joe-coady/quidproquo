@@ -8,7 +8,7 @@ const getAxiosInstance = () => {
   return instance;
 };
 
-export const apiRequestPost = async (path: string, body: object) => {
+export const apiRequestPost = async <T = any>(path: string, body: object): Promise<T> => {
   const res = await getAxiosInstance().post(path, body, {
     headers: {
       'Content-Type': 'application/json',

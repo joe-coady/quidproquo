@@ -67,3 +67,8 @@ export interface StoryResultMetadataLog {
 
   error?: string;
 }
+
+export interface QpqLogListLog {
+  items: StoryResultMetadataLog[];
+  nextPageKey?: string;
+}

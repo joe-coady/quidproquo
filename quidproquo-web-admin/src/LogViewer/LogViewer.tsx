@@ -58,7 +58,7 @@ export function LogViewer() {
             LoadingOverlay: () => <LinearProgress variant="determinate" value={searchProgress} />,
           }}
           columns={columns}
-          rows={filteredLogs}
+          rows={filteredLogs.map((item, index) => ({ ...item, id: item.correlation }))}
           autoPageSize={true}
           loading={isLoading}
           onRowClick={onRowClick}
