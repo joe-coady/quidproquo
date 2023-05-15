@@ -15,7 +15,8 @@ export enum AuthenticateUserChallenge {
 
 export interface AuthenticationInfo {
   accessToken?: string;
-  expiresIn?: number;
+  expirationDurationInSeconds?: number;
+  expiresAt?: string;
   idToken?: string;
   refreshToken?: string;
   tokenType?: string;

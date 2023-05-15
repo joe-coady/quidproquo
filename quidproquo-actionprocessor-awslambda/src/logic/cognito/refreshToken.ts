@@ -35,7 +35,9 @@ export const refreshToken = async (
     },
   };
 
+  // Time we issued the request
+  const issueDateTime = new Date().toISOString();
   const response = await cognitoClient.send(new AdminInitiateAuthCommand(params));
 
-  return cognitoAdminInitiateAuthResponseToQpqAuthenticationInfo(response);
+  return cognitoAdminInitiateAuthResponseToQpqAuthenticationInfo(response, issueDateTime);
 };

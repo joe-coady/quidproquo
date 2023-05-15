@@ -26,6 +26,9 @@ export const authenticateUser = async (
   const clientSecret = await getUserPoolClientSecret(userPoolId, clientId, region);
   const secretHash = calculateSecretHash(username, clientId, clientSecret);
 
+  // Time we issued the request
+  const issueDateTime = new Date().toISOString();
+
   const params: AdminInitiateAuthCommandInput = {
     AuthFlow: AuthFlowType.ADMIN_USER_PASSWORD_AUTH,
     UserPoolId: userPoolId,
@@ -40,7 +43,7 @@ export const authenticateUser = async (
 
   try {
     const response = await cognitoClient.send(new AdminInitiateAuthCommand(params));
-    return cognitoAdminInitiateAuthResponseToQpqAuthenticationInfo(response);
+    return cognitoAdminInitiateAuthResponseToQpqAuthenticationInfo(response, issueDateTime);
   } catch (e) {
     if (e instanceof Error) {
       switch (e.name) {
