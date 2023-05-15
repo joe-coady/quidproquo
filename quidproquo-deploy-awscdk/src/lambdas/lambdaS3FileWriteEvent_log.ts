@@ -45,6 +45,7 @@ const writeStoryResultMetadataToDynamo = async (
         S: `${storyResultMetadata.startedAt}#${storyResultMetadata.correlation}`,
       },
       runtimeType: { S: storyResultMetadata.runtimeType },
+      correlation: { S: storyResultMetadata.correlation },
       error: { S: storyResultMetadata.error || '' },
       generic: { S: storyResultMetadata.generic },
       moduleName: { S: storyResultMetadata.moduleName },
