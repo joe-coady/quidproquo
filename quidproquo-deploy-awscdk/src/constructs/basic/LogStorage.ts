@@ -6,7 +6,7 @@ import { aws_s3, aws_iam, aws_dynamodb, aws_s3_notifications } from 'aws-cdk-lib
 import * as cdk from 'aws-cdk-lib';
 import { QpqResource } from '../base';
 import { QPQConfig } from 'quidproquo-core/lib';
-import { QPQ_LOG_BUCKET_NAME, QPQ_FROM_LOG_BUCKET_NAME } from '../../constants';
+import { QPQ_LOG_BUCKET_NAME } from '../../constants';
 import { Function } from './Function';
 // import { qpqWebServerUtils } from '../../utils';
 
@@ -14,15 +14,18 @@ export interface LogStorageProps extends QpqConstructBlockProps {}
 
 export abstract class LogStorageConstructBase extends QpqConstructBlock implements QpqResource {
   abstract bucket: aws_s3.IBucket;
-  abstract table: aws_dynamodb.ITable;
+  abstract storyResultsTable: aws_dynamodb.ITable;
+  abstract fromStoryResultsTable: aws_dynamodb.ITable;
 
   public grantRead(grantee: aws_iam.IGrantable): aws_iam.Grant {
-    this.table.grantReadData(grantee);
+    this.storyResultsTable.grantReadData(grantee);
+    this.fromStoryResultsTable.grantReadData(grantee);
     return this.bucket.grantRead(grantee);
   }
 
   public grantWrite(grantee: aws_iam.IGrantable): aws_iam.Grant {
-    this.table.grantWriteData(grantee);
+    this.storyResultsTable.grantWriteData(grantee);
+    this.fromStoryResultsTable.grantWriteData(grantee);
     return this.bucket.grantWrite(grantee);
   }
 
@@ -34,7 +37,8 @@ export abstract class LogStorageConstructBase extends QpqConstructBlock implemen
 
 export class LogStorage extends QpqConstructBlock {
   public readonly bucket: aws_s3.IBucket;
-  public readonly table: aws_dynamodb.ITable;
+  public readonly storyResultsTable: aws_dynamodb.ITable;
+  public readonly fromStoryResultsTable: aws_dynamodb.ITable;
 
   static fromOtherStack(
     scope: Construct,
@@ -50,10 +54,16 @@ export class LogStorage extends QpqConstructBlock {
         this.qpqResourceName(serviceBucketName, 'log'),
       );
 
-      table = aws_dynamodb.Table.fromTableName(
+      storyResultsTable = aws_dynamodb.Table.fromTableName(
         scope,
-        `${id}-table`,
+        `${id}-log-table`,
         this.qpqResourceName(serviceBucketName, 'log'),
+      );
+
+      fromStoryResultsTable = aws_dynamodb.Table.fromTableName(
+        scope,
+        `${id}-flog-table`,
+        this.qpqResourceName(serviceBucketName, 'flog'),
       );
     }
 
@@ -94,14 +104,15 @@ export class LogStorage extends QpqConstructBlock {
     // Also, we cant have a GSI on keys that can be undefined, this table will only contain
     // logs with a fromCorrelation
     const fromStoryResultsTable = new aws_dynamodb.Table(this, 'from-table', {
-      tableName: this.qpqResourceName(QPQ_FROM_LOG_BUCKET_NAME, 'flog'),
+      tableName: this.qpqResourceName(QPQ_LOG_BUCKET_NAME, 'flog'),
       partitionKey: { name: 'fromCorrelation', type: aws_dynamodb.AttributeType.STRING },
       sortKey: { name: 'startedAtWithCorrelation', type: aws_dynamodb.AttributeType.STRING },
       billingMode: aws_dynamodb.BillingMode.PAY_PER_REQUEST,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
-    this.table = storyResultsTable;
+    this.storyResultsTable = storyResultsTable;
+    this.fromStoryResultsTable = fromStoryResultsTable;
 
     // Create a lambda that is trigged when files are written to the bucket
     const func = new Function(this, 'function', {

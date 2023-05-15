@@ -15,8 +15,11 @@ export async function getLogChildrenByFromCorrelation(
 
   const queryParams: QueryCommandInput = {
     TableName: tableName,
-    IndexName: 'FromCorrelationIndex', // use the GSI
-    KeyConditionExpression: 'fromCorrelation = :fromCorrelation',
+    // removed IndexName
+    KeyConditionExpression: '#fromCorrelation = :fromCorrelation', // use the primary key
+    ExpressionAttributeNames: {
+      '#fromCorrelation': 'fromCorrelation', // define attribute name
+    },
     ExpressionAttributeValues: {
       ':fromCorrelation': { S: fromCorrelation },
     },

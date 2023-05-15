@@ -9,9 +9,7 @@ import {
   Button,
 } from '@mui/material';
 
-import { LoadingBox } from '../components/LoadingBox/LoadingBox';
 import { LogCorrelations } from './LogCorrelations';
-import { SearchParams } from './types';
 import { LogDetails } from './LogDetails';
 
 import { StoryResultMetadataLog } from '../types';
@@ -77,7 +75,7 @@ const LogDialog = ({
         },
       }}
     >
-      <DialogTitle id="scroll-dialog-title">Log Details</DialogTitle>
+      <DialogTitle id="scroll-dialog-title">Log Details - {logCorrelation}</DialogTitle>
       <DialogContent
         dividers={true}
         sx={{

@@ -17,7 +17,6 @@ import {
   getConfigGetParametersActionProcessor,
   getServiceFunctionActionProcessor,
   getAdminActionProcessor,
-  awsLambdaUtils,
   DynamicModuleLoader,
   LambdaRuntimeConfig,
 } from 'quidproquo-actionprocessor-awslambda';

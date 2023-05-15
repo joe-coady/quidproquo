@@ -38,7 +38,7 @@ const getLogMetadataChildrenActionProcessor = (
   qpqConfig: QPQConfig,
 ): AdminGetLogMetadataChildrenActionProcessor => {
   return async ({ correlationId }) => {
-    const tableName = getQpqRuntimeResourceNameFromConfig(QPQ_LOG_BUCKET_NAME, qpqConfig, 'log');
+    const tableName = getQpqRuntimeResourceNameFromConfig(QPQ_LOG_BUCKET_NAME, qpqConfig, 'flog');
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const response = await getLogChildrenByFromCorrelation(tableName, region, correlationId);

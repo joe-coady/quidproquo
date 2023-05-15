@@ -87,11 +87,22 @@ export const getFromCorrelationBucketNameFromLog = (
   return newBucketName;
 };
 
+function getFromCorrelationDynamoTableNameFromBucketName(bucketName: string): string {
+  const target = 'qpqlog';
+  const replacement = 'qpqflog';
+
+  if (bucketName.endsWith(target)) {
+    return bucketName.slice(0, bucketName.length - target.length) + replacement;
+  }
+
+  return bucketName;
+}
+
 export const executeS3FileWriteEvent: S3Handler = async (event: S3Event) => {
   for (const record of event.Records) {
     const bucketName = record.s3.bucket.name;
     const awsRegion = record.awsRegion;
-    const key = record.s3.object.key;
+    const key = decodeURIComponent(record.s3.object.key);
 
     const storyResultMetadata = await readLogFromBucket(bucketName, awsRegion, key);
 
@@ -100,8 +111,16 @@ export const executeS3FileWriteEvent: S3Handler = async (event: S3Event) => {
 
     // Write the same log to the table of the from service, so it can query links on the fromGuid GSI
     const fromBucketName = getFromCorrelationBucketNameFromLog(storyResultMetadata, bucketName);
-    if (fromBucketName) {
-      await writeStoryResultMetadataToDynamo(fromBucketName, storyResultMetadata, awsRegion);
+
+    const targetFromCorrelationDynamoTableName =
+      getFromCorrelationDynamoTableNameFromBucketName(fromBucketName);
+
+    if (targetFromCorrelationDynamoTableName) {
+      await writeStoryResultMetadataToDynamo(
+        targetFromCorrelationDynamoTableName,
+        storyResultMetadata,
+        awsRegion,
+      );
     }
   }
 };

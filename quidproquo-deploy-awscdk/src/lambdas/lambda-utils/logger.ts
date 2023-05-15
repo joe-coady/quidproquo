@@ -10,8 +10,6 @@ export const storyLogger = async (
   result: StoryResult<any>,
   qpqConfig: QPQConfig,
 ): Promise<void> => {
-  /*
-
   const bucketName = awsNamingUtils.getQpqRuntimeResourceNameFromConfig(
     QPQ_LOG_BUCKET_NAME,
     qpqConfig,
@@ -28,8 +26,6 @@ export const storyLogger = async (
       Body: JSON.stringify(result),
     }),
   );
-  
-  */
 };
 
 export const getLogger = (qpqConfig: QPQConfig) => async (result: StoryResult<any>) => {

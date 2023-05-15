@@ -109,7 +109,7 @@ export class Function extends QpqConstructBlock {
         //     'aws:ResourceTag/Name': '*qpqlog',
         //   },
         // },
-        resources: ['arn:aws:dynamodb:*:*:table/logs-*', 'arn:aws:dynamodb:*:*:table/flogs-*'],
+        resources: ['arn:aws:dynamodb:*:*:table/logs-*'],
       }),
     );
   }
