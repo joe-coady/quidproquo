@@ -111,6 +111,8 @@ const getProcessAutoRespond = (
       });
     }
 
+    // TODO: We can pull out the jwt from the session if thats a better way?
+    // Think about that when you dont have covid.
     const authValid = await isAuthValid(
       qpqConfig,
       qpqWebServerUtils.getHeaderValue('Authorization', payload.transformedEventParams.headers),

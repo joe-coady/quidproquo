@@ -17,6 +17,13 @@ export const getHeaderValue = (header: string, headers: HttpEventHeaders): strin
   return headers[realHeaderKey] || null;
 };
 
+export const getAccessTokenFromHeaders = (headers: HttpEventHeaders): string | undefined => {
+  const authorizationHeader = getHeaderValue('authorization', headers) || '';
+  const [authType, authToken] = authorizationHeader.split(' ');
+
+  return authToken;
+};
+
 export const getAllowedOrigins = (qpqConfig: QPQConfig, route: RouteOptions): string[] => {
   // Root domain
   const rootDomain = `https://${getBaseDomainName(qpqConfig)}`;

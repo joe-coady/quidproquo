@@ -60,6 +60,7 @@ export const getAPIGatewayEventExecutor = (
 ) => {
   return async (event: APIGatewayEvent, context: Context) => {
     const cdkConfig = await getLambdaConfigs();
+    const jwtToken = qpqWebServerUtils.getAccessTokenFromHeaders(event.headers);
 
     // Build a processor for the session and stuff
     // Remove the non route ones ~ let the story execute action add them
@@ -89,6 +90,7 @@ export const getAPIGatewayEventExecutor = (
       cdkConfig.qpqConfig,
       {
         depth: 0,
+        jwt: jwtToken,
       },
       storyActionProcessor,
       getDateNow,
