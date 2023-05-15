@@ -5,7 +5,6 @@ import { UserDirectoryActionType, AuthenticateUserResponse } from './UserDirecto
 export interface UserDirectoryRefreshTokenActionPayload {
   userDirectoryName: string;
 
-  username: string;
   refreshToken: string;
 }
 

@@ -1,4 +1,4 @@
-import { CognitoJwtVerifier } from 'aws-jwt-verify';
+import { decodeValidJwt } from './decodeValidJwt';
 
 export const verifyJwt = async (
   accessToken: string,
@@ -6,20 +6,8 @@ export const verifyJwt = async (
   clientId: string,
   tokenType: 'id' | 'access',
 ): Promise<boolean> => {
-  const verifier = CognitoJwtVerifier.create({
-    userPoolId: userPoolId,
-    tokenUse: tokenType,
-    clientId: clientId,
-  });
+  const info = await decodeValidJwt(userPoolId, clientId, tokenType, accessToken);
 
-  try {
-    const payload = await verifier.verify(accessToken);
-
-    console.log('verify: ', JSON.stringify(payload, null, 2));
-
-    return true;
-  } catch (e) {
-    console.log(e);
-    return false;
-  }
+  // if we hav info, its valid
+  return !!info;
 };

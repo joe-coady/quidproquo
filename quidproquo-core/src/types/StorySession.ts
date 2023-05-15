@@ -4,7 +4,13 @@ import { Action } from './Action';
 export interface StorySession {
   correlation?: string;
   depth: number;
-  jwt?: string;
+
+  // TODO: We will probably want to think about if we want this
+  // how we deal with refreshing it
+  // maybe storing a userid is better after we validate it
+  // but what if a event 3 weeks from now is run, but the user is deleted, but now
+  // still has access ?
+  accessToken?: string;
 }
 
 export interface StoryError {

@@ -70,7 +70,7 @@ export const createRuntime = (
     const storySession: StorySession = {
       correlation: runtimeCorrelation,
       depth: callerSession.depth + 1,
-      jwt: callerSession.jwt,
+      accessToken: callerSession.accessToken,
     };
 
     const response: StoryResult<any> = {

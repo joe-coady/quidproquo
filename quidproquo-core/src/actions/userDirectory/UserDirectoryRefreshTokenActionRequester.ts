@@ -3,7 +3,6 @@ import { UserDirectoryActionType } from './UserDirectoryActionType';
 
 export function* askUserDirectoryRefreshToken(
   userDirectoryName: string,
-  username: string,
   refreshToken: string,
 ): UserDirectoryRefreshTokenActionRequester {
   return yield {
@@ -11,7 +10,6 @@ export function* askUserDirectoryRefreshToken(
     payload: {
       userDirectoryName,
 
-      username,
       refreshToken,
     },
   };

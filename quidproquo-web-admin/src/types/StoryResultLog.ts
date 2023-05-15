@@ -19,7 +19,7 @@ export interface ActionHistoryLog {
 export interface StorySessionLog {
   correlation?: string;
   depth: number;
-  jwt?: string;
+  accessToken?: string;
 }
 
 export interface StoryResultLog {

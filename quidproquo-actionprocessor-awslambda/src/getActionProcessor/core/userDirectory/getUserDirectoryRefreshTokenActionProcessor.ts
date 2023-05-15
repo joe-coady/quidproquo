@@ -4,6 +4,8 @@ import {
   QPQConfig,
   qpqCoreUtils,
   UserDirectoryActionType,
+  actionResultError,
+  ErrorTypeEnum,
 } from 'quidproquo-core';
 
 import {
@@ -13,11 +15,12 @@ import {
 
 import { refreshToken as cognitoRefreshToken } from '../../../logic/cognito/refreshToken';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
+import { decodeValidJwt } from '../../../logic/cognito/decodeValidJwt';
 
 const getUserDirectoryRefreshTokenActionProcessor = (
   qpqConfig: QPQConfig,
 ): UserDirectoryRefreshTokenActionProcessor => {
-  return async ({ userDirectoryName, username, refreshToken }) => {
+  return async ({ userDirectoryName, refreshToken }, session) => {
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const userPoolId = await getExportedValue(
@@ -30,11 +33,21 @@ const getUserDirectoryRefreshTokenActionProcessor = (
       region,
     );
 
+    const authInfo = await decodeValidJwt(
+      userPoolId,
+      userPoolClientId,
+      'access',
+      session.accessToken,
+    );
+    if (!authInfo || !authInfo?.username) {
+      return actionResultError(ErrorTypeEnum.Unauthorized, 'Invalid accessToken');
+    }
+
     const authResponse = await cognitoRefreshToken(
       userPoolId,
       userPoolClientId,
       qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig),
-      username,
+      authInfo?.username,
       refreshToken,
     );
 
