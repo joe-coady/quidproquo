@@ -6,6 +6,7 @@ export enum UserDirectoryActionType {
   RefreshToken = '@quidproquo-core/UserDirectory/RefreshToken',
   RequestEmailVerification = '@quidproquo-core/UserDirectory/RequestEmailVerification',
   ConfirmEmailVerification = '@quidproquo-core/UserDirectory/ConfirmEmailVerification',
+  ReadAccessToken = '@quidproquo-core/UserDirectory/ReadAccessToken',
 }
 
 export enum AuthenticateUserChallenge {
@@ -33,4 +34,9 @@ export interface AuthenticateUserResponse {
 
   authenticationInfo?: AuthenticationInfo;
   session?: string;
+}
+
+export interface DecodedAccessToken {
+  userId: string;
+  username: string;
 }

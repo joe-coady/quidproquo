@@ -9,6 +9,9 @@ export * from './UserDirectoryConfirmEmailVerificationActionTypes';
 export * from './UserDirectoryConfirmForgotPasswordActionRequester';
 export * from './UserDirectoryConfirmForgotPasswordActionTypes';
 
+export * from './UserDirectoryReadAccessTokenActionRequester';
+export * from './UserDirectoryReadAccessTokenActionTypes';
+
 export * from './UserDirectoryCreateUserActionRequester';
 export * from './UserDirectoryCreateUserActionTypes';
 
