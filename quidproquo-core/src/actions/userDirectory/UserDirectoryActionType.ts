@@ -1,3 +1,5 @@
+import { AuthenticateUserChallenge } from './types';
+
 export enum UserDirectoryActionType {
   CreateUser = '@quidproquo-core/UserDirectory/CreateUser',
   AuthenticateUser = '@quidproquo-core/UserDirectory/AuthenticateUser',
@@ -7,12 +9,7 @@ export enum UserDirectoryActionType {
   RequestEmailVerification = '@quidproquo-core/UserDirectory/RequestEmailVerification',
   ConfirmEmailVerification = '@quidproquo-core/UserDirectory/ConfirmEmailVerification',
   ReadAccessToken = '@quidproquo-core/UserDirectory/ReadAccessToken',
-}
-
-export enum AuthenticateUserChallenge {
-  NONE = 'NONE',
-  RESET_PASSWORD = 'RESET_PASSWORD',
-  NEW_PASSWORD_REQUIRED = 'NEW_PASSWORD_REQUIRED',
+  RespondToAuthChallenge = '@quidproquo-core/UserDirectory/RespondToAuthChallenge',
 }
 
 export interface AuthenticationInfo {

@@ -1,3 +1,5 @@
+export * from './types';
+
 export * from './UserDirectoryActionType';
 
 export * from './UserDirectoryAuthenticateUserActionRequester';
