@@ -43,6 +43,8 @@ export const authenticateUser = async (
 
   try {
     const response = await cognitoClient.send(new AdminInitiateAuthCommand(params));
+    console.log('authenticateUser response: ', JSON.stringify(response, null, 2));
+
     return cognitoAdminInitiateAuthResponseToQpqAuthenticationInfo(response, issueDateTime);
   } catch (e) {
     if (e instanceof Error) {

@@ -7,6 +7,7 @@ import {
 import {
   AuthenticationResultType,
   AdminInitiateAuthResponse,
+  ChallengeNameType,
 } from '@aws-sdk/client-cognito-identity-provider';
 
 export const cognitoAuthenticationResultTypeToQpqAuthenticationInfo = (
@@ -30,13 +31,30 @@ export const cognitoAuthenticationResultTypeToQpqAuthenticationInfo = (
   };
 };
 
+export const cognitoChallengeNameTypeToQpqAuthenticateUserChallenge = (
+  cognitoChallengeName: ChallengeNameType | string | undefined,
+): AuthenticateUserChallenge => {
+  if (!cognitoChallengeName) {
+    return AuthenticateUserChallenge.NONE;
+  }
+
+  const map: Record<string, AuthenticateUserChallenge | string> = {
+    [ChallengeNameType.NEW_PASSWORD_REQUIRED]: AuthenticateUserChallenge.NEW_PASSWORD_REQUIRED,
+  };
+
+  // TODO: handle the NOT-IMP cases
+  const challenge = map[cognitoChallengeName] || `NOT-IMP-${cognitoChallengeName}`;
+
+  return challenge as AuthenticateUserChallenge;
+};
+
 export const cognitoAdminInitiateAuthResponseToQpqAuthenticationInfo = (
   authResponse: AdminInitiateAuthResponse,
   issueDateTime: string,
 ): AuthenticateUserResponse => {
   const res: AuthenticateUserResponse = {
     session: authResponse.Session,
-    challenge: AuthenticateUserChallenge.NONE,
+    challenge: cognitoChallengeNameTypeToQpqAuthenticateUserChallenge(authResponse.ChallengeName),
   };
 
   if (authResponse.AuthenticationResult) {

@@ -12,6 +12,7 @@ export enum UserDirectoryActionType {
 export enum AuthenticateUserChallenge {
   NONE = 'NONE',
   RESET_PASSWORD = 'RESET_PASSWORD',
+  NEW_PASSWORD_REQUIRED = 'NEW_PASSWORD_REQUIRED',
 }
 
 export interface AuthenticationInfo {
