@@ -1,6 +1,6 @@
 import { AnyAuthChallenge } from './types';
 import { Action, ActionProcessor, ActionRequester } from '../../types';
-import { UserDirectoryActionType, AuthenticationDeliveryDetails } from './UserDirectoryActionType';
+import { UserDirectoryActionType, AuthenticateUserResponse } from './UserDirectoryActionType';
 
 // Payload
 export interface UserDirectoryRespondToAuthChallengeActionPayload {
@@ -19,9 +19,9 @@ export interface UserDirectoryRespondToAuthChallengeAction
 // Function Types
 export type UserDirectoryRespondToAuthChallengeActionProcessor = ActionProcessor<
   UserDirectoryRespondToAuthChallengeAction,
-  AuthenticationDeliveryDetails
+  AuthenticateUserResponse
 >;
 export type UserDirectoryRespondToAuthChallengeActionRequester = ActionRequester<
   UserDirectoryRespondToAuthChallengeAction,
-  AuthenticationDeliveryDetails
+  AuthenticateUserResponse
 >;

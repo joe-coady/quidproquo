@@ -25,3 +25,6 @@ export * from './UserDirectoryRefreshTokenActionTypes';
 
 export * from './UserDirectoryRequestEmailVerificationActionRequester';
 export * from './UserDirectoryRequestEmailVerificationActionTypes';
+
+export * from './UserDirectoryRespondToAuthChallengeActionRequester';
+export * from './UserDirectoryRespondToAuthChallengeActionTypes';
