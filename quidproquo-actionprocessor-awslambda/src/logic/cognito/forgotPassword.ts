@@ -24,6 +24,9 @@ export const forgotPassword = async (
     ClientId: clientId,
     Username: username,
     SecretHash: secretHash,
+    ClientMetadata: {
+      userInitiated: 'true',
+    },
   };
 
   const response = await cognitoClient.send(new ForgotPasswordCommand(params));

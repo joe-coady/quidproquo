@@ -44,5 +44,6 @@ export const defineUserDirectory = (
   emailTemplates: {
     verifyEmail: options?.emailTemplates?.verifyEmail || verifyEmailTemplate,
     resetPassword: options?.emailTemplates?.resetPassword || resetPassword,
+    resetPasswordAdmin: options?.emailTemplates?.resetPasswordAdmin || resetPassword,
   },
 });

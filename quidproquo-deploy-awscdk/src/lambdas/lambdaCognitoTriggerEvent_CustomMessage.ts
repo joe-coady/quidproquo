@@ -48,10 +48,25 @@ export const executeCognitoTriggerEvent = async (
   const templates = getTemplates();
 
   switch (event.triggerSource) {
-    case 'CustomMessage_ForgotPassword':
-      event.response.emailMessage = await renderTemplate(templates.resetPassword!.body, params);
-      event.response.emailSubject = await renderTemplate(templates.resetPassword!.subject, params);
+    case 'CustomMessage_ForgotPassword': {
+      if (event.request.clientMetadata?.['userInitiated'] === 'true') {
+        event.response.emailMessage = await renderTemplate(templates.resetPassword!.body, params);
+        event.response.emailSubject = await renderTemplate(
+          templates.resetPassword!.subject,
+          params,
+        );
+      } else {
+        event.response.emailMessage = await renderTemplate(
+          templates.resetPasswordAdmin!.body,
+          params,
+        );
+        event.response.emailSubject = await renderTemplate(
+          templates.resetPasswordAdmin!.subject,
+          params,
+        );
+      }
       break;
+    }
 
     case 'CustomMessage_VerifyUserAttribute':
       event.response.emailMessage = await renderTemplate(templates.verifyEmail!.body, params);

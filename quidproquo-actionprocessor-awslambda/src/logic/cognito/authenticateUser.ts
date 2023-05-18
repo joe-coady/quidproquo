@@ -41,25 +41,7 @@ export const authenticateUser = async (
     },
   };
 
-  try {
-    const response = await cognitoClient.send(new AdminInitiateAuthCommand(params));
-    console.log('authenticateUser response: ', JSON.stringify(response, null, 2));
+  const response = await cognitoClient.send(new AdminInitiateAuthCommand(params));
 
-    return cognitoAdminInitiateAuthResponseToQpqAuthenticationInfo(response, issueDateTime);
-  } catch (e) {
-    if (e instanceof Error) {
-      switch (e.name) {
-        case 'PasswordResetRequiredException':
-          return {
-            challenge: AuthenticateUserChallenge.RESET_PASSWORD,
-          };
-      }
-
-      throw new Error(`${e.name}: ${e.message}`);
-    }
-
-    console.log('authenticateUser Error: ', e);
-
-    throw new Error(`Unknown error has occurred in authenticateUser`);
-  }
+  return cognitoAdminInitiateAuthResponseToQpqAuthenticationInfo(response, issueDateTime);
 };

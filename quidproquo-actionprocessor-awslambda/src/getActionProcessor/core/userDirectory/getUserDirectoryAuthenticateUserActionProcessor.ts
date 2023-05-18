@@ -1,10 +1,12 @@
 import {
   UserDirectoryAuthenticateUserActionProcessor,
   actionResult,
+  actionResultError,
   QPQConfig,
   qpqCoreUtils,
   UserDirectoryActionType,
   AuthenticateUserChallenge,
+  ErrorTypeEnum,
 } from 'quidproquo-core';
 
 import {
@@ -31,15 +33,23 @@ const getUserDirectoryAuthenticateUserActionProcessor = (
       region,
     );
 
-    const authResponse = await authenticateUser(
-      userPoolId,
-      userPoolClientId,
-      qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig),
-      payload.authenticateUserRequest.email,
-      payload.authenticateUserRequest.password,
-    );
+    try {
+      const authResponse = await authenticateUser(
+        userPoolId,
+        userPoolClientId,
+        qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig),
+        payload.authenticateUserRequest.email,
+        payload.authenticateUserRequest.password,
+      );
 
-    return actionResult(authResponse);
+      return actionResult(authResponse);
+    } catch (e) {
+      if (e instanceof Error) {
+        return actionResultError(ErrorTypeEnum.Unauthorized, e.message);
+      }
+
+      return actionResultError(ErrorTypeEnum.GenericError, 'An unknown error has occurred.');
+    }
   };
 };
 

@@ -56,10 +56,11 @@ const getProcessExecuteStory = <T extends Array<any>>(
     const storyResult = await resolveStory(story, payload.params);
 
     if (storyResult.error) {
+      const stack = `${payload.src}::${payload.runtime}`;
       return actionResultError(
         storyResult.error.errorType,
         storyResult.error.errorText,
-        `story error! in ${payload.src}::${payload.runtime} -> [${storyResult.error.errorStack}]`,
+        storyResult.error.errorStack ? `${stack} -> [${storyResult.error.errorStack}]` : stack,
       );
     }
 
