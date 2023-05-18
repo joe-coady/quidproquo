@@ -1,8 +1,9 @@
-import { KeyValueStoreQPQConfigSetting, QPQConfig } from 'quidproquo-core';
+import { KeyValueStoreQPQConfigSetting, QPQConfig, KvsKey } from 'quidproquo-core';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
 import { Construct } from 'constructs';
 import { aws_dynamodb, aws_iam } from 'aws-cdk-lib';
+import * as cdk from 'aws-cdk-lib';
 
 export interface QpqCoreKeyValueStoreConstructProps extends QpqConstructBlockProps {
   keyValueStoreConfig: KeyValueStoreQPQConfigSetting;
@@ -23,6 +24,26 @@ export abstract class QpqCoreKeyValueStoreConstructBase extends QpqConstructBloc
     this.table.grantFullAccess(grantee);
   }
 }
+
+export const convertKvsKeyTypeToDynamodbAttributeType = (
+  kvsKeyType: KvsKey['type'],
+): aws_dynamodb.AttributeType => {
+  switch (kvsKeyType) {
+    case 'string':
+      return aws_dynamodb.AttributeType.STRING;
+    case 'number':
+      return aws_dynamodb.AttributeType.NUMBER;
+    case 'binary':
+      return aws_dynamodb.AttributeType.BINARY;
+  }
+
+  throw new Error(`Unknown KvsKeyType: ${kvsKeyType}`);
+};
+
+export const convertKvsKeyToDynamodbAttribute = (kvsKey: KvsKey): aws_dynamodb.Attribute => ({
+  name: kvsKey.key,
+  type: convertKvsKeyTypeToDynamodbAttributeType(kvsKey.type),
+});
 
 export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstructBase {
   table: aws_dynamodb.ITable;
@@ -48,14 +69,35 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
   constructor(scope: Construct, id: string, props: QpqCoreKeyValueStoreConstructProps) {
     super(scope, id, props);
 
-    this.table = new aws_dynamodb.Table(this, 'table', {
+    const [primarySortKey] = props.keyValueStoreConfig.sortKeys;
+
+    const table = new aws_dynamodb.Table(this, 'table', {
       tableName: this.qpqResourceName(props.keyValueStoreConfig.keyValueStoreName, 'kvs'),
-      partitionKey: {
-        name: 'key',
-        type: aws_dynamodb.AttributeType.STRING,
-      },
+      partitionKey: convertKvsKeyToDynamodbAttribute(props.keyValueStoreConfig.partitionKey),
+      sortKey: primarySortKey && convertKvsKeyToDynamodbAttribute(primarySortKey),
       billingMode: aws_dynamodb.BillingMode.PAY_PER_REQUEST,
-      timeToLiveAttribute: 'expires',
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
+
+    // Do local secondary indexes
+    for (let i = 1; i < props.keyValueStoreConfig.sortKeys.length; i++) {
+      let sortKey = props.keyValueStoreConfig.sortKeys[i];
+
+      table.addLocalSecondaryIndex({
+        indexName: sortKey.key,
+        sortKey: convertKvsKeyToDynamodbAttribute(sortKey),
+      });
+    }
+
+    // Do global secondary indexes
+    for (const index of props.keyValueStoreConfig.indexes) {
+      table.addGlobalSecondaryIndex({
+        indexName: index.partitionKey.key,
+        partitionKey: convertKvsKeyToDynamodbAttribute(index.partitionKey),
+        sortKey: index.sortKey && convertKvsKeyToDynamodbAttribute(index.sortKey),
+      });
+    }
+
+    this.table = table;
   }
 }
