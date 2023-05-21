@@ -3,10 +3,10 @@ import { decodeValidJwt } from './decodeValidJwt';
 export const verifyJwt = async (
   accessToken: string,
   userPoolId: string,
-  clientId: string,
-  tokenType: 'id' | 'access',
+  region: string,
+  ignoreExpiration: boolean = false,
 ): Promise<boolean> => {
-  const info = await decodeValidJwt(userPoolId, clientId, tokenType, accessToken);
+  const info = await decodeValidJwt(userPoolId, region, ignoreExpiration, accessToken);
 
   // if we hav info, its valid
   return !!info;

@@ -5,6 +5,8 @@ import { UserDirectoryActionType, DecodedAccessToken } from './UserDirectoryActi
 export interface UserDirectoryReadAccessTokenActionPayload {
   userDirectoryName: string;
 
+  ignoreExpiration: boolean;
+
   serviceOverride?: string;
 }
 

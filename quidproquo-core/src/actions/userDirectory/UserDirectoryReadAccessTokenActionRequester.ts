@@ -3,6 +3,7 @@ import { UserDirectoryActionType } from './UserDirectoryActionType';
 
 export function* askUserDirectoryReadAccessToken(
   userDirectoryName: string,
+  ignoreExpiration: boolean,
   serviceOverride?: string,
 ): UserDirectoryReadAccessTokenActionRequester {
   return yield {
@@ -11,6 +12,8 @@ export function* askUserDirectoryReadAccessToken(
       userDirectoryName,
 
       serviceOverride,
+
+      ignoreExpiration,
     },
   };
 }

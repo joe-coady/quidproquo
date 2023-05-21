@@ -8,10 +8,7 @@ import {
   ErrorTypeEnum,
 } from 'quidproquo-core';
 
-import {
-  getCFExportNameUserPoolIdFromConfig,
-  getCFExportNameUserPoolClientIdFromConfig,
-} from '../../../awsNamingUtils';
+import { getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { decodeValidJwt } from '../../../logic/cognito/decodeValidJwt';
@@ -19,7 +16,7 @@ import { decodeValidJwt } from '../../../logic/cognito/decodeValidJwt';
 const getUserDirectoryReadAccessTokenActionProcessor = (
   qpqConfig: QPQConfig,
 ): UserDirectoryReadAccessTokenActionProcessor => {
-  return async ({ userDirectoryName, serviceOverride }, session) => {
+  return async ({ userDirectoryName, serviceOverride, ignoreExpiration }, session) => {
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const userPoolId = await getExportedValue(
@@ -27,15 +24,10 @@ const getUserDirectoryReadAccessTokenActionProcessor = (
       region,
     );
 
-    const userPoolClientId = await getExportedValue(
-      getCFExportNameUserPoolClientIdFromConfig(userDirectoryName, qpqConfig, serviceOverride),
-      region,
-    );
-
     const authInfo = await decodeValidJwt(
       userPoolId,
-      userPoolClientId,
-      'access',
+      region,
+      ignoreExpiration,
       session.accessToken,
     );
 

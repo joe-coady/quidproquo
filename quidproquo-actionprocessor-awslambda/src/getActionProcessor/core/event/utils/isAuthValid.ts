@@ -1,13 +1,11 @@
 import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
-import { RouteAuthSettings, qpqWebServerUtils } from 'quidproquo-webserver';
+import { RouteAuthSettings } from 'quidproquo-webserver';
 
 import { verifyJwt } from '../../../../logic/cognito/verifyJwt';
 import { getExportedValue } from '../../../../logic/cloudformation/getExportedValue';
 import { getApiKeys } from '../../../../logic/apiGateway/getApiKeys';
 import {
   getCFExportNameUserPoolIdFromConfig,
-  getCFExportNameUserPoolClientIdFromConfig,
-  getCFExportNameApiKeyIdFromConfig,
   getConfigRuntimeResourceName,
 } from '../../../../awsNamingUtils';
 
@@ -47,19 +45,8 @@ const isAuthValidForCognito = async (
     region,
   );
 
-  // Resolve the user pool client id
-  const userPoolClientId = await getExportedValue(
-    getCFExportNameUserPoolClientIdFromConfig(
-      userDirectoryName,
-      qpqConfig,
-      authSettings.serviceName,
-      authSettings.applicationName,
-    ),
-    region,
-  );
-
   // Verify the token
-  return await verifyJwt(accessToken, userPoolId, userPoolClientId, 'access');
+  return await verifyJwt(accessToken, userPoolId, region, false);
 };
 
 const isAuthValidForApiKeys = async (

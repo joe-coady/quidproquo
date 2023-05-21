@@ -33,12 +33,8 @@ const getUserDirectoryRefreshTokenActionProcessor = (
       region,
     );
 
-    const authInfo = await decodeValidJwt(
-      userPoolId,
-      userPoolClientId,
-      'access',
-      session.accessToken,
-    );
+    const authInfo = await decodeValidJwt(userPoolId, region, true, session.accessToken);
+
     if (!authInfo || !authInfo?.username) {
       return actionResultError(ErrorTypeEnum.Unauthorized, 'Invalid accessToken');
     }
