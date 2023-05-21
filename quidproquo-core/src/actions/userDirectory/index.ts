@@ -20,6 +20,9 @@ export * from './UserDirectoryCreateUserActionTypes';
 export * from './UserDirectoryForgotPasswordActionRequester';
 export * from './UserDirectoryForgotPasswordActionTypes';
 
+export * from './UserDirectoryGetUserAttributesActionRequester';
+export * from './UserDirectoryGetUserAttributesActionTypes';
+
 export * from './UserDirectoryRefreshTokenActionRequester';
 export * from './UserDirectoryRefreshTokenActionTypes';
 
