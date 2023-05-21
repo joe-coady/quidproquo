@@ -2,12 +2,12 @@ import { QPQConfig } from 'quidproquo-core';
 
 import getKeyValueStoreDeleteActionProcessor from './getKeyValueStoreDeleteActionProcessor';
 import getKeyValueStoreGetActionProcessor from './getKeyValueStoreGetActionProcessor';
-import getKeyValueStoreSetActionProcessor from './getKeyValueStoreSetActionProcessor';
+import getKeyValueStoreUpsertActionProcessor from './getKeyValueStoreUpsertActionProcessor';
 import getKeyValueStoreUpdateActionProcessor from './getKeyValueStoreUpdateActionProcessor';
 
 export default (qpqConfig: QPQConfig) => ({
   ...getKeyValueStoreDeleteActionProcessor(qpqConfig),
   ...getKeyValueStoreGetActionProcessor(qpqConfig),
-  ...getKeyValueStoreSetActionProcessor(qpqConfig),
+  ...getKeyValueStoreUpsertActionProcessor(qpqConfig),
   ...getKeyValueStoreUpdateActionProcessor(qpqConfig),
 });

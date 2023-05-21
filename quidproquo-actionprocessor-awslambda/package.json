@@ -38,12 +38,14 @@
     "@aws-sdk/client-ssm": "^3.278.0",
     "aws-jwt-verify": "^3.4.0",
     "aws-sdk": "^2.1322.0",
+    "lodash": "^4.17.21",
     "node-match-path": "^0.6.3",
     "quidproquo-core": "*",
     "quidproquo-webserver": "*"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.109",
+    "@types/lodash": "^4.14.194",
     "@types/node": "^18.11.9",
     "quidproquo-tsconfig": "*",
     "typescript": "^4.9.3"

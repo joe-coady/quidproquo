@@ -9,8 +9,8 @@ export * from './KeyValueStoreGetActionTypes';
 export * from './KeyValueStoreGetAllActionRequester';
 export * from './KeyValueStoreGetAllActionTypes';
 
-export * from './KeyValueStoreSetActionRequester';
-export * from './KeyValueStoreSetActionTypes';
-
 export * from './KeyValueStoreUpdateActionRequester';
 export * from './KeyValueStoreUpdateActionTypes';
+
+export * from './KeyValueStoreUpsertActionRequester';
+export * from './KeyValueStoreUpsertActionTypes';

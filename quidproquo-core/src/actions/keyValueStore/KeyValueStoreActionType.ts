@@ -1,5 +1,5 @@
 export enum KeyValueStoreActionType {
-  Set = '@quidproquo-core/KeyValueStore/Set',
+  Upsert = '@quidproquo-core/KeyValueStore/Upsert',
   Get = '@quidproquo-core/KeyValueStore/Get',
   GetAll = '@quidproquo-core/KeyValueStore/GetAll',
   Delete = '@quidproquo-core/KeyValueStore/Delete',
