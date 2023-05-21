@@ -11,6 +11,7 @@ export enum UserDirectoryActionType {
   ReadAccessToken = '@quidproquo-core/UserDirectory/ReadAccessToken',
   RespondToAuthChallenge = '@quidproquo-core/UserDirectory/RespondToAuthChallenge',
   GetUserAttributes = '@quidproquo-core/UserDirectory/GetUserAttributes',
+  SetUserAttributes = '@quidproquo-core/UserDirectory/SetUserAttributes',
 }
 
 export interface AuthenticationInfo {

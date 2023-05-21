@@ -31,3 +31,6 @@ export * from './UserDirectoryRequestEmailVerificationActionTypes';
 
 export * from './UserDirectoryRespondToAuthChallengeActionRequester';
 export * from './UserDirectoryRespondToAuthChallengeActionTypes';
+
+export * from './UserDirectorySetUserAttributesActionRequester';
+export * from './UserDirectorySetUserAttributesActionTypes';
