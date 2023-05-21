@@ -108,6 +108,10 @@ export class QpqCoreUserDirectoryConstruct extends QpqCoreUserDirectoryConstruct
         email: true,
         phone: props.userDirectoryConfig.phoneRequired,
       },
+      // signInAliases: {
+      //   username: true,
+      //   email: true,
+      // },
     });
 
     this.userPool = userPool;

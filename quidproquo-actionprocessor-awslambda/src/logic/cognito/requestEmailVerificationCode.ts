@@ -15,6 +15,4 @@ export const requestEmailVerificationCode = async (region: string, accessToken: 
   const requestEmailVerificationCodeResponse = await cognitoClient.send(
     new GetUserAttributeVerificationCodeCommand(params),
   );
-
-  console.log(JSON.stringify(requestEmailVerificationCodeResponse, null, 2));
 };

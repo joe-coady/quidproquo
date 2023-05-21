@@ -44,8 +44,6 @@ export const decodeValidJwt = async (
     const key = await client.getSigningKey(decodedToken.header.kid);
     const signingKey = key.getPublicKey();
 
-    console.log(`[${signingKey}]`);
-
     const payload = verify(accessToken, signingKey, {
       algorithms: ['RS256'],
       ignoreExpiration,

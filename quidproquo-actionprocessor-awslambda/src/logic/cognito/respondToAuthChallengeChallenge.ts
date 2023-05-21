@@ -37,8 +37,6 @@ export const respondToAuthChallengeChallenge = async (
     },
   };
 
-  console.log('params', JSON.stringify(params, null, 2));
-
   const issueDateTime = new Date().toISOString();
   const response = await cognitoClient.send(new RespondToAuthChallengeCommand(params));
 

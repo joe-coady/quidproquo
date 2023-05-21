@@ -38,8 +38,6 @@ export const getUser = async (accessToken: string, region: string): Promise<User
 
   const response = await cognitoClient.send(new GetUserCommand(params));
 
-  console.log(JSON.stringify(response, null, 2));
-
   const attributeTypes = (response.UserAttributes || []).filter((ua) => !!ua.Value);
   const userAttributes = attributeTypes.reduce(
     (acc, ua) => ({ ...acc, [ua.Name!]: ua.Value! }),
@@ -53,8 +51,6 @@ export const getUser = async (accessToken: string, region: string): Promise<User
 
     userAttributes,
   };
-
-  console.log(JSON.stringify(user, null, 2));
 
   return user;
 };
