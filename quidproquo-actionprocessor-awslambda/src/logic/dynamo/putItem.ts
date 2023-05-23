@@ -63,12 +63,7 @@ export async function putItem<Item>(
   await dynamoClient.send(
     new PutItemCommand({
       TableName: tableName,
-      Item: {
-        ...dynamoProps,
-        ['__qpq-data']: {
-          M: convertObjectToDynamoMap(item),
-        },
-      },
+      Item: convertObjectToDynamoMap(item),
     }),
   );
 }
