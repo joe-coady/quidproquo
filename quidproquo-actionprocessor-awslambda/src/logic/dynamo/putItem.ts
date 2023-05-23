@@ -1,6 +1,7 @@
 import { KvsKey } from 'quidproquo-core';
 import { DynamoDBClient, PutItemCommand, AttributeValue } from '@aws-sdk/client-dynamodb';
 import { get } from 'lodash';
+import { convertObjectToDynamoMap } from './convertObjectToDynamoMap';
 
 export interface PutItemOptions {
   expires?: number;
@@ -38,7 +39,6 @@ export const getDynamoValueTypeFromKvsKey = (key: KvsKey): DynamoAttributeType =
 
 export async function putItem<Item>(
   tableName: string,
-  key: string,
   item: Item,
   attributes: KvsKey[],
   options: PutItemOptions,
@@ -65,6 +65,9 @@ export async function putItem<Item>(
       TableName: tableName,
       Item: {
         ...dynamoProps,
+        ['__qpq-data']: {
+          M: convertObjectToDynamoMap(item),
+        },
       },
     }),
   );
