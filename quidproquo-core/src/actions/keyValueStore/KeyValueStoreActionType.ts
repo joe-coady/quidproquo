@@ -4,4 +4,5 @@ export enum KeyValueStoreActionType {
   GetAll = '@quidproquo-core/KeyValueStore/GetAll',
   Delete = '@quidproquo-core/KeyValueStore/Delete',
   Update = '@quidproquo-core/KeyValueStore/Update',
+  Query = '@quidproquo-core/KeyValueStore/Query',
 }

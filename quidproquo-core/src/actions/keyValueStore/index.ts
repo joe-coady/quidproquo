@@ -1,4 +1,6 @@
 export * from './KeyValueStoreActionType';
+export * from './types';
+export * from './utils';
 
 export * from './KeyValueStoreDeleteActionRequester';
 export * from './KeyValueStoreDeleteActionTypes';
@@ -8,6 +10,9 @@ export * from './KeyValueStoreGetActionTypes';
 
 export * from './KeyValueStoreGetAllActionRequester';
 export * from './KeyValueStoreGetAllActionTypes';
+
+export * from './KeyValueStoreQueryActionRequester';
+export * from './KeyValueStoreQueryActionTypes';
 
 export * from './KeyValueStoreUpdateActionRequester';
 export * from './KeyValueStoreUpdateActionTypes';
