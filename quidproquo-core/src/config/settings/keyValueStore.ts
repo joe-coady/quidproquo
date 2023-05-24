@@ -27,10 +27,12 @@ export const kvsKey = (key: string, type: KvsKeyType = 'string'): KvsKey => ({
 });
 
 type CompositeKvsKey = KvsKey | string;
-export type CompositeKvsIndex = {
-  partitionKey: CompositeKvsKey;
-  sortKey?: CompositeKvsKey;
-};
+export type CompositeKvsIndex =
+  | string
+  | {
+      partitionKey: CompositeKvsKey;
+      sortKey?: CompositeKvsKey;
+    };
 
 const convertCompositeKvsKeyToKvsKey = (compositeKvsKey: CompositeKvsKey): KvsKey => {
   if (typeof compositeKvsKey === 'string') {
@@ -40,12 +42,20 @@ const convertCompositeKvsKeyToKvsKey = (compositeKvsKey: CompositeKvsKey): KvsKe
   return compositeKvsKey;
 };
 
-const convertCompositeKvsIndexToKvsIndex = (compositeKvsIndex: CompositeKvsIndex): KvsIndex => ({
-  partitionKey: convertCompositeKvsKeyToKvsKey(compositeKvsIndex.partitionKey),
-  sortKey: compositeKvsIndex.sortKey
-    ? convertCompositeKvsKeyToKvsKey(compositeKvsIndex.sortKey)
-    : undefined,
-});
+const convertCompositeKvsIndexToKvsIndex = (compositeKvsIndex: CompositeKvsIndex): KvsIndex => {
+  if (typeof compositeKvsIndex === 'string') {
+    return {
+      partitionKey: kvsKey(compositeKvsIndex, 'string'),
+    };
+  }
+
+  return {
+    partitionKey: convertCompositeKvsKeyToKvsKey(compositeKvsIndex.partitionKey),
+    sortKey: compositeKvsIndex.sortKey
+      ? convertCompositeKvsKeyToKvsKey(compositeKvsIndex.sortKey)
+      : undefined,
+  };
+};
 
 export interface QPQConfigAdvancedKeyValueStoreSettings extends QPQConfigAdvancedSettings {
   indexes: CompositeKvsIndex[];

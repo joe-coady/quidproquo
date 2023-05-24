@@ -10,6 +10,7 @@ import {
   SecretQPQConfigSetting,
   QPQConfig,
   QueueQPQConfigSetting,
+  KeyValueStoreQPQConfigSetting,
 } from 'quidproquo-core';
 
 import {
@@ -27,6 +28,7 @@ import {
   QpqCoreQueueConstruct,
   QpqCoreUserDirectoryConstruct,
   QpqCoreEventBusConstruct,
+  QpqCoreKeyValueStoreConstruct,
   LogStorage,
 } from '../constructs';
 
@@ -54,6 +56,27 @@ export const getQqpSecretGrantables = (
   });
 
   return secretResources;
+};
+
+export const getQqpKvsGrantables = (
+  scope: Construct,
+  id: string,
+  qpqConfig: QPQConfig,
+  awsAccountId: string,
+): QpqResource[] => {
+  const kvsSettings = [...qpqCoreUtils.getAllKeyValueStores(qpqConfig)];
+
+  const kvsResources = kvsSettings.map((kvsSetting) => {
+    return QpqCoreKeyValueStoreConstruct.fromOtherStack(
+      scope,
+      `${id}-${qpqCoreUtils.getUniqueKeyForSetting(kvsSetting)}-grantable`,
+      qpqConfig,
+      awsAccountId,
+      kvsSetting.keyValueStoreName,
+    );
+  });
+
+  return kvsResources;
 };
 
 export const getQqpParameterGrantables = (
@@ -259,6 +282,7 @@ export const getQqpGrantableResources = (
     ...getQqpUserPoolGrantables(scope, id, qpqConfig, awsAccountId),
     ...getQqpTopicGrantables(scope, id, qpqConfig, awsAccountId),
     ...getQqpServiceLogGrantables(scope, id, qpqConfig, awsAccountId),
+    ...getQqpKvsGrantables(scope, id, qpqConfig, awsAccountId),
   ];
 };
 

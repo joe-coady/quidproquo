@@ -43,3 +43,18 @@ export enum KvsQueryOperationType {
   /** Corresponds to the DynamoDB 'NOT_CONTAINS' condition. */
   NotContains = 'NotContains',
 }
+
+/**
+ * Enum representing the logical operators for a key-value store query.
+ */
+export enum KvsLogicalOperatorType {
+  /**
+   * Represents the logical AND operator.
+   */
+  And = 'And',
+
+  /**
+   * Represents the logical OR operator.
+   */
+  Or = 'Or',
+}

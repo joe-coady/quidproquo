@@ -11,7 +11,7 @@ import { query } from '../../../logic/dynamo';
 const getProcessKeyValueStoreQuery = (
   qpqConfig: QPQConfig,
 ): KeyValueStoreQueryActionProcessor<any> => {
-  return async ({ keyValueStoreName, operations }) => {
+  return async ({ keyValueStoreName }) => {
     const dynamoTableName = getQpqRuntimeResourceNameFromConfig(
       keyValueStoreName,
       qpqConfig,

@@ -12,7 +12,8 @@ export interface KeyValueStoreQueryOptions {
 export interface KeyValueStoreQueryActionPayload {
   keyValueStoreName: string;
 
-  operations: KvsQueryOperation[];
+  keyCondition: KvsQueryOperation;
+  filterCondition?: KvsQueryOperation;
 }
 
 // Action

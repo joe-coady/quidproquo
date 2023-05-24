@@ -1,25 +1,9 @@
 import { SQSEvent, SQSBatchResponse, Context } from 'aws-lambda';
 
-import { coreActionProcessor, webserverActionProcessor } from 'quidproquo-actionprocessor-node';
-
 import {
   getSQSEventRecordActionProcessor,
-  getSystemActionProcessor,
-  getFileActionProcessor,
-  getQueueActionProcessor,
-  getEventBusActionProcessor,
-  getConfigGetSecretActionProcessor,
-  getConfigGetParameterActionProcessor,
-  getConfigGetParametersActionProcessor,
-  getUserDirectoryActionProcessor,
-  getWebEntryActionProcessor,
-  getServiceFunctionActionProcessor,
-  getAdminActionProcessor,
-  awsLambdaUtils,
   DynamicModuleLoader,
 } from 'quidproquo-actionprocessor-awslambda';
-
-import { getConfigActionProcessor } from 'quidproquo-actionprocessor-node';
 
 import { getLambdaConfigs } from './lambdaConfig';
 
@@ -32,7 +16,7 @@ import {
 } from 'quidproquo-core';
 
 import { ActionProcessorListResolver } from './actionProcessorListResolver';
-import { getLogger, getRuntimeCorrelation } from './lambda-utils';
+import { getLogger, getRuntimeCorrelation, getLambdaActionProcessors } from './lambda-utils';
 
 import { dynamicModuleLoader } from './dynamicModuleLoader';
 
@@ -57,24 +41,10 @@ export const getStoryActionRuntime = async (
   // Build a processor for the session and stuff
   // Remove the non route ones ~ let the story execute action add them
   const storyActionProcessor = {
-    ...coreActionProcessor,
-    ...webserverActionProcessor,
+    ...getLambdaActionProcessors(cdkConfig.qpqConfig),
 
     ...getSQSEventRecordActionProcessor(cdkConfig.qpqConfig),
-    ...getConfigGetSecretActionProcessor(cdkConfig.qpqConfig),
-    ...getConfigGetParameterActionProcessor(cdkConfig.qpqConfig),
-    ...getConfigGetParametersActionProcessor(cdkConfig.qpqConfig),
-    ...getSystemActionProcessor(cdkConfig.qpqConfig, dynamicModuleLoader),
-    ...getFileActionProcessor(cdkConfig.qpqConfig),
-    ...getConfigActionProcessor(cdkConfig.qpqConfig),
-    ...getQueueActionProcessor(cdkConfig.qpqConfig),
-    ...getEventBusActionProcessor(cdkConfig.qpqConfig),
-    ...getUserDirectoryActionProcessor(cdkConfig.qpqConfig),
-    ...getWebEntryActionProcessor(cdkConfig.qpqConfig),
-    ...getServiceFunctionActionProcessor(cdkConfig.qpqConfig),
-    ...getAdminActionProcessor(cdkConfig.qpqConfig),
 
-    ...getCustomActionProcessors(cdkConfig.qpqConfig),
     ...qpqCustomActionProcessors(),
   };
 
