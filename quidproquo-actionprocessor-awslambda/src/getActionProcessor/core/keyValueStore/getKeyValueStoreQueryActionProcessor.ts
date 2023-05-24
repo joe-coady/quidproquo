@@ -7,11 +7,12 @@ import {
   KeyValueStoreActionType,
 } from 'quidproquo-core';
 import { query } from '../../../logic/dynamo';
+import { getDynamoTableIndexByConfigAndQuery } from '../../../logic/dynamo/qpqDynamoOrm/thing';
 
 const getProcessKeyValueStoreQuery = (
   qpqConfig: QPQConfig,
 ): KeyValueStoreQueryActionProcessor<any> => {
-  return async ({ keyValueStoreName }) => {
+  return async ({ keyValueStoreName, keyCondition, filterCondition }) => {
     const dynamoTableName = getQpqRuntimeResourceNameFromConfig(
       keyValueStoreName,
       qpqConfig,
@@ -27,9 +28,15 @@ const getProcessKeyValueStoreQuery = (
       );
     }
 
-    await query(dynamoTableName, region);
+    const items = await query(
+      dynamoTableName,
+      region,
+      keyCondition,
+      filterCondition,
+      getDynamoTableIndexByConfigAndQuery(storeConfig, keyCondition),
+    );
 
-    return actionResult([]);
+    return actionResult(items);
   };
 };
 

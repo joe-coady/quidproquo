@@ -1,54 +1,40 @@
-import {
-  DynamoDBClient,
-  QueryCommand,
-  QueryCommandInput,
-  AttributeValue,
-} from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, QueryCommand, QueryCommandInput } from '@aws-sdk/client-dynamodb';
 
-export async function query<Item>(tableName: string, region: string): Promise<void> {
+import { KvsQueryOperation } from 'quidproquo-core';
+import { convertDynamoMapToObject } from './convertObjectToDynamoMap';
+
+import {
+  buildExpressionAttributeValues,
+  buildExpressionAttributeNames,
+  buildDynamoQueryExpression,
+} from './qpqDynamoOrm';
+
+export async function query<Item>(
+  tableName: string,
+  region: string,
+  keyExpression: KvsQueryOperation,
+  filterExpression?: KvsQueryOperation,
+  indexName?: string,
+): Promise<Item[]> {
   // Instantiate DynamoDB client
   const dynamoClient = new DynamoDBClient({ region });
 
-  // Define query parameters
-  // const params: QueryCommandInput = {
-  //   TableName: tableName,
-  //   // KeyConditionExpression: '#id = :idValue',
-  //   FilterExpression: 'begins_with(test.#ok, :okValue)',
-  //   ExpressionAttributeValues: {
-  //     // ':idValue': { S: '1234' },
-  //     ':okValue': { S: '11' },
-  //   },
-  //   ExpressionAttributeNames: {
-  //     // '#test': 'test',
-  //     '#ok': 'ok',
-  //   },
-  //   // ProjectionExpression: '#test.#ok',
-  // };
-
   const params: QueryCommandInput = {
     TableName: tableName,
-    // KeyConditionExpression: '#id = :idValue',
-    KeyConditionExpression:
-      '((#id = :idValueA) AND (#startedAt BETWEEN :startedAtValueA AND :startedAtValueB))',
-    ExpressionAttributeValues: {
-      ':idValueA': { S: '1234' },
-      ':startedAtValueA': { S: '2023-05-23T04:12:17.000Z' },
-      ':startedAtValueB': { S: '2023-05-23T04:12:39.000Z' },
-    },
-    ExpressionAttributeNames: {
-      '#startedAt': 'startedAt',
-      '#id': 'id',
-    },
+    KeyConditionExpression: buildDynamoQueryExpression(keyExpression),
+    FilterExpression: buildDynamoQueryExpression(filterExpression),
+    ExpressionAttributeValues: buildExpressionAttributeValues([keyExpression, filterExpression]),
+    ExpressionAttributeNames: buildExpressionAttributeNames([keyExpression, filterExpression]),
+    IndexName: indexName,
   };
+
+  console.log(params);
 
   // Create QueryCommand
   const command = new QueryCommand(params);
 
-  try {
-    // Send the QueryCommand
-    const data = await dynamoClient.send(command);
-    console.log('Success', JSON.stringify(data.Items, null, 2));
-  } catch (error) {
-    console.error('Error', error);
-  }
+  // TODO: Catch errors and throw QPQ ones
+  const data = await dynamoClient.send(command);
+
+  return (data.Items?.map((i) => convertDynamoMapToObject(i)) || []) as Item[];
 }

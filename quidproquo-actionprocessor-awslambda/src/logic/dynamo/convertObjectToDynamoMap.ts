@@ -39,3 +39,37 @@ export function convertObjectToDynamoMap(obj: any) {
 
   return map;
 }
+
+export function convertDynamoMapToObject(dynamoMap: any): any {
+  const obj: any = {};
+
+  for (const property in dynamoMap) {
+    const value = dynamoMap[property];
+    const valueType = Object.keys(value)[0];
+
+    switch (valueType) {
+      case 'S':
+        obj[property] = value.S;
+        break;
+      case 'N':
+        obj[property] = parseFloat(value.N);
+        break;
+      case 'BOOL':
+        obj[property] = value.BOOL;
+        break;
+      case 'NULL':
+        obj[property] = null;
+        break;
+      case 'L':
+        obj[property] = value.L.map((item: any) => convertDynamoMapToObject({ temp: item }).temp);
+        break;
+      case 'M':
+        obj[property] = convertDynamoMapToObject(value.M);
+        break;
+      default:
+        throw new Error(`Unsupported DynamoDB data type: ${valueType}`);
+    }
+  }
+
+  return obj;
+}

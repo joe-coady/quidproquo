@@ -4,7 +4,7 @@ import { KvsQueryOperationType, KvsLogicalOperatorType } from './KvsQueryOperati
 export type KvsQueryCondition = {
   key: string;
   operation: KvsQueryOperationType;
-  valueA?: string | number | boolean;
+  valueA?: string | number | boolean | string[];
   valueB?: string | number | boolean;
 };
 
