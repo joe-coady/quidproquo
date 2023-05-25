@@ -5,6 +5,7 @@ import getKeyValueStoreGetActionProcessor from './getKeyValueStoreGetActionProce
 import getKeyValueStoreUpsertActionProcessor from './getKeyValueStoreUpsertActionProcessor';
 import getKeyValueStoreUpdateActionProcessor from './getKeyValueStoreUpdateActionProcessor';
 import getKeyValueStoreQueryActionProcessor from './getKeyValueStoreQueryActionProcessor';
+import getKeyValueStoreScanActionProcessor from './getKeyValueStoreScanActionProcessor';
 
 export default (qpqConfig: QPQConfig) => ({
   ...getKeyValueStoreDeleteActionProcessor(qpqConfig),
@@ -12,4 +13,5 @@ export default (qpqConfig: QPQConfig) => ({
   ...getKeyValueStoreQueryActionProcessor(qpqConfig),
   ...getKeyValueStoreUpdateActionProcessor(qpqConfig),
   ...getKeyValueStoreUpsertActionProcessor(qpqConfig),
+  ...getKeyValueStoreScanActionProcessor(qpqConfig),
 });

@@ -5,4 +5,5 @@ export enum KeyValueStoreActionType {
   Delete = '@quidproquo-core/KeyValueStore/Delete',
   Update = '@quidproquo-core/KeyValueStore/Update',
   Query = '@quidproquo-core/KeyValueStore/Query',
+  Scan = '@quidproquo-core/KeyValueStore/Scan',
 }

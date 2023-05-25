@@ -14,6 +14,9 @@ export * from './KeyValueStoreGetAllActionTypes';
 export * from './KeyValueStoreQueryActionRequester';
 export * from './KeyValueStoreQueryActionTypes';
 
+export * from './KeyValueStoreScanActionRequester';
+export * from './KeyValueStoreScanActionTypes';
+
 export * from './KeyValueStoreUpdateActionRequester';
 export * from './KeyValueStoreUpdateActionTypes';
 
