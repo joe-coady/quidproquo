@@ -1,21 +1,5 @@
 import {
-  coreActionProcessor,
-  webserverActionProcessor,
-  getConfigActionProcessor,
-} from 'quidproquo-actionprocessor-node';
-
-import {
   getCloudFrontOriginRequestEventActionProcessor,
-  getSystemActionProcessor,
-  getFileActionProcessor,
-  getUserDirectoryActionProcessor,
-  getConfigGetSecretActionProcessor,
-  getConfigGetParameterActionProcessor,
-  getConfigGetParametersActionProcessor,
-  getWebEntryActionProcessor,
-  getServiceFunctionActionProcessor,
-  getAdminActionProcessor,
-  awsLambdaUtils,
   DynamicModuleLoader,
 } from 'quidproquo-actionprocessor-awslambda';
 
@@ -26,7 +10,7 @@ import { createRuntime, askProcessEvent, QpqRuntimeType } from 'quidproquo-core'
 import { CloudFrontRequestEvent, CloudFrontRequestResult, Context } from 'aws-lambda';
 
 import { ActionProcessorListResolver } from './actionProcessorListResolver';
-import { getLogger, getRuntimeCorrelation } from './lambda-utils';
+import { getLogger, getRuntimeCorrelation, getLambdaActionProcessors } from './lambda-utils';
 
 import { dynamicModuleLoader } from './dynamicModuleLoader';
 
@@ -48,24 +32,9 @@ export const getOriginRequestEventExecutor = (
     // Build a processor for the session and stuff
     // Remove the non route ones ~ let the story execute action add them
     const storyActionProcessor = {
-      ...coreActionProcessor,
-      ...webserverActionProcessor,
-
+      ...getLambdaActionProcessors(cdkConfig.qpqConfig),
       ...getCloudFrontOriginRequestEventActionProcessor(cdkConfig.qpqConfig),
-      ...getConfigGetSecretActionProcessor(cdkConfig.qpqConfig),
-      ...getConfigGetParameterActionProcessor(cdkConfig.qpqConfig),
-      ...getConfigGetParametersActionProcessor(cdkConfig.qpqConfig),
-      ...getSystemActionProcessor(cdkConfig.qpqConfig, dynamicModuleLoader),
-      ...getFileActionProcessor(cdkConfig.qpqConfig),
-      ...getConfigActionProcessor(cdkConfig.qpqConfig),
-      ...getWebEntryActionProcessor(cdkConfig.qpqConfig),
-      ...getServiceFunctionActionProcessor(cdkConfig.qpqConfig),
-      ...getAdminActionProcessor(cdkConfig.qpqConfig),
 
-      // We probably don't want this?
-      ...getUserDirectoryActionProcessor(cdkConfig.qpqConfig),
-
-      ...getCustomActionProcessors(cdkConfig.qpqConfig),
       ...qpqCustomActionProcessors(),
     };
 

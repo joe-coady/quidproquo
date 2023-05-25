@@ -1,24 +1,4 @@
-import {
-  coreActionProcessor,
-  webserverActionProcessor,
-  getConfigActionProcessor,
-} from 'quidproquo-actionprocessor-node';
-
-import {
-  getAPIGatewayEventActionProcessor,
-  getSystemActionProcessor,
-  getFileActionProcessor,
-  getQueueActionProcessor,
-  getEventBusActionProcessor,
-  getConfigGetSecretActionProcessor,
-  getConfigGetParameterActionProcessor,
-  getConfigGetParametersActionProcessor,
-  getUserDirectoryActionProcessor,
-  getWebEntryActionProcessor,
-  getServiceFunctionActionProcessor,
-  getAdminActionProcessor,
-  awsLambdaUtils,
-} from 'quidproquo-actionprocessor-awslambda';
+import { getAPIGatewayEventActionProcessor } from 'quidproquo-actionprocessor-awslambda';
 
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
@@ -29,9 +9,7 @@ import { APIGatewayEvent, Context } from 'aws-lambda';
 import { getLambdaConfigs } from './lambdaConfig';
 import { ActionProcessorListResolver } from './actionProcessorListResolver';
 
-import { getLogger, getRuntimeCorrelation } from './lambda-utils';
-
-import { dynamicModuleLoader } from './dynamicModuleLoader';
+import { getLogger, getRuntimeCorrelation, getLambdaActionProcessors } from './lambda-utils';
 
 // @ts-ignore - Special webpack loader
 import qpqCustomActionProcessors from 'qpq-custom-action-processors-loader!';
@@ -65,24 +43,9 @@ export const getAPIGatewayEventExecutor = (
     // Build a processor for the session and stuff
     // Remove the non route ones ~ let the story execute action add them
     const storyActionProcessor = {
-      ...coreActionProcessor,
-      ...webserverActionProcessor,
-
+      ...getLambdaActionProcessors(cdkConfig.qpqConfig),
       ...getAPIGatewayEventActionProcessor(cdkConfig.qpqConfig),
-      ...getConfigGetSecretActionProcessor(cdkConfig.qpqConfig),
-      ...getConfigGetParameterActionProcessor(cdkConfig.qpqConfig),
-      ...getConfigGetParametersActionProcessor(cdkConfig.qpqConfig),
-      ...getSystemActionProcessor(cdkConfig.qpqConfig, dynamicModuleLoader),
-      ...getFileActionProcessor(cdkConfig.qpqConfig),
-      ...getConfigActionProcessor(cdkConfig.qpqConfig),
-      ...getQueueActionProcessor(cdkConfig.qpqConfig),
-      ...getEventBusActionProcessor(cdkConfig.qpqConfig),
-      ...getUserDirectoryActionProcessor(cdkConfig.qpqConfig),
-      ...getWebEntryActionProcessor(cdkConfig.qpqConfig),
-      ...getServiceFunctionActionProcessor(cdkConfig.qpqConfig),
-      ...getAdminActionProcessor(cdkConfig.qpqConfig),
 
-      ...getCustomActionProcessors(cdkConfig.qpqConfig),
       ...qpqCustomActionProcessors(),
     };
 

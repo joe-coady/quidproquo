@@ -186,6 +186,17 @@ export const getAllKeyValueStores = (qpqConfig: QPQConfig): KeyValueStoreQPQConf
   return keyValueStores;
 };
 
+export const getKeyValueStoreByName = (
+  qpqConfig: QPQConfig,
+  kvsName: string,
+): KeyValueStoreQPQConfigSetting | undefined => {
+  const keyValueStore = getAllKeyValueStores(qpqConfig).find(
+    (kvs) => kvs.keyValueStoreName === kvsName,
+  );
+
+  return keyValueStore;
+};
+
 export const getActionProcessorSources = (configs: QPQConfig): string[] => {
   const sources = getConfigSettings<ActionProcessorsQPQConfigSetting>(
     configs,

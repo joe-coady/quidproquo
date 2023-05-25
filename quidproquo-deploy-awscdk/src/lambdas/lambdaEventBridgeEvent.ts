@@ -1,22 +1,5 @@
 import {
-  coreActionProcessor,
-  webserverActionProcessor,
-  getConfigActionProcessor,
-} from 'quidproquo-actionprocessor-node';
-
-import {
   getEventBridgeEventActionProcessor,
-  getSystemActionProcessor,
-  getFileActionProcessor,
-  getQueueActionProcessor,
-  getEventBusActionProcessor,
-  getWebEntryActionProcessor,
-  getUserDirectoryActionProcessor,
-  getConfigGetSecretActionProcessor,
-  getConfigGetParameterActionProcessor,
-  getConfigGetParametersActionProcessor,
-  getServiceFunctionActionProcessor,
-  getAdminActionProcessor,
   DynamicModuleLoader,
   LambdaRuntimeConfig,
 } from 'quidproquo-actionprocessor-awslambda';
@@ -27,7 +10,7 @@ import { EventBridgeEvent, Context } from 'aws-lambda';
 
 import { getLambdaConfigs } from './lambdaConfig';
 import { ActionProcessorListResolver } from './actionProcessorListResolver';
-import { getLogger, getRuntimeCorrelation } from './lambda-utils';
+import { getLogger, getRuntimeCorrelation, getLambdaActionProcessors } from './lambda-utils';
 
 import { dynamicModuleLoader } from './dynamicModuleLoader';
 
@@ -51,24 +34,9 @@ export const getEventBridgeEventExecutor = (
     // Build a processor for the session and stuff
     // Remove the  non event ones
     const storyActionProcessor = {
-      ...coreActionProcessor,
-      ...webserverActionProcessor,
-
+      ...getLambdaActionProcessors(cdkConfig.qpqConfig),
       ...getEventBridgeEventActionProcessor(lambdaRuntimeConfig),
-      ...getSystemActionProcessor(cdkConfig.qpqConfig, dynamicModuleLoader),
-      ...getFileActionProcessor(cdkConfig.qpqConfig),
-      ...getConfigGetSecretActionProcessor(cdkConfig.qpqConfig),
-      ...getConfigGetParameterActionProcessor(cdkConfig.qpqConfig),
-      ...getConfigGetParametersActionProcessor(cdkConfig.qpqConfig),
-      ...getConfigActionProcessor(cdkConfig.qpqConfig),
-      ...getQueueActionProcessor(cdkConfig.qpqConfig),
-      ...getEventBusActionProcessor(cdkConfig.qpqConfig),
-      ...getWebEntryActionProcessor(cdkConfig.qpqConfig),
-      ...getServiceFunctionActionProcessor(cdkConfig.qpqConfig),
-      ...getAdminActionProcessor(cdkConfig.qpqConfig),
-      ...getUserDirectoryActionProcessor(cdkConfig.qpqConfig),
 
-      ...getCustomActionProcessors(cdkConfig.qpqConfig),
       ...qpqCustomActionProcessors(),
     };
 
