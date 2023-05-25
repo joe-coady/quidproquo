@@ -16,7 +16,6 @@ const getProcessKeyValueStoreUpsert = (
   qpqConfig: QPQConfig,
 ): KeyValueStoreUpsertActionProcessor<any> => {
   return async ({ keyValueStoreName, item, options }) => {
-    console.log('HERE!');
     const dynamoTableName = getQpqRuntimeResourceNameFromConfig(
       keyValueStoreName,
       qpqConfig,
