@@ -140,6 +140,7 @@ export const createRuntime = (
           error: {
             errorText: err.message.toString(),
             errorType: ErrorTypeEnum.GenericError, // resolve error type from err type?
+            errorStack: action?.value?.type,
           },
         };
       }
@@ -151,6 +152,7 @@ export const createRuntime = (
         error: {
           errorText: 'Unknown error has occurred!',
           errorType: ErrorTypeEnum.GenericError,
+          errorStack: action?.value?.type,
         },
       };
     }
