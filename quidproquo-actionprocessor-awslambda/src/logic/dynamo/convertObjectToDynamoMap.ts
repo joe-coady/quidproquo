@@ -2,12 +2,8 @@ export function convertObjectToDynamoMap(obj: any) {
   const map: any = {};
 
   for (const property in obj) {
-    console.log('starting', property);
-
     const value = obj[property];
     const valueType = typeof value;
-
-    console.log({ property, value, valueType });
 
     switch (valueType) {
       case 'string':
@@ -33,8 +29,6 @@ export function convertObjectToDynamoMap(obj: any) {
       default:
         throw new Error(`Unsupported data type: ${valueType}`);
     }
-
-    console.log('ending', property);
   }
 
   return map;

@@ -28,6 +28,7 @@ export async function query<Item>(
     IndexName: indexName,
   };
 
+  // TODO: Remove this log
   console.log(params);
 
   // Create QueryCommand

@@ -15,17 +15,15 @@ import { AttributeValue } from '@aws-sdk/client-dynamodb';
 
 const getHash = (name: string): string => {
   const c = crypto.createHash('md5').update(name).digest('hex');
-  console.log(`Hash for ${name} is ${c}`);
+
   return c;
 };
 
 const getItemName = (name: string) => {
-  console.log('item name');
   return `#${getHash(name)}`;
 };
 
 const getValueName = (value: string | number | boolean | string[]) => {
-  console.log('item value');
   return `:${getHash(`${typeof value}-${JSON.stringify(value)}`)}`;
 };
 
