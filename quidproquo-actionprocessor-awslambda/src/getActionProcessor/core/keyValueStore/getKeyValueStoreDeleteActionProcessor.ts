@@ -11,7 +11,7 @@ import { deleteItem } from '../../../logic/dynamo';
 const getProcessKeyValueStoreDelete = (
   qpqConfig: QPQConfig,
 ): KeyValueStoreDeleteActionProcessor => {
-  return async ({ keyValueStoreName, key }) => {
+  return async ({ keyValueStoreName, key, sortKey }) => {
     const dynamoTableName = getQpqRuntimeResourceNameFromConfig(
       keyValueStoreName,
       qpqConfig,
@@ -19,7 +19,7 @@ const getProcessKeyValueStoreDelete = (
     );
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
-    await deleteItem(dynamoTableName, key, region);
+    await deleteItem(dynamoTableName, region, key, sortKey);
 
     return actionResult(void 0);
   };

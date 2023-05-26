@@ -1,11 +1,15 @@
 import { KvsQueryOperationType, KvsLogicalOperatorType } from './KvsQueryOperationType';
 
+export type KvsCoreDataType = string | number;
+export type KvsBasicDataType = KvsCoreDataType | boolean;
+export type KvsAdvancedDataType = KvsBasicDataType | string[];
+
 // Type for individual query conditions
 export type KvsQueryCondition = {
   key: string;
   operation: KvsQueryOperationType;
-  valueA?: string | number | boolean | string[];
-  valueB?: string | number | boolean;
+  valueA?: KvsAdvancedDataType;
+  valueB?: KvsBasicDataType;
 };
 
 // Type for logical operators

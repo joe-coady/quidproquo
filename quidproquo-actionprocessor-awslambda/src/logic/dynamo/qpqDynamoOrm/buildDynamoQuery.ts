@@ -6,6 +6,7 @@ import {
   KvsQueryCondition,
   KvsLogicalOperator,
   KvsLogicalOperatorType,
+  KvsAdvancedDataType,
 } from 'quidproquo-core';
 
 import { AttributeValue } from '@aws-sdk/client-dynamodb';
@@ -23,7 +24,7 @@ const getItemName = (name: string) => {
   return `#${getHash(name)}`;
 };
 
-const getValueName = (value: string | number | boolean | string[]) => {
+const getValueName = (value: KvsAdvancedDataType) => {
   return `:${getHash(`${typeof value}-${JSON.stringify(value)}`)}`;
 };
 
@@ -145,7 +146,7 @@ const buildDynamoQueryExpressionRoot = (query: KvsQueryOperation): string => {
   throw new Error(`Invalid query operation: ${JSON.stringify(query)}`);
 };
 
-const buildAttributeValue = (value: string | number | boolean | string[]): AttributeValue => {
+export const buildAttributeValue = (value: KvsAdvancedDataType): AttributeValue => {
   switch (typeof value) {
     case 'string':
       return { S: value };
