@@ -20,11 +20,11 @@ const getHash = (name: string): string => {
   return c;
 };
 
-const getItemName = (name: string) => {
+export const getItemName = (name: string) => {
   return `#${getHash(name)}`;
 };
 
-const getValueName = (value: KvsAdvancedDataType) => {
+export const getValueName = (value: KvsAdvancedDataType) => {
   return `:${getHash(`${typeof value}-${JSON.stringify(value)}`)}`;
 };
 

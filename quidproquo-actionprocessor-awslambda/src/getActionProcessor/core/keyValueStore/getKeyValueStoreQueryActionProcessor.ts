@@ -7,7 +7,7 @@ import {
   KeyValueStoreActionType,
 } from 'quidproquo-core';
 import { query } from '../../../logic/dynamo';
-import { getDynamoTableIndexByConfigAndQuery } from '../../../logic/dynamo/qpqDynamoOrm/thing';
+import { getDynamoTableIndexByConfigAndQuery } from '../../../logic/dynamo/qpqDynamoOrm';
 
 const getProcessKeyValueStoreQuery = (
   qpqConfig: QPQConfig,

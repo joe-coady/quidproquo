@@ -7,3 +7,4 @@ export * from './runtimeConfig/QPQAWSResourceMap';
 export * from './types';
 
 export * from './logic/parametersManager/getParameter';
+export * from './logic/parametersManager/getParameters';

@@ -1,17 +1,18 @@
 import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
+import { KvsUpdate, KvsCoreDataType } from './types';
 
 // Options Type
-export interface KeyValueStoreUpdateOptions {
-  ttl?: number; // Time-to-live in seconds
-  // Add options here as needed, for example, conditional update
-}
+export interface KeyValueStoreUpdateOptions {}
 
 // Payload
 export interface KeyValueStoreUpdateActionPayload<Value> {
   keyValueStoreName: string;
-  key: string;
-  value: Partial<Value>;
+
+  key: KvsCoreDataType;
+  sortKey?: KvsCoreDataType;
+
+  updates: KvsUpdate;
   options?: KeyValueStoreUpdateOptions;
 }
 

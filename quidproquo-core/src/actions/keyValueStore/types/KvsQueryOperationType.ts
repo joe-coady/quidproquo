@@ -58,3 +58,30 @@ export enum KvsLogicalOperatorType {
    */
   Or = 'Or',
 }
+
+/**
+ * The `KvsUpdateActionType` enum represents the four types of update actions in DynamoDB.
+ */
+export enum KvsUpdateActionType {
+  /**
+   * The `Set` action is used to create an attribute or change the value of an existing attribute.
+   */
+  Set = 'Set',
+
+  /**
+   * The `Remove` action is used to delete an attribute from an item.
+   */
+  Remove = 'Remove',
+
+  /**
+   * The `Add` action is used to increment/decrement a number data type or add elements to a set data type.
+   * Note: For number data types, if the attribute does not already exist, DynamoDB will create it.
+   */
+  Add = 'Add',
+
+  /**
+   * The `Delete` action is used to remove one or more elements from a set or a list data type attribute.
+   * Note: This action only applies to set and list data types.
+   */
+  Delete = 'Delete',
+}

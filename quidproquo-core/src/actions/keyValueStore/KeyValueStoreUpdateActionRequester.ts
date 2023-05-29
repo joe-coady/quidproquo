@@ -4,10 +4,16 @@ import {
   KeyValueStoreUpdateOptions,
 } from './KeyValueStoreUpdateActionTypes';
 
+import { KvsCoreDataType, KvsUpdate } from './types';
+
 export function* askKeyValueStoreUpdate<Value>(
   keyValueStoreName: string,
-  key: string,
-  value: Partial<Value>,
+
+  updates: KvsUpdate,
+
+  key: KvsCoreDataType,
+  sortKey?: KvsCoreDataType,
+
   options?: KeyValueStoreUpdateOptions,
 ): KeyValueStoreUpdateActionRequester<Value> {
   return yield {
@@ -15,7 +21,8 @@ export function* askKeyValueStoreUpdate<Value>(
     payload: {
       keyValueStoreName,
       key,
-      value,
+      sortKey,
+      updates,
       options,
     },
   };

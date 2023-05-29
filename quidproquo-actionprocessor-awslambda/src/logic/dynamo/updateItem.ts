@@ -1,60 +1,57 @@
+import { KvsUpdate, KvsCoreDataType, KvsUpdateAction } from 'quidproquo-core';
 import {
   DynamoDBClient,
   UpdateItemCommand,
   UpdateItemCommandInput,
+  AttributeValue,
 } from '@aws-sdk/client-dynamodb';
 
-// THIS DOES NOT WORK ~ DO NOT USE
+import {
+  buildAttributeValue,
+  buildDynamoUpdateExpression,
+  getValueName,
+  buildUpdateExpressionAttributeNames,
+} from './qpqDynamoOrm';
 
-export async function updateItem(
+const buildUpdateExpressionAttributeValues = (
+  updates: KvsUpdate,
+): { [key: string]: AttributeValue } | undefined => {
+  let attributeValues: { [key: string]: AttributeValue } = {};
+
+  for (let update of updates) {
+    if (update.value !== undefined) {
+      const valuePlaceholder = getValueName(update.value);
+      attributeValues[valuePlaceholder] = buildAttributeValue(update.value);
+    }
+  }
+
+  return Object.keys(attributeValues).length > 0 ? attributeValues : undefined;
+};
+
+export async function updateItem<Item>(
   tableName: string,
-  key: string,
-  value: any,
-  options: { expires?: number } = {},
   region: string,
+  update: KvsUpdate,
+  key: KvsCoreDataType,
+  sortKey?: KvsCoreDataType,
 ): Promise<void> {
   const dynamoClient = new DynamoDBClient({ region });
 
-  const updateExpressions = Object.keys(value).map((attr, idx) => {
-    return `SET #value.#${attr} = :${attr}`;
-  });
-
-  const expressionAttributeNames = {
-    '#value': 'value',
-    ...Object.keys(value).reduce((obj, attr) => {
-      obj[`#${attr}`] = attr;
-      return obj;
-    }, {} as Record<string, string>),
-  };
-
-  const expressionAttributeValues = Object.keys(value).reduce((obj, attr) => {
-    obj[`:${attr}`] = { S: JSON.stringify(value[attr]) };
-    return obj;
-  }, {} as Record<string, { S: string } | { N: string }>);
-
-  if (options.expires) {
-    updateExpressions.push('SET expires = :expires');
-    expressionAttributeValues[':expires'] = { N: options.expires.toString() };
-  }
-
-  const updateItemParams: UpdateItemCommandInput = {
+  const params: UpdateItemCommandInput = {
     TableName: tableName,
     Key: {
-      key: {
-        S: key,
-      },
+      id: buildAttributeValue(key),
     },
-    UpdateExpression: updateExpressions.join(', '),
-    ExpressionAttributeNames: expressionAttributeNames,
-    ExpressionAttributeValues: expressionAttributeValues,
+    UpdateExpression: buildDynamoUpdateExpression(update),
+    ExpressionAttributeValues: buildUpdateExpressionAttributeValues(update),
+    ExpressionAttributeNames: buildUpdateExpressionAttributeNames(update),
   };
 
-  console.log('updateItemParams:', JSON.stringify(updateItemParams, null, 2));
-
-  try {
-    await dynamoClient.send(new UpdateItemCommand(updateItemParams));
-  } catch (error) {
-    console.error('Error updating item:', error);
-    throw error;
+  if (sortKey) {
+    params.Key!['sk'] = buildAttributeValue(sortKey);
   }
+
+  console.log(JSON.stringify(params, null, 2));
+
+  await dynamoClient.send(new UpdateItemCommand(params));
 }

@@ -11,7 +11,7 @@ import { updateItem } from '../../../logic/dynamo';
 const getProcessKeyValueStoreUpdate = (
   qpqConfig: QPQConfig,
 ): KeyValueStoreUpdateActionProcessor<any> => {
-  return async ({ keyValueStoreName, key, value, options }) => {
+  return async ({ keyValueStoreName, key, sortKey, updates, options }) => {
     const dynamoTableName = getQpqRuntimeResourceNameFromConfig(
       keyValueStoreName,
       qpqConfig,
@@ -19,15 +19,7 @@ const getProcessKeyValueStoreUpdate = (
     );
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
-    await updateItem(
-      dynamoTableName,
-      key,
-      value,
-      {
-        expires: options?.ttl,
-      },
-      region,
-    );
+    await updateItem(dynamoTableName, region, updates, key, sortKey);
 
     return actionResult(void 0);
   };
