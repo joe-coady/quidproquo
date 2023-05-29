@@ -1,5 +1,7 @@
+import { AttributeValue } from '@aws-sdk/client-dynamodb';
+
 import { KvsUpdateAction, KvsUpdateActionType, KvsUpdate } from 'quidproquo-core';
-import { getItemName, getValueName } from './buildDynamoQuery';
+import { getItemName, getValueName, buildAttributeValue } from './buildDynamoQuery';
 import { KvsAttributePath } from 'quidproquo-core';
 
 interface ExpressionAttributeNameMap {
@@ -32,6 +34,21 @@ export const buildUpdateExpressionAttributeNames = (
   }
 
   return attributeNames;
+};
+
+export const buildUpdateExpressionAttributeValues = (
+  updates: KvsUpdate,
+): { [key: string]: AttributeValue } | undefined => {
+  let attributeValues: { [key: string]: AttributeValue } = {};
+
+  for (let update of updates) {
+    if (update.value !== undefined) {
+      const valuePlaceholder = getValueName(update.value);
+      attributeValues[valuePlaceholder] = buildAttributeValue(update.value);
+    }
+  }
+
+  return Object.keys(attributeValues).length > 0 ? attributeValues : undefined;
 };
 
 const buildDynamoUpdateExpressionSet = (update: KvsUpdateAction): string => {

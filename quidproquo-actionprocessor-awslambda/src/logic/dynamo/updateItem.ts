@@ -1,34 +1,19 @@
-import { KvsUpdate, KvsCoreDataType, KvsUpdateAction } from 'quidproquo-core';
 import {
   DynamoDBClient,
   UpdateItemCommand,
   UpdateItemCommandInput,
-  AttributeValue,
 } from '@aws-sdk/client-dynamodb';
+
+import { KvsUpdate, KvsCoreDataType } from 'quidproquo-core';
 
 import {
   buildAttributeValue,
   buildDynamoUpdateExpression,
-  getValueName,
   buildUpdateExpressionAttributeNames,
+  buildUpdateExpressionAttributeValues,
 } from './qpqDynamoOrm';
 
-const buildUpdateExpressionAttributeValues = (
-  updates: KvsUpdate,
-): { [key: string]: AttributeValue } | undefined => {
-  let attributeValues: { [key: string]: AttributeValue } = {};
-
-  for (let update of updates) {
-    if (update.value !== undefined) {
-      const valuePlaceholder = getValueName(update.value);
-      attributeValues[valuePlaceholder] = buildAttributeValue(update.value);
-    }
-  }
-
-  return Object.keys(attributeValues).length > 0 ? attributeValues : undefined;
-};
-
-export async function updateItem<Item>(
+export async function updateItem(
   tableName: string,
   region: string,
   update: KvsUpdate,
@@ -51,7 +36,5 @@ export async function updateItem<Item>(
     params.Key!['sk'] = buildAttributeValue(sortKey);
   }
 
-  console.log(JSON.stringify(params, null, 2));
-
-  await dynamoClient.send(new UpdateItemCommand(params));
+  console.log(await dynamoClient.send(new UpdateItemCommand(params)));
 }
