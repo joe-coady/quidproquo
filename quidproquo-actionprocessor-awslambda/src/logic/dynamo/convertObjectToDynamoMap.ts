@@ -1,38 +1,39 @@
-export function convertObjectToDynamoMap(obj: any) {
-  const map: any = {};
+// Deprecated: 2021-06-01
+// export function convertObjectToDynamoMap(obj: any) {
+//   const map: any = {};
 
-  for (const property in obj) {
-    const value = obj[property];
-    const valueType = typeof value;
+//   for (const property in obj) {
+//     const value = obj[property];
+//     const valueType = typeof value;
 
-    switch (valueType) {
-      case 'string':
-        map[property] = { S: value };
-        break;
-      case 'number':
-        map[property] = { N: value.toString() };
-        break;
-      case 'boolean':
-        map[property] = { BOOL: value };
-        break;
-      case 'object':
-        if (Array.isArray(value)) {
-          map[property] = {
-            L: value.map((item) => convertObjectToDynamoMap({ temp: item }).temp),
-          };
-        } else if (value !== null) {
-          map[property] = { M: convertObjectToDynamoMap(value) };
-        } else {
-          map[property] = { NULL: true };
-        }
-        break;
-      default:
-        throw new Error(`Unsupported data type: ${valueType}`);
-    }
-  }
+//     switch (valueType) {
+//       case 'string':
+//         map[property] = { S: value };
+//         break;
+//       case 'number':
+//         map[property] = { N: value.toString() };
+//         break;
+//       case 'boolean':
+//         map[property] = { BOOL: value };
+//         break;
+//       case 'object':
+//         if (Array.isArray(value)) {
+//           map[property] = {
+//             L: value.map((item) => convertObjectToDynamoMap({ temp: item }).temp),
+//           };
+//         } else if (value !== null) {
+//           map[property] = { M: convertObjectToDynamoMap(value) };
+//         } else {
+//           map[property] = { NULL: true };
+//         }
+//         break;
+//       default:
+//         throw new Error(`Unsupported data type: ${valueType}`);
+//     }
+//   }
 
-  return map;
-}
+//   return map;
+// }
 
 export function convertDynamoMapToObject(dynamoMap: any): any {
   const obj: any = {};

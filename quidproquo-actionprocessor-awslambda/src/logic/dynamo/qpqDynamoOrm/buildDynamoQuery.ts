@@ -147,24 +147,31 @@ const buildDynamoQueryExpressionRoot = (query: KvsQueryOperation): string => {
 };
 
 export const buildAttributeValue = (value: KvsAdvancedDataType): AttributeValue => {
-  switch (typeof value) {
+  const valueType = typeof value;
+  switch (valueType) {
     case 'string':
-      return { S: value };
+      return { S: value as string };
+
     case 'number':
-      return { N: value.toString() };
+      return { N: (value as number).toString() };
+
     case 'boolean':
-      return { BOOL: value };
+      return { BOOL: value as boolean };
+
     case 'object':
       if (Array.isArray(value)) {
-        // check if all elements in the array are strings
-        if (value.every((item) => typeof item === 'string')) {
-          return { L: value.map((item) => ({ S: item })) };
-        }
-        throw new Error(`Invalid attribute value array content: ${JSON.stringify(value)}`);
+        return {
+          L: value.map((item) => buildAttributeValue(item)),
+        };
+      } else if (value !== null) {
+        return {
+          M: Object.fromEntries(Object.entries(value).map(([k, v]) => [k, buildAttributeValue(v)])),
+        };
+      } else {
+        return { NULL: true };
       }
-      throw new Error(`Invalid attribute value type: ${typeof value}`);
     default:
-      throw new Error(`Invalid attribute value type: ${typeof value}`);
+      throw new Error(`Unsupported data type: ${valueType}`);
   }
 };
 
