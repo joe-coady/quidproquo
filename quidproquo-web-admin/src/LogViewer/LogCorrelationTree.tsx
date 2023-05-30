@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, memo } from 'react';
+import { useState, useEffect, useRef, memo, Fragment } from 'react';
 import { Tree } from 'react-d3-tree';
 import { StoryResultMetadataLog } from '../types';
 import { findLogDirectChildren } from './logic';
@@ -64,7 +64,7 @@ const renderRectSvgNode =
             const y = i === 0 ? -20 : 10 + i * 20;
             const fontSize = i === 0 ? 30 : 15;
             return (
-              <>
+              <Fragment key={`${i}`}>
                 <rect
                   x={x - 50}
                   y={y - fontSize / 2 - 8}
@@ -74,7 +74,6 @@ const renderRectSvgNode =
                   strokeWidth="0"
                 />
                 <text
-                  key={`${i}`}
                   textAnchor="middle"
                   fontSize={fontSize}
                   fill={!!nodeDatum.error ? 'red' : 'black'}
@@ -83,7 +82,7 @@ const renderRectSvgNode =
                 >
                   {text}
                 </text>
-              </>
+              </Fragment>
             );
           })}
       </g>

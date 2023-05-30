@@ -3,9 +3,12 @@ export const findServiceEndpointByLogCorrelation = (
   storyResultMetadatas: any[],
   logCorrelation: string,
 ): string | undefined => {
-  const moduleName = storyResultMetadatas.find(
-    (log: any) => log.correlation === logCorrelation,
-  )?.moduleName;
+  // const metadata = storyResultMetadatas.find(
+  //   (log: any) => log.correlation === logCorrelation,
+  // );
+
+  const moduleName = (logCorrelation || '').split('::')[0];
+
   const serviceEndpoint =
     moduleName && serviceLogEndpoints.find((se: string) => se.endsWith(moduleName));
 

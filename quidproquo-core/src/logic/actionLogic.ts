@@ -19,7 +19,9 @@ export const isErroredActionResult = <T>(actionResult: ActionProcessorResult<T>)
 };
 
 export const resolveActionResult = <T>(actionResult: ActionProcessorResult<T>) => {
-  return actionResult[0];
+  // We say that it has to have a value, otherwise don't call this function
+  // use isErroredActionResult to check
+  return actionResult[0]!;
 };
 
 export const resolveActionResultError = <T>(actionResult: ActionProcessorResult<T>): QPQError => {
