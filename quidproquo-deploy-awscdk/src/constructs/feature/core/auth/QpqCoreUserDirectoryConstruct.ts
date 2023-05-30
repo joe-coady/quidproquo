@@ -27,6 +27,7 @@ export abstract class QpqCoreUserDirectoryConstructBase extends QpqConstructBloc
 
       'cognito-idp:ListUsers',
       'cognito-idp:GetUser',
+      'cognito-idp:AdminGetUser',
 
       'cognito-idp:ListGroups',
       'cognito-idp:GetGroup',
