@@ -10,6 +10,7 @@ import {
   actionResult,
   actionResultError,
   ErrorTypeEnum,
+  QPQBinaryData,
 } from 'quidproquo-core';
 
 import {
@@ -27,6 +28,7 @@ import { APIGatewayEvent, Context, APIGatewayProxyResult } from 'aws-lambda';
 import { matchUrl } from '../../../awsLambdaUtils';
 
 import { isAuthValid } from './utils/isAuthValid';
+import { parseMultipartFormData } from './utils/parseMultipartFormData';
 
 export type HttpRouteMatchStoryResult = MatchStoryResult<HttpEventRouteParams, RouteOptions>;
 export type ApiGatewayEventParams = [APIGatewayEvent, Context];
@@ -60,6 +62,16 @@ const getProcessTransformEventParams = (
       sourceIp: apiGatewayEvent.requestContext.identity.sourceIp,
       isBase64Encoded: apiGatewayEvent.isBase64Encoded,
     };
+
+    // Transform the body if its a multipart/form-data
+    if (
+      (qpqWebServerUtils.getHeaderValue('Content-Type', apiGatewayEvent.headers) || '').startsWith(
+        'multipart/form-data',
+      ) &&
+      apiGatewayEvent.body
+    ) {
+      transformedEventParams.files = await parseMultipartFormData(apiGatewayEvent);
+    }
 
     console.log(JSON.stringify(transformedEventParams, null, 2));
 

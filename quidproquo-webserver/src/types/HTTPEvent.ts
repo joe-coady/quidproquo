@@ -1,4 +1,4 @@
-import { HTTPMethod } from 'quidproquo-core';
+import { HTTPMethod, QPQBinaryData } from 'quidproquo-core';
 
 export interface HttpEventHeaders {
   [key: string]: undefined | string;
@@ -17,6 +17,7 @@ export interface HTTPEvent<T = string> {
   correlation: string;
   sourceIp: string;
   isBase64Encoded: boolean;
+  files?: QPQBinaryData[];
 }
 
 export interface HTTPEventResponse<T = string> {
