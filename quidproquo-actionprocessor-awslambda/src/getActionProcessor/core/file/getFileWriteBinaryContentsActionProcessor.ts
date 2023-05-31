@@ -6,14 +6,14 @@ import {
   qpqCoreUtils,
 } from 'quidproquo-core';
 
-import { resolveResourceName } from '../../../runtimeConfig/qpqAwsLambdaRuntimeConfigUtils';
+import { resolveStorageDriveBucketName } from './utils';
 import { writeBinaryFile } from '../../../logic/s3/s3Utils';
 
 const getProcessFileWriteBinaryContents = (
   qpqConfig: QPQConfig,
 ): FileWriteBinaryContentsActionProcessor => {
   return async ({ drive, filepath, data }) => {
-    const s3BucketName = resolveResourceName(drive, qpqConfig);
+    const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
     await writeBinaryFile(
       s3BucketName,
       filepath,

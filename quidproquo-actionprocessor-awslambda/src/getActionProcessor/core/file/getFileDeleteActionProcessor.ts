@@ -1,18 +1,18 @@
 import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
-import { resolveResourceName } from '../../../runtimeConfig/qpqAwsLambdaRuntimeConfigUtils';
 import {
   FileDeleteActionProcessor,
   actionResult,
-  actionResultError,
   FileActionType,
-  ErrorTypeEnum,
+  DriveName,
+  CrossServiceDriveName,
 } from 'quidproquo-core';
 import { deleteFiles } from '../../../logic/s3/s3Utils';
+import { resolveStorageDriveBucketName } from './utils';
 
 const getProcessFileDelete = (qpqConfig: QPQConfig): FileDeleteActionProcessor => {
   return async ({ drive, filepaths }) => {
-    const s3BucketName = resolveResourceName(drive, qpqConfig);
+    const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
     const errored = await deleteFiles(
       s3BucketName,
       filepaths,

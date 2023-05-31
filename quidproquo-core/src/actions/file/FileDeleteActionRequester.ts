@@ -1,7 +1,7 @@
 import { FileDeleteActionRequester } from './FileDeleteActionTypes';
-import { FileActionType } from './FileActionType';
+import { FileActionType, DriveName } from './FileActionType';
 
-export function* askFileDelete(drive: string, filepaths: string[]): FileDeleteActionRequester {
+export function* askFileDelete(drive: DriveName, filepaths: string[]): FileDeleteActionRequester {
   return yield {
     type: FileActionType.Delete,
     payload: {

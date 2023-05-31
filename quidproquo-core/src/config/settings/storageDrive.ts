@@ -6,11 +6,13 @@ import {
 
 export interface QPQConfigAdvancedStorageDriveSettings extends QPQConfigAdvancedSettings {
   copyPath?: string;
+  global?: boolean;
 }
 
 export interface StorageDriveQPQConfigSetting extends QPQConfigSetting {
   storageDrive: string;
   copyPath?: string;
+  global: boolean;
 }
 
 export const defineStorageDrive = (
@@ -23,4 +25,6 @@ export const defineStorageDrive = (
   storageDrive,
 
   copyPath: options?.copyPath,
+
+  global: options?.global ?? false,
 });

@@ -54,6 +54,19 @@ export const getConfigRuntimeResourceNameFromConfig = (
   return getConfigRuntimeResourceName(resourceName, application, service, environment, feature);
 };
 
+export const getConfigRuntimeResourceNameFromConfigWithServiceOverride = (
+  resourceName: string,
+  qpqConfig: QPQConfig,
+  serviceOverride?: string,
+) => {
+  const application = qpqCoreUtils.getApplicationName(qpqConfig);
+  const service = serviceOverride || qpqCoreUtils.getApplicationModuleName(qpqConfig);
+  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
+  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+
+  return getConfigRuntimeResourceName(resourceName, application, service, environment, feature);
+};
+
 export const getQpqRuntimeResourceName = (
   resourceName: string,
   application: string,

@@ -1,7 +1,7 @@
 import { FileExistsActionRequester } from './FileExistsActionTypes';
-import { FileActionType } from './FileActionType';
+import { FileActionType, DriveName } from './FileActionType';
 
-export function* askFileExists(drive: string, filepath: string): FileExistsActionRequester {
+export function* askFileExists(drive: DriveName, filepath: string): FileExistsActionRequester {
   return yield {
     type: FileActionType.Exists,
     payload: {

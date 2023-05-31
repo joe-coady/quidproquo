@@ -10,9 +10,14 @@ export enum FileActionType {
 
 export const filePathDelimiter = `/`;
 
+export type CrossServiceDriveName = {
+  name: string;
+  service?: string;
+};
+
 export interface FileInfo {
   filepath: string;
-  drive: string;
+  drive: CrossServiceDriveName;
   isDir: boolean;
   hashMd5?: string;
 }
@@ -21,3 +26,5 @@ export interface DirectoryList {
   fileInfos: FileInfo[];
   pageToken?: string;
 }
+
+export type DriveName = string | CrossServiceDriveName;

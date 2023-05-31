@@ -1,8 +1,8 @@
 import { FileReadBinaryContentsActionRequester } from './FileReadBinaryContentsActionTypes';
-import { FileActionType } from './FileActionType';
+import { FileActionType, DriveName } from './FileActionType';
 
 export function* askFileReadBinaryContents(
-  drive: string,
+  drive: DriveName,
   filepath: string,
 ): FileReadBinaryContentsActionRequester {
   return yield {

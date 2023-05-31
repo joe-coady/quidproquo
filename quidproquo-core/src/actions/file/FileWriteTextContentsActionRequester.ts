@@ -1,8 +1,8 @@
 import { FileWriteTextContentsActionRequester } from './FileWriteTextContentsActionTypes';
-import { FileActionType } from './FileActionType';
+import { FileActionType, DriveName } from './FileActionType';
 
 export function* askFileWriteTextContents(
-  drive: string,
+  drive: DriveName,
   filepath: string,
   data: string,
 ): FileWriteTextContentsActionRequester {

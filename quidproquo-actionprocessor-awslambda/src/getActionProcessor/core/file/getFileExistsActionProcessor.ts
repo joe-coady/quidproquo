@@ -6,12 +6,12 @@ import {
   qpqCoreUtils,
 } from 'quidproquo-core';
 
-import { resolveResourceName } from '../../../runtimeConfig/qpqAwsLambdaRuntimeConfigUtils';
+import { resolveStorageDriveBucketName } from './utils';
 import { objectExists } from '../../../logic/s3/s3Utils';
 
 const getProcessFileExists = (qpqConfig: QPQConfig): FileExistsActionProcessor => {
   return async ({ drive, filepath }) => {
-    const s3BucketName = resolveResourceName(drive, qpqConfig);
+    const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
 
     return actionResult(
       await objectExists(

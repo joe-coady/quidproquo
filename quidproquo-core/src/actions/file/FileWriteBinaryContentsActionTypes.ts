@@ -1,10 +1,10 @@
 import { QPQBinaryData } from '../../types/QPQBinaryData';
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
-import { FileActionType } from './FileActionType';
+import { FileActionType, DriveName } from './FileActionType';
 
 // Payload
 export interface FileWriteBinaryContentsActionPayload {
-  drive: string;
+  drive: DriveName;
   filepath: string;
   data: QPQBinaryData;
 }
