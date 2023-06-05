@@ -1,7 +1,7 @@
-import { QPQConfig, DriveName, CrossServiceDriveName } from 'quidproquo-core';
+import { QPQConfig, DriveName, CrossServiceResourceName } from 'quidproquo-core';
 import { getConfigRuntimeResourceNameFromConfigWithServiceOverride } from '../../../../awsNamingUtils';
 
-export const resolveCrossServiceDriveName = (drive: DriveName): CrossServiceDriveName => {
+export const resolveCrossServiceDriveName = (drive: DriveName): CrossServiceResourceName => {
   if (typeof drive === 'string') {
     return {
       name: drive,

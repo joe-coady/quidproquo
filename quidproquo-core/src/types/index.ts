@@ -5,3 +5,4 @@ export * from './ErrorTypeEnum';
 export * from './ScheduledEvent';
 export * from './LogLevelEnum';
 export * from './QPQBinaryData';
+export * from './CrossServiceResourceName';

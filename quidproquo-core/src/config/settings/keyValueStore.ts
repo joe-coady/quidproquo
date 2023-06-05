@@ -58,7 +58,9 @@ const convertCompositeKvsIndexToKvsIndex = (compositeKvsIndex: CompositeKvsIndex
 };
 
 export interface QPQConfigAdvancedKeyValueStoreSettings extends QPQConfigAdvancedSettings {
-  indexes: CompositeKvsIndex[];
+  indexes?: CompositeKvsIndex[];
+
+  global?: boolean;
 }
 
 export interface KeyValueStoreQPQConfigSetting extends QPQConfigSetting {
@@ -68,6 +70,8 @@ export interface KeyValueStoreQPQConfigSetting extends QPQConfigSetting {
   sortKeys: KvsKey[];
 
   indexes: KvsIndex[];
+
+  global: boolean;
 }
 
 export const defineKeyValueStore = (
@@ -87,4 +91,6 @@ export const defineKeyValueStore = (
   sortKeys: sortKeys.map(convertCompositeKvsKeyToKvsKey),
 
   indexes: (options?.indexes ?? []).map(convertCompositeKvsIndexToKvsIndex),
+
+  global: options?.global ?? false,
 });

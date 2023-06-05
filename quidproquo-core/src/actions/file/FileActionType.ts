@@ -1,3 +1,5 @@
+import { CrossServiceResourceName } from '../../types';
+
 export enum FileActionType {
   ReadTextContents = '@quidproquo-core/File/ReadTextContents',
   WriteTextContents = '@quidproquo-core/File/WriteTextContents',
@@ -10,14 +12,9 @@ export enum FileActionType {
 
 export const filePathDelimiter = `/`;
 
-export type CrossServiceDriveName = {
-  name: string;
-  service?: string;
-};
-
 export interface FileInfo {
   filepath: string;
-  drive: CrossServiceDriveName;
+  drive: CrossServiceResourceName;
   isDir: boolean;
   hashMd5?: string;
 }
@@ -27,4 +24,4 @@ export interface DirectoryList {
   pageToken?: string;
 }
 
-export type DriveName = string | CrossServiceDriveName;
+export type DriveName = string | CrossServiceResourceName;
