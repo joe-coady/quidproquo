@@ -1,0 +1,32 @@
+{
+  "name": "quidproquo-config-aws",
+  "version": "0.0.108",
+  "description": "",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.js",
+  "files": [
+    "lib/**/*"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "clean": "npx rimraf lib",
+    "build": "npm run clean && tsc",
+    "watch": "tsc -w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joe-coady/quidproquo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/joe-coady/quidproquo/issues"
+  },
+  "homepage": "https://github.com/joe-coady/quidproquo#readme",
+  "devDependencies": {
+    "quidproquo-core": "*",
+    "quidproquo-tsconfig": "*",
+    "typescript": "^4.9.3"
+  }
+}
