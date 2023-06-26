@@ -1,4 +1,5 @@
 import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { getServiceAccountInfo } from 'quidproquo-config-aws';
 
 export const getGlobalConfigRuntimeResourceName = (
   resourceName: string,
@@ -210,4 +211,12 @@ export const getCFExportNameDistributionIdArnFromConfig = (
     feature,
     'distribution-id-export',
   );
+};
+
+export const getEventBusSnsTopicArn = (eventBusName: string, qpqConfig: QPQConfig) => {
+  const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
+  const topicName = getConfigRuntimeResourceNameFromConfig(eventBusName, qpqConfig);
+  const awsAccountId = getServiceAccountInfo(qpqConfig).awsAccountId;
+
+  return `arn:aws:sns:${region}:${awsAccountId}:${topicName}`;
 };

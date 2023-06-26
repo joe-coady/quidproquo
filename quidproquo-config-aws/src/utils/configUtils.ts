@@ -1,8 +1,9 @@
 import { qpqCoreUtils, QPQConfig } from 'quidproquo-core';
+import { ServiceAccountInfo } from '../types';
 
 import { AwsServiceAccountInfoQPQConfigSetting, QPQAwsConfigSettingType } from '../config';
 
-export const getAllAwsServiceAccountInfoConfigs = (
+const getAwsServiceAccountInfoConfig = (
   qpqConfig: QPQConfig,
 ): AwsServiceAccountInfoQPQConfigSetting => {
   const serviceAccountInfos = qpqCoreUtils.getConfigSettings<AwsServiceAccountInfoQPQConfigSetting>(
@@ -21,7 +22,41 @@ export const getAllAwsServiceAccountInfoConfigs = (
   return serviceAccountInfos[0];
 };
 
-// export const getAwsServiceAccountList = (qpqConfig: QPQConfig): string[] => {
-//   const serviceAccountInfos = getAllAwsServiceAccountInfoConfigs(qpqConfig);
-//   const serviceInfos = serviceAccountInfos.serviceInfoMap.flatMap((si) => si.serviceInfoMap);
-// };
+export const getAwsServiceAccountInfos = (qpqConfig: QPQConfig): ServiceAccountInfo[] => {
+  const awsServiceAccountInfoConfig = getAwsServiceAccountInfoConfig(qpqConfig);
+
+  const serviceInfos = [
+    ...awsServiceAccountInfoConfig.serviceInfoMap,
+    getServiceAccountInfo(qpqConfig),
+  ];
+
+  const uniqueServices = serviceInfos.filter(
+    (service, index, self) =>
+      index ===
+      self.findIndex(
+        (t) =>
+          t.moduleName === service.moduleName &&
+          t.applicationName === service.applicationName &&
+          t.environment === service.environment &&
+          t.feature === service.feature,
+      ),
+  );
+
+  return uniqueServices;
+};
+
+export const getServiceAccountInfo = (qpqConfig: QPQConfig): ServiceAccountInfo => {
+  const awsServiceAccountInfoConfig = getAwsServiceAccountInfoConfig(qpqConfig);
+
+  const serviceAccountInfo: ServiceAccountInfo = {
+    moduleName: qpqCoreUtils.getApplicationModuleName(qpqConfig),
+    applicationName: qpqCoreUtils.getApplicationName(qpqConfig),
+    environment: qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
+    feature: qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
+
+    awsAccountId: awsServiceAccountInfoConfig.deployAccountId,
+    awsRegion: awsServiceAccountInfoConfig.deployRegion,
+  };
+
+  return serviceAccountInfo;
+};

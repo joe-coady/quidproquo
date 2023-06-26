@@ -7,8 +7,7 @@ import {
 } from 'quidproquo-core';
 import { publishMessage } from '../../../logic/sns/publishMessage';
 
-import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
-import { getCFExportNameSnsTopicArnFromConfig } from '../../../awsNamingUtils';
+import { getEventBusSnsTopicArn } from '../../../awsNamingUtils';
 
 // TODO: Unify this once the lambda code moves from CDK to awslambda
 type AnyEventBusMessageWithSession = EventBusMessage<any> & {
@@ -21,10 +20,7 @@ const getProcessEventBusSendMessage = (
   return async ({ eventBusName, eventBusMessages }, session) => {
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
-    const topicArn = await getExportedValue(
-      getCFExportNameSnsTopicArnFromConfig(eventBusName, qpqConfig),
-      region,
-    );
+    const topicArn = getEventBusSnsTopicArn(eventBusName, qpqConfig);
 
     await publishMessage(
       topicArn,

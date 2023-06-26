@@ -2,7 +2,6 @@ import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { EventBusQPQConfigSetting, qpqCoreUtils, QPQConfig } from 'quidproquo-core';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
-import { QpqResource } from '../../../base/QpqResource';
 
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
 
@@ -39,13 +38,7 @@ export class QpqCoreEventBusConstruct extends QpqCoreEventBusConstructBase {
     eventBusName: string,
     applicationOverride?: string,
   ): QpqCoreEventBusConstructBase {
-    const topicArn = qpqDeployAwsCdkUtils.importStackValue(
-      awsNamingUtils.getCFExportNameSnsTopicArnFromConfig(
-        eventBusName,
-        qpqConfig,
-        applicationOverride,
-      ),
-    );
+    const topicArn = awsNamingUtils.getEventBusSnsTopicArn(eventBusName, qpqConfig);
 
     class Import extends QpqCoreEventBusConstructBase {
       topic = aws_sns.Topic.fromTopicArn(this, 'topic-arn', topicArn);
@@ -62,6 +55,7 @@ export class QpqCoreEventBusConstruct extends QpqCoreEventBusConstructBase {
       displayName: props.eventBusConfig.name,
     });
 
+    // TODO: remove this, its deprecated
     qpqDeployAwsCdkUtils.exportStackValue(
       this,
       awsNamingUtils.getCFExportNameSnsTopicArnFromConfig(

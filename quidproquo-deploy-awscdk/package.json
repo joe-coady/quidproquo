@@ -33,6 +33,7 @@
     "liquidjs": "^10.7.0",
     "quidproquo-actionprocessor-awslambda": "*",
     "quidproquo-actionprocessor-node": "*",
+    "quidproquo-config-aws": "*",
     "quidproquo-core": "*",
     "quidproquo-webserver": "*"
   },

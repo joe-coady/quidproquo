@@ -1,7 +1,7 @@
 import { QueueQPQConfigSetting, qpqCoreUtils, QPQConfig } from 'quidproquo-core';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
-import { QpqResource } from '../../../base/QpqResource';
+import { getAwsServiceAccountInfos } from 'quidproquo-config-aws';
 
 import { Construct } from 'constructs';
 import { aws_sqs, aws_iam } from 'aws-cdk-lib';
@@ -73,21 +73,29 @@ export class QpqCoreQueueConstruct extends QpqCoreQueueConstructBase {
       },
     });
 
+    const uniqueAccountIds: string[] = [
+      ...new Set(
+        getAwsServiceAccountInfos(props.qpqConfig).map((accountInfo) => accountInfo.awsAccountId),
+      ),
+    ];
+
     // This has to be any topic arn as we want other services / apps to be able
     // to publish to this queue
-    this.queue.addToResourcePolicy(
-      new aws_iam.PolicyStatement({
-        sid: 'AllowSNSServicePrincipal',
-        effect: aws_iam.Effect.ALLOW,
-        principals: [new aws_iam.ServicePrincipal('sns.amazonaws.com')],
-        actions: ['sqs:SendMessage'],
-        resources: [this.queue.queueArn],
-        conditions: {
-          ArnEquals: {
-            'aws:SourceArn': `arn:aws:sns:*:${props.awsAccountId}:*`,
+    uniqueAccountIds.forEach((accountId) => {
+      this.queue.addToResourcePolicy(
+        new aws_iam.PolicyStatement({
+          sid: `AllowSNSServicePrincipal_${accountId}`,
+          effect: aws_iam.Effect.ALLOW,
+          principals: [new aws_iam.ServicePrincipal('sns.amazonaws.com')],
+          actions: ['sqs:SendMessage'],
+          resources: [this.queue.queueArn],
+          conditions: {
+            ArnEquals: {
+              'aws:SourceArn': `arn:aws:sns:*:${accountId}:*`,
+            },
           },
-        },
-      }),
-    );
+        }),
+      );
+    });
   }
 }
