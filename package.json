@@ -25,6 +25,7 @@
   "workspaces": [
     "quidproquo-tsconfig",
     "quidproquo-core",
+    "quidproquo-config-aws",
     "quidproquo-webserver",
     "quidproquo-actionprocessor-node",
     "quidproquo-actionprocessor-awslambda",
