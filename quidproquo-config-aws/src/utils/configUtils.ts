@@ -1,5 +1,5 @@
 import { qpqCoreUtils, QPQConfig } from 'quidproquo-core';
-import { ServiceAccountInfo } from '../types';
+import { ServiceAccountInfo, LocalServiceAccountInfo } from '../types';
 
 import { AwsServiceAccountInfoQPQConfigSetting, QPQAwsConfigSettingType } from '../config';
 
@@ -8,10 +8,11 @@ const getAwsServiceAccountInfoConfig = (
 ): AwsServiceAccountInfoQPQConfigSetting => {
   const serviceAccountInfos = qpqCoreUtils.getConfigSettings<AwsServiceAccountInfoQPQConfigSetting>(
     qpqConfig,
-    QPQAwsConfigSettingType.serviceAccountInfo,
+    QPQAwsConfigSettingType.awsServiceAccountInfo,
   );
 
   if (serviceAccountInfos.length === 0) {
+    console.log(JSON.stringify(qpqConfig, null, 2));
     throw new Error('use defineAwsServiceAccountInfo to define aws deployment config');
   }
 
@@ -27,7 +28,7 @@ export const getAwsServiceAccountInfos = (qpqConfig: QPQConfig): ServiceAccountI
 
   const serviceInfos = [
     ...awsServiceAccountInfoConfig.serviceInfoMap,
-    getServiceAccountInfo(qpqConfig),
+    getLocalServiceAccountInfo(qpqConfig),
   ];
 
   const uniqueServices = serviceInfos.filter(
@@ -45,10 +46,10 @@ export const getAwsServiceAccountInfos = (qpqConfig: QPQConfig): ServiceAccountI
   return uniqueServices;
 };
 
-export const getServiceAccountInfo = (qpqConfig: QPQConfig): ServiceAccountInfo => {
+export const getLocalServiceAccountInfo = (qpqConfig: QPQConfig): LocalServiceAccountInfo => {
   const awsServiceAccountInfoConfig = getAwsServiceAccountInfoConfig(qpqConfig);
 
-  const serviceAccountInfo: ServiceAccountInfo = {
+  const serviceAccountInfo: LocalServiceAccountInfo = {
     moduleName: qpqCoreUtils.getApplicationModuleName(qpqConfig),
     applicationName: qpqCoreUtils.getApplicationName(qpqConfig),
     environment: qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
@@ -58,5 +59,39 @@ export const getServiceAccountInfo = (qpqConfig: QPQConfig): ServiceAccountInfo 
     awsRegion: awsServiceAccountInfoConfig.deployRegion,
   };
 
-  return serviceAccountInfo;
+  return serviceAccountInfo as LocalServiceAccountInfo;
+};
+
+export const getAwsServiceAccountInfoByDeploymentInfo = (
+  qpqConfig: QPQConfig,
+
+  targetModule?: string,
+  targetEnvironment?: string,
+  targetFeature?: string,
+  targetApplication?: string,
+): ServiceAccountInfo => {
+  const awsServiceAccountInfos = getAwsServiceAccountInfos(qpqConfig);
+
+  const getMatchWeight = (serviceAccountInfo: ServiceAccountInfo) => {
+    // Note: remember not to have overlapping weights
+    return (
+      1.8 * Number(serviceAccountInfo.applicationName === targetApplication) +
+      1.4 * Number(serviceAccountInfo.environment === targetEnvironment) +
+      1.2 * Number(serviceAccountInfo.moduleName === targetModule) +
+      1.1 * Number(serviceAccountInfo.feature === targetFeature)
+    );
+  };
+
+  const serviceAccountInfo = awsServiceAccountInfos
+    .map((info) => ({ info, weight: getMatchWeight(info) }))
+    .sort((a, b) => b.weight - a.weight)
+    .find((info) => info.weight > 0);
+
+  if (!serviceAccountInfo) {
+    throw new Error(
+      `No aws service account info found for ${targetModule} ${targetEnvironment} ${targetFeature}`,
+    );
+  }
+
+  return serviceAccountInfo.info;
 };

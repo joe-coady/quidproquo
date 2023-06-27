@@ -11,6 +11,7 @@ import * as qpqDeployAwsCdkUtils from '../../../../utils';
 import { Construct } from 'constructs';
 import { aws_lambda_event_sources, aws_lambda, aws_sns, aws_sns_subscriptions } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
+import { getLocalServiceAccountInfo } from 'quidproquo-config-aws';
 
 export interface QpqApiCoreQueueConstructProps extends QpqConstructBlockProps {
   queueConfig: QueueQPQConfigSetting;
@@ -63,12 +64,18 @@ export class QpqApiCoreQueueConstruct extends QpqConstructBlock {
     );
 
     props.queueConfig.eventBusSubscriptions.forEach((eventBusName) => {
+      const localServiceInfo = getLocalServiceAccountInfo(props.qpqConfig);
+
       const eventBus = QpqCoreEventBusConstruct.fromOtherStack(
         this,
         `event-bus-${eventBusName}`,
         props.qpqConfig,
         props.awsAccountId,
         eventBusName,
+        localServiceInfo.moduleName,
+        localServiceInfo.environment,
+        localServiceInfo.applicationName,
+        localServiceInfo.feature,
       );
 
       eventBus.topic.addSubscription(

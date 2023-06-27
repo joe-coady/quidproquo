@@ -3,11 +3,19 @@ import { EventBusActionType } from './EventBusActionType';
 
 export type EventBusMessage<T> = CrossModuleMessage<T>;
 
-// Payload
-export interface EventBusSendMessageActionPayload<T> {
+export interface EventBusSendMessageOptions<T> {
   eventBusName: string;
   eventBusMessages: EventBusMessage<T>[];
+
+  // Used to find the account it should exist in
+  moduleOverride?: string;
+  environmentOverride?: string;
+  featureOverride?: string;
+  applicationOverride?: string;
 }
+
+// Payload
+export interface EventBusSendMessageActionPayload<T> extends EventBusSendMessageOptions<T> {}
 
 // Action
 export interface EventBusSendMessageAction<T> extends Action<EventBusSendMessageActionPayload<T>> {

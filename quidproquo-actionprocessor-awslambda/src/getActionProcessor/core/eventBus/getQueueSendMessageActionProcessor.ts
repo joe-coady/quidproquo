@@ -17,10 +17,29 @@ type AnyEventBusMessageWithSession = EventBusMessage<any> & {
 const getProcessEventBusSendMessage = (
   qpqConfig: QPQConfig,
 ): EventBusSendMessageActionProcessor<any> => {
-  return async ({ eventBusName, eventBusMessages }, session) => {
+  return async (
+    {
+      eventBusName,
+      eventBusMessages,
+
+      moduleOverride,
+      environmentOverride,
+      featureOverride,
+      applicationOverride,
+    },
+    session,
+  ) => {
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
-    const topicArn = getEventBusSnsTopicArn(eventBusName, qpqConfig);
+    const topicArn = getEventBusSnsTopicArn(
+      eventBusName,
+      qpqConfig,
+
+      moduleOverride || qpqCoreUtils.getApplicationModuleName(qpqConfig),
+      environmentOverride || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
+      applicationOverride || qpqCoreUtils.getApplicationName(qpqConfig),
+      featureOverride || qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
+    );
 
     await publishMessage(
       topicArn,

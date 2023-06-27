@@ -36,9 +36,20 @@ export class QpqCoreEventBusConstruct extends QpqCoreEventBusConstructBase {
     qpqConfig: QPQConfig,
     awsAccountId: string,
     eventBusName: string,
-    applicationOverride?: string,
+
+    module: string,
+    environment: string,
+    application: string,
+    feature?: string,
   ): QpqCoreEventBusConstructBase {
-    const topicArn = awsNamingUtils.getEventBusSnsTopicArn(eventBusName, qpqConfig);
+    const topicArn = awsNamingUtils.getEventBusSnsTopicArn(
+      eventBusName,
+      qpqConfig,
+      module,
+      environment,
+      application,
+      feature,
+    );
 
     class Import extends QpqCoreEventBusConstructBase {
       topic = aws_sns.Topic.fromTopicArn(this, 'topic-arn', topicArn);
@@ -56,13 +67,11 @@ export class QpqCoreEventBusConstruct extends QpqCoreEventBusConstructBase {
     });
 
     // TODO: remove this, its deprecated
-    qpqDeployAwsCdkUtils.exportStackValue(
-      this,
-      awsNamingUtils.getCFExportNameSnsTopicArnFromConfig(
-        props.eventBusConfig.name,
-        props.qpqConfig,
-      ),
-      this.topic.topicArn,
+    const exportName = awsNamingUtils.getCFExportNameSnsTopicArnFromConfig(
+      props.eventBusConfig.name,
+      props.qpqConfig,
     );
+    qpqDeployAwsCdkUtils.exportStackValue(this, exportName, this.topic.topicArn);
+    // ///////// end todo
   }
 }

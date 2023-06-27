@@ -1,18 +1,15 @@
+import { CrossModuleMessage } from '../../types';
 import { EventBusActionType } from './EventBusActionType';
 import {
   EventBusSendMessageActionRequester,
-  EventBusMessage,
+  EventBusSendMessageOptions,
 } from './EventBusSendMessageActionTypes';
 
-export function* askEventBusSendMessages<T extends EventBusMessage<any>>(
-  eventBusName: string,
-  ...eventBusMessages: T[]
+export function* askEventBusSendMessages<T>(
+  eventBusSendMessageOptions: EventBusSendMessageOptions<T>,
 ): EventBusSendMessageActionRequester<T> {
   return yield {
     type: EventBusActionType.SendMessages,
-    payload: {
-      eventBusMessages,
-      eventBusName,
-    },
+    payload: eventBusSendMessageOptions,
   };
 }

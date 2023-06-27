@@ -8,3 +8,6 @@ export type ServiceAccountInfo = {
   awsAccountId: string;
   awsRegion: string;
 };
+
+export type LocalServiceAccountInfo = Required<Omit<ServiceAccountInfo, 'feature'>> &
+  Pick<ServiceAccountInfo, 'feature'>;

@@ -1,10 +1,8 @@
-import {
-  QPQConfigSetting,
-  QPQCoreConfigSettingType,
-  QPQConfigAdvancedSettings,
-} from 'quidproquo-core';
+import { QPQConfigSetting, QPQConfigAdvancedSettings } from 'quidproquo-core';
 
 import { ServiceAccountInfo } from '../../types';
+
+import { QPQAwsConfigSettingType } from '../QPQConfig';
 
 export interface QPQConfigAdvancedAwsServiceAccountInfoSettings extends QPQConfigAdvancedSettings {}
 
@@ -21,12 +19,16 @@ export const defineAwsServiceAccountInfo = (
 
   serviceInfoMap?: ServiceAccountInfo[],
   options?: QPQConfigAdvancedAwsServiceAccountInfoSettings,
-): AwsServiceAccountInfoQPQConfigSetting => ({
-  configSettingType: QPQCoreConfigSettingType.eventBus,
-  uniqueKey: 'AwsServiceAccountInfo',
+): AwsServiceAccountInfoQPQConfigSetting => {
+  console.log('ASDSDASD', QPQAwsConfigSettingType.awsServiceAccountInfo);
 
-  deployAccountId,
-  deployRegion,
+  return {
+    configSettingType: QPQAwsConfigSettingType.awsServiceAccountInfo,
+    uniqueKey: 'AwsServiceAccountInfo',
 
-  serviceInfoMap: serviceInfoMap ?? [],
-});
+    deployAccountId,
+    deployRegion,
+
+    serviceInfoMap: serviceInfoMap ?? [],
+  };
+};
