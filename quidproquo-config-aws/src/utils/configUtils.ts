@@ -1,4 +1,10 @@
-import { qpqCoreUtils, QPQConfig } from 'quidproquo-core';
+import {
+  qpqCoreUtils,
+  QPQConfig,
+  EventBusSubscriptionDetails,
+  EventBusSubscription,
+} from 'quidproquo-core';
+
 import { ServiceAccountInfo, LocalServiceAccountInfo } from '../types';
 
 import { AwsServiceAccountInfoQPQConfigSetting, QPQAwsConfigSettingType } from '../config';
@@ -44,6 +50,14 @@ export const getAwsServiceAccountInfos = (qpqConfig: QPQConfig): ServiceAccountI
   );
 
   return uniqueServices;
+};
+
+export const getAwsAccountIds = (qpqConfig: QPQConfig): string[] => {
+  const uniqueAccountIds: string[] = [
+    ...new Set(getAwsServiceAccountInfos(qpqConfig).map((accountInfo) => accountInfo.awsAccountId)),
+  ];
+
+  return uniqueAccountIds;
 };
 
 export const getLocalServiceAccountInfo = (qpqConfig: QPQConfig): LocalServiceAccountInfo => {
@@ -94,4 +108,29 @@ export const getAwsServiceAccountInfoByDeploymentInfo = (
   }
 
   return serviceAccountInfo.info;
+};
+
+export const getEventBusSubscriptionDetails = (
+  eventBusSubscription: EventBusSubscription,
+  qpqConfig: QPQConfig,
+): EventBusSubscriptionDetails => {
+  const localServiceAccountInfo = getLocalServiceAccountInfo(qpqConfig);
+
+  if (typeof eventBusSubscription === 'string') {
+    return {
+      eventBusName: eventBusSubscription,
+      module: localServiceAccountInfo.moduleName,
+      application: localServiceAccountInfo.applicationName,
+      feature: localServiceAccountInfo.feature,
+      environment: localServiceAccountInfo.environment,
+    };
+  }
+
+  return {
+    eventBusName: eventBusSubscription.eventBusName,
+    module: eventBusSubscription.module ?? localServiceAccountInfo.moduleName,
+    application: eventBusSubscription.application ?? localServiceAccountInfo.applicationName,
+    feature: eventBusSubscription.feature ?? localServiceAccountInfo.feature,
+    environment: eventBusSubscription.environment ?? localServiceAccountInfo.environment,
+  };
 };

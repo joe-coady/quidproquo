@@ -189,8 +189,6 @@ export const getQqpTopicGrantables = (
     .getAllEventBusConfigs(qpqConfig)
     .filter((ebc) => !ebc.deprecated);
 
-  const serviceAccountInfo = getLocalServiceAccountInfo(qpqConfig);
-
   const eventBuses = eventBusConfigs.map((eventBus) => {
     return QpqCoreEventBusConstruct.fromOtherStack(
       scope,
@@ -198,10 +196,6 @@ export const getQqpTopicGrantables = (
       qpqConfig,
       awsAccountId,
       eventBus.name,
-      serviceAccountInfo.moduleName,
-      serviceAccountInfo.environment,
-      serviceAccountInfo.applicationName,
-      serviceAccountInfo.feature,
     );
   });
 

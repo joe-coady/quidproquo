@@ -1,7 +1,7 @@
 import { QueueQPQConfigSetting, qpqCoreUtils, QPQConfig } from 'quidproquo-core';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
-import { getAwsServiceAccountInfos } from 'quidproquo-config-aws';
+import { getAwsAccountIds } from 'quidproquo-config-aws';
 
 import { Construct } from 'constructs';
 import { aws_sqs, aws_iam } from 'aws-cdk-lib';
@@ -73,15 +73,11 @@ export class QpqCoreQueueConstruct extends QpqCoreQueueConstructBase {
       },
     });
 
-    const uniqueAccountIds: string[] = [
-      ...new Set(
-        getAwsServiceAccountInfos(props.qpqConfig).map((accountInfo) => accountInfo.awsAccountId),
-      ),
-    ];
+    const accountIds = getAwsAccountIds(props.qpqConfig);
 
     // This has to be any topic arn as we want other services / apps to be able
     // to publish to this queue
-    uniqueAccountIds.forEach((accountId) => {
+    accountIds.forEach((accountId) => {
       this.queue.addToResourcePolicy(
         new aws_iam.PolicyStatement({
           sid: `AllowSNSServicePrincipal_${accountId}`,

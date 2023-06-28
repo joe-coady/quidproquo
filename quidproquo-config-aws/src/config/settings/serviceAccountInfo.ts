@@ -19,16 +19,12 @@ export const defineAwsServiceAccountInfo = (
 
   serviceInfoMap?: ServiceAccountInfo[],
   options?: QPQConfigAdvancedAwsServiceAccountInfoSettings,
-): AwsServiceAccountInfoQPQConfigSetting => {
-  console.log('ASDSDASD', QPQAwsConfigSettingType.awsServiceAccountInfo);
+): AwsServiceAccountInfoQPQConfigSetting => ({
+  configSettingType: QPQAwsConfigSettingType.awsServiceAccountInfo,
+  uniqueKey: 'AwsServiceAccountInfo',
 
-  return {
-    configSettingType: QPQAwsConfigSettingType.awsServiceAccountInfo,
-    uniqueKey: 'AwsServiceAccountInfo',
+  deployAccountId,
+  deployRegion,
 
-    deployAccountId,
-    deployRegion,
-
-    serviceInfoMap: serviceInfoMap ?? [],
-  };
-};
+  serviceInfoMap: serviceInfoMap ?? [],
+});

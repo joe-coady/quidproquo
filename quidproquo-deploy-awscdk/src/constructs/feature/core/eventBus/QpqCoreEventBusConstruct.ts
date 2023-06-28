@@ -1,5 +1,13 @@
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-import { EventBusQPQConfigSetting, qpqCoreUtils, QPQConfig } from 'quidproquo-core';
+import {
+  EventBusQPQConfigSetting,
+  qpqCoreUtils,
+  EventBusSubscriptionDetails,
+  QPQConfig,
+  EventBusSubscription,
+} from 'quidproquo-core';
+
+import { getAwsAccountIds } from 'quidproquo-config-aws';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
@@ -7,6 +15,7 @@ import * as qpqDeployAwsCdkUtils from '../../../../utils';
 
 import { Construct } from 'constructs';
 import { aws_sns, aws_iam } from 'aws-cdk-lib';
+import { getEventBusSubscriptionDetails } from 'quidproquo-config-aws';
 
 export interface QpqCoreEventBusConstructProps extends QpqConstructBlockProps {
   eventBusConfig: EventBusQPQConfigSetting;
@@ -35,20 +44,17 @@ export class QpqCoreEventBusConstruct extends QpqCoreEventBusConstructBase {
     id: string,
     qpqConfig: QPQConfig,
     awsAccountId: string,
-    eventBusName: string,
-
-    module: string,
-    environment: string,
-    application: string,
-    feature?: string,
+    eventBusSubscription: EventBusSubscription,
   ): QpqCoreEventBusConstructBase {
+    const subDetails = getEventBusSubscriptionDetails(eventBusSubscription, qpqConfig);
+
     const topicArn = awsNamingUtils.getEventBusSnsTopicArn(
-      eventBusName,
+      subDetails.eventBusName,
       qpqConfig,
-      module,
-      environment,
-      application,
-      feature,
+      subDetails.module,
+      subDetails.environment,
+      subDetails.application,
+      subDetails.feature,
     );
 
     class Import extends QpqCoreEventBusConstructBase {
@@ -64,6 +70,19 @@ export class QpqCoreEventBusConstruct extends QpqCoreEventBusConstructBase {
     this.topic = new aws_sns.Topic(this, 'topic', {
       topicName: this.resourceName(props.eventBusConfig.name),
       displayName: props.eventBusConfig.name,
+    });
+
+    const accountIds = getAwsAccountIds(props.qpqConfig);
+    accountIds.forEach((accountId) => {
+      this.topic.addToResourcePolicy(
+        new aws_iam.PolicyStatement({
+          sid: `x-account-sub-${accountId}`,
+          effect: aws_iam.Effect.ALLOW,
+          principals: [new aws_iam.AccountPrincipal(accountId)],
+          actions: ['sns:Subscribe'],
+          resources: [this.topic.topicArn],
+        }),
+      );
     });
 
     // TODO: remove this, its deprecated
