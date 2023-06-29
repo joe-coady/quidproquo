@@ -10,6 +10,8 @@ export const publishMessage = async (
   region: string,
   messages: string[],
 ): Promise<void> => {
+  console.log(topicArn, region, JSON.stringify(messages, null, 2));
+
   const sqsClient = new SNSClient({
     region,
   });
