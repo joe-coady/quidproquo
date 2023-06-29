@@ -41,13 +41,6 @@ const getProcessEventBusSendMessage = (
       featureOverride || qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
     );
 
-    console.log(
-      moduleOverride || qpqCoreUtils.getApplicationModuleName(qpqConfig),
-      environmentOverride || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
-      applicationOverride || qpqCoreUtils.getApplicationName(qpqConfig),
-      featureOverride || qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
-    );
-
     await publishMessage(
       topicArn,
       region,
