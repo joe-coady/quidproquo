@@ -2,16 +2,9 @@ import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
 import { Construct } from 'constructs';
 import { aws_lambda } from 'aws-cdk-lib';
+import { getLambdaLayersWithFullPaths } from 'quidproquo-config-aws';
 
-export interface ApiLayer {
-  buildPath?: string;
-  name: string;
-  layerArn?: string;
-}
-
-export interface LambdaLayersProps extends QpqConstructBlockProps {
-  apiLayers?: ApiLayer[];
-}
+export interface LambdaLayersProps extends QpqConstructBlockProps {}
 
 export class LambdaLayers extends QpqConstructBlock {
   public readonly layers: aws_lambda.ILayerVersion[];
@@ -19,7 +12,9 @@ export class LambdaLayers extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: LambdaLayersProps) {
     super(scope, id, props);
 
-    this.layers = (props.apiLayers || []).map((layer) => {
+    const apiLayers = getLambdaLayersWithFullPaths(props.qpqConfig);
+
+    this.layers = apiLayers.map((layer) => {
       return layer.buildPath
         ? new aws_lambda.LayerVersion(this, `${layer.name}-layer`, {
             layerVersionName: awsNamingUtils.getQpqRuntimeResourceNameFromConfig(

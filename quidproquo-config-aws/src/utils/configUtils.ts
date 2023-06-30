@@ -1,3 +1,5 @@
+import path from 'path';
+
 import {
   qpqCoreUtils,
   QPQConfig,
@@ -5,7 +7,7 @@ import {
   EventBusSubscription,
 } from 'quidproquo-core';
 
-import { ServiceAccountInfo, LocalServiceAccountInfo } from '../types';
+import { ServiceAccountInfo, LocalServiceAccountInfo, ApiLayer } from '../types';
 
 import { AwsServiceAccountInfoQPQConfigSetting, QPQAwsConfigSettingType } from '../config';
 
@@ -133,4 +135,16 @@ export const getEventBusSubscriptionDetails = (
     feature: eventBusSubscription.feature ?? localServiceAccountInfo.feature,
     environment: eventBusSubscription.environment ?? localServiceAccountInfo.environment,
   };
+};
+
+export const getLambdaLayersWithFullPaths = (qpqConfig: QPQConfig): ApiLayer[] => {
+  const awsServiceAccountInfoConfig = getAwsServiceAccountInfoConfig(qpqConfig);
+
+  return awsServiceAccountInfoConfig.apiLayers.map((layer: ApiLayer) => ({
+    name: layer.name,
+    buildPath: layer.buildPath
+      ? path.join(qpqCoreUtils.getConfigRoot(qpqConfig), layer.buildPath)
+      : undefined,
+    layerArn: layer.layerArn,
+  }));
 };

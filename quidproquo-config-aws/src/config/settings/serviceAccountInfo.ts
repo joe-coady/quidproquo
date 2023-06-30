@@ -1,16 +1,19 @@
 import { QPQConfigSetting, QPQConfigAdvancedSettings } from 'quidproquo-core';
 
-import { ServiceAccountInfo } from '../../types';
+import { ServiceAccountInfo, ApiLayer } from '../../types';
 
 import { QPQAwsConfigSettingType } from '../QPQConfig';
 
-export interface QPQConfigAdvancedAwsServiceAccountInfoSettings extends QPQConfigAdvancedSettings {}
+export interface QPQConfigAdvancedAwsServiceAccountInfoSettings extends QPQConfigAdvancedSettings {
+  apiLayers?: ApiLayer[];
+}
 
 export interface AwsServiceAccountInfoQPQConfigSetting extends QPQConfigSetting {
   deployAccountId: string;
   deployRegion: string;
 
   serviceInfoMap: ServiceAccountInfo[];
+  apiLayers: ApiLayer[];
 }
 
 export const defineAwsServiceAccountInfo = (
@@ -27,4 +30,5 @@ export const defineAwsServiceAccountInfo = (
   deployRegion,
 
   serviceInfoMap: serviceInfoMap ?? [],
+  apiLayers: options?.apiLayers ?? [],
 });

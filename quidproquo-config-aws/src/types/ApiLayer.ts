@@ -1,4 +1,5 @@
 export interface ApiLayer {
-  buildPath: string;
+  buildPath?: string;
   name: string;
+  layerArn?: string;
 }

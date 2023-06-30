@@ -6,7 +6,6 @@ import { QpqServiceStack, QpqServiceStackProps } from './base/QpqServiceStack';
 
 import { InfQpqServiceStack } from './InfQpqServiceStack';
 import {
-  ApiLayer,
   LambdaLayers,
   QpqCoreRecurringScheduleConstruct,
   QpqWebserverApiConstruct,
@@ -17,7 +16,6 @@ import {
 
 export interface ApiQpqServiceStackProps extends QpqServiceStackProps {
   infQpqServiceStack: InfQpqServiceStack;
-  ApiLayers?: ApiLayer[];
 }
 
 export class ApiQpqServiceStack extends QpqServiceStack {
@@ -31,8 +29,6 @@ export class ApiQpqServiceStack extends QpqServiceStack {
     const layers = new LambdaLayers(this, 'lambda-layers', {
       awsAccountId: props.awsAccountId,
       qpqConfig: props.qpqConfig,
-
-      apiLayers: props.ApiLayers,
     });
 
     // Schedule Events
