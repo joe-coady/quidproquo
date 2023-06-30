@@ -47,7 +47,8 @@ const getProcessTransformEventParams = (
   serviceName: string,
 ): EventTransformEventParamsActionProcessor<ApiGatewayEventParams, HTTPEvent<any>> => {
   return async ({ eventParams: [apiGatewayEvent, context] }) => {
-    const path = (apiGatewayEvent.path || '').replace(new RegExp(`^(\/${serviceName})/`), '/');
+    // The comment here was for when we use base path as our service name, its now in the domain
+    const path = apiGatewayEvent.path || '/'; // (apiGatewayEvent.path || '').replace(new RegExp(`^(\/${serviceName})/`), '/');
 
     const transformedEventParams: HTTPEvent<any> = {
       path,

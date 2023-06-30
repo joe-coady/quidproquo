@@ -19,21 +19,27 @@ Currently under development ~ Not for production
 
 #### Todo:
 
-- Update config to support nested arrays
 - Use module federation to dynamically load
   - actions
   - stories
   - business logic.
-- Auth support
 - Retry support for actions
 - Action logging
 - Sort out package versions (don't use \*)
 - Tests
 - Create QPQ App
 - Move into @quidproquo/\* packaged namespace
-- Environment config support ~ Specifically dev / prod config parameters.
 - OpenApi support for controllers (validation)
 - share the action processor logic between lambdas (+ general cleanup)
+
+### optimizations:
+
+- Seems that Execute story takes longer then the sum of its action parts by a fair bit
+  - investigate this, i suspect it takes time to write the logs, however, logs do not need to be
+    written in sync
+    - we can queue them up, and let the owner lambda hold onto them until they are done, so we can
+      do other things
+    - it may shave 100ms off function calls
 
 #### Must haves
 
@@ -42,7 +48,6 @@ Currently under development ~ Not for production
 - Finish auth
 - Local Dev
 - import html file as strings for email templates
-- key value store powered by dynamo / s3
 - Add monad support to actions (allow return with error info)
 - eslint
   - import order
@@ -53,3 +58,18 @@ Currently under development ~ Not for production
 - (if !fedmod logic) - create dynamic loaders for each lambda type to reduce lambda build sizes
 - ESLint plugin to make sure user yield\* before an askGenerator
 - keep lambda's warm by adding a polling event every x mins
+
+#### OOOOHHHH Thoughts
+
+- Try catch support ~ Think about this
+
+```
+yield* askTryCatch(
+    askSomeBusinessFunc,
+    [arg1, arg2],
+    function* onError(error: Error) {
+      yield* askLogCreate(LogLevelEnum.Error, 'Something went wrong', error);
+      yield* askThrowError(ErrorTypeEnum.GenericError, 'Something went wrong');
+    }
+  );
+```
