@@ -94,14 +94,26 @@ export const getAwsServiceAccountInfoByDeploymentInfo = (
       1.8 * Number(serviceAccountInfo.applicationName === targetApplication) +
       1.4 * Number(serviceAccountInfo.environment === targetEnvironment) +
       1.2 * Number(serviceAccountInfo.moduleName === targetModule) +
-      1.1 * Number(serviceAccountInfo.feature === targetFeature)
+      // We only want to compare features if they are defined. Sometimes we will
+      // use null, undefined or an empty string to clear out the feature. Therefore,
+      // we ensure both serviceAccountInfo.feature and targetFeature are truthy before
+      // comparing them. This prevents a false match if either feature is a falsey value.
+      1.1 *
+        Number(
+          !!serviceAccountInfo.feature &&
+            !!targetFeature &&
+            serviceAccountInfo.feature === targetFeature,
+        )
     );
   };
 
-  const serviceAccountInfo = awsServiceAccountInfos
+  const sortedAwsServiceAccountInfos = awsServiceAccountInfos
     .map((info) => ({ info, weight: getMatchWeight(info) }))
-    .sort((a, b) => b.weight - a.weight)
-    .find((info) => info.weight > 0);
+    .sort((a, b) => b.weight - a.weight);
+
+  // console.log(JSON.stringify(sortedList.slice(0, 3), null, 2));
+
+  const serviceAccountInfo = sortedAwsServiceAccountInfos.find((info) => info.weight > 0);
 
   if (!serviceAccountInfo) {
     throw new Error(
