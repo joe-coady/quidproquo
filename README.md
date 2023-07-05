@@ -8,6 +8,8 @@ JS Library for building web servers using pure functions and generators.
 - [quidproquo-core](https://www.npmjs.com/package/quidproquo-core)
 - [quidproquo-tsconfig](https://www.npmjs.com/package/quidproquo-tsconfig)
 - [quidproquo-webserver](https://www.npmjs.com/package/quidproquo-webserver)
+- [quidproquo-web-admin](https://www.npmjs.com/package/quidproquo-web-admin)
+- [quidproquo-config-aws](https://www.npmjs.com/package/quidproquo-config-aws)
 - [quidproquo-deploy-awscdk](https://www.npmjs.com/package/quidproquo-deploy-awscdk)
 - [quidproquo-deploy-webpack](https://www.npmjs.com/package/quidproquo-deploy-webpack)
 - [quidproquo-actionprocessor-awslambda](https://www.npmjs.com/package/quidproquo-actionprocessor-awslambda)
@@ -58,6 +60,13 @@ Currently under development ~ Not for production
 - (if !fedmod logic) - create dynamic loaders for each lambda type to reduce lambda build sizes
 - ESLint plugin to make sure user yield\* before an askGenerator
 - keep lambda's warm by adding a polling event every x mins
+
+#### Nice Things
+
+- Logs
+  - Timestamps AND execution length on the log metadata
+    - visualization for how long a specific thing took to execute, similar to Performance tab in
+      chrome
 
 #### OOOOHHHH Thoughts
 
