@@ -1,4 +1,4 @@
-import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { QPQConfig, qpqCoreUtils, ResourceName, CrossServiceResourceName } from 'quidproquo-core';
 import { getAwsServiceAccountInfoByDeploymentInfo } from 'quidproquo-config-aws';
 
 export const getGlobalConfigRuntimeResourceName = (
@@ -87,17 +87,20 @@ export const getQpqRuntimeResourceName = (
 };
 
 export const getQpqRuntimeResourceNameFromConfig = (
-  resourceName: string,
+  resourceName: ResourceName,
   qpqConfig: QPQConfig,
   resourceType: string = '',
 ) => {
+  const crossServiceResourceName = qpqCoreUtils.resolveCrossServiceResourceName(resourceName);
+
   const application = qpqCoreUtils.getApplicationName(qpqConfig);
-  const service = qpqCoreUtils.getApplicationModuleName(qpqConfig);
+  const service =
+    crossServiceResourceName.service || qpqCoreUtils.getApplicationModuleName(qpqConfig);
   const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
   const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
 
   return getQpqRuntimeResourceName(
-    resourceName,
+    crossServiceResourceName.name,
     application,
     service,
     environment,

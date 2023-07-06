@@ -4,8 +4,10 @@ import {
   KeyValueStoreGetOptions,
 } from './KeyValueStoreGetActionTypes';
 
+import { ResourceName } from '../../types';
+
 export function* askKeyValueStoreGet<Value>(
-  keyValueStoreName: string,
+  keyValueStoreName: ResourceName,
   key: string,
   options?: KeyValueStoreGetOptions,
 ): KeyValueStoreGetActionRequester<Value> {

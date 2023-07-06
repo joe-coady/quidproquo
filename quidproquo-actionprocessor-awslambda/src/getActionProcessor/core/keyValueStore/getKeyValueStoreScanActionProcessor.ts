@@ -19,14 +19,6 @@ const getProcessKeyValueStoreScan = (
     );
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
-    const storeConfig = qpqCoreUtils.getKeyValueStoreByName(qpqConfig, keyValueStoreName);
-    if (!storeConfig) {
-      return actionResultError(
-        ErrorTypeEnum.NotFound,
-        `Could not find key value store with name "${keyValueStoreName}"`,
-      );
-    }
-
     const items = await scan(dynamoTableName, region, filterCondition);
 
     return actionResult(items);

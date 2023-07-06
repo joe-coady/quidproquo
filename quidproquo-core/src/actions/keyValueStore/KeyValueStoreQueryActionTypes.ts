@@ -3,6 +3,8 @@ import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
 
 import { KvsQueryOperation } from './types';
 
+import { ResourceName } from '../../types';
+
 // Options Type
 export interface KeyValueStoreQueryOptions {
   ttlInSeconds?: number; // Time-to-live in seconds
@@ -10,7 +12,7 @@ export interface KeyValueStoreQueryOptions {
 
 // Payload
 export interface KeyValueStoreQueryActionPayload {
-  keyValueStoreName: string;
+  keyValueStoreName: ResourceName;
 
   keyCondition: KvsQueryOperation;
   filterCondition?: KvsQueryOperation;

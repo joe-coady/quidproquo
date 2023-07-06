@@ -21,6 +21,7 @@ import {
   EnvironmentSettingsQPQConfigSetting,
 } from './config/settings';
 import { EmailTemplates } from './config/settings/emailTemplates/types';
+import { CrossServiceResourceName, ResourceName } from './types';
 
 /**
  * Flattens a QPQConfig array into a single array of QPQConfigSetting objects.
@@ -186,12 +187,26 @@ export const getAllKeyValueStores = (qpqConfig: QPQConfig): KeyValueStoreQPQConf
   return keyValueStores;
 };
 
+export const resolveCrossServiceResourceName = (
+  resourceName: ResourceName,
+): CrossServiceResourceName => {
+  if (typeof resourceName === 'string') {
+    return {
+      name: resourceName,
+    };
+  }
+
+  return resourceName;
+};
+
 export const getKeyValueStoreByName = (
   qpqConfig: QPQConfig,
-  kvsName: string,
+  kvsName: ResourceName,
 ): KeyValueStoreQPQConfigSetting | undefined => {
+  const crossServiceResourceName = resolveCrossServiceResourceName(kvsName);
+
   const keyValueStore = getAllKeyValueStores(qpqConfig).find(
-    (kvs) => kvs.keyValueStoreName === kvsName,
+    (kvs) => kvs.keyValueStoreName === crossServiceResourceName.name,
   );
 
   return keyValueStore;

@@ -1,4 +1,4 @@
-import { CrossServiceResourceName } from '../../types';
+import { CrossServiceResourceName, ResourceName } from '../../types';
 
 export enum FileActionType {
   ReadTextContents = '@quidproquo-core/File/ReadTextContents',
@@ -24,4 +24,4 @@ export interface DirectoryList {
   pageToken?: string;
 }
 
-export type DriveName = string | CrossServiceResourceName;
+export type DriveName = ResourceName;

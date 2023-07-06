@@ -5,8 +5,10 @@ import {
 } from './KeyValueStoreDeleteActionTypes';
 import { KvsCoreDataType } from './types';
 
+import { ResourceName } from '../../types';
+
 export function* askKeyValueStoreDelete(
-  keyValueStoreName: string,
+  keyValueStoreName: ResourceName,
   key: KvsCoreDataType,
   sortKey?: KvsCoreDataType,
   options?: KeyValueStoreDeleteOptions,

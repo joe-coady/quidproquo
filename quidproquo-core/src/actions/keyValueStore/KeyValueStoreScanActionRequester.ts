@@ -3,8 +3,10 @@ import { KeyValueStoreScanActionRequester } from './KeyValueStoreScanActionTypes
 
 import { KvsQueryOperation } from './types';
 
+import { ResourceName } from '../../types';
+
 export function* askKeyValueStoreScan<KvsItem>(
-  keyValueStoreName: string,
+  keyValueStoreName: ResourceName,
 
   filterCondition?: KvsQueryOperation,
 ): KeyValueStoreScanActionRequester<KvsItem> {
