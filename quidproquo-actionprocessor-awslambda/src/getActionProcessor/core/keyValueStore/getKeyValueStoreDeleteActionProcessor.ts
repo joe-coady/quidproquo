@@ -1,6 +1,6 @@
 import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
-import { getQpqRuntimeResourceNameFromConfig } from '../../../awsNamingUtils';
+import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
 import {
   KeyValueStoreDeleteActionProcessor,
   actionResult,
@@ -12,11 +12,7 @@ const getProcessKeyValueStoreDelete = (
   qpqConfig: QPQConfig,
 ): KeyValueStoreDeleteActionProcessor => {
   return async ({ keyValueStoreName, key, sortKey }) => {
-    const dynamoTableName = getQpqRuntimeResourceNameFromConfig(
-      keyValueStoreName,
-      qpqConfig,
-      'kvs',
-    );
+    const dynamoTableName = getKvsDynamoTableNameFromConfig(keyValueStoreName, qpqConfig, 'kvs');
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     await deleteItem(dynamoTableName, region, key, sortKey);

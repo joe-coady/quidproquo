@@ -9,7 +9,7 @@ import { InfQpqServiceStack } from './InfQpqServiceStack';
 import { QpqWebserverWebEntryConstruct } from '../constructs';
 
 export interface WebQpqServiceStackProps extends QpqServiceStackProps {
-  infQpqServiceStack: InfQpqServiceStack;
+  infQpqServiceStack?: InfQpqServiceStack;
 }
 
 export class WebQpqServiceStack extends QpqServiceStack {
@@ -17,7 +17,9 @@ export class WebQpqServiceStack extends QpqServiceStack {
     super(scope, id, props);
 
     // Add the inf stack as a dependency so it builds first
-    this.addDependency(props.infQpqServiceStack);
+    if (props.infQpqServiceStack) {
+      this.addDependency(props.infQpqServiceStack);
+    }
 
     // Web entries
     const webEntries = qpqWebServerUtils.getWebEntryConfigs(props.qpqConfig).map(

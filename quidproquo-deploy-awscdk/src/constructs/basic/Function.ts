@@ -89,11 +89,11 @@ export class Function extends QpqConstructBlock {
       }),
     );
 
-    // Let lambdas write to dynamo logs
+    // Let lambdas access s3
     this.lambdaFunction.addToRolePolicy(
       new aws_iam.PolicyStatement({
-        actions: ['lambda:InvokeFunction'],
-        resources: ['arn:aws:lambda:*:*:function:*sfunc*'],
+        actions: ['s3:GetObject', 's3:PutObject', 's3:ListBucket', 's3:DeleteObject'],
+        resources: ['arn:aws:s3:::*'],
       }),
     );
 
@@ -109,7 +109,9 @@ export class Function extends QpqConstructBlock {
         //     'aws:ResourceTag/Name': '*qpqlog',
         //   },
         // },
-        resources: ['arn:aws:dynamodb:*:*:table/logs-*'],
+        // Actually all tables currently :/
+        resources: ['arn:aws:dynamodb:*:*:table/*'],
+        // resources: ['arn:aws:dynamodb:*:*:table/logs-*'],
       }),
     );
   }

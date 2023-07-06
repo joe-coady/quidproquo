@@ -15,7 +15,7 @@ import {
 } from '../constructs';
 
 export interface ApiQpqServiceStackProps extends QpqServiceStackProps {
-  infQpqServiceStack: InfQpqServiceStack;
+  infQpqServiceStack?: InfQpqServiceStack;
 }
 
 export class ApiQpqServiceStack extends QpqServiceStack {
@@ -23,7 +23,9 @@ export class ApiQpqServiceStack extends QpqServiceStack {
     super(scope, id, props);
 
     // Add the inf stack as a dependency so it builds first
-    this.addDependency(props.infQpqServiceStack);
+    if (props.infQpqServiceStack) {
+      this.addDependency(props.infQpqServiceStack);
+    }
 
     // Build Lambda Layers
     const layers = new LambdaLayers(this, 'lambda-layers', {

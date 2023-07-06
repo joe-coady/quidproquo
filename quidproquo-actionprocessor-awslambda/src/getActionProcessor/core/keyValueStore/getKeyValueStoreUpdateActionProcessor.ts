@@ -1,6 +1,6 @@
 import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
-import { getQpqRuntimeResourceNameFromConfig } from '../../../awsNamingUtils';
+import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
 import {
   KeyValueStoreUpdateActionProcessor,
   actionResult,
@@ -12,11 +12,7 @@ const getProcessKeyValueStoreUpdate = (
   qpqConfig: QPQConfig,
 ): KeyValueStoreUpdateActionProcessor<any> => {
   return async ({ keyValueStoreName, key, sortKey, updates, options }) => {
-    const dynamoTableName = getQpqRuntimeResourceNameFromConfig(
-      keyValueStoreName,
-      qpqConfig,
-      'kvs',
-    );
+    const dynamoTableName = getKvsDynamoTableNameFromConfig(keyValueStoreName, qpqConfig, 'kvs');
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     await updateItem(dynamoTableName, region, updates, key, sortKey);

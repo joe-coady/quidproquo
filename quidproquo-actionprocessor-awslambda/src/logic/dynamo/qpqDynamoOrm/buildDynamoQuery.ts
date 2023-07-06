@@ -164,14 +164,20 @@ export const buildAttributeValue = (value: KvsAdvancedDataType): AttributeValue 
           L: value.map((item) => buildAttributeValue(item)),
         };
       } else if (value !== null) {
+        const objectKeyValuePairs = Object.entries(value)
+          .filter(([k, v]) => v !== undefined)
+          .map(([k, v]) => {
+            return [k, buildAttributeValue(v)];
+          });
+
         return {
-          M: Object.fromEntries(Object.entries(value).map(([k, v]) => [k, buildAttributeValue(v)])),
+          M: Object.fromEntries(objectKeyValuePairs),
         };
       } else {
         return { NULL: true };
       }
     default:
-      throw new Error(`Unsupported data type: ${valueType}`);
+      throw new Error(`Unsupported data type in kvs expression: ${valueType}`);
   }
 };
 

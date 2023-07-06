@@ -1,6 +1,6 @@
 import { QPQConfig, qpqCoreUtils, actionResultError, ErrorTypeEnum } from 'quidproquo-core';
 
-import { getQpqRuntimeResourceNameFromConfig } from '../../../awsNamingUtils';
+import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
 import {
   KeyValueStoreScanActionProcessor,
   actionResult,
@@ -12,11 +12,7 @@ const getProcessKeyValueStoreScan = (
   qpqConfig: QPQConfig,
 ): KeyValueStoreScanActionProcessor<any> => {
   return async ({ keyValueStoreName, filterCondition }) => {
-    const dynamoTableName = getQpqRuntimeResourceNameFromConfig(
-      keyValueStoreName,
-      qpqConfig,
-      'kvs',
-    );
+    const dynamoTableName = getKvsDynamoTableNameFromConfig(keyValueStoreName, qpqConfig, 'kvs');
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const items = await scan(dynamoTableName, region, filterCondition);

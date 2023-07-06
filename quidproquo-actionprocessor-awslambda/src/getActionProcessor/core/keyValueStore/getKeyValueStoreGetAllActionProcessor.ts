@@ -1,6 +1,6 @@
 import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
-import { getQpqRuntimeResourceNameFromConfig } from '../../../awsNamingUtils';
+import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
 import {
   KeyValueStoreGetAllActionProcessor,
   actionResult,
@@ -12,11 +12,7 @@ const getProcessKeyValueStoreGetAll = (
   qpqConfig: QPQConfig,
 ): KeyValueStoreGetAllActionProcessor<any> => {
   return async ({ keyValueStoreName }) => {
-    const dynamoTableName = getQpqRuntimeResourceNameFromConfig(
-      keyValueStoreName,
-      qpqConfig,
-      'kvs',
-    );
+    const dynamoTableName = getKvsDynamoTableNameFromConfig(keyValueStoreName, qpqConfig, 'kvs');
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const result = await getAllItems(dynamoTableName, region);

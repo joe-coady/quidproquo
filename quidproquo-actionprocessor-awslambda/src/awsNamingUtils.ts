@@ -109,6 +109,34 @@ export const getQpqRuntimeResourceNameFromConfig = (
   );
 };
 
+export const getKvsDynamoTableNameFromConfig = (
+  resourceName: ResourceName,
+  qpqConfig: QPQConfig,
+  resourceType: string = '',
+) => {
+  const storeConfig = qpqCoreUtils.getKeyValueStoreByName(qpqConfig, resourceName);
+
+  const crossServiceResourceName = qpqCoreUtils.resolveCrossServiceResourceName(resourceName);
+
+  const application = qpqCoreUtils.getApplicationName(qpqConfig);
+  const service =
+    crossServiceResourceName.service ||
+    storeConfig?.owner?.module ||
+    qpqCoreUtils.getApplicationModuleName(qpqConfig);
+
+  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
+  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+
+  return getQpqRuntimeResourceName(
+    crossServiceResourceName.name,
+    application,
+    service,
+    environment,
+    feature,
+    resourceType,
+  );
+};
+
 export const getCFExportNameUserPoolIdFromConfig = (
   userDirectoryName: string,
   qpqConfig: QPQConfig,

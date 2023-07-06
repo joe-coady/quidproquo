@@ -83,17 +83,17 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
       }),
     );
 
-    if (props.storageDriveConfig.global) {
-      this.bucket.addToResourcePolicy(
-        new aws_iam.PolicyStatement({
-          sid: 'AllowAllEntitiesInAccount',
-          effect: aws_iam.Effect.ALLOW,
-          principals: [new aws_iam.AccountPrincipal(props.awsAccountId)],
-          actions: ['s3:GetObject', 's3:PutObject', 's3:ListBucket', 's3:DeleteObject'],
-          resources: [this.bucket.arnForObjects('*'), this.bucket.bucketArn],
-        }),
-      );
-    }
+    // if (props.storageDriveConfig.global) {
+    //   this.bucket.addToResourcePolicy(
+    //     new aws_iam.PolicyStatement({
+    //       sid: 'AllowAllEntitiesInAccount',
+    //       effect: aws_iam.Effect.ALLOW,
+    //       principals: [new aws_iam.AccountPrincipal(props.awsAccountId)],
+    //       actions: ['s3:GetObject', 's3:PutObject', 's3:ListBucket', 's3:DeleteObject'],
+    //       resources: [this.bucket.arnForObjects('*'), this.bucket.bucketArn],
+    //     }),
+    //   );
+    // }
 
     if (props.storageDriveConfig.copyPath) {
       const srcDir = qpqCoreUtils.getStorageDriveUploadFullPath(

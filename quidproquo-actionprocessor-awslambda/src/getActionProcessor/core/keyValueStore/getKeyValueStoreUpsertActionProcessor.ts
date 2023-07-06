@@ -8,7 +8,7 @@ import {
   actionResultError,
 } from 'quidproquo-core';
 
-import { getQpqRuntimeResourceNameFromConfig } from '../../../awsNamingUtils';
+import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
 
 import { putItem } from '../../../logic/dynamo';
 
@@ -16,11 +16,7 @@ const getProcessKeyValueStoreUpsert = (
   qpqConfig: QPQConfig,
 ): KeyValueStoreUpsertActionProcessor<any> => {
   return async ({ keyValueStoreName, item, options }) => {
-    const dynamoTableName = getQpqRuntimeResourceNameFromConfig(
-      keyValueStoreName,
-      qpqConfig,
-      'kvs',
-    );
+    const dynamoTableName = getKvsDynamoTableNameFromConfig(keyValueStoreName, qpqConfig, 'kvs');
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const storeConfig = qpqCoreUtils.getKeyValueStoreByName(qpqConfig, keyValueStoreName);

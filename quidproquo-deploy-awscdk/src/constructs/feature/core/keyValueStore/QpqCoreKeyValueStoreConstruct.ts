@@ -101,11 +101,10 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
     this.table = table;
 
     // Security ~ IF global is true
-    if (props.keyValueStoreConfig.global) {
+    if (!!props.keyValueStoreConfig.owner) {
       const policyStatement = new aws_iam.PolicyStatement({
         sid: 'AllowAllEntitiesInAccount',
         effect: aws_iam.Effect.ALLOW,
-        principals: [new aws_iam.AccountPrincipal(props.awsAccountId)],
         actions: [
           'dynamodb:GetItem',
           'dynamodb:PutItem',
