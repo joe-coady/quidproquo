@@ -99,5 +99,29 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
     }
 
     this.table = table;
+
+    // Security ~ IF global is true
+    if (props.keyValueStoreConfig.global) {
+      const policyStatement = new aws_iam.PolicyStatement({
+        sid: 'AllowAllEntitiesInAccount',
+        effect: aws_iam.Effect.ALLOW,
+        principals: [new aws_iam.AccountPrincipal(props.awsAccountId)],
+        actions: [
+          'dynamodb:GetItem',
+          'dynamodb:PutItem',
+          'dynamodb:Query',
+          'dynamodb:Scan',
+          'dynamodb:UpdateItem',
+          'dynamodb:DeleteItem',
+        ],
+        resources: [table.tableArn],
+      });
+
+      const role = new aws_iam.Role(this, 'AllowAllEntitiesInAccountRole', {
+        assumedBy: new aws_iam.AccountPrincipal(props.awsAccountId),
+      });
+
+      role.addToPolicy(policyStatement);
+    }
   }
 }

@@ -45,6 +45,7 @@ Currently under development ~ Not for production
 
 #### Must haves
 
+- Remove aws region being passed into QpqConfig
 - QPQ Types package ~ Web / Node
 - Reduce the log lifetime for lambda to a week or two by default
 - Finish auth
