@@ -118,7 +118,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
     );
 
     // key value store
-    const keyValueStores = qpqCoreUtils.getAllKeyValueStores(props.qpqConfig).map(
+    const keyValueStores = qpqCoreUtils.getOwnedKeyValueStores(props.qpqConfig).map(
       (setting) =>
         new QpqCoreKeyValueStoreConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           awsAccountId: props.awsAccountId,

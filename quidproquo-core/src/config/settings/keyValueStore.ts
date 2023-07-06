@@ -1,3 +1,4 @@
+import { CrossModuleOwner } from '../../types';
 import {
   QPQConfigSetting,
   QPQCoreConfigSettingType,
@@ -61,6 +62,8 @@ export interface QPQConfigAdvancedKeyValueStoreSettings extends QPQConfigAdvance
   indexes?: CompositeKvsIndex[];
 
   global?: boolean;
+
+  owner?: CrossModuleOwner;
 }
 
 export interface KeyValueStoreQPQConfigSetting extends QPQConfigSetting {
@@ -93,4 +96,6 @@ export const defineKeyValueStore = (
   indexes: (options?.indexes ?? []).map(convertCompositeKvsIndexToKvsIndex),
 
   global: options?.global ?? false,
+
+  owner: options?.owner,
 });

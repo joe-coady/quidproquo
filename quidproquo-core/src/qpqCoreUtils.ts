@@ -178,6 +178,14 @@ export const getAllEventBusConfigs = (qpqConfig: QPQConfig): EventBusQPQConfigSe
   return eventBuses;
 };
 
+export const getOwnedItems = <T extends QPQConfigSetting>(
+  settings: T[],
+  qpqConfig: QPQConfig,
+): T[] => {
+  const appModuleName = getApplicationModuleName(qpqConfig);
+  return settings.filter((s) => !s.owner || s.owner.module === appModuleName);
+};
+
 export const getAllKeyValueStores = (qpqConfig: QPQConfig): KeyValueStoreQPQConfigSetting[] => {
   const keyValueStores = getConfigSettings<KeyValueStoreQPQConfigSetting>(
     qpqConfig,
@@ -185,6 +193,10 @@ export const getAllKeyValueStores = (qpqConfig: QPQConfig): KeyValueStoreQPQConf
   );
 
   return keyValueStores;
+};
+
+export const getOwnedKeyValueStores = (qpqConfig: QPQConfig): KeyValueStoreQPQConfigSetting[] => {
+  return getOwnedItems(getAllKeyValueStores(qpqConfig), qpqConfig);
 };
 
 export const resolveCrossServiceResourceName = (

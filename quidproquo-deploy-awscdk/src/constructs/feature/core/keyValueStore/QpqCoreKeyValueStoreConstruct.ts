@@ -1,4 +1,4 @@
-import { KeyValueStoreQPQConfigSetting, QPQConfig, KvsKey } from 'quidproquo-core';
+import { KeyValueStoreQPQConfigSetting, QPQConfig, KvsKey, qpqCoreUtils } from 'quidproquo-core';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
 import { Construct } from 'constructs';

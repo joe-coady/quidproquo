@@ -1,3 +1,5 @@
+import { CrossModuleOwner } from '../types';
+
 export enum QPQCoreConfigSettingType {
   appName = '@quidproquo-core/config/AppName',
   storageDrive = '@quidproquo-core/config/storageDrive',
@@ -17,6 +19,8 @@ export enum QPQCoreConfigSettingType {
 export interface QPQConfigSetting {
   configSettingType: string;
   uniqueKey: string;
+
+  owner?: CrossModuleOwner;
 }
 
 export interface QPQConfigAdvancedSettings {
