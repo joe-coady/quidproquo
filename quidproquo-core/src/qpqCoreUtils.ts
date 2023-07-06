@@ -216,9 +216,12 @@ export const getKeyValueStoreByName = (
   kvsName: ResourceName,
 ): KeyValueStoreQPQConfigSetting | undefined => {
   const crossServiceResourceName = resolveCrossServiceResourceName(kvsName);
+  const appModuleName = getApplicationModuleName(qpqConfig);
 
   const keyValueStore = getAllKeyValueStores(qpqConfig).find(
-    (kvs) => kvs.keyValueStoreName === crossServiceResourceName.name,
+    (kvs) =>
+      kvs.keyValueStoreName === crossServiceResourceName.name &&
+      (!crossServiceResourceName.service || crossServiceResourceName.service === appModuleName),
   );
 
   return keyValueStore;
