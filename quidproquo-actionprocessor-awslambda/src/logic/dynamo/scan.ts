@@ -1,7 +1,9 @@
 import { DynamoDBClient, ScanCommand, ScanCommandInput } from '@aws-sdk/client-dynamodb';
 
-import { KvsQueryOperation } from 'quidproquo-core';
+import { KvsQueryOperation, QpqPagedData } from 'quidproquo-core';
 import { convertDynamoMapToObject } from './convertObjectToDynamoMap';
+import { stringToLastEvaluatedKey } from './logs';
+import { itemsToQpqPagedData } from './utils/itemsToQpqPagedData';
 
 import {
   buildExpressionAttributeValues,
@@ -13,7 +15,8 @@ export async function scan<Item>(
   tableName: string,
   region: string,
   filterExpression?: KvsQueryOperation,
-): Promise<Item[]> {
+  pageKey?: string,
+): Promise<QpqPagedData<Item>> {
   // Instantiate DynamoDB client
   const dynamoClient = new DynamoDBClient({ region });
 
@@ -24,7 +27,9 @@ export async function scan<Item>(
     ExpressionAttributeNames: buildExpressionAttributeNames([filterExpression]),
   };
 
-  console.log(params);
+  if (pageKey) {
+    params.ExclusiveStartKey = stringToLastEvaluatedKey(pageKey);
+  }
 
   // Create ScanCommand
   const command = new ScanCommand(params);
@@ -32,5 +37,8 @@ export async function scan<Item>(
   // TODO: Catch errors and throw QPQ ones
   const data = await dynamoClient.send(command);
 
-  return (data.Items?.map((i) => convertDynamoMapToObject(i)) || []) as Item[];
+  return itemsToQpqPagedData(
+    (data.Items?.map((i) => convertDynamoMapToObject(i)) || []) as Item[],
+    data.LastEvaluatedKey,
+  );
 }

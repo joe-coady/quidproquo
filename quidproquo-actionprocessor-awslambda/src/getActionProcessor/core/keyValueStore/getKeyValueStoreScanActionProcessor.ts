@@ -11,11 +11,11 @@ import { scan } from '../../../logic/dynamo/scan';
 const getProcessKeyValueStoreScan = (
   qpqConfig: QPQConfig,
 ): KeyValueStoreScanActionProcessor<any> => {
-  return async ({ keyValueStoreName, filterCondition }) => {
+  return async ({ keyValueStoreName, filterCondition, nextPageKey }) => {
     const dynamoTableName = getKvsDynamoTableNameFromConfig(keyValueStoreName, qpqConfig, 'kvs');
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
-    const items = await scan(dynamoTableName, region, filterCondition);
+    const items = await scan<any>(dynamoTableName, region, filterCondition, nextPageKey);
 
     return actionResult(items);
   };

@@ -7,8 +7,8 @@ import { ResourceName } from '../../types';
 
 export function* askKeyValueStoreScan<KvsItem>(
   keyValueStoreName: ResourceName,
-
   filterCondition?: KvsQueryOperation,
+  nextPageKey?: string,
 ): KeyValueStoreScanActionRequester<KvsItem> {
   return yield {
     type: KeyValueStoreActionType.Scan,
@@ -16,6 +16,8 @@ export function* askKeyValueStoreScan<KvsItem>(
       keyValueStoreName,
 
       filterCondition,
+
+      nextPageKey,
     },
   };
 }

@@ -7,3 +7,4 @@ export * from './LogLevelEnum';
 export * from './QPQBinaryData';
 export * from './CrossServiceResourceName';
 export * from './CrossModuleOwner';
+export * from './QpqPagedData';

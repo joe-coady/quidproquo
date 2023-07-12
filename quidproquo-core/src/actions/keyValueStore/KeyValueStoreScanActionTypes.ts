@@ -1,3 +1,5 @@
+import { QpqPagedData } from '../../types';
+
 import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
 
@@ -8,6 +10,7 @@ import { ResourceName } from '../../types';
 // Options Type
 export interface KeyValueStoreScanOptions {
   ttlInSeconds?: number; // Time-to-live in seconds
+  limit?: number; // Maximum number of items to return
 }
 
 // Payload
@@ -15,6 +18,8 @@ export interface KeyValueStoreScanActionPayload {
   keyValueStoreName: ResourceName;
 
   filterCondition?: KvsQueryOperation;
+
+  nextPageKey?: string;
 }
 
 // Action
@@ -26,9 +31,9 @@ export interface KeyValueStoreScanAction extends Action<KeyValueStoreScanActionP
 // Function Types
 export type KeyValueStoreScanActionProcessor<KvsItem> = ActionProcessor<
   KeyValueStoreScanAction,
-  KvsItem[]
+  QpqPagedData<KvsItem>
 >;
 export type KeyValueStoreScanActionRequester<KvsItem> = ActionRequester<
   KeyValueStoreScanAction,
-  KvsItem[]
+  QpqPagedData<KvsItem>
 >;
