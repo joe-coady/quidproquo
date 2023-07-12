@@ -12,6 +12,7 @@ export enum UserDirectoryActionType {
   DecodeAccessToken = '@quidproquo-core/UserDirectory/DecodeAccessToken',
   RespondToAuthChallenge = '@quidproquo-core/UserDirectory/RespondToAuthChallenge',
   GetUserAttributes = '@quidproquo-core/UserDirectory/GetUserAttributes',
+  GetUserAttributesByUserId = '@quidproquo-core/UserDirectory/GetUserAttributesByUserId',
   SetUserAttributes = '@quidproquo-core/UserDirectory/SetUserAttributes',
 }
 

@@ -26,6 +26,9 @@ export * from './UserDirectoryForgotPasswordActionTypes';
 export * from './UserDirectoryGetUserAttributesActionRequester';
 export * from './UserDirectoryGetUserAttributesActionTypes';
 
+export * from './UserDirectoryGetUserAttributesByUserIdActionRequester';
+export * from './UserDirectoryGetUserAttributesByUserIdActionTypes';
+
 export * from './UserDirectoryRefreshTokenActionRequester';
 export * from './UserDirectoryRefreshTokenActionTypes';
 
