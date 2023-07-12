@@ -3,7 +3,7 @@ import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
 
 import { KvsQueryOperation } from './types';
 
-import { ResourceName } from '../../types';
+import { ResourceName, QpqPagedData } from '../../types';
 
 // Options Type
 export interface KeyValueStoreQueryOptions {
@@ -16,6 +16,8 @@ export interface KeyValueStoreQueryActionPayload {
 
   keyCondition: KvsQueryOperation;
   filterCondition?: KvsQueryOperation;
+
+  nextPageKey?: string;
 }
 
 // Action
@@ -27,9 +29,9 @@ export interface KeyValueStoreQueryAction extends Action<KeyValueStoreQueryActio
 // Function Types
 export type KeyValueStoreQueryActionProcessor<KvsItem> = ActionProcessor<
   KeyValueStoreQueryAction,
-  KvsItem[]
+  QpqPagedData<KvsItem>
 >;
 export type KeyValueStoreQueryActionRequester<KvsItem> = ActionRequester<
   KeyValueStoreQueryAction,
-  KvsItem[]
+  QpqPagedData<KvsItem>
 >;

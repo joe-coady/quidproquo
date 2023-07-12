@@ -12,7 +12,7 @@ import { getDynamoTableIndexByConfigAndQuery } from '../../../logic/dynamo/qpqDy
 const getProcessKeyValueStoreQuery = (
   qpqConfig: QPQConfig,
 ): KeyValueStoreQueryActionProcessor<any> => {
-  return async ({ keyValueStoreName, keyCondition, filterCondition }) => {
+  return async ({ keyValueStoreName, keyCondition, filterCondition, nextPageKey }) => {
     const dynamoTableName = getKvsDynamoTableNameFromConfig(keyValueStoreName, qpqConfig, 'kvs');
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
@@ -24,11 +24,12 @@ const getProcessKeyValueStoreQuery = (
       );
     }
 
-    const items = await query(
+    const items = await query<any>(
       dynamoTableName,
       region,
       keyCondition,
       filterCondition,
+      nextPageKey,
       getDynamoTableIndexByConfigAndQuery(storeConfig, keyCondition),
     );
 

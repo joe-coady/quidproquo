@@ -9,6 +9,8 @@ export function* askKeyValueStoreQuery<KvsItem>(
 
   keyCondition: KvsQueryOperation,
   filterCondition?: KvsQueryOperation,
+
+  nextPageKey?: string,
 ): KeyValueStoreQueryActionRequester<KvsItem> {
   return yield {
     type: KeyValueStoreActionType.Query,
@@ -17,6 +19,8 @@ export function* askKeyValueStoreQuery<KvsItem>(
 
       keyCondition,
       filterCondition,
+
+      nextPageKey,
     },
   };
 }
