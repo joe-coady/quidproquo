@@ -1,6 +1,7 @@
 import { QPQConfig } from 'quidproquo-core';
 
 import getUserDirectoryAuthenticateUserActionProcessor from './getUserDirectoryAuthenticateUserActionProcessor';
+import getUserDirectoryChangePasswordActionProcessor from './getUserDirectoryChangePasswordActionProcessor';
 import getUserDirectoryConfirmEmailVerificationActionProcessor from './getUserDirectoryConfirmEmailVerificationActionProcessor';
 import getUserDirectoryConfirmForgetPasswordActionProcessor from './getUserDirectoryConfirmForgetPasswordActionProcessor';
 import getUserDirectoryCreateUserActionProcessor from './getUserDirectoryCreateUserActionProcessor';
@@ -16,6 +17,7 @@ import getUserDirectorySetUserAttributesActionProcessor from './getUserDirectory
 
 export default (qpqConfig: QPQConfig) => ({
   ...getUserDirectoryAuthenticateUserActionProcessor(qpqConfig),
+  ...getUserDirectoryChangePasswordActionProcessor(qpqConfig),
   ...getUserDirectoryConfirmEmailVerificationActionProcessor(qpqConfig),
   ...getUserDirectoryConfirmForgetPasswordActionProcessor(qpqConfig),
   ...getUserDirectoryCreateUserActionProcessor(qpqConfig),

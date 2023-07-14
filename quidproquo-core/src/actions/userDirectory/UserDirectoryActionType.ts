@@ -14,6 +14,7 @@ export enum UserDirectoryActionType {
   GetUserAttributes = '@quidproquo-core/UserDirectory/GetUserAttributes',
   GetUserAttributesByUserId = '@quidproquo-core/UserDirectory/GetUserAttributesByUserId',
   SetUserAttributes = '@quidproquo-core/UserDirectory/SetUserAttributes',
+  ChangePassword = '@quidproquo-core/UserDirectory/ChangePassword',
 }
 
 export interface AuthenticationInfo {
