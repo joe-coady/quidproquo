@@ -43,6 +43,9 @@ export class QpqApiCoreQueueConstruct extends QpqConstructBlock {
 
       // TODO: Expose this as a config option
       reservedConcurrentExecutions: props.queueConfig.maxConcurrentExecutions,
+
+      // Timeout in 15 mins
+      timeoutInSeconds: 15*60
     });
 
     // TODO: Make this a utility function

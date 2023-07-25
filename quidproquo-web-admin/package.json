@@ -1,6 +1,6 @@
 {
   "name": "quidproquo-web-admin",
-  "version": "0.0.118",
+  "version": "0.0.119",
   "description": "",
   "main": "./lib/index.js",
   "types": "./lib/index.d.js",
@@ -12,7 +12,7 @@
     "clean": "npx rimraf lib",
     "start": "npx webpack serve --config webpack.config.ts --mode=development --port 3001",
     "build": "npx webpack --config webpack.config.ts",
-    "watch": "npx webpack --config webpack.config.ts --watch"
+    "watch": "npm run start"
   },
   "repository": {
     "type": "git",
