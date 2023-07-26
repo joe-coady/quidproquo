@@ -88,6 +88,18 @@ export const createRuntime = (
       runtimeType: runtimeType,
     };
 
+    // Exit if the depth has exceeded the limit (of 100)
+    if (storySession.depth > 100) {
+      return {
+        ...response,
+        finishedAt: getTimeNow(),
+        error: {
+          errorText: `Story depth exceeded [${storySession.depth}]!`,
+          errorType: ErrorTypeEnum.GenericError,
+        },
+      }
+    }
+
     try {
       action = reader.next();
 
