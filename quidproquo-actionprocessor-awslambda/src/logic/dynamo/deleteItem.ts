@@ -11,19 +11,21 @@ export async function deleteItem(
   tableName: string,
   region: string,
   key: KvsCoreDataType,
+  keyName: string,
   sortKey?: KvsCoreDataType,
+  sortKeyName?: string,
 ): Promise<void> {
   const dynamoClient = new DynamoDBClient({ region });
 
   const deleteItemParams: DeleteItemCommandInput = {
     TableName: tableName,
     Key: {
-      key: buildAttributeValue(key),
+      [keyName]: buildAttributeValue(key),
     },
   };
 
-  if (sortKey != undefined) {
-    deleteItemParams.Key!.sortKey = buildAttributeValue(sortKey);
+  if (sortKey && sortKeyName) {
+    deleteItemParams.Key![sortKeyName] = buildAttributeValue(sortKey);
   }
 
   await dynamoClient.send(new DeleteItemCommand(deleteItemParams));

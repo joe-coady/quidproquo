@@ -15,7 +15,9 @@ const getProcessKeyValueStoreDelete = (
     const dynamoTableName = getKvsDynamoTableNameFromConfig(keyValueStoreName, qpqConfig, 'kvs');
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
-    await deleteItem(dynamoTableName, region, key, sortKey);
+    const storeConfig = qpqCoreUtils.getKeyValueStoreByName(qpqConfig, keyValueStoreName)!;
+
+    await deleteItem(dynamoTableName, region, key, storeConfig.partitionKey.key, sortKey, storeConfig.sortKeys[0]?.key);
 
     return actionResult(void 0);
   };
