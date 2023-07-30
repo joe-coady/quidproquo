@@ -44,8 +44,13 @@ export class QpqApiCoreQueueConstruct extends QpqConstructBlock {
       // TODO: Expose this as a config option
       reservedConcurrentExecutions: props.queueConfig.maxConcurrentExecutions,
 
-      // Timeout in 15 mins
-      timeoutInSeconds: 15*60
+      // Timeout in 15 mins ~ Max
+      // Note: AWS requires that the visibility timeout of the SQS queue be greater than or
+      //       equal to the timeout of the Lambda function. This is because if a message is
+      //       processed by a Lambda function for a time longer than the SQS visibility timeout,
+      //       the message will become visible in the SQS queue again and could be consumed
+      //       by another Lambda function, resulting in the message being processed multiple times.
+      timeoutInSeconds: Math.min(props.queueConfig.ttRetryInSeconds, 15*60)
     });
 
     // TODO: Make this a utility function

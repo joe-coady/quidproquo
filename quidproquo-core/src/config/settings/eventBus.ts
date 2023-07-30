@@ -1,3 +1,4 @@
+import { CrossModuleOwner } from '../../types';
 import {
   QPQConfigSetting,
   QPQCoreConfigSettingType,
@@ -37,12 +38,16 @@ export type PartialEventBusSubscriptionDetails = Pick<EventBusSubscriptionDetail
  */
 export type EventBusSubscription = PartialEventBusSubscriptionDetails | string;
 
-export interface QPQConfigAdvancedEventBusSettings extends QPQConfigAdvancedSettings {}
+export interface QPQConfigAdvancedEventBusSettings extends QPQConfigAdvancedSettings {
+  owner?: CrossModuleOwner;
+}
 
 export interface EventBusQPQConfigSetting extends QPQConfigSetting {
   name: string;
 
   deprecated?: boolean;
+
+  owner?: CrossModuleOwner;
 }
 
 export const defineEventBus = (

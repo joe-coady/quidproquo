@@ -65,7 +65,7 @@ export const defineQueue = (
   concurrency: options?.concurrency || 1,
 
   maxTries: options?.maxTries || 1,
-  ttRetryInSeconds: Math.min(options?.ttRetryInSeconds || 300, 30),
+  ttRetryInSeconds: Math.min(options?.ttRetryInSeconds || 15*60, 15*60),
 
   hasDeadLetterQueue: options?.hasDeadLetterQueue || true,
 
