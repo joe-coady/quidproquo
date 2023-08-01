@@ -1,10 +1,20 @@
-import { CustomMessageTriggerEvent, Context } from 'aws-lambda';
-import { Liquid } from 'liquidjs';
+import { getLambdaCognitoCustomMessage } from 'quidproquo-actionprocessor-awslambda';
 
-import { EmailTemplates } from 'quidproquo-core';
+import { qpqWebServerUtils } from 'quidproquo-webserver';
+
+import { createRuntime, askProcessEvent, ErrorTypeEnum, QpqRuntimeType } from 'quidproquo-core';
+
+import { CustomMessageTriggerEvent, Context } from 'aws-lambda';
+
+import { getLambdaConfigs } from './lambdaConfig';
+
+import { getLogger, getRuntimeCorrelation, getLambdaActionProcessors } from './lambda-utils';
 
 // @ts-ignore - Special webpack loader
-import qpqEmailTemplates from 'qpq-user-directory-email-templates!';
+import qpqCustomActionProcessors from 'qpq-custom-action-processors-loader!';
+
+// TODO: Make this a util or something based on server time or something..
+const getDateNow = () => new Date().toISOString();
 
 export interface EmailPayload {
   username: string;
@@ -14,67 +24,49 @@ export interface EmailPayload {
   baseDomain: string;
 }
 
-export const renderTemplate = async (template: string, data: EmailPayload) => {
-  const engine = new Liquid();
+export const getLambdaCognitoCustomMessageTriggerEvent = () => {
+  return async (
+    event: CustomMessageTriggerEvent,
+    context: Context
+    ) => {
+    const cdkConfig = await getLambdaConfigs();
 
-  const output = await engine.parseAndRender(template, data);
+    // Build a processor for the session and stuff
+    // Remove the non route ones ~ let the story execute action add them
+    const storyActionProcessor = {
+      ...getLambdaActionProcessors(cdkConfig.qpqConfig),
+      ...getLambdaCognitoCustomMessage(cdkConfig.qpqConfig),
 
-  return output;
-};
+      ...qpqCustomActionProcessors(),
+    };
 
-export const getTemplates = (): EmailTemplates => {
-  const emailTemplates: Record<string, EmailTemplates> = qpqEmailTemplates;
-  const templates = emailTemplates[process.env.userDirectoryName!];
+    const resolveStory = createRuntime(
+      cdkConfig.qpqConfig,
+      {
+        depth: 0
+      },
+      storyActionProcessor,
+      getDateNow,
+      getLogger(cdkConfig.qpqConfig),
+      getRuntimeCorrelation(cdkConfig.qpqConfig),
+      QpqRuntimeType.SEND_EMAIL_EVENT,
+    );
 
-  return templates;
-};
+    const result = await resolveStory(askProcessEvent, [event, context]);
 
-export const executeCognitoTriggerEvent = async (
-  event: CustomMessageTriggerEvent,
-  context: Context,
-) => {
-  console.log(
-    `executeCognitoTriggerEvent: Started [${event.triggerSource}]`,
-    JSON.stringify(event, null, 2),
-  );
-
-  const params = {
-    baseDomain: 'joecoady.development.kitted.app',
-    code: event.request.codeParameter,
-    userAttributes: event.request.userAttributes,
-    username: event.userName,
-  };
-
-  const templates = getTemplates();
-
-  switch (event.triggerSource) {
-    case 'CustomMessage_ForgotPassword': {
-      if (event.request.clientMetadata?.['userInitiated'] === 'true') {
-        event.response.emailMessage = await renderTemplate(templates.resetPassword!.body, params);
-        event.response.emailSubject = await renderTemplate(
-          templates.resetPassword!.subject,
-          params,
-        );
-      } else {
-        event.response.emailMessage = await renderTemplate(
-          templates.resetPasswordAdmin!.body,
-          params,
-        );
-        event.response.emailSubject = await renderTemplate(
-          templates.resetPasswordAdmin!.subject,
-          params,
-        );
-      }
-      break;
+    // Run the callback
+    if (result.error) {
+      throw new Error("Unable to process email");
     }
 
-    case 'CustomMessage_VerifyUserAttribute':
-      event.response.emailMessage = await renderTemplate(templates.verifyEmail!.body, params);
-      event.response.emailSubject = await renderTemplate(templates.verifyEmail!.subject, params);
-      break;
-  }
+    console.log("body log: ", result.result.body)
 
-  console.log('executeCognitoTriggerEvent: Ended');
+    event.response.emailMessage = result.result.body;
+    event.response.emailSubject = result.result.subject;
 
-  return event;
+    return event;
+  };
 };
+
+// Default executor
+export const executeLambdaCognitoCustomMessageTriggerEvent = getLambdaCognitoCustomMessageTriggerEvent();

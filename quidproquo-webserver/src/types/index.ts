@@ -3,3 +3,4 @@ export * from './ExecuteServiceFunctionEvent';
 export * from './QueueEvent';
 export * from './SEOEvent';
 export * from './constants';
+export * from "./EmailSendEvent";

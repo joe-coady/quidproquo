@@ -1,10 +1,10 @@
-export interface EmailTemplate {
-  subject: string;
-  body: string;
+export interface QpqEmailTemplateSourceEntry {
+  src: string;
+  runtime: string;
 }
 
 export interface EmailTemplates {
-  verifyEmail?: EmailTemplate;
-  resetPassword?: EmailTemplate;
-  resetPasswordAdmin?: EmailTemplate;
+  verifyEmail?: QpqEmailTemplateSourceEntry;
+  resetPassword?: QpqEmailTemplateSourceEntry;
+  resetPasswordAdmin?: QpqEmailTemplateSourceEntry;
 }

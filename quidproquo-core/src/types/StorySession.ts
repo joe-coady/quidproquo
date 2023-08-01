@@ -35,6 +35,7 @@ export enum QpqRuntimeType {
   QUEUE_EVENT = 'QUEUE_EVENT',
   EVENT_SEO_OR = 'EVENT_SEO_OR',
   SERVICE_FUNCTION_EXE = 'SERVICE_FUNCTION_EXE',
+  SEND_EMAIL_EVENT = 'SEND_EMAIL_EVENT',
 }
 
 export interface StoryResult<TArgs extends Array<any>, TResult = any> {

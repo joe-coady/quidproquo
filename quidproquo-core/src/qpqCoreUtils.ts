@@ -271,9 +271,24 @@ export const getQueueSrcEntries = (configs: QPQConfig): string[] => {
   );
 };
 
+export const getUserDirectorySrcEntries = (qpqConfig: QPQConfig): string[] => {
+  const userConfigs = getUserDirectories(qpqConfig);
+
+  return userConfigs.reduce(
+    (acc, ud) => [...acc, ...Object.values(ud.emailTemplates).map((et) => et.src)],
+    [] as string[],
+  ).filter(src => !!src);
+};
+
+
+
 // Used in bundlers to know where and what to build and index
 export const getAllSrcEntries = (qpqConfig: QPQConfig): string[] => {
-  return [...getScheduleEvents(qpqConfig).map((r) => r.src), ...getQueueSrcEntries(qpqConfig)];
+  return [
+    ...getScheduleEvents(qpqConfig).map((r) => r.src),
+    ...getQueueSrcEntries(qpqConfig),
+    ...getUserDirectorySrcEntries(qpqConfig),
+  ];
 };
 
 export const getOwnedSecrets = (configs: QPQConfig): SecretQPQConfigSetting[] => {

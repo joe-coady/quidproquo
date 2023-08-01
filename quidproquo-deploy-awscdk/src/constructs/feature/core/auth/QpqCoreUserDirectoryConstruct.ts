@@ -135,7 +135,7 @@ export class QpqCoreUserDirectoryConstruct extends QpqCoreUserDirectoryConstruct
       ),
       functionName: this.qpqResourceName(`${props.userDirectoryConfig.name}`, 'cm-trig'),
       functionType: 'lambdaCognitoTriggerEvent_CustomMessage',
-      executorName: 'executeCognitoTriggerEvent',
+      executorName: 'executeLambdaCognitoCustomMessageTriggerEvent',
 
       qpqConfig: props.qpqConfig,
 

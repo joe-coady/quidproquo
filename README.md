@@ -63,7 +63,7 @@ Currently under development ~ Not for production
 - keep lambda's warm by adding a polling event every x mins
 
 #### Nice Things
-
+- Copy JSON from input / output in the log viewer (Copy the javascript object directly, not the json.)
 - Logs
   - Timestamps AND execution length on the log metadata
     - visualization for how long a specific thing took to execute, similar to Performance tab in

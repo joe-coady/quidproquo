@@ -7,4 +7,5 @@ export const RuntimeTypes = [
   'QUEUE_EVENT',
   'EVENT_SEO_OR',
   'SERVICE_FUNCTION_EXE',
+  'SEND_EMAIL_EVENT'
 ];
