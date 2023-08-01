@@ -41,5 +41,8 @@ export * from './UserDirectoryRequestEmailVerificationActionTypes';
 export * from './UserDirectoryRespondToAuthChallengeActionRequester';
 export * from './UserDirectoryRespondToAuthChallengeActionTypes';
 
+export * from './UserDirectorySetPasswordActionRequester';
+export * from './UserDirectorySetPasswordActionTypes';
+
 export * from './UserDirectorySetUserAttributesActionRequester';
 export * from './UserDirectorySetUserAttributesActionTypes';
