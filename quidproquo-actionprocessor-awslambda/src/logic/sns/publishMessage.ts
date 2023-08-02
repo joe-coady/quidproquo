@@ -4,13 +4,14 @@ import {
   SNSClient,
   PublishBatchRequestEntry,
 } from '@aws-sdk/client-sns';
+import { createAwsClient } from '../createAwsClient';
 
 export const publishMessage = async (
   topicArn: string,
   region: string,
   messages: string[],
 ): Promise<void> => {
-  const sqsClient = new SNSClient({
+  const sqsClient = createAwsClient(SNSClient, {
     region,
   });
 

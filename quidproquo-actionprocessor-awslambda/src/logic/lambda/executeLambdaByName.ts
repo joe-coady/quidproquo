@@ -19,7 +19,9 @@ export const executeLambdaByName = async <R>(
   );
 
   if (response.FunctionError) {
-    throw new Error(response.FunctionError);
+    // Get more details about the error if available
+    const errorDetails = response.Payload ? new TextDecoder().decode(response.Payload) : '';
+    throw new Error(`Lambda Error: ${response.FunctionError}. Details: ${errorDetails}`);
   }
 
   if (response.Payload) {
