@@ -11,7 +11,7 @@ import { ServiceAccountInfo, LocalServiceAccountInfo, ApiLayer } from '../types'
 
 import { AwsServiceAccountInfoQPQConfigSetting, QPQAwsConfigSettingType } from '../config';
 
-const getAwsServiceAccountInfoConfig = (
+export const getAwsServiceAccountInfoConfig = (
   qpqConfig: QPQConfig,
 ): AwsServiceAccountInfoQPQConfigSetting => {
   const serviceAccountInfos = qpqCoreUtils.getConfigSettings<AwsServiceAccountInfoQPQConfigSetting>(

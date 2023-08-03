@@ -5,6 +5,8 @@ import { Construct } from 'constructs';
 import { aws_lambda, aws_iam } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 
+import { getAwsServiceAccountInfoConfig } from 'quidproquo-config-aws';
+
 export interface FunctionProps extends QpqConstructBlockProps {
   functionName: string;
 
@@ -33,12 +35,16 @@ export class Function extends QpqConstructBlock {
 
     const handlerFile = props.srcFilename || 'index';
 
+    const serviceInfo = getAwsServiceAccountInfoConfig(
+      props.qpqConfig
+    );
+
     this.lambdaFunction = new aws_lambda.Function(this, 'function', {
       functionName: props.functionName,
       timeout: cdk.Duration.seconds(props.timeoutInSeconds || 25),
 
       runtime: aws_lambda.Runtime.NODEJS_18_X,
-      memorySize: props.memoryInBytes || 1024,
+      memorySize: props.memoryInBytes || serviceInfo.lambdaMaxMemoryInMiB || 1024,
       layers: props.apiLayerVersions,
 
       code: aws_lambda.Code.fromAsset(path.join(props.buildPath, props.functionType)),
@@ -47,6 +53,9 @@ export class Function extends QpqConstructBlock {
       environment: props.environment,
 
       reservedConcurrentExecutions: props.reservedConcurrentExecutions,
+
+      // TODO: Make this optional
+      tracing: aws_lambda.Tracing.ACTIVE, // Enable Enhanced Monitoring
     });
 
     // Let lambdas read from the exported variables in cloudformation

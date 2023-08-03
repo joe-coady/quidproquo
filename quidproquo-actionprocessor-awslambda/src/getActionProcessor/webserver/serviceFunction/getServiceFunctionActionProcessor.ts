@@ -55,7 +55,7 @@ const getServiceFunctionExecuteActionProcessor = (
       return actionResultError(
         result?.error.errorType,
         result?.error.errorText,
-        result?.error.errorStack,
+        `${service}::${functionName}: ${result?.error.errorStack || ''}`,
       );
     }
 
