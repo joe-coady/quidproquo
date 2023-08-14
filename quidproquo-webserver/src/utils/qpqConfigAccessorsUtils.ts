@@ -119,11 +119,14 @@ export const getWebEntrySeoFullPath = (
   qpqConfig: QPQConfig,
   webEntryQPQWebServerConfigSetting: WebEntryQPQWebServerConfigSetting,
 ): string => {
+  // Throw an error if no SEO build path has been defined.
+  if (!webEntryQPQWebServerConfigSetting.seoBuildPath) {
+    throw new Error(`Please define a 'seoBuildPath' in your web entry [${webEntryQPQWebServerConfigSetting.name}]`);
+  }
+
   return path.join(
     qpqCoreUtils.getConfigRoot(qpqConfig),
-    webEntryQPQWebServerConfigSetting.seoBuildPath ||
-      webEntryQPQWebServerConfigSetting.buildPath ||
-      '',
+    webEntryQPQWebServerConfigSetting.seoBuildPath,
   );
 };
 
