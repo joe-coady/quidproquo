@@ -90,7 +90,7 @@ export class Function extends QpqConstructBlock {
       }),
     );
 
-    // Let lambdas publish sns messages.
+    // Let lambdas publish service functions
     this.lambdaFunction.addToRolePolicy(
       new aws_iam.PolicyStatement({
         actions: ['lambda:InvokeFunction'],

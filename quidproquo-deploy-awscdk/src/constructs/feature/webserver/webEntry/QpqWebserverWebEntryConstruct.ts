@@ -126,6 +126,8 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
       minTtl: cdk.Duration.seconds(props.webEntryConfig.cache.minTTLInSeconds),
       maxTtl: cdk.Duration.seconds(props.webEntryConfig.cache.maxTTLInSeconds),
 
+      headerBehavior: aws_cloudfront.CacheHeaderBehavior.allowList(qpqHeaderIsBot),
+
       enableAcceptEncodingGzip: true,
       enableAcceptEncodingBrotli: true,
     });
@@ -238,6 +240,14 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
         handler: 'index.executeEventOriginRequest',
       });
 
+      // let OR edge lambdas execute service functions
+      edgeFunctionOR.addToRolePolicy(
+        new aws_iam.PolicyStatement({
+          actions: ['lambda:InvokeFunction'],
+          resources: ['arn:aws:lambda:*:*:function:*sfunc*'],
+        }),
+      );
+
       const grantables = qpqDeployAwsCdkUtils.getQqpGrantableResources(
         this,
         'grantable',
@@ -273,6 +283,7 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
 
         const wildcardPath = seo.path.replaceAll(/{(.+?)}/g, '*');
         distribution.addBehavior(wildcardPath, distributionOrigin, {
+          cachePolicy: cachePolicy,
           // cachePolicy: seoCachePolicy,
           viewerProtocolPolicy: aws_cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
           compress: props.webEntryConfig.compressFiles,
