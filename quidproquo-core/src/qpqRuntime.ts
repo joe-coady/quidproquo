@@ -1,4 +1,4 @@
-import { Action, ActionProcessorList, ActionProcessorResult } from './types/Action';
+import { Action, ActionProcessorList, ActionProcessorResult, ActionRequester } from './types/Action';
 import { ErrorTypeEnum } from './types/ErrorTypeEnum';
 import { StoryResult, StorySession, QpqRuntimeType } from './types/StorySession';
 import { SystemActionType } from './actions/system/SystemActionType';
@@ -17,7 +17,7 @@ import { getApplicationModuleName } from './qpqCoreUtils';
 async function processAction(
   action: Action<any>,
   actionProcessors: ActionProcessorList,
-  session: any,
+  session: StorySession,
   logger: (res: StoryResult<any>) => Promise<void>,
 ) {
   // Special action ~ batch - needs access to the processAction / actionProcessor context
@@ -60,12 +60,12 @@ export const createRuntime = (
   initialTags?: string[],
 ) => {
   async function resolveStory<TArgs extends Array<any>>(
-    story: (...args: TArgs) => Generator<any, any, Action<any>>,
+    story: (...args: TArgs) => ActionRequester<Action<any>, any, any>,
     args: TArgs,
   ): Promise<StoryResult<any>> {
     const reader = story(...args);
 
-    let action = null;
+    let storyProgress = null;
 
     const storySession: StorySession = {
       correlation: runtimeCorrelation,
@@ -101,34 +101,35 @@ export const createRuntime = (
     }
 
     try {
-      action = reader.next();
+      storyProgress = reader.next();
 
-      while (!action.done) {
+      while (!storyProgress.done) {
+        const action: Action<any> = storyProgress.value;
         const executionTime = getTimeNow();
 
         const actionResult: ActionProcessorResult<any> = await processAction(
-          action.value,
+          action,
           actionProcessors,
           storySession,
           logger,
         );
 
         const history = {
-          act: action.value,
+          act: action,
           res: actionResult,
           startedAt: executionTime,
           finishedAt: getTimeNow(),
         };
 
         console.log(
-          `${action.value.type}: took ${
+          `${action.type}: took ${
             new Date(history.finishedAt).getTime() - new Date(history.startedAt).getTime()
           }ms`,
         );
 
         response.history.push(history);
 
-        if (isErroredActionResult(actionResult)) {
+        if (isErroredActionResult(actionResult) && action) {
           console.log('Caught Error: ', JSON.stringify(resolveActionResultError(actionResult)));
           return {
             ...response,
@@ -138,13 +139,13 @@ export const createRuntime = (
         }
 
         // TODO: Catch errors here ~ business logic
-        action = reader.next(resolveActionResult(actionResult));
+        storyProgress = reader.next(resolveActionResult(actionResult));
       }
     } catch (err) {
       // Dev Only ~ Todo
       if (err instanceof Error) {
         console.log(
-          `Uncaught Error: [${JSON.stringify(action?.value?.type)}] ${err.message.toString()}`,
+          `Uncaught Error: [${JSON.stringify(storyProgress?.value?.type)}] ${err.message.toString()}`,
         );
         return {
           ...response,
@@ -152,7 +153,7 @@ export const createRuntime = (
           error: {
             errorText: err.message.toString(),
             errorType: ErrorTypeEnum.GenericError, // resolve error type from err type?
-            errorStack: action?.value?.type,
+            errorStack: storyProgress?.value?.type,
           },
         };
       }
@@ -164,7 +165,7 @@ export const createRuntime = (
         error: {
           errorText: 'Unknown error has occurred!',
           errorType: ErrorTypeEnum.GenericError,
-          errorStack: action?.value?.type,
+          errorStack: storyProgress?.value?.type,
         },
       };
     }
@@ -172,7 +173,7 @@ export const createRuntime = (
     const storyResult = {
       ...response,
       finishedAt: getTimeNow(),
-      result: action.value,
+      result: storyProgress.value,
     };
 
     console.log(
