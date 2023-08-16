@@ -1,4 +1,4 @@
-import { Action, ActionProcessorList, ActionProcessorResult, ActionRequester } from './types/Action';
+import { Action, ActionProcessorList, ActionProcessorResult, ActionRequester, EitherActionResult } from './types/Action';
 import { ErrorTypeEnum } from './types/ErrorTypeEnum';
 import { StoryResult, StorySession, QpqRuntimeType } from './types/StorySession';
 import { SystemActionType } from './actions/system/SystemActionType';
@@ -20,33 +20,40 @@ async function processAction(
   session: StorySession,
   logger: (res: StoryResult<any>) => Promise<void>,
 ) {
-  // Special action ~ batch - needs access to the processAction / actionProcessor context
-  if (action.type === SystemActionType.Batch) {
-    const batchRes = await Promise.all(
-      action.payload.actions.map((a: any) => {
-        return a ? processAction(a, actionProcessors, session, logger) : null;
-      }),
-    );
+  try {
+    // Special action ~ batch - needs access to the processAction / actionProcessor context
+    if (action.type === SystemActionType.Batch) {
+      const batchRes = await Promise.all(
+        action.payload.actions.map((a: any) => {
+          return a ? processAction(a, actionProcessors, session, logger) : null;
+        }),
+      );
 
-    // If there was an error, throw that error back
-    const erroredBatchItem = batchRes.find((br) => isErroredActionResult(br));
-    if (erroredBatchItem) {
-      const error = resolveActionResultError(erroredBatchItem);
-      return actionResultError(ErrorTypeEnum.GenericError, error.errorText, error.errorStack);
+      // If there was an error, throw that error back
+      const erroredBatchItem = batchRes.find((br) => isErroredActionResult(br));
+      if (erroredBatchItem) {
+        const error = resolveActionResultError(erroredBatchItem);
+        return actionResultError(ErrorTypeEnum.GenericError, error.errorText, error.errorStack);
+      }
+
+      // unwrap the values
+      return actionResult(batchRes.map((br) => resolveActionResult(br)));
     }
 
-    // unwrap the values
-    return actionResult(batchRes.map((br) => resolveActionResult(br)));
-  }
+    const processor = actionProcessors?.[action?.type];
+    if (!processor) {
+      throw new Error(
+        `Unable to process action: ${action?.type} from ${Object.keys(actionProcessors).join(', ')}`,
+      );
+    }
 
-  const processor = actionProcessors?.[action?.type];
-  if (!processor) {
-    throw new Error(
-      `Unable to process action: ${action?.type} from ${Object.keys(actionProcessors).join(', ')}`,
-    );
+    return await processor(action.payload, session, actionProcessors, logger);
+  } catch (e: unknown) {
+    if (e instanceof Error) {
+      return actionResultError(ErrorTypeEnum.GenericError, e.message, e.stack);
+    }
+    return actionResultError(ErrorTypeEnum.GenericError, `An unknown error occurred in [${action?.type}]`);
   }
-
-  return await processor(action.payload, session, actionProcessors, logger);
 }
 
 export const createRuntime = (
@@ -129,7 +136,7 @@ export const createRuntime = (
 
         response.history.push(history);
 
-        if (isErroredActionResult(actionResult) && action) {
+        if (isErroredActionResult(actionResult) && !action.returnErrors) {
           console.log('Caught Error: ', JSON.stringify(resolveActionResultError(actionResult)));
           return {
             ...response,
@@ -139,7 +146,22 @@ export const createRuntime = (
         }
 
         // TODO: Catch errors here ~ business logic
-        storyProgress = reader.next(resolveActionResult(actionResult));
+        if (action.returnErrors) {
+          const isSuccess = !isErroredActionResult(actionResult);
+          const result: EitherActionResult<any> = isSuccess
+            ? {
+                success: true,
+                result: resolveActionResult(actionResult),
+              }
+            : {
+                success: false,
+                error: resolveActionResultError(actionResult),
+              };
+          
+          storyProgress = reader.next(result);
+        } else {
+          storyProgress = reader.next(resolveActionResult(actionResult));
+        }
       }
     } catch (err) {
       // Dev Only ~ Todo

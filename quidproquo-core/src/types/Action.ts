@@ -6,10 +6,25 @@ import { StoryResult, StorySession } from './StorySession';
 export interface Action<T> {
   type: string;
   payload?: T;
+  
+  returnErrors?: boolean;
 }
 
 // Result tuple ~ Either result or error
 export type ActionProcessorResult<T> = [T?, QPQError?];
+
+// Action result ~ Either result or error
+export type EitherActionResult<T> =
+  | {
+      success: true;
+      result: T;
+      error?: never;
+    }
+  | {
+      success: false;
+      result?: never;
+      error: QPQError;
+    };
 
 // A function type ~ Processes an action and returns an ActionProcessorResult
 export type ActionProcessor<
