@@ -19,7 +19,31 @@ export interface StoryError {
   errorStack?: string;
 }
 
-export type AskResponse<T> = Generator<any, T, any>;
+export type AskResponse<T> = Generator<Action<any>, T, any>;
+
+/**
+ * Represents the return type of an `AskResponse`.
+ *
+ * When extracting the return type of a generator (or iterator) in TypeScript,
+ * the inferred type is a union of all possible `yield` values combined with the `return` value.
+ *
+ * For our generators, they typically yield `Action<any>` and return some distinct type.
+ * However, TypeScript doesn't provide a direct utility to exclusively extract the iterator's return type.
+ *
+ * To navigate this, we begin by extracting the union type of both yielded and returned values with
+ * `ReturnType<T['next']>['value']`. This typically results in a type like `Action<any> | SomeOtherType`.
+ *
+ * In order to solely retrieve the desired return type (i.e., `SomeOtherType`), we use the `Exclude`
+ * utility type from TypeScript to exclude `Action<any>` from this union. This leaves us only with
+ * the intended return type.
+ *
+ * With this approach, `AskResponseReturnType` precisely represents the type that the generator
+ * returns, and not any intermediary `yield` values.
+ */
+export type AskResponseReturnType<T extends AskResponse<any>> = Exclude<
+  ReturnType<T['next']>['value'],
+  Action<any>
+>;
 
 export interface ActionHistory<T = any> {
   act: Action<T>;
