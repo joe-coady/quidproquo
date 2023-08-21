@@ -15,6 +15,7 @@ export const writeBinaryFile = async (
       Bucket: bucketName,
       Body: Buffer.from(data.base64Data, 'base64'),
       ContentType: data.mimetype,
+      ContentDisposition: data.contentDisposition,
     }),
   );
 };

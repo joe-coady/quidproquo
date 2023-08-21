@@ -65,9 +65,18 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
       // Allow bucket to auto delete upon cdk:Destroy
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
+
+      cors: [
+        {
+          allowedOrigins: ['*'],
+          allowedMethods: [aws_s3.HttpMethods.GET, aws_s3.HttpMethods.HEAD],
+          allowedHeaders: ['*'],
+        },
+      ],
     });
 
     // TODO: Only do this IF a cloud front dist wants to use it
+    // same with cors above.
     this.bucket.addToResourcePolicy(
       new aws_iam.PolicyStatement({
         sid: 'AllowCloudFrontServicePrincipal',
