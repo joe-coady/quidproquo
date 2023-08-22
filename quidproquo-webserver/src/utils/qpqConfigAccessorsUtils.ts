@@ -12,6 +12,7 @@ import {
   QPQWebServerConfigSettingType,
   DefaultRouteOptionsQPQWebServerConfigSetting,
   ServiceFunctionQPQWebServerConfigSetting,
+  WebSocketQPQWebServerConfigSetting,
 } from '../config';
 
 import { WebEntryQPQWebServerConfigSetting, ApiQPQWebServerConfigSetting } from '../config';
@@ -250,4 +251,16 @@ export const getDomainRoot = (
   }
 
   return `${domainPrefix}${rootDomain}`;
+};
+
+export const getWebsocketSettings = (
+  qpqConfig: QPQConfig,
+): WebSocketQPQWebServerConfigSetting[] => {
+  const websocketSettings =
+    qpqCoreUtils.getConfigSettings<WebSocketQPQWebServerConfigSetting>(
+      qpqConfig,
+      QPQWebServerConfigSettingType.WebSocket,
+    ) || [];
+
+  return websocketSettings;
 };
