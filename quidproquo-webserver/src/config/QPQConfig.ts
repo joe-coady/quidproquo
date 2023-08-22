@@ -9,6 +9,7 @@ export enum QPQWebServerConfigSettingType {
   Api = '@quidproquo-webserver/config/Api',
   ApiKey = '@quidproquo-webserver/config/ApiKey',
   ServiceFunction = '@quidproquo-webserver/config/ServiceFunction',
+  WebSocket = '@quidproquo-webserver/config/WebSocket',
 }
 
 export interface CacheSettings {

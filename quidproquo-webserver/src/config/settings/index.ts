@@ -9,3 +9,4 @@ export * from './route';
 export * from './seo';
 export * from './subdomainRedirect';
 export * from './webEntry';
+export * from './websocket';
