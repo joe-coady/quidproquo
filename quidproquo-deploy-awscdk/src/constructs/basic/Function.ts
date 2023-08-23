@@ -2,7 +2,7 @@ import path from 'path';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
 import { Construct } from 'constructs';
-import { aws_lambda, aws_iam } from 'aws-cdk-lib';
+import { aws_lambda, aws_iam, aws_logs } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 
 import { getAwsServiceAccountInfoConfig } from 'quidproquo-config-aws';
@@ -56,6 +56,8 @@ export class Function extends QpqConstructBlock {
 
       // TODO: Make this optional
       tracing: aws_lambda.Tracing.ACTIVE, // Enable Enhanced Monitoring
+
+      logRetention: aws_logs.RetentionDays.ONE_WEEK,
     });
 
     // Let lambdas read from the exported variables in cloudformation
