@@ -73,6 +73,10 @@ export const getAllOpenApiSpecs = (configs: QPQConfig): OpenApiQPQWebServerConfi
   return openApiSpecs;
 };
 
+export const getAllWebsocketSrcEntries = (qpqConfig: QPQConfig): string[] => {
+  return getWebsocketSettings(qpqConfig).flatMap(s => [s.eventProcessors.onConnect.src, s.eventProcessors.onDisconnect.src, s.eventProcessors.onMessage.src]);
+};
+
 // Used in bundlers to know where and what to build and index
 // Events, routes, etc
 export const getAllSrcEntries = (configs: QPQConfig): string[] => {
@@ -81,6 +85,7 @@ export const getAllSrcEntries = (configs: QPQConfig): string[] => {
     ...getAllOpenApiSpecs(configs).map((r) => r.openApiSpecPath),
     ...getAllSeo(configs).map((seo) => seo.src),
     ...getAllServiceFunctions(configs).map((sf) => sf.src),
+    ...getAllWebsocketSrcEntries(configs)
   ];
 };
 
@@ -155,6 +160,21 @@ export const getWebsocketEntryFullPath = (
   }
 
   return path.join(qpqCoreUtils.getConfigRoot(qpqConfig), websocketBuildPath);
+};
+
+export const getWebsocketEntryByApiName = (
+  apiName: string,
+  qpqConfig: QPQConfig
+): WebSocketQPQWebServerConfigSetting => {
+  const websocketSettings = getWebsocketSettings(qpqConfig);
+
+  const websocketSetting = websocketSettings.find(s => s.apiName === apiName);
+
+  if (!websocketSetting) {
+    throw new Error(`No websocket setting found for api [${apiName}]`);
+  }
+
+  return websocketSetting;
 };
 
 export const getServiceFunctionFullPath = (

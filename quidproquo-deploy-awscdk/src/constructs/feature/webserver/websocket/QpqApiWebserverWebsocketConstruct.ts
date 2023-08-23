@@ -49,6 +49,10 @@ export class QpqApiWebserverWebsocketConstruct extends QpqConstructBlock {
       apiLayerVersions: props.apiLayerVersions,
 
       awsAccountId: props.awsAccountId,
+
+      environment: {
+        websocketApiName: props.websocketConfig.apiName,
+      },
     });
 
     // Let api gateway invoke this ok
