@@ -111,7 +111,14 @@ export class Function extends QpqConstructBlock {
     // We need access to dynamo log tables
     this.lambdaFunction.addToRolePolicy(
       new aws_iam.PolicyStatement({
-        actions: ['dynamodb:GetItem', 'dynamodb:Scan', 'dynamodb:Query', 'dynamodb:PutItem'],
+        actions: [
+          'dynamodb:GetItem', 
+          'dynamodb:Scan', 
+          'dynamodb:Query', 
+          'dynamodb:PutItem', 
+          'dynamodb:UpdateItem', 
+          'dynamodb:DeleteItem'
+        ],
 
         // TODO: Revisit this, the user can make logs tables them selves... ~ Slight security risk here
         // Consider making tags to identify logs tables, all qpq resourses
