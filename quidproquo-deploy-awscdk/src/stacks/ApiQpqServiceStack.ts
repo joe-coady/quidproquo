@@ -12,6 +12,7 @@ import {
   QpqApiCoreQueueConstruct,
   QpqWebserverSubdomainRedirectConstruct,
   QpqWebserverServiceFunctionConstruct,
+  QpqApiWebserverWebsocketConstruct
 } from '../constructs';
 
 export interface ApiQpqServiceStackProps extends QpqServiceStackProps {
@@ -98,6 +99,17 @@ export class ApiQpqServiceStack extends QpqServiceStack {
             apiLayerVersions: layers.layers,
           },
         ),
+    );
+
+     // Build websocket apis
+     const websockets = qpqWebServerUtils.getWebsocketSettings(props.qpqConfig).map(
+      (setting) =>
+        new QpqApiWebserverWebsocketConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
+          awsAccountId: props.awsAccountId,
+          qpqConfig: props.qpqConfig,
+
+          websocketConfig: setting,
+        }),
     );
   }
 }

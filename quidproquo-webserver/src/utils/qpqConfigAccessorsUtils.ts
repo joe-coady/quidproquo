@@ -135,13 +135,26 @@ export const getApiEntryFullPath = (
   qpqConfig: QPQConfig,
   apiConfig: ApiQPQWebServerConfigSetting,
 ): string => {
-  const apiEntry = apiConfig.buildPath;
+  const apiBuildPath = apiConfig.buildPath;
 
-  if (!apiEntry) {
-    throw new Error('please use defineWebEntry in your qpq config');
+  if (!apiBuildPath) {
+    throw new Error(`please define a build path for your api ${apiConfig.apiName}`);
   }
 
-  return path.join(qpqCoreUtils.getConfigRoot(qpqConfig), apiEntry);
+  return path.join(qpqCoreUtils.getConfigRoot(qpqConfig), apiBuildPath);
+};
+
+export const getWebsocketEntryFullPath = (
+  qpqConfig: QPQConfig,
+  websocketConfig: WebSocketQPQWebServerConfigSetting,
+): string => {
+  const websocketBuildPath = websocketConfig.buildPath;
+
+  if (!websocketBuildPath) {
+    throw new Error(`please define a build path for your websocket [${websocketConfig.apiName}]`);
+  }
+
+  return path.join(qpqCoreUtils.getConfigRoot(qpqConfig), websocketBuildPath);
 };
 
 export const getServiceFunctionFullPath = (

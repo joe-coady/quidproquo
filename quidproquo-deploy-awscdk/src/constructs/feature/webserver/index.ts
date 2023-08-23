@@ -4,3 +4,4 @@ export * from './domain';
 export * from './redirect';
 export * from './serviceFunction';
 export * from './webEntry';
+export * from './websocket';

@@ -14,6 +14,7 @@ import {
   QpqCoreUserDirectoryConstruct,
   QpqWebserverApiKeyConstruct,
   QpqCoreKeyValueStoreConstruct,
+  QpqWebserverWebsocketConstruct,
   LogStorage,
 } from '../constructs';
 
@@ -127,5 +128,17 @@ export class InfQpqServiceStack extends QpqServiceStack {
           keyValueStoreConfig: setting,
         }),
     );
+
+    // Build websocket apis
+    const websockets = qpqWebServerUtils.getWebsocketSettings(props.qpqConfig).map(
+      (setting) =>
+        new QpqWebserverWebsocketConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
+          awsAccountId: props.awsAccountId,
+          qpqConfig: props.qpqConfig,
+
+          websocketConfig: setting,
+        }),
+    );
+
   }
 }

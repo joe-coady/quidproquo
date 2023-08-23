@@ -244,6 +244,28 @@ export const getCFExportNameDistributionIdArnFromConfig = (
   );
 };
 
+export const getCFExportNameWebsocketApiIdFromConfig = (
+  websocketApiName: string,
+  qpqConfig: QPQConfig,
+
+  serviceOverride?: string,
+  applicationOverride?: string,
+) => {
+  const application = applicationOverride || qpqCoreUtils.getApplicationName(qpqConfig);
+  const service = serviceOverride || qpqCoreUtils.getApplicationModuleName(qpqConfig);
+  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
+  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+
+  return getQpqRuntimeResourceName(
+    websocketApiName,
+    application,
+    service,
+    environment,
+    feature,
+    'websocket-api-id-export',
+  );
+};
+
 export const getEventBusSnsTopicArn = (
   eventBusName: string,
   qpqConfig: QPQConfig,
