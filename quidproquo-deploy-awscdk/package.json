@@ -26,8 +26,8 @@
   },
   "homepage": "https://github.com/joe-coady/quidproquo#readme",
   "dependencies": {
-    "aws-cdk": "^2.58.1",
-    "aws-cdk-lib": "^2.58.1",
+    "aws-cdk": "^2.91.0",
+    "aws-cdk-lib": "^2.92.0",
     "constructs": "^10.1.208",
     "esbuild": "^0.15.16",
     "liquidjs": "^10.7.0",
