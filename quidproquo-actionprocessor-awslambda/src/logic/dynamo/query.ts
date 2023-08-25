@@ -25,7 +25,7 @@ export async function query<Item>(
   const params: QueryCommandInput = {
     TableName: tableName,
     KeyConditionExpression: buildDynamoQueryExpression(keyExpression),
-    FilterExpression: buildDynamoQueryExpression(filterExpression),
+    FilterExpression: filterExpression && buildDynamoQueryExpression(filterExpression),
     ExpressionAttributeValues: buildExpressionAttributeValues([keyExpression, filterExpression]),
     ExpressionAttributeNames: buildExpressionAttributeNames([keyExpression, filterExpression]),
     IndexName: indexName,

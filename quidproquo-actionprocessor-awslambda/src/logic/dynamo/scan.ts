@@ -23,8 +23,8 @@ export async function scan<Item>(
   const params: ScanCommandInput = {
     TableName: tableName,
     FilterExpression: buildDynamoQueryExpression(filterExpression),
-    ExpressionAttributeValues: buildExpressionAttributeValues([filterExpression]),
-    ExpressionAttributeNames: buildExpressionAttributeNames([filterExpression]),
+    ExpressionAttributeValues: filterExpression && buildExpressionAttributeValues([filterExpression]),
+    ExpressionAttributeNames: filterExpression && buildExpressionAttributeNames([filterExpression]),
   };
 
   if (pageKey) {
