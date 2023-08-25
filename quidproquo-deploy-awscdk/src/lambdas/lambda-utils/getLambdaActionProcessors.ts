@@ -17,6 +17,7 @@ import {
   getUserDirectoryActionProcessor,
   getWebEntryActionProcessor,
   getServiceFunctionActionProcessor,
+  getWebsocketActionProcessor,
   getAdminActionProcessor,
   getKeyValueStoreActionProcessor,
 } from 'quidproquo-actionprocessor-awslambda';
@@ -44,6 +45,7 @@ export const getLambdaActionProcessors = (qpqConfig: QPQConfig) => {
     ...getServiceFunctionActionProcessor(qpqConfig),
     ...getAdminActionProcessor(qpqConfig),
     ...getKeyValueStoreActionProcessor(qpqConfig),
+    ...getWebsocketActionProcessor(qpqConfig),
 
     ...qpqCustomActionProcessors(),
   };

@@ -108,6 +108,13 @@ export class Function extends QpqConstructBlock {
       }),
     );
 
+    this.lambdaFunction.addToRolePolicy(
+      new aws_iam.PolicyStatement({
+        actions: ['execute-api:ManageConnections'],
+        resources: ["*"],
+      }),
+    );
+
     // We need access to dynamo log tables
     this.lambdaFunction.addToRolePolicy(
       new aws_iam.PolicyStatement({

@@ -53,7 +53,7 @@ const getProcessTransformEventParams = (): EventTransformEventParamsActionProces
       sourceIp: websocketEvent.requestContext.identity.sourceIp,
       userAgent: websocketEvent.requestContext.identity.userAgent,
       requestTime: new Date(websocketEvent.requestContext.requestTimeEpoch).toISOString(),
-      body: websocketEvent.body
+      body: (websocketEvent.body as (string | Blob | ArrayBuffer | undefined))
     };
 
     return actionResult(transformedEventParams);

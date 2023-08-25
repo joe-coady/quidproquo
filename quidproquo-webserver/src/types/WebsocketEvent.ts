@@ -10,12 +10,12 @@ export type WebsocketEvent<T extends string | Blob | ArrayBuffer> = {
   messageId: string;
   connectionId: string;
   requestTime: string;
-  requestTimeEpoch: string;
+  requestTimeEpoch: number;
 
   userAgent: string;
   sourceIp: string;
 
-  body: T;
+  body?: T;
 }
 
 export type WebsocketEventResponse = void;

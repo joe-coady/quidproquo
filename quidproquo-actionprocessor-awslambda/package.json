@@ -26,6 +26,7 @@
   "homepage": "https://github.com/joe-coady/quidproquo#readme",
   "dependencies": {
     "@aws-sdk/client-api-gateway": "^3.379.1",
+    "@aws-sdk/client-apigatewaymanagementapi": "^3.379.1",
     "@aws-sdk/client-cloudformation": "^3.379.1",
     "@aws-sdk/client-cloudfront": "^3.379.1",
     "@aws-sdk/client-cognito-identity-provider": "^3.379.1",
