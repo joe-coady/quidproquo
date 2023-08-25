@@ -20,3 +20,14 @@ export const toJsonEventResponse = (item: any, status: number = 200): HTTPEventR
     },
   };
 };
+
+export const toHtmlResponse = (html: string, status: number = 200): HTTPEventResponse => {
+  return {
+    status,
+    body: html,
+    isBase64Encoded: false,
+    headers: {
+      'content-type': 'text/html',
+    },
+  };
+};
