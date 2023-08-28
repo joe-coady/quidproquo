@@ -1,5 +1,5 @@
 import { QPQError } from './ErrorTypeEnum';
-import { StoryResult, StorySession } from './StorySession';
+import { StoryResult, StorySession, StorySessionUpdater } from './StorySession';
 
 // Action ~ Think redux action
 // They must have a type, and an optional payload
@@ -36,6 +36,7 @@ export type ActionProcessor<
   session: StorySession,
   actionProcessors: ActionProcessorList,
   logger: (result: StoryResult<any>) => Promise<void>,
+  updateSession: StorySessionUpdater,
 ) => Promise<ActionProcessorResult<TReturn>>;
 
 // Generator<

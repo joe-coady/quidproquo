@@ -1,6 +1,6 @@
 import { Action, ActionProcessorList, ActionProcessorResult, ActionRequester, EitherActionResult } from './types/Action';
 import { ErrorTypeEnum } from './types/ErrorTypeEnum';
-import { StoryResult, StorySession, QpqRuntimeType } from './types/StorySession';
+import { StoryResult, StorySession, QpqRuntimeType, StorySessionUpdater } from './types/StorySession';
 import { SystemActionType } from './actions/system/SystemActionType';
 import {
   resolveActionResult,
@@ -19,13 +19,14 @@ async function processAction(
   actionProcessors: ActionProcessorList,
   session: StorySession,
   logger: (res: StoryResult<any>) => Promise<void>,
+  updateSession: StorySessionUpdater,
 ) {
   try {
     // Special action ~ batch - needs access to the processAction / actionProcessor context
     if (action.type === SystemActionType.Batch) {
       const batchRes = await Promise.all(
         action.payload.actions.map((a: any) => {
-          return a ? processAction(a, actionProcessors, session, logger) : null;
+          return a ? processAction(a, actionProcessors, session, logger, updateSession) : null;
         }),
       );
 
@@ -47,7 +48,7 @@ async function processAction(
       );
     }
 
-    return await processor(action.payload, session, actionProcessors, logger);
+    return await processor(action.payload, session, actionProcessors, logger, updateSession);
   } catch (e: unknown) {
     if (e instanceof Error) {
       return actionResultError(ErrorTypeEnum.GenericError, e.message, e.stack);
@@ -74,15 +75,22 @@ export const createRuntime = (
 
     let storyProgress = null;
 
-    const storySession: StorySession = {
+    let storySession: StorySession = {
       correlation: runtimeCorrelation,
       depth: callerSession.depth + 1,
       accessToken: callerSession.accessToken,
     };
 
+    const updateSession: StorySessionUpdater = (newSession: Partial<StorySession>): void => {
+      storySession = {
+        ...storySession,
+        ...newSession
+      };
+    }
+
     const response: StoryResult<any> = {
       input: args,
-      session: storySession,
+      session: { ... storySession },
 
       history: [],
       startedAt: getTimeNow(),
@@ -119,6 +127,7 @@ export const createRuntime = (
           actionProcessors,
           storySession,
           logger,
+          updateSession
         );
 
         const history = {

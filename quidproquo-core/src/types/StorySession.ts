@@ -13,6 +13,8 @@ export interface StorySession {
   accessToken?: string;
 }
 
+export type StorySessionUpdater = (newSession: Partial<StorySession>) => void;
+
 export interface StoryError {
   errorType: ErrorTypeEnum;
   errorText: string;
