@@ -1,4 +1,4 @@
-import { aws_lambda, aws_apigatewayv2, aws_iam, aws_logs } from 'aws-cdk-lib';
+import { aws_lambda, aws_apigatewayv2, aws_iam, aws_logs, aws_apigateway } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
@@ -9,6 +9,7 @@ import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqCons
 import { QpqResource } from '../../../base';
 import { exportStackValue, importStackValue } from '../../../../utils';
 import { Function } from '../../../basic/Function';
+import { SubdomainName } from '../../../basic';
 
 
 
@@ -102,6 +103,26 @@ export class QpqApiWebserverWebsocketConstruct extends QpqConstructBlock {
 
     deployment.addDependency(connectRoute);
     deployment.addDependency(disconnectRoute);
-    deployment.addDependency(defaultRoute);    
+    deployment.addDependency(defaultRoute);
+
+    // Attach a custom domain name to the api
+    const apexDomain = props.websocketConfig.onRootDomain
+      ? qpqWebServerUtils.getBaseDomainName(props.qpqConfig)
+      : qpqWebServerUtils.getServiceDomainName(props.qpqConfig);
+
+    // Create subdomain
+    const subdomain = new SubdomainName(this, 'subdomain', {
+      apexDomain,
+      subdomain: props.websocketConfig.apiSubdomain,
+      qpqConfig: props.qpqConfig,
+      awsAccountId: props.awsAccountId,
+    });
+
+    // Create a mapping between the custom domain name and the WebSocket API
+    new aws_apigatewayv2.CfnApiMapping(this, 'websocket-api-mapping', {
+      apiId: apiId,
+      domainName: subdomain.domainName.domainName,
+      stage: stage.stageName,
+    });
   }
 }

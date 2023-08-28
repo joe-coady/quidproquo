@@ -14,6 +14,7 @@ export interface SubdomainNameProps extends QpqConstructBlockProps {
 
 export class SubdomainName extends QpqConstructBlock {
   public readonly domainName: aws_apigateway.DomainName;
+  public readonly certificate: aws_certificatemanager.Certificate;
 
   constructor(scope: Construct, id: string, props: SubdomainNameProps) {
     super(scope, id, props);
@@ -24,7 +25,7 @@ export class SubdomainName extends QpqConstructBlock {
       domainName: props.apexDomain,
     });
 
-    const certificate = new aws_certificatemanager.Certificate(this, 'certificate', {
+    this.certificate = new aws_certificatemanager.Certificate(this, 'certificate', {
       domainName: newDomainName,
       certificateName: this.qpqResourceName(props.subdomain, 'cert'),
       validation: aws_certificatemanager.CertificateValidation.fromDns(apexHostedZone),
@@ -32,7 +33,7 @@ export class SubdomainName extends QpqConstructBlock {
 
     this.domainName = new aws_apigateway.DomainName(this, 'domain-name', {
       domainName: newDomainName,
-      certificate,
+      certificate: this.certificate,
       securityPolicy: aws_apigateway.SecurityPolicy.TLS_1_2,
       endpointType: aws_apigateway.EndpointType.REGIONAL,
     });
