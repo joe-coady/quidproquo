@@ -1,11 +1,12 @@
 import path from 'path';
 
-import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
+import { QPQConfig } from 'quidproquo-core';
 import { Construct } from 'constructs';
 import { aws_s3, aws_iam, aws_dynamodb, aws_s3_notifications } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
+
+import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
 import { QpqResource } from '../base';
-import { QPQConfig } from 'quidproquo-core/lib';
 import { QPQ_LOG_BUCKET_NAME } from '../../constants';
 import { Function } from './Function';
 // import { qpqWebServerUtils } from '../../utils';

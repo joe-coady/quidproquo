@@ -1,0 +1,60 @@
+{
+  "compilerOptions": {
+    // Determines the module system, "node" works well in a Node.js environment
+    "moduleResolution": "node",
+    
+    // Enables compatibility with ES6 module imports
+    "esModuleInterop": true,
+    
+    // Sets the JavaScript language target to ES6
+    "target": "ES6",
+    
+    // Includes type definitions for ES2021 features and DOM APIs
+    "lib": ["es2021", "dom"],
+    
+    // Allows default imports from modules with no default export
+    "allowSyntheticDefaultImports": true,
+
+    // Enables all strict type checking options
+    "strict": true,
+
+    // Enforces ECMAScript strict mode to eliminate some JavaScript silent errors
+    "alwaysStrict": true,
+
+    // Enables strict null checks for more type safety
+    "strictNullChecks": true,
+
+    // Raise error on expressions and declarations with an implied 'any' type
+    "noImplicitAny": true,
+    
+    // Raise error on 'this' expressions with an implied 'any' type
+    "noImplicitThis": true,
+
+    // Report error when not all code paths return in function
+    "noImplicitReturns": true,
+
+    // Report fallthrough cases in switch statement
+    "noFallthroughCasesInSwitch": true,
+
+    // Enforce consistent casing in file names
+    "forceConsistentCasingInFileNames": true,
+
+    // Do not emit output (JavaScript files)
+    "noEmit": false,
+
+    // Generate corresponding '.map' file
+    "sourceMap": true,
+
+    // Allows importing JSON files
+    "resolveJsonModule": true,
+
+    // Allows compiling JavaScript files
+    "allowJs": true,
+
+    // Generates a .d.ts file for the TypeScript files
+    "declaration": true
+  },  
+  
+  // Exclude the node_modules directory to improve performance
+  "exclude": ["node_modules"]
+}

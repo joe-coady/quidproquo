@@ -1,7 +1,7 @@
 {
-  "extends": "quidproquo-tsconfig",
+  "extends": "quidproquo-tsconfig/tsconfig.esm.json",
   "compilerOptions": {
-    "outDir": "./lib"
+    "outDir": "./lib/esm"
   },
   "include": ["src"],
   "exclude": ["node_modules"]

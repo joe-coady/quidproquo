@@ -2,16 +2,16 @@
   "name": "quidproquo-deploy-webpack",
   "version": "0.0.127",
   "description": "",
-  "main": "./lib/webpack.config.js",
-  "types": "./lib/webpack.config.d.js",
+  "main": "./lib/commonjs/webpack.config.js",
+  "types": "./lib/commonjs/webpack.config.d.js",
   "files": [
     "lib/**/*"
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "npx rimraf lib",
-    "build": "npm run clean && tsc",
-    "watch": "tsc -w"
+    "build": "npm run clean && tsc -p tsconfig.commonjs.json",
+    "watch": "tsc -p tsconfig.commonjs.json -w"
   },
   "repository": {
     "type": "git",

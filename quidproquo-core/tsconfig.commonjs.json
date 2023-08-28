@@ -1,13 +1,7 @@
 {
   "extends": "quidproquo-tsconfig/tsconfig.commonjs.json",
   "compilerOptions": {
-    "jsx": "react-jsx",
-    "outDir": "./lib"
-  },
-  "ts-node": {
-    "compilerOptions": {
-      "module": "commonjs"
-    }
+    "outDir": "./lib/commonjs"
   },
   "include": ["src"],
   "exclude": ["node_modules"]

@@ -1,17 +1,17 @@
 {
-  "name": "quidproquo-actionprocessor-node",
+  "name": "quidproquo-web",
   "version": "0.0.127",
   "description": "",
-  "main": "./lib/commonjs/index.js",
-  "types": "./lib/commonjs/index.d.js",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.js",
   "files": [
     "lib/**/*"
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "npx rimraf lib",
-    "build": "npm run clean && tsc -p tsconfig.commonjs.json",
-    "watch": "tsc -p tsconfig.commonjs.json -w"
+    "build": "npm run clean && tsc",
+    "watch": "tsc -w"
   },
   "repository": {
     "type": "git",
@@ -24,15 +24,8 @@
     "url": "https://github.com/joe-coady/quidproquo/issues"
   },
   "homepage": "https://github.com/joe-coady/quidproquo#readme",
-  "dependencies": {
-    "axios": "^1.2.1",
-    "mime-types": "^2.1.35",
-    "quidproquo-core": "*",
-    "uuid": "^9.0.0"
-  },
   "devDependencies": {
-    "@types/mime-types": "^2.1.1",
-    "@types/uuid": "^9.0.0",
+    "quidproquo-core": "*",
     "quidproquo-tsconfig": "*",
     "typescript": "^4.9.3"
   }
