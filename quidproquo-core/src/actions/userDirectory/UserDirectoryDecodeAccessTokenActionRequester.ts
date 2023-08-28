@@ -5,6 +5,7 @@ export function* askUserDirectoryDecodeAccessToken(
   userDirectoryName: string,
   ignoreExpiration: boolean,
   accessToken: string,
+  serviceOverride?: string,
 ): UserDirectoryDecodeAccessTokenActionRequester {
   return yield {
     type: UserDirectoryActionType.DecodeAccessToken,
@@ -14,6 +15,8 @@ export function* askUserDirectoryDecodeAccessToken(
       accessToken,
 
       ignoreExpiration,
+
+      serviceOverride
     },
   };
 }

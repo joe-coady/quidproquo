@@ -16,11 +16,11 @@ import { decodeValidJwt } from '../../../logic/cognito/decodeValidJwt';
 const getUserDirectoryDecodeAccessTokenActionProcessor = (
   qpqConfig: QPQConfig,
 ): UserDirectoryDecodeAccessTokenActionProcessor => {
-  return async ({ userDirectoryName, accessToken, ignoreExpiration }) => {
+  return async ({ userDirectoryName, accessToken, ignoreExpiration, serviceOverride }) => {
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const userPoolId = await getExportedValue(
-      getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig),
+      getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig, serviceOverride),
       region,
     );
 

@@ -27,6 +27,7 @@
   "devDependencies": {
     "quidproquo-core": "*",
     "quidproquo-tsconfig": "*",
+    "quidproquo-webserver": "*",
     "typescript": "^4.9.3"
   }
 }
