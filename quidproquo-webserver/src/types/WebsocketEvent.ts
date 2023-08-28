@@ -5,7 +5,7 @@ export enum WebSocketEventType {
   Message = 'MESSAGE',
 }
 
-export type WebsocketEvent<T extends string | Blob | ArrayBuffer> = {
+export type WebsocketEvent<T extends string | Blob | ArrayBuffer = string> = {
   eventType: WebSocketEventType;
   messageId: string;
   connectionId: string;
