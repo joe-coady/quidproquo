@@ -1,7 +1,7 @@
 import { SSMClient, GetParametersCommand } from '@aws-sdk/client-ssm';
-import { memoFunc } from '../cache/memoFunc';
+import { memoFuncAsync } from '../cache/memoFuncAsync';
 
-export const getParameters = memoFunc(
+export const getParameters = memoFuncAsync(
   async (parameterNames: string[], region: string): Promise<string[]> => {
     const smClient = new SSMClient({ region });
 

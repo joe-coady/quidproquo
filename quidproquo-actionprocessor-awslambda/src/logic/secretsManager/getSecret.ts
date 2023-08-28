@@ -1,7 +1,7 @@
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
-import { memoFunc } from '../cache/memoFunc';
+import { memoFuncAsync } from '../cache/memoFuncAsync';
 
-export const getSecret = memoFunc(async (secretName: string, region: string): Promise<string> => {
+export const getSecret = memoFuncAsync(async (secretName: string, region: string): Promise<string> => {
   const smClient = new SecretsManagerClient({
     region,
   });
