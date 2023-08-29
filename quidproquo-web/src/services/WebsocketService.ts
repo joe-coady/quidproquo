@@ -107,7 +107,6 @@ export class WebsocketService {
             for (const event in this.eventListeners) {
             if (this.eventListeners.hasOwnProperty(event)) {
                 for (const listener of this.eventListeners[event]) {
-                    console.log('remove', event);
                     this.socket.removeEventListener(event, listener);
                 }
             }
@@ -133,6 +132,7 @@ export class WebsocketService {
     }
 
     private onClose() {
+        console.log(`Websocket disconnected`);
         this.removeAllEventListeners();
         this.reconnectIfNotDestroyed();
 
