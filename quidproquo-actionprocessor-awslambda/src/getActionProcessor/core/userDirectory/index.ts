@@ -9,6 +9,7 @@ import getUserDirectoryDecodeAccessTokenActionProcessor from './getUserDirectory
 import getUserDirectoryForgetPasswordActionProcessor from './getUserDirectoryForgetPasswordActionProcessor';
 import getUserDirectoryGetUserAttributesActionProcessor from './getUserDirectoryGetUserAttributesActionProcessor';
 import getUserDirectoryGetUserAttributesByUserIdActionProcessor from './getUserDirectoryGetUserAttributesByUserIdActionProcessor';
+import getUserDirectoryGetUsersActionProcessor from './getUserDirectoryGetUsersActionProcessor';
 import getUserDirectoryReadAccessTokenActionProcessor from './getUserDirectoryReadAccessTokenActionProcessor';
 import getUserDirectoryRefreshTokenActionProcessor from './getUserDirectoryRefreshTokenActionProcessor';
 import getUserDirectoryRequestEmailVerificationActionProcessor from './getUserDirectoryRequestEmailVerificationActionProcessor';
@@ -27,6 +28,7 @@ export default (qpqConfig: QPQConfig) => ({
   ...getUserDirectoryForgetPasswordActionProcessor(qpqConfig),
   ...getUserDirectoryGetUserAttributesActionProcessor(qpqConfig),
   ...getUserDirectoryGetUserAttributesByUserIdActionProcessor(qpqConfig),
+  ...getUserDirectoryGetUsersActionProcessor(qpqConfig),
   ...getUserDirectoryReadAccessTokenActionProcessor(qpqConfig),
   ...getUserDirectoryRefreshTokenActionProcessor(qpqConfig),
   ...getUserDirectoryRequestEmailVerificationActionProcessor(qpqConfig),
