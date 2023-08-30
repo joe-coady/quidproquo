@@ -49,7 +49,7 @@ export const getWebsocketAPIGatewayEventExecutor = () => {
       getDateNow,
       getLogger(cdkConfig.qpqConfig),
       getRuntimeCorrelation(cdkConfig.qpqConfig),
-      QpqRuntimeType.SEND_EMAIL_EVENT,
+      QpqRuntimeType.WEBSOCKET_EVENT,
     );
     
     const storyResult = await resolveStory(askProcessEvent, [event, context]);

@@ -42,8 +42,9 @@
     // Do not emit output (JavaScript files)
     "noEmit": false,
 
-    // Generate corresponding '.map' file
-    "sourceMap": true,
+    // Generate corresponding '.map' file ~ We need to turn this off because
+    // the build output has no access to src files
+    "sourceMap": false,
 
     // Allows importing JSON files
     "resolveJsonModule": true,
