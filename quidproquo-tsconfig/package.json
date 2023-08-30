@@ -2,7 +2,7 @@
   "name": "quidproquo-tsconfig",
   "version": "0.0.129",
   "description": "",
-  "main": "tsconfig.json",
+  "main": "tsconfig.base.json",
   "scripts": {
     "test": "",
     "clean": "",

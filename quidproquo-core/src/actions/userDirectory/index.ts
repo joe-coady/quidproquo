@@ -32,6 +32,9 @@ export * from './UserDirectoryGetUserAttributesActionTypes';
 export * from './UserDirectoryGetUserAttributesByUserIdActionRequester';
 export * from './UserDirectoryGetUserAttributesByUserIdActionTypes';
 
+export * from './UserDirectoryGetUsersActionRequester';
+export * from './UserDirectoryGetUsersActionTypes';
+
 export * from './UserDirectoryRefreshTokenActionRequester';
 export * from './UserDirectoryRefreshTokenActionTypes';
 

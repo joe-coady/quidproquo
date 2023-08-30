@@ -21,8 +21,6 @@ export const getUserAttributesBySub = async (
     }),
   );
 
-  console.log(response);
-
   const [user] = response?.Users || [];
   if (!user) {
     throw new Error('User not found');
