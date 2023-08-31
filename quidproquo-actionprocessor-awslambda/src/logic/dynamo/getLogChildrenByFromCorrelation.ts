@@ -42,6 +42,7 @@ export async function getLogChildrenByFromCorrelation(
         correlation,
         moduleName: i.moduleName.S || '',
         fromCorrelation: i.fromCorrelation?.S,
+        executionTimeMs: i.executionTimeMs?.N ? parseInt(i.executionTimeMs.N) : 0,
       };
 
       return metaData;

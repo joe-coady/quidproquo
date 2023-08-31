@@ -73,7 +73,7 @@ export const createRuntime = (
   ): Promise<StoryResult<any>> {
     const reader = story(...args);
 
-    let storyProgress = null;
+    let storyProgress: IteratorResult<Action<any>, any> | null = null;
 
     let storySession: StorySession = {
       correlation: runtimeCorrelation,
@@ -94,6 +94,7 @@ export const createRuntime = (
 
       history: [],
       startedAt: getTimeNow(),
+      finishedAt: getTimeNow(),
 
       tags: initialTags || [],
       moduleName: getApplicationModuleName(qpqConfig),

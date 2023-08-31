@@ -50,6 +50,7 @@ const writeStoryResultMetadataToDynamo = async (
       generic: { S: storyResultMetadata.generic },
       moduleName: { S: storyResultMetadata.moduleName },
       fromCorrelation: { S: storyResultMetadata.fromCorrelation || '' },
+      executionTimeMs: { N: storyResultMetadata.executionTimeMs.toString() },
     },
   });
 

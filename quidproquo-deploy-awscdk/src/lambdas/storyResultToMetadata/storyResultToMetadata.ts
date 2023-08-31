@@ -34,6 +34,7 @@ export const storyResultToMetadata = (
     runtimeType: storyResult.runtimeType,
     startedAt: storyResult.startedAt,
     generic: tags.filter((t) => !!t).join(', '),
+    executionTimeMs: new Date(storyResult.finishedAt).getTime() - new Date(storyResult.startedAt).getTime(),
   };
 
   // Extract error text

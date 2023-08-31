@@ -1,14 +1,30 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { SearchParams } from '../types';
 
 import { useServiceLogEndpoints } from './useServiceLogEndpoints';
 import { useOnSearch } from './useOnSearch';
 import { filterLogs, getOnRowClick } from '../logic';
 
+declare global {
+  interface Window {
+    logs: any;
+    viewLog: any;
+  }
+}
+
 export const useLogManagement = () => {
   const serviceLogEndpoints = useServiceLogEndpoints();
   const [selectedLogCorrelation, setSelectedLogCorrelation] = useState<string>('');
   const [logs, setLogs] = useState<any>([]);
+
+  useEffect(() => {
+    window.logs = logs;
+    window.viewLog = (log: any) => {setSelectedLogCorrelation(log.correlation)};
+  }, [logs]);
+
+  useEffect(() => {
+    console.log("logs attached to window, try: viewLog(logs[0])");
+  }, []);
 
   const [searchParams, setSearchParams] = useState<SearchParams>(() => {
     const currentDate = new Date();

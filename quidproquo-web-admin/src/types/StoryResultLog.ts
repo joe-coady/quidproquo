@@ -34,7 +34,7 @@ export interface StoryResultLog {
 
   // When the story started / finished
   startedAt: string;
-  finishedAt?: string;
+  finishedAt: string;
 
   // correlationGuid from the calling story
   fromCorrelation?: string;
@@ -66,6 +66,8 @@ export interface StoryResultMetadataLog {
   generic: string;
 
   error?: string;
+
+  executionTimeMs: number;
 }
 
 export interface QpqLogListLog {
