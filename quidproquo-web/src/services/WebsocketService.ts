@@ -124,8 +124,6 @@ export class WebsocketService {
     }
 
     private onConnect() {
-        console.log(`WebSocket connected: ${this.url}`);
-
         this.notifySubscribers(this.subscriptions.open);
 
         // Send any pending messages once we are connected
@@ -137,7 +135,6 @@ export class WebsocketService {
     }
 
     private onClose() {
-        console.log(`Websocket disconnected`);
         this.removeAllEventListeners();
         this.reconnectIfNotDestroyed();
 
