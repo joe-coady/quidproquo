@@ -19,6 +19,8 @@ type Subscriptions = {
     [key in WebsocketServiceEvent]: SubscriptionMap;
 }
 
+type WebsocketSendPayload = string | ArrayBufferLike | Blob | ArrayBufferView;
+
 export type WebSocketServiceSubscriptionFunction = (websocketService: WebsocketService, data?: string) => any
 
 export class WebsocketService {
@@ -26,6 +28,7 @@ export class WebsocketService {
     private socket: WebSocket | null = null;
     private eventListeners: { [key: string]: WebSocketEventListnerFunction[] } = {};
     private isDestroyed: boolean = false;
+    private pendingMessages: WebsocketSendPayload[] = [];
     private subscriptions: Subscriptions = {
         [WebsocketServiceEvent.OPEN]: new Map(),
         [WebsocketServiceEvent.CLOSE]: new Map(),
@@ -49,20 +52,15 @@ export class WebsocketService {
         this.socket?.close();
     }
 
+    public isConnected() {
+        return this.socket?.readyState === WebSocket.OPEN;
+    }
+
     public subscribe(subscriptionType: WebsocketServiceEvent, callback: WebSocketServiceSubscriptionFunction) {
         const subscriptionHandle: SubscriptionHandle = {
             type: subscriptionType
         };
         this.subscriptions[subscriptionType].set(subscriptionHandle, callback);
-
-        // If we are already open, then call the callback immediately
-        if (subscriptionType === WebsocketServiceEvent.OPEN && this.socket?.readyState === WebSocket.OPEN) {
-            try {
-                callback(this);
-            } catch (e) {
-                console.error('Error in Websocket onConnect callback: ', e);
-            }
-        }
 
         return subscriptionHandle;
     }
@@ -129,6 +127,13 @@ export class WebsocketService {
         console.log(`WebSocket connected: ${this.url}`);
 
         this.notifySubscribers(this.subscriptions.open);
+
+        // Send any pending messages once we are connected
+        const messages = this.pendingMessages;
+        this.pendingMessages = [];
+        messages.forEach((message) => {
+            this.send(message);
+        });
     }
 
     private onClose() {
@@ -153,11 +158,11 @@ export class WebsocketService {
         });
     }
   
-    public send(data: string | ArrayBufferLike | Blob | ArrayBufferView) {
+    public send(data: WebsocketSendPayload) {
       if (this.socket && this.socket.readyState === WebSocket.OPEN) {
         this.socket.send(data);
       } else {
-        console.error(`WebSocket is not open [${this.socket?.readyState}]. Unable to send data.`);
+        this.pendingMessages.push(data);
       }
     }
   }
