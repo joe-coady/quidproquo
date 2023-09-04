@@ -4,6 +4,7 @@ import {
   coreActionProcessor,
   webserverActionProcessor,
   getConfigActionProcessor,
+  getContextActionProcessor,
 } from 'quidproquo-actionprocessor-node';
 
 import {
@@ -46,6 +47,7 @@ export const getLambdaActionProcessors = (qpqConfig: QPQConfig) => {
     ...getAdminActionProcessor(qpqConfig),
     ...getKeyValueStoreActionProcessor(qpqConfig),
     ...getWebsocketActionProcessor(qpqConfig),
+    ...getContextActionProcessor(qpqConfig),
 
     ...qpqCustomActionProcessors(),
   };
