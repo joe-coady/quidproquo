@@ -41,7 +41,7 @@ export function* askContextProvideValue<T extends AskResponse<any>>(
             }
             
             // return it to our children
-            storyIterator.next(allContextValues);
+            nextResult = storyIterator.next(allContextValues);
 
             // And keep processing
             continue;
