@@ -1,4 +1,5 @@
-import { Action, ActionProcessor, ActionRequester, CrossModuleMessage } from '../../types';
+import { Action, ActionProcessor, ActionRequester, CrossModuleMessage, QpqContext } from '../../types';
+import { ContextListAction, ContextReadAction } from '../context';
 import { QueueActionType } from './QueueActionType';
 
 export type QueueMessage<T> = CrossModuleMessage<T>;
@@ -7,6 +8,7 @@ export type QueueMessage<T> = CrossModuleMessage<T>;
 export interface QueueSendMessageActionPayload<T> {
   queueName: string;
   queueMessages: QueueMessage<T>[];
+  context: QpqContext<any>;
 }
 
 // Action
@@ -17,4 +19,4 @@ export interface QueueSendMessageAction<T> extends Action<QueueSendMessageAction
 
 // Function Types
 export type QueueSendMessageActionProcessor<T> = ActionProcessor<QueueSendMessageAction<T>, void>;
-export type QueueSendMessageActionRequester<T> = ActionRequester<QueueSendMessageAction<T>, void>;
+export type QueueSendMessageActionRequester<T> = ActionRequester<QueueSendMessageAction<T> | ContextListAction, void, QpqContext<any> | void>;

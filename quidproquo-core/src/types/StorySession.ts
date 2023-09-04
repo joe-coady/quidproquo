@@ -1,5 +1,6 @@
 import { ErrorTypeEnum } from './ErrorTypeEnum';
 import { Action } from './Action';
+import { QpqContext } from './QpqContextIdentifier';
 
 export interface StorySession {
   correlation?: string;
@@ -10,7 +11,12 @@ export interface StorySession {
   // maybe storing a userid is better after we validate it
   // but what if a event 3 weeks from now is run, but the user is deleted, but now
   // still has access ?
+
+  // Decoded access token + roles token
   accessToken?: string;
+
+  // Context
+  context: QpqContext<any>;
 }
 
 export type StorySessionUpdater = (newSession: Partial<StorySession>) => void;

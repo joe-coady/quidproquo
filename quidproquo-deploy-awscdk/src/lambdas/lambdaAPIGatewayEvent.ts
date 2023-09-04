@@ -54,6 +54,7 @@ export const getAPIGatewayEventExecutor = (
       {
         depth: 0,
         accessToken: accessToken,
+        context: {}
       },
       storyActionProcessor,
       getDateNow,

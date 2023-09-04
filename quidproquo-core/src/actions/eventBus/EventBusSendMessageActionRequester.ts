@@ -1,4 +1,5 @@
 import { CrossModuleMessage } from '../../types';
+import { ContextActionType } from '../context';
 import { EventBusActionType } from './EventBusActionType';
 import {
   EventBusSendMessageActionRequester,
@@ -8,8 +9,16 @@ import {
 export function* askEventBusSendMessages<T>(
   eventBusSendMessageOptions: EventBusSendMessageOptions<T>,
 ): EventBusSendMessageActionRequester<T> {
-  return yield {
+   // Read the context so we can send it with the queue message
+   const context = (yield {
+    type: ContextActionType.List
+  })!;
+
+  yield {
     type: EventBusActionType.SendMessages,
-    payload: eventBusSendMessageOptions,
+    payload: {
+      ...eventBusSendMessageOptions,
+      context
+    },
   };
 }

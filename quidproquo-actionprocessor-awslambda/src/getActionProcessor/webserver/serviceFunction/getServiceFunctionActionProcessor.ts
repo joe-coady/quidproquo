@@ -24,7 +24,7 @@ type AnyExecuteServiceFunctionEventWithSession = ExecuteServiceFunctionEvent<any
 const getServiceFunctionExecuteActionProcessor = (
   qpqConfig: QPQConfig,
 ): ServiceFunctionExecuteActionProcessor<any, any> => {
-  return async ({ functionName, service, payload }, session) => {
+  return async ({ functionName, service, payload, context }, session) => {
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const appName = qpqCoreUtils.getApplicationName(qpqConfig);
@@ -42,7 +42,10 @@ const getServiceFunctionExecuteActionProcessor = (
     const serviceFunctionEvent: AnyExecuteServiceFunctionEventWithSession = {
       functionName: functionName,
       payload: payload,
-      storySession: session,
+      storySession: {
+        ...session,
+        context
+      },
     };
 
     const result = await executeLambdaByName<StoryResult<any[], any>>(

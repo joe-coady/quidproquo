@@ -43,7 +43,8 @@ export const getLambdaCognitoCustomMessageTriggerEvent = () => {
     const resolveStory = createRuntime(
       cdkConfig.qpqConfig,
       {
-        depth: 0
+        depth: 0,
+        context: {},
       },
       storyActionProcessor,
       getDateNow,

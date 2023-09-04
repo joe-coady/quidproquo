@@ -44,6 +44,7 @@ export const getEventBridgeEventExecutor = (
       cdkConfig.qpqConfig,
       {
         depth: 0,
+        context: {},
       },
       storyActionProcessor,
       getDateNow,

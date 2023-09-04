@@ -23,6 +23,7 @@ export const qpqExecuteLog = async (
     {
       correlation: storyResult.fromCorrelation,
       depth: 0,
+      context: storyResult.session.context,
     },
     storyActionProcessor,
     () => new Date().toISOString(),

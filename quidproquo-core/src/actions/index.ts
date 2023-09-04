@@ -1,4 +1,5 @@
 export * from './config';
+export * from './context';
 export * from './date';
 export * from './error';
 export * from './event';

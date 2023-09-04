@@ -10,7 +10,7 @@ type AnyQueueMessageWithSession = QueueMessage<any> & {
 };
 
 const getProcessQueueSendMessage = (qpqConfig: QPQConfig): QueueSendMessageActionProcessor<any> => {
-  return async ({ queueName, queueMessages }, session) => {
+  return async ({ queueName, queueMessages, context }, session) => {
     // While we have some uuids
     const sqsQueueName = resolveResourceName(queueName, qpqConfig);
     await sendMessages(
@@ -20,7 +20,10 @@ const getProcessQueueSendMessage = (qpqConfig: QPQConfig): QueueSendMessageActio
         // Add the session info to the message
         const queueMessageWithSession: AnyQueueMessageWithSession = {
           ...message,
-          storySession: session,
+          storySession: {
+            ...session,
+            context 
+          },
         };
 
         return JSON.stringify(queueMessageWithSession);

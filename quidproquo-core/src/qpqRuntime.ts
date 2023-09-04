@@ -79,6 +79,7 @@ export const createRuntime = (
       correlation: runtimeCorrelation,
       depth: callerSession.depth + 1,
       accessToken: callerSession.accessToken,
+      context: callerSession.context,
     };
 
     const updateSession: StorySessionUpdater = (newSession: Partial<StorySession>): void => {

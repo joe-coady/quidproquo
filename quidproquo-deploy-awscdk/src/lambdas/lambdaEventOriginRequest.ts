@@ -42,6 +42,7 @@ export const getOriginRequestEventExecutor = (
       cdkConfig.qpqConfig,
       {
         depth: 0,
+        context: {},
       },
       storyActionProcessor,
       getDateNow,

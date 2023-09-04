@@ -26,6 +26,7 @@ const getProcessEventBusSendMessage = (
       environmentOverride,
       featureOverride,
       applicationOverride,
+      context
     },
     session,
   ) => {
@@ -47,7 +48,10 @@ const getProcessEventBusSendMessage = (
       eventBusMessages.map((message) => {
         const eventBusMessageWithSession: AnyEventBusMessageWithSession = {
           ...message,
-          storySession: session,
+          storySession: {
+            ...session,
+            context
+          },
         };
 
         return JSON.stringify(eventBusMessageWithSession);
