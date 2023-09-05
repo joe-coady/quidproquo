@@ -84,34 +84,32 @@ export const getAwsServiceAccountInfoByDeploymentInfo = (
   targetModule?: string,
   targetEnvironment?: string,
   targetFeature?: string,
-  targetApplication?: string,
+  targetApplication?: string
 ): ServiceAccountInfo => {
   const awsServiceAccountInfos = getAwsServiceAccountInfos(qpqConfig);
 
   const getMatchWeight = (serviceAccountInfo: ServiceAccountInfo) => {
     // Note: remember not to have overlapping weights
     return (
-      1.8 * Number(serviceAccountInfo.applicationName === targetApplication) +
-      1.4 * Number(serviceAccountInfo.environment === targetEnvironment) +
-      1.2 * Number(serviceAccountInfo.moduleName === targetModule) +
-      // We only want to compare features if they are defined. Sometimes we will
-      // use null, undefined or an empty string to clear out the feature. Therefore,
-      // we ensure both serviceAccountInfo.feature and targetFeature are truthy before
-      // comparing them. This prevents a false match if either feature is a falsey value.
-      1.1 *
-        Number(
-          !!serviceAccountInfo.feature &&
-            !!targetFeature &&
-            serviceAccountInfo.feature === targetFeature,
-        )
+      1.8 * Number(!serviceAccountInfo.applicationName || serviceAccountInfo.applicationName === targetApplication) +
+      1.4 * Number(!serviceAccountInfo.environment || serviceAccountInfo.environment === targetEnvironment) +
+      1.2 * Number(!serviceAccountInfo.moduleName || serviceAccountInfo.moduleName === targetModule) +
+      1.1 * Number(!serviceAccountInfo.feature || ((serviceAccountInfo.feature === targetFeature) && (!serviceAccountInfo.feature === !targetFeature)))
     );
   };
 
   const sortedAwsServiceAccountInfos = awsServiceAccountInfos
     .map((info) => ({ info, weight: getMatchWeight(info) }))
-    .sort((a, b) => b.weight - a.weight);
+    .sort((a, b) => {
+      const weightDiff = b.weight - a.weight;
+      if (weightDiff !== 0) return weightDiff;
+      return Object.keys(b.info).length - Object.keys(a.info).length;
+    });
 
-  // console.log(JSON.stringify(sortedList.slice(0, 3), null, 2));
+  // if (printInfo) {
+  //   console.log(`getMatchWeight: targetModule: [${targetModule}], targetEnvironment: [${targetEnvironment}], targetFeature: [${targetFeature}], targetApplication: [${targetApplication}]`);
+  //   console.log(JSON.stringify(sortedAwsServiceAccountInfos.slice(0, 5), null, 2));
+  // }
 
   const serviceAccountInfo = sortedAwsServiceAccountInfos.find((info) => info.weight > 0);
 
