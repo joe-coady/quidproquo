@@ -4,16 +4,22 @@ import {
     AskResponse, 
     AskResponseReturnType, 
     EitherActionResult, 
+    QpqContext, 
     QpqContextIdentifier
   } from "../../types";
 
 
-export function* askContextProvideValue<T extends AskResponse<any>>(
-    contextIdentifier: QpqContextIdentifier<any>,
-    value: any,
+export function* askContextProvideValue<R, T extends AskResponse<any>>(
+    contextIdentifier: QpqContextIdentifier<R>,
+    value: R,
     storyIterator: T
   ): AskResponse<EitherActionResult<AskResponseReturnType<T>>> {
     let nextResult = storyIterator.next();
+
+    // We cache the context values because the parent can't change, unilateral dataflow
+    // and we don't want to recompute the context values every time we are asked for them.
+    // we dont want to hit the hit the owner of the context as it shows in the logs for no reason
+    let cache: QpqContext<any> | null = null;
 
     while (!nextResult.done) {
         // If this action is a read context
@@ -31,17 +37,23 @@ export function* askContextProvideValue<T extends AskResponse<any>>(
 
         // If we are trying to list all context values
         else if (nextResult.value.type === ContextActionType.List) {
-            // Grab the parent context values
-            const parentContextValues = yield nextResult.value;
+            // Update the cache
+            if (cache === null) {
+                // Grab the parent context values
+                const parentContextValues = yield nextResult.value;
 
-            // overide / attach our context value
-            const allContextValues = {
-                ...parentContextValues,
-                [contextIdentifier.uniqueName]: value
+                // overide / attach our context value
+                const allContextValues = {
+                    ...parentContextValues,
+                    [contextIdentifier.uniqueName]: value
+                }
+
+                // Update the cache
+                cache = allContextValues;
             }
             
-            // return it to our children
-            nextResult = storyIterator.next(allContextValues);
+            // pass in our chached context values
+            nextResult = storyIterator.next(cache);
 
             // And keep processing
             continue;
