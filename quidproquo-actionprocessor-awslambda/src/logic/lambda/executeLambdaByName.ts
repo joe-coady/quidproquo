@@ -4,6 +4,7 @@ export const executeLambdaByName = async <R>(
   functionName: string,
   region: string,
   payload: any,
+  isAsync: boolean
 ): Promise<R | undefined> => {
   const lambda = new LambdaClient({ region });
 
@@ -14,7 +15,7 @@ export const executeLambdaByName = async <R>(
     new InvokeCommand({
       FunctionName: functionName,
       Payload: encodedPayload,
-      InvocationType: 'RequestResponse',
+      InvocationType: isAsync ? 'Event' : 'RequestResponse',
     }),
   );
 
@@ -24,11 +25,12 @@ export const executeLambdaByName = async <R>(
     throw new Error(`Lambda Error: ${response.FunctionError}. Details: ${errorDetails}`);
   }
 
-  if (response.Payload) {
+  if (!isAsync && response.Payload) {
     const jsonString = new TextDecoder().decode(response.Payload);
-    const object = JSON.parse(jsonString);
-
-    return object;
+    if (jsonString) {
+      const object = JSON.parse(jsonString);
+      return object;
+    }
   }
 
   return undefined;

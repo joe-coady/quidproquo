@@ -7,6 +7,7 @@ export interface ServiceFunctionExecuteActionPayload<T> {
   functionName: string;
   payload: T;
   context: QpqContext<any>;
+  isAsync: boolean
 }
 
 // Action

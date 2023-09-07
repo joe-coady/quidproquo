@@ -24,7 +24,7 @@ type AnyExecuteServiceFunctionEventWithSession = ExecuteServiceFunctionEvent<any
 const getServiceFunctionExecuteActionProcessor = (
   qpqConfig: QPQConfig,
 ): ServiceFunctionExecuteActionProcessor<any, any> => {
-  return async ({ functionName, service, payload, context }, session) => {
+  return async ({ functionName, service, payload, context, isAsync }, session) => {
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const appName = qpqCoreUtils.getApplicationName(qpqConfig);
@@ -52,6 +52,7 @@ const getServiceFunctionExecuteActionProcessor = (
       awsFunctionName,
       region,
       serviceFunctionEvent,
+      isAsync
     );
 
     if (result?.error) {
