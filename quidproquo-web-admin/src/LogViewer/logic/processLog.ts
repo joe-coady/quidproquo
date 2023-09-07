@@ -33,7 +33,7 @@ export const processLog = (logFile: any) => {
       subText: `${h.act.payload ? `Input: ${JSON.stringify(h.act.payload, null, 2)}\n` : ''}${
         h.res ? `Output: ${JSON.stringify(h.res, null, 2)}` : ''
       }`,
-      title: `Action: ${h.act.type.split('/').pop()}`,
+      title: h.act.type.split('/').slice(-2).join('::'),
       key: logFile.id + i,
       dateTime: h.startedAt,
       timeMs: new Date(h.finishedAt).getTime() - new Date(h.startedAt).getTime(),
