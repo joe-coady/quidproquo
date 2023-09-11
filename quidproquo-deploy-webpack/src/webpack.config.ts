@@ -98,6 +98,7 @@ export const getWebpackEntryNames = () => [
   'lambdaAPIGatewayEvent',
   'lambdaAPIGatewayEvent_redirect',
   'lambdaWebsocketAPIGatewayEvent',
+  'lambdaEventBridgeEventStackDeploy',
   'lambdaEventBridgeEvent',
   'lambdaEventOriginRequest',
   'lambdaEventViewerRequest',
@@ -116,6 +117,7 @@ export const getSeoWebpackConfig = (qpqConfig: QPQConfig, outputPath?: string) =
 
 export const getApiWebpackConfig = (qpqConfig: QPQConfig, outputPath?: string) =>
   getWebpackConfig(qpqConfig, outputPath || 'build', [
+    'lambdaEventBridgeEventStackDeploy',
     'lambdaEventBridgeEvent',
     'lambdaAPIGatewayEvent',
     'lambdaWebsocketAPIGatewayEvent',

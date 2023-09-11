@@ -15,6 +15,7 @@ import {
   QpqWebserverApiKeyConstruct,
   QpqCoreKeyValueStoreConstruct,
   QpqWebserverWebsocketConstruct,
+  QpqCoreMigrationsConstruct,
   LogStorage,
 } from '../constructs';
 
@@ -137,6 +138,17 @@ export class InfQpqServiceStack extends QpqServiceStack {
           qpqConfig: props.qpqConfig,
 
           websocketConfig: setting,
+        }),
+    );
+
+    // migrations
+    const migrations = qpqCoreUtils.getMigrationConfigs(props.qpqConfig).map(
+      (setting) =>
+        new QpqCoreMigrationsConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
+          awsAccountId: props.awsAccountId,
+          qpqConfig: props.qpqConfig,
+
+          migrationsConfig: setting,
         }),
     );
 

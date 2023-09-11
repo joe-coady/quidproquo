@@ -19,6 +19,7 @@ import {
   UserDirectoryQPQConfigSetting,
   KeyValueStoreQPQConfigSetting,
   EnvironmentSettingsQPQConfigSetting,
+  MigrationsQPQConfigSetting
 } from './config/settings';
 import { EmailTemplates } from './config/settings/emailTemplates/types';
 import { CrossServiceResourceName, ResourceName } from './types';
@@ -195,6 +196,15 @@ export const getAllKeyValueStores = (qpqConfig: QPQConfig): KeyValueStoreQPQConf
   return keyValueStores;
 };
 
+export const getMigrationConfigs = (qpqConfig: QPQConfig): MigrationsQPQConfigSetting[] => {
+  const migrations = getConfigSettings<MigrationsQPQConfigSetting>(
+    qpqConfig,
+    QPQCoreConfigSettingType.migrations,
+  );
+
+  return migrations;
+};
+
 export const getOwnedKeyValueStores = (qpqConfig: QPQConfig): KeyValueStoreQPQConfigSetting[] => {
   return getOwnedItems(getAllKeyValueStores(qpqConfig), qpqConfig);
 };
@@ -339,6 +349,13 @@ export const getScheduleEntryFullPath = (
   scheduleConfig: ScheduleQPQConfigSetting,
 ): string => {
   return path.join(getConfigRoot(qpqConfig), scheduleConfig.buildPath);
+};
+
+export const getMigrationsFullPath = (
+  qpqConfig: QPQConfig,
+  migrationsConfig: MigrationsQPQConfigSetting,
+): string => {
+  return path.join(getConfigRoot(qpqConfig), migrationsConfig.buildPath);
 };
 
 export const getStorageDriveUploadFullPath = (

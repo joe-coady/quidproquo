@@ -6,3 +6,4 @@ export * from './queue';
 export * from './schedule';
 export * from './secret';
 export * from './storageDrive';
+export * from './migrations';
