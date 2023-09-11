@@ -12,6 +12,8 @@ import {
   DeployEventStatusTypeEnum,
   DeployEventType,
   qpqCoreUtils,
+  actionResultError,
+  ErrorTypeEnum,
 } from 'quidproquo-core';
 
 import { getApiStackName, getInfStackName, getWebStackName } from '../../../awsNamingUtils';
@@ -41,6 +43,9 @@ const deployTypeMap: Record<string, DeployEventStatusTypeEnum> = {
   'CREATE_COMPLETE': DeployEventStatusTypeEnum.Create,
   'DELETE_COMPLETE': DeployEventStatusTypeEnum.Delete,
 };
+
+// TODO: Don't use Globals like this
+const GLOBAL_DEPLOY_EVENT_NAME = process.env.deployEventConfigName!;
 
 const getProcessTransformEventParams = (qpqConfig: QPQConfig): EventTransformEventParamsActionProcessor<EventInput, InternalEventInput> => {
   return async ({ eventParams: [event, context] }) => {
@@ -104,13 +109,16 @@ const getProcessAutoRespond = (
 const getProcessMatchStory = (
   qpqConfig: QPQConfig,
 ): EventMatchStoryActionProcessor<InternalEventInput, MatchResult> => {
-  const [deployConfig] = qpqCoreUtils.getDeployEventConfigs(qpqConfig);
-
+  const deployConfig = qpqCoreUtils.getDeployEventConfigs(qpqConfig).find(c => c.name === GLOBAL_DEPLOY_EVENT_NAME);
   return async (payload) => {
+    if (!deployConfig) {
+      return actionResultError(ErrorTypeEnum.NotFound, `Could not find deploy event config ${GLOBAL_DEPLOY_EVENT_NAME}`);
+    }
+
     return actionResult<MatchResult>({
       src: deployConfig.src.src,
       runtime: deployConfig.src.runtime
-    })
+    });
   };
 };
 

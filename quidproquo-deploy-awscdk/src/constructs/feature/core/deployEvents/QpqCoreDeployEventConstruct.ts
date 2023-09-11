@@ -19,7 +19,7 @@ export class QpqCoreDeployEventConstruct extends QpqConstructBlock {
 
     const func = new Function(this, props.deployEventConfig.uniqueKey, {
       buildPath: qpqCoreUtils.getDeployEventFullPath(props.qpqConfig, props.deployEventConfig),
-      functionName: this.qpqResourceName(`${props.deployEventConfig.uniqueKey}`, 'de'),
+      functionName: this.qpqResourceName(`${props.deployEventConfig.name}`, 'deployEvent'),
       functionType: 'lambdaEventBridgeEventStackDeploy',
       executorName: 'executelambdaEventBridgeEventStackDeploy',
 
@@ -30,7 +30,11 @@ export class QpqCoreDeployEventConstruct extends QpqConstructBlock {
       awsAccountId: props.awsAccountId,
 
       // 15 min timeout
-      timeoutInSeconds: 15*60
+      timeoutInSeconds: 15*60,
+
+      environment: {
+        deployEventConfigName: props.deployEventConfig.name,
+      }
     });
 
     // TODO: Make this a utility function
@@ -51,9 +55,6 @@ export class QpqCoreDeployEventConstruct extends QpqConstructBlock {
       eventPattern: {
         source: ['aws.cloudformation'],
         detailType: ["CloudFormation Stack Status Change"],
-        // detail: {
-        //   eventName: ["UPDATE_COMPLETE", "CREATE_COMPLETE", "DELETE_COMPLETE"],
-        // },
       },
     });
 
