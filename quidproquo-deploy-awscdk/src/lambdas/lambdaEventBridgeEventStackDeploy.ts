@@ -1,11 +1,12 @@
 import {
   DynamicModuleLoader,
   LambdaRuntimeConfig,
+  getEventBridgeEventStackDeployActionProcessor
 } from 'quidproquo-actionprocessor-awslambda';
 
 import { createRuntime, askProcessEvent, QpqRuntimeType } from 'quidproquo-core';
 
-import { APIGatewayProxyHandler, APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
+import { EventBridgeEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 
 import { getLambdaConfigs } from './lambdaConfig';
 import { ActionProcessorListResolver } from './actionProcessorListResolver';
@@ -23,43 +24,34 @@ export const getlambdaEventBridgeEventStackDeployExecutor = (
   dynamicModuleLoader: DynamicModuleLoader,
   getCustomActionProcessors: ActionProcessorListResolver = () => ({}),
 ) => {
-  return async (event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> => {
-    console.log("Event!: ", JSON.stringify(event, null, 2));
+  return async (event: EventBridgeEvent<"CloudFormation Stack Status Change", any>, context: Context): Promise<void> => {
+    console.log("EventBridgeEvent: ~ ", JSON.stringify(event, null, 2));
 
-    // const cdkConfig = await getLambdaConfigs();
+    const cdkConfig = await getLambdaConfigs();
 
-    // const lambdaRuntimeConfig: LambdaRuntimeConfig = JSON.parse(
-    //   process.env.lambdaRuntimeConfig || '{}',
-    // );
+    // Build a processor for the session and stuff
+    // Remove the  non event ones
+    const storyActionProcessor = {
+      ...getLambdaActionProcessors(cdkConfig.qpqConfig),
+      ...getEventBridgeEventStackDeployActionProcessor(cdkConfig.qpqConfig),
 
-    // // Build a processor for the session and stuff
-    // // Remove the  non event ones
-    // const storyActionProcessor = {
-    //   ...getLambdaActionProcessors(cdkConfig.qpqConfig),
-    //   ...getlambdaEventBridgeEventStackDeployActionProcessor(lambdaRuntimeConfig),
-
-    //   ...qpqCustomActionProcessors(),
-    // };
-
-    // const resolveStory = createRuntime(
-    //   cdkConfig.qpqConfig,
-    //   {
-    //     depth: 0,
-    //     context: {},
-    //   },
-    //   storyActionProcessor,
-    //   getDateNow,
-    //   getLogger(cdkConfig.qpqConfig),
-    //   getRuntimeCorrelation(cdkConfig.qpqConfig),
-    //   QpqRuntimeType.RECURRING_SCHEDULE,
-    // );
-
-    // await resolveStory(askProcessEvent, [event, context]);
-
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ message: 'Hello, world!' })
+      ...qpqCustomActionProcessors(),
     };
+
+    const resolveStory = createRuntime(
+      cdkConfig.qpqConfig,
+      {
+        depth: 0,
+        context: {},
+      },
+      storyActionProcessor,
+      getDateNow,
+      getLogger(cdkConfig.qpqConfig),
+      getRuntimeCorrelation(cdkConfig.qpqConfig),
+      QpqRuntimeType.DEPLOY_EVENT,
+    );
+
+    await resolveStory(askProcessEvent, [event, context]);
   };
 };
 

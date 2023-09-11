@@ -9,4 +9,5 @@ export const RuntimeTypes = [
   'SERVICE_FUNCTION_EXE',
   'SEND_EMAIL_EVENT',
   'WEBSOCKET_EVENT',
+  'DEPLOY_EVENT',
 ];

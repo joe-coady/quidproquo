@@ -6,6 +6,7 @@ export { default as getAPIGatewayEventActionProcessor } from './event/getAPIGate
 export { default as getCloudFrontOriginRequestEventActionProcessor } from './event/getCloudFrontOriginRequestEventActionProcessor';
 export { default as getSQSEventRecordActionProcessor } from './event/getSQSEventRecordActionProcessor';
 export { default as getServiceFunctionExecuteEventActionProcessor } from './event/getServiceFunctionExecuteEventActionProcessor';
+export { default as getEventBridgeEventStackDeployActionProcessor } from './event/getEventBridgeEventStackDeployActionProcessor';
 export { default as getEventBridgeEventActionProcessor } from './event/getEventBridgeEventActionProcessor';
 export { default as getLambdaCognitoCustomMessage } from './event/getLambdaCognitoCustomMessage';
 export { default as getWebsocketAPIGatewayEventActionProcessor } from './event/getWebsocketAPIGatewayEventActionProcessor';

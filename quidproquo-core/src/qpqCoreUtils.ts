@@ -298,6 +298,7 @@ export const getAllSrcEntries = (qpqConfig: QPQConfig): string[] => {
     ...getScheduleEvents(qpqConfig).map((r) => r.src),
     ...getQueueSrcEntries(qpqConfig),
     ...getUserDirectorySrcEntries(qpqConfig),
+    ...getDeployEventConfigs(qpqConfig).map((r) => r.src.src),
   ];
 };
 

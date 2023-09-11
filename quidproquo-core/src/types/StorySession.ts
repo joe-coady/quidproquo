@@ -69,6 +69,7 @@ export enum QpqRuntimeType {
   SERVICE_FUNCTION_EXE = 'SERVICE_FUNCTION_EXE',
   SEND_EMAIL_EVENT = 'SEND_EMAIL_EVENT',
   WEBSOCKET_EVENT = 'WEBSOCKET_EVENT',
+  DEPLOY_EVENT = 'DEPLOY_EVENT',
 }
 
 export interface StoryResult<TArgs extends Array<any>, TResult = any> {

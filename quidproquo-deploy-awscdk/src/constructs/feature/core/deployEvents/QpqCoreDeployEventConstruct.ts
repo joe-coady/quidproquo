@@ -51,9 +51,9 @@ export class QpqCoreDeployEventConstruct extends QpqConstructBlock {
       eventPattern: {
         source: ['aws.cloudformation'],
         detailType: ["CloudFormation Stack Status Change"],
-        detail: {
-          eventName: ["UPDATE_COMPLETE", "CREATE_COMPLETE", "DELETE_COMPLETE"],
-        },
+        // detail: {
+        //   eventName: ["UPDATE_COMPLETE", "CREATE_COMPLETE", "DELETE_COMPLETE"],
+        // },
       },
     });
 

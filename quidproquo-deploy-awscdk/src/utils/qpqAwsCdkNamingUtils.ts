@@ -1,28 +1,6 @@
-import { qpqCoreUtils, QPQConfig } from 'quidproquo-core';
+import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 
-export const getBaseStackName = (qpqConfig: QPQConfig) => {
-  const appName = qpqCoreUtils.getApplicationName(qpqConfig);
-  const moduleName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
-  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
-  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
-
-  const baseName = `${appName}-${moduleName}-${environment}`;
-
-  if (feature) {
-    return `${baseName}-${feature}`;
-  }
-
-  return baseName;
-};
-
-export const getInfStackName = (qpqConfig: QPQConfig) => {
-  return `${getBaseStackName(qpqConfig)}-inf`;
-};
-
-export const getWebStackName = (qpqConfig: QPQConfig) => {
-  return `${getBaseStackName(qpqConfig)}-web`;
-};
-
-export const getApiStackName = (qpqConfig: QPQConfig) => {
-  return `${getBaseStackName(qpqConfig)}-api`;
-};
+export const getBaseStackName = awsNamingUtils.getBaseStackName;
+export const getInfStackName = awsNamingUtils.getInfStackName;
+export const getWebStackName = awsNamingUtils.getWebStackName;
+export const getApiStackName = awsNamingUtils.getApiStackName;
