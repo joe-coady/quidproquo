@@ -19,7 +19,8 @@ import {
   UserDirectoryQPQConfigSetting,
   KeyValueStoreQPQConfigSetting,
   EnvironmentSettingsQPQConfigSetting,
-  DeployEventsQPQConfigSetting
+  DeployEventsQPQConfigSetting,
+  GlobalQPQConfigSetting
 } from './config/settings';
 import { EmailTemplates } from './config/settings/emailTemplates/types';
 import { CrossServiceResourceName, ResourceName } from './types';
@@ -309,6 +310,19 @@ export const getOwnedSecrets = (configs: QPQConfig): SecretQPQConfigSetting[] =>
   );
 
   return secrets.filter((s) => s.owned);
+};
+
+export const getGlobalConfigValue = <T>(qpqConfig: QPQConfig, name: string): T => {
+  const global = getConfigSettings<GlobalQPQConfigSetting<T>>(
+    qpqConfig,
+    QPQCoreConfigSettingType.global,
+  ).find(g => g.key === name);
+
+  if (!global) {
+    throw new Error(`Global config ${name} not found`);
+  }
+
+  return global.value;
 };
 
 export const getUserDirectories = (configs: QPQConfig): UserDirectoryQPQConfigSetting[] => {

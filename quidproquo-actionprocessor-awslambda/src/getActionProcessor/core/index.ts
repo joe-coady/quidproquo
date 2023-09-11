@@ -1,6 +1,7 @@
 export { default as getConfigGetSecretActionProcessor } from './config/getConfigGetSecretActionProcessor';
 export { default as getConfigGetParameterActionProcessor } from './config/getConfigGetParameterActionProcessor';
 export { default as getConfigGetParametersActionProcessor } from './config/getConfigGetParametersActionProcessor';
+export { default as getConfigGetGlobalActionProcessor } from './config/getConfigGetGlobalActionProcessor';
 
 export { default as getAPIGatewayEventActionProcessor } from './event/getAPIGatewayEventActionProcessor';
 export { default as getCloudFrontOriginRequestEventActionProcessor } from './event/getCloudFrontOriginRequestEventActionProcessor';

@@ -8,6 +8,7 @@ export * from './environmentSettings';
 export * from './eventBus';
 export * from './keyValueStore';
 export * from './deployEvent';
+export * from './global';
 export * from './parameter';
 export * from './queue';
 export * from './schedule';
