@@ -9,3 +9,4 @@ export * from './CrossServiceResourceName';
 export * from './CrossModuleOwner';
 export * from './QpqPagedData';
 export * from './QpqContextIdentifier';
+export * from './DeployEvent';

@@ -4,8 +4,15 @@ export enum DeployEventType {
   Web = 'Web',
 }
 
+export enum DeployEventStatusTypeEnum {
+  Update = 'Update',
+  Create = 'Create',
+  Delete = 'Delete',
+}
+
 export type DeployEvent = {
-  DeployEventType: DeployEventType;
+  deployEventType: DeployEventType;
+  deployEventStatusType: DeployEventStatusTypeEnum;
 }
 
 export type DeployEventResponse = void;
