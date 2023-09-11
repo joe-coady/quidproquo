@@ -7,7 +7,7 @@ export * from './configValue';
 export * from './environmentSettings';
 export * from './eventBus';
 export * from './keyValueStore';
-export * from './migrations';
+export * from './deployEvent';
 export * from './parameter';
 export * from './queue';
 export * from './schedule';

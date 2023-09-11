@@ -19,7 +19,7 @@ import {
   UserDirectoryQPQConfigSetting,
   KeyValueStoreQPQConfigSetting,
   EnvironmentSettingsQPQConfigSetting,
-  MigrationsQPQConfigSetting
+  DeployEventsQPQConfigSetting
 } from './config/settings';
 import { EmailTemplates } from './config/settings/emailTemplates/types';
 import { CrossServiceResourceName, ResourceName } from './types';
@@ -196,13 +196,13 @@ export const getAllKeyValueStores = (qpqConfig: QPQConfig): KeyValueStoreQPQConf
   return keyValueStores;
 };
 
-export const getMigrationConfigs = (qpqConfig: QPQConfig): MigrationsQPQConfigSetting[] => {
-  const migrations = getConfigSettings<MigrationsQPQConfigSetting>(
+export const getDeployEventConfigs = (qpqConfig: QPQConfig): DeployEventsQPQConfigSetting[] => {
+  const deployEvents = getConfigSettings<DeployEventsQPQConfigSetting>(
     qpqConfig,
-    QPQCoreConfigSettingType.migrations,
+    QPQCoreConfigSettingType.deployEvent,
   );
 
-  return migrations;
+  return deployEvents;
 };
 
 export const getOwnedKeyValueStores = (qpqConfig: QPQConfig): KeyValueStoreQPQConfigSetting[] => {
@@ -351,11 +351,11 @@ export const getScheduleEntryFullPath = (
   return path.join(getConfigRoot(qpqConfig), scheduleConfig.buildPath);
 };
 
-export const getMigrationsFullPath = (
+export const getDeployEventFullPath = (
   qpqConfig: QPQConfig,
-  migrationsConfig: MigrationsQPQConfigSetting,
+  deployEventConfig: DeployEventsQPQConfigSetting,
 ): string => {
-  return path.join(getConfigRoot(qpqConfig), migrationsConfig.buildPath);
+  return path.join(getConfigRoot(qpqConfig), deployEventConfig.buildPath);
 };
 
 export const getStorageDriveUploadFullPath = (

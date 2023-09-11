@@ -14,7 +14,7 @@ export enum QPQCoreConfigSettingType {
   keyValueStore = '@quidproquo-core/config/KeyValueStore',
   configValue = '@quidproquo-core/config/ConfigValue',
   environmentSettings = '@quidproquo-core/config/EnvironmentSettings',
-  migrations = '@quidproquo-core/config/Migrations',
+  deployEvent = '@quidproquo-core/config/DeployEvent',
 }
 
 export interface QPQConfigSetting {
