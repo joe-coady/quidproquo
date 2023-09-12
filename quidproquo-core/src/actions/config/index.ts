@@ -14,3 +14,6 @@ export * from './ConfigGetSecretActionTypes';
 
 export * from './ConfigGetGlobalActionRequester';
 export * from './ConfigGetGlobalActionTypes';
+
+export * from './ConfigSetParameterActionRequester';
+export * from './ConfigSetParameterActionTypes';

@@ -42,7 +42,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
     );
 
     // Build the parameters
-    const parameters = qpqCoreUtils.getOwnedParameters(props.qpqConfig).map(
+    const parameters = qpqCoreUtils.getParameterConfigs(props.qpqConfig).map(
       (setting) =>
         new QpqCoreParameterConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           awsAccountId: props.awsAccountId,

@@ -54,7 +54,7 @@ export class QpqCoreParameterConstruct extends QpqCoreParameterConstructBase {
     this.stringParameter = new aws_ssm.StringParameter(this, 'param', {
       parameterName: this.resourceName(props.parameterConfig.key),
       description: props.parameterConfig.key,
-      stringValue: props.parameterConfig.value,
+      stringValue: props.parameterConfig.value || "Please set a value",
 
       // No additional costs ~ 4k max size
       tier: aws_ssm.ParameterTier.STANDARD,

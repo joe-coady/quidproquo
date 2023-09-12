@@ -334,13 +334,13 @@ export const getUserDirectories = (configs: QPQConfig): UserDirectoryQPQConfigSe
   return userDirectories;
 };
 
-export const getOwnedParameters = (configs: QPQConfig): ParameterQPQConfigSetting[] => {
-  const secrets = getConfigSettings<ParameterQPQConfigSetting>(
-    configs,
+export const getParameterConfigs = (qpqConfig: QPQConfig): ParameterQPQConfigSetting[] => {
+  const parameters = getConfigSettings<ParameterQPQConfigSetting>(
+    qpqConfig,
     QPQCoreConfigSettingType.parameter,
   );
 
-  return secrets.filter((s) => s.owned);
+  return parameters;
 };
 
 export const getSharedSecrets = (configs: QPQConfig): SecretQPQConfigSetting[] => {
