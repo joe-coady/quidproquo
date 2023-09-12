@@ -9,7 +9,7 @@ import {
   actionResult,
   DeployEvent,
   DeployEventResponse,
-  DeployEventStatusTypeEnum,
+  DeployEventStatusType,
   DeployEventType,
   qpqCoreUtils,
   actionResultError,
@@ -38,10 +38,10 @@ type InternalEventOutput = DeployEventResponse;
 type AutoRespondResult = boolean;
 type MatchResult = MatchStoryResult<any, any>;
 
-const deployTypeMap: Record<string, DeployEventStatusTypeEnum> = {
-  'UPDATE_COMPLETE': DeployEventStatusTypeEnum.Update,
-  'CREATE_COMPLETE': DeployEventStatusTypeEnum.Create,
-  'DELETE_COMPLETE': DeployEventStatusTypeEnum.Delete,
+const deployTypeMap: Record<string, DeployEventStatusType> = {
+  'UPDATE_COMPLETE': DeployEventStatusType.Update,
+  'CREATE_COMPLETE': DeployEventStatusType.Create,
+  'DELETE_COMPLETE': DeployEventStatusType.Delete,
 };
 
 // TODO: Don't use Globals like this
@@ -59,12 +59,10 @@ const getProcessTransformEventParams = (qpqConfig: QPQConfig): EventTransformEve
 
     const transformedEventParams: InternalEventInput = {
       deployEventType: DeployEventType.Unknown,
-      deployEventStatusType:  deployTypeMap[status] || DeployEventStatusTypeEnum.Unknown,
+      deployEventStatusType:  deployTypeMap[status] || DeployEventStatusType.Unknown,
     };
 
-    if (stackName === getInfStackName(qpqConfig)) {
-      transformedEventParams.deployEventType = DeployEventType.Infrastructure;
-    } else if (stackName === getApiStackName(qpqConfig)) {
+    if (stackName === getApiStackName(qpqConfig)) {
       transformedEventParams.deployEventType = DeployEventType.Api;
     } else if (stackName === getWebStackName(qpqConfig)) {
       transformedEventParams.deployEventType = DeployEventType.Web;
@@ -101,7 +99,7 @@ const getProcessAutoRespond = (
     // exit if we don't know what deploy type this is, probably another stack
     return actionResult(
       transformedEventParams.deployEventType === DeployEventType.Unknown ||
-      transformedEventParams.deployEventStatusType === DeployEventStatusTypeEnum.Unknown
+      transformedEventParams.deployEventStatusType === DeployEventStatusType.Unknown
     );
   };
 };

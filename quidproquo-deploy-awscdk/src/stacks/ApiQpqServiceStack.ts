@@ -12,7 +12,8 @@ import {
   QpqApiCoreQueueConstruct,
   QpqWebserverSubdomainRedirectConstruct,
   QpqWebserverServiceFunctionConstruct,
-  QpqApiWebserverWebsocketConstruct
+  QpqApiWebserverWebsocketConstruct,
+  QpqCoreDeployEventConstruct
 } from '../constructs';
 
 export interface ApiQpqServiceStackProps extends QpqServiceStackProps {
@@ -109,6 +110,17 @@ export class ApiQpqServiceStack extends QpqServiceStack {
           qpqConfig: props.qpqConfig,
 
           websocketConfig: setting,
+        }),
+    );
+
+    // migrations
+    const deployEvents = qpqCoreUtils.getDeployEventConfigs(props.qpqConfig).map(
+      (setting) =>
+        new QpqCoreDeployEventConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
+          awsAccountId: props.awsAccountId,
+          qpqConfig: props.qpqConfig,
+
+          deployEventConfig: setting,
         }),
     );
   }

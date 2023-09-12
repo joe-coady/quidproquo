@@ -1,11 +1,10 @@
 export enum DeployEventType {
   Unknown = 'Unknown',
-  Infrastructure = 'Infrastructure',
   Api = 'Api',
   Web = 'Web',
 }
 
-export enum DeployEventStatusTypeEnum {
+export enum DeployEventStatusType {
   Unknown = 'Unknown',
   Update = 'Update',
   Create = 'Create',
@@ -14,7 +13,7 @@ export enum DeployEventStatusTypeEnum {
 
 export type DeployEvent = {
   deployEventType: DeployEventType;
-  deployEventStatusType: DeployEventStatusTypeEnum;
+  deployEventStatusType: DeployEventStatusType;
 }
 
 export type DeployEventResponse = void;

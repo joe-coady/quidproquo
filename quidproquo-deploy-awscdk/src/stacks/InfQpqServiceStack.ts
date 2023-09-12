@@ -15,7 +15,6 @@ import {
   QpqWebserverApiKeyConstruct,
   QpqCoreKeyValueStoreConstruct,
   QpqWebserverWebsocketConstruct,
-  QpqCoreDeployEventConstruct,
   LogStorage,
 } from '../constructs';
 
@@ -140,17 +139,5 @@ export class InfQpqServiceStack extends QpqServiceStack {
           websocketConfig: setting,
         }),
     );
-
-    // migrations
-    const deployEvents = qpqCoreUtils.getDeployEventConfigs(props.qpqConfig).map(
-      (setting) =>
-        new QpqCoreDeployEventConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
-          awsAccountId: props.awsAccountId,
-          qpqConfig: props.qpqConfig,
-
-          deployEventConfig: setting,
-        }),
-    );
-
   }
 }
