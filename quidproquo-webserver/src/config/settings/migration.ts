@@ -1,4 +1,4 @@
-import { QPQConfig, defineDeployEvent, defineKeyValueStore, QpqSourceEntry, DeployEventType, defineQueue, defineGlobal } from 'quidproquo-core';
+import { QPQConfig, defineDeployEvent, defineKeyValueStore, QpqSourceEntry, DeployEventType, defineQueue, defineGlobal, QPQConfigAdvancedSettings } from 'quidproquo-core';
 
 import { getServiceEntry } from '../../utils/serviceConfig';
 
@@ -7,14 +7,18 @@ export interface Migration {
   deployType: DeployEventType;
 }
 
-export const defineMigration = (buildPath: string, migrations: Migration[]): QPQConfig => {
+export interface QPQConfigAdvancedMigrationSettings extends QPQConfigAdvancedSettings {
+  
+}
+
+export const defineMigration = (buildPath: string, migrations: Migration[], options?: QPQConfigAdvancedMigrationSettings): QPQConfig => {
 
   return [
     // Define a global so we can access the migrations from the src
     defineGlobal('qpqMigrations', migrations),
 
     // Create a kvs so we can track which migrations have been run
-    defineKeyValueStore('qpqMigrations', 'srcPath', ['deployType']),
+    defineKeyValueStore('qpqMigrations', 'srcPath', ['deployType'], options),
   
     // Listen to deploy events
     defineDeployEvent(buildPath, 'qpqMigrations', {
@@ -27,6 +31,7 @@ export const defineMigration = (buildPath: string, migrations: Migration[]): QPQ
       ...acc,
       [m.src.src]: m.src
     }), {}), {
+      ...options,
       maxConcurrentExecutions: 1,
       batchSize: 1,
       concurrency: 1

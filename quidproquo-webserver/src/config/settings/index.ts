@@ -11,3 +11,4 @@ export * from './seo';
 export * from './subdomainRedirect';
 export * from './webEntry';
 export * from './websocket';
+export * from './seed';

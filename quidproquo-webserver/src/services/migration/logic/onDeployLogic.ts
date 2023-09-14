@@ -11,15 +11,21 @@ import { Migration } from '../../../config/settings/migration';
 
 import * as migrationInfoData from '../data/migrationInfoData';
 
-export function* onDeploy(
-    deployEventType: DeployEventType,
-    deployEventStatusType: DeployEventStatusType
-): AskResponse<void> {
-  // Make sure its only for updates
-  if (deployEventStatusType !== DeployEventStatusType.Update) {
-    return;
-  }
+export function* askProcessOnDeployCreate(): AskResponse<void> {
+  const allMigrations = yield* askConfigGetGlobal<Migration[]>('qpqMigrations');
 
+  // Insert all migrations into the database
+  // we don't need to run any current migrations
+  // because database should be ready with seed data.
+  for (const migration of allMigrations) {
+    yield* migrationInfoData.askUpsert({
+      deployType: migration.deployType,
+      srcPath: migration.src.src,
+    });
+  }
+}
+
+export function* askProcessOnDeployUpdate(deployEventType: DeployEventType): AskResponse<void> {
   const allMigrations = yield* askConfigGetGlobal<Migration[]>('qpqMigrations');
   const migrationsForThisDeploy = allMigrations.filter(m => m.deployType === deployEventType);
 
@@ -39,12 +45,21 @@ export function* onDeploy(
   
     yield* askQueueSendMessages('qpqMigrations', message);
 
-    console.log("test");
-
     // insert the migration into into the database so 
     yield* migrationInfoData.askUpsert({
       deployType: migration.deployType,
       srcPath: migration.src.src,
     });
+  }
+}
+
+export function* onDeploy(
+  deployEventType: DeployEventType,
+  deployEventStatusType: DeployEventStatusType
+): AskResponse<void> {
+  if (deployEventStatusType === DeployEventStatusType.Update) {
+    yield* askProcessOnDeployUpdate(deployEventType);
+  } else if (deployEventStatusType === DeployEventStatusType.Create) {
+    yield* askProcessOnDeployCreate();
   }
 }

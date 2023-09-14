@@ -11,6 +11,11 @@ const serviceEntryMap = {
     'deployEvent', 
     'onDeploy'
   )]: require('../services/migration/entry/deployEvent/onDeploy'),
+  [getServiceEntry(
+    'seed', 
+    'deployEvent', 
+    'onDeploy'
+  )]: require('../services/seed/entry/deployEvent/onDeploy'),
 };
 
 export const serviceImporter = async (modulePath: string): Promise<any> => {
