@@ -39,6 +39,8 @@ export class Function extends QpqConstructBlock {
       props.qpqConfig
     );
 
+    console.log(`FuncName: ${props.functionName}::${props.functionName.length}`);
+
     this.lambdaFunction = new aws_lambda.Function(this, 'function', {
       functionName: props.functionName,
       timeout: cdk.Duration.seconds(props.timeoutInSeconds || 25),

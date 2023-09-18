@@ -19,7 +19,7 @@ export class QpqCoreDeployEventConstruct extends QpqConstructBlock {
 
     const func = new Function(this, props.deployEventConfig.uniqueKey, {
       buildPath: qpqCoreUtils.getDeployEventFullPath(props.qpqConfig, props.deployEventConfig),
-      functionName: this.qpqResourceName(`${props.deployEventConfig.name}`, 'deployEvent'),
+      functionName: this.qpqResourceName(`${props.deployEventConfig.name}`, 'de'),
       functionType: 'lambdaEventBridgeEventStackDeploy',
       executorName: 'executelambdaEventBridgeEventStackDeploy',
 
