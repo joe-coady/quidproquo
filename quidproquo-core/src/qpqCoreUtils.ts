@@ -366,6 +366,17 @@ export const getScheduleEntryFullPath = (
   return path.join(getConfigRoot(qpqConfig), scheduleConfig.buildPath);
 };
 
+export const getStorageDriveEntryFullPath = (
+  qpqConfig: QPQConfig,
+  storageDriveConfig: StorageDriveQPQConfigSetting,
+): string => {
+  if (!storageDriveConfig.onEvent?.buildPath) {
+    throw new Error('Please specify a build path in your storage drive config (onEvent)');
+  }
+
+  return path.join(getConfigRoot(qpqConfig), storageDriveConfig.onEvent.buildPath);
+};
+
 export const getDeployEventFullPath = (
   qpqConfig: QPQConfig,
   deployEventConfig: DeployEventsQPQConfigSetting,

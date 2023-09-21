@@ -40,7 +40,7 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
     qpqConfig: QPQConfig,
     storageDriveConfig: StorageDriveQPQConfigSetting,
     awsAccountId: string,
-  ): QpqResource {
+  ): QpqCoreStorageDriveConstructBase {
     class Import extends QpqCoreStorageDriveConstructBase {
       bucket = aws_s3.Bucket.fromBucketName(
         scope,

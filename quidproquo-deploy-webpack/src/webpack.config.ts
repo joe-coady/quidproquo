@@ -104,6 +104,7 @@ export const getWebpackEntryNames = () => [
   'lambdaEventViewerRequest',
   'lambdaServiceFunctionExecute',
   'lambdaSQSEvent',
+  'lambdaS3FileEvent',
 
   'lambdaCognitoTriggerEvent_CustomMessage',
 ];
@@ -123,6 +124,7 @@ export const getApiWebpackConfig = (qpqConfig: QPQConfig, outputPath?: string) =
     'lambdaWebsocketAPIGatewayEvent',
     'lambdaServiceFunctionExecute',
     'lambdaSQSEvent',
+    'lambdaS3FileEvent',
 
     'lambdaCognitoTriggerEvent_CustomMessage',
   ]);

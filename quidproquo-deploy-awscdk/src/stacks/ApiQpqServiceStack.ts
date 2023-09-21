@@ -13,7 +13,8 @@ import {
   QpqWebserverSubdomainRedirectConstruct,
   QpqWebserverServiceFunctionConstruct,
   QpqApiWebserverWebsocketConstruct,
-  QpqCoreDeployEventConstruct
+  QpqCoreDeployEventConstruct,
+  QpqApiCoreStorageDriveConstruct
 } from '../constructs';
 
 export interface ApiQpqServiceStackProps extends QpqServiceStackProps {
@@ -121,6 +122,16 @@ export class ApiQpqServiceStack extends QpqServiceStack {
           qpqConfig: props.qpqConfig,
 
           deployEventConfig: setting,
+        }),
+    );
+
+    const storageDrives = qpqCoreUtils.getStorageDrives(props.qpqConfig).map(
+      (setting) =>
+        new QpqApiCoreStorageDriveConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
+          awsAccountId: props.awsAccountId,
+          qpqConfig: props.qpqConfig,
+
+          storageDriveConfig: setting,
         }),
     );
   }
