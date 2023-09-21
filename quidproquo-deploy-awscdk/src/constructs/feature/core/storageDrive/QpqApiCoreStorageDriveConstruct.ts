@@ -40,6 +40,7 @@ export class QpqApiCoreStorageDriveConstruct extends QpqConstructBlock {
         awsAccountId: props.awsAccountId,
 
         environment: {
+          // Never change: storageDriveName ~ Its hard coded to stop logs being recursive
           storageDriveName: props.storageDriveConfig.storageDrive,
           storageDriveCreateEntry: JSON.stringify(props.storageDriveConfig.onEvent?.create)
         },

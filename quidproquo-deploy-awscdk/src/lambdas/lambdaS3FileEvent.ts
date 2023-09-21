@@ -6,7 +6,7 @@ import { S3Event, Context } from 'aws-lambda';
 
 import { getLambdaConfigs } from './lambdaConfig';
 
-import { getRuntimeCorrelation, getLambdaActionProcessors } from './lambda-utils';
+import { getLogger, getRuntimeCorrelation, getLambdaActionProcessors } from './lambda-utils';
 
 // @ts-ignore - Special webpack loader
 import qpqCustomActionProcessors from 'qpq-custom-action-processors-loader!';
@@ -46,7 +46,7 @@ export const getS3FileEventExecutor = () => {
       },
       storyActionProcessor,
       getDateNow,
-      async (result: StoryResult<any>) => {},
+      getLogger(cdkConfig.qpqConfig),
       getRuntimeCorrelation(cdkConfig.qpqConfig),
       QpqRuntimeType.STORAGEDRIVE_EVENT,
     );

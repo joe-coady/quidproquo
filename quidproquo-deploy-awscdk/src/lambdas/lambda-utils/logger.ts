@@ -28,9 +28,11 @@ export const storyLogger = async (
 
 export const getLogger = (qpqConfig: QPQConfig) => {
   const awsSettings = getAwsServiceAccountInfoConfig(qpqConfig);
+
+  console.log("process.env.storageDriveName: ", process.env.storageDriveName);
   
   // If we have no log service, just return nothing.
-  if (!awsSettings.logServiceName) {
+  if (!awsSettings.logServiceName || process.env.storageDriveName === "qpq-logs") {
     return async (result: StoryResult<any>) => {}
   }
 
