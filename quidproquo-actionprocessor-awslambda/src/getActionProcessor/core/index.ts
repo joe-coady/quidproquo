@@ -12,6 +12,7 @@ export { default as getEventBridgeEventStackDeployActionProcessor } from './even
 export { default as getEventBridgeEventActionProcessor } from './event/getEventBridgeEventActionProcessor';
 export { default as getLambdaCognitoCustomMessage } from './event/getLambdaCognitoCustomMessage';
 export { default as getWebsocketAPIGatewayEventActionProcessor } from './event/getWebsocketAPIGatewayEventActionProcessor';
+export { default as getS3FileEventActionProcessor } from './event/getS3FileEventActionProcessor';
 
 export { default as getSystemActionProcessor } from './system';
 export { default as getFileActionProcessor } from './file';

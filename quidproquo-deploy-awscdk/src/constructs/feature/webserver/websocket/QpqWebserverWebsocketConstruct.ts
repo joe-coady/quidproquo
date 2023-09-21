@@ -5,7 +5,6 @@ import { QPQConfig } from 'quidproquo-core';
 import { WebSocketQPQWebServerConfigSetting, qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
-import { QpqResource } from '../../../base';
 import { exportStackValue } from '../../../../utils';
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 

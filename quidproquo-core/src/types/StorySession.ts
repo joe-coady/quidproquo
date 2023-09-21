@@ -70,6 +70,7 @@ export enum QpqRuntimeType {
   SEND_EMAIL_EVENT = 'SEND_EMAIL_EVENT',
   WEBSOCKET_EVENT = 'WEBSOCKET_EVENT',
   DEPLOY_EVENT = 'DEPLOY_EVENT',
+  STORAGEDRIVE_EVENT = 'STORAGEDRIVE_EVENT',
 }
 
 export interface StoryResult<TArgs extends Array<any>, TResult = any> {

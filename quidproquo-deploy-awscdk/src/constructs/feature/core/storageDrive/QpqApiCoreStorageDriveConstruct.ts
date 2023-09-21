@@ -37,7 +37,12 @@ export class QpqApiCoreStorageDriveConstruct extends QpqConstructBlock {
   
         apiLayerVersions: props.apiLayerVersions,
   
-        awsAccountId: props.awsAccountId
+        awsAccountId: props.awsAccountId,
+
+        environment: {
+          storageDriveName: props.storageDriveConfig.storageDrive,
+          storageDriveCreateEntry: JSON.stringify(props.storageDriveConfig.onEvent?.create)
+        },
       });
   
       bucket.addEventNotification(

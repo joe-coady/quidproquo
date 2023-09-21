@@ -19,6 +19,8 @@ const extractors: Record<string, (sr: StoryResult<any>) => string> = {
   ['WEBSOCKET_EVENT']: unknownGenericTextExtractor,
   
   ['DEPLOY_EVENT']: unknownGenericTextExtractor,
+
+  ['STORAGEDRIVE_EVENT']: unknownGenericTextExtractor,
 };
 
 export const storyResultToMetadata = (

@@ -10,4 +10,5 @@ export const RuntimeTypes = [
   'SEND_EMAIL_EVENT',
   'WEBSOCKET_EVENT',
   'DEPLOY_EVENT',
+  'STORAGEDRIVE_EVENT',
 ];
