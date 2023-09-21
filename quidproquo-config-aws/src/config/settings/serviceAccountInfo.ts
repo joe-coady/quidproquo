@@ -7,11 +7,15 @@ import { QPQAwsConfigSettingType } from '../QPQConfig';
 export interface QPQConfigAdvancedAwsServiceAccountInfoSettings extends QPQConfigAdvancedSettings {
   apiLayers?: ApiLayer[];
   lambdaMaxMemoryInMiB?: number;
+
+  logServiceName?: string;
 }
 
 export interface AwsServiceAccountInfoQPQConfigSetting extends QPQConfigSetting {
   deployAccountId: string;
   deployRegion: string;
+
+  logServiceName?: string;
 
   serviceInfoMap: ServiceAccountInfo[];
   apiLayers: ApiLayer[];
@@ -35,5 +39,7 @@ export const defineAwsServiceAccountInfo = (
   serviceInfoMap: serviceInfoMap ?? [],
   apiLayers: options?.apiLayers ?? [],
 
-  lambdaMaxMemoryInMiB: options?.lambdaMaxMemoryInMiB || 1024
+  lambdaMaxMemoryInMiB: options?.lambdaMaxMemoryInMiB || 1024,
+
+  logServiceName: options?.logServiceName,
 });

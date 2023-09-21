@@ -4,30 +4,62 @@ import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 
 import { StoryResult, qpqCoreUtils, QPQConfig } from 'quidproquo-core';
 
-import { QPQ_LOG_BUCKET_NAME } from '../../constants';
+import { getAwsServiceAccountInfoConfig, getAwsServiceAccountInfoByDeploymentInfo } from "quidproquo-config-aws";
 
 export const storyLogger = async (
   result: StoryResult<any>,
-  qpqConfig: QPQConfig,
+  bucketName: string,
+  region: string,
 ): Promise<void> => {
-  const bucketName = awsNamingUtils.getQpqRuntimeResourceNameFromConfig(
-    QPQ_LOG_BUCKET_NAME,
-    qpqConfig,
-    'log',
-  );
-  const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
+  try {
+    const s3Client = new S3Client({ region });
 
-  const s3Client = new S3Client({ region });
-
-  await s3Client.send(
-    new PutObjectCommand({
-      Key: `${result.correlation}.json`,
-      Bucket: bucketName,
-      Body: JSON.stringify(result),
-    }),
-  );
+    await s3Client.send(
+      new PutObjectCommand({
+        Key: `${result.correlation}.json`,
+        Bucket: bucketName,
+        Body: JSON.stringify(result),
+      }),
+    );
+  } catch {
+    console.log(`Failed to log story result to S3 [${result.correlation}]`);
+  }
 };
 
-export const getLogger = (qpqConfig: QPQConfig) => async (result: StoryResult<any>) => {
-  await storyLogger(result, qpqConfig);
+export const getLogger = (qpqConfig: QPQConfig) => {
+  const awsSettings = getAwsServiceAccountInfoConfig(qpqConfig);
+  
+  // If we have no log service, just return nothing.
+  if (!awsSettings.logServiceName) {
+    return async (result: StoryResult<any>) => {}
+  }
+
+  const service = awsSettings.logServiceName;
+  const application = qpqCoreUtils.getApplicationName(qpqConfig);
+  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
+  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+
+  // Workout the bucket name.
+  const bucketName = awsNamingUtils.getConfigRuntimeResourceName(
+    "qpq-logs", 
+    application, 
+    service, 
+    environment, 
+    feature
+  );
+
+  // Where is this bucket?
+  const regionForBucket = getAwsServiceAccountInfoByDeploymentInfo(
+    qpqConfig,
+    service,
+    environment,
+    feature,
+    application
+  ).awsRegion;
+
+  console.log("Bucket for logs: ", bucketName, regionForBucket);
+
+  return async (result: StoryResult<any>) => {  
+    await storyLogger(result, bucketName, regionForBucket);
+  }
 };

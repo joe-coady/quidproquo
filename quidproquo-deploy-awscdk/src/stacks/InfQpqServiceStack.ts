@@ -25,10 +25,10 @@ export class InfQpqServiceStack extends QpqServiceStack {
     super(scope, id, props);
 
     // Build the log storage drive
-    const logBucket = new LogStorage(this, 'logStorage', {
-      awsAccountId: props.awsAccountId,
-      qpqConfig: props.qpqConfig,
-    }).bucket;
+    // const logBucket = new LogStorage(this, 'logStorage', {
+    //   awsAccountId: props.awsAccountId,
+    //   qpqConfig: props.qpqConfig,
+    // }).bucket;
 
     // Build the storage drives
     const storageDrives = qpqCoreUtils.getStorageDrives(props.qpqConfig).map(
