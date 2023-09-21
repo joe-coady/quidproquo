@@ -300,6 +300,7 @@ export const getAllSrcEntries = (qpqConfig: QPQConfig): string[] => {
     ...getQueueSrcEntries(qpqConfig),
     ...getUserDirectorySrcEntries(qpqConfig),
     ...getDeployEventConfigs(qpqConfig).map((r) => r.src.src),
+    ...getStorageDrives(qpqConfig).flatMap(sd => [sd.onEvent?.create?.src, sd.onEvent?.delete?.src]).filter(src => !!src) as string[],
   ];
 };
 

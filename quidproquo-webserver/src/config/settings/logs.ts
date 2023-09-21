@@ -1,4 +1,4 @@
-import { QPQConfig, defineKeyValueStore, defineStorageDrive } from 'quidproquo-core';
+import { QPQConfig, defineKeyValueStore, defineStorageDrive, getServiceEntry } from 'quidproquo-core';
 
 export const defineLogs = (buildPath: string): QPQConfig => {
   // comment
@@ -7,8 +7,12 @@ export const defineLogs = (buildPath: string): QPQConfig => {
       onEvent: {
         buildPath,
         create: {
-          src: "",
-          runtime: ""
+          src: getServiceEntry(
+            'log',
+            'storageDrive',
+            'onCreate',
+          ),
+          runtime: "onCreate"
         }
       }
     }),

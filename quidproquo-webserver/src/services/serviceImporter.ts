@@ -1,4 +1,4 @@
-import { getServiceEntry } from '../utils/serviceConfig';
+import { getServiceEntry } from 'quidproquo-core';
 
 const serviceEntryMap = {
   [getServiceEntry(
@@ -6,6 +6,11 @@ const serviceEntryMap = {
     'controller',
     'logController',
   )]: require('../services/log/entry/controller/logController'),
+  [getServiceEntry(
+    'log',
+    'storageDrive',
+    'onCreate',
+  )]: require('../services/log/entry/storageDrive/onCreate'),  
   [getServiceEntry(
     'migration', 
     'deployEvent', 

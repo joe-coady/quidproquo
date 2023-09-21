@@ -1,6 +1,4 @@
-import { QPQConfig, defineDeployEvent, defineKeyValueStore, QpqSourceEntry, DeployEventType, defineQueue, defineGlobal } from 'quidproquo-core';
-
-import { getServiceEntry } from '../../utils/serviceConfig';
+import { QPQConfig, defineDeployEvent, defineKeyValueStore, QpqSourceEntry, DeployEventType, defineQueue, defineGlobal, getServiceEntry } from 'quidproquo-core';
 
 export const defineSeed = (buildPath: string, seeds: QpqSourceEntry[]): QPQConfig => {
 
