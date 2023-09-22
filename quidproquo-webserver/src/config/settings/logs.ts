@@ -25,8 +25,11 @@ export const defineLogs = (buildPath: string): QPQConfig => {
       }
     }),
 
-    defineKeyValueStore(logResourceName, 'runtimeType', ['startedAtWithCorrelation'], {
-      indexes: ['fromCorrelation']
+    defineKeyValueStore(logResourceName, 'correlation', [], {
+      indexes: [
+        { partitionKey: 'runtimeType', sortKey: 'startedAt' },
+        { partitionKey: 'fromCorrelation', sortKey: 'startedAt' }
+      ]
     }),
   ];
 
