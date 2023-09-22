@@ -1,26 +1,22 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { ErrorTypeEnum, QpqRuntimeType, askThrowError } from 'quidproquo-core';
+
 import { HTTPEvent } from '../../../../types';
 import { toJsonEventResponse, fromJsonEventRequest } from '../../../../utils/httpEventUtils';
-import {
-  askAdminGetLogs,
-  askAdminGetLog,
-  askAdminGetLogMetadata,
-  askAdminGetLogMetadataChildren,
-} from '../../../../actions';
+import { askListLogs, askGetByCorrelation, askGetByFromCorrelation } from '../data/logMetadataData';
 
 export interface GetLogsParams {
   nextPageKey?: string;
 
   startIsoDateTime: string;
   endIsoDateTime: string;
-  runtimeType: string;
+  runtimeType: QpqRuntimeType;
 }
 
 export function* getLogs(event: HTTPEvent, params: {}) {
-  const { nextPageKey, startIsoDateTime, endIsoDateTime, runtimeType } =
-    fromJsonEventRequest<GetLogsParams>(event);
+  const { nextPageKey, startIsoDateTime, endIsoDateTime, runtimeType } = fromJsonEventRequest<GetLogsParams>(event);
 
-  const logs = yield* askAdminGetLogs(runtimeType, startIsoDateTime, endIsoDateTime, nextPageKey);
+  const logs = yield* askListLogs(runtimeType, startIsoDateTime, endIsoDateTime, nextPageKey);
 
   return toJsonEventResponse(logs);
 }
@@ -31,29 +27,21 @@ export function* getLog(
     correlationId: string;
   },
 ) {
-  const log = yield* askAdminGetLog(params.correlationId);
+  const log = yield* askGetByCorrelation(params.correlationId);
+  if (!log) {
+    yield* askThrowError(ErrorTypeEnum.NotFound, 'Log not found');
+  }
 
   return toJsonEventResponse(log);
 }
 
-export function* getLogMetadata(
+export function* getChildren(
   event: HTTPEvent,
   params: {
-    correlationId: string;
+    fromCorrelation: string;
   },
 ) {
-  const log = yield* askAdminGetLogMetadata(params.correlationId);
-
-  return toJsonEventResponse(log);
-}
-
-export function* getLogMetadataChildren(
-  event: HTTPEvent,
-  params: {
-    correlationId: string;
-  },
-) {
-  const log = yield* askAdminGetLogMetadataChildren(params.correlationId);
+  const log = yield* askGetByFromCorrelation(params.fromCorrelation);
 
   return toJsonEventResponse(log);
 }

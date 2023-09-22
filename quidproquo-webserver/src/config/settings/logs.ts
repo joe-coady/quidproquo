@@ -1,4 +1,6 @@
 import { QPQConfig, defineKeyValueStore, defineStorageDrive, getServiceEntry } from 'quidproquo-core';
+import { defineRoute } from './route';
+import { defineApi } from './api';
 
 // NEVER EVER CHANGE THIS NAME
 // if you do, you might get logs generated from the logging service
@@ -31,6 +33,31 @@ export const defineLogs = (buildPath: string): QPQConfig => {
         { partitionKey: 'fromCorrelation', sortKey: 'startedAt' }
       ]
     }),
+
+    // defineApi('logs', buildPath, {
+    //   apiName: 'logs'
+    // }),
+
+    defineRoute(
+      'POST',
+      '/log/list',
+      getServiceEntry('log', 'controller', 'logController'),
+      'getLogs'
+    ),
+
+    defineRoute(
+      'GET',
+      '/log/{correlationId}',
+      getServiceEntry('log', 'controller', 'logController'),
+      'getLog',
+    ),
+
+    defineRoute(
+      'GET',
+      '/log/children/{fromCorrelation}',
+      getServiceEntry('log', 'controller', 'logController'),
+      'getChildren',
+    ),
   ];
 
   return configs;
