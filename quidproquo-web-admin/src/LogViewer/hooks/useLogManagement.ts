@@ -1,7 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { SearchParams } from '../types';
 
-import { useServiceLogEndpoints } from './useServiceLogEndpoints';
 import { useOnSearch } from './useOnSearch';
 import { filterLogs, getOnRowClick } from '../logic';
 
@@ -13,7 +12,6 @@ declare global {
 }
 
 export const useLogManagement = () => {
-  const serviceLogEndpoints = useServiceLogEndpoints();
   const [selectedLogCorrelation, setSelectedLogCorrelation] = useState<string>('');
   const [logs, setLogs] = useState<any>([]);
 
@@ -41,7 +39,7 @@ export const useLogManagement = () => {
     };
   });
 
-  const [searchProgress, onSearch] = useOnSearch(searchParams, serviceLogEndpoints, setLogs);
+  const [searchProgress, onSearch] = useOnSearch(searchParams, setLogs);
 
   const filteredLogs = useMemo(
     () => filterLogs(searchParams.errorFilter, logs),
@@ -61,7 +59,6 @@ export const useLogManagement = () => {
     onRowClick,
     clearSelectedLogCorrelation,
     setSelectedLogCorrelation,
-    serviceLogEndpoints,
     searchProgress,
   };
 };

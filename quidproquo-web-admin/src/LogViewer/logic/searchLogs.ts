@@ -4,7 +4,6 @@ import { RuntimeTypes } from '../constants';
 
 export const searchLogs = async (
   searchParams: SearchParams,
-  serviceLogEndpoints: string[],
   callback?: (progress: number) => void,
 ) => {
   const updateProgress = (progress: number) => {
@@ -19,24 +18,22 @@ export const searchLogs = async (
       : [searchParams.runtimeType];
 
   var progress = 0;
-  const totalCount = effectiveRuntimeTypes.length * serviceLogEndpoints.length;
+  const totalCount = effectiveRuntimeTypes.length;
 
   updateProgress(0);
 
   const allLogs: any[][] = await Promise.all(
     effectiveRuntimeTypes.flatMap((type) =>
-      serviceLogEndpoints.map((x) =>
-        getLogs(
-          `/${x}/log/list`,
-          type,
-          searchParams.startIsoDateTime,
-          searchParams.endIsoDateTime,
-        ).finally(() => {
-          progress = progress + 1;
+      getLogs(
+        `/log/list`,
+        type,
+        searchParams.startIsoDateTime,
+        searchParams.endIsoDateTime,
+      ).finally(() => {
+        progress = progress + 1;
 
-          updateProgress((progress / totalCount) * 100);
-        }),
-      ),
+        updateProgress((progress / totalCount) * 100);
+      }),
     ),
   );
 

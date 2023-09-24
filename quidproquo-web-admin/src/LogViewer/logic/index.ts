@@ -1,7 +1,6 @@
 export * from './filterLogs';
 export * from './findLogDirectChildren';
 export * from './findRootLog';
-export * from './findServiceEndpointByLogCorrelation';
 export * from './getLogs';
 export * from './getLogUrl';
 export * from './getOnRowClick';

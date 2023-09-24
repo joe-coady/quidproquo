@@ -5,7 +5,6 @@ import { searchLogs } from '../logic';
 
 export const useOnSearch = (
   searchParams: SearchParams,
-  serviceLogEndpoints: string[],
   setLogs: (logs: any) => void,
 ): [number, (newSearchParams?: SearchParams) => Promise<any[]>] => {
   const [progress, setProgress] = useState<number>(0);
@@ -14,7 +13,6 @@ export const useOnSearch = (
     async (newSearchParams?: SearchParams) => {
       const newLogs = await searchLogs(
         newSearchParams || searchParams,
-        serviceLogEndpoints,
         setProgress,
       );
 
@@ -22,7 +20,7 @@ export const useOnSearch = (
 
       return newLogs;
     },
-    [setLogs, searchLogs, searchParams, serviceLogEndpoints],
+    [setLogs, searchLogs, searchParams],
   );
 
   const onSearchWithLoading = useAsyncLoading(onSearch);

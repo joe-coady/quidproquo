@@ -20,7 +20,7 @@ export const getLogs = async (
   do {
     newLogs = await apiRequestPost<QpqLogListLog>(url, {
       ...requestSpan,
-      nextPageKey: nextPageKey,
+      nextPageKey: nextPageKey,      
     });
 
     logs = [...logs, ...newLogs.items];

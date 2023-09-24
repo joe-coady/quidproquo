@@ -4,6 +4,7 @@ import { ErrorTypeEnum, QpqRuntimeType, askThrowError } from 'quidproquo-core';
 import { HTTPEvent } from '../../../../types';
 import { toJsonEventResponse, fromJsonEventRequest } from '../../../../utils/httpEventUtils';
 import { askListLogs, askGetByCorrelation, askGetByFromCorrelation } from '../data/logMetadataData';
+import * as logData from '../data/logData';
 
 export interface GetLogsParams {
   nextPageKey?: string;
@@ -42,6 +43,17 @@ export function* getChildren(
   },
 ) {
   const log = yield* askGetByFromCorrelation(params.fromCorrelation);
+
+  return toJsonEventResponse(log);
+}
+
+export function* downloadLog(
+  event: HTTPEvent,
+  params: {
+    correlationId: string;
+  },
+) {
+  const log = yield* logData.askGetByCorrelation(params.correlationId);
 
   return toJsonEventResponse(log);
 }

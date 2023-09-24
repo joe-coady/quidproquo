@@ -21,7 +21,6 @@ interface LogDialogProps {
   open: boolean;
   logCorrelation: string;
   handleClose: () => void;
-  serviceLogEndpoints: string[];
   storyResultMetadatas: any[];
   setSelectedLogCorrelation: (logCorrelation: string) => void;
 }
@@ -43,17 +42,16 @@ const LogDialog = ({
   logCorrelation,
   open,
   handleClose,
-  serviceLogEndpoints,
   storyResultMetadatas,
   setSelectedLogCorrelation,
 }: LogDialogProps) => {
-  const logUrl = getLogUrl(serviceLogEndpoints, storyResultMetadatas, logCorrelation);
+  const logUrl = getLogUrl(logCorrelation);
   const log = useDataFromPath<StoryResultMetadataLog>(logUrl);
   const isLoading = useIsLoading();
 
   const handleExecute = async () => {
     if (log) {
-      await apiRequestPost('/admin/service/log/execute', log);
+      await apiRequestPost('https://localhost:8080/admin/service/log/execute', log);
     }
   };
 

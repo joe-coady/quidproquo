@@ -60,7 +60,6 @@ export function LogViewer() {
     filteredLogs,
     onRowClick,
     clearSelectedLogCorrelation,
-    serviceLogEndpoints,
     setSelectedLogCorrelation,
     searchProgress,
   } = useLogManagement();
@@ -94,7 +93,6 @@ export function LogViewer() {
         open={!!selectedLogCorrelation}
         handleClose={clearSelectedLogCorrelation}
         logCorrelation={selectedLogCorrelation}
-        serviceLogEndpoints={serviceLogEndpoints}
         storyResultMetadatas={logs}
         setSelectedLogCorrelation={setSelectedLogCorrelation}
       />

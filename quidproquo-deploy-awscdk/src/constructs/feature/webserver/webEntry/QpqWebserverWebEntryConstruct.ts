@@ -45,7 +45,7 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
       : apexDomain;
 
     // create / reference an s3 bucket
-    let originBucket = null;
+    let originBucket: aws_s3.IBucket | null = null;
 
     if (!props.webEntryConfig.storageDrive.sourceStorageDrive) {
       originBucket = new aws_s3.Bucket(this, 'bucket', {

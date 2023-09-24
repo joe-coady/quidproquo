@@ -1,6 +1,6 @@
 import { QPQConfig, defineKeyValueStore, defineStorageDrive, getServiceEntry } from 'quidproquo-core';
 import { defineRoute } from './route';
-import { defineApi } from './api';
+import { defineWebEntry } from './webEntry';
 
 // NEVER EVER CHANGE THIS NAME
 // if you do, you might get logs generated from the logging service
@@ -10,7 +10,10 @@ import { defineApi } from './api';
 
 const logResourceName = 'qpq-logs';
 
-export const defineLogs = (buildPath: string): QPQConfig => {
+export const defineLogs = (
+  buildPath: string,
+  webFilesPath: string
+): QPQConfig => {
   // comment
   const configs = [
     defineStorageDrive(logResourceName, {
@@ -58,6 +61,43 @@ export const defineLogs = (buildPath: string): QPQConfig => {
       getServiceEntry('log', 'controller', 'logController'),
       'getChildren',
     ),
+
+    defineRoute(
+      'GET',
+      '/log/download/{correlationId}',
+      getServiceEntry('log', 'controller', 'logController'),
+      'downloadLog',
+    ),
+
+    defineWebEntry('admin', {
+      buildPath: webFilesPath,
+      domain: {
+        subDomainName: 'admin',
+        onRootDomain: true
+      },
+
+      securityHeaders: {
+        contentSecurityPolicy: {
+          override: true,
+          contentSecurityPolicy: {
+            'default-src': ["'self'"],
+            
+            'connect-src': [
+              "'self'"
+            ],
+            
+            'style-src': [
+              "'self'",
+              "'unsafe-inline'", // For inline styles
+            ],
+    
+            'script-src': [
+              "'self'", // For scripts from the same domain
+            ],
+          },
+        },
+      },
+    })
   ];
 
   return configs;
