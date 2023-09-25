@@ -4,6 +4,7 @@ import { RuntimeTypes } from '../constants';
 
 export const searchLogs = async (
   searchParams: SearchParams,
+  accessToken?: string,
   callback?: (progress: number) => void,
 ) => {
   const updateProgress = (progress: number) => {
@@ -29,6 +30,7 @@ export const searchLogs = async (
         type,
         searchParams.startIsoDateTime,
         searchParams.endIsoDateTime,
+        accessToken
       ).finally(() => {
         progress = progress + 1;
 

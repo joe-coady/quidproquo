@@ -15,8 +15,28 @@ interface GenericRouteAuthSettings<T> {
   apiKeys?: T[];
 }
 
+export interface ServiceAllowedOrigin {
+  /**
+   * The name of the api subdomain name for the given service
+   */
+  api: string;
+  /**
+   * The domain name the service is hosted on, if left undefined, the domain name of this service will be used
+   */
+  domain?: string;
+  /**
+   * The service name, as seen in the subdomain
+   */
+  service?: string;
+
+  /**
+   * The protocol to use, defaults to https
+   */
+  protocol?: 'http' | 'https';
+}
+
 interface GenericRouteOptions<T> {
-  allowedOrigins?: string[];
+  allowedOrigins?: (string | ServiceAllowedOrigin)[];
 
   routeAuthSettings?: GenericRouteAuthSettings<T>;
 }

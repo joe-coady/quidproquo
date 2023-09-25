@@ -14,7 +14,13 @@ export const defineLogs = (
   buildPath: string,
   webFilesPath: string
 ): QPQConfig => {
-  // comment
+  
+  const routeAuthSettings = {
+    routeAuthSettings: {
+      userDirectoryName: 'qpq-admin',
+    },
+  };
+
   const configs = [
     defineStorageDrive(logResourceName, {
       onEvent: {
@@ -50,7 +56,8 @@ export const defineLogs = (
       'POST',
       '/log/list',
       getServiceEntry('log', 'controller', 'logController'),
-      'getLogs'
+      'getLogs',
+      routeAuthSettings
     ),
 
     defineRoute(
@@ -58,6 +65,7 @@ export const defineLogs = (
       '/log/{correlationId}',
       getServiceEntry('log', 'controller', 'logController'),
       'getLog',
+      routeAuthSettings
     ),
 
     defineRoute(
@@ -65,6 +73,7 @@ export const defineLogs = (
       '/log/children/{fromCorrelation}',
       getServiceEntry('log', 'controller', 'logController'),
       'getChildren',
+      routeAuthSettings
     ),
 
     defineRoute(
@@ -72,13 +81,14 @@ export const defineLogs = (
       '/log/download/{correlationId}',
       getServiceEntry('log', 'controller', 'logController'),
       'downloadLog',
+      routeAuthSettings
     ),
 
     defineWebEntry('admin', {
       buildPath: webFilesPath,
       domain: {
         subDomainName: 'admin',
-        onRootDomain: true
+        onRootDomain: false
       },
 
       ignoreCache: ['index.html', 'index.js'],

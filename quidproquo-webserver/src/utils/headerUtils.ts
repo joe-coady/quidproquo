@@ -1,7 +1,7 @@
 import { QPQConfig } from 'quidproquo-core';
 
 import { HttpEventHeaders } from '../types/HTTPEvent';
-import { RouteOptions } from '../config/settings/route';
+import { RouteOptions, ServiceAllowedOrigin } from '../config/settings/route';
 
 import { getBaseDomainName } from './qpqConfigAccessorsUtils';
 import { qpqWebServerUtils } from '../qpqWebServerUtils';
@@ -24,22 +24,52 @@ export const getAccessTokenFromHeaders = (headers: HttpEventHeaders): string | u
   return authToken;
 };
 
+export const convertContentSecurityPolicyEntryToString = (
+  baseDomain: string,
+  allowedOrigin: ServiceAllowedOrigin | string,
+): string => {
+  if (typeof allowedOrigin === 'string') {
+    return allowedOrigin;
+  }
+
+  // Otherwise its a QpqServiceContentSecurityPolicy
+  const domain = allowedOrigin.domain || baseDomain;
+
+  const protocol = allowedOrigin.protocol || 'https';
+
+  if (allowedOrigin.service) {
+    return `${protocol}://${allowedOrigin.api}.${allowedOrigin.service}.${domain}`;
+  }
+
+  return `${protocol}://${allowedOrigin.api}.${domain}`;
+};
+
 export const getAllowedOrigins = (qpqConfig: QPQConfig, route: RouteOptions): string[] => {
+  const baseDomain = getBaseDomainName(qpqConfig);
   // Root domain
-  const rootDomain = `https://${getBaseDomainName(qpqConfig)}`;
+  const rootDomain = `https://${baseDomain}`;
 
   // generic settings
   const defaultRouteSettings = qpqWebServerUtils.getDefaultRouteSettings(qpqConfig);
 
   const defaultAllowedOrigins = defaultRouteSettings.reduce(
-    (acc, cur) => [...acc, ...(cur.routeOptions.allowedOrigins || [])],
+    (acc, cur) => [...acc, ...(cur.routeOptions.allowedOrigins || []).map(ao => convertContentSecurityPolicyEntryToString(baseDomain, ao))],
     [] as string[],
   );
 
   // Route specific
-  const routeAllowedOrigins = route.allowedOrigins || [];
+  const routeAllowedOrigins = (route.allowedOrigins || []).map(ao => convertContentSecurityPolicyEntryToString(baseDomain, ao));
 
-  return [rootDomain, ...defaultAllowedOrigins, ...routeAllowedOrigins].map((o) => o.toLowerCase());
+  // Return the allowed origins
+  const allAllowedOrigins = [
+    rootDomain,
+    ...defaultAllowedOrigins,
+    ...routeAllowedOrigins
+  ].map((o) => o.toLowerCase());
+
+  console.log(allAllowedOrigins);
+
+  return allAllowedOrigins;
 };
 
 export const getCorsHeaders = (

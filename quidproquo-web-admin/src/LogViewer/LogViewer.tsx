@@ -50,7 +50,7 @@ const columns: GridColDef[] = [
   },
 ];
 
-export function LogViewer() {
+export function LogViewer() {  
   const {
     selectedLogCorrelation,
     logs,

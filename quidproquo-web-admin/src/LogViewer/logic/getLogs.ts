@@ -6,6 +6,7 @@ export const getLogs = async (
   runtimeType: string,
   startIsoDateTime: string,
   endIsoDateTime: string,
+  accessToken?: string
 ): Promise<StoryResultMetadataLog[]> => {
   var logs: StoryResultMetadataLog[] = [];
   var newLogs: QpqLogListLog;
@@ -20,8 +21,8 @@ export const getLogs = async (
   do {
     newLogs = await apiRequestPost<QpqLogListLog>(url, {
       ...requestSpan,
-      nextPageKey: nextPageKey,      
-    });
+      nextPageKey: nextPageKey,
+    }, accessToken);
 
     logs = [...logs, ...newLogs.items];
 

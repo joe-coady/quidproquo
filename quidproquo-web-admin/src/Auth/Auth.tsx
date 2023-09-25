@@ -6,6 +6,7 @@ import { respondToAuthChallenge } from "../LogViewer/logic/respondToAuthChalleng
 import { Login } from "./Login";
 import { AuthChallengeNewPasswordRequired } from "./AuthChallengeNewPasswordRequired"
 import { AuthState } from '../types';
+import { authContext } from './authContext';
 
 interface AuthProps {
   children?: ReactNode;
@@ -14,8 +15,8 @@ interface AuthProps {
 
 export const useAuth = () => {
   const [authState, setAuthState] = useState<AuthState>({
-    username: "joe.coady@twothousandfivehundred.com",
-    password: "7&sip3U9"
+    username: "",
+    password: ""
   });
 
   const onLogin = async () => {
@@ -72,7 +73,9 @@ export function Auth({ children }: AuthProps) {
   return (
     <>
       { !isLoggedIn && <Login setUsername={setUsername} setPassword={setPassword} username={authState.username} password={authState.password} onLogin={onLogin} authState={authState} />}
-      { isLoggedIn && children }
+      { isLoggedIn && <authContext.Provider value={authState}>
+        {children}
+      </authContext.Provider> }
     </>
   );
 }
