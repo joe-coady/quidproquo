@@ -3,19 +3,20 @@ import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 
 interface AsyncButtonProps {
-    onClick: () => Promise<void>;
+    onClick: (event: any) => Promise<void>;
     children?: ReactNode;
     disabled?: boolean;
     style?: React.CSSProperties;
+    type?: "button" | "submit" | "reset";
 }
 
-export function AsyncButton({ onClick, children, disabled, style }: AsyncButtonProps) {
+export function AsyncButton({ onClick, children, disabled, style, type }: AsyncButtonProps) {
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async () => {
+  const handleLogin = async (event: any) => {
     setLoading(true);
     try {
-      await onClick();
+      await onClick(event);
     } catch (error) {
       console.error("Login error:", error);
       // Handle error, show a message, etc.
@@ -32,6 +33,7 @@ export function AsyncButton({ onClick, children, disabled, style }: AsyncButtonP
       color="primary" 
       disabled={loading || disabled}
       style={style}
+      type={type}
     >
       {loading ? <CircularProgress size={24} /> : children}
     </Button>

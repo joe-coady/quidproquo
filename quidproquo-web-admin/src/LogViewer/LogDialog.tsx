@@ -51,7 +51,7 @@ const LogDialog = ({
 
   const handleExecute = async () => {
     if (log) {
-      await apiRequestPost('https://localhost:8080/admin/service/log/execute', log);
+      await apiRequestPost('http://localhost:8080/admin/service/log/execute', log);
     }
   };
 
