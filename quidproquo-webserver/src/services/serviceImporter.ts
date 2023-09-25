@@ -7,6 +7,12 @@ const serviceEntryMap = {
     'logController',
   )]: require('../services/log/entry/controller/logController'),
   [getServiceEntry(
+    'log', 
+    'controller', 
+    'loginController'
+  )]: require('../services/log/entry/controller/loginController'),
+
+  [getServiceEntry(
     'log',
     'storageDrive',
     'onCreate',

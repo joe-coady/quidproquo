@@ -1,4 +1,4 @@
-import { QPQConfig, defineKeyValueStore, defineStorageDrive, getServiceEntry } from 'quidproquo-core';
+import { QPQConfig, defineKeyValueStore, defineStorageDrive, defineUserDirectory, getServiceEntry } from 'quidproquo-core';
 import { defineRoute } from './route';
 import { defineWebEntry } from './webEntry';
 
@@ -41,6 +41,10 @@ export const defineLogs = (
     //   apiName: 'logs'
     // }),
 
+    defineUserDirectory('qpq-admin', buildPath),
+    defineRoute('POST', '/login', getServiceEntry('log', 'controller', 'loginController'), 'login'),
+    defineRoute('POST', '/refreshToken', getServiceEntry('log', 'controller', 'loginController'), 'refreshToken'),
+
     defineRoute(
       'POST',
       '/log/list',
@@ -75,6 +79,8 @@ export const defineLogs = (
         subDomainName: 'admin',
         onRootDomain: true
       },
+
+      ignoreCache: ['index.html', 'index.js'],
 
       securityHeaders: {
         contentSecurityPolicy: {

@@ -1,10 +1,13 @@
 import { LogViewer } from './LogViewer';
+import { Auth } from './Auth';
 import { LoadingProvider } from './view';
 
 export const App = () => {
   return (
     <LoadingProvider>
-      <LogViewer />
+      <Auth>
+        <LogViewer />
+      </Auth>
     </LoadingProvider>
   );
 };
