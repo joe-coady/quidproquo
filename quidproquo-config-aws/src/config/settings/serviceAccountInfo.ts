@@ -9,6 +9,8 @@ export interface QPQConfigAdvancedAwsServiceAccountInfoSettings extends QPQConfi
   lambdaMaxMemoryInMiB?: number;
 
   logServiceName?: string;
+
+  disableLogs?: boolean;
 }
 
 export interface AwsServiceAccountInfoQPQConfigSetting extends QPQConfigSetting {
@@ -21,6 +23,8 @@ export interface AwsServiceAccountInfoQPQConfigSetting extends QPQConfigSetting 
   apiLayers: ApiLayer[];
 
   lambdaMaxMemoryInMiB: number;
+
+  disableLogs: boolean;
 }
 
 export const defineAwsServiceAccountInfo = (
@@ -42,4 +46,6 @@ export const defineAwsServiceAccountInfo = (
   lambdaMaxMemoryInMiB: options?.lambdaMaxMemoryInMiB || 1024,
 
   logServiceName: options?.logServiceName,
+
+  disableLogs: !!options?.disableLogs,
 });
