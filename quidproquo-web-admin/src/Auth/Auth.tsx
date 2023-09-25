@@ -7,11 +7,12 @@ import { Login } from "./Login";
 import { AuthChallengeNewPasswordRequired } from "./AuthChallengeNewPasswordRequired"
 import { AuthState } from '../types';
 import { authContext } from './authContext';
+import { useRefreshTokens } from './hooks';
+import { refreshTokens } from '../LogViewer/logic/refreshTokens';
 
 interface AuthProps {
   children?: ReactNode;
 }
-
 
 export const useAuth = () => {
   const [authState, setAuthState] = useState<AuthState>({
@@ -27,6 +28,30 @@ export const useAuth = () => {
       console.log("AuthError: ", `${error}`)
     }
   }
+
+  const refresh = async (
+    authState: AuthState,
+  ): Promise<void> => {
+    try {
+      const result = await refreshTokens(authState);
+  
+      setAuthState((currentAuthState) => ({
+        ...currentAuthState,
+        challenge: result.challenge,
+        session: result.session,
+        authenticationInfo: {
+          ...(currentAuthState.authenticationInfo || {}),
+          ...(result.authenticationInfo || {})
+        }
+      }));
+    } catch {
+      setAuthState((currentAuthState) => ({
+        ...currentAuthState,
+        authenticationInfo: undefined,
+      }));
+    }
+  };
+  
 
   const onRespondToAuthChallenge = async (newPassword: string) => {
     const result = await respondToAuthChallenge(
@@ -56,13 +81,16 @@ export const useAuth = () => {
 
     onRespondToAuthChallenge,
     onLogin,
+    refreshTokens: refresh,
 
     authState,
   }
 }
 
 export function Auth({ children }: AuthProps) {
-  const { onLogin, authState, setUsername, setPassword, onRespondToAuthChallenge } = useAuth();
+  const { onLogin, authState, setUsername, setPassword, refreshTokens, onRespondToAuthChallenge } = useAuth();
+  
+  useRefreshTokens(authState, refreshTokens);
 
   const isLoggedIn = !!authState.authenticationInfo?.accessToken;
 
@@ -72,7 +100,7 @@ export function Auth({ children }: AuthProps) {
 
   return (
     <>
-      { !isLoggedIn && <Login setUsername={setUsername} setPassword={setPassword} username={authState.username} password={authState.password} onLogin={onLogin} authState={authState} />}
+      { !isLoggedIn && <Login setUsername={setUsername} setPassword={setPassword} username={authState.username} password={authState.password} onLogin={onLogin} />}
       { isLoggedIn && <authContext.Provider value={authState}>
         {children}
       </authContext.Provider> }

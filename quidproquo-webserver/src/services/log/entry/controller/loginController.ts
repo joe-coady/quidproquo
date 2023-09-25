@@ -28,6 +28,10 @@ export type NewPasswordChallengePayload = ChallengePayload & {
   newPassword: string;
 };
 
+export type RefreshTokenPayload = {
+  refreshToken: string;
+};
+
 export function* login(event: HTTPEvent): AskResponse<HTTPEventResponse> {
   const { username, password } = qpqWebServerUtils.fromJsonEventRequest<LoginPayload>(event);
 
