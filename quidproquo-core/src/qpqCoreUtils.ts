@@ -22,7 +22,7 @@ import {
   DeployEventsQPQConfigSetting,
   GlobalQPQConfigSetting
 } from './config/settings';
-import { EmailTemplates } from './config/settings/emailTemplates/types';
+import { EmailTemplates, QpqEmailTemplateSourceEntry } from './config/settings/emailTemplates/types';
 import { CrossServiceResourceName, ResourceName } from './types';
 
 /**
@@ -286,7 +286,7 @@ export const getUserDirectorySrcEntries = (qpqConfig: QPQConfig): string[] => {
   const userConfigs = getUserDirectories(qpqConfig);
 
   return userConfigs.reduce(
-    (acc, ud) => [...acc, ...Object.values(ud.emailTemplates).map((et) => et.src)],
+    (acc, ud) => [...acc, ...Object.values(ud.emailTemplates).map((et: QpqEmailTemplateSourceEntry) => et?.src)],
     [] as string[],
   ).filter(src => !!src);
 };
