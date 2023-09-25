@@ -3,7 +3,6 @@ import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 
-import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 
 import InputLabel from '@mui/material/InputLabel';
@@ -12,12 +11,13 @@ import { LocalizationProvider, DateTimePicker } from '@mui/x-date-pickers';
 
 import { SearchParams } from './types';
 import { RuntimeTypes } from './constants';
+import { AsyncButton } from '../components';
 
 export interface TopSectionProps {
   searchParams: SearchParams;
   setSearchParams: (setter: (searchParams: SearchParams) => SearchParams) => void;
 
-  onSearch: () => void;
+  onSearch: () => Promise<any>;
 }
 
 export function TopSection({ searchParams, setSearchParams, onSearch }: TopSectionProps) {
@@ -105,13 +105,12 @@ export function TopSection({ searchParams, setSearchParams, onSearch }: TopSecti
           </FormControl>
         </Grid>
         <Grid item xs={1}>
-          <Button
-            variant="contained"
+          <AsyncButton
             onClick={() => onSearch()}
             style={{ width: '100%', height: '100%' }}
           >
             Search
-          </Button>
+          </AsyncButton>
         </Grid>
       </Grid>
     </LocalizationProvider>

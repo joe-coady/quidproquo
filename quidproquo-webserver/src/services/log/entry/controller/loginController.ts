@@ -1,4 +1,4 @@
-import { AskResponse } from 'quidproquo-core';
+import { AskResponse, AuthenticateUserChallenge } from 'quidproquo-core';
 import {
   HTTPEvent,
   HTTPEventResponse
@@ -16,6 +16,16 @@ export type LoginPayload = {
 
 export type RefreshPayload = {
     refreshToken: string;
+};
+
+export type ChallengePayload = {
+  email: string;
+  session: string;
+  challenge: string;
+};
+
+export type NewPasswordChallengePayload = ChallengePayload & {
+  newPassword: string;
 };
 
 export function* login(event: HTTPEvent): AskResponse<HTTPEventResponse> {
@@ -36,4 +46,21 @@ export function* refreshToken(
   );
 
   return qpqWebServerUtils.toJsonEventResponse(refreshResponse);
+}
+
+export function* respondToAuthChallenge(
+  event: HTTPEvent
+): AskResponse<HTTPEventResponse> {
+  const authChallenge =
+    qpqWebServerUtils.fromJsonEventRequest<NewPasswordChallengePayload>(event);
+
+  // TODO: Make this more generic ~ Currently we only support one challenge
+  const response = yield* authLogic.askRespondToAuthChallenge(
+    authChallenge.email,
+    AuthenticateUserChallenge.NEW_PASSWORD_REQUIRED,
+    authChallenge.session,
+    authChallenge.newPassword
+  );
+
+  return qpqWebServerUtils.toJsonEventResponse(response);
 }

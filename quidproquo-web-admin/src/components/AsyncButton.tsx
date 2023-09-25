@@ -5,9 +5,11 @@ import CircularProgress from '@mui/material/CircularProgress';
 interface AsyncButtonProps {
     onClick: () => Promise<void>;
     children?: ReactNode;
+    disabled?: boolean;
+    style?: React.CSSProperties;
 }
 
-export function AsyncButton({ onClick, children }: AsyncButtonProps) {
+export function AsyncButton({ onClick, children, disabled, style }: AsyncButtonProps) {
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
@@ -28,7 +30,8 @@ export function AsyncButton({ onClick, children }: AsyncButtonProps) {
       fullWidth 
       variant="contained" 
       color="primary" 
-      disabled={loading}
+      disabled={loading || disabled}
+      style={style}
     >
       {loading ? <CircularProgress size={24} /> : children}
     </Button>

@@ -44,6 +44,7 @@ export const defineLogs = (
     defineUserDirectory('qpq-admin', buildPath),
     defineRoute('POST', '/login', getServiceEntry('log', 'controller', 'loginController'), 'login'),
     defineRoute('POST', '/refreshToken', getServiceEntry('log', 'controller', 'loginController'), 'refreshToken'),
+    defineRoute('POST', '/challenge', getServiceEntry('log', 'controller', 'loginController'), 'respondToAuthChallenge'),
 
     defineRoute(
       'POST',

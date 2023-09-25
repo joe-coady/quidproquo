@@ -1,5 +1,5 @@
 import { LogViewer } from './LogViewer';
-import { Auth } from './Auth';
+import { Auth } from './Auth/Auth';
 import { LoadingProvider } from './view';
 
 export const App = () => {
