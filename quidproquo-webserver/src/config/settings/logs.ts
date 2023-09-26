@@ -33,7 +33,7 @@ export const defineLogs = (
           ),
           runtime: "onCreate"
         }
-      }
+      },
     }),
 
     defineKeyValueStore(logResourceName, 'correlation', [], {

@@ -23,7 +23,7 @@ interface LoginProps {
 export function Login({ username, password, setUsername, setPassword, onLogin }: LoginProps) {
   return (
     <Box sx={{ height: '100vh', width: '100%', p: 2, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-      <Box component="form" action="#" method="post" sx={{ width: '100%', maxWidth: 360 }}>
+      <Box component="form" action="#" autoComplete="on" method="post" sx={{ width: '100%', maxWidth: 360 }}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
