@@ -10,6 +10,7 @@ import {
   buildExpressionAttributeNames,
   buildDynamoQueryExpression,
 } from './qpqDynamoOrm';
+import { createAwsClient } from '../createAwsClient';
 
 export async function query<Item>(
   tableName: string,
@@ -20,7 +21,7 @@ export async function query<Item>(
   indexName?: string,
 ): Promise<QpqPagedData<Item>> {
   // Instantiate DynamoDB client
-  const dynamoClient = new DynamoDBClient({ region });
+  const dynamoDBClient = createAwsClient(DynamoDBClient, { region });
 
   const params: QueryCommandInput = {
     TableName: tableName,
@@ -39,7 +40,7 @@ export async function query<Item>(
   const command = new QueryCommand(params);
 
   // TODO: Catch errors and throw QPQ ones
-  const data = await dynamoClient.send(command);
+  const data = await dynamoDBClient.send(command);
 
   return itemsToQpqPagedData<Item>(
     (data.Items?.map((i) => convertDynamoMapToObject(i)) || []) as Item[],

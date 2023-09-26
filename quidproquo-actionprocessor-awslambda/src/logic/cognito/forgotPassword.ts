@@ -1,4 +1,4 @@
-import { AuthenticateUserResponse, AuthenticationDeliveryDetails } from 'quidproquo-core';
+import { AuthenticationDeliveryDetails } from 'quidproquo-core';
 
 import {
   CognitoIdentityProviderClient,
@@ -8,6 +8,7 @@ import {
 
 import { calculateSecretHash } from './utils/calculateSecretHash';
 import { getUserPoolClientSecret } from './getUserPoolClientSecret';
+import { createAwsClient } from '../createAwsClient';
 
 export const forgotPassword = async (
   userPoolId: string,
@@ -15,7 +16,7 @@ export const forgotPassword = async (
   region: string,
   username: string,
 ): Promise<AuthenticationDeliveryDetails> => {
-  const cognitoClient = new CognitoIdentityProviderClient({ region });
+  const cognitoClient = createAwsClient(CognitoIdentityProviderClient, { region });
 
   const clientSecret = await getUserPoolClientSecret(userPoolId, clientId, region);
   const secretHash = calculateSecretHash(username, clientId, clientSecret);

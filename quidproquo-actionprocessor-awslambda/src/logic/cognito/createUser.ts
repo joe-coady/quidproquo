@@ -11,6 +11,7 @@ import { authenticateUser } from './authenticateUser';
 import { setUserPassword } from './setUserPassword';
 
 import { getCognitoUserAttributesFromQpqUserAttributes } from './cognitoAttributeMap';
+import { createAwsClient } from '../createAwsClient';
 
 export const createUser = async (
   userPoolId: string,
@@ -18,7 +19,7 @@ export const createUser = async (
   clientId: string,
   createUserRequest: CreateUserRequest,
 ): Promise<AuthenticateUserResponse> => {
-  const cognitoClient = new CognitoIdentityProviderClient({ region });
+  const cognitoClient = createAwsClient(CognitoIdentityProviderClient, { region });
 
   const params: AdminCreateUserCommandInput = {
     UserPoolId: userPoolId,

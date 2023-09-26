@@ -1,7 +1,8 @@
 import { DynamoDBClient, GetItemCommand, GetItemCommandInput } from '@aws-sdk/client-dynamodb';
+import { createAwsClient } from '../createAwsClient';
 
 export async function getItem(tableName: string, key: string, region: string): Promise<any | null> {
-  const dynamoDBClient = new DynamoDBClient({ region });
+  const dynamoDBClient = createAwsClient(DynamoDBClient, { region });
 
   const getItemParams: GetItemCommandInput = {
     TableName: tableName,

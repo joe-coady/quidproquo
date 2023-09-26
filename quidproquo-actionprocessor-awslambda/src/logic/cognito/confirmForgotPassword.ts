@@ -9,6 +9,7 @@ import {
 import { calculateSecretHash } from './utils/calculateSecretHash';
 import { getUserPoolClientSecret } from './getUserPoolClientSecret';
 import { authenticateUser } from './authenticateUser';
+import { createAwsClient } from '../createAwsClient';
 
 export const confirmForgotPassword = async (
   userPoolId: string,
@@ -18,7 +19,7 @@ export const confirmForgotPassword = async (
   username: string,
   password: string,
 ): Promise<AuthenticateUserResponse> => {
-  const cognitoClient = new CognitoIdentityProviderClient({ region });
+  const cognitoClient = createAwsClient(CognitoIdentityProviderClient, { region });
 
   const clientSecret = await getUserPoolClientSecret(userPoolId, clientId, region);
   const secretHash = calculateSecretHash(username, clientId, clientSecret);

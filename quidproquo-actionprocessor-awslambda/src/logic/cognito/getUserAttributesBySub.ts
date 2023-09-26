@@ -6,13 +6,14 @@ import {
 import { UserAttributes } from 'quidproquo-core';
 
 import { getQpqAttributesFromCognitoUserAttributes } from './cognitoAttributeMap';
+import { createAwsClient } from '../createAwsClient';
 
 export const getUserAttributesBySub = async (
   userPoolId: string,
   region: string,
   sub: string,
 ): Promise<UserAttributes> => {
-  const cognitoClient = new CognitoIdentityProviderClient({ region });
+  const cognitoClient = createAwsClient(CognitoIdentityProviderClient, { region });
 
   const response = await cognitoClient.send(
     new ListUsersCommand({

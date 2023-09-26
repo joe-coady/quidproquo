@@ -6,6 +6,7 @@ import {
 
 import { KvsCoreDataType } from 'quidproquo-core';
 import { buildAttributeValue } from './qpqDynamoOrm';
+import { createAwsClient } from '../createAwsClient';
 
 export async function deleteItem(
   tableName: string,
@@ -15,7 +16,7 @@ export async function deleteItem(
   sortKey?: KvsCoreDataType,
   sortKeyName?: string,
 ): Promise<void> {
-  const dynamoClient = new DynamoDBClient({ region });
+  const dynamoDBClient = createAwsClient(DynamoDBClient, { region });
 
   const deleteItemParams: DeleteItemCommandInput = {
     TableName: tableName,
@@ -28,5 +29,5 @@ export async function deleteItem(
     deleteItemParams.Key![sortKeyName] = buildAttributeValue(sortKey);
   }
 
-  await dynamoClient.send(new DeleteItemCommand(deleteItemParams));
+  await dynamoDBClient.send(new DeleteItemCommand(deleteItemParams));
 }

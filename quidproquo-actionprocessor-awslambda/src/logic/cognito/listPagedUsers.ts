@@ -10,13 +10,14 @@ import {
 import { getQpqAttributesFromCognitoUserAttributes } from './cognitoAttributeMap';
 
 import { pageKeyToPaginationToken, paginationTokenToPageKey } from './utils';
+import { createAwsClient } from '../createAwsClient';
 
 export const listPagedUsers = async (
   userPoolId: string,
   region: string,
   pageKey?: string,
 ): Promise<QpqPagedData<UserAttributes>> => {
-  const cognitoClient = new CognitoIdentityProviderClient({ region });
+  const cognitoClient = createAwsClient(CognitoIdentityProviderClient, { region });
 
   const response: ListUsersResponse = await cognitoClient.send(
     new ListUsersCommand({

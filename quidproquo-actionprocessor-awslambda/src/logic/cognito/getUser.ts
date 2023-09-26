@@ -4,6 +4,7 @@ import {
   GetUserCommand,
   AttributeType,
 } from '@aws-sdk/client-cognito-identity-provider';
+import { createAwsClient } from '../createAwsClient';
 
 export interface UserAttributes {
   [attribute: string]: string;
@@ -30,7 +31,7 @@ const getUserAttribute = (
 };
 
 export const getUser = async (accessToken: string, region: string): Promise<User> => {
-  const cognitoClient = new CognitoIdentityProviderClient({ region });
+  const cognitoClient = createAwsClient(CognitoIdentityProviderClient, { region });
 
   const params: GetUserCommandInput = {
     AccessToken: accessToken,

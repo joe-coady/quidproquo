@@ -1,7 +1,8 @@
 import { DynamoDBClient, ScanCommand, ScanCommandInput } from '@aws-sdk/client-dynamodb';
+import { createAwsClient } from '../createAwsClient';
 
 export async function getAllItems(tableName: string, region: string): Promise<any[]> {
-  const dynamoDBClient = new DynamoDBClient({ region });
+  const dynamoDBClient = createAwsClient(DynamoDBClient, { region });
 
   let records: any[] = [];
   let lastEvaluatedKey: { [key: string]: any } | undefined;

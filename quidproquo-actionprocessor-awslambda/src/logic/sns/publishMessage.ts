@@ -11,9 +11,7 @@ export const publishMessage = async (
   region: string,
   messages: string[],
 ): Promise<void> => {
-  const sqsClient = createAwsClient(SNSClient, {
-    region,
-  });
+  const sqsClient = createAwsClient(SNSClient, { region });
 
   // Convert them to entries
   const entries: PublishBatchRequestEntry[] = messages.map((message, index) => ({

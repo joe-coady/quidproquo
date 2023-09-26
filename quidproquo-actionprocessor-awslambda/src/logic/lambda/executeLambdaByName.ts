@@ -1,4 +1,5 @@
 import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
+import { createAwsClient } from '../createAwsClient';
 
 export const executeLambdaByName = async <R>(
   functionName: string,
@@ -6,12 +7,12 @@ export const executeLambdaByName = async <R>(
   payload: any,
   isAsync: boolean
 ): Promise<R | undefined> => {
-  const lambda = new LambdaClient({ region });
+  const lambdaClient = createAwsClient(LambdaClient, { region });
 
   const encoder = new TextEncoder();
   const encodedPayload = encoder.encode(JSON.stringify(payload));
 
-  const response = await lambda.send(
+  const response = await lambdaClient.send(
     new InvokeCommand({
       FunctionName: functionName,
       Payload: encodedPayload,

@@ -4,6 +4,7 @@ import { QpqRuntimeType, StoryResultMetadata } from 'quidproquo-core';
 import { QpqLogList } from 'quidproquo-webserver';
 
 import { lastEvaluatedKeyToString, stringToLastEvaluatedKey } from './logs';
+import { createAwsClient } from '../createAwsClient';
 
 export async function getPagedItemsOverRange(
   tableName: string,
@@ -13,7 +14,7 @@ export async function getPagedItemsOverRange(
   endIsoDateTime: string,
   pageKey?: string,
 ): Promise<QpqLogList> {
-  const dynamoDBClient = new DynamoDBClient({ region });
+  const dynamoDBClient = createAwsClient(DynamoDBClient, { region });
 
   const queryParams: QueryCommandInput = {
     TableName: tableName,

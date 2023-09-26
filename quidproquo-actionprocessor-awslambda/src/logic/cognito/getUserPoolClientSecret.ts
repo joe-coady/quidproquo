@@ -3,13 +3,14 @@ import {
   DescribeUserPoolClientCommand,
   DescribeUserPoolClientCommandInput,
 } from '@aws-sdk/client-cognito-identity-provider';
+import { createAwsClient } from '../createAwsClient';
 
 export const getUserPoolClientSecret = async (
   userPoolId: string,
   clientId: string,
   region: string,
 ): Promise<string> => {
-  const cognitoClient = new CognitoIdentityProviderClient({ region });
+  const cognitoClient = createAwsClient(CognitoIdentityProviderClient, { region });
 
   const params: DescribeUserPoolClientCommandInput = {
     ClientId: clientId,

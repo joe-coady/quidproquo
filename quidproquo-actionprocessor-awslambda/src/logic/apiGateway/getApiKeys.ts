@@ -6,8 +6,10 @@ import {
 
 import { ApiKey } from 'quidproquo-webserver';
 
+import { createAwsClient } from '../createAwsClient';
+
 export const getApiKeys = async (region: string, ...keyNames: string[]): Promise<ApiKey[]> => {
-  const apiGatewayClient = new APIGatewayClient({ region });
+  const apiGatewayClient = createAwsClient(APIGatewayClient, { region });
 
   const input: GetApiKeysCommandInput = {
     includeValues: true,

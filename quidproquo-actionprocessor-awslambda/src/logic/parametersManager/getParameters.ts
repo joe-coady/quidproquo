@@ -1,11 +1,12 @@
 import { SSMClient, GetParametersCommand } from '@aws-sdk/client-ssm';
 import { memoFuncAsync } from '../cache/memoFuncAsync';
+import { createAwsClient } from '../createAwsClient';
 
 export const getParameters = memoFuncAsync(
   async (parameterNames: string[], region: string): Promise<string[]> => {
-    const smClient = new SSMClient({ region });
+    const ssmClient = createAwsClient(SSMClient, { region });
 
-    const response = await smClient.send(
+    const response = await ssmClient.send(
       new GetParametersCommand({
         Names: parameterNames,
       }),

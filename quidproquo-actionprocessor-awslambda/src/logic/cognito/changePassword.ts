@@ -3,6 +3,7 @@ import {
   ChangePasswordCommand,
   ChangePasswordCommandInput,
 } from '@aws-sdk/client-cognito-identity-provider';
+import { createAwsClient } from '../createAwsClient';
 
 export const changePassword = async (
   accessToken: string,
@@ -10,7 +11,7 @@ export const changePassword = async (
   proposedPassword: string,
   region: string,
 ): Promise<void> => {
-  const cognitoClient = new CognitoIdentityProviderClient({ region });
+  const cognitoClient = createAwsClient(CognitoIdentityProviderClient, { region });
 
   const params: ChangePasswordCommandInput = {
     AccessToken: accessToken,

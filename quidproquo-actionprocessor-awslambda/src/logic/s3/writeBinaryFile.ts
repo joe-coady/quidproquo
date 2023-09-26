@@ -1,5 +1,6 @@
 import { QPQBinaryData } from 'quidproquo-core';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { createAwsClient } from '../createAwsClient';
 
 export const writeBinaryFile = async (
   bucketName: string,
@@ -7,7 +8,7 @@ export const writeBinaryFile = async (
   data: QPQBinaryData,
   region: string,
 ): Promise<void> => {
-  const s3Client = new S3Client({ region });
+  const s3Client = createAwsClient(S3Client, { region });
 
   await s3Client.send(
     new PutObjectCommand({

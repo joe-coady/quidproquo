@@ -1,6 +1,7 @@
 import { KvsObjectDataType, KvsKey } from 'quidproquo-core';
 import { DynamoDBClient, PutItemCommand, AttributeValue } from '@aws-sdk/client-dynamodb';
 import { buildAttributeValue } from './qpqDynamoOrm';
+import { createAwsClient } from '../createAwsClient';
 
 export interface PutItemOptions {
   expires?: number;
@@ -38,9 +39,9 @@ export async function putItem<Item>(
   options: PutItemOptions,
   region: string,
 ): Promise<void> {
-  const dynamoClient = new DynamoDBClient({ region });
+  const dynamoDBClient = createAwsClient(DynamoDBClient, { region });
 
-  await dynamoClient.send(
+  await dynamoDBClient.send(
     new PutItemCommand({
       TableName: tableName,
       Item: convertObjectToDynamoItem(item as KvsObjectDataType),

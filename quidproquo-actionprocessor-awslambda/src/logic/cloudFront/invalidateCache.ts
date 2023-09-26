@@ -5,6 +5,7 @@ import {
 } from '@aws-sdk/client-cloudfront';
 
 import crypto from 'crypto';
+import { createAwsClient } from '../createAwsClient';
 
 export const getInvalidationCallerReference = (paths: string[]): string => {
   const allPaths = paths.join('');
@@ -21,7 +22,8 @@ export const invalidateCache = async (
   region: string,
   paths: string[],
 ): Promise<void> => {
-  const cloudformation = new CloudFrontClient({ region });
+  const cloudFrontClient = createAwsClient(CloudFrontClient, { region });
+
   const input: CreateInvalidationCommandInput = {
     DistributionId: distributionId,
     InvalidationBatch: {
@@ -33,5 +35,5 @@ export const invalidateCache = async (
     },
   };
 
-  await cloudformation.send(new CreateInvalidationCommand(input));
+  await cloudFrontClient.send(new CreateInvalidationCommand(input));
 };

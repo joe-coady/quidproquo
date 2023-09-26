@@ -12,6 +12,7 @@ import {
   buildUpdateExpressionAttributeNames,
   buildUpdateExpressionAttributeValues,
 } from './qpqDynamoOrm';
+import { createAwsClient } from '../createAwsClient';
 
 export async function updateItem(
   tableName: string,
@@ -20,7 +21,7 @@ export async function updateItem(
   key: KvsCoreDataType,
   sortKey?: KvsCoreDataType,
 ): Promise<void> {
-  const dynamoClient = new DynamoDBClient({ region });
+  const dynamoDBClient = createAwsClient(DynamoDBClient, { region });
 
   const params: UpdateItemCommandInput = {
     TableName: tableName,
@@ -36,5 +37,5 @@ export async function updateItem(
     params.Key!['sk'] = buildAttributeValue(sortKey);
   }
 
-  console.log(await dynamoClient.send(new UpdateItemCommand(params)));
+  console.log(await dynamoDBClient.send(new UpdateItemCommand(params)));
 }

@@ -11,6 +11,7 @@ import { calculateSecretHash } from './utils/calculateSecretHash';
 import { getUserPoolClientSecret } from './getUserPoolClientSecret';
 
 import { cognitoAdminInitiateAuthResponseToQpqAuthenticationInfo } from './utils/transformCognitoResponse';
+import { createAwsClient } from '../createAwsClient';
 
 export const respondToAuthChallengeChallenge = async (
   userPoolId: string,
@@ -20,7 +21,7 @@ export const respondToAuthChallengeChallenge = async (
   session: string,
   attributes: Record<string, string>,
 ): Promise<AuthenticateUserResponse> => {
-  const cognitoClient = new CognitoIdentityProviderClient({ region });
+  const cognitoClient = createAwsClient(CognitoIdentityProviderClient, { region });
 
   const clientSecret = await getUserPoolClientSecret(userPoolId, clientId, region);
   const secretHash = calculateSecretHash(username, clientId, clientSecret);

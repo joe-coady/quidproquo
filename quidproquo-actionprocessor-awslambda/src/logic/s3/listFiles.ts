@@ -1,6 +1,7 @@
 import { S3Client } from '@aws-sdk/client-s3';
 import { ListObjectsV2Command, ListObjectsV2CommandInput } from '@aws-sdk/client-s3';
 import { filePathDelimiter } from 'quidproquo-core';
+import { createAwsClient } from '../createAwsClient';
 
 export interface S3FileInfo {
   filepath: string;
@@ -34,7 +35,7 @@ export const listFiles = async (
   // Declare truncated as a flag that the while loop is based on.
   let files: S3FileInfo[] = [];
 
-  const s3Client = new S3Client({ region });
+  const s3Client = createAwsClient(S3Client, { region });
 
   const response = await s3Client.send(new ListObjectsV2Command(bucketParams));
 

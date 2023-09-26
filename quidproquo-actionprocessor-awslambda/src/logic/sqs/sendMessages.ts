@@ -11,9 +11,7 @@ export const sendMessages = async (
   region: string,
   messages: string[],
 ): Promise<void> => {
-  const sqsClient = createAwsClient(SQSClient, {
-    region,
-  });
+  const sqsClient = createAwsClient(SQSClient, { region });
 
   const url = await getQueueUrl(queueName, sqsClient);
 

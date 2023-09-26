@@ -4,10 +4,12 @@ import {
   ListExportsCommandInput,
 } from '@aws-sdk/client-cloudformation';
 import { memoFuncAsync } from '../cache/memoFuncAsync';
+import { createAwsClient } from '../createAwsClient';
 
 export const getExportedValue = memoFuncAsync(
   async (variableName: string, region: string): Promise<string> => {
-    const cloudformation = new CloudFormationClient({ region });
+    const cloudformation = createAwsClient(CloudFormationClient, { region });
+
     const listCommandParams: ListExportsCommandInput = {};
 
     do {
