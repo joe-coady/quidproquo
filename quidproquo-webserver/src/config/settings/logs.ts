@@ -1,6 +1,10 @@
-import { QPQConfig, defineKeyValueStore, defineStorageDrive, defineUserDirectory, getServiceEntry } from 'quidproquo-core';
+import { QPQConfig, QPQConfigAdvancedSettings, defineGlobal, defineKeyValueStore, defineStorageDrive, defineUserDirectory, getServiceEntry } from 'quidproquo-core';
 import { defineRoute } from './route';
 import { defineWebEntry } from './webEntry';
+
+export interface QPQConfigAdvancedLogSettings extends QPQConfigAdvancedSettings {
+  logRetentionDays?: number;
+}
 
 // NEVER EVER CHANGE THIS NAME
 // if you do, you might get logs generated from the logging service
@@ -12,7 +16,8 @@ const logResourceName = 'qpq-logs';
 
 export const defineLogs = (
   buildPath: string,
-  webFilesPath: string
+  webFilesPath: string,
+  advancedSettings?: QPQConfigAdvancedLogSettings,
 ): QPQConfig => {
   
   const routeAuthSettings = {
@@ -22,6 +27,8 @@ export const defineLogs = (
   };
 
   const configs = [
+    defineGlobal("qpq-log-retention-days", advancedSettings?.logRetentionDays || 30),
+
     defineStorageDrive(logResourceName, {
       onEvent: {
         buildPath,
@@ -34,13 +41,16 @@ export const defineLogs = (
           runtime: "onCreate"
         }
       },
+      deprecated: advancedSettings?.deprecated,
     }),
 
     defineKeyValueStore(logResourceName, 'correlation', [], {
       indexes: [
         { partitionKey: 'runtimeType', sortKey: 'startedAt' },
         { partitionKey: 'fromCorrelation', sortKey: 'startedAt' }
-      ]
+      ],
+      ttlAttribute: 'ttl',
+      deprecated: advancedSettings?.deprecated,
     }),
 
     // defineApi('logs', buildPath, {

@@ -77,6 +77,7 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
       sortKey: primarySortKey && convertKvsKeyToDynamodbAttribute(primarySortKey),
       billingMode: aws_dynamodb.BillingMode.PAY_PER_REQUEST,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
+      timeToLiveAttribute: props.keyValueStoreConfig.ttlAttribute
     });
 
     // Do local secondary indexes

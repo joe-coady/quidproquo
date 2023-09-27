@@ -64,6 +64,8 @@ export interface QPQConfigAdvancedKeyValueStoreSettings extends QPQConfigAdvance
   global?: boolean;
 
   owner?: CrossModuleOwner;
+
+  ttlAttribute?: string;
 }
 
 export interface KeyValueStoreQPQConfigSetting extends QPQConfigSetting {
@@ -75,6 +77,8 @@ export interface KeyValueStoreQPQConfigSetting extends QPQConfigSetting {
   indexes: KvsIndex[];
 
   global: boolean;
+
+  ttlAttribute?: string;
 }
 
 export const defineKeyValueStore = (
@@ -98,4 +102,6 @@ export const defineKeyValueStore = (
   global: options?.global ?? false,
 
   owner: options?.owner,
+
+  ttlAttribute: options?.ttlAttribute,
 });
