@@ -29,7 +29,7 @@ const extractors: Record<QpqRuntimeType, (sr: StoryResult<any>) => string> = {
 
 export const storyResultToMetadata = (
   storyResult: StoryResult<any>,
-  ttl: number
+  ttl?: number
 ): LogMetadata => {
   // Add the generic text to the tag list
   const tags = [extractors[storyResult.runtimeType]?.(storyResult), ...storyResult.tags];
@@ -56,7 +56,7 @@ export const storyResultToMetadata = (
   return metadata;
 };
 
-export function* askUpdateDatabaseFromLogFile(storageDriveName: string, filesPath: string, ttl: number): AskResponse<void> {
+export function* askUpdateDatabaseFromLogFile(storageDriveName: string, filesPath: string, ttl?: number): AskResponse<void> {
     const logFile = yield* askFileReadTextContents(storageDriveName, filesPath);
     const metadata = storyResultToMetadata(JSON.parse(logFile), ttl);
 
@@ -64,9 +64,9 @@ export function* askUpdateDatabaseFromLogFile(storageDriveName: string, filesPat
 }
 
 export function* askUpdateDatabaseFromLogFiles(storageDriveName: string, filesPaths: string[]): AskResponse<void> {
-  const logRetentionDays = yield* askConfigGetGlobal<number>('qpq-log-retention-days');
-  const currentEpoch = yield* askGetCurrentEpoch();
-  const ttl = Math.floor(currentEpoch + logRetentionDays*24*60*60);
+  const logRetentionDays = yield* askConfigGetGlobal<number | undefined>('qpq-log-retention-days');
+
+  const ttl = logRetentionDays ? Math.floor((yield* askGetCurrentEpoch()) + logRetentionDays*24*60*60) : undefined;
 
   yield* askMap(filesPaths, function* (filePath: string) {
       yield* askUpdateDatabaseFromLogFile(storageDriveName, filePath, ttl);

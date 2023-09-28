@@ -1,4 +1,4 @@
-import { StorageDriveQPQConfigSetting, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { StorageDriveQPQConfigSetting, QPQConfig, qpqCoreUtils, StorageDriveLifecycleRule, StorageDriveTransition } from 'quidproquo-core';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { QpqResource } from '../../../base/QpqResource';
@@ -31,6 +31,22 @@ export abstract class QpqCoreStorageDriveConstructBase
   }
 }
 
+const convertStorageDriveTransitionToAwsS3Transition = (storageDriveTransition: StorageDriveTransition): aws_s3.Transition => ({
+  storageClass: aws_s3.StorageClass.DEEP_ARCHIVE,
+  transitionAfter: typeof(storageDriveTransition.transitionAfterDays) === 'number' ? cdk.Duration.days(storageDriveTransition.transitionAfterDays) : undefined,
+  transitionDate: typeof(storageDriveTransition.transitionDate) === 'string' ? new Date(storageDriveTransition.transitionDate) : undefined,
+});
+
+const convertStorageDriveLifecycleRuleToAwsS3LifecycleRule = (
+  lifecycleRule: StorageDriveLifecycleRule,
+): aws_s3.LifecycleRule => ({
+  prefix: lifecycleRule.prefix,
+  expiration: lifecycleRule.deleteAfterDays ? cdk.Duration.days(lifecycleRule.deleteAfterDays) : undefined,
+  objectSizeGreaterThan: lifecycleRule.fileSizeGreaterThan,
+  objectSizeLessThan: lifecycleRule.fileSizeLessThan,
+  transitions: lifecycleRule.transitions?.map(convertStorageDriveTransitionToAwsS3Transition)
+})
+
 export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBase {
   bucket: aws_s3.IBucket;
 
@@ -55,6 +71,12 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
   constructor(scope: Construct, id: string, props: QpqCoreStorageDriveConstructProps) {
     super(scope, id, props);
 
+    console.log(JSON.stringify(
+      props.storageDriveConfig.lifecycleRules?.map(convertStorageDriveLifecycleRuleToAwsS3LifecycleRule),
+      null,
+      2
+    ));
+
     this.bucket = new aws_s3.Bucket(this, 'bucket', {
       bucketName: this.resourceName(props.storageDriveConfig.storageDrive),
 
@@ -73,6 +95,8 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
           allowedHeaders: ['*'],
         },
       ],
+
+      lifecycleRules: props.storageDriveConfig.lifecycleRules?.map(convertStorageDriveLifecycleRuleToAwsS3LifecycleRule),
     });
 
     // TODO: Only do this IF a cloud front dist wants to use it

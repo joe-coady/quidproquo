@@ -68,6 +68,26 @@ export enum StorageDriveEvent {
   DELETED = 'DELETED',
 }
 
+export type StorageDriveTransition = { storageDriveTier: StorageDriveTier } & ({
+  transitionAfterDays: number;
+  transitionDate?: never;
+} | {
+  transitionAfterDays?: never;
+  transitionDate: string;
+});
+
+export type StorageDriveLifecycleRule = {
+  prefix?: string;
+  transitions?: StorageDriveTransition[];
+  deleteAfterDays?: number;
+  fileSizeLessThan?: number;
+  fileSizeGreaterThan?: number;
+  enabled?: boolean;
+  
+  // TODO: If we ever add versions
+  // add noncurrentVersionExpiration / noncurrentVersionTransitions support
+};
+
 export interface StorageDriveEvents {
   buildPath: string;
   
@@ -81,7 +101,7 @@ export interface QPQConfigAdvancedStorageDriveSettings extends QPQConfigAdvanced
 
   onEvent?: StorageDriveEvents;
 
-  storageDriveTier?: StorageDriveTier;
+  lifecycleRules?: StorageDriveLifecycleRule[];
 }
 
 export interface StorageDriveQPQConfigSetting extends QPQConfigSetting {
@@ -91,7 +111,7 @@ export interface StorageDriveQPQConfigSetting extends QPQConfigSetting {
 
   onEvent?: StorageDriveEvents;
 
-  storageDriveTier: StorageDriveTier;
+  lifecycleRules?: StorageDriveLifecycleRule[];
 }
 
 export const defineStorageDrive = (
@@ -109,5 +129,5 @@ export const defineStorageDrive = (
 
   onEvent: options?.onEvent,
 
-  storageDriveTier: options?.storageDriveTier ?? StorageDriveTier.SMART_TIERING,
+  lifecycleRules: options?.lifecycleRules,
 });

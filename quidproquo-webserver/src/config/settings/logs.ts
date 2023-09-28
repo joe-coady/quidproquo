@@ -1,9 +1,10 @@
-import { QPQConfig, QPQConfigAdvancedSettings, defineGlobal, defineKeyValueStore, defineStorageDrive, defineUserDirectory, getServiceEntry } from 'quidproquo-core';
+import { QPQConfig, QPQConfigAdvancedSettings, StorageDriveTier, defineGlobal, defineKeyValueStore, defineStorageDrive, defineUserDirectory, getServiceEntry } from 'quidproquo-core';
 import { defineRoute } from './route';
 import { defineWebEntry } from './webEntry';
 
 export interface QPQConfigAdvancedLogSettings extends QPQConfigAdvancedSettings {
   logRetentionDays?: number;
+  coldStorageAfterDays?: number;
 }
 
 // NEVER EVER CHANGE THIS NAME
@@ -26,22 +27,44 @@ export const defineLogs = (
     },
   };
 
+  /**
+   * Determines the number of days to retain logs.
+   * 
+   * - By default, logs are retained for 30 days.
+   * - If `logRetentionDays` is specified in the `advancedSettings`, it will be used.
+   * - If `coldStorageAfterDays` is specified, the retention is extended by an additional 180 days 
+   *   (to ensure logs outlive the transition period to cold storage).
+   * 
+   * The final retention period is the maximum value between the default, specified `logRetentionDays`,
+   * and `coldStorageAfterDays` plus 180.
+   */
+  const logRetentionDays: number | undefined = advancedSettings?.logRetentionDays ? Math.max(
+    advancedSettings?.logRetentionDays || 30,
+    advancedSettings?.coldStorageAfterDays ? 
+      advancedSettings?.coldStorageAfterDays + 180 :
+      0
+  ) : undefined;
+
   const configs = [
-    defineGlobal("qpq-log-retention-days", advancedSettings?.logRetentionDays || 30),
+    defineGlobal("qpq-log-retention-days", logRetentionDays),
 
     defineStorageDrive(logResourceName, {
       onEvent: {
         buildPath,
         create: {
-          src: getServiceEntry(
-            'log',
-            'storageDrive',
-            'onCreate',
-          ),
+          src: getServiceEntry('log', 'storageDrive', 'onCreate'),
           runtime: "onCreate"
         }
       },
-      deprecated: advancedSettings?.deprecated,
+      deprecated: advancedSettings?.deprecated,  
+      lifecycleRules: [{
+        // An array or undefined based on the number of days specified > 0
+        transitions: (advancedSettings?.coldStorageAfterDays || 0) > 0 ? [{
+          storageDriveTier: StorageDriveTier.DEEP_COLD_STORAGE,
+          transitionAfterDays: advancedSettings!.coldStorageAfterDays!
+        }] : undefined,
+        deleteAfterDays: logRetentionDays,
+      }]
     }),
 
     defineKeyValueStore(logResourceName, 'correlation', [], {
@@ -52,10 +75,6 @@ export const defineLogs = (
       ttlAttribute: 'ttl',
       deprecated: advancedSettings?.deprecated,
     }),
-
-    // defineApi('logs', buildPath, {
-    //   apiName: 'logs'
-    // }),
 
     defineUserDirectory('qpq-admin', buildPath),
     defineRoute('POST', '/login', getServiceEntry('log', 'controller', 'loginController'), 'login'),

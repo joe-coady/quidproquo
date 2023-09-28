@@ -1,10 +1,11 @@
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, PutObjectCommandInput } from '@aws-sdk/client-s3';
 
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 
 import { StoryResult, qpqCoreUtils, QPQConfig } from 'quidproquo-core';
 
 import { getAwsServiceAccountInfoConfig, getAwsServiceAccountInfoByDeploymentInfo } from "quidproquo-config-aws";
+import { StorageClass } from 'aws-cdk-lib/aws-s3';
 
 export const storyLogger = async (
   result: StoryResult<any>,
@@ -14,12 +15,15 @@ export const storyLogger = async (
   try {
     const s3Client = new S3Client({ region });
 
+    const commandParams: PutObjectCommandInput = {
+      Key: `${result.correlation}.json`,
+      Bucket: bucketName,
+      Body: JSON.stringify(result),
+      StorageClass: 'INTELLIGENT_TIERING',
+    }
+
     await s3Client.send(
-      new PutObjectCommand({
-        Key: `${result.correlation}.json`,
-        Bucket: bucketName,
-        Body: JSON.stringify(result),
-      }),
+      new PutObjectCommand(commandParams),
     );
   } catch {
     console.log(`Failed to log story result to S3 [${result.correlation}]`);
