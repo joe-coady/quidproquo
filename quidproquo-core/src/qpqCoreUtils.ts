@@ -210,6 +210,10 @@ export const getOwnedKeyValueStores = (qpqConfig: QPQConfig): KeyValueStoreQPQCo
   return getOwnedItems(getAllKeyValueStores(qpqConfig), qpqConfig);
 };
 
+export const getOwnedStorageDrives = (qpqConfig: QPQConfig): StorageDriveQPQConfigSetting[] => {
+  return getOwnedItems(getStorageDrives(qpqConfig), qpqConfig);
+};
+
 export const resolveCrossServiceResourceName = (
   resourceName: ResourceName,
 ): CrossServiceResourceName => {

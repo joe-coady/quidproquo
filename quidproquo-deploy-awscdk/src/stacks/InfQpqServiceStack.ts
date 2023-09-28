@@ -31,7 +31,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
     // }).bucket;
 
     // Build the storage drives
-    const storageDrives = qpqCoreUtils.getStorageDrives(props.qpqConfig).map(
+    const storageDrives = qpqCoreUtils.getOwnedStorageDrives(props.qpqConfig).map(
       (setting) =>
         new QpqCoreStorageDriveConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           awsAccountId: props.awsAccountId,

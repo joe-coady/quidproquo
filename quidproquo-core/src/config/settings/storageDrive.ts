@@ -4,6 +4,7 @@ import {
   QPQCoreConfigSettingType,
   QPQConfigAdvancedSettings,
 } from '../QPQConfig';
+import { CrossModuleOwner } from '../../types';
 
 /**
  * Represents different storage tiers for a "storageDrive".
@@ -102,6 +103,8 @@ export interface QPQConfigAdvancedStorageDriveSettings extends QPQConfigAdvanced
   onEvent?: StorageDriveEvents;
 
   lifecycleRules?: StorageDriveLifecycleRule[];
+
+  owner?: CrossModuleOwner;
 }
 
 export interface StorageDriveQPQConfigSetting extends QPQConfigSetting {
@@ -130,4 +133,6 @@ export const defineStorageDrive = (
   onEvent: options?.onEvent,
 
   lifecycleRules: options?.lifecycleRules,
+
+  owner: options?.owner,
 });
