@@ -1,5 +1,5 @@
 import { QPQBinaryData } from 'quidproquo-core';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, StorageClass } from '@aws-sdk/client-s3';
 import { createAwsClient } from '../createAwsClient';
 
 export const writeBinaryFile = async (
@@ -7,6 +7,7 @@ export const writeBinaryFile = async (
   key: string,
   data: QPQBinaryData,
   region: string,
+  storageClass: keyof typeof StorageClass
 ): Promise<void> => {
   const s3Client = createAwsClient(S3Client, { region });
 
@@ -17,6 +18,8 @@ export const writeBinaryFile = async (
       Body: Buffer.from(data.base64Data, 'base64'),
       ContentType: data.mimetype,
       ContentDisposition: data.contentDisposition,
+
+      StorageClass: storageClass
     }),
   );
 };

@@ -1,10 +1,11 @@
 import { FileWriteTextContentsActionRequester } from './FileWriteTextContentsActionTypes';
-import { FileActionType, DriveName } from './FileActionType';
+import { FileActionType, DriveName, StorageDriveAdvancedWriteOptions } from './FileActionType';
 
 export function* askFileWriteTextContents(
   drive: DriveName,
   filepath: string,
   data: string,
+  storageDriveAdvancedWriteOptions?: StorageDriveAdvancedWriteOptions,
 ): FileWriteTextContentsActionRequester {
   return yield {
     type: FileActionType.WriteTextContents,
@@ -12,6 +13,8 @@ export function* askFileWriteTextContents(
       drive,
       filepath,
       data,
+      
+      storageDriveAdvancedWriteOptions
     },
   };
 }

@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, StorageClass } from '@aws-sdk/client-s3';
 import { createAwsClient } from '../createAwsClient';
 
 export const writeTextFile = async (
@@ -6,6 +6,7 @@ export const writeTextFile = async (
   key: string,
   data: string,
   region: string,
+  storageClass: keyof typeof StorageClass
 ): Promise<void> => {
   const s3Client = createAwsClient(S3Client, { region });
 
@@ -14,6 +15,7 @@ export const writeTextFile = async (
       Key: key,
       Bucket: bucketName,
       Body: Buffer.from(data),
+      StorageClass: storageClass
     }),
   );
 };

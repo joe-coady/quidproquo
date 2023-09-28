@@ -1,6 +1,7 @@
+import { StorageClass  } from '@aws-sdk/client-s3';
 import { randomUUID } from 'crypto';
 import { match } from 'node-match-path';
-import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { StorageDriveTier } from 'quidproquo-core';
 
 export const randomGuid = () => {
   return randomUUID();
@@ -21,3 +22,24 @@ export const matchUrl = (path: string, url: string): UrlMatch => {
     params: matchResult.params,
   };
 };
+
+export const getS3BucketStorageClassFromStorageDriveTier = (driveTier?: StorageDriveTier): keyof typeof StorageClass => {
+  switch (driveTier) {
+      case StorageDriveTier.REGULAR:
+        return StorageClass.STANDARD;
+      case StorageDriveTier.OCCASIONAL_ACCESS:
+        return StorageClass.STANDARD_IA;
+      case StorageDriveTier.SINGLE_ZONE_OCCASIONAL_ACCESS:
+        return StorageClass.ONEZONE_IA;
+      case StorageDriveTier.COLD_STORAGE:
+        return StorageClass.GLACIER;
+      case StorageDriveTier.COLD_STORAGE_INSTANT_ACCESS:
+        return StorageClass.GLACIER_IR;
+      case StorageDriveTier.DEEP_COLD_STORAGE:
+        return StorageClass.DEEP_ARCHIVE;
+      case StorageDriveTier.SMART_TIERING:
+        return StorageClass.INTELLIGENT_TIERING;
+      default:
+        return StorageClass.INTELLIGENT_TIERING;
+  }
+}

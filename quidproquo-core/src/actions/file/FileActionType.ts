@@ -1,4 +1,5 @@
 import { CrossServiceResourceName, ResourceName } from '../../types';
+import { StorageDriveTier } from "../../config"
 
 export enum FileActionType {
   ReadTextContents = '@quidproquo-core/File/ReadTextContents',
@@ -25,3 +26,7 @@ export interface DirectoryList {
 }
 
 export type DriveName = ResourceName;
+
+export interface StorageDriveAdvancedWriteOptions {
+  storageDriveTier?: StorageDriveTier;
+}
