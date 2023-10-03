@@ -1,9 +1,9 @@
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
-import { FileActionType, DriveName, StorageDriveAdvancedWriteOptions } from './FileActionType';
+import { FileActionType, StorageDriveAdvancedWriteOptions } from './FileActionType';
 
 // Payload
 export interface FileWriteTextContentsActionPayload {
-  drive: DriveName;
+  drive: string;
   filepath: string;
   data: string;
   storageDriveAdvancedWriteOptions?: StorageDriveAdvancedWriteOptions;

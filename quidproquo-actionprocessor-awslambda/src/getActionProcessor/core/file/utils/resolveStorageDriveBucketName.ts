@@ -1,22 +1,16 @@
-import { QPQConfig, DriveName, CrossServiceResourceName } from 'quidproquo-core';
+import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 import { getConfigRuntimeResourceNameFromConfigWithServiceOverride } from '../../../../awsNamingUtils';
 
-export const resolveCrossServiceDriveName = (drive: DriveName): CrossServiceResourceName => {
-  if (typeof drive === 'string') {
-    return {
-      name: drive,
-    };
+export const resolveStorageDriveBucketName = (drive: string, qpqConfig: QPQConfig) => {
+  const storageDriveConfig = qpqCoreUtils.getStorageDriveByName(drive, qpqConfig);
+
+  if (!storageDriveConfig) {
+    throw new Error(`Could not find storage drive config for [${drive}]`);
   }
 
-  return drive;
-};
-
-export const resolveStorageDriveBucketName = (drive: DriveName, qpqConfig: QPQConfig) => {
-  const xServiceDriveName = resolveCrossServiceDriveName(drive);
-
   return getConfigRuntimeResourceNameFromConfigWithServiceOverride(
-    xServiceDriveName.name,
+    drive,
     qpqConfig,
-    xServiceDriveName.service,
+    storageDriveConfig.owner?.module,
   );
 };

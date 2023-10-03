@@ -1,9 +1,9 @@
 import { FileListDirectoryActionRequester } from './FileListDirectoryActionTypes';
-import { FileActionType, FileInfo, DriveName } from './FileActionType';
+import { FileActionType, FileInfo } from './FileActionType';
 import { AskResponse } from '../../types/StorySession';
 
 export function* askFileListDirectory(
-  drive: DriveName,
+  drive: string,
   folderPath: string,
   maxFiles: number = 1000,
   pageToken?: string,
@@ -20,7 +20,7 @@ export function* askFileListDirectory(
 }
 
 export function* askFileListAllDirectory(
-  drive: DriveName,
+  drive: string,
   folderPath: string,
 ): AskResponse<FileInfo[]> {
   var pageToken: string | undefined;

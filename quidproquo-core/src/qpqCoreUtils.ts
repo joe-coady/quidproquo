@@ -158,6 +158,10 @@ export const getStorageDrives = (configs: QPQConfig): StorageDriveQPQConfigSetti
   );
 };
 
+export const getStorageDriveByName = (storageDriveName: string, configs: QPQConfig): StorageDriveQPQConfigSetting | undefined => {
+  return getStorageDrives(configs).find(sd => sd.storageDrive === storageDriveName);
+};
+
 export const getQueues = (configs: QPQConfig): QueueQPQConfigSetting[] => {
   return getConfigSettings<QueueQPQConfigSetting>(configs, QPQCoreConfigSettingType.queue);
 };

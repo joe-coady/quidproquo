@@ -15,7 +15,7 @@ export const filePathDelimiter = `/`;
 
 export interface FileInfo {
   filepath: string;
-  drive: CrossServiceResourceName;
+  drive: string;
   isDir: boolean;
   hashMd5?: string;
 }
@@ -24,8 +24,6 @@ export interface DirectoryList {
   fileInfos: FileInfo[];
   pageToken?: string;
 }
-
-export type DriveName = ResourceName;
 
 export interface StorageDriveAdvancedWriteOptions {
   storageDriveTier?: StorageDriveTier;

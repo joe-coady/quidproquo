@@ -1,8 +1,8 @@
 import { FileReadTextContentsActionRequester } from './FileReadTextContentsActionTypes';
-import { FileActionType, DriveName } from './FileActionType';
+import { FileActionType } from './FileActionType';
 
 export function* askFileReadTextContents(
-  drive: DriveName,
+  drive: string,
   filepath: string,
 ): FileReadTextContentsActionRequester {
   return yield {

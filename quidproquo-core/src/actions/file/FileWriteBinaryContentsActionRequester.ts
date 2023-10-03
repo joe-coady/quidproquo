@@ -1,9 +1,9 @@
 import { QPQBinaryData } from '../../types/QPQBinaryData';
 import { FileWriteBinaryContentsActionRequester } from './FileWriteBinaryContentsActionTypes';
-import { FileActionType, DriveName, StorageDriveAdvancedWriteOptions } from './FileActionType';
+import { FileActionType, StorageDriveAdvancedWriteOptions } from './FileActionType';
 
 export function* askFileWriteBinaryContents(
-  drive: DriveName,
+  drive: string,
   filepath: string,
   data: QPQBinaryData,
   storageDriveAdvancedWriteOptions?: StorageDriveAdvancedWriteOptions,

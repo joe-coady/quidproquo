@@ -6,12 +6,11 @@ import {
   qpqCoreUtils,
 } from 'quidproquo-core';
 
-import { resolveStorageDriveBucketName, resolveCrossServiceDriveName } from './utils';
+import { resolveStorageDriveBucketName } from './utils';
 import { listFiles } from '../../../logic/s3/s3Utils';
 
 const getProcessFileListDirectory = (qpqConfig: QPQConfig): FileListDirectoryActionProcessor => {
   return async ({ drive, folderPath, maxFiles, pageToken }) => {
-    const xServiceDriveName = resolveCrossServiceDriveName(drive);
     const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
     const s3FileList = await listFiles(
       s3BucketName,
@@ -24,7 +23,7 @@ const getProcessFileListDirectory = (qpqConfig: QPQConfig): FileListDirectoryAct
     // Add the drive onto the list
     const fileInfos = s3FileList.fileInfos.map((s3fi) => ({
       ...s3fi,
-      drive: xServiceDriveName,
+      drive,
     }));
 
     return actionResult({

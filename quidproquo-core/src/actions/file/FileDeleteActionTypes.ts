@@ -1,9 +1,9 @@
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
-import { FileActionType, DriveName } from './FileActionType';
+import { FileActionType } from './FileActionType';
 
 // Payload
 export interface FileDeleteActionPayload {
-  drive: DriveName;
+  drive: string;
   filepaths: string[];
 }
 

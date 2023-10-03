@@ -1,9 +1,9 @@
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
-import { FileActionType, DirectoryList, DriveName } from './FileActionType';
+import { FileActionType, DirectoryList } from './FileActionType';
 
 // Payload
 export interface FileListDirectoryActionPayload {
-  drive: DriveName;
+  drive: string;
   folderPath: string;
   maxFiles: number;
   pageToken?: string;
