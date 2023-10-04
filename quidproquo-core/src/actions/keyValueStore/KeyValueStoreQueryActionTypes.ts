@@ -3,7 +3,7 @@ import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
 
 import { KvsQueryOperation } from './types';
 
-import { ResourceName, QpqPagedData } from '../../types';
+import { QpqPagedData } from '../../types';
 
 // Options Type
 export interface KeyValueStoreQueryOptions {
@@ -12,7 +12,7 @@ export interface KeyValueStoreQueryOptions {
 
 // Payload
 export interface KeyValueStoreQueryActionPayload {
-  keyValueStoreName: ResourceName;
+  keyValueStoreName: string;
 
   keyCondition: KvsQueryOperation;
   filterCondition?: KvsQueryOperation;

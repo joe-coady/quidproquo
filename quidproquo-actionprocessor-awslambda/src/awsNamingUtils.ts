@@ -110,17 +110,14 @@ export const getQpqRuntimeResourceNameFromConfig = (
 };
 
 export const getKvsDynamoTableNameFromConfig = (
-  resourceName: ResourceName,
+  resourceName: string,
   qpqConfig: QPQConfig,
   resourceType: string = '',
 ) => {
   const storeConfig = qpqCoreUtils.getKeyValueStoreByName(qpqConfig, resourceName);
 
-  const crossServiceResourceName = qpqCoreUtils.resolveCrossServiceResourceName(resourceName);
-
   const application = qpqCoreUtils.getApplicationName(qpqConfig);
   const service =
-    crossServiceResourceName.service ||
     storeConfig?.owner?.module ||
     qpqCoreUtils.getApplicationModuleName(qpqConfig);
 
@@ -128,7 +125,7 @@ export const getKvsDynamoTableNameFromConfig = (
   const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
 
   return getQpqRuntimeResourceName(
-    crossServiceResourceName.name,
+    resourceName,
     application,
     service,
     environment,

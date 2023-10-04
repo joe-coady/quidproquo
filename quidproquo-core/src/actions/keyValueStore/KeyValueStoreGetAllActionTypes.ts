@@ -6,11 +6,9 @@ export interface KeyValueStoreGetAllOptions {
   // Add options here as needed, for example, read consistency
 }
 
-import { ResourceName } from '../../types';
-
 // Payload
 export interface KeyValueStoreGetAllActionPayload {
-  keyValueStoreName: ResourceName;
+  keyValueStoreName: string;
   options?: KeyValueStoreGetAllOptions;
 }
 

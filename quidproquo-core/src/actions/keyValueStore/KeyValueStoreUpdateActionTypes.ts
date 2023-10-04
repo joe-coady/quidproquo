@@ -2,14 +2,12 @@ import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
 import { KvsUpdate, KvsCoreDataType } from './types';
 
-import { ResourceName } from '../../types';
-
 // Options Type
 export interface KeyValueStoreUpdateOptions {}
 
 // Payload
 export interface KeyValueStoreUpdateActionPayload<Value> {
-  keyValueStoreName: ResourceName;
+  keyValueStoreName: string;
 
   key: KvsCoreDataType;
   sortKey?: KvsCoreDataType;

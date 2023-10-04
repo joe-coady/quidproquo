@@ -1,8 +1,6 @@
 import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
 
-import { ResourceName } from '../../types';
-
 // Options Type
 export interface KeyValueStoreGetOptions {
   // Add options here as needed, for example, read consistency
@@ -10,7 +8,7 @@ export interface KeyValueStoreGetOptions {
 
 // Payload
 export interface KeyValueStoreGetActionPayload {
-  keyValueStoreName: ResourceName;
+  keyValueStoreName: string;
   key: string;
   options?: KeyValueStoreGetOptions;
 }

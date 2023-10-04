@@ -5,10 +5,9 @@ import {
 } from './KeyValueStoreUpdateActionTypes';
 
 import { KvsCoreDataType, KvsUpdate } from './types';
-import { ResourceName } from '../../types';
 
 export function* askKeyValueStoreUpdate<Value>(
-  keyValueStoreName: ResourceName,
+  keyValueStoreName: string,
 
   updates: KvsUpdate,
 

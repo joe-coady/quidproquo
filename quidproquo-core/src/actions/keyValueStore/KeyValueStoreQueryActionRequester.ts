@@ -2,10 +2,9 @@ import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 import { KeyValueStoreQueryActionRequester } from './KeyValueStoreQueryActionTypes';
 
 import { KvsQueryOperation } from './types';
-import { ResourceName } from '../../types';
 
 export function* askKeyValueStoreQuery<KvsItem>(
-  keyValueStoreName: ResourceName,
+  keyValueStoreName: string,
 
   keyCondition: KvsQueryOperation,
   filterCondition?: KvsQueryOperation,

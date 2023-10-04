@@ -1,8 +1,6 @@
 import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
 
-import { ResourceName } from '../../types';
-
 // Options Type
 export interface KeyValueStoreUpsertOptions {
   ttlInSeconds?: number; // Time-to-live in seconds
@@ -10,7 +8,7 @@ export interface KeyValueStoreUpsertOptions {
 
 // Payload
 export interface KeyValueStoreUpsertActionPayload<KvsItem> {
-  keyValueStoreName: ResourceName;
+  keyValueStoreName: string;
   item: KvsItem;
   options?: KeyValueStoreUpsertOptions;
 }

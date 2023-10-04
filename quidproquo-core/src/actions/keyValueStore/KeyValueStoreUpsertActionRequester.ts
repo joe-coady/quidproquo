@@ -4,10 +4,8 @@ import {
   KeyValueStoreUpsertOptions,
 } from './KeyValueStoreUpsertActionTypes';
 
-import { ResourceName } from '../../types';
-
 export function* askKeyValueStoreUpsert<KvsItem>(
-  keyValueStoreName: ResourceName,
+  keyValueStoreName: string,
   item: KvsItem,
   options?: KeyValueStoreUpsertOptions,
 ): KeyValueStoreUpsertActionRequester<KvsItem> {
