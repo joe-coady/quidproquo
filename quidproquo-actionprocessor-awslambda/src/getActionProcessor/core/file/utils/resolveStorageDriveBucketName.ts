@@ -9,7 +9,7 @@ export const resolveStorageDriveBucketName = (drive: string, qpqConfig: QPQConfi
   }
 
   return getConfigRuntimeResourceNameFromConfigWithServiceOverride(
-    drive,
+    storageDriveConfig.owner?.resourceNameOverride || drive,
     qpqConfig,
     storageDriveConfig.owner?.module,
   );
