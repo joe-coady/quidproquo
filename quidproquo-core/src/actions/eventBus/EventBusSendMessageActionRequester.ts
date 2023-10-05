@@ -1,4 +1,3 @@
-import { CrossModuleMessage } from '../../types';
 import { ContextActionType } from '../context';
 import { EventBusActionType } from './EventBusActionType';
 import {

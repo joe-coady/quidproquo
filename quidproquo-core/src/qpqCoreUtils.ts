@@ -23,7 +23,7 @@ import {
   GlobalQPQConfigSetting
 } from './config/settings';
 import { EmailTemplates, QpqEmailTemplateSourceEntry } from './config/settings/emailTemplates/types';
-import { CrossServiceResourceName, ResourceName } from './types';
+import { CrossModuleOwner, CrossServiceResourceName, ResourceName } from './types';
 
 /**
  * Flattens a QPQConfig array into a single array of QPQConfigSetting objects.
@@ -182,6 +182,17 @@ export const getAllEventBusConfigs = (qpqConfig: QPQConfig): EventBusQPQConfigSe
   );
 
   return eventBuses;
+};
+
+export const getOwnedEventBusConfigs = (qpqConfig: QPQConfig): EventBusQPQConfigSetting[] => {
+  const ownedEventBusConfigs = getOwnedItems(getAllEventBusConfigs(qpqConfig), qpqConfig);
+
+  return ownedEventBusConfigs;
+};
+
+export const getEventBusConfigByName = (eventBusName: string, qpqConfig: QPQConfig): EventBusQPQConfigSetting | undefined => {
+  const eventBusConfig = getAllEventBusConfigs(qpqConfig).find(eb => eb.name === eventBusName);
+  return eventBusConfig;
 };
 
 export const getOwnedItems = <T extends QPQConfigSetting>(
@@ -419,3 +430,24 @@ export const getQueueQueueProcessors = (name: string, qpqConfig: QPQConfig): Qpq
 
   return queueConfig?.qpqQueueProcessors || {};
 };
+
+export const convertCrossModuleOwnerToGenericResourceNameOverride = <T extends string>(
+  owner?: CrossModuleOwner<T>
+): CrossModuleOwner<'resourceNameOverride'> | undefined => {
+  if (!owner) {
+    return undefined;
+  }
+
+  type KeyType = keyof typeof owner;
+  const key: KeyType = (Array.from(Object.keys(owner)).find(
+    (k) => k !== 'module' && k !== 'application' && k !== 'feature' && k !== 'environment'
+  ) as any) as KeyType;
+
+  const resourceName = owner[key as T];
+  const { [key]: _, ...otherProps } = owner;
+  
+  return {
+    ...otherProps,
+    resourceNameOverride: resourceName
+  };
+}

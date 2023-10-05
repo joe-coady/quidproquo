@@ -7,12 +7,6 @@ export type EventBusMessage<T> = CrossModuleMessage<T>;
 export interface EventBusSendMessageOptions<T> {
   eventBusName: string;
   eventBusMessages: EventBusMessage<T>[];
-
-  // Used to find the account it should exist in
-  moduleOverride?: string;
-  environmentOverride?: string;
-  featureOverride?: string;
-  applicationOverride?: string;
 }
 
 // Payload

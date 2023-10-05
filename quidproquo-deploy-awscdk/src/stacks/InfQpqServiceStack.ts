@@ -108,7 +108,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
     );
 
     // Event Busses
-    const busses = qpqCoreUtils.getAllEventBusConfigs(props.qpqConfig).map(
+    const eventBusses = qpqCoreUtils.getOwnedEventBusConfigs(props.qpqConfig).map(
       (setting) =>
         new QpqCoreEventBusConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           awsAccountId: props.awsAccountId,

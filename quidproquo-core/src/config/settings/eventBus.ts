@@ -1,3 +1,4 @@
+import { convertCrossModuleOwnerToGenericResourceNameOverride } from '../../qpqCoreUtils';
 import { CrossModuleOwner } from '../../types';
 import {
   QPQConfigSetting,
@@ -39,7 +40,7 @@ export type PartialEventBusSubscriptionDetails = Pick<EventBusSubscriptionDetail
 export type EventBusSubscription = PartialEventBusSubscriptionDetails | string;
 
 export interface QPQConfigAdvancedEventBusSettings extends QPQConfigAdvancedSettings {
-  owner?: CrossModuleOwner;
+  owner?: CrossModuleOwner<'eventBusName'>;
 }
 
 export interface EventBusQPQConfigSetting extends QPQConfigSetting {
@@ -60,4 +61,6 @@ export const defineEventBus = (
   name,
 
   deprecated: !!options?.deprecated,
+
+  owner: convertCrossModuleOwnerToGenericResourceNameOverride(options?.owner),
 });

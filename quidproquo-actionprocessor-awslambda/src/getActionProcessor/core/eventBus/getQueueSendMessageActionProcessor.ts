@@ -1,4 +1,4 @@
-import { QPQConfig, qpqCoreUtils, EventBusMessage, StorySession } from 'quidproquo-core';
+import { QPQConfig, qpqCoreUtils, EventBusMessage, StorySession, actionResultError, ErrorTypeEnum } from 'quidproquo-core';
 
 import {
   EventBusSendMessageActionProcessor,
@@ -22,24 +22,26 @@ const getProcessEventBusSendMessage = (
       eventBusName,
       eventBusMessages,
 
-      moduleOverride,
-      environmentOverride,
-      featureOverride,
-      applicationOverride,
       context
     },
     session,
   ) => {
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
+    const eventBusConfig = qpqCoreUtils.getEventBusConfigByName(eventBusName, qpqConfig);
+
+    if (!eventBusConfig) {
+      return actionResultError(ErrorTypeEnum.NotFound, `Event bus ${eventBusName} not found`);
+    }
+
     const topicArn = getEventBusSnsTopicArn(
-      eventBusName,
+      eventBusConfig.owner?.resourceNameOverride || eventBusName,
       qpqConfig,
 
-      moduleOverride || qpqCoreUtils.getApplicationModuleName(qpqConfig),
-      environmentOverride || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
-      applicationOverride || qpqCoreUtils.getApplicationName(qpqConfig),
-      featureOverride || qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
+      eventBusConfig.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig),
+      eventBusConfig.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
+      eventBusConfig.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig),
+      eventBusConfig.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
     );
 
     await publishMessage(
