@@ -3,8 +3,6 @@ import path from 'path';
 import {
   qpqCoreUtils,
   QPQConfig,
-  EventBusSubscriptionDetails,
-  EventBusSubscription,
 } from 'quidproquo-core';
 
 import { ServiceAccountInfo, LocalServiceAccountInfo, ApiLayer } from '../types';
@@ -120,31 +118,6 @@ export const getAwsServiceAccountInfoByDeploymentInfo = (
   }
 
   return serviceAccountInfo.info;
-};
-
-export const getEventBusSubscriptionDetails = (
-  eventBusSubscription: EventBusSubscription,
-  qpqConfig: QPQConfig,
-): EventBusSubscriptionDetails => {
-  const localServiceAccountInfo = getLocalServiceAccountInfo(qpqConfig);
-
-  if (typeof eventBusSubscription === 'string') {
-    return {
-      eventBusName: eventBusSubscription,
-      module: localServiceAccountInfo.moduleName,
-      application: localServiceAccountInfo.applicationName,
-      feature: localServiceAccountInfo.feature,
-      environment: localServiceAccountInfo.environment,
-    };
-  }
-
-  return {
-    eventBusName: eventBusSubscription.eventBusName,
-    module: eventBusSubscription.module ?? localServiceAccountInfo.moduleName,
-    application: eventBusSubscription.application ?? localServiceAccountInfo.applicationName,
-    feature: eventBusSubscription.feature ?? localServiceAccountInfo.feature,
-    environment: eventBusSubscription.environment ?? localServiceAccountInfo.environment,
-  };
 };
 
 export const getLambdaLayersWithFullPaths = (qpqConfig: QPQConfig): ApiLayer[] => {

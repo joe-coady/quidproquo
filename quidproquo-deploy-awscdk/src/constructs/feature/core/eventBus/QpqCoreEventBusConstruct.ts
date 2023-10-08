@@ -1,10 +1,8 @@
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import {
   EventBusQPQConfigSetting,
-  qpqCoreUtils,
-  EventBusSubscriptionDetails,
   QPQConfig,
-  EventBusSubscription,
+  qpqCoreUtils,
 } from 'quidproquo-core';
 
 import { getAwsAccountIds } from 'quidproquo-config-aws';
@@ -15,7 +13,6 @@ import * as qpqDeployAwsCdkUtils from '../../../../utils';
 
 import { Construct } from 'constructs';
 import { aws_sns, aws_iam } from 'aws-cdk-lib';
-import { getEventBusSubscriptionDetails } from 'quidproquo-config-aws';
 
 export interface QpqCoreEventBusConstructProps extends QpqConstructBlockProps {
   eventBusConfig: EventBusQPQConfigSetting;
@@ -44,17 +41,17 @@ export class QpqCoreEventBusConstruct extends QpqCoreEventBusConstructBase {
     id: string,
     qpqConfig: QPQConfig,
     awsAccountId: string,
-    eventBusSubscription: EventBusSubscription,
+    eventBusSubscription: string,
   ): QpqCoreEventBusConstructBase {
-    const subDetails = getEventBusSubscriptionDetails(eventBusSubscription, qpqConfig);
+    const eventBusConfig = qpqCoreUtils.getEventBusConfigByName(eventBusSubscription, qpqConfig);
 
     const topicArn = awsNamingUtils.getEventBusSnsTopicArn(
-      subDetails.eventBusName,
+      eventBusConfig?.owner?.resourceNameOverride || eventBusSubscription,
       qpqConfig,
-      subDetails.module,
-      subDetails.environment,
-      subDetails.application,
-      subDetails.feature,
+      eventBusConfig?.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig),
+      eventBusConfig?.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
+      eventBusConfig?.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig),
+      eventBusConfig?.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
     );
 
     class Import extends QpqCoreEventBusConstructBase {

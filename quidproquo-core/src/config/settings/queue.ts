@@ -4,8 +4,6 @@ import {
   QPQConfigAdvancedSettings,
 } from '../QPQConfig';
 
-import { EventBusSubscription } from './eventBus';
-
 export interface QpqSourceEntry {
   src: string;
   runtime: string;
@@ -22,7 +20,7 @@ export interface QPQConfigAdvancedQueueSettings extends QPQConfigAdvancedSetting
   maxTries?: number;
   ttRetryInSeconds?: number;
   hasDeadLetterQueue?: boolean;
-  eventBusSubscriptions?: EventBusSubscription[];
+  eventBusSubscriptions?: string[];
   maxConcurrentExecutions?: number;
 }
 
@@ -42,7 +40,7 @@ export interface QueueQPQConfigSetting extends QPQConfigSetting {
   hasDeadLetterQueue: boolean;
   qpqQueueProcessors: QpqQueueProcessors;
 
-  eventBusSubscriptions: EventBusSubscription[];
+  eventBusSubscriptions: string[];
 
   maxConcurrentExecutions?: number;
 }

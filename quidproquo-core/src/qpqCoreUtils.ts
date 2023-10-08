@@ -200,7 +200,16 @@ export const getOwnedItems = <T extends QPQConfigSetting>(
   qpqConfig: QPQConfig,
 ): T[] => {
   const appModuleName = getApplicationModuleName(qpqConfig);
-  return settings.filter((s) => !s.owner || s.owner.module === appModuleName);
+  const appName = getApplicationName(qpqConfig);
+  const appFeature = getApplicationModuleFeature(qpqConfig);
+  const appEnvironment = getApplicationModuleEnvironment(qpqConfig);
+
+  return settings.filter((s) => !s.owner || (
+    (!s.owner.module || s.owner.module === appModuleName) &&
+    (!s.owner.application || s.owner.application === appName) &&
+    (!s.owner.feature || s.owner.feature === appFeature) &&
+    (!s.owner.environment || s.owner.environment === appEnvironment)
+  ));
 };
 
 export const getAllKeyValueStores = (qpqConfig: QPQConfig): KeyValueStoreQPQConfigSetting[] => {
