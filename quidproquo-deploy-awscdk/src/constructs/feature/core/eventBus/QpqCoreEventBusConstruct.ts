@@ -51,7 +51,7 @@ export class QpqCoreEventBusConstruct extends QpqCoreEventBusConstructBase {
       eventBusConfig?.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig),
       eventBusConfig?.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
       eventBusConfig?.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig),
-      eventBusConfig?.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
+      eventBusConfig?.owner?.feature ?? qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
     );
 
     class Import extends QpqCoreEventBusConstructBase {

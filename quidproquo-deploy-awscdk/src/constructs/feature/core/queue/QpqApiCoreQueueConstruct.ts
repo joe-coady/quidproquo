@@ -80,7 +80,7 @@ export class QpqApiCoreQueueConstruct extends QpqConstructBlock {
         props.qpqConfig,
         eventBusConfig?.owner?.module || qpqCoreUtils.getApplicationModuleName(props.qpqConfig),
         eventBusConfig?.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(props.qpqConfig),
-        eventBusConfig?.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(props.qpqConfig),
+        eventBusConfig?.owner?.feature ?? qpqCoreUtils.getApplicationModuleFeature(props.qpqConfig),
         eventBusConfig?.owner?.application || qpqCoreUtils.getApplicationName(props.qpqConfig),
       );
 
