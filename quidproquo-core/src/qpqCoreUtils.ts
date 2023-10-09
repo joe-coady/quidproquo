@@ -207,7 +207,7 @@ export const getOwnedItems = <T extends QPQConfigSetting>(
   return settings.filter((s) => !s.owner || (
     (!s.owner.module || s.owner.module === appModuleName) &&
     (!s.owner.application || s.owner.application === appName) &&
-    (!s.owner.feature || s.owner.feature === appFeature) &&
+    (s.owner.feature === undefined || (!s.owner.feature && !appFeature) || s.owner.feature === appFeature) &&
     (!s.owner.environment || s.owner.environment === appEnvironment)
   ));
 };
