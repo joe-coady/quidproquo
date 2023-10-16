@@ -20,7 +20,7 @@ export function* askProcessEvent(...eventArguments: any) {
   const earlyExitResponse = yield* askEventAutoRespond(transformedEventParams, matchResult);
 
   // Log the early exit response
-  yield* askLogCreate(LogLevelEnum.Info, `earlyExitResponse [${earlyExitResponse}]`);
+  yield* askLogCreate(LogLevelEnum.Info, `earlyExitResponse [${JSON.stringify(earlyExitResponse, null, 2)}]`);
 
   if (earlyExitResponse) {
     // Transform the early exit response if needed
