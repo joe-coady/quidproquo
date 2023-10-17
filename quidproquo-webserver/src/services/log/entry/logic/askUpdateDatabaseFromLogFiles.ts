@@ -25,6 +25,8 @@ const extractors: Record<QpqRuntimeType, (sr: StoryResult<any>) => string> = {
   [QpqRuntimeType.DEPLOY_EVENT]: unknownGenericTextExtractor,
 
   [QpqRuntimeType.STORAGEDRIVE_EVENT]: unknownGenericTextExtractor,
+
+  [QpqRuntimeType.CLOUD_FLARE_DEPLOY]: unknownGenericTextExtractor,
 };
 
 export const storyResultToMetadata = (

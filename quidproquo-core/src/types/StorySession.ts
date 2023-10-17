@@ -71,6 +71,7 @@ export enum QpqRuntimeType {
   WEBSOCKET_EVENT = 'WEBSOCKET_EVENT',
   DEPLOY_EVENT = 'DEPLOY_EVENT',
   STORAGEDRIVE_EVENT = 'STORAGEDRIVE_EVENT',
+  CLOUD_FLARE_DEPLOY = 'CLOUD_FLARE_DEPLOY',
 }
 
 export interface StoryResult<TArgs extends Array<any>, TResult = any> {

@@ -21,6 +21,8 @@ const extractors: Record<string, (sr: StoryResult<any>) => string> = {
   ['DEPLOY_EVENT']: unknownGenericTextExtractor,
 
   ['STORAGEDRIVE_EVENT']: unknownGenericTextExtractor,
+  
+  ['CLOUD_FLARE_DEPLOY']: unknownGenericTextExtractor,
 };
 
 export const storyResultToMetadata = (
