@@ -7,13 +7,13 @@ import {
   LogLevelEnum,
 } from 'quidproquo-core';
 import { CloudflareResponse, CloudflareDNSRecord } from '../types';
-import { CloudFlareDnsEntry } from '../../../types';
+import { CloudflareDnsEntry } from '../../../types';
 
-export function* askCloudFlareAddDNSRecord(
+export function* askCloudflareAddDNSRecord(
   apiKey: string,
   zoneId: string,
   cnameName: string,
-  dnsEntryValue: CloudFlareDnsEntry,
+  dnsEntryValue: CloudflareDnsEntry,
 ): AskResponse<void> {
   const requestBody = {
     type: dnsEntryValue.type, // Use the type from the dnsEntryValue

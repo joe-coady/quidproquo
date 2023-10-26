@@ -11,11 +11,11 @@ import {
 } from 'quidproquo-core';
 
 import {
-  CloudFlareDnsDeployEvent,
-  CloudFlareDnsDeployEventEnum,
-  CloudFlareDnsDeployEventResponse,
-  CloudFlareDnsEntries,
-  CloudFlareDnsEntry,
+  CloudflareDnsDeployEvent,
+  CloudflareDnsDeployEventEnum,
+  CloudflareDnsDeployEventResponse,
+  CloudflareDnsEntries,
+  CloudflareDnsEntry,
   qpqWebServerUtils,
 } from 'quidproquo-webserver';
 
@@ -28,8 +28,8 @@ type EventInput = [CloudFormationCustomResourceEvent, Context];
 type EventOutput = void;
 
 // Internals
-type InternalEventInput = CloudFlareDnsDeployEvent;
-type InternalEventOutput = CloudFlareDnsDeployEventResponse;
+type InternalEventInput = CloudflareDnsDeployEvent;
+type InternalEventOutput = CloudflareDnsDeployEventResponse;
 
 type AutoRespondResult = boolean;
 type MatchResult = MatchStoryResult<any, any>;
@@ -40,9 +40,9 @@ const GLOBAL_CERT_DOMAIN = process.env.certificateDomain!;
 const GLOBAL_CERT_REGION = process.env.certificateRegion!;
 
 const awsToQpqEventTypeMap = {
-  Create: CloudFlareDnsDeployEventEnum.Create,
-  Update: CloudFlareDnsDeployEventEnum.Update,
-  Delete: CloudFlareDnsDeployEventEnum.Delete,
+  Create: CloudflareDnsDeployEventEnum.Create,
+  Update: CloudflareDnsDeployEventEnum.Update,
+  Delete: CloudflareDnsDeployEventEnum.Delete,
 };
 
 const getProcessTransformEventParams = (
@@ -69,9 +69,9 @@ const getProcessTransformEventParams = (
         }),
         {},
       ),
-    }).reduce<CloudFlareDnsEntries>((acc, [key, value]) => {
+    }).reduce<CloudflareDnsEntries>((acc, [key, value]) => {
       const trimmedKey = key.endsWith('.') ? key.slice(0, -1) : key;
-      acc[trimmedKey] = value as CloudFlareDnsEntry;
+      acc[trimmedKey] = value as CloudflareDnsEntry;
       return acc;
     }, {});
 
