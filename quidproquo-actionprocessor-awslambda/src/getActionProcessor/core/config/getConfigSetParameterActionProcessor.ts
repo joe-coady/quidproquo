@@ -13,11 +13,11 @@ import { setParameter } from '../../../logic/parametersManager/setParameter';
 const getProcessConfigSetParameter = (qpqConfig: QPQConfig): ConfigSetParameterActionProcessor => {
   return async ({ parameterName, parameterValue }) => {
     const awsParameterKey = resolveParameterKey(parameterName, qpqConfig);
-    
+
     await setParameter(
       awsParameterKey,
       qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig),
-      parameterValue
+      parameterValue,
     );
 
     return actionResult(void 0);

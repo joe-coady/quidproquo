@@ -1,20 +1,27 @@
-import { QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
+import { convertCrossModuleOwnerToGenericResourceNameOverride } from '../../qpqCoreUtils';
+import { CrossModuleOwner } from '../../types';
+import {
+  QPQConfigAdvancedSettings,
+  QPQConfigSetting,
+  QPQCoreConfigSettingType,
+} from '../QPQConfig';
+
+export interface QPQConfigAdvancedSecretSettings extends QPQConfigAdvancedSettings {
+  owner?: CrossModuleOwner<'secretName'>;
+}
 
 export interface SecretQPQConfigSetting extends QPQConfigSetting {
   key: string;
-  value: string;
-  owned: boolean;
 }
 
 export const defineSecret = (
   key: string,
-  owned: boolean = true,
-  value: string = '',
+  options?: QPQConfigAdvancedSecretSettings,
 ): SecretQPQConfigSetting => ({
   configSettingType: QPQCoreConfigSettingType.secret,
   uniqueKey: key,
 
   key,
-  value,
-  owned,
+
+  owner: convertCrossModuleOwnerToGenericResourceNameOverride(options?.owner),
 });

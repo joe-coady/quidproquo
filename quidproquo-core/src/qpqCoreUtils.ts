@@ -20,9 +20,12 @@ import {
   KeyValueStoreQPQConfigSetting,
   EnvironmentSettingsQPQConfigSetting,
   DeployEventsQPQConfigSetting,
-  GlobalQPQConfigSetting
+  GlobalQPQConfigSetting,
 } from './config/settings';
-import { EmailTemplates, QpqEmailTemplateSourceEntry } from './config/settings/emailTemplates/types';
+import {
+  EmailTemplates,
+  QpqEmailTemplateSourceEntry,
+} from './config/settings/emailTemplates/types';
 import { CrossModuleOwner, CrossServiceResourceName, ResourceName } from './types';
 
 /**
@@ -158,8 +161,11 @@ export const getStorageDrives = (configs: QPQConfig): StorageDriveQPQConfigSetti
   );
 };
 
-export const getStorageDriveByName = (storageDriveName: string, configs: QPQConfig): StorageDriveQPQConfigSetting | undefined => {
-  return getStorageDrives(configs).find(sd => sd.storageDrive === storageDriveName);
+export const getStorageDriveByName = (
+  storageDriveName: string,
+  configs: QPQConfig,
+): StorageDriveQPQConfigSetting | undefined => {
+  return getStorageDrives(configs).find((sd) => sd.storageDrive === storageDriveName);
 };
 
 export const getQueues = (configs: QPQConfig): QueueQPQConfigSetting[] => {
@@ -190,8 +196,11 @@ export const getOwnedEventBusConfigs = (qpqConfig: QPQConfig): EventBusQPQConfig
   return ownedEventBusConfigs;
 };
 
-export const getEventBusConfigByName = (eventBusName: string, qpqConfig: QPQConfig): EventBusQPQConfigSetting | undefined => {
-  const eventBusConfig = getAllEventBusConfigs(qpqConfig).find(eb => eb.name === eventBusName);
+export const getEventBusConfigByName = (
+  eventBusName: string,
+  qpqConfig: QPQConfig,
+): EventBusQPQConfigSetting | undefined => {
+  const eventBusConfig = getAllEventBusConfigs(qpqConfig).find((eb) => eb.name === eventBusName);
   return eventBusConfig;
 };
 
@@ -204,12 +213,16 @@ export const getOwnedItems = <T extends QPQConfigSetting>(
   const appFeature = getApplicationModuleFeature(qpqConfig);
   const appEnvironment = getApplicationModuleEnvironment(qpqConfig);
 
-  return settings.filter((s) => !s.owner || (
-    (!s.owner.module || s.owner.module === appModuleName) &&
-    (!s.owner.application || s.owner.application === appName) &&
-    (s.owner.feature === undefined || (!s.owner.feature && !appFeature) || s.owner.feature === appFeature) &&
-    (!s.owner.environment || s.owner.environment === appEnvironment)
-  ));
+  return settings.filter(
+    (s) =>
+      !s.owner ||
+      ((!s.owner.module || s.owner.module === appModuleName) &&
+        (!s.owner.application || s.owner.application === appName) &&
+        (s.owner.feature === undefined ||
+          (!s.owner.feature && !appFeature) ||
+          s.owner.feature === appFeature) &&
+        (!s.owner.environment || s.owner.environment === appEnvironment)),
+  );
 };
 
 export const getAllKeyValueStores = (qpqConfig: QPQConfig): KeyValueStoreQPQConfigSetting[] => {
@@ -255,7 +268,7 @@ export const getKeyValueStoreByName = (
   kvsName: string,
 ): KeyValueStoreQPQConfigSetting | undefined => {
   const keyValueStore = getAllKeyValueStores(qpqConfig).find(
-    (kvs) => kvs.keyValueStoreName === kvsName
+    (kvs) => kvs.keyValueStoreName === kvsName,
   );
 
   return keyValueStore;
@@ -308,13 +321,16 @@ export const getQueueSrcEntries = (configs: QPQConfig): string[] => {
 export const getUserDirectorySrcEntries = (qpqConfig: QPQConfig): string[] => {
   const userConfigs = getUserDirectories(qpqConfig);
 
-  return userConfigs.reduce(
-    (acc, ud) => [...acc, ...Object.values(ud.emailTemplates).map((et: QpqEmailTemplateSourceEntry) => et?.src)],
-    [] as string[],
-  ).filter(src => !!src);
+  return userConfigs
+    .reduce(
+      (acc, ud) => [
+        ...acc,
+        ...Object.values(ud.emailTemplates).map((et: QpqEmailTemplateSourceEntry) => et?.src),
+      ],
+      [] as string[],
+    )
+    .filter((src) => !!src);
 };
-
-
 
 // Used in bundlers to know where and what to build and index
 export const getAllSrcEntries = (qpqConfig: QPQConfig): string[] => {
@@ -323,24 +339,44 @@ export const getAllSrcEntries = (qpqConfig: QPQConfig): string[] => {
     ...getQueueSrcEntries(qpqConfig),
     ...getUserDirectorySrcEntries(qpqConfig),
     ...getDeployEventConfigs(qpqConfig).map((r) => r.src.src),
-    ...getStorageDrives(qpqConfig).flatMap(sd => [sd.onEvent?.create?.src, sd.onEvent?.delete?.src]).filter(src => !!src) as string[],
+    ...(getStorageDrives(qpqConfig)
+      .flatMap((sd) => [sd.onEvent?.create?.src, sd.onEvent?.delete?.src])
+      .filter((src) => !!src) as string[]),
   ];
 };
 
-export const getOwnedSecrets = (configs: QPQConfig): SecretQPQConfigSetting[] => {
+export const getSecretByName = (
+  secretName: string,
+  qpqConfig: QPQConfig,
+): SecretQPQConfigSetting => {
   const secrets = getConfigSettings<SecretQPQConfigSetting>(
-    configs,
+    qpqConfig,
     QPQCoreConfigSettingType.secret,
   );
 
-  return secrets.filter((s) => s.owned);
+  const secret = secrets.find((s) => s.key === secretName);
+
+  if (!secret) {
+    throw new Error(`Can not find secret [${secretName}]`);
+  }
+
+  return secret;
+};
+
+export const getOwnedSecrets = (qpqConfig: QPQConfig): SecretQPQConfigSetting[] => {
+  const secrets = getConfigSettings<SecretQPQConfigSetting>(
+    qpqConfig,
+    QPQCoreConfigSettingType.secret,
+  );
+
+  return getOwnedItems(secrets, qpqConfig);
 };
 
 export const getGlobalConfigValue = <T>(qpqConfig: QPQConfig, name: string): T => {
   const global = getConfigSettings<GlobalQPQConfigSetting<T>>(
     qpqConfig,
     QPQCoreConfigSettingType.global,
-  ).find(g => g.key === name);
+  ).find((g) => g.key === name);
 
   if (!global) {
     throw new Error(`Global config ${name} not found`);
@@ -365,15 +401,6 @@ export const getParameterConfigs = (qpqConfig: QPQConfig): ParameterQPQConfigSet
   );
 
   return parameters;
-};
-
-export const getSharedSecrets = (configs: QPQConfig): SecretQPQConfigSetting[] => {
-  const secrets = getConfigSettings<SecretQPQConfigSetting>(
-    configs,
-    QPQCoreConfigSettingType.secret,
-  );
-
-  return secrets.filter((s) => !s.owned);
 };
 
 export const getUniqueKeyForSetting = (setting: QPQConfigSetting) => {
@@ -441,22 +468,22 @@ export const getQueueQueueProcessors = (name: string, qpqConfig: QPQConfig): Qpq
 };
 
 export const convertCrossModuleOwnerToGenericResourceNameOverride = <T extends string>(
-  owner?: CrossModuleOwner<T>
+  owner?: CrossModuleOwner<T>,
 ): CrossModuleOwner<'resourceNameOverride'> | undefined => {
   if (!owner) {
     return undefined;
   }
 
   type KeyType = keyof typeof owner;
-  const key: KeyType = (Array.from(Object.keys(owner)).find(
-    (k) => k !== 'module' && k !== 'application' && k !== 'feature' && k !== 'environment'
-  ) as any) as KeyType;
+  const key: KeyType = Array.from(Object.keys(owner)).find(
+    (k) => k !== 'module' && k !== 'application' && k !== 'feature' && k !== 'environment',
+  ) as any as KeyType;
 
   const resourceName = owner[key as T];
   const { [key]: _, ...otherProps } = owner;
-  
+
   return {
     ...otherProps,
-    resourceNameOverride: resourceName
+    resourceNameOverride: resourceName,
   };
-}
+};

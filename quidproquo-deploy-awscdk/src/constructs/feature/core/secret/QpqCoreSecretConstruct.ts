@@ -42,7 +42,7 @@ export class QpqCoreSecretConstruct extends QpqCoreSecretConstructBase {
       secret = aws_secretsmanager.Secret.fromSecretNameV2(
         scope,
         `${id}-${secretConfig.uniqueKey}`,
-        this.resourceName(secretConfig.key),
+        this.resourceNameWithModuleOveride(secretConfig.key, secretConfig.owner?.module),
       );
     }
 

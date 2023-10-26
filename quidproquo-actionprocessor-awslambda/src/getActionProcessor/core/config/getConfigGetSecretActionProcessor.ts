@@ -6,13 +6,12 @@ import {
   qpqCoreUtils,
 } from 'quidproquo-core';
 
-import { resolveSecretKey } from '../../../runtimeConfig/qpqAwsLambdaRuntimeConfigUtils';
-
 import { getSecret } from '../../../logic/secretsManager/getSecret';
+import { resolveSecretResourceName } from './utils';
 
 const getProcessConfigActionType = (qpqConfig: QPQConfig): ConfigGetSecretActionProcessor => {
   return async ({ secretName }) => {
-    const awsSecretKey = resolveSecretKey(secretName, qpqConfig);
+    const awsSecretKey = resolveSecretResourceName(secretName, qpqConfig);
     const secretValue = await getSecret(
       awsSecretKey,
       qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig),

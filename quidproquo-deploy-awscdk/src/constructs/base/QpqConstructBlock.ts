@@ -25,6 +25,14 @@ export class QpqConstructBlock extends Construct implements QpqResource {
     return awsNamingUtils.getConfigRuntimeResourceNameFromConfig(name, this.qpqConfig);
   }
 
+  resourceNameWithModuleOveride(name: string, module?: string) {
+    return awsNamingUtils.getConfigRuntimeResourceNameFromConfigWithServiceOverride(
+      name,
+      this.qpqConfig,
+      module,
+    );
+  }
+
   qpqResourceName(name: string, resourceType: string) {
     return awsNamingUtils.getQpqRuntimeResourceNameFromConfig(name, this.qpqConfig, resourceType);
   }
