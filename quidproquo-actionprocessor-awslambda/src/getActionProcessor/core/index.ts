@@ -13,7 +13,7 @@ export { default as getEventBridgeEventActionProcessor } from './event/getEventB
 export { default as getLambdaCognitoCustomMessage } from './event/getLambdaCognitoCustomMessage';
 export { default as getWebsocketAPIGatewayEventActionProcessor } from './event/getWebsocketAPIGatewayEventActionProcessor';
 export { default as getS3FileEventActionProcessor } from './event/getS3FileEventActionProcessor';
-export { default as getCustomResourceCloudFlareDnsEventActionProcessor } from './event/getCustomResourceCloudFlareDnsEventActionProcessor';
+export { default as getCustomResourceCloudflareDnsEventActionProcessor } from './event/getCustomResource_CloudflareDnsEventActionProcessor';
 
 export { default as getSystemActionProcessor } from './system';
 export { default as getFileActionProcessor } from './file';

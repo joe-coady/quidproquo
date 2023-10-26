@@ -117,7 +117,7 @@ const getProcessMatchStory = (
 ): EventMatchStoryActionProcessor<InternalEventInput, MatchResult> => {
   return async (payload) => {
     return actionResult<MatchResult>({
-      src: getServiceEntry('cloudFlare', 'cloudFlare', 'onDeploy'),
+      src: getServiceEntry('cloudflare', 'cloudflare', 'onDeploy'),
       runtime: 'onDeploy',
     });
   };

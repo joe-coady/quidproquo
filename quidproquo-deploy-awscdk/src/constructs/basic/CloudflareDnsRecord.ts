@@ -22,12 +22,12 @@ export class CloudflareDnsRecord extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: CloudflareDnsRecordProps) {
     super(scope, id, props);
 
-    const func = new Function(this, `cloudFlare`, {
+    const func = new Function(this, `cloudflare`, {
       buildPath: props.buildPath,
       // TODO: Name this function something more descriptive
       // functionName: this.resourceName(`cf-dms`),
-      functionType: 'lambdaCustomResource_cloudFlareDns',
-      executorName: 'executeCustomResourceCloudFlareDns',
+      functionType: 'lambdaCustomResource_cloudflareDns',
+      executorName: 'executeCustomResourceCloudflareDns',
 
       qpqConfig: props.qpqConfig,
 
