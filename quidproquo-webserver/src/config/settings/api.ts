@@ -5,6 +5,8 @@ import { QPQWebServerConfigSettingType } from '../QPQConfig';
 export interface QPQConfigAdvancedApiSettings extends QPQConfigAdvancedSettings {
   onRootDomain?: boolean;
   apiName?: string;
+
+  cloudFlareApiKeySecretName?: string;
 }
 
 export interface ApiQPQWebServerConfigSetting extends QPQConfigSetting {
@@ -15,6 +17,8 @@ export interface ApiQPQWebServerConfigSetting extends QPQConfigSetting {
   buildPath: string;
 
   deprecated: boolean;
+
+  cloudFlareApiKeySecretName?: string;
 }
 
 export const defineApi = (
@@ -34,5 +38,7 @@ export const defineApi = (
     apiName: options?.apiName || 'api',
 
     deprecated: options?.deprecated || false,
+
+    cloudFlareApiKeySecretName: options?.cloudFlareApiKeySecretName,
   };
 };

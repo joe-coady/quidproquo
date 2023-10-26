@@ -15,35 +15,39 @@ export interface SubdomainNameProps extends QpqConstructBlockProps {
 export class SubdomainName extends QpqConstructBlock {
   public readonly domainName: aws_apigateway.DomainName;
   public readonly certificate: aws_certificatemanager.Certificate;
+  public readonly targetARecord: aws_route53.RecordTarget;
+  public readonly deployDomain: string;
 
   constructor(scope: Construct, id: string, props: SubdomainNameProps) {
     super(scope, id, props);
 
-    const newDomainName = `${props.subdomain}.${props.apexDomain}`;
+    this.deployDomain = `${props.subdomain}.${props.apexDomain}`;
 
     const apexHostedZone = aws_route53.HostedZone.fromLookup(this, 'hosted-zone', {
       domainName: props.apexDomain,
     });
 
     this.certificate = new aws_certificatemanager.Certificate(this, 'certificate', {
-      domainName: newDomainName,
+      domainName: this.deployDomain,
       certificateName: this.qpqResourceName(props.subdomain, 'cert'),
       validation: aws_certificatemanager.CertificateValidation.fromDns(apexHostedZone),
     });
 
     this.domainName = new aws_apigateway.DomainName(this, 'domain-name', {
-      domainName: newDomainName,
+      domainName: this.deployDomain,
       certificate: this.certificate,
       securityPolicy: aws_apigateway.SecurityPolicy.TLS_1_2,
       endpointType: aws_apigateway.EndpointType.REGIONAL,
     });
 
+    this.targetARecord = aws_route53.RecordTarget.fromAlias(
+      new aws_route53_targets.ApiGatewayDomain(this.domainName),
+    );
+
     new aws_route53.ARecord(this, 'a-record', {
       zone: apexHostedZone,
-      recordName: newDomainName,
-      target: aws_route53.RecordTarget.fromAlias(
-        new aws_route53_targets.ApiGatewayDomain(this.domainName),
-      ),
+      recordName: this.deployDomain,
+      target: this.targetARecord,
     });
   }
 }

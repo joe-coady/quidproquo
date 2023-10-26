@@ -8,7 +8,7 @@ import * as cdk from 'aws-cdk-lib';
 import { getAwsServiceAccountInfoConfig } from 'quidproquo-config-aws';
 
 export interface FunctionProps extends QpqConstructBlockProps {
-  functionName: string;
+  functionName?: string;
 
   buildPath: string;
   srcFilename?: string;
@@ -35,11 +35,7 @@ export class Function extends QpqConstructBlock {
 
     const handlerFile = props.srcFilename || 'index';
 
-    const serviceInfo = getAwsServiceAccountInfoConfig(
-      props.qpqConfig
-    );
-
-    console.log(`FuncName: ${props.functionName}::${props.functionName.length}`);
+    const serviceInfo = getAwsServiceAccountInfoConfig(props.qpqConfig);
 
     this.lambdaFunction = new aws_lambda.Function(this, 'function', {
       functionName: props.functionName,
@@ -113,7 +109,15 @@ export class Function extends QpqConstructBlock {
     this.lambdaFunction.addToRolePolicy(
       new aws_iam.PolicyStatement({
         actions: ['execute-api:ManageConnections'],
-        resources: ["*"],
+        resources: ['*'],
+      }),
+    );
+
+    // Let the lambda describe any certificate to get its validation options
+    this.lambdaFunction.addToRolePolicy(
+      new aws_iam.PolicyStatement({
+        actions: ['acm:DescribeCertificate', 'acm:ListCertificates'],
+        resources: ['*'], // This allows describing any ACM certificate. Narrow down if necessary.
       }),
     );
 
@@ -121,12 +125,12 @@ export class Function extends QpqConstructBlock {
     this.lambdaFunction.addToRolePolicy(
       new aws_iam.PolicyStatement({
         actions: [
-          'dynamodb:GetItem', 
-          'dynamodb:Scan', 
-          'dynamodb:Query', 
-          'dynamodb:PutItem', 
-          'dynamodb:UpdateItem', 
-          'dynamodb:DeleteItem'
+          'dynamodb:GetItem',
+          'dynamodb:Scan',
+          'dynamodb:Query',
+          'dynamodb:PutItem',
+          'dynamodb:UpdateItem',
+          'dynamodb:DeleteItem',
         ],
 
         // TODO: Revisit this, the user can make logs tables them selves... ~ Slight security risk here

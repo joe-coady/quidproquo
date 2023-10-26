@@ -9,6 +9,7 @@ import { SubdomainName } from '../../../basic/SubdomainName';
 import { Function } from '../../../basic/Function';
 
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
+import { CloudflareDnsRecord } from '../../../basic/CloudflareDnsRecord';
 
 export interface QpqWebserverApiConstructProps extends QpqConstructBlockProps {
   apiConfig: ApiQPQWebServerConfigSetting;
@@ -73,6 +74,20 @@ export class QpqWebserverApiConstruct extends QpqConstructBlock {
         awsAccountId: props.awsAccountId,
       });
 
+      if (props.apiConfig.cloudFlareApiKeySecretName) {
+        new CloudflareDnsRecord(this, 'certFlare', {
+          awsAccountId: props.awsAccountId,
+          buildPath: qpqWebServerUtils.getApiEntryFullPath(props.qpqConfig, props.apiConfig),
+          qpqConfig: props.qpqConfig,
+
+          // certificateArn: subdomain.certificate.certificateArn,
+          certificateDomain: subdomain.deployDomain,
+
+          dnsEntries: {},
+          apiSecretName: props.apiConfig.cloudFlareApiKeySecretName,
+        });
+      }
+
       // Map all requests to this service to /serviceName/*
       new aws_apigateway.BasePathMapping(this, 'rest-bpm', {
         domainName: subdomain.domainName,
@@ -81,6 +96,23 @@ export class QpqWebserverApiConstruct extends QpqConstructBlock {
         // the properties below are optional
         // basePath: settings.service,
       });
+
+      if (props.apiConfig.cloudFlareApiKeySecretName) {
+        new CloudflareDnsRecord(this, 'cloudflare', {
+          awsAccountId: props.awsAccountId,
+          buildPath: qpqWebServerUtils.getApiEntryFullPath(props.qpqConfig, props.apiConfig),
+          qpqConfig: props.qpqConfig,
+
+          dnsEntries: {
+            [subdomain.deployDomain]: {
+              value: subdomain.domainName.domainNameAliasDomainName,
+              proxied: true,
+              type: 'CNAME',
+            },
+          },
+          apiSecretName: props.apiConfig.cloudFlareApiKeySecretName,
+        });
+      }
     }
   }
 }

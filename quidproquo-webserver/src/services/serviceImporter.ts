@@ -27,6 +27,12 @@ const serviceEntryMap = {
     'deployEvent', 
     'onDeploy'
   )]: require('../services/seed/entry/deployEvent/onDeploy'),
+
+  [getServiceEntry(
+    'cloudFlare', 
+    'cloudFlare', 
+    'onDeploy'
+  )]: require('../services/cloudFlare/entry/cloudFlare/onDeploy'),
 };
 
 export const serviceImporter = async (modulePath: string): Promise<any> => {

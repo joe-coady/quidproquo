@@ -1,10 +1,21 @@
-import { QPQConfig, QPQConfigAdvancedSettings, StorageDriveTier, defineGlobal, defineKeyValueStore, defineStorageDrive, defineUserDirectory, getServiceEntry } from 'quidproquo-core';
+import {
+  QPQConfig,
+  QPQConfigAdvancedSettings,
+  StorageDriveTier,
+  defineGlobal,
+  defineKeyValueStore,
+  defineStorageDrive,
+  defineUserDirectory,
+  getServiceEntry,
+} from 'quidproquo-core';
 import { defineRoute } from './route';
 import { defineWebEntry } from './webEntry';
 
 export interface QPQConfigAdvancedLogSettings extends QPQConfigAdvancedSettings {
   logRetentionDays?: number;
   coldStorageAfterDays?: number;
+
+  cloudFlareApiKeySecretName?: string;
 }
 
 // NEVER EVER CHANGE THIS NAME
@@ -20,7 +31,6 @@ export const defineLogs = (
   webFilesPath: string,
   advancedSettings?: QPQConfigAdvancedLogSettings,
 ): QPQConfig => {
-  
   const routeAuthSettings = {
     routeAuthSettings: {
       userDirectoryName: 'qpq-admin',
@@ -29,48 +39,55 @@ export const defineLogs = (
 
   /**
    * Determines the number of days to retain logs.
-   * 
+   *
    * - By default, logs are retained for 30 days.
    * - If `logRetentionDays` is specified in the `advancedSettings`, it will be used.
-   * - If `coldStorageAfterDays` is specified, the retention is extended by an additional 180 days 
+   * - If `coldStorageAfterDays` is specified, the retention is extended by an additional 180 days
    *   (to ensure logs outlive the transition period to cold storage).
-   * 
+   *
    * The final retention period is the maximum value between the default, specified `logRetentionDays`,
    * and `coldStorageAfterDays` plus 180.
    */
-  const logRetentionDays: number | undefined = advancedSettings?.logRetentionDays ? Math.max(
-    advancedSettings?.logRetentionDays || 30,
-    advancedSettings?.coldStorageAfterDays ? 
-      advancedSettings?.coldStorageAfterDays + 180 :
-      0
-  ) : undefined;
+  const logRetentionDays: number | undefined = advancedSettings?.logRetentionDays
+    ? Math.max(
+        advancedSettings?.logRetentionDays || 30,
+        advancedSettings?.coldStorageAfterDays ? advancedSettings?.coldStorageAfterDays + 180 : 0,
+      )
+    : undefined;
 
   const configs = [
-    defineGlobal("qpq-log-retention-days", logRetentionDays),
+    defineGlobal('qpq-log-retention-days', logRetentionDays),
 
     defineStorageDrive(logResourceName, {
       onEvent: {
         buildPath,
         create: {
           src: getServiceEntry('log', 'storageDrive', 'onCreate'),
-          runtime: "onCreate"
-        }
+          runtime: 'onCreate',
+        },
       },
-      deprecated: advancedSettings?.deprecated,  
-      lifecycleRules: [{
-        // An array or undefined based on the number of days specified > 0
-        transitions: (advancedSettings?.coldStorageAfterDays || 0) > 0 ? [{
-          storageDriveTier: StorageDriveTier.DEEP_COLD_STORAGE,
-          transitionAfterDays: advancedSettings!.coldStorageAfterDays!
-        }] : undefined,
-        deleteAfterDays: logRetentionDays,
-      }]
+      deprecated: advancedSettings?.deprecated,
+      lifecycleRules: [
+        {
+          // An array or undefined based on the number of days specified > 0
+          transitions:
+            (advancedSettings?.coldStorageAfterDays || 0) > 0
+              ? [
+                  {
+                    storageDriveTier: StorageDriveTier.DEEP_COLD_STORAGE,
+                    transitionAfterDays: advancedSettings!.coldStorageAfterDays!,
+                  },
+                ]
+              : undefined,
+          deleteAfterDays: logRetentionDays,
+        },
+      ],
     }),
 
     defineKeyValueStore(logResourceName, 'correlation', [], {
       indexes: [
         { partitionKey: 'runtimeType', sortKey: 'startedAt' },
-        { partitionKey: 'fromCorrelation', sortKey: 'startedAt' }
+        { partitionKey: 'fromCorrelation', sortKey: 'startedAt' },
       ],
       ttlAttribute: 'ttl',
       deprecated: advancedSettings?.deprecated,
@@ -78,15 +95,25 @@ export const defineLogs = (
 
     defineUserDirectory('qpq-admin', buildPath),
     defineRoute('POST', '/login', getServiceEntry('log', 'controller', 'loginController'), 'login'),
-    defineRoute('POST', '/refreshToken', getServiceEntry('log', 'controller', 'loginController'), 'refreshToken'),
-    defineRoute('POST', '/challenge', getServiceEntry('log', 'controller', 'loginController'), 'respondToAuthChallenge'),
+    defineRoute(
+      'POST',
+      '/refreshToken',
+      getServiceEntry('log', 'controller', 'loginController'),
+      'refreshToken',
+    ),
+    defineRoute(
+      'POST',
+      '/challenge',
+      getServiceEntry('log', 'controller', 'loginController'),
+      'respondToAuthChallenge',
+    ),
 
     defineRoute(
       'POST',
       '/log/list',
       getServiceEntry('log', 'controller', 'logController'),
       'getLogs',
-      routeAuthSettings
+      routeAuthSettings,
     ),
 
     defineRoute(
@@ -94,7 +121,7 @@ export const defineLogs = (
       '/log/{correlationId}',
       getServiceEntry('log', 'controller', 'logController'),
       'getLog',
-      routeAuthSettings
+      routeAuthSettings,
     ),
 
     defineRoute(
@@ -102,7 +129,7 @@ export const defineLogs = (
       '/log/children/{fromCorrelation}',
       getServiceEntry('log', 'controller', 'logController'),
       'getChildren',
-      routeAuthSettings
+      routeAuthSettings,
     ),
 
     defineRoute(
@@ -110,40 +137,40 @@ export const defineLogs = (
       '/log/download/{correlationId}',
       getServiceEntry('log', 'controller', 'logController'),
       'downloadLog',
-      routeAuthSettings
+      routeAuthSettings,
     ),
 
     defineWebEntry('admin', {
       buildPath: webFilesPath,
       domain: {
         subDomainName: 'admin',
-        onRootDomain: false
+        onRootDomain: false,
       },
 
       ignoreCache: ['index.html', 'index.js'],
+
+      cloudFlareApiKeySecretName: advancedSettings?.cloudFlareApiKeySecretName,
 
       securityHeaders: {
         contentSecurityPolicy: {
           override: true,
           contentSecurityPolicy: {
             'default-src': ["'self'"],
-            
-            'connect-src': [
-              "'self'"
-            ],
-            
+
+            'connect-src': ["'self'"],
+
             'style-src': [
               "'self'",
               "'unsafe-inline'", // For inline styles
             ],
-    
+
             'script-src': [
               "'self'", // For scripts from the same domain
             ],
           },
         },
       },
-    })
+    }),
   ];
 
   return configs;

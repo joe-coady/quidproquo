@@ -6,7 +6,6 @@ import {
   aws_iam,
   aws_cloudfront_origins,
   aws_cloudfront,
-  aws_certificatemanager,
   aws_route53,
   aws_s3_deployment,
   aws_route53_targets,
@@ -18,6 +17,9 @@ import {
   qpqWebServerUtils,
   qpqHeaderIsBot,
 } from 'quidproquo-webserver';
+
+import { CloudflareDnsRecord } from '../../../basic/CloudflareDnsRecord';
+import { DnsValidatedCertificate } from '../../../basic/DnsValidatedCertificate';
 
 import { convertSecurityHeadersFromQpqSecurityHeaders } from './utils/securityHeaders';
 
@@ -35,14 +37,6 @@ export interface QpqWebserverWebEntryConstructProps extends QpqConstructBlockPro
 export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: QpqWebserverWebEntryConstructProps) {
     super(scope, id, props);
-
-    const apexDomain = props.webEntryConfig.domain.onRootDomain
-      ? qpqWebServerUtils.getBaseDomainName(props.qpqConfig)
-      : qpqWebServerUtils.getServiceDomainName(props.qpqConfig);
-
-    const deployDomain = props.webEntryConfig.domain.subDomainName
-      ? `${props.webEntryConfig.domain.subDomainName}.${apexDomain}`
-      : apexDomain;
 
     // create / reference an s3 bucket
     let originBucket: aws_s3.IBucket | null = null;
@@ -95,14 +89,26 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
       });
     }
 
-    const hostedZone = aws_route53.HostedZone.fromLookup(this, 'MyHostedZone', {
-      domainName: apexDomain,
+    const dnsRecord = new DnsValidatedCertificate(this, 'cert', {
+      onRootDomain: props.webEntryConfig.domain.onRootDomain,
+      subdomain: props.webEntryConfig.domain.subDomainName,
+
+      awsAccountId: props.awsAccountId,
+      qpqConfig: props.qpqConfig,
     });
 
-    const myCertificate = new aws_certificatemanager.Certificate(this, 'mySiteCert', {
-      domainName: deployDomain,
-      validation: aws_certificatemanager.CertificateValidation.fromDns(hostedZone),
-    });
+    if (props.webEntryConfig.cloudFlareApiKeySecretName) {
+      new CloudflareDnsRecord(this, 'certDns', {
+        awsAccountId: props.awsAccountId,
+        buildPath: qpqWebServerUtils.getWebEntrySeoFullPath(props.qpqConfig, props.webEntryConfig),
+        qpqConfig: props.qpqConfig,
+
+        // certificateArn: dnsRecord.certificate.certificateArn,
+        certificateDomain: dnsRecord.deployDomain,
+        dnsEntries: {},
+        apiSecretName: props.webEntryConfig.cloudFlareApiKeySecretName,
+      });
+    }
 
     const originAccessControl = new aws_cloudfront.CfnOriginAccessControl(
       this,
@@ -162,8 +168,8 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
         responseHeadersPolicy: responseHeaderPolicy,
       },
 
-      domainNames: [deployDomain],
-      certificate: myCertificate,
+      domainNames: [dnsRecord.deployDomain],
+      certificate: dnsRecord.certificate,
       defaultRootObject: props.webEntryConfig.indexRoot,
 
       // redirect errors to root page and let spa sort it
@@ -201,12 +207,33 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
     );
 
     new aws_route53.ARecord(this, 'web-alias', {
-      zone: hostedZone,
-      recordName: deployDomain,
+      zone: dnsRecord.hostedZone,
+      recordName: dnsRecord.deployDomain,
       target: aws_route53.RecordTarget.fromAlias(
         new aws_route53_targets.CloudFrontTarget(distribution),
       ),
     });
+
+    if (props.webEntryConfig.cloudFlareApiKeySecretName) {
+      new CloudflareDnsRecord(this, 'cloudflare', {
+        awsAccountId: props.awsAccountId,
+        buildPath: qpqWebServerUtils.getWebEntrySeoFullPath(props.qpqConfig, props.webEntryConfig),
+        qpqConfig: props.qpqConfig,
+
+        // We cant add thease here, we need the certificate to validate
+        // before the distibution is finsished creating
+        // certificateArn: dnsRecord.certificate.certificateArn,
+        // certificateDomain: dnsRecord.deployDomain,
+        dnsEntries: {
+          [dnsRecord.deployDomain]: {
+            value: distribution.distributionDomainName,
+            proxied: true,
+            type: 'CNAME',
+          },
+        },
+        apiSecretName: props.webEntryConfig.cloudFlareApiKeySecretName,
+      });
+    }
 
     // All seos that are for this web entry
     const seos = qpqWebServerUtils

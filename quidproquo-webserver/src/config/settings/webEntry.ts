@@ -30,6 +30,8 @@ export interface QPQConfigAdvancedWebEntrySettings extends QPQConfigAdvancedSett
 
   compressFiles?: boolean;
 
+  cloudFlareApiKeySecretName?: string;
+
   securityHeaders?: ResponseSecurityHeaders;
 }
 
@@ -46,6 +48,8 @@ export interface WebEntryQPQWebServerConfigSetting extends QPQConfigSetting {
   ignoreCache: string[];
 
   compressFiles: boolean;
+
+  cloudFlareApiKeySecretName?: string;
 
   securityHeaders?: ResponseSecurityHeaders;
 }
@@ -82,4 +86,6 @@ export const defineWebEntry = (
   compressFiles: options?.compressFiles ?? true,
 
   securityHeaders: options?.securityHeaders,
+
+  cloudFlareApiKeySecretName: options?.cloudFlareApiKeySecretName,
 });

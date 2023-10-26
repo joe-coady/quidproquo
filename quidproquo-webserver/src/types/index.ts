@@ -6,3 +6,4 @@ export * from './constants';
 export * from "./EmailSendEvent";
 export * from "./WebsocketEvent";
 export * from "./StorageDriveEvent";
+export * from "./CloudFlareDnsDeployEvent";
