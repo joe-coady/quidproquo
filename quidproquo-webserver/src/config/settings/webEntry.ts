@@ -30,7 +30,7 @@ export interface QPQConfigAdvancedWebEntrySettings extends QPQConfigAdvancedSett
 
   compressFiles?: boolean;
 
-  cloudFlareApiKeySecretName?: string;
+  cloudflareApiKeySecretName?: string;
 
   securityHeaders?: ResponseSecurityHeaders;
 }
@@ -49,7 +49,7 @@ export interface WebEntryQPQWebServerConfigSetting extends QPQConfigSetting {
 
   compressFiles: boolean;
 
-  cloudFlareApiKeySecretName?: string;
+  cloudflareApiKeySecretName?: string;
 
   securityHeaders?: ResponseSecurityHeaders;
 }
@@ -87,5 +87,5 @@ export const defineWebEntry = (
 
   securityHeaders: options?.securityHeaders,
 
-  cloudFlareApiKeySecretName: options?.cloudFlareApiKeySecretName,
+  cloudflareApiKeySecretName: options?.cloudflareApiKeySecretName,
 });

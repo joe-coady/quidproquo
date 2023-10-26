@@ -74,7 +74,7 @@ export class QpqWebserverApiConstruct extends QpqConstructBlock {
         awsAccountId: props.awsAccountId,
       });
 
-      if (props.apiConfig.cloudFlareApiKeySecretName) {
+      if (props.apiConfig.cloudflareApiKeySecretName) {
         new CloudflareDnsRecord(this, 'certFlare', {
           awsAccountId: props.awsAccountId,
           buildPath: qpqWebServerUtils.getApiEntryFullPath(props.qpqConfig, props.apiConfig),
@@ -84,7 +84,7 @@ export class QpqWebserverApiConstruct extends QpqConstructBlock {
           certificateDomain: subdomain.deployDomain,
 
           dnsEntries: {},
-          apiSecretName: props.apiConfig.cloudFlareApiKeySecretName,
+          apiSecretName: props.apiConfig.cloudflareApiKeySecretName,
         });
       }
 
@@ -97,7 +97,7 @@ export class QpqWebserverApiConstruct extends QpqConstructBlock {
         // basePath: settings.service,
       });
 
-      if (props.apiConfig.cloudFlareApiKeySecretName) {
+      if (props.apiConfig.cloudflareApiKeySecretName) {
         new CloudflareDnsRecord(this, 'cloudflare', {
           awsAccountId: props.awsAccountId,
           buildPath: qpqWebServerUtils.getApiEntryFullPath(props.qpqConfig, props.apiConfig),
@@ -110,7 +110,7 @@ export class QpqWebserverApiConstruct extends QpqConstructBlock {
               type: 'CNAME',
             },
           },
-          apiSecretName: props.apiConfig.cloudFlareApiKeySecretName,
+          apiSecretName: props.apiConfig.cloudflareApiKeySecretName,
         });
       }
     }

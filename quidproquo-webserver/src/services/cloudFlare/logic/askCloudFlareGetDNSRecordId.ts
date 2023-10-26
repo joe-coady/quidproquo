@@ -1,7 +1,7 @@
 import { askNetworkRequest, AskResponse } from 'quidproquo-core';
 import { CloudflareResponse, CloudflareDNSRecord } from '../types';
 
-export function* askCloudFlareGetDNSRecordId(
+export function* askCloudflareGetDNSRecordId(
   apiKey: string,
   zoneId: string,
   cnameName: string,

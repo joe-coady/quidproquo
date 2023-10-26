@@ -1,12 +1,12 @@
 import { ACMClient, DescribeCertificateCommand } from '@aws-sdk/client-acm';
 import { createAwsClient } from '../createAwsClient';
 
-import { CloudFlareDnsEntries } from 'quidproquo-webserver';
+import { CloudflareDnsEntries } from 'quidproquo-webserver';
 
 export const getDomainValidationOptions = async (
   certificateArn: string,
   region: string,
-): Promise<CloudFlareDnsEntries> => {
+): Promise<CloudflareDnsEntries> => {
   const acmClient = createAwsClient(ACMClient, {
     region,
   });
@@ -17,7 +17,7 @@ export const getDomainValidationOptions = async (
 
   const result = await acmClient.send(command);
 
-  const entries: CloudFlareDnsEntries = {};
+  const entries: CloudflareDnsEntries = {};
 
   console.log('DescribeCertificateCommand: ', JSON.stringify(result, null, 2));
 

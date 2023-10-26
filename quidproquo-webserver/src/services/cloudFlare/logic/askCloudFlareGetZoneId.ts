@@ -1,7 +1,7 @@
 import { askNetworkRequest, AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
 import { CloudflareResponse, CloudflareZone } from '../types';
 
-export function* askCloudFlareGetZoneId(
+export function* askCloudflareGetZoneId(
   apiKey: string,
   siteDomainName: string,
 ): AskResponse<string> {

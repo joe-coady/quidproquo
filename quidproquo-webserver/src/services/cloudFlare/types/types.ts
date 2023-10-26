@@ -1,4 +1,4 @@
-export type CloudFlarePageInfo = {
+export type CloudflarePageInfo = {
   page: number;
   per_page: number;
   total_pages: number;
@@ -6,16 +6,16 @@ export type CloudFlarePageInfo = {
   total_count: number;
 };
 
-export type CloudFlareError = {
+export type CloudflareError = {
   code: string;
   message: string;
 };
 
 export type CloudflareResponse<T> = {
   result: T[];
-  result_info: CloudFlarePageInfo;
+  result_info: CloudflarePageInfo;
   success: boolean;
-  errors: CloudFlareError[];
+  errors: CloudflareError[];
   messages: string[]; // assuming messages are strings
 };
 

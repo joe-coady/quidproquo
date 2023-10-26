@@ -6,7 +6,7 @@ export interface QPQConfigAdvancedApiSettings extends QPQConfigAdvancedSettings 
   onRootDomain?: boolean;
   apiName?: string;
 
-  cloudFlareApiKeySecretName?: string;
+  cloudflareApiKeySecretName?: string;
 }
 
 export interface ApiQPQWebServerConfigSetting extends QPQConfigSetting {
@@ -18,7 +18,7 @@ export interface ApiQPQWebServerConfigSetting extends QPQConfigSetting {
 
   deprecated: boolean;
 
-  cloudFlareApiKeySecretName?: string;
+  cloudflareApiKeySecretName?: string;
 }
 
 export const defineApi = (
@@ -39,6 +39,6 @@ export const defineApi = (
 
     deprecated: options?.deprecated || false,
 
-    cloudFlareApiKeySecretName: options?.cloudFlareApiKeySecretName,
+    cloudflareApiKeySecretName: options?.cloudflareApiKeySecretName,
   };
 };

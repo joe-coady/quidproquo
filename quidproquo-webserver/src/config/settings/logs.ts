@@ -15,7 +15,7 @@ export interface QPQConfigAdvancedLogSettings extends QPQConfigAdvancedSettings 
   logRetentionDays?: number;
   coldStorageAfterDays?: number;
 
-  cloudFlareApiKeySecretName?: string;
+  cloudflareApiKeySecretName?: string;
 }
 
 // NEVER EVER CHANGE THIS NAME
@@ -149,7 +149,7 @@ export const defineLogs = (
 
       ignoreCache: ['index.html', 'index.js'],
 
-      cloudFlareApiKeySecretName: advancedSettings?.cloudFlareApiKeySecretName,
+      cloudflareApiKeySecretName: advancedSettings?.cloudflareApiKeySecretName,
 
       securityHeaders: {
         contentSecurityPolicy: {

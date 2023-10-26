@@ -1,4 +1,4 @@
-import { getCustomResourceCloudFlareDnsEventActionProcessor } from 'quidproquo-actionprocessor-awslambda';
+import { getCustomResourceCloudflareDnsEventActionProcessor } from 'quidproquo-actionprocessor-awslambda';
 
 import { createRuntime, askProcessEvent, QpqRuntimeType } from 'quidproquo-core';
 
@@ -14,7 +14,7 @@ import qpqCustomActionProcessors from 'qpq-custom-action-processors-loader!';
 // TODO: Make this a util or something based on server time or something..
 const getDateNow = () => new Date().toISOString();
 
-export const getCustomResourceCloudFlareDns = () => {
+export const getCustomResourceCloudflareDns = () => {
   return async (event: CloudFormationCustomResourceEvent, context: Context) => {
     const cdkConfig = await getLambdaConfigs();
 
@@ -22,7 +22,7 @@ export const getCustomResourceCloudFlareDns = () => {
     // Remove the non route ones ~ let the story execute action add them
     const storyActionProcessor = {
       ...getLambdaActionProcessors(cdkConfig.qpqConfig),
-      ...getCustomResourceCloudFlareDnsEventActionProcessor(cdkConfig.qpqConfig),
+      ...getCustomResourceCloudflareDnsEventActionProcessor(cdkConfig.qpqConfig),
 
       ...qpqCustomActionProcessors(),
     };
@@ -50,4 +50,4 @@ export const getCustomResourceCloudFlareDns = () => {
 };
 
 // Default executor
-export const executeCustomResourceCloudFlareDns = getCustomResourceCloudFlareDns();
+export const executeCustomResourceCloudflareDns = getCustomResourceCloudflareDns();

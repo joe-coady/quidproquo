@@ -97,7 +97,7 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
       qpqConfig: props.qpqConfig,
     });
 
-    if (props.webEntryConfig.cloudFlareApiKeySecretName) {
+    if (props.webEntryConfig.cloudflareApiKeySecretName) {
       new CloudflareDnsRecord(this, 'certDns', {
         awsAccountId: props.awsAccountId,
         buildPath: qpqWebServerUtils.getWebEntrySeoFullPath(props.qpqConfig, props.webEntryConfig),
@@ -106,7 +106,7 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
         // certificateArn: dnsRecord.certificate.certificateArn,
         certificateDomain: dnsRecord.deployDomain,
         dnsEntries: {},
-        apiSecretName: props.webEntryConfig.cloudFlareApiKeySecretName,
+        apiSecretName: props.webEntryConfig.cloudflareApiKeySecretName,
       });
     }
 
@@ -214,7 +214,7 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
       ),
     });
 
-    if (props.webEntryConfig.cloudFlareApiKeySecretName) {
+    if (props.webEntryConfig.cloudflareApiKeySecretName) {
       new CloudflareDnsRecord(this, 'cloudflare', {
         awsAccountId: props.awsAccountId,
         buildPath: qpqWebServerUtils.getWebEntrySeoFullPath(props.qpqConfig, props.webEntryConfig),
@@ -231,7 +231,7 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
             type: 'CNAME',
           },
         },
-        apiSecretName: props.webEntryConfig.cloudFlareApiKeySecretName,
+        apiSecretName: props.webEntryConfig.cloudflareApiKeySecretName,
       });
     }
 

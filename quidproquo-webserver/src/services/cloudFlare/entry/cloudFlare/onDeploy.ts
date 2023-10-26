@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { AskResponse } from 'quidproquo-core';
-import { CloudFlareDnsDeployEvent, CloudFlareDnsDeployEventResponse } from '../../../../types';
-import { askProcessCloudFlareDnsDeployEvent } from '../../logic/askProcessCloudFlareDnsDeployEvent';
+import { CloudflareDnsDeployEvent, CloudflareDnsDeployEventResponse } from '../../../../types';
+import { askProcessCloudflareDnsDeployEvent } from '../../logic/askProcessCloudflareDnsDeployEvent';
 
 export function* onDeploy(
-  event: CloudFlareDnsDeployEvent,
-): AskResponse<CloudFlareDnsDeployEventResponse> {
-  yield* askProcessCloudFlareDnsDeployEvent(event);
+  event: CloudflareDnsDeployEvent,
+): AskResponse<CloudflareDnsDeployEventResponse> {
+  yield* askProcessCloudflareDnsDeployEvent(event);
 }

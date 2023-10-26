@@ -3,8 +3,8 @@ import { Construct } from 'constructs';
 import { custom_resources, CustomResource, aws_route53, aws_certificatemanager } from 'aws-cdk-lib';
 import { Function } from './Function';
 import {
-  CloudFlareDnsDeployEventCommon,
-  CloudFlareDnsEntries,
+  CloudflareDnsDeployEventCommon,
+  CloudflareDnsEntries,
   qpqWebServerUtils,
 } from 'quidproquo-webserver';
 import * as qpqDeployAwsCdkUtils from '../../utils';
@@ -12,7 +12,7 @@ import * as qpqDeployAwsCdkUtils from '../../utils';
 export interface CloudflareDnsRecordProps extends QpqConstructBlockProps {
   buildPath: string;
 
-  dnsEntries: CloudFlareDnsEntries;
+  dnsEntries: CloudflareDnsEntries;
   certificateArn?: string;
   certificateDomain?: string;
   apiSecretName: string;
@@ -57,7 +57,7 @@ export class CloudflareDnsRecord extends QpqConstructBlock {
       onEventHandler: func.lambdaFunction,
     });
 
-    const properties: CloudFlareDnsDeployEventCommon = {
+    const properties: CloudflareDnsDeployEventCommon = {
       apiSecretName: props.apiSecretName,
       siteDns: qpqWebServerUtils.getDnsConfigs(props.qpqConfig)[0]?.dnsBase || '',
       dnsEntries: {

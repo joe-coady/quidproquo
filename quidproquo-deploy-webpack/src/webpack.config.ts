@@ -97,7 +97,7 @@ export const getWebpackConfig = (
 export const getWebpackEntryNames = () => [
   'lambdaAPIGatewayEvent',
   'lambdaAPIGatewayEvent_redirect',
-  'lambdaCustomResource_cloudFlareDns',
+  'lambdaCustomResource_cloudflareDns',
   'lambdaWebsocketAPIGatewayEvent',
   'lambdaEventBridgeEventStackDeploy',
   'lambdaEventBridgeEvent',
@@ -115,7 +115,7 @@ export const getSeoWebpackConfig = (qpqConfig: QPQConfig, outputPath?: string) =
     'lambdaEventOriginRequest',
     'lambdaEventViewerRequest',
     'lambdaAPIGatewayEvent_redirect',
-    'lambdaCustomResource_cloudFlareDns',
+    'lambdaCustomResource_cloudflareDns',
   ]);
 
 export const getApiWebpackConfig = (qpqConfig: QPQConfig, outputPath?: string) =>

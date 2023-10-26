@@ -7,32 +7,32 @@ const serviceEntryMap = {
     'logController',
   )]: require('../services/log/entry/controller/logController'),
   [getServiceEntry(
-    'log', 
-    'controller', 
-    'loginController'
+    'log',
+    'controller',
+    'loginController',
   )]: require('../services/log/entry/controller/loginController'),
 
   [getServiceEntry(
     'log',
     'storageDrive',
     'onCreate',
-  )]: require('../services/log/entry/storageDrive/onCreate'),  
+  )]: require('../services/log/entry/storageDrive/onCreate'),
   [getServiceEntry(
-    'migration', 
-    'deployEvent', 
-    'onDeploy'
+    'migration',
+    'deployEvent',
+    'onDeploy',
   )]: require('../services/migration/entry/deployEvent/onDeploy'),
   [getServiceEntry(
-    'seed', 
-    'deployEvent', 
-    'onDeploy'
+    'seed',
+    'deployEvent',
+    'onDeploy',
   )]: require('../services/seed/entry/deployEvent/onDeploy'),
 
   [getServiceEntry(
-    'cloudFlare', 
-    'cloudFlare', 
-    'onDeploy'
-  )]: require('../services/cloudFlare/entry/cloudFlare/onDeploy'),
+    'cloudflare',
+    'cloudflare',
+    'onDeploy',
+  )]: require('../services/cloudflare/entry/cloudflare/onDeploy'),
 };
 
 export const serviceImporter = async (modulePath: string): Promise<any> => {

@@ -2,7 +2,7 @@ import { askNetworkRequest, AskResponse, askThrowError, ErrorTypeEnum } from 'qu
 
 import { CloudflareResponse } from '../types';
 
-export function* askCloudFlareDeleteDNSRecord(
+export function* askCloudflareDeleteDNSRecord(
   apiKey: string,
   zoneId: string,
   recordId: string,

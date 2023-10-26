@@ -1,40 +1,40 @@
-export enum CloudFlareDnsDeployEventEnum {
+export enum CloudflareDnsDeployEventEnum {
   Create = 'Create',
   Update = 'Update',
   Delete = 'Delete',
 }
 
-export interface CloudFlareDnsEntry {
+export interface CloudflareDnsEntry {
   value: string;
   type: 'CNAME' | 'A';
   proxied: boolean;
 }
 
-export interface CloudFlareDnsEntries {
-  [Key: string]: CloudFlareDnsEntry;
+export interface CloudflareDnsEntries {
+  [Key: string]: CloudflareDnsEntry;
 }
 
-export interface CloudFlareDnsDeployEventCommon {
+export interface CloudflareDnsDeployEventCommon {
   siteDns: string;
-  dnsEntries: CloudFlareDnsEntries;
+  dnsEntries: CloudflareDnsEntries;
   apiSecretName: string;
 }
-export interface CloudFlareDnsDeployEventCreate extends CloudFlareDnsDeployEventCommon {
-  RequestType: CloudFlareDnsDeployEventEnum.Create;
+export interface CloudflareDnsDeployEventCreate extends CloudflareDnsDeployEventCommon {
+  RequestType: CloudflareDnsDeployEventEnum.Create;
 }
 
-export interface CloudFlareDnsDeployEventUpdate extends CloudFlareDnsDeployEventCommon {
-  RequestType: CloudFlareDnsDeployEventEnum.Update;
-  oldDnsEntries: CloudFlareDnsEntries;
+export interface CloudflareDnsDeployEventUpdate extends CloudflareDnsDeployEventCommon {
+  RequestType: CloudflareDnsDeployEventEnum.Update;
+  oldDnsEntries: CloudflareDnsEntries;
 }
 
-export interface CloudFlareDnsDeployEventDelete extends CloudFlareDnsDeployEventCommon {
-  RequestType: CloudFlareDnsDeployEventEnum.Delete;
+export interface CloudflareDnsDeployEventDelete extends CloudflareDnsDeployEventCommon {
+  RequestType: CloudflareDnsDeployEventEnum.Delete;
 }
 
-export type CloudFlareDnsDeployEvent =
-  | CloudFlareDnsDeployEventCreate
-  | CloudFlareDnsDeployEventUpdate
-  | CloudFlareDnsDeployEventDelete;
+export type CloudflareDnsDeployEvent =
+  | CloudflareDnsDeployEventCreate
+  | CloudflareDnsDeployEventUpdate
+  | CloudflareDnsDeployEventDelete;
 
-export type CloudFlareDnsDeployEventResponse = void;
+export type CloudflareDnsDeployEventResponse = void;
