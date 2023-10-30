@@ -1,6 +1,6 @@
 {
   "name": "quidproquo-config-aws",
-  "version": "0.0.143",
+  "version": "0.0.144",
   "description": "",
   "main": "./lib/commonjs/index.js",
   "types": "./lib/commonjs/index.d.js",
