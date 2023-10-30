@@ -142,6 +142,8 @@ export const defineLogs = (
 
     defineWebEntry('admin', {
       buildPath: webFilesPath,
+      seoBuildPath: buildPath,
+
       domain: {
         subDomainName: 'admin',
         onRootDomain: false,

@@ -10,8 +10,7 @@ import { QpqResource } from '../../../base';
 import { exportStackValue, importStackValue } from '../../../../utils';
 import { Function } from '../../../basic/Function';
 import { SubdomainName } from '../../../basic';
-
-
+import { CloudflareDnsRecord } from '../../../basic/CloudflareDnsRecord';
 
 export interface QpqApiWebserverWebsocketConstructProps extends QpqConstructBlockProps {
   websocketConfig: WebSocketQPQWebServerConfigSetting;
@@ -24,10 +23,12 @@ export class QpqApiWebserverWebsocketConstruct extends QpqConstructBlock {
 
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(props.qpqConfig);
 
-    const apiId = importStackValue(awsNamingUtils.getCFExportNameWebsocketApiIdFromConfig(
-      props.websocketConfig.apiName,
-      props.qpqConfig,
-    ));
+    const apiId = importStackValue(
+      awsNamingUtils.getCFExportNameWebsocketApiIdFromConfig(
+        props.websocketConfig.apiName,
+        props.qpqConfig,
+      ),
+    );
 
     const deployment = new aws_apigatewayv2.CfnDeployment(this, 'websocket-deployment', {
       apiId,
@@ -40,7 +41,10 @@ export class QpqApiWebserverWebsocketConstruct extends QpqConstructBlock {
     });
 
     const func = new Function(this, 'api-function', {
-      buildPath: qpqWebServerUtils.getWebsocketEntryFullPath(props.qpqConfig, props.websocketConfig),
+      buildPath: qpqWebServerUtils.getWebsocketEntryFullPath(
+        props.qpqConfig,
+        props.websocketConfig,
+      ),
       functionName: this.resourceName(`${props.websocketConfig.apiName}-ws`),
       functionType: 'lambdaWebsocketAPIGatewayEvent',
       executorName: 'executeWebsocketAPIGatewayEvent',
@@ -57,14 +61,16 @@ export class QpqApiWebserverWebsocketConstruct extends QpqConstructBlock {
     });
 
     // Let api gateway invoke this ok
-    func.lambdaFunction.grantInvoke(new aws_iam.ServicePrincipal('apigateway.amazonaws.com', {
-      conditions: {
-        ArnLike: {
-          'aws:SourceArn': `arn:aws:execute-api:${region}:${props.awsAccountId}:${apiId}/*`,
+    func.lambdaFunction.grantInvoke(
+      new aws_iam.ServicePrincipal('apigateway.amazonaws.com', {
+        conditions: {
+          ArnLike: {
+            'aws:SourceArn': `arn:aws:execute-api:${region}:${props.awsAccountId}:${apiId}/*`,
+          },
         },
-      },
-    }));
-    
+      }),
+    );
+
     const integration = new aws_apigatewayv2.CfnIntegration(this, 'websocket-integration', {
       apiId,
       integrationType: 'AWS_PROXY',
@@ -117,6 +123,23 @@ export class QpqApiWebserverWebsocketConstruct extends QpqConstructBlock {
       qpqConfig: props.qpqConfig,
       awsAccountId: props.awsAccountId,
     });
+
+    if (props.websocketConfig.cloudflareApiKeySecretName) {
+      new CloudflareDnsRecord(this, 'certFlare', {
+        awsAccountId: props.awsAccountId,
+        buildPath: qpqWebServerUtils.getWebsocketEntryFullPath(
+          props.qpqConfig,
+          props.websocketConfig,
+        ),
+        qpqConfig: props.qpqConfig,
+
+        // certificateArn: subdomain.certificate.certificateArn,
+        certificateDomain: subdomain.deployDomain,
+
+        dnsEntries: {},
+        apiSecretName: props.websocketConfig.cloudflareApiKeySecretName,
+      });
+    }
 
     // Create a mapping between the custom domain name and the WebSocket API
     new aws_apigatewayv2.CfnApiMapping(this, 'websocket-api-mapping', {

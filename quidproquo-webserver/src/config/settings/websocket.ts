@@ -13,6 +13,8 @@ export interface QpqWebSocketEventProcessors {
 export interface QPQConfigAdvancedWebSocketSettings extends QPQConfigAdvancedSettings {
   onRootDomain?: boolean;
   apiName?: string;
+
+  cloudflareApiKeySecretName?: string;
 }
 
 export interface WebSocketQPQWebServerConfigSetting extends QPQConfigSetting {
@@ -22,9 +24,11 @@ export interface WebSocketQPQWebServerConfigSetting extends QPQConfigSetting {
   apiName: string;
   buildPath: string;
 
-  eventProcessors: QpqWebSocketEventProcessors
+  eventProcessors: QpqWebSocketEventProcessors;
 
   deprecated: boolean;
+
+  cloudflareApiKeySecretName?: string;
 }
 
 export const defineWebsocket = (
@@ -47,5 +51,7 @@ export const defineWebsocket = (
     apiName: options?.apiName || 'api',
 
     deprecated: options?.deprecated || false,
+
+    cloudflareApiKeySecretName: options?.cloudflareApiKeySecretName,
   };
 };
