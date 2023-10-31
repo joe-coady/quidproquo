@@ -14,7 +14,7 @@ import {
   QpqWebserverServiceFunctionConstruct,
   QpqApiWebserverWebsocketConstruct,
   QpqCoreDeployEventConstruct,
-  QpqApiCoreStorageDriveConstruct
+  QpqApiCoreStorageDriveConstruct,
 } from '../constructs';
 
 export interface ApiQpqServiceStackProps extends QpqServiceStackProps {
@@ -72,7 +72,7 @@ export class ApiQpqServiceStack extends QpqServiceStack {
         }),
     );
 
-    // Queues
+    // Redirects
     const redirects = qpqWebServerUtils.getSubdomainRedirects(props.qpqConfig).map(
       (setting) =>
         new QpqWebserverSubdomainRedirectConstruct(
@@ -103,8 +103,8 @@ export class ApiQpqServiceStack extends QpqServiceStack {
         ),
     );
 
-     // Build websocket apis
-     const websockets = qpqWebServerUtils.getWebsocketSettings(props.qpqConfig).map(
+    // Build websocket apis
+    const websockets = qpqWebServerUtils.getWebsocketSettings(props.qpqConfig).map(
       (setting) =>
         new QpqApiWebserverWebsocketConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           awsAccountId: props.awsAccountId,

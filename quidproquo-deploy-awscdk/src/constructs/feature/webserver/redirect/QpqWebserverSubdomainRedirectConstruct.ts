@@ -95,5 +95,25 @@ export class QpqWebserverSubdomainRedirectConstruct extends QpqConstructBlock {
       // the properties below are optional
       // basePath: settings.service,
     });
+
+    if (props.subdomainRedirectConfig.cloudflareApiKeySecretName) {
+      new CloudflareDnsRecord(this, 'cloudflare', {
+        awsAccountId: props.awsAccountId,
+        buildPath: qpqWebServerUtils.getRedirectApiBuildFullPath(
+          props.qpqConfig,
+          props.subdomainRedirectConfig,
+        ),
+        qpqConfig: props.qpqConfig,
+
+        dnsEntries: {
+          [serviceDomainName.deployDomain]: {
+            value: serviceDomainName.domainName.domainNameAliasDomainName,
+            proxied: true,
+            type: 'CNAME',
+          },
+        },
+        apiSecretName: props.subdomainRedirectConfig.cloudflareApiKeySecretName,
+      });
+    }
   }
 }

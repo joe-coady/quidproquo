@@ -2,6 +2,9 @@ import { APIGatewayEvent, Context } from 'aws-lambda';
 import { SubdomainRedirectQPQWebServerConfigSetting } from 'quidproquo-webserver';
 
 export const executeAPIGatewayEvent = async (event: APIGatewayEvent, context: Context) => {
+  // console.log('event: ', JSON.stringify(event, null, 2));
+  // console.log('process.env: ', JSON.stringify(process.env, null, 2));
+
   const redirectConfig: SubdomainRedirectQPQWebServerConfigSetting = JSON.parse(
     process.env.redirectConfig as string,
   );
@@ -14,8 +17,9 @@ export const executeAPIGatewayEvent = async (event: APIGatewayEvent, context: Co
     const environment: SubdomainRedirectQPQWebServerConfigSetting = JSON.parse(
       process.env.environment as string,
     );
+
     const featureEnvironment: SubdomainRedirectQPQWebServerConfigSetting = JSON.parse(
-      process.env.featureEnvironment as string,
+      (process.env.featureEnvironment as string | undefined) || '""',
     );
 
     let baseDomain = redirectConfig.redirectUrl;
