@@ -1,6 +1,6 @@
 {
   "name": "quidproquo-deploy-webpack",
-  "version": "0.0.146",
+  "version": "0.0.148",
   "description": "",
   "main": "./lib/commonjs/webpack.config.js",
   "types": "./lib/commonjs/webpack.config.d.js",

@@ -10,9 +10,10 @@ import { askCloudflareDeleteDNSRecord } from './askCloudflareDeleteDNSRecord';
 import { askCloudflareAddDNSRecord } from './askCloudflareAddDNSRecord';
 
 export function getDnsEntryName(dnsEntryName: string, rootDomain: string) {
-  if (dnsEntryName === rootDomain) {
-    return '@';
-  }
+  // Apparently you don't need to do this...
+  // if (dnsEntryName === rootDomain) {
+  //   return '@';
+  // }
 
   return dnsEntryName;
 }
