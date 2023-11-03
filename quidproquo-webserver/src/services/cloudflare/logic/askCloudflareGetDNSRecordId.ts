@@ -1,4 +1,4 @@
-import { askNetworkRequest, AskResponse } from 'quidproquo-core';
+import { askNetworkRequest, AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
 import { CloudflareResponse, CloudflareDNSRecord } from '../types';
 
 export function* askCloudflareGetDNSRecordId(
@@ -16,6 +16,10 @@ export function* askCloudflareGetDNSRecordId(
       },
     },
   );
+
+  if (response.status < 200 || response.status >= 300) {
+    yield* askThrowError(ErrorTypeEnum.GenericError, `Error getting DNS record for [${cnameName}]`);
+  }
 
   console.log('exists', JSON.stringify(response.data, null, 2));
 

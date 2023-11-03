@@ -16,6 +16,13 @@ export function* askCloudflareGetZoneId(
     },
   );
 
+  if (response.status < 200 || response.status >= 300) {
+    yield* askThrowError(
+      ErrorTypeEnum.GenericError,
+      `Error getting zoneId for [${siteDomainName}]`,
+    );
+  }
+
   const zoneId = response.data.result[0]?.id;
 
   if (!zoneId) {

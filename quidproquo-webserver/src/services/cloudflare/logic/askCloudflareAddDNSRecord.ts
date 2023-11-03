@@ -45,6 +45,10 @@ export function* askCloudflareAddDNSRecord(
     body: requestBody,
   });
 
+  if (response.status < 200 || response.status >= 300) {
+    yield* askThrowError(ErrorTypeEnum.GenericError, `Error adding DNS records`);
+  }
+
   console.log(JSON.stringify(response.data, null, 2));
 
   if (!response.data.success) {
