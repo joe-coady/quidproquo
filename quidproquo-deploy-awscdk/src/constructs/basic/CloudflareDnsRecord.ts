@@ -33,6 +33,9 @@ export class CloudflareDnsRecord extends QpqConstructBlock {
 
       awsAccountId: props.awsAccountId,
 
+      // 15 min timeout
+      timeoutInSeconds: 15 * 60,
+
       environment: {
         certificateArn: props.certificateArn || '',
         certificateDomain: props.certificateDomain || '',

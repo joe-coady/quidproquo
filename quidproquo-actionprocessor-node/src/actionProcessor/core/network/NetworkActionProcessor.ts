@@ -50,7 +50,7 @@ const transformResponse = (
 };
 
 const axiosInstance = axios.create({
-  timeout: 10000,
+  timeout: 25000,
   headers: {
     // Fixes: https://github.com/axios/axios/issues/5346
     'Accept-Encoding': 'gzip,deflate,compress',
