@@ -21,7 +21,10 @@ export function* askCloudflareGetDNSRecordId(
     yield* askThrowError(ErrorTypeEnum.GenericError, `Error getting DNS record for [${cnameName}]`);
   }
 
-  console.log('exists', JSON.stringify(response.data, null, 2));
+  // Filter out all the non-cname records
+  const filteredRecords = response.data.result.filter(
+    (record) => record.type === 'CNAME' || record.type === 'A',
+  );
 
-  return response.data.result[0]?.id;
+  return filteredRecords[0]?.id;
 }
