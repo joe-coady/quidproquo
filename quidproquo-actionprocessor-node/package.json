@@ -1,6 +1,6 @@
 {
   "name": "quidproquo-actionprocessor-node",
-  "version": "0.0.152",
+  "version": "0.0.153",
   "description": "",
   "main": "./lib/commonjs/index.js",
   "types": "./lib/commonjs/index.d.js",
