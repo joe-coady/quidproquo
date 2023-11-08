@@ -162,6 +162,8 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
     const distribution = new aws_cloudfront.Distribution(this, 'MyDistribution', {
       defaultBehavior: {
         origin: distributionOrigin,
+        originRequestPolicy: aws_cloudfront.OriginRequestPolicy.CORS_S3_ORIGIN,
+
         cachePolicy: cachePolicy,
         viewerProtocolPolicy: aws_cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
         compress: props.webEntryConfig.compressFiles,
