@@ -14,17 +14,15 @@ export interface StorageDriveOptions {
   autoUpload: boolean;
 }
 
-export interface CacheOptions extends CacheSettings {}
-
 export interface QPQConfigAdvancedWebEntrySettings extends QPQConfigAdvancedSettings {
   buildPath?: string;
   seoBuildPath?: string;
 
   storageDrive?: StorageDriveOptions;
-  cache?: CacheOptions;
 
   domain?: WebDomainOptions;
 
+  cacheSettingsName?: string;
   indexRoot?: string;
   ignoreCache?: string[];
 
@@ -41,10 +39,10 @@ export interface WebEntryQPQWebServerConfigSetting extends QPQConfigSetting {
 
   storageDrive: StorageDriveOptions;
   domain: WebDomainOptions;
-  cache: CacheOptions;
 
   buildPath?: string;
   seoBuildPath?: string;
+  cacheSettingsName?: string;
   ignoreCache: string[];
 
   compressFiles: boolean;
@@ -72,13 +70,6 @@ export const defineWebEntry = (
     onRootDomain: true,
   },
 
-  cache: options?.cache || {
-    defaultTTLInSeconds: 7 * 24 * 60 * 60,
-    minTTLInSeconds: 3 * 24 * 60 * 60,
-    maxTTLInSeconds: 2 * 7 * 24 * 60 * 60,
-    mustRevalidate: options?.cache?.mustRevalidate ?? false,
-  },
-
   buildPath: options?.buildPath,
   seoBuildPath: options?.seoBuildPath,
   ignoreCache: options?.ignoreCache || [],
@@ -88,4 +79,6 @@ export const defineWebEntry = (
   securityHeaders: options?.securityHeaders,
 
   cloudflareApiKeySecretName: options?.cloudflareApiKeySecretName,
+
+  cacheSettingsName: options?.cacheSettingsName,
 });

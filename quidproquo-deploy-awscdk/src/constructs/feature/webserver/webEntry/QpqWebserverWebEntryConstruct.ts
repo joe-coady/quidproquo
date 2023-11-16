@@ -29,6 +29,7 @@ import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqCons
 import { Construct } from 'constructs';
 
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
+import { QpqWebServerCacheConstruct } from '../cache/QpqWebServerCacheConstruct';
 
 export interface QpqWebserverWebEntryConstructProps extends QpqConstructBlockProps {
   webEntryConfig: WebEntryQPQWebServerConfigSetting;
@@ -126,36 +127,39 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
       },
     );
 
-    const cachePolicy = new aws_cloudfront.CachePolicy(this, `dist-cp`, {
-      cachePolicyName: this.resourceName(props.webEntryConfig.name),
-      defaultTtl: cdk.Duration.seconds(props.webEntryConfig.cache.defaultTTLInSeconds),
-      minTtl: cdk.Duration.seconds(props.webEntryConfig.cache.minTTLInSeconds),
-      maxTtl: cdk.Duration.seconds(props.webEntryConfig.cache.maxTTLInSeconds),
+    const cachePolicy = props.webEntryConfig.cacheSettingsName
+      ? QpqWebServerCacheConstruct.fromOtherStack(
+          this,
+          'cache',
+          props.qpqConfig,
+          qpqWebServerUtils.getCacheConfigByName(
+            props.webEntryConfig.cacheSettingsName,
+            props.qpqConfig,
+          ),
+          props.awsAccountId,
+        ).cachePolicy
+      : aws_cloudfront.CachePolicy.CACHING_DISABLED;
 
-      headerBehavior: aws_cloudfront.CacheHeaderBehavior.allowList(qpqHeaderIsBot),
-
-      enableAcceptEncodingGzip: true,
-      enableAcceptEncodingBrotli: true,
-    });
-
-    const responseHeaderPolicy = new aws_cloudfront.ResponseHeadersPolicy(this, `dist-rhp`, {
-      responseHeadersPolicyName: this.resourceName(props.webEntryConfig.name),
-      customHeadersBehavior: {
-        customHeaders: [
-          {
-            header: 'Cache-Control',
-            value: `max-age=${props.webEntryConfig.cache.maxTTLInSeconds}${
-              props.webEntryConfig.cache.mustRevalidate ? ', must-revalidate' : ''
-            }`,
-            override: true,
-          },
-        ],
-      },
-      securityHeadersBehavior: convertSecurityHeadersFromQpqSecurityHeaders(
-        qpqWebServerUtils.getBaseDomainName(props.qpqConfig),
-        props.webEntryConfig.securityHeaders,
-      ),
-    });
+    const responseHeaderPolicy =
+      props.webEntryConfig.securityHeaders &&
+      new aws_cloudfront.ResponseHeadersPolicy(this, `dist-rhp`, {
+        responseHeadersPolicyName: this.resourceName(props.webEntryConfig.name),
+        // customHeadersBehavior: {
+        //   customHeaders: [
+        //     {
+        //       header: 'Cache-Control',
+        //       value: `max-age=${props.webEntryConfig.cache.maxTTLInSeconds}${
+        //         props.webEntryConfig.cache.mustRevalidate ? ', must-revalidate' : ''
+        //       }`,
+        //       override: true,
+        //     },
+        //   ],
+        // },
+        securityHeadersBehavior: convertSecurityHeadersFromQpqSecurityHeaders(
+          qpqWebServerUtils.getBaseDomainName(props.qpqConfig),
+          props.webEntryConfig.securityHeaders,
+        ),
+      });
 
     // Create a CloudFront distribution using the S3 bucket as the origin
     const distributionOrigin = new aws_cloudfront_origins.S3Origin(originBucket);
@@ -297,26 +301,21 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
 
         // TODO: Find a better solution for this.
         // Removed this because aws limits for the number of AWS CloudFront Cache Policies in your account
-        // const seoCachePolicy = new aws_cloudfront.CachePolicy(this, `seo-cp-${seo.uniqueKey}`, {
-        //   cachePolicyName: this.resourceName(`${props.webEntryConfig.name}-${seo.uniqueKey}`),
-        //   headerBehavior: aws_cloudfront.CacheHeaderBehavior.allowList(
-        //     qpqHeaderIsBot,
-        //     ...seo.cache.headers,
-        //   ),
-        //   defaultTtl: cdk.Duration.seconds(seo.cache.defaultTTLInSeconds),
-        //   minTtl: cdk.Duration.seconds(seo.cache.minTTLInSeconds),
-        //   maxTtl: cdk.Duration.seconds(seo.cache.maxTTLInSeconds),
-        //   enableAcceptEncodingGzip: true,
-        //   enableAcceptEncodingBrotli: true,
-        // });
+        const seoCachePolicy = seo.cacheSettingsName
+          ? QpqWebServerCacheConstruct.fromOtherStack(
+              this,
+              `seo-cache-${seo.uniqueKey}`,
+              props.qpqConfig,
+              qpqWebServerUtils.getCacheConfigByName(seo.cacheSettingsName, props.qpqConfig),
+              props.awsAccountId,
+            ).cachePolicy
+          : aws_cloudfront.CachePolicy.CACHING_DISABLED;
 
         const wildcardPath = seo.path.replaceAll(/{(.+?)}/g, '*');
         distribution.addBehavior(wildcardPath, distributionOrigin, {
-          cachePolicy: cachePolicy,
-          // cachePolicy: seoCachePolicy,
+          cachePolicy: seoCachePolicy,
           viewerProtocolPolicy: aws_cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
           compress: props.webEntryConfig.compressFiles,
-          responseHeadersPolicy: responseHeaderPolicy,
           edgeLambdas: [
             {
               functionVersion: edgeFunctionVR.currentVersion,

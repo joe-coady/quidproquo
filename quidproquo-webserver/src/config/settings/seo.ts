@@ -2,13 +2,9 @@ import { QPQConfigSetting, QPQConfigAdvancedSettings } from 'quidproquo-core';
 
 import { QPQWebServerConfigSettingType, CacheSettings } from '../QPQConfig';
 
-export interface SeoCacheSettings extends CacheSettings {
-  headers: string[];
-}
-
 export interface QPQConfigAdvancedSeoSettings extends QPQConfigAdvancedSettings {
   webEntry?: string;
-  cache?: SeoCacheSettings;
+  cacheSettingsName?: string;
 }
 
 export interface SeoQPQWebServerConfigSetting extends QPQConfigSetting {
@@ -18,7 +14,7 @@ export interface SeoQPQWebServerConfigSetting extends QPQConfigSetting {
   deprecated: boolean;
   webEntry?: string;
 
-  cache: SeoCacheSettings;
+  cacheSettingsName?: string;
 }
 
 export const defineSeo = (
@@ -37,11 +33,5 @@ export const defineSeo = (
   webEntry: options?.webEntry,
   deprecated: options?.deprecated || false,
 
-  cache: options?.cache || {
-    defaultTTLInSeconds: 86400,
-    minTTLInSeconds: 900,
-    maxTTLInSeconds: 172800,
-    headers: [],
-    mustRevalidate: false,
-  },
+  cacheSettingsName: options?.cacheSettingsName,
 });

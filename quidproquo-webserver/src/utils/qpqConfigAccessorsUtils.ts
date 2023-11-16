@@ -13,6 +13,7 @@ import {
   DefaultRouteOptionsQPQWebServerConfigSetting,
   ServiceFunctionQPQWebServerConfigSetting,
   WebSocketQPQWebServerConfigSetting,
+  CacheQPQWebServerConfigSetting,
 } from '../config';
 
 import { WebEntryQPQWebServerConfigSetting, ApiQPQWebServerConfigSetting } from '../config';
@@ -74,7 +75,11 @@ export const getAllOpenApiSpecs = (configs: QPQConfig): OpenApiQPQWebServerConfi
 };
 
 export const getAllWebsocketSrcEntries = (qpqConfig: QPQConfig): string[] => {
-  return getWebsocketSettings(qpqConfig).flatMap(s => [s.eventProcessors.onConnect.src, s.eventProcessors.onDisconnect.src, s.eventProcessors.onMessage.src]);
+  return getWebsocketSettings(qpqConfig).flatMap((s) => [
+    s.eventProcessors.onConnect.src,
+    s.eventProcessors.onDisconnect.src,
+    s.eventProcessors.onMessage.src,
+  ]);
 };
 
 // Used in bundlers to know where and what to build and index
@@ -85,7 +90,7 @@ export const getAllSrcEntries = (configs: QPQConfig): string[] => {
     ...getAllOpenApiSpecs(configs).map((r) => r.openApiSpecPath),
     ...getAllSeo(configs).map((seo) => seo.src),
     ...getAllServiceFunctions(configs).map((sf) => sf.src),
-    ...getAllWebsocketSrcEntries(configs)
+    ...getAllWebsocketSrcEntries(configs),
   ];
 };
 
@@ -127,7 +132,9 @@ export const getWebEntrySeoFullPath = (
 ): string => {
   // Throw an error if no SEO build path has been defined.
   if (!webEntryQPQWebServerConfigSetting.seoBuildPath) {
-    throw new Error(`Please define a 'seoBuildPath' in your web entry [${webEntryQPQWebServerConfigSetting.name}]`);
+    throw new Error(
+      `Please define a 'seoBuildPath' in your web entry [${webEntryQPQWebServerConfigSetting.name}]`,
+    );
   }
 
   return path.join(
@@ -164,11 +171,11 @@ export const getWebsocketEntryFullPath = (
 
 export const getWebsocketEntryByApiName = (
   apiName: string,
-  qpqConfig: QPQConfig
+  qpqConfig: QPQConfig,
 ): WebSocketQPQWebServerConfigSetting => {
   const websocketSettings = getWebsocketSettings(qpqConfig);
 
-  const websocketSetting = websocketSettings.find(s => s.apiName === apiName);
+  const websocketSetting = websocketSettings.find((s) => s.apiName === apiName);
 
   if (!websocketSetting) {
     throw new Error(`No websocket setting found for api [${apiName}]`);
@@ -230,6 +237,33 @@ export const getWebEntryConfigs = (configs: QPQConfig): WebEntryQPQWebServerConf
     configs,
     QPQWebServerConfigSettingType.WebEntry,
   );
+};
+
+export const getAllOwnedCacheConfigs = (qpqConfig: QPQConfig): CacheQPQWebServerConfigSetting[] => {
+  const cacheSettings = qpqCoreUtils.getConfigSettings<CacheQPQWebServerConfigSetting>(
+    qpqConfig,
+    QPQWebServerConfigSettingType.Cache,
+  );
+
+  return qpqCoreUtils.getOwnedItems(cacheSettings, qpqConfig);
+};
+
+export const getCacheConfigByName = (
+  cacheConfigName: string,
+  qpqConfig: QPQConfig,
+): CacheQPQWebServerConfigSetting => {
+  const cacheSetting = qpqCoreUtils
+    .getConfigSettings<CacheQPQWebServerConfigSetting>(
+      qpqConfig,
+      QPQWebServerConfigSettingType.Cache,
+    )
+    .find((c) => c.name === cacheConfigName);
+
+  if (!cacheSetting) {
+    throw new Error(`No cache config found for name [${cacheConfigName}]`);
+  }
+
+  return cacheSetting;
 };
 
 export const getEnvironmentDomainName = (configs: QPQConfig): string => {

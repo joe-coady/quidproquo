@@ -1,5 +1,6 @@
 export * from './api';
 export * from './apiKey';
+export * from './cache';
 export * from './defaultRouteOptions';
 export * from './dns';
 export * from './serviceFunction';

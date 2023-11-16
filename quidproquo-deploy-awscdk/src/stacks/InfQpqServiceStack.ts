@@ -17,6 +17,7 @@ import {
   QpqWebserverWebsocketConstruct,
   LogStorage,
 } from '../constructs';
+import { QpqWebServerCacheConstruct } from '../constructs/feature/webserver/cache/QpqWebServerCacheConstruct';
 
 export interface InfQpqServiceStackProps extends QpqServiceStackProps {}
 
@@ -137,6 +138,17 @@ export class InfQpqServiceStack extends QpqServiceStack {
           qpqConfig: props.qpqConfig,
 
           websocketConfig: setting,
+        }),
+    );
+
+    // Cache settings
+    const cache = qpqWebServerUtils.getAllOwnedCacheConfigs(props.qpqConfig).map(
+      (setting) =>
+        new QpqWebServerCacheConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
+          awsAccountId: props.awsAccountId,
+          qpqConfig: props.qpqConfig,
+
+          cacheConfig: setting,
         }),
     );
   }

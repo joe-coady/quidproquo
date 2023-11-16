@@ -117,9 +117,7 @@ export const getKvsDynamoTableNameFromConfig = (
   const storeConfig = qpqCoreUtils.getKeyValueStoreByName(qpqConfig, resourceName);
 
   const application = qpqCoreUtils.getApplicationName(qpqConfig);
-  const service =
-    storeConfig?.owner?.module ||
-    qpqCoreUtils.getApplicationModuleName(qpqConfig);
+  const service = storeConfig?.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig);
 
   const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
   const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
@@ -153,6 +151,28 @@ export const getCFExportNameUserPoolIdFromConfig = (
     environment,
     feature,
     'user-pool-id-export',
+  );
+};
+
+export const getCFExportNameCachePolicyIdFromConfig = (
+  cacheConfigName: string,
+  qpqConfig: QPQConfig,
+
+  serviceOverride?: string,
+  applicationOverride?: string,
+) => {
+  const application = applicationOverride || qpqCoreUtils.getApplicationName(qpqConfig);
+  const service = serviceOverride || qpqCoreUtils.getApplicationModuleName(qpqConfig);
+  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
+  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+
+  return getQpqRuntimeResourceName(
+    cacheConfigName,
+    application,
+    service,
+    environment,
+    feature,
+    'cache-policy-name-export',
   );
 };
 
