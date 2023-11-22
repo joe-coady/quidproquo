@@ -15,7 +15,9 @@ import {
   QpqApiWebserverWebsocketConstruct,
   QpqCoreDeployEventConstruct,
   QpqApiCoreStorageDriveConstruct,
+  QpqConfigAwsAlarmConstruct,
 } from '../constructs';
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 
 export interface ApiQpqServiceStackProps extends QpqServiceStackProps {
   infQpqServiceStack?: InfQpqServiceStack;
@@ -125,6 +127,7 @@ export class ApiQpqServiceStack extends QpqServiceStack {
         }),
     );
 
+    // Storage Drives
     const storageDrives = qpqCoreUtils.getStorageDrives(props.qpqConfig).map(
       (setting) =>
         new QpqApiCoreStorageDriveConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
@@ -132,6 +135,18 @@ export class ApiQpqServiceStack extends QpqServiceStack {
           qpqConfig: props.qpqConfig,
 
           storageDriveConfig: setting,
+        }),
+    );
+
+    // alarms
+    // create alarms inside the api stack because we want sns topics to be already made
+    const alarms = qpqConfigAwsUtils.getOwnedAwsAlarmConfigs(props.qpqConfig).map(
+      (setting) =>
+        new QpqConfigAwsAlarmConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
+          awsAccountId: props.awsAccountId,
+          qpqConfig: props.qpqConfig,
+
+          alarmConfig: setting,
         }),
     );
   }

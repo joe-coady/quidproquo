@@ -1,9 +1,5 @@
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-import {
-  EventBusQPQConfigSetting,
-  QPQConfig,
-  qpqCoreUtils,
-} from 'quidproquo-core';
+import { EventBusQPQConfigSetting, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
 import { getAwsAccountIds } from 'quidproquo-config-aws';
 
@@ -81,6 +77,16 @@ export class QpqCoreEventBusConstruct extends QpqCoreEventBusConstructBase {
         }),
       );
     });
+
+    this.topic.addToResourcePolicy(
+      new aws_iam.PolicyStatement({
+        sid: 'AllowCloudWatchAlarms',
+        effect: aws_iam.Effect.ALLOW,
+        principals: [new aws_iam.ServicePrincipal('cloudwatch.amazonaws.com')],
+        actions: ['sns:Publish'],
+        resources: [this.topic.topicArn],
+      }),
+    );
 
     // TODO: remove this, its deprecated
     const exportName = awsNamingUtils.getCFExportNameSnsTopicArnFromConfig(

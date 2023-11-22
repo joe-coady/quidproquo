@@ -1,13 +1,14 @@
 import path from 'path';
 
-import {
-  qpqCoreUtils,
-  QPQConfig,
-} from 'quidproquo-core';
+import { qpqCoreUtils, QPQConfig } from 'quidproquo-core';
 
 import { ServiceAccountInfo, LocalServiceAccountInfo, ApiLayer } from '../types';
 
-import { AwsServiceAccountInfoQPQConfigSetting, QPQAwsConfigSettingType } from '../config';
+import {
+  AwsAlarmQPQConfigSetting,
+  AwsServiceAccountInfoQPQConfigSetting,
+  QPQAwsConfigSettingType,
+} from '../config';
 
 export const getAwsServiceAccountInfoConfig = (
   qpqConfig: QPQConfig,
@@ -52,6 +53,15 @@ export const getAwsServiceAccountInfos = (qpqConfig: QPQConfig): ServiceAccountI
   return uniqueServices;
 };
 
+export const getOwnedAwsAlarmConfigs = (qpqConfig: QPQConfig): AwsAlarmQPQConfigSetting[] => {
+  const alarmConfigs = qpqCoreUtils.getConfigSettings<AwsAlarmQPQConfigSetting>(
+    qpqConfig,
+    QPQAwsConfigSettingType.awsServiceAlarm,
+  );
+
+  return qpqCoreUtils.getOwnedItems(alarmConfigs, qpqConfig);
+};
+
 export const getAwsAccountIds = (qpqConfig: QPQConfig): string[] => {
   const uniqueAccountIds: string[] = [
     ...new Set(getAwsServiceAccountInfos(qpqConfig).map((accountInfo) => accountInfo.awsAccountId)),
@@ -82,17 +92,30 @@ export const getAwsServiceAccountInfoByDeploymentInfo = (
   targetModule?: string,
   targetEnvironment?: string,
   targetFeature?: string,
-  targetApplication?: string
+  targetApplication?: string,
 ): ServiceAccountInfo => {
   const awsServiceAccountInfos = getAwsServiceAccountInfos(qpqConfig);
 
   const getMatchWeight = (serviceAccountInfo: ServiceAccountInfo) => {
     // Note: remember not to have overlapping weights
     return (
-      1.8 * Number(!serviceAccountInfo.applicationName || serviceAccountInfo.applicationName === targetApplication) +
-      1.4 * Number(!serviceAccountInfo.environment || serviceAccountInfo.environment === targetEnvironment) +
-      1.2 * Number(!serviceAccountInfo.moduleName || serviceAccountInfo.moduleName === targetModule) +
-      1.1 * Number(!serviceAccountInfo.feature || ((serviceAccountInfo.feature === targetFeature) && (!serviceAccountInfo.feature === !targetFeature)))
+      1.8 *
+        Number(
+          !serviceAccountInfo.applicationName ||
+            serviceAccountInfo.applicationName === targetApplication,
+        ) +
+      1.4 *
+        Number(
+          !serviceAccountInfo.environment || serviceAccountInfo.environment === targetEnvironment,
+        ) +
+      1.2 *
+        Number(!serviceAccountInfo.moduleName || serviceAccountInfo.moduleName === targetModule) +
+      1.1 *
+        Number(
+          !serviceAccountInfo.feature ||
+            (serviceAccountInfo.feature === targetFeature &&
+              !serviceAccountInfo.feature === !targetFeature),
+        )
     );
   };
 
