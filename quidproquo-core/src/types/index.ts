@@ -10,3 +10,4 @@ export * from './CrossModuleOwner';
 export * from './QpqPagedData';
 export * from './QpqContextIdentifier';
 export * from './DeployEvent';
+export * from './FullyQualifiedResource';

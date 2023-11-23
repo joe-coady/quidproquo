@@ -6,6 +6,7 @@ import { ServiceAccountInfo, LocalServiceAccountInfo, ApiLayer } from '../types'
 
 import {
   AwsAlarmQPQConfigSetting,
+  AwsDyanmoOverrideForKvsQPQConfigSetting,
   AwsServiceAccountInfoQPQConfigSetting,
   QPQAwsConfigSettingType,
 } from '../config';
@@ -153,4 +154,28 @@ export const getLambdaLayersWithFullPaths = (qpqConfig: QPQConfig): ApiLayer[] =
       : undefined,
     layerArn: layer.layerArn,
   }));
+};
+
+export const getDynamoTableNameOverrride = (srcKvsName: string, qpqConfig: QPQConfig): string => {
+  // Get the key value store config
+  const resource = qpqCoreUtils.getKeyValueStoreFullyQualifiedResourceName(srcKvsName, qpqConfig);
+
+  // Grab all the overrides that do exist
+  const dynamoOverrides = qpqCoreUtils.getConfigSettings<AwsDyanmoOverrideForKvsQPQConfigSetting>(
+    qpqConfig,
+    QPQAwsConfigSettingType.awsDyanmoOverrideForKvs,
+  );
+
+  // Find an override that matches the resource
+  const dynamoOverride = dynamoOverrides.find((override) =>
+    qpqCoreUtils.isSameResource(resource, override.kvsStore),
+  );
+
+  // If we found a matching resource, return the override
+  if (dynamoOverride) {
+    return dynamoOverride.dynamoTableName;
+  }
+
+  // No override found, return empty string
+  return '';
 };

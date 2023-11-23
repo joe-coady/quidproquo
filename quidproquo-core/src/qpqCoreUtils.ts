@@ -26,7 +26,13 @@ import {
   EmailTemplates,
   QpqEmailTemplateSourceEntry,
 } from './config/settings/emailTemplates/types';
-import { CrossModuleOwner, CrossServiceResourceName, ResourceName } from './types';
+import {
+  CrossModuleOwner,
+  CrossServiceResourceName,
+  CustomFullyQualifiedResource,
+  FullyQualifiedResource,
+  ResourceName,
+} from './types';
 
 /**
  * Flattens a QPQConfig array into a single array of QPQConfigSetting objects.
@@ -486,4 +492,66 @@ export const convertCrossModuleOwnerToGenericResourceNameOverride = <T extends s
     ...otherProps,
     resourceNameOverride: resourceName,
   };
+};
+
+export const convertCustomFullyQualifiedResourceToGeneric = <T extends string>(
+  resource: CustomFullyQualifiedResource<T>,
+): FullyQualifiedResource => {
+  type KeyType = keyof typeof resource;
+  const key: KeyType = Array.from(Object.keys(resource)).find(
+    (k) => k !== 'module' && k !== 'application' && k !== 'feature' && k !== 'environment',
+  ) as any as KeyType;
+
+  const resourceName = resource[key as T];
+
+  return {
+    module: resource.module,
+    application: resource.application,
+    feature: resource.feature,
+    environment: resource.environment,
+    resourceName: resourceName,
+  };
+};
+
+export const getFullyQualifiedResourceName = (
+  qpqConfig: QPQConfig,
+  resourceName: string,
+  config?: QPQConfigSetting,
+): FullyQualifiedResource => {
+  const confApplication = getApplicationName(qpqConfig);
+  const confEnvironment = getApplicationModuleEnvironment(qpqConfig);
+  const confFeature = getApplicationModuleFeature(qpqConfig);
+  const confModule = getApplicationModuleName(qpqConfig);
+
+  return {
+    resourceName: config?.owner?.resourceNameOverride || resourceName,
+
+    application: config?.owner?.application || confApplication,
+    environment: config?.owner?.environment || confEnvironment,
+    module: config?.owner?.module || confModule,
+    feature: config?.owner?.feature || confFeature || '',
+  };
+};
+
+// Fully Qualified Resource Names
+export const getKeyValueStoreFullyQualifiedResourceName = (
+  kvsName: string,
+  qpqConfig: QPQConfig,
+): FullyQualifiedResource => {
+  const storeConfig = getKeyValueStoreByName(qpqConfig, kvsName);
+
+  return getFullyQualifiedResourceName(qpqConfig, kvsName, storeConfig);
+};
+
+export const isSameResource = (
+  resourceA: FullyQualifiedResource,
+  resourceB: FullyQualifiedResource,
+): boolean => {
+  return (
+    resourceA.application === resourceB.application &&
+    resourceA.environment === resourceB.environment &&
+    resourceA.feature === resourceB.feature &&
+    resourceA.module === resourceB.module &&
+    resourceA.resourceName === resourceB.resourceName
+  );
 };

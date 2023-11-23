@@ -1,5 +1,5 @@
 import { QPQConfig, qpqCoreUtils, ResourceName, CrossServiceResourceName } from 'quidproquo-core';
-import { getAwsServiceAccountInfoByDeploymentInfo } from 'quidproquo-config-aws';
+import { getAwsServiceAccountInfoByDeploymentInfo, qpqConfigAwsUtils } from 'quidproquo-config-aws';
 
 export const getGlobalConfigRuntimeResourceName = (
   resourceName: string,
@@ -114,6 +114,11 @@ export const getKvsDynamoTableNameFromConfig = (
   qpqConfig: QPQConfig,
   resourceType: string = '',
 ) => {
+  const tableNameOverride = qpqConfigAwsUtils.getDynamoTableNameOverrride(resourceName, qpqConfig);
+  if (tableNameOverride) {
+    return tableNameOverride;
+  }
+
   const storeConfig = qpqCoreUtils.getKeyValueStoreByName(qpqConfig, resourceName);
 
   const application = qpqCoreUtils.getApplicationName(qpqConfig);

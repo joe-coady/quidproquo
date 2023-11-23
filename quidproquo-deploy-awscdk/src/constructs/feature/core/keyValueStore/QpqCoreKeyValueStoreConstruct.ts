@@ -1,5 +1,6 @@
 import { KeyValueStoreQPQConfigSetting, QPQConfig, KvsKey, qpqCoreUtils } from 'quidproquo-core';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 
 import { Construct } from 'constructs';
 import { aws_dynamodb, aws_iam } from 'aws-cdk-lib';
@@ -55,11 +56,16 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
     awsAccountId: string,
     keyValueStoreName: string,
   ): QpqCoreKeyValueStoreConstructBase {
+    const tableNameOverride = qpqConfigAwsUtils.getDynamoTableNameOverrride(
+      keyValueStoreName,
+      qpqConfig,
+    );
+
     class Import extends QpqCoreKeyValueStoreConstructBase {
       table = aws_dynamodb.Table.fromTableName(
         this,
         'table',
-        this.qpqResourceName(keyValueStoreName, 'kvs'),
+        tableNameOverride || this.qpqResourceName(keyValueStoreName, 'kvs'),
       );
     }
 
@@ -77,7 +83,7 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
       sortKey: primarySortKey && convertKvsKeyToDynamodbAttribute(primarySortKey),
       billingMode: aws_dynamodb.BillingMode.PAY_PER_REQUEST,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
-      timeToLiveAttribute: props.keyValueStoreConfig.ttlAttribute
+      timeToLiveAttribute: props.keyValueStoreConfig.ttlAttribute,
     });
 
     // Do local secondary indexes
@@ -101,27 +107,36 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
 
     this.table = table;
 
-    // Security ~ IF global is true
-    if (!!props.keyValueStoreConfig.owner) {
-      const policyStatement = new aws_iam.PolicyStatement({
-        sid: 'AllowAllEntitiesInAccount',
-        effect: aws_iam.Effect.ALLOW,
-        actions: [
-          'dynamodb:GetItem',
-          'dynamodb:PutItem',
-          'dynamodb:Query',
-          'dynamodb:Scan',
-          'dynamodb:UpdateItem',
-          'dynamodb:DeleteItem',
-        ],
-        resources: [table.tableArn],
-      });
-
-      const role = new aws_iam.Role(this, 'AllowAllEntitiesInAccountRole', {
-        assumedBy: new aws_iam.AccountPrincipal(props.awsAccountId),
-      });
-
-      role.addToPolicy(policyStatement);
+    // If we have an override, lets use it instead
+    // we still want to keep the above table created.
+    const tableNameOverride = qpqConfigAwsUtils.getDynamoTableNameOverrride(
+      props.keyValueStoreConfig.keyValueStoreName,
+      props.qpqConfig,
+    );
+    if (tableNameOverride) {
+      console.log('tableNameOverride', tableNameOverride);
+      this.table = aws_dynamodb.Table.fromTableName(this, 'tablelink', tableNameOverride);
     }
+
+    // Security
+    const policyStatement = new aws_iam.PolicyStatement({
+      sid: 'AllowAllEntitiesInAccount',
+      effect: aws_iam.Effect.ALLOW,
+      actions: [
+        'dynamodb:GetItem',
+        'dynamodb:PutItem',
+        'dynamodb:Query',
+        'dynamodb:Scan',
+        'dynamodb:UpdateItem',
+        'dynamodb:DeleteItem',
+      ],
+      resources: [this.table.tableArn],
+    });
+
+    const role = new aws_iam.Role(this, 'AllowAllEntitiesInAccountRole', {
+      assumedBy: new aws_iam.AccountPrincipal(props.awsAccountId),
+    });
+
+    role.addToPolicy(policyStatement);
   }
 }
