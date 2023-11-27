@@ -1,6 +1,6 @@
 {
   "name": "quidproquo-web-admin",
-  "version": "0.0.155",
+  "version": "0.0.156",
   "description": "",
   "main": "./lib/index.js",
   "types": "./lib/index.d.js",
