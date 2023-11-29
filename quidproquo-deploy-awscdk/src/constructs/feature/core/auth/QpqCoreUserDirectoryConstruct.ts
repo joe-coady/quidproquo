@@ -21,7 +21,7 @@ export interface QpqCoreUserDirectoryConstructProps extends QpqConstructBlockPro
 export abstract class QpqCoreUserDirectoryConstructBase extends QpqConstructBlock {
   abstract userPool: aws_cognito.IUserPool;
 
-  public grantRead(grantee: aws_iam.IGrantable) {
+  public grantRead(grantee: aws_iam.IGrantable): void {
     this.userPool.grant(
       grantee,
 

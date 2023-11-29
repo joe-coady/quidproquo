@@ -84,6 +84,7 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
       billingMode: aws_dynamodb.BillingMode.PAY_PER_REQUEST,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       timeToLiveAttribute: props.keyValueStoreConfig.ttlAttribute,
+      pointInTimeRecovery: props.keyValueStoreConfig.enableMonthlyRollingBackups,
     });
 
     // Do local secondary indexes
@@ -119,24 +120,24 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
     }
 
     // Security
-    const policyStatement = new aws_iam.PolicyStatement({
-      sid: 'AllowAllEntitiesInAccount',
-      effect: aws_iam.Effect.ALLOW,
-      actions: [
-        'dynamodb:GetItem',
-        'dynamodb:PutItem',
-        'dynamodb:Query',
-        'dynamodb:Scan',
-        'dynamodb:UpdateItem',
-        'dynamodb:DeleteItem',
-      ],
-      resources: [this.table.tableArn],
-    });
+    // const policyStatement = new aws_iam.PolicyStatement({
+    //   sid: 'AllowAllEntitiesInAccount',
+    //   effect: aws_iam.Effect.ALLOW,
+    //   actions: [
+    //     'dynamodb:GetItem',
+    //     'dynamodb:PutItem',
+    //     'dynamodb:Query',
+    //     'dynamodb:Scan',
+    //     'dynamodb:UpdateItem',
+    //     'dynamodb:DeleteItem',
+    //   ],
+    //   resources: [this.table.tableArn],
+    // });
 
-    const role = new aws_iam.Role(this, 'AllowAllEntitiesInAccountRole', {
-      assumedBy: new aws_iam.AccountPrincipal(props.awsAccountId),
-    });
+    // const role = new aws_iam.Role(this, 'AllowAllEntitiesInAccountRole', {
+    //   assumedBy: new aws_iam.AccountPrincipal(props.awsAccountId),
+    // });
 
-    role.addToPolicy(policyStatement);
+    // role.addToPolicy(policyStatement);
   }
 }

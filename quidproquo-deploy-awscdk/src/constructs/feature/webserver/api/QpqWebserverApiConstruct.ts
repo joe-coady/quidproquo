@@ -1,4 +1,4 @@
-import { aws_apigateway, aws_lambda } from 'aws-cdk-lib';
+import { aws_apigateway, aws_iam, aws_lambda } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { ApiQPQWebServerConfigSetting, qpqWebServerUtils } from 'quidproquo-webserver';
@@ -56,6 +56,7 @@ export class QpqWebserverApiConstruct extends QpqConstructBlock {
       },
       binaryMediaTypes: ['*/*'],
       proxy: true,
+      cloudWatchRole: false,
     });
 
     // If we have not deprecated this api, then we need to create a subdomain for it

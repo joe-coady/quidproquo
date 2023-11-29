@@ -17,6 +17,7 @@ import {
   QpqWebserverWebsocketConstruct,
 } from '../constructs';
 import { QpqWebServerCacheConstruct } from '../constructs/feature/webserver/cache/QpqWebServerCacheConstruct';
+import { WebserverRoll } from '../constructs/basic/WebserverRoll';
 
 export interface InfQpqServiceStackProps extends QpqServiceStackProps {}
 
@@ -29,6 +30,12 @@ export class InfQpqServiceStack extends QpqServiceStack {
     //   awsAccountId: props.awsAccountId,
     //   qpqConfig: props.qpqConfig,
     // }).bucket;
+
+    // Build the role for this service.
+    const webserverRoll = new WebserverRoll(this, 'webserverRoll', {
+      awsAccountId: props.awsAccountId,
+      qpqConfig: props.qpqConfig,
+    });
 
     // Build the storage drives
     const storageDrives = qpqCoreUtils.getOwnedStorageDrives(props.qpqConfig).map(

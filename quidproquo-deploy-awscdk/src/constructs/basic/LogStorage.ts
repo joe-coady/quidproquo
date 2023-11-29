@@ -18,16 +18,16 @@ export abstract class LogStorageConstructBase extends QpqConstructBlock implemen
   abstract storyResultsTable: aws_dynamodb.ITable;
   abstract fromStoryResultsTable: aws_dynamodb.ITable;
 
-  public grantRead(grantee: aws_iam.IGrantable): aws_iam.Grant {
+  public grantRead(grantee: aws_iam.IGrantable): void {
     this.storyResultsTable.grantReadData(grantee);
     this.fromStoryResultsTable.grantReadData(grantee);
-    return this.bucket.grantRead(grantee);
+    this.bucket.grantRead(grantee);
   }
 
-  public grantWrite(grantee: aws_iam.IGrantable): aws_iam.Grant {
+  public grantWrite(grantee: aws_iam.IGrantable): void {
     this.storyResultsTable.grantWriteData(grantee);
     this.fromStoryResultsTable.grantWriteData(grantee);
-    return this.bucket.grantWrite(grantee);
+    this.bucket.grantWrite(grantee);
   }
 
   public grantAll(grantee: aws_iam.IGrantable): void {

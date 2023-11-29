@@ -66,6 +66,8 @@ export interface QPQConfigAdvancedKeyValueStoreSettings extends QPQConfigAdvance
   owner?: CrossModuleOwner;
 
   ttlAttribute?: string;
+
+  enableMonthlyRollingBackups?: boolean;
 }
 
 export interface KeyValueStoreQPQConfigSetting extends QPQConfigSetting {
@@ -79,6 +81,8 @@ export interface KeyValueStoreQPQConfigSetting extends QPQConfigSetting {
   global: boolean;
 
   ttlAttribute?: string;
+
+  enableMonthlyRollingBackups: boolean;
 }
 
 export const defineKeyValueStore = (
@@ -104,4 +108,6 @@ export const defineKeyValueStore = (
   owner: options?.owner,
 
   ttlAttribute: options?.ttlAttribute,
+
+  enableMonthlyRollingBackups: options?.enableMonthlyRollingBackups ?? false,
 });

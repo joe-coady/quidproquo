@@ -37,6 +37,8 @@ export class Function extends QpqConstructBlock {
 
     const serviceInfo = getAwsServiceAccountInfoConfig(props.qpqConfig);
 
+    const role = aws_iam.Role.fromRoleName(this, 'service-roll', this.resourceName('service-roll'));
+
     this.lambdaFunction = new aws_lambda.Function(this, 'function', {
       functionName: props.functionName,
       timeout: cdk.Duration.seconds(props.timeoutInSeconds || 25),
@@ -56,94 +58,8 @@ export class Function extends QpqConstructBlock {
       tracing: aws_lambda.Tracing.ACTIVE, // Enable Enhanced Monitoring
 
       logRetention: aws_logs.RetentionDays.ONE_WEEK,
+
+      role,
     });
-
-    // Let lambdas read from the exported variables in cloudformation
-    this.lambdaFunction.addToRolePolicy(
-      new aws_iam.PolicyStatement({
-        actions: ['cloudformation:ListExports'],
-        resources: ['*'],
-      }),
-    );
-
-    // Let lambdas read from api keys in api gateway
-    this.lambdaFunction.addToRolePolicy(
-      new aws_iam.PolicyStatement({
-        actions: ['apigateway:GET'],
-        resources: ['*'],
-      }),
-    );
-
-    // Let lambdas invalidate cache for cloud front
-    this.lambdaFunction.addToRolePolicy(
-      new aws_iam.PolicyStatement({
-        actions: ['cloudfront:CreateInvalidation'],
-        resources: ['*'],
-      }),
-    );
-
-    // Let lambdas publish sns messages.
-    this.lambdaFunction.addToRolePolicy(
-      new aws_iam.PolicyStatement({
-        actions: ['sns:Publish'],
-        resources: ['*'],
-      }),
-    );
-
-    // Let lambdas publish service functions
-    this.lambdaFunction.addToRolePolicy(
-      new aws_iam.PolicyStatement({
-        actions: ['lambda:InvokeFunction'],
-        resources: ['arn:aws:lambda:*:*:function:*sfunc*'],
-      }),
-    );
-
-    // Let lambdas access s3
-    this.lambdaFunction.addToRolePolicy(
-      new aws_iam.PolicyStatement({
-        actions: ['s3:GetObject', 's3:PutObject', 's3:ListBucket', 's3:DeleteObject'],
-        resources: ['arn:aws:s3:::*'],
-      }),
-    );
-
-    this.lambdaFunction.addToRolePolicy(
-      new aws_iam.PolicyStatement({
-        actions: ['execute-api:ManageConnections'],
-        resources: ['*'],
-      }),
-    );
-
-    // Let the lambda describe any certificate to get its validation options
-    this.lambdaFunction.addToRolePolicy(
-      new aws_iam.PolicyStatement({
-        actions: ['acm:DescribeCertificate', 'acm:ListCertificates'],
-        resources: ['*'], // This allows describing any ACM certificate. Narrow down if necessary.
-      }),
-    );
-
-    // We need access to dynamo log tables
-    this.lambdaFunction.addToRolePolicy(
-      new aws_iam.PolicyStatement({
-        actions: [
-          'dynamodb:GetItem',
-          'dynamodb:Scan',
-          'dynamodb:Query',
-          'dynamodb:PutItem',
-          'dynamodb:UpdateItem',
-          'dynamodb:DeleteItem',
-        ],
-
-        // TODO: Revisit this, the user can make logs tables them selves... ~ Slight security risk here
-        // Consider making tags to identify logs tables, all qpq resourses
-        // conditions: {
-        //   'ForAllValues:StringLike': {
-        //     'aws:ResourceTag/Name': '*qpqlog',
-        //   },
-        // },
-        // Actually all tables currently :/
-        resources: ['arn:aws:dynamodb:*:*:table/*'],
-        // resources: ['arn:aws:dynamodb:*:*:table/logs-*'],
-      }),
-    );
   }
 }
