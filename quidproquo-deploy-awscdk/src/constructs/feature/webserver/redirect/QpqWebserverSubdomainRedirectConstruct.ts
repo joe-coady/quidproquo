@@ -46,6 +46,8 @@ export class QpqWebserverSubdomainRedirectConstruct extends QpqConstructBlock {
       },
 
       awsAccountId: props.awsAccountId,
+
+      role: this.getServiceRole(),
     });
 
     const restApi = new aws_apigateway.LambdaRestApi(this, 'rest-api', {

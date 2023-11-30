@@ -1,13 +1,12 @@
 import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
 import { Construct } from 'constructs';
-import { custom_resources, CustomResource, aws_route53, aws_certificatemanager } from 'aws-cdk-lib';
+import { custom_resources, CustomResource } from 'aws-cdk-lib';
 import { Function } from './Function';
 import {
   CloudflareDnsDeployEventCommon,
   CloudflareDnsEntries,
   qpqWebServerUtils,
 } from 'quidproquo-webserver';
-import * as qpqDeployAwsCdkUtils from '../../utils';
 
 export interface CloudflareDnsRecordProps extends QpqConstructBlockProps {
   buildPath: string;
@@ -41,20 +40,9 @@ export class CloudflareDnsRecord extends QpqConstructBlock {
         certificateDomain: props.certificateDomain || '',
         certificateRegion: 'us-east-1',
       },
-    });
 
-    // TODO: Make this a utility function
-    const grantables = qpqDeployAwsCdkUtils.getQqpGrantableResources(
-      this,
-      'grantable',
-      this.qpqConfig,
-      props.awsAccountId,
-    );
-
-    grantables.forEach((g) => {
-      g.grantAll(func.lambdaFunction);
+      role: this.getServiceRole(),
     });
-    // ///////// end todo
 
     const crProvider = new custom_resources.Provider(this, 'provider', {
       onEventHandler: func.lambdaFunction,

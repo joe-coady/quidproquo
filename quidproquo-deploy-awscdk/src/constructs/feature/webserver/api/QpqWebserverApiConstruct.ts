@@ -1,4 +1,4 @@
-import { aws_apigateway, aws_iam, aws_lambda } from 'aws-cdk-lib';
+import { aws_apigateway, aws_lambda } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { ApiQPQWebServerConfigSetting, qpqWebServerUtils } from 'quidproquo-webserver';
@@ -8,7 +8,6 @@ import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqCons
 import { SubdomainName } from '../../../basic/SubdomainName';
 import { Function } from '../../../basic/Function';
 
-import * as qpqDeployAwsCdkUtils from '../../../../utils';
 import { CloudflareDnsRecord } from '../../../basic/CloudflareDnsRecord';
 
 export interface QpqWebserverApiConstructProps extends QpqConstructBlockProps {
@@ -32,28 +31,14 @@ export class QpqWebserverApiConstruct extends QpqConstructBlock {
       apiLayerVersions: props.apiLayerVersions,
 
       awsAccountId: props.awsAccountId,
-    });
 
-    const grantables = qpqDeployAwsCdkUtils.getQqpGrantableResourcesForApiConfig(
-      this,
-      'grantable',
-      this.qpqConfig,
-      props.awsAccountId,
-      props.apiConfig,
-    );
-
-    grantables.forEach((g) => {
-      g.grantAll(func.lambdaFunction);
+      role: this.getServiceRole(),
     });
 
     // Create a rest api
     const api = new aws_apigateway.LambdaRestApi(this, 'lambda-rest-api', {
       restApiName: this.resourceName(`${props.apiConfig.apiName}-rest-api`),
       handler: func.lambdaFunction,
-      deployOptions: {
-        loggingLevel: aws_apigateway.MethodLoggingLevel.INFO,
-        dataTraceEnabled: true,
-      },
       binaryMediaTypes: ['*/*'],
       proxy: true,
       cloudWatchRole: false,

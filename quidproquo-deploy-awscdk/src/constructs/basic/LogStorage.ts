@@ -129,8 +129,8 @@ export class LogStorage extends QpqConstructBlock {
     });
 
     // Grant the Lambda function read access to the S3 bucket / dynamo table
-    this.bucket.grantRead(func.lambdaFunction);
-    storyResultsTable.grantWriteData(func.lambdaFunction);
+    // this.bucket.grantRead(func.lambdaFunction);
+    // storyResultsTable.grantWriteData(func.lambdaFunction);
 
     this.bucket.addEventNotification(
       aws_s3.EventType.OBJECT_CREATED,

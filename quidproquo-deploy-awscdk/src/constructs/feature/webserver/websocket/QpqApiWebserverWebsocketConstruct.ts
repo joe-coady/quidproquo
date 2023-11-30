@@ -58,6 +58,8 @@ export class QpqApiWebserverWebsocketConstruct extends QpqConstructBlock {
       environment: {
         websocketApiName: props.websocketConfig.apiName,
       },
+
+      role: this.getServiceRole(),
     });
 
     // Let api gateway invoke this ok

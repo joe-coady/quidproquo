@@ -35,17 +35,8 @@ export class QpqWebserverServiceFunctionConstruct extends QpqConstructBlock {
       apiLayerVersions: props.apiLayerVersions,
 
       awsAccountId: props.awsAccountId,
-    });
 
-    const grantables = qpqDeployAwsCdkUtils.getQqpGrantableResources(
-      this,
-      'grantable',
-      this.qpqConfig,
-      props.awsAccountId,
-    );
-
-    grantables.forEach((g) => {
-      g.grantAll(func.lambdaFunction);
+      role: this.getServiceRole(),
     });
   }
 }

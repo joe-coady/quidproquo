@@ -25,4 +25,8 @@ export class QpqServiceStack extends Stack {
     this.awsAccountId = props.awsAccountId;
     this.qpqConfig = props.qpqConfig;
   }
+
+  resourceName(name: string) {
+    return awsNamingUtils.getConfigRuntimeResourceNameFromConfig(name, this.qpqConfig);
+  }
 }

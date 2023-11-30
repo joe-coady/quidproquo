@@ -30,31 +30,20 @@ export class QpqCoreDeployEventConstruct extends QpqConstructBlock {
       awsAccountId: props.awsAccountId,
 
       // 15 min timeout
-      timeoutInSeconds: 15*60,
+      timeoutInSeconds: 15 * 60,
 
       environment: {
         deployEventConfigName: props.deployEventConfig.name,
-      }
-    });
+      },
 
-    // TODO: Make this a utility function
-    const grantables = qpqDeployAwsCdkUtils.getQqpGrantableResources(
-      this,
-      'grantable',
-      this.qpqConfig,
-      props.awsAccountId,
-    );
-
-    grantables.forEach((g) => {
-      g.grantAll(func.lambdaFunction);
+      role: this.getServiceRole(),
     });
-    // ///////// end todo
 
     // Create a CloudWatch Event that triggers when CloudFormation stack deploys
     const rule = new aws_events.Rule(this, 'Rule', {
       eventPattern: {
         source: ['aws.cloudformation'],
-        detailType: ["CloudFormation Stack Status Change"],
+        detailType: ['CloudFormation Stack Status Change'],
       },
     });
 

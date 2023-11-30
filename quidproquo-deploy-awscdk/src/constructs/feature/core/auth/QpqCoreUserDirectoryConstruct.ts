@@ -1,5 +1,3 @@
-import * as path from 'path';
-
 import { QPQConfig, UserDirectoryQPQConfigSetting, qpqCoreUtils } from 'quidproquo-core';
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 
@@ -42,6 +40,7 @@ export abstract class QpqCoreUserDirectoryConstructBase extends QpqConstructBloc
   public grantWrite(grantee: aws_iam.IGrantable): void {
     this.userPool.grant(
       grantee,
+
       'cognito-idp:SignUp',
       'cognito-idp:AdminCreateUser',
       'cognito-idp:AdminInitiateAuth',
@@ -117,17 +116,6 @@ export class QpqCoreUserDirectoryConstruct extends QpqCoreUserDirectoryConstruct
 
     this.userPool = userPool;
 
-    // const lambdaFunction = new aws_lambda.Function(this, 'csm-msg-trigger', {
-    //   functionName: this.qpqResourceName(`${props.userDirectoryConfig.name}`, 'csm-msg'),
-    //   timeout: cdk.Duration.seconds(25),
-
-    //   runtime: aws_lambda.Runtime.NODEJS_18_X,
-    //   memorySize: 256,
-
-    //   code: aws_lambda.Code.fromAsset(path.join(__dirname, '../../../../lambdas')),
-    //   handler: `lambdaCognitoTriggerEvent_CustomMessage.executeCognitoTriggerEvent`,
-    // });
-
     const customMessageTrigger = new Function(this, 'csm-msg-trigger-func', {
       buildPath: qpqCoreUtils.getUserDirectoryEntryFullPath(
         props.qpqConfig,
@@ -177,5 +165,39 @@ export class QpqCoreUserDirectoryConstruct extends QpqCoreUserDirectoryConstruct
       ),
       userPoolClient.userPoolClientId,
     );
+  }
+
+  public static authorizeActionsForRole(
+    role: aws_iam.IRole,
+    userDirectories: QpqCoreUserDirectoryConstruct[],
+  ) {
+    if (userDirectories.length > 0) {
+      role.addToPrincipalPolicy(
+        new aws_iam.PolicyStatement({
+          effect: aws_iam.Effect.ALLOW,
+          actions: [
+            'cognito-idp:SignUp',
+            'cognito-idp:AdminCreateUser',
+            'cognito-idp:AdminInitiateAuth',
+            'cognito-idp:AdminRespondToAuthChallenge',
+            'cognito-idp:AdminAddUserToGroup',
+            'cognito-idp:AdminDeleteUser',
+            'cognito-idp:AdminUpdateUserAttributes',
+            'cognito-idp:AdminDeleteUserAttributes',
+            'cognito-idp:AdminSetUserPassword',
+
+            'cognito-idp:ListUsers',
+            'cognito-idp:GetUser',
+            'cognito-idp:AdminGetUser',
+            'cognito-idp:ListGroups',
+            'cognito-idp:GetGroup',
+            'cognito-idp:ListUserPools',
+            'cognito-idp:DescribeUserPool',
+            'cognito-idp:DescribeUserPoolClient',
+          ],
+          resources: userDirectories.map((userDirectory) => userDirectory.userPool.userPoolArn),
+        }),
+      );
+    }
   }
 }

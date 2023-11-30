@@ -281,6 +281,7 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
         }),
       );
 
+      // let VR edge lambdas access the resources they need
       const grantables = qpqDeployAwsCdkUtils.getQqpGrantableResources(
         this,
         'grantable',

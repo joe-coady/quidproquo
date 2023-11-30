@@ -39,21 +39,10 @@ export class QpqCoreRecurringScheduleConstruct extends QpqConstructBlock {
       awsAccountId: props.awsAccountId,
 
       // 15 min timeout
-      timeoutInSeconds: 15*60
-    });
+      timeoutInSeconds: 15 * 60,
 
-    // TODO: Make this a utility function
-    const grantables = qpqDeployAwsCdkUtils.getQqpGrantableResources(
-      this,
-      'grantable',
-      this.qpqConfig,
-      props.awsAccountId,
-    );
-
-    grantables.forEach((g) => {
-      g.grantAll(schedulerFunction.lambdaFunction);
+      role: this.getServiceRole(),
     });
-    // ///////// end todo
 
     // EventBridge rule which runs every five minutes
     const cronRule = new aws_events.Rule(this, 'cron', {

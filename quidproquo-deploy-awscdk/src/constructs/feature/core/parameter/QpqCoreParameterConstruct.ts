@@ -54,10 +54,22 @@ export class QpqCoreParameterConstruct extends QpqCoreParameterConstructBase {
     this.stringParameter = new aws_ssm.StringParameter(this, 'param', {
       parameterName: this.resourceName(props.parameterConfig.key),
       description: props.parameterConfig.key,
-      stringValue: props.parameterConfig.value || "Please set a value",
+      stringValue: props.parameterConfig.value || 'Please set a value',
 
       // No additional costs ~ 4k max size
       tier: aws_ssm.ParameterTier.STANDARD,
     });
+  }
+
+  public static authorizeActionsForRole(role: aws_iam.IRole, params: QpqCoreParameterConstruct[]) {
+    if (params.length > 0) {
+      role.addToPrincipalPolicy(
+        new aws_iam.PolicyStatement({
+          effect: aws_iam.Effect.ALLOW,
+          actions: ['ssm:GetParameter', 'ssm:GetParameters', 'ssm:DescribeParameters'],
+          resources: params.map((sd) => sd.stringParameter.parameterArn),
+        }),
+      );
+    }
   }
 }

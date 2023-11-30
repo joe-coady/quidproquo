@@ -1,7 +1,6 @@
 import { Construct } from 'constructs';
+
 import * as cdk from 'aws-cdk-lib';
-import { QPQ_LOG_BUCKET_NAME } from '../constants';
-import { getLocalServiceAccountInfo } from 'quidproquo-config-aws';
 
 import {
   QPQCoreConfigSettingType,
@@ -11,7 +10,6 @@ import {
   SecretQPQConfigSetting,
   QPQConfig,
   QueueQPQConfigSetting,
-  KeyValueStoreQPQConfigSetting,
 } from 'quidproquo-core';
 
 import {

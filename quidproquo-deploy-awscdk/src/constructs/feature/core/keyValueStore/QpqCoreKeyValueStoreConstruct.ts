@@ -118,26 +118,27 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
       console.log('tableNameOverride', tableNameOverride);
       this.table = aws_dynamodb.Table.fromTableName(this, 'tablelink', tableNameOverride);
     }
+  }
 
-    // Security
-    // const policyStatement = new aws_iam.PolicyStatement({
-    //   sid: 'AllowAllEntitiesInAccount',
-    //   effect: aws_iam.Effect.ALLOW,
-    //   actions: [
-    //     'dynamodb:GetItem',
-    //     'dynamodb:PutItem',
-    //     'dynamodb:Query',
-    //     'dynamodb:Scan',
-    //     'dynamodb:UpdateItem',
-    //     'dynamodb:DeleteItem',
-    //   ],
-    //   resources: [this.table.tableArn],
-    // });
-
-    // const role = new aws_iam.Role(this, 'AllowAllEntitiesInAccountRole', {
-    //   assumedBy: new aws_iam.AccountPrincipal(props.awsAccountId),
-    // });
-
-    // role.addToPolicy(policyStatement);
+  public static authorizeActionsForRole(
+    role: aws_iam.IRole,
+    kvsList: QpqCoreKeyValueStoreConstruct[],
+  ) {
+    if (kvsList.length > 0) {
+      role.addToPrincipalPolicy(
+        new aws_iam.PolicyStatement({
+          effect: aws_iam.Effect.ALLOW,
+          actions: [
+            'dynamodb:GetItem',
+            'dynamodb:PutItem',
+            'dynamodb:Query',
+            'dynamodb:Scan',
+            'dynamodb:UpdateItem',
+            'dynamodb:DeleteItem',
+          ],
+          resources: kvsList.map((kvs) => kvs.table.tableArn),
+        }),
+      );
+    }
   }
 }

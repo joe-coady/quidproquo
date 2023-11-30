@@ -3,7 +3,8 @@ import { QPQConfig } from 'quidproquo-core';
 import { Construct } from 'constructs';
 
 import { QpqResource } from './QpqResource';
-import { IGrantable } from 'aws-cdk-lib/aws-iam';
+import { IGrantable, IRole } from 'aws-cdk-lib/aws-iam';
+import { aws_iam } from 'aws-cdk-lib';
 
 export interface QpqConstructBlockProps {
   awsAccountId: string;
@@ -13,6 +14,7 @@ export interface QpqConstructBlockProps {
 export class QpqConstructBlock extends Construct implements QpqResource {
   awsAccountId: string;
   qpqConfig: QPQConfig;
+  serviceRole?: aws_iam.IRole;
 
   constructor(scope: Construct, id: string, props: QpqConstructBlockProps) {
     super(scope, id);
@@ -44,5 +46,20 @@ export class QpqConstructBlock extends Construct implements QpqResource {
   grantAll(grantee: IGrantable): void {
     this.grantRead(grantee);
     this.grantWrite(grantee);
+  }
+
+  getServiceRole(): aws_iam.IRole {
+    if (!this.serviceRole) {
+      this.serviceRole = aws_iam.Role.fromRoleName(
+        this,
+        'service-role',
+        this.resourceName('service-role'),
+        {
+          mutable: true,
+        },
+      );
+    }
+
+    return this.serviceRole;
   }
 }

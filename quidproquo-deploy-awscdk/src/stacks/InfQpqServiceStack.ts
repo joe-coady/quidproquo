@@ -25,17 +25,11 @@ export class InfQpqServiceStack extends QpqServiceStack {
   constructor(scope: Construct, id: string, props: InfQpqServiceStackProps) {
     super(scope, id, props);
 
-    // Build the log storage drive
-    // const logBucket = new LogStorage(this, 'logStorage', {
-    //   awsAccountId: props.awsAccountId,
-    //   qpqConfig: props.qpqConfig,
-    // }).bucket;
-
     // Build the role for this service.
-    const webserverRoll = new WebserverRoll(this, 'webserverRoll', {
+    const webserverRole = new WebserverRoll(this, 'webserverRoll', {
       awsAccountId: props.awsAccountId,
       qpqConfig: props.qpqConfig,
-    });
+    }).role;
 
     // Build the storage drives
     const storageDrives = qpqCoreUtils.getOwnedStorageDrives(props.qpqConfig).map(
@@ -47,6 +41,8 @@ export class InfQpqServiceStack extends QpqServiceStack {
           storageDriveConfig: setting,
         }),
     );
+    QpqCoreStorageDriveConstruct.authorizeActionsForRole(webserverRole, storageDrives);
+    // end storage drives
 
     // Build the parameters
     const parameters = qpqCoreUtils.getParameterConfigs(props.qpqConfig).map(
@@ -58,6 +54,8 @@ export class InfQpqServiceStack extends QpqServiceStack {
           parameterConfig: setting,
         }),
     );
+    QpqCoreParameterConstruct.authorizeActionsForRole(webserverRole, parameters);
+    // end parameters
 
     // Secrets
     const secrets = qpqCoreUtils.getOwnedSecrets(props.qpqConfig).map(
@@ -69,6 +67,8 @@ export class InfQpqServiceStack extends QpqServiceStack {
           secretConfig: setting,
         }),
     );
+    QpqCoreSecretConstruct.authorizeActionsForRole(webserverRole, secrets);
+    // end secrets
 
     // Queues
     const queues = qpqCoreUtils.getQueues(props.qpqConfig).map(
@@ -80,6 +80,8 @@ export class InfQpqServiceStack extends QpqServiceStack {
           queueConfig: setting,
         }),
     );
+    QpqCoreQueueConstruct.authorizeActionsForRole(webserverRole, queues);
+    // end queues
 
     // Domain
     const dns = qpqWebServerUtils.getDnsConfigs(props.qpqConfig).map(
@@ -102,6 +104,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
           userDirectoryConfig: setting,
         }),
     );
+    QpqCoreUserDirectoryConstruct.authorizeActionsForRole(webserverRole, userDirectories);
 
     // Api Keys
     const apiKeys = qpqWebServerUtils.getAllApiKeyConfigs(props.qpqConfig).map(
@@ -135,6 +138,8 @@ export class InfQpqServiceStack extends QpqServiceStack {
           keyValueStoreConfig: setting,
         }),
     );
+    QpqCoreKeyValueStoreConstruct.authorizeActionsForRole(webserverRole, keyValueStores);
+    // end key value store
 
     // Build websocket apis
     const websockets = qpqWebServerUtils.getWebsocketSettings(props.qpqConfig).map(

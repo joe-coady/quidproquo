@@ -1,4 +1,10 @@
-import { StorageDriveQPQConfigSetting, QPQConfig, qpqCoreUtils, StorageDriveLifecycleRule, StorageDriveTransition } from 'quidproquo-core';
+import {
+  StorageDriveQPQConfigSetting,
+  QPQConfig,
+  qpqCoreUtils,
+  StorageDriveLifecycleRule,
+  StorageDriveTransition,
+} from 'quidproquo-core';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { QpqResource } from '../../../base/QpqResource';
@@ -31,21 +37,31 @@ export abstract class QpqCoreStorageDriveConstructBase
   }
 }
 
-const convertStorageDriveTransitionToAwsS3Transition = (storageDriveTransition: StorageDriveTransition): aws_s3.Transition => ({
+const convertStorageDriveTransitionToAwsS3Transition = (
+  storageDriveTransition: StorageDriveTransition,
+): aws_s3.Transition => ({
   storageClass: aws_s3.StorageClass.DEEP_ARCHIVE,
-  transitionAfter: typeof(storageDriveTransition.transitionAfterDays) === 'number' ? cdk.Duration.days(storageDriveTransition.transitionAfterDays) : undefined,
-  transitionDate: typeof(storageDriveTransition.transitionDate) === 'string' ? new Date(storageDriveTransition.transitionDate) : undefined,
+  transitionAfter:
+    typeof storageDriveTransition.transitionAfterDays === 'number'
+      ? cdk.Duration.days(storageDriveTransition.transitionAfterDays)
+      : undefined,
+  transitionDate:
+    typeof storageDriveTransition.transitionDate === 'string'
+      ? new Date(storageDriveTransition.transitionDate)
+      : undefined,
 });
 
 const convertStorageDriveLifecycleRuleToAwsS3LifecycleRule = (
   lifecycleRule: StorageDriveLifecycleRule,
 ): aws_s3.LifecycleRule => ({
   prefix: lifecycleRule.prefix,
-  expiration: lifecycleRule.deleteAfterDays ? cdk.Duration.days(lifecycleRule.deleteAfterDays) : undefined,
+  expiration: lifecycleRule.deleteAfterDays
+    ? cdk.Duration.days(lifecycleRule.deleteAfterDays)
+    : undefined,
   objectSizeGreaterThan: lifecycleRule.fileSizeGreaterThan,
   objectSizeLessThan: lifecycleRule.fileSizeLessThan,
-  transitions: lifecycleRule.transitions?.map(convertStorageDriveTransitionToAwsS3Transition)
-})
+  transitions: lifecycleRule.transitions?.map(convertStorageDriveTransitionToAwsS3Transition),
+});
 
 export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBase {
   bucket: aws_s3.IBucket;
@@ -71,11 +87,15 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
   constructor(scope: Construct, id: string, props: QpqCoreStorageDriveConstructProps) {
     super(scope, id, props);
 
-    console.log(JSON.stringify(
-      props.storageDriveConfig.lifecycleRules?.map(convertStorageDriveLifecycleRuleToAwsS3LifecycleRule),
-      null,
-      2
-    ));
+    console.log(
+      JSON.stringify(
+        props.storageDriveConfig.lifecycleRules?.map(
+          convertStorageDriveLifecycleRuleToAwsS3LifecycleRule,
+        ),
+        null,
+        2,
+      ),
+    );
 
     this.bucket = new aws_s3.Bucket(this, 'bucket', {
       bucketName: this.resourceName(props.storageDriveConfig.storageDrive),
@@ -96,7 +116,9 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
         },
       ],
 
-      lifecycleRules: props.storageDriveConfig.lifecycleRules?.map(convertStorageDriveLifecycleRuleToAwsS3LifecycleRule),
+      lifecycleRules: props.storageDriveConfig.lifecycleRules?.map(
+        convertStorageDriveLifecycleRuleToAwsS3LifecycleRule,
+      ),
     });
 
     // TODO: Only do this IF a cloud front dist wants to use it
@@ -138,6 +160,24 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
         sources: [aws_s3_deployment.Source.asset(srcDir)],
         destinationBucket: this.bucket,
       });
+    }
+  }
+
+  public static authorizeActionsForRole(
+    role: aws_iam.IRole,
+    storageDrives: QpqCoreStorageDriveConstruct[],
+  ) {
+    if (storageDrives.length > 0) {
+      role.addToPrincipalPolicy(
+        new aws_iam.PolicyStatement({
+          effect: aws_iam.Effect.ALLOW,
+          actions: ['s3:GetObject', 's3:PutObject', 's3:DeleteObject', 's3:ListBucket'],
+          resources: storageDrives.flatMap((sd) => [
+            sd.bucket.bucketArn,
+            sd.bucket.arnForObjects('*'),
+          ]),
+        }),
+      );
     }
   }
 }

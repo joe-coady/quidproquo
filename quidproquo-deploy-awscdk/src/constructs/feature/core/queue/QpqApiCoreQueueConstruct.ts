@@ -6,14 +6,10 @@ import { QpqCoreEventBusConstruct } from '../eventBus/QpqCoreEventBusConstruct';
 
 import { Function } from '../../../basic/Function';
 
-import * as qpqDeployAwsCdkUtils from '../../../../utils';
-
 import { Construct } from 'constructs';
 import { aws_lambda_event_sources, aws_lambda, aws_sns, aws_sns_subscriptions } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
-import {
-  getAwsServiceAccountInfoByDeploymentInfo,
-} from 'quidproquo-config-aws';
+import { getAwsServiceAccountInfoByDeploymentInfo } from 'quidproquo-config-aws';
 
 export interface QpqApiCoreQueueConstructProps extends QpqConstructBlockProps {
   queueConfig: QueueQPQConfigSetting;
@@ -49,21 +45,10 @@ export class QpqApiCoreQueueConstruct extends QpqConstructBlock {
       //       processed by a Lambda function for a time longer than the SQS visibility timeout,
       //       the message will become visible in the SQS queue again and could be consumed
       //       by another Lambda function, resulting in the message being processed multiple times.
-      timeoutInSeconds: Math.min(props.queueConfig.ttRetryInSeconds, 15*60)
-    });
+      timeoutInSeconds: Math.min(props.queueConfig.ttRetryInSeconds, 15 * 60),
 
-    // TODO: Make this a utility function
-    const grantables = qpqDeployAwsCdkUtils.getQqpGrantableResources(
-      this,
-      'grantable',
-      this.qpqConfig,
-      props.awsAccountId,
-    );
-
-    grantables.forEach((g) => {
-      g.grantAll(queueFunction.lambdaFunction);
+      role: this.getServiceRole(),
     });
-    // ///////// end todo
 
     const queueResource = QpqCoreQueueConstruct.fromOtherStack(
       this,
@@ -74,12 +59,16 @@ export class QpqApiCoreQueueConstruct extends QpqConstructBlock {
     );
 
     props.queueConfig.eventBusSubscriptions.forEach((eventBusSubscription) => {
-      const eventBusConfig = qpqCoreUtils.getEventBusConfigByName(eventBusSubscription, props.qpqConfig);
+      const eventBusConfig = qpqCoreUtils.getEventBusConfigByName(
+        eventBusSubscription,
+        props.qpqConfig,
+      );
 
       const deploymentInfo = getAwsServiceAccountInfoByDeploymentInfo(
         props.qpqConfig,
         eventBusConfig?.owner?.module || qpqCoreUtils.getApplicationModuleName(props.qpqConfig),
-        eventBusConfig?.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(props.qpqConfig),
+        eventBusConfig?.owner?.environment ||
+          qpqCoreUtils.getApplicationModuleEnvironment(props.qpqConfig),
         eventBusConfig?.owner?.feature ?? qpqCoreUtils.getApplicationModuleFeature(props.qpqConfig),
         eventBusConfig?.owner?.application || qpqCoreUtils.getApplicationName(props.qpqConfig),
       );

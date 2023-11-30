@@ -58,4 +58,16 @@ export class QpqCoreSecretConstruct extends QpqCoreSecretConstructBase {
       description: props.secretConfig.key,
     });
   }
+
+  public static authorizeActionsForRole(role: aws_iam.IRole, secrets: QpqCoreSecretConstruct[]) {
+    if (secrets.length > 0) {
+      role.addToPrincipalPolicy(
+        new aws_iam.PolicyStatement({
+          effect: aws_iam.Effect.ALLOW,
+          actions: ['secretsmanager:GetSecretValue'],
+          resources: secrets.map((sd) => sd.secret.secretArn),
+        }),
+      );
+    }
+  }
 }

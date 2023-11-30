@@ -2,7 +2,7 @@ import path from 'path';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
 import { Construct } from 'constructs';
-import { aws_lambda, aws_iam, aws_logs } from 'aws-cdk-lib';
+import { aws_lambda, aws_logs, aws_iam } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 
 import { getAwsServiceAccountInfoConfig } from 'quidproquo-config-aws';
@@ -25,6 +25,8 @@ export interface FunctionProps extends QpqConstructBlockProps {
   apiLayerVersions?: aws_lambda.ILayerVersion[];
 
   reservedConcurrentExecutions?: number;
+
+  role?: aws_iam.IRole;
 }
 
 export class Function extends QpqConstructBlock {
@@ -36,8 +38,6 @@ export class Function extends QpqConstructBlock {
     const handlerFile = props.srcFilename || 'index';
 
     const serviceInfo = getAwsServiceAccountInfoConfig(props.qpqConfig);
-
-    const role = aws_iam.Role.fromRoleName(this, 'service-roll', this.resourceName('service-roll'));
 
     this.lambdaFunction = new aws_lambda.Function(this, 'function', {
       functionName: props.functionName,
@@ -55,11 +55,11 @@ export class Function extends QpqConstructBlock {
       reservedConcurrentExecutions: props.reservedConcurrentExecutions,
 
       // TODO: Make this optional
-      tracing: aws_lambda.Tracing.ACTIVE, // Enable Enhanced Monitoring
+      tracing: aws_lambda.Tracing.DISABLED,
 
       logRetention: aws_logs.RetentionDays.ONE_WEEK,
 
-      role,
+      role: props.role,
     });
   }
 }

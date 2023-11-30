@@ -94,4 +94,22 @@ export class QpqCoreQueueConstruct extends QpqCoreQueueConstructBase {
       );
     });
   }
+
+  public static authorizeActionsForRole(role: aws_iam.IRole, queues: QpqCoreQueueConstruct[]) {
+    if (queues.length > 0) {
+      role.addToPrincipalPolicy(
+        new aws_iam.PolicyStatement({
+          effect: aws_iam.Effect.ALLOW,
+          actions: [
+            'sqs:GetQueueAttributes',
+            'sqs:GetQueueUrl',
+            'sqs:ListDeadLetterSourceQueues',
+            'sqs:ReceiveMessage',
+            'sqs:PeekMessage',
+          ],
+          resources: queues.map((queue) => queue.queue.queueArn),
+        }),
+      );
+    }
+  }
 }
