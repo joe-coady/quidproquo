@@ -24,7 +24,7 @@ export function createAwsClient<T>(ClientClass: ClientConstructor<T>, args: any)
         const paramsText = JSON.stringify(sendArgs);
         try {
           return await originalSend.apply(this, sendArgs);
-        } catch (error) {
+        } catch (error: any) {
           error.message = `aws client (${argsKey}) send with args: ${paramsText}\n\n${error.message}`;
           throw error;
         }
