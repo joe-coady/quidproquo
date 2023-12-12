@@ -106,6 +106,7 @@ export class QpqCoreQueueConstruct extends QpqCoreQueueConstructBase {
             'sqs:ListDeadLetterSourceQueues',
             'sqs:ReceiveMessage',
             'sqs:PeekMessage',
+            'sqs:SendMessage',
           ],
           resources: queues.map((queue) => queue.queue.queueArn),
         }),
