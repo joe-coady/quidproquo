@@ -1,6 +1,6 @@
 {
   "name": "quidproquo-web",
-  "version": "0.0.157",
+  "version": "0.0.158",
   "description": "",
   "main": "./lib/commonjs/index.js",
   "types": "./lib/commonjs/index.d.js",
