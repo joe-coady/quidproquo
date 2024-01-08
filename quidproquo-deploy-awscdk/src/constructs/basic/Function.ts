@@ -50,7 +50,10 @@ export class Function extends QpqConstructBlock {
       code: aws_lambda.Code.fromAsset(path.join(props.buildPath, props.functionType)),
       handler: `${handlerFile}.${props.executorName}`,
 
-      environment: props.environment,
+      environment: {
+        AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
+        ...(props.environment || {}),
+      },
 
       reservedConcurrentExecutions: props.reservedConcurrentExecutions,
 
