@@ -11,6 +11,7 @@ export enum QPQWebServerConfigSettingType {
   ServiceFunction = '@quidproquo-webserver/config/ServiceFunction',
   WebSocket = '@quidproquo-webserver/config/WebSocket',
   Cache = '@quidproquo-webserver/config/Cache',
+  Certificate = '@quidproquo-webserver/config/Certificate',
 }
 
 export interface CacheSettings {

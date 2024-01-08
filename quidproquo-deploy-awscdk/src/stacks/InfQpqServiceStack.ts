@@ -15,6 +15,7 @@ import {
   QpqWebserverApiKeyConstruct,
   QpqCoreKeyValueStoreConstruct,
   QpqWebserverWebsocketConstruct,
+  QpqWebserverCertificateConstruct,
 } from '../constructs';
 import { QpqWebServerCacheConstruct } from '../constructs/feature/webserver/cache/QpqWebServerCacheConstruct';
 import { WebserverRoll } from '../constructs/basic/WebserverRoll';
@@ -160,6 +161,17 @@ export class InfQpqServiceStack extends QpqServiceStack {
           qpqConfig: props.qpqConfig,
 
           cacheConfig: setting,
+        }),
+    );
+
+    // Certifcates
+    const certifcates = qpqWebServerUtils.getAllOwnedCertifcateConfigs(props.qpqConfig).map(
+      (setting) =>
+        new QpqWebserverCertificateConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
+          awsAccountId: props.awsAccountId,
+          qpqConfig: props.qpqConfig,
+
+          certificateConfig: setting,
         }),
     );
   }

@@ -14,6 +14,7 @@ import {
   ServiceFunctionQPQWebServerConfigSetting,
   WebSocketQPQWebServerConfigSetting,
   CacheQPQWebServerConfigSetting,
+  CertificateQPQWebServerConfigSetting,
 } from '../config';
 
 import { WebEntryQPQWebServerConfigSetting, ApiQPQWebServerConfigSetting } from '../config';
@@ -246,6 +247,17 @@ export const getAllOwnedCacheConfigs = (qpqConfig: QPQConfig): CacheQPQWebServer
   );
 
   return qpqCoreUtils.getOwnedItems(cacheSettings, qpqConfig);
+};
+
+export const getAllOwnedCertifcateConfigs = (
+  qpqConfig: QPQConfig,
+): CertificateQPQWebServerConfigSetting[] => {
+  const certificateSettings = qpqCoreUtils.getConfigSettings<CertificateQPQWebServerConfigSetting>(
+    qpqConfig,
+    QPQWebServerConfigSettingType.Certificate,
+  );
+
+  return qpqCoreUtils.getOwnedItems(certificateSettings, qpqConfig);
 };
 
 export const getCacheConfigByName = (
