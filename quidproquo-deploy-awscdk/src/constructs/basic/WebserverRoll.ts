@@ -14,8 +14,8 @@ export class WebserverRoll extends QpqConstructBlock {
     const role = new aws_iam.Role(this, 'role', {
       roleName: this.resourceName('service-role'),
       assumedBy: new aws_iam.CompositePrincipal(
-        // new aws_iam.ServicePrincipal('ec2.amazonaws.com'),
         new aws_iam.ServicePrincipal('lambda.amazonaws.com'),
+        new aws_iam.ServicePrincipal('transfer.amazonaws.com'),
       ),
     });
 
