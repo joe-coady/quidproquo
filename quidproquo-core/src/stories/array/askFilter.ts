@@ -2,7 +2,7 @@ import { AskResponse } from '../../types';
 
 export function* askFilter<T>(
   items: T[],
-  askCallback: (item: T, index: number, srcArray: T[]) => AskResponse<T>,
+  askCallback: (item: T, index: number, srcArray: T[]) => AskResponse<boolean>,
 ): AskResponse<T[]> {
   const filteredItems: T[] = [];
 

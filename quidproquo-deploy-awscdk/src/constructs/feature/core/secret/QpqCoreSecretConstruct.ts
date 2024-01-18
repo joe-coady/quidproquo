@@ -7,6 +7,8 @@ import { Construct } from 'constructs';
 import { aws_secretsmanager, aws_iam } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 
+import * as qpqDeployAwsCdkUtils from '../../../../utils';
+
 export interface QpqCoreSecretConstructProps extends QpqConstructBlockProps {
   secretConfig: SecretQPQConfigSetting;
 }
@@ -57,6 +59,8 @@ export class QpqCoreSecretConstruct extends QpqCoreSecretConstructBase {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       description: props.secretConfig.key,
     });
+
+    qpqDeployAwsCdkUtils.applyEnvironmentTags(this.secret, props.qpqConfig);
   }
 
   public static authorizeActionsForRole(role: aws_iam.IRole, secrets: QpqCoreSecretConstruct[]) {

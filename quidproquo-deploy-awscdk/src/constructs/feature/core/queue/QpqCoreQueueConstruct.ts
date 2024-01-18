@@ -3,6 +3,8 @@ import { QueueQPQConfigSetting, qpqCoreUtils, QPQConfig } from 'quidproquo-core'
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { getAwsAccountIds } from 'quidproquo-config-aws';
 
+import * as qpqDeployAwsCdkUtils from '../../../../utils/qpqDeployAwsCdkUtils';
+
 import { Construct } from 'constructs';
 import { aws_sqs, aws_iam } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
@@ -72,6 +74,8 @@ export class QpqCoreQueueConstruct extends QpqCoreQueueConstructBase {
         }),
       },
     });
+
+    qpqDeployAwsCdkUtils.applyEnvironmentTags(this.queue, props.qpqConfig);
 
     const accountIds = getAwsAccountIds(props.qpqConfig);
 

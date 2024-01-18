@@ -186,6 +186,8 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
       })),
     });
 
+    qpqDeployAwsCdkUtils.applyEnvironmentTags(distribution, props.qpqConfig);
+
     qpqDeployAwsCdkUtils.exportStackValue(
       this,
       awsNamingUtils.getCFExportNameDistributionIdArnFromConfig(

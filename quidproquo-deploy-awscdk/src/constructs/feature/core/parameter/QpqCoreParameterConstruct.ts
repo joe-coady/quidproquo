@@ -6,6 +6,8 @@ import { QpqResource } from '../../../base/QpqResource';
 import { Construct } from 'constructs';
 import { aws_ssm, aws_iam } from 'aws-cdk-lib';
 
+import * as qpqDeployAwsCdkUtils from '../../../../utils';
+
 export interface QpqCoreParameterConstructProps extends QpqConstructBlockProps {
   parameterConfig: ParameterQPQConfigSetting;
 }
@@ -59,6 +61,8 @@ export class QpqCoreParameterConstruct extends QpqCoreParameterConstructBase {
       // No additional costs ~ 4k max size
       tier: aws_ssm.ParameterTier.STANDARD,
     });
+
+    qpqDeployAwsCdkUtils.applyEnvironmentTags(this.stringParameter, props.qpqConfig);
   }
 
   public static authorizeActionsForRole(role: aws_iam.IRole, params: QpqCoreParameterConstruct[]) {

@@ -114,6 +114,8 @@ export class QpqCoreUserDirectoryConstruct extends QpqCoreUserDirectoryConstruct
       // },
     });
 
+    qpqDeployAwsCdkUtils.applyEnvironmentTags(userPool, props.qpqConfig);
+
     this.userPool = userPool;
 
     const customMessageTrigger = new Function(this, 'csm-msg-trigger-func', {

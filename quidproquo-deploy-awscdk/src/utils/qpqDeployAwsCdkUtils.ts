@@ -1,4 +1,4 @@
-import { Construct } from 'constructs';
+import { Construct, IConstruct } from 'constructs';
 
 import * as cdk from 'aws-cdk-lib';
 
@@ -295,4 +295,15 @@ export const exportStackValue = (
 
 export const importStackValue = (uniqueKey: string): string => {
   return cdk.Fn.importValue(uniqueKey);
+};
+
+export const applyEnvironmentTags = (scope: IConstruct, qpqConfig: QPQConfig) => {
+  cdk.Tags.of(scope).add('environment', qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig));
+  cdk.Tags.of(scope).add('application', qpqCoreUtils.getApplicationName(qpqConfig));
+  cdk.Tags.of(scope).add('module', qpqCoreUtils.getApplicationModuleName(qpqConfig));
+
+  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+  if (feature) {
+    cdk.Tags.of(scope).add('feature', feature);
+  }
 };

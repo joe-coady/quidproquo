@@ -86,3 +86,5 @@ yield* askTryCatch(
     }
   );
 ```
+
+TODO: FIX INCREMENT / DECREMENT COLUMN IN DYNAMO

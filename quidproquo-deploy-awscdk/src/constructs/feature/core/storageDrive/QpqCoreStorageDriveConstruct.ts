@@ -6,6 +6,8 @@ import {
   StorageDriveTransition,
 } from 'quidproquo-core';
 
+import * as qpqDeployAwsCdkUtils from '../../../../utils/qpqDeployAwsCdkUtils';
+
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { QpqResource } from '../../../base/QpqResource';
 
@@ -120,6 +122,8 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
         convertStorageDriveLifecycleRuleToAwsS3LifecycleRule,
       ),
     });
+
+    qpqDeployAwsCdkUtils.applyEnvironmentTags(this.bucket, props.qpqConfig);
 
     // TODO: Only do this IF a cloud front dist wants to use it
     // same with cors above.

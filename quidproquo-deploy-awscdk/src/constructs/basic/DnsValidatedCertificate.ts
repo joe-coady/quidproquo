@@ -3,6 +3,8 @@ import { Construct } from 'constructs';
 import { aws_route53, aws_certificatemanager } from 'aws-cdk-lib';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
+import * as qpqDeployAwsCdkUtils from '../../utils';
+
 export interface DnsValidatedCertificateProps extends QpqConstructBlockProps {
   onRootDomain: boolean;
   subdomain?: string;
@@ -30,5 +32,7 @@ export class DnsValidatedCertificate extends QpqConstructBlock {
       domainName: this.deployDomain,
       validation: aws_certificatemanager.CertificateValidation.fromDns(this.hostedZone),
     });
+
+    qpqDeployAwsCdkUtils.applyEnvironmentTags(this.certificate, props.qpqConfig);
   }
 }

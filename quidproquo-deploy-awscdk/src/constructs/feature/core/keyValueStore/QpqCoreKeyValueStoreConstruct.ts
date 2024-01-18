@@ -2,6 +2,8 @@ import { KeyValueStoreQPQConfigSetting, QPQConfig, KvsKey, qpqCoreUtils } from '
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 
+import * as qpqDeployAwsCdkUtils from '../../../../utils/qpqDeployAwsCdkUtils';
+
 import { Construct } from 'constructs';
 import { aws_dynamodb, aws_iam } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
@@ -86,6 +88,8 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
       timeToLiveAttribute: props.keyValueStoreConfig.ttlAttribute,
       pointInTimeRecovery: props.keyValueStoreConfig.enableMonthlyRollingBackups,
     });
+
+    qpqDeployAwsCdkUtils.applyEnvironmentTags(table, props.qpqConfig);
 
     // Do local secondary indexes
     for (let i = 1; i < props.keyValueStoreConfig.sortKeys.length; i++) {

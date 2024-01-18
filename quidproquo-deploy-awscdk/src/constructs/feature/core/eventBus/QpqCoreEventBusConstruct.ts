@@ -65,6 +65,8 @@ export class QpqCoreEventBusConstruct extends QpqCoreEventBusConstructBase {
       displayName: props.eventBusConfig.name,
     });
 
+    qpqDeployAwsCdkUtils.applyEnvironmentTags(this.topic, props.qpqConfig);
+
     const accountIds = getAwsAccountIds(props.qpqConfig);
     accountIds.forEach((accountId) => {
       this.topic.addToResourcePolicy(
