@@ -26,9 +26,9 @@ export interface KeyValueStoreUpdateAction<Value>
 // Function Types
 export type KeyValueStoreUpdateActionProcessor<Value> = ActionProcessor<
   KeyValueStoreUpdateAction<Value>,
-  void
+  Value
 >;
 export type KeyValueStoreUpdateActionRequester<Value> = ActionRequester<
   KeyValueStoreUpdateAction<Value>,
-  void
+  Value
 >;

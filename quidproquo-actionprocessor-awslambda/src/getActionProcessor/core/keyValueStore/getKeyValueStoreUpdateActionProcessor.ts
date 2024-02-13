@@ -15,9 +15,18 @@ const getProcessKeyValueStoreUpdate = (
     const dynamoTableName = getKvsDynamoTableNameFromConfig(keyValueStoreName, qpqConfig, 'kvs');
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
-    await updateItem(dynamoTableName, region, updates, key, sortKey);
+    const storeConfig = qpqCoreUtils.getKeyValueStoreByName(qpqConfig, keyValueStoreName)!;
 
-    return actionResult(void 0);
+    const item = await updateItem(
+      dynamoTableName,
+      region,
+      updates,
+      storeConfig.partitionKey.key,
+      key,
+      sortKey,
+    );
+
+    return actionResult(item);
   };
 };
 
