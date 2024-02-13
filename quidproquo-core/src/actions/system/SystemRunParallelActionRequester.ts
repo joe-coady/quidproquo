@@ -4,10 +4,16 @@
 import { askBatch } from './SystemBatchActionRequester';
 import { SystemRunParallelActionRequester } from './SystemRunParallelActionTypes';
 
-// TODO: Make this faster?
-// TODO: Type support
-// Runs n number of stories in parallel
-export function* askParallel(stories: Array<any>): SystemRunParallelActionRequester {
+/**
+ * @deprecated since version X.X. Please use {@link askRunParallel} instead.
+ * Runs n number of stories in parallel. This function is deprecated and has been replaced
+ * by a more efficient and type-supported version. The replacement function provides
+ * improved performance and better type support.
+ *
+ * @param {Array<any>} stories - An array of stories to be run in parallel.
+ * @returns {SystemRunParallelActionRequester} A requester for running actions in parallel.
+ */
+export function* askParallelDEPRECATED(stories: Array<any>): SystemRunParallelActionRequester {
   const itt = stories.map((s: any) => s[0](...s.slice(1)));
   let actions = itt.map((i: any) => i.next());
   let values: Array<any> = actions.map((a) => a.value);

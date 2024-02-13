@@ -1,1 +1,2 @@
-export * from "./askCatch"
+export * from './askCatch';
+export * from './askRunParallel';
