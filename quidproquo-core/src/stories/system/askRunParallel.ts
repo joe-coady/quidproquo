@@ -4,10 +4,10 @@ import { askBatch } from '../../actions';
 export function* askRunParallel<T extends Array<AskResponse<any>>>(
   storyRuntimes: [...T],
 ): AskResponse<{ [K in keyof T]: AskResponseReturnType<T[K]> }> {
-  // Need to make sure this has the same effect as askBatch when catching errors
-  // if (storyRuntimes.length === 1) {
-  //   return [yield* storyRuntimes[0]] as any;
-  // }
+  // No need to batch if we only have one story
+  if (storyRuntimes.length === 1) {
+    return [yield* storyRuntimes[0]] as any;
+  }
 
   // Begin executing the stories
   const storyProgress = storyRuntimes.map((input) => ({
