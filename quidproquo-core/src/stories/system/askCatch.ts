@@ -1,16 +1,11 @@
-import { 
-  AskResponse, 
-  AskResponseReturnType, 
-  EitherActionResult, 
-  ErrorTypeEnum
-} from "../../types";
+import { AskResponse, AskResponseReturnType, EitherActionResult, ErrorTypeEnum } from '../../types';
 
 export function* askCatch<T extends AskResponse<any>>(
-  storyIterator: T
+  storyIterator: T,
 ): AskResponse<EitherActionResult<AskResponseReturnType<T>>> {
-  let nextResult = storyIterator.next();
-
   try {
+    let nextResult = storyIterator.next();
+
     while (!nextResult.done) {
       // Add returnErrors to the action, so we can "catch" errors
       const nextInput: EitherActionResult<any> = yield {
@@ -26,9 +21,7 @@ export function* askCatch<T extends AskResponse<any>>(
       // Now resolve the value we need
       // We need to call the busisness logic with the pure result or the either result
       // depending on if the origional action was a pure action or an either action
-      nextResult = storyIterator.next(
-        nextResult.value.returnErrors ? nextInput : nextInput.result
-      );
+      nextResult = storyIterator.next(nextResult.value.returnErrors ? nextInput : nextInput.result);
     }
 
     // Return the successful final result of the generator
@@ -48,4 +41,3 @@ export function* askCatch<T extends AskResponse<any>>(
     };
   }
 }
-
