@@ -1,5 +1,8 @@
 import { KeyValueStoreActionType } from './KeyValueStoreActionType';
-import { KeyValueStoreQueryActionRequester } from './KeyValueStoreQueryActionTypes';
+import {
+  KeyValueStoreQueryActionRequester,
+  KeyValueStoreQueryOptions,
+} from './KeyValueStoreQueryActionTypes';
 
 import { KvsQueryOperation } from './types';
 
@@ -7,9 +10,7 @@ export function* askKeyValueStoreQuery<KvsItem>(
   keyValueStoreName: string,
 
   keyCondition: KvsQueryOperation,
-  filterCondition?: KvsQueryOperation,
-
-  nextPageKey?: string,
+  options?: KeyValueStoreQueryOptions,
 ): KeyValueStoreQueryActionRequester<KvsItem> {
   return yield {
     type: KeyValueStoreActionType.Query,
@@ -17,9 +18,8 @@ export function* askKeyValueStoreQuery<KvsItem>(
       keyValueStoreName,
 
       keyCondition,
-      filterCondition,
 
-      nextPageKey,
+      options,
     },
   };
 }

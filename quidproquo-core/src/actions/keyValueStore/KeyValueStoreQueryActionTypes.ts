@@ -8,6 +8,10 @@ import { QpqPagedData } from '../../types';
 // Options Type
 export interface KeyValueStoreQueryOptions {
   ttlInSeconds?: number; // Time-to-live in seconds
+  sortAscending?: boolean;
+  limit?: number;
+  nextPageKey?: string;
+  filter?: KvsQueryOperation;
 }
 
 // Payload
@@ -15,9 +19,8 @@ export interface KeyValueStoreQueryActionPayload {
   keyValueStoreName: string;
 
   keyCondition: KvsQueryOperation;
-  filterCondition?: KvsQueryOperation;
 
-  nextPageKey?: string;
+  options?: KeyValueStoreQueryOptions;
 }
 
 // Action

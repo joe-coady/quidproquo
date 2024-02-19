@@ -19,6 +19,8 @@ export async function query<Item>(
   filterExpression?: KvsQueryOperation,
   pageKey?: string,
   indexName?: string,
+  limit?: number,
+  sortAscending?: boolean,
 ): Promise<QpqPagedData<Item>> {
   // Instantiate DynamoDB client
   const dynamoDBClient = createAwsClient(DynamoDBClient, { region });
@@ -30,6 +32,8 @@ export async function query<Item>(
     ExpressionAttributeValues: buildExpressionAttributeValues([keyExpression, filterExpression]),
     ExpressionAttributeNames: buildExpressionAttributeNames([keyExpression, filterExpression]),
     IndexName: indexName,
+    Limit: limit,
+    ScanIndexForward: sortAscending,
   };
 
   if (pageKey) {
