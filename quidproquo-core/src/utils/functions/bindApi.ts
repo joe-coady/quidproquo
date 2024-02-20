@@ -3,7 +3,7 @@ import { bindApiFunction } from './bindApiFunction';
 
 export function bindApi<
   ApiDeps,
-  ApiFunctions extends Record<string, (...args: any) => AskResponse<any>>,
+  ApiFunctions extends Record<string, (deps: ApiDeps, ...args: any) => AskResponse<any>>,
 >(
   dependencies: ApiDeps,
   apiFunctions: ApiFunctions,

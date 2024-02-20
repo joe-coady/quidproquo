@@ -16,5 +16,5 @@ export interface ErrorThrowErrorAction extends Action<ErrorThrowErrorActionPaylo
 }
 
 // Functions
-export type ErrorThrowErrorActionProcessor = ActionProcessor<ErrorThrowErrorAction, void>;
-export type ErrorThrowErrorActionRequester = ActionRequester<ErrorThrowErrorAction, void>;
+export type ErrorThrowErrorActionProcessor<T = any> = ActionProcessor<ErrorThrowErrorAction, T>;
+export type ErrorThrowErrorActionRequester<T = any> = ActionRequester<ErrorThrowErrorAction, T>;
