@@ -3,7 +3,7 @@
   "version": "0.0.163",
   "description": "",
   "main": "./lib/index.js",
-  "types": "./lib/index.d.js",
+  "types": "./lib/index.d.ts",
   "files": [
     "lib/**/*"
   ],

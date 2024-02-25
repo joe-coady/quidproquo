@@ -3,7 +3,7 @@
   "version": "0.0.163",
   "description": "",
   "main": "./lib/commonjs/webpack.config.js",
-  "types": "./lib/commonjs/webpack.config.d.js",
+  "types": "./lib/commonjs/webpack.config.d.ts",
   "files": [
     "lib/**/*"
   ],

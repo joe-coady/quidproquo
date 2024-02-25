@@ -3,7 +3,7 @@
   "version": "0.0.163",
   "description": "",
   "main": "./lib/commonjs/index.js",
-  "types": "./lib/commonjs/index.d.js",
+  "types": "./lib/commonjs/index.d.ts",
   "files": [
     "lib/**/*",
     "src/**/*"
