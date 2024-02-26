@@ -1,6 +1,6 @@
 {
   "name": "quidproquo-actionprocessor-node",
-  "version": "0.0.166",
+  "version": "0.0.167",
   "description": "",
   "main": "./lib/commonjs/index.js",
   "types": "./lib/commonjs/index.d.ts",
@@ -27,13 +27,13 @@
   "dependencies": {
     "axios": "^1.2.1",
     "mime-types": "^2.1.35",
-    "quidproquo-core": "*",
+    "quidproquo-core": "0.0.167",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@types/mime-types": "^2.1.1",
     "@types/uuid": "^9.0.0",
-    "quidproquo-tsconfig": "*",
+    "quidproquo-tsconfig": "0.0.167",
     "typescript": "^4.9.3"
   }
 }
