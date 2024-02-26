@@ -14,7 +14,7 @@ import {
   StorageDriveEvent,
   StorageDriveEventResponse,
   StorageDriveEventType,
-  WebSocketEventType, 
+  WebSocketEventType,
   qpqWebServerUtils,
 } from 'quidproquo-webserver';
 
@@ -30,18 +30,23 @@ type InternalEventOutput = StorageDriveEventResponse;
 type AutoRespondResult = boolean;
 type MatchResult = MatchStoryResult<any, any>;
 
-// TODO: Don't use Globals like this
-console.log(process.env.storageDriveCreateEntry!);
-
 const GLOBAL_STORAGE_DRIVE_NAME = process.env.storageDriveName!;
-const GLOBAL_STORAGE_DRIVE_RUNTIME = JSON.parse(process.env.storageDriveCreateEntry || "{}") as QpqSourceEntry;
+const GLOBAL_STORAGE_DRIVE_RUNTIME = JSON.parse(
+  process.env.storageDriveEntry || '{}',
+) as QpqSourceEntry;
 
-const getProcessTransformEventParams = (): EventTransformEventParamsActionProcessor<EventInput, InternalEventInput> => {
+const getProcessTransformEventParams = (): EventTransformEventParamsActionProcessor<
+  EventInput,
+  InternalEventInput
+> => {
   return async ({ eventParams: [s3Event, context] }) => {
     const transformedEventParams: InternalEventInput = {
       driveName: GLOBAL_STORAGE_DRIVE_NAME,
-      filePaths: s3Event.Records.map(r => decodeURIComponent(r.s3.object.key)),
-      eventType: StorageDriveEventType.Create,
+      // TODO: Fix this to work for create delete for each record in one set?
+      filePaths: s3Event.Records.map((r) => decodeURIComponent(r.s3.object.key)),
+      eventType: s3Event.Records[0].eventName.startsWith('ObjectCreated')
+        ? StorageDriveEventType.Create
+        : StorageDriveEventType.Delete,
     };
 
     return actionResult(transformedEventParams);
@@ -64,11 +69,7 @@ const getProcessTransformResponseResult = (
 
 const getProcessAutoRespond = (
   qpqConfig: QPQConfig,
-): EventAutoRespondActionProcessor<
-  InternalEventInput,
-  MatchResult,
-  AutoRespondResult
-> => {
+): EventAutoRespondActionProcessor<InternalEventInput, MatchResult, AutoRespondResult> => {
   return async (payload) => {
     // always allow
     return actionResult(false);
