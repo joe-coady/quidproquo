@@ -1,12 +1,22 @@
-import { Action, ActionProcessorList, ActionProcessorResult, ActionRequester, EitherActionResult } from './types/Action';
+import {
+  Action,
+  ActionProcessorList,
+  ActionProcessorResult,
+  ActionRequester,
+  EitherActionResult,
+} from './types/Action';
 import { ErrorTypeEnum } from './types/ErrorTypeEnum';
-import { StoryResult, StorySession, QpqRuntimeType, StorySessionUpdater } from './types/StorySession';
-import { SystemActionType } from './actions/system/SystemActionType';
+import {
+  StoryResult,
+  StorySession,
+  QpqRuntimeType,
+  StorySessionUpdater,
+} from './types/StorySession';
+
 import {
   resolveActionResult,
   resolveActionResultError,
   isErroredActionResult,
-  actionResult,
   actionResultError,
 } from './logic/actionLogic';
 import { QPQConfig } from './config';
@@ -14,7 +24,7 @@ import { QPQConfig } from './config';
 import { getApplicationModuleName } from './qpqCoreUtils';
 
 // Make this type safe omg.
-async function processAction(
+export async function processAction(
   action: Action<any>,
   actionProcessors: ActionProcessorList,
   session: StorySession,
@@ -22,29 +32,12 @@ async function processAction(
   updateSession: StorySessionUpdater,
 ) {
   try {
-    // Special action ~ batch - needs access to the processAction / actionProcessor context
-    if (action.type === SystemActionType.Batch) {
-      const batchRes = await Promise.all(
-        action.payload.actions.map((a: any) => {
-          return a ? processAction(a, actionProcessors, session, logger, updateSession) : null;
-        }),
-      );
-
-      // If there was an error, throw that error back
-      const erroredBatchItem = batchRes.find((br) => isErroredActionResult(br));
-      if (erroredBatchItem) {
-        const error = resolveActionResultError(erroredBatchItem);
-        return actionResultError(ErrorTypeEnum.GenericError, error.errorText, error.errorStack);
-      }
-
-      // unwrap the values
-      return actionResult(batchRes.map((br) => resolveActionResult(br)));
-    }
-
     const processor = actionProcessors?.[action?.type];
     if (!processor) {
       throw new Error(
-        `Unable to process action: ${action?.type} from ${Object.keys(actionProcessors).join(', ')}`,
+        `Unable to process action: ${action?.type} from ${Object.keys(actionProcessors).join(
+          ', ',
+        )}`,
       );
     }
 
@@ -53,7 +46,10 @@ async function processAction(
     if (e instanceof Error) {
       return actionResultError(ErrorTypeEnum.GenericError, e.message, e.stack);
     }
-    return actionResultError(ErrorTypeEnum.GenericError, `An unknown error occurred in [${action?.type}]`);
+    return actionResultError(
+      ErrorTypeEnum.GenericError,
+      `An unknown error occurred in [${action?.type}]`,
+    );
   }
 }
 
@@ -85,15 +81,16 @@ export const createRuntime = (
     const updateSession: StorySessionUpdater = (newSession: Partial<StorySession>): void => {
       storySession = {
         ...storySession,
-        ...newSession
+        ...newSession,
       };
-    }
+    };
 
     const response: StoryResult<any> = {
       input: args,
-      session: { ... storySession },
+      session: { ...storySession },
 
       history: [],
+
       startedAt: getTimeNow(),
       finishedAt: getTimeNow(),
 
@@ -114,7 +111,7 @@ export const createRuntime = (
           errorText: `Story depth exceeded [${storySession.depth}]!`,
           errorType: ErrorTypeEnum.GenericError,
         },
-      }
+      };
     }
 
     try {
@@ -129,7 +126,7 @@ export const createRuntime = (
           actionProcessors,
           storySession,
           logger,
-          updateSession
+          updateSession,
         );
 
         const history = {
@@ -168,7 +165,7 @@ export const createRuntime = (
                 success: false,
                 error: resolveActionResultError(actionResult),
               };
-          
+
           storyProgress = reader.next(result);
         } else {
           storyProgress = reader.next(resolveActionResult(actionResult));
@@ -178,7 +175,9 @@ export const createRuntime = (
       // Dev Only ~ Todo
       if (err instanceof Error) {
         console.log(
-          `Uncaught Error: [${JSON.stringify(storyProgress?.value?.type)}] ${err.message.toString()}`,
+          `Uncaught Error: [${JSON.stringify(
+            storyProgress?.value?.type,
+          )}] ${err.message.toString()}`,
         );
         return {
           ...response,

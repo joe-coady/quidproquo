@@ -14,7 +14,7 @@ export interface SystemBatchAction extends Action<SystemBatchActionPayload> {
 
 // Functions
 export type SystemBatchActionProcessor<TReturn extends Array<any>> = ActionProcessor<
-  SystemBatchAction | Action<any>,
+  SystemBatchAction,
   TReturn
 >;
 export type SystemBatchActionRequester<TReturn extends Array<any>> = ActionRequester<

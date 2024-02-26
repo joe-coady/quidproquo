@@ -12,7 +12,11 @@ export const qpqExecuteLog = async (
     {},
     {
       get: (target: any, property: any) => {
-        return async () => storyResult.history[logIndex++].res;
+        return async () => {
+          const res = storyResult.history[logIndex].res;
+          logIndex = logIndex + 1;
+          return res;
+        };
       },
     },
   );
@@ -22,7 +26,7 @@ export const qpqExecuteLog = async (
     [defineApplicationModule('Debugger', storyResult.moduleName, 'development', __dirname)],
     {
       correlation: storyResult.fromCorrelation,
-      depth: 0,
+      depth: storyResult.session.depth,
       context: storyResult.session.context,
     },
     storyActionProcessor,
