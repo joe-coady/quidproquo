@@ -30,7 +30,7 @@ export class QpqApiCoreStorageDriveConstruct extends QpqConstructBlock {
           props.qpqConfig,
           props.storageDriveConfig,
         ),
-        functionName: this.resourceName(`${props.storageDriveConfig.storageDrive}-onCreate`),
+        functionName: this.resourceName(`${props.storageDriveConfig.storageDrive}-create`),
 
         functionType: 'lambdaS3FileEvent',
         executorName: 'executeS3FileEvent',
@@ -62,7 +62,7 @@ export class QpqApiCoreStorageDriveConstruct extends QpqConstructBlock {
           props.qpqConfig,
           props.storageDriveConfig,
         ),
-        functionName: this.resourceName(`${props.storageDriveConfig.storageDrive}-onDelete`),
+        functionName: this.resourceName(`${props.storageDriveConfig.storageDrive}-delete`),
 
         functionType: 'lambdaS3FileEvent',
         executorName: 'executeS3FileEvent',
