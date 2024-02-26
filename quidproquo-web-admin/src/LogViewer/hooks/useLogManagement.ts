@@ -17,24 +17,28 @@ export const useLogManagement = () => {
 
   useEffect(() => {
     window.logs = logs;
-    window.viewLog = (log: any) => {setSelectedLogCorrelation(log.correlation)};
+    window.viewLog = (log: any) => {
+      setSelectedLogCorrelation(log.correlation);
+    };
   }, [logs]);
 
   useEffect(() => {
-    console.log("logs attached to window, try: viewLog(logs[0])");
+    console.log('logs attached to window, try: viewLog(logs[0])');
   }, []);
 
   const [searchParams, setSearchParams] = useState<SearchParams>(() => {
     const currentDate = new Date();
-    const isoDateNow = currentDate.toISOString();
 
-    const threeHoursAgo = new Date(currentDate.getTime() - 30 * 60 * 60 * 1000);
+    const threeHoursAgo = new Date(currentDate.getTime() - 3 * 60 * 60 * 1000);
     const isoDateThreeHoursAgo = threeHoursAgo.toISOString();
+
+    const tomorrow = new Date(currentDate.getTime() + 24 * 60 * 60 * 1000);
+    const isoDateTomorrow = tomorrow.toISOString();
 
     return {
       runtimeType: 'EXECUTE_STORY',
       startIsoDateTime: isoDateThreeHoursAgo,
-      endIsoDateTime: isoDateNow,
+      endIsoDateTime: isoDateTomorrow,
       errorFilter: '',
     };
   });
