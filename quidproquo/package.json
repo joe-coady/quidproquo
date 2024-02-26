@@ -25,9 +25,11 @@
   },
   "homepage": "https://github.com/joe-coady/quidproquo#readme",
   "devDependencies": {
-    "quidproquo-tsconfig": "*",
+    "typescript": "^4.9.3",
+    "quidproquo-tsconfig": "*"
+  },
+  "dependencies": {
     "quidproquo-core": "*",
-    "quidproquo-webserver": "*",
-    "typescript": "^4.9.3"
+    "quidproquo-webserver": "*"
   }
 }
