@@ -8,6 +8,7 @@ import * as qpqDeployAwsCdkUtils from '../../../../utils/qpqDeployAwsCdkUtils';
 import { Construct } from 'constructs';
 import { aws_sqs, aws_iam } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
+import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 
 export interface QpqCoreQueueConstructProps extends QpqConstructBlockProps {
   queueConfig: QueueQPQConfigSetting;
@@ -47,11 +48,18 @@ export class QpqCoreQueueConstruct extends QpqCoreQueueConstructBase {
     queueConfig: QueueQPQConfigSetting,
     awsAccountId: string,
   ): QpqCoreQueueConstructBase {
+    const queueArn = `arn:aws:sqs:${qpqCoreUtils.getApplicationModuleDeployRegion(
+      qpqConfig,
+    )}:${awsAccountId}:${awsNamingUtils.getConfigRuntimeResourceNameFromConfig(
+      queueConfig.name,
+      qpqConfig,
+    )}`;
+
+    console.log('queueArn: ', queueArn);
+
     class Import extends QpqCoreQueueConstructBase {
       queue = aws_sqs.Queue.fromQueueAttributes(scope, `${id}-${queueConfig.uniqueKey}`, {
-        queueArn: `arn:aws:sqs:${qpqCoreUtils.getApplicationModuleDeployRegion(
-          qpqConfig,
-        )}:${awsAccountId}:${this.resourceName(queueConfig.name)}`,
+        queueArn: queueArn,
       });
     }
 
