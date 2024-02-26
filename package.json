@@ -1,6 +1,6 @@
 {
   "name": "quid-pro-quo",
-  "version": "0.0.3",
+  "version": "0.0.164",
   "description": "JS Library for building web servers using pure functions and generators.",
   "main": "index.js",
   "scripts": {
@@ -32,7 +32,8 @@
     "quidproquo-deploy-webpack",
     "quidproquo-deploy-awscdk",
     "quidproquo-web-admin",
-    "quidproquo-web"
+    "quidproquo-web",
+    "quidproquo"
   ],
   "devDependencies": {
     "prettier": "^3.0.3"
