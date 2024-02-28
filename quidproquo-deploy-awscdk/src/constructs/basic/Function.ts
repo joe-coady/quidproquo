@@ -27,6 +27,8 @@ export interface FunctionProps extends QpqConstructBlockProps {
   reservedConcurrentExecutions?: number;
 
   role?: aws_iam.IRole;
+
+  reacreateOnFunctionNameChange?: boolean;
 }
 
 export class Function extends QpqConstructBlock {
@@ -39,7 +41,10 @@ export class Function extends QpqConstructBlock {
 
     const serviceInfo = getAwsServiceAccountInfoConfig(props.qpqConfig);
 
-    this.lambdaFunction = new aws_lambda.Function(this, 'function', {
+    const functionId =
+      props.reacreateOnFunctionNameChange && props.functionName ? props.functionName : 'function';
+
+    this.lambdaFunction = new aws_lambda.Function(this, functionId, {
       functionName: props.functionName,
       timeout: cdk.Duration.seconds(props.timeoutInSeconds || 25),
 
