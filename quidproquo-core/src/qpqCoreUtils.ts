@@ -32,6 +32,7 @@ import {
   CustomFullyQualifiedResource,
   FullyQualifiedResource,
   ResourceName,
+  KeyOf,
 } from './types';
 
 /**
@@ -231,8 +232,10 @@ export const getOwnedItems = <T extends QPQConfigSetting>(
   );
 };
 
-export const getAllKeyValueStores = (qpqConfig: QPQConfig): KeyValueStoreQPQConfigSetting[] => {
-  const keyValueStores = getConfigSettings<KeyValueStoreQPQConfigSetting>(
+export const getAllKeyValueStores = <T = any>(
+  qpqConfig: QPQConfig,
+): KeyValueStoreQPQConfigSetting<T>[] => {
+  const keyValueStores = getConfigSettings<KeyValueStoreQPQConfigSetting<T>>(
     qpqConfig,
     QPQCoreConfigSettingType.keyValueStore,
   );
@@ -249,7 +252,9 @@ export const getDeployEventConfigs = (qpqConfig: QPQConfig): DeployEventsQPQConf
   return deployEvents;
 };
 
-export const getOwnedKeyValueStores = (qpqConfig: QPQConfig): KeyValueStoreQPQConfigSetting[] => {
+export const getOwnedKeyValueStores = <T = any>(
+  qpqConfig: QPQConfig,
+): KeyValueStoreQPQConfigSetting<T>[] => {
   return getOwnedItems(getAllKeyValueStores(qpqConfig), qpqConfig);
 };
 
@@ -269,11 +274,11 @@ export const resolveCrossServiceResourceName = (
   return resourceName;
 };
 
-export const getKeyValueStoreByName = (
+export const getKeyValueStoreByName = <T = any>(
   qpqConfig: QPQConfig,
   kvsName: string,
-): KeyValueStoreQPQConfigSetting | undefined => {
-  const keyValueStore = getAllKeyValueStores(qpqConfig).find(
+): KeyValueStoreQPQConfigSetting<T> | undefined => {
+  const keyValueStore = getAllKeyValueStores<T>(qpqConfig).find(
     (kvs) => kvs.keyValueStoreName === kvsName,
   );
 
@@ -497,7 +502,7 @@ export const convertCrossModuleOwnerToGenericResourceNameOverride = <T extends s
 export const convertCustomFullyQualifiedResourceToGeneric = <T extends string>(
   resource: CustomFullyQualifiedResource<T>,
 ): FullyQualifiedResource => {
-  type KeyType = keyof typeof resource;
+  type KeyType = KeyOf<CustomFullyQualifiedResource<T>>;
   const key: KeyType = Array.from(Object.keys(resource)).find(
     (k) => k !== 'module' && k !== 'application' && k !== 'feature' && k !== 'environment',
   ) as any as KeyType;

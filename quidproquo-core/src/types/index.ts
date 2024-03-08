@@ -13,3 +13,4 @@ export * from './DeployEvent';
 export * from './FullyQualifiedResource';
 export * from './BoundLogicStory';
 export * from './UnboundLogicStory';
+export * from './KeyOf';

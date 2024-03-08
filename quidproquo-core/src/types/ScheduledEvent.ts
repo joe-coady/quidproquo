@@ -1,4 +1,4 @@
-export interface ScheduledEventParams<T> {
+export interface ScheduledEventParams<T = void> {
   time: string;
   correlation: string;
 
