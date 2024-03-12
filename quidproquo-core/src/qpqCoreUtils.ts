@@ -232,7 +232,7 @@ export const getOwnedItems = <T extends QPQConfigSetting>(
   );
 };
 
-export const getAllKeyValueStores = <T = any>(
+export const getAllKeyValueStores = <T extends object = any>(
   qpqConfig: QPQConfig,
 ): KeyValueStoreQPQConfigSetting<T>[] => {
   const keyValueStores = getConfigSettings<KeyValueStoreQPQConfigSetting<T>>(
@@ -252,7 +252,7 @@ export const getDeployEventConfigs = (qpqConfig: QPQConfig): DeployEventsQPQConf
   return deployEvents;
 };
 
-export const getOwnedKeyValueStores = <T = any>(
+export const getOwnedKeyValueStores = <T extends object = any>(
   qpqConfig: QPQConfig,
 ): KeyValueStoreQPQConfigSetting<T>[] => {
   return getOwnedItems(getAllKeyValueStores(qpqConfig), qpqConfig);
@@ -274,7 +274,7 @@ export const resolveCrossServiceResourceName = (
   return resourceName;
 };
 
-export const getKeyValueStoreByName = <T = any>(
+export const getKeyValueStoreByName = <T extends object = any>(
   qpqConfig: QPQConfig,
   kvsName: string,
 ): KeyValueStoreQPQConfigSetting<T> | undefined => {

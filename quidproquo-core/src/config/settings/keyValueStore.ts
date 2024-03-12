@@ -12,31 +12,36 @@ import {
 // also ensure that key length is within DynamoDB's specified limits.
 
 export type KvsKeyType = 'string' | 'number' | 'binary';
-export type KvsKey<T> = {
+export type KvsKey<T extends object = any> = {
   key: KeyOf<T>;
   type: KvsKeyType;
 };
 
-export type KvsIndex<T> = {
+export type KvsIndex<T extends object = any> = {
   partitionKey: KvsKey<T>;
   sortKey?: KvsKey<T>;
 };
 
-export const kvsKey = <T>(key: KeyOf<T>, type: KvsKeyType = 'string'): KvsKey<T> => ({
+export const kvsKey = <T extends object = any>(
+  key: KeyOf<T>,
+  type: KvsKeyType = 'string',
+): KvsKey<T> => ({
   key,
   type,
 });
 
-type CompositeKvsKey<T> = KvsKey<T> | KeyOf<T>;
+type CompositeKvsKey<T extends object = any> = KvsKey<T> | KeyOf<T>;
 
-type CompositeCompositeKvsIndex<T> = {
+type CompositeCompositeKvsIndex<T extends object = any> = {
   partitionKey: CompositeKvsKey<T>;
   sortKey?: CompositeKvsKey<T>;
 };
 
-export type CompositeKvsIndex<T> = KeyOf<T> | CompositeCompositeKvsIndex<T>;
+export type CompositeKvsIndex<T extends object = any> = KeyOf<T> | CompositeCompositeKvsIndex<T>;
 
-const convertCompositeKvsKeyToKvsKey = <T>(compositeKvsKey: CompositeKvsKey<T>): KvsKey<T> => {
+const convertCompositeKvsKeyToKvsKey = <T extends object = any>(
+  compositeKvsKey: CompositeKvsKey<T>,
+): KvsKey<T> => {
   // Must be a keyof T
   if (typeof compositeKvsKey === 'string') {
     return kvsKey<T>(compositeKvsKey as KeyOf<T>, 'string');
@@ -46,13 +51,13 @@ const convertCompositeKvsKeyToKvsKey = <T>(compositeKvsKey: CompositeKvsKey<T>):
   return compositeKvsKey as KvsKey<T>;
 };
 
-const isCompositeKvsIndexACompositeCompositeKvsIndex = <T>(
+const isCompositeKvsIndexACompositeCompositeKvsIndex = <T extends object = any>(
   compositeKvsIndex: CompositeKvsIndex<T>,
 ): compositeKvsIndex is CompositeCompositeKvsIndex<T> => {
   return typeof compositeKvsIndex !== 'string';
 };
 
-const convertCompositeKvsIndexToKvsIndex = <T>(
+const convertCompositeKvsIndexToKvsIndex = <T extends object = any>(
   compositeKvsIndex: CompositeKvsIndex<T>,
 ): KvsIndex<T> => {
   if (!isCompositeKvsIndexACompositeCompositeKvsIndex<T>(compositeKvsIndex)) {
@@ -69,7 +74,8 @@ const convertCompositeKvsIndexToKvsIndex = <T>(
   };
 };
 
-export interface QPQConfigAdvancedKeyValueStoreSettings<T> extends QPQConfigAdvancedSettings {
+export interface QPQConfigAdvancedKeyValueStoreSettings<T extends object = any>
+  extends QPQConfigAdvancedSettings {
   indexes?: CompositeKvsIndex<T>[];
 
   global?: boolean;
@@ -81,7 +87,7 @@ export interface QPQConfigAdvancedKeyValueStoreSettings<T> extends QPQConfigAdva
   enableMonthlyRollingBackups?: boolean;
 }
 
-export interface KeyValueStoreQPQConfigSetting<T> extends QPQConfigSetting {
+export interface KeyValueStoreQPQConfigSetting<T extends object = any> extends QPQConfigSetting {
   keyValueStoreName: string;
 
   partitionKey: KvsKey<T>;

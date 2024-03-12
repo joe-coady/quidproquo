@@ -34,8 +34,6 @@ export class QpqWebServerCacheConstruct extends QpqConstructBlock {
       ),
     );
 
-    console.log('cachePolicyId', cachePolicyId);
-
     class Import extends QpqConstructBlock {
       cachePolicy = aws_cloudfront.CachePolicy.fromCachePolicyId(
         scope,

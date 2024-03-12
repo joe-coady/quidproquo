@@ -1,6 +1,6 @@
-import { QPQConfig } from 'quidproquo-core';
+import { AskResponse, ErrorTypeEnum, QPQConfig, askMap, askThrowError } from 'quidproquo-core';
 
-import { HttpEventHeaders } from '../types/HTTPEvent';
+import { HTTPEvent, HttpEventHeaders } from '../types/HTTPEvent';
 import { RouteOptions, ServiceAllowedOrigin } from '../config/settings/route';
 
 import { getBaseDomainName } from './qpqConfigAccessorsUtils';
@@ -16,6 +16,27 @@ export const getHeaderValue = (header: string, headers: HttpEventHeaders): strin
 
   return headers[realHeaderKey] || null;
 };
+
+export function* askReadRequiredHeader(
+  event: HTTPEvent,
+  requiredHeader: string,
+): AskResponse<string> {
+  const header = getHeaderValue(requiredHeader, event.headers);
+  if (!header) {
+    return yield* askThrowError(ErrorTypeEnum.NotFound, `Header ${requiredHeader} not found`);
+  }
+
+  return header;
+}
+
+export function* askReadRequiredHeaders(
+  event: HTTPEvent,
+  requiredHeaders: string[],
+): AskResponse<string[]> {
+  return yield* askMap(requiredHeaders, function* (header: string) {
+    return yield* askReadRequiredHeader(event, header);
+  });
+}
 
 export const getAccessTokenFromHeaders = (headers: HttpEventHeaders): string | undefined => {
   const authorizationHeader = getHeaderValue('authorization', headers) || '';
@@ -53,19 +74,24 @@ export const getAllowedOrigins = (qpqConfig: QPQConfig, route: RouteOptions): st
   const defaultRouteSettings = qpqWebServerUtils.getDefaultRouteSettings(qpqConfig);
 
   const defaultAllowedOrigins = defaultRouteSettings.reduce(
-    (acc, cur) => [...acc, ...(cur.routeOptions.allowedOrigins || []).map(ao => convertContentSecurityPolicyEntryToString(baseDomain, ao))],
+    (acc, cur) => [
+      ...acc,
+      ...(cur.routeOptions.allowedOrigins || []).map((ao) =>
+        convertContentSecurityPolicyEntryToString(baseDomain, ao),
+      ),
+    ],
     [] as string[],
   );
 
   // Route specific
-  const routeAllowedOrigins = (route.allowedOrigins || []).map(ao => convertContentSecurityPolicyEntryToString(baseDomain, ao));
+  const routeAllowedOrigins = (route.allowedOrigins || []).map((ao) =>
+    convertContentSecurityPolicyEntryToString(baseDomain, ao),
+  );
 
   // Return the allowed origins
-  const allAllowedOrigins = [
-    rootDomain,
-    ...defaultAllowedOrigins,
-    ...routeAllowedOrigins
-  ].map((o) => o.toLowerCase());
+  const allAllowedOrigins = [rootDomain, ...defaultAllowedOrigins, ...routeAllowedOrigins].map(
+    (o) => o.toLowerCase(),
+  );
 
   console.log(allAllowedOrigins);
 

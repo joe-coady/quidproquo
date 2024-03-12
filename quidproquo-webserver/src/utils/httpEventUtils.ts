@@ -1,12 +1,15 @@
 import { HTTPEvent, HTTPEventResponse } from '../types/HTTPEvent';
 
-export const fromJsonEventRequest = <T>(httpJsonEvent: HTTPEvent): T => {
-  const item: T = JSON.parse(
-    httpJsonEvent.isBase64Encoded
-      ? Buffer.from(httpJsonEvent.body, 'base64').toString()
-      : httpJsonEvent.body,
-  );
+export const rawFromJsonEventRequest = (httpJsonEvent: HTTPEvent): string => {
+  const json = httpJsonEvent.isBase64Encoded
+    ? Buffer.from(httpJsonEvent.body, 'base64').toString()
+    : httpJsonEvent.body;
 
+  return json;
+};
+
+export const fromJsonEventRequest = <T>(httpJsonEvent: HTTPEvent): T => {
+  const item: T = JSON.parse(rawFromJsonEventRequest(httpJsonEvent));
   return item;
 };
 

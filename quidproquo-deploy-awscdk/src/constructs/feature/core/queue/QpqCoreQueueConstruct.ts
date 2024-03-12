@@ -55,8 +55,6 @@ export class QpqCoreQueueConstruct extends QpqCoreQueueConstructBase {
       qpqConfig,
     )}`;
 
-    console.log('queueArn: ', queueArn);
-
     class Import extends QpqCoreQueueConstructBase {
       queue = aws_sqs.Queue.fromQueueAttributes(scope, `${id}-${queueConfig.uniqueKey}`, {
         queueArn: queueArn,
