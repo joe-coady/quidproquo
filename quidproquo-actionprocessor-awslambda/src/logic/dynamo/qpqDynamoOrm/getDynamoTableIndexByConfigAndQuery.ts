@@ -2,7 +2,7 @@ import { KeyValueStoreQPQConfigSetting, KvsQueryOperation } from 'quidproquo-cor
 import { isKvsQueryCondition, isKvsLogicalOperator } from './buildDynamoQuery';
 
 export const getDynamoTableIndexByConfigAndQuery = <T extends object = any>(
-  setting: KeyValueStoreQPQConfigSetting<T>,
+  setting: KeyValueStoreQPQConfigSetting,
   query: KvsQueryOperation,
 ): string | undefined => {
   // Function to extract keys from a query

@@ -35,7 +35,7 @@ const convertObjectToDynamoItem = (obj: KvsObjectDataType): Record<string, Attri
 export async function putItem<Item, T extends object = any>(
   tableName: string,
   item: Item,
-  attributes: KvsKey<T>[],
+  attributes: KvsKey[],
   options: PutItemOptions,
   region: string,
 ): Promise<void> {
