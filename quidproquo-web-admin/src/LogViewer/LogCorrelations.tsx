@@ -58,6 +58,7 @@ export const LogCorrelations = ({
           position: 'absolute',
           bottom: '10px',
           right: '10px',
+          background: 'white',
         }}
       >
         {isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}

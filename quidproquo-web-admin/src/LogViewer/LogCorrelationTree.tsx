@@ -3,6 +3,8 @@ import { Tree } from 'react-d3-tree';
 import { StoryResultMetadataLog } from '../types';
 import { findLogDirectChildren } from './logic';
 
+const BACKGROUND_COLOR = '#c1c1c1';
+
 interface LogCorrelationTreeProps {
   rootStoryResultMetadata: StoryResultMetadataLog;
   allStoryResultMetadatas: StoryResultMetadataLog[];
@@ -38,10 +40,12 @@ const renderRectSvgNode =
   ({ nodeDatum }) => {
     const color =
       nodeDatum.correlation === highlightCorrelation
-        ? '#e1e1e1'
+        ? !!nodeDatum.error
+          ? '#8B0000'
+          : '#00008B' // Very dark red for selected errors, dark blue for selected non-errors
         : !!nodeDatum.error
-        ? '#ffb1b1'
-        : 'white';
+        ? 'red'
+        : 'white'; // Bright red for non-selected errors, white for non-selected non-errors
 
     return (
       <g>
@@ -70,7 +74,7 @@ const renderRectSvgNode =
                   y={y - fontSize / 2 - 8}
                   width="100"
                   height={fontSize}
-                  fill="#FFFFFFAA"
+                  fill={BACKGROUND_COLOR}
                   strokeWidth="0"
                 />
                 <text
@@ -107,7 +111,10 @@ const LogCorrelationTreeComponent = ({
   }, []);
 
   return (
-    <div ref={treeContainer} style={{ width: '100%', height: '100%' }}>
+    <div
+      ref={treeContainer}
+      style={{ width: '100%', height: '100%', background: BACKGROUND_COLOR }}
+    >
       <Tree
         data={treeData}
         orientation="vertical"
