@@ -3,13 +3,13 @@ import {
   askEventTransformEventParams,
   askEventAutoRespond,
   askEventTransformResponseResult,
-  askEventMatchStory
+  askEventMatchStory,
 } from '../actions/event';
 
 import { askExecuteStory } from '../actions/system';
 import { LogLevelEnum } from '../types';
 
-export function* askProcessEvent(...eventArguments: any) {  
+export function* askProcessEvent(...eventArguments: any) {
   // Transform event params
   const transformedEventParams = yield* askEventTransformEventParams(...eventArguments);
 
@@ -20,7 +20,11 @@ export function* askProcessEvent(...eventArguments: any) {
   const earlyExitResponse = yield* askEventAutoRespond(transformedEventParams, matchResult);
 
   // Log the early exit response
-  yield* askLogCreate(LogLevelEnum.Info, `earlyExitResponse [${JSON.stringify(earlyExitResponse, null, 2)}]`);
+  yield* askLogCreate(
+    LogLevelEnum.Info,
+    'earlyExitResponse',
+    earlyExitResponse || `[no early exit response]`,
+  );
 
   if (earlyExitResponse) {
     // Transform the early exit response if needed

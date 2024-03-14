@@ -92,6 +92,11 @@ export enum QpqRuntimeType {
   CLOUD_FLARE_DEPLOY = 'CLOUD_FLARE_DEPLOY',
 }
 
+export interface qpqConsoleLog {
+  t: string;
+  a: any[];
+}
+
 export interface StoryResult<TArgs extends Array<any>, TResult = any> {
   // Params to story
   input: TArgs;
@@ -124,7 +129,7 @@ export interface StoryResult<TArgs extends Array<any>, TResult = any> {
   runtimeType: QpqRuntimeType;
 
   // Impure Logs
-  logs?: string[];
+  logs?: qpqConsoleLog[];
 }
 
 export interface StoryResultMetadata {

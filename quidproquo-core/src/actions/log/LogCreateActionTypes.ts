@@ -6,7 +6,7 @@ import { LogLevelEnum } from '../../types/LogLevelEnum';
 export interface LogCreateActionPayload {
   logLevel: LogLevelEnum;
   msg: string;
-  dataJson?: string;
+  data?: any;
 }
 
 // Action

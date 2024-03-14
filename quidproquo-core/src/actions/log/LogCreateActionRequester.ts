@@ -5,14 +5,14 @@ import { LogLevelEnum } from '../../types/LogLevelEnum';
 export function* askLogCreate(
   logLevel: LogLevelEnum,
   msg: string,
-  data?: object,
+  data?: any,
 ): LogCreateActionRequester {
   return yield {
     type: LogActionType.Create,
     payload: {
       logLevel,
       msg,
-      dataJson: JSON.stringify(data),
+      data,
     },
   };
 }

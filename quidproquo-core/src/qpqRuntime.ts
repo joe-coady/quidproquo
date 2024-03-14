@@ -11,6 +11,7 @@ import {
   StorySession,
   QpqRuntimeType,
   StorySessionUpdater,
+  qpqConsoleLog,
 } from './types/StorySession';
 
 import {
@@ -230,7 +231,13 @@ export const createRuntime = (
       // TODO: This would need to change once we move to web
       // we can't just override console.log like this when running concurrently
       console.log = (...args: any[]) => {
-        logs.push(args);
+        const logLog: qpqConsoleLog = {
+          t: getTimeNow(),
+          a: args,
+        };
+
+        logs.push(logLog);
+
         return oldConsoleLog(...args);
       };
 

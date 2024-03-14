@@ -12,10 +12,10 @@ import {
 import { LogCorrelations } from './LogCorrelations';
 import { LogDetails } from './LogDetails';
 
-import { StoryResultMetadataLog } from '../types';
 import { useDataFromPath } from '../components/LoadingBox/hooks';
 import { useIsLoading } from '../view';
 import { apiRequestPost } from '../logic';
+import { StoryResult } from 'quidproquo-core';
 
 interface LogDialogProps {
   open: boolean;
@@ -46,7 +46,7 @@ const LogDialog = ({
   setSelectedLogCorrelation,
 }: LogDialogProps) => {
   const logUrl = getLogUrl(logCorrelation);
-  const log = useDataFromPath<StoryResultMetadataLog>(logUrl);
+  const log = useDataFromPath<StoryResult<any>>(logUrl);
   const isLoading = useIsLoading();
 
   const handleExecute = async () => {
@@ -88,7 +88,7 @@ const LogDialog = ({
         />
         {!isLoading && (
           <LogDetails
-            log={log}
+            log={log!}
             storyResultMetadatas={storyResultMetadatas}
             setSelectedLogCorrelation={setSelectedLogCorrelation}
           />
