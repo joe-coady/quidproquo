@@ -1,17 +1,24 @@
 import { QPQError } from './ErrorTypeEnum';
-import { StoryResult, StorySession, StorySessionUpdater } from './StorySession';
+import {
+  ExtractGeneratorReturnType,
+  StoryResult,
+  StorySession,
+  StorySessionUpdater,
+} from './StorySession';
 
 // Action ~ Think redux action
 // They must have a type, and an optional payload
 export interface Action<T> {
   type: string;
   payload?: T;
-  
+
   returnErrors?: boolean;
 }
 
 // Result tuple ~ Either result or error
 export type ActionProcessorResult<T> = [T?, QPQError?];
+
+export type AsyncActionProcessorResult<T> = Promise<ActionProcessorResult<T>>;
 
 // Action result ~ Either result or error
 export type EitherActionResult<T> =
@@ -27,17 +34,13 @@ export type EitherActionResult<T> =
     };
 
 // A function type ~ Processes an action and returns an ActionProcessorResult
-export type ActionProcessor<
-  TAction extends Action<any>,
-  TReturn = any,
-  TActionPayload = TAction['payload'],
-> = (
-  payload: TActionPayload,
+export type ActionProcessor<TAction extends Action<any>, TReturn = any> = (
+  payload: TAction['payload'],
   session: StorySession,
   actionProcessors: ActionProcessorList,
   logger: (result: StoryResult<any>) => Promise<void>,
   updateSession: StorySessionUpdater,
-) => Promise<ActionProcessorResult<TReturn>>;
+) => AsyncActionProcessorResult<TReturn>;
 
 // Generator<
 //  Thing you are giving to QPQ,
@@ -50,6 +53,9 @@ export type ActionRequester<
   TQPQReturn = TReturn,
 > = Generator<TAction, TReturn, TQPQReturn>;
 
+export type ActionProcessorReturnType<T extends Generator<any, any, any>> =
+  ExtractGeneratorReturnType<T>;
+
 export type ActionProcessorList = {
-  [key: string]: ActionProcessor<any, any, any>;
+  [key: string]: ActionProcessor<any, any>;
 };
