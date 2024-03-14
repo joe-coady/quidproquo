@@ -122,6 +122,9 @@ export interface StoryResult<TArgs extends Array<any>, TResult = any> {
 
   // User specified runtime type
   runtimeType: QpqRuntimeType;
+
+  // Impure Logs
+  logs?: string[];
 }
 
 export interface StoryResultMetadata {

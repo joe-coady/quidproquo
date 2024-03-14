@@ -100,6 +100,8 @@ export const createRuntime = (
       correlation: storySession.correlation!,
       fromCorrelation: callerSession.correlation,
       runtimeType: runtimeType,
+
+      logs: [],
     };
 
     // Exit if the depth has exceeded the limit (of 100)
@@ -221,11 +223,27 @@ export const createRuntime = (
     story: (...args: TArgs) => Generator<any, any, Action<any>>,
     args: TArgs,
   ): Promise<StoryResult<any>> {
-    const storyResult = await resolveStory(story, args);
+    const logs: any[] = [];
+    const oldConsoleLog = console.log;
 
-    await logger(storyResult);
+    try {
+      // TODO: This would need to change once we move to web
+      // we can't just override console.log like this when running concurrently
+      console.log = (...args: any[]) => {
+        logs.push(args);
+        return oldConsoleLog(...args);
+      };
 
-    return storyResult;
+      const storyResult = await resolveStory(story, args);
+
+      storyResult.logs = logs;
+
+      await logger(storyResult);
+
+      return storyResult;
+    } finally {
+      console.log = oldConsoleLog;
+    }
   }
 
   return resolveStoryWithLogs;

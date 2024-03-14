@@ -21,11 +21,17 @@ export function createAwsClient<T>(ClientClass: ClientConstructor<T>, args: any)
     if (typeof newClient.send === 'function') {
       const originalSend = newClient.send;
       newClient.send = async function (...sendArgs: any[]) {
-        const paramsText = JSON.stringify(sendArgs);
         try {
           return await originalSend.apply(this, sendArgs);
         } catch (error: any) {
-          error.message = `aws client (${argsKey}) send with args: ${paramsText}\n\n${error.message}`;
+          console.log(
+            ClientClass.name || 'aws client',
+            args,
+            'send args',
+            sendArgs,
+            'error',
+            error.message,
+          );
           throw error;
         }
       };
