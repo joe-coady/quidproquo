@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useDataFromPath } from './hooks';
+import { usePlatformDataFromPath } from './hooks';
 import { useIsLoading } from '../../view';
 import { LoadingProvider } from '../../view';
 
@@ -14,7 +14,7 @@ interface LoadingBoxProps<T> {
 
 const LoadingBoxInternal = <T,>({ path, renderItem, renderLoading }: LoadingBoxProps<T>) => {
   const isLoading = useIsLoading();
-  const data: T | null = useDataFromPath<T>(path);
+  const data: T | null = usePlatformDataFromPath<T>(path);
 
   var reactNode: JSX.Element = <div>Error: Data could not be loaded</div>;
 

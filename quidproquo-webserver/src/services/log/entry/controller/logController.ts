@@ -1,5 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { ErrorTypeEnum, QpqRuntimeType, askThrowError } from 'quidproquo-core';
+import {
+  ErrorTypeEnum,
+  QpqRuntimeType,
+  askFileGenerateTemporarySecureUrl,
+  askThrowError,
+} from 'quidproquo-core';
 
 import { HTTPEvent } from '../../../../types';
 import { toJsonEventResponse, fromJsonEventRequest } from '../../../../utils/httpEventUtils';
@@ -15,7 +20,8 @@ export interface GetLogsParams {
 }
 
 export function* getLogs(event: HTTPEvent, params: {}) {
-  const { nextPageKey, startIsoDateTime, endIsoDateTime, runtimeType } = fromJsonEventRequest<GetLogsParams>(event);
+  const { nextPageKey, startIsoDateTime, endIsoDateTime, runtimeType } =
+    fromJsonEventRequest<GetLogsParams>(event);
 
   const logs = yield* askListLogs(runtimeType, startIsoDateTime, endIsoDateTime, nextPageKey);
 
@@ -47,13 +53,17 @@ export function* getChildren(
   return toJsonEventResponse(log);
 }
 
-export function* downloadLog(
+export function* downloadUrl(
   event: HTTPEvent,
   params: {
     correlationId: string;
   },
 ) {
-  const log = yield* logData.askGetByCorrelation(params.correlationId);
+  const url = yield* askFileGenerateTemporarySecureUrl(
+    'qpq-logs',
+    `${params.correlationId}.json`,
+    1 * 60 * 1000,
+  );
 
-  return toJsonEventResponse(log);
+  return toJsonEventResponse({ url });
 }

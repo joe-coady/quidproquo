@@ -1,4 +1,6 @@
-export const processLog = (logFile: any) => {
+import { StoryResult } from 'quidproquo-core';
+
+export const processLog = (logFile: StoryResult<any>) => {
   if (!logFile) {
     return [];
   }
@@ -8,15 +10,17 @@ export const processLog = (logFile: any) => {
   const firstEvent = {
     dateTime: logFile.startedAt,
     title: `${logFile.runtimeType} - ${logFile.moduleName}`,
-    subText: logFile.tags.join(','),
-    key: logFile.id,
+    subText: `${logFile.tags.join(',')}${
+      logFile.fromCorrelation ? '\r\n\r\nCaller: ' + logFile.fromCorrelation : ''
+    }`,
+    key: logFile.correlation + 'part_1',
   };
 
   const secondEvent = {
     dateTime: logFile.startedAt,
     title: 'Executed with input params of',
     subText: JSON.stringify(logFile.input, null, 1),
-    key: logFile.id + 'part_2',
+    key: logFile.correlation + 'part_2',
   };
 
   const finalEvent = {
@@ -25,7 +29,7 @@ export const processLog = (logFile: any) => {
     subText: logFile.error
       ? JSON.stringify(logFile.error, null, 1)
       : JSON.stringify(logFile.result, null, 1),
-    key: logFile.id + 'return',
+    key: logFile.correlation + 'final',
   };
 
   const history = logFile.history.map((h: any, i: number) => {
@@ -34,7 +38,7 @@ export const processLog = (logFile: any) => {
         h.res ? `Output: ${JSON.stringify(h.res, null, 2)}` : ''
       }`,
       title: h.act.type.split('/').slice(-2).join('::'),
-      key: logFile.id + i,
+      key: logFile.correlation + i,
       dateTime: h.startedAt,
       timeMs: new Date(h.finishedAt).getTime() - new Date(h.startedAt).getTime(),
     };

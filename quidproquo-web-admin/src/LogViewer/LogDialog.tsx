@@ -12,7 +12,7 @@ import {
 import { LogCorrelations } from './LogCorrelations';
 import { LogDetails } from './LogDetails';
 
-import { useDataFromPath } from '../components/LoadingBox/hooks';
+import { useExternalData, usePlatformDataFromPath } from '../components/LoadingBox/hooks';
 import { useIsLoading } from '../view';
 import { apiRequestPost } from '../logic';
 import { StoryResult } from 'quidproquo-core';
@@ -45,9 +45,10 @@ const LogDialog = ({
   storyResultMetadatas,
   setSelectedLogCorrelation,
 }: LogDialogProps) => {
-  const logUrl = getLogUrl(logCorrelation);
-  const log = useDataFromPath<StoryResult<any>>(logUrl);
-  const isLoading = useIsLoading();
+  const signedRequest = usePlatformDataFromPath<{ url: string }>(getLogUrl(logCorrelation));
+  const log = useExternalData<StoryResult<any>>(signedRequest?.url);
+
+  const isLoading = useIsLoading() || !log;
 
   const handleExecute = async () => {
     if (log) {
@@ -99,7 +100,7 @@ const LogDialog = ({
       <DialogActions>
         <Button
           onClick={(event) => {
-            downloadJson(JSON.stringify(log, null, 2), `${log.correlation}.json`);
+            downloadJson(JSON.stringify(log, null, 2), `${log!.correlation}.json`);
             event.stopPropagation();
           }}
           disabled={isLoading}

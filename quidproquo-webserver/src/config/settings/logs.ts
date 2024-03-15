@@ -134,9 +134,9 @@ export const defineLogs = (
 
     defineRoute(
       'GET',
-      '/log/download/{correlationId}',
+      '/log/downloadurl/{correlationId}',
       getServiceEntry('log', 'controller', 'logController'),
-      'downloadLog',
+      'downloadUrl',
       routeAuthSettings,
     ),
 

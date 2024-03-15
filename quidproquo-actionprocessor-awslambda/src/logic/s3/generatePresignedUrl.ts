@@ -17,7 +17,7 @@ export const generatePresignedUrl = async (
   });
 
   try {
-    const url = await getSignedUrl(s3Client, getObjectCommand, { expiresIn: expirationMs });
+    const url = await getSignedUrl(s3Client, getObjectCommand, { expiresIn: expirationMs / 1000 });
     return url;
   } catch (error) {
     console.error('Error generating presigned URL', error);
