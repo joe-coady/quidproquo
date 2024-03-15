@@ -2,6 +2,7 @@ import { QPQConfig } from 'quidproquo-core';
 
 import getFileDeleteActionProcessor from './getFileDeleteActionProcessor';
 import getFileExistsActionProcessor from './getFileExistsActionProcessor';
+import getFileGenerateTemporarySecureUrlActionProcessor from './getFileGenerateTemporarySecureUrlActionProcessor';
 import getFileListDirectoryActionProcessor from './getFileListDirectoryActionProcessor';
 import getFileReadTextContentsActionProcessor from './getFileReadTextContentsActionProcessor';
 import getFileWriteTextContentsActionProcessor from './getFileWriteTextContentsActionProcessor';
@@ -11,6 +12,7 @@ import getFileWriteBinaryContentsActionProcessor from './getFileWriteBinaryConte
 export default (qpqConfig: QPQConfig) => ({
   ...getFileDeleteActionProcessor(qpqConfig),
   ...getFileExistsActionProcessor(qpqConfig),
+  ...getFileGenerateTemporarySecureUrlActionProcessor(qpqConfig),
   ...getFileListDirectoryActionProcessor(qpqConfig),
   ...getFileReadTextContentsActionProcessor(qpqConfig),
   ...getFileWriteTextContentsActionProcessor(qpqConfig),

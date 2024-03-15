@@ -20,3 +20,6 @@ export * from './FileReadBinaryContentsActionTypes';
 
 export * from './FileWriteBinaryContentsActionRequester';
 export * from './FileWriteBinaryContentsActionTypes';
+
+export * from './FileGenerateTemporarySecureUrlActionRequester';
+export * from './FileGenerateTemporarySecureUrlActionTypes';
