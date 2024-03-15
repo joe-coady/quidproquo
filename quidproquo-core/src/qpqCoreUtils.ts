@@ -7,7 +7,7 @@ import {
   QPQConfigItem,
 } from './config/QPQConfig';
 import {
-  ApplicationModuleQPQConfigSetting,
+  ApplicationQPQConfigSetting,
   StorageDriveQPQConfigSetting,
   EventBusQPQConfigSetting,
   ScheduleQPQConfigSetting,
@@ -21,6 +21,7 @@ import {
   EnvironmentSettingsQPQConfigSetting,
   DeployEventsQPQConfigSetting,
   GlobalQPQConfigSetting,
+  ModuleQPQConfigSetting,
 } from './config/settings';
 import {
   EmailTemplates,
@@ -63,7 +64,7 @@ export const flattenQpqConfig = (qpqConfig: QPQConfig): QPQConfigSetting[] => {
       } else {
         // If its a appName config item, update the environment variable
         if (item.configSettingType === QPQCoreConfigSettingType.appName) {
-          environment = (item as ApplicationModuleQPQConfigSetting).environment || 'development';
+          environment = (item as ApplicationQPQConfigSetting).environment || 'development';
         }
 
         // Otherwise if its an environmentSettings config item, flatten out the child settings
@@ -119,46 +120,53 @@ export const getConfigSetting = <T extends QPQConfigSetting>(
  * Retrieves the ApplicationModuleSetting from a QPQConfig array.
  * @function
  * @param {QPQConfig} qpqConfig - The input QPQConfig array.
- * @returns {ApplicationModuleQPQConfigSetting} - The ApplicationModuleQPQConfigSetting from the QPQConfig array.
- * @throws {Error} - If the ApplicationModuleQPQConfigSetting is not found in the QPQConfig array.
+ * @returns {ApplicationQPQConfigSetting} - The ApplicationQPQConfigSetting from the QPQConfig array.
+ * @throws {Error} - If the ApplicationQPQConfigSetting is not found in the QPQConfig array.
  */
-export const getApplicationModuleSetting = (
-  qpqConfig: QPQConfig,
-): ApplicationModuleQPQConfigSetting => {
-  const applicationModuleSetting = getConfigSetting<ApplicationModuleQPQConfigSetting>(
+export const getApplicationConfigSetting = (qpqConfig: QPQConfig): ApplicationQPQConfigSetting => {
+  const applicationModuleSetting = getConfigSetting<ApplicationQPQConfigSetting>(
     qpqConfig,
     QPQCoreConfigSettingType.appName,
   );
 
   if (!applicationModuleSetting) {
-    throw new Error('please use defineApplicationModule in your QPQ config');
+    throw new Error('please use defineApplication in your QPQ config');
   }
 
   return applicationModuleSetting;
 };
 
-export const getApplicationName = (qpqConfig: QPQConfig): string => {
-  return getApplicationModuleSetting(qpqConfig).applicationName;
+export const getApplicationModuleName = (qpqConfig: QPQConfig): string => {
+  const moduleSetting = getConfigSetting<ModuleQPQConfigSetting>(
+    qpqConfig,
+    QPQCoreConfigSettingType.moduleName,
+  );
+
+  if (!moduleSetting) {
+    throw new Error('please use defineModule in your QPQ config');
+  }
+
+  return moduleSetting.moduleName;
 };
 
-export const getApplicationModuleName = (qpqConfig: QPQConfig): string => {
-  return getApplicationModuleSetting(qpqConfig).moduleName;
+export const getApplicationName = (qpqConfig: QPQConfig): string => {
+  return getApplicationConfigSetting(qpqConfig).applicationName;
 };
 
 export const getApplicationModuleFeature = (qpqConfig: QPQConfig): string | undefined => {
-  return getApplicationModuleSetting(qpqConfig).feature;
+  return getApplicationConfigSetting(qpqConfig).feature;
 };
 
 export const getConfigRoot = (qpqConfig: QPQConfig): string => {
-  return getApplicationModuleSetting(qpqConfig).configRoot;
+  return getApplicationConfigSetting(qpqConfig).configRoot;
 };
 
 export const getApplicationModuleEnvironment = (qpqConfig: QPQConfig): string => {
-  return getApplicationModuleSetting(qpqConfig).environment || 'production';
+  return getApplicationConfigSetting(qpqConfig).environment || 'production';
 };
 
 export const getApplicationModuleDeployRegion = (qpqConfig: QPQConfig): string => {
-  return getApplicationModuleSetting(qpqConfig).deployRegion || 'us-east-1';
+  return getApplicationConfigSetting(qpqConfig).deployRegion || 'us-east-1';
 };
 
 export const getStorageDrives = (configs: QPQConfig): StorageDriveQPQConfigSetting[] => {

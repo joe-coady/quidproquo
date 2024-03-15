@@ -345,3 +345,17 @@ export const getWebStackName = (qpqConfig: QPQConfig) => {
 export const getApiStackName = (qpqConfig: QPQConfig) => {
   return `${getBaseStackName(qpqConfig)}-api`;
 };
+
+export const getBootstrapStackName = (qpqConfig: QPQConfig) => {
+  const appName = qpqCoreUtils.getApplicationName(qpqConfig);
+  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
+  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+
+  const baseName = `${appName}-${environment}`;
+
+  if (feature) {
+    return `${baseName}-${feature}-bs`;
+  }
+
+  return `${baseName}-bs`;
+};

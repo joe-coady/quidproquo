@@ -2,6 +2,7 @@ import { CrossModuleOwner } from '../types';
 
 export enum QPQCoreConfigSettingType {
   appName = '@quidproquo-core/config/AppName',
+  moduleName = '@quidproquo-core/config/moduleName',
   storageDrive = '@quidproquo-core/config/storageDrive',
   schedule = '@quidproquo-core/config/schedule',
   secret = '@quidproquo-core/config/secret',

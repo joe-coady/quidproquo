@@ -2,6 +2,8 @@ export * from './emailTemplates';
 
 export * from './actionProcessors';
 export * from './applicationModule';
+export * from './applicationName';
+export * from './moduleName';
 export * from './buildPath';
 export * from './configValue';
 export * from './environmentSettings';

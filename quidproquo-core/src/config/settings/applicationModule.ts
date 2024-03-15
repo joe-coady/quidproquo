@@ -1,4 +1,6 @@
-import { QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
+import { QPQConfig, QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
+import { defineApplication } from './applicationName';
+import { defineModule } from './moduleName';
 
 export interface ApplicationModuleQPQConfigSetting extends QPQConfigSetting {
   applicationName: string;
@@ -16,14 +18,7 @@ export const defineApplicationModule = (
   configRoot: string,
   deployRegion?: string,
   feature?: string,
-): ApplicationModuleQPQConfigSetting => ({
-  configSettingType: QPQCoreConfigSettingType.appName,
-  uniqueKey: `${applicationName}-${moduleName}`,
-
-  applicationName,
-  moduleName,
-  configRoot,
-  environment,
-  deployRegion,
-  feature,
-});
+): QPQConfig => [
+  defineApplication(applicationName, environment, configRoot, deployRegion, feature),
+  defineModule(moduleName),
+];
