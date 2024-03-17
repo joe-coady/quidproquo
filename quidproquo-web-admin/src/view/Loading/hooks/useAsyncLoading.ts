@@ -14,7 +14,7 @@ import { AnyAsyncFunction } from '../../types';
 export function useAsyncLoading<T extends any[], U>(
   callback: AnyAsyncFunction<T, U>,
 ): AnyAsyncFunction<T, U> {
-  const loadingApi = useLoadingApi();
+  const { addLoading, removeLoading } = useLoadingApi();
 
   /**
    * The wrapped asynchronous function that adds and removes loading triggers around the original callback.
@@ -24,15 +24,14 @@ export function useAsyncLoading<T extends any[], U>(
    */
   const wrappedCallback: AnyAsyncFunction<T, U> = useCallback(
     async (...args: T) => {
-      loadingApi.addLoading();
+      addLoading();
       try {
-        const result = await callback(...args);
-        return result;
+        return await callback(...args);
       } finally {
-        loadingApi.removeLoading();
+        removeLoading();
       }
     },
-    [callback, loadingApi],
+    [callback, addLoading, removeLoading],
   );
 
   return wrappedCallback;

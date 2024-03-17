@@ -7,26 +7,24 @@ import LogDialog from './LogDialog';
 
 import { TopSection } from './TopSection';
 import { useIsLoading } from '../view';
-import { useLogManagement, useLogViewGridColumns } from './hooks';
-import { DataGridPagination } from '../components';
-import { DateCell } from '../components';
+import { useLogManagement } from './hooks';
+import { DataGridPagination, DateCell } from '../components';
 
 const formatTime = (ms: number) => {
   if (ms < 1000) return `${ms}ms`;
-  
-  let sec = ms / 1000;
+
+  const sec = ms / 1000;
   if (sec < 60) return `${sec.toFixed(1)}s`;
-  
-  let min = sec / 60;
+
+  const min = sec / 60;
   if (min < 60) return `${min.toFixed(1)}m`;
-  
-  let hr = min / 60;
+
+  const hr = min / 60;
   if (hr < 24) return `${hr.toFixed(1)}h`;
-  
-  let day = hr / 24;
+
+  const day = hr / 24;
   return `${day.toFixed(1)}d`;
 };
-
 
 const columns: GridColDef[] = [
   { field: 'moduleName', headerName: 'Service', flex: 1 },
@@ -39,18 +37,16 @@ const columns: GridColDef[] = [
   },
   { field: 'generic', headerName: 'Info', flex: 3 },
   { field: 'error', headerName: 'Error', flex: 4 },
-  { 
+  {
     field: 'executionTimeMs',
     headerName: 'executionTime',
     flex: 1,
     renderCell: (params: GridRenderCellParams) => <>{formatTime(params.value)}</>,
-    sortComparator: (v1, v2, cellParams1, cellParams2) => {
-      return Number(v1) - Number(v2);
-    },
+    sortComparator: (v1, v2) => Number(v1) - Number(v2),
   },
 ];
 
-export function LogViewer() {  
+export function LogViewer() {
   const {
     selectedLogCorrelation,
     logs,
@@ -83,8 +79,8 @@ export function LogViewer() {
             LoadingOverlay: () => <LinearProgress variant="determinate" value={searchProgress} />,
           }}
           columns={columns}
-          rows={filteredLogs.map((item, index) => ({ ...item, id: item.correlation }))}
-          autoPageSize={true}
+          rows={filteredLogs.map((item) => ({ ...item, id: item.correlation }))}
+          autoPageSize
           loading={isLoading}
           onRowClick={onRowClick}
         />
