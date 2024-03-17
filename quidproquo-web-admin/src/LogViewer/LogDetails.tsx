@@ -1,12 +1,11 @@
 import { StoryResult } from 'quidproquo-core';
 import ConsoleLogViewer from './ConsoleLogViewer';
 import TruncatedText from './TruncatedText';
-import { useLogEvents } from './hooks';
+import { useLogDetails } from './hooks';
 
 import { Table, TableBody, TableCell, TableRow, Box, Typography, IconButton } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import { useState } from 'react';
 
 interface LogDetailsProps {
   log: StoryResult<any>;
@@ -34,15 +33,7 @@ export const LogDetails = ({
   storyResultMetadatas,
   setSelectedLogCorrelation,
 }: LogDetailsProps) => {
-  const events = useLogEvents(log);
-  const [expandedEvents, setExpandedEvents] = useState<Record<string, boolean>>({});
-
-  const toggleEventExpanded = (key: string) => {
-    setExpandedEvents((prevState) => ({
-      ...prevState,
-      [key]: !prevState[key],
-    }));
-  };
+  const { events, expandedEvents, toggleEventExpanded } = useLogDetails(log);
 
   return (
     <Box sx={{ width: 1 }}>

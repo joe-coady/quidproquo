@@ -1,7 +1,7 @@
-import { useState } from 'react';
 import { Typography, IconButton } from '@mui/material';
 
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { useTruncatedText } from './hooks';
 
 const TruncatedText = ({
   title,
@@ -12,12 +12,7 @@ const TruncatedText = ({
   text: string;
   expanded: boolean;
 }) => {
-  const canTruncate = text.split('\n').length > 3;
-  const truncatedText = text.split('\n').slice(0, 3).join('\n') + '...';
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(text);
-  };
+  const { canTruncate, truncatedText, handleCopy } = useTruncatedText(text);
 
   return (
     <div style={{ position: 'relative' }}>
