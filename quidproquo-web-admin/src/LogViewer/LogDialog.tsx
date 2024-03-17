@@ -10,12 +10,14 @@ import {
   Tabs,
   Tab,
   Box,
+  AppBar,
+  useTheme,
 } from '@mui/material';
 
 import { LogCorrelations } from './LogCorrelations';
 import { LogDetails } from './LogDetails';
 import { LogSummary } from './LogSummary';
-import { LogRawJson } from './LogRawJson'; // Add this import
+import { LogRawJson } from './LogRawJson';
 
 import { useExternalData, usePlatformDataFromPath } from '../components/LoadingBox/hooks';
 import { useIsLoading } from '../view';
@@ -68,6 +70,8 @@ const LogDialog = ({
     setSelectedTab(newValue);
   };
 
+  const theme = useTheme();
+
   return (
     <Dialog
       open={open}
@@ -87,6 +91,19 @@ const LogDialog = ({
       }}
     >
       <DialogTitle id="scroll-dialog-title">Log Details - {logCorrelation}</DialogTitle>
+      <AppBar position="sticky" color="primary">
+        <Tabs
+          value={selectedTab}
+          onChange={handleTabChange}
+          textColor="inherit"
+          indicatorColor="secondary"
+        >
+          <Tab label="Log Details" />
+          <Tab label="Tree View" />
+          <Tab label="Summary" />
+          <Tab label="Raw JSON" />
+        </Tabs>
+      </AppBar>
       <DialogContent
         dividers={true}
         sx={{
@@ -94,14 +111,6 @@ const LogDialog = ({
           overflowY: 'scroll',
         }}
       >
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs value={selectedTab} onChange={handleTabChange}>
-            <Tab label="Log Details" />
-            <Tab label="Tree View" />
-            <Tab label="Summary" />
-            <Tab label="Raw JSON" /> {/* Add this new tab */}
-          </Tabs>
-        </Box>
         {selectedTab === 0 && (
           <>
             {!isLoading && (
@@ -127,7 +136,7 @@ const LogDialog = ({
             {isLoading && <LinearProgress />}
           </>
         )}
-        {selectedTab === 3 && ( // Add this new section for the Raw JSON tab
+        {selectedTab === 3 && (
           <>
             {!isLoading && <LogRawJson log={log!} />}
             {isLoading && <LinearProgress />}

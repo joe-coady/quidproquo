@@ -43,7 +43,8 @@
     "react-dom": "^18.2.0",
     "react-icons": "^4.8.0",
     "react-inspector": "^6.0.2",
-    "react-time-ago": "^7.2.1"
+    "react-time-ago": "^7.2.1",
+    "recharts": "^2.12.3"
   },
   "devDependencies": {
     "@babel/core": "^7.21.5",
