@@ -17,23 +17,25 @@ export const processLog = (logFile: StoryResult<any>) => {
   const secondEvent = {
     dateTime: logFile.startedAt,
     title: 'Executed with input params of',
-    subText: JSON.stringify(logFile.input, null, 2),
+    subText: '',
+    input: JSON.stringify(logFile.input, null, 2),
     key: logFile.correlation + 'part_2',
   };
 
   const finalEvent = {
     dateTime: logFile.finishedAt,
     title: logFile.error ? 'Thrown Error' : 'Returned',
-    subText: logFile.error
+    subText: '',
+    output: logFile.error
       ? JSON.stringify(logFile.error, null, 2)
       : JSON.stringify(logFile.result, null, 2),
     key: logFile.correlation + 'final',
   };
 
   const history = logFile.history.map((h: any, i: number) => ({
-    subText: `${h.act.payload ? `Input: ${JSON.stringify(h.act.payload, null, 2)}\n` : ''}${
-      h.res ? `Output: ${JSON.stringify(h.res, null, 2)}` : ''
-    }`,
+    subText: '',
+    input: JSON.stringify(h.act.payload, null, 2),
+    output: JSON.stringify(h.res, null, 2),
     title: h.act.type.split('/').slice(-2).join('::'),
     key: logFile.correlation + i,
     dateTime: h.startedAt,

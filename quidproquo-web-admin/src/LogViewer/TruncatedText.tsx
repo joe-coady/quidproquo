@@ -1,43 +1,48 @@
 import { useState } from 'react';
 import { Typography, IconButton } from '@mui/material';
 
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 const TruncatedText = ({
   title,
-  subText,
-  maxLength = 50,
+  text,
+  expanded,
 }: {
   title: string;
-  subText: string;
-  maxLength: number;
+  text: string;
+  expanded: boolean;
 }) => {
-  const [isTruncated, setIsTruncated] = useState(true);
-  const canTruncate = subText.length > maxLength;
+  const canTruncate = text.split('\n').length > 3;
+  const truncatedText = text.split('\n').slice(0, 3).join('\n') + '...';
 
-  const truncatedText = subText.slice(0, maxLength) + '...';
-
-  const handleToggle = () => {
-    setIsTruncated(!isTruncated);
+  const handleCopy = () => {
+    navigator.clipboard.writeText(text);
   };
 
   return (
-    <div>
-      <div>
-        <Typography variant="h6" component="span">
-          {title}
-        </Typography>
-        {canTruncate && (
-          <IconButton onClick={handleToggle} style={{ marginRight: '8px' }}>
-            {isTruncated ? <ExpandMoreIcon /> : <ExpandLessIcon />}
-          </IconButton>
-        )}
+    <div style={{ position: 'relative' }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          position: 'absolute',
+          left: '-45px',
+          top: '-10px',
+        }}
+      >
+        <IconButton onClick={handleCopy} style={{ marginLeft: '8px' }}>
+          <ContentCopyIcon />
+        </IconButton>
       </div>
       <pre
-        style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word', display: 'inline' }}
+        style={{
+          margin: 0,
+          whiteSpace: 'pre-wrap',
+          wordBreak: 'break-word',
+          display: 'inline',
+        }}
       >
-        {isTruncated && canTruncate ? truncatedText : subText}
+        {title}: {!expanded && canTruncate ? truncatedText : text}
       </pre>
     </div>
   );
