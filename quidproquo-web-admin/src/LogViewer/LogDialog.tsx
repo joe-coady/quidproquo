@@ -7,6 +7,9 @@ import {
   DialogContent,
   DialogActions,
   Button,
+  Tabs,
+  Tab,
+  Box,
 } from '@mui/material';
 
 import { LogCorrelations } from './LogCorrelations';
@@ -16,6 +19,7 @@ import { useExternalData, usePlatformDataFromPath } from '../components/LoadingB
 import { useIsLoading } from '../view';
 import { apiRequestPost } from '../logic';
 import { StoryResult } from 'quidproquo-core';
+import { useState } from 'react';
 
 interface LogDialogProps {
   open: boolean;
@@ -56,6 +60,12 @@ const LogDialog = ({
     }
   };
 
+  const [selectedTab, setSelectedTab] = useState(0);
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setSelectedTab(newValue);
+  };
+
   return (
     <Dialog
       open={open}
@@ -82,19 +92,31 @@ const LogDialog = ({
           overflowY: 'scroll',
         }}
       >
-        <LogCorrelations
-          logCorrelation={logCorrelation}
-          storyResultMetadatas={storyResultMetadatas}
-          setSelectedLogCorrelation={setSelectedLogCorrelation}
-        />
-        {!isLoading && (
-          <LogDetails
-            log={log!}
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <Tabs value={selectedTab} onChange={handleTabChange}>
+            <Tab label="Log Details" />
+            <Tab label="Tree View" />
+          </Tabs>
+        </Box>
+        {selectedTab === 0 && (
+          <>
+            {!isLoading && (
+              <LogDetails
+                log={log!}
+                storyResultMetadatas={storyResultMetadatas}
+                setSelectedLogCorrelation={setSelectedLogCorrelation}
+              />
+            )}
+            {isLoading && <LinearProgress />}
+          </>
+        )}
+        {selectedTab === 1 && (
+          <LogCorrelations
+            logCorrelation={logCorrelation}
             storyResultMetadatas={storyResultMetadatas}
             setSelectedLogCorrelation={setSelectedLogCorrelation}
           />
         )}
-        {isLoading && <LinearProgress />}
       </DialogContent>
 
       <DialogActions>
