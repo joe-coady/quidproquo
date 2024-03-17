@@ -15,6 +15,7 @@ import { AsyncButton } from '../components';
 import { IconButton, Menu } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useState } from 'react';
+import { Box } from '@mui/system';
 
 export interface TopSectionProps {
   searchParams: SearchParams;
@@ -101,13 +102,29 @@ export function TopSection({ searchParams, setSearchParams, onSearch }: TopSecti
           </FormControl>
         </Grid>
         <Grid item xs={2}>
-          <FormControl fullWidth>
-            <DateTimePicker
-              label="Start DateTime"
-              value={new Date(searchParams.startIsoDateTime)}
-              onChange={handleStartDateChange}
-            />
-          </FormControl>
+          <Box position="relative">
+            <FormControl fullWidth>
+              <DateTimePicker
+                label="Start DateTime"
+                value={new Date(searchParams.startIsoDateTime)}
+                onChange={handleStartDateChange}
+              />
+            </FormControl>
+            <IconButton
+              aria-label="quick time select"
+              aria-controls="quick-time-menu"
+              aria-haspopup="true"
+              onClick={handleQuickTimeClick}
+              sx={{
+                position: 'absolute',
+                right: '-28px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+              }}
+            >
+              <ExpandMoreIcon />
+            </IconButton>
+          </Box>
         </Grid>
         <Grid item xs={2}>
           <FormControl fullWidth>
@@ -118,29 +135,7 @@ export function TopSection({ searchParams, setSearchParams, onSearch }: TopSecti
             />
           </FormControl>
         </Grid>
-        <Grid item xs={1}>
-          <IconButton
-            aria-label="quick time select"
-            aria-controls="quick-time-menu"
-            aria-haspopup="true"
-            onClick={handleQuickTimeClick}
-          >
-            <ExpandMoreIcon />
-          </IconButton>
-          <Menu
-            id="quick-time-menu"
-            anchorEl={anchorEl}
-            keepMounted
-            open={Boolean(anchorEl)}
-            onClose={handleQuickTimeClose}
-          >
-            <MenuItem onClick={() => handleQuickTimeSelect(5)}>Last 5 minutes</MenuItem>
-            <MenuItem onClick={() => handleQuickTimeSelect(180)}>Last 3 hours</MenuItem>
-            <MenuItem onClick={() => handleQuickTimeSelect(1440)}>Last 24 hours</MenuItem>
-            <MenuItem onClick={() => handleQuickTimeSelect(10080)}>Last 7 days</MenuItem>
-          </Menu>
-        </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={5}>
           <FormControl fullWidth>
             <TextField
               label="Error Filter"
@@ -158,6 +153,18 @@ export function TopSection({ searchParams, setSearchParams, onSearch }: TopSecti
           </AsyncButton>
         </Grid>
       </Grid>
+      <Menu
+        id="quick-time-menu"
+        anchorEl={anchorEl}
+        keepMounted
+        open={Boolean(anchorEl)}
+        onClose={handleQuickTimeClose}
+      >
+        <MenuItem onClick={() => handleQuickTimeSelect(5)}>Last 5 minutes</MenuItem>
+        <MenuItem onClick={() => handleQuickTimeSelect(180)}>Last 3 hours</MenuItem>
+        <MenuItem onClick={() => handleQuickTimeSelect(1440)}>Last 24 hours</MenuItem>
+        <MenuItem onClick={() => handleQuickTimeSelect(10080)}>Last 7 days</MenuItem>
+      </Menu>
     </LocalizationProvider>
   );
 }
