@@ -14,7 +14,8 @@ import {
 
 import { LogCorrelations } from './LogCorrelations';
 import { LogDetails } from './LogDetails';
-import { LogSummary } from './LogSummary'; // Add this import
+import { LogSummary } from './LogSummary';
+import { LogRawJson } from './LogRawJson'; // Add this import
 
 import { useExternalData, usePlatformDataFromPath } from '../components/LoadingBox/hooks';
 import { useIsLoading } from '../view';
@@ -97,7 +98,8 @@ const LogDialog = ({
           <Tabs value={selectedTab} onChange={handleTabChange}>
             <Tab label="Log Details" />
             <Tab label="Tree View" />
-            <Tab label="Summary" /> {/* Add this new tab */}
+            <Tab label="Summary" />
+            <Tab label="Raw JSON" /> {/* Add this new tab */}
           </Tabs>
         </Box>
         {selectedTab === 0 && (
@@ -119,9 +121,15 @@ const LogDialog = ({
             setSelectedLogCorrelation={setSelectedLogCorrelation}
           />
         )}
-        {selectedTab === 2 && ( // Add this new section for the Summary tab
+        {selectedTab === 2 && (
           <>
             {!isLoading && <LogSummary log={log!} />}
+            {isLoading && <LinearProgress />}
+          </>
+        )}
+        {selectedTab === 3 && ( // Add this new section for the Raw JSON tab
+          <>
+            {!isLoading && <LogRawJson log={log!} />}
             {isLoading && <LinearProgress />}
           </>
         )}
