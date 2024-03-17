@@ -14,6 +14,7 @@ import {
 
 import { LogCorrelations } from './LogCorrelations';
 import { LogDetails } from './LogDetails';
+import { LogSummary } from './LogSummary'; // Add this import
 
 import { useExternalData, usePlatformDataFromPath } from '../components/LoadingBox/hooks';
 import { useIsLoading } from '../view';
@@ -96,6 +97,7 @@ const LogDialog = ({
           <Tabs value={selectedTab} onChange={handleTabChange}>
             <Tab label="Log Details" />
             <Tab label="Tree View" />
+            <Tab label="Summary" /> {/* Add this new tab */}
           </Tabs>
         </Box>
         {selectedTab === 0 && (
@@ -116,6 +118,12 @@ const LogDialog = ({
             storyResultMetadatas={storyResultMetadatas}
             setSelectedLogCorrelation={setSelectedLogCorrelation}
           />
+        )}
+        {selectedTab === 2 && ( // Add this new section for the Summary tab
+          <>
+            {!isLoading && <LogSummary log={log!} />}
+            {isLoading && <LinearProgress />}
+          </>
         )}
       </DialogContent>
 
