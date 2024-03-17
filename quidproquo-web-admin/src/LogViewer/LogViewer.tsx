@@ -1,7 +1,9 @@
+import React from 'react';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import LinearProgress from '@mui/material/LinearProgress';
 import { DataGrid, GridRenderCellParams, GridColDef } from '@mui/x-data-grid';
+import { Tabs, Tab } from '@mui/material';
 
 import LogDialog from './LogDialog';
 
@@ -9,6 +11,7 @@ import { TopSection } from './TopSection';
 import { useIsLoading } from '../view';
 import { useLogManagement } from './hooks';
 import { DataGridPagination, DateCell } from '../components';
+import { Dashboard } from './Dashboard';
 
 const formatTime = (ms: number) => {
   if (ms < 1000) return `${ms}ms`;
@@ -61,6 +64,12 @@ export function LogViewer() {
   } = useLogManagement();
   const isLoading = useIsLoading();
 
+  const [selectedTab, setSelectedTab] = React.useState(0);
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setSelectedTab(newValue);
+  };
+
   return (
     <Box sx={{ height: '100vh', width: '100%', p: 2, display: 'flex', flexDirection: 'column' }}>
       <Grid container spacing={2}>
@@ -72,19 +81,28 @@ export function LogViewer() {
           />
         </Grid>
       </Grid>
-      <Box sx={{ flex: 1 }}>
-        <DataGrid
-          components={{
-            Pagination: DataGridPagination,
-            LoadingOverlay: () => <LinearProgress variant="determinate" value={searchProgress} />,
-          }}
-          columns={columns}
-          rows={filteredLogs.map((item) => ({ ...item, id: item.correlation }))}
-          autoPageSize
-          loading={isLoading}
-          onRowClick={onRowClick}
-        />
+      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Tabs value={selectedTab} onChange={handleTabChange}>
+          <Tab label="Log Grid" />
+          <Tab label="Dashboard" />
+        </Tabs>
       </Box>
+      {selectedTab === 0 && (
+        <Box sx={{ flex: 1 }}>
+          <DataGrid
+            components={{
+              Pagination: DataGridPagination,
+              LoadingOverlay: () => <LinearProgress variant="determinate" value={searchProgress} />,
+            }}
+            columns={columns}
+            rows={filteredLogs.map((item) => ({ ...item, id: item.correlation }))}
+            autoPageSize
+            loading={isLoading}
+            onRowClick={onRowClick}
+          />
+        </Box>
+      )}
+      {selectedTab === 1 && <Dashboard logs={logs} searchParams={searchParams} />}
       <LogDialog
         open={!!selectedLogCorrelation}
         handleClose={clearSelectedLogCorrelation}
