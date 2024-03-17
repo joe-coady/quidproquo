@@ -6,6 +6,7 @@ import {
   aws_apigateway,
   aws_route53_targets,
 } from 'aws-cdk-lib';
+import * as cdk from 'aws-cdk-lib';
 
 export interface SubdomainNameProps extends QpqConstructBlockProps {
   subdomain: string;
@@ -29,7 +30,7 @@ export class SubdomainName extends QpqConstructBlock {
 
     this.certificate = new aws_certificatemanager.Certificate(this, 'certificate', {
       domainName: this.deployDomain,
-      certificateName: this.qpqResourceName(props.subdomain, 'cert'),
+      certificateName: `${this.deployDomain}-cert`,
       validation: aws_certificatemanager.CertificateValidation.fromDns(apexHostedZone),
     });
 
@@ -49,5 +50,11 @@ export class SubdomainName extends QpqConstructBlock {
       recordName: this.deployDomain,
       target: this.targetARecord,
     });
+
+    // // Export the names so we can import them later
+    // new cdk.CfnOutput(this, 'HostedZoneID', {
+    //   value: apexHostedZone.hostedZoneId,
+    //   exportName: `${apexHostedZone}-hosted-zone-id`,
+    // });
   }
 }

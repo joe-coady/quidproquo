@@ -47,8 +47,15 @@ const getProcessTransformEventParams = (
   serviceName: string,
 ): EventTransformEventParamsActionProcessor<ApiGatewayEventParams, HTTPEvent<any>> => {
   return async ({ eventParams: [apiGatewayEvent, context] }) => {
-    // The comment here was for when we use base path as our service name, its now in the domain
-    const path = apiGatewayEvent.path || '/'; // (apiGatewayEvent.path || '').replace(new RegExp(`^(\/${serviceName})/`), '/');
+    // const path = (apiGatewayEvent.path || '/').replace(new RegExp(`^(\/${serviceName})/`), '/');
+
+    // Initialize `path` by removing the service name prefix from `apiGatewayEvent.path`.
+    // This adjustment is necessary because the API gateway routes requests to services based on
+    // a base path that includes the service name. By subtracting `serviceName.length + 1` from the
+    // substring method's start index, we effectively strip the leading `/<serviceName>` segment,
+    // accounting for the leading slash. This ensures `path` reflects the intended resource location
+    // after the service name. Defaults to '/' if `apiGatewayEvent.path` is not provided.
+    const path = (apiGatewayEvent.path || '/').substring(serviceName.length + 1);
 
     const transformedEventParams: HTTPEvent<any> = {
       path,
