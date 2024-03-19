@@ -4,6 +4,7 @@ import { StoryResultMetadataLog } from '../types';
 import { findRootLog, fineLogDirectChildren } from './logic';
 import { useAuthAccessToken } from '../Auth/hooks';
 import { cache } from '../logic/cache';
+import { Box, CircularProgress } from '@mui/material';
 
 const BACKGROUND_COLOR = '#c1c1c1';
 
@@ -123,7 +124,7 @@ const LogCorrelationTreeComponent = ({
     };
 
     fetchTreeData();
-  }, [rootStoryResultMetadata, allStoryResultMetadatas, accessToken]);
+  }, [rootStoryResultMetadata.correlation]);
 
   useEffect(() => {
     if (treeContainer.current) {
@@ -133,7 +134,19 @@ const LogCorrelationTreeComponent = ({
   }, []);
 
   if (!treeData) {
-    return null;
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100%',
+          width: '100%',
+        }}
+      >
+        <CircularProgress size={100} />
+      </Box>
+    );
   }
 
   return (

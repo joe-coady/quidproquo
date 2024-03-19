@@ -1,4 +1,4 @@
-import { Box } from '@mui/material';
+import { Box, CircularProgress } from '@mui/material';
 
 import { StoryResultMetadataLog } from '../types';
 import { findRootLog } from './logic';
@@ -28,7 +28,19 @@ export const LogCorrelations = ({
   }, [logCorrelation]);
 
   if (!rootLog) {
-    return null;
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100%',
+          width: '100%',
+        }}
+      >
+        <CircularProgress size={100} />
+      </Box>
+    );
   }
 
   return (
