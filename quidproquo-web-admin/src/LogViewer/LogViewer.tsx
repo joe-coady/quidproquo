@@ -81,14 +81,8 @@ export function LogViewer() {
           />
         </Grid>
       </Grid>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={selectedTab} onChange={handleTabChange}>
-          <Tab label="Log Grid" />
-          <Tab label="Dashboard" />
-        </Tabs>
-      </Box>
-      {selectedTab === 0 && (
-        <Box sx={{ flex: 1 }}>
+      <Box sx={{ flex: 1, overflow: 'auto' }}>
+        {selectedTab === 0 && (
           <DataGrid
             components={{
               Pagination: DataGridPagination,
@@ -100,9 +94,24 @@ export function LogViewer() {
             loading={isLoading}
             onRowClick={onRowClick}
           />
-        </Box>
-      )}
-      {selectedTab === 1 && <Dashboard logs={logs} searchParams={searchParams} />}
+        )}
+        {selectedTab === 1 && <Dashboard logs={logs} searchParams={searchParams} />}
+      </Box>
+      <Box
+        sx={{
+          borderTop: 1,
+          borderColor: 'divider',
+          position: 'sticky',
+          bottom: 0,
+          bgcolor: 'background.paper',
+          zIndex: 1,
+        }}
+      >
+        <Tabs value={selectedTab} onChange={handleTabChange} centered>
+          <Tab label="Logs" />
+          <Tab label="Dashboard" />
+        </Tabs>
+      </Box>
       <LogDialog
         open={!!selectedLogCorrelation}
         handleClose={clearSelectedLogCorrelation}
