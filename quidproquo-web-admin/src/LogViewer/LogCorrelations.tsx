@@ -1,48 +1,18 @@
-import { Box, CircularProgress } from '@mui/material';
+import { Box } from '@mui/material';
 
-import { StoryResultMetadataLog } from '../types';
-import { findRootLog } from './logic';
 import { LogCorrelationTree } from './LogCorrelationTree';
-import { useEffect, useState } from 'react';
-import { useAuthAccessToken } from '../Auth/hooks';
 
 interface LogCorrelationsProps {
   logCorrelation: string;
-  storyResultMetadatas: StoryResultMetadataLog[];
   setSelectedLogCorrelation: (logCorrelation: string) => void;
+  isVisible: boolean;
 }
 
 export const LogCorrelations = ({
   logCorrelation,
-  storyResultMetadatas,
   setSelectedLogCorrelation,
+  isVisible,
 }: LogCorrelationsProps) => {
-  const [rootLog, setRootLog] = useState<StoryResultMetadataLog | null | undefined>(null);
-  const accessToken = useAuthAccessToken();
-
-  useEffect(() => {
-    findRootLog(logCorrelation, accessToken).then((foundRoot) => {
-      console.log('root: ', foundRoot);
-      setRootLog(foundRoot);
-    });
-  }, [logCorrelation]);
-
-  if (!rootLog) {
-    return (
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100%',
-          width: '100%',
-        }}
-      >
-        <CircularProgress size={100} />
-      </Box>
-    );
-  }
-
   return (
     <Box
       sx={{
@@ -55,10 +25,10 @@ export const LogCorrelations = ({
       }}
     >
       <LogCorrelationTree
-        rootStoryResultMetadata={rootLog}
-        allStoryResultMetadatas={storyResultMetadatas}
+        rootStoryCorrelation={logCorrelation}
         highlightCorrelation={logCorrelation}
         setSelectedLogCorrelation={setSelectedLogCorrelation}
+        isVisible={isVisible}
       />
     </Box>
   );

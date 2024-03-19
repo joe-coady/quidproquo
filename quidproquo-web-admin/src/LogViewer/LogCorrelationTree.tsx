@@ -9,10 +9,10 @@ import { Box, CircularProgress } from '@mui/material';
 const BACKGROUND_COLOR = '#c1c1c1';
 
 interface LogCorrelationTreeProps {
-  rootStoryResultMetadata: StoryResultMetadataLog;
-  allStoryResultMetadatas: StoryResultMetadataLog[];
+  rootStoryCorrelation: string;
   highlightCorrelation: string;
   setSelectedLogCorrelation: (logCorrelation: string) => void;
+  isVisible: boolean;
 }
 
 const createHierarchy = cache(
@@ -21,8 +21,6 @@ const createHierarchy = cache(
       rootStoryResultMetadata.correlation,
       accessToken,
     );
-
-    console.log('childrenLogs', childrenLogs);
 
     const children = await Promise.all(
       childrenLogs
@@ -44,7 +42,6 @@ const createHierarchy = cache(
 const renderRectSvgNode =
   (setSelectedLogCorrelation: (logCorrelation: string) => void, highlightCorrelation: string) =>
   ({ nodeDatum }) => {
-    console.log('nodeDatum', nodeDatum);
     const color =
       nodeDatum.correlation === highlightCorrelation
         ? !!nodeDatum.error
@@ -101,10 +98,10 @@ const renderRectSvgNode =
   };
 
 const LogCorrelationTreeComponent = ({
-  rootStoryResultMetadata,
-  allStoryResultMetadatas,
+  rootStoryCorrelation,
   highlightCorrelation,
   setSelectedLogCorrelation,
+  isVisible,
 }: LogCorrelationTreeProps) => {
   const treeContainer = useRef(null);
   const [translate, setTranslate] = useState({ x: 0, y: 0 });
@@ -113,7 +110,7 @@ const LogCorrelationTreeComponent = ({
 
   useEffect(() => {
     const fetchTreeData = async () => {
-      const rootLog = await findRootLog(rootStoryResultMetadata.correlation, accessToken);
+      const rootLog = await findRootLog(rootStoryCorrelation, accessToken);
 
       if (rootLog) {
         const data = await createHierarchy(rootLog, accessToken);
@@ -124,14 +121,15 @@ const LogCorrelationTreeComponent = ({
     };
 
     fetchTreeData();
-  }, [rootStoryResultMetadata.correlation]);
+  }, [rootStoryCorrelation]);
 
   useEffect(() => {
-    if (treeContainer.current) {
+    console.log(isVisible, 'isVisible');
+    if (treeContainer.current && isVisible) {
       const { clientWidth } = treeContainer.current;
       setTranslate({ x: clientWidth / 2, y: 40 });
     }
-  }, [treeData]);
+  }, [treeData, isVisible]);
 
   if (!treeData) {
     return (

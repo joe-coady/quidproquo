@@ -46,6 +46,11 @@ function downloadJson(json: string, filename: string): void {
   URL.revokeObjectURL(url);
 }
 
+const getTabStyle = (tabIndex: number, selectedTab: number) => ({
+  display: selectedTab === tabIndex ? 'block' : 'none',
+  height: '100%',
+});
+
 const LogDialog = ({
   logCorrelation,
   open,
@@ -111,37 +116,31 @@ const LogDialog = ({
           overflowY: 'scroll',
         }}
       >
-        {selectedTab === 0 && (
-          <>
-            {!isLoading && (
-              <LogDetails
-                log={log!}
-                storyResultMetadatas={storyResultMetadatas}
-                setSelectedLogCorrelation={setSelectedLogCorrelation}
-              />
-            )}
-            {isLoading && <LinearProgress />}
-          </>
-        )}
-        {selectedTab === 1 && (
+        <div style={getTabStyle(selectedTab, 0)}>
+          {!isLoading && (
+            <LogDetails
+              log={log!}
+              storyResultMetadatas={storyResultMetadatas}
+              setSelectedLogCorrelation={setSelectedLogCorrelation}
+            />
+          )}
+          {isLoading && <LinearProgress />}
+        </div>
+        <div style={getTabStyle(selectedTab, 1)}>
           <LogCorrelations
             logCorrelation={logCorrelation}
-            storyResultMetadatas={storyResultMetadatas}
             setSelectedLogCorrelation={setSelectedLogCorrelation}
+            isVisible={selectedTab === 1}
           />
-        )}
-        {selectedTab === 2 && (
-          <>
-            {!isLoading && <LogSummary log={log!} />}
-            {isLoading && <LinearProgress />}
-          </>
-        )}
-        {selectedTab === 3 && (
-          <>
-            {!isLoading && <LogRawJson log={log!} />}
-            {isLoading && <LinearProgress />}
-          </>
-        )}
+        </div>
+        <div style={getTabStyle(selectedTab, 2)}>
+          {!isLoading && <LogSummary log={log!} />}
+          {isLoading && <LinearProgress />}
+        </div>
+        <div style={getTabStyle(selectedTab, 3)}>
+          {!isLoading && <LogRawJson log={log!} />}
+          {isLoading && <LinearProgress />}
+        </div>
       </DialogContent>
 
       <DialogActions>
