@@ -7,8 +7,6 @@ export const useExternalData = <T>(url?: string): T | null => {
   const cache = useRef<Record<string, T>>({});
 
   useEffect(() => {
-    console.log('useExternalData', url);
-
     if (!url) {
       setData(null);
       return;
@@ -32,8 +30,6 @@ export const useExternalData = <T>(url?: string): T | null => {
       allowDataSet = false;
     };
   }, [url, loadData]);
-
-  console.log('data', data);
 
   return cache.current[url || ''];
 };
