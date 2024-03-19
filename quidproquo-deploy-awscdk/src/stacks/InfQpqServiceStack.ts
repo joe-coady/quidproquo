@@ -16,6 +16,7 @@ import {
   QpqCoreKeyValueStoreConstruct,
   QpqWebserverWebsocketConstruct,
   QpqWebserverCertificateConstruct,
+  InfQpqWebserverWebEntryConstruct,
 } from '../constructs';
 import { QpqWebServerCacheConstruct } from '../constructs/feature/webserver/cache/QpqWebServerCacheConstruct';
 import { WebserverRoll } from '../constructs/basic/WebserverRoll';
@@ -84,16 +85,13 @@ export class InfQpqServiceStack extends QpqServiceStack {
     QpqCoreQueueConstruct.authorizeActionsForRole(webserverRole, queues);
     // end queues
 
-    // Domain
-    const dns = qpqWebServerUtils.getDnsConfigs(props.qpqConfig).map(
-      (setting) =>
-        new QpqWebserverDomainConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
-          awsAccountId: props.awsAccountId,
-          qpqConfig: props.qpqConfig,
+    // Web entry foundations
+    new InfQpqWebserverWebEntryConstruct(this, 'webEntryInf', {
+      awsAccountId: props.awsAccountId,
+      qpqConfig: props.qpqConfig,
 
-          dnsConfig: setting,
-        }),
-    );
+      webEntryConfigs: qpqWebServerUtils.getWebEntryConfigs(props.qpqConfig),
+    });
 
     // User Directories
     const userDirectories = qpqCoreUtils.getUserDirectories(props.qpqConfig).map(

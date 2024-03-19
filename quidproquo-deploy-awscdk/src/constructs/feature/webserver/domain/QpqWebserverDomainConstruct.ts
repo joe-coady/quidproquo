@@ -41,11 +41,6 @@ export class QpqWebserverDomainConstruct extends QpqConstructBlock {
       domainName: feature ? featureDomainName : environmentDomain,
     });
 
-    // Only create a shared hosted zone if we need to
-    if (!qpqDeployAwsCdkUtils.serviceNeedsServiceHostedZone(props.qpqConfig)) {
-      return;
-    }
-
     // Root domain name for our service
     // search.example.com
     // search.dev.example.com

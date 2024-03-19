@@ -17,7 +17,10 @@ export class BootstrapQpqWebserverApiConstruct extends QpqConstructBlock {
     super(scope, id, props);
 
     // api.service.domain.com or api.domain.com
-    const apexDomain = qpqWebServerUtils.getBaseDomainName(props.qpqConfig);
+    const apexDomain = qpqWebServerUtils.resolveDomainRoot(
+      props.apiConfig.rootDomain,
+      props.qpqConfig,
+    );
 
     // Create subdomain
     new SubdomainName(this, 'subdomain', {

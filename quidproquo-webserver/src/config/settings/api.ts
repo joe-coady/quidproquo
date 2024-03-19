@@ -3,18 +3,17 @@ import { QPQConfigSetting, QPQConfigAdvancedSettings } from 'quidproquo-core';
 import { QPQWebServerConfigSettingType } from '../QPQConfig';
 
 export interface QPQConfigAdvancedApiSettings extends QPQConfigAdvancedSettings {
-  onRootDomain?: boolean;
-  apiName?: string;
-
+  subDomain?: string;
+  buildPath?: string;
   cloudflareApiKeySecretName?: string;
 }
 
 export interface ApiQPQWebServerConfigSetting extends QPQConfigSetting {
   apiSubdomain: string;
+  rootDomain: string;
 
-  onRootDomain: boolean;
   apiName: string;
-  buildPath: string;
+  buildPath?: string;
 
   deprecated: boolean;
 
@@ -22,20 +21,19 @@ export interface ApiQPQWebServerConfigSetting extends QPQConfigSetting {
 }
 
 export const defineApi = (
-  apiSubdomain: string,
-  buildPath: string,
+  apiName: string,
+  rootDomain: string,
   options?: QPQConfigAdvancedApiSettings,
 ): ApiQPQWebServerConfigSetting => {
   return {
     configSettingType: QPQWebServerConfigSettingType.Api,
-    uniqueKey: apiSubdomain,
+    uniqueKey: apiName,
 
-    apiSubdomain,
-    buildPath,
+    apiSubdomain: options?.subDomain || apiName,
+    buildPath: options?.buildPath,
+    rootDomain,
 
-    // advanced
-    onRootDomain: options?.onRootDomain || false,
-    apiName: options?.apiName || 'api',
+    apiName: apiName,
 
     deprecated: options?.deprecated || false,
 

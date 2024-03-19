@@ -6,7 +6,7 @@ import { QpqServiceStack, QpqServiceStackProps } from './base/QpqServiceStack';
 
 import { InfQpqServiceStack } from './InfQpqServiceStack';
 
-import { QpqWebserverWebEntryConstruct } from '../constructs';
+import { WebQpqWebserverWebEntryConstruct } from '../constructs';
 
 export interface WebQpqServiceStackProps extends QpqServiceStackProps {
   infQpqServiceStack?: InfQpqServiceStack;
@@ -24,7 +24,7 @@ export class WebQpqServiceStack extends QpqServiceStack {
     // Web entries
     const webEntries = qpqWebServerUtils.getWebEntryConfigs(props.qpqConfig).map(
       (setting) =>
-        new QpqWebserverWebEntryConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
+        new WebQpqWebserverWebEntryConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           awsAccountId: props.awsAccountId,
           qpqConfig: props.qpqConfig,
 

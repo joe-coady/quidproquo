@@ -307,6 +307,45 @@ export const getServiceDomainName = (qpqConfig: QPQConfig): string => {
   return `${service}.${domainBase}`;
 };
 
+export const resolveApexDomainNameFromDomainConfig = (
+  qpqConfig: QPQConfig,
+  rootDomain: string,
+  onRootDomain: boolean,
+): string => {
+  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
+
+  const apexDomain = onRootDomain
+    ? getDomainRoot(rootDomain, environment, feature)
+    : constructServiceDomainName(
+        rootDomain,
+        environment,
+        qpqCoreUtils.getApplicationModuleName(qpqConfig),
+        feature,
+      );
+
+  return apexDomain;
+};
+
+export const constructServiceDomainName = (
+  rootDomain: string,
+  environment: string,
+  service: string,
+  feature?: string,
+) => {
+  const domainBase = getDomainRoot(rootDomain, environment, feature);
+
+  return `${service}.${domainBase}`;
+};
+
+export const constructEnvironmentDomainName = (environment: string, domain: string): string => {
+  if (environment === 'production') {
+    return domain;
+  }
+
+  return `${environment}.${domain}`;
+};
+
 export const getDefaultRouteSettings = (
   qpqConfig: QPQConfig,
 ): DefaultRouteOptionsQPQWebServerConfigSetting[] => {
@@ -330,6 +369,16 @@ export const getDomainRoot = (
   }
 
   return `${domainPrefix}${rootDomain}`;
+};
+
+export const resolveDomainRoot = (rootDomain: string, qpqConfig: QPQConfig): string => {
+  const domain = getDomainRoot(
+    rootDomain,
+    qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
+    qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
+  );
+
+  return domain;
 };
 
 export const getWebsocketSettings = (

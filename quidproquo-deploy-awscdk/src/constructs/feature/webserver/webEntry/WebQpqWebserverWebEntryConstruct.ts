@@ -12,11 +12,7 @@ import {
 } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 
-import {
-  WebEntryQPQWebServerConfigSetting,
-  qpqWebServerUtils,
-  qpqHeaderIsBot,
-} from 'quidproquo-webserver';
+import { WebEntryQPQWebServerConfigSetting, qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { CloudflareDnsRecord } from '../../../basic/CloudflareDnsRecord';
 import { DnsValidatedCertificate } from '../../../basic/DnsValidatedCertificate';
@@ -31,12 +27,12 @@ import { Construct } from 'constructs';
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
 import { QpqWebServerCacheConstruct } from '../cache/QpqWebServerCacheConstruct';
 
-export interface QpqWebserverWebEntryConstructProps extends QpqConstructBlockProps {
+export interface WebQpqWebserverWebEntryConstructProps extends QpqConstructBlockProps {
   webEntryConfig: WebEntryQPQWebServerConfigSetting;
 }
 
-export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
-  constructor(scope: Construct, id: string, props: QpqWebserverWebEntryConstructProps) {
+export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
+  constructor(scope: Construct, id: string, props: WebQpqWebserverWebEntryConstructProps) {
     super(scope, id, props);
 
     // create / reference an s3 bucket
@@ -90,9 +86,10 @@ export class QpqWebserverWebEntryConstruct extends QpqConstructBlock {
       });
     }
 
-    const dnsRecord = new DnsValidatedCertificate(this, 'cert', {
+    const dnsRecord = new DnsValidatedCertificate(this, 'validcert', {
       onRootDomain: props.webEntryConfig.domain.onRootDomain,
       subdomain: props.webEntryConfig.domain.subDomainName,
+      rootDomain: props.webEntryConfig.domain.rootDomain,
 
       awsAccountId: props.awsAccountId,
       qpqConfig: props.qpqConfig,

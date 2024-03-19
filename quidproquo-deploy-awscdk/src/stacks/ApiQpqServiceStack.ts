@@ -8,7 +8,7 @@ import { InfQpqServiceStack } from './InfQpqServiceStack';
 import {
   LambdaLayers,
   QpqCoreRecurringScheduleConstruct,
-  QpqWebserverApiConstruct,
+  ApiQpqWebserverApiConstruct,
   QpqApiCoreQueueConstruct,
   QpqWebserverSubdomainRedirectConstruct,
   QpqWebserverServiceFunctionConstruct,
@@ -53,7 +53,7 @@ export class ApiQpqServiceStack extends QpqServiceStack {
     // Api - routes
     const apis = qpqWebServerUtils.getApiConfigs(props.qpqConfig).map(
       (setting) =>
-        new QpqWebserverApiConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
+        new ApiQpqWebserverApiConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           awsAccountId: props.awsAccountId,
           qpqConfig: props.qpqConfig,
 

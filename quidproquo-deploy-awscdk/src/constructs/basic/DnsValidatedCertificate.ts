@@ -8,6 +8,7 @@ import * as qpqDeployAwsCdkUtils from '../../utils';
 export interface DnsValidatedCertificateProps extends QpqConstructBlockProps {
   onRootDomain: boolean;
   subdomain?: string;
+  rootDomain: string;
 }
 
 export class DnsValidatedCertificate extends QpqConstructBlock {
@@ -18,11 +19,16 @@ export class DnsValidatedCertificate extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: DnsValidatedCertificateProps) {
     super(scope, id, props);
 
-    const apexDomain = props.onRootDomain
-      ? qpqWebServerUtils.getBaseDomainName(props.qpqConfig)
-      : qpqWebServerUtils.getServiceDomainName(props.qpqConfig);
+    const apexDomain = qpqWebServerUtils.resolveApexDomainNameFromDomainConfig(
+      props.qpqConfig,
+      props.rootDomain,
+      props.onRootDomain,
+    );
 
     this.deployDomain = props.subdomain ? `${props.subdomain}.${apexDomain}` : apexDomain;
+
+    console.log('this.deployDomain', this.deployDomain);
+    console.log('apexDomain', apexDomain);
 
     this.hostedZone = aws_route53.HostedZone.fromLookup(this, 'MyHostedZone', {
       domainName: apexDomain,

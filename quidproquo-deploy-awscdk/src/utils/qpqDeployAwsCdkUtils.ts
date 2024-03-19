@@ -229,25 +229,6 @@ export const getQqpUserPoolGrantablesForApiConfig = (
   return userDirectoryResources;
 };
 
-export const serviceNeedsServiceHostedZone = (qpqConfig: QPQConfig) => {
-  // We need it if we are deploying our api to a service domain
-  const apiConfigs = qpqCoreUtils
-    .getConfigSettings<ApiQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.Api)
-    .filter((config) => !config.onRootDomain);
-
-  const webEntryConfigs = qpqCoreUtils
-    .getConfigSettings<WebEntryQPQWebServerConfigSetting>(
-      qpqConfig,
-      QPQWebServerConfigSettingType.WebEntry,
-    )
-    .filter((config) => !config.domain.onRootDomain);
-
-  // // Or if we are deploying to a feature env ~ like joecoady
-  // const hasFeatureName = !!qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
-
-  return apiConfigs.length > 0 || webEntryConfigs.length > 0; // || hasFeatureName;
-};
-
 // Get resources that we can use to grant permissions to lambdas etc
 export const getQqpGrantableResources = (
   scope: Construct,

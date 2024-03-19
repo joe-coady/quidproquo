@@ -29,6 +29,7 @@ const logResourceName = 'qpq-logs';
 export const defineLogs = (
   buildPath: string,
   webFilesPath: string,
+  rootDomain: string,
   advancedSettings?: QPQConfigAdvancedLogSettings,
 ): QPQConfig => {
   const routeAuthSettings = {
@@ -147,6 +148,7 @@ export const defineLogs = (
       domain: {
         subDomainName: 'admin',
         onRootDomain: false,
+        rootDomain,
       },
 
       ignoreCache: ['index.html', 'index.js'],

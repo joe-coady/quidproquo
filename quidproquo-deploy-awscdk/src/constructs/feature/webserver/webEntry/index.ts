@@ -1,1 +1,2 @@
-export * from './QpqWebserverWebEntryConstruct';
+export * from './WebQpqWebserverWebEntryConstruct';
+export * from './InfQpqWebserverWebEntryConstruct';

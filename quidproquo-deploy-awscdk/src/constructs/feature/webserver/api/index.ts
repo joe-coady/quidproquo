@@ -1,2 +1,2 @@
-export * from './QpqWebserverApiConstruct';
+export * from './ApiQpqWebserverApiConstruct';
 export * from './BootstrapQpqWebserverApiConstruct';

@@ -7,10 +7,12 @@ export interface QPQConfigAdvancedCertificateSettings extends QPQConfigAdvancedS
 export interface CertificateQPQWebServerConfigSetting extends QPQConfigSetting {
   onRootDomain: boolean;
   subdomain?: string;
+  rootDomain: string;
 }
 
 export const defineCertificate = (
   onRootDomain: boolean,
+  rootDomain: string,
   subdomain?: string,
   options?: QPQConfigAdvancedCertificateSettings,
 ): CertificateQPQWebServerConfigSetting => ({
@@ -19,4 +21,5 @@ export const defineCertificate = (
 
   onRootDomain,
   subdomain,
+  rootDomain,
 });

@@ -17,6 +17,7 @@ export class QpqWebserverCertificateConstruct extends QpqConstructBlock {
     new DnsValidatedCertificate(this, 'cert', {
       onRootDomain: props.certificateConfig.onRootDomain,
       subdomain: props.certificateConfig.subdomain,
+      rootDomain: props.certificateConfig.rootDomain,
 
       awsAccountId: props.awsAccountId,
       qpqConfig: props.qpqConfig,

@@ -7,6 +7,7 @@ import { ResponseSecurityHeaders } from '../types/ResponseSecurityHeaders';
 export interface WebDomainOptions {
   subDomainName?: string;
   onRootDomain: boolean;
+  rootDomain: string;
 }
 
 export interface StorageDriveOptions {
@@ -20,7 +21,7 @@ export interface QPQConfigAdvancedWebEntrySettings extends QPQConfigAdvancedSett
 
   storageDrive?: StorageDriveOptions;
 
-  domain?: WebDomainOptions;
+  domain: WebDomainOptions;
 
   cacheSettingsName?: string;
   indexRoot?: string;
@@ -54,7 +55,7 @@ export interface WebEntryQPQWebServerConfigSetting extends QPQConfigSetting {
 
 export const defineWebEntry = (
   name: string,
-  options?: QPQConfigAdvancedWebEntrySettings,
+  options: QPQConfigAdvancedWebEntrySettings,
 ): WebEntryQPQWebServerConfigSetting => ({
   configSettingType: QPQWebServerConfigSettingType.WebEntry,
   uniqueKey: name,
@@ -66,9 +67,7 @@ export const defineWebEntry = (
     autoUpload: true,
   },
 
-  domain: options?.domain || {
-    onRootDomain: true,
-  },
+  domain: options.domain,
 
   buildPath: options?.buildPath,
   seoBuildPath: options?.seoBuildPath,
