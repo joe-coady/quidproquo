@@ -131,7 +131,7 @@ const LogCorrelationTreeComponent = ({
       const { clientWidth } = treeContainer.current;
       setTranslate({ x: clientWidth / 2, y: 40 });
     }
-  }, []);
+  }, [treeData]);
 
   if (!treeData) {
     return (
