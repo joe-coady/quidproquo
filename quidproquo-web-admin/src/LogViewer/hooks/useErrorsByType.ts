@@ -9,7 +9,7 @@ export const useErrorsByType = (logs: StoryResultMetadataLog[]) => {
       if (log.error) {
         const errorText = log.error || '';
         const truncatedErrorText =
-          errorText.length > 50 ? errorText.slice(0, 50) + '...' : errorText;
+          errorText.length > 100 ? errorText.slice(0, 100) + '...' : errorText;
 
         errorCounts[truncatedErrorText] = errorCounts[truncatedErrorText] || {
           count: 0,
@@ -25,5 +25,5 @@ export const useErrorsByType = (logs: StoryResultMetadataLog[]) => {
 
   console.log(data);
 
-  return data;
+  return data.slice(0, 10);
 };
