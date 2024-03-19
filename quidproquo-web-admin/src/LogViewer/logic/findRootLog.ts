@@ -1,17 +1,24 @@
 import { StoryResultMetadataLog } from '../../types';
+import { apiRequestGet } from '../../logic';
+import { cache } from '../../logic/cache';
 
-export function findRootLog(
-  logArray: StoryResultMetadataLog[],
-  log?: StoryResultMetadataLog,
-): StoryResultMetadataLog | undefined {
-  // Base case: if the log does not have a fromCorrelation field, return the log
-  if (!log || !log.fromCorrelation) {
-    return log;
+export const findRootLog = cache(async function findRootLog(
+  fromCorrelation?: string,
+  accessToken?: string,
+): Promise<StoryResultMetadataLog | undefined> {
+  if (!fromCorrelation) {
+    return;
   }
 
-  // Recursive case: find the parent log in the array and call the function again with the parent log
-  const parentLog = logArray.find((l) => l.correlation === log.fromCorrelation);
+  try {
+    const parentLog = await apiRequestGet<StoryResultMetadataLog>(
+      `/log/${fromCorrelation}`,
+      accessToken,
+    );
 
-  // If a parent log is found, make a recursive call with the parent log; otherwise, return the current log
-  return parentLog ? findRootLog(logArray, parentLog) : log;
-}
+    return (await findRootLog(parentLog?.fromCorrelation, accessToken)) || parentLog;
+  } catch (error) {
+    console.error(`Error fetching parent log for correlation ${fromCorrelation}:`, error);
+    return;
+  }
+});

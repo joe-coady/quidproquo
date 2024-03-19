@@ -3,44 +3,51 @@ import { Box } from '@mui/material';
 import { StoryResultMetadataLog } from '../types';
 import { findRootLog } from './logic';
 import { LogCorrelationTree } from './LogCorrelationTree';
+import { useEffect, useState } from 'react';
+import { useAuthAccessToken } from '../Auth/hooks';
 
 interface LogCorrelationsProps {
-logCorrelation: string;
-storyResultMetadatas: StoryResultMetadataLog[];
-setSelectedLogCorrelation: (logCorrelation: string) => void;
+  logCorrelation: string;
+  storyResultMetadatas: StoryResultMetadataLog[];
+  setSelectedLogCorrelation: (logCorrelation: string) => void;
 }
 
 export const LogCorrelations = ({
-logCorrelation,
-storyResultMetadatas,
-setSelectedLogCorrelation,
+  logCorrelation,
+  storyResultMetadatas,
+  setSelectedLogCorrelation,
 }: LogCorrelationsProps) => {
-const rootLog = findRootLog(
-storyResultMetadatas,
-storyResultMetadatas.find((l) => l.correlation === logCorrelation)!,
-);
+  const [rootLog, setRootLog] = useState<StoryResultMetadataLog | null | undefined>(null);
+  const accessToken = useAuthAccessToken();
 
-if (!rootLog) {
-return null;
-}
+  useEffect(() => {
+    findRootLog(logCorrelation, accessToken).then((foundRoot) => {
+      console.log('root: ', foundRoot);
+      setRootLog(foundRoot);
+    });
+  }, [logCorrelation]);
 
-return (
-<Box
-sx={{
-width: 1,
-display: 'flex',
-flexDirection: 'column',
-alignItems: 'center',
-justifyContent: 'center',
-height: '100%',
-}}
->
-<LogCorrelationTree
-rootStoryResultMetadata={rootLog}
-allStoryResultMetadatas={storyResultMetadatas}
-highlightCorrelation={logCorrelation}
-setSelectedLogCorrelation={setSelectedLogCorrelation}
-/>
-</Box>
-);
+  if (!rootLog) {
+    return null;
+  }
+
+  return (
+    <Box
+      sx={{
+        width: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100%',
+      }}
+    >
+      <LogCorrelationTree
+        rootStoryResultMetadata={rootLog}
+        allStoryResultMetadatas={storyResultMetadatas}
+        highlightCorrelation={logCorrelation}
+        setSelectedLogCorrelation={setSelectedLogCorrelation}
+      />
+    </Box>
+  );
 };

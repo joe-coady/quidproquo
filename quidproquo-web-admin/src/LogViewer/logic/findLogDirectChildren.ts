@@ -1,12 +1,22 @@
 import { StoryResultMetadataLog } from '../../types';
+import { apiRequestGet } from '../../logic';
+import { QpqPagedData } from 'quidproquo-core';
+import { cache } from '../../logic/cache';
 
-export function findLogDirectChildren(
-  log: StoryResultMetadataLog,
-  logArray: StoryResultMetadataLog[],
-): StoryResultMetadataLog[] {
-  // Filter the log array for logs where the fromCorrelation field matches the correlation field of the given log
-  const childLogs = logArray.filter((l) => l.fromCorrelation === log.correlation);
+export const fineLogDirectChildren = cache(async function findLogDirectChildren(
+  logCorrelation: string,
+  accessToken?: string,
+): Promise<StoryResultMetadataLog[]> {
+  try {
+    // TODO: Paging
+    const fetchedChildLogs = await apiRequestGet<QpqPagedData<StoryResultMetadataLog>>(
+      `/log/children/${logCorrelation}`,
+      accessToken,
+    );
 
-  // Return the array of child logs
-  return childLogs;
-}
+    return fetchedChildLogs.items;
+  } catch (error) {
+    console.error(`Error fetching child logs for correlation ${logCorrelation}:`, error);
+    return [];
+  }
+});

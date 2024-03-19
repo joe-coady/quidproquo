@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef, memo, Fragment } from 'react';
 import { Tree } from 'react-d3-tree';
 import { StoryResultMetadataLog } from '../types';
-import { findLogDirectChildren } from './logic';
+import { findRootLog, fineLogDirectChildren } from './logic';
+import { useAuthAccessToken } from '../Auth/hooks';
+import { cache } from '../logic/cache';
 
 const BACKGROUND_COLOR = '#c1c1c1';
 
@@ -12,32 +14,36 @@ interface LogCorrelationTreeProps {
   setSelectedLogCorrelation: (logCorrelation: string) => void;
 }
 
-const createHierarchy = (
-  rootStoryResultMetadata: StoryResultMetadataLog,
-  allStoryResultMetadatas: StoryResultMetadataLog[],
-): any => {
-  const childrenLogs: StoryResultMetadataLog[] = findLogDirectChildren(
-    rootStoryResultMetadata,
-    allStoryResultMetadatas,
-  );
+const createHierarchy = cache(
+  async (rootStoryResultMetadata: StoryResultMetadataLog, accessToken?: string): Promise<any> => {
+    const childrenLogs: StoryResultMetadataLog[] = await fineLogDirectChildren(
+      rootStoryResultMetadata.correlation,
+      accessToken,
+    );
 
-  const children = childrenLogs
-    .sort((a, b) => {
-      return a.startedAt < b.startedAt ? -1 : 1;
-    })
-    .map((child) => createHierarchy(child, allStoryResultMetadatas));
+    console.log('childrenLogs', childrenLogs);
 
-  return {
-    ...rootStoryResultMetadata,
-    children,
-  };
-};
+    const children = await Promise.all(
+      childrenLogs
+        .sort((a, b) => {
+          return a.startedAt < b.startedAt ? -1 : 1;
+        })
+        .map((child) => createHierarchy(child, accessToken)),
+    );
+
+    return {
+      ...rootStoryResultMetadata,
+      children,
+    };
+  },
+);
 
 // Here we're using `renderCustomNodeElement` to represent each node
 // as an SVG `rect` instead of the default `circle`.
 const renderRectSvgNode =
   (setSelectedLogCorrelation: (logCorrelation: string) => void, highlightCorrelation: string) =>
   ({ nodeDatum }) => {
+    console.log('nodeDatum', nodeDatum);
     const color =
       nodeDatum.correlation === highlightCorrelation
         ? !!nodeDatum.error
@@ -59,7 +65,7 @@ const renderRectSvgNode =
         {[
           nodeDatum.moduleName,
           nodeDatum.runtimeType,
-          nodeDatum.generic.split('::').pop(),
+          (nodeDatum.generic || '').split('::').pop(),
           nodeDatum.error || '',
         ]
           .filter((t) => !!t)
@@ -101,7 +107,23 @@ const LogCorrelationTreeComponent = ({
 }: LogCorrelationTreeProps) => {
   const treeContainer = useRef(null);
   const [translate, setTranslate] = useState({ x: 0, y: 0 });
-  const treeData = createHierarchy(rootStoryResultMetadata, allStoryResultMetadatas);
+  const [treeData, setTreeData] = useState<any>(null);
+  const accessToken = useAuthAccessToken();
+
+  useEffect(() => {
+    const fetchTreeData = async () => {
+      const rootLog = await findRootLog(rootStoryResultMetadata.correlation, accessToken);
+
+      if (rootLog) {
+        const data = await createHierarchy(rootLog, accessToken);
+
+        console.log('treeData: ', data);
+        setTreeData(data);
+      }
+    };
+
+    fetchTreeData();
+  }, [rootStoryResultMetadata, allStoryResultMetadatas, accessToken]);
 
   useEffect(() => {
     if (treeContainer.current) {
@@ -109,6 +131,10 @@ const LogCorrelationTreeComponent = ({
       setTranslate({ x: clientWidth / 2, y: 40 });
     }
   }, []);
+
+  if (!treeData) {
+    return null;
+  }
 
   return (
     <div
