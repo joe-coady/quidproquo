@@ -3,3 +3,4 @@ export * from './LambdaLayers';
 export * from './SubdomainName';
 export * from './LogStorage';
 export * from './ServiceDomain';
+export * from './InfQpqWebserverServiceDomainsConstruct';

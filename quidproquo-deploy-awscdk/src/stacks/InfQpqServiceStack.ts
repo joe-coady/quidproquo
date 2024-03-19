@@ -10,13 +10,12 @@ import {
   QpqCoreQueueConstruct,
   QpqCoreSecretConstruct,
   QpqCoreEventBusConstruct,
-  QpqWebserverDomainConstruct,
   QpqCoreUserDirectoryConstruct,
   QpqWebserverApiKeyConstruct,
   QpqCoreKeyValueStoreConstruct,
   QpqWebserverWebsocketConstruct,
   QpqWebserverCertificateConstruct,
-  InfQpqWebserverWebEntryConstruct,
+  InfQpqWebserverServiceDomainsConstruct,
 } from '../constructs';
 import { QpqWebServerCacheConstruct } from '../constructs/feature/webserver/cache/QpqWebServerCacheConstruct';
 import { WebserverRoll } from '../constructs/basic/WebserverRoll';
@@ -32,6 +31,15 @@ export class InfQpqServiceStack extends QpqServiceStack {
       awsAccountId: props.awsAccountId,
       qpqConfig: props.qpqConfig,
     }).role;
+
+    // Web entry foundations
+    new InfQpqWebserverServiceDomainsConstruct(this, 'serviceDomains', {
+      awsAccountId: props.awsAccountId,
+      qpqConfig: props.qpqConfig,
+
+      webEntryConfigs: qpqWebServerUtils.getWebEntryConfigs(props.qpqConfig),
+      websocketConfigs: qpqWebServerUtils.getWebsocketSettings(props.qpqConfig),
+    });
 
     // Build the storage drives
     const storageDrives = qpqCoreUtils.getOwnedStorageDrives(props.qpqConfig).map(
@@ -84,14 +92,6 @@ export class InfQpqServiceStack extends QpqServiceStack {
     );
     QpqCoreQueueConstruct.authorizeActionsForRole(webserverRole, queues);
     // end queues
-
-    // Web entry foundations
-    new InfQpqWebserverWebEntryConstruct(this, 'webEntryInf', {
-      awsAccountId: props.awsAccountId,
-      qpqConfig: props.qpqConfig,
-
-      webEntryConfigs: qpqWebServerUtils.getWebEntryConfigs(props.qpqConfig),
-    });
 
     // User Directories
     const userDirectories = qpqCoreUtils.getUserDirectories(props.qpqConfig).map(
