@@ -1,20 +1,29 @@
 import { useMemo } from 'react';
+import { StoryResultMetadataLog } from '../../types';
 
-export const useErrorsByType = (logs: any[]) => {
-const data = useMemo(() => {
-const errorCounts: Record<string, number> = {};
+export const useErrorsByType = (logs: StoryResultMetadataLog[]) => {
+  const data = useMemo(() => {
+    const errorCounts: Record<string, { count: number; errorText: string }> = {};
 
-logs.forEach((log) => {
-if (log.error) {
-errorCounts[log.error] = (errorCounts[log.error] || 0) + 1;
-}
-});
+    logs.forEach((log) => {
+      if (log.error) {
+        const errorText = log.error || '';
+        const truncatedErrorText =
+          errorText.length > 50 ? errorText.slice(0, 50) + '...' : errorText;
 
-return Object.entries(errorCounts).map(([errorType, count]) => ({
-errorType,
-count,
-}));
-}, [logs]);
+        errorCounts[truncatedErrorText] = errorCounts[truncatedErrorText] || {
+          count: 0,
+          errorText: truncatedErrorText,
+        };
 
-return data;
+        errorCounts[truncatedErrorText].count++;
+      }
+    });
+
+    return Object.values(errorCounts).sort((a, b) => b.count - a.count);
+  }, [logs]);
+
+  console.log(data);
+
+  return data;
 };
