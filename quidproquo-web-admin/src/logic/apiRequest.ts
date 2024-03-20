@@ -6,9 +6,13 @@ const getHeaders = (accessToken?: string) => ({
 });
 
 const getAxiosInstance = (accessToken?: string) => {
+  // TODO: Get this somehow, we dont know if they are using api or not..
+  // Think we should be able to bootstrap an admin domain to the service now.
+  const [service, ...domain] = window.location.host.split('.').slice(1);
+  const baseURL = `${window.location.protocol}//api.${domain.join('.')}/${service}`;
+
   const instance = axios.create({
-    // baseURL: `https://api.log.joecoady.development.YOURDOMAIN.app`,
-    baseURL: `${window.location.protocol}//${window.location.host.replace(/^[^\.]+/, 'api')}`,
+    baseURL, // : `https://api.joecoady.development.EXAMPLEDOMAIN.app/admin`,
     headers: getHeaders(accessToken),
   });
 
