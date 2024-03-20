@@ -17,12 +17,14 @@ const extractors: Record<string, (sr: StoryResult<any>) => string> = {
   ['EXECUTE_STORY']: unknownGenericTextExtractor,
   ['SEND_EMAIL_EVENT']: unknownGenericTextExtractor,
   ['WEBSOCKET_EVENT']: unknownGenericTextExtractor,
-  
+
   ['DEPLOY_EVENT']: unknownGenericTextExtractor,
 
   ['STORAGEDRIVE_EVENT']: unknownGenericTextExtractor,
-  
+
   ['CLOUD_FLARE_DEPLOY']: unknownGenericTextExtractor,
+
+  ['UNIT_TEST']: unknownGenericTextExtractor,
 };
 
 export const storyResultToMetadata = (
@@ -40,7 +42,8 @@ export const storyResultToMetadata = (
     runtimeType: storyResult.runtimeType,
     startedAt: storyResult.startedAt,
     generic: tags.filter((t) => !!t).join(', '),
-    executionTimeMs: new Date(storyResult.finishedAt).getTime() - new Date(storyResult.startedAt).getTime(),
+    executionTimeMs:
+      new Date(storyResult.finishedAt).getTime() - new Date(storyResult.startedAt).getTime(),
   };
 
   // Extract error text

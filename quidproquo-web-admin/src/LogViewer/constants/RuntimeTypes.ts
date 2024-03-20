@@ -11,5 +11,6 @@ export const RuntimeTypes = [
   'WEBSOCKET_EVENT',
   'DEPLOY_EVENT',
   'STORAGEDRIVE_EVENT',
-  'CLOUD_FLARE_DEPLOY'
+  'CLOUD_FLARE_DEPLOY',
+  'UNIT_TEST',
 ];

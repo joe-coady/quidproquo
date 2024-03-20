@@ -71,6 +71,10 @@ export type ExtractGeneratorReturnType<T extends Generator> = T extends Generato
 // for clear type inference and usage in TypeScript codebases.
 export type AskResponseReturnType<T extends AskResponse<any>> = ExtractGeneratorReturnType<T>;
 
+// Any generator function that returns an AskResponse
+// qpq runtimes are built on stories
+export type qpqStory = <T = any>(...args: any[]) => AskResponse<T>;
+
 export interface ActionHistory<T = any> {
   act: Action<T>;
   res: any;
@@ -90,6 +94,7 @@ export enum QpqRuntimeType {
   DEPLOY_EVENT = 'DEPLOY_EVENT',
   STORAGEDRIVE_EVENT = 'STORAGEDRIVE_EVENT',
   CLOUD_FLARE_DEPLOY = 'CLOUD_FLARE_DEPLOY',
+  UNIT_TEST = 'UNIT_TEST',
 }
 
 export interface qpqConsoleLog {
