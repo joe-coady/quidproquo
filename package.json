@@ -33,6 +33,7 @@
     "quidproquo-deploy-awscdk",
     "quidproquo-web-admin",
     "quidproquo-web",
+    "quidproquo-testing",
     "quidproquo"
   ],
   "devDependencies": {
