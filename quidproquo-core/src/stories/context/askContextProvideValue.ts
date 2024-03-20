@@ -1,4 +1,6 @@
+import { SystemActionType, SystemBatchActionPayload, askBatch } from '../../actions';
 import { ContextActionType, ContextReadActionPayload } from '../../actions/context';
+import { askMap } from '../../stories';
 import {
   Action,
   AskResponse,
@@ -7,6 +9,10 @@ import {
   QpqContext,
   QpqContextIdentifier,
 } from '../../types';
+
+function* askProcessAction<R>(action: Action<any>): AskResponse<R> {
+  return (yield action) as R;
+}
 
 export function* askContextProvideValue<R, T extends AskResponse<any>>(
   contextIdentifier: QpqContextIdentifier<R>,
@@ -60,6 +66,50 @@ export function* askContextProvideValue<R, T extends AskResponse<any>>(
       nextResult = storyIterator.next(cache);
 
       // And keep processing
+      continue;
+
+      // We have a batch that could contain a context action :(
+    } else if (nextResult.value.type === SystemActionType.Batch) {
+      // Extract the batch action payload from the batch action
+      const batchActionPayload: SystemBatchActionPayload = nextResult.value.payload;
+
+      // Process each action in the batch using askMap
+      const batchActionsToRun = yield* askMap(batchActionPayload.actions, function* (action) {
+        // Check if the action is a context action (List or Read)
+        const isContextAction = [ContextActionType.List, ContextActionType.Read].includes(
+          action.type as ContextActionType,
+        );
+
+        // Return an object containing the action, isContextAction flag, and the result
+        // If it's a context action, recursively call askContextProvideValue to process the action
+        // and obtain the result; otherwise, set result to undefined
+        return {
+          action,
+          isContextAction,
+          result: isContextAction
+            ? yield* askContextProvideValue(contextIdentifier, value, askProcessAction(action))
+            : undefined,
+        };
+      });
+
+      // Filter out the context actions from the batch actions
+      const remainingBatchActionsToRun = batchActionsToRun.filter((ba) => !ba.isContextAction);
+
+      // Run the remaining actions (non-context) in a normal batch
+      const results = yield* askBatch(remainingBatchActionsToRun.map((ba) => ba.action));
+
+      // Assign the results to the corresponding actions in the remainingBatchActionsToRun array
+      remainingBatchActionsToRun.forEach((ba, index) => {
+        ba.result = results[index];
+      });
+
+      // Create an array of all the results, including both context and non-context actions
+      const allResults = batchActionsToRun.map((ba) => ba.result);
+
+      // Pass the all results array back to the story iterator
+      nextResult = storyIterator.next(allResults);
+
+      // Continue processing the next action in the story iterator
       continue;
     }
 
