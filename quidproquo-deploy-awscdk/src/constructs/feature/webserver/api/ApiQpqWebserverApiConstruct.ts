@@ -42,6 +42,7 @@ export class ApiQpqWebserverApiConstruct extends QpqConstructBlock {
       binaryMediaTypes: ['*/*'],
       proxy: true,
       cloudWatchRole: false,
+      endpointTypes: [aws_apigateway.EndpointType.REGIONAL],
     });
 
     const baseDomain = qpqWebServerUtils.resolveDomainRoot(
