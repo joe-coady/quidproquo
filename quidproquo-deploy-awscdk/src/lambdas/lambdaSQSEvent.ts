@@ -16,7 +16,12 @@ import {
 } from 'quidproquo-core';
 
 import { ActionProcessorListResolver } from './actionProcessorListResolver';
-import { getLogger, getRuntimeCorrelation, getLambdaActionProcessors } from './lambda-utils';
+import {
+  getLogger,
+  getRuntimeCorrelation,
+  getLambdaActionProcessors,
+  qpqFunctionMiddleware,
+} from './lambda-utils';
 
 import { dynamicModuleLoader } from './dynamicModuleLoader';
 
@@ -125,4 +130,5 @@ export const getSQSEventExecutor = (
 };
 
 // Default executor
-export const executeSQSEvent = getSQSEventExecutor(dynamicModuleLoader);
+// TODO: Why do we need dynamicModuleLoader?
+export const executeSQSEvent = qpqFunctionMiddleware(getSQSEventExecutor(dynamicModuleLoader));

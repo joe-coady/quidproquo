@@ -8,7 +8,12 @@ import { CustomMessageTriggerEvent, Context } from 'aws-lambda';
 
 import { getLambdaConfigs } from './lambdaConfig';
 
-import { getLogger, getRuntimeCorrelation, getLambdaActionProcessors } from './lambda-utils';
+import {
+  getLogger,
+  getRuntimeCorrelation,
+  getLambdaActionProcessors,
+  qpqFunctionMiddleware,
+} from './lambda-utils';
 
 // @ts-ignore - Special webpack loader
 import qpqCustomActionProcessors from 'qpq-custom-action-processors-loader!';
@@ -24,50 +29,50 @@ export interface EmailPayload {
   baseDomain: string;
 }
 
-export const getLambdaCognitoCustomMessageTriggerEvent = () => {
-  return async (
-    event: CustomMessageTriggerEvent,
-    context: Context
-    ) => {
-    const cdkConfig = await getLambdaConfigs();
+export const lambdaCognitoCustomMessageTriggerEventHandler = async (
+  event: CustomMessageTriggerEvent,
+  context: Context,
+) => {
+  const cdkConfig = await getLambdaConfigs();
 
-    // Build a processor for the session and stuff
-    // Remove the non route ones ~ let the story execute action add them
-    const storyActionProcessor = {
-      ...getLambdaActionProcessors(cdkConfig.qpqConfig),
-      ...getLambdaCognitoCustomMessage(cdkConfig.qpqConfig),
+  // Build a processor for the session and stuff
+  // Remove the non route ones ~ let the story execute action add them
+  const storyActionProcessor = {
+    ...getLambdaActionProcessors(cdkConfig.qpqConfig),
+    ...getLambdaCognitoCustomMessage(cdkConfig.qpqConfig),
 
-      ...qpqCustomActionProcessors(),
-    };
-
-    const resolveStory = createRuntime(
-      cdkConfig.qpqConfig,
-      {
-        depth: 0,
-        context: {},
-      },
-      storyActionProcessor,
-      getDateNow,
-      getLogger(cdkConfig.qpqConfig),
-      getRuntimeCorrelation(cdkConfig.qpqConfig),
-      QpqRuntimeType.SEND_EMAIL_EVENT,
-    );
-
-    const result = await resolveStory(askProcessEvent, [event, context]);
-
-    // Run the callback
-    if (result.error) {
-      throw new Error("Unable to process email");
-    }
-
-    console.log("body log: ", result.result.body)
-
-    event.response.emailMessage = result.result.body;
-    event.response.emailSubject = result.result.subject;
-
-    return event;
+    ...qpqCustomActionProcessors(),
   };
+
+  const resolveStory = createRuntime(
+    cdkConfig.qpqConfig,
+    {
+      depth: 0,
+      context: {},
+    },
+    storyActionProcessor,
+    getDateNow,
+    getLogger(cdkConfig.qpqConfig),
+    getRuntimeCorrelation(cdkConfig.qpqConfig),
+    QpqRuntimeType.SEND_EMAIL_EVENT,
+  );
+
+  const result = await resolveStory(askProcessEvent, [event, context]);
+
+  // Run the callback
+  if (result.error) {
+    throw new Error('Unable to process email');
+  }
+
+  console.log('body log: ', result.result.body);
+
+  event.response.emailMessage = result.result.body;
+  event.response.emailSubject = result.result.subject;
+
+  return event;
 };
 
 // Default executor
-export const executeLambdaCognitoCustomMessageTriggerEvent = getLambdaCognitoCustomMessageTriggerEvent();
+export const executeLambdaCognitoCustomMessageTriggerEvent = qpqFunctionMiddleware(
+  lambdaCognitoCustomMessageTriggerEventHandler,
+);

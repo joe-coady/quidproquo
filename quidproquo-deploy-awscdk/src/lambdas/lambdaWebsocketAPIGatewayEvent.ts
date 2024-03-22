@@ -1,14 +1,17 @@
 import { getWebsocketAPIGatewayEventActionProcessor } from 'quidproquo-actionprocessor-awslambda';
 
-import { qpqWebServerUtils } from 'quidproquo-webserver';
-
-import { createRuntime, askProcessEvent, ErrorTypeEnum, QpqRuntimeType } from 'quidproquo-core';
+import { createRuntime, askProcessEvent, QpqRuntimeType } from 'quidproquo-core';
 
 import { CustomMessageTriggerEvent, Context } from 'aws-lambda';
 
 import { getLambdaConfigs } from './lambdaConfig';
 
-import { getLogger, getRuntimeCorrelation, getLambdaActionProcessors } from './lambda-utils';
+import {
+  getLogger,
+  getRuntimeCorrelation,
+  getLambdaActionProcessors,
+  qpqFunctionMiddleware,
+} from './lambda-utils';
 
 // @ts-ignore - Special webpack loader
 import qpqCustomActionProcessors from 'qpq-custom-action-processors-loader!';
@@ -24,11 +27,8 @@ export interface EmailPayload {
   baseDomain: string;
 }
 
-export const getWebsocketAPIGatewayEventExecutor = () => {
-  return async (
-    event: CustomMessageTriggerEvent,
-    context: Context
-    ) => {
+export const websocketAPIGatewayEventHandler =
+  () => async (event: CustomMessageTriggerEvent, context: Context) => {
     const cdkConfig = await getLambdaConfigs();
 
     // Build a processor for the session and stuff
@@ -52,14 +52,17 @@ export const getWebsocketAPIGatewayEventExecutor = () => {
       getRuntimeCorrelation(cdkConfig.qpqConfig),
       QpqRuntimeType.WEBSOCKET_EVENT,
     );
-    
+
     const storyResult = await resolveStory(askProcessEvent, [event, context]);
 
-    return storyResult.result || {
-      statusCode: 200,
-    }
+    return (
+      storyResult.result || {
+        statusCode: 200,
+      }
+    );
   };
-};
 
 // Default executor
-export const executeWebsocketAPIGatewayEvent = getWebsocketAPIGatewayEventExecutor();
+export const executeWebsocketAPIGatewayEvent = qpqFunctionMiddleware(
+  websocketAPIGatewayEventHandler,
+);

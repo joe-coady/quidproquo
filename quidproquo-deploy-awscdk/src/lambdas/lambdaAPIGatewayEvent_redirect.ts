@@ -1,7 +1,8 @@
 import { APIGatewayEvent, Context } from 'aws-lambda';
 import { SubdomainRedirectQPQWebServerConfigSetting } from 'quidproquo-webserver';
+import { qpqFunctionMiddleware } from './lambda-utils';
 
-export const executeAPIGatewayEvent = async (event: APIGatewayEvent, context: Context) => {
+export const apiGatewayEventHandler = async (event: APIGatewayEvent, context: Context) => {
   console.log('event: ', JSON.stringify(event, null, 2));
   console.log('process.env: ', JSON.stringify(process.env, null, 2));
 
@@ -50,3 +51,5 @@ export const executeAPIGatewayEvent = async (event: APIGatewayEvent, context: Co
     },
   };
 };
+
+export const executeAPIGatewayEvent = qpqFunctionMiddleware(apiGatewayEventHandler);
