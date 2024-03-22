@@ -2,10 +2,21 @@ import path from 'path';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
 import { Construct } from 'constructs';
-import { aws_lambda, aws_logs, aws_iam } from 'aws-cdk-lib';
+import {
+  aws_lambda,
+  aws_logs,
+  aws_sns,
+  aws_iam,
+  aws_sns_subscriptions,
+  aws_events,
+  aws_events_targets,
+} from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 
 import { getAwsServiceAccountInfoConfig } from 'quidproquo-config-aws';
+
+import { BootstrapResource, WARM_LAMBDA_EVENT } from '../../constants';
+import { qpqCoreUtils } from 'quidproquo-core';
 
 export interface FunctionProps extends QpqConstructBlockProps {
   functionName?: string;
@@ -69,5 +80,13 @@ export class Function extends QpqConstructBlock {
 
       role: props.role,
     });
+
+    const region = qpqCoreUtils.getApplicationModuleDeployRegion(props.qpqConfig);
+    const accountId = props.awsAccountId;
+    const topicName = this.qpqBootstrapResourceName(BootstrapResource.WarmLambdas);
+    const topicArn = `arn:aws:sns:${region}:${accountId}:${topicName}`;
+    const topic = aws_sns.Topic.fromTopicArn(this, 'ImportedTopic', topicArn);
+
+    topic.addSubscription(new aws_sns_subscriptions.LambdaSubscription(this.lambdaFunction));
   }
 }

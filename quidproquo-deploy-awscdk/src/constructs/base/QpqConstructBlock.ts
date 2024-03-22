@@ -39,6 +39,10 @@ export class QpqConstructBlock extends Construct implements QpqResource {
     return awsNamingUtils.getQpqRuntimeResourceNameFromConfig(name, this.qpqConfig, resourceType);
   }
 
+  qpqBootstrapResourceName(name: string) {
+    return awsNamingUtils.getConfigRuntimeBootstrapResourceNameFromConfig(name, this.qpqConfig);
+  }
+
   grantRead(grantee: IGrantable): void {}
 
   grantWrite(grantee: IGrantable): void {}

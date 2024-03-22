@@ -43,6 +43,21 @@ export const getConfigRuntimeResourceName = (
   return baseName;
 };
 
+export const getConfigRuntimeBootstrapResourceName = (
+  resourceName: string,
+  application: string,
+  environment: string,
+  feature?: string,
+) => {
+  const baseName = `${resourceName}-${application}-${environment}`;
+
+  if (feature) {
+    return `${baseName}-${feature}`;
+  }
+
+  return baseName;
+};
+
 export const getConfigRuntimeResourceNameFromConfig = (
   resourceName: string,
   qpqConfig: QPQConfig,
@@ -53,6 +68,17 @@ export const getConfigRuntimeResourceNameFromConfig = (
   const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
 
   return getConfigRuntimeResourceName(resourceName, application, service, environment, feature);
+};
+
+export const getConfigRuntimeBootstrapResourceNameFromConfig = (
+  resourceName: string,
+  qpqConfig: QPQConfig,
+) => {
+  const application = qpqCoreUtils.getApplicationName(qpqConfig);
+  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
+  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+
+  return getConfigRuntimeBootstrapResourceName(resourceName, application, environment, feature);
 };
 
 export const getConfigRuntimeResourceNameFromConfigWithServiceOverride = (
