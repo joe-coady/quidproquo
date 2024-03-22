@@ -3,6 +3,7 @@ import { Context } from 'aws-lambda';
 import { QpqFunctionExecutionEvent } from '../../types';
 
 import { SNSEvent } from 'aws-lambda';
+import { dynamicModuleLoaderWarmer } from '../dynamicModuleLoader';
 
 export const qpqFunctionMiddleware = <E extends QpqFunctionExecutionEvent<any>>(
   lambdaFunc: (event: E, context: Context) => any,
@@ -23,6 +24,7 @@ export const qpqFunctionMiddleware = <E extends QpqFunctionExecutionEvent<any>>(
       if (recordsNoWarm.length !== snsEvent.Records.length) {
         console.log('Found SNS warmer');
         // TODO: Warm qpq things with dynamic functions
+        await dynamicModuleLoaderWarmer();
 
         // If we have events that are not warmers, then we should execute them
         if (recordsNoWarm.length > 0) {
