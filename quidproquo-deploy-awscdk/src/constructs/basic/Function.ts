@@ -80,32 +80,6 @@ export class Function extends QpqConstructBlock {
       role: props.role,
     });
 
-    this.lambdaFunction = new aws_lambda.Function(this, functionId, {
-      functionName: props.functionName,
-      timeout: cdk.Duration.seconds(props.timeoutInSeconds || 25),
-
-      runtime: aws_lambda.Runtime.NODEJS_18_X,
-      memorySize: props.memoryInBytes || serviceInfo.lambdaMaxMemoryInMiB || 1024,
-      layers: props.apiLayerVersions,
-
-      code: aws_lambda.Code.fromAsset(path.join(props.buildPath, props.functionType)),
-      handler: `${handlerFile}.${props.executorName}`,
-
-      environment: {
-        AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
-        ...(props.environment || {}),
-      },
-
-      reservedConcurrentExecutions: props.reservedConcurrentExecutions,
-
-      // TODO: Make this optional
-      tracing: aws_lambda.Tracing.DISABLED,
-
-      logRetention: aws_logs.RetentionDays.ONE_WEEK,
-
-      role: props.role,
-    });
-
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(props.qpqConfig);
     const accountId = props.awsAccountId;
     const topicName = this.qpqBootstrapResourceName(BootstrapResource.WarmLambdas);
