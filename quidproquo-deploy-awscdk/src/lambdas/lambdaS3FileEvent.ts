@@ -1,6 +1,6 @@
 import { getS3FileEventActionProcessor } from 'quidproquo-actionprocessor-awslambda';
 
-import { createRuntime, askProcessEvent, QpqRuntimeType } from 'quidproquo-core';
+import { createRuntime, askProcessEvent, QpqRuntimeType, QpqLogger } from 'quidproquo-core';
 
 import { S3Event, Context } from 'aws-lambda';
 
@@ -27,7 +27,7 @@ export interface EmailPayload {
   baseDomain: string;
 }
 
-export const s3FileEventHandler = async (event: S3Event, context: Context) => {
+export const s3FileEventHandler = async (event: S3Event, context: Context, logger: QpqLogger) => {
   const cdkConfig = await getLambdaConfigs();
 
   // Build a processor for the session and stuff
@@ -47,7 +47,7 @@ export const s3FileEventHandler = async (event: S3Event, context: Context) => {
     },
     storyActionProcessor,
     getDateNow,
-    getLogger(cdkConfig.qpqConfig),
+    logger,
     getRuntimeCorrelation(cdkConfig.qpqConfig),
     QpqRuntimeType.STORAGEDRIVE_EVENT,
   );

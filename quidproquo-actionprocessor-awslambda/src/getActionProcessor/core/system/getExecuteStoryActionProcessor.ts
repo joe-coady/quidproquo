@@ -11,6 +11,7 @@ import {
   ActionProcessorList,
   QpqRuntimeType,
   qpqCoreUtils,
+  QpqLogger,
 } from 'quidproquo-core';
 
 import { randomGuid } from './../../../awsLambdaUtils';
@@ -27,7 +28,7 @@ const getProcessExecuteStory = <T extends Array<any>>(
     payload: SystemExecuteStoryActionPayload<T>,
     session: StorySession,
     actionProcessors: ActionProcessorList,
-    logger: (result: any) => Promise<void>,
+    logger: QpqLogger,
   ): Promise<any> => {
     let module = await dynamicModuleLoader(payload.src);
     if (module === null) {

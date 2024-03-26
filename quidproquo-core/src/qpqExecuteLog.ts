@@ -31,7 +31,11 @@ export const qpqExecuteLog = async (
     },
     storyActionProcessor,
     () => new Date().toISOString(),
-    async () => {},
+    {
+      log: async () => {},
+      waitToFinishWriting: async () => {},
+      moveToPermanentStorage: async () => {},
+    },
     storyResult.correlation,
     storyResult.runtimeType,
   );

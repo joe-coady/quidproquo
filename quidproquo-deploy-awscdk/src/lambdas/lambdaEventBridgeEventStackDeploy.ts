@@ -1,13 +1,12 @@
 import { getEventBridgeEventStackDeployActionProcessor } from 'quidproquo-actionprocessor-awslambda';
 
-import { createRuntime, askProcessEvent, QpqRuntimeType } from 'quidproquo-core';
+import { createRuntime, askProcessEvent, QpqRuntimeType, QpqLogger } from 'quidproquo-core';
 
 import { EventBridgeEvent, Context } from 'aws-lambda';
 
 import { getLambdaConfigs } from './lambdaConfig';
 
 import {
-  getLogger,
   getRuntimeCorrelation,
   getLambdaActionProcessors,
   qpqFunctionMiddleware,
@@ -24,6 +23,7 @@ const getDateNow = () => new Date().toISOString();
 export const lambdaEventBridgeEventStackDeployExecutorHandler = async (
   event: EventBridgeEvent<'CloudFormation Stack Status Change', any>,
   context: Context,
+  logger: QpqLogger,
 ): Promise<void> => {
   console.log('EventBridgeEvent: ~ ', JSON.stringify(event, null, 2));
 
@@ -46,7 +46,7 @@ export const lambdaEventBridgeEventStackDeployExecutorHandler = async (
     },
     storyActionProcessor,
     getDateNow,
-    getLogger(cdkConfig.qpqConfig),
+    logger,
     getRuntimeCorrelation(cdkConfig.qpqConfig),
     QpqRuntimeType.DEPLOY_EVENT,
   );

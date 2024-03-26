@@ -3,7 +3,7 @@ import {
   LambdaRuntimeConfig,
 } from 'quidproquo-actionprocessor-awslambda';
 
-import { createRuntime, askProcessEvent, QpqRuntimeType } from 'quidproquo-core';
+import { createRuntime, askProcessEvent, QpqRuntimeType, QpqLogger } from 'quidproquo-core';
 
 import { EventBridgeEvent, Context } from 'aws-lambda';
 
@@ -25,6 +25,7 @@ const getDateNow = () => new Date().toISOString();
 export const eventBridgeEventExecutorHandler = async (
   event: EventBridgeEvent<string, void>,
   context: Context,
+  logger: QpqLogger,
 ) => {
   const cdkConfig = await getLambdaConfigs();
 
@@ -49,7 +50,7 @@ export const eventBridgeEventExecutorHandler = async (
     },
     storyActionProcessor,
     getDateNow,
-    getLogger(cdkConfig.qpqConfig),
+    logger,
     getRuntimeCorrelation(cdkConfig.qpqConfig),
     QpqRuntimeType.RECURRING_SCHEDULE,
   );

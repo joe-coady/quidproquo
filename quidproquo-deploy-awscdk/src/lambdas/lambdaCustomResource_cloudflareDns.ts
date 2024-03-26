@@ -1,13 +1,12 @@
 import { getCustomResourceCloudflareDnsEventActionProcessor } from 'quidproquo-actionprocessor-awslambda';
 
-import { createRuntime, askProcessEvent, QpqRuntimeType } from 'quidproquo-core';
+import { createRuntime, askProcessEvent, QpqRuntimeType, QpqLogger } from 'quidproquo-core';
 
 import { CloudFormationCustomResourceEvent, Context } from 'aws-lambda';
 
 import { getLambdaConfigs } from './lambdaConfig';
 
 import {
-  getLogger,
   getRuntimeCorrelation,
   getLambdaActionProcessors,
   qpqFunctionMiddleware,
@@ -22,6 +21,7 @@ const getDateNow = () => new Date().toISOString();
 export const customResourceCloudflareDnsHandler = async (
   event: CloudFormationCustomResourceEvent,
   context: Context,
+  logger: QpqLogger,
 ) => {
   const cdkConfig = await getLambdaConfigs();
 
@@ -42,7 +42,7 @@ export const customResourceCloudflareDnsHandler = async (
     },
     storyActionProcessor,
     getDateNow,
-    getLogger(cdkConfig.qpqConfig),
+    logger,
     getRuntimeCorrelation(cdkConfig.qpqConfig),
     QpqRuntimeType.CLOUD_FLARE_DEPLOY,
   );

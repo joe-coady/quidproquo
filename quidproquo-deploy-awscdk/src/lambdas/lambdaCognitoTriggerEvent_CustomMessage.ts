@@ -1,15 +1,12 @@
 import { getLambdaCognitoCustomMessage } from 'quidproquo-actionprocessor-awslambda';
 
-import { qpqWebServerUtils } from 'quidproquo-webserver';
-
-import { createRuntime, askProcessEvent, ErrorTypeEnum, QpqRuntimeType } from 'quidproquo-core';
+import { createRuntime, askProcessEvent, QpqRuntimeType, QpqLogger } from 'quidproquo-core';
 
 import { CustomMessageTriggerEvent, Context } from 'aws-lambda';
 
 import { getLambdaConfigs } from './lambdaConfig';
 
 import {
-  getLogger,
   getRuntimeCorrelation,
   getLambdaActionProcessors,
   qpqFunctionMiddleware,
@@ -32,6 +29,7 @@ export interface EmailPayload {
 export const lambdaCognitoCustomMessageTriggerEventHandler = async (
   event: CustomMessageTriggerEvent,
   context: Context,
+  logger: QpqLogger,
 ) => {
   const cdkConfig = await getLambdaConfigs();
 
@@ -52,7 +50,7 @@ export const lambdaCognitoCustomMessageTriggerEventHandler = async (
     },
     storyActionProcessor,
     getDateNow,
-    getLogger(cdkConfig.qpqConfig),
+    logger,
     getRuntimeCorrelation(cdkConfig.qpqConfig),
     QpqRuntimeType.SEND_EMAIL_EVENT,
   );

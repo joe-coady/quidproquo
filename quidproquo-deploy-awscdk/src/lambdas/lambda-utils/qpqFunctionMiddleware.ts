@@ -4,12 +4,18 @@ import { QpqFunctionExecutionEvent } from '../../types';
 
 import { SNSEvent } from 'aws-lambda';
 import { dynamicModuleLoaderWarmer } from '../dynamicModuleLoader';
+import { getLambdaConfigs } from '../lambdaConfig';
+import { getLogger } from './logger';
+import { QpqLogger } from 'quidproquo-core';
 
 export const qpqFunctionMiddleware = <E extends QpqFunctionExecutionEvent<any>>(
-  lambdaFunc: (event: E, context: Context) => any,
+  lambdaFunc: (event: E, context: Context, logger: QpqLogger) => any,
 ) => {
   return async (event: E, context: Context) => {
     console.log('tick: ', JSON.stringify(event, null, 2));
+
+    const cdkConfig = await getLambdaConfigs();
+    const logger = getLogger(cdkConfig.qpqConfig);
 
     const snsEvent = event as SNSEvent;
     if (event && typeof event === 'object' && snsEvent.Records && Array.isArray(snsEvent.Records)) {
@@ -26,16 +32,23 @@ export const qpqFunctionMiddleware = <E extends QpqFunctionExecutionEvent<any>>(
         // TODO: Warm qpq things with dynamic functions
         await dynamicModuleLoaderWarmer();
 
+        // Might as well move the logs to permanent storage
+        await logger.moveToPermanentStorage();
+
         // If we have events that are not warmers, then we should execute them
         if (recordsNoWarm.length > 0) {
           console.log('Running other actions');
-          return lambdaFunc(
+          const result = await lambdaFunc(
             {
               ...event,
               Records: recordsNoWarm,
             },
             context,
+            logger,
           );
+
+          await logger.waitToFinishWriting();
+          return result;
         }
 
         return 'Warmed up!';
@@ -43,6 +56,8 @@ export const qpqFunctionMiddleware = <E extends QpqFunctionExecutionEvent<any>>(
     }
 
     console.log('Running normal event');
-    return lambdaFunc(event, context);
+    const result = await lambdaFunc(event, context, logger);
+    await logger.waitToFinishWriting();
+    return result;
   };
 };

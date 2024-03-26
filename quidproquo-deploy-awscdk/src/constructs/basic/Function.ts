@@ -8,8 +8,7 @@ import {
   aws_sns,
   aws_iam,
   aws_sns_subscriptions,
-  aws_events,
-  aws_events_targets,
+  aws_lambda_destinations,
 } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 
@@ -54,6 +53,32 @@ export class Function extends QpqConstructBlock {
 
     const functionId =
       props.reacreateOnFunctionNameChange && props.functionName ? props.functionName : 'function';
+
+    this.lambdaFunction = new aws_lambda.Function(this, functionId, {
+      functionName: props.functionName,
+      timeout: cdk.Duration.seconds(props.timeoutInSeconds || 25),
+
+      runtime: aws_lambda.Runtime.NODEJS_18_X,
+      memorySize: props.memoryInBytes || serviceInfo.lambdaMaxMemoryInMiB || 1024,
+      layers: props.apiLayerVersions,
+
+      code: aws_lambda.Code.fromAsset(path.join(props.buildPath, props.functionType)),
+      handler: `${handlerFile}.${props.executorName}`,
+
+      environment: {
+        AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
+        ...(props.environment || {}),
+      },
+
+      reservedConcurrentExecutions: props.reservedConcurrentExecutions,
+
+      // TODO: Make this optional
+      tracing: aws_lambda.Tracing.DISABLED,
+
+      logRetention: aws_logs.RetentionDays.ONE_WEEK,
+
+      role: props.role,
+    });
 
     this.lambdaFunction = new aws_lambda.Function(this, functionId, {
       functionName: props.functionName,

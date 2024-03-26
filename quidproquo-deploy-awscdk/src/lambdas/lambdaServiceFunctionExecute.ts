@@ -2,7 +2,13 @@ import { ExecuteServiceFunctionEvent } from 'quidproquo-webserver';
 
 import { getServiceFunctionExecuteEventActionProcessor } from 'quidproquo-actionprocessor-awslambda';
 
-import { createRuntime, askProcessEvent, QpqRuntimeType, StorySession } from 'quidproquo-core';
+import {
+  createRuntime,
+  askProcessEvent,
+  QpqRuntimeType,
+  StorySession,
+  QpqLogger,
+} from 'quidproquo-core';
 
 import { Context } from 'aws-lambda';
 
@@ -29,6 +35,7 @@ type AnyExecuteServiceFunctionEventWithSession = ExecuteServiceFunctionEvent<any
 export const serviceFunctionExecuteEventHandler = async (
   event: AnyExecuteServiceFunctionEventWithSession,
   context: Context,
+  logger: QpqLogger,
 ) => {
   const cdkConfig = await getLambdaConfigs();
 
@@ -46,7 +53,7 @@ export const serviceFunctionExecuteEventHandler = async (
     event.storySession,
     storyActionProcessor,
     getDateNow,
-    getLogger(cdkConfig.qpqConfig),
+    logger,
     getRuntimeCorrelation(cdkConfig.qpqConfig),
     QpqRuntimeType.SERVICE_FUNCTION_EXE,
   );

@@ -1,11 +1,18 @@
+import fs from 'fs';
+import path from 'path';
+
 import { S3Client, PutObjectCommand, PutObjectCommandInput } from '@aws-sdk/client-s3';
 
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 
-import { StoryResult, qpqCoreUtils, QPQConfig } from 'quidproquo-core';
+import { StoryResult, qpqCoreUtils, QPQConfig, QpqLogger } from 'quidproquo-core';
 
-import { getAwsServiceAccountInfoConfig, getAwsServiceAccountInfoByDeploymentInfo } from "quidproquo-config-aws";
-import { StorageClass } from 'aws-cdk-lib/aws-s3';
+const tempDirectory = '/tmp/qpqlogs';
+
+import {
+  getAwsServiceAccountInfoConfig,
+  getAwsServiceAccountInfoByDeploymentInfo,
+} from 'quidproquo-config-aws';
 
 export const storyLogger = async (
   result: StoryResult<any>,
@@ -20,22 +27,65 @@ export const storyLogger = async (
       Bucket: bucketName,
       Body: JSON.stringify(result),
       StorageClass: 'INTELLIGENT_TIERING',
-    }
+    };
 
-    await s3Client.send(
-      new PutObjectCommand(commandParams),
-    );
+    await s3Client.send(new PutObjectCommand(commandParams));
   } catch {
     console.log(`Failed to log story result to S3 [${result.correlation}]`);
   }
 };
 
-export const getLogger = (qpqConfig: QPQConfig) => {
+export const storyLoggerFs = async (result: StoryResult<any>): Promise<void> => {
+  try {
+    await fs.promises.mkdir(tempDirectory, { recursive: true });
+
+    const filePath = path.join(tempDirectory, `${result.correlation}.json`);
+    await fs.promises.writeFile(filePath, JSON.stringify(result));
+    console.log(`Story result logged to temporary file [${filePath}]`);
+  } catch (error) {
+    console.log(`Failed to log story result to temporary file [${result.correlation}]`);
+    console.error(error);
+  }
+};
+
+export const moveLogsToPerminateStorage = async (
+  bucketName: string,
+  region: string,
+): Promise<void> => {
+  try {
+    await fs.promises.mkdir(tempDirectory, { recursive: true });
+    const files = await fs.promises.readdir(tempDirectory);
+
+    for (const file of files) {
+      const filePath = path.join(tempDirectory, file);
+      const data = await fs.promises.readFile(filePath, 'utf-8');
+      const result: StoryResult<any> = JSON.parse(data);
+
+      await storyLogger(result, bucketName, region);
+
+      await fs.promises.unlink(filePath);
+      console.log(`Moved log file [${file}] to S3 and deleted from temporary directory`);
+    }
+  } catch (error) {
+    console.error('Failed to move logs to permanent storage');
+    console.error(error);
+  }
+};
+
+export const getLogger = (qpqConfig: QPQConfig): QpqLogger => {
   const awsSettings = getAwsServiceAccountInfoConfig(qpqConfig);
-  
+
   // If we have no log service, just return nothing.
-  if (!awsSettings.logServiceName || awsSettings.disableLogs || process.env.storageDriveName === "qpq-logs") {
-    return async (result: StoryResult<any>) => {}
+  if (
+    !awsSettings.logServiceName ||
+    awsSettings.disableLogs ||
+    process.env.storageDriveName === 'qpq-logs'
+  ) {
+    return {
+      log: async () => {},
+      waitToFinishWriting: async () => {},
+      moveToPermanentStorage: async () => {},
+    };
   }
 
   const service = awsSettings.logServiceName;
@@ -45,11 +95,11 @@ export const getLogger = (qpqConfig: QPQConfig) => {
 
   // Workout the bucket name.
   const bucketName = awsNamingUtils.getConfigRuntimeResourceName(
-    "qpq-logs", 
-    application, 
-    service, 
-    environment, 
-    feature
+    'qpq-logs',
+    application,
+    service,
+    environment,
+    feature,
   );
 
   // Where is this bucket?
@@ -58,12 +108,34 @@ export const getLogger = (qpqConfig: QPQConfig) => {
     service,
     environment,
     feature,
-    application
+    application,
   ).awsRegion;
 
-  console.log("Bucket for logs: ", bucketName, regionForBucket);
+  console.log('Bucket for logs: ', bucketName, regionForBucket);
 
-  return async (result: StoryResult<any>) => {  
-    await storyLogger(result, bucketName, regionForBucket);
-  }
+  const logs: Promise<void>[] = [];
+
+  return {
+    log: async (result: StoryResult<any>) => {
+      const promise = storyLoggerFs(result).catch((e) => {
+        console.log('Failed to log story result to S3', JSON.stringify(e, null, 2));
+      });
+
+      logs.push(promise);
+
+      console.log('Added to logs', logs.length);
+    },
+    waitToFinishWriting: async () => {
+      console.log('logs.length', logs.length);
+
+      console.time('Writing Logs');
+      await Promise.all(logs);
+      console.timeEnd('Writing Logs');
+
+      console.log('done writing logs');
+    },
+    moveToPermanentStorage: async () => {
+      await moveLogsToPerminateStorage(bucketName, regionForBucket);
+    },
+  };
 };

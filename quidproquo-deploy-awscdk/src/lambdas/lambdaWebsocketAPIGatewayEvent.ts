@@ -1,6 +1,6 @@
 import { getWebsocketAPIGatewayEventActionProcessor } from 'quidproquo-actionprocessor-awslambda';
 
-import { createRuntime, askProcessEvent, QpqRuntimeType } from 'quidproquo-core';
+import { createRuntime, askProcessEvent, QpqRuntimeType, QpqLogger } from 'quidproquo-core';
 
 import { CustomMessageTriggerEvent, Context } from 'aws-lambda';
 
@@ -28,7 +28,7 @@ export interface EmailPayload {
 }
 
 export const websocketAPIGatewayEventHandler =
-  () => async (event: CustomMessageTriggerEvent, context: Context) => {
+  () => async (event: CustomMessageTriggerEvent, context: Context, logger: QpqLogger) => {
     const cdkConfig = await getLambdaConfigs();
 
     // Build a processor for the session and stuff
@@ -48,7 +48,7 @@ export const websocketAPIGatewayEventHandler =
       },
       storyActionProcessor,
       getDateNow,
-      getLogger(cdkConfig.qpqConfig),
+      logger,
       getRuntimeCorrelation(cdkConfig.qpqConfig),
       QpqRuntimeType.WEBSOCKET_EVENT,
     );

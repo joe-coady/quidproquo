@@ -1,4 +1,5 @@
 import { QPQError } from './ErrorTypeEnum';
+import { QpqLogger } from './QpqLogger';
 import {
   ExtractGeneratorReturnType,
   StoryResult,
@@ -38,7 +39,7 @@ export type ActionProcessor<TAction extends Action<any>, TReturn = any> = (
   payload: TAction['payload'],
   session: StorySession,
   actionProcessors: ActionProcessorList,
-  logger: (result: StoryResult<any>) => Promise<void>,
+  logger: QpqLogger,
   updateSession: StorySessionUpdater,
 ) => AsyncActionProcessorResult<TReturn>;
 

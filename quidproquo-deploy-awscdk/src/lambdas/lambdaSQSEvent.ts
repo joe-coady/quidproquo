@@ -13,6 +13,7 @@ import {
   QpqRuntimeType,
   StorySession,
   QueueMessage,
+  QpqLogger,
 } from 'quidproquo-core';
 
 import { ActionProcessorListResolver } from './actionProcessorListResolver';
@@ -40,6 +41,7 @@ export const getStoryActionRuntime = async (
   dynamicModuleLoader: DynamicModuleLoader,
   getCustomActionProcessors: ActionProcessorListResolver = () => ({}),
   callerStorySession: StorySession,
+  logger: QpqLogger,
 ) => {
   const cdkConfig = await getLambdaConfigs();
 
@@ -58,7 +60,7 @@ export const getStoryActionRuntime = async (
     callerStorySession,
     storyActionProcessor,
     getDateNow,
-    getLogger(cdkConfig.qpqConfig),
+    logger,
     getRuntimeCorrelation(cdkConfig.qpqConfig),
     QpqRuntimeType.QUEUE_EVENT,
   );
@@ -71,7 +73,11 @@ export const getSQSEventExecutor = (
   dynamicModuleLoader: DynamicModuleLoader,
   getCustomActionProcessors: ActionProcessorListResolver = () => ({}),
 ) => {
-  return async (event: SQSEvent, context: Context): Promise<SQSBatchResponse> => {
+  return async (
+    event: SQSEvent,
+    context: Context,
+    logger: QpqLogger,
+  ): Promise<SQSBatchResponse> => {
     // const queueQPQConfigSetting = getQueueConfigSetting();
     // TODO: Check settings / concurrency and such to make sure we can processes
     // in parallel
@@ -95,6 +101,7 @@ export const getSQSEventExecutor = (
           depth: 0,
           context: {},
         },
+        logger,
       );
 
       // TODO: Read above, this is a hack

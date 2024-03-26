@@ -2,7 +2,7 @@ import { getCloudFrontOriginRequestEventActionProcessor } from 'quidproquo-actio
 
 import { getLambdaConfigs } from './lambdaConfig';
 
-import { createRuntime, askProcessEvent, QpqRuntimeType } from 'quidproquo-core';
+import { createRuntime, askProcessEvent, QpqRuntimeType, QpqLogger } from 'quidproquo-core';
 
 import { CloudFrontRequestEvent, CloudFrontRequestResult, Context } from 'aws-lambda';
 
@@ -24,6 +24,7 @@ const getDateNow = () => new Date().toISOString();
 export const originRequestEventHandler = async (
   event: CloudFrontRequestEvent,
   context: Context,
+  logger: QpqLogger,
 ) => {
   console.log(JSON.stringify(event));
 
@@ -46,7 +47,7 @@ export const originRequestEventHandler = async (
     },
     storyActionProcessor,
     getDateNow,
-    getLogger(cdkConfig.qpqConfig),
+    logger,
     getRuntimeCorrelation(cdkConfig.qpqConfig),
     QpqRuntimeType.EVENT_SEO_OR,
   );

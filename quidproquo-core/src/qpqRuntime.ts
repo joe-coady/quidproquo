@@ -21,6 +21,7 @@ import {
   actionResultError,
 } from './logic/actionLogic';
 import { QPQConfig } from './config';
+import { QpqLogger } from './types';
 
 import { getApplicationModuleName } from './qpqCoreUtils';
 
@@ -29,7 +30,7 @@ export async function processAction(
   action: Action<any>,
   actionProcessors: ActionProcessorList,
   session: StorySession,
-  logger: (res: StoryResult<any>) => Promise<void>,
+  logger: QpqLogger,
   updateSession: StorySessionUpdater,
 ) {
   try {
@@ -59,7 +60,7 @@ export const createRuntime = (
   callerSession: StorySession,
   actionProcessors: ActionProcessorList,
   getTimeNow: () => string,
-  logger: (res: StoryResult<any>) => Promise<void>,
+  logger: QpqLogger,
   runtimeCorrelation: string,
   runtimeType: QpqRuntimeType,
   initialTags?: string[],
@@ -245,7 +246,7 @@ export const createRuntime = (
 
       storyResult.logs = logs;
 
-      await logger(storyResult);
+      await logger.log(storyResult);
 
       return storyResult;
     } finally {
