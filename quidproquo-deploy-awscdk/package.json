@@ -1,6 +1,6 @@
 {
   "name": "quidproquo-deploy-awscdk",
-  "version": "0.0.173",
+  "version": "0.0.174",
   "description": "",
   "main": "./lib/commonjs/index.js",
   "types": "./lib/commonjs/index.d.ts",
@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "clean": "npx rimraf lib",
+    "clean": "npx rimraf lib && npx rimraf node_modules",
     "build": "npm run clean && tsc -p tsconfig.commonjs.json",
     "watch": "tsc -p tsconfig.commonjs.json -w"
   },
@@ -31,18 +31,18 @@
     "constructs": "^10.1.208",
     "esbuild": "^0.15.16",
     "liquidjs": "^10.7.0",
-    "quidproquo-actionprocessor-awslambda": "0.0.173",
-    "quidproquo-actionprocessor-node": "0.0.173",
-    "quidproquo-config-aws": "0.0.173",
-    "quidproquo-core": "0.0.173",
-    "quidproquo-webserver": "0.0.173"
+    "quidproquo-actionprocessor-awslambda": "0.0.174",
+    "quidproquo-actionprocessor-node": "0.0.174",
+    "quidproquo-config-aws": "0.0.174",
+    "quidproquo-core": "0.0.174",
+    "quidproquo-webserver": "0.0.174"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.109",
     "@types/babel__traverse": "7.18.2",
     "@types/node": "^20.2.1",
     "@types/prettier": "2.6.0",
-    "quidproquo-tsconfig": "0.0.173",
+    "quidproquo-tsconfig": "0.0.174",
     "ts-node": "^10.9.1",
     "typescript": "^4.9.3"
   }
