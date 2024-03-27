@@ -18,7 +18,7 @@ export class InfQpqWebserverServiceDomainsConstruct extends QpqConstructBlock {
 
     const domainProxyRootDomains = qpqWebServerUtils
       .getDomainProxyConfigs(props.qpqConfig)
-      .filter((we) => !we.domain.onRootDomain)
+      .filter((we) => we.domain.onRootDomain)
       .map((we) => we.domain.rootDomain);
 
     const websocketRootDomains = qpqWebServerUtils

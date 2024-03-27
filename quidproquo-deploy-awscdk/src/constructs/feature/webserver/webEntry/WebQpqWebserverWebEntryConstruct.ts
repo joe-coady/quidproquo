@@ -87,9 +87,13 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
     }
 
     const dnsRecord = new DnsValidatedCertificate(this, 'validcert', {
-      onRootDomain: props.webEntryConfig.domain.onRootDomain,
-      subdomain: props.webEntryConfig.domain.subDomainName,
-      rootDomain: props.webEntryConfig.domain.rootDomain,
+      domain: {
+        onRootDomain: props.webEntryConfig.domain.onRootDomain,
+        subDomainNames: props.webEntryConfig.domain.subDomainName
+          ? [props.webEntryConfig.domain.subDomainName]
+          : undefined,
+        rootDomain: props.webEntryConfig.domain.rootDomain,
+      },
 
       awsAccountId: props.awsAccountId,
       qpqConfig: props.qpqConfig,
@@ -102,7 +106,7 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
         qpqConfig: props.qpqConfig,
 
         // certificateArn: dnsRecord.certificate.certificateArn,
-        certificateDomain: dnsRecord.deployDomain,
+        certificateDomain: dnsRecord.domainNames[0],
         dnsEntries: {},
         apiSecretName: props.webEntryConfig.cloudflareApiKeySecretName,
       });
@@ -171,7 +175,7 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
         responseHeadersPolicy: responseHeaderPolicy,
       },
 
-      domainNames: [dnsRecord.deployDomain],
+      domainNames: dnsRecord.domainNames,
       certificate: dnsRecord.certificate,
       defaultRootObject: props.webEntryConfig.indexRoot,
 
@@ -211,34 +215,34 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
       '',
     );
 
-    new aws_route53.ARecord(this, 'web-alias', {
+    new aws_route53.ARecord(this, `web-alias`, {
       zone: dnsRecord.hostedZone,
-      recordName: dnsRecord.deployDomain,
+      recordName: dnsRecord.domainNames[0],
       target: aws_route53.RecordTarget.fromAlias(
         new aws_route53_targets.CloudFrontTarget(distribution),
       ),
     });
 
-    if (props.webEntryConfig.cloudflareApiKeySecretName) {
-      new CloudflareDnsRecord(this, 'cloudflare', {
-        awsAccountId: props.awsAccountId,
-        buildPath: qpqWebServerUtils.getWebEntrySeoFullPath(props.qpqConfig, props.webEntryConfig),
-        qpqConfig: props.qpqConfig,
+    // if (props.webEntryConfig.cloudflareApiKeySecretName) {
+    //   new CloudflareDnsRecord(this, 'cloudflare', {
+    //     awsAccountId: props.awsAccountId,
+    //     buildPath: qpqWebServerUtils.getWebEntrySeoFullPath(props.qpqConfig, props.webEntryConfig),
+    //     qpqConfig: props.qpqConfig,
 
-        // We cant add thease here, we need the certificate to validate
-        // before the distibution is finsished creating
-        // certificateArn: dnsRecord.certificate.certificateArn,
-        // certificateDomain: dnsRecord.deployDomain,
-        dnsEntries: {
-          [dnsRecord.deployDomain]: {
-            value: distribution.distributionDomainName,
-            proxied: true,
-            type: 'CNAME',
-          },
-        },
-        apiSecretName: props.webEntryConfig.cloudflareApiKeySecretName,
-      });
-    }
+    //     // We cant add thease here, we need the certificate to validate
+    //     // before the distibution is finsished creating
+    //     // certificateArn: dnsRecord.certificate.certificateArn,
+    //     // certificateDomain: dnsRecord.deployDomain,
+    //     dnsEntries: {
+    //       [dnsRecord.deployDomain]: {
+    //         value: distribution.distributionDomainName,
+    //         proxied: true,
+    //         type: 'CNAME',
+    //       },
+    //     },
+    //     apiSecretName: props.webEntryConfig.cloudflareApiKeySecretName,
+    //   });
+    // }
 
     // All seos that are for this web entry
     const seos = qpqWebServerUtils

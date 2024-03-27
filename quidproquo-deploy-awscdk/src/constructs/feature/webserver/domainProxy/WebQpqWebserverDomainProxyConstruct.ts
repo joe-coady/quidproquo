@@ -26,10 +26,11 @@ export class WebQpqWebserverDomainProxyConstruct extends QpqConstructBlock {
     super(scope, id, props);
 
     const dnsRecord = new DnsValidatedCertificate(this, 'validcert', {
-      onRootDomain: props.domainProxyConfig.domain.onRootDomain,
-      subdomain: props.domainProxyConfig.domain.subDomainName,
-      rootDomain: props.domainProxyConfig.domain.rootDomain,
-
+      domain: {
+        onRootDomain: props.domainProxyConfig.domain.onRootDomain,
+        subDomainNames: props.domainProxyConfig.domain.subDomainNames,
+        rootDomain: props.domainProxyConfig.domain.rootDomain,
+      },
       awsAccountId: props.awsAccountId,
       qpqConfig: props.qpqConfig,
     });
@@ -62,7 +63,7 @@ export class WebQpqWebserverDomainProxyConstruct extends QpqConstructBlock {
         viewerProtocolPolicy: aws_cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
       },
 
-      domainNames: [dnsRecord.deployDomain],
+      domainNames: dnsRecord.domainNames,
       certificate: dnsRecord.certificate,
     });
 
@@ -77,12 +78,14 @@ export class WebQpqWebserverDomainProxyConstruct extends QpqConstructBlock {
       distribution.distributionId,
     );
 
-    new aws_route53.ARecord(this, 'web-alias', {
-      zone: dnsRecord.hostedZone,
-      recordName: dnsRecord.deployDomain,
-      target: aws_route53.RecordTarget.fromAlias(
-        new aws_route53_targets.CloudFrontTarget(distribution),
-      ),
+    dnsRecord.domainNames.forEach((domainName) => {
+      new aws_route53.ARecord(this, `${domainName}-web-alias`, {
+        zone: dnsRecord.hostedZone,
+        recordName: domainName,
+        target: aws_route53.RecordTarget.fromAlias(
+          new aws_route53_targets.CloudFrontTarget(distribution),
+        ),
+      });
     });
 
     props.domainProxyConfig.ignoreCache.forEach((pathPattern) => {

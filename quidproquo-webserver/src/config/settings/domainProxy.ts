@@ -3,9 +3,9 @@ import { QPQConfigSetting, QPQConfigAdvancedSettings } from 'quidproquo-core';
 import { QPQWebServerConfigSettingType } from '../QPQConfig';
 
 export interface DomainProxyDomainOptions {
-  subDomainName?: string;
-  onRootDomain: boolean;
   rootDomain: string;
+  subDomainNames?: string[];
+  onRootDomain: boolean;
 }
 
 export interface QPQConfigAdvancedDomainProxySettings extends QPQConfigAdvancedSettings {
