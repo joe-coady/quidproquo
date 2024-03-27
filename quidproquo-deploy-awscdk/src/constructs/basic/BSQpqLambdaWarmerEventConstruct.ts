@@ -14,7 +14,7 @@ export class BSQpqLambdaWarmerEventConstructConstruct extends QpqConstructBlock 
     const rule = new aws_events.Rule(this, 'WarmLambdaRule', {
       ruleName: this.qpqBootstrapResourceName(BootstrapResource.WarmLambdas),
       // Create an EventBridge rule to trigger the Lambda every X minutes
-      schedule: aws_events.Schedule.expression('rate(1 minute)'),
+      schedule: aws_events.Schedule.expression('rate(5 minutes)'),
     });
 
     const topic = new aws_sns.Topic(this, 'MyTopic', {
