@@ -1,6 +1,6 @@
 import { QPQConfigSetting, QPQConfigAdvancedSettings } from 'quidproquo-core';
 
-import { QPQWebServerConfigSettingType, CacheSettings } from '../QPQConfig';
+import { QPQWebServerConfigSettingType } from '../QPQConfig';
 
 import { ResponseSecurityHeaders } from '../types/ResponseSecurityHeaders';
 

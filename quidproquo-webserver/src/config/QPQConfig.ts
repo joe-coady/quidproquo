@@ -12,6 +12,7 @@ export enum QPQWebServerConfigSettingType {
   WebSocket = '@quidproquo-webserver/config/WebSocket',
   Cache = '@quidproquo-webserver/config/Cache',
   Certificate = '@quidproquo-webserver/config/Certificate',
+  DomainProxy = '@quidproquo-webserver/config/DomainProxy',
 }
 
 export interface CacheSettings {

@@ -15,6 +15,7 @@ import {
   WebSocketQPQWebServerConfigSetting,
   CacheQPQWebServerConfigSetting,
   CertificateQPQWebServerConfigSetting,
+  DomainProxyQPQWebServerConfigSetting,
 } from '../config';
 
 import { WebEntryQPQWebServerConfigSetting, ApiQPQWebServerConfigSetting } from '../config';
@@ -237,6 +238,15 @@ export const getWebEntryConfigs = (configs: QPQConfig): WebEntryQPQWebServerConf
   return qpqCoreUtils.getConfigSettings<WebEntryQPQWebServerConfigSetting>(
     configs,
     QPQWebServerConfigSettingType.WebEntry,
+  );
+};
+
+export const getDomainProxyConfigs = (
+  configs: QPQConfig,
+): DomainProxyQPQWebServerConfigSetting[] => {
+  return qpqCoreUtils.getConfigSettings<DomainProxyQPQWebServerConfigSetting>(
+    configs,
+    QPQWebServerConfigSettingType.DomainProxy,
   );
 };
 

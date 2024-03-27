@@ -36,9 +36,6 @@ export class InfQpqServiceStack extends QpqServiceStack {
     new InfQpqWebserverServiceDomainsConstruct(this, 'serviceDomains', {
       awsAccountId: props.awsAccountId,
       qpqConfig: props.qpqConfig,
-
-      webEntryConfigs: qpqWebServerUtils.getWebEntryConfigs(props.qpqConfig),
-      websocketConfigs: qpqWebServerUtils.getWebsocketSettings(props.qpqConfig),
     });
 
     // Build the storage drives
