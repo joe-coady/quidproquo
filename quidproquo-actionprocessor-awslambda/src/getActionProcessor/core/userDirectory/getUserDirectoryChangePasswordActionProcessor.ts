@@ -14,8 +14,6 @@ const getUserDirectoryChangePasswordActionProcessor = (
   return async ({ oldPassword, newPassword }, session) => {
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
-    console.log({ oldPassword, newPassword });
-
     await changePassword(session.accessToken!, oldPassword, newPassword, region);
 
     return actionResult(void 0);
