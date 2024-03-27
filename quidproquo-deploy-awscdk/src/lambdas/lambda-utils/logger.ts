@@ -117,7 +117,7 @@ export const getLogger = (qpqConfig: QPQConfig): QpqLogger => {
 
   return {
     log: async (result: StoryResult<any>) => {
-      const promise = storyLoggerFs(result).catch((e) => {
+      const promise = storyLogger(result, bucketName, regionForBucket).catch((e) => {
         console.log('Failed to log story result to S3', JSON.stringify(e, null, 2));
       });
 
