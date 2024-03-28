@@ -13,6 +13,10 @@ const ActionComponentMap: Record<string, ActionComponent> = {
     'askWebsocketSendMessage',
     ['websocketApiName', 'connectionId', 'payload'],
   ),
+  ['@quidproquo-core/UserDirectory/RefreshToken']: getGenericActionRenderer(
+    'askUserDirectoryRefreshToken',
+    ['userDirectoryName', 'refreshToken'],
+  ),
   ['@quidproquo-core/KeyValueStore/Query']: getGenericActionRenderer(
     'askKeyValueStoreQuery',
     ['keyValueStoreName', 'keyCondition', 'options'],

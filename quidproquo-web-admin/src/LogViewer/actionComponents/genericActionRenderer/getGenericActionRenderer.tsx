@@ -16,6 +16,7 @@ export const getGenericActionRenderer =
             functionName={functionName}
             args={args}
             tooltipMap={tooltipMap}
+            expanded={expanded}
           />
         </pre>
         <ActionResultDisplay historyItem={historyItem} expanded={expanded} />
