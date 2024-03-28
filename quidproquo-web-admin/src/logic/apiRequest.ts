@@ -12,7 +12,7 @@ const getAxiosInstance = (accessToken?: string) => {
   const baseURL = `${window.location.protocol}//api.${domain.join('.')}/${service}`;
 
   const instance = axios.create({
-    baseURL, // : `https://api.joecoady.development.EXAMPLEDOMAIN.app/admin`,
+    baseURL: `https://api.joecoady.development.kitted.app/admin`,
     headers: getHeaders(accessToken),
   });
 
