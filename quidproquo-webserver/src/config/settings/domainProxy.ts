@@ -2,6 +2,15 @@ import { QPQConfigSetting, QPQConfigAdvancedSettings } from 'quidproquo-core';
 
 import { QPQWebServerConfigSettingType } from '../QPQConfig';
 
+export enum DomainProxyViewerProtocolPolicy {
+  /** HTTPS only */
+  HTTPS_ONLY = 'https-only',
+  /** Will redirect HTTP requests to HTTPS */
+  REDIRECT_TO_HTTPS = 'redirect-to-https',
+  /** Both HTTP and HTTPS supported */
+  ALLOW_ALL = 'allow-all',
+}
+
 export interface DomainProxyDomainOptions {
   rootDomain: string;
   subDomainNames?: string[];
@@ -16,10 +25,14 @@ export interface QPQConfigAdvancedDomainProxySettings extends QPQConfigAdvancedS
   cacheSettingsName?: string;
 
   ignoreCache?: string[];
+
+  domainProxyViewerProtocolPolicy: DomainProxyViewerProtocolPolicy;
 }
 
 export interface DomainProxyQPQWebServerConfigSetting extends QPQConfigSetting {
   name: string;
+
+  domainProxyViewerProtocolPolicy: DomainProxyViewerProtocolPolicy;
 
   domain: DomainProxyDomainOptions;
   httpProxyDomain: string;
@@ -37,11 +50,13 @@ export const defineDomainProxy = (
 
   name,
 
-  httpProxyDomain: options?.httpProxyDomain,
+  httpProxyDomain: options.httpProxyDomain,
 
   domain: options.domain,
 
-  ignoreCache: options?.ignoreCache || [],
+  ignoreCache: options.ignoreCache || [],
 
-  cacheSettingsName: options?.cacheSettingsName,
+  cacheSettingsName: options.cacheSettingsName,
+
+  domainProxyViewerProtocolPolicy: options.domainProxyViewerProtocolPolicy,
 });

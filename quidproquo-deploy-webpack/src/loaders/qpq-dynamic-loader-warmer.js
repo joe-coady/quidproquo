@@ -20,7 +20,7 @@ ${requireStatements.join(',\n')}
   ]);
 }`;
 
-  console.log(result);
+  // console.log(result);
 
   return result;
 };

@@ -16,9 +16,25 @@ import { Construct } from 'constructs';
 
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
 import { QpqWebServerCacheConstruct } from '../cache/QpqWebServerCacheConstruct';
+import { DomainProxyViewerProtocolPolicy } from 'quidproquo-webserver';
 
 export interface WebQpqWebserverDomainProxyConstructProps extends QpqConstructBlockProps {
   domainProxyConfig: DomainProxyQPQWebServerConfigSetting;
+}
+
+function convertDomainProxyViewerProtocolPolicyToAwsViewerProtocolPolicy(
+  policy: DomainProxyViewerProtocolPolicy,
+): aws_cloudfront.ViewerProtocolPolicy {
+  switch (policy) {
+    case DomainProxyViewerProtocolPolicy.HTTPS_ONLY:
+      return aws_cloudfront.ViewerProtocolPolicy.HTTPS_ONLY;
+    case DomainProxyViewerProtocolPolicy.REDIRECT_TO_HTTPS:
+      return aws_cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS;
+    case DomainProxyViewerProtocolPolicy.ALLOW_ALL:
+      return aws_cloudfront.ViewerProtocolPolicy.ALLOW_ALL;
+    default:
+      throw new Error('Unknown DomainProxyViewerProtocolPolicy value');
+  }
 }
 
 export class WebQpqWebserverDomainProxyConstruct extends QpqConstructBlock {
@@ -54,13 +70,18 @@ export class WebQpqWebserverDomainProxyConstruct extends QpqConstructBlock {
       props.domainProxyConfig.httpProxyDomain,
     );
 
+    const viewerProtocolPolicy = convertDomainProxyViewerProtocolPolicyToAwsViewerProtocolPolicy(
+      props.domainProxyConfig.domainProxyViewerProtocolPolicy,
+    );
+
     const distribution = new aws_cloudfront.Distribution(this, 'MyDistribution', {
       defaultBehavior: {
         origin: distributionOrigin,
         originRequestPolicy: aws_cloudfront.OriginRequestPolicy.ALL_VIEWER,
+        allowedMethods: aws_cloudfront.AllowedMethods.ALLOW_ALL,
 
         cachePolicy: cachePolicy,
-        viewerProtocolPolicy: aws_cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+        viewerProtocolPolicy,
       },
 
       domainNames: dnsRecord.domainNames,
@@ -91,7 +112,7 @@ export class WebQpqWebserverDomainProxyConstruct extends QpqConstructBlock {
     props.domainProxyConfig.ignoreCache.forEach((pathPattern) => {
       distribution.addBehavior(pathPattern, distributionOrigin, {
         cachePolicy: aws_cloudfront.CachePolicy.CACHING_DISABLED,
-        viewerProtocolPolicy: aws_cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+        viewerProtocolPolicy,
       });
     });
   }
