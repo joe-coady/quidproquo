@@ -134,6 +134,8 @@ export class QpqCoreUserDirectoryConstruct extends QpqCoreUserDirectoryConstruct
       },
 
       awsAccountId: props.awsAccountId,
+
+      role: this.getServiceRole(),
     });
 
     userPool.addTrigger(
