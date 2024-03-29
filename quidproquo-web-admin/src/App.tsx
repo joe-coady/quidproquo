@@ -3,6 +3,7 @@ import { Auth } from './Auth/Auth';
 import { LoadingProvider } from './view';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import { BrowserRouter as Router } from 'react-router-dom';
 
 const darkTheme = createTheme({
   palette: {
@@ -12,13 +13,15 @@ const darkTheme = createTheme({
 
 export const App = () => {
   return (
-    <ThemeProvider theme={darkTheme}>
-      <CssBaseline />
-      <LoadingProvider>
-        <Auth>
-          <LogViewer />
-        </Auth>
-      </LoadingProvider>
-    </ThemeProvider>
+    <Router>
+      <ThemeProvider theme={darkTheme}>
+        <CssBaseline />
+        <LoadingProvider>
+          <Auth>
+            <LogViewer />
+          </Auth>
+        </LoadingProvider>
+      </ThemeProvider>
+    </Router>
   );
 };

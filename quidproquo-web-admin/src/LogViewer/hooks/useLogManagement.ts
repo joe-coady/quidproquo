@@ -3,6 +3,7 @@ import { SearchParams } from '../types';
 
 import { useOnSearch } from './useOnSearch';
 import { filterLogs, getOnRowClick } from '../logic';
+import { useSearchParams } from 'react-router-dom';
 
 declare global {
   interface Window {
@@ -12,7 +13,17 @@ declare global {
 }
 
 export const useLogManagement = () => {
-  const [selectedLogCorrelation, setSelectedLogCorrelation] = useState<string>('');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedLogCorrelation = searchParams.get('correlation') || '';
+
+  const setSelectedLogCorrelation = (correlation: string) => {
+    if (correlation) {
+      setSearchParams({ correlation });
+    } else {
+      setSearchParams({});
+    }
+  };
+
   const [logs, setLogs] = useState<any>([]);
 
   useEffect(() => {
@@ -26,7 +37,7 @@ export const useLogManagement = () => {
     console.log('logs attached to window, try: viewLog(logs[0])');
   }, []);
 
-  const [searchParams, setSearchParams] = useState<SearchParams>(() => {
+  const [searchParamsState, setSearchParamsState] = useState<SearchParams>(() => {
     const currentDate = new Date();
 
     const threeHoursAgo = new Date(currentDate.getTime() - 3 * 60 * 60 * 1000);
@@ -43,11 +54,11 @@ export const useLogManagement = () => {
     };
   });
 
-  const [searchProgress, onSearch] = useOnSearch(searchParams, setLogs);
+  const [searchProgress, onSearch] = useOnSearch(searchParamsState, setLogs);
 
   const filteredLogs = useMemo(
-    () => filterLogs(searchParams.errorFilter, logs),
-    [searchParams.errorFilter, logs],
+    () => filterLogs(searchParamsState.errorFilter, logs),
+    [searchParamsState.errorFilter, logs],
   );
 
   const onRowClick = getOnRowClick(setSelectedLogCorrelation);
@@ -56,8 +67,8 @@ export const useLogManagement = () => {
   return {
     selectedLogCorrelation,
     logs,
-    searchParams,
-    setSearchParams,
+    searchParams: searchParamsState,
+    setSearchParams: setSearchParamsState,
     onSearch,
     filteredLogs,
     onRowClick,

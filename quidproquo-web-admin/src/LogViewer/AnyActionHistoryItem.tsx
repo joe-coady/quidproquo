@@ -17,6 +17,10 @@ const ActionComponentMap: Record<string, ActionComponent> = {
     'askUserDirectoryRefreshToken',
     ['userDirectoryName', 'refreshToken'],
   ),
+  ['@quidproquo-core/UserDirectory/DecodeAccessToken']: getGenericActionRenderer(
+    'askUserDirectoryDecodeAccessToken',
+    ['userDirectoryName', 'ignoreExpiration', 'accessToken', 'serviceOverride'],
+  ),
   ['@quidproquo-core/KeyValueStore/Query']: getGenericActionRenderer(
     'askKeyValueStoreQuery',
     ['keyValueStoreName', 'keyCondition', 'options'],
