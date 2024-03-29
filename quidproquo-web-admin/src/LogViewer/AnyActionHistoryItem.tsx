@@ -4,33 +4,8 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { useState } from 'react';
 
-import { getGenericActionRenderer } from './actionComponents';
-import { ActionComponent } from './actionComponents/types';
 import { ActionHistoryItem } from './ActionHistoryItem';
-
-const ActionComponentMap: Record<string, ActionComponent> = {
-  ['@quidproquo-webserver/Websocket/SendMessage']: getGenericActionRenderer(
-    'askWebsocketSendMessage',
-    ['websocketApiName', 'connectionId', 'payload'],
-  ),
-  ['@quidproquo-core/UserDirectory/RefreshToken']: getGenericActionRenderer(
-    'askUserDirectoryRefreshToken',
-    ['userDirectoryName', 'refreshToken'],
-  ),
-  ['@quidproquo-core/UserDirectory/DecodeAccessToken']: getGenericActionRenderer(
-    'askUserDirectoryDecodeAccessToken',
-    ['userDirectoryName', 'ignoreExpiration', 'accessToken', 'serviceOverride'],
-  ),
-  ['@quidproquo-core/KeyValueStore/Query']: getGenericActionRenderer(
-    'askKeyValueStoreQuery',
-    ['keyValueStoreName', 'keyCondition', 'options'],
-    [
-      'keyValueStoreName: string',
-      'keyCondition: KvsQueryOperation',
-      'options?: KeyValueStoreQueryOptions',
-    ],
-  ),
-};
+import { actionComponentMap } from './logic/actionComponentMap';
 
 interface AnyActionHistoryItemProps {
   historyItem: ActionHistoryLog;
@@ -43,7 +18,7 @@ export const AnyActionHistoryItem = ({ historyItem }: AnyActionHistoryItemProps)
     setExpanded(!expanded);
   };
 
-  const ActionComponent = ActionComponentMap[historyItem.act.type];
+  const ActionComponent = actionComponentMap[historyItem.act.type];
 
   return (
     <>

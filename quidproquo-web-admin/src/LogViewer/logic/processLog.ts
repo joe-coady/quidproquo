@@ -5,5 +5,5 @@ export const processLog = (logFile: StoryResult<any>): ActionHistory[] => {
     return [];
   }
 
-  return logFile.history;
+  return logFile.history.filter((item) => item.act.type !== '@quidproquo-core/Context/List');
 };

@@ -7,11 +7,10 @@ import { LogSummaryReturn } from './LogSummaryReturn';
 
 import { Table, TableBody, TableCell, TableRow, Box, Typography } from '@mui/material';
 import { AnyActionHistoryItem } from './AnyActionHistoryItem';
+import { processLog } from './logic';
 
 interface LogDetailsProps {
   log: StoryResult<any>;
-  storyResultMetadatas: any[];
-  setSelectedLogCorrelation: (logCorrelation: string) => void;
   hideFastActions: boolean;
   orderByDuration: boolean;
 }
@@ -33,12 +32,11 @@ const rightTableCell = {
 
 export const LogDetails = ({
   log,
-  storyResultMetadatas,
-  setSelectedLogCorrelation,
+
   hideFastActions,
   orderByDuration,
 }: LogDetailsProps) => {
-  let history = [...log.history];
+  let history = processLog(log);
 
   if (hideFastActions) {
     history = history.filter((item) => {

@@ -150,8 +150,6 @@ const LogDialog = ({
               </div>
               <LogDetails
                 log={log!}
-                storyResultMetadatas={storyResultMetadatas}
-                setSelectedLogCorrelation={setSelectedLogCorrelation}
                 hideFastActions={hideFastActions}
                 orderByDuration={orderByDuration}
               />

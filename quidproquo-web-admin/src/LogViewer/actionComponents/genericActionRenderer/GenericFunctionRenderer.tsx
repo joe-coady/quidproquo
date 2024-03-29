@@ -13,11 +13,19 @@ export const genericFunctionRendererStyles = {
   functionName: { color: '#D0DC8B' }, // Function color
   stringValue: { color: '#CE834A' }, // String value color
   numberValue: { color: '#B5C078' }, // Number value color
+  undefinedValue: { color: '#4A9CB3' }, // Number value color
+  booleanValue: { color: '#4A9CB3' }, // Number value color
 };
 
 // Helper function to style values based on their type
 const styleValueByType = (value: any, expanded: boolean) => {
-  if (typeof value === 'number') {
+  if (value === undefined) {
+    return <span style={genericFunctionRendererStyles.undefinedValue}>undefined</span>;
+  } else if (value === null) {
+    return <span style={genericFunctionRendererStyles.undefinedValue}>null</span>;
+  } else if (typeof value === 'boolean') {
+    return <span style={genericFunctionRendererStyles.booleanValue}>{value.toString()}</span>;
+  } else if (typeof value === 'number') {
     return <span style={genericFunctionRendererStyles.numberValue}>{value}</span>;
   } else if (typeof value === 'object') {
     // Object values are displayed using normal text color, already set in <pre>

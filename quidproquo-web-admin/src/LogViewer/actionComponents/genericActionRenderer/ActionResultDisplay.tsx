@@ -1,5 +1,6 @@
 import { ActionComponent } from '../types';
 import TruncatedText from '../../TruncatedText';
+import { genericFunctionRendererStyles } from './GenericFunctionRenderer';
 
 const ActionResultDisplay: ActionComponent = ({ historyItem, expanded }) => {
   const result = historyItem.res || [];
@@ -9,16 +10,16 @@ const ActionResultDisplay: ActionComponent = ({ historyItem, expanded }) => {
   return (
     <>
       {successResult !== undefined && !errorResult && (
-        <pre>
+        <pre style={genericFunctionRendererStyles.pre}>
           <TruncatedText
-            title="Returned"
+            title="Error"
             text={JSON.stringify(successResult, null, 2)}
             expanded={expanded}
           />
         </pre>
       )}
       {errorResult !== undefined && (
-        <pre>
+        <pre style={genericFunctionRendererStyles.pre}>
           <TruncatedText
             title="Error"
             text={JSON.stringify(errorResult, null, 2)}
