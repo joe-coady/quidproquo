@@ -15,10 +15,11 @@ export const genericFunctionRendererStyles = {
   numberValue: { color: '#B5C078' }, // Number value color
   undefinedValue: { color: '#4A9CB3' }, // Number value color
   booleanValue: { color: '#4A9CB3' }, // Number value color
+  emptyObject: { color: 'grey' }, // Number value color
 };
 
 // Helper function to style values based on their type
-const styleValueByType = (value: any, expanded: boolean) => {
+export const styleValueByType = (value: any, expanded: boolean) => {
   if (value === undefined) {
     return <span style={genericFunctionRendererStyles.undefinedValue}>undefined</span>;
   } else if (value === null) {
@@ -27,15 +28,47 @@ const styleValueByType = (value: any, expanded: boolean) => {
     return <span style={genericFunctionRendererStyles.booleanValue}>{value.toString()}</span>;
   } else if (typeof value === 'number') {
     return <span style={genericFunctionRendererStyles.numberValue}>{value}</span>;
-  } else if (typeof value === 'object') {
-    // Object values are displayed using normal text color, already set in <pre>
-    return JSON.stringify(value, null, 2);
   } else if (typeof value === 'string') {
     const trimmedValue = value.length > 25 && !expanded ? `${value.slice(0, 25)}...` : value;
     return <span style={genericFunctionRendererStyles.stringValue}>"{trimmedValue}"</span>;
+  } else if (typeof value === 'object') {
+    const objectKeys = Object.keys(value);
+
+    if (objectKeys.length == 0) {
+      return !expanded ? (
+        <>
+          <span>{'{ '}</span>
+          <span style={genericFunctionRendererStyles.emptyObject}>Empty Object</span>
+          <span>{' }'}</span>
+        </>
+      ) : (
+        '{ }'
+      );
+    }
+
+    return !expanded ? (
+      <>
+        <span>{'{ '}</span>
+        {objectKeys.join(', ')}
+        <span>{' }'}</span>
+      </>
+    ) : (
+      <>
+        <span>{'{ '}</span>
+        <div style={{ paddingLeft: 10 }}>
+          {objectKeys.map((key, index) => (
+            <div key={key}>
+              {key}: {styleValueByType(value[key], expanded)},
+            </div>
+          ))}
+        </div>
+        <span>{'}'}</span>
+      </>
+    );
   }
+
   // Fallback for other types, using normal text color
-  return <span>{value}</span>;
+  return <span>{value.toString()}</span>;
 };
 
 // Props type definition for clarity
@@ -53,11 +86,15 @@ const renderBasicArg = (
   index: number,
   expanded: boolean,
   tooltip?: string,
-): JSX.Element => (
-  <React.Fragment key={arg}>
-    <span title={tooltip || arg}>{styleValueByType(value, expanded)}</span>
-  </React.Fragment>
-);
+): JSX.Element => {
+  const tooltipText = `${tooltip || arg}\n\nvalue: ${JSON.stringify(value, null, 2)}`;
+
+  return (
+    <React.Fragment key={arg}>
+      <span title={tooltipText}>{styleValueByType(value, expanded)}</span>
+    </React.Fragment>
+  );
+};
 
 const GenericFunctionRenderer: React.FC<GenericFunctionRendererProps> = ({
   functionName,
