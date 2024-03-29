@@ -16,6 +16,8 @@ export const genericFunctionRendererStyles = {
   undefinedValue: { color: '#4A9CB3' }, // Number value color
   booleanValue: { color: '#4A9CB3' }, // Number value color
   emptyObject: { color: 'grey' }, // Number value color
+  commentBlock: { color: '#5E993E', paddingBottom: 10 }, // Number value color
+  highlightComment: { color: 'white' }, // Number value color
 };
 
 // Helper function to style values based on their type
