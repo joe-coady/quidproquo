@@ -20,6 +20,7 @@ import { LogCorrelations } from './LogCorrelations';
 import { LogDetails } from './LogDetails';
 import { LogSummary } from './LogSummary';
 import { LogRawJson } from './LogRawJson';
+import { HelpChat } from './HelpChat';
 
 import { useExternalData, usePlatformDataFromPath } from '../components/LoadingBox/hooks';
 import { useIsLoading } from '../view';
@@ -111,6 +112,7 @@ const LogDialog = ({
           <Tab label="Tree View" />
           <Tab label="Summary" />
           <Tab label="Raw JSON" />
+          <Tab label="Help" />
         </Tabs>
       </AppBar>
       <DialogContent
@@ -171,6 +173,9 @@ const LogDialog = ({
         <div style={getTabStyle(selectedTab, 3)}>
           {!isLoading && <LogRawJson log={log!} />}
           {isLoading && <LinearProgress />}
+        </div>
+        <div style={getTabStyle(selectedTab, 4)}>
+          <HelpChat />
         </div>
       </DialogContent>
 
