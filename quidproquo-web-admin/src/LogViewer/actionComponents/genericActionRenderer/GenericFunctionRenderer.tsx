@@ -18,6 +18,7 @@ export const genericFunctionRendererStyles = {
   emptyObject: { color: 'grey' }, // Number value color
   commentBlock: { color: '#5E993E', paddingBottom: 10 }, // Number value color
   highlightComment: { color: 'white' }, // Number value color
+  jsonComment: { color: '#5E993E' }, // Number value color
 };
 
 // Helper function to style values based on their type
@@ -31,8 +32,21 @@ export const styleValueByType = (value: any, expanded: boolean) => {
   } else if (typeof value === 'number') {
     return <span style={genericFunctionRendererStyles.numberValue}>{value}</span>;
   } else if (typeof value === 'string') {
-    const trimmedValue = value.length > 25 && !expanded ? `${value.slice(0, 25)}...` : value;
-    return <span style={genericFunctionRendererStyles.stringValue}>"{trimmedValue}"</span>;
+    try {
+      const jsonValue = JSON.parse(value);
+
+      return (
+        <>
+          <span style={genericFunctionRendererStyles.jsonComment}>
+            {'<'}json{'>'}
+          </span>
+          {styleValueByType(jsonValue, expanded)}
+        </>
+      );
+    } catch {
+      const trimmedValue = value.length > 25 && !expanded ? `${value.slice(0, 25)}...` : value;
+      return <span style={genericFunctionRendererStyles.stringValue}>"{trimmedValue}"</span>;
+    }
   } else if (typeof value === 'object') {
     const objectKeys = Object.keys(value);
 
