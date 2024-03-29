@@ -13,17 +13,10 @@ import coreMathActionComponentMap from './coreMathActionComponentMap';
 import coreNetworkActionComponentMap from './coreNetworkActionComponentMap';
 import corePlatformActionComponentMap from './corePlatformActionComponentMap';
 import coreQueueActionComponentMap from './coreQueueActionComponentMap';
-import coreServiceFunctionActionComponentMap from './coreServiceFunctionActionComponentMap';
 import coreSystemActionComponentMap from './coreSystemActionComponentMap';
-import coreWebsocketActionComponentMap from './coreWebsocketActionComponentMap';
 import coreUserDirectoryActionComponentMap from './coreUserDirectoryActionComponentMap';
 
 export default {
-  ...coreContextActionComponentMap,
-  ...coreKeyValueStoreActionComponentMap,
-  ...coreServiceFunctionActionComponentMap,
-  ...coreWebsocketActionComponentMap,
-  ...coreQueueActionComponentMap,
   ...coreDeployEventActionComponentMap,
   ...coreConfigActionComponentMap,
   ...coreContextActionComponentMap,
@@ -39,8 +32,6 @@ export default {
   ...coreNetworkActionComponentMap,
   ...corePlatformActionComponentMap,
   ...coreQueueActionComponentMap,
-  ...coreServiceFunctionActionComponentMap,
   ...coreSystemActionComponentMap,
-  ...coreWebsocketActionComponentMap,
   ...coreUserDirectoryActionComponentMap,
 };

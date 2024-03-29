@@ -1,4 +1,4 @@
-const coreWebsocketActionComponentMap: Record<string, string[]> = {
+const webserverWebsocketActionComponentMap: Record<string, string[]> = {
   ['@quidproquo-webserver/Websocket/SendMessage']: [
     'askWebsocketSendMessage',
     'websocketApiName',
@@ -7,4 +7,4 @@ const coreWebsocketActionComponentMap: Record<string, string[]> = {
   ],
 };
 
-export default coreWebsocketActionComponentMap;
+export default webserverWebsocketActionComponentMap;

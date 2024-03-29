@@ -1,4 +1,4 @@
-const coreServiceFunctionActionComponentMap: Record<string, string[]> = {
+const webserverServiceFunctionActionComponentMap: Record<string, string[]> = {
   ['@quidproquo-webserver/ServiceFunction/Execute']: [
     'askServiceFunctionExecute',
     'service',
@@ -8,4 +8,4 @@ const coreServiceFunctionActionComponentMap: Record<string, string[]> = {
   ],
 };
 
-export default coreServiceFunctionActionComponentMap;
+export default webserverServiceFunctionActionComponentMap;
