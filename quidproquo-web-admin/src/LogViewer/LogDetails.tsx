@@ -12,6 +12,8 @@ interface LogDetailsProps {
   log: StoryResult<any>;
   storyResultMetadatas: any[];
   setSelectedLogCorrelation: (logCorrelation: string) => void;
+  hideFastActions: boolean;
+  orderByDuration: boolean;
 }
 
 const leftTableCell = {
@@ -33,7 +35,26 @@ export const LogDetails = ({
   log,
   storyResultMetadatas,
   setSelectedLogCorrelation,
+  hideFastActions,
+  orderByDuration,
 }: LogDetailsProps) => {
+  let history = [...log.history];
+
+  if (hideFastActions) {
+    history = history.filter((item) => {
+      const duration = new Date(item.finishedAt).getTime() - new Date(item.startedAt).getTime();
+      return duration >= 500;
+    });
+  }
+
+  if (orderByDuration) {
+    history.sort((a, b) => {
+      const durationA = new Date(a.finishedAt).getTime() - new Date(a.startedAt).getTime();
+      const durationB = new Date(b.finishedAt).getTime() - new Date(b.startedAt).getTime();
+      return durationB - durationA;
+    });
+  }
+
   return (
     <Box sx={{ width: 1 }}>
       <Table sx={{ tableLayout: 'fixed' }}>
@@ -47,7 +68,7 @@ export const LogDetails = ({
             </TableCell>
           </TableRow>
 
-          {log.history.map((historyItem, index) => (
+          {history.map((historyItem, index) => (
             <TableRow key={`${index}`}>
               <TableCell sx={leftTableCell}>
                 <ActionHistoryItemTimeStamp

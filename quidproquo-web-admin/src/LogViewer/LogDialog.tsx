@@ -12,6 +12,8 @@ import {
   Box,
   AppBar,
   useTheme,
+  FormControlLabel,
+  Checkbox,
 } from '@mui/material';
 
 import { LogCorrelations } from './LogCorrelations';
@@ -70,6 +72,8 @@ const LogDialog = ({
   };
 
   const [selectedTab, setSelectedTab] = useState(0);
+  const [hideFastActions, setHideFastActions] = useState(false);
+  const [orderByDuration, setOrderByDuration] = useState(false);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);
@@ -118,11 +122,40 @@ const LogDialog = ({
       >
         <div style={getTabStyle(selectedTab, 0)}>
           {!isLoading && (
-            <LogDetails
-              log={log!}
-              storyResultMetadatas={storyResultMetadatas}
-              setSelectedLogCorrelation={setSelectedLogCorrelation}
-            />
+            <>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row-reverse',
+                }}
+              >
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={hideFastActions}
+                      onChange={(event) => setHideFastActions(event.target.checked)}
+                    />
+                  }
+                  label="Hide Fast Actions"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={orderByDuration}
+                      onChange={(event) => setOrderByDuration(event.target.checked)}
+                    />
+                  }
+                  label="Order by Duration"
+                />
+              </div>
+              <LogDetails
+                log={log!}
+                storyResultMetadatas={storyResultMetadatas}
+                setSelectedLogCorrelation={setSelectedLogCorrelation}
+                hideFastActions={hideFastActions}
+                orderByDuration={orderByDuration}
+              />
+            </>
           )}
           {isLoading && <LinearProgress />}
         </div>

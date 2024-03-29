@@ -61,11 +61,11 @@ const GenericFunctionRenderer: React.FC<GenericFunctionRendererProps> = ({
   // Convert args object to an array of key-value pairs and map each to a span element with dynamic styling and optional tooltip
   const argEntries = Object.entries(args);
   const argsWithTooltips = argEntries.map(([arg, value], index) => (
-    <>
+    <React.Fragment key={index}>
       {argRenderer(arg, value, index, expanded, tooltipMap[index])}
       {index < argEntries.length ? ', ' : ''}
       <br />
-    </>
+    </React.Fragment>
   ));
 
   return (
