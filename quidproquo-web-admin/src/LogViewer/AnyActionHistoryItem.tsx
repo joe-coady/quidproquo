@@ -5,7 +5,8 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { useState } from 'react';
 
 import { ActionHistoryItem } from './ActionHistoryItem';
-import { actionComponentMap } from './logic/actionComponentMap';
+import actionComponentMap from './logic/actionComponentMap';
+import { getGenericActionRenderer } from './actionComponents';
 
 interface AnyActionHistoryItemProps {
   historyItem: ActionHistoryLog;
@@ -18,7 +19,10 @@ export const AnyActionHistoryItem = ({ historyItem }: AnyActionHistoryItemProps)
     setExpanded(!expanded);
   };
 
-  const ActionComponent = actionComponentMap[historyItem.act.type];
+  const actionComponentConfig = actionComponentMap[historyItem.act.type];
+  const ActionComponent = actionComponentConfig
+    ? getGenericActionRenderer(actionComponentConfig[0], actionComponentConfig.slice(1))
+    : ActionHistoryItem;
 
   return (
     <>
@@ -30,11 +34,7 @@ export const AnyActionHistoryItem = ({ historyItem }: AnyActionHistoryItemProps)
           {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
         </IconButton>
       </Box>
-      {ActionComponent ? (
-        <ActionComponent historyItem={historyItem} expanded={expanded} />
-      ) : (
-        <ActionHistoryItem historyItem={historyItem} expanded={expanded} />
-      )}
+      <ActionComponent historyItem={historyItem} expanded={expanded} />
     </>
   );
 };
