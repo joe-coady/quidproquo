@@ -54,7 +54,12 @@ export class QpqWebServerCacheConstruct extends QpqConstructBlock {
       minTtl: cdk.Duration.seconds(props.cacheConfig.cache.minTTLInSeconds),
       maxTtl: cdk.Duration.seconds(props.cacheConfig.cache.maxTTLInSeconds),
 
-      headerBehavior: aws_cloudfront.CacheHeaderBehavior.allowList(qpqHeaderIsBot),
+      headerBehavior: aws_cloudfront.CacheHeaderBehavior.allowList(
+        qpqHeaderIsBot,
+        'Origin',
+        'Access-Control-Request-Headers',
+        'Access-Control-Request-Method',
+      ),
 
       enableAcceptEncodingGzip: true,
       enableAcceptEncodingBrotli: true,
