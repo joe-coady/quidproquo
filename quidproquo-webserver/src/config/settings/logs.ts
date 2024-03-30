@@ -149,6 +149,16 @@ export const defineLogs = (
       routeAuthSettings,
     ),
 
+    defineRoute(
+      'POST',
+      '/log/chat',
+      getServiceEntry('log', 'controller', 'logController'),
+      'getChatMessages',
+      routeAuthSettings,
+    ),
+
+    defineKeyValueStore('qpq-log-messages', 'correlationId', ['timestamp']),
+
     defineWebEntry('admin', {
       buildPath: webFilesPath,
       seoBuildPath: buildPath,

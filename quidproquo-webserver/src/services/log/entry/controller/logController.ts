@@ -4,14 +4,14 @@ import {
   QpqRuntimeType,
   askThrowError,
   askFileGenerateTemporarySecureUrl,
-  askDateNow,
-  askDelay,
 } from 'quidproquo-core';
 
 import { HTTPEvent } from '../../../../types';
 import { toJsonEventResponse, fromJsonEventRequest } from '../../../../utils/httpEventUtils';
 import { askListLogs, askGetByCorrelation, askGetByFromCorrelation } from '../data/logMetadataData';
-import { LogChatMessage, SendLogChatMessage } from '../domain';
+import { ListLogChatMessages, LogChatMessage, SendLogChatMessage } from '../domain';
+import { askLogSendChatMessage } from '../logic/askLogSendChatMessage';
+import { askGetLogChatMessages } from '../logic/askGetLogChatMessages';
 
 export interface GetLogsParams {
   nextPageKey?: string;
@@ -73,13 +73,21 @@ export function* downloadUrl(
 export function* sendChatMessage(event: HTTPEvent) {
   const sendLogChatMessage = fromJsonEventRequest<SendLogChatMessage>(event);
 
-  const response: LogChatMessage = {
-    isAi: true,
-    message: `<p>You said: "${sendLogChatMessage.message}". I'm just a mock response for now!</p>`,
-    timestamp: yield* askDateNow(),
-  };
+  const message = yield* askLogSendChatMessage(
+    sendLogChatMessage.correlationId,
+    sendLogChatMessage.message,
+  );
 
-  yield* askDelay(2000);
+  return toJsonEventResponse(message);
+}
 
-  return toJsonEventResponse(response);
+export function* getChatMessages(event: HTTPEvent) {
+  const listLogChatMessages = fromJsonEventRequest<ListLogChatMessages>(event);
+
+  const messages = yield* askGetLogChatMessages(
+    listLogChatMessages.correlationId,
+    listLogChatMessages.nextPageKey,
+  );
+
+  return toJsonEventResponse(messages);
 }

@@ -3,7 +3,8 @@ import { Box, TextField, Button, Avatar, Typography, Paper, CircularProgress } f
 import { Person as PersonIcon, Android as AndroidIcon } from '@mui/icons-material';
 import { useAuthAccessToken } from '../../Auth/hooks';
 import { apiRequestPost } from '../../logic';
-import { LogChatMessage, SendLogChatMessage } from '../../types';
+import { LogChatMessage, SendLogChatMessage, ListLogChatMessages } from '../../types';
+import { QpqPagedData } from 'quidproquo-core';
 
 interface HelpChatProps {
   logCorrelation: string;
@@ -13,8 +14,33 @@ export const HelpChat: React.FC<HelpChatProps> = ({ logCorrelation }) => {
   const [chatMessages, setChatMessages] = useState<LogChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [pendingRequests, setPendingRequests] = useState(0);
+  const [nextPageKey, setNextPageKey] = useState<string | undefined>(undefined);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const accessToken = useAuthAccessToken();
+
+  useEffect(() => {
+    fetchChatMessages();
+  }, []);
+
+  const fetchChatMessages = async () => {
+    const listLogChatMessages: ListLogChatMessages = {
+      correlationId: logCorrelation,
+      nextPageKey: nextPageKey,
+    };
+
+    try {
+      const response = await apiRequestPost<QpqPagedData<LogChatMessage>>(
+        '/log/chat',
+        listLogChatMessages,
+        accessToken,
+      );
+
+      setChatMessages((prevMessages) => [...prevMessages, ...response.items]);
+      setNextPageKey(response.nextPageKey);
+    } finally {
+      // Do nothing
+    }
+  };
 
   const handleSendMessage = async () => {
     if (inputMessage.trim() !== '') {
