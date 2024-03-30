@@ -175,7 +175,7 @@ const LogDialog = ({
           {isLoading && <LinearProgress />}
         </div>
         <div style={getTabStyle(selectedTab, 4)}>
-          <HelpChat />
+          <HelpChat logCorrelation={logCorrelation} />
         </div>
       </DialogContent>
 

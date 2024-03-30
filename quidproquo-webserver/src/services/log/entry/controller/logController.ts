@@ -4,12 +4,14 @@ import {
   QpqRuntimeType,
   askThrowError,
   askFileGenerateTemporarySecureUrl,
+  askDateNow,
+  askDelay,
 } from 'quidproquo-core';
 
 import { HTTPEvent } from '../../../../types';
 import { toJsonEventResponse, fromJsonEventRequest } from '../../../../utils/httpEventUtils';
 import { askListLogs, askGetByCorrelation, askGetByFromCorrelation } from '../data/logMetadataData';
-import * as logData from '../data/logData';
+import { LogChatMessage, SendLogChatMessage } from '../domain';
 
 export interface GetLogsParams {
   nextPageKey?: string;
@@ -66,4 +68,18 @@ export function* downloadUrl(
   );
 
   return toJsonEventResponse({ url });
+}
+
+export function* sendChatMessage(event: HTTPEvent) {
+  const sendLogChatMessage = fromJsonEventRequest<SendLogChatMessage>(event);
+
+  const response: LogChatMessage = {
+    isAi: true,
+    message: `<p>You said: "${sendLogChatMessage.message}". I'm just a mock response for now!</p>`,
+    timestamp: yield* askDateNow(),
+  };
+
+  yield* askDelay(2000);
+
+  return toJsonEventResponse(response);
 }

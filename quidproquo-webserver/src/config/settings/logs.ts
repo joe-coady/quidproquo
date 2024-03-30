@@ -141,6 +141,14 @@ export const defineLogs = (
       routeAuthSettings,
     ),
 
+    defineRoute(
+      'POST',
+      '/log/chat/message',
+      getServiceEntry('log', 'controller', 'logController'),
+      'sendChatMessage',
+      routeAuthSettings,
+    ),
+
     defineWebEntry('admin', {
       buildPath: webFilesPath,
       seoBuildPath: buildPath,
