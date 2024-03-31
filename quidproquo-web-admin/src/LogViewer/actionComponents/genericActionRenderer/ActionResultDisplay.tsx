@@ -1,6 +1,7 @@
 import { ActionComponent } from '../types';
 import TruncatedText from '../../TruncatedText';
-import { genericFunctionRendererStyles, styleValueByType } from './GenericFunctionRenderer';
+import { genericFunctionRendererStyles } from './AnyVariableView';
+import { AnyVariableView } from './AnyVariableView';
 
 const ActionResultDisplay: ActionComponent = ({ historyItem, expanded }) => {
   const result = historyItem.res || [];
@@ -12,16 +13,12 @@ const ActionResultDisplay: ActionComponent = ({ historyItem, expanded }) => {
       {successResult !== undefined && !errorResult && (
         <pre style={genericFunctionRendererStyles.pre}>
           <span>Result: </span>
-          {styleValueByType(successResult, expanded)}
+          <AnyVariableView value={successResult} expanded={expanded} />
         </pre>
       )}
       {errorResult !== undefined && (
         <pre style={genericFunctionRendererStyles.pre}>
-          <TruncatedText
-            title="Error"
-            text={JSON.stringify(errorResult, null, 2)}
-            expanded={expanded}
-          />
+          <AnyVariableView value={errorResult} expanded={expanded} />
         </pre>
       )}
     </>

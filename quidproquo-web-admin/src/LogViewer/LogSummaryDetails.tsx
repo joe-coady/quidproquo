@@ -1,8 +1,9 @@
 import { Typography } from '@mui/material';
 import { StoryResult } from 'quidproquo-core';
-import GenericFunctionRenderer, {
+import {
+  GenericFunctionRenderer,
   genericFunctionRendererStyles,
-} from './actionComponents/genericActionRenderer/GenericFunctionRenderer';
+} from './actionComponents/genericActionRenderer/AnyVariableView';
 
 interface LogSummaryDetailsProps {
   log: StoryResult<any>;

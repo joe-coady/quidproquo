@@ -1,5 +1,6 @@
 import { Typography } from '@mui/material';
 import { StoryResult } from 'quidproquo-core';
+import { AnyVariableView, genericFunctionRendererStyles } from './actionComponents';
 
 interface LogSummaryReturnProps {
   log: StoryResult<any>;
@@ -12,7 +13,13 @@ export const LogSummaryReturn = ({ log }: LogSummaryReturnProps) => {
         {log.error ? 'Thrown Error' : 'Returned'}
       </Typography>
       <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-        {log.error ? JSON.stringify(log.error, null, 2) : JSON.stringify(log.result, null, 2)}
+        <pre style={genericFunctionRendererStyles.pre}>
+          {log.error ? (
+            <AnyVariableView value={log.error} expanded={true} />
+          ) : (
+            <AnyVariableView value={log.result} expanded={true} />
+          )}
+        </pre>
       </pre>
     </div>
   );

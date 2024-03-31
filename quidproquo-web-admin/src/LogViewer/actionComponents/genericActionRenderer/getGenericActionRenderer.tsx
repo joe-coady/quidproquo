@@ -1,7 +1,7 @@
 import React from 'react';
 import { ActionComponent } from '../types';
 import ActionResultDisplay from './ActionResultDisplay';
-import GenericFunctionRenderer, { genericFunctionRendererStyles } from './GenericFunctionRenderer'; // Assuming this is the correct path
+import { GenericFunctionRenderer, genericFunctionRendererStyles } from './AnyVariableView'; // Assuming this is the correct path
 
 export const getGenericActionRenderer =
   (functionName: string, argMap: string[], tooltipMap: string[] = argMap): ActionComponent =>
