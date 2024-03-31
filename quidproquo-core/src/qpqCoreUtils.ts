@@ -22,6 +22,7 @@ import {
   DeployEventsQPQConfigSetting,
   GlobalQPQConfigSetting,
   ModuleQPQConfigSetting,
+  ClaudeAIQPQConfigSetting,
 } from './config/settings';
 import {
   EmailTemplates,
@@ -203,6 +204,15 @@ export const getAllEventBusConfigs = (qpqConfig: QPQConfig): EventBusQPQConfigSe
   );
 
   return eventBuses;
+};
+
+export const getAllClaudeAiConfigs = (qpqConfig: QPQConfig): ClaudeAIQPQConfigSetting[] => {
+  const claudeAis = getConfigSettings<ClaudeAIQPQConfigSetting>(
+    qpqConfig,
+    QPQCoreConfigSettingType.claudeAi,
+  );
+
+  return claudeAis;
 };
 
 export const getOwnedEventBusConfigs = (qpqConfig: QPQConfig): EventBusQPQConfigSetting[] => {

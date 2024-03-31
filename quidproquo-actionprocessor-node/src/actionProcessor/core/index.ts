@@ -1,3 +1,4 @@
+import ClaudeAiActionProcessor from './claudeAi/ClaudeAiActionProcessor';
 import DateActionProcessor from './date/DateActionProcessor';
 import ErrorActionProcessor from './error/ErrorActionProcessor';
 import EventActionProcessor from './event/EventActionProcessor';
@@ -9,6 +10,7 @@ import PlatformActionProcessor from './platform/PlatformActionProcessor';
 import SystemActionProcessor from './system/SystemActionProcessor';
 
 export default {
+  ...ClaudeAiActionProcessor,
   ...DateActionProcessor,
   ...ErrorActionProcessor,
   ...EventActionProcessor,

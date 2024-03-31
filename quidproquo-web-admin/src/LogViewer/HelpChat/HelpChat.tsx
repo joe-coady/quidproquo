@@ -5,6 +5,7 @@ import { useAuthAccessToken } from '../../Auth/hooks';
 import { apiRequestPost } from '../../logic';
 import { LogChatMessage, SendLogChatMessage, ListLogChatMessages } from '../../types';
 import { QpqPagedData } from 'quidproquo-core';
+import Markdown from 'react-markdown';
 
 interface HelpChatProps {
   logCorrelation: string;
@@ -114,7 +115,7 @@ export const HelpChat: React.FC<HelpChatProps> = ({ logCorrelation }) => {
                 </Avatar>
                 <Typography variant="subtitle2">{message.isAi ? 'AI Assistant' : 'You'}</Typography>
               </Box>
-              <div dangerouslySetInnerHTML={{ __html: message.message }}></div>
+              <Markdown>{message.message}</Markdown>
             </Paper>
           </Box>
         ))}

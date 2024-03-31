@@ -16,6 +16,7 @@ export interface QPQConfigAdvancedLogSettings extends QPQConfigAdvancedSettings 
   coldStorageAfterDays?: number;
 
   cloudflareApiKeySecretName?: string;
+  claudeAiApiKeySecretName?: string;
 }
 
 // NEVER EVER CHANGE THIS NAME
@@ -148,6 +149,8 @@ export const defineLogs = (
       'sendChatMessage',
       routeAuthSettings,
     ),
+
+    defineGlobal('claudeAi-api-key', advancedSettings?.claudeAiApiKeySecretName || ''),
 
     defineRoute(
       'POST',

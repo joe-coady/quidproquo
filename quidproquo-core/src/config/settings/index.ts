@@ -17,3 +17,4 @@ export * from './schedule';
 export * from './secret';
 export * from './storageDrive';
 export * from './userDirectory';
+export * from './claudeAi';

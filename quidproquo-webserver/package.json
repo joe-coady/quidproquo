@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/joe-coady/quidproquo#readme",
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.19.1",
     "quidproquo-core": "0.0.177"
   },
   "devDependencies": {
