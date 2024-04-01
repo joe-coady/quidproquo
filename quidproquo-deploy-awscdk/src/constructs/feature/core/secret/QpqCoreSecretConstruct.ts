@@ -1,4 +1,6 @@
 import { SecretQPQConfigSetting, QPQConfig } from 'quidproquo-core';
+import { resolveAwsServiceAccountInfo } from 'quidproquo-config-aws';
+import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { QpqResource } from '../../../base/QpqResource';
@@ -63,13 +65,29 @@ export class QpqCoreSecretConstruct extends QpqCoreSecretConstructBase {
     qpqDeployAwsCdkUtils.applyEnvironmentTags(this.secret, props.qpqConfig);
   }
 
-  public static authorizeActionsForRole(role: aws_iam.IRole, secrets: QpqCoreSecretConstruct[]) {
-    if (secrets.length > 0) {
+  public static authorizeActionsForRole(
+    role: aws_iam.IRole,
+    secretConfigs: SecretQPQConfigSetting[],
+    qpqConfig: QPQConfig,
+  ) {
+    if (secretConfigs.length > 0) {
       role.addToPrincipalPolicy(
         new aws_iam.PolicyStatement({
           effect: aws_iam.Effect.ALLOW,
           actions: ['secretsmanager:GetSecretValue'],
-          resources: secrets.map((sd) => sd.secret.secretArn),
+          resources: secretConfigs.map((secretConfig) => {
+            const { awsRegion, awsAccountId } = resolveAwsServiceAccountInfo(
+              qpqConfig,
+              secretConfig.owner,
+            );
+
+            const secretName = awsNamingUtils.getConfigRuntimeResourceNameFromConfig(
+              secretConfig.key,
+              qpqConfig,
+            );
+
+            return `arn:aws:secretsmanager:${awsRegion}:${awsAccountId}:secret:${secretName}`;
+          }),
         }),
       );
     }

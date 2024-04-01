@@ -392,11 +392,17 @@ export const getSecretByName = (
   return secret;
 };
 
-export const getOwnedSecrets = (qpqConfig: QPQConfig): SecretQPQConfigSetting[] => {
+export const getAllSecretConfigs = (qpqConfig: QPQConfig): SecretQPQConfigSetting[] => {
   const secrets = getConfigSettings<SecretQPQConfigSetting>(
     qpqConfig,
     QPQCoreConfigSettingType.secret,
   );
+
+  return secrets;
+};
+
+export const getOwnedSecrets = (qpqConfig: QPQConfig): SecretQPQConfigSetting[] => {
+  const secrets = getAllSecretConfigs(qpqConfig);
 
   return getOwnedItems(secrets, qpqConfig);
 };

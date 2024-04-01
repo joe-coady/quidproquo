@@ -74,7 +74,11 @@ export class InfQpqServiceStack extends QpqServiceStack {
           secretConfig: setting,
         }),
     );
-    QpqCoreSecretConstruct.authorizeActionsForRole(webserverRole, secrets);
+    QpqCoreSecretConstruct.authorizeActionsForRole(
+      webserverRole,
+      qpqCoreUtils.getAllSecretConfigs(props.qpqConfig),
+      props.qpqConfig,
+    );
     // end secrets
 
     // Queues

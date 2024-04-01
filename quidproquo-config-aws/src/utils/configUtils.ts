@@ -1,6 +1,6 @@
 import path from 'path';
 
-import { qpqCoreUtils, QPQConfig } from 'quidproquo-core';
+import { qpqCoreUtils, QPQConfig, CrossModuleOwner } from 'quidproquo-core';
 
 import { ServiceAccountInfo, LocalServiceAccountInfo, ApiLayer } from '../types';
 
@@ -85,6 +85,27 @@ export const getLocalServiceAccountInfo = (qpqConfig: QPQConfig): LocalServiceAc
   };
 
   return serviceAccountInfo as LocalServiceAccountInfo;
+};
+
+export const resolveAwsServiceAccountInfo = (
+  qpqConfig: QPQConfig,
+  crossModuleOwner?: CrossModuleOwner,
+): ServiceAccountInfo => {
+  const localServiceInfo = getLocalServiceAccountInfo(qpqConfig);
+
+  const targetModule: string = crossModuleOwner?.module || localServiceInfo.moduleName;
+  const targetEnvironment: string = crossModuleOwner?.environment || localServiceInfo.environment;
+  const targetApplication: string =
+    crossModuleOwner?.application || localServiceInfo.applicationName;
+  const targetFeature: string | undefined = crossModuleOwner?.feature || localServiceInfo.feature;
+
+  return getAwsServiceAccountInfoByDeploymentInfo(
+    qpqConfig,
+    targetModule,
+    targetEnvironment,
+    targetFeature,
+    targetApplication,
+  );
 };
 
 export const getAwsServiceAccountInfoByDeploymentInfo = (
