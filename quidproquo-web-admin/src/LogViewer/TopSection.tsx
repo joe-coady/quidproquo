@@ -61,12 +61,16 @@ export function TopSection({ searchParams, setSearchParams, onSearch }: TopSecti
 
   const handleQuickTimeSelect = (minutes: number) => {
     const now = new Date();
+    // Calculate the start date by subtracting minutes from the current time
     const startDate = new Date(now.getTime() - minutes * 60000);
+    // Set the end date to 24 hours from the current time
+    const endDate = new Date(now.getTime() + 24 * 60 * 60000);
 
     setSearchParams((prevSearchParams) => ({
       ...prevSearchParams,
       startIsoDateTime: startDate.toISOString(),
-      endIsoDateTime: now.toISOString(),
+      // Use the newly calculated endDate for the endIsoDateTime
+      endIsoDateTime: endDate.toISOString(),
     }));
 
     setAnchorEl(null);
@@ -161,9 +165,11 @@ export function TopSection({ searchParams, setSearchParams, onSearch }: TopSecti
         onClose={handleQuickTimeClose}
       >
         <MenuItem onClick={() => handleQuickTimeSelect(5)}>Last 5 minutes</MenuItem>
-        <MenuItem onClick={() => handleQuickTimeSelect(180)}>Last 3 hours</MenuItem>
-        <MenuItem onClick={() => handleQuickTimeSelect(1440)}>Last 24 hours</MenuItem>
-        <MenuItem onClick={() => handleQuickTimeSelect(10080)}>Last 7 days</MenuItem>
+        <MenuItem onClick={() => handleQuickTimeSelect(3 * 60)}>Last 3 hours</MenuItem>
+        <MenuItem onClick={() => handleQuickTimeSelect(8 * 60)}>Last 8 hours</MenuItem>
+        <MenuItem onClick={() => handleQuickTimeSelect(16 * 60)}>Last 16 hours</MenuItem>
+        <MenuItem onClick={() => handleQuickTimeSelect(24 * 60)}>Last 24 hours</MenuItem>
+        <MenuItem onClick={() => handleQuickTimeSelect(7 * 24 * 60)}>Last 7 days</MenuItem>
       </Menu>
     </LocalizationProvider>
   );

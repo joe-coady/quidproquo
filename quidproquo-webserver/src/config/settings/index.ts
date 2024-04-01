@@ -5,7 +5,6 @@ export * from './certificate';
 export * from './defaultRouteOptions';
 export * from './dns';
 export * from './serviceFunction';
-export * from './logApi';
 export * from './migration';
 export * from './openApi';
 export * from './route';
