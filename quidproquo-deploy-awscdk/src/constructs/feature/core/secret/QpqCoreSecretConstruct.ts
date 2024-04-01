@@ -81,9 +81,10 @@ export class QpqCoreSecretConstruct extends QpqCoreSecretConstructBase {
               secretConfig.owner,
             );
 
-            const secretName = awsNamingUtils.getConfigRuntimeResourceNameFromConfig(
+            const secretName = awsNamingUtils.resolveConfigRuntimeResourceNameFromConfig(
               secretConfig.key,
               qpqConfig,
+              secretConfig.owner,
             );
 
             return `arn:aws:secretsmanager:${awsRegion}:${awsAccountId}:secret:${secretName}`;

@@ -52,7 +52,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
     // end storage drives
 
     // Build the parameters
-    const parameters = qpqCoreUtils.getParameterConfigs(props.qpqConfig).map(
+    const parameters = qpqCoreUtils.getOwnedParameterConfigs(props.qpqConfig).map(
       (setting) =>
         new QpqCoreParameterConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           awsAccountId: props.awsAccountId,
@@ -61,7 +61,11 @@ export class InfQpqServiceStack extends QpqServiceStack {
           parameterConfig: setting,
         }),
     );
-    QpqCoreParameterConstruct.authorizeActionsForRole(webserverRole, parameters);
+    QpqCoreParameterConstruct.authorizeActionsForRole(
+      webserverRole,
+      qpqCoreUtils.getAllParameterConfigs(props.qpqConfig),
+      props.qpqConfig,
+    );
     // end parameters
 
     // Secrets

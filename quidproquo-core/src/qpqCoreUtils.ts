@@ -429,13 +429,37 @@ export const getUserDirectories = (configs: QPQConfig): UserDirectoryQPQConfigSe
   return userDirectories;
 };
 
-export const getParameterConfigs = (qpqConfig: QPQConfig): ParameterQPQConfigSetting[] => {
+export const getAllParameterConfigs = (qpqConfig: QPQConfig): ParameterQPQConfigSetting[] => {
   const parameters = getConfigSettings<ParameterQPQConfigSetting>(
     qpqConfig,
     QPQCoreConfigSettingType.parameter,
   );
 
   return parameters;
+};
+
+export const getParameterConfig = (
+  name: string,
+  qpqConfig: QPQConfig,
+): ParameterQPQConfigSetting => {
+  const parameters = getConfigSettings<ParameterQPQConfigSetting>(
+    qpqConfig,
+    QPQCoreConfigSettingType.parameter,
+  );
+
+  const param = parameters.find((p) => p.key === name);
+
+  if (!param) {
+    throw new Error(`Parameter ${name} not found`);
+  }
+
+  return param;
+};
+
+export const getOwnedParameterConfigs = (qpqConfig: QPQConfig): ParameterQPQConfigSetting[] => {
+  const parameters = getAllParameterConfigs(qpqConfig);
+
+  return getOwnedItems(parameters, qpqConfig);
 };
 
 export const getUniqueKeyForSetting = (setting: QPQConfigSetting) => {
