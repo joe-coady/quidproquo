@@ -87,7 +87,7 @@ export class QpqCoreSecretConstruct extends QpqCoreSecretConstructBase {
               secretConfig.owner,
             );
 
-            return `arn:aws:secretsmanager:${awsRegion}:${awsAccountId}:secret:${secretName}`;
+            return `arn:aws:secretsmanager:${awsRegion}:${awsAccountId}:secret:${secretName}-*`;
           }),
         }),
       );
