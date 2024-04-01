@@ -19,10 +19,9 @@ export const memoFuncAsync = <T extends (...args: any[]) => any>(
 
     const cacheKey = JSON.stringify(args);
     const nodeCache = cache.get(func)!;
-    const cachedValue = nodeCache.get<T>(cacheKey);
 
-    if (cachedValue !== undefined) {
-      return cachedValue;
+    if (nodeCache.has(cacheKey)) {
+      return nodeCache.get<T>(cacheKey);
     }
 
     try {
@@ -31,8 +30,6 @@ export const memoFuncAsync = <T extends (...args: any[]) => any>(
       nodeCache.set(cacheKey, result);
       return result;
     } catch (err) {
-      // If an error occurs, cache the error
-      nodeCache.set(cacheKey, err);
       throw err; // re-throw the error to be caught by caller
     }
   }) as unknown as T;
