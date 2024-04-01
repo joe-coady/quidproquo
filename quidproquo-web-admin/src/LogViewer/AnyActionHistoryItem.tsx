@@ -1,7 +1,8 @@
 import { ActionHistoryLog } from '../types';
-import { Typography, IconButton, Box } from '@mui/material';
+import { Typography, IconButton, Box, Tooltip } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import HistoryIcon from '@mui/icons-material/History';
 import { useState } from 'react';
 
 import { ActionHistoryItem } from './ActionHistoryItem';
@@ -14,13 +15,20 @@ interface AnyActionHistoryItemProps {
 
 export const AnyActionHistoryItem = ({ historyItem }: AnyActionHistoryItemProps) => {
   const [expanded, setExpanded] = useState(false);
+  const [legacy, setLegacy] = useState(false);
 
   const toggleExpanded = () => {
     setExpanded(!expanded);
   };
 
+  const toggleLegacy = () => {
+    setLegacy(!legacy);
+  };
+
   const actionComponentConfig = actionComponentMap[historyItem.act.type];
-  const ActionComponent = actionComponentConfig
+  const ActionComponent = legacy
+    ? ActionHistoryItem
+    : actionComponentConfig
     ? getGenericActionRenderer(actionComponentConfig[0], actionComponentConfig.slice(1))
     : ActionHistoryItem;
 
@@ -30,9 +38,16 @@ export const AnyActionHistoryItem = ({ historyItem }: AnyActionHistoryItemProps)
         <Typography variant="h6" component="span">
           {historyItem.act.type.split('/').slice(-2).join('::')}
         </Typography>
-        <IconButton size="small" onClick={toggleExpanded}>
-          {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-        </IconButton>
+        <Tooltip title={expanded ? 'Collapse' : 'Expand'}>
+          <IconButton size="small" onClick={toggleExpanded}>
+            {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Legacy View">
+          <IconButton size="small" onClick={toggleLegacy}>
+            <HistoryIcon color={legacy ? 'primary' : 'inherit'} />
+          </IconButton>
+        </Tooltip>
       </Box>
       <ActionComponent historyItem={historyItem} expanded={expanded} />
     </>
