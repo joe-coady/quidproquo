@@ -42,11 +42,17 @@ export class QpqCoreSecretConstruct extends QpqCoreSecretConstructBase {
     secretConfig: SecretQPQConfigSetting,
     awsAccountId: string,
   ): QpqResource {
+    const secretName = awsNamingUtils.resolveConfigRuntimeResourceNameFromConfig(
+      secretConfig.key,
+      qpqConfig,
+      secretConfig.owner,
+    );
+
     class Import extends QpqCoreSecretConstructBase {
       secret = aws_secretsmanager.Secret.fromSecretNameV2(
         scope,
         `${id}-${secretConfig.uniqueKey}`,
-        this.resourceNameWithModuleOveride(secretConfig.key, secretConfig.owner?.module),
+        secretName,
       );
     }
 

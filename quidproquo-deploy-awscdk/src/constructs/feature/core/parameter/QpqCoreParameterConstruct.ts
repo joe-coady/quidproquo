@@ -41,11 +41,17 @@ export class QpqCoreParameterConstruct extends QpqCoreParameterConstructBase {
     parameterConfig: ParameterQPQConfigSetting,
     awsAccountId: string,
   ): QpqResource {
+    const paramName = awsNamingUtils.resolveConfigRuntimeResourceNameFromConfig(
+      parameterConfig.key,
+      qpqConfig,
+      parameterConfig.owner,
+    );
+
     class Import extends QpqCoreParameterConstructBase {
       stringParameter = aws_ssm.StringParameter.fromStringParameterName(
         scope,
         `${id}-${parameterConfig.uniqueKey}`,
-        this.resourceName(parameterConfig.key),
+        paramName,
       );
     }
 

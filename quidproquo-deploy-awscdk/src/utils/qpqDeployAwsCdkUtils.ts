@@ -83,12 +83,7 @@ export const getQqpParameterGrantables = (
   qpqConfig: QPQConfig,
   awsAccountId: string,
 ): QpqResource[] => {
-  const parameterSettings = [
-    ...qpqCoreUtils.getConfigSettings<ParameterQPQConfigSetting>(
-      qpqConfig,
-      QPQCoreConfigSettingType.parameter,
-    ),
-  ];
+  const parameterSettings = qpqCoreUtils.getAllParameterConfigs(qpqConfig);
 
   const parameterResources = parameterSettings.map((parameterSetting) => {
     return QpqCoreParameterConstruct.fromOtherStack(
