@@ -25,8 +25,8 @@ export const LogCorrelations = ({
       }}
     >
       <LogCorrelationTree
-        rootStoryCorrelation={logCorrelation}
-        highlightCorrelation={logCorrelation}
+        correlationId={logCorrelation}
+        highlightCorrelationId={logCorrelation}
         setSelectedLogCorrelation={setSelectedLogCorrelation}
         isVisible={isVisible}
       />

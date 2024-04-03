@@ -19,6 +19,7 @@ export const ActionHistoryItemTimeStamp = ({
         {startDate.toLocaleTimeString('en-AU', {
           hour: '2-digit',
           minute: '2-digit',
+          second: '2-digit',
         })}
       </Typography>
       <Typography variant="body2">{startDate.toLocaleDateString('en-AU')}</Typography>

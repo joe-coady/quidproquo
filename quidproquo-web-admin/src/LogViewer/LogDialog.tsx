@@ -21,6 +21,7 @@ import { LogDetails } from './LogDetails';
 import { LogSummary } from './LogSummary';
 import { LogRawJson } from './LogRawJson';
 import { HelpChat } from './HelpChat';
+import { EventTimeline } from './EventTimeline'; // Add this import
 
 import { useExternalData, usePlatformDataFromPath } from '../components/LoadingBox/hooks';
 import { useIsLoading } from '../view';
@@ -109,7 +110,8 @@ const LogDialog = ({
           indicatorColor="secondary"
         >
           <Tab label="Log Details" />
-          <Tab label="Tree View" />
+          <Tab label="Tree" />
+          <Tab label="Timeline" />
           <Tab label="Summary" />
           <Tab label="Raw JSON" />
           <Tab label="Help" />
@@ -167,14 +169,21 @@ const LogDialog = ({
           />
         </div>
         <div style={getTabStyle(selectedTab, 2)}>
+          <EventTimeline
+            logCorrelation={logCorrelation}
+            setSelectedLogCorrelation={setSelectedLogCorrelation}
+            isVisible={selectedTab === 2}
+          />
+        </div>
+        <div style={getTabStyle(selectedTab, 3)}>
           {!isLoading && <LogSummary log={log!} />}
           {isLoading && <LinearProgress />}
         </div>
-        <div style={getTabStyle(selectedTab, 3)}>
+        <div style={getTabStyle(selectedTab, 4)}>
           {!isLoading && <LogRawJson log={log!} />}
           {isLoading && <LinearProgress />}
         </div>
-        <div style={getTabStyle(selectedTab, 4)}>
+        <div style={getTabStyle(selectedTab, 5)}>
           <HelpChat logCorrelation={logCorrelation} />
         </div>
       </DialogContent>
