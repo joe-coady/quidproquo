@@ -145,19 +145,22 @@ export const ObjectVariableView = ({ value, expanded }: VariableViewProps) => {
     return <QpqBinaryDataVariableView value={value} expanded={expanded} />;
   }
 
+  const cleanObject = JSON.parse(JSON.stringify(value));
+  const cleanObjectKeys = Object.keys(cleanObject);
+
   return !expanded ? (
     <>
       <span>{'{ '}</span>
-      {objectKeys.join(', ')}
+      {cleanObjectKeys.join(', ')}
       <span>{' }'}</span>
     </>
   ) : (
     <>
       <span>{'{ '}</span>
       <div style={{ paddingLeft: 10 }}>
-        {objectKeys.map((key, index) => (
+        {cleanObjectKeys.map((key, index) => (
           <div key={key}>
-            {key}: <AnyVariableView value={value[key]} expanded={expanded} />,
+            {key}: <AnyVariableView value={cleanObject[key]} expanded={expanded} />,
           </div>
         ))}
       </div>

@@ -10,7 +10,6 @@ import coreFileActionComponentMap from './coreFileActionComponentMap';
 import coreGuidActionComponentMap from './coreGuidActionComponentMap';
 import coreLogActionComponentMap from './coreLogActionComponentMap';
 import coreMathActionComponentMap from './coreMathActionComponentMap';
-import coreNetworkActionComponentMap from './coreNetworkActionComponentMap';
 import corePlatformActionComponentMap from './corePlatformActionComponentMap';
 import coreQueueActionComponentMap from './coreQueueActionComponentMap';
 import coreSystemActionComponentMap from './coreSystemActionComponentMap';
@@ -29,7 +28,6 @@ export default {
   ...coreKeyValueStoreActionComponentMap,
   ...coreLogActionComponentMap,
   ...coreMathActionComponentMap,
-  ...coreNetworkActionComponentMap,
   ...corePlatformActionComponentMap,
   ...coreQueueActionComponentMap,
   ...coreSystemActionComponentMap,

@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { ActionHistoryItem } from './ActionHistoryItem';
 import actionComponentMap from './logic/actionComponentMap';
 import { getGenericActionRenderer } from './actionComponents';
+import customActionsMap from './actionComponents/customActionsMap';
 
 interface AnyActionHistoryItemProps {
   historyItem: ActionHistoryLog;
@@ -28,6 +29,8 @@ export const AnyActionHistoryItem = ({ historyItem }: AnyActionHistoryItemProps)
   const actionComponentConfig = actionComponentMap[historyItem.act.type];
   const ActionComponent = legacy
     ? ActionHistoryItem
+    : customActionsMap[historyItem.act.type]
+    ? customActionsMap[historyItem.act.type]
     : actionComponentConfig
     ? getGenericActionRenderer(actionComponentConfig[0], actionComponentConfig.slice(1))
     : ActionHistoryItem;
