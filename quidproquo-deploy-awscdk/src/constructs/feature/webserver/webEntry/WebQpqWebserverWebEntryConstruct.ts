@@ -223,27 +223,6 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
       ),
     });
 
-    // if (props.webEntryConfig.cloudflareApiKeySecretName) {
-    //   new CloudflareDnsRecord(this, 'cloudflare', {
-    //     awsAccountId: props.awsAccountId,
-    //     buildPath: qpqWebServerUtils.getWebEntrySeoFullPath(props.qpqConfig, props.webEntryConfig),
-    //     qpqConfig: props.qpqConfig,
-
-    //     // We cant add thease here, we need the certificate to validate
-    //     // before the distibution is finsished creating
-    //     // certificateArn: dnsRecord.certificate.certificateArn,
-    //     // certificateDomain: dnsRecord.deployDomain,
-    //     dnsEntries: {
-    //       [dnsRecord.deployDomain]: {
-    //         value: distribution.distributionDomainName,
-    //         proxied: true,
-    //         type: 'CNAME',
-    //       },
-    //     },
-    //     apiSecretName: props.webEntryConfig.cloudflareApiKeySecretName,
-    //   });
-    // }
-
     // All seos that are for this web entry
     const seos = qpqWebServerUtils
       .getAllSeo(props.qpqConfig)
@@ -274,27 +253,8 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
 
         code: aws_lambda.Code.fromAsset(path.join(seoEntryBuildPath, 'lambdaEventOriginRequest')),
         handler: 'index.executeEventOriginRequest',
-      });
 
-      // let OR edge lambdas execute service functions
-      edgeFunctionOR.addToRolePolicy(
-        new aws_iam.PolicyStatement({
-          actions: ['lambda:InvokeFunction'],
-          resources: ['arn:aws:lambda:*:*:function:*sfunc*'],
-        }),
-      );
-
-      // let VR edge lambdas access the resources they need
-      const grantables = qpqDeployAwsCdkUtils.getQqpGrantableResources(
-        this,
-        'grantable',
-        this.qpqConfig,
-        props.awsAccountId,
-      );
-
-      grantables.forEach((g) => {
-        g.grantAll(edgeFunctionVR);
-        g.grantAll(edgeFunctionOR);
+        role: this.getServiceRole(),
       });
 
       for (var seo of seos) {
@@ -333,28 +293,6 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
         });
       }
     }
-
-    // Removed this because aws limits for the number of AWS CloudFront Cache Policies in your account
-    // const ignoreCacheResponseHeaderPolicy = new aws_cloudfront.ResponseHeadersPolicy(
-    //   this,
-    //   `dist-rhp-ignore`,
-    //   {
-    //     responseHeadersPolicyName: this.qpqResourceName(props.webEntryConfig.name, 'ignore'),
-    //     customHeadersBehavior: {
-    //       customHeaders: [
-    //         {
-    //           header: 'Cache-Control',
-    //           value: `max-age=300, must-revalidate`,
-    //           override: true,
-    //         },
-    //       ],
-    //     },
-    //     securityHeadersBehavior: convertSecurityHeadersFromQpqSecurityHeaders(
-    //       qpqWebServerUtils.getBaseDomainName(props.qpqConfig),
-    //       props.webEntryConfig.securityHeaders,
-    //     ),
-    //   },
-    // );
 
     props.webEntryConfig.ignoreCache.forEach((pathPattern) => {
       distribution.addBehavior(pathPattern, distributionOrigin, {

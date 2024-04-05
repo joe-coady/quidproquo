@@ -16,6 +16,7 @@ export class WebserverRoll extends QpqConstructBlock {
       assumedBy: new aws_iam.CompositePrincipal(
         new aws_iam.ServicePrincipal('lambda.amazonaws.com'),
         new aws_iam.ServicePrincipal('transfer.amazonaws.com'),
+        new aws_iam.ServicePrincipal('edgelambda.amazonaws.com'),
       ),
     });
 

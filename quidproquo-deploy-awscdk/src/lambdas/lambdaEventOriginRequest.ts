@@ -7,13 +7,10 @@ import { createRuntime, askProcessEvent, QpqRuntimeType, QpqLogger } from 'quidp
 import { CloudFrontRequestEvent, CloudFrontRequestResult, Context } from 'aws-lambda';
 
 import {
-  getLogger,
   getRuntimeCorrelation,
   getLambdaActionProcessors,
   qpqFunctionMiddleware,
 } from './lambda-utils';
-
-import { dynamicModuleLoader } from './dynamicModuleLoader';
 
 // @ts-ignore - Special webpack loader
 import qpqCustomActionProcessors from 'qpq-custom-action-processors-loader!';
