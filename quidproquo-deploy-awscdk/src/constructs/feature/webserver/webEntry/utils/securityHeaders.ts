@@ -47,11 +47,15 @@ export const convertContentSecurityPolicyEntryToString = (
   const scsp: QpqServiceContentSecurityPolicy = contentSecurityPolicyEntry;
   const domain = scsp.domain || baseDomain;
 
-  if (scsp.service) {
-    return `${scsp.api}.${scsp.service}.${domain}`;
+  const fullDomain = scsp.service
+    ? `${scsp.api}.${scsp.service}.${domain}`
+    : `${scsp.api}.${domain}`;
+
+  if (scsp.protocol) {
+    return `${scsp.protocol}://${fullDomain}`;
   }
 
-  return `${scsp.api}.${domain}`;
+  return fullDomain;
 };
 
 export const convertContentSecurityPolicy = (

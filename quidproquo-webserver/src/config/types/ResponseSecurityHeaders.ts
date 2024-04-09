@@ -62,6 +62,11 @@ export interface QpqServiceContentSecurityPolicy {
    * The service name, as seen in the subdomain
    */
   service?: string;
+
+  /**
+   * The protocol to use, defaults to https
+   */
+  protocol?: 'http' | 'https' | 'ws' | 'wss';
 }
 
 /**

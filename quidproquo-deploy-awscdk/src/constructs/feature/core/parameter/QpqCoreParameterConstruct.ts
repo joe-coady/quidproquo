@@ -78,7 +78,6 @@ export class QpqCoreParameterConstruct extends QpqCoreParameterConstructBase {
     parameterConfigs: ParameterQPQConfigSetting[],
     qpqConfig: QPQConfig,
   ) {
-    console.log('OMG PARAMS', parameterConfigs.length);
     if (parameterConfigs.length > 0) {
       role.addToPrincipalPolicy(
         new aws_iam.PolicyStatement({

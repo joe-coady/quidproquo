@@ -225,6 +225,15 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
       ),
     });
 
+    props.webEntryConfig.ignoreCache.forEach((pathPattern) => {
+      distribution.addBehavior(pathPattern, distributionOrigin, {
+        cachePolicy: aws_cloudfront.CachePolicy.CACHING_DISABLED,
+        viewerProtocolPolicy: aws_cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+        compress: props.webEntryConfig.compressFiles,
+        responseHeadersPolicy: responseHeaderPolicy,
+      });
+    });
+
     // All seos that are for this web entry
     const seos = qpqWebServerUtils
       .getAllSeo(props.qpqConfig)
@@ -296,14 +305,5 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
         });
       }
     }
-
-    props.webEntryConfig.ignoreCache.forEach((pathPattern) => {
-      distribution.addBehavior(pathPattern, distributionOrigin, {
-        cachePolicy: aws_cloudfront.CachePolicy.CACHING_DISABLED,
-        viewerProtocolPolicy: aws_cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-        compress: props.webEntryConfig.compressFiles,
-        responseHeadersPolicy: responseHeaderPolicy,
-      });
-    });
   }
 }
