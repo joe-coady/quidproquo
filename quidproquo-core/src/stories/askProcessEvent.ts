@@ -9,7 +9,14 @@ import {
 import { askExecuteStory } from '../actions/system';
 import { LogLevelEnum } from '../types';
 
+import { askGetApplicationVersion } from './askGetApplicationVersion';
+
 export function* askProcessEvent(...eventArguments: any) {
+  // Try and get the app version
+  // This should be something the developer knows how to get to the code version
+  // like the git sha, we don't need to do anything with the global, it will be in the logs
+  yield* askGetApplicationVersion();
+
   // Transform event params
   const transformedEventParams = yield* askEventTransformEventParams(...eventArguments);
 

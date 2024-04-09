@@ -1,6 +1,6 @@
 {
   "name": "quidproquo-tsconfig",
-  "version": "0.0.181",
+  "version": "0.0.182",
   "description": "",
   "main": "tsconfig.base.json",
   "scripts": {
