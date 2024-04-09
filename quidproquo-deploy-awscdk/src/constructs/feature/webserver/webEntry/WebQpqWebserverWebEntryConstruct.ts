@@ -141,6 +141,7 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
         ).cachePolicy
       : aws_cloudfront.CachePolicy.CACHING_DISABLED;
 
+    // NOTE: This is used in the ignore cache down the bottom.
     const responseHeaderPolicy =
       props.webEntryConfig.securityHeaders &&
       new aws_cloudfront.ResponseHeadersPolicy(this, `dist-rhp`, {
@@ -184,6 +185,7 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
         httpStatus: code,
         responseHttpStatus: 200,
         responsePagePath: '/',
+        ttl: cdk.Duration.seconds(0),
       })),
     });
 
@@ -290,6 +292,7 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
               eventType: aws_cloudfront.LambdaEdgeEventType.ORIGIN_REQUEST,
             },
           ],
+          responseHeadersPolicy: responseHeaderPolicy,
         });
       }
     }
@@ -299,7 +302,7 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
         cachePolicy: aws_cloudfront.CachePolicy.CACHING_DISABLED,
         viewerProtocolPolicy: aws_cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
         compress: props.webEntryConfig.compressFiles,
-        // responseHeadersPolicy: ignoreCacheResponseHeaderPolicy,
+        responseHeadersPolicy: responseHeaderPolicy,
       });
     });
   }
