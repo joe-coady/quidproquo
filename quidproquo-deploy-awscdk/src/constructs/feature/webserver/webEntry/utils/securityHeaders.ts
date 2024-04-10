@@ -69,12 +69,27 @@ export const convertContentSecurityPolicy = (
     };
   }
 
+  const contentSecurityPolicyCopy: Record<string, ContentSecurityPolicyEntry[]> = {
+    ...contentSecurityPolicy.contentSecurityPolicy,
+
+    // Auto add the secure urls for s3
+    // TODO: Do a better url like the one below
+    // https://*.s3.${region}.amazonaws.com
+    // Or even better:
+    // https://${bucketName}.s3.${region}.amazonaws.com
+    // even better better could be to proxy secure links with a new web proxy and it would hide the bucket.
+    'connect-src': [
+      ...(contentSecurityPolicy.contentSecurityPolicy['connect-src'] || []),
+      'https://*.amazonaws.com',
+    ],
+  };
+
   return {
-    contentSecurityPolicy: Object.keys(contentSecurityPolicy.contentSecurityPolicy)
+    contentSecurityPolicy: Object.keys(contentSecurityPolicyCopy)
       .map((directive) =>
         [
           directive,
-          ...contentSecurityPolicy.contentSecurityPolicy[directive].map((cspe) =>
+          ...contentSecurityPolicyCopy[directive].map((cspe) =>
             convertContentSecurityPolicyEntryToString(baseDomain, cspe),
           ),
         ].join(' '),

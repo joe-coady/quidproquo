@@ -182,7 +182,7 @@ export const defineLogs = (
           contentSecurityPolicy: {
             'default-src': ["'self'"],
 
-            'connect-src': ["'self'"],
+            'connect-src': ["'self'", { api: 'api' }],
 
             'style-src': [
               "'self'",
