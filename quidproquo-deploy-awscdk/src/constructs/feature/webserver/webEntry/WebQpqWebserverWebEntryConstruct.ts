@@ -161,6 +161,21 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
           qpqWebServerUtils.getBaseDomainName(props.qpqConfig),
           props.webEntryConfig.securityHeaders,
         ),
+
+        // TODO: Expose this to config.
+        corsBehavior: {
+          accessControlAllowCredentials: false,
+          accessControlAllowHeaders: [
+            'Origin',
+            'Access-Control-Request-Headers',
+            'Access-Control-Request-Method',
+          ],
+          accessControlAllowMethods: ['GET', 'HEAD', 'OPTIONS'],
+          accessControlAllowOrigins: ['*'],
+          accessControlExposeHeaders: ['*'],
+          accessControlMaxAge: cdk.Duration.seconds(600),
+          originOverride: true,
+        },
       });
 
     // Create a CloudFront distribution using the S3 bucket as the origin

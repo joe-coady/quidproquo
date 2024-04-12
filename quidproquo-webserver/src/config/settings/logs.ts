@@ -182,7 +182,8 @@ export const defineLogs = (
           contentSecurityPolicy: {
             'default-src': ["'self'"],
 
-            'connect-src': ["'self'", { api: 'api' }],
+            // maybe pass in the api / localhost port in as args
+            'connect-src': ["'self'", { api: 'api' }, 'http://localhost:8080'],
 
             'style-src': [
               "'self'",
