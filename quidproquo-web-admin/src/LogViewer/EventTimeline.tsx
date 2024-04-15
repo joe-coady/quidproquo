@@ -145,21 +145,26 @@ export const EventTimeline: React.FC<EventTimelineProps> = ({
   const scale = 1100 / offsetMs + scaleOffset;
 
   return (
-    <div
-      ref={setTimelineRef}
-      onWheel={handleOnWheel}
-      style={{ position: 'relative', width: '100%', height: '100%', overflow: 'auto' }}
-    >
-      {timelineData[0] && (
-        <TimelineEvent
-          event={timelineData[0]}
-          level={0}
-          setSelectedLogCorrelation={setSelectedLogCorrelation}
-          scale={scale}
-          parrentTimeOffsetMs={0}
-          totalParrentTimeOffsetMs={0}
-        />
-      )}
+    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+      <div style={{ padding: '10px', fontSize: '18px', fontWeight: 'bold' }}>
+        Total Runtime: {offsetMs}ms
+      </div>
+      <div
+        ref={setTimelineRef}
+        onWheel={handleOnWheel}
+        style={{ width: '100%', height: 'calc(100% - 40px)', overflow: 'auto' }}
+      >
+        {timelineData[0] && (
+          <TimelineEvent
+            event={timelineData[0]}
+            level={0}
+            setSelectedLogCorrelation={setSelectedLogCorrelation}
+            scale={scale}
+            parrentTimeOffsetMs={0}
+            totalParrentTimeOffsetMs={0}
+          />
+        )}
+      </div>
     </div>
   );
 };
