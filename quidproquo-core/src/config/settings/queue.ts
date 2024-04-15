@@ -57,13 +57,13 @@ export const defineQueue = (
   name,
   buildPath,
 
-  batchSize: options?.batchSize || 1,
+  batchSize: options?.batchSize || 0,
   batchWindowInSeconds: options?.batchWindowInSeconds || 5,
 
   concurrency: options?.concurrency || 1,
 
   maxTries: options?.maxTries || 1,
-  ttRetryInSeconds: Math.min(options?.ttRetryInSeconds || 15*60, 15*60),
+  ttRetryInSeconds: Math.min(options?.ttRetryInSeconds || 15 * 60, 15 * 60),
 
   hasDeadLetterQueue: options?.hasDeadLetterQueue || true,
 

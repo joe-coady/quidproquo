@@ -97,12 +97,16 @@ export class QpqApiCoreQueueConstruct extends QpqConstructBlock {
       );
     });
 
+    const eventSourceOptions: aws_lambda_event_sources.SqsEventSourceProps =
+      props.queueConfig.batchSize > 0
+        ? {
+            batchSize: props.queueConfig.batchSize,
+            maxBatchingWindow: cdk.Duration.seconds(props.queueConfig.batchWindowInSeconds),
+          }
+        : {};
+
     queueFunction.lambdaFunction.addEventSource(
-      new aws_lambda_event_sources.SqsEventSource(queueResource.queue, {
-        batchSize: props.queueConfig.batchSize,
-        maxBatchingWindow: cdk.Duration.seconds(props.queueConfig.batchWindowInSeconds),
-        reportBatchItemFailures: true,
-      }),
+      new aws_lambda_event_sources.SqsEventSource(queueResource.queue, eventSourceOptions),
     );
   }
 }
