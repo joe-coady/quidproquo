@@ -179,17 +179,23 @@ export const getKvsDynamoTableNameFromConfig = (
 export const getCFExportNameUserPoolIdFromConfig = (
   userDirectoryName: string,
   qpqConfig: QPQConfig,
-
-  serviceOverride?: string,
-  applicationOverride?: string,
 ) => {
-  const application = applicationOverride || qpqCoreUtils.getApplicationName(qpqConfig);
-  const service = serviceOverride || qpqCoreUtils.getApplicationModuleName(qpqConfig);
-  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
-  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+  const userDirectoryConfig = qpqCoreUtils.getUserDirectoryByName(userDirectoryName, qpqConfig);
+
+  const application =
+    userDirectoryConfig.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig);
+  const service =
+    userDirectoryConfig.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig);
+  const environment =
+    userDirectoryConfig.owner?.environment ||
+    qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
+  const feature =
+    userDirectoryConfig.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+
+  const resourceName = userDirectoryConfig.owner?.resourceNameOverride || userDirectoryName;
 
   return getQpqRuntimeResourceName(
-    userDirectoryName,
+    resourceName,
     application,
     service,
     environment,
@@ -223,17 +229,23 @@ export const getCFExportNameCachePolicyIdFromConfig = (
 export const getCFExportNameUserPoolClientIdFromConfig = (
   userDirectoryName: string,
   qpqConfig: QPQConfig,
-
-  serviceOverride?: string,
-  applicationOverride?: string,
 ) => {
-  const application = applicationOverride || qpqCoreUtils.getApplicationName(qpqConfig);
-  const service = serviceOverride || qpqCoreUtils.getApplicationModuleName(qpqConfig);
-  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
-  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+  const userDirectoryConfig = qpqCoreUtils.getUserDirectoryByName(userDirectoryName, qpqConfig);
+
+  const application =
+    userDirectoryConfig.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig);
+  const service =
+    userDirectoryConfig.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig);
+  const environment =
+    userDirectoryConfig.owner?.environment ||
+    qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
+  const feature =
+    userDirectoryConfig.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+
+  const resourceName = userDirectoryConfig.owner?.resourceNameOverride || userDirectoryName;
 
   return getQpqRuntimeResourceName(
-    userDirectoryName,
+    resourceName,
     application,
     service,
     environment,

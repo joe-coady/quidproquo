@@ -14,11 +14,11 @@ import { getUserAttributes } from '../../../logic/cognito/getUserAttributes';
 const getUserDirectoryGetUserAttributesActionProcessor = (
   qpqConfig: QPQConfig,
 ): UserDirectoryGetUserAttributesActionProcessor => {
-  return async ({ userDirectoryName, serviceOverride, username }, session) => {
+  return async ({ userDirectoryName, username }, session) => {
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const userPoolId = await getExportedValue(
-      getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig, serviceOverride),
+      getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig),
       region,
     );
 

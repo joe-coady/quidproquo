@@ -4,7 +4,6 @@ import { UserDirectoryActionType } from './UserDirectoryActionType';
 export function* askUserDirectoryGetUserAttributesByUserId(
   userDirectoryName: string,
   userId: string,
-  serviceOverride?: string,
 ): UserDirectoryGetUserAttributesByUserIdActionRequester {
   return yield {
     type: UserDirectoryActionType.GetUserAttributesByUserId,
@@ -12,8 +11,6 @@ export function* askUserDirectoryGetUserAttributesByUserId(
       userDirectoryName,
 
       userId,
-
-      serviceOverride,
     },
   };
 }

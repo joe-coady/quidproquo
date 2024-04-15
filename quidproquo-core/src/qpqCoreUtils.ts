@@ -348,7 +348,8 @@ export const getQueueSrcEntries = (configs: QPQConfig): string[] => {
 };
 
 export const getUserDirectorySrcEntries = (qpqConfig: QPQConfig): string[] => {
-  const userConfigs = getUserDirectories(qpqConfig);
+  // We just want the ones this service owns.
+  const userConfigs = getOwnedUserDirectories(qpqConfig);
 
   return userConfigs
     .reduce(
@@ -427,6 +428,25 @@ export const getUserDirectories = (configs: QPQConfig): UserDirectoryQPQConfigSe
   );
 
   return userDirectories;
+};
+
+export const getOwnedUserDirectories = (qpqConifg: QPQConfig): UserDirectoryQPQConfigSetting[] => {
+  const userDirectories = getUserDirectories(qpqConifg);
+
+  return getOwnedItems(userDirectories, qpqConifg);
+};
+
+export const getUserDirectoryByName = (
+  userDirectoryName: string,
+  qpqConifg: QPQConfig,
+): UserDirectoryQPQConfigSetting => {
+  const userDirectory = getUserDirectories(qpqConifg).find((ud) => ud.name === userDirectoryName);
+
+  if (!userDirectory) {
+    throw new Error(`UserDirectory not found: ${userDirectoryName}`);
+  }
+
+  return userDirectory;
 };
 
 export const getAllParameterConfigs = (qpqConfig: QPQConfig): ParameterQPQConfigSetting[] => {

@@ -5,13 +5,11 @@ import { UserDirectoryActionType, UserAttributes } from './UserDirectoryActionTy
 // Payload
 export interface UserDirectoryGetUsersActionPayload {
   userDirectoryName: string;
-  serviceOverride?: string;
   nextPageKey?: string;
 }
 
 // Action
-export interface UserDirectoryGetUsersAction
-  extends Action<UserDirectoryGetUsersActionPayload> {
+export interface UserDirectoryGetUsersAction extends Action<UserDirectoryGetUsersActionPayload> {
   type: UserDirectoryActionType.GetUsers;
   payload: UserDirectoryGetUsersActionPayload;
 }

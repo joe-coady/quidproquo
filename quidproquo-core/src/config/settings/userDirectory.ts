@@ -1,3 +1,5 @@
+import { convertCrossModuleOwnerToGenericResourceNameOverride } from '../../qpqCoreUtils';
+import { CrossModuleOwner } from '../../types';
 import {
   QPQConfigSetting,
   QPQCoreConfigSettingType,
@@ -12,6 +14,8 @@ export interface QPQConfigAdvancedUserDirectorySettings extends QPQConfigAdvance
   selfSignUpEnabled?: boolean;
 
   emailTemplates?: EmailTemplates;
+
+  owner?: CrossModuleOwner<'userDirectoryName'>;
 }
 
 export interface UserDirectoryQPQConfigSetting extends QPQConfigSetting {
@@ -23,6 +27,8 @@ export interface UserDirectoryQPQConfigSetting extends QPQConfigSetting {
   selfSignUpEnabled: boolean;
 
   emailTemplates: EmailTemplates;
+
+  owner?: CrossModuleOwner;
 }
 
 export const defineUserDirectory = (
@@ -45,4 +51,6 @@ export const defineUserDirectory = (
     resetPassword: options?.emailTemplates?.resetPassword,
     resetPasswordAdmin: options?.emailTemplates?.resetPasswordAdmin,
   },
+
+  owner: convertCrossModuleOwnerToGenericResourceNameOverride(options?.owner),
 });

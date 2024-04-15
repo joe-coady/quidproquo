@@ -7,9 +7,6 @@ import { ApiKeyReference } from './apiKey';
 interface GenericRouteAuthSettings<T> {
   userDirectoryName?: string;
 
-  applicationName?: string;
-  serviceName?: string;
-
   scopes?: string[];
 
   apiKeys?: T[];

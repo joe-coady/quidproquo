@@ -5,7 +5,6 @@ export function* askUserDirectorySetUserAttributes(
   userDirectoryName: string,
   username: string,
   userAttributes: UserAttributes,
-  serviceOverride?: string,
 ): UserDirectorySetUserAttributesActionRequester {
   return yield {
     type: UserDirectoryActionType.SetUserAttributes,
@@ -14,8 +13,6 @@ export function* askUserDirectorySetUserAttributes(
 
       username,
       userAttributes,
-
-      serviceOverride,
     },
   };
 }

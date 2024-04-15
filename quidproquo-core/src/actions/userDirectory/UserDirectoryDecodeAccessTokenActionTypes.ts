@@ -8,8 +8,6 @@ export interface UserDirectoryDecodeAccessTokenActionPayload {
   ignoreExpiration: boolean;
 
   accessToken: string;
-  
-  serviceOverride?: string;
 }
 
 // Action

@@ -36,12 +36,7 @@ const isAuthValidForCognito = async (
 
   // Resolve the user pool id
   const userPoolId = await getExportedValue(
-    getCFExportNameUserPoolIdFromConfig(
-      userDirectoryName,
-      qpqConfig,
-      authSettings.serviceName,
-      authSettings.applicationName,
-    ),
+    getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig),
     region,
   );
 

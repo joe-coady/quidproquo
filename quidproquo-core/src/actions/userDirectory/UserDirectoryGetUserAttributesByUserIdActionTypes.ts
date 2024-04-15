@@ -4,7 +4,6 @@ import { UserDirectoryActionType, UserAttributes } from './UserDirectoryActionTy
 // Payload
 export interface UserDirectoryGetUserAttributesByUserIdActionPayload {
   userDirectoryName: string;
-  serviceOverride?: string;
 
   userId: string;
 }

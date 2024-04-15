@@ -11,6 +11,7 @@ import * as cdk from 'aws-cdk-lib';
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
 
 import { Function } from '../../../basic/Function';
+import { resolveAwsServiceAccountInfo } from 'quidproquo-config-aws';
 
 export interface QpqCoreUserDirectoryConstructProps extends QpqConstructBlockProps {
   userDirectoryConfig: UserDirectoryQPQConfigSetting;
@@ -68,16 +69,9 @@ export class QpqCoreUserDirectoryConstruct extends QpqCoreUserDirectoryConstruct
     qpqConfig: QPQConfig,
     awsAccountId: string,
     userDirectoryName: string,
-    serviceOverride?: string,
-    applicationOverride?: string,
   ): QpqResource {
     const userPoolId = qpqDeployAwsCdkUtils.importStackValue(
-      awsNamingUtils.getCFExportNameUserPoolIdFromConfig(
-        userDirectoryName,
-        qpqConfig,
-        serviceOverride,
-        applicationOverride,
-      ),
+      awsNamingUtils.getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig),
     );
 
     class Import extends QpqCoreUserDirectoryConstructBase {
@@ -173,9 +167,10 @@ export class QpqCoreUserDirectoryConstruct extends QpqCoreUserDirectoryConstruct
 
   public static authorizeActionsForRole(
     role: aws_iam.IRole,
-    userDirectories: QpqCoreUserDirectoryConstruct[],
+    userDirectorieConfigs: UserDirectoryQPQConfigSetting[],
+    qpqConfig: QPQConfig,
   ) {
-    if (userDirectories.length > 0) {
+    if (userDirectorieConfigs.length > 0) {
       role.addToPrincipalPolicy(
         new aws_iam.PolicyStatement({
           effect: aws_iam.Effect.ALLOW,
@@ -199,7 +194,21 @@ export class QpqCoreUserDirectoryConstruct extends QpqCoreUserDirectoryConstruct
             'cognito-idp:DescribeUserPool',
             'cognito-idp:DescribeUserPoolClient',
           ],
-          resources: userDirectories.map((userDirectory) => userDirectory.userPool.userPoolArn),
+          resources: userDirectorieConfigs.map((userDirectoryConfig) => {
+            const { awsRegion, awsAccountId } = resolveAwsServiceAccountInfo(
+              qpqConfig,
+              userDirectoryConfig.owner,
+            );
+
+            const userpoolId = qpqDeployAwsCdkUtils.importStackValue(
+              awsNamingUtils.getCFExportNameUserPoolIdFromConfig(
+                userDirectoryConfig.name,
+                qpqConfig,
+              ),
+            );
+
+            return `arn:aws:cognito-idp:${awsRegion}:${awsAccountId}:userpool/${userpoolId}`;
+          }),
         }),
       );
     }

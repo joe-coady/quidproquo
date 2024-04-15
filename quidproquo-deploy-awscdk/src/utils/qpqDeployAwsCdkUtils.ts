@@ -203,11 +203,7 @@ export const getQqpUserPoolGrantablesForApiConfig = (
 ): QpqResource[] => {
   const routesWithAuth = qpqWebServerUtils
     .getAllRoutesForApi(config.apiName, qpqConfig)
-    .filter(
-      (r) =>
-        r.options.routeAuthSettings?.userDirectoryName &&
-        (r.options.routeAuthSettings?.applicationName || r.options.routeAuthSettings?.serviceName),
-    );
+    .filter((r) => r.options.routeAuthSettings?.userDirectoryName);
 
   const userDirectoryResources = routesWithAuth.map((route) => {
     return QpqCoreUserDirectoryConstruct.fromOtherStack(
@@ -216,8 +212,6 @@ export const getQqpUserPoolGrantablesForApiConfig = (
       qpqConfig,
       awsAccountId,
       route.options.routeAuthSettings?.userDirectoryName!,
-      route.options.routeAuthSettings?.serviceName,
-      route.options.routeAuthSettings?.applicationName,
     );
   });
 

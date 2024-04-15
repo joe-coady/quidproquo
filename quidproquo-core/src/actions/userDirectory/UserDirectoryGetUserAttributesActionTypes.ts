@@ -8,7 +8,6 @@ import {
 // Payload
 export interface UserDirectoryGetUserAttributesActionPayload {
   userDirectoryName: string;
-  serviceOverride?: string;
 
   username: string;
 }

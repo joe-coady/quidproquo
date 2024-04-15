@@ -14,11 +14,11 @@ import { listPagedUsers } from '../../../logic/cognito/listPagedUsers';
 const getUserDirectoryGetUsersActionProcessor = (
   qpqConfig: QPQConfig,
 ): UserDirectoryGetUsersActionProcessor => {
-  return async ({ userDirectoryName, serviceOverride, nextPageKey }, session) => {
+  return async ({ userDirectoryName, nextPageKey }, session) => {
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const userPoolId = await getExportedValue(
-      getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig, serviceOverride),
+      getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig),
       region,
     );
 
@@ -30,7 +30,6 @@ const getUserDirectoryGetUsersActionProcessor = (
 
 export default (qpqConfig: QPQConfig) => {
   return {
-    [UserDirectoryActionType.GetUsers]:
-      getUserDirectoryGetUsersActionProcessor(qpqConfig),
+    [UserDirectoryActionType.GetUsers]: getUserDirectoryGetUsersActionProcessor(qpqConfig),
   };
 };

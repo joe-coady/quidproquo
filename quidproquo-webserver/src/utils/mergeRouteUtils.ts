@@ -11,8 +11,6 @@ export const mergeRouteAuthSettings = (
   routeAuthSettingsB?: RouteAuthSettings,
 ): RouteAuthSettings => {
   return {
-    applicationName: routeAuthSettingsB?.applicationName || routeAuthSettingsA?.applicationName,
-    serviceName: routeAuthSettingsB?.serviceName || routeAuthSettingsA?.serviceName,
     userDirectoryName:
       routeAuthSettingsB?.userDirectoryName || routeAuthSettingsA?.userDirectoryName,
     scopes: [

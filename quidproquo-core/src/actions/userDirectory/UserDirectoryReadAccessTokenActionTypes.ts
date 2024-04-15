@@ -6,8 +6,6 @@ export interface UserDirectoryReadAccessTokenActionPayload {
   userDirectoryName: string;
 
   ignoreExpiration: boolean;
-
-  serviceOverride?: string;
 }
 
 // Action
