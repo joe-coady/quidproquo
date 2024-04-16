@@ -106,7 +106,7 @@ export class ApiQpqServiceStack extends QpqServiceStack {
     );
 
     // Build websocket apis
-    const websockets = qpqWebServerUtils.getWebsocketSettings(props.qpqConfig).map(
+    const websockets = qpqWebServerUtils.getOwnedWebsocketSettings(props.qpqConfig).map(
       (setting) =>
         new QpqApiWebserverWebsocketConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           awsAccountId: props.awsAccountId,

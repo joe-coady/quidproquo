@@ -1,5 +1,6 @@
 import { QPQConfig, qpqCoreUtils, ResourceName, CrossModuleOwner } from 'quidproquo-core';
 import { getAwsServiceAccountInfoByDeploymentInfo, qpqConfigAwsUtils } from 'quidproquo-config-aws';
+import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 export const getGlobalConfigRuntimeResourceName = (
   resourceName: string,
@@ -320,17 +321,26 @@ export const getCFExportNameDistributionIdArnFromConfig = (
 export const getCFExportNameWebsocketApiIdFromConfig = (
   websocketApiName: string,
   qpqConfig: QPQConfig,
-
-  serviceOverride?: string,
-  applicationOverride?: string,
 ) => {
-  const application = applicationOverride || qpqCoreUtils.getApplicationName(qpqConfig);
-  const service = serviceOverride || qpqCoreUtils.getApplicationModuleName(qpqConfig);
-  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
-  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+  const websocketApiConfig = qpqWebServerUtils.getWebsocketEntryByApiName(
+    websocketApiName,
+    qpqConfig,
+  );
+
+  const application =
+    websocketApiConfig.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig);
+  const service =
+    websocketApiConfig.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig);
+  const environment =
+    websocketApiConfig.owner?.environment ||
+    qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
+  const feature =
+    websocketApiConfig.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+
+  const resourceName = websocketApiConfig.owner?.resourceNameOverride || websocketApiName;
 
   return getQpqRuntimeResourceName(
-    websocketApiName,
+    resourceName,
     application,
     service,
     environment,

@@ -150,7 +150,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
     // end key value store
 
     // Build websocket apis
-    const websockets = qpqWebServerUtils.getWebsocketSettings(props.qpqConfig).map(
+    const websockets = qpqWebServerUtils.getOwnedWebsocketSettings(props.qpqConfig).map(
       (setting) =>
         new QpqWebserverWebsocketConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           awsAccountId: props.awsAccountId,

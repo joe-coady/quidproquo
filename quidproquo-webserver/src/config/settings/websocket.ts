@@ -1,4 +1,10 @@
-import { QPQConfigSetting, QPQConfigAdvancedSettings, QpqSourceEntry } from 'quidproquo-core';
+import {
+  QPQConfigSetting,
+  QPQConfigAdvancedSettings,
+  QpqSourceEntry,
+  CrossModuleOwner,
+  qpqCoreUtils,
+} from 'quidproquo-core';
 
 import { QPQWebServerConfigSettingType } from '../QPQConfig';
 
@@ -15,6 +21,8 @@ export interface QPQConfigAdvancedWebSocketSettings extends QPQConfigAdvancedSet
   apiName?: string;
 
   cloudflareApiKeySecretName?: string;
+
+  owner?: CrossModuleOwner<'websocketApiName'>;
 }
 
 export interface WebSocketQPQWebServerConfigSetting extends QPQConfigSetting {
@@ -57,5 +65,7 @@ export const defineWebsocket = (
     deprecated: options?.deprecated || false,
 
     cloudflareApiKeySecretName: options?.cloudflareApiKeySecretName,
+
+    owner: qpqCoreUtils.convertCrossModuleOwnerToGenericResourceNameOverride(options?.owner),
   };
 };

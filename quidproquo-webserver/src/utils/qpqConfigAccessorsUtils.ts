@@ -77,7 +77,7 @@ export const getAllOpenApiSpecs = (configs: QPQConfig): OpenApiQPQWebServerConfi
 };
 
 export const getAllWebsocketSrcEntries = (qpqConfig: QPQConfig): string[] => {
-  return getWebsocketSettings(qpqConfig).flatMap((s) => [
+  return getOwnedWebsocketSettings(qpqConfig).flatMap((s) => [
     s.eventProcessors.onConnect.src,
     s.eventProcessors.onDisconnect.src,
     s.eventProcessors.onMessage.src,
@@ -401,4 +401,12 @@ export const getWebsocketSettings = (
     ) || [];
 
   return websocketSettings;
+};
+
+export const getOwnedWebsocketSettings = (
+  qpqConfig: QPQConfig,
+): WebSocketQPQWebServerConfigSetting[] => {
+  const websocketSettings = getWebsocketSettings(qpqConfig);
+
+  return qpqCoreUtils.getOwnedItems(websocketSettings, qpqConfig);
 };

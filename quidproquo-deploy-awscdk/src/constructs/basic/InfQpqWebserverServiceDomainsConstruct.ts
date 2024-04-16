@@ -22,7 +22,7 @@ export class InfQpqWebserverServiceDomainsConstruct extends QpqConstructBlock {
       .map((we) => we.domain.rootDomain);
 
     const websocketRootDomains = qpqWebServerUtils
-      .getWebsocketSettings(props.qpqConfig)
+      .getOwnedWebsocketSettings(props.qpqConfig)
       .filter((we) => !we.onRootDomain)
       .map((we) => we.rootDomain);
 
