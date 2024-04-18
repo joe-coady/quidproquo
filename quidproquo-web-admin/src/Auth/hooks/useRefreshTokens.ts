@@ -1,42 +1,40 @@
-import { useEffect, useRef } from "react";
-import { AuthState } from "../../types";
+import { useEffect, useRef } from 'react';
+import { AuthState } from '../../types';
 
-export const useRefreshTokens = (authState: AuthState, refreshTokens: (authState: AuthState) => void) => {
-    const timerId = useRef<NodeJS.Timeout | null>(null);
+export const useRefreshTokens = (
+  authState: AuthState,
+  refreshTokens: (authState: AuthState) => void,
+) => {
+  const refresh = () => {
+    const { refreshToken, expiresAt } = authState.authenticationInfo || {};
 
-    const refresh = () => {
-        const { refreshToken, expiresAt } = authState.authenticationInfo || {};
+    if (refreshToken && expiresAt) {
+      const now = new Date().toISOString();
+      const timeToExpire = new Date(expiresAt).getTime() - new Date(now).getTime();
 
-        if (refreshToken && expiresAt) {
-            const now = new Date().toISOString();
-            const timeToExpire = new Date(expiresAt).getTime() - new Date(now).getTime();
+      // Refresh the token 10 minutes before it expires to ensure there's a buffer
+      const bufferTime = 10 * 60 * 1000;
+      const refreshTime = timeToExpire - bufferTime;
 
-            // Refresh the token 10 minutes before it expires to ensure there's a buffer
-            const bufferTime = 10 * 60 * 1000;
-            const refreshTime = timeToExpire - bufferTime;
-
-            if (timerId.current) {
-                clearTimeout(timerId.current);
-                timerId.current = null;
-            }
-
-            if (refreshTime > 0) {
-                timerId.current = setTimeout(() => refreshTokens(authState), refreshTime);
-            } else {
-                // If the token is already expired or very close to expiration, refresh immediately
-                refreshTokens(authState);
-            }
-        }
+      if (refreshTime > 0) {
+        return setTimeout(() => refreshTokens(authState), refreshTime);
+      } else {
+        // If the token is already expired or very close to expiration, refresh immediately
+        refreshTokens(authState);
+      }
     }
 
-    useEffect(() => {
-        refresh();
+    return null;
+  };
 
-        return () => {
-            // Cleanup on unmount or when authState changes
-            if (timerId.current) {
-                clearTimeout(timerId.current);
-            }
-        }
-    }, [authState, refreshTokens]);
-}
+  useEffect(() => {
+    const timerId = refresh();
+
+    return () => {
+      // Cleanup on unmount or when authState changes
+      if (timerId) {
+        clearTimeout(timerId);
+      }
+    };
+  }, [authState, refreshTokens]);
+};
