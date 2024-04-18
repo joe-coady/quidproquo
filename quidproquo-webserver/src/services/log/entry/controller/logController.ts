@@ -4,14 +4,17 @@ import {
   QpqRuntimeType,
   askThrowError,
   askFileGenerateTemporarySecureUrl,
+  AskResponse,
 } from 'quidproquo-core';
 
-import { HTTPEvent } from '../../../../types';
+import { HTTPEvent, HTTPEventResponse } from '../../../../types';
 import { toJsonEventResponse, fromJsonEventRequest } from '../../../../utils/httpEventUtils';
-import { askListLogs, askGetByCorrelation, askGetByFromCorrelation } from '../data/logMetadataData';
-import { ListLogChatMessages, LogChatMessage, SendLogChatMessage } from '../domain';
+import { askGetByCorrelation, askGetByFromCorrelation } from '../data/logMetadataData';
+import { ListLogChatMessages, SendLogChatMessage } from '../domain';
 import { askLogSendChatMessage } from '../logic/askLogSendChatMessage';
 import { askGetLogChatMessages } from '../logic/askGetLogChatMessages';
+
+import { logsLogic } from '../logic';
 
 export interface GetLogsParams {
   nextPageKey?: string;
@@ -21,11 +24,16 @@ export interface GetLogsParams {
   runtimeType: QpqRuntimeType;
 }
 
-export function* getLogs(event: HTTPEvent, params: {}) {
+export function* getLogs(event: HTTPEvent, params: {}): AskResponse<HTTPEventResponse> {
   const { nextPageKey, startIsoDateTime, endIsoDateTime, runtimeType } =
     fromJsonEventRequest<GetLogsParams>(event);
 
-  const logs = yield* askListLogs(runtimeType, startIsoDateTime, endIsoDateTime, nextPageKey);
+  const logs = yield* logsLogic.askGetLogs(
+    runtimeType,
+    startIsoDateTime,
+    endIsoDateTime,
+    nextPageKey,
+  );
 
   return toJsonEventResponse(logs);
 }
