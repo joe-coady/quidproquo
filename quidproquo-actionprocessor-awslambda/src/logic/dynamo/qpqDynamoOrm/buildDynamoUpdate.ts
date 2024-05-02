@@ -56,11 +56,11 @@ const buildDynamoUpdateExpressionSet = (update: KvsUpdateAction): string => {
     throw new Error("Value must be provided for 'SET' action");
   }
 
-  return `SET ${getNestedItemName(update.attributePath)} = ${getValueName(update.value)}`;
+  return `${getNestedItemName(update.attributePath)} = ${getValueName(update.value)}`;
 };
 
 const buildDynamoUpdateExpressionRemove = (update: KvsUpdateAction): string => {
-  return `REMOVE ${getNestedItemName(update.attributePath)}`;
+  return `${getNestedItemName(update.attributePath)}`;
 };
 
 const buildDynamoUpdateExpressionAdd = (update: KvsUpdateAction): string => {
@@ -68,14 +68,14 @@ const buildDynamoUpdateExpressionAdd = (update: KvsUpdateAction): string => {
     throw new Error("Value must be provided for 'ADD' action");
   }
 
-  return `ADD ${getNestedItemName(update.attributePath)} ${getValueName(update.value)}`;
+  return `${getNestedItemName(update.attributePath)} ${getValueName(update.value)}`;
 };
 
 const buildDynamoUpdateExpressionDelete = (update: KvsUpdateAction): string => {
   if (update.value) {
-    return `DELETE ${getNestedItemName(update.attributePath)} ${getValueName(update.value)}`;
+    return `${getNestedItemName(update.attributePath)} ${getValueName(update.value)}`;
   } else {
-    return `DELETE ${getNestedItemName(update.attributePath)}`;
+    return `${getNestedItemName(update.attributePath)}`;
   }
 };
 
@@ -95,7 +95,7 @@ const getNestedItemName = (attributePath: KvsAttributePath): string => {
   }
 };
 
-const buildDynamoUpdateExpressionRoot = (update: KvsUpdateAction): string => {
+const buildDynamoUpdateExpressionPart = (update: KvsUpdateAction, updateIndex: number): string => {
   switch (update.action) {
     case KvsUpdateActionType.Set:
       return buildDynamoUpdateExpressionSet(update);
@@ -110,6 +110,44 @@ const buildDynamoUpdateExpressionRoot = (update: KvsUpdateAction): string => {
   }
 };
 
+export const buildDynamoUpdateExpressionForType = (
+  type: KvsUpdateActionType,
+  kvsUpdate: KvsUpdate,
+): string => {
+  const actions = kvsUpdate.filter((update) => update.action === type);
+
+  // If there are no actions of this type, return an empty string
+  if (actions.length === 0) {
+    return '';
+  }
+
+  const expressions = actions
+    .map((update, index) => buildDynamoUpdateExpressionPart(update, index))
+    .join(', ');
+
+  switch (type) {
+    case KvsUpdateActionType.Set:
+      return `SET ${expressions}`;
+    case KvsUpdateActionType.Remove:
+      return `REMOVE ${expressions}`;
+    case KvsUpdateActionType.Add:
+      return `ADD ${expressions}`;
+    case KvsUpdateActionType.Delete:
+      return `DELETE ${expressions}`;
+    default:
+      throw new Error(`Invalid update action type: ${type}`);
+  }
+};
+
 export const buildDynamoUpdateExpression = (updates: KvsUpdate): string => {
-  return updates.map((update) => buildDynamoUpdateExpressionRoot(update)).join(', ');
+  const updatesExpressions = [
+    KvsUpdateActionType.Set,
+    KvsUpdateActionType.Remove,
+    KvsUpdateActionType.Add,
+    KvsUpdateActionType.Delete,
+  ]
+    .map((kvsUpdateActionType) => buildDynamoUpdateExpressionForType(kvsUpdateActionType, updates))
+    .filter((expression) => !!expression);
+
+  return updatesExpressions.join(' ');
 };

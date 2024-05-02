@@ -4,3 +4,4 @@ export * from './system';
 export * from './dateTime';
 export * from './askProcessEvent';
 export * from './askGetApplicationVersion';
+export * from './kvs';
