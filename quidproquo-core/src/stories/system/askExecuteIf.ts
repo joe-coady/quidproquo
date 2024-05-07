@@ -5,7 +5,7 @@ export function* askExecuteIf<T extends AskResponse<any>>(
   condition: boolean = true,
 ): AskResponse<AskResponseReturnType<T> | undefined> {
   if (condition && !!storyIterator && typeof storyIterator === 'object') {
-    yield* storyIterator;
+    return yield* storyIterator;
   }
 
   return undefined;

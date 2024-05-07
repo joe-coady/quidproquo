@@ -1,3 +1,3 @@
 import { QpqRuntimeType } from 'quidproquo';
 
-export const RuntimeTypes = Object.keys(QpqRuntimeType);
+export const RuntimeTypes = ['ALL', ...Object.keys(QpqRuntimeType)];
