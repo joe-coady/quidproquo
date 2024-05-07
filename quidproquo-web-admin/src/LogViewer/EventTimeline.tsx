@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Box, CircularProgress } from '@mui/material';
-import { StoryResultMetadataWithChildren, getTimeBounds } from 'quidproquo-core';
+import { StoryResultMetadataWithChildren, getTimeBounds } from 'quidproquo';
 
 import { useLogTreeData } from './hooks';
 

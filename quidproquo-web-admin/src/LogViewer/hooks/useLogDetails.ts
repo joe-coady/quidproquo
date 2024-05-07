@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { StoryResult } from 'quidproquo-core';
+import { StoryResult } from 'quidproquo';
 import { processLog } from '../logic';
 
 export const useLogDetails = (log: StoryResult<any>) => {

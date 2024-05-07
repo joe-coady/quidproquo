@@ -4,7 +4,7 @@ import { Person as PersonIcon, Android as AndroidIcon } from '@mui/icons-materia
 import { useAuthAccessToken } from '../../Auth/hooks';
 import { apiRequestPost } from '../../logic';
 import { LogChatMessage, SendLogChatMessage, ListLogChatMessages } from '../../types';
-import { QpqPagedData } from 'quidproquo-core';
+import { QpqPagedData } from 'quidproquo';
 import Markdown from 'react-markdown';
 
 interface HelpChatProps {

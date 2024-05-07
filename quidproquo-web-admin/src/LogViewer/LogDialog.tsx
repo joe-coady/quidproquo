@@ -9,7 +9,6 @@ import {
   Button,
   Tabs,
   Tab,
-  Box,
   AppBar,
   useTheme,
   FormControlLabel,
@@ -26,7 +25,7 @@ import { EventTimeline } from './EventTimeline'; // Add this import
 import { useExternalData, usePlatformDataFromPath } from '../components/LoadingBox/hooks';
 import { useIsLoading } from '../view';
 import { apiRequestPost } from '../logic';
-import { StoryResult } from 'quidproquo-core';
+import { StoryResult } from 'quidproquo';
 import { useState } from 'react';
 
 interface LogDialogProps {

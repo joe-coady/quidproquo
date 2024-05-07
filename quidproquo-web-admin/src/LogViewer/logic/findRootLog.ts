@@ -1,4 +1,4 @@
-import { StoryResultMetadata } from 'quidproquo-core';
+import { StoryResultMetadata } from 'quidproquo';
 import { apiRequestGet } from '../../logic';
 import { cache } from '../../logic/cache';
 

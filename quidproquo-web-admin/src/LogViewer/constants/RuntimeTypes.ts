@@ -1,16 +1,3 @@
-// Object.keys(QpqRuntimeType)
-export const RuntimeTypes = [
-  'ALL',
-  'API',
-  'EXECUTE_STORY',
-  'RECURRING_SCHEDULE',
-  'QUEUE_EVENT',
-  'EVENT_SEO_OR',
-  'SERVICE_FUNCTION_EXE',
-  'SEND_EMAIL_EVENT',
-  'WEBSOCKET_EVENT',
-  'DEPLOY_EVENT',
-  'STORAGEDRIVE_EVENT',
-  'CLOUD_FLARE_DEPLOY',
-  'UNIT_TEST',
-];
+import { QpqRuntimeType } from 'quidproquo';
+
+export const RuntimeTypes = Object.keys(QpqRuntimeType);

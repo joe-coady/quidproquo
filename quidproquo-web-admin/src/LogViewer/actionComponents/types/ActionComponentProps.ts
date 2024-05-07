@@ -1,4 +1,4 @@
-import { ActionHistory } from 'quidproquo-core';
+import { ActionHistory } from 'quidproquo';
 import { FC } from 'react';
 
 export type ActionComponentProps = {
