@@ -31,7 +31,11 @@ export const LogSummaryDetails = ({ log }: LogSummaryDetailsProps) => {
             </div>
             <div>// //////////////////////////////////////////////////////</div>
           </div>
-          <GenericFunctionRenderer functionName={log.moduleName} args={log.input} expanded={true} />
+          <GenericFunctionRenderer
+            functionName={log.tags.join('::').split('::').pop() || 'unknown'}
+            args={log.input}
+            expanded={true}
+          />
         </pre>
       </div>
     </>
