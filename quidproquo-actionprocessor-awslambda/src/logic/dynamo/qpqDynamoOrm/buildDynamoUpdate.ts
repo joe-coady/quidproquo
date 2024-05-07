@@ -149,5 +149,8 @@ export const buildDynamoUpdateExpression = (updates: KvsUpdate): string => {
     .map((kvsUpdateActionType) => buildDynamoUpdateExpressionForType(kvsUpdateActionType, updates))
     .filter((expression) => !!expression);
 
-  return updatesExpressions.join(' ');
+  const result = updatesExpressions.join(' ');
+  console.log('Update Expression: ', result);
+
+  return result;
 };
