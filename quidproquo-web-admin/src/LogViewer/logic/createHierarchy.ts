@@ -1,17 +1,14 @@
+import { StoryResultMetadata } from 'quidproquo-core';
 import { cache } from '../../logic/cache';
-import { StoryResultMetadataLog } from '../../types';
-import { fineLogDirectChildren } from './findLogDirectChildren';
 
-export type StoryResultMetadataLogWithChildren = StoryResultMetadataLog & {
-  children: StoryResultMetadataLogWithChildren[];
-};
+import { fineLogDirectChildren } from './findLogDirectChildren';
 
 export const createHierarchy = cache(
   async (
-    rootStoryResultMetadata: StoryResultMetadataLog,
+    rootStoryResultMetadata: StoryResultMetadata,
     accessToken?: string,
-  ): Promise<StoryResultMetadataLogWithChildren> => {
-    const childrenLogs: StoryResultMetadataLog[] = await fineLogDirectChildren(
+  ): Promise<StoryResultMetadataWithChildren> => {
+    const childrenLogs: StoryResultMetadata[] = await fineLogDirectChildren(
       rootStoryResultMetadata.correlation,
       accessToken,
     );

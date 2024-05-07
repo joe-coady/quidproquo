@@ -1,15 +1,15 @@
+import { StoryResultMetadata, QpqLogList } from 'quidproquo';
 import { apiRequestPost } from '../../logic';
-import { QpqLogListLog, StoryResultMetadataLog } from '../../types';
 
 export const getLogs = async (
   url: string,
   runtimeType: string,
   startIsoDateTime: string,
   endIsoDateTime: string,
-  accessToken?: string
-): Promise<StoryResultMetadataLog[]> => {
-  var logs: StoryResultMetadataLog[] = [];
-  var newLogs: QpqLogListLog;
+  accessToken?: string,
+): Promise<StoryResultMetadata[]> => {
+  var logs: StoryResultMetadata[] = [];
+  var newLogs: QpqLogList;
   var nextPageKey = undefined;
 
   const requestSpan = {
@@ -19,10 +19,14 @@ export const getLogs = async (
   };
 
   do {
-    newLogs = await apiRequestPost<QpqLogListLog>(url, {
-      ...requestSpan,
-      nextPageKey: nextPageKey,
-    }, accessToken);
+    newLogs = await apiRequestPost<QpqLogList>(
+      url,
+      {
+        ...requestSpan,
+        nextPageKey: nextPageKey,
+      },
+      accessToken,
+    );
 
     logs = [...logs, ...newLogs.items];
 

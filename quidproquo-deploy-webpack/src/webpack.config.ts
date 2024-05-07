@@ -68,6 +68,7 @@ export const getWebpackConfig = (
     resolve: {
       extensions: ['.ts', '.tsx', '.js', '.json'],
       fallback: {
+        path: require.resolve('path-browserify'),
         crypto: false,
       },
     },

@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useAuthAccessToken } from '../../Auth/hooks';
-import { StoryResultMetadataLogWithChildren, createHierarchy, findRootLog } from '../logic';
+import { createHierarchy, findRootLog } from '../logic';
+import { StoryResultMetadataWithChildren } from 'quidproquo-core';
 
 const filterQpqActions = (
-  logs: StoryResultMetadataLogWithChildren[],
-): StoryResultMetadataLogWithChildren[] => {
-  const filteredLogs: StoryResultMetadataLogWithChildren[] = [];
+  logs: StoryResultMetadataWithChildren[],
+): StoryResultMetadataWithChildren[] => {
+  const filteredLogs: StoryResultMetadataWithChildren[] = [];
 
   for (const log of logs) {
     if (!log.runtimeType.startsWith('EXECUTE_STORY')) {
@@ -14,7 +15,7 @@ const filterQpqActions = (
     } else {
       // If the log is not a QPQ action, add it to the filtered logs array
       // and recursively filter its children
-      const filteredLog: StoryResultMetadataLogWithChildren = {
+      const filteredLog: StoryResultMetadataWithChildren = {
         ...log,
         children: filterQpqActions(log.children),
       };
@@ -28,7 +29,7 @@ const filterQpqActions = (
 export const useLogTreeData = (
   correlationId: string,
   hideQpqActions: boolean = false,
-): StoryResultMetadataLogWithChildren[] | null => {
+): StoryResultMetadataWithChildren[] | null => {
   const [treeData, setTreeData] = useState<any>(null);
   const accessToken = useAuthAccessToken();
 

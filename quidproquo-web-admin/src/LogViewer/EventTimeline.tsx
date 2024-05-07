@@ -1,12 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Box, CircularProgress } from '@mui/material';
-
-import {
-  StoryResultMetadataLogWithChildren,
-  findRootLog,
-  fineLogDirectChildren,
-  getTimeBounds,
-} from './logic';
+import { StoryResultMetadataWithChildren, getTimeBounds } from 'quidproquo-core';
 
 import { useLogTreeData } from './hooks';
 
@@ -20,7 +14,7 @@ const EVENT_HEIGHT = 30;
 const EVENT_COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8c00', '#ff0080'];
 
 type TimelineEventProps = {
-  event: StoryResultMetadataLogWithChildren;
+  event: StoryResultMetadataWithChildren;
   level: number;
   setSelectedLogCorrelation: (logCorrelation: string) => void;
   scale: number;
@@ -67,7 +61,7 @@ const TimelineEvent = ({
         {event.moduleName}::{event.generic.split('::').pop()} - @{parrentTimeOffsetMs}ms -{' '}
         {event.executionTimeMs}ms
       </div>
-      {event.children.map((child: StoryResultMetadataLogWithChildren) => {
+      {event.children.map((child: StoryResultMetadataWithChildren) => {
         const childDate = new Date(child.startedAt);
         const eventDate = new Date(event.startedAt);
         const offsetMs = childDate.getTime() - eventDate.getTime();
@@ -138,6 +132,7 @@ export const EventTimeline: React.FC<EventTimelineProps> = ({
   }
 
   const { earliestStartedAt, latestFinishedAt } = getTimeBounds(timelineData);
+
   const startDate = new Date(earliestStartedAt);
   const endDate = new Date(latestFinishedAt);
   const offsetMs = endDate.getTime() - startDate.getTime();

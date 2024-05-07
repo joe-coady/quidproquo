@@ -49,6 +49,7 @@
     "recharts": "^2.12.3"
   },
   "devDependencies": {
+    "path-browserify": "^1.0.1",
     "@babel/core": "^7.21.5",
     "@babel/plugin-transform-react-jsx": "^7.21.5",
     "@babel/preset-env": "^7.21.5",

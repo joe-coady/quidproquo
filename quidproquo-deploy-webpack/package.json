@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/joe-coady/quidproquo#readme",
   "dependencies": {
+    "path-browserify": "^1.0.1",
     "quidproquo-actionprocessor-awslambda": "0.0.188",
     "quidproquo-actionprocessor-node": "0.0.188",
     "quidproquo-core": "0.0.188",

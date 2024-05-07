@@ -1,4 +1,4 @@
-import * as path from 'path';
+import { joinPaths } from './utils';
 
 import {
   QPQConfig,
@@ -6,6 +6,7 @@ import {
   QPQCoreConfigSettingType,
   QPQConfigItem,
 } from './config/QPQConfig';
+
 import {
   ApplicationQPQConfigSetting,
   StorageDriveQPQConfigSetting,
@@ -24,10 +25,12 @@ import {
   ModuleQPQConfigSetting,
   ClaudeAIQPQConfigSetting,
 } from './config/settings';
+
 import {
   EmailTemplates,
   QpqEmailTemplateSourceEntry,
 } from './config/settings/emailTemplates/types';
+
 import {
   CrossModuleOwner,
   CrossServiceResourceName,
@@ -493,7 +496,7 @@ export const getScheduleEntryFullPath = (
   qpqConfig: QPQConfig,
   scheduleConfig: ScheduleQPQConfigSetting,
 ): string => {
-  return path.join(getConfigRoot(qpqConfig), scheduleConfig.buildPath);
+  return joinPaths(getConfigRoot(qpqConfig), scheduleConfig.buildPath);
 };
 
 export const getStorageDriveEntryFullPath = (
@@ -504,35 +507,35 @@ export const getStorageDriveEntryFullPath = (
     throw new Error('Please specify a build path in your storage drive config (onEvent)');
   }
 
-  return path.join(getConfigRoot(qpqConfig), storageDriveConfig.onEvent.buildPath);
+  return joinPaths(getConfigRoot(qpqConfig), storageDriveConfig.onEvent.buildPath);
 };
 
 export const getDeployEventFullPath = (
   qpqConfig: QPQConfig,
   deployEventConfig: DeployEventsQPQConfigSetting,
 ): string => {
-  return path.join(getConfigRoot(qpqConfig), deployEventConfig.buildPath);
+  return joinPaths(getConfigRoot(qpqConfig), deployEventConfig.buildPath);
 };
 
 export const getStorageDriveUploadFullPath = (
   qpqConfig: QPQConfig,
   storageDriveConfig: StorageDriveQPQConfigSetting,
 ): string => {
-  return path.join(getConfigRoot(qpqConfig), storageDriveConfig.copyPath || '');
+  return joinPaths(getConfigRoot(qpqConfig), storageDriveConfig.copyPath || '');
 };
 
 export const getQueueEntryFullPath = (
   qpqConfig: QPQConfig,
   queueConfig: QueueQPQConfigSetting,
 ): string => {
-  return path.join(getConfigRoot(qpqConfig), queueConfig.buildPath);
+  return joinPaths(getConfigRoot(qpqConfig), queueConfig.buildPath);
 };
 
 export const getUserDirectoryEntryFullPath = (
   qpqConfig: QPQConfig,
   userDirectoryConfig: UserDirectoryQPQConfigSetting,
 ): string => {
-  return path.join(getConfigRoot(qpqConfig), userDirectoryConfig.buildPath);
+  return joinPaths(getConfigRoot(qpqConfig), userDirectoryConfig.buildPath);
 };
 
 export const getQueueQueueProcessors = (name: string, qpqConfig: QPQConfig): QpqQueueProcessors => {

@@ -1,4 +1,5 @@
-import { ActionHistoryLog } from '../types';
+import { ActionHistory } from 'quidproquo-core';
+
 import { Typography, IconButton, Box, Tooltip } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
@@ -11,7 +12,7 @@ import { getGenericActionRenderer } from './actionComponents';
 import customActionsMap from './actionComponents/customActionsMap';
 
 interface AnyActionHistoryItemProps {
-  historyItem: ActionHistoryLog;
+  historyItem: ActionHistory;
 }
 
 export const AnyActionHistoryItem = ({ historyItem }: AnyActionHistoryItemProps) => {

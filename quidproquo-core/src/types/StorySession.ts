@@ -152,3 +152,7 @@ export interface StoryResultMetadata {
 
   executionTimeMs: number;
 }
+
+export type StoryResultMetadataWithChildren = StoryResultMetadata & {
+  children: StoryResultMetadataWithChildren[];
+};

@@ -1,7 +1,7 @@
+import { StoryResultMetadata } from 'quidproquo-core';
 import { useMemo } from 'react';
-import { StoryResultMetadataLog } from '../../types';
 
-export const useErrorsByType = (logs: StoryResultMetadataLog[]) => {
+export const useErrorsByType = (logs: StoryResultMetadata[]) => {
   const data = useMemo(() => {
     const errorCounts: Record<string, { count: number; errorText: string }> = {};
 

@@ -1,12 +1,12 @@
-import { StoryResultMetadataLogWithChildren } from './createHierarchy';
+import { StoryResultMetadataWithChildren } from '../../types';
 
 export const getTimeBounds = (
-  logs: StoryResultMetadataLogWithChildren[],
+  logs: StoryResultMetadataWithChildren[],
 ): { earliestStartedAt: string; latestFinishedAt: string } => {
   let earliestStartedAt = '';
   let latestFinishedAt = '';
 
-  const traverse = (node: StoryResultMetadataLogWithChildren) => {
+  const traverse = (node: StoryResultMetadataWithChildren) => {
     if (node.startedAt && (!earliestStartedAt || node.startedAt < earliestStartedAt)) {
       earliestStartedAt = node.startedAt;
     }

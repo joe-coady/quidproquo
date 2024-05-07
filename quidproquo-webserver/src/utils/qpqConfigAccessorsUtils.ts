@@ -1,6 +1,4 @@
-import * as path from 'path';
-
-import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { QPQConfig, joinPaths, qpqCoreUtils } from 'quidproquo-core';
 
 import {
   ApiKeyQPQWebServerConfigSetting,
@@ -122,7 +120,7 @@ export const getWebEntryFullPath = (
   qpqConfig: QPQConfig,
   webEntryQPQWebServerConfigSetting: WebEntryQPQWebServerConfigSetting,
 ): string => {
-  return path.join(
+  return joinPaths(
     qpqCoreUtils.getConfigRoot(qpqConfig),
     webEntryQPQWebServerConfigSetting.buildPath || '',
   );
@@ -139,7 +137,7 @@ export const getWebEntrySeoFullPath = (
     );
   }
 
-  return path.join(
+  return joinPaths(
     qpqCoreUtils.getConfigRoot(qpqConfig),
     webEntryQPQWebServerConfigSetting.seoBuildPath,
   );
@@ -155,7 +153,7 @@ export const getApiEntryFullPath = (
     throw new Error(`please define a build path for your api ${apiConfig.apiName}`);
   }
 
-  return path.join(qpqCoreUtils.getConfigRoot(qpqConfig), apiBuildPath);
+  return joinPaths(qpqCoreUtils.getConfigRoot(qpqConfig), apiBuildPath);
 };
 
 export const getWebsocketEntryFullPath = (
@@ -168,7 +166,7 @@ export const getWebsocketEntryFullPath = (
     throw new Error(`please define a build path for your websocket [${websocketConfig.apiName}]`);
   }
 
-  return path.join(qpqCoreUtils.getConfigRoot(qpqConfig), websocketBuildPath);
+  return joinPaths(qpqCoreUtils.getConfigRoot(qpqConfig), websocketBuildPath);
 };
 
 export const getWebsocketEntryByApiName = (
@@ -196,7 +194,7 @@ export const getServiceFunctionFullPath = (
     throw new Error('please use defineWebEntry in your qpq config');
   }
 
-  return path.join(qpqCoreUtils.getConfigRoot(qpqConfig), buildPath);
+  return joinPaths(qpqCoreUtils.getConfigRoot(qpqConfig), buildPath);
 };
 
 export const getRedirectApiBuildFullPath = (
@@ -205,7 +203,7 @@ export const getRedirectApiBuildFullPath = (
 ): string => {
   const apiEntry = redirectConfig.apiBuildPath;
 
-  return path.join(qpqCoreUtils.getConfigRoot(qpqConfig), apiEntry);
+  return joinPaths(qpqCoreUtils.getConfigRoot(qpqConfig), apiEntry);
 };
 
 export const getSubdomainRedirects = (

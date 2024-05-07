@@ -33,6 +33,10 @@ const config = (): Configuration => {
       alias: {
         src: path.resolve(__dirname, './src/'),
       },
+
+      fallback: {
+        path: require.resolve('path-browserify'),
+      },
     },
 
     plugins: [

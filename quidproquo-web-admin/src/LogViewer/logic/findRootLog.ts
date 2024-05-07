@@ -1,17 +1,17 @@
-import { StoryResultMetadataLog } from '../../types';
+import { StoryResultMetadata } from 'quidproquo-core';
 import { apiRequestGet } from '../../logic';
 import { cache } from '../../logic/cache';
 
 export const findRootLog = cache(async function findRootLog(
   fromCorrelation?: string,
   accessToken?: string,
-): Promise<StoryResultMetadataLog | undefined> {
+): Promise<StoryResultMetadata | undefined> {
   if (!fromCorrelation) {
     return;
   }
 
   try {
-    const parentLog = await apiRequestGet<StoryResultMetadataLog>(
+    const parentLog = await apiRequestGet<StoryResultMetadata>(
       `/log/${fromCorrelation}`,
       accessToken,
     );

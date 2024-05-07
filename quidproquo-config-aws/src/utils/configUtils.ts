@@ -1,6 +1,4 @@
-import path from 'path';
-
-import { qpqCoreUtils, QPQConfig, CrossModuleOwner } from 'quidproquo-core';
+import { qpqCoreUtils, QPQConfig, CrossModuleOwner, joinPaths } from 'quidproquo-core';
 
 import { ServiceAccountInfo, LocalServiceAccountInfo, ApiLayer } from '../types';
 
@@ -171,7 +169,7 @@ export const getLambdaLayersWithFullPaths = (qpqConfig: QPQConfig): ApiLayer[] =
   return awsServiceAccountInfoConfig.apiLayers.map((layer: ApiLayer) => ({
     name: layer.name,
     buildPath: layer.buildPath
-      ? path.join(qpqCoreUtils.getConfigRoot(qpqConfig), layer.buildPath)
+      ? joinPaths(qpqCoreUtils.getConfigRoot(qpqConfig), layer.buildPath)
       : undefined,
     layerArn: layer.layerArn,
   }));

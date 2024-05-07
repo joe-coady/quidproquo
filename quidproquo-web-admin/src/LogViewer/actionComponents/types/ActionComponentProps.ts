@@ -1,8 +1,8 @@
+import { ActionHistory } from 'quidproquo-core';
 import { FC } from 'react';
-import { ActionHistoryLog } from '../../../types';
 
 export type ActionComponentProps = {
-  historyItem: ActionHistoryLog;
+  historyItem: ActionHistory;
   expanded: boolean;
 };
 
