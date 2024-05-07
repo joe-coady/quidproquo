@@ -5,6 +5,7 @@ import { RouteOptions, ServiceAllowedOrigin } from '../config/settings/route';
 
 import { getBaseDomainName } from './qpqConfigAccessorsUtils';
 import { qpqWebServerUtils } from '../qpqWebServerUtils';
+import { SeoEvent, qpqHeaderIsBot } from '../types';
 
 export const getHeaderValue = (header: string, headers: HttpEventHeaders): string | null => {
   const headerAsLower = header.toLowerCase();
@@ -120,4 +121,8 @@ export const getCorsHeaders = (
     'Access-Control-Allow-Credentials': `${allowCredentials}`,
     Vary: 'Origin',
   };
+};
+
+export const isBot = (event: HTTPEvent | SeoEvent<any>): boolean => {
+  return event.headers[qpqHeaderIsBot] === 'true';
 };

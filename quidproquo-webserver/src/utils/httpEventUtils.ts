@@ -1,3 +1,4 @@
+import { SeoEventResponse } from '../types';
 import { HTTPEvent, HTTPEventResponse } from '../types/HTTPEvent';
 
 export const rawFromJsonEventRequest = (httpJsonEvent: HTTPEvent): string => {
@@ -32,5 +33,43 @@ export const toHtmlResponse = (html: string, status: number = 200): HTTPEventRes
     headers: {
       'content-type': 'text/html',
     },
+  };
+};
+
+export const toTextResponse = (text: string, status: number = 200): HTTPEventResponse => {
+  return {
+    status,
+    body: text,
+    isBase64Encoded: false,
+    headers: {
+      'content-type': 'text/plain',
+    },
+  };
+};
+
+export const toMovedPermanentlyRedirectResponse = (location: string): HTTPEventResponse => {
+  return {
+    status: 301,
+    isBase64Encoded: false,
+    headers: {
+      Location: location,
+    },
+  };
+};
+
+export const toMovedTemporarilyRedirectResponse = (location: string): HTTPEventResponse => {
+  return {
+    status: 302,
+    isBase64Encoded: false,
+    headers: {
+      Location: location,
+    },
+  };
+};
+
+export const toCdnResponse = (status: number = 200): SeoEventResponse => {
+  return {
+    status,
+    fallbackToCDN: true,
   };
 };

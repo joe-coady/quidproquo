@@ -10,7 +10,6 @@ import {
   actionResult,
   actionResultError,
   ErrorTypeEnum,
-  QPQBinaryData,
 } from 'quidproquo-core';
 
 import {
@@ -167,17 +166,13 @@ const getProcessMatchStory = (
   return async (payload) => {
     // Sort the routes by string length
     // Note: We may need to filter variable routes out {} as the variables are length independent
-    const sortedRoutes = routes
-      .filter(
-        (r: any) =>
-          r.method === payload.transformedEventParams.method ||
-          payload.transformedEventParams.method === 'OPTIONS',
-      )
-      .sort((a: any, b: any) => {
-        if (a.path.length < b.path.length) return -1;
-        if (a.path.length > b.path.length) return 1;
-        return 0;
-      });
+    const routesWithNoOptions = routes.filter(
+      (r: any) =>
+        r.method === payload.transformedEventParams.method ||
+        payload.transformedEventParams.method === 'OPTIONS',
+    );
+
+    const sortedRoutes = qpqWebServerUtils.sortPathMatchConfigs(routesWithNoOptions);
 
     // Find the most relevant match
     const matchedRoute = sortedRoutes

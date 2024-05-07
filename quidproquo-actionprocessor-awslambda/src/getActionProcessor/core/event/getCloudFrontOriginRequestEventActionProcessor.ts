@@ -81,13 +81,9 @@ const getProcessMatchStory = (
   seoConfigs: SeoQPQWebServerConfigSetting[],
 ): EventMatchStoryActionProcessor<SeoEvent<any>, CloudFrontOriginMatchStoryResult> => {
   return async (payload) => {
-    /// Sort the routes by string length
-    // Note: We may need to filter variable routes out {} as the variables are length independent
-    const sortedSeoConfigs = seoConfigs.sort((a: any, b: any) => {
-      if (a.path.length < b.path.length) return -1;
-      if (a.path.length > b.path.length) return 1;
-      return 0;
-    });
+    // Sort the routes by string length
+    // we don't sort them here for SEO... its the order they are defined.
+    const sortedSeoConfigs = seoConfigs; // qpqWebServerUtils.sortPathMatchConfigs(seoConfigs);
 
     // Find the most relevant match
     const matchedSeoConfig = sortedSeoConfigs

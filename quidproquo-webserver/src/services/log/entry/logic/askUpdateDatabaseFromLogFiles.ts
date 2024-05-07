@@ -14,6 +14,7 @@ import {
   unknownGenericTextExtractor,
   queueEventGenericTextExtractor,
   serviceFunctionExeGenericTextExtractor,
+  seoORGenericTextExtractor,
 } from './genericTextExtractors';
 
 import * as logMetadataData from '../data/logMetadataData';
@@ -25,7 +26,7 @@ const extractors: Record<QpqRuntimeType, (sr: StoryResult<any>) => string> = {
   [QpqRuntimeType.SERVICE_FUNCTION_EXE]: serviceFunctionExeGenericTextExtractor,
 
   [QpqRuntimeType.RECURRING_SCHEDULE]: unknownGenericTextExtractor,
-  [QpqRuntimeType.EVENT_SEO_OR]: unknownGenericTextExtractor,
+  [QpqRuntimeType.EVENT_SEO_OR]: seoORGenericTextExtractor,
   [QpqRuntimeType.EXECUTE_STORY]: unknownGenericTextExtractor,
   [QpqRuntimeType.SEND_EMAIL_EVENT]: unknownGenericTextExtractor,
   [QpqRuntimeType.WEBSOCKET_EVENT]: unknownGenericTextExtractor,
