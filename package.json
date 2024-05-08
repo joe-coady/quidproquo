@@ -31,8 +31,8 @@
     "quidproquo-actionprocessor-awslambda",
     "quidproquo-deploy-webpack",
     "quidproquo-deploy-awscdk",
-    "quidproquo-web-admin",
     "quidproquo-web",
+    "quidproquo-web-admin",
     "quidproquo-testing",
     "quidproquo"
   ],
