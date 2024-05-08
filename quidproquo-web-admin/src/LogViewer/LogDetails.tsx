@@ -1,4 +1,4 @@
-import { StoryResult } from 'quidproquo';
+import { StoryResult } from 'quidproquo-core';
 import ConsoleLogViewer from './ConsoleLogViewer';
 
 import { ActionHistoryItemTimeStamp } from './ActionHistoryItemTimeStamp';

@@ -1,4 +1,4 @@
-import { StoryResult } from 'quidproquo';
+import { StoryResult } from 'quidproquo-core';
 import { Box, Typography } from '@mui/material';
 
 interface LogSummaryProps {

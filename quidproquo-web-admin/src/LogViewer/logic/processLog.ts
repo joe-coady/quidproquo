@@ -1,4 +1,4 @@
-import { ActionHistory, StoryResult } from 'quidproquo';
+import { ActionHistory, StoryResult } from 'quidproquo-core';
 
 export const processLog = (logFile: StoryResult<any>): ActionHistory[] => {
   if (!logFile) {

@@ -1,7 +1,7 @@
 import { ObjectInspector } from 'react-inspector';
 
 import { memo } from 'react';
-import { StoryResult } from 'quidproquo';
+import { StoryResult } from 'quidproquo-core';
 import { useConsoleLogViewer } from './hooks';
 
 interface ConsoleLogViewerProps {

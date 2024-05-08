@@ -1,4 +1,4 @@
-import { ActionHistory } from 'quidproquo';
+import { ActionHistory } from 'quidproquo-core';
 
 import { Typography, IconButton, Box, Tooltip } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';

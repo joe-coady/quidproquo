@@ -1,6 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Box, CircularProgress } from '@mui/material';
-import { StoryResultMetadataWithChildren, getTimeBounds } from 'quidproquo';
+import {
+  StoryResultMetadataWithChildren,
+  formatDuration,
+  getTimeBounds,
+  getTotalExecutionTime,
+} from 'quidproquo-core';
 
 import { useLogTreeData } from './hooks';
 
@@ -132,6 +137,7 @@ export const EventTimeline: React.FC<EventTimelineProps> = ({
   }
 
   const { earliestStartedAt, latestFinishedAt } = getTimeBounds(timelineData);
+  const totalExecutionTime = getTotalExecutionTime(timelineData);
 
   const startDate = new Date(earliestStartedAt);
   const endDate = new Date(latestFinishedAt);
@@ -141,13 +147,15 @@ export const EventTimeline: React.FC<EventTimelineProps> = ({
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-      <div style={{ padding: '10px', fontSize: '18px', fontWeight: 'bold' }}>
-        Total Runtime: {offsetMs}ms
+      <div style={{ height: 24 }}>
+        <b>{formatDuration(totalExecutionTime)}</b>
+        <i> of compute over </i>
+        <b>{formatDuration(offsetMs)}</b>
       </div>
       <div
         ref={setTimelineRef}
         onWheel={handleOnWheel}
-        style={{ width: '100%', height: 'calc(100% - 40px)', overflow: 'auto' }}
+        style={{ width: '100%', height: 'calc(100% - 24px)' }}
       >
         {timelineData[0] && (
           <TimelineEvent

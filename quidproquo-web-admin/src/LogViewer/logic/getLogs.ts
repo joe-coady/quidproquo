@@ -1,4 +1,4 @@
-import { StoryResultMetadata, QpqLogList } from 'quidproquo';
+import { StoryResultMetadata, QpqLogList } from 'quidproquo-core';
 import { apiRequestPost } from '../../logic';
 
 export const getLogs = async (

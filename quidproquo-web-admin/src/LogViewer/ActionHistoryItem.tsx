@@ -1,4 +1,4 @@
-import { ActionHistory } from 'quidproquo';
+import { ActionHistory } from 'quidproquo-core';
 import TruncatedText from './TruncatedText';
 
 interface ActionHistoryItemProps {

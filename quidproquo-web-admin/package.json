@@ -37,7 +37,7 @@
     "date-fns": "^2.30.0",
     "dayjs": "^1.11.7",
     "javascript-time-ago": "^2.5.9",
-    "quidproquo": "0.0.189",
+    "quidproquo-core": "0.0.189",
     "react": "^18.2.0",
     "react-d3-tree": "^3.6.0",
     "react-dom": "^18.2.0",
