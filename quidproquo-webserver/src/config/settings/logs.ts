@@ -32,6 +32,7 @@ export const defineLogs = (
   buildPath: string,
   webFilesPath: string,
   rootDomain: string,
+  services: string[],
   advancedSettings?: QPQConfigAdvancedLogSettings,
 ): QPQConfig => {
   const routeAuthSettings = {
@@ -59,6 +60,7 @@ export const defineLogs = (
     : undefined;
 
   const configs = [
+    defineGlobal('qpq-serviceNames', services),
     defineGlobal('qpq-log-retention-days', logRetentionDays),
 
     defineStorageDrive(logResourceName, {
@@ -118,6 +120,13 @@ export const defineLogs = (
       '/challenge',
       getServiceEntry('log', 'controller', 'loginController'),
       'respondToAuthChallenge',
+    ),
+
+    defineRoute(
+      'GET',
+      '/admin/services',
+      getServiceEntry('log', 'controller', 'logController'),
+      'getServiceNames',
     ),
 
     defineRoute(

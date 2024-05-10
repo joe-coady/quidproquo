@@ -13,6 +13,7 @@ import { IconButton, Menu, Autocomplete } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useState } from 'react';
 import { Box } from '@mui/system';
+import { useServiceNames } from './hooks';
 
 export interface TopSectionProps {
   searchParams: SearchParams;
@@ -20,14 +21,10 @@ export interface TopSectionProps {
   onSearch: () => Promise<any>;
 }
 
-const serviceOptions = [
-  { label: 'Service A', value: 'card' },
-  { label: 'Service B', value: 'shell' },
-  // Add more services as needed
-];
-
 export function TopSection({ searchParams, setSearchParams, onSearch }: TopSectionProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const serviceOptions = useServiceNames();
 
   const handleRuntimeTypeChange = (event: SelectChangeEvent<string>) => {
     setSearchParams((prevSearchParams) => ({

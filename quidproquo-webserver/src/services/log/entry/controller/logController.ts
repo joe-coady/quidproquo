@@ -5,6 +5,7 @@ import {
   askThrowError,
   askFileGenerateTemporarySecureUrl,
   AskResponse,
+  askConfigGetGlobal,
 } from 'quidproquo-core';
 
 import { HTTPEvent, HTTPEventResponse } from '../../../../types';
@@ -68,6 +69,12 @@ export function* getLog(
   }
 
   return toJsonEventResponse(log);
+}
+
+export function* getServiceNames(event: HTTPEvent) {
+  const serviceNames = yield* askConfigGetGlobal('qpq-serviceNames');
+
+  return toJsonEventResponse(serviceNames);
 }
 
 export function* getHierarchies(

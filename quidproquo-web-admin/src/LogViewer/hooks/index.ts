@@ -6,3 +6,4 @@ export * from './useConsoleLogViewer';
 export * from './useLogDetails';
 export * from './useTruncatedText';
 export * from './useLogTreeData';
+export * from './useServiceNames';

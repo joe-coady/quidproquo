@@ -8,3 +8,4 @@ export * from './processLog';
 export * from './searchLogs';
 export * from './createHierarchy';
 export * from './getLogHierarchy';
+export * from './getServiceNames';
