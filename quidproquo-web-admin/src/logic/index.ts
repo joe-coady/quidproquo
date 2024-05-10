@@ -1,1 +1,1 @@
-export * from './apiRequest';
+export * from './platform';

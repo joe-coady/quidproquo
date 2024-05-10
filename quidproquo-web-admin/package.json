@@ -38,6 +38,8 @@
     "dayjs": "^1.11.7",
     "javascript-time-ago": "^2.5.9",
     "quidproquo-core": "0.0.191",
+    "quidproquo-web": "0.0.191",
+    "quidproquo-webserver": "0.0.191",
     "react": "^18.2.0",
     "react-d3-tree": "^3.6.0",
     "react-dom": "^18.2.0",

@@ -1,5 +1,5 @@
 import { useAsyncLoading } from '../Loading';
-import { apiRequestGet, externalRequestGet } from '../../logic/apiRequest';
+import { apiRequestGet, externalRequestGet } from '../../logic';
 import { AnyAsyncFunction } from '../types';
 import { useCallback } from 'react';
 import { useAuthAccessToken } from '../../Auth/hooks';

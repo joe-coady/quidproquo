@@ -1,5 +1,5 @@
 import { StoryResultMetadata, StoryResultMetadataWithChildren } from 'quidproquo-core';
-import { cache } from '../../logic/cache';
+import { cache } from '../../logic';
 
 import { fineLogDirectChildren } from './findLogDirectChildren';
 

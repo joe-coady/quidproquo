@@ -1,6 +1,5 @@
-import { apiRequestGet } from '../../logic';
+import { apiRequestGet, cache } from '../../logic';
 import { QpqPagedData, StoryResultMetadata } from 'quidproquo-core';
-import { cache } from '../../logic/cache';
 
 export const fineLogDirectChildren = cache(async function findLogDirectChildren(
   logCorrelation: string,
