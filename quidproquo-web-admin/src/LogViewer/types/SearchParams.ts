@@ -1,6 +1,9 @@
 export interface SearchParams {
   runtimeType: string;
-  errorFilter: string;
   startIsoDateTime: string;
   endIsoDateTime: string;
+
+  serviceFilter: string;
+  infoFilter: string;
+  errorFilter: string;
 }

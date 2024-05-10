@@ -9,7 +9,11 @@ import {
 
 import { HTTPEvent, HTTPEventResponse } from '../../../../types';
 import { toJsonEventResponse, fromJsonEventRequest } from '../../../../utils/httpEventUtils';
-import { askGetByCorrelation, askGetByFromCorrelation } from '../data/logMetadataData';
+import {
+  askGetByCorrelation,
+  askGetByFromCorrelation,
+  askGetHierarchiesByCorrelation,
+} from '../data/logMetadataData';
 import { ListLogChatMessages, SendLogChatMessage } from '../domain';
 import { askLogSendChatMessage } from '../logic/askLogSendChatMessage';
 import { askGetLogChatMessages } from '../logic/askGetLogChatMessages';
@@ -22,16 +26,30 @@ export interface GetLogsParams {
   startIsoDateTime: string;
   endIsoDateTime: string;
   runtimeType: QpqRuntimeType;
+
+  infoFilter: string;
+  errorFilter: string;
+  serviceFilter: string;
 }
 
 export function* getLogs(event: HTTPEvent, params: {}): AskResponse<HTTPEventResponse> {
-  const { nextPageKey, startIsoDateTime, endIsoDateTime, runtimeType } =
-    fromJsonEventRequest<GetLogsParams>(event);
+  const {
+    nextPageKey,
+    startIsoDateTime,
+    endIsoDateTime,
+    runtimeType,
+    errorFilter,
+    serviceFilter,
+    infoFilter,
+  } = fromJsonEventRequest<GetLogsParams>(event);
 
   const logs = yield* logsLogic.askGetLogs(
     runtimeType,
     startIsoDateTime,
     endIsoDateTime,
+    errorFilter,
+    serviceFilter,
+    infoFilter,
     nextPageKey,
   );
 
@@ -50,6 +68,17 @@ export function* getLog(
   }
 
   return toJsonEventResponse(log);
+}
+
+export function* getHierarchies(
+  event: HTTPEvent,
+  params: {
+    correlationId: string;
+  },
+) {
+  const reportUrl = yield* askGetHierarchiesByCorrelation(params.correlationId);
+
+  return toJsonEventResponse({ url: reportUrl });
 }
 
 export function* getChildren(

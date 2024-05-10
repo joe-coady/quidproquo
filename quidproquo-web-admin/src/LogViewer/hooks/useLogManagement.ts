@@ -51,6 +51,8 @@ export const useLogManagement = () => {
       startIsoDateTime: isoDateThreeHoursAgo,
       endIsoDateTime: isoDateTomorrow,
       errorFilter: '',
+      infoFilter: '',
+      serviceFilter: '',
     };
   });
 

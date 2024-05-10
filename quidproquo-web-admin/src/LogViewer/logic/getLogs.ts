@@ -6,6 +6,9 @@ export const getLogs = async (
   runtimeType: string,
   startIsoDateTime: string,
   endIsoDateTime: string,
+  serviceFilter: string,
+  infoFilter: string,
+  errorFilter: string,
   accessToken?: string,
 ): Promise<StoryResultMetadata[]> => {
   var logs: StoryResultMetadata[] = [];
@@ -16,6 +19,9 @@ export const getLogs = async (
     startIsoDateTime,
     endIsoDateTime,
     runtimeType,
+    serviceFilter,
+    errorFilter,
+    infoFilter,
   };
 
   do {

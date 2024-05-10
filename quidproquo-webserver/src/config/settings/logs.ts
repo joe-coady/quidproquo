@@ -26,6 +26,7 @@ export interface QPQConfigAdvancedLogSettings extends QPQConfigAdvancedSettings 
 // This should be part of core
 
 const logResourceName = 'qpq-logs';
+export const logReportsResourceName = 'qpq-log-reports';
 
 export const defineLogs = (
   buildPath: string,
@@ -86,6 +87,15 @@ export const defineLogs = (
       ],
     }),
 
+    defineStorageDrive(logReportsResourceName, {
+      deprecated: advancedSettings?.deprecated,
+      lifecycleRules: [
+        {
+          deleteAfterDays: 30,
+        },
+      ],
+    }),
+
     defineKeyValueStore(logResourceName, 'correlation', [], {
       indexes: [
         { partitionKey: 'runtimeType', sortKey: 'startedAt' },
@@ -131,6 +141,14 @@ export const defineLogs = (
       '/log/children/{fromCorrelation}',
       getServiceEntry('log', 'controller', 'logController'),
       'getChildren',
+      routeAuthSettings,
+    ),
+
+    defineRoute(
+      'GET',
+      '/log/{correlationId}/hierarchies',
+      getServiceEntry('log', 'controller', 'logController'),
+      'getHierarchies',
       routeAuthSettings,
     ),
 

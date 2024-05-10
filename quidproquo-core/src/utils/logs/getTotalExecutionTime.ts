@@ -1,11 +1,13 @@
-import { StoryResultMetadataWithChildren } from '../../types';
+import { QpqRuntimeType, StoryResultMetadataWithChildren } from '../../types';
 
 export const getTotalExecutionTime = (logs: StoryResultMetadataWithChildren[]): number => {
   let totalExecutionTimeMs = 0;
 
   const traverse = (node: StoryResultMetadataWithChildren) => {
     // Add the node's execution time to the total
-    totalExecutionTimeMs += node.executionTimeMs;
+    if (node.runtimeType === QpqRuntimeType.EXECUTE_STORY) {
+      totalExecutionTimeMs += node.executionTimeMs;
+    }
 
     // Recursively process each child
     for (const child of node.children) {

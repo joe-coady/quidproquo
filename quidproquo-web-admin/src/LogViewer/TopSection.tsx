@@ -2,17 +2,14 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
-
 import Grid from '@mui/material/Grid';
-
 import InputLabel from '@mui/material/InputLabel';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider, DateTimePicker } from '@mui/x-date-pickers';
-
 import { SearchParams } from './types';
 import { RuntimeTypes } from './constants';
 import { AsyncButton } from '../components';
-import { IconButton, Menu } from '@mui/material';
+import { IconButton, Menu, Autocomplete } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useState } from 'react';
 import { Box } from '@mui/system';
@@ -20,9 +17,14 @@ import { Box } from '@mui/system';
 export interface TopSectionProps {
   searchParams: SearchParams;
   setSearchParams: (setter: (searchParams: SearchParams) => SearchParams) => void;
-
   onSearch: () => Promise<any>;
 }
+
+const serviceOptions = [
+  { label: 'Service A', value: 'card' },
+  { label: 'Service B', value: 'shell' },
+  // Add more services as needed
+];
 
 export function TopSection({ searchParams, setSearchParams, onSearch }: TopSectionProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -59,17 +61,18 @@ export function TopSection({ searchParams, setSearchParams, onSearch }: TopSecti
     }));
   };
 
+  const handleInfoFilterChange = (event: any) => {
+    setSearchParams((prev) => ({ ...prev, infoFilter: event.target.value }));
+  };
+
   const handleQuickTimeSelect = (minutes: number) => {
     const now = new Date();
-    // Calculate the start date by subtracting minutes from the current time
     const startDate = new Date(now.getTime() - minutes * 60000);
-    // Set the end date to 24 hours from the current time
-    const endDate = new Date(now.getTime() + 24 * 60 * 60000);
+    const endDate = new Date(now.getTime() + 7 * 24 * 60 * 60000);
 
     setSearchParams((prevSearchParams) => ({
       ...prevSearchParams,
       startIsoDateTime: startDate.toISOString(),
-      // Use the newly calculated endDate for the endIsoDateTime
       endIsoDateTime: endDate.toISOString(),
     }));
 
@@ -84,10 +87,17 @@ export function TopSection({ searchParams, setSearchParams, onSearch }: TopSecti
     setAnchorEl(null);
   };
 
+  const handleServiceChange = (event: any, value: any) => {
+    setSearchParams((prevSearchParams) => ({
+      ...prevSearchParams,
+      serviceFilter: value ? value.value : '',
+    }));
+  };
+
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <Grid container columns={12} spacing={2}>
-        <Grid item xs={2}>
+        <Grid item xs={3}>
           <FormControl fullWidth>
             <InputLabel id="runtime-select-label">Runtime Type</InputLabel>
             <Select
@@ -105,7 +115,17 @@ export function TopSection({ searchParams, setSearchParams, onSearch }: TopSecti
             </Select>
           </FormControl>
         </Grid>
-        <Grid item xs={2}>
+        <Grid item xs={3}>
+          <FormControl fullWidth>
+            <Autocomplete
+              options={serviceOptions}
+              getOptionLabel={(option) => option.label}
+              onChange={handleServiceChange}
+              renderInput={(params) => <TextField {...params} label="Service Name" />}
+            />
+          </FormControl>
+        </Grid>
+        <Grid item xs={3}>
           <Box position="relative">
             <FormControl fullWidth>
               <DateTimePicker
@@ -130,12 +150,24 @@ export function TopSection({ searchParams, setSearchParams, onSearch }: TopSecti
             </IconButton>
           </Box>
         </Grid>
-        <Grid item xs={2}>
+        <Grid item xs={3}>
           <FormControl fullWidth>
             <DateTimePicker
               label="End DateTime"
               value={new Date(searchParams.endIsoDateTime)}
               onChange={handleEndDateChange}
+            />
+          </FormControl>
+        </Grid>
+        <Grid item xs={5}>
+          <FormControl fullWidth>
+            <TextField
+              label="Info"
+              value={searchParams.infoFilter}
+              onChange={handleInfoFilterChange}
+              InputLabelProps={{
+                shrink: true,
+              }}
             />
           </FormControl>
         </Grid>
@@ -151,7 +183,7 @@ export function TopSection({ searchParams, setSearchParams, onSearch }: TopSecti
             />
           </FormControl>
         </Grid>
-        <Grid item xs={1}>
+        <Grid item xs={2}>
           <AsyncButton onClick={() => onSearch()} style={{ width: '100%', height: '100%' }}>
             Search
           </AsyncButton>
@@ -165,11 +197,14 @@ export function TopSection({ searchParams, setSearchParams, onSearch }: TopSecti
         onClose={handleQuickTimeClose}
       >
         <MenuItem onClick={() => handleQuickTimeSelect(5)}>Last 5 minutes</MenuItem>
+        <MenuItem onClick={() => handleQuickTimeSelect(30)}>Last 30 minutes</MenuItem>
+        <MenuItem onClick={() => handleQuickTimeSelect(1 * 60)}>Last hour</MenuItem>
         <MenuItem onClick={() => handleQuickTimeSelect(3 * 60)}>Last 3 hours</MenuItem>
         <MenuItem onClick={() => handleQuickTimeSelect(8 * 60)}>Last 8 hours</MenuItem>
         <MenuItem onClick={() => handleQuickTimeSelect(16 * 60)}>Last 16 hours</MenuItem>
         <MenuItem onClick={() => handleQuickTimeSelect(24 * 60)}>Last 24 hours</MenuItem>
         <MenuItem onClick={() => handleQuickTimeSelect(7 * 24 * 60)}>Last 7 days</MenuItem>
+        <MenuItem onClick={() => handleQuickTimeSelect(30 * 24 * 60)}>Last month</MenuItem>
       </Menu>
     </LocalizationProvider>
   );

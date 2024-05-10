@@ -1,17 +1,20 @@
 import { Box } from '@mui/material';
 
 import { LogCorrelationTree } from './LogCorrelationTree';
+import { StoryResultMetadataWithChildren } from 'quidproquo-core';
 
 interface LogCorrelationsProps {
   logCorrelation: string;
   setSelectedLogCorrelation: (logCorrelation: string) => void;
   isVisible: boolean;
+  timelineData?: StoryResultMetadataWithChildren[];
 }
 
 export const LogCorrelations = ({
   logCorrelation,
   setSelectedLogCorrelation,
   isVisible,
+  timelineData,
 }: LogCorrelationsProps) => {
   return (
     <Box
@@ -29,6 +32,7 @@ export const LogCorrelations = ({
         highlightCorrelationId={logCorrelation}
         setSelectedLogCorrelation={setSelectedLogCorrelation}
         isVisible={isVisible}
+        timelineData={timelineData}
       />
     </Box>
   );

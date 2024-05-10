@@ -30,7 +30,10 @@ export const searchLogs = async (
         type,
         searchParams.startIsoDateTime,
         searchParams.endIsoDateTime,
-        accessToken
+        searchParams.serviceFilter,
+        searchParams.infoFilter,
+        searchParams.errorFilter,
+        accessToken,
       ).finally(() => {
         progress = progress + 1;
 

@@ -13,6 +13,7 @@ interface EventTimelineProps {
   logCorrelation: string;
   setSelectedLogCorrelation: (logCorrelation: string) => void;
   isVisible: boolean;
+  timelineData?: StoryResultMetadataWithChildren[];
 }
 
 const EVENT_HEIGHT = 30;
@@ -92,8 +93,8 @@ export const EventTimeline: React.FC<EventTimelineProps> = ({
   logCorrelation,
   setSelectedLogCorrelation,
   isVisible,
+  timelineData,
 }) => {
-  const timelineData = useLogTreeData(logCorrelation, true);
   const [scaleOffset, setScaleOffset] = useState(0.0);
   const [handleOnWheel, setHandleWheel] = useState<any>(() => () => {});
 
@@ -101,7 +102,7 @@ export const EventTimeline: React.FC<EventTimelineProps> = ({
 
   useEffect(() => {
     const handleWheel = (event: any) => {
-      if (event.altKey) {
+      if (event && event.altKey) {
         event.preventDefault(); // Prevent default scrolling behavior
         const delta = event.deltaY > 0 ? -0.01 : 0.01;
         setScaleOffset((prevScale) => Math.max(0.0, prevScale + delta));

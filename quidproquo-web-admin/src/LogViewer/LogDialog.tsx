@@ -27,6 +27,7 @@ import { useIsLoading } from '../view';
 import { apiRequestPost } from '../logic';
 import { StoryResult } from 'quidproquo-core';
 import { useState } from 'react';
+import { useLogTreeData } from './hooks';
 
 interface LogDialogProps {
   open: boolean;
@@ -81,6 +82,8 @@ const LogDialog = ({
   };
 
   const theme = useTheme();
+
+  const timelineData = useLogTreeData(logCorrelation, false);
 
   return (
     <Dialog
@@ -165,6 +168,7 @@ const LogDialog = ({
             logCorrelation={logCorrelation}
             setSelectedLogCorrelation={setSelectedLogCorrelation}
             isVisible={selectedTab === 1}
+            timelineData={timelineData}
           />
         </div>
         <div style={getTabStyle(selectedTab, 2)}>
@@ -172,6 +176,7 @@ const LogDialog = ({
             logCorrelation={logCorrelation}
             setSelectedLogCorrelation={setSelectedLogCorrelation}
             isVisible={selectedTab === 2}
+            timelineData={timelineData}
           />
         </div>
         <div style={getTabStyle(selectedTab, 3)}>

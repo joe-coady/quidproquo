@@ -1,7 +1,7 @@
 import { StoryResultMetadataWithChildren } from 'quidproquo-core';
 import { useEffect, useState } from 'react';
 import { useAuthAccessToken } from '../../Auth/hooks';
-import { createHierarchy, findRootLog } from '../logic';
+import { createHierarchy, findRootLog, getLogHierarchy } from '../logic';
 
 const filterQpqActions = (
   logs: StoryResultMetadataWithChildren[],
@@ -29,23 +29,23 @@ const filterQpqActions = (
 export const useLogTreeData = (
   correlationId: string,
   hideQpqActions: boolean = false,
-): StoryResultMetadataWithChildren[] | null => {
-  const [treeData, setTreeData] = useState<any>(null);
+): StoryResultMetadataWithChildren[] | undefined => {
+  const [treeData, setTreeData] = useState<StoryResultMetadataWithChildren[]>();
   const accessToken = useAuthAccessToken();
 
   useEffect(() => {
     const fetchTreeData = async () => {
-      const rootLog = await findRootLog(correlationId, accessToken);
+      console.log('correlationId: ', correlationId);
+      const logHierarchy = await getLogHierarchy(correlationId, accessToken);
 
-      if (rootLog) {
-        const data = await createHierarchy(rootLog, accessToken);
-
-        console.log('treeData: ', data);
-        setTreeData([data]);
+      if (logHierarchy) {
+        setTreeData([logHierarchy]);
       }
     };
 
-    fetchTreeData();
+    if (correlationId) {
+      fetchTreeData();
+    }
   }, [correlationId]);
 
   if (hideQpqActions) {
