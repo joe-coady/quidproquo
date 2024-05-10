@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, memo, Fragment } from 'react';
 import { Tree } from 'react-d3-tree';
 
 import { Box, CircularProgress } from '@mui/material';
-import { StoryResultMetadataWithChildren } from 'quidproquo-core';
+import { TreeApi } from './hooks';
 
 const BACKGROUND_COLOR = '#c1c1c1';
 
@@ -11,7 +11,7 @@ interface LogCorrelationTreeProps {
   highlightCorrelationId: string;
   setSelectedLogCorrelation: (logCorrelation: string) => void;
   isVisible: boolean;
-  timelineData?: StoryResultMetadataWithChildren[];
+  treeApi: TreeApi;
 }
 
 // Here we're using `renderCustomNodeElement` to represent each node
@@ -79,7 +79,7 @@ const LogCorrelationTreeComponent = ({
   highlightCorrelationId,
   setSelectedLogCorrelation,
   isVisible,
-  timelineData,
+  treeApi,
 }: LogCorrelationTreeProps) => {
   const treeContainer = useRef(null);
   const [translate, setTranslate] = useState({ x: 0, y: 0 });
@@ -90,9 +90,9 @@ const LogCorrelationTreeComponent = ({
       const { clientWidth } = treeContainer.current;
       setTranslate({ x: clientWidth / 2, y: 40 });
     }
-  }, [timelineData, isVisible]);
+  }, [treeApi.treeData, isVisible]);
 
-  if (!timelineData) {
+  if (treeApi.isLoading) {
     return (
       <Box
         sx={{
@@ -108,13 +108,17 @@ const LogCorrelationTreeComponent = ({
     );
   }
 
+  if (!treeApi.treeData) {
+    return <div>Error</div>;
+  }
+
   return (
     <div
       ref={treeContainer}
       style={{ width: '100%', height: '100%', background: BACKGROUND_COLOR }}
     >
       <Tree
-        data={timelineData}
+        data={treeApi.treeData}
         orientation="vertical"
         renderCustomNodeElement={renderRectSvgNode(
           setSelectedLogCorrelation,

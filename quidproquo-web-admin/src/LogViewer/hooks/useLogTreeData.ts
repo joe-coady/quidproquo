@@ -1,7 +1,7 @@
 import { StoryResultMetadataWithChildren } from 'quidproquo-core';
 import { useEffect, useState } from 'react';
 import { useAuthAccessToken } from '../../Auth/hooks';
-import { createHierarchy, findRootLog, getLogHierarchy } from '../logic';
+import { getLogHierarchy } from '../logic';
 
 const filterQpqActions = (
   logs: StoryResultMetadataWithChildren[],
@@ -26,31 +26,54 @@ const filterQpqActions = (
   return filteredLogs;
 };
 
-export const useLogTreeData = (
-  correlationId: string,
-  hideQpqActions: boolean = false,
-): StoryResultMetadataWithChildren[] | undefined => {
+export type TreeApi = {
+  treeData?: StoryResultMetadataWithChildren[];
+  treeDataWithNoQpqActions?: StoryResultMetadataWithChildren[];
+  isLoading: boolean;
+  refreshTreeData: () => void;
+};
+
+export const useLogTreeData = (correlationId: string, hideQpqActions: boolean = false): TreeApi => {
   const [treeData, setTreeData] = useState<StoryResultMetadataWithChildren[]>();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const accessToken = useAuthAccessToken();
+
+  const refreshTreeData = async () => {
+    setIsLoading(true);
+    const logHierarchy = await getLogHierarchy(correlationId, true, accessToken);
+
+    if (logHierarchy) {
+      setTreeData([logHierarchy]);
+    }
+
+    setIsLoading(false);
+  };
 
   useEffect(() => {
     const fetchTreeData = async () => {
+      setIsLoading(true);
       console.log('correlationId: ', correlationId);
-      const logHierarchy = await getLogHierarchy(correlationId, accessToken);
+      const logHierarchy = await getLogHierarchy(correlationId, false, accessToken);
 
       if (logHierarchy) {
         setTreeData([logHierarchy]);
       }
+
+      setIsLoading(false);
     };
 
     if (correlationId) {
       fetchTreeData();
     }
-  }, [correlationId]);
+  }, [!!correlationId]);
 
-  if (hideQpqActions) {
-    return treeData ? filterQpqActions(treeData) : treeData;
-  }
+  const result: TreeApi = {
+    isLoading,
+    refreshTreeData: refreshTreeData,
+    treeDataWithNoQpqActions: treeData ? filterQpqActions(treeData) : treeData,
+    treeData: treeData,
+  };
 
-  return treeData;
+  return result;
 };

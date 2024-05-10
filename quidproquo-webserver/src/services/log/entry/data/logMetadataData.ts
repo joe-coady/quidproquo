@@ -123,13 +123,14 @@ export function* askCreateHierarchy(
 
 export function* askGetHierarchiesByCorrelation(
   correlation: string,
+  forceRefresh: boolean,
 ): AskResponse<string | undefined> {
   const root = yield* askFindRootLog(correlation);
   if (root) {
     const rootReportFilename = `${root.correlation}-tree.json`;
     const reportExists = yield* askFileExists(logReportsResourceName, rootReportFilename);
 
-    if (!reportExists) {
+    if (!reportExists || forceRefresh) {
       const report = yield* askCreateHierarchy(root);
       yield* askFileWriteTextContents(
         logReportsResourceName,

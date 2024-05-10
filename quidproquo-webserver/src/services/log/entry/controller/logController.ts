@@ -83,7 +83,13 @@ export function* getHierarchies(
     correlationId: string;
   },
 ) {
-  const reportUrl = yield* askGetHierarchiesByCorrelation(params.correlationId);
+  console.log('getHierarchies', params.correlationId);
+  console.log('getHierarchies', event.query.refresh);
+
+  const reportUrl = yield* askGetHierarchiesByCorrelation(
+    params.correlationId,
+    event.query.refresh === 'true',
+  );
 
   return toJsonEventResponse({ url: reportUrl });
 }

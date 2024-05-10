@@ -3,6 +3,7 @@ import { apiRequestGet, externalRequestGet } from '../../logic';
 
 export const getLogHierarchy = async function findRootLog(
   correlation?: string,
+  refreshReport?: boolean,
   accessToken?: string,
 ): Promise<StoryResultMetadataWithChildren | undefined> {
   if (!correlation) {
@@ -10,7 +11,7 @@ export const getLogHierarchy = async function findRootLog(
   }
 
   const hierarchyUrl = await apiRequestGet<{ url: string }>(
-    `/log/${correlation}/hierarchies`,
+    `/log/${correlation}/hierarchies?refresh=${!!refreshReport}`,
     accessToken,
   );
 

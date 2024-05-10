@@ -83,7 +83,7 @@ const LogDialog = ({
 
   const theme = useTheme();
 
-  const timelineData = useLogTreeData(logCorrelation, false);
+  const treeApi = useLogTreeData(logCorrelation, false);
 
   return (
     <Dialog
@@ -168,7 +168,7 @@ const LogDialog = ({
             logCorrelation={logCorrelation}
             setSelectedLogCorrelation={setSelectedLogCorrelation}
             isVisible={selectedTab === 1}
-            timelineData={timelineData}
+            treeApi={treeApi}
           />
         </div>
         <div style={getTabStyle(selectedTab, 2)}>
@@ -176,7 +176,7 @@ const LogDialog = ({
             logCorrelation={logCorrelation}
             setSelectedLogCorrelation={setSelectedLogCorrelation}
             isVisible={selectedTab === 2}
-            timelineData={timelineData}
+            treeApi={treeApi}
           />
         </div>
         <div style={getTabStyle(selectedTab, 3)}>
@@ -193,6 +193,20 @@ const LogDialog = ({
       </DialogContent>
 
       <DialogActions>
+        <Button
+          style={getTabStyle(selectedTab, 1)}
+          onClick={(event) => treeApi.refreshTreeData()}
+          disabled={isLoading}
+        >
+          Refresh Tree
+        </Button>
+        <Button
+          style={getTabStyle(selectedTab, 2)}
+          onClick={(event) => treeApi.refreshTreeData()}
+          disabled={isLoading}
+        >
+          Refresh Timeline
+        </Button>
         <Button
           onClick={(event) => {
             downloadJson(JSON.stringify(log, null, 2), `${log!.correlation}.json`);

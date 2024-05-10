@@ -6,14 +6,13 @@ import {
   getTimeBounds,
   getTotalExecutionTime,
 } from 'quidproquo-core';
-
-import { useLogTreeData } from './hooks';
+import { TreeApi } from './hooks';
 
 interface EventTimelineProps {
   logCorrelation: string;
   setSelectedLogCorrelation: (logCorrelation: string) => void;
   isVisible: boolean;
-  timelineData?: StoryResultMetadataWithChildren[];
+  treeApi: TreeApi;
 }
 
 const EVENT_HEIGHT = 30;
@@ -93,7 +92,7 @@ export const EventTimeline: React.FC<EventTimelineProps> = ({
   logCorrelation,
   setSelectedLogCorrelation,
   isVisible,
-  timelineData,
+  treeApi,
 }) => {
   const [scaleOffset, setScaleOffset] = useState(0.0);
   const [handleOnWheel, setHandleWheel] = useState<any>(() => () => {});
@@ -121,7 +120,7 @@ export const EventTimeline: React.FC<EventTimelineProps> = ({
     };
   }, [timelineRef]);
 
-  if (!timelineData) {
+  if (treeApi.isLoading) {
     return (
       <Box
         sx={{
@@ -137,8 +136,12 @@ export const EventTimeline: React.FC<EventTimelineProps> = ({
     );
   }
 
-  const { earliestStartedAt, latestFinishedAt } = getTimeBounds(timelineData);
-  const totalExecutionTime = getTotalExecutionTime(timelineData);
+  if (!treeApi.treeDataWithNoQpqActions) {
+    return <div>Error</div>;
+  }
+
+  const { earliestStartedAt, latestFinishedAt } = getTimeBounds(treeApi.treeDataWithNoQpqActions);
+  const totalExecutionTime = getTotalExecutionTime(treeApi.treeDataWithNoQpqActions);
 
   const startDate = new Date(earliestStartedAt);
   const endDate = new Date(latestFinishedAt);
@@ -158,9 +161,9 @@ export const EventTimeline: React.FC<EventTimelineProps> = ({
         onWheel={handleOnWheel}
         style={{ width: '100%', height: 'calc(100% - 24px)' }}
       >
-        {timelineData[0] && (
+        {treeApi.treeDataWithNoQpqActions[0] && (
           <TimelineEvent
-            event={timelineData[0]}
+            event={treeApi.treeDataWithNoQpqActions[0]}
             level={0}
             setSelectedLogCorrelation={setSelectedLogCorrelation}
             scale={scale}
