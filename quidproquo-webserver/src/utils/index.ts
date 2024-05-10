@@ -4,3 +4,4 @@ export * from './mergeRouteUtils';
 export * from './qpqConfigAccessorsUtils';
 export * from './websocketEventUtils';
 export * from './pathUtils';
+export * from './jwtUtils';

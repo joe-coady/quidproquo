@@ -53,6 +53,7 @@ export const useLogManagement = () => {
       errorFilter: '',
       infoFilter: '',
       serviceFilter: '',
+      userFilter: '',
     };
   });
 

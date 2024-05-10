@@ -31,6 +31,7 @@ export interface GetLogsParams {
   infoFilter: string;
   errorFilter: string;
   serviceFilter: string;
+  userFilter: string;
 }
 
 export function* getLogs(event: HTTPEvent, params: {}): AskResponse<HTTPEventResponse> {
@@ -42,6 +43,7 @@ export function* getLogs(event: HTTPEvent, params: {}): AskResponse<HTTPEventRes
     errorFilter,
     serviceFilter,
     infoFilter,
+    userFilter,
   } = fromJsonEventRequest<GetLogsParams>(event);
 
   const logs = yield* logsLogic.askGetLogs(
@@ -51,6 +53,7 @@ export function* getLogs(event: HTTPEvent, params: {}): AskResponse<HTTPEventRes
     errorFilter,
     serviceFilter,
     infoFilter,
+    userFilter,
     nextPageKey,
   );
 

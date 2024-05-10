@@ -10,6 +10,7 @@ export function* askGetLogs(
   errorFilter: string,
   serviceFilter: string,
   infoFilter: string,
+  userFilter: string,
   nextPageKey?: string,
 ): AskResponse<QpqPagedData<LogMetadata>> {
   const result: QpqPagedData<LogMetadata> = {
@@ -25,6 +26,7 @@ export function* askGetLogs(
       errorFilter,
       serviceFilter,
       infoFilter,
+      userFilter,
       result.nextPageKey,
     );
 

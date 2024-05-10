@@ -34,6 +34,7 @@ export function* askListLogs(
   errorFilter: string,
   serviceFilter: string,
   infoFilter: string,
+  userFilter: string,
   nextPageKey?: string,
 ): AskResponse<QpqPagedData<LogMetadata>> {
   const filters: KvsQueryCondition[] = [];
@@ -48,6 +49,10 @@ export function* askListLogs(
 
   if (errorFilter) {
     filters.push(kvsContains('error', errorFilter));
+  }
+
+  if (userFilter) {
+    filters.push(kvsContains('userInfo', userFilter));
   }
 
   console.log('filters', JSON.stringify(filters, null, 2));

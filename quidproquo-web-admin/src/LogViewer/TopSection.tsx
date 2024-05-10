@@ -58,6 +58,13 @@ export function TopSection({ searchParams, setSearchParams, onSearch }: TopSecti
     }));
   };
 
+  const handleUserFilterChange = (event: any) => {
+    setSearchParams((prevSearchParams) => ({
+      ...prevSearchParams,
+      userFilter: event.target.value,
+    }));
+  };
+
   const handleInfoFilterChange = (event: any) => {
     setSearchParams((prev) => ({ ...prev, infoFilter: event.target.value }));
   };
@@ -94,7 +101,7 @@ export function TopSection({ searchParams, setSearchParams, onSearch }: TopSecti
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <Grid container columns={12} spacing={2}>
-        <Grid item xs={3}>
+        <Grid item xs={2}>
           <FormControl fullWidth>
             <InputLabel id="runtime-select-label">Runtime Type</InputLabel>
             <Select
@@ -112,17 +119,25 @@ export function TopSection({ searchParams, setSearchParams, onSearch }: TopSecti
             </Select>
           </FormControl>
         </Grid>
-        <Grid item xs={3}>
+        <Grid item xs={2}>
           <FormControl fullWidth>
             <Autocomplete
               options={serviceOptions}
               getOptionLabel={(option) => option.label}
               onChange={handleServiceChange}
-              renderInput={(params) => <TextField {...params} label="Service Name" />}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Service Name"
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+              )}
             />
           </FormControl>
         </Grid>
-        <Grid item xs={3}>
+        <Grid item xs={2}>
           <Box position="relative">
             <FormControl fullWidth>
               <DateTimePicker
@@ -147,12 +162,24 @@ export function TopSection({ searchParams, setSearchParams, onSearch }: TopSecti
             </IconButton>
           </Box>
         </Grid>
-        <Grid item xs={3}>
+        <Grid item xs={2}>
           <FormControl fullWidth>
             <DateTimePicker
               label="End DateTime"
               value={new Date(searchParams.endIsoDateTime)}
               onChange={handleEndDateChange}
+            />
+          </FormControl>
+        </Grid>
+        <Grid item xs={4}>
+          <FormControl fullWidth>
+            <TextField
+              label="User"
+              value={searchParams.userFilter}
+              onChange={handleUserFilterChange}
+              InputLabelProps={{
+                shrink: true,
+              }}
             />
           </FormControl>
         </Grid>

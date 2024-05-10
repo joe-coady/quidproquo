@@ -30,16 +30,21 @@ const formatTime = (ms: number) => {
 };
 
 const columns: GridColDef[] = [
-  { field: 'moduleName', headerName: 'Service', flex: 1 },
-  { field: 'runtimeType', headerName: 'Type', flex: 1 },
   {
     field: 'startedAt',
     headerName: 'Started at',
     flex: 1,
     renderCell: (params: GridRenderCellParams) => <DateCell isoDateTime={params.value} />,
   },
+  { field: 'moduleName', headerName: 'Service', flex: 1 },
+  { field: 'runtimeType', headerName: 'Type', flex: 1 },
   { field: 'generic', headerName: 'Info', flex: 3 },
   { field: 'error', headerName: 'Error', flex: 4 },
+  {
+    field: 'userInfo',
+    headerName: 'User',
+    flex: 1.5,
+  },
   {
     field: 'executionTimeMs',
     headerName: 'executionTime',

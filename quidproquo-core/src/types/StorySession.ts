@@ -137,7 +137,7 @@ export interface StoryResult<TArgs extends Array<any>, TResult = any> {
   logs?: qpqConsoleLog[];
 }
 
-export interface StoryResultMetadata {
+export type StoryResultMetadata = {
   correlation: string;
   fromCorrelation?: string;
 
@@ -151,7 +151,9 @@ export interface StoryResultMetadata {
   error?: string;
 
   executionTimeMs: number;
-}
+
+  userInfo?: string;
+};
 
 export type StoryResultMetadataWithChildren = StoryResultMetadata & {
   children: StoryResultMetadataWithChildren[];

@@ -9,6 +9,7 @@ export const getLogs = async (
   serviceFilter: string,
   infoFilter: string,
   errorFilter: string,
+  userFilter: string,
   accessToken?: string,
 ): Promise<StoryResultMetadata[]> => {
   var logs: StoryResultMetadata[] = [];
@@ -22,6 +23,7 @@ export const getLogs = async (
     serviceFilter,
     errorFilter,
     infoFilter,
+    userFilter,
   };
 
   do {

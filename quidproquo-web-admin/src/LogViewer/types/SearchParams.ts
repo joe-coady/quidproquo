@@ -6,4 +6,5 @@ export interface SearchParams {
   serviceFilter: string;
   infoFilter: string;
   errorFilter: string;
+  userFilter: string;
 }
