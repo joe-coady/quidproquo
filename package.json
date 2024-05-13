@@ -32,6 +32,7 @@
     "quidproquo-deploy-webpack",
     "quidproquo-deploy-awscdk",
     "quidproquo-web",
+    "quidproquo-web-react",
     "quidproquo-web-admin",
     "quidproquo-testing",
     "quidproquo"

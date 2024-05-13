@@ -15,3 +15,4 @@ export * from './BoundLogicStory';
 export * from './UnboundLogicStory';
 export * from './KeyOf';
 export * from './QpqLogger';
+export * from './EventMessage';

@@ -10,6 +10,7 @@ import {
 } from 'quidproquo-core';
 import { defineRoute } from './route';
 import { defineWebEntry } from './webEntry';
+import { defineWebsocket } from './websocket';
 
 export interface QPQConfigAdvancedLogSettings extends QPQConfigAdvancedSettings {
   logRetentionDays?: number;
@@ -24,7 +25,6 @@ export interface QPQConfigAdvancedLogSettings extends QPQConfigAdvancedSettings 
 // which would be recursive and bad
 // its hard coded in the lambda code (TODO: remove the hard coding in lambda)
 // This should be part of core
-
 const logResourceName = 'qpq-logs';
 export const logReportsResourceName = 'qpq-log-reports';
 
@@ -188,6 +188,29 @@ export const defineLogs = (
     ),
 
     defineKeyValueStore('qpq-log-messages', 'correlationId', ['timestamp']),
+
+    defineWebsocket(
+      'wsadmin',
+      rootDomain,
+      buildPath,
+      {
+        onConnect: {
+          src: getServiceEntry('log', 'webSocket', 'onWebsocketEvent'),
+          runtime: 'onConnect',
+        },
+        onDisconnect: {
+          src: getServiceEntry('log', 'webSocket', 'onWebsocketEvent'),
+          runtime: 'onDisconnect',
+        },
+        onMessage: {
+          src: getServiceEntry('log', 'webSocket', 'onWebsocketEvent'),
+          runtime: 'onMessage',
+        },
+      },
+      {
+        apiName: 'wsadmin',
+      },
+    ),
 
     defineWebEntry('admin', {
       buildPath: webFilesPath,
