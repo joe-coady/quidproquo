@@ -9,7 +9,7 @@ import {
 
 import { useSubscribeToWebsocket, useWebsocketApi, useWebsocketSendEvent } from '../../hooks';
 
-export const useWebsocketAuthSync = (tokens: AuthenticationInfo) => {
+export const useWebsocketAuthSync = (accessToken: AuthenticationInfo['accessToken']) => {
   const sendMessage = useWebsocketSendEvent();
   const websocketApi = useWebsocketApi();
 
@@ -18,11 +18,11 @@ export const useWebsocketAuthSync = (tokens: AuthenticationInfo) => {
       return;
     }
 
-    if (tokens?.accessToken) {
+    if (accessToken) {
       const authMessage: WebSocketClientEventMessageAuthenticate = {
         type: WebsocketClientMessageEventType.Authenticate,
         payload: {
-          accessToken: tokens.accessToken,
+          accessToken: accessToken,
         },
       };
 
@@ -34,7 +34,7 @@ export const useWebsocketAuthSync = (tokens: AuthenticationInfo) => {
 
       sendMessage(authMessage);
     }
-  }, [sendMessage, tokens?.accessToken, websocketApi]);
+  }, [sendMessage, accessToken, websocketApi, websocketApi?.isConnected()]);
 
   // Sync the tokens in on open
   useSubscribeToWebsocket(WebsocketServiceEvent.OPEN, updateAuthTokens);

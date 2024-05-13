@@ -5,11 +5,11 @@ import { AuthenticationInfo } from 'quidproquo-core';
 
 export type WebSocketAuthSyncProps = {
   children: React.ReactNode;
-  tokens: AuthenticationInfo;
+  accessToken: AuthenticationInfo['accessToken'];
 };
 
-const WebSocketAuthSync: React.FC<WebSocketAuthSyncProps> = ({ children, tokens }) => {
-  useWebsocketAuthSync(tokens);
+const component: React.FC<WebSocketAuthSyncProps> = ({ children, accessToken }) => {
+  useWebsocketAuthSync(accessToken);
 
   // Keep the active websocket alive
   useWebsocketPingPong();
@@ -19,4 +19,4 @@ const WebSocketAuthSync: React.FC<WebSocketAuthSyncProps> = ({ children, tokens 
   return <>{children}</>;
 };
 
-export default memo(WebSocketAuthSync);
+export const WebSocketAuthSync = memo(component);

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getApiBaseUrl } from './getApiBaseUrl';
 
 const getHeaders = (accessToken?: string) => ({
   'Content-Type': 'application/json',
@@ -6,13 +7,7 @@ const getHeaders = (accessToken?: string) => ({
 });
 
 const getAxiosInstance = (accessToken?: string) => {
-  // TODO: Get this somehow, we dont know if they are using api or not..
-  // Think we should be able to bootstrap an admin domain to the service now.
-  const [service, ...domain] = window.location.host.split('.').slice(1);
-  const baseURL =
-    window.location.hostname !== 'localhost'
-      ? `${window.location.protocol}//api.${domain.join('.')}/${service}`
-      : `http://localhost:8080/api/admin`;
+  const baseURL = getApiBaseUrl();
 
   const instance = axios.create({
     baseURL,

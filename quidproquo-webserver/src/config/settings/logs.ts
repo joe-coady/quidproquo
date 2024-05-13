@@ -32,6 +32,7 @@ export const defineLogs = (
   buildPath: string,
   webFilesPath: string,
   rootDomain: string,
+  hostService: string,
   services: string[],
   advancedSettings?: QPQConfigAdvancedLogSettings,
 ): QPQConfig => {
@@ -233,7 +234,12 @@ export const defineLogs = (
             'default-src': ["'self'"],
 
             // maybe pass in the api / localhost port in as args
-            'connect-src': ["'self'", { api: 'api' }, 'http://localhost:8080'],
+            'connect-src': [
+              "'self'",
+              { api: 'api' },
+              'http://localhost:8080',
+              { protocol: 'wss', api: 'wsadmin', service: hostService },
+            ],
 
             'style-src': [
               "'self'",

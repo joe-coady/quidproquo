@@ -1,16 +1,17 @@
 import { WebsocketService } from 'quidproquo-web';
-import { useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 
 export const useWebsocketManagement = (wsUrl: string) => {
-  // We may need to support the URL changing at some point
-  const websocketApiRef = useRef<WebsocketService>(new WebsocketService(wsUrl));
+  const [websocketApi, setWebsocketApi] = useState<WebsocketService | null>(null);
 
-  useEffect(
-    () => () => {
-      websocketApiRef.current.destroy();
-    },
-    [],
-  );
+  useEffect(() => {
+    const wsService = new WebsocketService(wsUrl);
+    setWebsocketApi(wsService);
 
-  return websocketApiRef.current;
+    return () => {
+      wsService.destroy();
+    };
+  }, [wsUrl]);
+
+  return websocketApi;
 };

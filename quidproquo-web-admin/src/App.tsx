@@ -1,9 +1,13 @@
+import CssBaseline from '@mui/material/CssBaseline';
+
 import { LogViewer } from './LogViewer';
 import { Auth } from './Auth/Auth';
 import { LoadingProvider } from './view';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
 import { BrowserRouter as Router } from 'react-router-dom';
+import { WebsocketProvider } from 'quidproquo-web-react';
+import { getWsBaseUrl } from './logic/platform/getApiBaseUrl';
+import { WebSocketAuthProvider } from './WebSocketAuthProvider';
 
 const darkTheme = createTheme({
   palette: {
@@ -18,7 +22,11 @@ export const App = () => {
         <CssBaseline />
         <LoadingProvider>
           <Auth>
-            <LogViewer />
+            <WebsocketProvider wsUrl={getWsBaseUrl()}>
+              <WebSocketAuthProvider>
+                <LogViewer />
+              </WebSocketAuthProvider>
+            </WebsocketProvider>
           </Auth>
         </LoadingProvider>
       </ThemeProvider>
