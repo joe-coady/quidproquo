@@ -10,7 +10,7 @@ const serviceEntryMap = {
     'log',
     'webSocket',
     'onWebsocketEvent',
-  )]: require('../services/log/entry/controller/logController'),
+  )]: require('../services/log/entry/webSocket/onWebsocketEvent'),
   [getServiceEntry(
     'log',
     'controller',

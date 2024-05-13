@@ -28,6 +28,7 @@ export interface QPQConfigAdvancedLogSettings extends QPQConfigAdvancedSettings 
 const logResourceName = 'qpq-logs';
 export const logReportsResourceName = 'qpq-log-reports';
 export const wsConnectionResourceName = 'qpq-admin-connections';
+export const adminUserDirectory = 'qpq-admin';
 
 export const defineLogs = (
   buildPath: string,
@@ -39,7 +40,7 @@ export const defineLogs = (
 ): QPQConfig => {
   const routeAuthSettings = {
     routeAuthSettings: {
-      userDirectoryName: 'qpq-admin',
+      userDirectoryName: adminUserDirectory,
     },
   };
 
@@ -113,7 +114,7 @@ export const defineLogs = (
       indexes: ['userId'],
     }),
 
-    defineUserDirectory('qpq-admin', buildPath),
+    defineUserDirectory(adminUserDirectory, buildPath),
     defineRoute('POST', '/login', getServiceEntry('log', 'controller', 'loginController'), 'login'),
     defineRoute(
       'POST',
