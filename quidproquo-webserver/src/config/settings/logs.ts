@@ -27,6 +27,7 @@ export interface QPQConfigAdvancedLogSettings extends QPQConfigAdvancedSettings 
 // This should be part of core
 const logResourceName = 'qpq-logs';
 export const logReportsResourceName = 'qpq-log-reports';
+export const wsConnectionResourceName = 'qpq-admin-connections';
 
 export const defineLogs = (
   buildPath: string,
@@ -106,6 +107,10 @@ export const defineLogs = (
       ],
       ttlAttribute: 'ttl',
       deprecated: advancedSettings?.deprecated,
+    }),
+
+    defineKeyValueStore(wsConnectionResourceName, 'id', undefined, {
+      indexes: ['userId'],
     }),
 
     defineUserDirectory('qpq-admin', buildPath),
