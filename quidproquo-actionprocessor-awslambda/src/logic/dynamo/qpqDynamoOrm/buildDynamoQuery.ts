@@ -191,7 +191,7 @@ export const buildDynamoQueryExpression = (query?: KvsQueryOperation): string | 
 
 export const buildExpressionAttributeValues = (
   queries: (KvsQueryOperation | undefined)[],
-): Record<string, AttributeValue> => {
+): Record<string, AttributeValue> | undefined => {
   const values: Record<string, AttributeValue> = {};
 
   const traverse = (query: KvsQueryOperation) => {
@@ -214,12 +214,12 @@ export const buildExpressionAttributeValues = (
 
   queries.filter((q) => !!q).forEach((q) => traverse(q!));
 
-  return values;
+  return Object.keys(values).length > 0 ? values : undefined;
 };
 
 export const buildExpressionAttributeNames = (
   queries: (KvsQueryOperation | undefined)[],
-): Record<string, string> => {
+): Record<string, string> | undefined => {
   const names: Record<string, string> = {};
 
   const traverse = (query: KvsQueryOperation) => {
@@ -235,5 +235,5 @@ export const buildExpressionAttributeNames = (
 
   queries.filter((q) => !!q).forEach((q) => traverse(q!));
 
-  return names;
+  return Object.keys(names).length > 0 ? names : undefined;
 };

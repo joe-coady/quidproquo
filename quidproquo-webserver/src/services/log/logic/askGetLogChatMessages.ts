@@ -1,7 +1,7 @@
-import { AskResponse, QpqPagedData, askDateNow } from 'quidproquo-core';
-import { LogChatMessage } from '../domain';
+import { AskResponse, QpqPagedData } from 'quidproquo-core';
+import { LogChatMessage } from '../entry/domain';
 
-import * as logChatMessageData from '../data/logChatMessageData';
+import * as logChatMessageData from '../entry/data/logChatMessageData';
 
 export function* askGetLogChatMessages(
   correlationId: string,

@@ -1,5 +1,5 @@
 import { EventActionType, QpqRuntimeType, StoryResult } from 'quidproquo-core';
-import { HTTPEvent } from '../../../../../types';
+import { HTTPEvent } from '../../../../types';
 
 export const apiGenericTextExtractor = (storyResult: StoryResult<any>): string => {
   if (storyResult.runtimeType === QpqRuntimeType.API) {

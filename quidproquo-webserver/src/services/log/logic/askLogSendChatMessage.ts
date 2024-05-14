@@ -9,11 +9,11 @@ import {
   askThrowError,
   ErrorTypeEnum,
 } from 'quidproquo-core';
-import { LogChatMessage } from '../domain';
-import { systemPrompt } from '../constants';
+import { LogChatMessage } from '../entry/domain';
+import { systemPrompt } from '../entry/constants';
 
-import * as logChatMessageData from '../data/logChatMessageData';
-import * as logData from '../data/logData';
+import * as logChatMessageData from '../entry/data/logChatMessageData';
+import * as logData from '../entry/data/logData';
 import Anthropic from '@anthropic-ai/sdk';
 
 export function* askClaudeSendChatMessage(correlationId: string): AskResponse<LogChatMessage> {

@@ -9,8 +9,8 @@ import {
   UserDirectoryActionType,
   ActionHistory,
 } from 'quidproquo-core';
-import { LogMetadata } from '../domain';
-import { decodeJWT } from '../../../../utils';
+import { LogMetadata } from '../entry/domain';
+import { decodeJWT } from '../../../utils';
 
 import {
   apiGenericTextExtractor,
@@ -20,7 +20,8 @@ import {
   seoORGenericTextExtractor,
 } from './genericTextExtractors';
 
-import * as logMetadataData from '../data/logMetadataData';
+import * as logMetadataData from '../entry/data/logMetadataData';
+import { askSendLogToAdmins } from './webSocket';
 
 // These have to be strings and not enum due to how the lambda is packaged
 const extractors: Record<QpqRuntimeType, (sr: StoryResult<any>) => string> = {
@@ -102,6 +103,11 @@ export function* askUpdateDatabaseFromLogFile(
   const metadata = storyResultToMetadata(JSON.parse(logFile), ttl);
 
   yield* logMetadataData.askUpsert(metadata);
+
+  // Send errors to admins
+  if (!!metadata.error) {
+    yield* askSendLogToAdmins(metadata);
+  }
 }
 
 export function* askUpdateDatabaseFromLogFiles(

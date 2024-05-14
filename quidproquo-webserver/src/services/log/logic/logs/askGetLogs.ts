@@ -1,7 +1,7 @@
 import { AskResponse, QpqPagedData, QpqRuntimeType } from 'quidproquo-core';
 
-import { askListLogs } from '../../data/logMetadataData';
-import { LogMetadata } from '../../domain';
+import { askListLogs } from '../../entry/data/logMetadataData';
+import { LogMetadata } from '../../entry/domain';
 
 export function* askGetLogs(
   runtimeType: QpqRuntimeType,
@@ -37,16 +37,4 @@ export function* askGetLogs(
   } while (result.nextPageKey && result.items.length < 3000);
 
   return result;
-
-  // the above was almost twice as long for requests over a few weeks...
-  // but i think its better now with the filters
-  // return yield* askListLogs(
-  //   runtimeType,
-  //   startIsoDateTime,
-  //   endIsoDateTime,
-  //   errorFilter,
-  //   serviceFilter,
-  //   infoFilter,
-  //   nextPageKey,
-  // );
 }
