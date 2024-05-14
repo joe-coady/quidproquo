@@ -1,7 +1,7 @@
-import { useCallback } from 'react';
 import { useLoadingApi } from './useLoadingApi';
 
 import { AnyAsyncFunction } from '../../types';
+import { useFastCallback } from 'quidproquo-web-react';
 
 /**
  * Custom hook that wraps an asynchronous function with loading triggers.
@@ -22,17 +22,14 @@ export function useAsyncLoading<T extends any[], U>(
    * @param {...T} args - Arguments to be passed to the original callback function.
    * @returns {Promise<U>} - A promise that resolves with the result of the original callback function.
    */
-  const wrappedCallback: AnyAsyncFunction<T, U> = useCallback(
-    async (...args: T) => {
-      addLoading();
-      try {
-        return await callback(...args);
-      } finally {
-        removeLoading();
-      }
-    },
-    [callback, addLoading, removeLoading],
-  );
+  const wrappedCallback: AnyAsyncFunction<T, U> = useFastCallback(async (...args: T) => {
+    addLoading();
+    try {
+      return await callback(...args);
+    } finally {
+      removeLoading();
+    }
+  });
 
   return wrappedCallback;
 }

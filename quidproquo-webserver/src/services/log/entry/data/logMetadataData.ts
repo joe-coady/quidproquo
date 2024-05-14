@@ -5,13 +5,13 @@ import {
   askKeyValueStoreQuery,
   askKeyValueStoreQueryAll,
   askKeyValueStoreUpsert,
-  askMap,
   askMapParallel,
   AskResponse,
   kvsAnd,
   kvsBetween,
   kvsContains,
   kvsEqual,
+  kvsExists,
   KvsQueryCondition,
   QpqPagedData,
   QpqRuntimeType,
@@ -35,9 +35,14 @@ export function* askListLogs(
   serviceFilter: string,
   infoFilter: string,
   userFilter: string,
+  onlyErrors: boolean,
   nextPageKey?: string,
 ): AskResponse<QpqPagedData<LogMetadata>> {
   const filters: KvsQueryCondition[] = [];
+
+  if (onlyErrors) {
+    filters.push(kvsExists('error'));
+  }
 
   if (serviceFilter) {
     filters.push(kvsEqual('moduleName', serviceFilter));

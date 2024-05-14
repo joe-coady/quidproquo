@@ -7,3 +7,4 @@ export * from './useLogDetails';
 export * from './useTruncatedText';
 export * from './useLogTreeData';
 export * from './useServiceNames';
+export * from './useLogSearch';

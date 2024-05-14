@@ -10,6 +10,6 @@ export const getWsBaseUrl = () => {
   const [service, ...domain] = window.location.host.split('.').slice(1);
 
   return window.location.hostname !== 'localhost'
-    ? `wss//wsadmin.${domain.join('.')}/${service}`
+    ? `wss://wsadmin.${service}.${domain.join('.')}`
     : `ws://localhost:8080/ws/admin`;
 };

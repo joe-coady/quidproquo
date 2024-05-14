@@ -1,1 +1,2 @@
-export * from "./entry";
+export * from './entry';
+export * from './logic';

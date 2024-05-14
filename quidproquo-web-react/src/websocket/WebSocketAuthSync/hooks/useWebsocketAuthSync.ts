@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useEffect } from 'react';
 import { AuthenticationInfo } from 'quidproquo';
 import { WebsocketServiceEvent } from 'quidproquo-web';
 import {
@@ -8,12 +8,13 @@ import {
 } from 'quidproquo-webserver';
 
 import { useSubscribeToWebsocket, useWebsocketApi, useWebsocketSendEvent } from '../../hooks';
+import { useFastCallback } from '../../../hooks';
 
 export const useWebsocketAuthSync = (accessToken: AuthenticationInfo['accessToken']) => {
   const sendMessage = useWebsocketSendEvent();
   const websocketApi = useWebsocketApi();
 
-  const updateAuthTokens = useCallback(() => {
+  const updateAuthTokens = useFastCallback(() => {
     if (!websocketApi?.isConnected()) {
       return;
     }
@@ -34,11 +35,11 @@ export const useWebsocketAuthSync = (accessToken: AuthenticationInfo['accessToke
 
       sendMessage(authMessage);
     }
-  }, [sendMessage, accessToken, websocketApi, websocketApi?.isConnected()]);
+  });
 
   // Sync the tokens in on open
   useSubscribeToWebsocket(WebsocketServiceEvent.OPEN, updateAuthTokens);
 
   // Sync the tokens when they change
-  useEffect(updateAuthTokens, [updateAuthTokens]);
+  useEffect(updateAuthTokens, [accessToken, websocketApi]);
 };

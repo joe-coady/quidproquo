@@ -34,6 +34,7 @@ export const searchLogs = async (
         searchParams.infoFilter,
         searchParams.errorFilter,
         searchParams.userFilter,
+        searchParams.onlyErrors || !!searchParams.errorFilter,
         accessToken,
       ).finally(() => {
         progress = progress + 1;

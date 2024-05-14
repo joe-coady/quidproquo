@@ -1,12 +1,12 @@
 import Box from '@mui/material/Box';
 import { TopSection } from './TopSection';
 import { useIsLoading } from '../view';
-import { useLogManagement } from './hooks';
+import { useLogSearch } from './hooks';
 
 import { LogMetadataGrid } from './LogMetadataGrid';
 
 export const LogSearch = () => {
-  const { searchParams, setSearchParams, onSearch, filteredLogs } = useLogManagement();
+  const { searchParams, setSearchParams, onSearch, logs } = useLogSearch();
 
   const isLoading = useIsLoading();
 
@@ -20,7 +20,7 @@ export const LogSearch = () => {
         />
       </Box>
       <Box sx={{ flex: 1, overflow: 'auto' }}>
-        <LogMetadataGrid logs={filteredLogs} isLoading={isLoading} />
+        <LogMetadataGrid logs={logs} isLoading={isLoading} />
       </Box>
     </Box>
   );

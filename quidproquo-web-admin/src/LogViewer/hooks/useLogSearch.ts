@@ -1,36 +1,19 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { SearchParams } from '../types';
 
 import { useOnSearch } from './useOnSearch';
-import { filterLogs, getOnRowClick } from '../logic';
-import { useSearchParams } from 'react-router-dom';
 
 declare global {
   interface Window {
     logs: any;
-    viewLog: any;
   }
 }
 
-export const useLogManagement = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const selectedLogCorrelation = searchParams.get('correlation') || '';
-
-  const setSelectedLogCorrelation = (correlation: string) => {
-    if (correlation) {
-      setSearchParams({ correlation });
-    } else {
-      setSearchParams({});
-    }
-  };
-
+export const useLogSearch = () => {
   const [logs, setLogs] = useState<any>([]);
 
   useEffect(() => {
     window.logs = logs;
-    window.viewLog = (log: any) => {
-      setSelectedLogCorrelation(log.correlation);
-    };
   }, [logs]);
 
   useEffect(() => {
@@ -54,31 +37,17 @@ export const useLogManagement = () => {
       infoFilter: '',
       serviceFilter: '',
       userFilter: '',
-
       onlyErrors: false,
     };
   });
 
   const [searchProgress, onSearch] = useOnSearch(searchParamsState, setLogs);
 
-  const filteredLogs = useMemo(
-    () => filterLogs(searchParamsState.errorFilter, logs),
-    [searchParamsState.errorFilter, logs],
-  );
-
-  const onRowClick = getOnRowClick(setSelectedLogCorrelation);
-  const clearSelectedLogCorrelation = () => setSelectedLogCorrelation('');
-
   return {
-    selectedLogCorrelation,
     logs,
     searchParams: searchParamsState,
     setSearchParams: setSearchParamsState,
-    onSearch,
-    filteredLogs,
-    onRowClick,
-    clearSelectedLogCorrelation,
-    setSelectedLogCorrelation,
     searchProgress,
+    onSearch,
   };
 };

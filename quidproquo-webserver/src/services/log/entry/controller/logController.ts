@@ -16,10 +16,10 @@ import {
   askGetHierarchiesByCorrelation,
 } from '../data/logMetadataData';
 import { ListLogChatMessages, SendLogChatMessage } from '../domain';
-import { askLogSendChatMessage } from '../logic/askLogSendChatMessage';
-import { askGetLogChatMessages } from '../logic/askGetLogChatMessages';
+import { askLogSendChatMessage } from '../../logic/askLogSendChatMessage';
+import { askGetLogChatMessages } from '../../logic/askGetLogChatMessages';
 
-import { logsLogic } from '../logic';
+import { logsLogic } from '../../logic';
 
 export interface GetLogsParams {
   nextPageKey?: string;
@@ -32,6 +32,7 @@ export interface GetLogsParams {
   errorFilter: string;
   serviceFilter: string;
   userFilter: string;
+  onlyErrors: boolean;
 }
 
 export function* getLogs(event: HTTPEvent, params: {}): AskResponse<HTTPEventResponse> {
@@ -44,6 +45,7 @@ export function* getLogs(event: HTTPEvent, params: {}): AskResponse<HTTPEventRes
     serviceFilter,
     infoFilter,
     userFilter,
+    onlyErrors,
   } = fromJsonEventRequest<GetLogsParams>(event);
 
   const logs = yield* logsLogic.askGetLogs(
@@ -54,6 +56,7 @@ export function* getLogs(event: HTTPEvent, params: {}): AskResponse<HTTPEventRes
     serviceFilter,
     infoFilter,
     userFilter,
+    onlyErrors,
     nextPageKey,
   );
 
@@ -86,9 +89,6 @@ export function* getHierarchies(
     correlationId: string;
   },
 ) {
-  console.log('getHierarchies', params.correlationId);
-  console.log('getHierarchies', event.query.refresh);
-
   const reportUrl = yield* askGetHierarchiesByCorrelation(
     params.correlationId,
     event.query.refresh === 'true',
