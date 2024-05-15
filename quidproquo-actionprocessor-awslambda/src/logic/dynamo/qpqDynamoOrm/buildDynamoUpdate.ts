@@ -42,7 +42,7 @@ export const buildUpdateExpressionAttributeValues = (
   let attributeValues: { [key: string]: AttributeValue } = {};
 
   for (let update of updates) {
-    if (update.value !== undefined) {
+    if (update.value !== undefined && update.value !== null) {
       const valuePlaceholder = getValueName(update.value);
       attributeValues[valuePlaceholder] = buildAttributeValue(update.value);
     }
@@ -52,7 +52,7 @@ export const buildUpdateExpressionAttributeValues = (
 };
 
 const buildDynamoUpdateExpressionSet = (update: KvsUpdateAction): string => {
-  if (!update.value) {
+  if (update.value === undefined || update.value === null) {
     throw new Error("Value must be provided for 'SET' action");
   }
 
@@ -64,7 +64,7 @@ const buildDynamoUpdateExpressionRemove = (update: KvsUpdateAction): string => {
 };
 
 const buildDynamoUpdateExpressionAdd = (update: KvsUpdateAction): string => {
-  if (!update.value) {
+  if (update.value === undefined || update.value === null) {
     throw new Error("Value must be provided for 'ADD' action");
   }
 
@@ -72,7 +72,7 @@ const buildDynamoUpdateExpressionAdd = (update: KvsUpdateAction): string => {
 };
 
 const buildDynamoUpdateExpressionDelete = (update: KvsUpdateAction): string => {
-  if (update.value) {
+  if (update.value !== undefined && update.value !== null) {
     return `${getNestedItemName(update.attributePath)} ${getValueName(update.value)}`;
   } else {
     return `${getNestedItemName(update.attributePath)}`;

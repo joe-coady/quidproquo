@@ -20,6 +20,7 @@ import { askLogSendChatMessage } from '../../logic/askLogSendChatMessage';
 import { askGetLogChatMessages } from '../../logic/askGetLogChatMessages';
 
 import { logsLogic } from '../../logic';
+import { askToggleLogChecked } from '../../logic/logs';
 
 export interface GetLogsParams {
   nextPageKey?: string;
@@ -73,6 +74,17 @@ export function* getLog(
   if (!log) {
     yield* askThrowError(ErrorTypeEnum.NotFound, 'Log not found');
   }
+
+  return toJsonEventResponse(log);
+}
+
+export function* toggleLogCheck(
+  event: HTTPEvent,
+  params: {
+    correlationId: string;
+  },
+) {
+  const log = yield* askToggleLogChecked(params.correlationId, false);
 
   return toJsonEventResponse(log);
 }

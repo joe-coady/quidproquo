@@ -1,12 +1,64 @@
+import { Box, Typography, Checkbox, FormControlLabel, CircularProgress } from '@mui/material';
+import { useEffect, useState } from 'react';
+import {
+  LogMetadata,
+  WebSocketAdminClientEventPayloadRefreshLogMetadata,
+  WebSocketAdminServerEventMessageLogMetadata,
+  WebSocketAdminServerEventMessageRefreshLogMetadata,
+  WebSocketClientEventMessageMarkLogChecked,
+  WebsocketAdminClientMessageEventType,
+  WebsocketAdminServerMessageEventType,
+  WebsocketClientMessageEventType,
+} from 'quidproquo-webserver';
+import { useSubscribeToWebSocketEvent, useWebsocketSendEvent } from 'quidproquo-web-react';
 import { StoryResult } from 'quidproquo-core';
-import { Box, Typography } from '@mui/material';
 
 interface LogSummaryProps {
   log: StoryResult<any>;
 }
 
 export const LogSummary = ({ log }: LogSummaryProps) => {
-  const executionTime = new Date(log.finishedAt).getTime() - new Date(log.startedAt).getTime();
+  const [checkedLoading, setCheckedLoading] = useState(true);
+  const [logMetadata, setLogMetadata] = useState<LogMetadata | null>(null);
+
+  const sendMessage = useWebsocketSendEvent();
+
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCheckedLoading(true);
+
+    const checkEvent: WebSocketClientEventMessageMarkLogChecked = {
+      type: WebsocketClientMessageEventType.MarkLogChecked,
+      payload: {
+        correlationId: log.correlation,
+        checked: event.target.checked,
+      },
+    };
+
+    sendMessage(checkEvent);
+  };
+
+  useSubscribeToWebSocketEvent(
+    WebsocketAdminServerMessageEventType.LogMetadata,
+    (webSocketService, message: WebSocketAdminServerEventMessageLogMetadata) => {
+      if (message.payload.log.correlation !== log.correlation) {
+        return;
+      }
+
+      setCheckedLoading(false);
+      setLogMetadata(message.payload.log);
+    },
+  );
+
+  useEffect(() => {
+    const checkEvent: WebSocketAdminServerEventMessageRefreshLogMetadata = {
+      type: WebsocketAdminClientMessageEventType.RefreshLogMetadata,
+      payload: {
+        correlationId: log.correlation,
+      },
+    };
+
+    sendMessage(checkEvent);
+  }, [log.correlation]);
 
   return (
     <Box sx={{ width: 1, p: 2 }}>
@@ -14,12 +66,16 @@ export const LogSummary = ({ log }: LogSummaryProps) => {
         Log Summary
       </Typography>
       <Typography>Correlation ID: {log.correlation}</Typography>
-      <Typography>Module Name: {log.moduleName}</Typography>
-      <Typography>Runtime Type: {log.runtimeType}</Typography>
-      <Typography>Started At: {new Date(log.startedAt).toLocaleString()}</Typography>
-      <Typography>Finished At: {new Date(log.finishedAt).toLocaleString()}</Typography>
-      <Typography>Execution Time: {executionTime} ms</Typography>
-      <Typography>Status: {log.error ? 'Error' : 'Success'}</Typography>
+      <FormControlLabel
+        control={
+          checkedLoading ? (
+            <CircularProgress size={24} />
+          ) : (
+            <Checkbox checked={!!logMetadata?.checked} onChange={handleCheckboxChange} />
+          )
+        }
+        label="Mark as done"
+      />
     </Box>
   );
 };

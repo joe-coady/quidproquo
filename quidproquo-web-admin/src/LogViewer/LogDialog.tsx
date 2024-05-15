@@ -114,7 +114,7 @@ const LogDialog = ({
           <Tab label="Log Details" />
           <Tab label="Tree" />
           <Tab label="Timeline" />
-          <Tab label="Summary" />
+          <Tab label="Notes" />
           <Tab label="Raw JSON" />
           <Tab label="Help" />
         </Tabs>

@@ -11,5 +11,5 @@ export const getWsBaseUrl = () => {
 
   return window.location.hostname !== 'localhost'
     ? `wss://wsadmin.${service}.${domain.join('.')}`
-    : `ws://localhost:8080/ws/admin`;
+    : `wss://wsadmin.admin.joecoady.development.kitted.app`;
 };

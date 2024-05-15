@@ -1,10 +1,16 @@
 import Box from '@mui/material/Box';
 import LinearProgress from '@mui/material/LinearProgress';
-import { DataGrid, GridRenderCellParams, GridColDef } from '@mui/x-data-grid';
+import {
+  DataGrid,
+  GridRenderCellParams,
+  GridColDef,
+  GridRowClassNameParams,
+} from '@mui/x-data-grid';
 import LogDialog from './LogDialog';
 import { useLogManagement } from './hooks';
 import { DataGridPagination, DateCell } from '../components';
 import { StoryResultMetadata } from 'quidproquo-core';
+import { LogMetadata } from 'quidproquo-webserver';
 
 const formatTime = (ms: number) => {
   if (ms < 1000) return `${ms}ms`;
@@ -40,7 +46,7 @@ const columns: GridColDef[] = [
 ];
 
 type LogMetadataGridProps = {
-  logs: StoryResultMetadata[];
+  logs: LogMetadata[];
   isLoading: boolean;
 };
 
@@ -53,8 +59,19 @@ export const LogMetadataGrid = ({ logs, isLoading }: LogMetadataGridProps) => {
     searchProgress,
   } = useLogManagement();
 
+  const getRowClassName = (params: GridRowClassNameParams) => {
+    return params.row.checked ? 'greenRow' : '';
+  };
+
   return (
     <>
+      <style>
+        {`
+          .greenRow {
+            background-color: #eaffea;
+          }
+        `}
+      </style>
       <DataGrid
         components={{
           Pagination: DataGridPagination,
@@ -65,6 +82,7 @@ export const LogMetadataGrid = ({ logs, isLoading }: LogMetadataGridProps) => {
         autoPageSize
         loading={isLoading}
         onRowClick={onRowClick}
+        getRowClassName={getRowClassName}
       />
       <LogDialog
         open={!!selectedLogCorrelation}

@@ -2,6 +2,7 @@ import React, { useEffect, useMemo } from 'react';
 import { useRunEvery, useThrottledMemo } from 'quidproquo-web-react';
 
 import {
+  LogMetadata,
   WebSocketAdminServerEventMessageLogMetadata,
   WebsocketAdminServerMessageEventType,
 } from 'quidproquo-webserver';
@@ -13,14 +14,15 @@ import { useLogSearch } from './hooks';
 import { useIsLoading } from '../view';
 import { StoryResultMetadata } from 'quidproquo-core';
 import { useSubscribeToWebSocketEvent } from 'quidproquo-web-react';
+import { uniqueBy } from 'quidproquo-web';
 
-const getLogCountForSinceXDaysAgo = (logs: StoryResultMetadata[], daysAgo: number) => {
+const getLogCountForSinceXDaysAgo = (logs: LogMetadata[], daysAgo: number) => {
   const currentDate = new Date();
   const daysAgoDate = new Date(currentDate.getTime() - daysAgo * 24 * 60 * 60 * 1000);
   const daysAgoString = daysAgoDate.toISOString();
 
   const logCount = logs.reduce(
-    (count, log) => (daysAgoString < log.startedAt ? count + 1 : count),
+    (count, log) => (daysAgoString < log.startedAt && !log.checked ? count + 1 : count),
     0,
   );
 
@@ -67,16 +69,24 @@ export const Dashboard: React.FC<DashboardProps> = ({}) => {
   useSubscribeToWebSocketEvent(
     WebsocketAdminServerMessageEventType.LogMetadata,
     (webSocketService, message: WebSocketAdminServerEventMessageLogMetadata) => {
-      setRealtimeLogs((prevLogs) => [...prevLogs, message.payload.log]);
+      // Add the log to the list if its an error
+      if (message.payload.log.error) {
+        setRealtimeLogs((prevLogs) => [
+          message.payload.log,
+          ...prevLogs.filter((pl) => pl.correlation !== message.payload.log.correlation),
+        ]);
+      }
     },
   );
 
   const hoursPassedToday = useRunEvery(getHoursSinceStartOfDay, 60);
 
-  const allLogs = useThrottledMemo(
-    () => [...realtimeLogs, ...weeklyLogs],
-    [realtimeLogs, weeklyLogs],
-  );
+  const allLogs = useThrottledMemo(() => {
+    const uniqueLogs = uniqueBy([...realtimeLogs, ...weeklyLogs], (log) => log.correlation);
+    return uniqueLogs.sort(
+      (a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime(),
+    );
+  }, [realtimeLogs, weeklyLogs]);
 
   const dailyErrorCount = useMemo(
     () => getLogCountForSinceXDaysAgo(allLogs, hoursPassedToday / 24),

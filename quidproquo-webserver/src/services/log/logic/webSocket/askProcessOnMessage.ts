@@ -3,12 +3,17 @@ import { AnyEventMessage, AskResponse, askThrowError, ErrorTypeEnum } from 'quid
 
 import {
   askProcessOnAuthenticate,
+  askProcessOnMarkLogChecked,
   askProcessOnPing,
+  askProcessOnRefreshLogMetadata,
   askProcessOnUnauthenticate,
   isWebSocketAuthenticateMessage,
+  isWebSocketMarkLogCheckedMessage,
   isWebSocketPingMessage,
+  isWebSocketRefreshLogMetadataMessage,
   isWebSocketUnauthenticateMessage,
 } from './messageProcessors';
+import { askAuthenticateConnection } from './askAuthenticateConnection';
 
 export function* askProcessOnMessage(
   connectionId: string,
@@ -34,6 +39,23 @@ export function* askProcessOnMessage(
     yield* askProcessOnPing(connectionId);
 
     return;
+  }
+
+  // Make sure any messages below have access to the authenticated user
+  yield* askAuthenticateConnection(connectionId);
+
+  if (isWebSocketMarkLogCheckedMessage(message)) {
+    yield* askProcessOnMarkLogChecked(
+      connectionId,
+      message.payload.correlationId,
+      message.payload.checked,
+    );
+
+    return;
+  }
+
+  if (isWebSocketRefreshLogMetadataMessage(message)) {
+    yield* askProcessOnRefreshLogMetadata(message.payload.correlationId);
   }
 
   // This should never be hit.

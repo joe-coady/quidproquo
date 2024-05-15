@@ -154,6 +154,14 @@ export const defineLogs = (
 
     defineRoute(
       'GET',
+      '/log/{correlationId}/toggle',
+      getServiceEntry('log', 'controller', 'logController'),
+      'toggleLogCheck',
+      routeAuthSettings,
+    ),
+
+    defineRoute(
+      'GET',
       '/log/children/{fromCorrelation}',
       getServiceEntry('log', 'controller', 'logController'),
       'getChildren',

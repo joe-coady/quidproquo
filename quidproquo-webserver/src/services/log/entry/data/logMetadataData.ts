@@ -4,6 +4,7 @@ import {
   askFileWriteTextContents,
   askKeyValueStoreQuery,
   askKeyValueStoreQueryAll,
+  askKeyValueStoreUpdatePartialProperties,
   askKeyValueStoreUpsert,
   askMapParallel,
   AskResponse,
@@ -25,6 +26,22 @@ const metadataStoreName = 'qpq-logs';
 
 export function* askUpsert(logMetadata: LogMetadata): AskResponse<void> {
   yield* askKeyValueStoreUpsert(metadataStoreName, logMetadata);
+}
+
+export function* askSetChecked(
+  correlation: string,
+  checked: boolean,
+  checkedBy: string,
+): AskResponse<LogMetadata> {
+  return yield* askKeyValueStoreUpdatePartialProperties<LogMetadata, 'correlation'>(
+    metadataStoreName,
+    'correlation',
+    {
+      correlation,
+      checked,
+      checkedBy,
+    },
+  );
 }
 
 export function* askListLogs(

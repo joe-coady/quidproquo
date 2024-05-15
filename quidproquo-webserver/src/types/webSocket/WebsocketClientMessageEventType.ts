@@ -3,4 +3,6 @@ export enum WebsocketClientMessageEventType {
   Unauthenticate = 'qpq/ws/Unauthenticate',
 
   Ping = 'qpq/ws/Ping',
+
+  MarkLogChecked = 'qpq/ws/MarkLogChecked',
 }
