@@ -9,5 +9,7 @@ export type WebSocketAuthProviderProps = {
 export const WebSocketAuthProvider: React.FC<WebSocketAuthProviderProps> = ({ children }) => {
   const accessToken = useAuthAccessToken();
 
+  // Should be able to check exp here.
+
   return <WebSocketAuthSync accessToken={accessToken}>{children}</WebSocketAuthSync>;
 };

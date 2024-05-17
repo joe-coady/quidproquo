@@ -1,8 +1,10 @@
-import { useContext } from "react";
-import { authContext } from "../authContext";
+import { useContext } from 'react';
+import { authContext } from '../authContext';
 
 export const useAuthAccessToken = () => {
-    const authState = useContext(authContext);
+  const authState = useContext(authContext);
 
-    return authState.authenticationInfo?.accessToken;
-}
+  // TODO: dont return access token if it has expired.
+
+  return authState.authenticationInfo?.accessToken;
+};
