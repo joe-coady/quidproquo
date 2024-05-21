@@ -1,4 +1,4 @@
-import { ErrorTypeEnum } from './ErrorTypeEnum';
+import { ErrorTypeEnum, QPQError } from './ErrorTypeEnum';
 import { Action } from './Action';
 import { QpqContext } from './QpqContextIdentifier';
 
@@ -20,12 +20,6 @@ export interface StorySession {
 }
 
 export type StorySessionUpdater = (newSession: Partial<StorySession>) => void;
-
-export interface StoryError {
-  errorType: ErrorTypeEnum;
-  errorText: string;
-  errorStack?: string;
-}
 
 export type AskResponse<T> = Generator<Action<any>, T, any>;
 
@@ -59,9 +53,7 @@ export type AskResponse<T> = Generator<Action<any>, T, any>;
  * code readability and maintainability.
  */
 
-export type ExtractGeneratorReturnType<T extends Generator> = T extends Generator<any, infer R, any>
-  ? R
-  : never;
+export type ExtractGeneratorReturnType<T extends Generator> = T extends Generator<any, infer R, any> ? R : never;
 
 // Directly extracting the generator's return type for any given AskResponse.
 // By applying ExtractGeneratorReturnType to an AskResponse, we can determine the
@@ -128,7 +120,7 @@ export interface StoryResult<TArgs extends Array<any>, TResult = any> {
 
   // Result of the story result or error not both
   result?: TResult;
-  error?: StoryError;
+  error?: QPQError;
 
   // User specified runtime type
   runtimeType: QpqRuntimeType;

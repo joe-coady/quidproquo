@@ -1,13 +1,9 @@
 import { ErrorActionType } from './ErrorActionType';
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
-import { ErrorTypeEnum } from '../../types/ErrorTypeEnum';
+import { QPQError } from '../../types/ErrorTypeEnum';
 
 // Payload
-export interface ErrorThrowErrorActionPayload {
-  errorType: ErrorTypeEnum;
-  errorText: string;
-  errorStack?: string;
-}
+export type ErrorThrowErrorActionPayload = QPQError;
 
 // Action
 export interface ErrorThrowErrorAction extends Action<ErrorThrowErrorActionPayload> {

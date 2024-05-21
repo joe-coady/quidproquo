@@ -44,7 +44,7 @@ export enum ErrorTypeEnum {
 }
 
 export interface QPQError {
-  errorType: ErrorTypeEnum;
+  errorType: ErrorTypeEnum | string;
   errorText: string;
   errorStack?: string;
 }

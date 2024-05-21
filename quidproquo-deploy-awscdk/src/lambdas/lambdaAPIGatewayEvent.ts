@@ -2,24 +2,13 @@ import { getAPIGatewayEventActionProcessor } from 'quidproquo-actionprocessor-aw
 
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
-import {
-  createRuntime,
-  askProcessEvent,
-  ErrorTypeEnum,
-  QpqRuntimeType,
-  QpqLogger,
-} from 'quidproquo-core';
+import { createRuntime, askProcessEvent, ErrorTypeEnum, QpqRuntimeType, QpqLogger } from 'quidproquo-core';
 
 import { APIGatewayEvent, Context } from 'aws-lambda';
 
 import { getLambdaConfigs } from './lambdaConfig';
 
-import {
-  getLogger,
-  getRuntimeCorrelation,
-  getLambdaActionProcessors,
-  qpqFunctionMiddleware,
-} from './lambda-utils';
+import { getLogger, getRuntimeCorrelation, getLambdaActionProcessors, qpqFunctionMiddleware } from './lambda-utils';
 
 // @ts-ignore - Special webpack loader
 import qpqCustomActionProcessors from 'qpq-custom-action-processors-loader!';
@@ -27,7 +16,7 @@ import qpqCustomActionProcessors from 'qpq-custom-action-processors-loader!';
 // TODO: Make this a util or something based on server time or something..
 const getDateNow = () => new Date().toISOString();
 
-const ErrorTypeHttpResponseMap = {
+const ErrorTypeHttpResponseMap: Record<string, number> = {
   [ErrorTypeEnum.BadRequest]: 400,
   [ErrorTypeEnum.Unauthorized]: 401,
   [ErrorTypeEnum.PaymentRequired]: 402,
@@ -43,11 +32,7 @@ const ErrorTypeHttpResponseMap = {
   [ErrorTypeEnum.Invalid]: 422,
 };
 
-export const apiGatewayEventHandler = async (
-  event: APIGatewayEvent,
-  context: Context,
-  logger: QpqLogger,
-) => {
+export const apiGatewayEventHandler = async (event: APIGatewayEvent, context: Context, logger: QpqLogger) => {
   const cdkConfig = await getLambdaConfigs();
   const accessToken = qpqWebServerUtils.getAccessTokenFromHeaders(event.headers);
 

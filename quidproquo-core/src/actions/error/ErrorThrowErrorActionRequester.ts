@@ -1,11 +1,11 @@
 import { ErrorThrowErrorActionRequester } from './ErrorThrowErrorActionRequesterTypes';
 import { ErrorActionType } from './ErrorActionType';
-import { ErrorTypeEnum } from '../../types/ErrorTypeEnum';
+import { ErrorTypeEnum, QPQError } from '../../types/ErrorTypeEnum';
 
 export function* askThrowError<T extends any>(
-  errorType: ErrorTypeEnum,
-  errorText: string,
-  errorStack?: string,
+  errorType: QPQError['errorType'],
+  errorText: QPQError['errorText'],
+  errorStack?: QPQError['errorStack'],
 ): ErrorThrowErrorActionRequester<T> {
   return (yield {
     type: ErrorActionType.ThrowError,

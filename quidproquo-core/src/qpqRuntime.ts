@@ -1,25 +1,8 @@
-import {
-  Action,
-  ActionProcessorList,
-  ActionProcessorResult,
-  ActionRequester,
-  EitherActionResult,
-} from './types/Action';
+import { Action, ActionProcessorList, ActionProcessorResult, ActionRequester, EitherActionResult } from './types/Action';
 import { ErrorTypeEnum } from './types/ErrorTypeEnum';
-import {
-  StoryResult,
-  StorySession,
-  QpqRuntimeType,
-  StorySessionUpdater,
-  qpqConsoleLog,
-} from './types/StorySession';
+import { StoryResult, StorySession, QpqRuntimeType, StorySessionUpdater, qpqConsoleLog } from './types/StorySession';
 
-import {
-  resolveActionResult,
-  resolveActionResultError,
-  isErroredActionResult,
-  actionResultError,
-} from './logic/actionLogic';
+import { resolveActionResult, resolveActionResultError, isErroredActionResult, actionResultError } from './logic/actionLogic';
 import { QPQConfig } from './config';
 import { QpqLogger } from './types';
 
@@ -36,22 +19,18 @@ export async function processAction(
   try {
     const processor = actionProcessors?.[action?.type];
     if (!processor) {
-      throw new Error(
-        `Unable to process action: ${action?.type} from ${Object.keys(actionProcessors).join(
-          ', ',
-        )}`,
-      );
+      throw new Error(`Unable to process action: ${action?.type} from ${Object.keys(actionProcessors).join(', ')}`);
     }
 
     return await processor(action.payload, session, actionProcessors, logger, updateSession);
   } catch (e: unknown) {
     if (e instanceof Error) {
-      return actionResultError(ErrorTypeEnum.GenericError, e.message, e.stack);
+      const errorName = (e as any).name;
+      const errorText = errorName ? `[${errorName}] - ${e.message}` : e.message;
+
+      return actionResultError(ErrorTypeEnum.GenericError, errorText, e.stack);
     }
-    return actionResultError(
-      ErrorTypeEnum.GenericError,
-      `An unknown error occurred in [${action?.type}]`,
-    );
+    return actionResultError(ErrorTypeEnum.GenericError, `An unknown error occurred in [${action?.type}]`);
   }
 }
 
@@ -125,13 +104,7 @@ export const createRuntime = (
         const action: Action<any> = storyProgress.value;
         const executionTime = getTimeNow();
 
-        const actionResult: ActionProcessorResult<any> = await processAction(
-          action,
-          actionProcessors,
-          storySession,
-          logger,
-          updateSession,
-        );
+        const actionResult: ActionProcessorResult<any> = await processAction(action, actionProcessors, storySession, logger, updateSession);
 
         const history = {
           act: action,
@@ -140,11 +113,7 @@ export const createRuntime = (
           finishedAt: getTimeNow(),
         };
 
-        console.log(
-          `${action.type}: took ${
-            new Date(history.finishedAt).getTime() - new Date(history.startedAt).getTime()
-          }ms`,
-        );
+        console.log(`${action.type}: took ${new Date(history.finishedAt).getTime() - new Date(history.startedAt).getTime()}ms`);
 
         response.history.push(history);
 
@@ -178,11 +147,7 @@ export const createRuntime = (
     } catch (err) {
       // Dev Only ~ Todo
       if (err instanceof Error) {
-        console.log(
-          `Uncaught Error: [${JSON.stringify(
-            storyProgress?.value?.type,
-          )}] ${err.message.toString()}`,
-        );
+        console.log(`Uncaught Error: [${JSON.stringify(storyProgress?.value?.type)}] ${err.message.toString()}`);
         return {
           ...response,
           finishedAt: getTimeNow(),
@@ -212,11 +177,7 @@ export const createRuntime = (
       result: storyProgress.value,
     };
 
-    console.log(
-      `story took took ${
-        new Date(storyResult.finishedAt).getTime() - new Date(storyResult.startedAt).getTime()
-      }ms`,
-    );
+    console.log(`story took took ${new Date(storyResult.finishedAt).getTime() - new Date(storyResult.startedAt).getTime()}ms`);
 
     return storyResult;
   }
