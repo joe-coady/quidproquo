@@ -5,33 +5,22 @@ import {
   QPQConfig,
   qpqCoreUtils,
   UserDirectoryActionType,
-  AuthenticateUserChallenge,
-  ErrorTypeEnum,
+  actionResultErrorFromCaughtError,
+  UserDirectoryAuthenticateUserErrorTypeEnum,
 } from 'quidproquo-core';
 
-import {
-  getCFExportNameUserPoolIdFromConfig,
-  getCFExportNameUserPoolClientIdFromConfig,
-} from '../../../awsNamingUtils';
+import { getCFExportNameUserPoolIdFromConfig, getCFExportNameUserPoolClientIdFromConfig } from '../../../awsNamingUtils';
 
 import { authenticateUser } from '../../../logic/cognito/authenticateUser';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 
-const getUserDirectoryAuthenticateUserActionProcessor = (
-  qpqConfig: QPQConfig,
-): UserDirectoryAuthenticateUserActionProcessor => {
+const getUserDirectoryAuthenticateUserActionProcessor = (qpqConfig: QPQConfig): UserDirectoryAuthenticateUserActionProcessor => {
   return async (payload) => {
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
-    const userPoolId = await getExportedValue(
-      getCFExportNameUserPoolIdFromConfig(payload.userDirectoryName, qpqConfig),
-      region,
-    );
+    const userPoolId = await getExportedValue(getCFExportNameUserPoolIdFromConfig(payload.userDirectoryName, qpqConfig), region);
 
-    const userPoolClientId = await getExportedValue(
-      getCFExportNameUserPoolClientIdFromConfig(payload.userDirectoryName, qpqConfig),
-      region,
-    );
+    const userPoolClientId = await getExportedValue(getCFExportNameUserPoolClientIdFromConfig(payload.userDirectoryName, qpqConfig), region);
 
     try {
       const authResponse = await authenticateUser(
@@ -43,19 +32,16 @@ const getUserDirectoryAuthenticateUserActionProcessor = (
       );
 
       return actionResult(authResponse);
-    } catch (e) {
-      if (e instanceof Error) {
-        return actionResultError(ErrorTypeEnum.Unauthorized, e.message);
-      }
-
-      return actionResultError(ErrorTypeEnum.GenericError, 'An unknown error has occurred.');
+    } catch (error: unknown) {
+      return actionResultErrorFromCaughtError(error, {
+        UserNotFoundException: () => actionResultError(UserDirectoryAuthenticateUserErrorTypeEnum.UserNotFound, 'Incorrect username or password'),
+      });
     }
   };
 };
 
 export default (qpqConfig: QPQConfig) => {
   return {
-    [UserDirectoryActionType.AuthenticateUser]:
-      getUserDirectoryAuthenticateUserActionProcessor(qpqConfig),
+    [UserDirectoryActionType.AuthenticateUser]: getUserDirectoryAuthenticateUserActionProcessor(qpqConfig),
   };
 };

@@ -42,9 +42,7 @@ const transformHttpEventHeadersToAPIGatewayProxyResultHeaders = (
     .reduce((acc, header) => ({ ...acc, [header]: headers[header] }), {});
 };
 
-const getProcessTransformEventParams = (
-  serviceName: string,
-): EventTransformEventParamsActionProcessor<ApiGatewayEventParams, HTTPEvent<any>> => {
+const getProcessTransformEventParams = (serviceName: string): EventTransformEventParamsActionProcessor<ApiGatewayEventParams, HTTPEvent<any>> => {
   return async ({ eventParams: [apiGatewayEvent, context] }) => {
     // const path = (apiGatewayEvent.path || '/').replace(new RegExp(`^(\/${serviceName})/`), '/');
 
@@ -71,12 +69,7 @@ const getProcessTransformEventParams = (
     };
 
     // Transform the body if its a multipart/form-data
-    if (
-      (qpqWebServerUtils.getHeaderValue('Content-Type', apiGatewayEvent.headers) || '').startsWith(
-        'multipart/form-data',
-      ) &&
-      apiGatewayEvent.body
-    ) {
+    if ((qpqWebServerUtils.getHeaderValue('Content-Type', apiGatewayEvent.headers) || '').startsWith('multipart/form-data') && apiGatewayEvent.body) {
       transformedEventParams.files = await parseMultipartFormData(apiGatewayEvent);
     }
 
@@ -88,11 +81,7 @@ const getProcessTransformEventParams = (
 
 const getProcessTransformResponseResult = (
   qpqConfig: QPQConfig,
-): EventTransformResponseResultActionProcessor<
-  HTTPEventResponse<string>,
-  HTTPEvent,
-  APIGatewayProxyResult
-> => {
+): EventTransformResponseResultActionProcessor<HTTPEventResponse<string>, HTTPEvent, APIGatewayProxyResult> => {
   // We might need to JSON.stringify the body.
   return async (payload) => {
     const headers: HttpEventHeaders = {
@@ -102,7 +91,7 @@ const getProcessTransformResponseResult = (
 
     return actionResult<APIGatewayProxyResult>({
       statusCode: payload.response.status,
-      body: payload.response.body || '',
+      body: payload.transformedEventParams.method === 'HEAD' || !payload.response.body ? '' : payload.response.body,
       isBase64Encoded: payload.response.isBase64Encoded,
       headers: transformHttpEventHeadersToAPIGatewayProxyResultHeaders(headers),
     });
@@ -111,22 +100,14 @@ const getProcessTransformResponseResult = (
 
 const getProcessAutoRespond = (
   qpqConfig: QPQConfig,
-): EventAutoRespondActionProcessor<
-  HTTPEvent<any>,
-  HttpRouteMatchStoryResult,
-  HTTPEventResponse | null
-> => {
+): EventAutoRespondActionProcessor<HTTPEvent<any>, HttpRouteMatchStoryResult, HTTPEventResponse | null> => {
   return async (payload) => {
     if (payload.transformedEventParams.method === 'OPTIONS') {
       return actionResult({
         status: 200,
         isBase64Encoded: false,
         body: '',
-        headers: qpqWebServerUtils.getCorsHeaders(
-          qpqConfig,
-          payload.matchResult.config || {},
-          payload.transformedEventParams.headers,
-        ),
+        headers: qpqWebServerUtils.getCorsHeaders(qpqConfig, payload.matchResult.config || {}, payload.transformedEventParams.headers),
       });
     }
 
@@ -146,11 +127,7 @@ const getProcessAutoRespond = (
         body: JSON.stringify({
           message: 'You are unauthorized to access this resource',
         }),
-        headers: qpqWebServerUtils.getCorsHeaders(
-          qpqConfig,
-          payload.matchResult.config || {},
-          payload.transformedEventParams.headers,
-        ),
+        headers: qpqWebServerUtils.getCorsHeaders(qpqConfig, payload.matchResult.config || {}, payload.transformedEventParams.headers),
       });
     }
 
@@ -158,9 +135,7 @@ const getProcessAutoRespond = (
   };
 };
 
-const getProcessMatchStory = (
-  qpqConfig: QPQConfig,
-): EventMatchStoryActionProcessor<HTTPEvent<any>, HttpRouteMatchStoryResult> => {
+const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProcessor<HTTPEvent<any>, HttpRouteMatchStoryResult> => {
   const routes: RouteQPQWebServerConfigSetting[] = qpqWebServerUtils.getAllRoutes(qpqConfig);
 
   return async (payload) => {
@@ -169,7 +144,8 @@ const getProcessMatchStory = (
     const routesWithNoOptions = routes.filter(
       (r: any) =>
         r.method === payload.transformedEventParams.method ||
-        payload.transformedEventParams.method === 'OPTIONS',
+        payload.transformedEventParams.method === 'OPTIONS' ||
+        (payload.transformedEventParams.method === 'HEAD' && r.method === 'GET'),
     );
 
     const sortedRoutes = qpqWebServerUtils.sortPathMatchConfigs(routesWithNoOptions);
@@ -185,9 +161,7 @@ const getProcessMatchStory = (
     if (!matchedRoute) {
       return actionResultError(
         ErrorTypeEnum.NotFound,
-        `route not found [${
-          payload.transformedEventParams.path
-        }] - [${qpqWebServerUtils.getHeaderValue(
+        `route not found [${payload.transformedEventParams.path}] - [${qpqWebServerUtils.getHeaderValue(
           'user-agent',
           payload.transformedEventParams.headers,
         )}]`,
