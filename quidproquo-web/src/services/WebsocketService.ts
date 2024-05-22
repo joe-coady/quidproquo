@@ -22,15 +22,9 @@ type Subscriptions = {
 
 type WebsocketSendPayload = string | ArrayBufferLike | Blob | ArrayBufferView;
 
-export type WebSocketServiceSubscriptionFunction = (
-  websocketService: WebsocketService,
-  data?: string,
-) => any;
+export type WebSocketServiceSubscriptionFunction = (websocketService: WebsocketService, event?: Event) => any;
 
-export type WebSocketServiceEventSubscriptionFunction<E extends AnyEventMessage> = (
-  websocketService: WebsocketService,
-  event: E,
-) => void;
+export type WebSocketServiceEventSubscriptionFunction<E extends AnyEventMessage> = (websocketService: WebsocketService, event: E) => void;
 
 export class WebsocketService {
   private url: string;
@@ -65,10 +59,7 @@ export class WebsocketService {
     return this.socket?.readyState === WebSocket.OPEN;
   }
 
-  public subscribe(
-    subscriptionType: WebsocketServiceEvent,
-    callback: WebSocketServiceSubscriptionFunction,
-  ): SubscriptionHandle {
+  public subscribe(subscriptionType: WebsocketServiceEvent, callback: WebSocketServiceSubscriptionFunction): SubscriptionHandle {
     const subscriptionHandle: SubscriptionHandle = {
       type: subscriptionType,
     };
@@ -81,21 +72,19 @@ export class WebsocketService {
     subscriptionType: E['type'],
     callback: WebSocketServiceEventSubscriptionFunction<E>,
   ): SubscriptionHandle {
-    return this.subscribe(
-      WebsocketServiceEvent.MESSAGE,
-      (websocketService: WebsocketService, data?: string) => {
-        if (data) {
-          try {
-            const event: E = JSON.parse(data);
-            if (event.type === subscriptionType) {
-              callback(websocketService, event);
-            }
-          } catch (e) {
-            // Must of been some other message format / type
+    return this.subscribe(WebsocketServiceEvent.MESSAGE, (websocketService: WebsocketService, event?: Event) => {
+      if (event) {
+        const data = (event as MessageEvent).data;
+        try {
+          const event: E = JSON.parse(data);
+          if (event.type === subscriptionType) {
+            callback(websocketService, event);
           }
+        } catch (e) {
+          // Must of been some other message format / type
         }
-      },
-    );
+      }
+    });
   }
 
   public unsubscribe(subscriptionHandle: SubscriptionHandle) {
@@ -175,16 +164,16 @@ export class WebsocketService {
   }
 
   private onMessage(event: Event) {
-    this.notifySubscribers(this.subscriptions.message, (event as MessageEvent).data);
+    this.notifySubscribers(this.subscriptions.message, event);
   }
 
-  private onError() {
-    this.notifySubscribers(this.subscriptions.error);
+  private onError(event: Event) {
+    this.notifySubscribers(this.subscriptions.error, event);
   }
 
-  private notifySubscribers(subscibers: SubscriptionMap, data?: string) {
+  private notifySubscribers(subscibers: SubscriptionMap, event?: Event) {
     subscibers.forEach((callback: WebSocketServiceSubscriptionFunction) => {
-      callback(this, data);
+      callback(this, event);
     });
   }
 
