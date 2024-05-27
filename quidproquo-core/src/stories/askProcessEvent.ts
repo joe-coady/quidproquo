@@ -4,12 +4,14 @@ import {
   askEventAutoRespond,
   askEventTransformResponseResult,
   askEventMatchStory,
+  askEventResolveCaughtError,
 } from '../actions/event';
 
 import { askExecuteStory } from '../actions/system';
 import { LogLevelEnum } from '../types';
 
 import { askGetApplicationVersion } from './askGetApplicationVersion';
+import { askCatch } from './system/askCatch';
 
 export function* askProcessEvent(...eventArguments: any) {
   // Try and get the app version
@@ -27,11 +29,7 @@ export function* askProcessEvent(...eventArguments: any) {
   const earlyExitResponse = yield* askEventAutoRespond(transformedEventParams, matchResult);
 
   // Log the early exit response
-  yield* askLogCreate(
-    LogLevelEnum.Info,
-    'earlyExitResponse',
-    earlyExitResponse || `[no early exit response]`,
-  );
+  yield* askLogCreate(LogLevelEnum.Info, 'earlyExitResponse', earlyExitResponse || `[no early exit response]`);
 
   if (earlyExitResponse) {
     // Transform the early exit response if needed
@@ -39,11 +37,16 @@ export function* askProcessEvent(...eventArguments: any) {
   }
 
   // Execute the story
-  const result = yield* askExecuteStory('route', matchResult.src!, matchResult.runtime!, [
-    transformedEventParams,
-    matchResult.runtimeOptions,
-  ]);
+  const result = yield* askCatch(
+    askExecuteStory('route', matchResult.src!, matchResult.runtime!, [transformedEventParams, matchResult.runtimeOptions]),
+  );
 
-  // return the result of the story back to the event caller
-  return yield* askEventTransformResponseResult(result, transformedEventParams);
+  if (result.success) {
+    // return the result of the story back to the event caller
+    return yield* askEventTransformResponseResult(result.result, transformedEventParams);
+  }
+
+  const erroredResponse = yield* askEventResolveCaughtError(result.error);
+
+  return yield* askEventTransformResponseResult(erroredResponse, transformedEventParams);
 }

@@ -3,6 +3,7 @@ export enum EventActionType {
   TransformResponseResult = '@quidproquo-core/event/TransformResponseResult',
   AutoRespond = '@quidproquo-core/event/AutoRespond',
   MatchStory = '@quidproquo-core/event/MatchStory',
+  ResolveCaughtError = '@quidproquo-core/event/ResolveCaughtError',
 }
 
 export type MatchStoryResult<MatchOptions, Config> = {

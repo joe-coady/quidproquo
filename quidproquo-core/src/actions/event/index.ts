@@ -11,3 +11,6 @@ export * from './EventTransformEventParamsActionTypes';
 
 export * from './EventTransformResponseResultActionRequester';
 export * from './EventTransformResponseResultActionTypes';
+
+export * from './EventResolveCaughtErrorActionRequester';
+export * from './EventResolveCaughtErrorActionTypes';

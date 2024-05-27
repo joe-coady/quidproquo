@@ -1,7 +1,6 @@
 import {
   EventActionType,
   QPQConfig,
-  qpqCoreUtils,
   MatchStoryResult,
   EventMatchStoryActionProcessor,
   EventTransformEventParamsActionProcessor,
@@ -10,27 +9,31 @@ import {
   actionResult,
   actionResultError,
   ErrorTypeEnum,
+  qpqCoreUtils,
+  HTTPMethod,
+  EventResolveCaughtErrorActionProcessor,
 } from 'quidproquo-core';
 
-import {
-  RouteQPQWebServerConfigSetting,
-  HTTPEvent,
-  HTTPEventResponse,
-  HttpEventHeaders,
-  qpqWebServerUtils,
-  HttpEventRouteParams,
-  RouteOptions,
-} from 'quidproquo-webserver';
+import { HTTPEvent, HTTPEventResponse, HttpEventHeaders, RouteQPQWebServerConfigSetting, qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { APIGatewayEvent, Context, APIGatewayProxyResult } from 'aws-lambda';
-
+import { parseMultipartFormData } from './utils/parseMultipartFormData';
+import { isAuthValid } from './utils/isAuthValid';
 import { matchUrl } from '../../../awsLambdaUtils';
 
-import { isAuthValid } from './utils/isAuthValid';
-import { parseMultipartFormData } from './utils/parseMultipartFormData';
+type AnyHTTPEvent = HTTPEvent<any>;
+type AnyHTTPEventResponse = HTTPEventResponse<any>;
 
-export type HttpRouteMatchStoryResult = MatchStoryResult<HttpEventRouteParams, RouteOptions>;
-export type ApiGatewayEventParams = [APIGatewayEvent, Context];
+// Externals
+type EventInput = [APIGatewayEvent, Context];
+type EventOutput = APIGatewayProxyResult;
+
+// Internals
+type InternalEventInput = AnyHTTPEvent;
+type InternalEventOutput = AnyHTTPEventResponse;
+
+type AutoRespondResult = HTTPEventResponse | false;
+type MatchResult = MatchStoryResult<any, any>;
 
 const transformHttpEventHeadersToAPIGatewayProxyResultHeaders = (
   headers: HttpEventHeaders,
@@ -42,10 +45,10 @@ const transformHttpEventHeadersToAPIGatewayProxyResultHeaders = (
     .reduce((acc, header) => ({ ...acc, [header]: headers[header] }), {});
 };
 
-const getProcessTransformEventParams = (serviceName: string): EventTransformEventParamsActionProcessor<ApiGatewayEventParams, HTTPEvent<any>> => {
-  return async ({ eventParams: [apiGatewayEvent, context] }) => {
-    // const path = (apiGatewayEvent.path || '/').replace(new RegExp(`^(\/${serviceName})/`), '/');
+const getProcessTransformEventParams = (qpqConfig: QPQConfig): EventTransformEventParamsActionProcessor<EventInput, InternalEventInput> => {
+  const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
 
+  return async ({ eventParams: [apiGatewayEvent, context] }) => {
     // Initialize `path` by removing the service name prefix from `apiGatewayEvent.path`.
     // This adjustment is necessary because the API gateway routes requests to services based on
     // a base path that includes the service name. By subtracting `serviceName.length + 1` from the
@@ -62,7 +65,7 @@ const getProcessTransformEventParams = (serviceName: string): EventTransformEven
       } as { [key: string]: undefined | string | string[] },
       body: apiGatewayEvent.body,
       headers: apiGatewayEvent.headers,
-      method: apiGatewayEvent.httpMethod as 'GET' | 'POST',
+      method: apiGatewayEvent.httpMethod as HTTPMethod,
       correlation: context.awsRequestId,
       sourceIp: apiGatewayEvent.requestContext.identity.sourceIp,
       isBase64Encoded: apiGatewayEvent.isBase64Encoded,
@@ -79,28 +82,7 @@ const getProcessTransformEventParams = (serviceName: string): EventTransformEven
   };
 };
 
-const getProcessTransformResponseResult = (
-  qpqConfig: QPQConfig,
-): EventTransformResponseResultActionProcessor<HTTPEventResponse<string>, HTTPEvent, APIGatewayProxyResult> => {
-  // We might need to JSON.stringify the body.
-  return async (payload) => {
-    const headers: HttpEventHeaders = {
-      ...qpqWebServerUtils.getCorsHeaders(qpqConfig, {}, payload.transformedEventParams.headers),
-      ...(payload?.response?.headers || {}),
-    };
-
-    return actionResult<APIGatewayProxyResult>({
-      statusCode: payload.response.status,
-      body: payload.transformedEventParams.method === 'HEAD' || !payload.response.body ? '' : payload.response.body,
-      isBase64Encoded: payload.response.isBase64Encoded,
-      headers: transformHttpEventHeadersToAPIGatewayProxyResultHeaders(headers),
-    });
-  };
-};
-
-const getProcessAutoRespond = (
-  qpqConfig: QPQConfig,
-): EventAutoRespondActionProcessor<HTTPEvent<any>, HttpRouteMatchStoryResult, HTTPEventResponse | null> => {
+const getProcessAutoRespond = (qpqConfig: QPQConfig): EventAutoRespondActionProcessor<InternalEventInput, MatchResult, AutoRespondResult> => {
   return async (payload) => {
     if (payload.transformedEventParams.method === 'OPTIONS') {
       return actionResult({
@@ -131,11 +113,32 @@ const getProcessAutoRespond = (
       });
     }
 
-    return actionResult(null);
+    return actionResult(false);
   };
 };
 
-const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProcessor<HTTPEvent<any>, HttpRouteMatchStoryResult> => {
+const getProcessTransformResponseResult = (
+  qpqConfig: QPQConfig,
+): EventTransformResponseResultActionProcessor<InternalEventOutput, InternalEventInput, EventOutput> => {
+  // We might need to JSON.stringify the body.
+  return async (payload) => {
+    // Add the cors headers
+    const headers: HttpEventHeaders = {
+      ...qpqWebServerUtils.getCorsHeaders(qpqConfig, {}, payload.transformedEventParams.headers),
+      ...(payload?.response?.headers || {}),
+    };
+
+    // Transform back to api gateway
+    return actionResult<APIGatewayProxyResult>({
+      statusCode: payload.response.status,
+      body: payload.transformedEventParams.method === 'HEAD' || !payload.response.body ? '' : payload.response.body,
+      isBase64Encoded: payload.response.isBase64Encoded,
+      headers: transformHttpEventHeadersToAPIGatewayProxyResultHeaders(headers),
+    });
+  };
+};
+
+const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProcessor<InternalEventInput, MatchResult> => {
   const routes: RouteQPQWebServerConfigSetting[] = qpqWebServerUtils.getAllRoutes(qpqConfig);
 
   return async (payload) => {
@@ -168,7 +171,7 @@ const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProces
       );
     }
 
-    return actionResult<HttpRouteMatchStoryResult>({
+    return actionResult({
       src: matchedRoute.route.src,
       runtime: matchedRoute.route.runtime,
       runtimeOptions: matchedRoute.match.params || {},
@@ -179,14 +182,43 @@ const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProces
   };
 };
 
-export default (qpqConfig: QPQConfig) => {
-  // TODO: Make this aware of the API that we are eventing
-  const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
+const getProcessResolveCaughtError = (qpqConfig: QPQConfig): EventResolveCaughtErrorActionProcessor<InternalEventOutput> => {
+  const ErrorTypeHttpResponseMap: Record<string, number> = {
+    [ErrorTypeEnum.BadRequest]: 400,
+    [ErrorTypeEnum.Unauthorized]: 401,
+    [ErrorTypeEnum.PaymentRequired]: 402,
+    [ErrorTypeEnum.Forbidden]: 403,
+    [ErrorTypeEnum.NotFound]: 404,
+    [ErrorTypeEnum.TimeOut]: 408,
+    [ErrorTypeEnum.Conflict]: 409,
+    [ErrorTypeEnum.UnsupportedMediaType]: 415,
+    [ErrorTypeEnum.OutOfResources]: 500,
+    [ErrorTypeEnum.GenericError]: 500,
+    [ErrorTypeEnum.NotImplemented]: 501,
+    [ErrorTypeEnum.NoContent]: 204,
+    [ErrorTypeEnum.Invalid]: 422,
+  };
 
+  return async (payload) => {
+    const statusCode = ErrorTypeHttpResponseMap[payload.error.errorType] || 500;
+    return actionResult(
+      qpqWebServerUtils.toJsonEventResponse(
+        {
+          errorType: payload.error.errorType,
+          errorText: payload.error.errorText,
+        },
+        statusCode,
+      ),
+    );
+  };
+};
+
+export default (qpqConfig: QPQConfig) => {
   return {
-    [EventActionType.TransformEventParams]: getProcessTransformEventParams(serviceName),
+    [EventActionType.TransformEventParams]: getProcessTransformEventParams(qpqConfig),
     [EventActionType.TransformResponseResult]: getProcessTransformResponseResult(qpqConfig),
     [EventActionType.AutoRespond]: getProcessAutoRespond(qpqConfig),
     [EventActionType.MatchStory]: getProcessMatchStory(qpqConfig),
+    [EventActionType.ResolveCaughtError]: getProcessResolveCaughtError(qpqConfig),
   };
 };
