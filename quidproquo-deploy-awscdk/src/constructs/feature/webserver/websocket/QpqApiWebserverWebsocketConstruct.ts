@@ -1,16 +1,15 @@
 import { aws_lambda, aws_apigatewayv2, aws_iam, aws_logs, aws_apigateway } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
-import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { qpqCoreUtils } from 'quidproquo-core';
 import { WebSocketQPQWebServerConfigSetting, qpqWebServerUtils } from 'quidproquo-webserver';
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
-import { QpqResource } from '../../../base';
-import { exportStackValue, importStackValue } from '../../../../utils';
+
+import { importStackValue } from '../../../../utils';
 import { Function } from '../../../basic/Function';
 import { SubdomainName } from '../../../basic';
-import { CloudflareDnsRecord } from '../../../basic/CloudflareDnsRecord';
 
 export interface QpqApiWebserverWebsocketConstructProps extends QpqConstructBlockProps {
   websocketConfig: WebSocketQPQWebServerConfigSetting;
@@ -23,12 +22,7 @@ export class QpqApiWebserverWebsocketConstruct extends QpqConstructBlock {
 
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(props.qpqConfig);
 
-    const apiId = importStackValue(
-      awsNamingUtils.getCFExportNameWebsocketApiIdFromConfig(
-        props.websocketConfig.apiName,
-        props.qpqConfig,
-      ),
-    );
+    const apiId = importStackValue(awsNamingUtils.getCFExportNameWebsocketApiIdFromConfig(props.websocketConfig.apiName, props.qpqConfig));
 
     const deployment = new aws_apigatewayv2.CfnDeployment(this, 'websocket-deployment', {
       apiId,
@@ -41,10 +35,7 @@ export class QpqApiWebserverWebsocketConstruct extends QpqConstructBlock {
     });
 
     const func = new Function(this, 'api-function', {
-      buildPath: qpqWebServerUtils.getWebsocketEntryFullPath(
-        props.qpqConfig,
-        props.websocketConfig,
-      ),
+      buildPath: qpqWebServerUtils.getWebsocketEntryFullPath(props.qpqConfig, props.websocketConfig),
       functionName: this.resourceName(`${props.websocketConfig.apiName}-ws`),
       functionType: 'lambdaWebsocketAPIGatewayEvent',
       executorName: 'executeWebsocketAPIGatewayEvent',
@@ -125,23 +116,6 @@ export class QpqApiWebserverWebsocketConstruct extends QpqConstructBlock {
       qpqConfig: props.qpqConfig,
       awsAccountId: props.awsAccountId,
     });
-
-    if (props.websocketConfig.cloudflareApiKeySecretName) {
-      new CloudflareDnsRecord(this, 'certFlare', {
-        awsAccountId: props.awsAccountId,
-        buildPath: qpqWebServerUtils.getWebsocketEntryFullPath(
-          props.qpqConfig,
-          props.websocketConfig,
-        ),
-        qpqConfig: props.qpqConfig,
-
-        // certificateArn: subdomain.certificate.certificateArn,
-        certificateDomain: subdomain.deployDomain,
-
-        dnsEntries: {},
-        apiSecretName: props.websocketConfig.cloudflareApiKeySecretName,
-      });
-    }
 
     // Create a mapping between the custom domain name and the WebSocket API
     new aws_apigatewayv2.CfnApiMapping(this, 'websocket-api-mapping', {

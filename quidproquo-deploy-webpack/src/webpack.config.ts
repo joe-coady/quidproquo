@@ -17,15 +17,8 @@ const getWebpackBuildMode = (qpqConfig: QPQConfig): WebpackBuildMode => {
   return 'production';
 };
 
-export const getWebpackConfig = (
-  qpqConfig: QPQConfig,
-  buildPath: string,
-  awsLambdasToBuild: string[],
-) => {
-  const allSrcEntries = [
-    ...qpqCoreUtils.getAllSrcEntries(qpqConfig),
-    ...qpqWebServerUtils.getAllSrcEntries(qpqConfig),
-  ];
+export const getWebpackConfig = (qpqConfig: QPQConfig, buildPath: string, awsLambdasToBuild: string[]) => {
+  const allSrcEntries = [...qpqCoreUtils.getAllSrcEntries(qpqConfig), ...qpqWebServerUtils.getAllSrcEntries(qpqConfig)];
 
   const customActionProcessorSources = qpqCoreUtils.getActionProcessorSources(qpqConfig);
 
@@ -40,10 +33,7 @@ export const getWebpackConfig = (
   });
 
   return {
-    entry: awsLambdasToBuild.reduce(
-      (acc, name) => ({ ...acc, [name]: `quidproquo-deploy-awscdk/src/lambdas/${name}.ts` }),
-      {},
-    ),
+    entry: awsLambdasToBuild.reduce((acc, name) => ({ ...acc, [name]: `quidproquo-deploy-awscdk/src/lambdas/${name}.ts` }), {}),
 
     resolveLoader: {
       modules: [path.resolve(__dirname, 'loaders'), 'node_modules'],
@@ -98,7 +88,6 @@ export const getWebpackConfig = (
 export const getWebpackEntryNames = () => [
   'lambdaAPIGatewayEvent',
   'lambdaAPIGatewayEvent_redirect',
-  'lambdaCustomResource_cloudflareDns',
   'lambdaWebsocketAPIGatewayEvent',
   'lambdaEventBridgeEventStackDeploy',
   'lambdaEventBridgeEvent',
@@ -112,12 +101,7 @@ export const getWebpackEntryNames = () => [
 ];
 
 export const getSeoWebpackConfig = (qpqConfig: QPQConfig, outputPath?: string) =>
-  getWebpackConfig(qpqConfig, outputPath || 'build', [
-    'lambdaEventOriginRequest',
-    'lambdaEventViewerRequest',
-    'lambdaAPIGatewayEvent_redirect',
-    'lambdaCustomResource_cloudflareDns',
-  ]);
+  getWebpackConfig(qpqConfig, outputPath || 'build', ['lambdaEventOriginRequest', 'lambdaEventViewerRequest', 'lambdaAPIGatewayEvent_redirect']);
 
 export const getApiWebpackConfig = (qpqConfig: QPQConfig, outputPath?: string) =>
   getWebpackConfig(qpqConfig, outputPath || 'build', [

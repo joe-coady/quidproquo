@@ -2,10 +2,7 @@ import path from 'path';
 import * as cdk from 'aws-cdk-lib';
 
 import { qpqCoreUtils } from 'quidproquo-core';
-import {
-  SubdomainRedirectQPQWebServerConfigSetting,
-  qpqWebServerUtils,
-} from 'quidproquo-webserver';
+import { SubdomainRedirectQPQWebServerConfigSetting, qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
@@ -15,7 +12,6 @@ import { SubdomainName } from '../../../basic/SubdomainName';
 
 import { Function } from '../../../basic/Function';
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
-import { CloudflareDnsRecord } from '../../../basic/CloudflareDnsRecord';
 
 export interface QpqWebserverSubdomainRedirectConstructProps extends QpqConstructBlockProps {
   subdomainRedirectConfig: SubdomainRedirectQPQWebServerConfigSetting;
@@ -29,10 +25,7 @@ export class QpqWebserverSubdomainRedirectConstruct extends QpqConstructBlock {
     const feature = qpqCoreUtils.getApplicationModuleFeature(props.qpqConfig);
 
     const func = new Function(this, 'redirect', {
-      buildPath: qpqWebServerUtils.getRedirectApiBuildFullPath(
-        props.qpqConfig,
-        props.subdomainRedirectConfig,
-      ),
+      buildPath: qpqWebServerUtils.getRedirectApiBuildFullPath(props.qpqConfig, props.subdomainRedirectConfig),
       functionName: this.resourceName(`${props.subdomainRedirectConfig.subdomain}-redirect`),
       functionType: 'lambdaAPIGatewayEvent_redirect',
       executorName: 'executeAPIGatewayEvent',
@@ -72,23 +65,6 @@ export class QpqWebserverSubdomainRedirectConstruct extends QpqConstructBlock {
       awsAccountId: props.awsAccountId,
     });
 
-    if (props.subdomainRedirectConfig.cloudflareApiKeySecretName) {
-      new CloudflareDnsRecord(this, 'certFlare', {
-        awsAccountId: props.awsAccountId,
-        buildPath: qpqWebServerUtils.getRedirectApiBuildFullPath(
-          props.qpqConfig,
-          props.subdomainRedirectConfig,
-        ),
-        qpqConfig: props.qpqConfig,
-
-        // certificateArn: subdomain.certificate.certificateArn,
-        certificateDomain: serviceDomainName.deployDomain,
-
-        dnsEntries: {},
-        apiSecretName: props.subdomainRedirectConfig.cloudflareApiKeySecretName,
-      });
-    }
-
     // Map all requests to this service to /serviceName/*
     new aws_apigateway.BasePathMapping(this, 'base-path-mapping', {
       domainName: serviceDomainName.domainName,
@@ -97,25 +73,5 @@ export class QpqWebserverSubdomainRedirectConstruct extends QpqConstructBlock {
       // the properties below are optional
       // basePath: settings.service,
     });
-
-    if (props.subdomainRedirectConfig.cloudflareApiKeySecretName) {
-      new CloudflareDnsRecord(this, 'cloudflare', {
-        awsAccountId: props.awsAccountId,
-        buildPath: qpqWebServerUtils.getRedirectApiBuildFullPath(
-          props.qpqConfig,
-          props.subdomainRedirectConfig,
-        ),
-        qpqConfig: props.qpqConfig,
-
-        dnsEntries: {
-          [serviceDomainName.deployDomain]: {
-            value: serviceDomainName.domainName.domainNameAliasDomainName,
-            proxied: true,
-            type: 'CNAME',
-          },
-        },
-        apiSecretName: props.subdomainRedirectConfig.cloudflareApiKeySecretName,
-      });
-    }
   }
 }

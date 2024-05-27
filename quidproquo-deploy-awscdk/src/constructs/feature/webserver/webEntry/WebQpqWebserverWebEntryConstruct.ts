@@ -14,7 +14,6 @@ import * as cdk from 'aws-cdk-lib';
 
 import { WebEntryQPQWebServerConfigSetting, qpqWebServerUtils } from 'quidproquo-webserver';
 
-import { CloudflareDnsRecord } from '../../../basic/CloudflareDnsRecord';
 import { DnsValidatedCertificate } from '../../../basic/DnsValidatedCertificate';
 
 import { convertSecurityHeadersFromQpqSecurityHeaders } from './utils/securityHeaders';
@@ -68,18 +67,11 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
         }),
       );
     } else {
-      originBucket = aws_s3.Bucket.fromBucketName(
-        this,
-        'src-bucket-lookup',
-        this.resourceName(props.webEntryConfig.storageDrive.sourceStorageDrive),
-      );
+      originBucket = aws_s3.Bucket.fromBucketName(this, 'src-bucket-lookup', this.resourceName(props.webEntryConfig.storageDrive.sourceStorageDrive));
     }
 
     if (props.webEntryConfig.storageDrive.autoUpload) {
-      const webEntryBuildPath = qpqWebServerUtils.getWebEntryFullPath(
-        props.qpqConfig,
-        props.webEntryConfig,
-      );
+      const webEntryBuildPath = qpqWebServerUtils.getWebEntryFullPath(props.qpqConfig, props.webEntryConfig);
       new aws_s3_deployment.BucketDeployment(this, 'bucket-deploy', {
         sources: [aws_s3_deployment.Source.asset(webEntryBuildPath)],
         destinationBucket: originBucket,
@@ -89,28 +81,13 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
     const dnsRecord = new DnsValidatedCertificate(this, 'validcert', {
       domain: {
         onRootDomain: props.webEntryConfig.domain.onRootDomain,
-        subDomainNames: props.webEntryConfig.domain.subDomainName
-          ? [props.webEntryConfig.domain.subDomainName]
-          : undefined,
+        subDomainNames: props.webEntryConfig.domain.subDomainName ? [props.webEntryConfig.domain.subDomainName] : undefined,
         rootDomain: props.webEntryConfig.domain.rootDomain,
       },
 
       awsAccountId: props.awsAccountId,
       qpqConfig: props.qpqConfig,
     });
-
-    if (props.webEntryConfig.cloudflareApiKeySecretName) {
-      new CloudflareDnsRecord(this, 'certDns', {
-        awsAccountId: props.awsAccountId,
-        buildPath: qpqWebServerUtils.getWebEntrySeoFullPath(props.qpqConfig, props.webEntryConfig),
-        qpqConfig: props.qpqConfig,
-
-        // certificateArn: dnsRecord.certificate.certificateArn,
-        certificateDomain: dnsRecord.domainNames[0],
-        dnsEntries: {},
-        apiSecretName: props.webEntryConfig.cloudflareApiKeySecretName,
-      });
-    }
 
     const originAccessControl = new aws_cloudfront.CfnOriginAccessControl(
       this,
@@ -133,10 +110,7 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
           this,
           'cache',
           props.qpqConfig,
-          qpqWebServerUtils.getCacheConfigByName(
-            props.webEntryConfig.cacheSettingsName,
-            props.qpqConfig,
-          ),
+          qpqWebServerUtils.getCacheConfigByName(props.webEntryConfig.cacheSettingsName, props.qpqConfig),
           props.awsAccountId,
         ).cachePolicy
       : aws_cloudfront.CachePolicy.CACHING_DISABLED;
@@ -165,11 +139,7 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
         // TODO: Expose this to config.
         corsBehavior: {
           accessControlAllowCredentials: false,
-          accessControlAllowHeaders: [
-            'Origin',
-            'Access-Control-Request-Headers',
-            'Access-Control-Request-Method',
-          ],
+          accessControlAllowHeaders: ['Origin', 'Access-Control-Request-Headers', 'Access-Control-Request-Method'],
           accessControlAllowMethods: ['GET', 'HEAD', 'OPTIONS'],
           accessControlAllowOrigins: ['*'],
           accessControlExposeHeaders: ['*'],
@@ -208,10 +178,7 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
 
     qpqDeployAwsCdkUtils.exportStackValue(
       this,
-      awsNamingUtils.getCFExportNameDistributionIdArnFromConfig(
-        props.webEntryConfig.name,
-        props.qpqConfig,
-      ),
+      awsNamingUtils.getCFExportNameDistributionIdArnFromConfig(props.webEntryConfig.name, props.qpqConfig),
       distribution.distributionId,
     );
 
@@ -220,24 +187,16 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
     // Currently distribution don't have support for origin access control settings
     // So we manually add it.
     const cfnDistribution = distribution.node.defaultChild as aws_cloudfront.CfnDistribution;
-    cfnDistribution.addPropertyOverride(
-      'DistributionConfig.Origins.0.OriginAccessControlId',
-      originAccessControl.getAtt('Id'),
-    );
+    cfnDistribution.addPropertyOverride('DistributionConfig.Origins.0.OriginAccessControlId', originAccessControl.getAtt('Id'));
 
     // We need to null out the OriginAccessIdentity that it creates by default
     // as the distribution cant work with both.
-    cfnDistribution.addPropertyOverride(
-      'DistributionConfig.Origins.0.S3OriginConfig.OriginAccessIdentity',
-      '',
-    );
+    cfnDistribution.addPropertyOverride('DistributionConfig.Origins.0.S3OriginConfig.OriginAccessIdentity', '');
 
     new aws_route53.ARecord(this, `web-alias`, {
       zone: dnsRecord.hostedZone,
       recordName: dnsRecord.domainNames[0],
-      target: aws_route53.RecordTarget.fromAlias(
-        new aws_route53_targets.CloudFrontTarget(distribution),
-      ),
+      target: aws_route53.RecordTarget.fromAlias(new aws_route53_targets.CloudFrontTarget(distribution)),
     });
 
     props.webEntryConfig.ignoreCache.forEach((pathPattern) => {
@@ -250,16 +209,11 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
     });
 
     // All seos that are for this web entry
-    const seos = qpqWebServerUtils
-      .getAllSeo(props.qpqConfig)
-      .filter((seo) => !seo.webEntry || seo.webEntry === props.webEntryConfig.name);
+    const seos = qpqWebServerUtils.getAllSeo(props.qpqConfig).filter((seo) => !seo.webEntry || seo.webEntry === props.webEntryConfig.name);
 
     // if we have some ~ Build the edge lambdas and deploy
     if (seos.length > 0) {
-      const seoEntryBuildPath = qpqWebServerUtils.getWebEntrySeoFullPath(
-        props.qpqConfig,
-        props.webEntryConfig,
-      );
+      const seoEntryBuildPath = qpqWebServerUtils.getWebEntrySeoFullPath(props.qpqConfig, props.webEntryConfig);
 
       const edgeFunctionVR = new aws_cloudfront.experimental.EdgeFunction(this, `SEO-VR`, {
         functionName: this.qpqResourceName(props.webEntryConfig.name, 'SEO-VR'),
