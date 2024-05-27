@@ -4,7 +4,6 @@ export { default as getConfigGetParametersActionProcessor } from './config/getCo
 export { default as getConfigGetGlobalActionProcessor } from './config/getConfigGetGlobalActionProcessor';
 export { default as getConfigSetParameterActionProcessor } from './config/getConfigSetParameterActionProcessor';
 
-export { default as getAPIGatewayEventActionProcessor } from './event/getAPIGatewayEventActionProcessor';
 export { default as getCloudFrontOriginRequestEventActionProcessor } from './event/getCloudFrontOriginRequestEventActionProcessor';
 export { default as getSQSEventRecordActionProcessor } from './event/getSQSEventRecordActionProcessor';
 export { default as getServiceFunctionExecuteEventActionProcessor } from './event/getServiceFunctionExecuteEventActionProcessor';
@@ -21,3 +20,5 @@ export { default as getKeyValueStoreActionProcessor } from './keyValueStore';
 export { default as getQueueActionProcessor } from './queue';
 export { default as getUserDirectoryActionProcessor } from './userDirectory';
 export { default as getEventBusActionProcessor } from './eventBus';
+
+export * from './event';

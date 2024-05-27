@@ -1,12 +1,12 @@
 import { EventAutoRespondActionRequester } from './EventAutoRespondActionTypes';
 import { EventActionType, AnyMatchStoryResult } from './EventActionType';
 
-export function* askEventAutoRespond<T, MSR extends AnyMatchStoryResult, TRes>(
-  transformedEventParams: T,
+export function* askEventAutoRespond<QpqEventRecord, MSR extends AnyMatchStoryResult, QpqEventRecordResponse>(
+  qpqEventRecord: QpqEventRecord,
   matchResult: MSR,
-): EventAutoRespondActionRequester<T, MSR, TRes> {
+): EventAutoRespondActionRequester<QpqEventRecord, MSR, QpqEventRecordResponse> {
   return yield {
     type: EventActionType.AutoRespond,
-    payload: { transformedEventParams, matchResult },
+    payload: { qpqEventRecord, matchResult },
   };
 }

@@ -2,22 +2,22 @@ import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
 import { EventActionType, AnyMatchStoryResult } from './EventActionType';
 
 // Payload
-export interface EventMatchStoryActionPayload<T> {
-  transformedEventParams: T;
+export interface EventMatchStoryActionPayload<QpqEventRecord> {
+  qpqEventRecord: QpqEventRecord;
 }
 
 // Action
-export interface EventMatchStoryAction<T> extends Action<EventMatchStoryActionPayload<T>> {
+export interface EventMatchStoryAction<QpqEventRecord> extends Action<EventMatchStoryActionPayload<QpqEventRecord>> {
   type: EventActionType.MatchStory;
-  payload: EventMatchStoryActionPayload<T>;
+  payload: EventMatchStoryActionPayload<QpqEventRecord>;
 }
 
 // Functions
-export type EventMatchStoryActionProcessor<T, MSR extends AnyMatchStoryResult> = ActionProcessor<
-  EventMatchStoryAction<T>,
+export type EventMatchStoryActionProcessor<QpqEventRecord, MSR extends AnyMatchStoryResult> = ActionProcessor<
+  EventMatchStoryAction<QpqEventRecord>,
   MSR
 >;
-export type EventMatchStoryActionRequester<T, MSR extends AnyMatchStoryResult> = ActionRequester<
-  EventMatchStoryAction<T>,
+export type EventMatchStoryActionRequester<QpqEventRecord, MSR extends AnyMatchStoryResult> = ActionRequester<
+  EventMatchStoryAction<QpqEventRecord>,
   MSR
 >;

@@ -3,6 +3,9 @@ export * from './EventActionType';
 export * from './EventAutoRespondActionRequester';
 export * from './EventAutoRespondActionTypes';
 
+export * from './EventGetRecordsActionRequester';
+export * from './EventGetRecordsActionTypes';
+
 export * from './EventMatchStoryActionRequester';
 export * from './EventMatchStoryActionTypes';
 
@@ -14,3 +17,6 @@ export * from './EventTransformResponseResultActionTypes';
 
 export * from './EventResolveCaughtErrorActionRequester';
 export * from './EventResolveCaughtErrorActionTypes';
+
+export * from './EventTransformEventRecordActionRequester';
+export * from './EventTransformEventRecordActionTypes';
