@@ -1,4 +1,4 @@
-import { AskResponse, QpqPagedData, QpqRuntimeType } from 'quidproquo-core';
+import { AskResponse, QpqPagedData, QpqRuntimeType, askFileReadTextContents, askFilter, askMapParallelBatch } from 'quidproquo-core';
 
 import { askListLogs } from '../../entry/data/logMetadataData';
 import { LogMetadata } from '../../entry/domain';
@@ -11,6 +11,7 @@ export function* askGetLogs(
   serviceFilter: string,
   infoFilter: string,
   userFilter: string,
+  deep: string,
   onlyErrors: boolean,
   nextPageKey?: string,
 ): AskResponse<QpqPagedData<LogMetadata>> {
@@ -32,7 +33,23 @@ export function* askGetLogs(
       result.nextPageKey,
     );
 
-    result.items.push(...logPage.items);
+    const data = deep
+      ? yield* askMapParallelBatch(logPage.items, 10, function* askFilterDeep(log) {
+          try {
+            return yield* askFileReadTextContents('qpq-logs', `${log.correlation}.json`);
+          } catch {
+            return '';
+          }
+        })
+      : [];
+
+    const filtered = !!deep
+      ? yield* askFilter(logPage.items, function* askFilterDeep(log, index) {
+          return data[index].includes(deep);
+        })
+      : logPage.items;
+
+    result.items.push(...filtered);
     result.nextPageKey = logPage.nextPageKey;
 
     // Keep going until we get some items, if there are some to fetch

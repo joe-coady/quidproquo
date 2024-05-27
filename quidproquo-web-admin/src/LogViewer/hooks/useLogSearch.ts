@@ -37,6 +37,7 @@ export const useLogSearch = () => {
       infoFilter: '',
       serviceFilter: '',
       userFilter: '',
+      deep: '',
       onlyErrors: false,
     };
   });

@@ -69,6 +69,10 @@ export function TopSection({ searchParams, setSearchParams, onSearch }: TopSecti
     setSearchParams((prev) => ({ ...prev, infoFilter: event.target.value }));
   };
 
+  const handleDeepSearchChange = (event: any) => {
+    setSearchParams((prev) => ({ ...prev, deep: event.target.value }));
+  };
+
   const handleQuickTimeSelect = (minutes: number) => {
     const now = new Date();
     const startDate = new Date(now.getTime() - minutes * 60000);
@@ -140,11 +144,7 @@ export function TopSection({ searchParams, setSearchParams, onSearch }: TopSecti
         <Grid item xs={2}>
           <Box position="relative">
             <FormControl fullWidth>
-              <DateTimePicker
-                label="Start DateTime"
-                value={new Date(searchParams.startIsoDateTime)}
-                onChange={handleStartDateChange}
-              />
+              <DateTimePicker label="Start DateTime" value={new Date(searchParams.startIsoDateTime)} onChange={handleStartDateChange} />
             </FormControl>
             <IconButton
               aria-label="quick time select"
@@ -164,11 +164,7 @@ export function TopSection({ searchParams, setSearchParams, onSearch }: TopSecti
         </Grid>
         <Grid item xs={2}>
           <FormControl fullWidth>
-            <DateTimePicker
-              label="End DateTime"
-              value={new Date(searchParams.endIsoDateTime)}
-              onChange={handleEndDateChange}
-            />
+            <DateTimePicker label="End DateTime" value={new Date(searchParams.endIsoDateTime)} onChange={handleEndDateChange} />
           </FormControl>
         </Grid>
         <Grid item xs={4}>
@@ -183,7 +179,7 @@ export function TopSection({ searchParams, setSearchParams, onSearch }: TopSecti
             />
           </FormControl>
         </Grid>
-        <Grid item xs={5}>
+        <Grid item xs={6}>
           <FormControl fullWidth>
             <TextField
               label="Info"
@@ -195,12 +191,25 @@ export function TopSection({ searchParams, setSearchParams, onSearch }: TopSecti
             />
           </FormControl>
         </Grid>
-        <Grid item xs={5}>
+        <Grid item xs={6}>
           <FormControl fullWidth>
             <TextField
               label="Error Filter"
               value={searchParams.errorFilter}
               onChange={handleErrorFilterChange}
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+          </FormControl>
+        </Grid>
+        <Grid item xs={10}>
+          <FormControl fullWidth>
+            <TextField
+              label="Deep Search"
+              value={searchParams.deep}
+              onChange={handleDeepSearchChange}
+              placeholder="Use with caution, reduce results with above fields first, this is a contains search on the log JSON, so it will be slow."
               InputLabelProps={{
                 shrink: true,
               }}
@@ -213,13 +222,7 @@ export function TopSection({ searchParams, setSearchParams, onSearch }: TopSecti
           </AsyncButton>
         </Grid>
       </Grid>
-      <Menu
-        id="quick-time-menu"
-        anchorEl={anchorEl}
-        keepMounted
-        open={Boolean(anchorEl)}
-        onClose={handleQuickTimeClose}
-      >
+      <Menu id="quick-time-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleQuickTimeClose}>
         <MenuItem onClick={() => handleQuickTimeSelect(5)}>Last 5 minutes</MenuItem>
         <MenuItem onClick={() => handleQuickTimeSelect(30)}>Last 30 minutes</MenuItem>
         <MenuItem onClick={() => handleQuickTimeSelect(1 * 60)}>Last hour</MenuItem>

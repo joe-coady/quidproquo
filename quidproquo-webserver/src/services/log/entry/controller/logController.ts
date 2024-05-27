@@ -1,20 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import {
-  ErrorTypeEnum,
-  QpqRuntimeType,
-  askThrowError,
-  askFileGenerateTemporarySecureUrl,
-  AskResponse,
-  askConfigGetGlobal,
-} from 'quidproquo-core';
+import { ErrorTypeEnum, QpqRuntimeType, askThrowError, askFileGenerateTemporarySecureUrl, AskResponse, askConfigGetGlobal } from 'quidproquo-core';
 
 import { HTTPEvent, HTTPEventResponse } from '../../../../types';
 import { toJsonEventResponse, fromJsonEventRequest } from '../../../../utils/httpEventUtils';
-import {
-  askGetByCorrelation,
-  askGetByFromCorrelation,
-  askGetHierarchiesByCorrelation,
-} from '../data/logMetadataData';
+import { askGetByCorrelation, askGetByFromCorrelation, askGetHierarchiesByCorrelation } from '../data/logMetadataData';
 import { ListLogChatMessages, SendLogChatMessage } from '../domain';
 import { askLogSendChatMessage } from '../../logic/askLogSendChatMessage';
 import { askGetLogChatMessages } from '../../logic/askGetLogChatMessages';
@@ -33,21 +22,13 @@ export interface GetLogsParams {
   errorFilter: string;
   serviceFilter: string;
   userFilter: string;
+  deep: string;
   onlyErrors: boolean;
 }
 
 export function* getLogs(event: HTTPEvent, params: {}): AskResponse<HTTPEventResponse> {
-  const {
-    nextPageKey,
-    startIsoDateTime,
-    endIsoDateTime,
-    runtimeType,
-    errorFilter,
-    serviceFilter,
-    infoFilter,
-    userFilter,
-    onlyErrors,
-  } = fromJsonEventRequest<GetLogsParams>(event);
+  const { nextPageKey, startIsoDateTime, endIsoDateTime, runtimeType, errorFilter, serviceFilter, infoFilter, userFilter, onlyErrors, deep } =
+    fromJsonEventRequest<GetLogsParams>(event);
 
   const logs = yield* logsLogic.askGetLogs(
     runtimeType,
@@ -57,6 +38,7 @@ export function* getLogs(event: HTTPEvent, params: {}): AskResponse<HTTPEventRes
     serviceFilter,
     infoFilter,
     userFilter,
+    deep,
     onlyErrors,
     nextPageKey,
   );
@@ -101,10 +83,7 @@ export function* getHierarchies(
     correlationId: string;
   },
 ) {
-  const reportUrl = yield* askGetHierarchiesByCorrelation(
-    params.correlationId,
-    event.query.refresh === 'true',
-  );
+  const reportUrl = yield* askGetHierarchiesByCorrelation(params.correlationId, event.query.refresh === 'true');
 
   return toJsonEventResponse({ url: reportUrl });
 }
@@ -126,11 +105,7 @@ export function* downloadUrl(
     correlationId: string;
   },
 ) {
-  const url = yield* askFileGenerateTemporarySecureUrl(
-    'qpq-logs',
-    `${params.correlationId}.json`,
-    1 * 60 * 1000,
-  );
+  const url = yield* askFileGenerateTemporarySecureUrl('qpq-logs', `${params.correlationId}.json`, 1 * 60 * 1000);
 
   return toJsonEventResponse({ url });
 }
@@ -138,10 +113,7 @@ export function* downloadUrl(
 export function* sendChatMessage(event: HTTPEvent) {
   const sendLogChatMessage = fromJsonEventRequest<SendLogChatMessage>(event);
 
-  const message = yield* askLogSendChatMessage(
-    sendLogChatMessage.correlationId,
-    sendLogChatMessage.message,
-  );
+  const message = yield* askLogSendChatMessage(sendLogChatMessage.correlationId, sendLogChatMessage.message);
 
   return toJsonEventResponse(message);
 }
@@ -149,10 +121,7 @@ export function* sendChatMessage(event: HTTPEvent) {
 export function* getChatMessages(event: HTTPEvent) {
   const listLogChatMessages = fromJsonEventRequest<ListLogChatMessages>(event);
 
-  const messages = yield* askGetLogChatMessages(
-    listLogChatMessages.correlationId,
-    listLogChatMessages.nextPageKey,
-  );
+  const messages = yield* askGetLogChatMessages(listLogChatMessages.correlationId, listLogChatMessages.nextPageKey);
 
   return toJsonEventResponse(messages);
 }

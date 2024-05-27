@@ -7,6 +7,7 @@ export interface SearchParams {
   infoFilter: string;
   errorFilter: string;
   userFilter: string;
+  deep: string;
 
   onlyErrors: boolean;
 }

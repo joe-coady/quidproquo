@@ -2,21 +2,14 @@ import { getLogs } from './getLogs';
 import { SearchParams } from '../types';
 import { RuntimeTypes } from '../constants';
 
-export const searchLogs = async (
-  searchParams: SearchParams,
-  accessToken?: string,
-  callback?: (progress: number) => void,
-) => {
+export const searchLogs = async (searchParams: SearchParams, accessToken?: string, callback?: (progress: number) => void) => {
   const updateProgress = (progress: number) => {
     if (callback) {
       callback(progress);
     }
   };
 
-  const effectiveRuntimeTypes =
-    searchParams.runtimeType === 'ALL'
-      ? RuntimeTypes.filter((type) => type !== 'ALL')
-      : [searchParams.runtimeType];
+  const effectiveRuntimeTypes = searchParams.runtimeType === 'ALL' ? RuntimeTypes.filter((type) => type !== 'ALL') : [searchParams.runtimeType];
 
   var progress = 0;
   const totalCount = effectiveRuntimeTypes.length;
@@ -34,6 +27,7 @@ export const searchLogs = async (
         searchParams.infoFilter,
         searchParams.errorFilter,
         searchParams.userFilter,
+        searchParams.deep,
         searchParams.onlyErrors || !!searchParams.errorFilter,
         accessToken,
       ).finally(() => {

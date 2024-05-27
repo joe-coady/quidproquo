@@ -28,20 +28,12 @@ export function* askUpsert(logMetadata: LogMetadata): AskResponse<void> {
   yield* askKeyValueStoreUpsert(metadataStoreName, logMetadata);
 }
 
-export function* askSetChecked(
-  correlation: string,
-  checked: boolean,
-  checkedBy: string,
-): AskResponse<LogMetadata> {
-  return yield* askKeyValueStoreUpdatePartialProperties<LogMetadata, 'correlation'>(
-    metadataStoreName,
-    'correlation',
-    {
-      correlation,
-      checked,
-      checkedBy,
-    },
-  );
+export function* askSetChecked(correlation: string, checked: boolean, checkedBy: string): AskResponse<LogMetadata> {
+  return yield* askKeyValueStoreUpdatePartialProperties<LogMetadata, 'correlation'>(metadataStoreName, 'correlation', {
+    correlation,
+    checked,
+    checkedBy,
+  });
 }
 
 export function* askListLogs(
@@ -81,10 +73,7 @@ export function* askListLogs(
 
   const logs = yield* askKeyValueStoreQuery<LogMetadata>(
     metadataStoreName,
-    kvsAnd([
-      kvsEqual('runtimeType', runtimeType),
-      kvsBetween('startedAt', startDateTime, endDateTime),
-    ]),
+    kvsAnd([kvsEqual('runtimeType', runtimeType), kvsBetween('startedAt', startDateTime, endDateTime)]),
     {
       nextPageKey,
       filter: filters.length > 0 ? kvsAnd(filters) : undefined,
@@ -95,30 +84,19 @@ export function* askListLogs(
 }
 
 export function* askGetByCorrelation(correlation: string): AskResponse<LogMetadata | undefined> {
-  const logs = yield* askKeyValueStoreQuery<LogMetadata>(
-    metadataStoreName,
-    kvsEqual('correlation', correlation),
-  );
+  const logs = yield* askKeyValueStoreQuery<LogMetadata>(metadataStoreName, kvsEqual('correlation', correlation));
 
   return logs.items[0];
 }
 
-export function* askGetByFromCorrelation(
-  fromCorrelation: string,
-): AskResponse<QpqPagedData<LogMetadata>> {
-  const logs = yield* askKeyValueStoreQuery<LogMetadata>(
-    metadataStoreName,
-    kvsEqual('fromCorrelation', fromCorrelation),
-  );
+export function* askGetByFromCorrelation(fromCorrelation: string): AskResponse<QpqPagedData<LogMetadata>> {
+  const logs = yield* askKeyValueStoreQuery<LogMetadata>(metadataStoreName, kvsEqual('fromCorrelation', fromCorrelation));
 
   return logs;
 }
 
 export function* askGetAllByFromCorrelation(fromCorrelation: string): AskResponse<LogMetadata[]> {
-  return yield* askKeyValueStoreQueryAll<LogMetadata>(
-    metadataStoreName,
-    kvsEqual('fromCorrelation', fromCorrelation),
-  );
+  return yield* askKeyValueStoreQueryAll<LogMetadata>(metadataStoreName, kvsEqual('fromCorrelation', fromCorrelation));
 }
 
 export function* askFindRootLog(fromCorrelation?: string): AskResponse<LogMetadata | undefined> {
@@ -130,12 +108,8 @@ export function* askFindRootLog(fromCorrelation?: string): AskResponse<LogMetada
   return (yield* askFindRootLog(parentLog?.fromCorrelation)) || parentLog;
 }
 
-export function* askCreateHierarchy(
-  rootStoryResultMetadata: StoryResultMetadata,
-): AskResponse<StoryResultMetadataWithChildren> {
-  const childrenLogs: StoryResultMetadata[] = yield* askGetAllByFromCorrelation(
-    rootStoryResultMetadata.correlation,
-  );
+export function* askCreateHierarchy(rootStoryResultMetadata: StoryResultMetadata): AskResponse<StoryResultMetadataWithChildren> {
+  const childrenLogs: StoryResultMetadata[] = yield* askGetAllByFromCorrelation(rootStoryResultMetadata.correlation);
 
   const sortedChildren = childrenLogs.sort((a, b) => {
     return a.startedAt < b.startedAt ? -1 : 1;
@@ -148,10 +122,7 @@ export function* askCreateHierarchy(
   };
 }
 
-export function* askGetHierarchiesByCorrelation(
-  correlation: string,
-  forceRefresh: boolean,
-): AskResponse<string | undefined> {
+export function* askGetHierarchiesByCorrelation(correlation: string, forceRefresh: boolean): AskResponse<string | undefined> {
   const root = yield* askFindRootLog(correlation);
   if (root) {
     const rootReportFilename = `${root.correlation}-tree.json`;
@@ -159,18 +130,10 @@ export function* askGetHierarchiesByCorrelation(
 
     if (!reportExists || forceRefresh) {
       const report = yield* askCreateHierarchy(root);
-      yield* askFileWriteTextContents(
-        logReportsResourceName,
-        rootReportFilename,
-        JSON.stringify(report),
-      );
+      yield* askFileWriteTextContents(logReportsResourceName, rootReportFilename, JSON.stringify(report));
     }
 
-    return yield* askFileGenerateTemporarySecureUrl(
-      logReportsResourceName,
-      rootReportFilename,
-      1 * 60 * 1000,
-    );
+    return yield* askFileGenerateTemporarySecureUrl(logReportsResourceName, rootReportFilename, 1 * 60 * 1000);
   }
 
   return undefined;

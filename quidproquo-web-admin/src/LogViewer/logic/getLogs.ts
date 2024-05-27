@@ -10,6 +10,7 @@ export const getLogs = async (
   infoFilter: string,
   errorFilter: string,
   userFilter: string,
+  deep: string,
   onlyErrors: boolean,
   accessToken?: string,
 ): Promise<StoryResultMetadata[]> => {
@@ -26,6 +27,7 @@ export const getLogs = async (
     infoFilter,
     userFilter,
     onlyErrors,
+    deep,
   };
 
   do {

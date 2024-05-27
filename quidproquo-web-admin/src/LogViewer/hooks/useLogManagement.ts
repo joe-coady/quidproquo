@@ -54,6 +54,7 @@ export const useLogManagement = () => {
       infoFilter: '',
       serviceFilter: '',
       userFilter: '',
+      deep: '',
 
       onlyErrors: false,
     };
@@ -61,10 +62,7 @@ export const useLogManagement = () => {
 
   const [searchProgress, onSearch] = useOnSearch(searchParamsState, setLogs);
 
-  const filteredLogs = useMemo(
-    () => filterLogs(searchParamsState.errorFilter, logs),
-    [searchParamsState.errorFilter, logs],
-  );
+  const filteredLogs = useMemo(() => filterLogs(searchParamsState.errorFilter, logs), [searchParamsState.errorFilter, logs]);
 
   const onRowClick = getOnRowClick(setSelectedLogCorrelation);
   const clearSelectedLogCorrelation = () => setSelectedLogCorrelation('');
