@@ -52,9 +52,11 @@ function* askProcessEventRecord<QpqEventRecord, MSR extends AnyMatchStoryResult,
     ),
   );
 
+  yield* askLogCreate(LogLevelEnum.Info, 'executeStoryResponse', executeStoryResponse);
+
   if (executeStoryResponse.success) {
     // return the result of the story back to the event caller
-    return getSuccessfulEitherActionResult(executeStoryResponse.result.result!);
+    return getSuccessfulEitherActionResult(executeStoryResponse.result);
   }
 
   return getUnsuccessfulEitherActionResult(executeStoryResponse.error);

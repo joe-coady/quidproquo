@@ -34,9 +34,10 @@ const getProcessAutoRespond = (qpqConfig: QPQConfig): EventAutoRespondActionProc
         if (!userDirectoryConfig?.emailTemplates.verifyEmail?.src || !userDirectoryConfig?.emailTemplates.verifyEmail?.runtime) {
           return getErrorResult();
         }
+        break;
 
       default:
-        return actionResultError(ErrorTypeEnum.NotFound, `Email lambda not implemented for ${qpqEventRecord.eventType}`);
+        return actionResultError(ErrorTypeEnum.NotFound, `Email processor not implemented for ${qpqEventRecord.eventType}`);
     }
 
     return actionResult(null);

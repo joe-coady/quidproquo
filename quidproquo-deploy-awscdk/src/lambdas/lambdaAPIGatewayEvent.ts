@@ -1,6 +1,6 @@
 import { QpqRuntimeType } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
-import { getAPIGatewayEventActionProcessor } from 'quidproquo-actionprocessor-awslambda';
+import { getApiGatewayApiEventEventProcessor } from 'quidproquo-actionprocessor-awslambda';
 import { APIGatewayEvent } from 'aws-lambda';
 
 import { getQpqLambdaRuntimeForEvent } from './lambda-utils';
@@ -17,5 +17,5 @@ export const executeAPIGatewayEvent = getQpqLambdaRuntimeForEvent<APIGatewayEven
       context: {},
     };
   },
-  (qpqConfig) => getAPIGatewayEventActionProcessor(qpqConfig),
+  (qpqConfig) => getApiGatewayApiEventEventProcessor(qpqConfig),
 );

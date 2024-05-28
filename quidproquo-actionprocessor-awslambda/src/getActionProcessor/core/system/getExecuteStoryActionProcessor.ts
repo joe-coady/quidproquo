@@ -19,10 +19,10 @@ import { DynamicModuleLoader } from '../../../types/DynamicLoader';
 
 export const getDateNow = () => new Date().toISOString();
 
-const getProcessExecuteStory = <T extends Array<any>>(
+const getProcessExecuteStory = <T extends Array<any>, R>(
   qpqConfig: QPQConfig,
   dynamicModuleLoader: DynamicModuleLoader,
-): SystemExecuteStoryActionProcessor<T> => {
+): SystemExecuteStoryActionProcessor<T, R> => {
   const moduleName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
   return async (
     payload: SystemExecuteStoryActionPayload<T>,
@@ -37,10 +37,7 @@ const getProcessExecuteStory = <T extends Array<any>>(
 
     const story = module[payload.runtime];
     if (!story) {
-      return actionResultError(
-        ErrorTypeEnum.NotFound,
-        `[${payload.runtime}] not found in module [${payload.src}]`,
-      );
+      return actionResultError(ErrorTypeEnum.NotFound, `[${payload.runtime}] not found in module [${payload.src}]`);
     }
 
     const resolveStory = createRuntime(
@@ -65,7 +62,7 @@ const getProcessExecuteStory = <T extends Array<any>>(
       );
     }
 
-    return actionResult(storyResult.result);
+    return actionResult<R>(storyResult.result);
   };
 };
 

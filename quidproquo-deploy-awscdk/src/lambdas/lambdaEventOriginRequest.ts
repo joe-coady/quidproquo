@@ -1,7 +1,7 @@
-import { getCloudFrontOriginRequestEventActionProcessor } from 'quidproquo-actionprocessor-awslambda';
 import { QpqRuntimeType } from 'quidproquo-core';
 import { CloudFrontRequestEvent } from 'aws-lambda';
 import { getQpqLambdaRuntimeForEvent } from './lambda-utils';
+import { getCloudFrontOriginRequestEventProcessor } from 'quidproquo-actionprocessor-awslambda';
 
 // Default executor
 export const executeEventOriginRequest = getQpqLambdaRuntimeForEvent<CloudFrontRequestEvent>(
@@ -12,5 +12,5 @@ export const executeEventOriginRequest = getQpqLambdaRuntimeForEvent<CloudFrontR
       context: {},
     };
   },
-  (qpqConfig) => getCloudFrontOriginRequestEventActionProcessor(qpqConfig),
+  (qpqConfig) => getCloudFrontOriginRequestEventProcessor(qpqConfig),
 );

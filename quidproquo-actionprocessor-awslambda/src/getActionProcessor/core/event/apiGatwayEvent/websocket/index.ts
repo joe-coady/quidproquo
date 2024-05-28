@@ -5,7 +5,7 @@ import getGetRecords from './getRecords';
 import getMatchStory from './matchStory';
 import getTransformResponseResult from './transformResponseResult';
 
-export const getEventBridgeStackDeployEventActionProcessor = (qpqConfig: QPQConfig) => ({
+export const getApiGatewayWebsocketEventEventProcessor = (qpqConfig: QPQConfig) => ({
   ...getGetRecords(qpqConfig),
   ...getMatchStory(qpqConfig),
   ...getAutoRespond(qpqConfig),
