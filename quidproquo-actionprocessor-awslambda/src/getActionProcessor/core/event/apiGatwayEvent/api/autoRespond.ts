@@ -2,7 +2,7 @@ import { EventActionType, QPQConfig, EventAutoRespondActionProcessor, actionResu
 
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
-import { isAuthValid } from '../utils/isAuthValid';
+import { isAuthValid } from '../../utils/isAuthValid';
 import { InternalEventOutput, InternalEventRecord, MatchResult } from './types';
 
 const getProcessAutoRespond = (qpqConfig: QPQConfig): EventAutoRespondActionProcessor<InternalEventRecord, MatchResult, InternalEventOutput> => {

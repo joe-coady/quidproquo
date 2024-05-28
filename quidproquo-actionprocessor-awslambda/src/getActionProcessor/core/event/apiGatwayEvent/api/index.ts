@@ -5,7 +5,7 @@ import getGetRecords from './getRecords';
 import getMatchStory from './matchStory';
 import getTransformResponseResult from './transformResponseResult';
 
-export const getLambdaServiceFunctionEventProcessor = (qpqConfig: QPQConfig) => ({
+export const getApiGatewayApiEventEventProcessor = (qpqConfig: QPQConfig) => ({
   ...getGetRecords(qpqConfig),
   ...getMatchStory(qpqConfig),
   ...getAutoRespond(qpqConfig),

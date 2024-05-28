@@ -2,7 +2,7 @@ import { ErrorTypeEnum, EventActionType, EventMatchStoryActionProcessor, QPQConf
 import { InternalEventRecord, MatchResult } from './types';
 import { RouteQPQWebServerConfigSetting, qpqWebServerUtils } from 'quidproquo-webserver';
 
-import { matchUrl } from '../../../../awsLambdaUtils';
+import { matchUrl } from '../../../../../awsLambdaUtils';
 
 const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProcessor<InternalEventRecord, MatchResult> => {
   const routes: RouteQPQWebServerConfigSetting[] = qpqWebServerUtils.getAllRoutes(qpqConfig);

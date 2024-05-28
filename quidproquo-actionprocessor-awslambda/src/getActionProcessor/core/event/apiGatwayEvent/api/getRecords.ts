@@ -2,7 +2,7 @@ import { EventActionType, QPQConfig, actionResult, qpqCoreUtils, HTTPMethod, Eve
 
 import { HTTPEvent, qpqWebServerUtils } from 'quidproquo-webserver';
 
-import { parseMultipartFormData } from '../utils/parseMultipartFormData';
+import { parseMultipartFormData } from '../../utils/parseMultipartFormData';
 import { EventInput, InternalEventRecord } from './types';
 
 const getProcessGetRecords = (qpqConfig: QPQConfig): EventGetRecordsActionProcessor<EventInput, InternalEventRecord> => {

@@ -1,27 +1,20 @@
-import {
-  EventActionType,
-  QPQConfig,
-  EventTransformResponseResultActionProcessor,
-  actionResult,
-  ErrorTypeEnum,
-  actionResultError,
-} from 'quidproquo-core';
+import { EventActionType, QPQConfig, EventTransformResponseResultActionProcessor, actionResult, actionResultError } from 'quidproquo-core';
 
-import { HttpEventHeaders, qpqWebServerUtils } from 'quidproquo-webserver';
-import { EventInput, EventOutput, InternalEventOutput, InternalEventRecord } from './types';
+import { EventInput, EventOutput, InternalEventOutput } from './types';
 
 const getProcessTransformResponseResult = (
   qpqConfig: QPQConfig,
 ): EventTransformResponseResultActionProcessor<EventInput, InternalEventOutput, EventOutput> => {
   // We might need to JSON.stringify the body.
   return async ({ eventParams, qpqEventRecordResponses }) => {
-    const onesThatErrored = qpqEventRecordResponses.filter((r) => !r.success);
-    if (onesThatErrored.length > 0) {
-      return actionResultError(ErrorTypeEnum.GenericError, `[${onesThatErrored.length}] was unable to be processed.`);
+    const [record] = qpqEventRecordResponses;
+
+    if (record.error) {
+      return actionResultError(record.error.errorType, record.error.errorText, record.error.errorStack);
     }
 
     // Transform back to api gateway
-    return actionResult<EventOutput>(void 0);
+    return actionResult<EventOutput>(record.result);
   };
 };
 
