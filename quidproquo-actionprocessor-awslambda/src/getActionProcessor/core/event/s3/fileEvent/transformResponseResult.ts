@@ -7,7 +7,6 @@ import {
   actionResultError,
 } from 'quidproquo-core';
 
-import { HttpEventHeaders, qpqWebServerUtils } from 'quidproquo-webserver';
 import { EventInput, EventOutput, InternalEventOutput, InternalEventRecord } from './types';
 
 const getProcessTransformResponseResult = (
@@ -17,7 +16,7 @@ const getProcessTransformResponseResult = (
   return async ({ eventParams, qpqEventRecordResponses }) => {
     const onesThatErrored = qpqEventRecordResponses.filter((r) => !r.success);
     if (onesThatErrored.length > 0) {
-      return actionResultError(ErrorTypeEnum.GenericError, `[${onesThatErrored.length}] was unable to be processed.`);
+      return actionResultError(ErrorTypeEnum.GenericError, `[${onesThatErrored.length}] files unable to be processed.`);
     }
 
     // Transform back to api gateway
