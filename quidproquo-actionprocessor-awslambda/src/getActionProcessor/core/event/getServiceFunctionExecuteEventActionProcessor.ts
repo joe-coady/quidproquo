@@ -44,7 +44,7 @@ const getProcessTransformResponseResult = (
   ServiceFunctionExecuteEventResponse
 > => {
   return async (payload) => {
-    return actionResult<any>(payload.response);
+    return actionResult<any>(payload.);
   };
 };
 
