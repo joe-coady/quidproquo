@@ -1,7 +1,7 @@
 import { ExecuteServiceFunctionEvent } from 'quidproquo-webserver';
 
 import { Context } from 'aws-lambda';
-import { MatchStoryResult, StoryResult, StorySession } from 'quidproquo-core';
+import { EitherActionResult, MatchStoryResult, StoryResult, StorySession } from 'quidproquo-core';
 
 // Customs
 export type AnyExecuteServiceFunctionEventWithSession = ExecuteServiceFunctionEvent<any[]> & {
@@ -10,7 +10,7 @@ export type AnyExecuteServiceFunctionEventWithSession = ExecuteServiceFunctionEv
 
 // Externals - The ins and outs of the external event
 export type EventInput = [AnyExecuteServiceFunctionEventWithSession, Context];
-export type EventOutput = StoryResult<any, any>; // TODO: Return an either result <any>
+export type EventOutput = EitherActionResult<any>;
 
 // Internals - the ins and outs of each record in the event
 export type InternalEventRecord = ExecuteServiceFunctionEvent<any[]>;

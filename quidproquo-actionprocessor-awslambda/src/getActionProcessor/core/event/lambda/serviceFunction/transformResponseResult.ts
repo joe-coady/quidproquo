@@ -9,12 +9,8 @@ const getProcessTransformResponseResult = (
   return async ({ eventParams, qpqEventRecordResponses }) => {
     const [record] = qpqEventRecordResponses;
 
-    if (record.error) {
-      return actionResultError(record.error.errorType, record.error.errorText, record.error.errorStack);
-    }
-
-    // Transform back to api gateway
-    return actionResult<EventOutput>(record.result);
+    // Just return the either result back, let the caller deal with it.
+    return actionResult<EventOutput>(record);
   };
 };
 

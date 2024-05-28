@@ -3,7 +3,7 @@ import { ExecuteServiceFunctionEvent } from 'quidproquo-webserver';
 import { QpqRuntimeType, StorySession } from 'quidproquo-core';
 
 import { getQpqLambdaRuntimeForEvent } from './lambda-utils';
-import { getS3FileEventEventProcessor } from 'quidproquo-actionprocessor-awslambda';
+import { getLambdaServiceFunctionEventProcessor } from 'quidproquo-actionprocessor-awslambda';
 
 // TODO: Unify this once the lambda code moves from CDK to awslambda
 type AnyExecuteServiceFunctionEventWithSession = ExecuteServiceFunctionEvent<any[]> & {
@@ -16,5 +16,5 @@ export const executeServiceFunctionExecuteEvent = getQpqLambdaRuntimeForEvent<An
   (event) => {
     return event.storySession;
   },
-  (qpqConfig) => getS3FileEventEventProcessor(qpqConfig),
+  (qpqConfig) => getLambdaServiceFunctionEventProcessor(qpqConfig),
 );
