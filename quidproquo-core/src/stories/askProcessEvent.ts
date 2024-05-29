@@ -1,10 +1,17 @@
 import { askLogCreate } from '../actions';
-import { askEventAutoRespond, askEventTransformResponseResult, askEventMatchStory, askEventGetRecords, AnyMatchStoryResult } from '../actions/event';
+import {
+  askEventAutoRespond,
+  askEventTransformResponseResult,
+  askEventMatchStory,
+  askEventGetRecords,
+  AnyMatchStoryResult,
+  askEventGetStorySession,
+} from '../actions';
 
 import { askMapParallel } from './array';
 
 import { askExecuteStory } from '../actions/system';
-import { AskResponse, EitherActionResult, LogLevelEnum, QPQError, StoryResult } from '../types';
+import { AskResponse, EitherActionResult, LogLevelEnum, QPQError, StoryResult, StorySession } from '../types';
 
 import { askGetApplicationVersion } from './askGetApplicationVersion';
 import { askCatch } from './system/askCatch';
@@ -19,8 +26,9 @@ const getUnsuccessfulEitherActionResult = (error: QPQError): EitherActionResult<
   error: error,
 });
 
-function* askProcessEventRecord<QpqEventRecord, MSR extends AnyMatchStoryResult, QpqEventRecordResponse>(
+function* askProcessEventRecord<QpqEventRecord, MSR extends AnyMatchStoryResult, QpqEventRecordResponse, EventParams extends Array<unknown> = any[]>(
   qpqEventRecord: QpqEventRecord,
+  eventArguments: EventParams,
 ): AskResponse<EitherActionResult<QpqEventRecordResponse>> {
   // Try and match a story to execute
   const matchResultResult = yield* askCatch(askEventMatchStory<QpqEventRecord, MSR>(qpqEventRecord));
@@ -43,12 +51,15 @@ function* askProcessEventRecord<QpqEventRecord, MSR extends AnyMatchStoryResult,
     return getSuccessfulEitherActionResult(earlyExitQpqEventRecordResponse);
   }
 
+  const messageSession = yield* askEventGetStorySession<EventParams, QpqEventRecord>(eventArguments, qpqEventRecord);
+
   // Execute the story
   const executeStoryResponse = yield* askCatch(
     askExecuteStory<[QpqEventRecord, MSR['runtimeOptions']], QpqEventRecordResponse>(
       matchResultResult.result.src!,
       matchResultResult.result.runtime!,
       [qpqEventRecord, matchResultResult.result.runtimeOptions],
+      messageSession,
     ),
   );
 
@@ -68,7 +79,7 @@ export function* askProcessEvent<
   QpqEventRecordResponse = any,
   MSR extends AnyMatchStoryResult = AnyMatchStoryResult,
   EventResponse = any,
->(...eventArguments: any): AskResponse<EventResponse> {
+>(...eventArguments: EventParams): AskResponse<EventResponse> {
   // Try and get the app version
   // This should be something the developer knows how to get to the code version
   // like the git sha, we don't need to do anything with the global, it will be in the logs
@@ -76,7 +87,9 @@ export function* askProcessEvent<
 
   const records = yield* askEventGetRecords<EventParams, QpqEventRecord>(...eventArguments);
 
-  const processedRecords = yield* askMapParallel(records, askProcessEventRecord<QpqEventRecord, MSR, QpqEventRecordResponse>);
+  const processedRecords = yield* askMapParallel(records, function* askProcessEventRecordWithEvent(record) {
+    return yield* askProcessEventRecord<QpqEventRecord, MSR, QpqEventRecordResponse, EventParams>(record, eventArguments);
+  });
 
   return yield* askEventTransformResponseResult<EventParams, QpqEventRecordResponse, EventResponse>(processedRecords, ...eventArguments);
 }

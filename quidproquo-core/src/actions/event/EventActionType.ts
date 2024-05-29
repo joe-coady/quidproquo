@@ -3,6 +3,7 @@ export enum EventActionType {
   TransformEventRecord = '@quidproquo-core/event/TransformEventRecord',
   TransformEventRecordResponse = '@quidproquo-core/event/TransformEventRecordResponse',
   MatchStory = '@quidproquo-core/event/MatchStory',
+  GetStorySession = '@quidproquo-core/event/GetStorySession',
 
   TransformEventParams = '@quidproquo-core/event/TransformEventParams',
   TransformResponseResult = '@quidproquo-core/event/TransformResponseResult',

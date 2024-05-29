@@ -20,3 +20,6 @@ export * from './EventResolveCaughtErrorActionTypes';
 
 export * from './EventTransformEventRecordActionRequester';
 export * from './EventTransformEventRecordActionTypes';
+
+export * from './EventGetStorySessionActionRequester';
+export * from './EventGetStorySessionActionTypes';
