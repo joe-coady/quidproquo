@@ -3,10 +3,10 @@ import { EventActionType } from './EventActionType';
 
 export function* askEventGetStorySession<EventParams extends Array<unknown>, QpqEventRecord>(
   eventParams: EventParams,
-  record: QpqEventRecord,
+  qpqEventRecord: QpqEventRecord,
 ): EventGetStorySessionActionRequester<EventParams, QpqEventRecord> {
   return yield {
     type: EventActionType.GetStorySession,
-    payload: { eventParams, record },
+    payload: { eventParams, qpqEventRecord },
   };
 }

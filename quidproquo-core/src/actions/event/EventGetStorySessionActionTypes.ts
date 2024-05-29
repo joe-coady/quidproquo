@@ -4,7 +4,7 @@ import { EventActionType } from './EventActionType';
 
 // Payload
 export interface EventGetStorySessionActionPayload<EventParams extends Array<unknown>, QpqEventRecord> {
-  record: QpqEventRecord;
+  qpqEventRecord: QpqEventRecord;
   eventParams: EventParams;
 }
 

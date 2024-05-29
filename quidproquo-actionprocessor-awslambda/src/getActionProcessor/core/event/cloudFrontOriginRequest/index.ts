@@ -4,8 +4,10 @@ import getAutoRespond from './autoRespond';
 import getGetRecords from './getRecords';
 import getMatchStory from './matchStory';
 import getTransformResponseResult from './transformResponseResult';
+import getStorySession from './getStorySession';
 
 export const getCloudFrontOriginRequestEventProcessor = (qpqConfig: QPQConfig) => ({
+  ...getStorySession(qpqConfig),
   ...getGetRecords(qpqConfig),
   ...getMatchStory(qpqConfig),
   ...getAutoRespond(qpqConfig),

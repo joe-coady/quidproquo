@@ -1,4 +1,4 @@
-import { QueueMessage, StorySession } from 'quidproquo-core';
+import { QueueMessage } from 'quidproquo-core';
 
 export interface QueueEventTypeParams {
   [key: string]: string;
@@ -6,7 +6,7 @@ export interface QueueEventTypeParams {
 
 export interface QueueEvent<T extends QueueMessage<any>> {
   message: T;
-  storySession: StorySession;
+  id: string;
 }
 
 export type QueueEventResponse = boolean;

@@ -14,7 +14,7 @@ const getProcessGetRecords = (qpqConfig: QPQConfig): EventGetRecordsActionProces
           type: parsedInternalEventRecord.type || 'AWS_ALARM',
           payload: parsedInternalEventRecord.payload || {},
         },
-        storySession: parsedInternalEventRecord.storySession || {},
+        id: record.messageId,
       };
 
       return internalEventRecord;
