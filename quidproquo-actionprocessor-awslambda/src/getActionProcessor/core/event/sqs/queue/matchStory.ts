@@ -32,7 +32,7 @@ const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProces
     // Find the most relevant match
     const matchedQueueType = queueTypes
       .map((qt) => ({
-        match: matchUrl(qt, qpqEventRecord.type),
+        match: matchUrl(qt, qpqEventRecord.message.type),
         queueType: qt,
       }))
       .find((m) => m.match.didMatch);
@@ -44,7 +44,7 @@ const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProces
         return actionResult<MatchResult>({});
       }
 
-      return actionResultError(ErrorTypeEnum.NotFound, `queue type not found ${qpqEventRecord.type}`);
+      return actionResultError(ErrorTypeEnum.NotFound, `queue type not found ${qpqEventRecord.message.type}`);
     }
 
     const sourceEntry = queueQueueProcessors[matchedQueueType.queueType];
