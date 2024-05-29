@@ -42,7 +42,12 @@ const getProcessExecuteStory = <T extends Array<any>, R>(
 
     const resolveStory = createRuntime(
       qpqConfig,
-      session,
+      {
+        context: payload.storySession?.context || session.context,
+        depth: (payload.storySession?.depth || session.depth || 0) + 1,
+        accessToken: payload.storySession?.accessToken || session.accessToken,
+        correlation: payload.storySession?.correlation || session.correlation,
+      },
       actionProcessors,
       getDateNow,
       logger,

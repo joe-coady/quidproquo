@@ -1,11 +1,13 @@
 import { SystemActionType } from './SystemActionType';
 import { Action, ActionRequester, ActionProcessor } from '../../types/Action';
+import { StorySession } from '../../types';
 
 // Payload
 export interface SystemExecuteStoryActionPayload<StoryInput extends Array<any>> {
   src: string;
   runtime: string;
   params: StoryInput;
+  storySession?: StorySession;
 }
 
 // Action
