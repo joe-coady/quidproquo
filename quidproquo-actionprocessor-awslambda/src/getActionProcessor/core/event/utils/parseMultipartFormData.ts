@@ -1,5 +1,4 @@
-// can i import this normally?
-import Busboy = require('busboy');
+import Busboy from 'busboy';
 
 import { APIGatewayEvent } from 'aws-lambda';
 import { QPQBinaryData } from 'quidproquo-core';
@@ -71,7 +70,7 @@ export const parseMultipartFormData = (event: APIGatewayEvent): Promise<QPQBinar
             filename: f.filename,
             mimetype: f.contentType,
             base64Data: f.content.toString('base64'),
-          } as QPQBinaryData),
+          }) as QPQBinaryData,
       );
 
       resolve(qpqBinaryFiles);

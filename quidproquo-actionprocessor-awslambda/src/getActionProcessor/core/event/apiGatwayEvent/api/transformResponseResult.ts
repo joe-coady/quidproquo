@@ -54,7 +54,7 @@ const getProcessTransformResponseResult = (
     // Add the cors headers
     const currentHeaders = successRecord.headers || {};
     const headers: HttpEventHeaders = {
-      ...qpqWebServerUtils.getCorsHeaders(qpqConfig, {}, currentHeaders),
+      ...qpqWebServerUtils.getCorsHeaders(qpqConfig, {}, apiGatewayEvent.headers),
       ...currentHeaders,
     };
 
