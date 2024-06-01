@@ -3,6 +3,7 @@
   "extends": "./tsconfig.base",
   "compilerOptions": {
     "module": "ESNext",
+    "target": "ESNext",
     "outDir": "./lib/esm"
   }
 }

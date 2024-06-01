@@ -2,26 +2,24 @@ import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
 import { EventActionType, AnyMatchStoryResult } from './EventActionType';
 
 // payload
-export interface EventAutoRespondActionPayload<T, MSR extends AnyMatchStoryResult> {
-  transformedEventParams: T;
+export interface EventAutoRespondActionPayload<QpqEventRecord, MSR extends AnyMatchStoryResult> {
+  qpqEventRecord: QpqEventRecord;
   matchResult: MSR;
 }
 
 // action
-export interface EventAutoRespondAction<T, MSR extends AnyMatchStoryResult>
-  extends Action<EventAutoRespondActionPayload<T, MSR>> {
+export interface EventAutoRespondAction<QpqEventRecord, MSR extends AnyMatchStoryResult>
+  extends Action<EventAutoRespondActionPayload<QpqEventRecord, MSR>> {
   type: EventActionType.AutoRespond;
-  payload: EventAutoRespondActionPayload<T, MSR>;
+  payload: EventAutoRespondActionPayload<QpqEventRecord, MSR>;
 }
 
-// Functions  - // TODO: Remove anys here
-export type EventAutoRespondActionProcessor<
-  T,
-  MSR extends AnyMatchStoryResult,
-  TRes,
-> = ActionProcessor<EventAutoRespondAction<T, MSR>, TRes>;
-export type EventAutoRespondActionRequester<
-  T,
-  MSR extends AnyMatchStoryResult,
-  TRes,
-> = ActionRequester<EventAutoRespondAction<T, MSR>, TRes>;
+// Functions
+export type EventAutoRespondActionProcessor<QpqEventRecord, MSR extends AnyMatchStoryResult, QpqEventRecordResponse> = ActionProcessor<
+  EventAutoRespondAction<QpqEventRecord, MSR>,
+  QpqEventRecordResponse | null
+>;
+export type EventAutoRespondActionRequester<QpqEventRecord, MSR extends AnyMatchStoryResult, QpqEventRecordResponse> = ActionRequester<
+  EventAutoRespondAction<QpqEventRecord, MSR>,
+  QpqEventRecordResponse | null
+>;

@@ -1,25 +1,25 @@
-import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
+import { Action, ActionProcessor, ActionRequester, EitherActionResult } from '../../types/Action';
 import { EventActionType } from './EventActionType';
 
 // Payload
-export interface EventTransformResponseResultActionPayload<R, T> {
-  response: R;
-  transformedEventParams: T;
+export interface EventTransformResponseResultActionPayload<EventParams extends Array<unknown>, QpqEventRecordResponse> {
+  qpqEventRecordResponses: EitherActionResult<QpqEventRecordResponse>[];
+  eventParams: EventParams;
 }
 
-// Action
-export interface EventTransformResponseResultAction<R, T>
-  extends Action<EventTransformResponseResultActionPayload<R, T>> {
+// Action.
+export interface EventTransformResponseResultAction<EventParams extends Array<unknown>, QpqEventRecordResponse>
+  extends Action<EventTransformResponseResultActionPayload<EventParams, QpqEventRecordResponse>> {
   type: EventActionType.TransformResponseResult;
-  payload: EventTransformResponseResultActionPayload<R, T>;
+  payload: EventTransformResponseResultActionPayload<EventParams, QpqEventRecordResponse>;
 }
 
 // Functions
-export type EventTransformResponseResultActionProcessor<R, T, TRes> = ActionProcessor<
-  EventTransformResponseResultAction<R, T>,
-  TRes
+export type EventTransformResponseResultActionProcessor<EventParams extends Array<unknown>, QpqEventRecordResponse, EventResponse> = ActionProcessor<
+  EventTransformResponseResultAction<EventParams, QpqEventRecordResponse>,
+  EventResponse
 >;
-export type EventTransformResponseResultActionRequester<R, T, TRes> = ActionRequester<
-  EventTransformResponseResultAction<R, T>,
-  TRes
+export type EventTransformResponseResultActionRequester<EventParams extends Array<unknown>, QpqEventRecordResponse, EventResponse> = ActionRequester<
+  EventTransformResponseResultAction<EventParams, QpqEventRecordResponse>,
+  EventResponse
 >;

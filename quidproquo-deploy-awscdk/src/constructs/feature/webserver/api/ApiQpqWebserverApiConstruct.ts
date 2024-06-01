@@ -45,10 +45,7 @@ export class ApiQpqWebserverApiConstruct extends QpqConstructBlock {
       endpointTypes: [aws_apigateway.EndpointType.REGIONAL],
     });
 
-    const baseDomain = qpqWebServerUtils.resolveDomainRoot(
-      props.apiConfig.rootDomain,
-      props.qpqConfig,
-    );
+    const baseDomain = qpqWebServerUtils.resolveDomainRoot(props.apiConfig.rootDomain, props.qpqConfig);
 
     const domain = `${props.apiConfig.apiSubdomain}.${baseDomain}`;
 
@@ -58,51 +55,5 @@ export class ApiQpqWebserverApiConstruct extends QpqConstructBlock {
       restApiId: api.restApiId,
       stage: api.deploymentStage.stageName,
     });
-
-    // If we have not deprecated this api, then we need to create a subdomain for it
-    //if (!props.apiConfig.deprecated) {
-    // api.service.domain.com or api.domain.com
-    // const apexDomain = props.apiConfig.onRootDomain
-    //   ? qpqWebServerUtils.getBaseDomainName(props.qpqConfig)
-    //   : qpqWebServerUtils.getServiceDomainName(props.qpqConfig);
-    // // Create subdomain
-    // const subdomain = new SubdomainName(this, 'subdomain', {
-    //   apexDomain,
-    //   subdomain: props.apiConfig.apiSubdomain,
-    //   qpqConfig: props.qpqConfig,
-    //   awsAccountId: props.awsAccountId,
-    // });
-    // // Map all requests to this service to /serviceName/*
-    // new aws_apigateway.BasePathMapping(this, 'rest-bpm', {
-    //   domainName: subdomain.domainName,
-    //   restApi: api,
-    //   // the properties below are optional
-    //   // basePath: settings.service,
-    // });
-    // if (props.apiConfig.cloudflareApiKeySecretName) {
-    //   new CloudflareDnsRecord(this, 'certFlare', {
-    //     awsAccountId: props.awsAccountId,
-    //     buildPath: qpqWebServerUtils.getApiEntryFullPath(props.qpqConfig, props.apiConfig),
-    //     qpqConfig: props.qpqConfig,
-    //     // certificateArn: subdomain.certificate.certificateArn,
-    //     certificateDomain: subdomain.deployDomain,
-    //     dnsEntries: {},
-    //     apiSecretName: props.apiConfig.cloudflareApiKeySecretName,
-    //   });
-    //   new CloudflareDnsRecord(this, 'cloudflare', {
-    //     awsAccountId: props.awsAccountId,
-    //     buildPath: qpqWebServerUtils.getApiEntryFullPath(props.qpqConfig, props.apiConfig),
-    //     qpqConfig: props.qpqConfig,
-    //     dnsEntries: {
-    //       [subdomain.deployDomain]: {
-    //         value: subdomain.domainName.domainNameAliasDomainName,
-    //         proxied: true,
-    //         type: 'CNAME',
-    //       },
-    //     },
-    //     apiSecretName: props.apiConfig.cloudflareApiKeySecretName,
-    //   });
-    // }
-    // }
   }
 }

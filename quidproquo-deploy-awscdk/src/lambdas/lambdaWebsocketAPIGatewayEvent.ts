@@ -1,71 +1,22 @@
-import { getWebsocketAPIGatewayEventActionProcessor } from 'quidproquo-actionprocessor-awslambda';
+import { QpqRuntimeType } from 'quidproquo-core';
 
-import { createRuntime, askProcessEvent, QpqRuntimeType, QpqLogger } from 'quidproquo-core';
+import { APIGatewayProxyWebsocketEventV2WithRequestContext, APIGatewayEventWebsocketRequestContextV2 } from 'aws-lambda';
 
-import { CustomMessageTriggerEvent, Context } from 'aws-lambda';
+import { getQpqLambdaRuntimeForEvent } from './lambda-utils';
+import { getApiGatewayWebsocketEventEventProcessor } from 'quidproquo-actionprocessor-awslambda';
 
-import { getLambdaConfigs } from './lambdaConfig';
-
-import {
-  getLogger,
-  getRuntimeCorrelation,
-  getLambdaActionProcessors,
-  qpqFunctionMiddleware,
-} from './lambda-utils';
-
-// @ts-ignore - Special webpack loader
-import qpqCustomActionProcessors from 'qpq-custom-action-processors-loader!';
-
-// TODO: Make this a util or something based on server time or something..
-const getDateNow = () => new Date().toISOString();
-
-export interface EmailPayload {
-  username: string;
-  code: string;
-
-  userAttributes: Record<string, string>;
-  baseDomain: string;
-}
-
-export const websocketAPIGatewayEventHandler = async (
-  event: CustomMessageTriggerEvent,
-  context: Context,
-  logger: QpqLogger,
-) => {
-  const cdkConfig = await getLambdaConfigs();
-
-  // Build a processor for the session and stuff
-  // Remove the non route ones ~ let the story execute action add them
-  const storyActionProcessor = {
-    ...getLambdaActionProcessors(cdkConfig.qpqConfig),
-    ...getWebsocketAPIGatewayEventActionProcessor(cdkConfig.qpqConfig),
-
-    ...qpqCustomActionProcessors(),
-  };
-
-  const resolveStory = createRuntime(
-    cdkConfig.qpqConfig,
-    {
-      depth: 0,
-      context: {},
-    },
-    storyActionProcessor,
-    getDateNow,
-    logger,
-    getRuntimeCorrelation(cdkConfig.qpqConfig),
-    QpqRuntimeType.WEBSOCKET_EVENT,
-  );
-
-  const storyResult = await resolveStory(askProcessEvent, [event, context]);
-
-  return (
-    storyResult.result || {
-      statusCode: 200,
-    }
-  );
-};
+type ApiGatwayEventWebsocketWithIdentity = APIGatewayProxyWebsocketEventV2WithRequestContext<
+  APIGatewayEventWebsocketRequestContextV2 & { identity: { sourceIp: string; userAgent: string } }
+>;
 
 // Default executor
-export const executeWebsocketAPIGatewayEvent = qpqFunctionMiddleware(
-  websocketAPIGatewayEventHandler,
+export const executeWebsocketAPIGatewayEvent = getQpqLambdaRuntimeForEvent<ApiGatwayEventWebsocketWithIdentity>(
+  QpqRuntimeType.WEBSOCKET_EVENT,
+  (event) => {
+    return {
+      depth: 0,
+      context: {},
+    };
+  },
+  (qpqConfig) => getApiGatewayWebsocketEventEventProcessor(qpqConfig),
 );

@@ -1,27 +1,27 @@
 import { SystemActionType } from './SystemActionType';
 import { Action, ActionRequester, ActionProcessor } from '../../types/Action';
+import { StorySession } from '../../types';
 
 // Payload
-export interface SystemExecuteStoryActionPayload<T extends Array<any>> {
-  type: string;
+export interface SystemExecuteStoryActionPayload<StoryInput extends Array<any>> {
   src: string;
   runtime: string;
-  params: T;
+  params: StoryInput;
+  storySession?: StorySession;
 }
 
 // Action
-export interface SystemExecuteStoryAction<T extends Array<any>>
-  extends Action<SystemExecuteStoryActionPayload<T>> {
+export interface SystemExecuteStoryAction<StoryInput extends Array<any>> extends Action<SystemExecuteStoryActionPayload<StoryInput>> {
   type: SystemActionType.ExecuteStory;
-  payload: SystemExecuteStoryActionPayload<T>;
+  payload: SystemExecuteStoryActionPayload<StoryInput>;
 }
 
 // Functions
-export type SystemExecuteStoryActionProcessor<T extends Array<any>> = ActionProcessor<
-  SystemExecuteStoryAction<T>,
-  any
+export type SystemExecuteStoryActionProcessor<StoryInput extends Array<any>, StoryOutput> = ActionProcessor<
+  SystemExecuteStoryAction<StoryInput>,
+  StoryOutput
 >;
-export type SystemExecuteStoryActionRequester<T extends Array<any>> = ActionRequester<
-  SystemExecuteStoryAction<T>,
-  any
+export type SystemExecuteStoryActionRequester<StoryInput extends Array<any>, StoryOutput> = ActionRequester<
+  SystemExecuteStoryAction<StoryInput>,
+  StoryOutput
 >;

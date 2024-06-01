@@ -55,13 +55,7 @@ const getTabStyle = (tabIndex: number, selectedTab: number) => ({
   height: '100%',
 });
 
-const LogDialog = ({
-  logCorrelation,
-  open,
-  handleClose,
-  storyResultMetadatas,
-  setSelectedLogCorrelation,
-}: LogDialogProps) => {
+const LogDialog = ({ logCorrelation, open, handleClose, storyResultMetadatas, setSelectedLogCorrelation }: LogDialogProps) => {
   const signedRequest = usePlatformDataFromPath<{ url: string }>(getLogUrl(logCorrelation));
   const log = useExternalData<StoryResult<any>>(signedRequest?.url);
 
@@ -105,12 +99,7 @@ const LogDialog = ({
     >
       <DialogTitle id="scroll-dialog-title">Log Details - {logCorrelation}</DialogTitle>
       <AppBar position="sticky" color="primary">
-        <Tabs
-          value={selectedTab}
-          onChange={handleTabChange}
-          textColor="inherit"
-          indicatorColor="secondary"
-        >
+        <Tabs value={selectedTab} onChange={handleTabChange} textColor="inherit" indicatorColor="secondary">
           <Tab label="Log Details" />
           <Tab label="Tree" />
           <Tab label="Timeline" />
@@ -136,29 +125,15 @@ const LogDialog = ({
                 }}
               >
                 <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={hideFastActions}
-                      onChange={(event) => setHideFastActions(event.target.checked)}
-                    />
-                  }
+                  control={<Checkbox checked={hideFastActions} onChange={(event) => setHideFastActions(event.target.checked)} />}
                   label="Hide Fast Actions"
                 />
                 <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={orderByDuration}
-                      onChange={(event) => setOrderByDuration(event.target.checked)}
-                    />
-                  }
+                  control={<Checkbox checked={orderByDuration} onChange={(event) => setOrderByDuration(event.target.checked)} />}
                   label="Order by Duration"
                 />
               </div>
-              <LogDetails
-                log={log!}
-                hideFastActions={hideFastActions}
-                orderByDuration={orderByDuration}
-              />
+              <LogDetails log={log!} hideFastActions={hideFastActions} orderByDuration={orderByDuration} />
             </>
           )}
           {isLoading && <LinearProgress />}
@@ -193,18 +168,10 @@ const LogDialog = ({
       </DialogContent>
 
       <DialogActions>
-        <Button
-          style={getTabStyle(selectedTab, 1)}
-          onClick={(event) => treeApi.refreshTreeData()}
-          disabled={isLoading}
-        >
+        <Button style={getTabStyle(selectedTab, 1)} onClick={(event) => treeApi.refreshTreeData()} disabled={isLoading}>
           Refresh Tree
         </Button>
-        <Button
-          style={getTabStyle(selectedTab, 2)}
-          onClick={(event) => treeApi.refreshTreeData()}
-          disabled={isLoading}
-        >
+        <Button style={getTabStyle(selectedTab, 2)} onClick={(event) => treeApi.refreshTreeData()} disabled={isLoading}>
           Refresh Timeline
         </Button>
         <Button
@@ -216,7 +183,7 @@ const LogDialog = ({
         >
           Download
         </Button>
-        {log && log.runtimeType === 'EXECUTE_STORY' && (
+        {log && (
           <Button onClick={handleExecute} disabled={isLoading}>
             Execute
           </Button>

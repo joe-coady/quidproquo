@@ -1,12 +1,13 @@
+import { EitherActionResult } from '../../types';
 import { EventActionType } from './EventActionType';
 import { EventTransformResponseResultActionRequester } from './EventTransformResponseResultActionTypes';
 
-export function* askEventTransformResponseResult<TOutputRes, TInputRes, TTransformedEventParams>(
-  response: TInputRes,
-  transformedEventParams: TTransformedEventParams,
-): EventTransformResponseResultActionRequester<TInputRes, TTransformedEventParams, TOutputRes> {
+export function* askEventTransformResponseResult<EventParams extends Array<unknown>, QpqEventRecordResponse, EventResponse>(
+  qpqEventRecordResponses: EitherActionResult<QpqEventRecordResponse>[],
+  ...eventParams: EventParams
+): EventTransformResponseResultActionRequester<EventParams, QpqEventRecordResponse, EventResponse> {
   return yield {
     type: EventActionType.TransformResponseResult,
-    payload: { response, transformedEventParams },
+    payload: { qpqEventRecordResponses, eventParams },
   };
 }

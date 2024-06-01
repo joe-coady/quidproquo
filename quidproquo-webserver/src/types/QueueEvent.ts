@@ -6,6 +6,7 @@ export interface QueueEventTypeParams {
 
 export interface QueueEvent<T extends QueueMessage<any>> {
   message: T;
+  id: string;
 }
 
 export type QueueEventResponse = boolean;

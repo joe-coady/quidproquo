@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { AuthenticationInfo } from 'quidproquo';
+import { AuthenticationInfo } from 'quidproquo-core';
 import { WebsocketServiceEvent } from 'quidproquo-web';
 import {
   WebSocketClientEventMessageAuthenticate,
