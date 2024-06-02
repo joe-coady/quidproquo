@@ -6,8 +6,9 @@ export class QpqRuntimeModuleLoaderPlugin implements WebpackPluginInstance {
       const entryFiles = Object.keys(compiler.options.entry);
 
       entryFiles.forEach((entryName) => {
-        const assetName = `${entryName}.bundle.js`;
+        const assetName = `${entryName}.js`;
         if (compilation.assets[assetName]) {
+          console.log("Doing: ", entryName);
           const bundledFile = compilation.assets[assetName];
           const wrappedSource = `
             (function() {
