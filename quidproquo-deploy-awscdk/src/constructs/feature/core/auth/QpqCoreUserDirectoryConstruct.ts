@@ -12,6 +12,7 @@ import * as qpqDeployAwsCdkUtils from '../../../../utils';
 
 import { Function } from '../../../basic/Function';
 import { resolveAwsServiceAccountInfo } from 'quidproquo-config-aws';
+import path from 'path';
 
 export interface QpqCoreUserDirectoryConstructProps extends QpqConstructBlockProps {
   userDirectoryConfig: UserDirectoryQPQConfigSetting;
@@ -113,10 +114,7 @@ export class QpqCoreUserDirectoryConstruct extends QpqCoreUserDirectoryConstruct
     this.userPool = userPool;
 
     const customMessageTrigger = new Function(this, 'csm-msg-trigger-func', {
-      buildPath: qpqCoreUtils.getUserDirectoryEntryFullPath(
-        props.qpqConfig,
-        props.userDirectoryConfig,
-      ),
+      buildPath: path.join(__dirname, '../../../../../bundled/lambda'),
       functionName: this.qpqResourceName(`${props.userDirectoryConfig.name}`, 'cm-trig'),
       functionType: 'lambdaCognitoTriggerEvent_CustomMessage',
       executorName: 'executeLambdaCognitoCustomMessageTriggerEvent',

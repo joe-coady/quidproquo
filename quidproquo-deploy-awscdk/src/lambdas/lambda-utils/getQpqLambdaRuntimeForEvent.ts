@@ -6,11 +6,11 @@ import { SNSEvent } from 'aws-lambda';
 import { dynamicModuleLoaderWarmer } from '../dynamicModuleLoader';
 import { getLambdaConfigs } from '../lambdaConfig';
 import { getLogger } from './logger';
-import { ActionProcessorList, QPQConfig, QpqLogger, QpqRuntimeType, StorySession, askProcessEvent, createRuntime } from 'quidproquo-core';
+import { ActionProcessorList, QPQConfig, QpqRuntimeType, StorySession, askProcessEvent, createRuntime } from 'quidproquo-core';
 import { getLambdaActionProcessors } from './getLambdaActionProcessors';
 
 // @ts-ignore - Special webpack loader
-import qpqCustomActionProcessors from 'qpq-custom-action-processors-loader!';
+// import qpqCustomActionProcessors from 'qpq-custom-action-processors-loader!';
 import { getRuntimeCorrelation } from './getRuntimeCorrelation';
 
 const isSnsEvent = <T>(event: QpqFunctionExecutionEvent<T>): event is SNSEvent => {
@@ -30,8 +30,14 @@ export const getQpqLambdaRuntimeForEvent = <E extends QpqFunctionExecutionEvent<
   return async (event: E, context: Context) => {
     console.log('tick: ', JSON.stringify(event, null, 2));
 
+    console.log("A: ");
+
     const cdkConfig = await getLambdaConfigs();
+    console.log("AA: ");
     const logger = getLogger(cdkConfig.qpqConfig);
+    console.log("AAA: ");
+    
+    console.log("B: ");
 
     const resolveStory = createRuntime(
       cdkConfig.qpqConfig,
@@ -39,7 +45,7 @@ export const getQpqLambdaRuntimeForEvent = <E extends QpqFunctionExecutionEvent<
       {
         ...getLambdaActionProcessors(cdkConfig.qpqConfig),
         ...getActionProcessorList(cdkConfig.qpqConfig),
-        ...qpqCustomActionProcessors(),
+        // ...qpqCustomActionProcessors(),
       },
       () => new Date().toISOString(),
       logger,
@@ -47,24 +53,36 @@ export const getQpqLambdaRuntimeForEvent = <E extends QpqFunctionExecutionEvent<
       runtimeType,
     );
 
+    console.log("C: ");
+
     const processEvent = async () => {
+      console.log("E: ");
       const result = await resolveStory(askProcessEvent, [event, context]);
+
+      console.log("F: ");
       await logger.waitToFinishWriting();
 
+      console.log("G: ");
       if (result.error) {
         throw new Error(result.error.errorText);
       }
 
+      console.log("H: ");
       console.log('Finished, returning: ', result.result);
       return result.result;
     };
 
+    console.log("D: ");
+
     if (isSnsEvent(event)) {
+
+      console.log("I: ");
       // Non warmer records
       const recordsNoWarm = event.Records.filter(
         (record) => record.EventSource !== 'aws:sns' || JSON.parse(record.Sns.Message).type !== 'QpqLambdaWarmerEvent',
       );
 
+      console.log("J: ");
       // if we have found some warmers - then we need to warm the lambda
       if (recordsNoWarm.length !== event.Records.length) {
         console.log('Found SNS warmer');

@@ -1,14 +1,19 @@
 import { QPQConfig } from 'quidproquo-core';
-
-// @ts-ignore
-import qpqConfig from 'qpq-config-loader!';
+import { getModuleQpqConfig } from 'quidproquo-actionprocessor-awslambda';
 
 export interface QPQCDKConfig {
   qpqConfig: QPQConfig;
 }
 
 export const getLambdaConfigs = async (): Promise<QPQCDKConfig> => {
+  console.log("Get Configs");
+
+  const qpqConfig = await getModuleQpqConfig();
+
+  console.log("Got Configs", qpqConfig);
+
   return {
-    qpqConfig: qpqConfig,
+    // This is injected in via the webpack plugin
+    qpqConfig,
   };
 };

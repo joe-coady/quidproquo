@@ -10,6 +10,7 @@ import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqCons
 import { importStackValue } from '../../../../utils';
 import { Function } from '../../../basic/Function';
 import { SubdomainName } from '../../../basic';
+import path from 'path';
 
 export interface QpqApiWebserverWebsocketConstructProps extends QpqConstructBlockProps {
   websocketConfig: WebSocketQPQWebServerConfigSetting;
@@ -35,7 +36,7 @@ export class QpqApiWebserverWebsocketConstruct extends QpqConstructBlock {
     });
 
     const func = new Function(this, 'api-function', {
-      buildPath: qpqWebServerUtils.getWebsocketEntryFullPath(props.qpqConfig, props.websocketConfig),
+      buildPath: path.join(__dirname, '../../../../../bundled/lambda'),
       functionName: this.resourceName(`${props.websocketConfig.apiName}-ws`),
       functionType: 'lambdaWebsocketAPIGatewayEvent',
       executorName: 'executeWebsocketAPIGatewayEvent',

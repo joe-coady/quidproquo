@@ -198,3 +198,9 @@ export const getDynamoTableNameOverrride = (srcKvsName: string, qpqConfig: QPQCo
   // No override found, return empty string
   return '';
 };
+
+export const getApiBuildPath = (qpqConfig: QPQConfig) => {
+  const awsServiceAccountInfoConfig = getAwsServiceAccountInfoConfig(qpqConfig);
+
+  return joinPaths(qpqCoreUtils.getConfigRoot(qpqConfig), awsServiceAccountInfoConfig.apiBuildPath);
+}

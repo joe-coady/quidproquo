@@ -6,6 +6,7 @@ import { Construct } from 'constructs';
 import { aws_lambda, aws_s3, aws_s3_notifications } from 'aws-cdk-lib';
 import { QpqCoreStorageDriveConstruct } from './QpqCoreStorageDriveConstruct';
 import { Function } from '../../../basic/Function';
+import path from 'path';
 
 export interface QpqApiCoreStorageDriveConstructProps extends QpqConstructBlockProps {
   storageDriveConfig: StorageDriveQPQConfigSetting;
@@ -26,10 +27,7 @@ export class QpqApiCoreStorageDriveConstruct extends QpqConstructBlock {
 
     if (props.storageDriveConfig.onEvent?.create) {
       const func = new Function(this, 'create', {
-        buildPath: qpqCoreUtils.getStorageDriveEntryFullPath(
-          props.qpqConfig,
-          props.storageDriveConfig,
-        ),
+        buildPath: path.join(__dirname, '../../../../../bundled/lambda'),
 
         reacreateOnFunctionNameChange: true,
         functionName: this.qpqResourceName(props.storageDriveConfig.storageDrive, 's3Create'),
@@ -60,10 +58,7 @@ export class QpqApiCoreStorageDriveConstruct extends QpqConstructBlock {
 
     if (props.storageDriveConfig.onEvent?.delete) {
       const func = new Function(this, 'delete', {
-        buildPath: qpqCoreUtils.getStorageDriveEntryFullPath(
-          props.qpqConfig,
-          props.storageDriveConfig,
-        ),
+        buildPath: path.join(__dirname, '../../../../../bundled/lambda'),
 
         reacreateOnFunctionNameChange: true,
         functionName: this.qpqResourceName(props.storageDriveConfig.storageDrive, 's3Delete'),

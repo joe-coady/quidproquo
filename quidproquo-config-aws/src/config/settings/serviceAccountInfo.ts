@@ -25,11 +25,13 @@ export interface AwsServiceAccountInfoQPQConfigSetting extends QPQConfigSetting 
   lambdaMaxMemoryInMiB: number;
 
   disableLogs: boolean;
+  apiBuildPath: string;
 }
 
 export const defineAwsServiceAccountInfo = (
   deployAccountId: string,
   deployRegion: string,
+  apiBuildPath: string,
 
   serviceInfoMap?: ServiceAccountInfo[],
   options?: QPQConfigAdvancedAwsServiceAccountInfoSettings,
@@ -48,4 +50,6 @@ export const defineAwsServiceAccountInfo = (
   logServiceName: options?.logServiceName,
 
   disableLogs: !!options?.disableLogs,
+
+  apiBuildPath
 });

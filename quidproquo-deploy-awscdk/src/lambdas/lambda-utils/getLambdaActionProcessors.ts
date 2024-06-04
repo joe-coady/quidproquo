@@ -23,12 +23,8 @@ import {
   getWebsocketActionProcessor,
   getAdminActionProcessor,
   getKeyValueStoreActionProcessor,
+  dynamicModuleLoader
 } from 'quidproquo-actionprocessor-awslambda';
-
-import { dynamicModuleLoader } from '../dynamicModuleLoader';
-
-// @ts-ignore - Special webpack loader
-import qpqCustomActionProcessors from 'qpq-custom-action-processors-loader!';
 
 export const getLambdaActionProcessors = (qpqConfig: QPQConfig) => {
   const storyActionProcessor = {
@@ -40,7 +36,6 @@ export const getLambdaActionProcessors = (qpqConfig: QPQConfig) => {
     ...getConfigGetParametersActionProcessor(qpqConfig),
     ...getConfigGetGlobalActionProcessor(qpqConfig),
     ...getConfigSetParameterActionProcessor(qpqConfig),
-    ...getSystemActionProcessor(qpqConfig, dynamicModuleLoader),
     ...getFileActionProcessor(qpqConfig),
     ...getConfigActionProcessor(qpqConfig),
     ...getQueueActionProcessor(qpqConfig),
@@ -53,7 +48,7 @@ export const getLambdaActionProcessors = (qpqConfig: QPQConfig) => {
     ...getWebsocketActionProcessor(qpqConfig),
     ...getContextActionProcessor(qpqConfig),
 
-    ...qpqCustomActionProcessors(),
+    ...getSystemActionProcessor(qpqConfig, dynamicModuleLoader),
   };
 
   return storyActionProcessor;

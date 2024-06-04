@@ -8,6 +8,7 @@ import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqCons
 import { Function } from '../../../basic/Function';
 
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
+import path from 'path';
 
 export interface QpqWebserverServiceFunctionConstructProps extends QpqConstructBlockProps {
   serviceFunctionConfig: ServiceFunctionQPQWebServerConfigSetting;
@@ -20,10 +21,7 @@ export class QpqWebserverServiceFunctionConstruct extends QpqConstructBlock {
 
     // Build Function
     const func = new Function(this, 'api-function', {
-      buildPath: qpqWebServerUtils.getServiceFunctionFullPath(
-        props.qpqConfig,
-        props.serviceFunctionConfig,
-      ),
+      buildPath: path.join(__dirname, '../../../../../bundled/lambda'),
       functionName: this.resourceName(`${props.serviceFunctionConfig.functionName}-sfunc`),
       functionType: 'lambdaServiceFunctionExecute',
       executorName: 'executeServiceFunctionExecuteEvent',

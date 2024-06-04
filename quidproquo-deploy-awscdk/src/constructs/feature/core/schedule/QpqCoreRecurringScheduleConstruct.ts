@@ -9,6 +9,7 @@ import { aws_events, aws_events_targets, aws_lambda } from 'aws-cdk-lib';
 
 import { Function } from '../../../basic/Function';
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
+import path from 'path';
 
 export interface QpqCoreRecurringScheduleConstructProps extends QpqConstructBlockProps {
   scheduleConfig: ScheduleQPQConfigSetting;
@@ -20,7 +21,7 @@ export class QpqCoreRecurringScheduleConstruct extends QpqConstructBlock {
     super(scope, id, props);
 
     const schedulerFunction = new Function(this, props.scheduleConfig.uniqueKey, {
-      buildPath: qpqCoreUtils.getScheduleEntryFullPath(props.qpqConfig, props.scheduleConfig),
+      buildPath: path.join(__dirname, '../../../../../bundled/lambda'),
       functionName: this.resourceName(`${props.scheduleConfig.uniqueKey}-SE`),
       functionType: 'lambdaEventBridgeEvent',
       executorName: 'executeEventBridgeEvent',

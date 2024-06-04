@@ -53,7 +53,10 @@
     "allowJs": true,
 
     // Generates a .d.ts file for the TypeScript files
-    "declaration": true
+    "declaration": true,
+
+    // Disable the use of tslib
+    "importHelpers": false,
   },  
   
   // Exclude the node_modules directory to improve performance

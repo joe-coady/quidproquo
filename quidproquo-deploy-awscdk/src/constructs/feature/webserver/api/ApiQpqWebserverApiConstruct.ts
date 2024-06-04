@@ -9,6 +9,7 @@ import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqCons
 import { Function } from '../../../basic/Function';
 
 import { qpqCoreUtils } from 'quidproquo-core';
+import path from 'path';
 
 export interface ApiQpqWebserverApiConstructProps extends QpqConstructBlockProps {
   apiConfig: ApiQPQWebServerConfigSetting;
@@ -21,7 +22,7 @@ export class ApiQpqWebserverApiConstruct extends QpqConstructBlock {
 
     // Build Function
     const func = new Function(this, 'api-function', {
-      buildPath: qpqWebServerUtils.getApiEntryFullPath(props.qpqConfig, props.apiConfig),
+      buildPath: path.join(__dirname, '../../../../../bundled/lambda'),
       functionName: this.resourceName(`${props.apiConfig.apiName}-route`),
       functionType: 'lambdaAPIGatewayEvent',
       executorName: 'executeAPIGatewayEvent',

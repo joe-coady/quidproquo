@@ -15,7 +15,7 @@ import {
   QpqCoreKeyValueStoreConstruct,
   QpqWebserverWebsocketConstruct,
   QpqWebserverCertificateConstruct,
-  InfQpqWebserverServiceDomainsConstruct,
+  ApiCodeStorage,
 } from '../constructs';
 import { QpqWebServerCacheConstruct } from '../constructs/feature/webserver/cache/QpqWebServerCacheConstruct';
 import { WebserverRoll } from '../constructs/basic/WebserverRoll';
@@ -33,10 +33,11 @@ export class InfQpqServiceStack extends QpqServiceStack {
     }).role;
 
     // Web entry foundations
-    new InfQpqWebserverServiceDomainsConstruct(this, 'serviceDomains', {
+    const apiCodeStorage = new ApiCodeStorage(this, 'apiCode', {
       awsAccountId: props.awsAccountId,
       qpqConfig: props.qpqConfig,
     });
+    ApiCodeStorage.authorizeActionsForRole(webserverRole, apiCodeStorage);
 
     // Build the storage drives
     const storageDrives = qpqCoreUtils.getOwnedStorageDrives(props.qpqConfig).map(

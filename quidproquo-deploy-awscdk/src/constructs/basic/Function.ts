@@ -14,8 +14,9 @@ import * as cdk from 'aws-cdk-lib';
 
 import { getAwsServiceAccountInfoConfig } from 'quidproquo-config-aws';
 
-import { BootstrapResource, WARM_LAMBDA_EVENT } from '../../constants';
+import { BootstrapResource } from '../../constants';
 import { qpqCoreUtils } from 'quidproquo-core';
+import { getQpqRuntimeResourceNameFromConfig } from 'quidproquo-actionprocessor-awslambda/lib/esm/awsNamingUtils';
 
 export interface FunctionProps extends QpqConstructBlockProps {
   functionName?: string;
@@ -54,6 +55,8 @@ export class Function extends QpqConstructBlock {
     const functionId =
       props.reacreateOnFunctionNameChange && props.functionName ? props.functionName : 'function';
 
+    const bucketName = getQpqRuntimeResourceNameFromConfig('code', props.qpqConfig, 'api');
+
     this.lambdaFunction = new aws_lambda.Function(this, functionId, {
       functionName: props.functionName,
       timeout: cdk.Duration.seconds(props.timeoutInSeconds || 25),
@@ -67,6 +70,7 @@ export class Function extends QpqConstructBlock {
 
       environment: {
         AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
+        QPQ_CODE_BUCKET_NAME: bucketName,
         ...(props.environment || {}),
       },
 

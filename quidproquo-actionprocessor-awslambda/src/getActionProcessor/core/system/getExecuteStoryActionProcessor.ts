@@ -30,10 +30,12 @@ const getProcessExecuteStory = <T extends Array<any>, R>(
     actionProcessors: ActionProcessorList,
     logger: QpqLogger,
   ): Promise<any> => {
+    console.log("Trying to load...");
     let module = await dynamicModuleLoader(payload.src);
     if (module === null) {
       return actionResultError(ErrorTypeEnum.NotFound, `Module not found [${payload.src}]`);
     }
+    console.log("Done Trying to load...");
 
     const story = module[payload.runtime];
     if (!story) {

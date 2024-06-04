@@ -10,6 +10,7 @@ import { Construct } from 'constructs';
 import { aws_lambda_event_sources, aws_lambda, aws_sns, aws_sns_subscriptions } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { getAwsServiceAccountInfoByDeploymentInfo } from 'quidproquo-config-aws';
+import path from 'path';
 
 export interface QpqApiCoreQueueConstructProps extends QpqConstructBlockProps {
   queueConfig: QueueQPQConfigSetting;
@@ -21,7 +22,7 @@ export class QpqApiCoreQueueConstruct extends QpqConstructBlock {
     super(scope, id, props);
 
     const queueFunction = new Function(this, props.queueConfig.uniqueKey, {
-      buildPath: qpqCoreUtils.getQueueEntryFullPath(props.qpqConfig, props.queueConfig),
+      buildPath: path.join(__dirname, '../../../../../bundled/lambda'),
       functionName: this.resourceName(`${props.queueConfig.uniqueKey}-queue`),
       functionType: 'lambdaSQSEvent',
       executorName: 'executeSQSEvent',

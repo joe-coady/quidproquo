@@ -44,6 +44,8 @@ export const createRuntime = (
   runtimeType: QpqRuntimeType,
   initialTags?: string[],
 ) => {
+  console.log("Runtime: ");
+
   async function resolveStory<TArgs extends Array<any>>(
     story: (...args: TArgs) => ActionRequester<Action<any>, any, any>,
     args: TArgs,
@@ -182,6 +184,8 @@ export const createRuntime = (
     return storyResult;
   }
 
+  console.log("Runtime with logs: ");
+
   async function resolveStoryWithLogs<TArgs extends Array<any>>(
     story: (...args: TArgs) => Generator<any, any, Action<any>>,
     args: TArgs,
@@ -214,6 +218,8 @@ export const createRuntime = (
       console.log = oldConsoleLog;
     }
   }
+
+  console.log("Return Runtime with logs!");
 
   return resolveStoryWithLogs;
 };

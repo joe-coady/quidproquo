@@ -1,0 +1,1 @@
+export const qpqCodeBucketName = process.env.QPQ_CODE_BUCKET_NAME as string;

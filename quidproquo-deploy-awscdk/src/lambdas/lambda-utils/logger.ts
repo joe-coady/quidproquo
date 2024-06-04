@@ -73,14 +73,17 @@ export const moveLogsToPerminateStorage = async (
 };
 
 export const getLogger = (qpqConfig: QPQConfig): QpqLogger => {
+  console.log("getLogger: A");
   const awsSettings = getAwsServiceAccountInfoConfig(qpqConfig);
 
+  console.log("getLogger: A");
   // If we have no log service, just return nothing.
   if (
     !awsSettings.logServiceName ||
     awsSettings.disableLogs ||
     process.env.storageDriveName === 'qpq-logs'
   ) {
+    console.log("getLogger: C");
     return {
       log: async () => {},
       waitToFinishWriting: async () => {},
@@ -88,11 +91,13 @@ export const getLogger = (qpqConfig: QPQConfig): QpqLogger => {
     };
   }
 
+  console.log("getLogger: D");
   const service = awsSettings.logServiceName;
   const application = qpqCoreUtils.getApplicationName(qpqConfig);
   const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
   const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
 
+  console.log("getLogger: E");
   // Workout the bucket name.
   const bucketName = awsNamingUtils.getConfigRuntimeResourceName(
     'qpq-logs',
@@ -102,6 +107,8 @@ export const getLogger = (qpqConfig: QPQConfig): QpqLogger => {
     feature,
   );
 
+  console.log("getLogger: F");
+
   // Where is this bucket?
   const regionForBucket = getAwsServiceAccountInfoByDeploymentInfo(
     qpqConfig,
@@ -110,6 +117,8 @@ export const getLogger = (qpqConfig: QPQConfig): QpqLogger => {
     feature,
     application,
   ).awsRegion;
+
+  console.log("getLogger: G");
 
   console.log('Bucket for logs: ', bucketName, regionForBucket);
 

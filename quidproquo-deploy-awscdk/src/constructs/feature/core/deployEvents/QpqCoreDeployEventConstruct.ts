@@ -7,6 +7,7 @@ import { aws_events, aws_events_targets, aws_lambda } from 'aws-cdk-lib';
 
 import { Function } from '../../../basic/Function';
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
+import path from 'path';
 
 export interface QpqCoreDeployEventConstructProps extends QpqConstructBlockProps {
   deployEventConfig: DeployEventsQPQConfigSetting;
@@ -18,7 +19,7 @@ export class QpqCoreDeployEventConstruct extends QpqConstructBlock {
     super(scope, id, props);
 
     const func = new Function(this, props.deployEventConfig.uniqueKey, {
-      buildPath: qpqCoreUtils.getDeployEventFullPath(props.qpqConfig, props.deployEventConfig),
+      buildPath: path.join(__dirname, '../../../../../bundled/lambda'),
       functionName: this.qpqResourceName(`${props.deployEventConfig.name}`, 'de'),
       functionType: 'lambdaEventBridgeEventStackDeploy',
       executorName: 'executelambdaEventBridgeEventStackDeploy',
