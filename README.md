@@ -27,7 +27,6 @@ Currently under development ~ Not for production
   - business logic.
 - Retry support for actions
 - Action logging
-- Sort out package versions (don't use \*)
 - Tests
 - Create QPQ App
 - Move into @quidproquo/\* packaged namespace
@@ -37,10 +36,8 @@ Currently under development ~ Not for production
 ### optimizations:
 
 - Seems that Execute story takes longer then the sum of its action parts by a fair bit
-  - investigate this, i suspect it takes time to write the logs, however, logs do not need to be
-    written in sync
-    - we can queue them up, and let the owner lambda hold onto them until they are done, so we can
-      do other things
+  - investigate this, i suspect it takes time to write the logs, however, logs do not need to be written in sync
+    - we can queue them up, and let the owner lambda hold onto them until they are done, so we can do other things
     - it may shave 100ms off function calls
 
 #### Must haves
@@ -63,28 +60,44 @@ Currently under development ~ Not for production
 - ESLint plugin to make sure user yield\* before an askGenerator
 - keep lambda's warm by adding a polling event every x mins
 
-#### Nice Things
+### Federated Module Implementation Attempt
 
-- Copy JSON from input / output in the log viewer (Copy the javascript object directly, not the
-  json.)
-- Logs
-  - Timestamps AND execution length on the log metadata
-    - visualization for how long a specific thing took to execute, similar to Performance tab in
-      chrome
+#### Objective
 
-#### OOOOHHHH Thoughts
+- Develop the business logic on the application side and upload it to S3.
+- Use AWS CDK to create generic Lambda functions with a module loader method capable of retrieving client logic from S3, mounting it in the Lambda
+  runtime, and executing it via an execution story. This approach ensures that Lambdas remain hot, enables A/B testing, and allows for near-instant
+  deployments and rollbacks.
 
-- Try catch support ~ Think about this
+#### Attempts and Challenges
 
-```
-yield* askTryCatch(
-    askSomeBusinessFunc,
-    [arg1, arg2],
-    function* onError(error: Error) {
-      yield* askLogCreate(LogLevelEnum.Error, 'Something went wrong', error);
-      yield* askThrowError(ErrorTypeEnum.GenericError, 'Something went wrong');
-    }
-  );
-```
+1. **Single JS File with Webpack**:
 
-TODO: FIX INCREMENT / DECREMENT COLUMN IN DYNAMO
+   - Attempted to build the business logic as a single JavaScript file using Webpack.
+   - Created a custom plugin to wrap the output file with a function to evaluate and return exported members.
+   - Encountered issues with Webpack bundling, resulting in runtime chunks and separate chunks for services like `reactMediaPlayer`. The concept
+     seemed sound, but the execution was unsuccessful.
+
+2. **Module Federation V2**:
+
+   - Tried using Module Federation V2, but faced difficulties in the Node environment.
+
+3. **Custom Runtime Plugin**:
+   - Developed a custom runtime plugin but struggled to determine the correct method for mounting downloaded code or streaming from S3.
+   - Reference: [Module Federation Plugin](https://module-federation.io/plugin/dev/index.html)
+   - Expected a straightforward process of building the business logic with entries exported via federation and dynamically loading them into the
+     runtime. However, encountered errors such as `(i.init is not a function)` after significant time investment.
+
+#### Relevant Links
+
+- [Module Federation](https://module-federation.io/)
+- [Module Federation Runtime Guide](https://module-federation.io/guide/basic/runtime.html)
+- [Next.js SSR Streaming Example](https://github.com/module-federation/nextjs-ssr/blob/main/streaming/src/templates/loadScript.js)
+
+Explored the possibility of dynamically loading JavaScript from S3 using `require` instead of federation. However, Lambda’s limitations on overriding
+`require` presented challenges.
+
+#### Future Direction
+
+- Plan to wait for a viable solution, as there is considerable interest in dynamically loading JavaScript from S3 into Lambda, but no reliable
+  solutions are currently available.
