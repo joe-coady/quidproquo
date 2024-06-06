@@ -16,20 +16,26 @@ export class ApiCodeStorage extends QpqConstructBlock {
 
     this.bucket = new aws_s3.Bucket(this, 'bucket', {
       bucketName: this.qpqResourceName('code', 'api'),
-      // Disable public access to this bucket, Clou+dFront will do that
-      publicReadAccess: false,
-      blockPublicAccess: aws_s3.BlockPublicAccess.BLOCK_ALL,
-
+      // Enable public access to this bucket
+      publicReadAccess: true,
+    
       // Allow bucket to auto delete upon cdk:Destroy
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
     });
+    
+    // Optionally, add a bucket policy to allow public read access
+    this.bucket.addToResourcePolicy(new aws_iam.PolicyStatement({
+      actions: ['s3:GetObject'],
+      resources: [`${this.bucket.bucketArn}/*`],
+      principals: [new aws_iam.AnyPrincipal()],
+    }));
 
-    const buildPath = qpqConfigAwsUtils.getApiBuildPath(props.qpqConfig);
-    new aws_s3_deployment.BucketDeployment(this, 'bucket-deploy', {
-      sources: [aws_s3_deployment.Source.asset(buildPath)],
-      destinationBucket: this.bucket,
-    });
+    // const buildPath = qpqConfigAwsUtils.getApiBuildPath(props.qpqConfig);
+    // new aws_s3_deployment.BucketDeployment(this, 'bucket-deploy', {
+    //   sources: [aws_s3_deployment.Source.asset(buildPath)],
+    //   destinationBucket: this.bucket,
+    // });
   }
 
   public static authorizeActionsForRole(

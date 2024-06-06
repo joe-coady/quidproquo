@@ -1,4 +1,5 @@
 import path from 'path';
+import { ModuleFederationPlugin } from '@module-federation/enhanced/webpack';
 
 const lambdaRuntimes = [
   'lambdaAPIGatewayEvent',
@@ -31,6 +32,7 @@ const webpackConfig = {
     filename: '[name]/index.js',
     globalObject: 'this',
     libraryTarget: 'commonjs2',
+    publicPath: 'auto'
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.json'],
@@ -58,6 +60,19 @@ const webpackConfig = {
       },
     ],
   },
+  plugins: [
+    new ModuleFederationPlugin({
+      name: 'qpq-fed',
+      filename: 'remoteEntry.js',
+      // runtimePlugins: [
+      //   path.join(__dirname, 'src', 'plugin', 's3LoaderPlugin')
+      // ]
+
+      remotes: {
+        app2: 'app2@https://code-kitted-account-development-joecoady-qpqapi.s3.us-east-1.amazonaws.com/remoteEntry.js',
+      },
+    }),
+  ],
 };
 
 export default webpackConfig;

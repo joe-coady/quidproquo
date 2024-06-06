@@ -4,3 +4,4 @@ export * from './stacks';
 
 export * as qpqDeployAwsCdkUtils from './utils';
 // export * from './lambdas';
+export * from './plugin';
