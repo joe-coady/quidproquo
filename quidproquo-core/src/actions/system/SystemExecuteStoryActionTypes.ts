@@ -25,3 +25,8 @@ export type SystemExecuteStoryActionRequester<StoryInput extends Array<any>, Sto
   SystemExecuteStoryAction<StoryInput>,
   StoryOutput
 >;
+
+// Action Requester Type map
+export type SystemExecuteStoryActionRequesterTypeMap<StoryInput extends Array<any>, StoryOutput> = {
+  [SystemActionType.ExecuteStory]: SystemExecuteStoryActionRequester<StoryInput, StoryOutput>;
+};

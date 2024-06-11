@@ -81,6 +81,7 @@ Currently under development ~ Not for production
 2. **Module Federation V2**:
 
    - Tried using Module Federation V2, but faced difficulties in the Node environment.
+   - i tried public hosting of my files in s3 so i could just use urls like the examples, but that didnt work either :(
 
 3. **Custom Runtime Plugin**:
    - Developed a custom runtime plugin but struggled to determine the correct method for mounting downloaded code or streaming from S3.

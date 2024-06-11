@@ -15,3 +15,8 @@ export interface ConfigGetSecretAction extends Action<ConfigGetSecretActionPaylo
 // Function Types
 export type ConfigGetSecretActionProcessor = ActionProcessor<ConfigGetSecretAction, string>;
 export type ConfigGetSecretActionRequester = ActionRequester<ConfigGetSecretAction, string>;
+
+// Action Requester Type map
+export type ConfigGetSecretActionRequesterTypeMap = {
+  [ConfigActionType.GetSecret]: ConfigGetSecretActionRequester;
+};

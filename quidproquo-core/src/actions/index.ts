@@ -1,3 +1,8 @@
+import { ClaudeAiActionRequesterTypeMap } from './claudeAi';
+import { ConfigActionRequesterTypeMap } from './config';
+import { MathActionRequesterTypeMap } from './math';
+import { SystemActionRequesterTypeMap } from './system';
+
 export * from './claudeAi';
 export * from './config';
 export * from './context';
@@ -15,3 +20,8 @@ export * from './platform';
 export * from './queue';
 export * from './system';
 export * from './userDirectory';
+
+export type QpqCoreActionsRequesterTypeMap = ClaudeAiActionRequesterTypeMap &
+  ConfigActionRequesterTypeMap &
+  MathActionRequesterTypeMap &
+  SystemActionRequesterTypeMap;

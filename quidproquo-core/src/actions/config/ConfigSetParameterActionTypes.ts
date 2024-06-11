@@ -16,3 +16,8 @@ export interface ConfigSetParameterAction extends Action<ConfigSetParameterActio
 // Function Types
 export type ConfigSetParameterActionProcessor = ActionProcessor<ConfigSetParameterAction, void>;
 export type ConfigSetParameterActionRequester = ActionRequester<ConfigSetParameterAction, void>;
+
+// Action Requester Type map
+export type ConfigSetParameterActionRequesterTypeMap = {
+  [ConfigActionType.SetParameter]: ConfigSetParameterActionRequester;
+};

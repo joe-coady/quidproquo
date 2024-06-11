@@ -54,6 +54,7 @@ export type AskResponse<T> = Generator<Action<any>, T, any>;
  */
 
 export type ExtractGeneratorReturnType<T extends Generator> = T extends Generator<any, infer R, any> ? R : never;
+export type ExtractGeneratorYieldType<T extends Generator> = T extends Generator<infer Y, any, any> ? Y : never;
 
 // Directly extracting the generator's return type for any given AskResponse.
 // By applying ExtractGeneratorReturnType to an AskResponse, we can determine the
@@ -62,6 +63,7 @@ export type ExtractGeneratorReturnType<T extends Generator> = T extends Generato
 // is distinct from the types of actions or values yielded by the generator, allowing
 // for clear type inference and usage in TypeScript codebases.
 export type AskResponseReturnType<T extends AskResponse<any>> = ExtractGeneratorReturnType<T>;
+export type AskResponseYieldType<T extends AskResponse<any>> = ExtractGeneratorYieldType<T>;
 
 // Any generator function that returns an AskResponse
 // qpq runtimes are built on stories

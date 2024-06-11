@@ -1,3 +1,10 @@
+import { ConfigGetApplicationInfoActionRequesterTypeMap } from './ConfigGetApplicationInfoActionTypes';
+import { ConfigGetGlobalActionRequesterTypeMap } from './ConfigGetGlobalActionTypes';
+import { ConfigGetParameterActionRequesterTypeMap } from './ConfigGetParameterActionTypes';
+import { ConfigGetParametersActionRequesterTypeMap } from './ConfigGetParametersActionTypes';
+import { ConfigGetSecretActionRequesterTypeMap } from './ConfigGetSecretActionTypes';
+import { ConfigSetParameterActionRequesterTypeMap } from './ConfigSetParameterActionTypes';
+
 export * from './ConfigActionType';
 
 export * from './ConfigGetApplicationInfoActionRequester';
@@ -17,3 +24,10 @@ export * from './ConfigGetGlobalActionTypes';
 
 export * from './ConfigSetParameterActionRequester';
 export * from './ConfigSetParameterActionTypes';
+
+export type ConfigActionRequesterTypeMap = ConfigGetApplicationInfoActionRequesterTypeMap &
+  ConfigGetGlobalActionRequesterTypeMap<any> &
+  ConfigGetParameterActionRequesterTypeMap &
+  ConfigGetParametersActionRequesterTypeMap &
+  ConfigGetSecretActionRequesterTypeMap &
+  ConfigSetParameterActionRequesterTypeMap;

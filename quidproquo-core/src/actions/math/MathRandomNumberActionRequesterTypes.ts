@@ -12,3 +12,8 @@ export interface MathRandomNumberAction extends Action<MathRandomNumberActionPay
 // Function Types
 export type MathRandomNumberActionProcessor = ActionProcessor<MathRandomNumberAction, number>;
 export type MathRandomNumberActionRequester = ActionRequester<MathRandomNumberAction, number>;
+
+// Action Requester Type map
+export type MathRandomNumberActionRequesterTypeMap = {
+  [MathActionType.RandomNumber]: MathRandomNumberActionRequester;
+};

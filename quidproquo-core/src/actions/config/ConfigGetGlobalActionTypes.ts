@@ -15,3 +15,8 @@ export interface ConfigGetGlobalAction extends Action<ConfigGetGlobalActionPaylo
 // Function Types
 export type ConfigGetGlobalActionProcessor<T> = ActionProcessor<ConfigGetGlobalAction, T>;
 export type ConfigGetGlobalActionRequester<T> = ActionRequester<ConfigGetGlobalAction, T>;
+
+// Action Requester Type map
+export type ConfigGetGlobalActionRequesterTypeMap<T> = {
+  [ConfigActionType.GetGlobal]: ConfigGetGlobalActionRequester<T>;
+};
