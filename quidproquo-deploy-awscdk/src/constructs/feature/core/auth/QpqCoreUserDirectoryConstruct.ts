@@ -63,16 +63,8 @@ export abstract class QpqCoreUserDirectoryConstructBase extends QpqConstructBloc
 export class QpqCoreUserDirectoryConstruct extends QpqCoreUserDirectoryConstructBase {
   userPool: aws_cognito.IUserPool;
 
-  static fromOtherStack(
-    scope: Construct,
-    id: string,
-    qpqConfig: QPQConfig,
-    awsAccountId: string,
-    userDirectoryName: string,
-  ): QpqResource {
-    const userPoolId = qpqDeployAwsCdkUtils.importStackValue(
-      awsNamingUtils.getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig),
-    );
+  static fromOtherStack(scope: Construct, id: string, qpqConfig: QPQConfig, awsAccountId: string, userDirectoryName: string): QpqResource {
+    const userPoolId = qpqDeployAwsCdkUtils.importStackValue(awsNamingUtils.getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig));
 
     class Import extends QpqCoreUserDirectoryConstructBase {
       userPool = aws_cognito.UserPool.fromUserPoolId(this, 'pool-id', userPoolId);
@@ -113,10 +105,7 @@ export class QpqCoreUserDirectoryConstruct extends QpqCoreUserDirectoryConstruct
     this.userPool = userPool;
 
     const customMessageTrigger = new Function(this, 'csm-msg-trigger-func', {
-      buildPath: qpqCoreUtils.getUserDirectoryEntryFullPath(
-        props.qpqConfig,
-        props.userDirectoryConfig,
-      ),
+      buildPath: qpqCoreUtils.getUserDirectoryEntryFullPath(props.qpqConfig, props.userDirectoryConfig),
       functionName: this.qpqResourceName(`${props.userDirectoryConfig.name}`, 'cm-trig'),
       functionType: 'lambdaCognitoTriggerEvent_CustomMessage',
       executorName: 'executeLambdaCognitoCustomMessageTriggerEvent',
@@ -132,17 +121,11 @@ export class QpqCoreUserDirectoryConstruct extends QpqCoreUserDirectoryConstruct
       role: this.getServiceRole(),
     });
 
-    userPool.addTrigger(
-      aws_cognito.UserPoolOperation.CUSTOM_MESSAGE,
-      customMessageTrigger.lambdaFunction,
-    );
+    userPool.addTrigger(aws_cognito.UserPoolOperation.CUSTOM_MESSAGE, customMessageTrigger.lambdaFunction);
 
     qpqDeployAwsCdkUtils.exportStackValue(
       this,
-      awsNamingUtils.getCFExportNameUserPoolIdFromConfig(
-        props.userDirectoryConfig.name,
-        props.qpqConfig,
-      ),
+      awsNamingUtils.getCFExportNameUserPoolIdFromConfig(props.userDirectoryConfig.name, props.qpqConfig),
       this.userPool.userPoolId,
     );
 
@@ -157,20 +140,18 @@ export class QpqCoreUserDirectoryConstruct extends QpqCoreUserDirectoryConstruct
 
     qpqDeployAwsCdkUtils.exportStackValue(
       this,
-      awsNamingUtils.getCFExportNameUserPoolClientIdFromConfig(
-        props.userDirectoryConfig.name,
-        props.qpqConfig,
-      ),
+      awsNamingUtils.getCFExportNameUserPoolClientIdFromConfig(props.userDirectoryConfig.name, props.qpqConfig),
       userPoolClient.userPoolClientId,
     );
   }
 
   public static authorizeActionsForRole(
     role: aws_iam.IRole,
-    userDirectorieConfigs: UserDirectoryQPQConfigSetting[],
+    userDirectoryConfigs: UserDirectoryQPQConfigSetting[],
+    userDirectoryConstructs: QpqCoreUserDirectoryConstruct[],
     qpqConfig: QPQConfig,
   ) {
-    if (userDirectorieConfigs.length > 0) {
+    if (userDirectoryConstructs.length > 0) {
       role.addToPrincipalPolicy(
         new aws_iam.PolicyStatement({
           effect: aws_iam.Effect.ALLOW,
@@ -194,18 +175,10 @@ export class QpqCoreUserDirectoryConstruct extends QpqCoreUserDirectoryConstruct
             'cognito-idp:DescribeUserPool',
             'cognito-idp:DescribeUserPoolClient',
           ],
-          resources: userDirectorieConfigs.map((userDirectoryConfig) => {
-            const { awsRegion, awsAccountId } = resolveAwsServiceAccountInfo(
-              qpqConfig,
-              userDirectoryConfig.owner,
-            );
+          resources: userDirectoryConfigs.map((userDirectoryConfig, index) => {
+            const { awsRegion, awsAccountId } = resolveAwsServiceAccountInfo(qpqConfig, userDirectoryConfig.owner);
 
-            const userpoolId = qpqDeployAwsCdkUtils.importStackValue(
-              awsNamingUtils.getCFExportNameUserPoolIdFromConfig(
-                userDirectoryConfig.name,
-                qpqConfig,
-              ),
-            );
+            const userpoolId = userDirectoryConstructs[index].userPool.userPoolId;
 
             return `arn:aws:cognito-idp:${awsRegion}:${awsAccountId}:userpool/${userpoolId}`;
           }),

@@ -61,11 +61,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
           parameterConfig: setting,
         }),
     );
-    QpqCoreParameterConstruct.authorizeActionsForRole(
-      webserverRole,
-      qpqCoreUtils.getAllParameterConfigs(props.qpqConfig),
-      props.qpqConfig,
-    );
+    QpqCoreParameterConstruct.authorizeActionsForRole(webserverRole, qpqCoreUtils.getAllParameterConfigs(props.qpqConfig), props.qpqConfig);
     // end parameters
 
     // Secrets
@@ -78,11 +74,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
           secretConfig: setting,
         }),
     );
-    QpqCoreSecretConstruct.authorizeActionsForRole(
-      webserverRole,
-      qpqCoreUtils.getAllSecretConfigs(props.qpqConfig),
-      props.qpqConfig,
-    );
+    QpqCoreSecretConstruct.authorizeActionsForRole(webserverRole, qpqCoreUtils.getAllSecretConfigs(props.qpqConfig), props.qpqConfig);
     // end secrets
 
     // Queues
@@ -99,7 +91,8 @@ export class InfQpqServiceStack extends QpqServiceStack {
     // end queues
 
     // User Directories
-    const userDirectories = qpqCoreUtils.getOwnedUserDirectories(props.qpqConfig).map(
+    const ownedUserDirectoriesConfigs = qpqCoreUtils.getOwnedUserDirectories(props.qpqConfig);
+    const userDirectories = ownedUserDirectoriesConfigs.map(
       (setting) =>
         new QpqCoreUserDirectoryConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           awsAccountId: props.awsAccountId,
@@ -108,11 +101,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
           userDirectoryConfig: setting,
         }),
     );
-    QpqCoreUserDirectoryConstruct.authorizeActionsForRole(
-      webserverRole,
-      qpqCoreUtils.getOwnedUserDirectories(props.qpqConfig),
-      props.qpqConfig,
-    );
+    QpqCoreUserDirectoryConstruct.authorizeActionsForRole(webserverRole, ownedUserDirectoriesConfigs, userDirectories, props.qpqConfig);
 
     // Api Keys
     const apiKeys = qpqWebServerUtils.getAllApiKeyConfigs(props.qpqConfig).map(
