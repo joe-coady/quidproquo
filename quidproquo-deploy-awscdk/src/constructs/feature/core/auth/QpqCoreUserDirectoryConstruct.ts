@@ -104,24 +104,30 @@ export class QpqCoreUserDirectoryConstruct extends QpqCoreUserDirectoryConstruct
 
     this.userPool = userPool;
 
-    const customMessageTrigger = new Function(this, 'csm-msg-trigger-func', {
-      buildPath: qpqCoreUtils.getUserDirectoryEntryFullPath(props.qpqConfig, props.userDirectoryConfig),
-      functionName: this.qpqResourceName(`${props.userDirectoryConfig.name}`, 'cm-trig'),
-      functionType: 'lambdaCognitoTriggerEvent_CustomMessage',
-      executorName: 'executeLambdaCognitoCustomMessageTriggerEvent',
+    if (
+      props.userDirectoryConfig.emailTemplates.resetPassword ||
+      props.userDirectoryConfig.emailTemplates.resetPasswordAdmin ||
+      props.userDirectoryConfig.emailTemplates.verifyEmail
+    ) {
+      const customMessageTrigger = new Function(this, 'csm-msg-trigger-func', {
+        buildPath: qpqCoreUtils.getUserDirectoryEntryFullPath(props.qpqConfig, props.userDirectoryConfig),
+        functionName: this.qpqResourceName(`${props.userDirectoryConfig.name}`, 'cm-trig'),
+        functionType: 'lambdaCognitoTriggerEvent_CustomMessage',
+        executorName: 'executeLambdaCognitoCustomMessageTriggerEvent',
 
-      qpqConfig: props.qpqConfig,
+        qpqConfig: props.qpqConfig,
 
-      environment: {
-        userDirectoryName: props.userDirectoryConfig.name,
-      },
+        environment: {
+          userDirectoryName: props.userDirectoryConfig.name,
+        },
 
-      awsAccountId: props.awsAccountId,
+        awsAccountId: props.awsAccountId,
 
-      role: this.getServiceRole(),
-    });
+        role: this.getServiceRole(),
+      });
 
-    userPool.addTrigger(aws_cognito.UserPoolOperation.CUSTOM_MESSAGE, customMessageTrigger.lambdaFunction);
+      userPool.addTrigger(aws_cognito.UserPoolOperation.CUSTOM_MESSAGE, customMessageTrigger.lambdaFunction);
+    }
 
     qpqDeployAwsCdkUtils.exportStackValue(
       this,
