@@ -8,9 +8,8 @@ const getProcessAutoRespond = (qpqConfig: QPQConfig): EventAutoRespondActionProc
     const earlyExit =
       qpqEventRecord.deployEventType === DeployEventType.Unknown || qpqEventRecord.deployEventStatusType === DeployEventStatusType.Unknown;
 
-    // THIS IS A HACK... We need to support early exit on void responses...
-    // Maybe void reponses should just be "completed successfully"... then we can early exit as it has completed successfully
-    return actionResult(earlyExit as unknown as null);
+    // This is strange, but null means don't early exit.
+    return actionResult(!earlyExit ? null : void 0);
   };
 };
 
