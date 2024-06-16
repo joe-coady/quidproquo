@@ -4,7 +4,7 @@ import { QpqFunctionExecutionEvent } from '../../types';
 
 import { SNSEvent } from 'aws-lambda';
 import { dynamicModuleLoaderWarmer } from '../dynamicModuleLoader';
-import { getLambdaConfigs } from '../lambdaConfig';
+import { getLambdaConfigs } from './lambdaConfig';
 import { getLogger } from './logger';
 import { ActionProcessorList, QPQConfig, QpqLogger, QpqRuntimeType, StorySession, askProcessEvent, createRuntime } from 'quidproquo-core';
 import { getLambdaActionProcessors } from './getLambdaActionProcessors';

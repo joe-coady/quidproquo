@@ -47,5 +47,8 @@
     "quidproquo-tsconfig": "0.0.204",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.4"
+  },
+  "peerDependencies": {
+    "webpack": "^5.91.0"
   }
 }
