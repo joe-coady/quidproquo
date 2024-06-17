@@ -1,6 +1,6 @@
 import { Context } from 'aws-lambda';
 
-import { QpqFunctionExecutionEvent } from '../../types';
+import { QpqFunctionExecutionEvent } from '../types';
 
 import { SNSEvent } from 'aws-lambda';
 import { dynamicModuleLoaderWarmer } from '../dynamicModuleLoader';

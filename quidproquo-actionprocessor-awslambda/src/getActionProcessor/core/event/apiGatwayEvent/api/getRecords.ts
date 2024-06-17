@@ -17,13 +17,13 @@ const getProcessGetRecords = (qpqConfig: QPQConfig): EventGetRecordsActionProces
     // after the service name. Defaults to '/' if `apiGatewayEvent.path` is not provided.
     const path = (apiGatewayEvent.path || '/').substring(serviceName.length + 1);
 
-    const internalEventRecord: HTTPEvent<any> = {
+    const internalEventRecord: InternalEventRecord = {
       path,
       query: {
         ...(apiGatewayEvent.multiValueQueryStringParameters || {}),
         ...(apiGatewayEvent.queryStringParameters || {}),
       } as { [key: string]: undefined | string | string[] },
-      body: apiGatewayEvent.body,
+      body: apiGatewayEvent.body === null ? undefined : apiGatewayEvent.body,
       headers: apiGatewayEvent.headers,
       method: apiGatewayEvent.httpMethod as HTTPMethod,
       correlation: context.awsRequestId,

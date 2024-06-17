@@ -49,7 +49,15 @@ const getProcessTransformResponseResult = (
     const [record] = qpqEventRecordResponses;
 
     // If we have an error, we need to transform it to a response, otherwise we can just use the record as is
-    const successRecord = record.success ? record.result : getResponseFromErrorResult(record.error);
+    let successRecord = record.success ? record.result : getResponseFromErrorResult(record.error);
+
+    // Return an error if the body is the wrong type.
+    if (successRecord.body && typeof successRecord.body !== 'string') {
+      successRecord = getResponseFromErrorResult({
+        errorText: 'Response body must be a string',
+        errorType: ErrorTypeEnum.GenericError,
+      });
+    }
 
     // Add the cors headers
     const currentHeaders = successRecord.headers || {};

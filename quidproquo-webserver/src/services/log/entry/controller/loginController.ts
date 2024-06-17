@@ -30,7 +30,7 @@ export type RefreshTokenPayload = {
 };
 
 export function* login(event: HTTPEvent): AskResponse<HTTPEventResponse> {
-  const { username, password } = qpqWebServerUtils.fromJsonEventRequest<LoginPayload>(event);
+  const { username, password } = yield* qpqWebServerUtils.askFromJsonEventRequest<LoginPayload>(event);
 
   const authResponse = yield* authLogic.askLogin(username, password);
 
@@ -38,7 +38,7 @@ export function* login(event: HTTPEvent): AskResponse<HTTPEventResponse> {
 }
 
 export function* refreshToken(event: HTTPEvent): AskResponse<HTTPEventResponse> {
-  const { refreshToken } = qpqWebServerUtils.fromJsonEventRequest<RefreshPayload>(event);
+  const { refreshToken } = yield* qpqWebServerUtils.askFromJsonEventRequest<RefreshPayload>(event);
 
   const refreshResponse = yield* authLogic.askRefreshToken(refreshToken);
 
@@ -46,7 +46,7 @@ export function* refreshToken(event: HTTPEvent): AskResponse<HTTPEventResponse> 
 }
 
 export function* respondToAuthChallenge(event: HTTPEvent): AskResponse<HTTPEventResponse> {
-  const authChallenge = qpqWebServerUtils.fromJsonEventRequest<NewPasswordChallengePayload>(event);
+  const authChallenge = yield* qpqWebServerUtils.askFromJsonEventRequest<NewPasswordChallengePayload>(event);
 
   // TODO: Make this more generic ~ Currently we only support one challenge
   const response = yield* authLogic.askRespondToAuthChallenge(
