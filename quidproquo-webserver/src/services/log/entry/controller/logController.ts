@@ -2,7 +2,7 @@
 import { ErrorTypeEnum, QpqRuntimeType, askThrowError, askFileGenerateTemporarySecureUrl, AskResponse, askConfigGetGlobal } from 'quidproquo-core';
 
 import { HTTPEvent, HTTPEventResponse } from '../../../../types';
-import { toJsonEventResponse, fromJsonEventRequest } from '../../../../utils/httpEventUtils';
+import { toJsonEventResponse, askFromJsonEventRequest } from '../../../../utils/httpEventUtils';
 import { askGetByCorrelation, askGetByFromCorrelation, askGetHierarchiesByCorrelation } from '../data/logMetadataData';
 import { ListLogChatMessages, SendLogChatMessage } from '../domain';
 import { askLogSendChatMessage } from '../../logic/askLogSendChatMessage';
@@ -28,7 +28,7 @@ export interface GetLogsParams {
 
 export function* getLogs(event: HTTPEvent, params: {}): AskResponse<HTTPEventResponse> {
   const { nextPageKey, startIsoDateTime, endIsoDateTime, runtimeType, errorFilter, serviceFilter, infoFilter, userFilter, onlyErrors, deep } =
-    fromJsonEventRequest<GetLogsParams>(event);
+    yield* askFromJsonEventRequest<GetLogsParams>(event);
 
   const logs = yield* logsLogic.askGetLogs(
     runtimeType,
@@ -111,7 +111,7 @@ export function* downloadUrl(
 }
 
 export function* sendChatMessage(event: HTTPEvent) {
-  const sendLogChatMessage = fromJsonEventRequest<SendLogChatMessage>(event);
+  const sendLogChatMessage = yield* askFromJsonEventRequest<SendLogChatMessage>(event);
 
   const message = yield* askLogSendChatMessage(sendLogChatMessage.correlationId, sendLogChatMessage.message);
 
@@ -119,7 +119,7 @@ export function* sendChatMessage(event: HTTPEvent) {
 }
 
 export function* getChatMessages(event: HTTPEvent) {
-  const listLogChatMessages = fromJsonEventRequest<ListLogChatMessages>(event);
+  const listLogChatMessages = yield* askFromJsonEventRequest<ListLogChatMessages>(event);
 
   const messages = yield* askGetLogChatMessages(listLogChatMessages.correlationId, listLogChatMessages.nextPageKey);
 

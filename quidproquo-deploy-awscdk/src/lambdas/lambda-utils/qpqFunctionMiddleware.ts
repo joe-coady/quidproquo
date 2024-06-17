@@ -1,10 +1,10 @@
 import { Context } from 'aws-lambda';
 
-import { QpqFunctionExecutionEvent } from '../../types';
+import { QpqFunctionExecutionEvent } from '../types';
 
 import { SNSEvent } from 'aws-lambda';
 import { dynamicModuleLoaderWarmer } from '../dynamicModuleLoader';
-import { getLambdaConfigs } from '../lambdaConfig';
+import { getLambdaConfigs } from './lambdaConfig';
 import { getLogger } from './logger';
 import { QpqLogger } from 'quidproquo-core';
 
@@ -21,9 +21,7 @@ export const qpqFunctionMiddleware = <E extends QpqFunctionExecutionEvent<any>>(
     if (event && typeof event === 'object' && snsEvent.Records && Array.isArray(snsEvent.Records)) {
       console.log('Found possible SNS Event');
       const recordsNoWarm = snsEvent.Records.filter(
-        (record) =>
-          record.EventSource !== 'aws:sns' ||
-          JSON.parse(record.Sns.Message).type !== 'QpqLambdaWarmerEvent',
+        (record) => record.EventSource !== 'aws:sns' || JSON.parse(record.Sns.Message).type !== 'QpqLambdaWarmerEvent',
       );
 
       // if we have found some warmers - then we need to warm the lambda

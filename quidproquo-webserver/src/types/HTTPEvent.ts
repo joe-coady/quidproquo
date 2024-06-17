@@ -8,10 +8,10 @@ export interface HttpEventRouteParams {
   [key: string]: string;
 }
 
-export interface HTTPEvent<T = string> {
+export interface HTTPEvent {
   path: string;
   query: { [key: string]: undefined | string | string[] };
-  body: T;
+  body?: string;
   headers: HttpEventHeaders;
   method: HTTPMethod;
   correlation: string;
@@ -20,9 +20,9 @@ export interface HTTPEvent<T = string> {
   files?: QPQBinaryData[];
 }
 
-export interface HTTPEventResponse<T = string> {
+export interface HTTPEventResponse {
   status: number;
-  body?: T;
+  body?: string;
   headers?: HttpEventHeaders;
   isBase64Encoded: boolean;
 }
