@@ -27,7 +27,7 @@ export type WebSocketServiceSubscriptionFunction = (websocketService: WebsocketS
 export type WebSocketServiceEventSubscriptionFunction<E extends AnyEventMessage> = (websocketService: WebsocketService, event: E) => void;
 
 export class WebsocketService {
-  private url: string;
+  public readonly url: string;
   private socket: WebSocket | null = null;
   private eventListeners: { [key: string]: WebSocketEventListenerFunction[] } = {};
   private isDestroyed: boolean = false;
@@ -57,6 +57,14 @@ export class WebsocketService {
 
   public isConnected() {
     return this.socket?.readyState === WebSocket.OPEN;
+  }
+
+  public hasBeenDestroyed() {
+    return this.isDestroyed;
+  }
+
+  public getSocket() {
+    return this.socket;
   }
 
   public subscribe(subscriptionType: WebsocketServiceEvent, callback: WebSocketServiceSubscriptionFunction): SubscriptionHandle {
@@ -145,7 +153,7 @@ export class WebsocketService {
   }
 
   private onConnect() {
-    this.notifySubscribers(this.subscriptions[WebsocketServiceEvent.OPEN]);
+    this.notifySubscribers(WebsocketServiceEvent.OPEN);
     const messages = this.pendingMessages;
     this.pendingMessages = [];
     messages.forEach((message) => {
@@ -156,19 +164,19 @@ export class WebsocketService {
   private onClose() {
     this.removeAllEventListeners();
     this.reconnectIfNotDestroyed();
-    this.notifySubscribers(this.subscriptions[WebsocketServiceEvent.CLOSE]);
+    this.notifySubscribers(WebsocketServiceEvent.CLOSE);
   }
 
   private onMessage(event: Event) {
-    this.notifySubscribers(this.subscriptions[WebsocketServiceEvent.MESSAGE], event);
+    this.notifySubscribers(WebsocketServiceEvent.MESSAGE, event);
   }
 
   private onError(event: Event) {
-    this.notifySubscribers(this.subscriptions[WebsocketServiceEvent.ERROR], event);
+    this.notifySubscribers(WebsocketServiceEvent.ERROR, event);
   }
 
-  private notifySubscribers(subscribers: SubscriptionMap, event?: Event) {
-    subscribers.forEach((callback) => {
+  private notifySubscribers(subType: WebsocketServiceEvent, event?: Event) {
+    this.subscriptions[subType].forEach((callback) => {
       callback(this, event);
     });
   }
