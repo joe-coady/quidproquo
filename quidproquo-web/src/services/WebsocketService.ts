@@ -1,7 +1,7 @@
 import { AnyEventMessage, EventMessage } from 'quidproquo-core';
 
 // Private / internal types
-type WebSocketEventListnerFunction = (this: WebSocket, ev: Event, data?: string) => any;
+type WebSocketEventListenerFunction = (this: WebSocket, ev: Event) => any;
 
 export enum WebsocketServiceEvent {
   OPEN = 'open',
@@ -29,7 +29,7 @@ export type WebSocketServiceEventSubscriptionFunction<E extends AnyEventMessage>
 export class WebsocketService {
   private url: string;
   private socket: WebSocket | null = null;
-  private eventListeners: { [key: string]: WebSocketEventListnerFunction[] } = {};
+  private eventListeners: { [key: string]: WebSocketEventListenerFunction[] } = {};
   private isDestroyed: boolean = false;
   private pendingMessages: WebsocketSendPayload[] = [];
   private subscriptions: Subscriptions = {
@@ -76,19 +76,19 @@ export class WebsocketService {
       if (event) {
         const data = (event as MessageEvent).data;
         try {
-          const event: E = JSON.parse(data);
-          if (event.type === subscriptionType) {
-            callback(websocketService, event);
+          const parsedEvent: E = JSON.parse(data);
+          if (parsedEvent.type === subscriptionType) {
+            callback(websocketService, parsedEvent);
           }
         } catch (e) {
-          // Must of been some other message format / type
+          // Must have been some other message format / type do nothing.
         }
       }
     });
   }
 
   public unsubscribe(subscriptionHandle: SubscriptionHandle) {
-    return this.subscriptions[subscriptionHandle.type].delete(subscriptionHandle);
+    this.subscriptions[subscriptionHandle.type].delete(subscriptionHandle);
   }
 
   public unsubscribeAll() {
@@ -104,13 +104,13 @@ export class WebsocketService {
 
     this.socket = new WebSocket(this.url);
 
-    this.addEventListener('open', this.onConnect.bind(this));
-    this.addEventListener('close', this.onClose.bind(this));
-    this.addEventListener('message', this.onMessage.bind(this));
-    this.addEventListener('error', this.onError.bind(this));
+    this.addEventListener(WebsocketServiceEvent.OPEN, this.onConnect.bind(this));
+    this.addEventListener(WebsocketServiceEvent.CLOSE, this.onClose.bind(this));
+    this.addEventListener(WebsocketServiceEvent.MESSAGE, this.onMessage.bind(this));
+    this.addEventListener(WebsocketServiceEvent.ERROR, this.onError.bind(this));
   }
 
-  private addEventListener(event: string, listener: WebSocketEventListnerFunction) {
+  private addEventListener(event: WebsocketServiceEvent, listener: WebSocketEventListenerFunction) {
     if (this.socket) {
       this.socket.addEventListener(event, listener);
 
@@ -133,7 +133,6 @@ export class WebsocketService {
       }
     }
 
-    // Clear the eventListeners object
     this.eventListeners = {};
   }
 
@@ -146,9 +145,7 @@ export class WebsocketService {
   }
 
   private onConnect() {
-    this.notifySubscribers(this.subscriptions.open);
-
-    // Send any pending messages once we are connected
+    this.notifySubscribers(this.subscriptions[WebsocketServiceEvent.OPEN]);
     const messages = this.pendingMessages;
     this.pendingMessages = [];
     messages.forEach((message) => {
@@ -159,26 +156,25 @@ export class WebsocketService {
   private onClose() {
     this.removeAllEventListeners();
     this.reconnectIfNotDestroyed();
-
-    this.notifySubscribers(this.subscriptions.close);
+    this.notifySubscribers(this.subscriptions[WebsocketServiceEvent.CLOSE]);
   }
 
   private onMessage(event: Event) {
-    this.notifySubscribers(this.subscriptions.message, event);
+    this.notifySubscribers(this.subscriptions[WebsocketServiceEvent.MESSAGE], event);
   }
 
   private onError(event: Event) {
-    this.notifySubscribers(this.subscriptions.error, event);
+    this.notifySubscribers(this.subscriptions[WebsocketServiceEvent.ERROR], event);
   }
 
-  private notifySubscribers(subscibers: SubscriptionMap, event?: Event) {
-    subscibers.forEach((callback: WebSocketServiceSubscriptionFunction) => {
+  private notifySubscribers(subscribers: SubscriptionMap, event?: Event) {
+    subscribers.forEach((callback) => {
       callback(this, event);
     });
   }
 
   public send(data: WebsocketSendPayload) {
-    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+    if (this.socket?.readyState === WebSocket.OPEN) {
       this.socket.send(data);
     } else {
       this.pendingMessages.push(data);
