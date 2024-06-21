@@ -57,6 +57,7 @@ const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProces
     });
   };
 };
+
 export default (qpqConfig: QPQConfig) => {
   return {
     [EventActionType.MatchStory]: getProcessMatchStory(qpqConfig),

@@ -1,11 +1,6 @@
 import { joinPaths } from './utils';
 
-import {
-  QPQConfig,
-  QPQConfigSetting,
-  QPQCoreConfigSettingType,
-  QPQConfigItem,
-} from './config/QPQConfig';
+import { QPQConfig, QPQConfigSetting, QPQCoreConfigSettingType, QPQConfigItem } from './config/QPQConfig';
 
 import {
   ApplicationQPQConfigSetting,
@@ -26,19 +21,9 @@ import {
   ClaudeAIQPQConfigSetting,
 } from './config/settings';
 
-import {
-  EmailTemplates,
-  QpqEmailTemplateSourceEntry,
-} from './config/settings/emailTemplates/types';
+import { EmailTemplates, QpqEmailTemplateSourceEntry } from './config/settings/emailTemplates/types';
 
-import {
-  CrossModuleOwner,
-  CrossServiceResourceName,
-  CustomFullyQualifiedResource,
-  FullyQualifiedResource,
-  ResourceName,
-  KeyOf,
-} from './types';
+import { CrossModuleOwner, CrossServiceResourceName, CustomFullyQualifiedResource, FullyQualifiedResource, ResourceName, KeyOf } from './types';
 
 /**
  * Flattens a QPQConfig array into a single array of QPQConfigSetting objects.
@@ -58,10 +43,7 @@ export const flattenQpqConfig = (qpqConfig: QPQConfig): QPQConfigSetting[] => {
    * @param {QPQConfigSetting[]} accumulator - An accumulator array for storing the flattened QPQConfigSetting objects.
    * @returns {QPQConfigSetting[]} - The flattened array of QPQConfigSetting objects.
    */
-  const flatten = (
-    configItems: QPQConfigItem[],
-    accumulator: QPQConfigSetting[] = [],
-  ): QPQConfigSetting[] => {
+  const flatten = (configItems: QPQConfigItem[], accumulator: QPQConfigSetting[] = []): QPQConfigSetting[] => {
     return configItems.reduce<QPQConfigSetting[]>((acc, item) => {
       if (Array.isArray(item)) {
         return flatten(item, acc);
@@ -96,10 +78,7 @@ export const flattenQpqConfig = (qpqConfig: QPQConfig): QPQConfigSetting[] => {
  * @param {string} configSettingType - The specific config setting type to filter.
  * @returns {T[]} - An array of filtered config settings of the specified type.
  */
-export const getConfigSettings = <T extends QPQConfigSetting>(
-  qpqConfig: QPQConfig,
-  configSettingType: string,
-): T[] => {
+export const getConfigSettings = <T extends QPQConfigSetting>(qpqConfig: QPQConfig, configSettingType: string): T[] => {
   const flatConfig = flattenQpqConfig(qpqConfig);
   return flatConfig.filter((c) => c.configSettingType === configSettingType) as T[];
 };
@@ -112,10 +91,7 @@ export const getConfigSettings = <T extends QPQConfigSetting>(
  * @param {string} serviceInfrastructureConfigType - The specific config setting type to retrieve.
  * @returns {T | undefined} - The found config setting of the specified type or undefined if not found.
  */
-export const getConfigSetting = <T extends QPQConfigSetting>(
-  qpqConfig: QPQConfig,
-  serviceInfrastructureConfigType: string,
-): T | undefined => {
+export const getConfigSetting = <T extends QPQConfigSetting>(qpqConfig: QPQConfig, serviceInfrastructureConfigType: string): T | undefined => {
   const [setting] = getConfigSettings<T>(qpqConfig, serviceInfrastructureConfigType);
   return setting;
 };
@@ -128,10 +104,7 @@ export const getConfigSetting = <T extends QPQConfigSetting>(
  * @throws {Error} - If the ApplicationQPQConfigSetting is not found in the QPQConfig array.
  */
 export const getApplicationConfigSetting = (qpqConfig: QPQConfig): ApplicationQPQConfigSetting => {
-  const applicationModuleSetting = getConfigSetting<ApplicationQPQConfigSetting>(
-    qpqConfig,
-    QPQCoreConfigSettingType.appName,
-  );
+  const applicationModuleSetting = getConfigSetting<ApplicationQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.appName);
 
   if (!applicationModuleSetting) {
     throw new Error('please use defineApplication in your QPQ config');
@@ -141,10 +114,7 @@ export const getApplicationConfigSetting = (qpqConfig: QPQConfig): ApplicationQP
 };
 
 export const getApplicationModuleName = (qpqConfig: QPQConfig): string => {
-  const moduleSetting = getConfigSetting<ModuleQPQConfigSetting>(
-    qpqConfig,
-    QPQCoreConfigSettingType.moduleName,
-  );
+  const moduleSetting = getConfigSetting<ModuleQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.moduleName);
 
   if (!moduleSetting) {
     throw new Error('please use defineModule in your QPQ config');
@@ -174,16 +144,10 @@ export const getApplicationModuleDeployRegion = (qpqConfig: QPQConfig): string =
 };
 
 export const getStorageDrives = (configs: QPQConfig): StorageDriveQPQConfigSetting[] => {
-  return getConfigSettings<StorageDriveQPQConfigSetting>(
-    configs,
-    QPQCoreConfigSettingType.storageDrive,
-  );
+  return getConfigSettings<StorageDriveQPQConfigSetting>(configs, QPQCoreConfigSettingType.storageDrive);
 };
 
-export const getStorageDriveByName = (
-  storageDriveName: string,
-  configs: QPQConfig,
-): StorageDriveQPQConfigSetting | undefined => {
+export const getStorageDriveByName = (storageDriveName: string, configs: QPQConfig): StorageDriveQPQConfigSetting | undefined => {
   return getStorageDrives(configs).find((sd) => sd.storageDrive === storageDriveName);
 };
 
@@ -191,29 +155,26 @@ export const getQueues = (configs: QPQConfig): QueueQPQConfigSetting[] => {
   return getConfigSettings<QueueQPQConfigSetting>(configs, QPQCoreConfigSettingType.queue);
 };
 
+export const getQueueByName = (configs: QPQConfig, name: string): QueueQPQConfigSetting | undefined => {
+  return getQueues(configs).find((q) => q.name === name);
+};
+
 export const getStorageDriveNames = (configs: QPQConfig): string[] => {
-  const storageDriveNames = getConfigSettings<StorageDriveQPQConfigSetting>(
-    configs,
-    QPQCoreConfigSettingType.storageDrive,
-  ).map((sd) => sd.storageDrive);
+  const storageDriveNames = getConfigSettings<StorageDriveQPQConfigSetting>(configs, QPQCoreConfigSettingType.storageDrive).map(
+    (sd) => sd.storageDrive,
+  );
 
   return storageDriveNames;
 };
 
 export const getAllEventBusConfigs = (qpqConfig: QPQConfig): EventBusQPQConfigSetting[] => {
-  const eventBuses = getConfigSettings<EventBusQPQConfigSetting>(
-    qpqConfig,
-    QPQCoreConfigSettingType.eventBus,
-  );
+  const eventBuses = getConfigSettings<EventBusQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.eventBus);
 
   return eventBuses;
 };
 
 export const getAllClaudeAiConfigs = (qpqConfig: QPQConfig): ClaudeAIQPQConfigSetting[] => {
-  const claudeAis = getConfigSettings<ClaudeAIQPQConfigSetting>(
-    qpqConfig,
-    QPQCoreConfigSettingType.claudeAi,
-  );
+  const claudeAis = getConfigSettings<ClaudeAIQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.claudeAi);
 
   return claudeAis;
 };
@@ -224,18 +185,12 @@ export const getOwnedEventBusConfigs = (qpqConfig: QPQConfig): EventBusQPQConfig
   return ownedEventBusConfigs;
 };
 
-export const getEventBusConfigByName = (
-  eventBusName: string,
-  qpqConfig: QPQConfig,
-): EventBusQPQConfigSetting | undefined => {
+export const getEventBusConfigByName = (eventBusName: string, qpqConfig: QPQConfig): EventBusQPQConfigSetting | undefined => {
   const eventBusConfig = getAllEventBusConfigs(qpqConfig).find((eb) => eb.name === eventBusName);
   return eventBusConfig;
 };
 
-export const getOwnedItems = <T extends QPQConfigSetting>(
-  settings: T[],
-  qpqConfig: QPQConfig,
-): T[] => {
+export const getOwnedItems = <T extends QPQConfigSetting>(settings: T[], qpqConfig: QPQConfig): T[] => {
   const appModuleName = getApplicationModuleName(qpqConfig);
   const appName = getApplicationName(qpqConfig);
   const appFeature = getApplicationModuleFeature(qpqConfig);
@@ -246,36 +201,24 @@ export const getOwnedItems = <T extends QPQConfigSetting>(
       !s.owner ||
       ((!s.owner.module || s.owner.module === appModuleName) &&
         (!s.owner.application || s.owner.application === appName) &&
-        (s.owner.feature === undefined ||
-          (!s.owner.feature && !appFeature) ||
-          s.owner.feature === appFeature) &&
+        (s.owner.feature === undefined || (!s.owner.feature && !appFeature) || s.owner.feature === appFeature) &&
         (!s.owner.environment || s.owner.environment === appEnvironment)),
   );
 };
 
-export const getAllKeyValueStores = <T extends object = any>(
-  qpqConfig: QPQConfig,
-): KeyValueStoreQPQConfigSetting<T>[] => {
-  const keyValueStores = getConfigSettings<KeyValueStoreQPQConfigSetting<T>>(
-    qpqConfig,
-    QPQCoreConfigSettingType.keyValueStore,
-  );
+export const getAllKeyValueStores = <T extends object = any>(qpqConfig: QPQConfig): KeyValueStoreQPQConfigSetting<T>[] => {
+  const keyValueStores = getConfigSettings<KeyValueStoreQPQConfigSetting<T>>(qpqConfig, QPQCoreConfigSettingType.keyValueStore);
 
   return keyValueStores;
 };
 
 export const getDeployEventConfigs = (qpqConfig: QPQConfig): DeployEventsQPQConfigSetting[] => {
-  const deployEvents = getConfigSettings<DeployEventsQPQConfigSetting>(
-    qpqConfig,
-    QPQCoreConfigSettingType.deployEvent,
-  );
+  const deployEvents = getConfigSettings<DeployEventsQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.deployEvent);
 
   return deployEvents;
 };
 
-export const getOwnedKeyValueStores = <T extends object = any>(
-  qpqConfig: QPQConfig,
-): KeyValueStoreQPQConfigSetting<T>[] => {
+export const getOwnedKeyValueStores = <T extends object = any>(qpqConfig: QPQConfig): KeyValueStoreQPQConfigSetting<T>[] => {
   return getOwnedItems(getAllKeyValueStores(qpqConfig), qpqConfig);
 };
 
@@ -283,9 +226,7 @@ export const getOwnedStorageDrives = (qpqConfig: QPQConfig): StorageDriveQPQConf
   return getOwnedItems(getStorageDrives(qpqConfig), qpqConfig);
 };
 
-export const resolveCrossServiceResourceName = (
-  resourceName: ResourceName,
-): CrossServiceResourceName => {
+export const resolveCrossServiceResourceName = (resourceName: ResourceName): CrossServiceResourceName => {
   if (typeof resourceName === 'string') {
     return {
       name: resourceName,
@@ -299,29 +240,19 @@ export const getKeyValueStoreByName = <T extends object = any>(
   qpqConfig: QPQConfig,
   kvsName: string,
 ): KeyValueStoreQPQConfigSetting<T> | undefined => {
-  const keyValueStore = getAllKeyValueStores<T>(qpqConfig).find(
-    (kvs) => kvs.keyValueStoreName === kvsName,
-  );
+  const keyValueStore = getAllKeyValueStores<T>(qpqConfig).find((kvs) => kvs.keyValueStoreName === kvsName);
 
   return keyValueStore;
 };
 
 export const getActionProcessorSources = (configs: QPQConfig): string[] => {
-  const sources = getConfigSettings<ActionProcessorsQPQConfigSetting>(
-    configs,
-    QPQCoreConfigSettingType.actionProcessors,
-  ).map((ap) => ap.src);
+  const sources = getConfigSettings<ActionProcessorsQPQConfigSetting>(configs, QPQCoreConfigSettingType.actionProcessors).map((ap) => ap.src);
 
   return sources;
 };
 
-export const getUserDirectoryEmailTemplates = (
-  qpqConfig: QPQConfig,
-): Record<string, EmailTemplates> => {
-  const userDirectories = getConfigSettings<UserDirectoryQPQConfigSetting>(
-    qpqConfig,
-    QPQCoreConfigSettingType.userDirectory,
-  );
+export const getUserDirectoryEmailTemplates = (qpqConfig: QPQConfig): Record<string, EmailTemplates> => {
+  const userDirectories = getConfigSettings<UserDirectoryQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.userDirectory);
 
   const record = userDirectories.reduce(
     (acc, ud) => ({
@@ -339,15 +270,9 @@ export const getScheduleEvents = (configs: QPQConfig): ScheduleQPQConfigSetting[
 };
 
 export const getQueueSrcEntries = (configs: QPQConfig): string[] => {
-  const queueConfigs = getConfigSettings<QueueQPQConfigSetting>(
-    configs,
-    QPQCoreConfigSettingType.queue,
-  );
+  const queueConfigs = getConfigSettings<QueueQPQConfigSetting>(configs, QPQCoreConfigSettingType.queue);
 
-  return queueConfigs.reduce(
-    (acc, qc) => [...acc, ...Object.values(qc.qpqQueueProcessors).map((q) => q.src)],
-    [] as string[],
-  );
+  return queueConfigs.reduce((acc, qc) => [...acc, ...Object.values(qc.qpqQueueProcessors).map((q) => q.src)], [] as string[]);
 };
 
 export const getUserDirectorySrcEntries = (qpqConfig: QPQConfig): string[] => {
@@ -355,13 +280,7 @@ export const getUserDirectorySrcEntries = (qpqConfig: QPQConfig): string[] => {
   const userConfigs = getOwnedUserDirectories(qpqConfig);
 
   return userConfigs
-    .reduce(
-      (acc, ud) => [
-        ...acc,
-        ...Object.values(ud.emailTemplates).map((et: QpqEmailTemplateSourceEntry) => et?.src),
-      ],
-      [] as string[],
-    )
+    .reduce((acc, ud) => [...acc, ...Object.values(ud.emailTemplates).map((et: QpqEmailTemplateSourceEntry) => et?.src)], [] as string[])
     .filter((src) => !!src);
 };
 
@@ -378,14 +297,8 @@ export const getAllSrcEntries = (qpqConfig: QPQConfig): string[] => {
   ];
 };
 
-export const getSecretByName = (
-  secretName: string,
-  qpqConfig: QPQConfig,
-): SecretQPQConfigSetting => {
-  const secrets = getConfigSettings<SecretQPQConfigSetting>(
-    qpqConfig,
-    QPQCoreConfigSettingType.secret,
-  );
+export const getSecretByName = (secretName: string, qpqConfig: QPQConfig): SecretQPQConfigSetting => {
+  const secrets = getConfigSettings<SecretQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.secret);
 
   const secret = secrets.find((s) => s.key === secretName);
 
@@ -397,10 +310,7 @@ export const getSecretByName = (
 };
 
 export const getAllSecretConfigs = (qpqConfig: QPQConfig): SecretQPQConfigSetting[] => {
-  const secrets = getConfigSettings<SecretQPQConfigSetting>(
-    qpqConfig,
-    QPQCoreConfigSettingType.secret,
-  );
+  const secrets = getConfigSettings<SecretQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.secret);
 
   return secrets;
 };
@@ -412,10 +322,7 @@ export const getOwnedSecrets = (qpqConfig: QPQConfig): SecretQPQConfigSetting[] 
 };
 
 export const getGlobalConfigValue = <T>(qpqConfig: QPQConfig, name: string): T => {
-  const global = getConfigSettings<GlobalQPQConfigSetting<T>>(
-    qpqConfig,
-    QPQCoreConfigSettingType.global,
-  ).find((g) => g.key === name);
+  const global = getConfigSettings<GlobalQPQConfigSetting<T>>(qpqConfig, QPQCoreConfigSettingType.global).find((g) => g.key === name);
 
   if (!global) {
     throw new Error(`Global config ${name} not found`);
@@ -425,10 +332,7 @@ export const getGlobalConfigValue = <T>(qpqConfig: QPQConfig, name: string): T =
 };
 
 export const getUserDirectories = (configs: QPQConfig): UserDirectoryQPQConfigSetting[] => {
-  const userDirectories = getConfigSettings<UserDirectoryQPQConfigSetting>(
-    configs,
-    QPQCoreConfigSettingType.userDirectory,
-  );
+  const userDirectories = getConfigSettings<UserDirectoryQPQConfigSetting>(configs, QPQCoreConfigSettingType.userDirectory);
 
   return userDirectories;
 };
@@ -439,10 +343,7 @@ export const getOwnedUserDirectories = (qpqConifg: QPQConfig): UserDirectoryQPQC
   return getOwnedItems(userDirectories, qpqConifg);
 };
 
-export const getUserDirectoryByName = (
-  userDirectoryName: string,
-  qpqConifg: QPQConfig,
-): UserDirectoryQPQConfigSetting => {
+export const getUserDirectoryByName = (userDirectoryName: string, qpqConifg: QPQConfig): UserDirectoryQPQConfigSetting => {
   const userDirectory = getUserDirectories(qpqConifg).find((ud) => ud.name === userDirectoryName);
 
   if (!userDirectory) {
@@ -453,22 +354,13 @@ export const getUserDirectoryByName = (
 };
 
 export const getAllParameterConfigs = (qpqConfig: QPQConfig): ParameterQPQConfigSetting[] => {
-  const parameters = getConfigSettings<ParameterQPQConfigSetting>(
-    qpqConfig,
-    QPQCoreConfigSettingType.parameter,
-  );
+  const parameters = getConfigSettings<ParameterQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.parameter);
 
   return parameters;
 };
 
-export const getParameterConfig = (
-  name: string,
-  qpqConfig: QPQConfig,
-): ParameterQPQConfigSetting => {
-  const parameters = getConfigSettings<ParameterQPQConfigSetting>(
-    qpqConfig,
-    QPQCoreConfigSettingType.parameter,
-  );
+export const getParameterConfig = (name: string, qpqConfig: QPQConfig): ParameterQPQConfigSetting => {
+  const parameters = getConfigSettings<ParameterQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.parameter);
 
   const param = parameters.find((p) => p.key === name);
 
@@ -492,17 +384,11 @@ export const getUniqueKeyForSetting = (setting: QPQConfigSetting) => {
   return `${type}${key}`;
 };
 
-export const getScheduleEntryFullPath = (
-  qpqConfig: QPQConfig,
-  scheduleConfig: ScheduleQPQConfigSetting,
-): string => {
+export const getScheduleEntryFullPath = (qpqConfig: QPQConfig, scheduleConfig: ScheduleQPQConfigSetting): string => {
   return joinPaths(getConfigRoot(qpqConfig), scheduleConfig.buildPath);
 };
 
-export const getStorageDriveEntryFullPath = (
-  qpqConfig: QPQConfig,
-  storageDriveConfig: StorageDriveQPQConfigSetting,
-): string => {
+export const getStorageDriveEntryFullPath = (qpqConfig: QPQConfig, storageDriveConfig: StorageDriveQPQConfigSetting): string => {
   if (!storageDriveConfig.onEvent?.buildPath) {
     throw new Error('Please specify a build path in your storage drive config (onEvent)');
   }
@@ -510,39 +396,24 @@ export const getStorageDriveEntryFullPath = (
   return joinPaths(getConfigRoot(qpqConfig), storageDriveConfig.onEvent.buildPath);
 };
 
-export const getDeployEventFullPath = (
-  qpqConfig: QPQConfig,
-  deployEventConfig: DeployEventsQPQConfigSetting,
-): string => {
+export const getDeployEventFullPath = (qpqConfig: QPQConfig, deployEventConfig: DeployEventsQPQConfigSetting): string => {
   return joinPaths(getConfigRoot(qpqConfig), deployEventConfig.buildPath);
 };
 
-export const getStorageDriveUploadFullPath = (
-  qpqConfig: QPQConfig,
-  storageDriveConfig: StorageDriveQPQConfigSetting,
-): string => {
+export const getStorageDriveUploadFullPath = (qpqConfig: QPQConfig, storageDriveConfig: StorageDriveQPQConfigSetting): string => {
   return joinPaths(getConfigRoot(qpqConfig), storageDriveConfig.copyPath || '');
 };
 
-export const getQueueEntryFullPath = (
-  qpqConfig: QPQConfig,
-  queueConfig: QueueQPQConfigSetting,
-): string => {
+export const getQueueEntryFullPath = (qpqConfig: QPQConfig, queueConfig: QueueQPQConfigSetting): string => {
   return joinPaths(getConfigRoot(qpqConfig), queueConfig.buildPath);
 };
 
-export const getUserDirectoryEntryFullPath = (
-  qpqConfig: QPQConfig,
-  userDirectoryConfig: UserDirectoryQPQConfigSetting,
-): string => {
+export const getUserDirectoryEntryFullPath = (qpqConfig: QPQConfig, userDirectoryConfig: UserDirectoryQPQConfigSetting): string => {
   return joinPaths(getConfigRoot(qpqConfig), userDirectoryConfig.buildPath);
 };
 
 export const getQueueQueueProcessors = (name: string, qpqConfig: QPQConfig): QpqQueueProcessors => {
-  const seoConfigs = getConfigSettings<QueueQPQConfigSetting>(
-    qpqConfig,
-    QPQCoreConfigSettingType.queue,
-  );
+  const seoConfigs = getConfigSettings<QueueQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.queue);
 
   const queueConfig = seoConfigs.find((c) => c.name === name);
 
@@ -570,9 +441,7 @@ export const convertCrossModuleOwnerToGenericResourceNameOverride = <T extends s
   };
 };
 
-export const convertCustomFullyQualifiedResourceToGeneric = <T extends string>(
-  resource: CustomFullyQualifiedResource<T>,
-): FullyQualifiedResource => {
+export const convertCustomFullyQualifiedResourceToGeneric = <T extends string>(resource: CustomFullyQualifiedResource<T>): FullyQualifiedResource => {
   type KeyType = KeyOf<CustomFullyQualifiedResource<T>>;
   const key: KeyType = Array.from(Object.keys(resource)).find(
     (k) => k !== 'module' && k !== 'application' && k !== 'feature' && k !== 'environment',
@@ -589,11 +458,7 @@ export const convertCustomFullyQualifiedResourceToGeneric = <T extends string>(
   };
 };
 
-export const getFullyQualifiedResourceName = (
-  qpqConfig: QPQConfig,
-  resourceName: string,
-  config?: QPQConfigSetting,
-): FullyQualifiedResource => {
+export const getFullyQualifiedResourceName = (qpqConfig: QPQConfig, resourceName: string, config?: QPQConfigSetting): FullyQualifiedResource => {
   const confApplication = getApplicationName(qpqConfig);
   const confEnvironment = getApplicationModuleEnvironment(qpqConfig);
   const confFeature = getApplicationModuleFeature(qpqConfig);
@@ -610,19 +475,13 @@ export const getFullyQualifiedResourceName = (
 };
 
 // Fully Qualified Resource Names
-export const getKeyValueStoreFullyQualifiedResourceName = (
-  kvsName: string,
-  qpqConfig: QPQConfig,
-): FullyQualifiedResource => {
+export const getKeyValueStoreFullyQualifiedResourceName = (kvsName: string, qpqConfig: QPQConfig): FullyQualifiedResource => {
   const storeConfig = getKeyValueStoreByName(qpqConfig, kvsName);
 
   return getFullyQualifiedResourceName(qpqConfig, kvsName, storeConfig);
 };
 
-export const isSameResource = (
-  resourceA: FullyQualifiedResource,
-  resourceB: FullyQualifiedResource,
-): boolean => {
+export const isSameResource = (resourceA: FullyQualifiedResource, resourceB: FullyQualifiedResource): boolean => {
   return (
     resourceA.application === resourceB.application &&
     resourceA.environment === resourceB.environment &&
