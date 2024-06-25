@@ -1,15 +1,14 @@
 import path from 'path';
 
 import { Configuration } from 'webpack';
-import HtmlWebpackPlugin from 'html-webpack-plugin';
+import { ModuleFederationPlugin } from '@module-federation/enhanced/webpack';
 import { Configuration as DevServerConfiguration } from 'webpack-dev-server';
+
+import packageJson from './package.json';
 
 interface WebpackConfiguration extends Configuration {
   devServer?: DevServerConfiguration;
 }
-
-// import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
-// import { ModuleFederationPlugin } from '@module-federation/enhanced/webpack';
 
 const config = (): WebpackConfiguration => {
   return {
@@ -18,13 +17,16 @@ const config = (): WebpackConfiguration => {
     output: {
       path: path.resolve(__dirname, './lib'),
       filename: '[name].[contenthash].js',
+      chunkFilename: '[name].[contenthash].js',
+      publicPath: 'auto',
       // libraryTarget: 'module',
       // module: true,
       // clean: true,
+      globalObject: 'this',
     },
     devServer: {
-      port: 3001,
-      hot: true,
+      port: 3002,
+      hot: false,
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
@@ -86,20 +88,24 @@ const config = (): WebpackConfiguration => {
       // },
     },
     plugins: [
-      new HtmlWebpackPlugin({
-        template: './src/index.html',
-        inject: true,
+      new ModuleFederationPlugin({
+        name: 'qpq_test_app',
+        filename: 'remoteEntry.js',
+        exposes: {
+          // Set the modules to be exported, default export as '.'
+          './add': './src/add',
+        },
+        shared: {
+          react: {
+            singleton: true,
+            requiredVersion: packageJson.dependencies.react,
+          },
+          'react-dom': {
+            singleton: true,
+            requiredVersion: packageJson.dependencies['react-dom'],
+          },
+        },
       }),
-      // new ModuleFederationPlugin({
-      //   name: 'qpq_admin_fm',
-      //   filename: 'remoteEntry.js',
-      //   remotes: [
-      //     {
-      //       name: 'qpq_test_app',
-      //       entry: 'http://localhost:3002/mf-manifest.json',
-      //     },
-      //   ],
-      // }),
     ],
   };
 };

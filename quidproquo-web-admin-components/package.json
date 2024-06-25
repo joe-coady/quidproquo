@@ -1,5 +1,5 @@
 {
-  "name": "quidproquo-web-admin",
+  "name": "quidproquo-web-admin-components",
   "version": "0.0.208",
   "description": "",
   "main": "./lib/index.js",
@@ -10,7 +10,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "npx rimraf lib && npx rimraf node_modules",
-    "start": "npx webpack serve --config webpack.config.ts --mode=development --port 3001",
+    "start": "npx webpack serve --config webpack.config.ts --mode=development --port 3002",
     "build": "npm run clean && npx webpack --config webpack.config.ts",
     "watch": "npm run start"
   },

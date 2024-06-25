@@ -3,9 +3,10 @@ import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import LockIcon from '@mui/icons-material/Lock';
 
-import { AsyncButton } from '../components';
-
 import { Typography } from '@mui/material';
+import { useFederatedFrontend } from '../useFederatedFrontend';
+import { FederatedAddon } from '../FederatedAddon';
+import { AsyncButton } from '../components';
 
 interface LoginProps {
   onLogin: () => Promise<void>;
@@ -18,6 +19,12 @@ interface LoginProps {
 }
 
 export function Login({ username, password, setUsername, setPassword, onLogin }: LoginProps) {
+  const module = useFederatedFrontend<FederatedAddon>('qpq_test_app');
+
+  if (!module) {
+    return <div>Loading</div>;
+  }
+
   return (
     <Box
       sx={{
@@ -30,13 +37,7 @@ export function Login({ username, password, setUsername, setPassword, onLogin }:
         alignItems: 'center',
       }}
     >
-      <Box
-        component="form"
-        action="#"
-        autoComplete="on"
-        method="post"
-        sx={{ width: '100%', maxWidth: 360 }}
-      >
+      <Box component="form" action="#" autoComplete="on" method="post" sx={{ width: '100%', maxWidth: 360 }}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
@@ -70,7 +71,7 @@ export function Login({ username, password, setUsername, setPassword, onLogin }:
             />
           </Grid>
           <Grid item xs={12}>
-            <AsyncButton
+            <module.AsyncButton
               type="submit"
               onClick={async (event) => {
                 event.preventDefault();
@@ -78,7 +79,7 @@ export function Login({ username, password, setUsername, setPassword, onLogin }:
               }}
             >
               Login
-            </AsyncButton>
+            </module.AsyncButton>
           </Grid>
         </Grid>
       </Box>
