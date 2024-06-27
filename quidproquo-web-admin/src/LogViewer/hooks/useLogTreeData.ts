@@ -1,11 +1,9 @@
 import { StoryResultMetadataWithChildren } from 'quidproquo-core';
 import { useEffect, useState } from 'react';
-import { useAuthAccessToken } from '../../Auth/hooks';
+import { useAuthAccessToken } from 'quidproquo-web-react';
 import { getLogHierarchy } from '../logic';
 
-const filterQpqActions = (
-  logs: StoryResultMetadataWithChildren[],
-): StoryResultMetadataWithChildren[] => {
+const filterQpqActions = (logs: StoryResultMetadataWithChildren[]): StoryResultMetadataWithChildren[] => {
   const filteredLogs: StoryResultMetadataWithChildren[] = [];
 
   for (const log of logs) {

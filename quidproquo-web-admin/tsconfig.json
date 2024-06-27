@@ -9,6 +9,6 @@
       "module": "commonjs"
     }
   },
-  "include": ["src"],
+  "include": ["src", "../quidproquo-web-react/src/auth/WebSocketAuthProvider.tsx"],
   "exclude": ["node_modules"]
 }

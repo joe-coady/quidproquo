@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { SearchParams } from '../types';
 import { useAsyncLoading } from '../../view';
 import { searchLogs } from '../logic';
-import { useAuthAccessToken } from '../../Auth/hooks';
-import { useFastCallback } from 'quidproquo-web-react';
+
+import { useFastCallback, useAuthAccessToken } from 'quidproquo-web-react';
 
 export const useOnSearch = (
   searchParams: SearchParams,

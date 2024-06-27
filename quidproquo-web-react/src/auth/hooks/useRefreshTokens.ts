@@ -1,10 +1,7 @@
 import { useEffect, useRef } from 'react';
-import { AuthState } from '../../types';
+import { AuthState } from '../types';
 
-export const useRefreshTokens = (
-  authState: AuthState,
-  refreshTokens: (authState: AuthState) => void,
-) => {
+export const useRefreshTokens = (authState: AuthState, refreshTokens: (authState: AuthState) => void) => {
   const refresh = () => {
     const { refreshToken, expiresAt } = authState.authenticationInfo || {};
 

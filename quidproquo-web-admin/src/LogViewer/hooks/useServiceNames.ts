@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import { useAuthAccessToken } from '../../Auth/hooks';
+import { useAuthAccessToken } from 'quidproquo-web-react';
 import { getServiceNames } from '../logic';
 
 type AutoCompleteOption = {

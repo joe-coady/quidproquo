@@ -1,7 +1,7 @@
 import { useAsyncLoading } from '../Loading';
 import { apiRequestGet, externalRequestGet } from '../../logic';
 import { AnyAsyncFunction } from '../types';
-import { useAuthAccessToken } from '../../Auth/hooks';
+import { useAuthAccessToken } from 'quidproquo-web-react';
 import { useFastCallback } from 'quidproquo-web-react';
 
 /**

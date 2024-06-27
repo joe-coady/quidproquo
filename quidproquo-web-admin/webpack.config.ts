@@ -106,6 +106,10 @@ const config = (): WebpackConfiguration => {
             singleton: true,
             requiredVersion: packageJson.dependencies['react-dom'],
           },
+          'quidproquo-web-react': {
+            singleton: true,
+            // requiredVersion: packageJson.devDependencies['quidproquo-web-react'],
+          },
         },
       }),
     ],

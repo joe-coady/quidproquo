@@ -1,6 +1,4 @@
-import { WebSocketAuthSync } from 'quidproquo-web-react';
-
-import { useAuthAccessToken } from './Auth/hooks';
+import { WebSocketAuthSync, useAuthAccessToken } from 'quidproquo-web-react';
 
 export type WebSocketAuthProviderProps = {
   children: React.ReactNode;
