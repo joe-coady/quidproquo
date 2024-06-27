@@ -1,5 +1,5 @@
+import React from 'react';
 import CssBaseline from '@mui/material/CssBaseline';
-
 import { LogViewer } from './LogViewer';
 import { Auth } from './Auth/Auth';
 import { LoadingProvider } from './view';
@@ -15,7 +15,7 @@ const darkTheme = createTheme({
   },
 });
 
-export const App = () => {
+export const App: React.FC = () => {
   return (
     <Router>
       <ThemeProvider theme={darkTheme}>

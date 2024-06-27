@@ -6,6 +6,7 @@ import { apiRequestGet } from './logic';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { FederatedAddon } from './FederatedAddon';
 
 init({
   name: '@quidproquo/admin',
@@ -32,15 +33,19 @@ init({
   },
 });
 
-export function useFederatedFrontend<T>(appName: string): T | null {
-  const [loadedModule, setLoadedModule] = useState<T | null>(null);
+export function useFederatedAddon(appName: string): FederatedAddon[] {
+  const [federatedAddons, setFederatedAddons] = useState<FederatedAddon[]>([]);
 
   useEffect(() => {
     const doAsyncWork = async () => {
       // Get the manifest url from the dev server
-      const url = await apiRequestGet<{
-        location: string;
-      }>('http://localhost:8080/mf-manifest-location.json');
+      // const url = await apiRequestGet<{
+      //   location: string;
+      // }>('http://localhost:8080/mf-manifest-location.json');
+
+      const url = {
+        location: 'http://localhost:7000/mf-manifest.json',
+      };
 
       // Update the remote
       registerRemotes(
@@ -54,17 +59,24 @@ export function useFederatedFrontend<T>(appName: string): T | null {
       );
 
       // Load the remote
-      const remote = await loadRemote<T>(`${appName}/add`, {
+      const remote = await loadRemote<any>(`${appName}/qpqAdminAddon`, {
         from: 'runtime',
       });
 
-      setLoadedModule(remote);
+      if (remote && typeof remote === 'object') {
+        const allAddons = Object.values(remote)
+          .filter((possibleAddon: any) => typeof possibleAddon === 'object')
+          .filter((possibleAddon: any) => (possibleAddon as FederatedAddon).isQpqAdminFederatedAddon);
+
+        setFederatedAddons(allAddons as FederatedAddon[]);
+      }
     };
 
     doAsyncWork().catch((e) => {
+      console.log(e);
       console.log('Unable to federate modules in');
     });
   }, [appName]);
 
-  return loadedModule;
+  return federatedAddons;
 }

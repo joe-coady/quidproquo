@@ -4,8 +4,7 @@ import TextField from '@mui/material/TextField';
 import LockIcon from '@mui/icons-material/Lock';
 
 import { Typography } from '@mui/material';
-import { useFederatedFrontend } from '../useFederatedFrontend';
-import { FederatedAddon } from '../FederatedAddon';
+
 import { AsyncButton } from '../components';
 
 interface LoginProps {
@@ -19,8 +18,6 @@ interface LoginProps {
 }
 
 export function Login({ username, password, setUsername, setPassword, onLogin }: LoginProps) {
-  const module = useFederatedFrontend<FederatedAddon>('qpq_test_app');
-
   if (!module) {
     return <div>Loading</div>;
   }
@@ -71,7 +68,7 @@ export function Login({ username, password, setUsername, setPassword, onLogin }:
             />
           </Grid>
           <Grid item xs={12}>
-            <module.AsyncButton
+            <AsyncButton
               type="submit"
               onClick={async (event) => {
                 event.preventDefault();
@@ -79,7 +76,7 @@ export function Login({ username, password, setUsername, setPassword, onLogin }:
               }}
             >
               Login
-            </module.AsyncButton>
+            </AsyncButton>
           </Grid>
         </Grid>
       </Box>

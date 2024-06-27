@@ -3,13 +3,12 @@ import path from 'path';
 import { Configuration } from 'webpack';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import { Configuration as DevServerConfiguration } from 'webpack-dev-server';
+import packageJson from './package.json';
+import { ModuleFederationPlugin } from '@module-federation/enhanced/webpack';
 
 interface WebpackConfiguration extends Configuration {
   devServer?: DevServerConfiguration;
 }
-
-// import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
-// import { ModuleFederationPlugin } from '@module-federation/enhanced/webpack';
 
 const config = (): WebpackConfiguration => {
   return {
@@ -21,6 +20,7 @@ const config = (): WebpackConfiguration => {
       // libraryTarget: 'module',
       // module: true,
       // clean: true,
+      publicPath: 'auto',
     },
     devServer: {
       port: 3001,
@@ -90,16 +90,24 @@ const config = (): WebpackConfiguration => {
         template: './src/index.html',
         inject: true,
       }),
-      // new ModuleFederationPlugin({
-      //   name: 'qpq_admin_fm',
-      //   filename: 'remoteEntry.js',
-      //   remotes: [
-      //     {
-      //       name: 'qpq_test_app',
-      //       entry: 'http://localhost:3002/mf-manifest.json',
-      //     },
-      //   ],
-      // }),
+      new ModuleFederationPlugin({
+        name: 'qpq_admin_fm',
+        filename: 'remoteEntry.js',
+        exposes: {
+          // Set the modules to be exported, default export as '.'
+          './addonSupport': './src/addonSupport',
+        },
+        shared: {
+          react: {
+            singleton: true,
+            requiredVersion: packageJson.dependencies.react,
+          },
+          'react-dom': {
+            singleton: true,
+            requiredVersion: packageJson.dependencies['react-dom'],
+          },
+        },
+      }),
     ],
   };
 };
