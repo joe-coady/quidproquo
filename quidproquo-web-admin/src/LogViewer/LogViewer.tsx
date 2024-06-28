@@ -5,11 +5,16 @@ import { LogSearch } from './LogSearch';
 import { Dashboard } from './Dashboard';
 import { useFederatedAddon } from '../useFederatedAddon';
 import { FederatedTab } from '../FederatedAddon';
+import RandomView from '../tmp/RandomView';
 
 export function useTabs(): FederatedTab[] {
   const addons = useFederatedAddon('shop_fm');
 
   const allTabs: FederatedTab[] = [
+    // {
+    //   name: 'TEST',
+    //   View: RandomView,
+    // },
     {
       name: 'Logs',
       View: LogSearch,
@@ -38,7 +43,7 @@ export function LogViewer() {
       <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
         {allTabs
           .filter((tab, index) => index === selectedTab)
-          .map((tab, index) => (
+          .map((tab) => (
             <tab.View key={tab.name} />
           ))}
       </Box>

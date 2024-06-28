@@ -11,6 +11,7 @@ import {
 import { defineRoute } from './route';
 import { defineWebEntry } from './webEntry';
 import { defineWebsocket } from './websocket';
+import { adminUserDirectoryResourceName } from './adminUserDirectory';
 
 export interface QPQConfigAdvancedLogSettings extends QPQConfigAdvancedSettings {
   logRetentionDays?: number;
@@ -28,7 +29,6 @@ export interface QPQConfigAdvancedLogSettings extends QPQConfigAdvancedSettings 
 const logResourceName = 'qpq-logs';
 export const logReportsResourceName = 'qpq-log-reports';
 export const wsConnectionResourceName = 'qpq-admin-connections';
-export const adminUserDirectory = 'qpq-admin';
 
 export const defineLogs = (
   buildPath: string,
@@ -40,7 +40,7 @@ export const defineLogs = (
 ): QPQConfig => {
   const routeAuthSettings = {
     routeAuthSettings: {
-      userDirectoryName: adminUserDirectory,
+      userDirectoryName: adminUserDirectoryResourceName,
     },
   };
 
@@ -56,10 +56,7 @@ export const defineLogs = (
    * and `coldStorageAfterDays` plus 180.
    */
   const logRetentionDays: number | undefined = advancedSettings?.logRetentionDays
-    ? Math.max(
-        advancedSettings?.logRetentionDays || 30,
-        advancedSettings?.coldStorageAfterDays ? advancedSettings?.coldStorageAfterDays + 180 : 0,
-      )
+    ? Math.max(advancedSettings?.logRetentionDays || 30, advancedSettings?.coldStorageAfterDays ? advancedSettings?.coldStorageAfterDays + 180 : 0)
     : undefined;
 
   const configs = [
@@ -114,59 +111,19 @@ export const defineLogs = (
       indexes: ['userId'],
     }),
 
-    defineUserDirectory(adminUserDirectory, buildPath),
     defineRoute('POST', '/login', getServiceEntry('log', 'controller', 'loginController'), 'login'),
-    defineRoute(
-      'POST',
-      '/refreshToken',
-      getServiceEntry('log', 'controller', 'loginController'),
-      'refreshToken',
-    ),
-    defineRoute(
-      'POST',
-      '/challenge',
-      getServiceEntry('log', 'controller', 'loginController'),
-      'respondToAuthChallenge',
-    ),
+    defineRoute('POST', '/refreshToken', getServiceEntry('log', 'controller', 'loginController'), 'refreshToken'),
+    defineRoute('POST', '/challenge', getServiceEntry('log', 'controller', 'loginController'), 'respondToAuthChallenge'),
 
-    defineRoute(
-      'GET',
-      '/admin/services',
-      getServiceEntry('log', 'controller', 'logController'),
-      'getServiceNames',
-    ),
+    defineRoute('GET', '/admin/services', getServiceEntry('log', 'controller', 'logController'), 'getServiceNames'),
 
-    defineRoute(
-      'POST',
-      '/log/list',
-      getServiceEntry('log', 'controller', 'logController'),
-      'getLogs',
-      routeAuthSettings,
-    ),
+    defineRoute('POST', '/log/list', getServiceEntry('log', 'controller', 'logController'), 'getLogs', routeAuthSettings),
 
-    defineRoute(
-      'GET',
-      '/log/{correlationId}',
-      getServiceEntry('log', 'controller', 'logController'),
-      'getLog',
-      routeAuthSettings,
-    ),
+    defineRoute('GET', '/log/{correlationId}', getServiceEntry('log', 'controller', 'logController'), 'getLog', routeAuthSettings),
 
-    defineRoute(
-      'GET',
-      '/log/{correlationId}/toggle',
-      getServiceEntry('log', 'controller', 'logController'),
-      'toggleLogCheck',
-      routeAuthSettings,
-    ),
+    defineRoute('GET', '/log/{correlationId}/toggle', getServiceEntry('log', 'controller', 'logController'), 'toggleLogCheck', routeAuthSettings),
 
-    defineRoute(
-      'GET',
-      '/log/children/{fromCorrelation}',
-      getServiceEntry('log', 'controller', 'logController'),
-      'getChildren',
-      routeAuthSettings,
-    ),
+    defineRoute('GET', '/log/children/{fromCorrelation}', getServiceEntry('log', 'controller', 'logController'), 'getChildren', routeAuthSettings),
 
     defineRoute(
       'GET',
@@ -176,31 +133,13 @@ export const defineLogs = (
       routeAuthSettings,
     ),
 
-    defineRoute(
-      'GET',
-      '/log/downloadurl/{correlationId}',
-      getServiceEntry('log', 'controller', 'logController'),
-      'downloadUrl',
-      routeAuthSettings,
-    ),
+    defineRoute('GET', '/log/downloadurl/{correlationId}', getServiceEntry('log', 'controller', 'logController'), 'downloadUrl', routeAuthSettings),
 
-    defineRoute(
-      'POST',
-      '/log/chat/message',
-      getServiceEntry('log', 'controller', 'logController'),
-      'sendChatMessage',
-      routeAuthSettings,
-    ),
+    defineRoute('POST', '/log/chat/message', getServiceEntry('log', 'controller', 'logController'), 'sendChatMessage', routeAuthSettings),
 
     defineGlobal('claudeAi-api-key', advancedSettings?.claudeAiApiKeySecretName || ''),
 
-    defineRoute(
-      'POST',
-      '/log/chat',
-      getServiceEntry('log', 'controller', 'logController'),
-      'getChatMessages',
-      routeAuthSettings,
-    ),
+    defineRoute('POST', '/log/chat', getServiceEntry('log', 'controller', 'logController'), 'getChatMessages', routeAuthSettings),
 
     defineKeyValueStore('qpq-log-messages', 'correlationId', ['timestamp']),
 
@@ -248,12 +187,7 @@ export const defineLogs = (
             'default-src': ["'self'"],
 
             // maybe pass in the api / localhost port in as args
-            'connect-src': [
-              "'self'",
-              { api: 'api' },
-              'http://localhost:8080',
-              { protocol: 'wss', api: 'wsadmin', service: hostService },
-            ],
+            'connect-src': ["'self'", { api: 'api' }, 'http://localhost:8080', { protocol: 'wss', api: 'wsadmin', service: hostService }],
 
             'style-src': [
               "'self'",

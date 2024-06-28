@@ -24,7 +24,7 @@ const config = (): WebpackConfiguration => {
     },
     devServer: {
       port: 3001,
-      hot: true,
+      hot: false,
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
@@ -96,6 +96,7 @@ const config = (): WebpackConfiguration => {
         exposes: {
           // Set the modules to be exported, default export as '.'
           './addonSupport': './src/addonSupport',
+          './components': './src/components',
         },
         shared: {
           react: {
