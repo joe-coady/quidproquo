@@ -1,6 +1,6 @@
 {
   "name": "quidproquo-actionprocessor-node",
-  "version": "0.0.208",
+  "version": "0.0.209",
   "description": "",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
@@ -32,13 +32,13 @@
     "@anthropic-ai/sdk": "^0.19.1",
     "axios": "^1.2.1",
     "mime-types": "^2.1.35",
-    "quidproquo-core": "0.0.208",
+    "quidproquo-core": "0.0.209",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@types/mime-types": "^2.1.1",
     "@types/uuid": "^9.0.0",
-    "quidproquo-tsconfig": "0.0.208",
+    "quidproquo-tsconfig": "0.0.209",
     "typescript": "^4.9.3"
   }
 }
