@@ -13,12 +13,32 @@ import { defineWebEntry } from './webEntry';
 import { defineWebsocket } from './websocket';
 import { adminUserDirectoryResourceName } from './adminUserDirectory';
 
+function getBaseUrl(url: string): string {
+  if (!url) {
+    return '';
+  }
+  // Use a URL object to parse the URL
+  const parsedUrl = new URL(url);
+
+  // Remove the last segment of the pathname
+  const segments = parsedUrl.pathname.split('/');
+  segments.pop();
+
+  // Update the pathname of the parsed URL
+  parsedUrl.pathname = segments.join('/');
+
+  // Return the updated URL
+  return parsedUrl.origin + parsedUrl.pathname;
+}
+
 export interface QPQConfigAdvancedLogSettings extends QPQConfigAdvancedSettings {
   logRetentionDays?: number;
   coldStorageAfterDays?: number;
 
   cloudflareApiKeySecretName?: string;
   claudeAiApiKeySecretName?: string;
+
+  federationManifestUrl?: string;
 }
 
 // NEVER EVER CHANGE THIS NAME
@@ -59,9 +79,12 @@ export const defineLogs = (
     ? Math.max(advancedSettings?.logRetentionDays || 30, advancedSettings?.coldStorageAfterDays ? advancedSettings?.coldStorageAfterDays + 180 : 0)
     : undefined;
 
+  const qpqFederationManifestUrl = advancedSettings?.federationManifestUrl || '';
+
   const configs = [
     defineGlobal('qpq-serviceNames', services),
     defineGlobal('qpq-log-retention-days', logRetentionDays),
+    defineGlobal('qpq-federationManifestUrl', advancedSettings?.federationManifestUrl || ''),
 
     defineStorageDrive(logResourceName, {
       onEvent: {
@@ -116,6 +139,7 @@ export const defineLogs = (
     defineRoute('POST', '/challenge', getServiceEntry('log', 'controller', 'loginController'), 'respondToAuthChallenge'),
 
     defineRoute('GET', '/admin/services', getServiceEntry('log', 'controller', 'logController'), 'getServiceNames'),
+    defineRoute('GET', '/admin/fmurl', getServiceEntry('log', 'controller', 'logController'), 'getManifestUrl'),
 
     defineRoute('POST', '/log/list', getServiceEntry('log', 'controller', 'logController'), 'getLogs', routeAuthSettings),
 
@@ -187,7 +211,13 @@ export const defineLogs = (
             'default-src': ["'self'"],
 
             // maybe pass in the api / localhost port in as args
-            'connect-src': ["'self'", { api: 'api' }, 'http://localhost:8080', { protocol: 'wss', api: 'wsadmin', service: hostService }],
+            'connect-src': [
+              "'self'",
+              { api: 'api' },
+              'http://localhost:8080',
+              { protocol: 'wss', api: 'wsadmin', service: hostService },
+              getBaseUrl(qpqFederationManifestUrl),
+            ],
 
             'style-src': [
               "'self'",
@@ -196,6 +226,7 @@ export const defineLogs = (
 
             'script-src': [
               "'self'", // For scripts from the same domain
+              getBaseUrl(qpqFederationManifestUrl),
             ],
           },
         },

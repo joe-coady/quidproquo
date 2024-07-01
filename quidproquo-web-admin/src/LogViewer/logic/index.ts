@@ -9,3 +9,4 @@ export * from './searchLogs';
 export * from './createHierarchy';
 export * from './getLogHierarchy';
 export * from './getServiceNames';
+export * from './getFederationManifestUrl';

@@ -11,6 +11,8 @@ interface WebpackConfiguration extends Configuration {
 }
 
 const config = (): WebpackConfiguration => {
+  console.log('WE NEED REACT VERSION: ', packageJson.dependencies.react);
+
   return {
     mode: 'production',
     entry: path.resolve(__dirname, './src/index.tsx'),

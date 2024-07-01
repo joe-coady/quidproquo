@@ -77,6 +77,12 @@ export function* getServiceNames(event: HTTPEvent) {
   return toJsonEventResponse(serviceNames);
 }
 
+export function* getManifestUrl(event: HTTPEvent) {
+  const manifestUrl = yield* askConfigGetGlobal('qpq-federationManifestUrl');
+
+  return toJsonEventResponse(manifestUrl);
+}
+
 export function* getHierarchies(
   event: HTTPEvent,
   params: {
