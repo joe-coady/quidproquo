@@ -33,7 +33,6 @@
     "quidproquo-deploy-awscdk",
     "quidproquo-web",
     "quidproquo-web-react",
-    "quidproquo-web-admin-components",
     "quidproquo-web-admin",
     "quidproquo-testing",
     "quidproquo"
