@@ -14,8 +14,9 @@ const config = (): WebpackConfiguration => {
   console.log('WE NEED REACT VERSION: ', packageJson.dependencies.react);
 
   return {
-    mode: 'production',
-    entry: path.resolve(__dirname, './src/index.tsx'),
+    // mode: 'production',
+    mode: 'development',
+    entry: path.resolve(__dirname, './src/index'),
     output: {
       path: path.resolve(__dirname, './lib'),
       filename: '[name].[contenthash].js',
@@ -24,6 +25,7 @@ const config = (): WebpackConfiguration => {
       // clean: true,
       publicPath: 'auto',
     },
+    devtool: 'source-map',
     devServer: {
       port: 3001,
       hot: false,

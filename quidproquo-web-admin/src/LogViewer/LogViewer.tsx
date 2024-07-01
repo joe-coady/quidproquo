@@ -26,6 +26,8 @@ export function useTabs(): FederatedTab[] {
     ...addons.map((addon) => addon.tab),
   ];
 
+  console.log('allTabs', allTabs);
+
   return allTabs;
 }
 

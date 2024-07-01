@@ -200,7 +200,7 @@ export const defineLogs = (
         rootDomain,
       },
 
-      ignoreCache: ['index.html', 'index.js'],
+      ignoreCache: ['index.html', 'index.js', 'remoteEntry.js', 'mf-manifest.json'],
 
       cloudflareApiKeySecretName: advancedSettings?.cloudflareApiKeySecretName,
 
@@ -226,6 +226,7 @@ export const defineLogs = (
 
             'script-src': [
               "'self'", // For scripts from the same domain
+              // "'unsafe-eval'", // Allow eval() for webpack DONT DO THIS.
               getBaseUrl(qpqFederationManifestUrl),
             ],
           },
