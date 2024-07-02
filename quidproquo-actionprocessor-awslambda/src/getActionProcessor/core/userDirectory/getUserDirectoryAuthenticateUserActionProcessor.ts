@@ -35,6 +35,7 @@ const getUserDirectoryAuthenticateUserActionProcessor = (qpqConfig: QPQConfig): 
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         UserNotFoundException: () => actionResultError(UserDirectoryAuthenticateUserErrorTypeEnum.UserNotFound, 'Incorrect username or password'),
+        NotAuthorizedException: () => actionResultError(UserDirectoryAuthenticateUserErrorTypeEnum.UserNotFound, 'Incorrect username or password'),
       });
     }
   };
