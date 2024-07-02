@@ -5,3 +5,9 @@ export async function getFederationManifestUrl(accessToken?: string): Promise<st
 
   return manifestUrl;
 }
+
+export async function getFederationManifest(url: string): Promise<{ id: string }> {
+  const manifestUrlJson = await apiRequestGet<{ id: string }>(url);
+
+  return manifestUrlJson;
+}

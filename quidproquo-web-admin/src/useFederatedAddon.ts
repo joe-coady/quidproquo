@@ -2,51 +2,44 @@ import { useState, useEffect } from 'react';
 
 import { loadRemote, registerRemotes } from '@module-federation/enhanced/runtime';
 
-// import React from 'react';
-// import ReactDOM from 'react-dom';
 import { FederatedAddon } from './FederatedAddon';
-import { getFederationManifestUrl } from './LogViewer/logic';
+import { getFederationManifest, getFederationManifestUrl } from './LogViewer/logic';
 import { useAuthAccessToken } from 'quidproquo-web-react';
-// import packageJson from '../package.json';
 
-// init({
-//   name: '@quidproquo/admin',
-//   remotes: [],
-//   shared: {
-//     react: {
-//       version: '18.3.1',
-//       scope: 'default',
-//       lib: () => React,
-//       shareConfig: {
-//         singleton: true,
-//         requiredVersion: packageJson.dependencies.react,
-//       },
-//     },
-//     'react-dom': {
-//       version: '18.3.1',
-//       scope: 'default',
-//       lib: () => ReactDOM,
-//       shareConfig: {
-//         singleton: true,
-//         requiredVersion: packageJson.dependencies['react-dom'],
-//       },
-//     },
-//   },
-// });
-
-export function useFederatedAddon(appName: string): FederatedAddon[] {
+export function useFederatedAddon(): {
+  addons: FederatedAddon[];
+  loading: boolean;
+} {
   const [federatedAddons, setFederatedAddons] = useState<FederatedAddon[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
   const accessToken = useAuthAccessToken();
 
   useEffect(() => {
     const doAsyncWork = async () => {
+      setLoading(true);
+
       const manifestUrl = await getFederationManifestUrl(accessToken);
 
+      console.log(`manifestUrl: [${manifestUrl}]`);
+      if (!manifestUrl) {
+        console.log(`Missing manifest Url`);
+        return;
+      }
+
+      console.log(`Reading manifest: [${manifestUrl}]`);
+      const manifest = await getFederationManifest(manifestUrl);
+
+      if (!manifest.id) {
+        console.log(`Manifest missing id`);
+        return;
+      }
+
       // Update the remote
+      console.log(`Updating remote: [${manifest.id}]`);
       registerRemotes(
         [
           {
-            name: appName,
+            name: manifest.id,
             entry: manifestUrl,
           },
         ],
@@ -54,7 +47,8 @@ export function useFederatedAddon(appName: string): FederatedAddon[] {
       );
 
       // Load the remote
-      const remote = await loadRemote<any>(`${appName}/qpqAdminAddon`, {
+      console.log(`Loading remote: [${manifest.id}]`);
+      const remote = await loadRemote<any>(`${manifest.id}/qpqAdminAddon`, {
         from: 'runtime',
       });
 
@@ -67,11 +61,18 @@ export function useFederatedAddon(appName: string): FederatedAddon[] {
       }
     };
 
-    doAsyncWork().catch((e) => {
-      console.log(e);
-      console.log('Unable to federate modules in');
-    });
-  }, [appName]);
+    doAsyncWork()
+      .catch((e) => {
+        console.log(e);
+        console.log('Unable to federate modules in');
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
 
-  return federatedAddons;
+  return {
+    addons: federatedAddons,
+    loading,
+  };
 }

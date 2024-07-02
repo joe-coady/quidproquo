@@ -5,30 +5,40 @@ import {
   defineGlobal,
   defineKeyValueStore,
   defineStorageDrive,
-  defineUserDirectory,
   getServiceEntry,
 } from 'quidproquo-core';
 import { defineRoute } from './route';
 import { defineWebEntry } from './webEntry';
 import { defineWebsocket } from './websocket';
 import { adminUserDirectoryResourceName } from './adminUserDirectory';
+import { ContentSecurityPolicyEntry, QpqServiceContentSecurityPolicy } from '../types/ResponseSecurityHeaders';
 
-function getBaseUrl(url: string): string {
+export type ManifestServiceUrlDefinition = QpqServiceContentSecurityPolicy & {
+  protocol: 'http' | 'https'; // Only can be serverd via http
+  path: string;
+};
+
+export type FederationManifestUrl = ManifestServiceUrlDefinition | string;
+
+function getContentSecurityPolicyEntryFromManifestServiceUrlDefinition(url?: FederationManifestUrl): ContentSecurityPolicyEntry {
+  // If its a QpqServiceContentSecurityPolicy - remove the path from the ManifestServiceUrlDefinition
+  if (typeof url === 'object') {
+    const { path, ...rest } = url;
+    return rest;
+  }
+
   if (!url) {
     return '';
   }
+
   // Use a URL object to parse the URL
   const parsedUrl = new URL(url);
 
-  // Remove the last segment of the pathname
-  const segments = parsedUrl.pathname.split('/');
-  segments.pop();
-
-  // Update the pathname of the parsed URL
-  parsedUrl.pathname = segments.join('/');
+  // Update the pathname of the parsed URL to root
+  parsedUrl.pathname = '/';
 
   // Return the updated URL
-  return parsedUrl.origin + parsedUrl.pathname;
+  return parsedUrl.origin;
 }
 
 export interface QPQConfigAdvancedLogSettings extends QPQConfigAdvancedSettings {
@@ -38,7 +48,7 @@ export interface QPQConfigAdvancedLogSettings extends QPQConfigAdvancedSettings 
   cloudflareApiKeySecretName?: string;
   claudeAiApiKeySecretName?: string;
 
-  federationManifestUrl?: string;
+  federationManifestUrl?: FederationManifestUrl;
 }
 
 // NEVER EVER CHANGE THIS NAME
@@ -216,7 +226,7 @@ export const defineLogs = (
               { api: 'api' },
               'http://localhost:8080',
               { protocol: 'wss', api: 'wsadmin', service: hostService },
-              getBaseUrl(qpqFederationManifestUrl),
+              getContentSecurityPolicyEntryFromManifestServiceUrlDefinition(qpqFederationManifestUrl),
             ],
 
             'style-src': [
@@ -227,7 +237,7 @@ export const defineLogs = (
             'script-src': [
               "'self'", // For scripts from the same domain
               // "'unsafe-eval'", // Allow eval() for webpack DONT DO THIS.
-              getBaseUrl(qpqFederationManifestUrl),
+              getContentSecurityPolicyEntryFromManifestServiceUrlDefinition(qpqFederationManifestUrl),
             ],
           },
         },

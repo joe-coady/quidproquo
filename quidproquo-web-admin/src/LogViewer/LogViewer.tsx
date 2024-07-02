@@ -1,5 +1,5 @@
 import React from 'react';
-import { Tabs, Tab } from '@mui/material';
+import { Tabs, Tab, CircularProgress } from '@mui/material';
 import Box from '@mui/material/Box';
 import { LogSearch } from './LogSearch';
 import { Dashboard } from './Dashboard';
@@ -7,8 +7,11 @@ import { useFederatedAddon } from '../useFederatedAddon';
 import { FederatedTab } from '../FederatedAddon';
 import RandomView from '../tmp/RandomView';
 
-export function useTabs(): FederatedTab[] {
-  const addons = useFederatedAddon('shop_fm');
+export function useTabs(): {
+  tabs: FederatedTab[];
+  loading: boolean;
+} {
+  const { addons, loading } = useFederatedAddon();
 
   const allTabs: FederatedTab[] = [
     // {
@@ -28,13 +31,16 @@ export function useTabs(): FederatedTab[] {
 
   console.log('allTabs', allTabs);
 
-  return allTabs;
+  return {
+    tabs: allTabs,
+    loading,
+  };
 }
 
 export function LogViewer() {
   const [selectedTab, setSelectedTab] = React.useState(0);
 
-  const allTabs = useTabs();
+  const { tabs, loading } = useTabs();
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);
@@ -43,7 +49,7 @@ export function LogViewer() {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100%' }}>
       <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
-        {allTabs
+        {tabs
           .filter((tab, index) => index === selectedTab)
           .map((tab) => (
             <tab.View key={tab.name} />
@@ -60,9 +66,10 @@ export function LogViewer() {
         }}
       >
         <Tabs value={selectedTab} onChange={handleTabChange} centered>
-          {allTabs.map((tab, index) => (
+          {tabs.map((tab, index) => (
             <Tab key={tab.name} label={tab.name} />
           ))}
+          {loading && <Tab label={<CircularProgress size={16} />} />}
         </Tabs>
       </Box>
     </Box>

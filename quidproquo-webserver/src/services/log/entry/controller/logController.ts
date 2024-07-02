@@ -8,7 +8,7 @@ import { ListLogChatMessages, SendLogChatMessage } from '../domain';
 import { askLogSendChatMessage } from '../../logic/askLogSendChatMessage';
 import { askGetLogChatMessages } from '../../logic/askGetLogChatMessages';
 
-import { logsLogic } from '../../logic';
+import { logsLogic, moduleFederationLogic } from '../../logic';
 import { askToggleLogChecked } from '../../logic/logs';
 
 export interface GetLogsParams {
@@ -78,7 +78,7 @@ export function* getServiceNames(event: HTTPEvent) {
 }
 
 export function* getManifestUrl(event: HTTPEvent) {
-  const manifestUrl = yield* askConfigGetGlobal('qpq-federationManifestUrl');
+  const manifestUrl = yield* moduleFederationLogic.askGetFederationManifestUrl();
 
   return toJsonEventResponse(manifestUrl);
 }
