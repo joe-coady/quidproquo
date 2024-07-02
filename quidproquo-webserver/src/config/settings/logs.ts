@@ -15,6 +15,7 @@ import { ContentSecurityPolicyEntry, QpqServiceContentSecurityPolicy } from '../
 
 export type ManifestServiceUrlDefinition = QpqServiceContentSecurityPolicy & {
   protocol: 'http' | 'https'; // Only can be serverd via http
+  domain: string;
   path: string;
 };
 

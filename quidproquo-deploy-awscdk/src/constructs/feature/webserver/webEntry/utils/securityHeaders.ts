@@ -1,5 +1,6 @@
 import { aws_cloudfront } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
+import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
 import {
   ResponseSecurityHeaders,
@@ -13,6 +14,7 @@ import {
   ResponseHeadersXSSProtection,
   ContentSecurityPolicyEntry,
   QpqServiceContentSecurityPolicy,
+  qpqWebServerUtils,
 } from 'quidproquo-webserver';
 
 export const convertStrictTransportSecurity = (
@@ -35,21 +37,22 @@ export const convertStrictTransportSecurity = (
   };
 };
 
-export const convertContentSecurityPolicyEntryToString = (
-  baseDomain: string,
-  contentSecurityPolicyEntry: ContentSecurityPolicyEntry,
-): string => {
+export const convertContentSecurityPolicyEntryToString = (qpqConfig: QPQConfig, contentSecurityPolicyEntry: ContentSecurityPolicyEntry): string => {
   if (typeof contentSecurityPolicyEntry === 'string') {
     return contentSecurityPolicyEntry;
   }
 
   // Otherwise its a QpqServiceContentSecurityPolicy
   const scsp: QpqServiceContentSecurityPolicy = contentSecurityPolicyEntry;
-  const domain = scsp.domain || baseDomain;
+  const webDomain = scsp.domain || qpqWebServerUtils.getDomainName(qpqConfig);
 
-  const fullDomain = scsp.service
-    ? `${scsp.api}.${scsp.service}.${domain}`
-    : `${scsp.api}.${domain}`;
+  const featureDomain = qpqWebServerUtils.getDomainRoot(
+    webDomain,
+    qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
+    qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
+  );
+
+  const fullDomain = scsp.service ? `${scsp.api}.${scsp.service}.${featureDomain}` : `${scsp.api}.${featureDomain}`;
 
   if (scsp.protocol) {
     return `${scsp.protocol}://${fullDomain}`;
@@ -59,7 +62,7 @@ export const convertContentSecurityPolicyEntryToString = (
 };
 
 export const convertContentSecurityPolicy = (
-  baseDomain: string,
+  qpqConfig: QPQConfig,
   contentSecurityPolicy?: ResponseHeadersContentSecurityPolicy,
 ): aws_cloudfront.ResponseHeadersContentSecurityPolicy | undefined => {
   if (!contentSecurityPolicy) {
@@ -78,22 +81,19 @@ export const convertContentSecurityPolicy = (
     // Or even better:
     // https://${bucketName}.s3.${region}.amazonaws.com
     // even better better could be to proxy secure links with a new web proxy and it would hide the bucket.
-    'connect-src': [
-      ...(contentSecurityPolicy.contentSecurityPolicy['connect-src'] || []),
-      'https://*.amazonaws.com',
-    ],
+    'connect-src': [...(contentSecurityPolicy.contentSecurityPolicy['connect-src'] || []), 'https://*.amazonaws.com'],
   };
 
   return {
     contentSecurityPolicy: Object.keys(contentSecurityPolicyCopy)
-      .map((directive) =>
-        [
+      .map((directive) => {
+        const result = [
           directive,
-          ...contentSecurityPolicyCopy[directive].map((cspe) =>
-            convertContentSecurityPolicyEntryToString(baseDomain, cspe),
-          ),
-        ].join(' '),
-      )
+          ...contentSecurityPolicyCopy[directive].map((cspe) => convertContentSecurityPolicyEntryToString(qpqConfig, cspe)),
+        ].join(' ');
+        console.log(directive, result);
+        return result;
+      })
       .join('; '),
     override: contentSecurityPolicy.override,
   };
@@ -113,9 +113,7 @@ export const convertContentTypeOptions = (
   };
 };
 
-export const convertFrameOptions = (
-  frameOptions?: ResponseHeadersFrameOptions,
-): aws_cloudfront.ResponseHeadersFrameOptions | undefined => {
+export const convertFrameOptions = (frameOptions?: ResponseHeadersFrameOptions): aws_cloudfront.ResponseHeadersFrameOptions | undefined => {
   if (!frameOptions) {
     return {
       frameOption: aws_cloudfront.HeadersFrameOption.DENY,
@@ -134,9 +132,7 @@ export const convertFrameOptions = (
   };
 };
 
-export const convertReferrerPolicy = (
-  referrerPolicy?: ResponseHeadersReferrerPolicy,
-): aws_cloudfront.ResponseHeadersReferrerPolicy | undefined => {
+export const convertReferrerPolicy = (referrerPolicy?: ResponseHeadersReferrerPolicy): aws_cloudfront.ResponseHeadersReferrerPolicy | undefined => {
   if (!referrerPolicy) {
     return {
       referrerPolicy: aws_cloudfront.HeadersReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN,
@@ -146,15 +142,12 @@ export const convertReferrerPolicy = (
 
   const referrerPolicyMap = {
     [HeadersReferrerPolicy.NO_REFERRER]: aws_cloudfront.HeadersReferrerPolicy.NO_REFERRER,
-    [HeadersReferrerPolicy.NO_REFERRER_WHEN_DOWNGRADE]:
-      aws_cloudfront.HeadersReferrerPolicy.NO_REFERRER_WHEN_DOWNGRADE,
+    [HeadersReferrerPolicy.NO_REFERRER_WHEN_DOWNGRADE]: aws_cloudfront.HeadersReferrerPolicy.NO_REFERRER_WHEN_DOWNGRADE,
     [HeadersReferrerPolicy.ORIGIN]: aws_cloudfront.HeadersReferrerPolicy.ORIGIN,
-    [HeadersReferrerPolicy.ORIGIN_WHEN_CROSS_ORIGIN]:
-      aws_cloudfront.HeadersReferrerPolicy.ORIGIN_WHEN_CROSS_ORIGIN,
+    [HeadersReferrerPolicy.ORIGIN_WHEN_CROSS_ORIGIN]: aws_cloudfront.HeadersReferrerPolicy.ORIGIN_WHEN_CROSS_ORIGIN,
     [HeadersReferrerPolicy.SAME_ORIGIN]: aws_cloudfront.HeadersReferrerPolicy.SAME_ORIGIN,
     [HeadersReferrerPolicy.STRICT_ORIGIN]: aws_cloudfront.HeadersReferrerPolicy.STRICT_ORIGIN,
-    [HeadersReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN]:
-      aws_cloudfront.HeadersReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN,
+    [HeadersReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN]: aws_cloudfront.HeadersReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN,
     [HeadersReferrerPolicy.UNSAFE_URL]: aws_cloudfront.HeadersReferrerPolicy.UNSAFE_URL,
   };
 
@@ -164,9 +157,7 @@ export const convertReferrerPolicy = (
   };
 };
 
-export const convertXssProtection = (
-  xssProtection?: ResponseHeadersXSSProtection,
-): aws_cloudfront.ResponseHeadersXSSProtection | undefined => {
+export const convertXssProtection = (xssProtection?: ResponseHeadersXSSProtection): aws_cloudfront.ResponseHeadersXSSProtection | undefined => {
   if (!xssProtection) {
     return {
       protection: true,
@@ -183,20 +174,15 @@ export const convertXssProtection = (
 };
 
 export const convertSecurityHeadersFromQpqSecurityHeaders = (
-  baseDomain: string,
+  qpqConfig: QPQConfig,
   securityHeaders?: ResponseSecurityHeaders,
 ): aws_cloudfront.ResponseSecurityHeadersBehavior => {
   return {
-    contentSecurityPolicy: convertContentSecurityPolicy(
-      baseDomain,
-      securityHeaders?.contentSecurityPolicy,
-    ),
+    contentSecurityPolicy: convertContentSecurityPolicy(qpqConfig, securityHeaders?.contentSecurityPolicy),
     contentTypeOptions: convertContentTypeOptions(securityHeaders?.contentTypeOptions),
     frameOptions: convertFrameOptions(securityHeaders?.frameOptions),
     referrerPolicy: convertReferrerPolicy(securityHeaders?.referrerPolicy),
     xssProtection: convertXssProtection(securityHeaders?.xssProtection),
-    strictTransportSecurity: convertStrictTransportSecurity(
-      securityHeaders?.strictTransportSecurity,
-    ),
+    strictTransportSecurity: convertStrictTransportSecurity(securityHeaders?.strictTransportSecurity),
   };
 };

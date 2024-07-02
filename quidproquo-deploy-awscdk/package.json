@@ -14,7 +14,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "npx rimraf lib && npx rimraf node_modules",
     "build": "npm run clean && npm run build:esm && npm run build:cjs",
-    "watch": "tsc -p tsconfig.esm.json -w",
+    "watch": "tsc -p tsconfig.commonjs.json -w",
     "build:cjs": "tsc -p tsconfig.commonjs.json",
     "build:esm": "tsc -p tsconfig.esm.json"
   },

@@ -131,10 +131,7 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
         //     },
         //   ],
         // },
-        securityHeadersBehavior: convertSecurityHeadersFromQpqSecurityHeaders(
-          qpqWebServerUtils.getBaseDomainName(props.qpqConfig),
-          props.webEntryConfig.securityHeaders,
-        ),
+        securityHeadersBehavior: convertSecurityHeadersFromQpqSecurityHeaders(props.qpqConfig, props.webEntryConfig.securityHeaders),
 
         // TODO: Expose this to config.
         corsBehavior: {
