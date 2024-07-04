@@ -2,15 +2,13 @@ import path from 'path';
 
 import { Configuration } from 'webpack';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
-import { Configuration as DevServerConfiguration } from 'webpack-dev-server';
 import packageJson from './package.json';
 import { ModuleFederationPlugin } from '@module-federation/enhanced/webpack';
 
-interface WebpackConfiguration extends Configuration {
-  devServer?: DevServerConfiguration;
-}
+// types for devServer ~ (╯°□°)╯︵ ┻━┻
+import 'webpack-dev-server';
 
-const config = (): WebpackConfiguration => {
+const config = (): Configuration => {
   console.log('WE NEED REACT VERSION: ', packageJson.dependencies.react);
 
   return {
