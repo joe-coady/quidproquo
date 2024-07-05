@@ -225,7 +225,7 @@ export const defineLogs = (
             'connect-src': [
               "'self'",
               { api: 'api' },
-              'http://localhost:8080',
+              'http://localhost:*',
               { protocol: 'wss', api: 'wsadmin', service: hostService },
               getContentSecurityPolicyEntryFromManifestServiceUrlDefinition(qpqFederationManifestUrl),
             ],
@@ -237,6 +237,7 @@ export const defineLogs = (
 
             'script-src': [
               "'self'", // For scripts from the same domain
+              'http://localhost:*',
               // "'unsafe-eval'", // Allow eval() for webpack DONT DO THIS.
               getContentSecurityPolicyEntryFromManifestServiceUrlDefinition(qpqFederationManifestUrl),
             ],

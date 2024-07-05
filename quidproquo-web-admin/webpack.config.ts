@@ -103,10 +103,12 @@ const config = (): Configuration => {
         shared: {
           react: {
             singleton: true,
+            eager: true,
             requiredVersion: packageJson.dependencies.react,
           },
           'react-dom': {
             singleton: true,
+            eager: true,
             requiredVersion: packageJson.dependencies['react-dom'],
           },
           'quidproquo-web-react': {
