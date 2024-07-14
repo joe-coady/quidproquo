@@ -1,14 +1,3 @@
 {
-  "extends": "quidproquo-tsconfig/tsconfig.commonjs.json",
-  "compilerOptions": {
-    "jsx": "react-jsx",
-    "outDir": "./lib"
-  },
-  "ts-node": {
-    "compilerOptions": {
-      "module": "commonjs"
-    }
-  },
-  "include": ["src", "../quidproquo-web-react/src/auth/WebSocketAuthProvider.tsx"],
-  "exclude": ["node_modules"]
+  "extends": "./tsconfig.commonjs.json"
 }

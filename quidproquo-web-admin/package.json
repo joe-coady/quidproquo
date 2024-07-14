@@ -2,17 +2,20 @@
   "name": "quidproquo-web-admin",
   "version": "0.0.209",
   "description": "",
-  "main": "./lib/index.js",
-  "types": "./lib/index.d.ts",
+  "main": "./lib/commonjs/index.js",
+  "module": "./lib/esm/index.js",
+  "types": "./lib/esm/index.d.ts",
+  "sideEffects": false,
   "files": [
     "lib/**/*"
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "npx rimraf lib && npx rimraf node_modules",
-    "start": "npx webpack serve --config webpack.config.ts --mode=development --port 3001",
-    "build": "npm run clean && npx webpack --config webpack.config.ts",
-    "watch": "npm run start"
+    "build": "npm run clean && npm run build:esm && npm run build:cjs",
+    "watch": "tsc -p tsconfig.esm.json -w",
+    "build:cjs": "tsc -p tsconfig.commonjs.json",
+    "build:esm": "tsc -p tsconfig.esm.json"
   },
   "repository": {
     "type": "git",
@@ -75,5 +78,8 @@
     "webpack-bundle-analyzer": "^4.10.2",
     "webpack-cli": "^5.0.2",
     "webpack-dev-server": "^4.13.3"
+  },
+  "peerDependencies": {
+    "react": ">=18.3.1"
   }
 }

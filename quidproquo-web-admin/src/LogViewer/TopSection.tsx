@@ -217,9 +217,7 @@ export function TopSection({ searchParams, setSearchParams, onSearch }: TopSecti
           </FormControl>
         </Grid>
         <Grid item xs={2}>
-          <AsyncButton onClick={() => onSearch()} style={{ width: '100%', height: '100%' }}>
-            Search
-          </AsyncButton>
+          <AsyncButton onClick={() => onSearch()}>Search</AsyncButton>
         </Grid>
       </Grid>
       <Menu id="quick-time-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleQuickTimeClose}>

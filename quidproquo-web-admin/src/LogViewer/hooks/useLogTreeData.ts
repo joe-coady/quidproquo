@@ -2,6 +2,7 @@ import { StoryResultMetadataWithChildren } from 'quidproquo-core';
 import { useEffect, useState } from 'react';
 import { useAuthAccessToken } from 'quidproquo-web-react';
 import { getLogHierarchy } from '../logic';
+import { TreeNodeDatum } from 'react-d3-tree';
 
 const filterQpqActions = (logs: StoryResultMetadataWithChildren[]): StoryResultMetadataWithChildren[] => {
   const filteredLogs: StoryResultMetadataWithChildren[] = [];
@@ -23,6 +24,8 @@ const filterQpqActions = (logs: StoryResultMetadataWithChildren[]): StoryResultM
 
   return filteredLogs;
 };
+
+export type TreeDataItem = TreeNodeDatum & StoryResultMetadataWithChildren;
 
 export type TreeApi = {
   treeData?: StoryResultMetadataWithChildren[];

@@ -8,7 +8,7 @@ export const genericFunctionRendererStyles = {
     padding: '10px', // Adding some padding for visual spacing
     borderRadius: '5px', // Optional: adds rounded corners to the <pre> tag
     whiteSpace: 'pre-wrap',
-    wordWrap: 'break-word',
+    wordWrap: 'break-word' as 'break-word',
   },
   functionName: { color: '#D0DC8B' }, // Function color
   stringValue: { color: '#CE834A' }, // String value color
@@ -57,7 +57,7 @@ export const ArrayVariableView = ({ value, expanded }: VariableViewProps) => {
         <span>]</span>
       </>
     ) : (
-      '[]'
+      <>[]</>
     );
   }
 
@@ -87,23 +87,11 @@ export const ArrayVariableView = ({ value, expanded }: VariableViewProps) => {
 };
 
 export const KvsQueryConditionVariableView = ({ value, expanded }: VariableViewProps) => {
-  return (
-    <GenericFunctionRenderer
-      functionName={`kvs${value.operation}`}
-      args={[value.key, value.valueA]}
-      expanded={expanded}
-    />
-  );
+  return <GenericFunctionRenderer functionName={`kvs${value.operation}`} args={[value.key, value.valueA]} expanded={expanded} />;
 };
 
 export const KvsLogicalOperatorVariableView = ({ value, expanded }: VariableViewProps) => {
-  return (
-    <GenericFunctionRenderer
-      functionName={`kvs${value.operation}`}
-      args={[value.conditions]}
-      expanded={expanded}
-    />
-  );
+  return <GenericFunctionRenderer functionName={`kvs${value.operation}`} args={[value.conditions]} expanded={expanded} />;
 };
 
 export const EmptyObjectVariableView = ({ value, expanded }: VariableViewProps) => {
@@ -114,17 +102,13 @@ export const EmptyObjectVariableView = ({ value, expanded }: VariableViewProps) 
       <span>{' }'}</span>
     </>
   ) : (
-    '{ }'
+    <>{`{ }`}</>
   );
 };
 
 export const QpqBinaryDataVariableView = ({ value, expanded }: VariableViewProps) => {
   return (
-    <img
-      src={`data:${value.mimeType || 'image/jpeg'};base64,${value.base64Data}`}
-      alt="Binary Data"
-      style={{ width: '100px', height: 'auto' }}
-    />
+    <img src={`data:${value.mimeType || 'image/jpeg'};base64,${value.base64Data}`} alt="Binary Data" style={{ width: '100px', height: 'auto' }} />
   );
 };
 
@@ -197,13 +181,7 @@ interface GenericFunctionRendererProps {
   expanded: boolean;
 }
 
-const renderBasicArg = (
-  arg: string,
-  value: any,
-  index: number,
-  expanded: boolean,
-  tooltip?: string,
-): JSX.Element => {
+const renderBasicArg = (arg: string, value: any, index: number, expanded: boolean, tooltip?: string): JSX.Element => {
   const tooltipText = `${tooltip || arg}\n\nvalue: ${JSON.stringify(value, null, 2)}`;
 
   return (
