@@ -1,6 +1,6 @@
 {
   "name": "quidproquo",
-  "version": "0.0.210",
+  "version": "0.0.211",
   "description": "",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
@@ -30,10 +30,10 @@
   "homepage": "https://github.com/joe-coady/quidproquo#readme",
   "devDependencies": {
     "typescript": "^4.9.3",
-    "quidproquo-tsconfig": "0.0.210"
+    "quidproquo-tsconfig": "0.0.211"
   },
   "dependencies": {
-    "quidproquo-core": "0.0.210",
-    "quidproquo-webserver": "0.0.210"
+    "quidproquo-core": "0.0.211",
+    "quidproquo-webserver": "0.0.211"
   }
 }
