@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Box, TextField, Button, Avatar, Typography, Paper, CircularProgress } from '@mui/material';
 import { Person as PersonIcon, Android as AndroidIcon } from '@mui/icons-material';
-import { useAuthAccessToken } from 'quidproquo-web-react';
+import { useAuthAccessToken, useBaseUrlResolvers } from 'quidproquo-web-react';
 import { apiRequestPost } from '../../logic';
 import { LogChatMessage, SendLogChatMessage, ListLogChatMessages } from '../../types';
 import { QpqPagedData } from 'quidproquo-core';
@@ -18,6 +18,7 @@ export const HelpChat: React.FC<HelpChatProps> = ({ logCorrelation }) => {
   const [nextPageKey, setNextPageKey] = useState<string | undefined>(undefined);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const accessToken = useAuthAccessToken();
+  const baseUrlResolvers = useBaseUrlResolvers();
 
   useEffect(() => {
     fetchChatMessages();
@@ -30,7 +31,12 @@ export const HelpChat: React.FC<HelpChatProps> = ({ logCorrelation }) => {
     };
 
     try {
-      const response = await apiRequestPost<QpqPagedData<LogChatMessage>>('/log/chat', listLogChatMessages, accessToken);
+      const response = await apiRequestPost<QpqPagedData<LogChatMessage>>(
+        '/log/chat',
+        listLogChatMessages,
+        baseUrlResolvers.getApiUrl(),
+        accessToken,
+      );
 
       setChatMessages((prevMessages) => [...prevMessages, ...response.items]);
       setNextPageKey(response.nextPageKey);
@@ -57,7 +63,7 @@ export const HelpChat: React.FC<HelpChatProps> = ({ logCorrelation }) => {
       setPendingRequests((prevCount) => prevCount + 1);
 
       try {
-        const response = await apiRequestPost<LogChatMessage>('/log/chat/message', sendLogChatMessage, accessToken);
+        const response = await apiRequestPost<LogChatMessage>('/log/chat/message', sendLogChatMessage, baseUrlResolvers.getApiUrl(), accessToken);
 
         setChatMessages((prevMessages) => [...prevMessages, response]);
       } finally {

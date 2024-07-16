@@ -4,7 +4,7 @@ import { loadRemote, registerRemotes } from '@module-federation/enhanced/runtime
 
 import { FederatedAddon } from './FederatedAddon';
 import { getFederationManifest, getFederationManifestUrl } from './LogViewer/logic';
-import { useAuthAccessToken } from 'quidproquo-web-react';
+import { useAuthAccessToken, useBaseUrlResolvers } from 'quidproquo-web-react';
 
 export function useFederatedAddon(): {
   addons: FederatedAddon[];
@@ -13,12 +13,13 @@ export function useFederatedAddon(): {
   const [federatedAddons, setFederatedAddons] = useState<FederatedAddon[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const accessToken = useAuthAccessToken();
+  const baseUrlResolvers = useBaseUrlResolvers();
 
   useEffect(() => {
     const doAsyncWork = async () => {
       setLoading(true);
 
-      const manifestUrl = await getFederationManifestUrl(accessToken);
+      const manifestUrl = await getFederationManifestUrl(baseUrlResolvers.getApiUrl(), accessToken);
 
       console.log(`manifestUrl: [${manifestUrl}]`);
       if (!manifestUrl) {
@@ -27,7 +28,7 @@ export function useFederatedAddon(): {
       }
 
       console.log(`Reading manifest: [${manifestUrl}]`);
-      const manifest = await getFederationManifest(manifestUrl);
+      const manifest = await getFederationManifest(baseUrlResolvers.getApiUrl(), manifestUrl);
 
       if (!manifest.id) {
         console.log(`Manifest missing id`);

@@ -8,10 +8,10 @@ import {
   getServiceEntry,
 } from 'quidproquo-core';
 import { defineRoute } from './route';
-import { defineWebEntry } from './webEntry';
+
 import { defineWebsocket } from './websocket';
 import { adminUserDirectoryResourceName } from './adminUserDirectory';
-import { ContentSecurityPolicyEntry, QpqServiceContentSecurityPolicy } from '../types/ResponseSecurityHeaders';
+import { QpqServiceContentSecurityPolicy } from '../types/ResponseSecurityHeaders';
 
 export type ManifestServiceUrlDefinition = QpqServiceContentSecurityPolicy & {
   protocol: 'http' | 'https'; // Only can be serverd via http
@@ -21,32 +21,10 @@ export type ManifestServiceUrlDefinition = QpqServiceContentSecurityPolicy & {
 
 export type FederationManifestUrl = ManifestServiceUrlDefinition | string;
 
-function getContentSecurityPolicyEntryFromManifestServiceUrlDefinition(url?: FederationManifestUrl): ContentSecurityPolicyEntry {
-  // If its a QpqServiceContentSecurityPolicy - remove the path from the ManifestServiceUrlDefinition
-  if (typeof url === 'object') {
-    const { path, ...rest } = url;
-    return rest;
-  }
-
-  if (!url) {
-    return '';
-  }
-
-  // Use a URL object to parse the URL
-  const parsedUrl = new URL(url);
-
-  // Update the pathname of the parsed URL to root
-  parsedUrl.pathname = '/';
-
-  // Return the updated URL
-  return parsedUrl.origin;
-}
-
 export interface QPQConfigAdvancedLogSettings extends QPQConfigAdvancedSettings {
   logRetentionDays?: number;
   coldStorageAfterDays?: number;
 
-  cloudflareApiKeySecretName?: string;
   claudeAiApiKeySecretName?: string;
 
   federationManifestUrl?: FederationManifestUrl;
@@ -61,14 +39,7 @@ const logResourceName = 'qpq-logs';
 export const logReportsResourceName = 'qpq-log-reports';
 export const wsConnectionResourceName = 'qpq-admin-connections';
 
-export const defineLogs = (
-  buildPath: string,
-  webFilesPath: string,
-  rootDomain: string,
-  hostService: string,
-  services: string[],
-  advancedSettings?: QPQConfigAdvancedLogSettings,
-): QPQConfig => {
+export const defineLogs = (buildPath: string, rootDomain: string, services: string[], advancedSettings?: QPQConfigAdvancedLogSettings): QPQConfig => {
   const routeAuthSettings = {
     routeAuthSettings: {
       userDirectoryName: adminUserDirectoryResourceName,
@@ -89,8 +60,6 @@ export const defineLogs = (
   const logRetentionDays: number | undefined = advancedSettings?.logRetentionDays
     ? Math.max(advancedSettings?.logRetentionDays || 30, advancedSettings?.coldStorageAfterDays ? advancedSettings?.coldStorageAfterDays + 180 : 0)
     : undefined;
-
-  const qpqFederationManifestUrl = advancedSettings?.federationManifestUrl || '';
 
   const configs = [
     defineGlobal('qpq-serviceNames', services),
@@ -200,51 +169,6 @@ export const defineLogs = (
         apiName: 'wsadmin',
       },
     ),
-
-    defineWebEntry('admin', {
-      buildPath: webFilesPath,
-      seoBuildPath: buildPath,
-
-      domain: {
-        subDomainName: 'admin',
-        onRootDomain: false,
-        rootDomain,
-      },
-
-      ignoreCache: ['index.html', 'index.js', 'remoteEntry.js', 'mf-manifest.json'],
-
-      cloudflareApiKeySecretName: advancedSettings?.cloudflareApiKeySecretName,
-
-      securityHeaders: {
-        contentSecurityPolicy: {
-          override: true,
-          contentSecurityPolicy: {
-            'default-src': ["'self'"],
-
-            // maybe pass in the api / localhost port in as args
-            'connect-src': [
-              "'self'",
-              { api: 'api' },
-              'http://localhost:*',
-              { protocol: 'wss', api: 'wsadmin', service: hostService },
-              getContentSecurityPolicyEntryFromManifestServiceUrlDefinition(qpqFederationManifestUrl),
-            ],
-
-            'style-src': [
-              "'self'",
-              "'unsafe-inline'", // For inline styles
-            ],
-
-            'script-src': [
-              "'self'", // For scripts from the same domain
-              'http://localhost:*',
-              // "'unsafe-eval'", // Allow eval() for webpack DONT DO THIS.
-              getContentSecurityPolicyEntryFromManifestServiceUrlDefinition(qpqFederationManifestUrl),
-            ],
-          },
-        },
-      },
-    }),
   ];
 
   return configs;

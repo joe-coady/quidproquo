@@ -1,6 +1,6 @@
 import { StoryResultMetadataWithChildren } from 'quidproquo-core';
 import { useEffect, useState } from 'react';
-import { useAuthAccessToken } from 'quidproquo-web-react';
+import { useAuthAccessToken, useBaseUrlResolvers } from 'quidproquo-web-react';
 import { getLogHierarchy } from '../logic';
 import { TreeNodeDatum } from 'react-d3-tree';
 
@@ -37,12 +37,13 @@ export type TreeApi = {
 export const useLogTreeData = (correlationId: string, hideQpqActions: boolean = false): TreeApi => {
   const [treeData, setTreeData] = useState<StoryResultMetadataWithChildren[]>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const baseUrlResolvers = useBaseUrlResolvers();
 
   const accessToken = useAuthAccessToken();
 
   const refreshTreeData = async () => {
     setIsLoading(true);
-    const logHierarchy = await getLogHierarchy(correlationId, true, accessToken);
+    const logHierarchy = await getLogHierarchy(baseUrlResolvers.getApiUrl(), correlationId, true, accessToken);
 
     if (logHierarchy) {
       setTreeData([logHierarchy]);
@@ -55,7 +56,7 @@ export const useLogTreeData = (correlationId: string, hideQpqActions: boolean = 
     const fetchTreeData = async () => {
       setIsLoading(true);
       console.log('correlationId: ', correlationId);
-      const logHierarchy = await getLogHierarchy(correlationId, false, accessToken);
+      const logHierarchy = await getLogHierarchy(baseUrlResolvers.getApiUrl(), correlationId, false, accessToken);
 
       if (logHierarchy) {
         setTreeData([logHierarchy]);

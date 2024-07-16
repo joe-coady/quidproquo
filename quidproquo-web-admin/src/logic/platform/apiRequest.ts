@@ -1,34 +1,28 @@
 import axios from 'axios';
-import { getApiBaseUrl } from './getApiBaseUrl';
+import { BaseUrlResolver } from 'quidproquo-web-react';
 
 const getHeaders = (accessToken?: string) => ({
   'Content-Type': 'application/json',
   ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
 });
 
-const getAxiosInstance = (accessToken?: string) => {
-  const baseURL = getApiBaseUrl();
-
+const getAxiosInstance = (apiBaseUrl: string, accessToken?: string) => {
   const instance = axios.create({
-    baseURL,
+    baseURL: apiBaseUrl,
     headers: getHeaders(accessToken),
   });
 
   return instance;
 };
 
-export const apiRequestPost = async <T = any>(
-  path: string,
-  body: object,
-  accessToken?: string,
-): Promise<T> => {
-  const res = await getAxiosInstance(accessToken).post(path, body);
+export const apiRequestPost = async <T = any>(path: string, body: object, apiBaseUrl: string, accessToken?: string): Promise<T> => {
+  const res = await getAxiosInstance(apiBaseUrl, accessToken).post(path, body);
 
   return res.data;
 };
 
-export const apiRequestGet = async <T = any>(path: string, accessToken?: string): Promise<T> => {
-  const res = await getAxiosInstance(accessToken).get(path);
+export const apiRequestGet = async <T = any>(path: string, apiBaseUrl: string, accessToken?: string): Promise<T> => {
+  const res = await getAxiosInstance(apiBaseUrl, accessToken).get(path);
 
   return res.data as T;
 };

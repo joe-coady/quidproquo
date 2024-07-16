@@ -26,6 +26,7 @@ import { useExternalData, usePlatformDataFromPath } from '../components/LoadingB
 import { useIsLoading } from '../view';
 import { apiRequestPost } from '../logic';
 import { StoryResult } from 'quidproquo-core';
+import { useBaseUrlResolvers } from 'quidproquo-web-react';
 import { useState } from 'react';
 import { useLogTreeData } from './hooks';
 
@@ -58,12 +59,13 @@ const getTabStyle = (tabIndex: number, selectedTab: number) => ({
 const LogDialog = ({ logCorrelation, open, handleClose, storyResultMetadatas, setSelectedLogCorrelation }: LogDialogProps) => {
   const signedRequest = usePlatformDataFromPath<{ url: string }>(getLogUrl(logCorrelation));
   const log = useExternalData<StoryResult<any>>(signedRequest?.url);
+  const urlResolvers = useBaseUrlResolvers();
 
   const isLoading = useIsLoading() || !log;
 
   const handleExecute = async () => {
     if (log) {
-      await apiRequestPost('http://localhost:8080/admin/service/log/execute', log);
+      await apiRequestPost('http://localhost:8080/admin/service/log/execute', log, urlResolvers.getApiUrl());
     }
   };
 

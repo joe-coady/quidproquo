@@ -6,7 +6,7 @@ import { respondToAuthChallenge } from '../LogViewer/logic/respondToAuthChalleng
 import { Login } from './Login';
 import { AuthChallengeNewPasswordRequired } from './AuthChallengeNewPasswordRequired';
 import { AuthState } from '../types';
-import { authContext } from 'quidproquo-web-react';
+import { authContext, useBaseUrlResolvers } from 'quidproquo-web-react';
 import { useRefreshTokens } from 'quidproquo-web-react';
 import { refreshTokens } from '../LogViewer/logic/refreshTokens';
 
@@ -20,9 +20,11 @@ export const useAuth = () => {
     password: '',
   });
 
+  const baseUrlResolvers = useBaseUrlResolvers();
+
   const onLogin = async () => {
     try {
-      const result = await login(authState.username, authState.password);
+      const result = await login(authState.username, authState.password, baseUrlResolvers.getApiUrl());
       setAuthState((currentAuthState) => ({
         ...currentAuthState,
         challenge: result.challenge,
@@ -36,7 +38,7 @@ export const useAuth = () => {
 
   const refresh = async (authState: AuthState): Promise<void> => {
     try {
-      const result = await refreshTokens(authState);
+      const result = await refreshTokens(authState, baseUrlResolvers.getApiUrl());
 
       setAuthState((currentAuthState) => ({
         ...currentAuthState,
@@ -56,7 +58,13 @@ export const useAuth = () => {
   };
 
   const onRespondToAuthChallenge = async (newPassword: string) => {
-    const result = await respondToAuthChallenge(authState.username, authState.session!, authState.challenge!, newPassword);
+    const result = await respondToAuthChallenge(
+      authState.username,
+      authState.session!,
+      authState.challenge!,
+      newPassword,
+      baseUrlResolvers.getApiUrl(),
+    );
 
     setAuthState((currentAuthState) => ({
       ...currentAuthState,

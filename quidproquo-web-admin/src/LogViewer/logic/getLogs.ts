@@ -1,6 +1,7 @@
 import { StoryResultMetadata } from 'quidproquo-core';
 import { QpqLogList } from 'quidproquo-webserver';
 import { apiRequestPost } from '../../logic';
+import { BaseUrlResolver } from 'quidproquo-web-react';
 
 export const getLogs = async (
   url: string,
@@ -13,6 +14,7 @@ export const getLogs = async (
   userFilter: string,
   deep: string,
   onlyErrors: boolean,
+  apiBaseUrl: string,
   accessToken?: string,
 ): Promise<StoryResultMetadata[]> => {
   var logs: StoryResultMetadata[] = [];
@@ -38,6 +40,7 @@ export const getLogs = async (
         ...requestSpan,
         nextPageKey: nextPageKey,
       },
+      apiBaseUrl,
       accessToken,
     );
 
