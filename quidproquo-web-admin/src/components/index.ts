@@ -9,3 +9,4 @@ export * from './GridContainer';
 export * from './GridItem';
 export * from './TextInput';
 export * from './DataGrid';
+export * from './AutocompleteInput';
