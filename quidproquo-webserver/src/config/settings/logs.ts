@@ -11,23 +11,20 @@ import { defineRoute } from './route';
 
 import { defineWebsocket } from './websocket';
 import { adminUserDirectoryResourceName } from './adminUserDirectory';
-import { QpqServiceContentSecurityPolicy } from '../types/ResponseSecurityHeaders';
 
-export type ManifestServiceUrlDefinition = QpqServiceContentSecurityPolicy & {
-  protocol: 'http' | 'https'; // Only can be serverd via http
-  domain: string;
-  path: string;
-};
+// export type ManifestServiceUrlDefinition = QpqServiceContentSecurityPolicy & {
+//   protocol: 'http' | 'https'; // Only can be serverd via http
+//   domain: string;
+//   path: string;
+// };
 
-export type FederationManifestUrl = ManifestServiceUrlDefinition | string;
+// export type FederationManifestUrl = ManifestServiceUrlDefinition | string;
 
 export interface QPQConfigAdvancedLogSettings extends QPQConfigAdvancedSettings {
   logRetentionDays?: number;
   coldStorageAfterDays?: number;
 
   claudeAiApiKeySecretName?: string;
-
-  federationManifestUrl?: FederationManifestUrl;
 }
 
 // NEVER EVER CHANGE THIS NAME
@@ -64,7 +61,6 @@ export const defineLogs = (buildPath: string, rootDomain: string, services: stri
   const configs = [
     defineGlobal('qpq-serviceNames', services),
     defineGlobal('qpq-log-retention-days', logRetentionDays),
-    defineGlobal('qpq-federationManifestUrl', advancedSettings?.federationManifestUrl || ''),
 
     defineStorageDrive(logResourceName, {
       onEvent: {
@@ -119,7 +115,6 @@ export const defineLogs = (buildPath: string, rootDomain: string, services: stri
     defineRoute('POST', '/challenge', getServiceEntry('log', 'controller', 'loginController'), 'respondToAuthChallenge'),
 
     defineRoute('GET', '/admin/services', getServiceEntry('log', 'controller', 'logController'), 'getServiceNames'),
-    defineRoute('GET', '/admin/fmurl', getServiceEntry('log', 'controller', 'logController'), 'getManifestUrl'),
 
     defineRoute('POST', '/log/list', getServiceEntry('log', 'controller', 'logController'), 'getLogs', routeAuthSettings),
 

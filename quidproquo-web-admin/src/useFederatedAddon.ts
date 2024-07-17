@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { loadRemote, registerRemotes } from '@module-federation/enhanced/runtime';
 
 import { FederatedAddon } from './FederatedAddon';
-import { getFederationManifest, getFederationManifestUrl } from './LogViewer/logic';
+import { getFederationManifest } from './LogViewer/logic';
 import { useAuthAccessToken, useBaseUrlResolvers } from 'quidproquo-web-react';
 
 export function useFederatedAddon(): {
@@ -19,7 +19,7 @@ export function useFederatedAddon(): {
     const doAsyncWork = async () => {
       setLoading(true);
 
-      const manifestUrl = await getFederationManifestUrl(baseUrlResolvers.getApiUrl(), accessToken);
+      const manifestUrl = `${baseUrlResolvers.getMFManifestUrl()}/mf-manifest.json`;
 
       console.log(`manifestUrl: [${manifestUrl}]`);
       if (!manifestUrl) {
