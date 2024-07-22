@@ -1,9 +1,4 @@
-import {
-  DynamoDBClient,
-  ReturnValue,
-  UpdateItemCommand,
-  UpdateItemCommandInput,
-} from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, ReturnValue, UpdateItemCommand, UpdateItemCommandInput } from '@aws-sdk/client-dynamodb';
 
 import { KvsUpdate, KvsCoreDataType } from 'quidproquo-core';
 
@@ -22,6 +17,7 @@ export async function updateItem<Item>(
   update: KvsUpdate,
   keyName: string,
   key: KvsCoreDataType,
+  sortkeyName?: string,
   sortKey?: KvsCoreDataType,
 ): Promise<Item> {
   const dynamoDBClient = createAwsClient(DynamoDBClient, { region });
@@ -37,8 +33,8 @@ export async function updateItem<Item>(
     ReturnValues: ReturnValue.ALL_NEW,
   };
 
-  if (sortKey) {
-    params.Key!['sk'] = buildAttributeValue(sortKey);
+  if (sortkeyName && sortKey !== undefined) {
+    params.Key![sortkeyName] = buildAttributeValue(sortKey);
   }
 
   const result = await dynamoDBClient.send(new UpdateItemCommand(params));
