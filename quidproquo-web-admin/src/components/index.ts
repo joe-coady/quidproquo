@@ -10,3 +10,4 @@ export * from './GridItem';
 export * from './TextInput';
 export * from './DataGrid';
 export * from './AutocompleteInput';
+export * from './AdminDialog';
