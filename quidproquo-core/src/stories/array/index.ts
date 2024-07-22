@@ -3,3 +3,4 @@ export * from './askMap';
 export * from './askReduce';
 export * from './askMapParallel';
 export * from './askMapParallelBatch';
+export * from './askArraySome';
