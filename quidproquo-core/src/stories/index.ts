@@ -5,3 +5,4 @@ export * from './dateTime';
 export * from './askProcessEvent';
 export * from './askGetApplicationVersion';
 export * from './kvs';
+export * from './binaryData';
