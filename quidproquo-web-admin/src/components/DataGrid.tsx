@@ -1,33 +1,30 @@
-import { DataGrid as MuiDataGrid, GridColDef } from '@mui/x-data-grid';
+import { DataGrid as MuiDataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 import { Box } from '@mui/material';
 
-export interface DataGridColumDefinitions<T> {
-  field: string;
+export type DataGridColumDefinitions<T extends object> = {
   headerName: string;
   widthScale?: number;
   sortable?: boolean;
-  valueGetter?: (i: T) => any;
-}
+} & ({ field: keyof T } | { valueGetter: (i: T) => any });
 
-interface DataGridProps<T> {
+export interface DataGridProps<T extends object> {
   items: T[];
   columns: DataGridColumDefinitions<T>[];
-  onRowClick?: (item: T) => void;
+  onRowClick?: (row: T) => void;
 }
 
-export const DataGrid = <T,>({ items, columns, onRowClick }: DataGridProps<T>) => {
+export const DataGrid = <T extends object>({ items, columns, onRowClick }: DataGridProps<T>) => {
   const handleRowClick = ({ row }: { row: T }) => {
-    () => {
-      onRowClick?.(row);
-    };
+    onRowClick?.(row);
   };
 
-  const muiColumns: GridColDef[] = columns.map((col) => ({
-    field: col.field,
+  const muiColumns: GridColDef[] = columns.map((col, index) => ({
     headerName: col.headerName,
     flex: col.widthScale,
     sortable: col.sortable !== undefined ? col.sortable : true,
-    valueGetter: col.valueGetter ? (item) => col.valueGetter?.(item.row) : undefined,
+
+    field: 'field' in col ? (col.field as string) : `_dynamicField${index}`,
+    valueGetter: 'valueGetter' in col ? (params: GridValueGetterParams) => col.valueGetter!(params.row as T) : undefined,
   }));
 
   return (
