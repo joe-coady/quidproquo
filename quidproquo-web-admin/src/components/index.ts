@@ -11,3 +11,4 @@ export * from './TextInput';
 export * from './DataGrid';
 export * from './AutocompleteInput';
 export * from './AdminDialog';
+export * from './LoadingSpinner';

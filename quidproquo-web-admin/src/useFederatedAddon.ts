@@ -49,7 +49,7 @@ export function useFederatedAddon(): {
 
       // Load the remote
       console.log(`Loading remote: [${manifest.id}]`);
-      const remote = await loadRemote<any>(`${manifest.id}/qpqAdminAddon`, {
+      const remote = await loadRemote<any>(`${manifest.id}/shared`, {
         from: 'runtime',
       });
 

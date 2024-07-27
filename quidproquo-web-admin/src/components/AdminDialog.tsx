@@ -1,12 +1,11 @@
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Tabs, Tab, AppBar } from '@mui/material';
 import { useState } from 'react';
 
-export const useAdminDialog = (title: string, tabs: string[], defaultTab: string) => {
-  const [open, setIsOpen] = useState<boolean>(true);
+export const useAdminDialog = (tabs: string[], defaultTab: string) => {
+  const [open, setIsOpen] = useState<boolean>(false);
   const [selectedTab, setSelectedTab] = useState<string>(defaultTab);
 
   return {
-    title,
     open,
     tabs,
     selectedTab,
