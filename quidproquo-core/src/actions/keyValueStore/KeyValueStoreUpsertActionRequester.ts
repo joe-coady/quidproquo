@@ -1,8 +1,8 @@
+import { createErrorEnumForAction } from '../../types';
 import { KeyValueStoreActionType } from './KeyValueStoreActionType';
-import {
-  KeyValueStoreUpsertActionRequester,
-  KeyValueStoreUpsertOptions,
-} from './KeyValueStoreUpsertActionTypes';
+import { KeyValueStoreUpsertActionRequester, KeyValueStoreUpsertOptions } from './KeyValueStoreUpsertActionTypes';
+
+export const KeyValueStoreUpsertErrorTypeEnum = createErrorEnumForAction(KeyValueStoreActionType.Upsert, ['ServiceUnavailable']);
 
 export function* askKeyValueStoreUpsert<KvsItem>(
   keyValueStoreName: string,

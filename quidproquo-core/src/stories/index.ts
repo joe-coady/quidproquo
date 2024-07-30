@@ -6,3 +6,4 @@ export * from './askProcessEvent';
 export * from './askGetApplicationVersion';
 export * from './kvs';
 export * from './binaryData';
+export * from './askRetry';
