@@ -130,6 +130,8 @@ export class QpqCoreUserDirectoryConstruct extends QpqCoreUserDirectoryConstruct
       });
 
       userPool.addTrigger(aws_cognito.UserPoolOperation.CUSTOM_MESSAGE, customMessageTrigger.lambdaFunction);
+
+      userPool.addTrigger(aws_cognito.UserPoolOperation.POST_CONFIRMATION, customMessageTrigger.lambdaFunction);
     }
 
     qpqDeployAwsCdkUtils.exportStackValue(

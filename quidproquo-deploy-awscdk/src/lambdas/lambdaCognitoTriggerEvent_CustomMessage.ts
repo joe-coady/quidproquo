@@ -1,9 +1,9 @@
 import { QpqRuntimeType } from 'quidproquo-core';
 
-import { CustomMessageTriggerEvent, Context } from 'aws-lambda';
+import { CustomMessageTriggerEvent } from 'aws-lambda';
 
 import { getQpqLambdaRuntimeForEvent } from './lambda-utils';
-import { getcognitoCustomMessageEventProcessor } from 'quidproquo-actionprocessor-awslambda';
+import { getCognitoCustomMessageEventProcessor } from 'quidproquo-actionprocessor-awslambda';
 
 // Default executor
 export const executeLambdaCognitoCustomMessageTriggerEvent = getQpqLambdaRuntimeForEvent<CustomMessageTriggerEvent>(
@@ -14,5 +14,5 @@ export const executeLambdaCognitoCustomMessageTriggerEvent = getQpqLambdaRuntime
       context: {},
     };
   },
-  (qpqConfig) => getcognitoCustomMessageEventProcessor(qpqConfig),
+  (qpqConfig) => getCognitoCustomMessageEventProcessor(qpqConfig),
 );

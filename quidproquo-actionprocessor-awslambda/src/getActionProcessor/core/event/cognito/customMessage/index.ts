@@ -6,7 +6,7 @@ import getMatchStory from './matchStory';
 import getTransformResponseResult from './transformResponseResult';
 import getStorySession from './getStorySession';
 
-export const getcognitoCustomMessageEventProcessor = (qpqConfig: QPQConfig) => ({
+export const getCognitoCustomMessageEventProcessor = (qpqConfig: QPQConfig) => ({
   ...getStorySession(qpqConfig),
   ...getGetRecords(qpqConfig),
   ...getMatchStory(qpqConfig),
