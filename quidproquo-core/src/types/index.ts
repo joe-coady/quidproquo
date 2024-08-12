@@ -18,3 +18,4 @@ export * from './QpqLogger';
 export * from './EventMessage';
 export * from './utils';
 export * from './ExcludeKeys';
+export * from './ConfigUrlDefinition';

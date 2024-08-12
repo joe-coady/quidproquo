@@ -1,17 +1,18 @@
-import { QPQConfig, UserDirectoryQPQConfigSetting, qpqCoreUtils } from 'quidproquo-core';
+import { AuthDirectoryFederatedProviderType, QPQConfig, UserDirectoryQPQConfigSetting, qpqCoreUtils } from 'quidproquo-core';
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { QpqResource } from '../../../base/QpqResource';
 
 import { Construct } from 'constructs';
-import { aws_iam, aws_cognito, aws_lambda } from 'aws-cdk-lib';
+import { aws_iam, aws_cognito, aws_lambda, aws_route53, aws_route53_targets } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
 
 import { Function } from '../../../basic/Function';
 import { resolveAwsServiceAccountInfo } from 'quidproquo-config-aws';
+import { DnsValidatedCertificate } from '../../../basic/DnsValidatedCertificate';
 
 export interface QpqCoreUserDirectoryConstructProps extends QpqConstructBlockProps {
   userDirectoryConfig: UserDirectoryQPQConfigSetting;
@@ -76,9 +77,11 @@ export class QpqCoreUserDirectoryConstruct extends QpqCoreUserDirectoryConstruct
   constructor(scope: Construct, id: string, props: QpqCoreUserDirectoryConstructProps) {
     super(scope, id, props);
 
+    const userPoolName = this.resourceName(props.userDirectoryConfig.name);
+
     const userPool = new aws_cognito.UserPool(this, 'user-pool', {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
-      userPoolName: this.resourceName(props.userDirectoryConfig.name),
+      userPoolName: userPoolName,
       selfSignUpEnabled: props.userDirectoryConfig.selfSignUpEnabled,
       standardAttributes: {
         email: {
@@ -135,12 +138,84 @@ export class QpqCoreUserDirectoryConstruct extends QpqCoreUserDirectoryConstruct
       this.userPool.userPoolId,
     );
 
+    const federatedProviders = props.userDirectoryConfig.oAuth?.federatedProviders || [];
+    federatedProviders.forEach((fp) => {
+      if (fp.type === AuthDirectoryFederatedProviderType.Facebook) {
+        new aws_cognito.UserPoolIdentityProviderFacebook(this, fp.clientId, {
+          userPool: this.userPool,
+          clientId: fp.clientId,
+          clientSecret: fp.clientSecret,
+
+          scopes: ['public_profile', 'email'],
+          attributeMapping: {
+            email: aws_cognito.ProviderAttribute.FACEBOOK_EMAIL,
+            givenName: aws_cognito.ProviderAttribute.FACEBOOK_FIRST_NAME,
+            familyName: aws_cognito.ProviderAttribute.FACEBOOK_LAST_NAME,
+            middleName: aws_cognito.ProviderAttribute.FACEBOOK_MIDDLE_NAME,
+            birthdate: aws_cognito.ProviderAttribute.FACEBOOK_BIRTHDAY,
+            profilePicture: aws_cognito.ProviderAttribute.other('picture'),
+          },
+        });
+      } else if (fp.type === AuthDirectoryFederatedProviderType.Google) {
+        new aws_cognito.UserPoolIdentityProviderGoogle(this, fp.clientId, {
+          userPool: this.userPool,
+          clientId: fp.clientId,
+          clientSecret: fp.clientSecret,
+          scopes: ['profile', 'email'],
+          attributeMapping: {
+            email: aws_cognito.ProviderAttribute.GOOGLE_EMAIL,
+            givenName: aws_cognito.ProviderAttribute.GOOGLE_NAME,
+            familyName: aws_cognito.ProviderAttribute.GOOGLE_FAMILY_NAME,
+            birthdate: aws_cognito.ProviderAttribute.GOOGLE_BIRTHDAYS,
+            profilePicture: aws_cognito.ProviderAttribute.GOOGLE_PICTURE,
+          },
+        });
+      }
+    });
+
+    if (props.userDirectoryConfig.dnsRecord) {
+      const dnsRecord = new DnsValidatedCertificate(this, 'validcert', {
+        domain: {
+          onRootDomain: true,
+          subDomainNames: [props.userDirectoryConfig.dnsRecord.subdomain],
+          rootDomain: props.userDirectoryConfig.dnsRecord.rootDomain,
+        },
+
+        awsAccountId: props.awsAccountId,
+        qpqConfig: props.qpqConfig,
+      });
+
+      const userPoolDomain = new aws_cognito.UserPoolDomain(this, 'user-pool-domain', {
+        userPool: this.userPool,
+
+        // Full custom domain
+        customDomain: {
+          certificate: dnsRecord.certificate,
+          domainName: dnsRecord.domainNames[0],
+        },
+      });
+
+      new aws_route53.ARecord(this, 'CognitoDomainAliasRecord', {
+        zone: dnsRecord.hostedZone,
+        recordName: dnsRecord.domainNames[0],
+        target: aws_route53.RecordTarget.fromAlias(new aws_route53_targets.UserPoolDomainTarget(userPoolDomain)),
+      });
+    }
+
     const userPoolClient = new aws_cognito.UserPoolClient(this, 'user-pool-client', {
       userPoolClientName: this.qpqResourceName(props.userDirectoryConfig.name, 'upc'),
       userPool: this.userPool,
       generateSecret: true,
       authFlows: {
         adminUserPassword: true,
+      },
+      supportedIdentityProviders: federatedProviders.map((fp) =>
+        fp.type === AuthDirectoryFederatedProviderType.Facebook
+          ? aws_cognito.UserPoolClientIdentityProvider.FACEBOOK
+          : aws_cognito.UserPoolClientIdentityProvider.GOOGLE,
+      ),
+      oAuth: {
+        callbackUrls: props.userDirectoryConfig.oAuth?.callbacks?.map((cb) => qpqCoreUtils.getFullUrlFromConfigUrl(cb, props.qpqConfig)),
       },
     });
 

@@ -23,7 +23,15 @@ import {
 
 import { EmailTemplates, QpqEmailTemplateSourceEntry } from './config/settings/emailTemplates/types';
 
-import { CrossModuleOwner, CrossServiceResourceName, CustomFullyQualifiedResource, FullyQualifiedResource, ResourceName, KeyOf } from './types';
+import {
+  CrossModuleOwner,
+  CrossServiceResourceName,
+  CustomFullyQualifiedResource,
+  FullyQualifiedResource,
+  ResourceName,
+  KeyOf,
+  ConfigUrl,
+} from './types';
 
 /**
  * Flattens a QPQConfig array into a single array of QPQConfigSetting objects.
@@ -489,4 +497,37 @@ export const isSameResource = (resourceA: FullyQualifiedResource, resourceB: Ful
     resourceA.module === resourceB.module &&
     resourceA.resourceName === resourceB.resourceName
   );
+};
+
+export const getFullUrlFromConfigUrl = (configUrl: ConfigUrl, qpqConfig: QPQConfig): string => {
+  if (typeof configUrl === 'string') {
+    return configUrl;
+  }
+
+  const confEnvironment = getApplicationModuleEnvironment(qpqConfig);
+  const confFeature = getApplicationModuleFeature(qpqConfig);
+
+  let fullUrl = `${configUrl.domain}`;
+
+  if (confEnvironment !== 'production') {
+    fullUrl = `${confEnvironment}.${fullUrl}`;
+  }
+
+  if (confFeature) {
+    fullUrl = `${confFeature}.${fullUrl}`;
+  }
+
+  if (configUrl.module) {
+    fullUrl = `${configUrl.module}.${fullUrl}`;
+  }
+
+  if (configUrl.path) {
+    fullUrl = `${fullUrl}${configUrl.path}`;
+  }
+
+  fullUrl = `${configUrl.protocol}://${fullUrl}`;
+
+  console.log(fullUrl);
+
+  return fullUrl;
 };
