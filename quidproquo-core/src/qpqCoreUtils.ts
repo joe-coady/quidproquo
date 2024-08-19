@@ -288,7 +288,14 @@ export const getUserDirectorySrcEntries = (qpqConfig: QPQConfig): string[] => {
   const userConfigs = getOwnedUserDirectories(qpqConfig);
 
   return userConfigs
-    .reduce((acc, ud) => [...acc, ...Object.values(ud.emailTemplates).map((et: QpqEmailTemplateSourceEntry) => et?.src)], [] as string[])
+    .reduce(
+      (acc, ud) => [
+        ...acc,
+        ...Object.values(ud.emailTemplates).map((et: QpqEmailTemplateSourceEntry) => et?.src),
+        ...Object.values(ud.customAuthRuntime || {}).map((et: QpqEmailTemplateSourceEntry) => et?.src),
+      ],
+      [] as string[],
+    )
     .filter((src) => !!src);
 };
 

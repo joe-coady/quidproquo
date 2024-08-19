@@ -42,13 +42,7 @@ export const createUser = async (
   await setUserPassword(region, userPoolId, username, createUserRequest.password);
 
   // Authenticate the user
-  const authResponse: AuthenticateUserResponse = await authenticateUser(
-    userPoolId,
-    clientId,
-    region,
-    username,
-    createUserRequest.password,
-  );
+  const authResponse: AuthenticateUserResponse = await authenticateUser(userPoolId, clientId, region, false, username, createUserRequest.password);
 
   return authResponse;
 };

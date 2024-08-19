@@ -17,9 +17,7 @@ import { getExportedValue } from '../../../logic/cloudformation/getExportedValue
 const getUserDirectoryAuthenticateUserActionProcessor = (qpqConfig: QPQConfig): UserDirectoryAuthenticateUserActionProcessor => {
   return async (payload) => {
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
-
     const userPoolId = await getExportedValue(getCFExportNameUserPoolIdFromConfig(payload.userDirectoryName, qpqConfig), region);
-
     const userPoolClientId = await getExportedValue(getCFExportNameUserPoolClientIdFromConfig(payload.userDirectoryName, qpqConfig), region);
 
     try {
@@ -27,6 +25,7 @@ const getUserDirectoryAuthenticateUserActionProcessor = (qpqConfig: QPQConfig): 
         userPoolId,
         userPoolClientId,
         qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig),
+        payload.authenticateUserRequest.isCustom,
         payload.authenticateUserRequest.email,
         payload.authenticateUserRequest.password,
       );

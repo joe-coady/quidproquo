@@ -37,6 +37,8 @@ export const actionResultErrorFromCaughtError = (error: unknown, errorMap: Error
   if (error instanceof Error) {
     const errorName = (error as any).name;
 
+    console.log('actionResultErrorFromCaughtError:', error, error.stack);
+
     if (errorMap[errorName]) {
       return errorMap[errorName](error);
     }
@@ -44,6 +46,8 @@ export const actionResultErrorFromCaughtError = (error: unknown, errorMap: Error
     console.log(`Error: ${errorName}`);
     return actionResultError(ErrorTypeEnum.GenericError, 'An unexpected error occurred.');
   }
+
+  console.log('Caught non-error:', error);
 
   return actionResultError(ErrorTypeEnum.GenericError, 'An unknown error occurred.');
 };

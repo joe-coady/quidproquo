@@ -2,12 +2,32 @@ import { UserDirectoryAuthenticateUserActionRequester, AuthenticateUserRequest }
 import { UserDirectoryActionType } from './UserDirectoryActionType';
 import { createErrorEnumForAction } from '../../types';
 
-export const UserDirectoryAuthenticateUserErrorTypeEnum = createErrorEnumForAction(UserDirectoryActionType.AuthenticateUser, ['UserNotFound']);
+export const UserDirectoryAuthenticateUserErrorTypeEnum = createErrorEnumForAction(UserDirectoryActionType.AuthenticateUser, [
+  'UserNotFound',
+  'InvalidPassword',
+]);
 
 export function* askUserDirectoryAuthenticateUser(
   userDirectoryName: string,
-  authenticateUserRequest: AuthenticateUserRequest,
+  isCustom: boolean,
+  email: string,
+  password?: string,
 ): UserDirectoryAuthenticateUserActionRequester {
+  // if (!isCustom && !password) {
+  //   return yield* askThrowError(UserDirectoryAuthenticateUserErrorTypeEnum.InvalidPassword, 'Password required');
+  // }
+
+  const authenticateUserRequest: AuthenticateUserRequest = isCustom
+    ? {
+        isCustom: true,
+        email: email,
+      }
+    : {
+        isCustom: false,
+        email,
+        password: password!,
+      };
+
   return yield {
     type: UserDirectoryActionType.AuthenticateUser,
     payload: {

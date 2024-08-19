@@ -130,8 +130,67 @@ export class QpqCoreUserDirectoryConstruct extends QpqCoreUserDirectoryConstruct
       });
 
       userPool.addTrigger(aws_cognito.UserPoolOperation.CUSTOM_MESSAGE, customMessageTrigger.lambdaFunction);
+    }
 
-      userPool.addTrigger(aws_cognito.UserPoolOperation.POST_CONFIRMATION, customMessageTrigger.lambdaFunction);
+    if (props.userDirectoryConfig.customAuthRuntime) {
+      const defAuthChallengeTrigger = new Function(this, 'def-auth-challenge', {
+        buildPath: qpqCoreUtils.getUserDirectoryEntryFullPath(props.qpqConfig, props.userDirectoryConfig),
+        functionName: this.qpqResourceName(`${props.userDirectoryConfig.name}`, 'cac-define'),
+        functionType: 'lambdaCognitoTriggerEvent_defineAuthChallenge',
+        executorName: 'executeLambdaCognitoDefineAuthChallengeTriggerEvent',
+
+        qpqConfig: props.qpqConfig,
+
+        environment: {
+          userDirectoryName: props.userDirectoryConfig.name,
+        },
+
+        awsAccountId: props.awsAccountId,
+
+        role: this.getServiceRole(),
+      });
+
+      userPool.addTrigger(aws_cognito.UserPoolOperation.DEFINE_AUTH_CHALLENGE, defAuthChallengeTrigger.lambdaFunction);
+
+      if (props.userDirectoryConfig.customAuthRuntime.createAuthChallenge) {
+        const createAuthChallengeTrigger = new Function(this, 'create-auth-challenge', {
+          buildPath: qpqCoreUtils.getUserDirectoryEntryFullPath(props.qpqConfig, props.userDirectoryConfig),
+          functionName: this.qpqResourceName(`${props.userDirectoryConfig.name}`, 'cac-create'),
+          functionType: 'lambdaCognitoTriggerEvent_createAuthChallenge',
+          executorName: 'executeLambdaCognitoCreateAuthChallengeTriggerEvent',
+
+          qpqConfig: props.qpqConfig,
+
+          environment: {
+            userDirectoryName: props.userDirectoryConfig.name,
+          },
+
+          awsAccountId: props.awsAccountId,
+
+          role: this.getServiceRole(),
+        });
+        userPool.addTrigger(aws_cognito.UserPoolOperation.CREATE_AUTH_CHALLENGE, createAuthChallengeTrigger.lambdaFunction);
+      }
+
+      if (props.userDirectoryConfig.customAuthRuntime.verifyAuthChallenge) {
+        const verifyAuthChallengeTrigger = new Function(this, 'verify-auth-challenge', {
+          buildPath: qpqCoreUtils.getUserDirectoryEntryFullPath(props.qpqConfig, props.userDirectoryConfig),
+          functionName: this.qpqResourceName(`${props.userDirectoryConfig.name}`, 'cac-verify'),
+          functionType: 'lambdaCognitoTriggerEvent_verifyAuthChallenge',
+          executorName: 'executeLambdaCognitoVerifyAuthChallengeTriggerEvent',
+
+          qpqConfig: props.qpqConfig,
+
+          environment: {
+            userDirectoryName: props.userDirectoryConfig.name,
+          },
+
+          awsAccountId: props.awsAccountId,
+
+          role: this.getServiceRole(),
+        });
+        userPool.addTrigger(aws_cognito.UserPoolOperation.VERIFY_AUTH_CHALLENGE_RESPONSE, verifyAuthChallengeTrigger.lambdaFunction);
+      }
     }
 
     qpqDeployAwsCdkUtils.exportStackValue(
@@ -210,6 +269,7 @@ export class QpqCoreUserDirectoryConstruct extends QpqCoreUserDirectoryConstruct
       generateSecret: true,
       authFlows: {
         adminUserPassword: true,
+        custom: !!props.userDirectoryConfig.customAuthRuntime,
       },
       supportedIdentityProviders: federatedProviders.map((fp) =>
         fp.type === AuthDirectoryFederatedProviderType.Facebook

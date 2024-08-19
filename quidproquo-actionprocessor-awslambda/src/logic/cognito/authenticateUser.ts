@@ -1,4 +1,4 @@
-import { AuthenticateUserResponse, AuthenticateUserChallenge } from 'quidproquo-core';
+import { AuthenticateUserResponse, AuthenticateUserChallenge, UserDirectoryAuthenticateUserActionPayload } from 'quidproquo-core';
 
 import {
   CognitoIdentityProviderClient,
@@ -19,8 +19,9 @@ export const authenticateUser = async (
   userPoolId: string,
   clientId: string,
   region: string,
+  isCustom: boolean,
   username: string,
-  password: string,
+  password?: string,
 ): Promise<AuthenticateUserResponse> => {
   const cognitoClient = createAwsClient(CognitoIdentityProviderClient, { region });
 
@@ -31,16 +32,19 @@ export const authenticateUser = async (
   const issueDateTime = new Date().toISOString();
 
   const params: AdminInitiateAuthCommandInput = {
-    AuthFlow: AuthFlowType.ADMIN_USER_PASSWORD_AUTH,
+    AuthFlow: isCustom ? AuthFlowType.CUSTOM_AUTH : AuthFlowType.ADMIN_USER_PASSWORD_AUTH,
     UserPoolId: userPoolId,
     ClientId: clientId,
 
     AuthParameters: {
       USERNAME: username,
-      PASSWORD: password,
       SECRET_HASH: secretHash,
     },
   };
+
+  if (password) {
+    params.AuthParameters!.PASSWORD = password;
+  }
 
   const response = await cognitoClient.send(new AdminInitiateAuthCommand(params));
 

@@ -8,3 +8,9 @@ export interface EmailTemplates {
   resetPassword?: QpqEmailTemplateSourceEntry;
   resetPasswordAdmin?: QpqEmailTemplateSourceEntry;
 }
+
+export interface CustomAuthRuntime {
+  defineAuthChallenge: QpqEmailTemplateSourceEntry;
+  createAuthChallenge?: QpqEmailTemplateSourceEntry;
+  verifyAuthChallenge?: QpqEmailTemplateSourceEntry;
+}

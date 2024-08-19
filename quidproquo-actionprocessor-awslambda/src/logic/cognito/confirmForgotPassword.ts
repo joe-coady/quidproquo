@@ -36,13 +36,7 @@ export const confirmForgotPassword = async (
   await cognitoClient.send(new ConfirmForgotPasswordCommand(params));
 
   // Authenticate the user
-  const authResponse: AuthenticateUserResponse = await authenticateUser(
-    userPoolId,
-    clientId,
-    region,
-    username,
-    password,
-  );
+  const authResponse: AuthenticateUserResponse = await authenticateUser(userPoolId, clientId, region, false, username, password);
 
   return authResponse;
 };

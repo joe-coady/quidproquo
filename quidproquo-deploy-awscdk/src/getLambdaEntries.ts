@@ -13,6 +13,9 @@ export const webpackEntryNames = [
   'lambdaS3FileEvent',
 
   'lambdaCognitoTriggerEvent_CustomMessage',
+  'lambdaCognitoTriggerEvent_defineAuthChallenge',
+  'lambdaCognitoTriggerEvent_createAuthChallenge',
+  'lambdaCognitoTriggerEvent_verifyAuthChallenge',
 ];
 
 export const getLambdaEntries = () => {

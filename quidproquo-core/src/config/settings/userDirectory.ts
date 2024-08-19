@@ -2,7 +2,7 @@ import { convertCrossModuleOwnerToGenericResourceNameOverride } from '../../qpqC
 import { ConfigUrl, CrossModuleOwner } from '../../types';
 import { QPQConfigSetting, QPQCoreConfigSettingType, QPQConfigAdvancedSettings } from '../QPQConfig';
 
-import { EmailTemplates } from './emailTemplates';
+import { CustomAuthRuntime, EmailTemplates } from './emailTemplates';
 
 export type AuthDirectoryDnsRecord = {
   subdomain: string;
@@ -47,6 +47,8 @@ export interface QPQConfigAdvancedUserDirectorySettings extends QPQConfigAdvance
   dnsRecord?: AuthDirectoryDnsRecord;
 
   oAuth?: AuthDirectoryOAuth;
+
+  customAuthRuntime?: CustomAuthRuntime;
 }
 
 export interface UserDirectoryQPQConfigSetting extends QPQConfigSetting {
@@ -63,6 +65,8 @@ export interface UserDirectoryQPQConfigSetting extends QPQConfigSetting {
 
   dnsRecord?: AuthDirectoryDnsRecord;
   oAuth?: AuthDirectoryOAuth;
+
+  customAuthRuntime?: CustomAuthRuntime;
 }
 
 export const defineUserDirectory = (
@@ -88,6 +92,7 @@ export const defineUserDirectory = (
 
   dnsRecord: options?.dnsRecord,
   oAuth: options?.oAuth,
+  customAuthRuntime: options?.customAuthRuntime,
 
   owner: convertCrossModuleOwnerToGenericResourceNameOverride(options?.owner),
 });
