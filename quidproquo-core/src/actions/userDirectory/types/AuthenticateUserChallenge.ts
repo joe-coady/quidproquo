@@ -5,4 +5,6 @@ export enum AuthenticateUserChallenge {
   // Im not sure if this is a challenge or not ~ I feel like its not
   // we will never challenge the user after an email has been sent to them... soo yeah
   RESET_PASSWORD = 'RESET_PASSWORD',
+
+  CUSTOM_CHALLENGE = 'CUSTOM_CHALLENGE',
 }

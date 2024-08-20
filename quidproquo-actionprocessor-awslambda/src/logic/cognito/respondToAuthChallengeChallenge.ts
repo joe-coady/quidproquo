@@ -19,6 +19,7 @@ export const respondToAuthChallengeChallenge = async (
   region: string,
   username: string,
   session: string,
+  challengeNameType: ChallengeNameType,
   attributes: Record<string, string>,
 ): Promise<AuthenticateUserResponse> => {
   const cognitoClient = createAwsClient(CognitoIdentityProviderClient, { region });
@@ -27,7 +28,7 @@ export const respondToAuthChallengeChallenge = async (
   const secretHash = calculateSecretHash(username, clientId, clientSecret);
 
   const params: RespondToAuthChallengeCommandInput = {
-    ChallengeName: ChallengeNameType.NEW_PASSWORD_REQUIRED,
+    ChallengeName: challengeNameType,
     ClientId: clientId,
     Session: session,
     ChallengeResponses: {

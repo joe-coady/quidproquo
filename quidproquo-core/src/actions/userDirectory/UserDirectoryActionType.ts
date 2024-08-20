@@ -38,9 +38,10 @@ export interface AuthenticationDeliveryDetails {
 
 export interface AuthenticateUserResponse {
   challenge: AuthenticateUserChallenge;
+  challengeParameters?: Record<string, string>;
+  session?: string;
 
   authenticationInfo?: AuthenticationInfo;
-  session?: string;
 }
 
 export interface DecodedAccessToken {

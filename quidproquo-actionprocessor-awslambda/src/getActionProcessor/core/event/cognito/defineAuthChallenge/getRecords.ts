@@ -2,9 +2,16 @@ import { EventActionType, QPQConfig, actionResult, EventGetRecordsActionProcesso
 
 import { EventInput, InternalEventRecord } from './types';
 
+import { getQpqAttributesFromCognitoStringMap } from '../../../../../logic/cognito/cognitoAttributeMap';
+import { getChallengeSessionFromCognitoTriggerEventSession } from '../utils';
+
 const getProcessGetRecords = (qpqConfig: QPQConfig): EventGetRecordsActionProcessor<EventInput, InternalEventRecord> => {
-  return async ({ eventParams: [customMessageTriggerEvent, context] }) => {
-    const internalEventRecord: InternalEventRecord = {};
+  return async ({ eventParams: [event, context] }) => {
+    const internalEventRecord: InternalEventRecord = {
+      userName: event.userName,
+      session: getChallengeSessionFromCognitoTriggerEventSession(event.request.session),
+      userAttributes: getQpqAttributesFromCognitoStringMap(event.request.userAttributes),
+    };
 
     return actionResult([internalEventRecord]);
   };

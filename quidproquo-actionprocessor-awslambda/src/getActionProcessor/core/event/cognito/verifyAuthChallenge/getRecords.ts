@@ -7,7 +7,7 @@ import { getQpqAttributesFromCognitoStringMap } from '../../../../../logic/cogni
 const getProcessGetRecords = (qpqConfig: QPQConfig): EventGetRecordsActionProcessor<EventInput, InternalEventRecord> => {
   return async ({ eventParams: [event, context] }) => {
     const internalEventRecord: InternalEventRecord = {
-      challengeAnswer: event.request.challengeAnswer,
+      challengeAnswer: event.request.challengeAnswer ? JSON.parse(event.request.challengeAnswer) : {},
       userAttributes: getQpqAttributesFromCognitoStringMap(event.request.userAttributes),
       userNotFound: event.request.userNotFound,
       privateChallengeParameters: event.request.privateChallengeParameters,

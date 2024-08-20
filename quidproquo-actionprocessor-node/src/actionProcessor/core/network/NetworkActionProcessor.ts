@@ -22,25 +22,18 @@ const getAxiosResponseType = (responseType: ResponseType) => {
   return 'json';
 };
 
-const transformResponse = (
-  payload: NetworkRequestActionPayload<any>,
-  response: AxiosResponse<any, any>,
-): AxiosResponse<any, QPQBinaryData> => {
+const transformResponse = (payload: NetworkRequestActionPayload<any>, response: AxiosResponse<any, any>): AxiosResponse<any, QPQBinaryData> => {
   if (payload.responseType === 'binary') {
     const headers = response.headers || {};
     const mimeType = headers['content-type'] || 'application/octet-stream';
 
-    const filename =
-      headers['content-disposition']?.match(/filename="([^"]+)"/)?.[1] ||
-      `file.${extension(mimeType)}`;
+    const filename = headers['content-disposition']?.match(/filename="([^"]+)"/)?.[1] || `file.${extension(mimeType)}`;
 
     return {
       ...response,
       data: {
         base64Data: Buffer.from(response.data).toString('base64'),
         mimetype: mimeType,
-
-        // TODO: We could get a filename from Content-Disposition header
         filename,
       } as QPQBinaryData,
     };
@@ -58,9 +51,7 @@ const axiosInstance = axios.create({
   validateStatus: () => true,
 });
 
-const processNetworkRequestGet = async (
-  payload: NetworkRequestActionPayload<any>,
-): Promise<AxiosResponse<any, any>> => {
+const processNetworkRequestGet = async (payload: NetworkRequestActionPayload<any>): Promise<AxiosResponse<any, any>> => {
   const response = await axiosInstance.get(payload.url, {
     baseURL: payload.basePath,
     headers: payload.headers,
@@ -71,9 +62,7 @@ const processNetworkRequestGet = async (
   return transformResponse(payload, response);
 };
 
-const processNetworkRequestPost = async (
-  payload: NetworkRequestActionPayload<any>,
-): Promise<AxiosResponse<any, any>> => {
+const processNetworkRequestPost = async (payload: NetworkRequestActionPayload<any>): Promise<AxiosResponse<any, any>> => {
   const response = await axiosInstance.post(payload.url, payload.body, {
     baseURL: payload.basePath,
     headers: payload.headers,
@@ -84,9 +73,7 @@ const processNetworkRequestPost = async (
   return transformResponse(payload, response);
 };
 
-const processNetworkRequestDelete = async (
-  payload: NetworkRequestActionPayload<any>,
-): Promise<AxiosResponse<any, any>> => {
+const processNetworkRequestDelete = async (payload: NetworkRequestActionPayload<any>): Promise<AxiosResponse<any, any>> => {
   const response = await axiosInstance.delete(payload.url, {
     baseURL: payload.basePath,
     headers: payload.headers,
@@ -97,9 +84,7 @@ const processNetworkRequestDelete = async (
   return transformResponse(payload, response);
 };
 
-const processNetworkRequestHead = async (
-  payload: NetworkRequestActionPayload<any>,
-): Promise<AxiosResponse<any, any>> => {
+const processNetworkRequestHead = async (payload: NetworkRequestActionPayload<any>): Promise<AxiosResponse<any, any>> => {
   const response = await axiosInstance.head(payload.url, {
     baseURL: payload.basePath,
     headers: payload.headers,
@@ -110,9 +95,7 @@ const processNetworkRequestHead = async (
   return transformResponse(payload, response);
 };
 
-const processNetworkRequestOptions = async (
-  payload: NetworkRequestActionPayload<any>,
-): Promise<AxiosResponse<any, any>> => {
+const processNetworkRequestOptions = async (payload: NetworkRequestActionPayload<any>): Promise<AxiosResponse<any, any>> => {
   const response = await axiosInstance.options(payload.url, {
     baseURL: payload.basePath,
     headers: payload.headers,
@@ -123,9 +106,7 @@ const processNetworkRequestOptions = async (
   return transformResponse(payload, response);
 };
 
-const processNetworkRequestPut = async (
-  payload: NetworkRequestActionPayload<any>,
-): Promise<AxiosResponse<any, any>> => {
+const processNetworkRequestPut = async (payload: NetworkRequestActionPayload<any>): Promise<AxiosResponse<any, any>> => {
   const response = await axiosInstance.put(payload.url, payload.body, {
     baseURL: payload.basePath,
     headers: payload.headers,
@@ -136,9 +117,7 @@ const processNetworkRequestPut = async (
   return transformResponse(payload, response);
 };
 
-const processNetworkRequestPatch = async (
-  payload: NetworkRequestActionPayload<any>,
-): Promise<AxiosResponse<any, any>> => {
+const processNetworkRequestPatch = async (payload: NetworkRequestActionPayload<any>): Promise<AxiosResponse<any, any>> => {
   const response = await axiosInstance.patch(payload.url, payload.body, {
     baseURL: payload.basePath,
     headers: payload.headers,
@@ -149,16 +128,11 @@ const processNetworkRequestPatch = async (
   return transformResponse(payload, response);
 };
 
-const processNetworkRequestConnect = async (
-  payload: NetworkRequestActionPayload<any>,
-): Promise<AxiosResponse<any, any>> => {
+const processNetworkRequestConnect = async (payload: NetworkRequestActionPayload<any>): Promise<AxiosResponse<any, any>> => {
   throw new Error('Function not implemented.');
 };
 
-const requestMethodMap: Record<
-  HTTPMethod,
-  (payload: NetworkRequestActionPayload<any>) => Promise<AxiosResponse<any, any>>
-> = {
+const requestMethodMap: Record<HTTPMethod, (payload: NetworkRequestActionPayload<any>) => Promise<AxiosResponse<any, any>>> = {
   GET: processNetworkRequestGet,
   POST: processNetworkRequestPost,
   DELETE: processNetworkRequestDelete,
