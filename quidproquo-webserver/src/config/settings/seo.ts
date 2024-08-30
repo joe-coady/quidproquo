@@ -1,4 +1,4 @@
-import { QPQConfigSetting, QPQConfigAdvancedSettings, generateSimpleHash } from 'quidproquo-core';
+import { QPQConfigSetting, QPQConfigAdvancedSettings, generateSimpleHash, QpqFunctionRuntime } from 'quidproquo-core';
 
 import { QPQWebServerConfigSettingType, CacheSettings } from '../QPQConfig';
 
@@ -9,25 +9,18 @@ export interface QPQConfigAdvancedSeoSettings extends QPQConfigAdvancedSettings 
 
 export interface SeoQPQWebServerConfigSetting extends QPQConfigSetting {
   path: string;
-  src: string;
-  runtime: string;
+  runtime: QpqFunctionRuntime;
   deprecated: boolean;
   webEntry?: string;
 
   cacheSettingsName?: string;
 }
 
-export const defineSeo = (
-  path: string,
-  src: string,
-  runtime: string,
-  options?: QPQConfigAdvancedSeoSettings,
-): SeoQPQWebServerConfigSetting => ({
+export const defineSeo = (path: string, runtime: QpqFunctionRuntime, options?: QPQConfigAdvancedSeoSettings): SeoQPQWebServerConfigSetting => ({
   configSettingType: QPQWebServerConfigSettingType.Seo,
   uniqueKey: generateSimpleHash(path),
 
   path,
-  src,
   runtime,
 
   webEntry: options?.webEntry,

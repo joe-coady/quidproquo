@@ -1,4 +1,4 @@
-import { StorageClass  } from '@aws-sdk/client-s3';
+import { StorageClass } from '@aws-sdk/client-s3';
 import { randomUUID } from 'crypto';
 import { match } from 'node-match-path';
 import { StorageDriveTier } from 'quidproquo-core';
@@ -13,6 +13,8 @@ export interface UrlMatch {
 }
 
 export const matchUrl = (path: string, url: string): UrlMatch => {
+  console.log('Matching: ', path);
+
   // /attempt/{attemptUuid}/result/{test} => /attempt/:attemptUuid/result/:test
   const modifiedPath = path.replaceAll(/{(.+?)}/g, (m, g) => `:${g}`);
 
@@ -25,21 +27,21 @@ export const matchUrl = (path: string, url: string): UrlMatch => {
 
 export const getS3BucketStorageClassFromStorageDriveTier = (driveTier?: StorageDriveTier): keyof typeof StorageClass => {
   switch (driveTier) {
-      case StorageDriveTier.REGULAR:
-        return "STANDARD";
-      case StorageDriveTier.OCCASIONAL_ACCESS:
-        return "STANDARD_IA";
-      case StorageDriveTier.SINGLE_ZONE_OCCASIONAL_ACCESS:
-        return "ONEZONE_IA";
-      case StorageDriveTier.COLD_STORAGE:
-        return "GLACIER";
-      case StorageDriveTier.COLD_STORAGE_INSTANT_ACCESS:
-        return "GLACIER_IR";
-      case StorageDriveTier.DEEP_COLD_STORAGE:
-        return "DEEP_ARCHIVE";
-      case StorageDriveTier.SMART_TIERING:
-        return "INTELLIGENT_TIERING";
-      default:
-        return "INTELLIGENT_TIERING";
+    case StorageDriveTier.REGULAR:
+      return 'STANDARD';
+    case StorageDriveTier.OCCASIONAL_ACCESS:
+      return 'STANDARD_IA';
+    case StorageDriveTier.SINGLE_ZONE_OCCASIONAL_ACCESS:
+      return 'ONEZONE_IA';
+    case StorageDriveTier.COLD_STORAGE:
+      return 'GLACIER';
+    case StorageDriveTier.COLD_STORAGE_INSTANT_ACCESS:
+      return 'GLACIER_IR';
+    case StorageDriveTier.DEEP_COLD_STORAGE:
+      return 'DEEP_ARCHIVE';
+    case StorageDriveTier.SMART_TIERING:
+      return 'INTELLIGENT_TIERING';
+    default:
+      return 'INTELLIGENT_TIERING';
   }
-}
+};

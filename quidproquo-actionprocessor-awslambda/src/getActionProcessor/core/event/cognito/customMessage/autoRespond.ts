@@ -19,19 +19,19 @@ const getProcessAutoRespond = (qpqConfig: QPQConfig): EventAutoRespondActionProc
 
     switch (qpqEventRecord.eventType) {
       case EmailSendEventType.ResetPassword:
-        if (!userDirectoryConfig?.emailTemplates.resetPassword?.src || !userDirectoryConfig?.emailTemplates.resetPassword?.runtime) {
+        if (!userDirectoryConfig?.emailTemplates.resetPassword) {
           return getErrorResult();
         }
         break;
 
       case EmailSendEventType.ResetPasswordAdmin:
-        if (!userDirectoryConfig?.emailTemplates.resetPasswordAdmin?.src || !userDirectoryConfig?.emailTemplates.resetPasswordAdmin?.runtime) {
+        if (!userDirectoryConfig?.emailTemplates.resetPasswordAdmin) {
           return getErrorResult();
         }
         break;
 
       case EmailSendEventType.VerifyEmail:
-        if (!userDirectoryConfig?.emailTemplates.verifyEmail?.src || !userDirectoryConfig?.emailTemplates.verifyEmail?.runtime) {
+        if (!userDirectoryConfig?.emailTemplates.verifyEmail) {
           return getErrorResult();
         }
         break;

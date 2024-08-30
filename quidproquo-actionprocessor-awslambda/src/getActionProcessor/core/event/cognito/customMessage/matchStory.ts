@@ -20,18 +20,15 @@ const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProces
     switch (qpqEventRecord.eventType) {
       case EmailSendEventType.ResetPassword:
         return actionResult<MatchResult>({
-          src: userDirectoryConfig?.emailTemplates.resetPassword?.src,
-          runtime: userDirectoryConfig?.emailTemplates.resetPassword?.runtime,
+          runtime: userDirectoryConfig?.emailTemplates.resetPassword,
         });
       case EmailSendEventType.ResetPasswordAdmin:
         return actionResult<MatchResult>({
-          src: userDirectoryConfig?.emailTemplates.resetPasswordAdmin?.src,
-          runtime: userDirectoryConfig?.emailTemplates.resetPasswordAdmin?.runtime,
+          runtime: userDirectoryConfig?.emailTemplates.resetPasswordAdmin,
         });
       case EmailSendEventType.VerifyEmail:
         return actionResult<MatchResult>({
-          src: userDirectoryConfig?.emailTemplates.verifyEmail?.src,
-          runtime: userDirectoryConfig?.emailTemplates.verifyEmail?.runtime,
+          runtime: userDirectoryConfig?.emailTemplates.verifyEmail,
         });
       default:
         return actionResultError(ErrorTypeEnum.NotFound, `Email lambda not implemented for ${qpqEventRecord.eventType}`);

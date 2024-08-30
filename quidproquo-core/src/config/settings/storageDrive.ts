@@ -1,10 +1,5 @@
-import { QpqSourceEntry } from './queue';
-import {
-  QPQConfigSetting,
-  QPQCoreConfigSettingType,
-  QPQConfigAdvancedSettings,
-} from '../QPQConfig';
-import { CrossModuleOwner } from '../../types';
+import { QPQConfigSetting, QPQCoreConfigSettingType, QPQConfigAdvancedSettings } from '../QPQConfig';
+import { CrossModuleOwner, QpqFunctionRuntime } from '../../types';
 import { convertCrossModuleOwnerToGenericResourceNameOverride } from '../../qpqCoreUtils';
 
 /**
@@ -91,8 +86,8 @@ export type StorageDriveLifecycleRule = {
 export interface StorageDriveEvents {
   buildPath: string;
 
-  create?: QpqSourceEntry;
-  delete?: QpqSourceEntry;
+  create?: QpqFunctionRuntime;
+  delete?: QpqFunctionRuntime;
 }
 
 export interface QPQConfigAdvancedStorageDriveSettings extends QPQConfigAdvancedSettings {
@@ -116,10 +111,7 @@ export interface StorageDriveQPQConfigSetting extends QPQConfigSetting {
   lifecycleRules?: StorageDriveLifecycleRule[];
 }
 
-export const defineStorageDrive = (
-  storageDrive: string,
-  options?: QPQConfigAdvancedStorageDriveSettings,
-): StorageDriveQPQConfigSetting => ({
+export const defineStorageDrive = (storageDrive: string, options?: QPQConfigAdvancedStorageDriveSettings): StorageDriveQPQConfigSetting => ({
   configSettingType: QPQCoreConfigSettingType.storageDrive,
   uniqueKey: storageDrive,
 

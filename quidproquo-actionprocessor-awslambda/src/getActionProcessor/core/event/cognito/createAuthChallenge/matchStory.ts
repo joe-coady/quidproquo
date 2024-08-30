@@ -9,13 +9,12 @@ const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProces
   const userDirectoryConfig = qpqCoreUtils.getUserDirectories(qpqConfig).find((ud) => ud.name === GLOBAL_USER_DIRECTORY_NAME);
 
   return async ({ qpqEventRecord }) => {
-    if (!userDirectoryConfig?.customAuthRuntime?.createAuthChallenge?.src) {
-      return actionResultError(ErrorTypeEnum.NotFound, `Missing customAuthRuntime.createAuthChallenge.src in [${GLOBAL_USER_DIRECTORY_NAME}]`);
+    if (!userDirectoryConfig?.customAuthRuntime?.createAuthChallenge) {
+      return actionResultError(ErrorTypeEnum.NotFound, `Missing customAuthRuntime.createAuthChallenge in [${GLOBAL_USER_DIRECTORY_NAME}]`);
     }
 
     return actionResult<MatchResult>({
-      src: userDirectoryConfig.customAuthRuntime.createAuthChallenge.src,
-      runtime: userDirectoryConfig.customAuthRuntime.createAuthChallenge.runtime,
+      runtime: userDirectoryConfig.customAuthRuntime.createAuthChallenge,
     });
   };
 };

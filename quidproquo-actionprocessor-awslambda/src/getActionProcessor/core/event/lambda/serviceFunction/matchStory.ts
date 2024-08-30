@@ -14,7 +14,6 @@ const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProces
     }
 
     return actionResult<MatchResult>({
-      src: matchedRoute.src,
       runtime: matchedRoute.runtime,
     });
   };

@@ -25,7 +25,6 @@ const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProces
     }
 
     return actionResult<MatchResult>({
-      src: matchedSeoConfig.route.src,
       runtime: matchedSeoConfig.route.runtime,
       runtimeOptions: matchedSeoConfig.match.params || {},
       config: matchedSeoConfig.route,

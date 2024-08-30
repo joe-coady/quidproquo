@@ -3,9 +3,9 @@ import { EventActionType, QPQConfig, EventAutoRespondActionProcessor, actionResu
 import { InternalEventOutput, InternalEventRecord, MatchResult } from './types';
 
 const getProcessAutoRespond = (qpqConfig: QPQConfig): EventAutoRespondActionProcessor<InternalEventRecord, MatchResult, InternalEventOutput> => {
-  return async ({ qpqEventRecord, matchResult }) => {
+  return async ({ matchResult }) => {
     // If we could not match, we can just auto respond...
-    if (!matchResult.src || !matchResult.runtime) {
+    if (!matchResult.runtime) {
       // Just say we have finished gracefully.
       return actionResult(true);
     }

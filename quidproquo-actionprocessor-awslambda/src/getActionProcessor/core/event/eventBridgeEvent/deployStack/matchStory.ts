@@ -21,8 +21,7 @@ const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProces
     }
 
     return actionResult<MatchResult>({
-      src: deployConfig.src.src,
-      runtime: deployConfig.src.runtime,
+      runtime: deployConfig.runtime,
     });
   };
 };

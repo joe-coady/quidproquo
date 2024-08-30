@@ -2,6 +2,7 @@ export * from './emailTemplates';
 export * from './actionProcessors';
 export * from './applicationModule';
 export * from './applicationName';
+export * from './applicationBasePath';
 export * from './applicationVersion';
 export * from './moduleName';
 export * from './buildPath';

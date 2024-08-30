@@ -2,13 +2,11 @@ import { ScheduleQPQConfigSetting, qpqCoreUtils } from 'quidproquo-core';
 import { LambdaRuntimeConfig } from 'quidproquo-actionprocessor-awslambda';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
-import { QpqResource } from '../../../base/QpqResource';
 
 import { Construct } from 'constructs';
 import { aws_events, aws_events_targets, aws_lambda } from 'aws-cdk-lib';
 
 import { Function } from '../../../basic/Function';
-import * as qpqDeployAwsCdkUtils from '../../../../utils';
 
 export interface QpqCoreRecurringScheduleConstructProps extends QpqConstructBlockProps {
   scheduleConfig: ScheduleQPQConfigSetting;
@@ -31,7 +29,6 @@ export class QpqCoreRecurringScheduleConstruct extends QpqConstructBlock {
 
       environment: {
         lambdaRuntimeConfig: JSON.stringify({
-          src: props.scheduleConfig.src,
           runtime: props.scheduleConfig.runtime,
         } as LambdaRuntimeConfig),
       },

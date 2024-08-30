@@ -23,11 +23,11 @@ export const getQueueConfigSetting = (): QueueQPQConfigSetting => {
 const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProcessor<InternalEventRecord, MatchResult> => {
   // TODO: Get this out of the qpqconfig like the other event processors
   const queueQPQConfigSetting = getQueueConfigSetting();
+  const queueQueueProcessors = qpqCoreUtils.getQueueQueueProcessors(queueQPQConfigSetting.name, qpqConfig);
+  const queueTypes = Object.keys(queueQueueProcessors).sort();
 
   return async ({ qpqEventRecord }) => {
-    const queueQueueProcessors = qpqCoreUtils.getQueueQueueProcessors(queueQPQConfigSetting.name, qpqConfig);
-
-    const queueTypes = Object.keys(queueQueueProcessors).sort();
+    console.log('qpqEventRecord', JSON.stringify(qpqEventRecord, null, 2));
 
     // Find the most relevant match
     const matchedQueueType = queueTypes
@@ -50,8 +50,7 @@ const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProces
     const sourceEntry = queueQueueProcessors[matchedQueueType.queueType];
 
     return actionResult<MatchResult>({
-      src: sourceEntry.src,
-      runtime: sourceEntry.runtime,
+      runtime: sourceEntry,
       runtimeOptions: matchedQueueType.match.params || {},
       config: matchedQueueType.queueType,
     });

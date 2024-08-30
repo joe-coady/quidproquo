@@ -1,4 +1,4 @@
-import { ErrorTypeEnum, EventActionType, EventMatchStoryActionProcessor, QPQConfig, actionResult, actionResultError } from 'quidproquo-core';
+import { EventActionType, EventMatchStoryActionProcessor, QPQConfig, actionResult, actionResultError } from 'quidproquo-core';
 import { InternalEventRecord, MatchResult } from './types';
 import { LambdaRuntimeConfig } from '../../../../../runtimeConfig/QPQAWSResourceMap';
 
@@ -8,7 +8,6 @@ const lambdaRuntimeConfig: LambdaRuntimeConfig = JSON.parse(process.env.lambdaRu
 const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProcessor<InternalEventRecord, MatchResult> => {
   return async ({ qpqEventRecord }) => {
     return actionResult<MatchResult>({
-      src: lambdaRuntimeConfig.src,
       runtime: lambdaRuntimeConfig.runtime,
       runtimeOptions: {},
     });

@@ -1,8 +1,6 @@
 import { ErrorTypeEnum, EventActionType, EventMatchStoryActionProcessor, QPQConfig, actionResult, actionResultError } from 'quidproquo-core';
 import { GLOBAL_WEBSOCKET_API_NAME, InternalEventRecord, MatchResult } from './types';
-import { RouteQPQWebServerConfigSetting, WebSocketEventType, qpqWebServerUtils } from 'quidproquo-webserver';
-
-import { matchUrl } from '../../../../../awsLambdaUtils';
+import { WebSocketEventType, qpqWebServerUtils } from 'quidproquo-webserver';
 
 const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProcessor<InternalEventRecord, MatchResult> => {
   const userDirectoryConfig = qpqWebServerUtils.getWebsocketEntryByApiName(GLOBAL_WEBSOCKET_API_NAME, qpqConfig);
@@ -11,18 +9,15 @@ const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProces
     switch (qpqEventRecord.eventType) {
       case WebSocketEventType.Connect:
         return actionResult<MatchResult>({
-          src: userDirectoryConfig.eventProcessors.onConnect.src,
-          runtime: userDirectoryConfig.eventProcessors.onConnect.runtime,
+          runtime: userDirectoryConfig.eventProcessors.onConnect,
         });
       case WebSocketEventType.Disconnect:
         return actionResult<MatchResult>({
-          src: userDirectoryConfig.eventProcessors.onDisconnect.src,
-          runtime: userDirectoryConfig.eventProcessors.onDisconnect.runtime,
+          runtime: userDirectoryConfig.eventProcessors.onDisconnect,
         });
       case WebSocketEventType.Message:
         return actionResult<MatchResult>({
-          src: userDirectoryConfig.eventProcessors.onMessage.src,
-          runtime: userDirectoryConfig.eventProcessors.onMessage.runtime,
+          runtime: userDirectoryConfig.eventProcessors.onMessage,
         });
       default:
         return actionResultError(ErrorTypeEnum.NotFound, `Websocket lambda not implemented for ${qpqEventRecord.eventType}`);

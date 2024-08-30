@@ -56,7 +56,6 @@ function* askProcessEventRecord<QpqEventRecord, MSR extends AnyMatchStoryResult,
   // Execute the story
   const executeStoryResponse = yield* askCatch(
     askExecuteStory<[QpqEventRecord, MSR['runtimeOptions']], QpqEventRecordResponse>(
-      matchResultResult.result.src!,
       matchResultResult.result.runtime!,
       [qpqEventRecord, matchResultResult.result.runtimeOptions],
       messageSession,

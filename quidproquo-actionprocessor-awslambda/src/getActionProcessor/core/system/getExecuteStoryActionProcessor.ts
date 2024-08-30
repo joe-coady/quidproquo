@@ -30,14 +30,12 @@ const getProcessExecuteStory = <T extends Array<any>, R>(
     actionProcessors: ActionProcessorList,
     logger: QpqLogger,
   ): Promise<any> => {
-    let module = await dynamicModuleLoader(payload.src);
-    if (module === null) {
-      return actionResultError(ErrorTypeEnum.NotFound, `Module not found [${payload.src}]`);
-    }
-
-    const story = module[payload.runtime];
+    console.log('Trying to load module');
+    let story = await dynamicModuleLoader(payload.runtime);
+    console.log('After - Trying to load module');
     if (!story) {
-      return actionResultError(ErrorTypeEnum.NotFound, `[${payload.runtime}] not found in module [${payload.src}]`);
+      console.log('No story');
+      return actionResultError(ErrorTypeEnum.NotFound, `Unable to dynamically load: [${payload.runtime}]`);
     }
 
     const resolveStory = createRuntime(
@@ -54,16 +52,15 @@ const getProcessExecuteStory = <T extends Array<any>, R>(
       // TODO: Share this logic.
       `${moduleName}::${randomGuid()}`,
       QpqRuntimeType.EXECUTE_STORY,
-      [`${payload.src}::${payload.runtime}`],
+      [payload.runtime],
     );
     const storyResult = await resolveStory(story, payload.params);
 
     if (storyResult.error) {
-      const stack = `${payload.src}::${payload.runtime}`;
       return actionResultError(
         storyResult.error.errorType,
         storyResult.error.errorText,
-        storyResult.error.errorStack ? `${stack} -> [${storyResult.error.errorStack}]` : stack,
+        storyResult.error.errorStack ? `${payload.runtime} -> [${storyResult.error.errorStack}]` : payload.runtime,
       );
     }
 

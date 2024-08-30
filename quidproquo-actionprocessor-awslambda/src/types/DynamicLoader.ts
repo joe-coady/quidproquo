@@ -1,1 +1,3 @@
-export type DynamicModuleLoader = (src: string) => Promise<any>;
+import { QpqFunctionRuntime } from 'quidproquo-core';
+
+export type DynamicModuleLoader = (runtime: QpqFunctionRuntime) => Promise<any>;
