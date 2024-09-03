@@ -1,4 +1,4 @@
-import { QPQConfigSetting, QPQConfigAdvancedSettings, QpqFunctionRuntime } from 'quidproquo-core';
+import { QPQConfigSetting, QPQConfigAdvancedSettings, QpqFunctionRuntime, qpqCoreUtils } from 'quidproquo-core';
 
 import { QPQWebServerConfigSettingType } from '../QPQConfig';
 
@@ -18,7 +18,8 @@ export const defineServiceFunction = (
   runtime: QpqFunctionRuntime,
   options?: QPQConfigAdvancedServiceFunctionSettings,
 ): ServiceFunctionQPQWebServerConfigSetting => {
-  const functionName = options?.functionName || runtime;
+  const functionName = options?.functionName || qpqCoreUtils.getStoryNameFromQpqFunctionRuntime(runtime);
+
   return {
     configSettingType: QPQWebServerConfigSettingType.ServiceFunction,
     uniqueKey: functionName,

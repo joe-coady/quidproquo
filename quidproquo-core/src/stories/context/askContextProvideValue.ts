@@ -1,14 +1,8 @@
 import { SystemActionType, SystemBatchActionPayload, askBatch } from '../../actions';
 import { ContextActionType, ContextReadActionPayload } from '../../actions/context';
 import { askMap } from '../../stories';
-import {
-  Action,
-  AskResponse,
-  AskResponseReturnType,
-  EitherActionResult,
-  QpqContext,
-  QpqContextIdentifier,
-} from '../../types';
+import { Action, AskResponse, AskResponseReturnType, QpqContext, QpqContextIdentifier } from '../../types';
+import { getSuccessfulEitherActionResult } from '../../logic/actionLogic';
 
 function* askProcessAction<R>(action: Action<any>): AskResponse<R> {
   return (yield action) as R;
@@ -30,15 +24,11 @@ export function* askContextProvideValue<R, T extends AskResponse<any>>(
     // If this action is a read context
     if (nextResult.value.type === ContextActionType.Read) {
       // and its trying to read from this context
-      const contextActionItterator = nextResult as IteratorYieldResult<
-        Action<ContextReadActionPayload<any>>
-      >;
-      if (
-        contextActionItterator.value.payload!.contextIdentifier.uniqueName ===
-        contextIdentifier.uniqueName
-      ) {
-        // then we feed it our value
-        nextResult = storyIterator.next(value);
+      const contextActionItterator = nextResult as IteratorYieldResult<Action<ContextReadActionPayload<any>>>;
+
+      if (contextActionItterator.value.payload!.contextIdentifier.uniqueName === contextIdentifier.uniqueName) {
+        // then we feed it our value - remember to send it back as an either result if needed
+        nextResult = storyIterator.next(contextActionItterator.value.returnErrors ? getSuccessfulEitherActionResult(value) : value);
 
         // And keep processing
         continue;
@@ -76,9 +66,7 @@ export function* askContextProvideValue<R, T extends AskResponse<any>>(
       // Process each action in the batch using askMap
       const batchActionsToRun = yield* askMap(batchActionPayload.actions, function* (action) {
         // Check if the action is a context action (List or Read)
-        const isContextAction = [ContextActionType.List, ContextActionType.Read].includes(
-          action.type as ContextActionType,
-        );
+        const isContextAction = [ContextActionType.List, ContextActionType.Read].includes(action.type as ContextActionType);
 
         // Return an object containing the action, isContextAction flag, and the result
         // If it's a context action, recursively call askContextProvideValue to process the action
@@ -86,9 +74,7 @@ export function* askContextProvideValue<R, T extends AskResponse<any>>(
         return {
           action,
           isContextAction,
-          result: isContextAction
-            ? yield* askContextProvideValue(contextIdentifier, value, askProcessAction(action))
-            : undefined,
+          result: isContextAction ? yield* askContextProvideValue(contextIdentifier, value, askProcessAction(action)) : undefined,
         };
       });
 

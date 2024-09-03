@@ -1,6 +1,16 @@
-import { ActionProcessorResult } from '../types/Action';
+import { ActionProcessorResult, EitherActionResult } from '../types/Action';
 import { ErrorTypeEnum } from '../types/ErrorTypeEnum';
 import { QPQError } from '../types/ErrorTypeEnum';
+
+export const getSuccessfulEitherActionResult = <T>(result: T): EitherActionResult<T> => ({
+  success: true,
+  result,
+});
+
+export const getUnsuccessfulEitherActionResult = (error: QPQError): EitherActionResult<any> => ({
+  success: false,
+  error: error,
+});
 
 export const actionResultError = (errorType: ErrorTypeEnum | string, errorText: string, errorStack?: string): ActionProcessorResult<any> => {
   return [undefined, { errorType, errorText, errorStack }];

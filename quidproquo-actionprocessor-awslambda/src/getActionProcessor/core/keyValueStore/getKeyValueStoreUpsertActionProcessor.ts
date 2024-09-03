@@ -46,6 +46,7 @@ const getProcessKeyValueStoreUpsert = (qpqConfig: QPQConfig): KeyValueStoreUpser
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         InternalServerError: () => actionResultError(KeyValueStoreUpsertErrorTypeEnum.ServiceUnavailable, 'KVS Service Unavailable'),
+        ResourceNotFoundException: () => actionResultError(KeyValueStoreUpsertErrorTypeEnum.ResourceNotFound, 'KVS Resource Not Found'),
       });
     }
   };

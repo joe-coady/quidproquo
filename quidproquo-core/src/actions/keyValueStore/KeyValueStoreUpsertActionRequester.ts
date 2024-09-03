@@ -2,7 +2,7 @@ import { createErrorEnumForAction } from '../../types';
 import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 import { KeyValueStoreUpsertActionRequester, KeyValueStoreUpsertOptions } from './KeyValueStoreUpsertActionTypes';
 
-export const KeyValueStoreUpsertErrorTypeEnum = createErrorEnumForAction(KeyValueStoreActionType.Upsert, ['ServiceUnavailable']);
+export const KeyValueStoreUpsertErrorTypeEnum = createErrorEnumForAction(KeyValueStoreActionType.Upsert, ['ServiceUnavailable', 'ResourceNotFound']);
 
 export function* askKeyValueStoreUpsert<KvsItem>(
   keyValueStoreName: string,
