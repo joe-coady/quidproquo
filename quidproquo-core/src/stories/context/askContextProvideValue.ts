@@ -1,7 +1,7 @@
 import { SystemActionType, SystemBatchActionPayload, askBatch } from '../../actions';
 import { ContextActionType, ContextReadActionPayload } from '../../actions/context';
 import { askMap } from '../../stories';
-import { Action, AskResponse, AskResponseReturnType, QpqContext, QpqContextIdentifier } from '../../types';
+import { Action, AskResponse, AskResponseReturnType, EitherActionResult, QpqContext, QpqContextIdentifier } from '../../types';
 import { getSuccessfulEitherActionResult } from '../../logic/actionLogic';
 
 function* askProcessAction<R>(action: Action<any>): AskResponse<R> {
@@ -17,7 +17,7 @@ export function* askContextProvideValue<R, T extends AskResponse<any>>(
 
   // We cache the context values because the parent can't change, unilateral dataflow
   // and we don't want to recompute the context values every time we are asked for them.
-  // we dont want to hit the hit the owner of the context as it shows in the logs for no reason
+  // we dont want to hit the owner of the context as it shows in the logs for no reason
   let cache: QpqContext<any> | null = null;
 
   while (!nextResult.done) {
@@ -39,12 +39,15 @@ export function* askContextProvideValue<R, T extends AskResponse<any>>(
     else if (nextResult.value.type === ContextActionType.List) {
       // Update the cache
       if (cache === null) {
-        // Grab the parent context values
-        const parentContextValues = yield nextResult.value;
+        // Grab the parent context values, always grab a either result
+        const parentContextValues: EitherActionResult<QpqContext<any>> = yield {
+          ...nextResult.value,
+          returnErrors: true,
+        };
 
         // overide / attach our context value
-        const allContextValues = {
-          ...parentContextValues,
+        const allContextValues: QpqContext<any> = {
+          ...(parentContextValues.result || {}),
           [contextIdentifier.uniqueName]: value,
         };
 
@@ -53,7 +56,7 @@ export function* askContextProvideValue<R, T extends AskResponse<any>>(
       }
 
       // pass in our chached context values
-      nextResult = storyIterator.next(cache);
+      nextResult = storyIterator.next(nextResult.value.returnErrors ? getSuccessfulEitherActionResult(cache) : cache);
 
       // And keep processing
       continue;

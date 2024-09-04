@@ -3,7 +3,9 @@ import { GLOBAL_STORAGE_DRIVE_RUNTIME, InternalEventRecord, MatchResult } from '
 
 const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProcessor<InternalEventRecord, MatchResult> => {
   return async ({ qpqEventRecord }) => {
-    return actionResult<MatchResult>(GLOBAL_STORAGE_DRIVE_RUNTIME);
+    return actionResult<MatchResult>({
+      runtime: GLOBAL_STORAGE_DRIVE_RUNTIME,
+    });
   };
 };
 export default (qpqConfig: QPQConfig) => {
