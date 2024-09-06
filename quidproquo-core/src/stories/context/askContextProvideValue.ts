@@ -1,11 +1,23 @@
-import { SystemActionType, SystemBatchActionPayload, askBatch } from '../../actions';
+import { SystemActionType, SystemBatchActionPayload, askBatch, askThrowError } from '../../actions';
 import { ContextActionType, ContextReadActionPayload } from '../../actions/context';
-import { askMap } from '../../stories';
+import { askCatch, askMap } from '../../stories';
 import { Action, AskResponse, AskResponseReturnType, EitherActionResult, QpqContext, QpqContextIdentifier } from '../../types';
 import { getSuccessfulEitherActionResult } from '../../logic/actionLogic';
 
 function* askProcessAction<R>(action: Action<any>): AskResponse<R> {
   return (yield action) as R;
+}
+
+function getSuccessfulEitherActionResultIfRequired<T, ReturnErrors extends boolean>(
+  value: T,
+  returnErrors?: ReturnErrors,
+): ReturnErrors extends true ? EitherActionResult<T> : T {
+  if (returnErrors) {
+    return getSuccessfulEitherActionResult(value) as ReturnErrors extends true ? EitherActionResult<T> : T;
+  } else {
+    // Explicitly return T when returnErrors is false
+    return value as ReturnErrors extends true ? EitherActionResult<T> : T;
+  }
 }
 
 export function* askContextProvideValue<R, T extends AskResponse<any>>(
@@ -28,7 +40,7 @@ export function* askContextProvideValue<R, T extends AskResponse<any>>(
 
       if (contextActionItterator.value.payload!.contextIdentifier.uniqueName === contextIdentifier.uniqueName) {
         // then we feed it our value - remember to send it back as an either result if needed
-        nextResult = storyIterator.next(contextActionItterator.value.returnErrors ? getSuccessfulEitherActionResult(value) : value);
+        nextResult = storyIterator.next(getSuccessfulEitherActionResultIfRequired(value, contextActionItterator.value.returnErrors));
 
         // And keep processing
         continue;
@@ -56,7 +68,7 @@ export function* askContextProvideValue<R, T extends AskResponse<any>>(
       }
 
       // pass in our chached context values
-      nextResult = storyIterator.next(nextResult.value.returnErrors ? getSuccessfulEitherActionResult(cache) : cache);
+      nextResult = storyIterator.next(getSuccessfulEitherActionResultIfRequired(cache, nextResult.value.returnErrors));
 
       // And keep processing
       continue;
@@ -85,18 +97,31 @@ export function* askContextProvideValue<R, T extends AskResponse<any>>(
       const remainingBatchActionsToRun = batchActionsToRun.filter((ba) => !ba.isContextAction);
 
       // Run the remaining actions (non-context) in a normal batch
-      const results = yield* askBatch(remainingBatchActionsToRun.map((ba) => ba.action));
+      // TODO: This needs to be wrapped in an ask catch
+      // and have the error passed back based on the original [nextResult.value.returnErrors]
+      const results = yield* askCatch(askBatch(remainingBatchActionsToRun.map((ba) => ba.action)));
 
-      // Assign the results to the corresponding actions in the remainingBatchActionsToRun array
-      remainingBatchActionsToRun.forEach((ba, index) => {
-        ba.result = results[index];
-      });
+      if (results.success) {
+        // Assign the results to the corresponding actions in the remainingBatchActionsToRun array
+        remainingBatchActionsToRun.forEach((ba, index) => {
+          ba.result = results.result[index];
+        });
+      }
 
       // Create an array of all the results, including both context and non-context actions
       const allResults = batchActionsToRun.map((ba) => ba.result);
 
-      // Pass the all results array back to the story iterator
-      nextResult = storyIterator.next(allResults);
+      // If we errored the batch
+      if (!results.success) {
+        if (!nextResult.value.returnErrors) {
+          return yield* askThrowError(results.error.errorType, results.error.errorText, results.error.errorStack);
+        } else {
+          nextResult = storyIterator.next(results);
+        }
+      } else {
+        // Pass the all results array back to the story iterator
+        nextResult = storyIterator.next(getSuccessfulEitherActionResultIfRequired(allResults, nextResult.value.returnErrors));
+      }
 
       // Continue processing the next action in the story iterator
       continue;

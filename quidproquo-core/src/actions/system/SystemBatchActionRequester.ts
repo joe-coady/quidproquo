@@ -3,9 +3,7 @@ import { SystemBatchActionRequester } from './SystemBatchActionTypes';
 import { Action } from '../../types/Action';
 
 // TODO: Make typings better
-export function* askBatch<TReturn extends Array<any>>(
-  actions: Action<any>[],
-): SystemBatchActionRequester<TReturn> {
+export function* askBatch<TReturn extends Array<any> = any[]>(actions: Action<any>[]): SystemBatchActionRequester<TReturn> {
   // If we only have one action, just execute it directly
   // No need to batch it
   if (actions.length === 1) {
