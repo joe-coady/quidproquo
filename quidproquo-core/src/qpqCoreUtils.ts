@@ -348,14 +348,18 @@ export function getSrcPathFromQpqFunctionRuntimeWithoutLeadingSlash(runtime: Qpq
   return srcPath;
 }
 
-export const getFullSrcPathFromQpqFunctionRuntime = (qpqFunctionRuntime: QpqFunctionRuntime, qpqConfig: QPQConfig): string => {
+export const getFullSrcPathFromQpqFunctionRuntime = (
+  qpqFunctionRuntime: QpqFunctionRuntime,
+  qpqConfig: QPQConfig,
+  configRootOverride?: string,
+): string => {
   const [srcPath, _method] = qpqFunctionRuntime.split('::');
 
   if (srcPath.startsWith('full@')) {
     return srcPath.slice(5);
   }
 
-  const configRoot = getApplicationConfigRoot(qpqConfig);
+  const configRoot = configRootOverride ?? getApplicationConfigRoot(qpqConfig);
 
   return joinPaths(configRoot, srcPath);
 };
