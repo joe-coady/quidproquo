@@ -22,7 +22,7 @@ const processBatch: SystemBatchActionProcessor<any[]> = async (payload, session,
   const erroredBatchItem = batchRes.find((br, i) => isErroredActionResult(br) && !payload.actions[i].returnErrors);
   if (erroredBatchItem) {
     const error = resolveActionResultError(erroredBatchItem);
-    return actionResultError(ErrorTypeEnum.GenericError, error.errorText, error.errorStack);
+    return actionResultError(error.errorType, error.errorText, error.errorStack);
   }
 
   // unwrap the values
