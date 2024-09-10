@@ -1,3 +1,4 @@
+import { getStoryNameFromQpqFunctionRuntime } from '../../qpqCoreUtils';
 import { QpqFunctionRuntime } from '../../types';
 import { QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
 
@@ -13,15 +14,19 @@ export interface ScheduleQPQConfigSetting extends QPQConfigSetting {
   buildPath: string;
 }
 
-export const defineRecurringSchedule = (cronExpression: string, runtime: QpqFunctionRuntime, buildPath: string): ScheduleQPQConfigSetting => ({
-  configSettingType: QPQCoreConfigSettingType.schedule,
-  uniqueKey: runtime,
+export const defineRecurringSchedule = (cronExpression: string, runtime: QpqFunctionRuntime, buildPath: string): ScheduleQPQConfigSetting => {
+  const uniqueKey = getStoryNameFromQpqFunctionRuntime(runtime);
 
-  scheduleType: ScheduleTypeEnum.Recurring,
+  return {
+    configSettingType: QPQCoreConfigSettingType.schedule,
+    uniqueKey: uniqueKey,
 
-  runtime,
+    scheduleType: ScheduleTypeEnum.Recurring,
 
-  cronExpression,
+    runtime,
 
-  buildPath,
-});
+    cronExpression,
+
+    buildPath,
+  };
+};
