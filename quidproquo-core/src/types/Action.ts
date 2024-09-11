@@ -1,11 +1,7 @@
+import { QPQConfig } from '../config';
 import { QPQError } from './ErrorTypeEnum';
 import { QpqLogger } from './QpqLogger';
-import {
-  ExtractGeneratorReturnType,
-  StoryResult,
-  StorySession,
-  StorySessionUpdater,
-} from './StorySession';
+import { ExtractGeneratorReturnType, StoryResult, StorySession, StorySessionUpdater } from './StorySession';
 
 // Action ~ Think redux action
 // They must have a type, and an optional payload
@@ -48,15 +44,12 @@ export type ActionProcessor<TAction extends Action<any>, TReturn = any> = (
 //  Thing the function returns to the regular logic,
 //  the thing QPQ gives us
 // >
-export type ActionRequester<
-  TAction extends Action<any>,
-  TReturn = undefined,
-  TQPQReturn = TReturn,
-> = Generator<TAction, TReturn, TQPQReturn>;
+export type ActionRequester<TAction extends Action<any>, TReturn = undefined, TQPQReturn = TReturn> = Generator<TAction, TReturn, TQPQReturn>;
 
-export type ActionProcessorReturnType<T extends Generator<any, any, any>> =
-  ExtractGeneratorReturnType<T>;
+export type ActionProcessorReturnType<T extends Generator<any, any, any>> = ExtractGeneratorReturnType<T>;
 
 export type ActionProcessorList = {
   [key: string]: ActionProcessor<any, any>;
 };
+
+export type ActionProcessorListResolver = (qpqConfig: QPQConfig) => Promise<ActionProcessorList>;

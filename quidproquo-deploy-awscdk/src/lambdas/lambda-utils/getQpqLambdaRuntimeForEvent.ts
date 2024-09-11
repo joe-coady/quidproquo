@@ -36,11 +36,11 @@ export const getQpqLambdaRuntimeForEvent = <E extends QpqFunctionExecutionEvent<
     const resolveStory = createRuntime(
       cdkConfig.qpqConfig,
       getStorySession(event),
-      {
+      async () => ({
         ...getLambdaActionProcessors(cdkConfig.qpqConfig),
         ...getActionProcessorList(cdkConfig.qpqConfig),
         ...qpqCustomActionProcessors(),
-      },
+      }),
       () => new Date().toISOString(),
       logger,
       getRuntimeCorrelation(cdkConfig.qpqConfig),

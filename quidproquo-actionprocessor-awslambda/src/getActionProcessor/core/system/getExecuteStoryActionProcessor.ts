@@ -46,7 +46,7 @@ const getProcessExecuteStory = <T extends Array<any>, R>(
         accessToken: payload.storySession?.accessToken || session.accessToken,
         correlation: payload.storySession?.correlation || session.correlation,
       },
-      actionProcessors,
+      async () => actionProcessors,
       getDateNow,
       logger,
       // TODO: Share this logic.

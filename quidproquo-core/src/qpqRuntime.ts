@@ -4,7 +4,7 @@ import { StoryResult, StorySession, QpqRuntimeType, StorySessionUpdater, qpqCons
 
 import { resolveActionResult, resolveActionResultError, isErroredActionResult, actionResultError } from './logic/actionLogic';
 import { QPQConfig } from './config';
-import { QpqLogger } from './types';
+import { ActionProcessorListResolver, QpqLogger } from './types';
 
 import { getApplicationModuleName } from './qpqCoreUtils';
 
@@ -37,7 +37,7 @@ export async function processAction(
 export const createRuntime = (
   qpqConfig: QPQConfig,
   callerSession: StorySession,
-  actionProcessors: ActionProcessorList,
+  getActionProcessors: ActionProcessorListResolver,
   getTimeNow: () => string,
   logger: QpqLogger,
   runtimeCorrelation: string,
@@ -48,6 +48,8 @@ export const createRuntime = (
     story: (...args: TArgs) => ActionRequester<Action<any>, any, any>,
     args: TArgs,
   ): Promise<StoryResult<any>> {
+    const actionProcessors: ActionProcessorList = await getActionProcessors(qpqConfig);
+
     const reader = story(...args);
 
     let storyProgress: IteratorResult<Action<any>, any> | null = null;

@@ -266,8 +266,8 @@ export const getKeyValueStoreByName = <T extends object = any>(
   return keyValueStore;
 };
 
-export const getActionProcessorSources = (configs: QPQConfig): string[] => {
-  const sources = getConfigSettings<ActionProcessorsQPQConfigSetting>(configs, QPQCoreConfigSettingType.actionProcessors).map((ap) => ap.src);
+export const getActionProcessorSources = (configs: QPQConfig): QpqFunctionRuntime[] => {
+  const sources = getConfigSettings<ActionProcessorsQPQConfigSetting>(configs, QPQCoreConfigSettingType.actionProcessors).map((ap) => ap.runtime);
 
   return sources;
 };
@@ -308,6 +308,7 @@ export const getUserDirectorySrcEntries = (qpqConfig: QPQConfig): QpqFunctionRun
 // Used in bundlers to know where and what to build and index
 export const getAllSrcEntries = (qpqConfig: QPQConfig): QpqFunctionRuntime[] => {
   const result = [
+    ...getActionProcessorSources(qpqConfig),
     ...getScheduleEvents(qpqConfig).map((r) => r.runtime),
     ...getQueueSrcEntries(qpqConfig),
     ...getUserDirectorySrcEntries(qpqConfig),
