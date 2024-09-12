@@ -14,5 +14,5 @@ export const executeLambdaCognitoVerifyAuthChallengeTriggerEvent = getQpqLambdaR
       context: {},
     };
   },
-  (qpqConfig) => getCognitoVerifyAuthChallengeEventProcessor(qpqConfig),
+  getCognitoVerifyAuthChallengeEventProcessor,
 );

@@ -1,8 +1,7 @@
-import { QPQConfig } from 'quidproquo-core';
+import { ActionProcessorList, ActionProcessorListResolver, QPQConfig } from 'quidproquo-core';
 
-import getExecuteStoryActionProcessor from './getExecuteStoryActionProcessor';
-import { DynamicModuleLoader } from '../../../types/DynamicLoader';
+import { getSystemExecuteStoryActionProcessor } from './getSystemExecuteStoryActionProcessor';
 
-export default (qpqConfig: QPQConfig, dynamicModuleLoader: DynamicModuleLoader) => ({
-  ...getExecuteStoryActionProcessor(qpqConfig, dynamicModuleLoader),
+export const getSystemActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
+  ...(await getSystemExecuteStoryActionProcessor(qpqConfig)),
 });

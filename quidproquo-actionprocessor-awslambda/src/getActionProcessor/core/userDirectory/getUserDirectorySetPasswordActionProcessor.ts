@@ -1,37 +1,31 @@
 import {
+  ActionProcessorList,
+  ActionProcessorListResolver,
   actionResult,
   QPQConfig,
   qpqCoreUtils,
   UserDirectoryActionType,
   UserDirectorySetPasswordActionProcessor,
 } from 'quidproquo-core';
-import {
-  getCFExportNameUserPoolIdFromConfig,
-} from '../../../awsNamingUtils';
+import { getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { setUserPassword } from '../../../logic/cognito/setUserPassword';
 
-const getUserDirectorySetPasswordActionProcessor = (
-  qpqConfig: QPQConfig,
-): UserDirectorySetPasswordActionProcessor => {
+const getProcessSetPassword = (qpqConfig: QPQConfig): UserDirectorySetPasswordActionProcessor => {
   return async ({ userDirectoryName, newPassword, username }, session) => {
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
-    const userPoolId = await getExportedValue(
-      getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig),
-      region,
-    );
-    
+    const userPoolId = await getExportedValue(getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig), region);
+
     await setUserPassword(region, userPoolId, username, newPassword);
 
     return actionResult(void 0);
   };
 };
 
-export default (qpqConfig: QPQConfig) => {
-  return {
-    [UserDirectoryActionType.SetPassword]:
-      getUserDirectorySetPasswordActionProcessor(qpqConfig),
-  };
-};
+export const getUserDirectorySetPasswordActionProcessor: ActionProcessorListResolver = async (
+  qpqConfig: QPQConfig,
+): Promise<ActionProcessorList> => ({
+  [UserDirectoryActionType.SetPassword]: getProcessSetPassword(qpqConfig),
+});

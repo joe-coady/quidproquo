@@ -14,5 +14,5 @@ export const executeLambdaCognitoCustomMessageTriggerEvent = getQpqLambdaRuntime
       context: {},
     };
   },
-  (qpqConfig) => getCognitoCustomMessageEventProcessor(qpqConfig),
+  getCognitoCustomMessageEventProcessor,
 );

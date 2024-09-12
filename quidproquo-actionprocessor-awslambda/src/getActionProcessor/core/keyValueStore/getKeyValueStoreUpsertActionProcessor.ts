@@ -7,6 +7,8 @@ import {
   ErrorTypeEnum,
   actionResultError,
   actionResultErrorFromCaughtError,
+  ActionProcessorListResolver,
+  ActionProcessorList,
 } from 'quidproquo-core';
 
 import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
@@ -52,6 +54,6 @@ const getProcessKeyValueStoreUpsert = (qpqConfig: QPQConfig): KeyValueStoreUpser
   };
 };
 
-export default (qpqConfig: QPQConfig) => ({
+export const getKeyValueStoreUpsertActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
   [KeyValueStoreActionType.Upsert]: getProcessKeyValueStoreUpsert(qpqConfig),
 });

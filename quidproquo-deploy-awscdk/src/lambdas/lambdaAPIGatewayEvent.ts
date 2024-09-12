@@ -17,5 +17,5 @@ export const executeAPIGatewayEvent = getQpqLambdaRuntimeForEvent<APIGatewayEven
       context: {},
     };
   },
-  (qpqConfig) => getApiGatewayApiEventEventProcessor(qpqConfig),
+  getApiGatewayApiEventEventProcessor,
 );

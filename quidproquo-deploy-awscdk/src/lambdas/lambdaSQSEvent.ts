@@ -14,5 +14,5 @@ export const executeSQSEvent = getQpqLambdaRuntimeForEvent<SQSEvent>(
       context: {},
     };
   },
-  (qpqConfig) => getSqsQueueEventProcessor(qpqConfig),
+  getSqsQueueEventProcessor,
 );

@@ -21,3 +21,4 @@ export * from './ExcludeKeys';
 export * from './ConfigUrlDefinition';
 export * from './authChallenge';
 export * from './QpqFunctionRuntime';
+export * from './DynamicModuleLoader';

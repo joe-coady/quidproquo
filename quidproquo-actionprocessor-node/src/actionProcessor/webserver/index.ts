@@ -1,5 +1,5 @@
-import GenericDataResourceActionProcessor from "./genericDataResource/GenericDataResourceActionProcessor";
+import { ActionProcessorList, ActionProcessorListResolver, QPQConfig } from 'quidproquo-core';
 
-export default {
-  ...GenericDataResourceActionProcessor,
-};
+export const getWebserverActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
+  // Nothing yet
+});

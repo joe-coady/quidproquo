@@ -6,6 +6,8 @@ import {
   UserDirectoryActionType,
   AnyAuthChallenge,
   AuthenticateUserChallenge,
+  ActionProcessorList,
+  ActionProcessorListResolver,
 } from 'quidproquo-core';
 
 import { getCFExportNameUserPoolIdFromConfig, getCFExportNameUserPoolClientIdFromConfig } from '../../../awsNamingUtils';
@@ -45,7 +47,7 @@ const anyAuthChallengeToCognitoChallengeName = (authChallenge: AnyAuthChallenge)
   }
 };
 
-const getUserDirectoryRespondToAuthChallengeActionProcessor = (qpqConfig: QPQConfig): UserDirectoryRespondToAuthChallengeActionProcessor => {
+const getProcessRespondToAuthChallenge = (qpqConfig: QPQConfig): UserDirectoryRespondToAuthChallengeActionProcessor => {
   return async ({ userDirectoryName, authChallenge }) => {
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
@@ -67,8 +69,8 @@ const getUserDirectoryRespondToAuthChallengeActionProcessor = (qpqConfig: QPQCon
   };
 };
 
-export default (qpqConfig: QPQConfig) => {
-  return {
-    [UserDirectoryActionType.RespondToAuthChallenge]: getUserDirectoryRespondToAuthChallengeActionProcessor(qpqConfig),
-  };
-};
+export const getUserDirectoryRespondToAuthChallengeActionProcessor: ActionProcessorListResolver = async (
+  qpqConfig: QPQConfig,
+): Promise<ActionProcessorList> => ({
+  [UserDirectoryActionType.RespondToAuthChallenge]: getProcessRespondToAuthChallenge(qpqConfig),
+});

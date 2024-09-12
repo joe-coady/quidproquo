@@ -16,5 +16,5 @@ export const executeServiceFunctionExecuteEvent = getQpqLambdaRuntimeForEvent<An
   (event) => {
     return event.storySession;
   },
-  (qpqConfig) => getLambdaServiceFunctionEventProcessor(qpqConfig),
+  getLambdaServiceFunctionEventProcessor,
 );

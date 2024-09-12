@@ -1,7 +1,7 @@
-import { QPQConfig } from 'quidproquo-core';
+import { ActionProcessorList, ActionProcessorListResolver, QPQConfig } from 'quidproquo-core';
 
-import getServiceFunctionActionProcessor from './getServiceFunctionActionProcessor';
+import { getServiceFunctionExecuteActionProcessor } from './getServiceFunctionExecuteActionProcessor';
 
-export default (qpqConfig: QPQConfig) => ({
-  ...getServiceFunctionActionProcessor(qpqConfig),
+export const getServiceFunctionActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
+  ...(await getServiceFunctionExecuteActionProcessor(qpqConfig)),
 });

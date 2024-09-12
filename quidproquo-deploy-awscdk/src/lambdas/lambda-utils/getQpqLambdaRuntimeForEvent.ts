@@ -3,10 +3,19 @@ import { Context } from 'aws-lambda';
 import { QpqFunctionExecutionEvent } from '../types';
 
 import { SNSEvent } from 'aws-lambda';
-import { dynamicModuleLoaderWarmer } from '../dynamicModuleLoader';
+import { dynamicModuleLoader, dynamicModuleLoaderWarmer } from '../dynamicModuleLoader';
 import { getLambdaConfigs } from './lambdaConfig';
 import { getLogger } from './logger';
-import { ActionProcessorList, QPQConfig, QpqLogger, QpqRuntimeType, StorySession, askProcessEvent, createRuntime } from 'quidproquo-core';
+import {
+  ActionProcessorList,
+  ActionProcessorListResolver,
+  QPQConfig,
+  QpqLogger,
+  QpqRuntimeType,
+  StorySession,
+  askProcessEvent,
+  createRuntime,
+} from 'quidproquo-core';
 import { getLambdaActionProcessors } from './getLambdaActionProcessors';
 
 // @ts-ignore - Special webpack loader
@@ -25,7 +34,7 @@ const isSnsEvent = <T>(event: QpqFunctionExecutionEvent<T>): event is SNSEvent =
 export const getQpqLambdaRuntimeForEvent = <E extends QpqFunctionExecutionEvent<any>>(
   runtimeType: QpqRuntimeType,
   getStorySession: (event: E) => StorySession,
-  getActionProcessorList: (qpqConfig: QPQConfig) => ActionProcessorList,
+  getActionProcessorList: ActionProcessorListResolver,
 ) => {
   return async (event: E, context: Context) => {
     console.log('tick: ', JSON.stringify(event, null, 2));
@@ -37,14 +46,15 @@ export const getQpqLambdaRuntimeForEvent = <E extends QpqFunctionExecutionEvent<
       cdkConfig.qpqConfig,
       getStorySession(event),
       async () => ({
-        ...getLambdaActionProcessors(cdkConfig.qpqConfig),
-        ...getActionProcessorList(cdkConfig.qpqConfig),
-        ...qpqCustomActionProcessors(),
+        ...(await getLambdaActionProcessors(cdkConfig.qpqConfig)),
+        ...(await getActionProcessorList(cdkConfig.qpqConfig)),
+        ...(await qpqCustomActionProcessors()),
       }),
       () => new Date().toISOString(),
       logger,
       getRuntimeCorrelation(cdkConfig.qpqConfig),
       runtimeType,
+      dynamicModuleLoader,
     );
 
     const processEvent = async () => {

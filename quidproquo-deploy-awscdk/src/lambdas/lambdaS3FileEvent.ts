@@ -14,5 +14,5 @@ export const executeS3FileEvent = getQpqLambdaRuntimeForEvent<S3Event>(
       context: {},
     };
   },
-  (qpqConfig) => getS3FileEventEventProcessor(qpqConfig),
+  getS3FileEventEventProcessor,
 );

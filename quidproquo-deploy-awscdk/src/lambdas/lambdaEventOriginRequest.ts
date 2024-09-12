@@ -12,5 +12,5 @@ export const executeEventOriginRequest = getQpqLambdaRuntimeForEvent<CloudFrontR
       context: {},
     };
   },
-  (qpqConfig) => getCloudFrontOriginRequestEventProcessor(qpqConfig),
+  getCloudFrontOriginRequestEventProcessor,
 );

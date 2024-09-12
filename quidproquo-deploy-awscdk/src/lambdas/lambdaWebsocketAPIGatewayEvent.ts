@@ -18,5 +18,5 @@ export const executeWebsocketAPIGatewayEvent = getQpqLambdaRuntimeForEvent<ApiGa
       context: {},
     };
   },
-  (qpqConfig) => getApiGatewayWebsocketEventEventProcessor(qpqConfig),
+  getApiGatewayWebsocketEventEventProcessor,
 );

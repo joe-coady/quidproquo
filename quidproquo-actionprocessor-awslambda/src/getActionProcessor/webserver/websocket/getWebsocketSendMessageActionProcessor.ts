@@ -1,4 +1,12 @@
-import { actionResult, actionResultError, actionResultErrorFromCaughtError, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import {
+  ActionProcessorList,
+  ActionProcessorListResolver,
+  actionResult,
+  actionResultError,
+  actionResultErrorFromCaughtError,
+  QPQConfig,
+  qpqCoreUtils,
+} from 'quidproquo-core';
 
 import { WebsocketSendMessageActionProcessor, WebsocketActionType, WebsocketSendMessageErrorTypeEnum } from 'quidproquo-webserver';
 
@@ -7,7 +15,7 @@ import { getCFExportNameWebsocketApiIdFromConfig } from '../../../awsNamingUtils
 import { sendMessageToWebSocketConnection } from '../../../logic/apiGateway/websocketSendMessage';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 
-const getWebsocketSendMessageActionProcessor = (qpqConfig: QPQConfig): WebsocketSendMessageActionProcessor<any> => {
+const getProcessSendMessage = (qpqConfig: QPQConfig): WebsocketSendMessageActionProcessor<any> => {
   return async ({ connectionId, payload, websocketApiName }) => {
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
@@ -26,8 +34,6 @@ const getWebsocketSendMessageActionProcessor = (qpqConfig: QPQConfig): Websocket
   };
 };
 
-export default (qpqConfig: QPQConfig) => {
-  return {
-    [WebsocketActionType.SendMessage]: getWebsocketSendMessageActionProcessor(qpqConfig),
-  };
-};
+export const getWebsocketSendMessageActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
+  [WebsocketActionType.SendMessage]: getProcessSendMessage(qpqConfig),
+});

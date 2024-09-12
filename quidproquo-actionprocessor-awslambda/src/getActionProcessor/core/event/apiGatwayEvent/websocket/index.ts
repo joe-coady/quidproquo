@@ -1,15 +1,15 @@
-import { QPQConfig } from 'quidproquo-core';
+import { ActionProcessorList, ActionProcessorListResolver, QPQConfig } from 'quidproquo-core';
 
-import getAutoRespond from './autoRespond';
-import getGetRecords from './getRecords';
-import getMatchStory from './matchStory';
-import getTransformResponseResult from './transformResponseResult';
-import getStorySession from './getStorySession';
+import { getEventAutoRespondActionProcessor } from './getEventAutoRespondActionProcessor';
+import { getEventGetRecordsActionProcessor } from './getEventGetRecordsActionProcessor';
+import { getEventGetStorySessionActionProcessor } from './getEventGetStorySessionActionProcessor';
+import { getEventMatchStoryActionProcessor } from './getEventMatchStoryActionProcessor';
+import { getEventTransformResponseResultActionProcessor } from './getEventTransformResponseResultActionProcessor';
 
-export const getApiGatewayWebsocketEventEventProcessor = (qpqConfig: QPQConfig) => ({
-  ...getStorySession(qpqConfig),
-  ...getGetRecords(qpqConfig),
-  ...getMatchStory(qpqConfig),
-  ...getAutoRespond(qpqConfig),
-  ...getTransformResponseResult(qpqConfig),
+export const getApiGatewayWebsocketEventEventProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
+  ...(await getEventAutoRespondActionProcessor(qpqConfig)),
+  ...(await getEventGetRecordsActionProcessor(qpqConfig)),
+  ...(await getEventGetStorySessionActionProcessor(qpqConfig)),
+  ...(await getEventMatchStoryActionProcessor(qpqConfig)),
+  ...(await getEventTransformResponseResultActionProcessor(qpqConfig)),
 });

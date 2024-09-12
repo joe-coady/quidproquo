@@ -1,4 +1,4 @@
-import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { ActionProcessorList, ActionProcessorListResolver, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
 import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
 import { KeyValueStoreUpdateActionProcessor, actionResult, KeyValueStoreActionType } from 'quidproquo-core';
@@ -17,6 +17,6 @@ const getProcessKeyValueStoreUpdate = (qpqConfig: QPQConfig): KeyValueStoreUpdat
   };
 };
 
-export default (qpqConfig: QPQConfig) => ({
+export const getKeyValueStoreUpdateActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
   [KeyValueStoreActionType.Update]: getProcessKeyValueStoreUpdate(qpqConfig),
 });

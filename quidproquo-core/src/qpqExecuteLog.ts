@@ -42,6 +42,7 @@ export const qpqExecuteLog = async (storyResult: StoryResult<any>, runtime: any,
     },
     storyResult.correlation,
     storyResult.runtimeType,
+    async () => null,
   );
 
   // Execute it with the initial input

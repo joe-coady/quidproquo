@@ -4,7 +4,7 @@ import { StoryResult, StorySession, QpqRuntimeType, StorySessionUpdater, qpqCons
 
 import { resolveActionResult, resolveActionResultError, isErroredActionResult, actionResultError } from './logic/actionLogic';
 import { QPQConfig } from './config';
-import { ActionProcessorListResolver, QpqLogger } from './types';
+import { ActionProcessorListResolver, DynamicModuleLoader, QpqLogger } from './types';
 
 import { getApplicationModuleName } from './qpqCoreUtils';
 
@@ -15,6 +15,7 @@ export async function processAction(
   session: StorySession,
   logger: QpqLogger,
   updateSession: StorySessionUpdater,
+  dynamicModuleLoader: DynamicModuleLoader,
 ) {
   try {
     const processor = actionProcessors?.[action?.type];
@@ -22,7 +23,7 @@ export async function processAction(
       throw new Error(`Unable to process action: ${action?.type} from ${Object.keys(actionProcessors).join(', ')}`);
     }
 
-    return await processor(action.payload, session, actionProcessors, logger, updateSession);
+    return await processor(action.payload, session, actionProcessors, logger, updateSession, dynamicModuleLoader);
   } catch (e: unknown) {
     if (e instanceof Error) {
       const errorName = (e as any).name;
@@ -42,6 +43,7 @@ export const createRuntime = (
   logger: QpqLogger,
   runtimeCorrelation: string,
   runtimeType: QpqRuntimeType,
+  dynamicModuleLoader: DynamicModuleLoader,
   initialTags?: string[],
 ) => {
   async function resolveStory<TArgs extends Array<any>>(
@@ -106,7 +108,14 @@ export const createRuntime = (
         const action: Action<any> = storyProgress.value;
         const executionTime = getTimeNow();
 
-        const actionResult: ActionProcessorResult<any> = await processAction(action, actionProcessors, storySession, logger, updateSession);
+        const actionResult: ActionProcessorResult<any> = await processAction(
+          action,
+          actionProcessors,
+          storySession,
+          logger,
+          updateSession,
+          dynamicModuleLoader,
+        );
 
         const history = {
           act: action,

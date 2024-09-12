@@ -5,30 +5,21 @@ import {
   qpqCoreUtils,
   UserDirectoryActionType,
   AuthenticateUserResponse,
+  ActionProcessorList,
+  ActionProcessorListResolver,
 } from 'quidproquo-core';
-import {
-  getCFExportNameUserPoolIdFromConfig,
-  getCFExportNameUserPoolClientIdFromConfig,
-} from '../../../awsNamingUtils';
+import { getCFExportNameUserPoolIdFromConfig, getCFExportNameUserPoolClientIdFromConfig } from '../../../awsNamingUtils';
 
 import { createUser } from '../../../logic/cognito/createUser';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 
-const getUserDirectoryCreateUserActionProcessor = (
-  qpqConfig: QPQConfig,
-): UserDirectoryCreateUserActionProcessor => {
+const getProcessCreateUser = (qpqConfig: QPQConfig): UserDirectoryCreateUserActionProcessor => {
   return async (payload) => {
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
-    const userPoolId = await getExportedValue(
-      getCFExportNameUserPoolIdFromConfig(payload.userDirectoryName, qpqConfig),
-      region,
-    );
+    const userPoolId = await getExportedValue(getCFExportNameUserPoolIdFromConfig(payload.userDirectoryName, qpqConfig), region);
 
-    const userPoolClientId = await getExportedValue(
-      getCFExportNameUserPoolClientIdFromConfig(payload.userDirectoryName, qpqConfig),
-      region,
-    );
+    const userPoolClientId = await getExportedValue(getCFExportNameUserPoolClientIdFromConfig(payload.userDirectoryName, qpqConfig), region);
 
     const authResponse: AuthenticateUserResponse = await createUser(
       userPoolId,
@@ -41,8 +32,6 @@ const getUserDirectoryCreateUserActionProcessor = (
   };
 };
 
-export default (qpqConfig: QPQConfig) => {
-  return {
-    [UserDirectoryActionType.CreateUser]: getUserDirectoryCreateUserActionProcessor(qpqConfig),
-  };
-};
+export const getUserDirectoryCreateUserActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
+  [UserDirectoryActionType.CreateUser]: getProcessCreateUser(qpqConfig),
+});

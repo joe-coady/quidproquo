@@ -1,4 +1,4 @@
-import { QPQConfig, qpqCoreUtils, QueueMessage, StorySession } from 'quidproquo-core';
+import { ActionProcessorList, ActionProcessorListResolver, QPQConfig, qpqCoreUtils, QueueMessage, StorySession } from 'quidproquo-core';
 
 import { resolveResourceName } from '../../../runtimeConfig/qpqAwsLambdaRuntimeConfigUtils';
 import { QueueSendMessageActionProcessor, actionResult, QueueActionType } from 'quidproquo-core';
@@ -22,7 +22,7 @@ const getProcessQueueSendMessage = (qpqConfig: QPQConfig): QueueSendMessageActio
           ...message,
           storySession: {
             ...session,
-            context 
+            context,
           },
         };
 
@@ -34,6 +34,6 @@ const getProcessQueueSendMessage = (qpqConfig: QPQConfig): QueueSendMessageActio
   };
 };
 
-export default (qpqConfig: QPQConfig) => ({
+export const getQueueSendMessagesActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
   [QueueActionType.SendMessages]: getProcessQueueSendMessage(qpqConfig),
 });

@@ -14,5 +14,5 @@ export const executeEventBridgeEvent = getQpqLambdaRuntimeForEvent<EventBridgeEv
       context: {},
     };
   },
-  (qpqConfig) => getEventBridgeEventActionProcessor(qpqConfig),
+  getEventBridgeEventActionProcessor,
 );

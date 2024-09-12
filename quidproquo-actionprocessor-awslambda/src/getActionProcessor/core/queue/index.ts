@@ -1,7 +1,7 @@
-import { QPQConfig } from 'quidproquo-core';
+import { ActionProcessorList, ActionProcessorListResolver, QPQConfig } from 'quidproquo-core';
 
-import getQueueSendMessageActionProcessor from './getQueueSendMessageActionProcessor';
+import { getQueueSendMessagesActionProcessor } from './getQueueSendMessageActionProcessor';
 
-export default (qpqConfig: QPQConfig) => ({
-  ...getQueueSendMessageActionProcessor(qpqConfig),
+export const getQueueActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
+  ...(await getQueueSendMessagesActionProcessor(qpqConfig)),
 });

@@ -1,15 +1,15 @@
-import { QPQConfig } from 'quidproquo-core';
+import { ActionProcessorList, ActionProcessorListResolver, QPQConfig } from 'quidproquo-core';
 
-import getConfigGetParameterActionProcessor from './getConfigGetParameterActionProcessor';
-import getConfigGetParametersActionProcessor from './getConfigGetParametersActionProcessor';
-import getConfigGetSecretActionProcessor from './getConfigGetSecretActionProcessor';
-import getConfigGetGlobalActionProcessor from './getConfigGetGlobalActionProcessor';
-import getConfigSetParameterActionProcessor from './getConfigSetParameterActionProcessor';
+import { getConfigGetGlobalActionProcessor } from './getConfigGetGlobalActionProcessor';
+import { getConfigGetParameterActionProcessor } from './getConfigGetParameterActionProcessor';
+import { getConfigGetParametersActionProcessor } from './getConfigGetParametersActionProcessor';
+import { getConfigGetSecretActionProcessor } from './getConfigGetSecretActionProcessor';
+import { getConfigSetParameterActionProcessor } from './getConfigSetParameterActionProcessor';
 
-export default (qpqConfig: QPQConfig) => ({
-  ...getConfigGetParameterActionProcessor(qpqConfig),
-  ...getConfigGetParametersActionProcessor(qpqConfig),
-  ...getConfigGetSecretActionProcessor(qpqConfig),
-  ...getConfigGetGlobalActionProcessor(qpqConfig),
-  ...getConfigSetParameterActionProcessor(qpqConfig),
+export const getConfigActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
+  ...(await getConfigGetGlobalActionProcessor(qpqConfig)),
+  ...(await getConfigGetParameterActionProcessor(qpqConfig)),
+  ...(await getConfigGetParametersActionProcessor(qpqConfig)),
+  ...(await getConfigGetSecretActionProcessor(qpqConfig)),
+  ...(await getConfigSetParameterActionProcessor(qpqConfig)),
 });

@@ -1,4 +1,5 @@
 import { QPQConfig } from '../config';
+import { DynamicModuleLoader } from './DynamicModuleLoader';
 import { QPQError } from './ErrorTypeEnum';
 import { QpqLogger } from './QpqLogger';
 import { ExtractGeneratorReturnType, StoryResult, StorySession, StorySessionUpdater } from './StorySession';
@@ -37,6 +38,7 @@ export type ActionProcessor<TAction extends Action<any>, TReturn = any> = (
   actionProcessors: ActionProcessorList,
   logger: QpqLogger,
   updateSession: StorySessionUpdater,
+  dynamicModuleLoader: DynamicModuleLoader,
 ) => AsyncActionProcessorResult<TReturn>;
 
 // Generator<

@@ -13,5 +13,5 @@ export const executelambdaEventBridgeEventStackDeploy = getQpqLambdaRuntimeForEv
       context: {},
     };
   },
-  (qpqConfig) => getEventBridgeStackDeployEventActionProcessor(qpqConfig),
+  getEventBridgeStackDeployEventActionProcessor,
 );
