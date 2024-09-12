@@ -1,4 +1,4 @@
-import { ActionProcessorList, ActionProcessorListResolver, QPQConfig } from 'quidproquo-core';
+import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
 
 import { getEventAutoRespondActionProcessor } from './getEventAutoRespondActionProcessor';
 import { getEventGetRecordsActionProcessor } from './getEventGetRecordsActionProcessor';
@@ -6,10 +6,13 @@ import { getEventGetStorySessionActionProcessor } from './getEventGetStorySessio
 import { getEventMatchStoryActionProcessor } from './getEventMatchStoryActionProcessor';
 import { getEventTransformResponseResultActionProcessor } from './getEventTransformResponseResultActionProcessor';
 
-export const getCloudFrontOriginRequestEventProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  ...(await getEventAutoRespondActionProcessor(qpqConfig)),
-  ...(await getEventGetRecordsActionProcessor(qpqConfig)),
-  ...(await getEventGetStorySessionActionProcessor(qpqConfig)),
-  ...(await getEventMatchStoryActionProcessor(qpqConfig)),
-  ...(await getEventTransformResponseResultActionProcessor(qpqConfig)),
+export const getCloudFrontOriginRequestEventProcessor: ActionProcessorListResolver = async (
+  qpqConfig: QPQConfig,
+  dynamicModuleLoader: DynamicModuleLoader,
+): Promise<ActionProcessorList> => ({
+  ...(await getEventAutoRespondActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getEventGetRecordsActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getEventGetStorySessionActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getEventMatchStoryActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getEventTransformResponseResultActionProcessor(qpqConfig, dynamicModuleLoader)),
 });

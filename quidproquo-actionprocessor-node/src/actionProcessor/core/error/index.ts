@@ -1,7 +1,10 @@
-import { QPQConfig, ActionProcessorList, ActionProcessorListResolver } from 'quidproquo-core';
+import { QPQConfig, ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader } from 'quidproquo-core';
 
 import { getErrorThrowErrorActionProcessor } from './getErrorThrowErrorActionProcessor';
 
-export const getErrorActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  ...(await getErrorThrowErrorActionProcessor(qpqConfig)),
+export const getErrorActionProcessor: ActionProcessorListResolver = async (
+  qpqConfig: QPQConfig,
+  dynamicModuleLoader: DynamicModuleLoader,
+): Promise<ActionProcessorList> => ({
+  ...(await getErrorThrowErrorActionProcessor(qpqConfig, dynamicModuleLoader)),
 });

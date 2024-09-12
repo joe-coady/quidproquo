@@ -54,4 +54,4 @@ export type ActionProcessorList = {
   [key: string]: ActionProcessor<any, any>;
 };
 
-export type ActionProcessorListResolver = (qpqConfig: QPQConfig) => Promise<ActionProcessorList>;
+export type ActionProcessorListResolver = (qpqConfig: QPQConfig, dynamicModuleLoader: DynamicModuleLoader) => Promise<ActionProcessorList>;

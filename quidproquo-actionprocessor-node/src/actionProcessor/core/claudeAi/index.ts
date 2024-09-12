@@ -1,7 +1,10 @@
-import { ActionProcessorList, ActionProcessorListResolver, QPQConfig } from 'quidproquo-core';
+import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
 
 import { getClaudeAiMessagesApiActionProcessor } from './getClaudeAiMessagesApiActionProcessor';
 
-export const getClaudeAiActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  ...(await getClaudeAiMessagesApiActionProcessor(qpqConfig)),
+export const getClaudeAiActionProcessor: ActionProcessorListResolver = async (
+  qpqConfig: QPQConfig,
+  dynamicModuleLoader: DynamicModuleLoader,
+): Promise<ActionProcessorList> => ({
+  ...(await getClaudeAiMessagesApiActionProcessor(qpqConfig, dynamicModuleLoader)),
 });

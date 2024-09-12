@@ -6,10 +6,13 @@ export * from './webEntry';
 export * from './serviceFunction';
 export * from './websocket';
 
-import { ActionProcessorList, ActionProcessorListResolver, QPQConfig } from 'quidproquo-core';
+import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
 
-export const getWebserverActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  ...(await getWebEntryActionProcessor(qpqConfig)),
-  ...(await getServiceFunctionActionProcessor(qpqConfig)),
-  ...(await getWebsocketActionProcessor(qpqConfig)),
+export const getWebserverActionProcessor: ActionProcessorListResolver = async (
+  qpqConfig: QPQConfig,
+  dynamicModuleLoader: DynamicModuleLoader,
+): Promise<ActionProcessorList> => ({
+  ...(await getWebEntryActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getServiceFunctionActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getWebsocketActionProcessor(qpqConfig, dynamicModuleLoader)),
 });

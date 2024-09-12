@@ -9,6 +9,7 @@ import {
   QPQConfig,
   ActionProcessorListResolver,
   ActionProcessorList,
+  DynamicModuleLoader,
 } from 'quidproquo-core';
 
 const getProcessMessagesApi = (qpqConfig: QPQConfig): ClaudeAiMessagesApiActionProcessor => {

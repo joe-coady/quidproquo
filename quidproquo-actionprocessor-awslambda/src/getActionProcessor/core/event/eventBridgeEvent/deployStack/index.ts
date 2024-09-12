@@ -1,4 +1,4 @@
-import { ActionProcessorList, ActionProcessorListResolver, QPQConfig } from 'quidproquo-core';
+import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
 
 import { getEventAutoRespondActionProcessor } from './getEventAutoRespondActionProcessor';
 import { getEventGetRecordsActionProcessor } from './getEventGetRecordsActionProcessor';
@@ -8,10 +8,11 @@ import { getEventTransformResponseResultActionProcessor } from './getEventTransf
 
 export const getEventBridgeStackDeployEventActionProcessor: ActionProcessorListResolver = async (
   qpqConfig: QPQConfig,
+  dynamicModuleLoader: DynamicModuleLoader,
 ): Promise<ActionProcessorList> => ({
-  ...(await getEventAutoRespondActionProcessor(qpqConfig)),
-  ...(await getEventGetRecordsActionProcessor(qpqConfig)),
-  ...(await getEventGetStorySessionActionProcessor(qpqConfig)),
-  ...(await getEventMatchStoryActionProcessor(qpqConfig)),
-  ...(await getEventTransformResponseResultActionProcessor(qpqConfig)),
+  ...(await getEventAutoRespondActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getEventGetRecordsActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getEventGetStorySessionActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getEventMatchStoryActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getEventTransformResponseResultActionProcessor(qpqConfig, dynamicModuleLoader)),
 });

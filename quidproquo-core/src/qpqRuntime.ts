@@ -50,7 +50,7 @@ export const createRuntime = (
     story: (...args: TArgs) => ActionRequester<Action<any>, any, any>,
     args: TArgs,
   ): Promise<StoryResult<any>> {
-    const actionProcessors: ActionProcessorList = await getActionProcessors(qpqConfig);
+    const actionProcessors: ActionProcessorList = await getActionProcessors(qpqConfig, dynamicModuleLoader);
 
     const reader = story(...args);
 

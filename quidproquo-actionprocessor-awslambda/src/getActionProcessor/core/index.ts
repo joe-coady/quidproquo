@@ -16,15 +16,18 @@ import { getSystemActionProcessor } from './system';
 import { getConfigActionProcessor } from './config';
 import { getApiGatewayApiEventEventProcessor } from './event';
 
-import { ActionProcessorList, ActionProcessorListResolver, QPQConfig } from 'quidproquo-core';
+import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
 
-export const getCoreActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  ...(await getFileActionProcessor(qpqConfig)),
-  ...(await getKeyValueStoreActionProcessor(qpqConfig)),
-  ...(await getQueueActionProcessor(qpqConfig)),
-  ...(await getUserDirectoryActionProcessor(qpqConfig)),
-  ...(await getEventBusActionProcessor(qpqConfig)),
-  ...(await getSystemActionProcessor(qpqConfig)),
-  ...(await getConfigActionProcessor(qpqConfig)),
-  ...(await getApiGatewayApiEventEventProcessor(qpqConfig)),
+export const getCoreActionProcessor: ActionProcessorListResolver = async (
+  qpqConfig: QPQConfig,
+  dynamicModuleLoader: DynamicModuleLoader,
+): Promise<ActionProcessorList> => ({
+  ...(await getFileActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getKeyValueStoreActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getQueueActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getUserDirectoryActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getEventBusActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getSystemActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getConfigActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getApiGatewayApiEventEventProcessor(qpqConfig, dynamicModuleLoader)),
 });

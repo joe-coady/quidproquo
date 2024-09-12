@@ -19,7 +19,6 @@ import {
 import { getLambdaActionProcessors } from './getLambdaActionProcessors';
 
 // @ts-ignore - Special webpack loader
-import qpqCustomActionProcessors from 'qpq-custom-action-processors-loader!';
 import { getRuntimeCorrelation } from './getRuntimeCorrelation';
 
 const isSnsEvent = <T>(event: QpqFunctionExecutionEvent<T>): event is SNSEvent => {
@@ -46,9 +45,8 @@ export const getQpqLambdaRuntimeForEvent = <E extends QpqFunctionExecutionEvent<
       cdkConfig.qpqConfig,
       getStorySession(event),
       async () => ({
-        ...(await getLambdaActionProcessors(cdkConfig.qpqConfig)),
-        ...(await getActionProcessorList(cdkConfig.qpqConfig)),
-        ...(await qpqCustomActionProcessors()),
+        ...(await getLambdaActionProcessors(cdkConfig.qpqConfig, dynamicModuleLoader)),
+        ...(await getActionProcessorList(cdkConfig.qpqConfig, dynamicModuleLoader)),
       }),
       () => new Date().toISOString(),
       logger,

@@ -1,4 +1,4 @@
-import { ActionProcessorList, ActionProcessorListResolver, QPQConfig } from 'quidproquo-core';
+import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
 
 import { getUserDirectoryAuthenticateUserActionProcessor } from './getUserDirectoryAuthenticateUserActionProcessor';
 import { getUserDirectoryChangePasswordActionProcessor } from './getUserDirectoryChangePasswordActionProcessor';
@@ -19,23 +19,26 @@ import { getUserDirectorySetAccessTokenActionProcessor } from './getUserDirector
 import { getUserDirectorySetPasswordActionProcessor } from './getUserDirectorySetPasswordActionProcessor';
 import { getUserDirectorySetUserAttributesActionProcessor } from './getUserDirectorySetUserAttributesActionProcessor';
 
-export const getUserDirectoryActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  ...(await getUserDirectoryAuthenticateUserActionProcessor(qpqConfig)),
-  ...(await getUserDirectoryChangePasswordActionProcessor(qpqConfig)),
-  ...(await getUserDirectoryConfirmEmailVerificationActionProcessor(qpqConfig)),
-  ...(await getUserDirectoryConfirmForgotPasswordActionProcessor(qpqConfig)),
-  ...(await getUserDirectoryCreateUserActionProcessor(qpqConfig)),
-  ...(await getUserDirectoryDecodeAccessTokenActionProcessor(qpqConfig)),
-  ...(await getUserDirectoryForgotPasswordActionProcessor(qpqConfig)),
-  ...(await getUserDirectoryGetUserAttributesActionProcessor(qpqConfig)),
-  ...(await getUserDirectoryGetUserAttributesByUserIdActionProcessor(qpqConfig)),
-  ...(await getUserDirectoryGetUsersActionProcessor(qpqConfig)),
-  ...(await getUserDirectoryGetUsersByAttributeActionProcessor(qpqConfig)),
-  ...(await getUserDirectoryReadAccessTokenActionProcessor(qpqConfig)),
-  ...(await getUserDirectoryRefreshTokenActionProcessor(qpqConfig)),
-  ...(await getUserDirectoryRequestEmailVerificationActionProcessor(qpqConfig)),
-  ...(await getUserDirectoryRespondToAuthChallengeActionProcessor(qpqConfig)),
-  ...(await getUserDirectorySetAccessTokenActionProcessor(qpqConfig)),
-  ...(await getUserDirectorySetPasswordActionProcessor(qpqConfig)),
-  ...(await getUserDirectorySetUserAttributesActionProcessor(qpqConfig)),
+export const getUserDirectoryActionProcessor: ActionProcessorListResolver = async (
+  qpqConfig: QPQConfig,
+  dynamicModuleLoader: DynamicModuleLoader,
+): Promise<ActionProcessorList> => ({
+  ...(await getUserDirectoryAuthenticateUserActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getUserDirectoryChangePasswordActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getUserDirectoryConfirmEmailVerificationActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getUserDirectoryConfirmForgotPasswordActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getUserDirectoryCreateUserActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getUserDirectoryDecodeAccessTokenActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getUserDirectoryForgotPasswordActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getUserDirectoryGetUserAttributesActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getUserDirectoryGetUserAttributesByUserIdActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getUserDirectoryGetUsersActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getUserDirectoryGetUsersByAttributeActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getUserDirectoryReadAccessTokenActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getUserDirectoryRefreshTokenActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getUserDirectoryRequestEmailVerificationActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getUserDirectoryRespondToAuthChallengeActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getUserDirectorySetAccessTokenActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getUserDirectorySetPasswordActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getUserDirectorySetUserAttributesActionProcessor(qpqConfig, dynamicModuleLoader)),
 });
