@@ -1,10 +1,7 @@
 import { CloudFrontRequestEvent, Context } from 'aws-lambda';
 import { qpqHeaderIsBot } from 'quidproquo-webserver';
 
-export const viewerRequestEventHandler = async (
-  event: CloudFrontRequestEvent,
-  context: Context,
-) => {
+export const viewerRequestEventHandler = async (event: CloudFrontRequestEvent, context: Context) => {
   console.log(JSON.stringify(event));
 
   const request = event.Records[0].cf.request;
@@ -35,4 +32,4 @@ export const viewerRequestEventHandler = async (
 };
 
 // Default executor
-export const executeEventViewerRequest = viewerRequestEventHandler;
+export const getCloudFrontRequestEvent_viewerRequest = () => viewerRequestEventHandler;

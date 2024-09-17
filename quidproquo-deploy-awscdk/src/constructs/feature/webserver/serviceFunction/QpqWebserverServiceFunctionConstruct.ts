@@ -20,8 +20,8 @@ export class QpqWebserverServiceFunctionConstruct extends QpqConstructBlock {
     const func = new Function(this, 'api-function', {
       buildPath: qpqWebServerUtils.getServiceFunctionFullPath(props.qpqConfig, props.serviceFunctionConfig),
       functionName: this.resourceName(`${props.serviceFunctionConfig.functionName}-sfunc`),
-      functionType: 'lambdaServiceFunctionExecute',
-      executorName: 'executeServiceFunctionExecuteEvent',
+      functionType: 'anyExecuteServiceFunctionEvent_serviceFunction',
+      executorName: 'anyExecuteServiceFunctionEvent_serviceFunction',
 
       timeoutInSeconds: 14.5 * 60,
 

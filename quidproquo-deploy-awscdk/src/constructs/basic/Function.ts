@@ -2,12 +2,12 @@ import path from 'path';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
 import { Construct } from 'constructs';
-import { aws_lambda, aws_logs, aws_sns, aws_iam, aws_sns_subscriptions, aws_lambda_destinations } from 'aws-cdk-lib';
+import { aws_lambda, aws_logs, aws_sns, aws_iam, aws_sns_subscriptions } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 
 import { getAwsServiceAccountInfoConfig } from 'quidproquo-config-aws';
 
-import { BootstrapResource, WARM_LAMBDA_EVENT } from '../../constants';
+import { BootstrapResource } from '../../constants';
 import { qpqCoreUtils } from 'quidproquo-core';
 
 export interface FunctionProps extends QpqConstructBlockProps {

@@ -3,22 +3,15 @@ import path from 'path';
 
 import { S3Client, PutObjectCommand, PutObjectCommandInput } from '@aws-sdk/client-s3';
 
-import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
+import { getConfigRuntimeResourceName } from '../../awsNamingUtils';
 
 import { StoryResult, qpqCoreUtils, QPQConfig, QpqLogger } from 'quidproquo-core';
 
 const tempDirectory = '/tmp/qpqlogs';
 
-import {
-  getAwsServiceAccountInfoConfig,
-  getAwsServiceAccountInfoByDeploymentInfo,
-} from 'quidproquo-config-aws';
+import { getAwsServiceAccountInfoConfig, getAwsServiceAccountInfoByDeploymentInfo } from 'quidproquo-config-aws';
 
-export const storyLogger = async (
-  result: StoryResult<any>,
-  bucketName: string,
-  region: string,
-): Promise<void> => {
+export const storyLogger = async (result: StoryResult<any>, bucketName: string, region: string): Promise<void> => {
   try {
     const s3Client = new S3Client({ region });
 
@@ -48,10 +41,7 @@ export const storyLoggerFs = async (result: StoryResult<any>): Promise<void> => 
   }
 };
 
-export const moveLogsToPerminateStorage = async (
-  bucketName: string,
-  region: string,
-): Promise<void> => {
+export const moveLogsToPerminateStorage = async (bucketName: string, region: string): Promise<void> => {
   try {
     await fs.promises.mkdir(tempDirectory, { recursive: true });
     const files = await fs.promises.readdir(tempDirectory);
@@ -76,11 +66,7 @@ export const getLogger = (qpqConfig: QPQConfig): QpqLogger => {
   const awsSettings = getAwsServiceAccountInfoConfig(qpqConfig);
 
   // If we have no log service, just return nothing.
-  if (
-    !awsSettings.logServiceName ||
-    awsSettings.disableLogs ||
-    process.env.storageDriveName === 'qpq-logs'
-  ) {
+  if (!awsSettings.logServiceName || awsSettings.disableLogs || process.env.storageDriveName === 'qpq-logs') {
     return {
       log: async () => {},
       waitToFinishWriting: async () => {},
@@ -94,22 +80,10 @@ export const getLogger = (qpqConfig: QPQConfig): QpqLogger => {
   const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
 
   // Workout the bucket name.
-  const bucketName = awsNamingUtils.getConfigRuntimeResourceName(
-    'qpq-logs',
-    application,
-    service,
-    environment,
-    feature,
-  );
+  const bucketName = getConfigRuntimeResourceName('qpq-logs', application, service, environment, feature);
 
   // Where is this bucket?
-  const regionForBucket = getAwsServiceAccountInfoByDeploymentInfo(
-    qpqConfig,
-    service,
-    environment,
-    feature,
-    application,
-  ).awsRegion;
+  const regionForBucket = getAwsServiceAccountInfoByDeploymentInfo(qpqConfig, service, environment, feature, application).awsRegion;
 
   console.log('Bucket for logs: ', bucketName, regionForBucket);
 

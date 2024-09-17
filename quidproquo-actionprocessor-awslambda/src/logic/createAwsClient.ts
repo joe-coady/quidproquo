@@ -24,14 +24,7 @@ export function createAwsClient<T>(ClientClass: ClientConstructor<T>, args: any)
         try {
           return await originalSend.apply(this, sendArgs);
         } catch (error: any) {
-          console.log(
-            ClientClass.name || 'aws client',
-            args,
-            'send args',
-            sendArgs,
-            'error',
-            error.message,
-          );
+          console.log(ClientClass.name || 'aws client', args, 'send args', sendArgs, 'error', error.message);
           throw error;
         }
       };

@@ -3,23 +3,21 @@ import { Context } from 'aws-lambda';
 import { QpqFunctionExecutionEvent } from '../types';
 
 import { SNSEvent } from 'aws-lambda';
-import { dynamicModuleLoader, dynamicModuleLoaderWarmer } from '../dynamicModuleLoader';
-import { getLambdaConfigs } from './lambdaConfig';
+import { dynamicModuleLoaderWarmer } from './dynamicModuleLoaderWarmer';
 import { getLogger } from './logger';
 import {
-  ActionProcessorList,
   ActionProcessorListResolver,
+  DynamicModuleLoader,
   QPQConfig,
-  QpqLogger,
   QpqRuntimeType,
   StorySession,
   askProcessEvent,
   createRuntime,
 } from 'quidproquo-core';
-import { getLambdaActionProcessors } from './getLambdaActionProcessors';
 
-// @ts-ignore - Special webpack loader
 import { getRuntimeCorrelation } from './getRuntimeCorrelation';
+
+import { getAwsActionProcessors } from '../../getActionProcessor';
 
 const isSnsEvent = <T>(event: QpqFunctionExecutionEvent<T>): event is SNSEvent => {
   if (event && typeof event === 'object') {
@@ -34,23 +32,24 @@ export const getQpqLambdaRuntimeForEvent = <E extends QpqFunctionExecutionEvent<
   runtimeType: QpqRuntimeType,
   getStorySession: (event: E) => StorySession,
   getActionProcessorList: ActionProcessorListResolver,
+  dynamicModuleLoader: DynamicModuleLoader,
+  qpqConfig: QPQConfig,
 ) => {
   return async (event: E, context: Context) => {
     console.log('tick: ', JSON.stringify(event, null, 2));
 
-    const cdkConfig = await getLambdaConfigs();
-    const logger = getLogger(cdkConfig.qpqConfig);
+    const logger = getLogger(qpqConfig);
 
     const resolveStory = createRuntime(
-      cdkConfig.qpqConfig,
+      qpqConfig,
       getStorySession(event),
       async () => ({
-        ...(await getLambdaActionProcessors(cdkConfig.qpqConfig, dynamicModuleLoader)),
-        ...(await getActionProcessorList(cdkConfig.qpqConfig, dynamicModuleLoader)),
+        ...(await getAwsActionProcessors(qpqConfig, dynamicModuleLoader)),
+        ...(await getActionProcessorList(qpqConfig, dynamicModuleLoader)),
       }),
       () => new Date().toISOString(),
       logger,
-      getRuntimeCorrelation(cdkConfig.qpqConfig),
+      getRuntimeCorrelation(qpqConfig),
       runtimeType,
       dynamicModuleLoader,
     );

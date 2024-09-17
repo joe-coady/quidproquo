@@ -115,8 +115,8 @@ export class QpqCoreUserDirectoryConstruct extends QpqCoreUserDirectoryConstruct
       const customMessageTrigger = new Function(this, 'csm-msg-trigger-func', {
         buildPath: qpqCoreUtils.getUserDirectoryEntryFullPath(props.qpqConfig, props.userDirectoryConfig),
         functionName: this.qpqResourceName(`${props.userDirectoryConfig.name}`, 'cm-trig'),
-        functionType: 'lambdaCognitoTriggerEvent_CustomMessage',
-        executorName: 'executeLambdaCognitoCustomMessageTriggerEvent',
+        functionType: 'customMessageTriggerEvent_customMessage',
+        executorName: 'customMessageTriggerEvent_customMessage',
 
         qpqConfig: props.qpqConfig,
 
@@ -136,8 +136,8 @@ export class QpqCoreUserDirectoryConstruct extends QpqCoreUserDirectoryConstruct
       const defAuthChallengeTrigger = new Function(this, 'def-auth-challenge', {
         buildPath: qpqCoreUtils.getUserDirectoryEntryFullPath(props.qpqConfig, props.userDirectoryConfig),
         functionName: this.qpqResourceName(`${props.userDirectoryConfig.name}`, 'cac-define'),
-        functionType: 'lambdaCognitoTriggerEvent_defineAuthChallenge',
-        executorName: 'executeLambdaCognitoDefineAuthChallengeTriggerEvent',
+        functionType: 'customMessageTriggerEvent_defineAuthChallenge',
+        executorName: 'customMessageTriggerEvent_defineAuthChallenge',
 
         qpqConfig: props.qpqConfig,
 
@@ -156,8 +156,8 @@ export class QpqCoreUserDirectoryConstruct extends QpqCoreUserDirectoryConstruct
         const createAuthChallengeTrigger = new Function(this, 'create-auth-challenge', {
           buildPath: qpqCoreUtils.getUserDirectoryEntryFullPath(props.qpqConfig, props.userDirectoryConfig),
           functionName: this.qpqResourceName(`${props.userDirectoryConfig.name}`, 'cac-create'),
-          functionType: 'lambdaCognitoTriggerEvent_createAuthChallenge',
-          executorName: 'executeLambdaCognitoCreateAuthChallengeTriggerEvent',
+          functionType: 'customMessageTriggerEvent_createAuthChallenge',
+          executorName: 'customMessageTriggerEvent_createAuthChallenge',
 
           qpqConfig: props.qpqConfig,
 
@@ -176,8 +176,8 @@ export class QpqCoreUserDirectoryConstruct extends QpqCoreUserDirectoryConstruct
         const verifyAuthChallengeTrigger = new Function(this, 'verify-auth-challenge', {
           buildPath: qpqCoreUtils.getUserDirectoryEntryFullPath(props.qpqConfig, props.userDirectoryConfig),
           functionName: this.qpqResourceName(`${props.userDirectoryConfig.name}`, 'cac-verify'),
-          functionType: 'lambdaCognitoTriggerEvent_verifyAuthChallenge',
-          executorName: 'executeLambdaCognitoVerifyAuthChallengeTriggerEvent',
+          functionType: 'customMessageTriggerEvent_verifyAuthChallenge',
+          executorName: 'customMessageTriggerEvent_verifyAuthChallenge',
 
           qpqConfig: props.qpqConfig,
 
