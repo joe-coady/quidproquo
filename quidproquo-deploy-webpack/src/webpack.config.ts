@@ -36,3 +36,4 @@ export const setupWebpackQPQRuntime = (qpqConfig: QPQConfig, buildPath: string):
 export const getResolveLoaderModules = () => [path.resolve(__dirname, 'loaders'), 'node_modules'];
 
 export * from './plugins';
+export * from './getWebpackConfigForQpq';

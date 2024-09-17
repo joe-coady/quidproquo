@@ -46,9 +46,10 @@
     "babel-loader": "^9.1.2",
     "quidproquo-tsconfig": "0.0.222",
     "ts-node": "^10.9.1",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "webpack-virtual-modules": "^0.6.2"
   },
   "peerDependencies": {
-    "webpack": "^5.91.0"
+    "webpack": "^5.0.0"
   }
 }

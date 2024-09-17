@@ -10,3 +10,4 @@ export * from './logic/parametersManager/getParameters';
 export * from './logic/cache/memoFunc';
 
 export * from './lambdaHandlers';
+export * from './getLambdaEntries';
