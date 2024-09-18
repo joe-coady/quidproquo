@@ -217,7 +217,7 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
         timeout: cdk.Duration.seconds(5),
         runtime: aws_lambda.Runtime.NODEJS_18_X,
 
-        code: aws_lambda.Code.fromAsset(path.join(seoEntryBuildPath, 'lambdaEventViewerRequest')),
+        code: aws_lambda.Code.fromAsset(path.join(seoEntryBuildPath, 'cloudFrontRequestEvent_viewerRequest')),
         handler: 'index.cloudFrontRequestEvent_viewerRequest',
       });
 
@@ -228,7 +228,7 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
 
         memorySize: 1024,
 
-        code: aws_lambda.Code.fromAsset(path.join(seoEntryBuildPath, 'lambdaEventOriginRequest')),
+        code: aws_lambda.Code.fromAsset(path.join(seoEntryBuildPath, 'cloudFrontRequestEvent_originRequest')),
         handler: 'index.cloudFrontRequestEvent_originRequest',
 
         role: this.getServiceRole(),

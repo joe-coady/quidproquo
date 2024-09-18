@@ -45,7 +45,7 @@ export const getQpqDyanmicLoaderSrcFromQpqConfig = (qpqConfig: QPQConfig) => {
     return null;
   };`;
 
-  console.log(result);
+  // console.log(result);
 
   return result;
 };
