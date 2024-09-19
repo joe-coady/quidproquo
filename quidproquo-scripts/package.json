@@ -1,5 +1,5 @@
 {
-  "name": "quidproquo-actionprocessor-node",
+  "name": "quidproquo-scripts",
   "version": "0.0.227",
   "description": "",
   "main": "./lib/commonjs/index.js",
@@ -9,6 +9,9 @@
   "files": [
     "lib/**/*"
   ],
+  "bin": {
+    "quidproquo-scripts": "./lib/commonjs/index.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "npx rimraf lib && npx rimraf node_modules",
@@ -29,16 +32,9 @@
   },
   "homepage": "https://github.com/joe-coady/quidproquo#readme",
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.19.1",
-    "axios": "^1.2.1",
-    "mime-types": "^2.1.35",
-    "quidproquo-core": "0.0.227",
-    "uuid": "^9.0.0",
-    "uuidv7": "^1.0.1"
+    "quidproquo-core": "0.0.227"
   },
   "devDependencies": {
-    "@types/mime-types": "^2.1.1",
-    "@types/uuid": "^9.0.0",
     "quidproquo-tsconfig": "0.0.227",
     "typescript": "^4.9.3"
   }
