@@ -44,7 +44,7 @@ export const getWebpackConfig = (qpqConfig: QPQConfig, buildPath: string, entrie
       },
     },
 
-    plugins: [new QpqPlugin({ qpqConfig })],
+    plugins: [new QpqPlugin({ qpqConfigs: [qpqConfig] })],
 
     module: {
       rules: [

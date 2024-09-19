@@ -1,10 +1,10 @@
 import { QPQConfig } from 'quidproquo-core';
 import { Compiler, WebpackPluginInstance } from 'webpack';
 import VirtualModulesPlugin from 'webpack-virtual-modules';
-import { getQpqDyanmicLoaderSrcFromQpqConfig } from './getQpqDyanmicLoaderSrcFromQpqConfig';
+import { getQpqDyanmicLoaderSrcFromQpqConfigs } from './getQpqDyanmicLoaderSrcFromQpqConfigs';
 
 interface QpqPluginOptions {
-  qpqConfig: QPQConfig;
+  qpqConfigs: QPQConfig[];
 }
 
 export class QpqPlugin implements WebpackPluginInstance {
@@ -16,7 +16,7 @@ export class QpqPlugin implements WebpackPluginInstance {
 
   apply(compiler: Compiler): void {
     new VirtualModulesPlugin({
-      'node_modules/quidproquo-dynamic-loader.js': getQpqDyanmicLoaderSrcFromQpqConfig(this.options.qpqConfig),
+      'node_modules/quidproquo-dynamic-loader.js': getQpqDyanmicLoaderSrcFromQpqConfigs(this.options.qpqConfigs),
     }).apply(compiler);
   }
 }

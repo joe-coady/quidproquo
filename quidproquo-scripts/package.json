@@ -10,7 +10,7 @@
     "lib/**/*"
   ],
   "bin": {
-    "quidproquo-scripts": "./lib/commonjs/index.js"
+    "quidproquo-scripts": "node ./lib/commonjs/index.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

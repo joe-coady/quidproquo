@@ -1,10 +1,8 @@
 import { qpqCoreUtils, QPQConfig } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
-export const getQpqDyanmicLoaderSrcFromQpqConfig = (qpqConfig: QPQConfig) => {
-  const uniqueSrcFiles = [...qpqCoreUtils.getAllSrcEntries(qpqConfig), ...qpqWebServerUtils.getAllSrcEntries(qpqConfig)].filter(
-    (sf, index, arr) => arr.indexOf(sf) === index,
-  );
+export function getSrcLoaderForQpqConfig(qpqConfig, moduleNameVariableName) {
+  const uniqueSrcFiles = [...new Set([...qpqCoreUtils.getAllSrcEntries(qpqConfig), ...qpqWebServerUtils.getAllSrcEntries(qpqConfig)])];
 
   const caseStatements = [
     ...uniqueSrcFiles.map((e) => {
@@ -34,18 +32,11 @@ export const getQpqDyanmicLoaderSrcFromQpqConfig = (qpqConfig: QPQConfig) => {
     }`,
   ];
 
-  const result = `export const qpqConfig = ${JSON.stringify(qpqConfig, null, 2)};
-
-  export const qpqDynamicModuleLoader = async (moduleName) => {
-    switch (moduleName) {
-      ${caseStatements.join('\n')}
-    }
-
-    // This will never get hit
-    return null;
-  };`;
-
-  // console.log(result);
+  const result = `
+  switch (${moduleNameVariableName}) {
+    ${caseStatements.join('\n')}
+  }
+`;
 
   return result;
-};
+}
