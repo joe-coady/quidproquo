@@ -1,6 +1,6 @@
 {
-  "name": "quidproquo-scripts",
-  "version": "0.0.227",
+  "name": "quidproquo-dev-server",
+  "version": "0.0.229",
   "description": "",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
@@ -9,9 +9,6 @@
   "files": [
     "lib/**/*"
   ],
-  "bin": {
-    "quidproquo-scripts": "node ./lib/commonjs/index.js"
-  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "npx rimraf lib && npx rimraf node_modules",
@@ -32,10 +29,13 @@
   },
   "homepage": "https://github.com/joe-coady/quidproquo#readme",
   "dependencies": {
-    "quidproquo-core": "0.0.227"
+    "multer": "^1.4.5-lts.1",
+    "quidproquo-core": "0.0.229",
+    "quidproquo-webserver": "0.0.229"
   },
   "devDependencies": {
-    "quidproquo-tsconfig": "0.0.227",
+    "@types/multer": "^1.4.12",
+    "quidproquo-tsconfig": "0.0.229",
     "typescript": "^4.9.3"
   }
 }

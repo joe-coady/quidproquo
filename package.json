@@ -35,7 +35,7 @@
     "quidproquo-web-react",
     "quidproquo-web-admin",
     "quidproquo-testing",
-    "quidproquo-scripts",
+    "quidproquo-dev-server",
     "quidproquo"
   ],
   "devDependencies": {
