@@ -25,23 +25,13 @@ import {
   QpqCoreSecretConstruct,
   QpqCoreStorageDriveConstruct,
   QpqCoreQueueConstruct,
-  QpqCoreUserDirectoryConstruct,
+  QpqInfCoreUserDirectoryConstruct,
   QpqCoreEventBusConstruct,
   QpqCoreKeyValueStoreConstruct,
 } from '../constructs';
 
-export const getQqpSecretGrantables = (
-  scope: Construct,
-  id: string,
-  qpqConfig: QPQConfig,
-  awsAccountId: string,
-): QpqResource[] => {
-  const secretSettings = [
-    ...qpqCoreUtils.getConfigSettings<SecretQPQConfigSetting>(
-      qpqConfig,
-      QPQCoreConfigSettingType.secret,
-    ),
-  ];
+export const getQqpSecretGrantables = (scope: Construct, id: string, qpqConfig: QPQConfig, awsAccountId: string): QpqResource[] => {
+  const secretSettings = [...qpqCoreUtils.getConfigSettings<SecretQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.secret)];
 
   const secretResources = secretSettings.map((secretSetting) => {
     return QpqCoreSecretConstruct.fromOtherStack(
@@ -56,12 +46,7 @@ export const getQqpSecretGrantables = (
   return secretResources;
 };
 
-export const getQqpKvsGrantables = (
-  scope: Construct,
-  id: string,
-  qpqConfig: QPQConfig,
-  awsAccountId: string,
-): QpqResource[] => {
+export const getQqpKvsGrantables = (scope: Construct, id: string, qpqConfig: QPQConfig, awsAccountId: string): QpqResource[] => {
   const kvsSettings = [...qpqCoreUtils.getAllKeyValueStores(qpqConfig)];
 
   const kvsResources = kvsSettings.map((kvsSetting) => {
@@ -77,12 +62,7 @@ export const getQqpKvsGrantables = (
   return kvsResources;
 };
 
-export const getQqpParameterGrantables = (
-  scope: Construct,
-  id: string,
-  qpqConfig: QPQConfig,
-  awsAccountId: string,
-): QpqResource[] => {
+export const getQqpParameterGrantables = (scope: Construct, id: string, qpqConfig: QPQConfig, awsAccountId: string): QpqResource[] => {
   const parameterSettings = qpqCoreUtils.getAllParameterConfigs(qpqConfig);
 
   const parameterResources = parameterSettings.map((parameterSetting) => {
@@ -98,18 +78,8 @@ export const getQqpParameterGrantables = (
   return parameterResources;
 };
 
-export const getQqpStorageDriveGrantables = (
-  scope: Construct,
-  id: string,
-  qpqConfig: QPQConfig,
-  awsAccountId: string,
-): QpqResource[] => {
-  const storageDriveSettings = [
-    ...qpqCoreUtils.getConfigSettings<StorageDriveQPQConfigSetting>(
-      qpqConfig,
-      QPQCoreConfigSettingType.storageDrive,
-    ),
-  ];
+export const getQqpStorageDriveGrantables = (scope: Construct, id: string, qpqConfig: QPQConfig, awsAccountId: string): QpqResource[] => {
+  const storageDriveSettings = [...qpqCoreUtils.getConfigSettings<StorageDriveQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.storageDrive)];
 
   const storageDriveResources = storageDriveSettings.map((storageDriveSetting) => {
     return QpqCoreStorageDriveConstruct.fromOtherStack(
@@ -124,18 +94,8 @@ export const getQqpStorageDriveGrantables = (
   return storageDriveResources;
 };
 
-export const getQqpQueueGrantables = (
-  scope: Construct,
-  id: string,
-  qpqConfig: QPQConfig,
-  awsAccountId: string,
-): QpqResource[] => {
-  const queueSettings = [
-    ...qpqCoreUtils.getConfigSettings<QueueQPQConfigSetting>(
-      qpqConfig,
-      QPQCoreConfigSettingType.queue,
-    ),
-  ];
+export const getQqpQueueGrantables = (scope: Construct, id: string, qpqConfig: QPQConfig, awsAccountId: string): QpqResource[] => {
+  const queueSettings = [...qpqCoreUtils.getConfigSettings<QueueQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.queue)];
 
   const queueResources = queueSettings.map((queueSetting) => {
     return QpqCoreQueueConstruct.fromOtherStack(
@@ -150,16 +110,11 @@ export const getQqpQueueGrantables = (
   return queueResources;
 };
 
-export const getQqpUserPoolGrantables = (
-  scope: Construct,
-  id: string,
-  qpqConfig: QPQConfig,
-  awsAccountId: string,
-): QpqResource[] => {
+export const getQqpUserPoolGrantables = (scope: Construct, id: string, qpqConfig: QPQConfig, awsAccountId: string): QpqResource[] => {
   const userDirectoryConfigs = qpqCoreUtils.getUserDirectories(qpqConfig);
 
   const userDirectoryResources = userDirectoryConfigs.map((userDirectoryConfig) => {
-    return QpqCoreUserDirectoryConstruct.fromOtherStack(
+    return QpqInfCoreUserDirectoryConstruct.fromOtherStack(
       scope,
       `${id}-${qpqCoreUtils.getUniqueKeyForSetting(userDirectoryConfig)}-grantable`,
       qpqConfig,
@@ -171,15 +126,8 @@ export const getQqpUserPoolGrantables = (
   return userDirectoryResources;
 };
 
-export const getQqpTopicGrantables = (
-  scope: Construct,
-  id: string,
-  qpqConfig: QPQConfig,
-  awsAccountId: string,
-): QpqResource[] => {
-  const eventBusConfigs = qpqCoreUtils
-    .getAllEventBusConfigs(qpqConfig)
-    .filter((ebc) => !ebc.deprecated);
+export const getQqpTopicGrantables = (scope: Construct, id: string, qpqConfig: QPQConfig, awsAccountId: string): QpqResource[] => {
+  const eventBusConfigs = qpqCoreUtils.getAllEventBusConfigs(qpqConfig).filter((ebc) => !ebc.deprecated);
 
   const eventBuses = eventBusConfigs.map((eventBus) => {
     return QpqCoreEventBusConstruct.fromOtherStack(
@@ -206,7 +154,7 @@ export const getQqpUserPoolGrantablesForApiConfig = (
     .filter((r) => r.options.routeAuthSettings?.userDirectoryName);
 
   const userDirectoryResources = routesWithAuth.map((route) => {
-    return QpqCoreUserDirectoryConstruct.fromOtherStack(
+    return QpqInfCoreUserDirectoryConstruct.fromOtherStack(
       scope,
       `${id}-${qpqCoreUtils.getUniqueKeyForSetting(route)}-grantable-xserver`,
       qpqConfig,
@@ -219,12 +167,7 @@ export const getQqpUserPoolGrantablesForApiConfig = (
 };
 
 // Get resources that we can use to grant permissions to lambdas etc
-export const getQqpGrantableResources = (
-  scope: Construct,
-  id: string,
-  qpqConfig: QPQConfig,
-  awsAccountId: string,
-): QpqResource[] => {
+export const getQqpGrantableResources = (scope: Construct, id: string, qpqConfig: QPQConfig, awsAccountId: string): QpqResource[] => {
   return [
     ...getQqpParameterGrantables(scope, id, qpqConfig, awsAccountId),
     ...getQqpSecretGrantables(scope, id, qpqConfig, awsAccountId),
@@ -252,11 +195,7 @@ export const getQqpGrantableResourcesForApiConfig = (
   ];
 };
 
-export const exportStackValue = (
-  scope: Construct,
-  uniqueKey: string,
-  value: string,
-): cdk.CfnOutput => {
+export const exportStackValue = (scope: Construct, uniqueKey: string, value: string): cdk.CfnOutput => {
   return new cdk.CfnOutput(scope, uniqueKey, {
     exportName: uniqueKey,
     value,

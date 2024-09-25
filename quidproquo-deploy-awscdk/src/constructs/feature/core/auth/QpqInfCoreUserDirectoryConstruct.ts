@@ -14,67 +14,30 @@ import { Function } from '../../../basic/Function';
 import { resolveAwsServiceAccountInfo } from 'quidproquo-config-aws';
 import { DnsValidatedCertificate } from '../../../basic/DnsValidatedCertificate';
 
-export interface QpqCoreUserDirectoryConstructProps extends QpqConstructBlockProps {
+export interface QpqInfCoreUserDirectoryConstructProps extends QpqConstructBlockProps {
   userDirectoryConfig: UserDirectoryQPQConfigSetting;
 }
 
-export abstract class QpqCoreUserDirectoryConstructBase extends QpqConstructBlock {
-  abstract userPool: aws_cognito.IUserPool;
+export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
+  public userPool: aws_cognito.IUserPool;
 
-  public grantRead(grantee: aws_iam.IGrantable): void {
-    this.userPool.grant(
-      grantee,
-
-      'cognito-idp:ListUsers',
-      'cognito-idp:GetUser',
-      'cognito-idp:AdminGetUser',
-
-      'cognito-idp:ListGroups',
-      'cognito-idp:GetGroup',
-
-      'cognito-idp:ListUserPools',
-
-      'cognito-idp:DescribeUserPool',
-      'cognito-idp:DescribeUserPoolClient',
-    );
-  }
-
-  public grantWrite(grantee: aws_iam.IGrantable): void {
-    this.userPool.grant(
-      grantee,
-
-      'cognito-idp:SignUp',
-      'cognito-idp:AdminCreateUser',
-      'cognito-idp:AdminInitiateAuth',
-      'cognito-idp:AdminRespondToAuthChallenge',
-      'cognito-idp:AdminAddUserToGroup',
-      'cognito-idp:AdminDeleteUser',
-      'cognito-idp:AdminUpdateUserAttributes',
-      'cognito-idp:AdminDeleteUserAttributes',
-      'cognito-idp:AdminSetUserPassword',
-    );
-  }
-
-  public grantAll(grantee: aws_iam.IGrantable): void {
-    this.grantRead(grantee);
-    this.grantWrite(grantee);
-  }
-}
-
-export class QpqCoreUserDirectoryConstruct extends QpqCoreUserDirectoryConstructBase {
-  userPool: aws_cognito.IUserPool;
-
-  static fromOtherStack(scope: Construct, id: string, qpqConfig: QPQConfig, awsAccountId: string, userDirectoryName: string): QpqResource {
+  static fromOtherStack(
+    scope: Construct,
+    id: string,
+    qpqConfig: QPQConfig,
+    awsAccountId: string,
+    userDirectoryName: string,
+  ): QpqInfCoreUserDirectoryConstruct {
     const userPoolId = qpqDeployAwsCdkUtils.importStackValue(awsNamingUtils.getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig));
 
-    class Import extends QpqCoreUserDirectoryConstructBase {
+    class Import extends QpqConstructBlock {
       userPool = aws_cognito.UserPool.fromUserPoolId(this, 'pool-id', userPoolId);
     }
 
     return new Import(scope, id, { qpqConfig, awsAccountId });
   }
 
-  constructor(scope: Construct, id: string, props: QpqCoreUserDirectoryConstructProps) {
+  constructor(scope: Construct, id: string, props: QpqInfCoreUserDirectoryConstructProps) {
     super(scope, id, props);
 
     const userPoolName = this.resourceName(props.userDirectoryConfig.name);
@@ -291,7 +254,7 @@ export class QpqCoreUserDirectoryConstruct extends QpqCoreUserDirectoryConstruct
   public static authorizeActionsForRole(
     role: aws_iam.IRole,
     userDirectoryConfigs: UserDirectoryQPQConfigSetting[],
-    userDirectoryConstructs: QpqCoreUserDirectoryConstruct[],
+    userDirectoryConstructs: QpqInfCoreUserDirectoryConstruct[],
     qpqConfig: QPQConfig,
   ) {
     if (userDirectoryConstructs.length > 0) {
