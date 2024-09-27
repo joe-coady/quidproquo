@@ -19,3 +19,4 @@ export * from './secret';
 export * from './storageDrive';
 export * from './userDirectory';
 export * from './claudeAi';
+export * from './graphDatabase';

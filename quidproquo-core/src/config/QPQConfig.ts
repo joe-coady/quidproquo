@@ -19,6 +19,7 @@ export enum QPQCoreConfigSettingType {
   environmentSettings = '@quidproquo-core/config/EnvironmentSettings',
   deployEvent = '@quidproquo-core/config/DeployEvent',
   claudeAi = '@quidproquo-core/config/ClaudeAi',
+  graphDatabase = '@quidproquo-core/config/GraphDatabase',
 }
 
 export interface QPQConfigSetting {
