@@ -131,10 +131,7 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
         //     },
         //   ],
         // },
-        securityHeadersBehavior: convertSecurityHeadersFromQpqSecurityHeaders(
-          qpqWebServerUtils.getBaseDomainName(props.qpqConfig),
-          props.webEntryConfig.securityHeaders,
-        ),
+        securityHeadersBehavior: convertSecurityHeadersFromQpqSecurityHeaders(props.qpqConfig, props.webEntryConfig.securityHeaders),
 
         // TODO: Expose this to config.
         corsBehavior: {
@@ -220,8 +217,8 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
         timeout: cdk.Duration.seconds(5),
         runtime: aws_lambda.Runtime.NODEJS_18_X,
 
-        code: aws_lambda.Code.fromAsset(path.join(seoEntryBuildPath, 'lambdaEventViewerRequest')),
-        handler: 'index.executeEventViewerRequest',
+        code: aws_lambda.Code.fromAsset(path.join(seoEntryBuildPath, 'cloudFrontRequestEvent_viewerRequest')),
+        handler: 'index.cloudFrontRequestEvent_viewerRequest',
       });
 
       const edgeFunctionOR = new aws_cloudfront.experimental.EdgeFunction(this, `SEO-OR`, {
@@ -231,8 +228,8 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
 
         memorySize: 1024,
 
-        code: aws_lambda.Code.fromAsset(path.join(seoEntryBuildPath, 'lambdaEventOriginRequest')),
-        handler: 'index.executeEventOriginRequest',
+        code: aws_lambda.Code.fromAsset(path.join(seoEntryBuildPath, 'cloudFrontRequestEvent_originRequest')),
+        handler: 'index.cloudFrontRequestEvent_originRequest',
 
         role: this.getServiceRole(),
       });

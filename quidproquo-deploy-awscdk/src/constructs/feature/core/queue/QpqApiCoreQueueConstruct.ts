@@ -23,8 +23,8 @@ export class QpqApiCoreQueueConstruct extends QpqConstructBlock {
     const queueFunction = new Function(this, props.queueConfig.uniqueKey, {
       buildPath: qpqCoreUtils.getQueueEntryFullPath(props.qpqConfig, props.queueConfig),
       functionName: this.resourceName(`${props.queueConfig.uniqueKey}-queue`),
-      functionType: 'lambdaSQSEvent',
-      executorName: 'executeSQSEvent',
+      functionType: 'sqsEvent_queueEvent',
+      executorName: 'sqsEvent_queueEvent',
 
       qpqConfig: props.qpqConfig,
 
@@ -36,7 +36,6 @@ export class QpqApiCoreQueueConstruct extends QpqConstructBlock {
         queueQPQConfigSetting: JSON.stringify(props.queueConfig),
       },
 
-      // TODO: Expose this as a config option
       reservedConcurrentExecutions: props.queueConfig.maxConcurrentExecutions,
 
       // Timeout in 15 mins ~ Max
@@ -50,25 +49,15 @@ export class QpqApiCoreQueueConstruct extends QpqConstructBlock {
       role: this.getServiceRole(),
     });
 
-    const queueResource = QpqCoreQueueConstruct.fromOtherStack(
-      this,
-      'queue',
-      props.qpqConfig,
-      props.queueConfig,
-      props.awsAccountId,
-    );
+    const queueResource = QpqCoreQueueConstruct.fromOtherStack(this, 'queue', props.qpqConfig, props.queueConfig, props.awsAccountId);
 
     props.queueConfig.eventBusSubscriptions.forEach((eventBusSubscription) => {
-      const eventBusConfig = qpqCoreUtils.getEventBusConfigByName(
-        eventBusSubscription,
-        props.qpqConfig,
-      );
+      const eventBusConfig = qpqCoreUtils.getEventBusConfigByName(eventBusSubscription, props.qpqConfig);
 
       const deploymentInfo = getAwsServiceAccountInfoByDeploymentInfo(
         props.qpqConfig,
         eventBusConfig?.owner?.module || qpqCoreUtils.getApplicationModuleName(props.qpqConfig),
-        eventBusConfig?.owner?.environment ||
-          qpqCoreUtils.getApplicationModuleEnvironment(props.qpqConfig),
+        eventBusConfig?.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(props.qpqConfig),
         eventBusConfig?.owner?.feature ?? qpqCoreUtils.getApplicationModuleFeature(props.qpqConfig),
         eventBusConfig?.owner?.application || qpqCoreUtils.getApplicationName(props.qpqConfig),
       );
@@ -105,8 +94,6 @@ export class QpqApiCoreQueueConstruct extends QpqConstructBlock {
           }
         : {};
 
-    queueFunction.lambdaFunction.addEventSource(
-      new aws_lambda_event_sources.SqsEventSource(queueResource.queue, eventSourceOptions),
-    );
+    queueFunction.lambdaFunction.addEventSource(new aws_lambda_event_sources.SqsEventSource(queueResource.queue, eventSourceOptions));
   }
 }

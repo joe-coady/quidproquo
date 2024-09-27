@@ -5,7 +5,7 @@ import { defineApplicationModule } from './config';
 export const qpqExecuteLog = async (storyResult: StoryResult<any>, runtime: any, overrides: ActionProcessorList = {}): Promise<StoryResult<any>> => {
   // Create a proxy that just resolves all actions to reading from the history
   var logIndex = 0;
-  const storyActionProcessor = new Proxy(
+  const storyActionProcessor: ActionProcessorList = new Proxy(
     {},
     {
       get: (target: any, property: any) => {
@@ -33,7 +33,7 @@ export const qpqExecuteLog = async (storyResult: StoryResult<any>, runtime: any,
       depth: storyResult.session.depth,
       context: storyResult.session.context,
     },
-    storyActionProcessor,
+    async () => storyActionProcessor,
     () => new Date().toISOString(),
     {
       log: async () => {},
@@ -42,6 +42,7 @@ export const qpqExecuteLog = async (storyResult: StoryResult<any>, runtime: any,
     },
     storyResult.correlation,
     storyResult.runtimeType,
+    async () => null,
   );
 
   // Execute it with the initial input

@@ -1,7 +1,10 @@
-import { QPQConfig } from 'quidproquo-core';
+import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
 
-import getQueueSendMessageActionProcessor from './getQueueSendMessageActionProcessor';
+import { getQueueSendMessagesActionProcessor } from './getQueueSendMessageActionProcessor';
 
-export default (qpqConfig: QPQConfig) => ({
-  ...getQueueSendMessageActionProcessor(qpqConfig),
+export const getQueueActionProcessor: ActionProcessorListResolver = async (
+  qpqConfig: QPQConfig,
+  dynamicModuleLoader: DynamicModuleLoader,
+): Promise<ActionProcessorList> => ({
+  ...(await getQueueSendMessagesActionProcessor(qpqConfig, dynamicModuleLoader)),
 });

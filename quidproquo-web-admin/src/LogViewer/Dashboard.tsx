@@ -11,6 +11,7 @@ import { useIsLoading } from '../view';
 import { StoryResultMetadata } from 'quidproquo-core';
 import { useSubscribeToWebSocketEvent } from 'quidproquo-web-react';
 import { uniqueBy } from 'quidproquo-web';
+import { TabViewBox } from '../components';
 
 const getLogCountForSinceXDaysAgo = (logs: LogMetadata[], daysAgo: number) => {
   const currentDate = new Date();
@@ -81,7 +82,7 @@ export const Dashboard: React.FC<DashboardProps> = ({}) => {
   const weeklyErrorCount = useMemo(() => getLogCountForSinceXDaysAgo(allLogs, 7), [allLogs]);
 
   return (
-    <Box sx={{ width: '100%', p: 2, display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <TabViewBox>
       <Grid container spacing={2} sx={{ mb: 2 }}>
         <Grid item xs={6}>
           <Paper sx={{ p: 2, textAlign: 'center' }}>
@@ -99,6 +100,6 @@ export const Dashboard: React.FC<DashboardProps> = ({}) => {
       <Box sx={{ flex: 1, overflow: 'auto' }}>
         <LogMetadataGrid logs={allLogs} isLoading={isLoading} />
       </Box>
-    </Box>
+    </TabViewBox>
   );
 };

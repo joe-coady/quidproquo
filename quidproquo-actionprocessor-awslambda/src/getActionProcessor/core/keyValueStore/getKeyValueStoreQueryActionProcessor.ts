@@ -1,27 +1,18 @@
-import { QPQConfig, qpqCoreUtils, actionResultError, ErrorTypeEnum } from 'quidproquo-core';
+import { QPQConfig, qpqCoreUtils, actionResultError, ErrorTypeEnum, ActionProcessorListResolver, ActionProcessorList } from 'quidproquo-core';
 
 import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
-import {
-  KeyValueStoreQueryActionProcessor,
-  actionResult,
-  KeyValueStoreActionType,
-} from 'quidproquo-core';
+import { KeyValueStoreQueryActionProcessor, actionResult, KeyValueStoreActionType } from 'quidproquo-core';
 import { query } from '../../../logic/dynamo';
 import { getDynamoTableIndexByConfigAndQuery } from '../../../logic/dynamo/qpqDynamoOrm';
 
-const getProcessKeyValueStoreQuery = (
-  qpqConfig: QPQConfig,
-): KeyValueStoreQueryActionProcessor<any> => {
+const getProcessKeyValueStoreQuery = (qpqConfig: QPQConfig): KeyValueStoreQueryActionProcessor<any> => {
   return async ({ keyValueStoreName, keyCondition, options }) => {
     const dynamoTableName = getKvsDynamoTableNameFromConfig(keyValueStoreName, qpqConfig, 'kvs');
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const storeConfig = qpqCoreUtils.getKeyValueStoreByName(qpqConfig, keyValueStoreName);
     if (!storeConfig) {
-      return actionResultError(
-        ErrorTypeEnum.NotFound,
-        `Could not find key value store with name "${keyValueStoreName}"`,
-      );
+      return actionResultError(ErrorTypeEnum.NotFound, `Could not find key value store with name "${keyValueStoreName}"`);
     }
 
     const items = await query<any>(
@@ -39,6 +30,6 @@ const getProcessKeyValueStoreQuery = (
   };
 };
 
-export default (qpqConfig: QPQConfig) => ({
+export const getKeyValueStoreQueryActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
   [KeyValueStoreActionType.Query]: getProcessKeyValueStoreQuery(qpqConfig),
 });

@@ -1,7 +1,10 @@
-import { QPQConfig } from 'quidproquo-core';
+import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
 
-import getWebEntryInvalidateCacheActionProcessor from './getWebEntryInvalidateCacheActionProcessor';
+import { getWebEntryInvalidateCacheActionProcessor } from './getWebEntryInvalidateCacheActionProcessor';
 
-export default (qpqConfig: QPQConfig) => ({
-  ...getWebEntryInvalidateCacheActionProcessor(qpqConfig),
+export const getWebEntryActionProcessor: ActionProcessorListResolver = async (
+  qpqConfig: QPQConfig,
+  dynamicModuleLoader: DynamicModuleLoader,
+): Promise<ActionProcessorList> => ({
+  ...(await getWebEntryInvalidateCacheActionProcessor(qpqConfig, dynamicModuleLoader)),
 });

@@ -1,21 +1,17 @@
+import { QpqFunctionRuntime } from '../../types';
 import { QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
-import { QpqSourceEntry } from './queue';
 
 export interface DeployEventsQPQConfigSetting extends QPQConfigSetting {
-  name: string,
+  name: string;
   buildPath: string;
-  src: QpqSourceEntry;
+  runtime: QpqFunctionRuntime;
 }
 
-export const defineDeployEvent = (
-  buildPath: string,
-  name: string,
-  src: QpqSourceEntry
-): DeployEventsQPQConfigSetting => ({
+export const defineDeployEvent = (buildPath: string, name: string, runtime: QpqFunctionRuntime): DeployEventsQPQConfigSetting => ({
   configSettingType: QPQCoreConfigSettingType.deployEvent,
   uniqueKey: name,
 
   buildPath,
-  src,
-  name
+  runtime,
+  name,
 });

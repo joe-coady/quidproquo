@@ -1,12 +1,39 @@
 import { convertCrossModuleOwnerToGenericResourceNameOverride } from '../../qpqCoreUtils';
-import { CrossModuleOwner } from '../../types';
-import {
-  QPQConfigSetting,
-  QPQCoreConfigSettingType,
-  QPQConfigAdvancedSettings,
-} from '../QPQConfig';
+import { ConfigUrl, CrossModuleOwner } from '../../types';
+import { QPQConfigSetting, QPQCoreConfigSettingType, QPQConfigAdvancedSettings } from '../QPQConfig';
 
-import { EmailTemplates } from './emailTemplates';
+import { CustomAuthRuntime, EmailTemplates } from './emailTemplates';
+
+export type AuthDirectoryDnsRecord = {
+  subdomain: string;
+  rootDomain: string;
+};
+
+export enum AuthDirectoryFederatedProviderType {
+  Facebook = 'facebook',
+  Google = 'google',
+}
+
+export type AuthDirectoryFacebookFederatedProvider = {
+  type: AuthDirectoryFederatedProviderType.Facebook;
+
+  clientId: string;
+  clientSecret: string;
+};
+
+export type AuthDirectoryGoogleFederatedProvider = {
+  type: AuthDirectoryFederatedProviderType.Google;
+
+  clientId: string;
+  clientSecret: string;
+};
+
+export type AnyAuthDirectoryFederatedProvider = AuthDirectoryFacebookFederatedProvider | AuthDirectoryGoogleFederatedProvider;
+
+export type AuthDirectoryOAuth = {
+  callbacks?: ConfigUrl[];
+  federatedProviders?: AnyAuthDirectoryFederatedProvider[];
+};
 
 export interface QPQConfigAdvancedUserDirectorySettings extends QPQConfigAdvancedSettings {
   phoneRequired?: boolean;
@@ -16,6 +43,12 @@ export interface QPQConfigAdvancedUserDirectorySettings extends QPQConfigAdvance
   emailTemplates?: EmailTemplates;
 
   owner?: CrossModuleOwner<'userDirectoryName'>;
+
+  dnsRecord?: AuthDirectoryDnsRecord;
+
+  oAuth?: AuthDirectoryOAuth;
+
+  customAuthRuntime?: CustomAuthRuntime;
 }
 
 export interface UserDirectoryQPQConfigSetting extends QPQConfigSetting {
@@ -29,6 +62,11 @@ export interface UserDirectoryQPQConfigSetting extends QPQConfigSetting {
   emailTemplates: EmailTemplates;
 
   owner?: CrossModuleOwner;
+
+  dnsRecord?: AuthDirectoryDnsRecord;
+  oAuth?: AuthDirectoryOAuth;
+
+  customAuthRuntime?: CustomAuthRuntime;
 }
 
 export const defineUserDirectory = (
@@ -51,6 +89,10 @@ export const defineUserDirectory = (
     resetPassword: options?.emailTemplates?.resetPassword,
     resetPasswordAdmin: options?.emailTemplates?.resetPasswordAdmin,
   },
+
+  dnsRecord: options?.dnsRecord,
+  oAuth: options?.oAuth,
+  customAuthRuntime: options?.customAuthRuntime,
 
   owner: convertCrossModuleOwnerToGenericResourceNameOverride(options?.owner),
 });

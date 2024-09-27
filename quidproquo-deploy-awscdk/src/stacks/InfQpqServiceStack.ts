@@ -10,7 +10,7 @@ import {
   QpqCoreQueueConstruct,
   QpqCoreSecretConstruct,
   QpqCoreEventBusConstruct,
-  QpqCoreUserDirectoryConstruct,
+  QpqInfCoreUserDirectoryConstruct,
   QpqWebserverApiKeyConstruct,
   QpqCoreKeyValueStoreConstruct,
   QpqWebserverWebsocketConstruct,
@@ -94,14 +94,14 @@ export class InfQpqServiceStack extends QpqServiceStack {
     const ownedUserDirectoriesConfigs = qpqCoreUtils.getOwnedUserDirectories(props.qpqConfig);
     const userDirectories = ownedUserDirectoriesConfigs.map(
       (setting) =>
-        new QpqCoreUserDirectoryConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
+        new QpqInfCoreUserDirectoryConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           awsAccountId: props.awsAccountId,
           qpqConfig: props.qpqConfig,
 
           userDirectoryConfig: setting,
         }),
     );
-    QpqCoreUserDirectoryConstruct.authorizeActionsForRole(webserverRole, ownedUserDirectoriesConfigs, userDirectories, props.qpqConfig);
+    QpqInfCoreUserDirectoryConstruct.authorizeActionsForRole(webserverRole, ownedUserDirectoriesConfigs, userDirectories, props.qpqConfig);
 
     // Api Keys
     const apiKeys = qpqWebServerUtils.getAllApiKeyConfigs(props.qpqConfig).map(

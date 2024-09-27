@@ -1,5 +1,5 @@
-import { QPQConfig } from 'quidproquo-core';
+import { QpqFunctionRuntime } from 'quidproquo-core';
+
 export interface LambdaRuntimeConfig {
-  src: string;
-  runtime: string;
+  runtime: QpqFunctionRuntime;
 }

@@ -1,3 +1,4 @@
+export * from './adminUserDirectory';
 export * from './api';
 export * from './apiKey';
 export * from './cache';

@@ -2,7 +2,7 @@ import { getLogs } from './getLogs';
 import { SearchParams } from '../types';
 import { RuntimeTypes } from '../constants';
 
-export const searchLogs = async (searchParams: SearchParams, accessToken?: string, callback?: (progress: number) => void) => {
+export const searchLogs = async (searchParams: SearchParams, apiBaseUrl: string, accessToken?: string, callback?: (progress: number) => void) => {
   const updateProgress = (progress: number) => {
     if (callback) {
       callback(progress);
@@ -29,6 +29,7 @@ export const searchLogs = async (searchParams: SearchParams, accessToken?: strin
         searchParams.userFilter,
         searchParams.deep,
         searchParams.onlyErrors || !!searchParams.errorFilter,
+        apiBaseUrl,
         accessToken,
       ).finally(() => {
         progress = progress + 1;

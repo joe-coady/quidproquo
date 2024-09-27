@@ -1,7 +1,7 @@
 import { useAsyncLoading } from '../Loading';
 import { apiRequestGet, externalRequestGet } from '../../logic';
 import { AnyAsyncFunction } from '../types';
-import { useAuthAccessToken } from '../../Auth/hooks';
+import { useAuthAccessToken, useBaseUrlResolvers } from 'quidproquo-web-react';
 import { useFastCallback } from 'quidproquo-web-react';
 
 /**
@@ -13,9 +13,10 @@ import { useFastCallback } from 'quidproquo-web-react';
  */
 export const usePlatformApiGet = <T>(path?: string | null): AnyAsyncFunction<[], T> => {
   const accessToken = useAuthAccessToken();
+  const baseUrlResolvers = useBaseUrlResolvers();
 
   const requestFunc = useFastCallback(async (): Promise<T> => {
-    return await apiRequestGet<T>(path!, accessToken);
+    return await apiRequestGet<T>(path!, baseUrlResolvers.getApiUrl(), accessToken);
   });
 
   const requestFuncWithLoadingTrigger = useAsyncLoading(requestFunc);

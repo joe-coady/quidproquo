@@ -4,13 +4,13 @@ import {
   QPQConfig,
   qpqCoreUtils,
   UserDirectoryActionType,
+  ActionProcessorList,
+  ActionProcessorListResolver,
 } from 'quidproquo-core';
 
 import { changePassword } from '../../../logic/cognito/changePassword';
 
-const getUserDirectoryChangePasswordActionProcessor = (
-  qpqConfig: QPQConfig,
-): UserDirectoryChangePasswordActionProcessor => {
+const getProcessChangePassword = (qpqConfig: QPQConfig): UserDirectoryChangePasswordActionProcessor => {
   return async ({ oldPassword, newPassword }, session) => {
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
@@ -20,9 +20,8 @@ const getUserDirectoryChangePasswordActionProcessor = (
   };
 };
 
-export default (qpqConfig: QPQConfig) => {
-  return {
-    [UserDirectoryActionType.ChangePassword]:
-      getUserDirectoryChangePasswordActionProcessor(qpqConfig),
-  };
-};
+export const getUserDirectoryChangePasswordActionProcessor: ActionProcessorListResolver = async (
+  qpqConfig: QPQConfig,
+): Promise<ActionProcessorList> => ({
+  [UserDirectoryActionType.ChangePassword]: getProcessChangePassword(qpqConfig),
+});

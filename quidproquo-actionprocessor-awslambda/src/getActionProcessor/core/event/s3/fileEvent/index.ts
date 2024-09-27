@@ -1,15 +1,18 @@
-import { QPQConfig } from 'quidproquo-core';
+import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
 
-import getAutoRespond from './autoRespond';
-import getGetRecords from './getRecords';
-import getMatchStory from './matchStory';
-import getTransformResponseResult from './transformResponseResult';
-import getStorySession from './getStorySession';
+import { getEventAutoRespondActionProcessor } from './getEventAutoRespondActionProcessor';
+import { getEventGetRecordsActionProcessor } from './getEventGetRecordsActionProcessor';
+import { getEventGetStorySessionActionProcessor } from './getEventGetStorySessionActionProcessor';
+import { getEventMatchStoryActionProcessor } from './getEventMatchStoryActionProcessor';
+import { getEventTransformResponseResultActionProcessor } from './getEventTransformResponseResultActionProcessor';
 
-export const getS3FileEventEventProcessor = (qpqConfig: QPQConfig) => ({
-  ...getStorySession(qpqConfig),
-  ...getGetRecords(qpqConfig),
-  ...getMatchStory(qpqConfig),
-  ...getAutoRespond(qpqConfig),
-  ...getTransformResponseResult(qpqConfig),
+export const getS3FileEventEventProcessor: ActionProcessorListResolver = async (
+  qpqConfig: QPQConfig,
+  dynamicModuleLoader: DynamicModuleLoader,
+): Promise<ActionProcessorList> => ({
+  ...(await getEventAutoRespondActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getEventGetRecordsActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getEventGetStorySessionActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getEventMatchStoryActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getEventTransformResponseResultActionProcessor(qpqConfig, dynamicModuleLoader)),
 });

@@ -1,4 +1,4 @@
-import { QPQConfig, joinPaths, qpqCoreUtils } from 'quidproquo-core';
+import { QPQConfig, QpqFunctionRuntime, joinPaths, qpqCoreUtils } from 'quidproquo-core';
 
 import {
   ApiKeyQPQWebServerConfigSetting,
@@ -19,44 +19,30 @@ import {
 import { WebEntryQPQWebServerConfigSetting, ApiQPQWebServerConfigSetting } from '../config';
 
 export const getAllRoutes = (qpqConfig: QPQConfig): RouteQPQWebServerConfigSetting[] => {
-  const routes = qpqCoreUtils.getConfigSettings<RouteQPQWebServerConfigSetting>(
-    qpqConfig,
-    QPQWebServerConfigSettingType.Route,
-  );
+  const routes = qpqCoreUtils.getConfigSettings<RouteQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.Route);
 
   return routes;
 };
 
-export const getAllRoutesForApi = (
-  apiName: string,
-  qpqConfig: QPQConfig,
-): RouteQPQWebServerConfigSetting[] => {
+export const getAllRoutesForApi = (apiName: string, qpqConfig: QPQConfig): RouteQPQWebServerConfigSetting[] => {
   const routes = getAllRoutes(qpqConfig);
 
   return routes;
 };
 
 export const getAllApiKeyConfigs = (qpqConfig: QPQConfig): ApiKeyQPQWebServerConfigSetting[] => {
-  const apiKeyConfigs = qpqCoreUtils.getConfigSettings<ApiKeyQPQWebServerConfigSetting>(
-    qpqConfig,
-    QPQWebServerConfigSettingType.ApiKey,
-  );
+  const apiKeyConfigs = qpqCoreUtils.getConfigSettings<ApiKeyQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.ApiKey);
 
   return apiKeyConfigs;
 };
 
 export const getAllSeo = (qpqConfig: QPQConfig): SeoQPQWebServerConfigSetting[] => {
-  const seoConfigs = qpqCoreUtils.getConfigSettings<SeoQPQWebServerConfigSetting>(
-    qpqConfig,
-    QPQWebServerConfigSettingType.Seo,
-  );
+  const seoConfigs = qpqCoreUtils.getConfigSettings<SeoQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.Seo);
 
   return seoConfigs;
 };
 
-export const getAllServiceFunctions = (
-  qpqConfig: QPQConfig,
-): ServiceFunctionQPQWebServerConfigSetting[] => {
+export const getAllServiceFunctions = (qpqConfig: QPQConfig): ServiceFunctionQPQWebServerConfigSetting[] => {
   const serviceFunctions = qpqCoreUtils.getConfigSettings<ServiceFunctionQPQWebServerConfigSetting>(
     qpqConfig,
     QPQWebServerConfigSettingType.ServiceFunction,
@@ -66,48 +52,39 @@ export const getAllServiceFunctions = (
 };
 
 export const getAllOpenApiSpecs = (configs: QPQConfig): OpenApiQPQWebServerConfigSetting[] => {
-  const openApiSpecs = qpqCoreUtils.getConfigSettings<OpenApiQPQWebServerConfigSetting>(
-    configs,
-    QPQWebServerConfigSettingType.OpenApi,
-  );
+  const openApiSpecs = qpqCoreUtils.getConfigSettings<OpenApiQPQWebServerConfigSetting>(configs, QPQWebServerConfigSettingType.OpenApi);
 
   return openApiSpecs;
 };
 
-export const getAllWebsocketSrcEntries = (qpqConfig: QPQConfig): string[] => {
+export const getAllWebsocketSrcEntries = (qpqConfig: QPQConfig): QpqFunctionRuntime[] => {
   return getOwnedWebsocketSettings(qpqConfig).flatMap((s) => [
-    s.eventProcessors.onConnect.src,
-    s.eventProcessors.onDisconnect.src,
-    s.eventProcessors.onMessage.src,
+    s.eventProcessors.onConnect,
+    s.eventProcessors.onDisconnect,
+    s.eventProcessors.onMessage,
   ]);
 };
 
 // Used in bundlers to know where and what to build and index
 // Events, routes, etc
-export const getAllSrcEntries = (configs: QPQConfig): string[] => {
+export const getAllSrcEntries = (configs: QPQConfig): QpqFunctionRuntime[] => {
   return [
-    ...getAllRoutes(configs).map((r) => r.src),
-    ...getAllOpenApiSpecs(configs).map((r) => r.openApiSpecPath),
-    ...getAllSeo(configs).map((seo) => seo.src),
-    ...getAllServiceFunctions(configs).map((sf) => sf.src),
+    ...getAllRoutes(configs).map((r) => r.runtime),
+    // ...getAllOpenApiSpecs(configs).map((r) => r.openApiSpecPath),
+    ...getAllSeo(configs).map((seo) => seo.runtime),
+    ...getAllServiceFunctions(configs).map((sf) => sf.runtime),
     ...getAllWebsocketSrcEntries(configs),
   ];
 };
 
 export const getDomainName = (configs: QPQConfig): string => {
-  const dnsSettings = qpqCoreUtils.getConfigSetting<DnsQPQWebServerConfigSetting>(
-    configs,
-    QPQWebServerConfigSettingType.Dns,
-  );
+  const dnsSettings = qpqCoreUtils.getConfigSetting<DnsQPQWebServerConfigSetting>(configs, QPQWebServerConfigSettingType.Dns);
 
   return dnsSettings?.dnsBase || '';
 };
 
 export const getWebEntry = (configs: QPQConfig): string => {
-  const webEntry = qpqCoreUtils.getConfigSetting<WebEntryQPQWebServerConfigSetting>(
-    configs,
-    QPQWebServerConfigSettingType.WebEntry,
-  );
+  const webEntry = qpqCoreUtils.getConfigSetting<WebEntryQPQWebServerConfigSetting>(configs, QPQWebServerConfigSettingType.WebEntry);
 
   if (!webEntry?.buildPath) {
     throw new Error('please use defineWebEntry in your qpq config');
@@ -116,37 +93,20 @@ export const getWebEntry = (configs: QPQConfig): string => {
   return webEntry?.buildPath;
 };
 
-export const getWebEntryFullPath = (
-  qpqConfig: QPQConfig,
-  webEntryQPQWebServerConfigSetting: WebEntryQPQWebServerConfigSetting,
-): string => {
-  return joinPaths(
-    qpqCoreUtils.getConfigRoot(qpqConfig),
-    webEntryQPQWebServerConfigSetting.buildPath || '',
-  );
+export const getWebEntryFullPath = (qpqConfig: QPQConfig, webEntryQPQWebServerConfigSetting: WebEntryQPQWebServerConfigSetting): string => {
+  return joinPaths(qpqCoreUtils.getConfigRoot(qpqConfig), webEntryQPQWebServerConfigSetting.buildPath || '');
 };
 
-export const getWebEntrySeoFullPath = (
-  qpqConfig: QPQConfig,
-  webEntryQPQWebServerConfigSetting: WebEntryQPQWebServerConfigSetting,
-): string => {
+export const getWebEntrySeoFullPath = (qpqConfig: QPQConfig, webEntryQPQWebServerConfigSetting: WebEntryQPQWebServerConfigSetting): string => {
   // Throw an error if no SEO build path has been defined.
   if (!webEntryQPQWebServerConfigSetting.seoBuildPath) {
-    throw new Error(
-      `Please define a 'seoBuildPath' in your web entry [${webEntryQPQWebServerConfigSetting.name}]`,
-    );
+    throw new Error(`Please define a 'seoBuildPath' in your web entry [${webEntryQPQWebServerConfigSetting.name}]`);
   }
 
-  return joinPaths(
-    qpqCoreUtils.getConfigRoot(qpqConfig),
-    webEntryQPQWebServerConfigSetting.seoBuildPath,
-  );
+  return joinPaths(qpqCoreUtils.getConfigRoot(qpqConfig), webEntryQPQWebServerConfigSetting.seoBuildPath);
 };
 
-export const getApiEntryFullPath = (
-  qpqConfig: QPQConfig,
-  apiConfig: ApiQPQWebServerConfigSetting,
-): string => {
+export const getApiEntryFullPath = (qpqConfig: QPQConfig, apiConfig: ApiQPQWebServerConfigSetting): string => {
   const apiBuildPath = apiConfig.buildPath;
 
   if (!apiBuildPath) {
@@ -156,10 +116,7 @@ export const getApiEntryFullPath = (
   return joinPaths(qpqCoreUtils.getConfigRoot(qpqConfig), apiBuildPath);
 };
 
-export const getWebsocketEntryFullPath = (
-  qpqConfig: QPQConfig,
-  websocketConfig: WebSocketQPQWebServerConfigSetting,
-): string => {
+export const getWebsocketEntryFullPath = (qpqConfig: QPQConfig, websocketConfig: WebSocketQPQWebServerConfigSetting): string => {
   const websocketBuildPath = websocketConfig.buildPath;
 
   if (!websocketBuildPath) {
@@ -169,10 +126,7 @@ export const getWebsocketEntryFullPath = (
   return joinPaths(qpqCoreUtils.getConfigRoot(qpqConfig), websocketBuildPath);
 };
 
-export const getWebsocketEntryByApiName = (
-  apiName: string,
-  qpqConfig: QPQConfig,
-): WebSocketQPQWebServerConfigSetting => {
+export const getWebsocketEntryByApiName = (apiName: string, qpqConfig: QPQConfig): WebSocketQPQWebServerConfigSetting => {
   const websocketSettings = getWebsocketSettings(qpqConfig);
 
   const websocketSetting = websocketSettings.find((s) => s.apiName === apiName);
@@ -184,10 +138,7 @@ export const getWebsocketEntryByApiName = (
   return websocketSetting;
 };
 
-export const getServiceFunctionFullPath = (
-  qpqConfig: QPQConfig,
-  serviceFunctionConfig: ServiceFunctionQPQWebServerConfigSetting,
-): string => {
+export const getServiceFunctionFullPath = (qpqConfig: QPQConfig, serviceFunctionConfig: ServiceFunctionQPQWebServerConfigSetting): string => {
   const buildPath = serviceFunctionConfig.buildPath;
 
   if (!buildPath) {
@@ -197,69 +148,44 @@ export const getServiceFunctionFullPath = (
   return joinPaths(qpqCoreUtils.getConfigRoot(qpqConfig), buildPath);
 };
 
-export const getRedirectApiBuildFullPath = (
-  qpqConfig: QPQConfig,
-  redirectConfig: SubdomainRedirectQPQWebServerConfigSetting,
-): string => {
+export const getRedirectApiBuildFullPath = (qpqConfig: QPQConfig, redirectConfig: SubdomainRedirectQPQWebServerConfigSetting): string => {
   const apiEntry = redirectConfig.apiBuildPath;
 
   return joinPaths(qpqCoreUtils.getConfigRoot(qpqConfig), apiEntry);
 };
 
-export const getSubdomainRedirects = (
-  configs: QPQConfig,
-): SubdomainRedirectQPQWebServerConfigSetting[] => {
-  const subdomainRedirects =
-    qpqCoreUtils.getConfigSettings<SubdomainRedirectQPQWebServerConfigSetting>(
-      configs,
-      QPQWebServerConfigSettingType.SubdomainRedirect,
-    );
+export const getSubdomainRedirects = (configs: QPQConfig): SubdomainRedirectQPQWebServerConfigSetting[] => {
+  const subdomainRedirects = qpqCoreUtils.getConfigSettings<SubdomainRedirectQPQWebServerConfigSetting>(
+    configs,
+    QPQWebServerConfigSettingType.SubdomainRedirect,
+  );
 
   return subdomainRedirects;
 };
 
 export const getApiConfigs = (configs: QPQConfig): ApiQPQWebServerConfigSetting[] => {
-  return qpqCoreUtils.getConfigSettings<ApiQPQWebServerConfigSetting>(
-    configs,
-    QPQWebServerConfigSettingType.Api,
-  );
+  return qpqCoreUtils.getConfigSettings<ApiQPQWebServerConfigSetting>(configs, QPQWebServerConfigSettingType.Api);
 };
 
 export const getDnsConfigs = (configs: QPQConfig): DnsQPQWebServerConfigSetting[] => {
-  return qpqCoreUtils.getConfigSettings<DnsQPQWebServerConfigSetting>(
-    configs,
-    QPQWebServerConfigSettingType.Dns,
-  );
+  return qpqCoreUtils.getConfigSettings<DnsQPQWebServerConfigSetting>(configs, QPQWebServerConfigSettingType.Dns);
 };
 
 export const getWebEntryConfigs = (configs: QPQConfig): WebEntryQPQWebServerConfigSetting[] => {
-  return qpqCoreUtils.getConfigSettings<WebEntryQPQWebServerConfigSetting>(
-    configs,
-    QPQWebServerConfigSettingType.WebEntry,
-  );
+  return qpqCoreUtils.getConfigSettings<WebEntryQPQWebServerConfigSetting>(configs, QPQWebServerConfigSettingType.WebEntry);
 };
 
-export const getDomainProxyConfigs = (
-  configs: QPQConfig,
-): DomainProxyQPQWebServerConfigSetting[] => {
-  return qpqCoreUtils.getConfigSettings<DomainProxyQPQWebServerConfigSetting>(
-    configs,
-    QPQWebServerConfigSettingType.DomainProxy,
-  );
+export const getDomainProxyConfigs = (configs: QPQConfig): DomainProxyQPQWebServerConfigSetting[] => {
+  return qpqCoreUtils.getConfigSettings<DomainProxyQPQWebServerConfigSetting>(configs, QPQWebServerConfigSettingType.DomainProxy);
 };
 
 export const getAllOwnedCacheConfigs = (qpqConfig: QPQConfig): CacheQPQWebServerConfigSetting[] => {
-  const cacheSettings = qpqCoreUtils.getConfigSettings<CacheQPQWebServerConfigSetting>(
-    qpqConfig,
-    QPQWebServerConfigSettingType.Cache,
-  );
+  const cacheSettings = qpqCoreUtils.getConfigSettings<CacheQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.Cache);
 
   return qpqCoreUtils.getOwnedItems(cacheSettings, qpqConfig);
 };
 
-export const getAllOwnedCertifcateConfigs = (
-  qpqConfig: QPQConfig,
-): CertificateQPQWebServerConfigSetting[] => {
+export const getAllOwnedCertifcateConfigs = (qpqConfig: QPQConfig): CertificateQPQWebServerConfigSetting[] => {
   const certificateSettings = qpqCoreUtils.getConfigSettings<CertificateQPQWebServerConfigSetting>(
     qpqConfig,
     QPQWebServerConfigSettingType.Certificate,
@@ -268,15 +194,9 @@ export const getAllOwnedCertifcateConfigs = (
   return qpqCoreUtils.getOwnedItems(certificateSettings, qpqConfig);
 };
 
-export const getCacheConfigByName = (
-  cacheConfigName: string,
-  qpqConfig: QPQConfig,
-): CacheQPQWebServerConfigSetting => {
+export const getCacheConfigByName = (cacheConfigName: string, qpqConfig: QPQConfig): CacheQPQWebServerConfigSetting => {
   const cacheSetting = qpqCoreUtils
-    .getConfigSettings<CacheQPQWebServerConfigSetting>(
-      qpqConfig,
-      QPQWebServerConfigSettingType.Cache,
-    )
+    .getConfigSettings<CacheQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.Cache)
     .find((c) => c.name === cacheConfigName);
 
   if (!cacheSetting) {
@@ -315,32 +235,18 @@ export const getServiceDomainName = (qpqConfig: QPQConfig): string => {
   return `${service}.${domainBase}`;
 };
 
-export const resolveApexDomainNameFromDomainConfig = (
-  qpqConfig: QPQConfig,
-  rootDomain: string,
-  onRootDomain: boolean,
-): string => {
+export const resolveApexDomainNameFromDomainConfig = (qpqConfig: QPQConfig, rootDomain: string, onRootDomain: boolean): string => {
   const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
   const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
 
   const apexDomain = onRootDomain
     ? getDomainRoot(rootDomain, environment, feature)
-    : constructServiceDomainName(
-        rootDomain,
-        environment,
-        qpqCoreUtils.getApplicationModuleName(qpqConfig),
-        feature,
-      );
+    : constructServiceDomainName(rootDomain, environment, qpqCoreUtils.getApplicationModuleName(qpqConfig), feature);
 
   return apexDomain;
 };
 
-export const constructServiceDomainName = (
-  rootDomain: string,
-  environment: string,
-  service: string,
-  feature?: string,
-) => {
+export const constructServiceDomainName = (rootDomain: string, environment: string, service: string, feature?: string) => {
   const domainBase = getDomainRoot(rootDomain, environment, feature);
 
   return `${service}.${domainBase}`;
@@ -354,23 +260,14 @@ export const constructEnvironmentDomainName = (environment: string, domain: stri
   return `${environment}.${domain}`;
 };
 
-export const getDefaultRouteSettings = (
-  qpqConfig: QPQConfig,
-): DefaultRouteOptionsQPQWebServerConfigSetting[] => {
+export const getDefaultRouteSettings = (qpqConfig: QPQConfig): DefaultRouteOptionsQPQWebServerConfigSetting[] => {
   const defaultRouteSettings =
-    qpqCoreUtils.getConfigSettings<DefaultRouteOptionsQPQWebServerConfigSetting>(
-      qpqConfig,
-      QPQWebServerConfigSettingType.DefaultRouteOptions,
-    ) || [];
+    qpqCoreUtils.getConfigSettings<DefaultRouteOptionsQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.DefaultRouteOptions) || [];
 
   return defaultRouteSettings;
 };
 
-export const getDomainRoot = (
-  rootDomain: string,
-  environment: string,
-  feature?: string,
-): string => {
+export const getDomainRoot = (rootDomain: string, environment: string, feature?: string): string => {
   let domainPrefix = environment !== 'production' ? `${environment}.` : '';
   if (feature) {
     domainPrefix = `${feature}.${domainPrefix}`;
@@ -389,21 +286,14 @@ export const resolveDomainRoot = (rootDomain: string, qpqConfig: QPQConfig): str
   return domain;
 };
 
-export const getWebsocketSettings = (
-  qpqConfig: QPQConfig,
-): WebSocketQPQWebServerConfigSetting[] => {
+export const getWebsocketSettings = (qpqConfig: QPQConfig): WebSocketQPQWebServerConfigSetting[] => {
   const websocketSettings =
-    qpqCoreUtils.getConfigSettings<WebSocketQPQWebServerConfigSetting>(
-      qpqConfig,
-      QPQWebServerConfigSettingType.WebSocket,
-    ) || [];
+    qpqCoreUtils.getConfigSettings<WebSocketQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.WebSocket) || [];
 
   return websocketSettings;
 };
 
-export const getOwnedWebsocketSettings = (
-  qpqConfig: QPQConfig,
-): WebSocketQPQWebServerConfigSetting[] => {
+export const getOwnedWebsocketSettings = (qpqConfig: QPQConfig): WebSocketQPQWebServerConfigSetting[] => {
   const websocketSettings = getWebsocketSettings(qpqConfig);
 
   return qpqCoreUtils.getOwnedItems(websocketSettings, qpqConfig);

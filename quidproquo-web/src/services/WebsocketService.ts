@@ -14,6 +14,8 @@ export type SubscriptionHandle = {
   type: WebsocketServiceEvent;
 };
 
+export type WebSocketServiceSubscriptionFunction = (websocketService: WebsocketService, event?: Event) => any;
+
 type SubscriptionMap = Map<SubscriptionHandle, WebSocketServiceSubscriptionFunction>;
 
 type Subscriptions = {
@@ -21,8 +23,6 @@ type Subscriptions = {
 };
 
 type WebsocketSendPayload = string | ArrayBufferLike | Blob | ArrayBufferView;
-
-export type WebSocketServiceSubscriptionFunction = (websocketService: WebsocketService, event?: Event) => any;
 
 export type WebSocketServiceEventSubscriptionFunction<E extends AnyEventMessage> = (websocketService: WebsocketService, event: E) => void;
 

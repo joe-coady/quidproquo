@@ -26,16 +26,13 @@ export class QpqApiCoreStorageDriveConstruct extends QpqConstructBlock {
 
     if (props.storageDriveConfig.onEvent?.create) {
       const func = new Function(this, 'create', {
-        buildPath: qpqCoreUtils.getStorageDriveEntryFullPath(
-          props.qpqConfig,
-          props.storageDriveConfig,
-        ),
+        buildPath: qpqCoreUtils.getStorageDriveEntryFullPath(props.qpqConfig, props.storageDriveConfig),
 
         reacreateOnFunctionNameChange: true,
         functionName: this.qpqResourceName(props.storageDriveConfig.storageDrive, 's3Create'),
 
-        functionType: 'lambdaS3FileEvent',
-        executorName: 'executeS3FileEvent',
+        functionType: 's3Event_fileEvent',
+        executorName: 's3Event_fileEvent',
 
         qpqConfig: props.qpqConfig,
 
@@ -52,24 +49,18 @@ export class QpqApiCoreStorageDriveConstruct extends QpqConstructBlock {
         role: this.getServiceRole(),
       });
 
-      bucket.addEventNotification(
-        aws_s3.EventType.OBJECT_CREATED,
-        new aws_s3_notifications.LambdaDestination(func.lambdaFunction),
-      );
+      bucket.addEventNotification(aws_s3.EventType.OBJECT_CREATED, new aws_s3_notifications.LambdaDestination(func.lambdaFunction));
     }
 
     if (props.storageDriveConfig.onEvent?.delete) {
       const func = new Function(this, 'delete', {
-        buildPath: qpqCoreUtils.getStorageDriveEntryFullPath(
-          props.qpqConfig,
-          props.storageDriveConfig,
-        ),
+        buildPath: qpqCoreUtils.getStorageDriveEntryFullPath(props.qpqConfig, props.storageDriveConfig),
 
         reacreateOnFunctionNameChange: true,
         functionName: this.qpqResourceName(props.storageDriveConfig.storageDrive, 's3Delete'),
 
-        functionType: 'lambdaS3FileEvent',
-        executorName: 'executeS3FileEvent',
+        functionType: 's3Event_fileEvent',
+        executorName: 's3Event_fileEvent',
 
         qpqConfig: props.qpqConfig,
 
@@ -86,10 +77,7 @@ export class QpqApiCoreStorageDriveConstruct extends QpqConstructBlock {
         role: this.getServiceRole(),
       });
 
-      bucket.addEventNotification(
-        aws_s3.EventType.OBJECT_REMOVED,
-        new aws_s3_notifications.LambdaDestination(func.lambdaFunction),
-      );
+      bucket.addEventNotification(aws_s3.EventType.OBJECT_REMOVED, new aws_s3_notifications.LambdaDestination(func.lambdaFunction));
     }
   }
 }

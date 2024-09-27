@@ -1,4 +1,4 @@
-import { QPQConfigSetting, QPQConfigAdvancedSettings } from 'quidproquo-core';
+import { QPQConfigSetting, QPQConfigAdvancedSettings, QpqFunctionRuntime, qpqCoreUtils } from 'quidproquo-core';
 
 import { QPQWebServerConfigSettingType } from '../QPQConfig';
 
@@ -7,8 +7,7 @@ export interface QPQConfigAdvancedServiceFunctionSettings extends QPQConfigAdvan
 }
 
 export interface ServiceFunctionQPQWebServerConfigSetting extends QPQConfigSetting {
-  src: string;
-  runtime: string;
+  runtime: QpqFunctionRuntime;
 
   buildPath: string;
   functionName: string;
@@ -16,18 +15,17 @@ export interface ServiceFunctionQPQWebServerConfigSetting extends QPQConfigSetti
 
 export const defineServiceFunction = (
   buildPath: string,
-  src: string,
-  runtime: string,
+  runtime: QpqFunctionRuntime,
   options?: QPQConfigAdvancedServiceFunctionSettings,
 ): ServiceFunctionQPQWebServerConfigSetting => {
-  const functionName = options?.functionName || runtime;
+  const functionName = options?.functionName || qpqCoreUtils.getStoryNameFromQpqFunctionRuntime(runtime);
+
   return {
     configSettingType: QPQWebServerConfigSettingType.ServiceFunction,
     uniqueKey: functionName,
 
     buildPath,
 
-    src,
     runtime,
 
     functionName: functionName,

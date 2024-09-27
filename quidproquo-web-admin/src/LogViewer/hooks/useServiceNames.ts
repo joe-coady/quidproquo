@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import { useAuthAccessToken } from '../../Auth/hooks';
+import { useAuthAccessToken, useBaseUrlResolvers } from 'quidproquo-web-react';
 import { getServiceNames } from '../logic';
 
 type AutoCompleteOption = {
@@ -10,10 +10,11 @@ type AutoCompleteOption = {
 export const useServiceNames = (): AutoCompleteOption[] => {
   const [serviceNames, setServiceNames] = useState<string[]>(['All']);
   const accessToken = useAuthAccessToken();
+  const baseUrlResolvers = useBaseUrlResolvers();
 
   useEffect(() => {
     const fetchData = async () => {
-      const updatedServiceNames = await getServiceNames(accessToken);
+      const updatedServiceNames = await getServiceNames(baseUrlResolvers.getApiUrl(), accessToken);
 
       setServiceNames(updatedServiceNames);
     };

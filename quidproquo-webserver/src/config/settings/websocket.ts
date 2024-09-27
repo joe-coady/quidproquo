@@ -1,17 +1,11 @@
-import {
-  QPQConfigSetting,
-  QPQConfigAdvancedSettings,
-  QpqSourceEntry,
-  CrossModuleOwner,
-  qpqCoreUtils,
-} from 'quidproquo-core';
+import { QPQConfigSetting, QPQConfigAdvancedSettings, CrossModuleOwner, qpqCoreUtils, QpqFunctionRuntime } from 'quidproquo-core';
 
 import { QPQWebServerConfigSettingType } from '../QPQConfig';
 
 export interface QpqWebSocketEventProcessors {
-  onConnect: QpqSourceEntry;
-  onDisconnect: QpqSourceEntry;
-  onMessage: QpqSourceEntry;
+  onConnect: QpqFunctionRuntime;
+  onDisconnect: QpqFunctionRuntime;
+  onMessage: QpqFunctionRuntime;
 
   // [type: string]: QpqSourceEntry;
 }

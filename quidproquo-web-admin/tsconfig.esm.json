@@ -1,0 +1,9 @@
+{
+  "extends": "quidproquo-tsconfig/tsconfig.esm.json",
+  "compilerOptions": {
+    "outDir": "./lib/esm",
+    "jsx": "react-jsx"
+  },
+  "include": ["src"],
+  "exclude": ["node_modules"]
+}

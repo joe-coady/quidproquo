@@ -1,4 +1,4 @@
-import { actionResult, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { ActionProcessorList, ActionProcessorListResolver, actionResult, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
 import { WebEntryInvalidateCacheActionProcessor, WebEntryActionType } from 'quidproquo-webserver';
 
@@ -7,16 +7,11 @@ import { getCFExportNameDistributionIdArnFromConfig } from '../../../awsNamingUt
 import { invalidateCache } from '../../../logic/cloudFront/invalidateCache';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 
-const getWebEntryInvalidteCacheActionProcessor = (
-  qpqConfig: QPQConfig,
-): WebEntryInvalidateCacheActionProcessor => {
+const getProcessInvalidateCache = (qpqConfig: QPQConfig): WebEntryInvalidateCacheActionProcessor => {
   return async ({ paths, webEntryName }) => {
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
-    const distributionId = await getExportedValue(
-      getCFExportNameDistributionIdArnFromConfig(webEntryName, qpqConfig),
-      region,
-    );
+    const distributionId = await getExportedValue(getCFExportNameDistributionIdArnFromConfig(webEntryName, qpqConfig), region);
 
     await invalidateCache(distributionId, region, paths);
 
@@ -24,8 +19,6 @@ const getWebEntryInvalidteCacheActionProcessor = (
   };
 };
 
-export default (qpqConfig: QPQConfig) => {
-  return {
-    [WebEntryActionType.InvalidateCache]: getWebEntryInvalidteCacheActionProcessor(qpqConfig),
-  };
-};
+export const getWebEntryInvalidateCacheActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
+  [WebEntryActionType.InvalidateCache]: getProcessInvalidateCache(qpqConfig),
+});

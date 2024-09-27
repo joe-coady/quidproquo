@@ -1,8 +1,11 @@
 import { joinPaths } from './utils';
 
-import { QPQConfig, QPQConfigSetting, QPQCoreConfigSettingType, QPQConfigItem } from './config/QPQConfig';
-
 import {
+  QPQConfig,
+  QPQConfigSetting,
+  QPQCoreConfigSettingType,
+  QPQConfigItem,
+  EmailTemplates,
   ApplicationQPQConfigSetting,
   StorageDriveQPQConfigSetting,
   EventBusQPQConfigSetting,
@@ -19,11 +22,19 @@ import {
   GlobalQPQConfigSetting,
   ModuleQPQConfigSetting,
   ClaudeAIQPQConfigSetting,
-} from './config/settings';
+  ApplicationBasePathQPQConfigSetting,
+} from './config';
 
-import { EmailTemplates, QpqEmailTemplateSourceEntry } from './config/settings/emailTemplates/types';
-
-import { CrossModuleOwner, CrossServiceResourceName, CustomFullyQualifiedResource, FullyQualifiedResource, ResourceName, KeyOf } from './types';
+import {
+  CrossModuleOwner,
+  CrossServiceResourceName,
+  CustomFullyQualifiedResource,
+  FullyQualifiedResource,
+  ResourceName,
+  KeyOf,
+  ConfigUrl,
+  QpqFunctionRuntime,
+} from './types';
 
 /**
  * Flattens a QPQConfig array into a single array of QPQConfigSetting objects.
@@ -121,6 +132,16 @@ export const getApplicationModuleName = (qpqConfig: QPQConfig): string => {
   }
 
   return moduleSetting.moduleName;
+};
+
+export const getApplicationConfigRoot = (qpqConfig: QPQConfig): string => {
+  const moduleSetting = getConfigSetting<ApplicationQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.appName);
+
+  if (!moduleSetting) {
+    throw new Error('please use defineApplication in your QPQ config');
+  }
+
+  return moduleSetting.configRoot;
 };
 
 export const getApplicationName = (qpqConfig: QPQConfig): string => {
@@ -245,8 +266,8 @@ export const getKeyValueStoreByName = <T extends object = any>(
   return keyValueStore;
 };
 
-export const getActionProcessorSources = (configs: QPQConfig): string[] => {
-  const sources = getConfigSettings<ActionProcessorsQPQConfigSetting>(configs, QPQCoreConfigSettingType.actionProcessors).map((ap) => ap.src);
+export const getActionProcessorSources = (configs: QPQConfig): QpqFunctionRuntime[] => {
+  const sources = getConfigSettings<ActionProcessorsQPQConfigSetting>(configs, QPQCoreConfigSettingType.actionProcessors).map((ap) => ap.runtime);
 
   return sources;
 };
@@ -269,32 +290,91 @@ export const getScheduleEvents = (configs: QPQConfig): ScheduleQPQConfigSetting[
   return getConfigSettings<ScheduleQPQConfigSetting>(configs, QPQCoreConfigSettingType.schedule);
 };
 
-export const getQueueSrcEntries = (configs: QPQConfig): string[] => {
+export const getQueueSrcEntries = (configs: QPQConfig): QpqFunctionRuntime[] => {
   const queueConfigs = getConfigSettings<QueueQPQConfigSetting>(configs, QPQCoreConfigSettingType.queue);
 
-  return queueConfigs.reduce((acc, qc) => [...acc, ...Object.values(qc.qpqQueueProcessors).map((q) => q.src)], [] as string[]);
+  return queueConfigs.reduce((acc, qc) => [...acc, ...Object.values(qc.qpqQueueProcessors)], [] as QpqFunctionRuntime[]);
 };
 
-export const getUserDirectorySrcEntries = (qpqConfig: QPQConfig): string[] => {
+export const getUserDirectorySrcEntries = (qpqConfig: QPQConfig): QpqFunctionRuntime[] => {
   // We just want the ones this service owns.
   const userConfigs = getOwnedUserDirectories(qpqConfig);
 
   return userConfigs
-    .reduce((acc, ud) => [...acc, ...Object.values(ud.emailTemplates).map((et: QpqEmailTemplateSourceEntry) => et?.src)], [] as string[])
-    .filter((src) => !!src);
+    .reduce((acc, ud) => [...acc, ...Object.values(ud.emailTemplates), ...Object.values(ud.customAuthRuntime || {})], [] as QpqFunctionRuntime[])
+    .filter((se) => !!se);
 };
 
 // Used in bundlers to know where and what to build and index
-export const getAllSrcEntries = (qpqConfig: QPQConfig): string[] => {
-  return [
-    ...getScheduleEvents(qpqConfig).map((r) => r.src),
+export const getAllSrcEntries = (qpqConfig: QPQConfig): QpqFunctionRuntime[] => {
+  const result = [
+    ...getActionProcessorSources(qpqConfig),
+    ...getScheduleEvents(qpqConfig).map((r) => r.runtime),
     ...getQueueSrcEntries(qpqConfig),
     ...getUserDirectorySrcEntries(qpqConfig),
-    ...getDeployEventConfigs(qpqConfig).map((r) => r.src.src),
-    ...(getStorageDrives(qpqConfig)
-      .flatMap((sd) => [sd.onEvent?.create?.src, sd.onEvent?.delete?.src])
-      .filter((src) => !!src) as string[]),
+    ...getDeployEventConfigs(qpqConfig).map((r) => r.runtime),
+    ...getStorageDrives(qpqConfig).flatMap((sd) => [sd.onEvent?.create, sd.onEvent?.delete].filter((r) => !!r) as QpqFunctionRuntime[]),
   ];
+
+  return result;
+};
+
+export const getApplicationBasePath = (qpqConfig: QPQConfig): string => {
+  const [basePath] = getConfigSettings<ApplicationBasePathQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.appBasePath);
+
+  if (!basePath) {
+    throw new Error(`Can not find app base path use defineApplicationBasePath`);
+  }
+
+  return basePath.basePath;
+};
+
+export const getSrcPathFromQpqFunctionRuntime = (qpqFunctionRuntime: QpqFunctionRuntime): string => {
+  const [srcPath, _method] = qpqFunctionRuntime.split('::');
+
+  if (srcPath.startsWith('full@')) {
+    return srcPath.slice(5);
+  }
+
+  return srcPath;
+};
+
+export function getSrcPathFromQpqFunctionRuntimeWithoutLeadingSlash(runtime: QpqFunctionRuntime): string {
+  const srcPath = getSrcPathFromQpqFunctionRuntime(runtime);
+
+  if (srcPath.startsWith('/')) {
+    return srcPath.slice(1);
+  }
+
+  return srcPath;
+}
+
+export const getFullSrcPathFromQpqFunctionRuntime = (
+  qpqFunctionRuntime: QpqFunctionRuntime,
+  qpqConfig: QPQConfig,
+  configRootOverride?: string,
+): string => {
+  const [srcPath, _method] = qpqFunctionRuntime.split('::');
+
+  if (srcPath.startsWith('full@')) {
+    return srcPath.slice(5);
+  }
+
+  const configRoot = configRootOverride ?? getApplicationConfigRoot(qpqConfig);
+
+  return joinPaths(configRoot, srcPath);
+};
+
+export const getStoryNameFromQpqFunctionRuntime = (qpqFunctionRuntime: QpqFunctionRuntime): string => {
+  const [_srcPath, method] = qpqFunctionRuntime.split('::');
+
+  return method;
+};
+
+export const getSrcFilenameFromQpqFunctionRuntime = (qpqFunctionRuntime: QpqFunctionRuntime): string => {
+  const [srcPath] = qpqFunctionRuntime.split('::');
+
+  return srcPath.split('/').pop() || '';
 };
 
 export const getSecretByName = (secretName: string, qpqConfig: QPQConfig): SecretQPQConfigSetting => {
@@ -489,4 +569,37 @@ export const isSameResource = (resourceA: FullyQualifiedResource, resourceB: Ful
     resourceA.module === resourceB.module &&
     resourceA.resourceName === resourceB.resourceName
   );
+};
+
+export const getFullUrlFromConfigUrl = (configUrl: ConfigUrl, qpqConfig: QPQConfig): string => {
+  if (typeof configUrl === 'string') {
+    return configUrl;
+  }
+
+  const confEnvironment = getApplicationModuleEnvironment(qpqConfig);
+  const confFeature = getApplicationModuleFeature(qpqConfig);
+
+  let fullUrl = `${configUrl.domain}`;
+
+  if (confEnvironment !== 'production') {
+    fullUrl = `${confEnvironment}.${fullUrl}`;
+  }
+
+  if (confFeature) {
+    fullUrl = `${confFeature}.${fullUrl}`;
+  }
+
+  if (configUrl.module) {
+    fullUrl = `${configUrl.module}.${fullUrl}`;
+  }
+
+  if (configUrl.path) {
+    fullUrl = `${fullUrl}${configUrl.path}`;
+  }
+
+  fullUrl = `${configUrl.protocol}://${fullUrl}`;
+
+  console.log(fullUrl);
+
+  return fullUrl;
 };

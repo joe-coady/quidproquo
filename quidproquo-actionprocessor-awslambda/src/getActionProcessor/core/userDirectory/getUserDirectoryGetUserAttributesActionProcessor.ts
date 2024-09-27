@@ -7,6 +7,8 @@ import {
   actionResultError,
   UserDirectoryGetUserAttributesErrorTypeEnum,
   actionResultErrorFromCaughtError,
+  ActionProcessorListResolver,
+  ActionProcessorList,
 } from 'quidproquo-core';
 
 import { getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
@@ -14,7 +16,7 @@ import { getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { getUserAttributes } from '../../../logic/cognito/getUserAttributes';
 
-const getUserDirectoryGetUserAttributesActionProcessor = (qpqConfig: QPQConfig): UserDirectoryGetUserAttributesActionProcessor => {
+const getProcessGetUserAttributes = (qpqConfig: QPQConfig): UserDirectoryGetUserAttributesActionProcessor => {
   return async ({ userDirectoryName, username }) => {
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
@@ -32,8 +34,8 @@ const getUserDirectoryGetUserAttributesActionProcessor = (qpqConfig: QPQConfig):
   };
 };
 
-export default (qpqConfig: QPQConfig) => {
-  return {
-    [UserDirectoryActionType.GetUserAttributes]: getUserDirectoryGetUserAttributesActionProcessor(qpqConfig),
-  };
-};
+export const getUserDirectoryGetUserAttributesActionProcessor: ActionProcessorListResolver = async (
+  qpqConfig: QPQConfig,
+): Promise<ActionProcessorList> => ({
+  [UserDirectoryActionType.GetUserAttributes]: getProcessGetUserAttributes(qpqConfig),
+});

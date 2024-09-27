@@ -1,14 +1,6 @@
-import {
-  AuthenticateUserResponse,
-  AuthenticationInfo,
-  AuthenticateUserChallenge,
-} from 'quidproquo-core';
+import { AuthenticateUserResponse, AuthenticationInfo, AuthenticateUserChallenge } from 'quidproquo-core';
 
-import {
-  AuthenticationResultType,
-  AdminInitiateAuthResponse,
-  ChallengeNameType,
-} from '@aws-sdk/client-cognito-identity-provider';
+import { AuthenticationResultType, AdminInitiateAuthResponse, ChallengeNameType } from '@aws-sdk/client-cognito-identity-provider';
 
 export const cognitoAuthenticationResultTypeToQpqAuthenticationInfo = (
   authResult: AuthenticationResultType,
@@ -40,10 +32,11 @@ export const cognitoChallengeNameTypeToQpqAuthenticateUserChallenge = (
 
   const map: Record<string, AuthenticateUserChallenge | string> = {
     [ChallengeNameType.NEW_PASSWORD_REQUIRED]: AuthenticateUserChallenge.NEW_PASSWORD_REQUIRED,
+    [ChallengeNameType.CUSTOM_CHALLENGE]: AuthenticateUserChallenge.CUSTOM_CHALLENGE,
   };
 
   // TODO: handle the NOT-IMP cases
-  const challenge = map[cognitoChallengeName] || `NOT-IMP-${cognitoChallengeName}`;
+  const challenge = map[cognitoChallengeName] || `QPQ-NOT-IMP-${cognitoChallengeName}`;
 
   return challenge as AuthenticateUserChallenge;
 };
@@ -52,16 +45,16 @@ export const cognitoAdminInitiateAuthResponseToQpqAuthenticationInfo = (
   authResponse: AdminInitiateAuthResponse,
   issueDateTime: string,
 ): AuthenticateUserResponse => {
+  console.log('authResponse XYZ', authResponse);
+
   const res: AuthenticateUserResponse = {
     session: authResponse.Session,
     challenge: cognitoChallengeNameTypeToQpqAuthenticateUserChallenge(authResponse.ChallengeName),
+    challengeParameters: authResponse.ChallengeParameters,
   };
 
   if (authResponse.AuthenticationResult) {
-    res.authenticationInfo = cognitoAuthenticationResultTypeToQpqAuthenticationInfo(
-      authResponse.AuthenticationResult,
-      issueDateTime,
-    );
+    res.authenticationInfo = cognitoAuthenticationResultTypeToQpqAuthenticationInfo(authResponse.AuthenticationResult, issueDateTime);
   }
 
   return res;

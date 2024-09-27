@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Box, TextField, Button, Avatar, Typography, Paper, CircularProgress } from '@mui/material';
 import { Person as PersonIcon, Android as AndroidIcon } from '@mui/icons-material';
-import { useAuthAccessToken } from '../../Auth/hooks';
+import { useAuthAccessToken, useBaseUrlResolvers } from 'quidproquo-web-react';
 import { apiRequestPost } from '../../logic';
 import { LogChatMessage, SendLogChatMessage, ListLogChatMessages } from '../../types';
 import { QpqPagedData } from 'quidproquo-core';
@@ -18,6 +18,7 @@ export const HelpChat: React.FC<HelpChatProps> = ({ logCorrelation }) => {
   const [nextPageKey, setNextPageKey] = useState<string | undefined>(undefined);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const accessToken = useAuthAccessToken();
+  const baseUrlResolvers = useBaseUrlResolvers();
 
   useEffect(() => {
     fetchChatMessages();
@@ -33,6 +34,7 @@ export const HelpChat: React.FC<HelpChatProps> = ({ logCorrelation }) => {
       const response = await apiRequestPost<QpqPagedData<LogChatMessage>>(
         '/log/chat',
         listLogChatMessages,
+        baseUrlResolvers.getApiUrl(),
         accessToken,
       );
 
@@ -61,11 +63,7 @@ export const HelpChat: React.FC<HelpChatProps> = ({ logCorrelation }) => {
       setPendingRequests((prevCount) => prevCount + 1);
 
       try {
-        const response = await apiRequestPost<LogChatMessage>(
-          '/log/chat/message',
-          sendLogChatMessage,
-          accessToken,
-        );
+        const response = await apiRequestPost<LogChatMessage>('/log/chat/message', sendLogChatMessage, baseUrlResolvers.getApiUrl(), accessToken);
 
         setChatMessages((prevMessages) => [...prevMessages, response]);
       } finally {
@@ -110,9 +108,7 @@ export const HelpChat: React.FC<HelpChatProps> = ({ logCorrelation }) => {
               }}
             >
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                <Avatar sx={{ mr: 1, bgcolor: message.isAi ? 'grey.500' : 'primary.dark' }}>
-                  {message.isAi ? <AndroidIcon /> : <PersonIcon />}
-                </Avatar>
+                <Avatar sx={{ mr: 1, bgcolor: message.isAi ? 'grey.500' : 'primary.dark' }}>{message.isAi ? <AndroidIcon /> : <PersonIcon />}</Avatar>
                 <Typography variant="subtitle2">{message.isAi ? 'AI Assistant' : 'You'}</Typography>
               </Box>
               <Markdown>{message.message}</Markdown>

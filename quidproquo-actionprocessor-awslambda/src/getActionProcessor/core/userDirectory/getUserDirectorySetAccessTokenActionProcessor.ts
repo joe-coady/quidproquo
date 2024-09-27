@@ -3,24 +3,22 @@ import {
   actionResult,
   QPQConfig,
   UserDirectoryActionType,
+  ActionProcessorListResolver,
+  ActionProcessorList,
 } from 'quidproquo-core';
 
-const getUserDirectorySetAccessTokenActionProcessor = (
-  qpqConfig: QPQConfig,
-): UserDirectorySetAccessTokenActionProcessor => {
+const getProcessSetAccessToken = (qpqConfig: QPQConfig): UserDirectorySetAccessTokenActionProcessor => {
   return async ({ accessToken }, session, aps, logger, updateSession) => {
-    
     updateSession({
-      accessToken
+      accessToken,
     });
 
     return actionResult(void 0);
   };
 };
 
-export default (qpqConfig: QPQConfig) => {
-  return {
-    [UserDirectoryActionType.SetAccessToken]:
-      getUserDirectorySetAccessTokenActionProcessor(qpqConfig),
-  };
-};
+export const getUserDirectorySetAccessTokenActionProcessor: ActionProcessorListResolver = async (
+  qpqConfig: QPQConfig,
+): Promise<ActionProcessorList> => ({
+  [UserDirectoryActionType.SetAccessToken]: getProcessSetAccessToken(qpqConfig),
+});

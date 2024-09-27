@@ -1,16 +1,8 @@
-import {
-  QPQConfigSetting,
-  QPQCoreConfigSettingType,
-  QPQConfigAdvancedSettings,
-} from '../QPQConfig';
-
-export interface QpqSourceEntry {
-  src: string;
-  runtime: string;
-}
+import { QpqFunctionRuntime } from '../../types';
+import { QPQConfigSetting, QPQCoreConfigSettingType, QPQConfigAdvancedSettings } from '../QPQConfig';
 
 export interface QpqQueueProcessors {
-  [type: string]: QpqSourceEntry;
+  [type: string]: QpqFunctionRuntime;
 }
 
 export interface QPQConfigAdvancedQueueSettings extends QPQConfigAdvancedSettings {

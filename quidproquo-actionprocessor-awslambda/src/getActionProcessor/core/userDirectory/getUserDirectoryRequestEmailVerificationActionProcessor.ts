@@ -4,13 +4,13 @@ import {
   QPQConfig,
   qpqCoreUtils,
   UserDirectoryActionType,
+  ActionProcessorListResolver,
+  ActionProcessorList,
 } from 'quidproquo-core';
 
 import { requestEmailVerificationCode } from '../../../logic/cognito/requestEmailVerificationCode';
 
-const getUserDirectoryRequestEmailVerificationActionProcessor = (
-  qpqConfig: QPQConfig,
-): UserDirectoryRequestEmailVerificationActionProcessor => {
+const getProcessRequestEmailVerification = (qpqConfig: QPQConfig): UserDirectoryRequestEmailVerificationActionProcessor => {
   return async ({ userDirectoryName, accessToken }) => {
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
@@ -20,9 +20,8 @@ const getUserDirectoryRequestEmailVerificationActionProcessor = (
   };
 };
 
-export default (qpqConfig: QPQConfig) => {
-  return {
-    [UserDirectoryActionType.RequestEmailVerification]:
-      getUserDirectoryRequestEmailVerificationActionProcessor(qpqConfig),
-  };
-};
+export const getUserDirectoryRequestEmailVerificationActionProcessor: ActionProcessorListResolver = async (
+  qpqConfig: QPQConfig,
+): Promise<ActionProcessorList> => ({
+  [UserDirectoryActionType.RequestEmailVerification]: getProcessRequestEmailVerification(qpqConfig),
+});

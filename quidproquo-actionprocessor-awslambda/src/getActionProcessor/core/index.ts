@@ -1,14 +1,33 @@
-export { default as getConfigGetSecretActionProcessor } from './config/getConfigGetSecretActionProcessor';
-export { default as getConfigGetParameterActionProcessor } from './config/getConfigGetParameterActionProcessor';
-export { default as getConfigGetParametersActionProcessor } from './config/getConfigGetParametersActionProcessor';
-export { default as getConfigGetGlobalActionProcessor } from './config/getConfigGetGlobalActionProcessor';
-export { default as getConfigSetParameterActionProcessor } from './config/getConfigSetParameterActionProcessor';
-
-export { default as getSystemActionProcessor } from './system';
-export { default as getFileActionProcessor } from './file';
-export { default as getKeyValueStoreActionProcessor } from './keyValueStore';
-export { default as getQueueActionProcessor } from './queue';
-export { default as getUserDirectoryActionProcessor } from './userDirectory';
-export { default as getEventBusActionProcessor } from './eventBus';
-
+export * from './file';
+export * from './keyValueStore';
+export * from './queue';
+export * from './userDirectory';
+export * from './eventBus';
+export * from './system';
+export * from './config';
 export * from './event';
+
+import { getFileActionProcessor } from './file';
+import { getKeyValueStoreActionProcessor } from './keyValueStore';
+import { getQueueActionProcessor } from './queue';
+import { getUserDirectoryActionProcessor } from './userDirectory';
+import { getEventBusActionProcessor } from './eventBus';
+import { getSystemActionProcessor } from './system';
+import { getConfigActionProcessor } from './config';
+import { getApiGatewayApiEventEventProcessor } from './event';
+
+import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
+
+export const getCoreActionProcessor: ActionProcessorListResolver = async (
+  qpqConfig: QPQConfig,
+  dynamicModuleLoader: DynamicModuleLoader,
+): Promise<ActionProcessorList> => ({
+  ...(await getFileActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getKeyValueStoreActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getQueueActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getUserDirectoryActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getEventBusActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getSystemActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getConfigActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getApiGatewayApiEventEventProcessor(qpqConfig, dynamicModuleLoader)),
+});

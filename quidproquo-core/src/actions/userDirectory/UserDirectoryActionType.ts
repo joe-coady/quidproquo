@@ -18,6 +18,7 @@ export enum UserDirectoryActionType {
   ChangePassword = '@quidproquo-core/UserDirectory/ChangePassword',
   SetPassword = '@quidproquo-core/UserDirectory/SetPassword',
   GetUsers = '@quidproquo-core/UserDirectory/GetUsers',
+  GetUsersByAttribute = '@quidproquo-core/UserDirectory/GetUsersByAttribute',
 }
 
 export interface AuthenticationInfo {
@@ -37,9 +38,10 @@ export interface AuthenticationDeliveryDetails {
 
 export interface AuthenticateUserResponse {
   challenge: AuthenticateUserChallenge;
+  challengeParameters?: Record<string, string>;
+  session?: string;
 
   authenticationInfo?: AuthenticationInfo;
-  session?: string;
 }
 
 export interface DecodedAccessToken {

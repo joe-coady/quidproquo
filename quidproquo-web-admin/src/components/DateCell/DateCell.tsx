@@ -1,12 +1,17 @@
 import Typography from '@mui/material/Typography';
 import LastSeen from '../LastSeen/LastSeen';
 
-interface DateCellProps {
-  isoDateTime: string;
-}
+type DateCellProps =
+  | {
+      isoDateTime: string;
+    }
+  | {
+      unixTimestampMs: number;
+    };
 
-export const DateCell: React.FC<DateCellProps> = ({ isoDateTime }) => {
-  const date = new Date(isoDateTime);
+export const DateCell: React.FC<DateCellProps> = (props: DateCellProps) => {
+  let date = 'isoDateTime' in props ? new Date(props.isoDateTime) : new Date(props.unixTimestampMs);
+
   const formattedTime = date.toLocaleTimeString('en-AU', {
     hour: '2-digit',
     minute: '2-digit',
@@ -22,7 +27,7 @@ export const DateCell: React.FC<DateCellProps> = ({ isoDateTime }) => {
       <Typography variant="body2" component="span">
         {formattedDate} {formattedTime}
       </Typography>
-      <LastSeen isoTime={isoDateTime} timeStyle="twitter" />
+      <LastSeen isoTime={date.toISOString()} timeStyle="twitter" />
     </div>
   );
 };

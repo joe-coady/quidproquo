@@ -1,4 +1,4 @@
-import { QPQConfigSetting, HTTPMethod } from 'quidproquo-core';
+import { QPQConfigSetting, HTTPMethod, QpqFunctionRuntime } from 'quidproquo-core';
 
 import { QPQWebServerConfigSettingType } from '../QPQConfig';
 
@@ -32,7 +32,7 @@ export interface ServiceAllowedOrigin {
   protocol?: 'http' | 'https';
 }
 
-interface GenericRouteOptions<T> {
+export interface GenericRouteOptions<T> {
   allowedOrigins?: (string | ServiceAllowedOrigin)[];
 
   routeAuthSettings?: GenericRouteAuthSettings<T>;
@@ -47,16 +47,14 @@ export type RouteOptions = GenericRouteOptions<ApiKeyReference>;
 export interface RouteQPQWebServerConfigSetting extends QPQConfigSetting {
   method: HTTPMethod;
   path: string;
-  src: string;
-  runtime: string;
+  runtime: QpqFunctionRuntime;
   options: RouteOptions;
 }
 
 export const defineRoute = (
   method: HTTPMethod,
   path: string,
-  src: string,
-  runtime: string,
+  runtime: QpqFunctionRuntime,
   options: GenericRouteOptions<ApiKeyReference | string> = {},
 ): RouteQPQWebServerConfigSetting => {
   const routeAuthSettings = options.routeAuthSettings || {};
@@ -75,7 +73,6 @@ export const defineRoute = (
 
     method,
     path,
-    src,
     runtime,
     options: newOptions,
   };

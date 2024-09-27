@@ -11,14 +11,14 @@ export function* askCatch<T extends AskResponse<any>>(storyIterator: T): AskResp
         returnErrors: true,
       };
 
-      // If there is an error, lets just return it
-      if (nextInput.success === false) {
+      // If there is an error, and no child askCatch, return the error
+      if (nextInput.success === false && !nextResult.value.returnErrors) {
         return nextInput;
       }
 
-      // Now resolve the value we need
-      // We need to call the busisness logic with the pure result or the either result
-      // depending on if the origional action was a pure action or an either action
+      // Continue executing the story
+      // If there is a child askCatch, then pass down the either result
+      // otherwise just pass down the result as we would expect.
       nextResult = storyIterator.next(nextResult.value.returnErrors ? nextInput : nextInput.result);
     }
 

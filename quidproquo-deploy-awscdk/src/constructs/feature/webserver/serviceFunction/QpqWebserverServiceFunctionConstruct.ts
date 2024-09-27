@@ -7,8 +7,6 @@ import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqCons
 
 import { Function } from '../../../basic/Function';
 
-import * as qpqDeployAwsCdkUtils from '../../../../utils';
-
 export interface QpqWebserverServiceFunctionConstructProps extends QpqConstructBlockProps {
   serviceFunctionConfig: ServiceFunctionQPQWebServerConfigSetting;
   apiLayerVersions?: aws_lambda.ILayerVersion[];
@@ -20,13 +18,10 @@ export class QpqWebserverServiceFunctionConstruct extends QpqConstructBlock {
 
     // Build Function
     const func = new Function(this, 'api-function', {
-      buildPath: qpqWebServerUtils.getServiceFunctionFullPath(
-        props.qpqConfig,
-        props.serviceFunctionConfig,
-      ),
+      buildPath: qpqWebServerUtils.getServiceFunctionFullPath(props.qpqConfig, props.serviceFunctionConfig),
       functionName: this.resourceName(`${props.serviceFunctionConfig.functionName}-sfunc`),
-      functionType: 'lambdaServiceFunctionExecute',
-      executorName: 'executeServiceFunctionExecuteEvent',
+      functionType: 'anyExecuteServiceFunctionEvent_serviceFunction',
+      executorName: 'anyExecuteServiceFunctionEvent_serviceFunction',
 
       timeoutInSeconds: 14.5 * 60,
 

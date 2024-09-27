@@ -2,19 +2,12 @@ import path from 'path';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
 import { Construct } from 'constructs';
-import {
-  aws_lambda,
-  aws_logs,
-  aws_sns,
-  aws_iam,
-  aws_sns_subscriptions,
-  aws_lambda_destinations,
-} from 'aws-cdk-lib';
+import { aws_lambda, aws_logs, aws_sns, aws_iam, aws_sns_subscriptions } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 
 import { getAwsServiceAccountInfoConfig } from 'quidproquo-config-aws';
 
-import { BootstrapResource, WARM_LAMBDA_EVENT } from '../../constants';
+import { BootstrapResource } from '../../constants';
 import { qpqCoreUtils } from 'quidproquo-core';
 
 export interface FunctionProps extends QpqConstructBlockProps {
@@ -47,12 +40,13 @@ export class Function extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: FunctionProps) {
     super(scope, id, props);
 
+    console.log(`Function: [${props.functionName || ''}]::${props.functionName?.length}`);
+
     const handlerFile = props.srcFilename || 'index';
 
     const serviceInfo = getAwsServiceAccountInfoConfig(props.qpqConfig);
 
-    const functionId =
-      props.reacreateOnFunctionNameChange && props.functionName ? props.functionName : 'function';
+    const functionId = props.reacreateOnFunctionNameChange && props.functionName ? props.functionName : 'function';
 
     this.lambdaFunction = new aws_lambda.Function(this, functionId, {
       functionName: props.functionName,

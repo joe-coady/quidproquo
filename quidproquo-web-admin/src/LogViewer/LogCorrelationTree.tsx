@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, memo, Fragment } from 'react';
-import { Tree } from 'react-d3-tree';
+import { Tree, TreeNodeDatum } from 'react-d3-tree';
 
 import { Box, CircularProgress } from '@mui/material';
 import { TreeApi } from './hooks';
@@ -18,31 +18,21 @@ interface LogCorrelationTreeProps {
 // as an SVG `rect` instead of the default `circle`.
 const renderRectSvgNode =
   (setSelectedLogCorrelation: (logCorrelation: string) => void, highlightCorrelationId: string) =>
-  ({ nodeDatum }) => {
+  ({ nodeDatum }: { nodeDatum: any }) => {
+    // TODO: Workout the nodeDateum type
     const color =
       nodeDatum.correlation === highlightCorrelationId
         ? !!nodeDatum.error
           ? '#8B0000'
           : '#00008B' // Very dark red for selected errors, dark blue for selected non-errors
         : !!nodeDatum.error
-        ? 'red'
-        : 'white'; // Bright red for non-selected errors, white for non-selected non-errors
+          ? 'red'
+          : 'white'; // Bright red for non-selected errors, white for non-selected non-errors
 
     return (
       <g>
-        <circle
-          r={10}
-          fill={color}
-          x="10"
-          y="10"
-          onClick={() => setSelectedLogCorrelation(nodeDatum.correlation)}
-        />
-        {[
-          nodeDatum.moduleName,
-          nodeDatum.runtimeType,
-          (nodeDatum.generic || '').split('::').pop(),
-          nodeDatum.error || '',
-        ]
+        <circle r={10} fill={color} x="10" y="10" onClick={() => setSelectedLogCorrelation(nodeDatum.correlation)} />
+        {[nodeDatum.moduleName, nodeDatum.runtimeType, (nodeDatum.generic || '').split('::').pop(), nodeDatum.error || '']
           .filter((t) => !!t)
           .map((text, i) => {
             const x = 0;
@@ -50,21 +40,8 @@ const renderRectSvgNode =
             const fontSize = i === 0 ? 30 : 15;
             return (
               <Fragment key={`${i}`}>
-                <rect
-                  x={x - 50}
-                  y={y - fontSize / 2 - 8}
-                  width="100"
-                  height={fontSize}
-                  fill={BACKGROUND_COLOR}
-                  strokeWidth="0"
-                />
-                <text
-                  textAnchor="middle"
-                  fontSize={fontSize}
-                  fill={!!nodeDatum.error ? 'red' : 'black'}
-                  strokeWidth={0}
-                  y={y}
-                >
+                <rect x={x - 50} y={y - fontSize / 2 - 8} width="100" height={fontSize} fill={BACKGROUND_COLOR} strokeWidth="0" />
+                <text textAnchor="middle" fontSize={fontSize} fill={!!nodeDatum.error ? 'red' : 'black'} strokeWidth={0} y={y}>
                   {text}
                 </text>
               </Fragment>
@@ -113,17 +90,12 @@ const LogCorrelationTreeComponent = ({
   }
 
   return (
-    <div
-      ref={treeContainer}
-      style={{ width: '100%', height: '100%', background: BACKGROUND_COLOR }}
-    >
+    <div ref={treeContainer} style={{ width: '100%', height: '100%', background: BACKGROUND_COLOR }}>
       <Tree
-        data={treeApi.treeData}
+        // TODO: Pass the correct type here
+        data={treeApi.treeData as unknown as TreeNodeDatum[]}
         orientation="vertical"
-        renderCustomNodeElement={renderRectSvgNode(
-          setSelectedLogCorrelation,
-          highlightCorrelationId,
-        )}
+        renderCustomNodeElement={renderRectSvgNode(setSelectedLogCorrelation, highlightCorrelationId)}
         translate={translate}
       />
     </div>

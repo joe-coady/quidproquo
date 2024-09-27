@@ -37,8 +37,8 @@ export class QpqApiWebserverWebsocketConstruct extends QpqConstructBlock {
     const func = new Function(this, 'api-function', {
       buildPath: qpqWebServerUtils.getWebsocketEntryFullPath(props.qpqConfig, props.websocketConfig),
       functionName: this.resourceName(`${props.websocketConfig.apiName}-ws`),
-      functionType: 'lambdaWebsocketAPIGatewayEvent',
-      executorName: 'executeWebsocketAPIGatewayEvent',
+      functionType: 'apiGatwayEventWebsocketWithIdentity_websocketEvent',
+      executorName: 'apiGatwayEventWebsocketWithIdentity_websocketEvent',
 
       qpqConfig: props.qpqConfig,
 

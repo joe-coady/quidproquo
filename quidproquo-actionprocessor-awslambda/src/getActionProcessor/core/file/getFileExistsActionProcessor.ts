@@ -4,6 +4,8 @@ import {
   FileActionType,
   QPQConfig,
   qpqCoreUtils,
+  ActionProcessorListResolver,
+  ActionProcessorList,
 } from 'quidproquo-core';
 
 import { resolveStorageDriveBucketName } from './utils';
@@ -13,16 +15,10 @@ const getProcessFileExists = (qpqConfig: QPQConfig): FileExistsActionProcessor =
   return async ({ drive, filepath }) => {
     const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
 
-    return actionResult(
-      await objectExists(
-        s3BucketName,
-        filepath,
-        qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig),
-      ),
-    );
+    return actionResult(await objectExists(s3BucketName, filepath, qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig)));
   };
 };
 
-export default (qpqConfig: QPQConfig) => ({
+export const getFileExistsActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
   [FileActionType.Exists]: getProcessFileExists(qpqConfig),
 });

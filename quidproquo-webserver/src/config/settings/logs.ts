@@ -1,22 +1,23 @@
-import {
-  QPQConfig,
-  QPQConfigAdvancedSettings,
-  StorageDriveTier,
-  defineGlobal,
-  defineKeyValueStore,
-  defineStorageDrive,
-  defineUserDirectory,
-  getServiceEntry,
-} from 'quidproquo-core';
+import { QPQConfig, QPQConfigAdvancedSettings, StorageDriveTier, defineGlobal, defineKeyValueStore, defineStorageDrive } from 'quidproquo-core';
 import { defineRoute } from './route';
-import { defineWebEntry } from './webEntry';
+
 import { defineWebsocket } from './websocket';
+import { adminUserDirectoryResourceName } from './adminUserDirectory';
+
+import { defineAdminServiceAuthRoute, defineAdminServiceLogRoute, getServiceEntryQpqFunctionRuntime } from '../../services';
+
+// export type ManifestServiceUrlDefinition = QpqServiceContentSecurityPolicy & {
+//   protocol: 'http' | 'https'; // Only can be serverd via http
+//   domain: string;
+//   path: string;
+// };
+
+// export type FederationManifestUrl = ManifestServiceUrlDefinition | string;
 
 export interface QPQConfigAdvancedLogSettings extends QPQConfigAdvancedSettings {
   logRetentionDays?: number;
   coldStorageAfterDays?: number;
 
-  cloudflareApiKeySecretName?: string;
   claudeAiApiKeySecretName?: string;
 }
 
@@ -28,19 +29,11 @@ export interface QPQConfigAdvancedLogSettings extends QPQConfigAdvancedSettings 
 const logResourceName = 'qpq-logs';
 export const logReportsResourceName = 'qpq-log-reports';
 export const wsConnectionResourceName = 'qpq-admin-connections';
-export const adminUserDirectory = 'qpq-admin';
 
-export const defineLogs = (
-  buildPath: string,
-  webFilesPath: string,
-  rootDomain: string,
-  hostService: string,
-  services: string[],
-  advancedSettings?: QPQConfigAdvancedLogSettings,
-): QPQConfig => {
+export const defineLogs = (buildPath: string, rootDomain: string, services: string[], advancedSettings?: QPQConfigAdvancedLogSettings): QPQConfig => {
   const routeAuthSettings = {
     routeAuthSettings: {
-      userDirectoryName: adminUserDirectory,
+      userDirectoryName: adminUserDirectoryResourceName,
     },
   };
 
@@ -56,10 +49,7 @@ export const defineLogs = (
    * and `coldStorageAfterDays` plus 180.
    */
   const logRetentionDays: number | undefined = advancedSettings?.logRetentionDays
-    ? Math.max(
-        advancedSettings?.logRetentionDays || 30,
-        advancedSettings?.coldStorageAfterDays ? advancedSettings?.coldStorageAfterDays + 180 : 0,
-      )
+    ? Math.max(advancedSettings?.logRetentionDays || 30, advancedSettings?.coldStorageAfterDays ? advancedSettings?.coldStorageAfterDays + 180 : 0)
     : undefined;
 
   const configs = [
@@ -69,10 +59,7 @@ export const defineLogs = (
     defineStorageDrive(logResourceName, {
       onEvent: {
         buildPath,
-        create: {
-          src: getServiceEntry('log', 'storageDrive', 'onCreate'),
-          runtime: 'onCreate',
-        },
+        create: getServiceEntryQpqFunctionRuntime('log', 'storageDrive', 'onCreate::onCreate'),
       },
       deprecated: advancedSettings?.deprecated,
       lifecycleRules: [
@@ -114,93 +101,21 @@ export const defineLogs = (
       indexes: ['userId'],
     }),
 
-    defineUserDirectory(adminUserDirectory, buildPath),
-    defineRoute('POST', '/login', getServiceEntry('log', 'controller', 'loginController'), 'login'),
-    defineRoute(
-      'POST',
-      '/refreshToken',
-      getServiceEntry('log', 'controller', 'loginController'),
-      'refreshToken',
-    ),
-    defineRoute(
-      'POST',
-      '/challenge',
-      getServiceEntry('log', 'controller', 'loginController'),
-      'respondToAuthChallenge',
-    ),
+    defineAdminServiceAuthRoute('POST', '/login', 'login'),
+    defineAdminServiceAuthRoute('POST', '/refreshToken', 'refreshToken'),
+    defineAdminServiceAuthRoute('POST', '/challenge', 'respondToAuthChallenge'),
 
-    defineRoute(
-      'GET',
-      '/admin/services',
-      getServiceEntry('log', 'controller', 'logController'),
-      'getServiceNames',
-    ),
-
-    defineRoute(
-      'POST',
-      '/log/list',
-      getServiceEntry('log', 'controller', 'logController'),
-      'getLogs',
-      routeAuthSettings,
-    ),
-
-    defineRoute(
-      'GET',
-      '/log/{correlationId}',
-      getServiceEntry('log', 'controller', 'logController'),
-      'getLog',
-      routeAuthSettings,
-    ),
-
-    defineRoute(
-      'GET',
-      '/log/{correlationId}/toggle',
-      getServiceEntry('log', 'controller', 'logController'),
-      'toggleLogCheck',
-      routeAuthSettings,
-    ),
-
-    defineRoute(
-      'GET',
-      '/log/children/{fromCorrelation}',
-      getServiceEntry('log', 'controller', 'logController'),
-      'getChildren',
-      routeAuthSettings,
-    ),
-
-    defineRoute(
-      'GET',
-      '/log/{correlationId}/hierarchies',
-      getServiceEntry('log', 'controller', 'logController'),
-      'getHierarchies',
-      routeAuthSettings,
-    ),
-
-    defineRoute(
-      'GET',
-      '/log/downloadurl/{correlationId}',
-      getServiceEntry('log', 'controller', 'logController'),
-      'downloadUrl',
-      routeAuthSettings,
-    ),
-
-    defineRoute(
-      'POST',
-      '/log/chat/message',
-      getServiceEntry('log', 'controller', 'logController'),
-      'sendChatMessage',
-      routeAuthSettings,
-    ),
+    defineAdminServiceLogRoute('GET', '/admin/services', 'getServiceNames'),
+    defineAdminServiceLogRoute('POST', '/log/list', 'getLogs', routeAuthSettings),
+    defineAdminServiceLogRoute('GET', '/log/{correlationId}', 'getLog', routeAuthSettings),
+    defineAdminServiceLogRoute('GET', '/log/{correlationId}/toggle', 'toggleLogCheck', routeAuthSettings),
+    defineAdminServiceLogRoute('GET', '/log/children/{fromCorrelation}', 'getChildren', routeAuthSettings),
+    defineAdminServiceLogRoute('GET', '/log/{correlationId}/hierarchies', 'getHierarchies', routeAuthSettings),
+    defineAdminServiceLogRoute('GET', '/log/downloadurl/{correlationId}', 'downloadUrl', routeAuthSettings),
+    defineAdminServiceLogRoute('POST', '/log/chat/message', 'sendChatMessage', routeAuthSettings),
+    defineAdminServiceLogRoute('POST', '/log/chat', 'getChatMessages', routeAuthSettings),
 
     defineGlobal('claudeAi-api-key', advancedSettings?.claudeAiApiKeySecretName || ''),
-
-    defineRoute(
-      'POST',
-      '/log/chat',
-      getServiceEntry('log', 'controller', 'logController'),
-      'getChatMessages',
-      routeAuthSettings,
-    ),
 
     defineKeyValueStore('qpq-log-messages', 'correlationId', ['timestamp']),
 
@@ -209,64 +124,14 @@ export const defineLogs = (
       rootDomain,
       buildPath,
       {
-        onConnect: {
-          src: getServiceEntry('log', 'webSocket', 'onWebsocketEvent'),
-          runtime: 'onConnect',
-        },
-        onDisconnect: {
-          src: getServiceEntry('log', 'webSocket', 'onWebsocketEvent'),
-          runtime: 'onDisconnect',
-        },
-        onMessage: {
-          src: getServiceEntry('log', 'webSocket', 'onWebsocketEvent'),
-          runtime: 'onMessage',
-        },
+        onConnect: getServiceEntryQpqFunctionRuntime('log', 'webSocket', 'onWebsocketEvent::onConnect'),
+        onDisconnect: getServiceEntryQpqFunctionRuntime('log', 'webSocket', 'onWebsocketEvent::onDisconnect'),
+        onMessage: getServiceEntryQpqFunctionRuntime('log', 'webSocket', 'onWebsocketEvent::onMessage'),
       },
       {
         apiName: 'wsadmin',
       },
     ),
-
-    defineWebEntry('admin', {
-      buildPath: webFilesPath,
-      seoBuildPath: buildPath,
-
-      domain: {
-        subDomainName: 'admin',
-        onRootDomain: false,
-        rootDomain,
-      },
-
-      ignoreCache: ['index.html', 'index.js'],
-
-      cloudflareApiKeySecretName: advancedSettings?.cloudflareApiKeySecretName,
-
-      securityHeaders: {
-        contentSecurityPolicy: {
-          override: true,
-          contentSecurityPolicy: {
-            'default-src': ["'self'"],
-
-            // maybe pass in the api / localhost port in as args
-            'connect-src': [
-              "'self'",
-              { api: 'api' },
-              'http://localhost:8080',
-              { protocol: 'wss', api: 'wsadmin', service: hostService },
-            ],
-
-            'style-src': [
-              "'self'",
-              "'unsafe-inline'", // For inline styles
-            ],
-
-            'script-src': [
-              "'self'", // For scripts from the same domain
-            ],
-          },
-        },
-      },
-    }),
   ];
 
   return configs;

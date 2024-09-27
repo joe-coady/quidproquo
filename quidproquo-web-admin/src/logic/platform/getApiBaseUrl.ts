@@ -3,7 +3,7 @@ export const getApiBaseUrl = () => {
 
   return window.location.hostname !== 'localhost'
     ? `${window.location.protocol}//api.${domain.join('.')}/${service}`
-    : `http://localhost:8080/api/admin`;
+    : `https://api.joecoady.development.kitted.app/admin`;
 };
 
 export const getWsBaseUrl = () => {

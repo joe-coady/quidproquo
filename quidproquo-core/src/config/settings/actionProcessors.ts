@@ -1,15 +1,13 @@
+import { QpqFunctionRuntime } from '../../types';
 import { QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
 
 export interface ActionProcessorsQPQConfigSetting extends QPQConfigSetting {
-  src: string;
+  runtime: QpqFunctionRuntime;
 }
 
-export const defineActionProcessors = (
-  name: string,
-  src: string,
-): ActionProcessorsQPQConfigSetting => ({
+export const defineActionProcessors = (getActionProcessors: QpqFunctionRuntime): ActionProcessorsQPQConfigSetting => ({
   configSettingType: QPQCoreConfigSettingType.actionProcessors,
-  uniqueKey: name,
+  uniqueKey: getActionProcessors,
 
-  src,
+  runtime: getActionProcessors,
 });

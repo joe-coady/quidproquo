@@ -15,16 +15,7 @@ import { AskResponse, EitherActionResult, LogLevelEnum, QPQError, StoryResult, S
 
 import { askGetApplicationVersion } from './askGetApplicationVersion';
 import { askCatch } from './system/askCatch';
-
-const getSuccessfulEitherActionResult = <T>(result: T): EitherActionResult<T> => ({
-  success: true,
-  result,
-});
-
-const getUnsuccessfulEitherActionResult = (error: QPQError): EitherActionResult<any> => ({
-  success: false,
-  error: error,
-});
+import { getSuccessfulEitherActionResult, getUnsuccessfulEitherActionResult } from '../logic/actionLogic';
 
 function* askProcessEventRecord<QpqEventRecord, MSR extends AnyMatchStoryResult, QpqEventRecordResponse, EventParams extends Array<unknown> = any[]>(
   qpqEventRecord: QpqEventRecord,
@@ -56,7 +47,6 @@ function* askProcessEventRecord<QpqEventRecord, MSR extends AnyMatchStoryResult,
   // Execute the story
   const executeStoryResponse = yield* askCatch(
     askExecuteStory<[QpqEventRecord, MSR['runtimeOptions']], QpqEventRecordResponse>(
-      matchResultResult.result.src!,
       matchResultResult.result.runtime!,
       [qpqEventRecord, matchResultResult.result.runtimeOptions],
       messageSession,

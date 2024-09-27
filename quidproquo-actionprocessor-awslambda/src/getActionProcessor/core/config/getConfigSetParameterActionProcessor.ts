@@ -4,6 +4,8 @@ import {
   actionResult,
   QPQConfig,
   qpqCoreUtils,
+  ActionProcessorList,
+  ActionProcessorListResolver,
 } from 'quidproquo-core';
 
 import { resolveParameterKey } from '../../../runtimeConfig/qpqAwsLambdaRuntimeConfigUtils';
@@ -14,18 +16,12 @@ const getProcessConfigSetParameter = (qpqConfig: QPQConfig): ConfigSetParameterA
   return async ({ parameterName, parameterValue }) => {
     const awsParameterKey = resolveParameterKey(parameterName, qpqConfig);
 
-    await setParameter(
-      awsParameterKey,
-      qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig),
-      parameterValue,
-    );
+    await setParameter(awsParameterKey, qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig), parameterValue);
 
     return actionResult(void 0);
   };
 };
 
-export default (qpqConfig: QPQConfig) => {
-  return {
-    [ConfigActionType.SetParameter]: getProcessConfigSetParameter(qpqConfig),
-  };
-};
+export const getConfigSetParameterActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
+  [ConfigActionType.SetParameter]: getProcessConfigSetParameter(qpqConfig),
+});

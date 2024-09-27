@@ -16,6 +16,4 @@ export * from './qpqExecuteLog';
 
 export * from './logic';
 
-export * from './serviceConfig';
-
 export * from './utils';

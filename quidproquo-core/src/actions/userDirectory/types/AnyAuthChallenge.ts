@@ -1,3 +1,3 @@
-import { AuthenticateUserNewPasswordRequiredChallenge } from './AuthChallenges';
+import { AuthenticateUserCustomChallengeChallenge, AuthenticateUserNewPasswordRequiredChallenge } from './AuthChallenges';
 
-export type AnyAuthChallenge = AuthenticateUserNewPasswordRequiredChallenge; // | ...;
+export type AnyAuthChallenge = AuthenticateUserNewPasswordRequiredChallenge | AuthenticateUserCustomChallengeChallenge<any>;

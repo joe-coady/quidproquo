@@ -1,1 +1,1 @@
-export * from './QpqCoreUserDirectoryConstruct';
+export * from './QpqInfCoreUserDirectoryConstruct';

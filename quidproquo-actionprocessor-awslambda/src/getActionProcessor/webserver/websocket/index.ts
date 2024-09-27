@@ -1,7 +1,10 @@
-import { QPQConfig } from 'quidproquo-core';
+import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
 
-import getWebsocketSendMessageActionProcessor from './getWebsocketSendMessageActionProcessor';
+import { getWebsocketSendMessageActionProcessor } from './getWebsocketSendMessageActionProcessor';
 
-export default (qpqConfig: QPQConfig) => ({
-  ...getWebsocketSendMessageActionProcessor(qpqConfig),
+export const getWebsocketActionProcessor: ActionProcessorListResolver = async (
+  qpqConfig: QPQConfig,
+  dynamicModuleLoader: DynamicModuleLoader,
+): Promise<ActionProcessorList> => ({
+  ...(await getWebsocketSendMessageActionProcessor(qpqConfig, dynamicModuleLoader)),
 });

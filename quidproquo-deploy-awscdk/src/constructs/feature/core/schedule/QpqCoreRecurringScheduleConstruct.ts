@@ -2,13 +2,11 @@ import { ScheduleQPQConfigSetting, qpqCoreUtils } from 'quidproquo-core';
 import { LambdaRuntimeConfig } from 'quidproquo-actionprocessor-awslambda';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
-import { QpqResource } from '../../../base/QpqResource';
 
 import { Construct } from 'constructs';
 import { aws_events, aws_events_targets, aws_lambda } from 'aws-cdk-lib';
 
 import { Function } from '../../../basic/Function';
-import * as qpqDeployAwsCdkUtils from '../../../../utils';
 
 export interface QpqCoreRecurringScheduleConstructProps extends QpqConstructBlockProps {
   scheduleConfig: ScheduleQPQConfigSetting;
@@ -22,8 +20,8 @@ export class QpqCoreRecurringScheduleConstruct extends QpqConstructBlock {
     const schedulerFunction = new Function(this, props.scheduleConfig.uniqueKey, {
       buildPath: qpqCoreUtils.getScheduleEntryFullPath(props.qpqConfig, props.scheduleConfig),
       functionName: this.resourceName(`${props.scheduleConfig.uniqueKey}-SE`),
-      functionType: 'lambdaEventBridgeEvent',
-      executorName: 'executeEventBridgeEvent',
+      functionType: 'eventBridgeEvent_recurringSchedule',
+      executorName: 'eventBridgeEvent_recurringSchedule',
 
       qpqConfig: props.qpqConfig,
 
@@ -31,7 +29,6 @@ export class QpqCoreRecurringScheduleConstruct extends QpqConstructBlock {
 
       environment: {
         lambdaRuntimeConfig: JSON.stringify({
-          src: props.scheduleConfig.src,
           runtime: props.scheduleConfig.runtime,
         } as LambdaRuntimeConfig),
       },

@@ -1,3 +1,5 @@
+import { QpqFunctionRuntime } from '../../types';
+
 export enum EventActionType {
   GetRecords = '@quidproquo-core/Event/GetRecords',
   TransformEventRecord = '@quidproquo-core/event/TransformEventRecord',
@@ -12,8 +14,7 @@ export enum EventActionType {
 }
 
 export type MatchStoryResult<MatchOptions, Config> = {
-  src?: string;
-  runtime?: string;
+  runtime?: QpqFunctionRuntime;
   runtimeOptions?: MatchOptions;
   config?: Config;
 };

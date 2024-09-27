@@ -1,11 +1,10 @@
 import { StoryResultMetadataWithChildren } from 'quidproquo-core';
 import { useEffect, useState } from 'react';
-import { useAuthAccessToken } from '../../Auth/hooks';
+import { useAuthAccessToken, useBaseUrlResolvers } from 'quidproquo-web-react';
 import { getLogHierarchy } from '../logic';
+import { TreeNodeDatum } from 'react-d3-tree';
 
-const filterQpqActions = (
-  logs: StoryResultMetadataWithChildren[],
-): StoryResultMetadataWithChildren[] => {
+const filterQpqActions = (logs: StoryResultMetadataWithChildren[]): StoryResultMetadataWithChildren[] => {
   const filteredLogs: StoryResultMetadataWithChildren[] = [];
 
   for (const log of logs) {
@@ -26,6 +25,8 @@ const filterQpqActions = (
   return filteredLogs;
 };
 
+export type TreeDataItem = TreeNodeDatum & StoryResultMetadataWithChildren;
+
 export type TreeApi = {
   treeData?: StoryResultMetadataWithChildren[];
   treeDataWithNoQpqActions?: StoryResultMetadataWithChildren[];
@@ -36,12 +37,13 @@ export type TreeApi = {
 export const useLogTreeData = (correlationId: string, hideQpqActions: boolean = false): TreeApi => {
   const [treeData, setTreeData] = useState<StoryResultMetadataWithChildren[]>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const baseUrlResolvers = useBaseUrlResolvers();
 
   const accessToken = useAuthAccessToken();
 
   const refreshTreeData = async () => {
     setIsLoading(true);
-    const logHierarchy = await getLogHierarchy(correlationId, true, accessToken);
+    const logHierarchy = await getLogHierarchy(baseUrlResolvers.getApiUrl(), correlationId, true, accessToken);
 
     if (logHierarchy) {
       setTreeData([logHierarchy]);
@@ -54,7 +56,7 @@ export const useLogTreeData = (correlationId: string, hideQpqActions: boolean = 
     const fetchTreeData = async () => {
       setIsLoading(true);
       console.log('correlationId: ', correlationId);
-      const logHierarchy = await getLogHierarchy(correlationId, false, accessToken);
+      const logHierarchy = await getLogHierarchy(baseUrlResolvers.getApiUrl(), correlationId, false, accessToken);
 
       if (logHierarchy) {
         setTreeData([logHierarchy]);

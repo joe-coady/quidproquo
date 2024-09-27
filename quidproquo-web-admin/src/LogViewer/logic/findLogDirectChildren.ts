@@ -3,14 +3,12 @@ import { QpqPagedData, StoryResultMetadata } from 'quidproquo-core';
 
 export const fineLogDirectChildren = cache(async function findLogDirectChildren(
   logCorrelation: string,
+  apiBaseUrl: string,
   accessToken?: string,
 ): Promise<StoryResultMetadata[]> {
   try {
     // TODO: Paging
-    const fetchedChildLogs = await apiRequestGet<QpqPagedData<StoryResultMetadata>>(
-      `/log/children/${logCorrelation}`,
-      accessToken,
-    );
+    const fetchedChildLogs = await apiRequestGet<QpqPagedData<StoryResultMetadata>>(`/log/children/${logCorrelation}`, apiBaseUrl, accessToken);
 
     return fetchedChildLogs.items;
   } catch (error) {

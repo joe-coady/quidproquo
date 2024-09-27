@@ -15,3 +15,5 @@ node_modules/
 
 # Don't commit test files
 tests/**/*
+
+@mf-types

@@ -1,6 +1,16 @@
-import { ActionProcessorResult } from '../types/Action';
+import { ActionProcessorResult, EitherActionResult } from '../types/Action';
 import { ErrorTypeEnum } from '../types/ErrorTypeEnum';
 import { QPQError } from '../types/ErrorTypeEnum';
+
+export const getSuccessfulEitherActionResult = <T>(result: T): EitherActionResult<T> => ({
+  success: true,
+  result,
+});
+
+export const getUnsuccessfulEitherActionResult = (error: QPQError): EitherActionResult<any> => ({
+  success: false,
+  error: error,
+});
 
 export const actionResultError = (errorType: ErrorTypeEnum | string, errorText: string, errorStack?: string): ActionProcessorResult<any> => {
   return [undefined, { errorType, errorText, errorStack }];
@@ -37,6 +47,8 @@ export const actionResultErrorFromCaughtError = (error: unknown, errorMap: Error
   if (error instanceof Error) {
     const errorName = (error as any).name;
 
+    console.log('actionResultErrorFromCaughtError:', error, error.stack);
+
     if (errorMap[errorName]) {
       return errorMap[errorName](error);
     }
@@ -44,6 +56,8 @@ export const actionResultErrorFromCaughtError = (error: unknown, errorMap: Error
     console.log(`Error: ${errorName}`);
     return actionResultError(ErrorTypeEnum.GenericError, 'An unexpected error occurred.');
   }
+
+  console.log('Caught non-error:', error);
 
   return actionResultError(ErrorTypeEnum.GenericError, 'An unknown error occurred.');
 };

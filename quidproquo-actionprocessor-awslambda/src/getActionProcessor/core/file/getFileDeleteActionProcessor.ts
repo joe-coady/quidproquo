@@ -1,4 +1,4 @@
-import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { ActionProcessorList, ActionProcessorListResolver, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
 import { FileDeleteActionProcessor, actionResult, FileActionType } from 'quidproquo-core';
 import { deleteFiles } from '../../../logic/s3/s3Utils';
@@ -7,11 +7,7 @@ import { resolveStorageDriveBucketName } from './utils';
 const getProcessFileDelete = (qpqConfig: QPQConfig): FileDeleteActionProcessor => {
   return async ({ drive, filepaths }) => {
     const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
-    const errored = await deleteFiles(
-      s3BucketName,
-      filepaths,
-      qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig),
-    );
+    const errored = await deleteFiles(s3BucketName, filepaths, qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig));
 
     // errored deletes are a graceful success ~ Retry
     // if (errored.length > 0) {
@@ -25,6 +21,6 @@ const getProcessFileDelete = (qpqConfig: QPQConfig): FileDeleteActionProcessor =
   };
 };
 
-export default (qpqConfig: QPQConfig) => ({
+export const getFileDeleteActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
   [FileActionType.Delete]: getProcessFileDelete(qpqConfig),
 });

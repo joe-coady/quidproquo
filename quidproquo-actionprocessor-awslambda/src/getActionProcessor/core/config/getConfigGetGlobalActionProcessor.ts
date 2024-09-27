@@ -4,17 +4,17 @@ import {
   actionResult,
   QPQConfig,
   qpqCoreUtils,
+  ActionProcessorListResolver,
+  ActionProcessorList,
 } from 'quidproquo-core';
 
-const getProcessConfigActionType = (qpqConfig: QPQConfig): ConfigGetGlobalActionProcessor<any> => {
+const getProcessConfigGetGlobal = (qpqConfig: QPQConfig): ConfigGetGlobalActionProcessor<any> => {
   return async ({ globalName }) => {
     const globalValue = qpqCoreUtils.getGlobalConfigValue(qpqConfig, globalName);
     return actionResult(globalValue);
   };
 };
 
-export default (qpqConfig: QPQConfig) => {
-  return {
-    [ConfigActionType.GetGlobal]: getProcessConfigActionType(qpqConfig),
-  };
-};
+export const getConfigGetGlobalActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
+  [ConfigActionType.GetGlobal]: getProcessConfigGetGlobal(qpqConfig),
+});
