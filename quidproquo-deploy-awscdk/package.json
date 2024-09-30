@@ -30,6 +30,7 @@
   },
   "homepage": "https://github.com/joe-coady/quidproquo#readme",
   "dependencies": {
+    "@aws-cdk/aws-neptune-alpha": "^2.160.0-alpha.0",
     "aws-cdk": "^2.150.0",
     "aws-cdk-lib": "^2.150.0",
     "constructs": "^10.1.208",

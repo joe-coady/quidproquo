@@ -11,7 +11,7 @@ export interface GraphDatabaseQPQConfigSetting extends QPQConfigSetting {
 }
 
 export const defineGraphDatabase = (name: string, options?: QPQConfigAdvancedGraphDatabaseSettings): GraphDatabaseQPQConfigSetting => ({
-  configSettingType: QPQCoreConfigSettingType.buildPath,
+  configSettingType: QPQCoreConfigSettingType.graphDatabase,
   uniqueKey: name,
 
   name,

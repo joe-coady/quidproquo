@@ -16,6 +16,7 @@ import {
   QpqWebserverWebsocketConstruct,
   QpqWebserverCertificateConstruct,
   InfQpqWebserverServiceDomainsConstruct,
+  QpqCoreApiGraphDatabaseConstruct,
 } from '../constructs';
 import { QpqWebServerCacheConstruct } from '../constructs/feature/webserver/cache/QpqWebServerCacheConstruct';
 import { WebserverRoll } from '../constructs/basic/WebserverRoll';
@@ -136,6 +137,19 @@ export class InfQpqServiceStack extends QpqServiceStack {
         }),
     );
     QpqCoreKeyValueStoreConstruct.authorizeActionsForRole(webserverRole, keyValueStores);
+    // end key value store
+
+    // Graph Databases
+    const graphDatabases = qpqCoreUtils.getOwnedGraphDatabases(props.qpqConfig).map(
+      (setting) =>
+        new QpqCoreApiGraphDatabaseConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
+          awsAccountId: props.awsAccountId,
+          qpqConfig: props.qpqConfig,
+
+          graphDatabaseConfig: setting,
+        }),
+    );
+    QpqCoreApiGraphDatabaseConstruct.authorizeActionsForRole(webserverRole, graphDatabases);
     // end key value store
 
     // Build websocket apis

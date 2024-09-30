@@ -17,6 +17,7 @@ export class WebserverRoll extends QpqConstructBlock {
         new aws_iam.ServicePrincipal('lambda.amazonaws.com'),
         new aws_iam.ServicePrincipal('transfer.amazonaws.com'),
         new aws_iam.ServicePrincipal('edgelambda.amazonaws.com'),
+        new aws_iam.ServicePrincipal('neptune.amazonaws.com'),
       ),
     });
 
@@ -71,14 +72,7 @@ export class WebserverRoll extends QpqConstructBlock {
 
       {
         sid: 'DynamoDBTableOperations',
-        actions: [
-          'dynamodb:GetItem',
-          'dynamodb:Scan',
-          'dynamodb:Query',
-          'dynamodb:PutItem',
-          'dynamodb:UpdateItem',
-          'dynamodb:DeleteItem',
-        ],
+        actions: ['dynamodb:GetItem', 'dynamodb:Scan', 'dynamodb:Query', 'dynamodb:PutItem', 'dynamodb:UpdateItem', 'dynamodb:DeleteItem'],
         resources: ['arn:aws:dynamodb:*:*:table/*'],
       },
 
