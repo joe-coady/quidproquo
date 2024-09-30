@@ -8,13 +8,19 @@ export interface QPQConfigAdvancedGraphDatabaseSettings extends QPQConfigAdvance
 
 export interface GraphDatabaseQPQConfigSetting extends QPQConfigSetting {
   name: string;
+  virualNetworkName: string;
 }
 
-export const defineGraphDatabase = (name: string, options?: QPQConfigAdvancedGraphDatabaseSettings): GraphDatabaseQPQConfigSetting => ({
+export const defineGraphDatabase = (
+  name: string,
+  virualNetworkName: string,
+  options?: QPQConfigAdvancedGraphDatabaseSettings,
+): GraphDatabaseQPQConfigSetting => ({
   configSettingType: QPQCoreConfigSettingType.graphDatabase,
   uniqueKey: name,
 
   name,
+  virualNetworkName,
 
   owner: convertCrossModuleOwnerToGenericResourceNameOverride(options?.owner),
 });

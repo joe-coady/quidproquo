@@ -5,6 +5,8 @@ import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import { Construct } from 'constructs';
 import { aws_dynamodb, aws_iam, aws_ec2, aws_logs } from 'aws-cdk-lib';
 import * as aws_neptune from '@aws-cdk/aws-neptune-alpha';
+import * as cdk from 'aws-cdk-lib';
+import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 
 export interface QpqCoreApiGraphDatabaseConstructProps extends QpqConstructBlockProps {
   graphDatabaseConfig: GraphDatabaseQPQConfigSetting;
@@ -26,10 +28,8 @@ export class QpqCoreApiGraphDatabaseConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: QpqCoreApiGraphDatabaseConstructProps) {
     super(scope, id, props);
 
-    console.log('Graph Database');
-
-    const vpc = new aws_ec2.Vpc(this, 'NeptuneVpc', {
-      maxAzs: 2,
+    const vpc = aws_ec2.Vpc.fromLookup(this, 'vpc-lookup', {
+      vpcName: awsNamingUtils.getConfigRuntimeBootstrapResourceNameFromConfig(props.graphDatabaseConfig.virualNetworkName, props.qpqConfig),
     });
 
     const clusterParameterGroup = new aws_neptune.ClusterParameterGroup(this, 'ClusterParams', {
@@ -56,6 +56,8 @@ export class QpqCoreApiGraphDatabaseConstruct extends QpqConstructBlock {
       cloudwatchLogsExports: [aws_neptune.LogType.AUDIT],
       // Optionally set a retention period on exported CloudWatch Logs
       cloudwatchLogsRetention: aws_logs.RetentionDays.ONE_WEEK,
+
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
     this.cluster.connections.allowDefaultPortFromAnyIpv4('Open to the world');

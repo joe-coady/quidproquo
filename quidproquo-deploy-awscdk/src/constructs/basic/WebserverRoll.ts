@@ -17,7 +17,7 @@ export class WebserverRoll extends QpqConstructBlock {
         new aws_iam.ServicePrincipal('lambda.amazonaws.com'),
         new aws_iam.ServicePrincipal('transfer.amazonaws.com'),
         new aws_iam.ServicePrincipal('edgelambda.amazonaws.com'),
-        new aws_iam.ServicePrincipal('neptune.amazonaws.com'),
+        // new aws_iam.ServicePrincipal('neptune.amazonaws.com'),
       ),
     });
 

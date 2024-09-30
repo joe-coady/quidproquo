@@ -24,6 +24,7 @@ import {
   ClaudeAIQPQConfigSetting,
   ApplicationBasePathQPQConfigSetting,
   GraphDatabaseQPQConfigSetting,
+  VirtualNetworkQPQConfigSetting,
 } from './config';
 
 import {
@@ -244,6 +245,10 @@ export const getDeployEventConfigs = (qpqConfig: QPQConfig): DeployEventsQPQConf
   const deployEvents = getConfigSettings<DeployEventsQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.deployEvent);
 
   return deployEvents;
+};
+
+export const getVirualNetworkConfigs = (qpqConfig: QPQConfig): VirtualNetworkQPQConfigSetting[] => {
+  return getConfigSettings<VirtualNetworkQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.virtualNetwork);
 };
 
 export const getOwnedKeyValueStores = <T extends object = any>(qpqConfig: QPQConfig): KeyValueStoreQPQConfigSetting<T>[] => {

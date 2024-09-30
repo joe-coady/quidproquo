@@ -8,3 +8,4 @@ export * from './secret';
 export * from './storageDrive';
 export * from './deployEvents';
 export * from './graphDatabase';
+export * from './virtualNetwork';
