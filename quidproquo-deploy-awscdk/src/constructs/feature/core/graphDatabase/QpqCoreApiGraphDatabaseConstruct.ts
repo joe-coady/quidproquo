@@ -32,14 +32,16 @@ export class QpqCoreApiGraphDatabaseConstruct extends QpqConstructBlock {
       vpcName: awsNamingUtils.getConfigRuntimeBootstrapResourceNameFromConfig(props.graphDatabaseConfig.virualNetworkName, props.qpqConfig),
     });
 
-    const clusterParameterGroup = new aws_neptune.ClusterParameterGroup(this, 'ClusterParams', {
-      description: 'Cluster parameter group',
-      parameters: {
-        neptune_enable_audit_log: '1',
-      },
-    });
+    // const clusterParameterGroup = new aws_neptune.ClusterParameterGroup(this, 'ClusterParams', {
+    //   description: 'Cluster parameter group',
+    //   parameters: {
+    //     neptune_enable_audit_log: '1',
+    //   },
+    // });
 
-    this.cluster = new aws_neptune.DatabaseCluster(this, 'Database', {
+    this.cluster = new aws_neptune.DatabaseCluster(this, 'cluster', {
+      dbClusterName: this.resourceName(props.graphDatabaseConfig.name),
+
       vpc,
       instanceType: aws_neptune.InstanceType.SERVERLESS,
 
@@ -58,6 +60,8 @@ export class QpqCoreApiGraphDatabaseConstruct extends QpqConstructBlock {
       cloudwatchLogsRetention: aws_logs.RetentionDays.ONE_WEEK,
 
       removalPolicy: cdk.RemovalPolicy.DESTROY,
+
+      // clusterParameterGroup,
     });
 
     this.cluster.connections.allowDefaultPortFromAnyIpv4('Open to the world');
