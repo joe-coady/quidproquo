@@ -89,6 +89,18 @@ export class WebserverRoll extends QpqConstructBlock {
         ],
         resources: ['*'],
       },
+
+      {
+        sid: 'EC2NetworkInterfacePermissions',
+        actions: [
+          'ec2:CreateNetworkInterface',
+          'ec2:DescribeNetworkInterfaces',
+          'ec2:DeleteNetworkInterface',
+          'ec2:AssignPrivateIpAddresses',
+          'ec2:UnassignPrivateIpAddresses',
+        ],
+        resources: ['*'],
+      },
     ];
 
     policies.forEach((policy) => {
