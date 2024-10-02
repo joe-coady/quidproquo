@@ -7,6 +7,7 @@ export * as qpqCoreUtils from './qpqCoreUtils';
 export * from './stories';
 
 export * from './qpqRuntime';
+export * from './createImplementationRuntime';
 
 export * from './types';
 
