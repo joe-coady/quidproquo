@@ -1,5 +1,5 @@
 import {
-  GraphDatabaseGetEndpointsActionProcessor,
+  GraphDatabaseExecuteOpenCypherQueryActionProcessor,
   actionResult,
   QPQConfig,
   qpqCoreUtils,
@@ -13,8 +13,8 @@ import { getConfigRuntimeResourceNameFromConfig } from '../../../awsNamingUtils'
 
 import { getNeptuneEndpoints } from '../../../logic/neptune';
 
-const getProcessGetEndpoints = (qpqConfig: QPQConfig): GraphDatabaseGetEndpointsActionProcessor => {
-  return async ({ graphDatabaseName }) => {
+const getProcessExecuteOpenCypherQuery = (qpqConfig: QPQConfig): GraphDatabaseExecuteOpenCypherQueryActionProcessor => {
+  return async ({ graphDatabaseName }, session, actionProcessorList, logger, updateSession, dynamicModuleLoader) => {
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const databaseName = getConfigRuntimeResourceNameFromConfig(graphDatabaseName, qpqConfig);
@@ -29,8 +29,8 @@ const getProcessGetEndpoints = (qpqConfig: QPQConfig): GraphDatabaseGetEndpoints
   };
 };
 
-export const getGraphDatabaseGetEndpointsActionProcessor: ActionProcessorListResolver = async (
+export const getGraphDatabaseExecuteOpenCypherQueryActionProcessor: ActionProcessorListResolver = async (
   qpqConfig: QPQConfig,
 ): Promise<ActionProcessorList> => ({
-  [GraphDatabaseActionType.GetEndpoints]: getProcessGetEndpoints(qpqConfig),
+  [GraphDatabaseActionType.ExecuteOpenCypherQuery]: getProcessExecuteOpenCypherQuery(qpqConfig),
 });

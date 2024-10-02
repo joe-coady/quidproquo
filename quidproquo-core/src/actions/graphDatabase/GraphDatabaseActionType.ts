@@ -1,3 +1,3 @@
 export enum GraphDatabaseActionType {
-  GetEndpoints = '@quidproquo-core/GraphDatabase/GetEndpoints',
+  ExecuteOpenCypherQuery = '@quidproquo-core/GraphDatabase/ExecuteOpenCypherQuery',
 }

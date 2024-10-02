@@ -1,4 +1,4 @@
 export * from './GraphDatabaseActionType';
 
-export * from './GraphDatabaseGetEndpointsActionRequester';
-export * from './GraphDatabaseGetEndpointsActionTypes';
+export * from './GraphDatabaseExecuteOpenCypherQueryActionRequester';
+export * from './GraphDatabaseExecuteOpenCypherQueryActionTypes';
