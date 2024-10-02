@@ -1,6 +1,6 @@
 import { GraphDatabaseQPQConfigSetting, QPQConfig } from 'quidproquo-core';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
-import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
+import { qpqConfigAwsUtils, resolveAwsServiceAccountInfo } from 'quidproquo-config-aws';
 
 import { Construct } from 'constructs';
 import { aws_dynamodb, aws_iam, aws_ec2, aws_logs } from 'aws-cdk-lib';
@@ -67,15 +67,21 @@ export class QpqCoreApiGraphDatabaseConstruct extends QpqConstructBlock {
     this.cluster.connections.allowDefaultPortFromAnyIpv4('Open to the world');
   }
 
-  public static authorizeActionsForRole(role: aws_iam.IRole, graphDatabaseList: QpqCoreApiGraphDatabaseConstruct[]) {
-    if (graphDatabaseList.length > 0) {
-      // role.addToPrincipalPolicy(
-      //   new aws_iam.PolicyStatement({
-      //     effect: aws_iam.Effect.ALLOW,
-      //     actions: ['dynamodb:GetItem', 'dynamodb:PutItem', 'dynamodb:Query', 'dynamodb:Scan', 'dynamodb:UpdateItem', 'dynamodb:DeleteItem'],
-      //     resources: graphDatabaseList.map((kvs) => kvs.table.tableArn),
-      //   }),
-      // );
+  public static authorizeActionsForRole(role: aws_iam.IRole, graphDatabaseConfigs: GraphDatabaseQPQConfigSetting[], qpqConfig: QPQConfig) {
+    if (graphDatabaseConfigs.length > 0) {
+      role.addToPrincipalPolicy(
+        new aws_iam.PolicyStatement({
+          effect: aws_iam.Effect.ALLOW,
+          actions: ['rds:DescribeDBClusters'],
+          resources: graphDatabaseConfigs.map((gdbc) => {
+            const { awsRegion, awsAccountId } = resolveAwsServiceAccountInfo(qpqConfig, gdbc.owner);
+
+            const clusterName = awsNamingUtils.getConfigRuntimeResourceNameFromConfig(gdbc.name, qpqConfig);
+
+            return `arn:aws:rds:${awsRegion}:${awsAccountId}:cluster:${clusterName}`;
+          }),
+        }),
+      );
     }
   }
 }

@@ -140,6 +140,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
     // end key value store
 
     // Graph Databases
+    const allGraphDatabaseConfigs = qpqCoreUtils.getAllGraphDatabaseConfigs(props.qpqConfig);
     const graphDatabases = qpqCoreUtils.getOwnedGraphDatabases(props.qpqConfig).map(
       (setting) =>
         new QpqCoreApiGraphDatabaseConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
@@ -149,7 +150,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
           graphDatabaseConfig: setting,
         }),
     );
-    QpqCoreApiGraphDatabaseConstruct.authorizeActionsForRole(webserverRole, graphDatabases);
+    QpqCoreApiGraphDatabaseConstruct.authorizeActionsForRole(webserverRole, allGraphDatabaseConfigs, props.qpqConfig);
     // end key value store
 
     // Build websocket apis
