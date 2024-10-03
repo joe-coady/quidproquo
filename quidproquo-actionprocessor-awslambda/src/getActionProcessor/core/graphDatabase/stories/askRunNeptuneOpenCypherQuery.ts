@@ -5,6 +5,7 @@ import {
   GraphDatabaseExecuteOpenCypherQueryActionPayload,
   askNetworkRequest,
   askThrowError,
+  GraphDatabaseInstanceType,
 } from 'quidproquo-core';
 import { askGraphDatabaseForNeptuneGetEndpoints } from '../customActions';
 import { NeptuneCypherRequest, NeptuneCypherResponse } from './types';
@@ -14,16 +15,16 @@ export function* askRunNeptuneOpenCypherQuery({
   graphDatabaseName,
   openCypherQuery,
   params,
+  instance,
 }: GraphDatabaseExecuteOpenCypherQueryActionPayload): AskResponse<GraphCypherResponse> {
   const graphEndpoints = yield* askGraphDatabaseForNeptuneGetEndpoints(graphDatabaseName);
+  const graphEndpoint = instance === GraphDatabaseInstanceType.Read ? graphEndpoints.readEndpoint : graphEndpoints.writeEndpoint;
 
-  if (!graphEndpoints.writeEndpoint) {
-    return yield* askThrowError(ErrorTypeEnum.GenericError, 'No write endpoint found');
+  if (!graphEndpoint) {
+    return yield* askThrowError(ErrorTypeEnum.GenericError, `No [${instance}] endpoint found`);
   }
 
-  const endpoint = `${graphEndpoints.writeEndpoint}/openCypher`;
-
-  const response = yield* askNetworkRequest<NeptuneCypherRequest, NeptuneCypherResponse>('POST', endpoint, {
+  const response = yield* askNetworkRequest<NeptuneCypherRequest, NeptuneCypherResponse>('POST', `${graphEndpoint}/openCypher`, {
     body: { query: openCypherQuery, parameters: params },
     headers: {
       'Content-Type': 'application/json',

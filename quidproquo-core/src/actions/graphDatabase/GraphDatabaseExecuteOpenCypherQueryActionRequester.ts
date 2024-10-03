@@ -3,12 +3,14 @@ import { GraphDatabaseActionType } from './GraphDatabaseActionType';
 import {
   GraphDatabaseExecuteOpenCypherQueryActionPayload,
   GraphDatabaseExecuteOpenCypherQueryActionRequester,
+  GraphDatabaseInstanceType,
 } from './GraphDatabaseExecuteOpenCypherQueryActionTypes';
 
 export const GraphDatabaseExecuteOpenCypherQueryErrorTypeEnum = createErrorEnumForAction(GraphDatabaseActionType.ExecuteOpenCypherQuery, []);
 
 export function* askGraphDatabaseExecuteOpenCypherQuery(
   graphDatabaseName: string,
+  instance: GraphDatabaseInstanceType,
   openCypherQuery: GraphDatabaseExecuteOpenCypherQueryActionPayload['openCypherQuery'],
   params: GraphDatabaseExecuteOpenCypherQueryActionPayload['params'],
 ): GraphDatabaseExecuteOpenCypherQueryActionRequester {
@@ -19,6 +21,8 @@ export function* askGraphDatabaseExecuteOpenCypherQuery(
 
       openCypherQuery,
       params,
+
+      instance,
     },
   };
 }
