@@ -1,7 +1,17 @@
 import { QPQConfig } from './config';
 import { getApplicationModuleName } from './qpqCoreUtils';
-import { ActionProcessorList, DynamicModuleLoader, QpqLogger, QpqRuntimeType, StorySession } from './types';
+import {
+  ActionProcessor,
+  ActionProcessorList,
+  ActionProcessorListResolver,
+  AnyStory,
+  DynamicModuleLoader,
+  QpqLogger,
+  QpqRuntimeType,
+  StorySession,
+} from './types';
 import { createRuntime } from './qpqRuntime';
+import { actionResult, actionResultError } from './logic/actionLogic';
 
 // export const getDateNow = () => new Date().toISOString();
 // export const randomGuid = () => new Date().toISOString();
@@ -22,7 +32,7 @@ import { createRuntime } from './qpqRuntime';
 
 export const createImplementationRuntime = (
   qpqConfig: QPQConfig,
-  tag: string,
+  tags: string[],
 
   getDateNow: Parameters<typeof createRuntime>[3],
   randomGuid: () => string,
@@ -49,8 +59,43 @@ export const createImplementationRuntime = (
     `${moduleName}::${randomGuid()}`,
     QpqRuntimeType.EXECUTE_IMPLEMENTATION_STORY,
     dynamicModuleLoader,
-    [tag],
+    tags,
   );
 
   return resolveStory;
+};
+
+export const getProcessCustomImplementation = <T extends ActionProcessor<any, any>>(
+  qpqConfig: QPQConfig,
+  story: AnyStory,
+  tag: string,
+  actionProcessorListResolver: ActionProcessorListResolver,
+  getDateNow: () => string,
+  getNewGuid: () => string,
+): T => {
+  const actionProcesor: ActionProcessor<any, any> = async (payload, session, actionProcessorList, logger, updateSession, dynamicModuleLoader) => {
+    const resolveStory = createImplementationRuntime(
+      qpqConfig,
+      [tag],
+      getDateNow,
+      getNewGuid,
+      session,
+      {
+        ...actionProcessorList,
+        ...(await actionProcessorListResolver(qpqConfig, dynamicModuleLoader)),
+      },
+      logger,
+      dynamicModuleLoader,
+    );
+
+    const storyResult = await resolveStory(story, [payload]);
+
+    if (storyResult.error) {
+      return actionResultError(storyResult.error.errorType, storyResult.error.errorText);
+    }
+
+    return actionResult(storyResult.result);
+  };
+
+  return actionProcesor as T;
 };

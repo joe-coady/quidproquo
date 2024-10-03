@@ -1,5 +1,6 @@
 import { GraphDatabaseActionType } from './GraphDatabaseActionType';
 import { Action, ActionProcessor, ActionRequester } from '../../types';
+import { GraphCypherResponse } from '../../config';
 
 // Payload
 export interface GraphDatabaseExecuteOpenCypherQueryActionPayload {
@@ -15,5 +16,5 @@ export interface GraphDatabaseExecuteOpenCypherQueryAction extends Action<GraphD
 }
 
 // Function Types
-export type GraphDatabaseExecuteOpenCypherQueryActionProcessor = ActionProcessor<GraphDatabaseExecuteOpenCypherQueryAction, void>;
-export type GraphDatabaseExecuteOpenCypherQueryActionRequester = ActionRequester<GraphDatabaseExecuteOpenCypherQueryAction, void>;
+export type GraphDatabaseExecuteOpenCypherQueryActionProcessor = ActionProcessor<GraphDatabaseExecuteOpenCypherQueryAction, GraphCypherResponse>;
+export type GraphDatabaseExecuteOpenCypherQueryActionRequester = ActionRequester<GraphDatabaseExecuteOpenCypherQueryAction, GraphCypherResponse>;

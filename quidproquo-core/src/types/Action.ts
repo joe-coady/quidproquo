@@ -55,3 +55,5 @@ export type ActionProcessorList = {
 };
 
 export type ActionProcessorListResolver = (qpqConfig: QPQConfig, dynamicModuleLoader: DynamicModuleLoader) => Promise<ActionProcessorList>;
+
+export type AnyStory<TArgs extends Array<any> = Array<any>> = (...args: TArgs) => ActionRequester<Action<any>, any, any>;
