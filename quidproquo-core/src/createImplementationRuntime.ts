@@ -69,7 +69,7 @@ export const getProcessCustomImplementation = <T extends ActionProcessor<any, an
   qpqConfig: QPQConfig,
   story: AnyStory,
   tag: string,
-  actionProcessorListResolver: ActionProcessorListResolver,
+  actionProcessorListResolver: ActionProcessorListResolver | null,
   getDateNow: () => string,
   getNewGuid: () => string,
 ): T => {
@@ -82,7 +82,7 @@ export const getProcessCustomImplementation = <T extends ActionProcessor<any, an
       session,
       {
         ...actionProcessorList,
-        ...(await actionProcessorListResolver(qpqConfig, dynamicModuleLoader)),
+        ...(actionProcessorListResolver ? await actionProcessorListResolver(qpqConfig, dynamicModuleLoader) : {}),
       },
       logger,
       dynamicModuleLoader,

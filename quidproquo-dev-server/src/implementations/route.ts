@@ -10,9 +10,11 @@ import {
   qpqWebServerUtils,
 } from 'quidproquo';
 import { getAwsActionProcessors, getLogger } from 'quidproquo-actionprocessor-awslambda';
+import { getCustomActionActionProcessor } from 'quidproquo-actionprocessor-node';
 
 import { ExpressEvent, ExpressEventResponse } from '../types';
 import { getExpressApiEventEventProcessor } from '../getActionProcessor';
+import { getGraphDatabaseActionProcessor } from '../actionProcessor';
 
 // TODO: Make this a util or something based on server time or something..
 const getDateNow = () => new Date().toISOString();
@@ -49,6 +51,10 @@ export const route = async (
     async () => ({
       ...(await getAwsActionProcessors(qpqConfig, dynamicModuleLoader)),
       ...(await getExpressApiEventEventProcessor(qpqConfig, dynamicModuleLoader)),
+      ...(await getGraphDatabaseActionProcessor(qpqConfig, dynamicModuleLoader)),
+
+      // Always done last, so they can ovveride the default ones if the user wants.
+      ...(await getCustomActionActionProcessor(qpqConfig, dynamicModuleLoader)),
     }),
     getDateNow,
     getLogger(qpqConfig),

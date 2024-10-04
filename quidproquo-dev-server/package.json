@@ -31,7 +31,9 @@
   "dependencies": {
     "multer": "^1.4.5-lts.1",
     "quidproquo-core": "0.0.229",
-    "quidproquo-webserver": "0.0.229"
+    "quidproquo-webserver": "0.0.229",
+    "quidproquo-actionprocessor-awslambda": "0.0.229",
+    "quidproquo-actionprocessor-node": "0.0.229"
   },
   "devDependencies": {
     "@types/multer": "^1.4.12",
