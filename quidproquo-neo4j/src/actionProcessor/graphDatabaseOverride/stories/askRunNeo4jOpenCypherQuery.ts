@@ -8,7 +8,7 @@ import {
   ErrorTypeEnum,
   GraphCypherResponse,
   GraphDatabaseExecuteOpenCypherQueryActionPayload,
-} from 'quidproquo';
+} from 'quidproquo-core';
 
 import { askConvertNeo4jCypherResponseToCypherResponse } from './converters';
 import { Neo4jCypherRequest, Neo4jCypherResponse } from './types';
@@ -23,19 +23,12 @@ export function* askRunNeo4jOpenCypherQuery({
   const neo4jQuery = convertQpqQueryToNeo4j(openCypherQuery);
 
   // Get the neo4j instance name
-  const instanceName = yield* askConfigGetParameter(
-    `neo4j-${graphDatabaseName}-instance`
-  );
+  const instanceName = yield* askConfigGetParameter(`neo4j-${graphDatabaseName}-instance`);
 
   // Get password
-  const password = yield* askConfigGetSecret(
-    `neo4j-${graphDatabaseName}-password`
-  );
+  const password = yield* askConfigGetSecret(`neo4j-${graphDatabaseName}-password`);
 
-  const response = yield* askNetworkRequest<
-    Neo4jCypherRequest,
-    Neo4jCypherResponse
-  >(
+  const response = yield* askNetworkRequest<Neo4jCypherRequest, Neo4jCypherResponse>(
     'POST',
     `HTTPS://${instanceName}.databases.neo4j.io:443/db/neo4j/query/v2`,
     {
@@ -48,14 +41,11 @@ export function* askRunNeo4jOpenCypherQuery({
         Accept: 'application/json',
         Authorization: `Basic ${Buffer.from(`neo4j:${password}`).toString('base64')}`,
       },
-    }
+    },
   );
 
   if (response.status < 200 || response.status >= 300) {
-    return yield* askThrowError(
-      ErrorTypeEnum.GenericError,
-      'Unable to query database'
-    );
+    return yield* askThrowError(ErrorTypeEnum.GenericError, 'Unable to query database');
   }
 
   return yield* askConvertNeo4jCypherResponseToCypherResponse(response.data);

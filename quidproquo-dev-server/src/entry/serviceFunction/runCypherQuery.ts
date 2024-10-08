@@ -1,10 +1,10 @@
 import {
   AskResponse,
-  ExecuteServiceFunctionEvent,
   GraphCypherResponse,
   GraphDatabaseExecuteOpenCypherQueryActionPayload,
   askGraphDatabaseExecuteOpenCypherQuery,
-} from 'quidproquo';
+} from 'quidproquo-core';
+import { ExecuteServiceFunctionEvent } from 'quidproquo-webserver';
 
 export function* runCypherQuery(
   event: ExecuteServiceFunctionEvent<GraphDatabaseExecuteOpenCypherQueryActionPayload>,

@@ -1,10 +1,8 @@
-import { AskResponse, GraphEntityType, GraphNodeResult } from 'quidproquo';
+import { AskResponse, GraphEntityType, GraphNodeResult } from 'quidproquo-core';
 
 import { Neo4jNodeResult } from '../types';
 
-export function* askConvertNeo4jNodeResultToGraphNodeResult(
-  neptuneNodeResult: Neo4jNodeResult
-): AskResponse<GraphNodeResult> {
+export function* askConvertNeo4jNodeResultToGraphNodeResult(neptuneNodeResult: Neo4jNodeResult): AskResponse<GraphNodeResult> {
   return {
     $entityType: GraphEntityType.Node,
     $id: neptuneNodeResult.elementId,

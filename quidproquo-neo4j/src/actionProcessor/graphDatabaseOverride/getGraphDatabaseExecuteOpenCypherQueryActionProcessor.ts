@@ -6,19 +6,19 @@ import {
   GraphDatabaseActionType,
   GraphDatabaseExecuteOpenCypherQueryActionProcessor,
   QPQConfig,
-} from 'quidproquo';
+} from 'quidproquo-core';
 
 import { askRunNeo4jOpenCypherQuery } from './stories';
 
-export const getGraphDatabaseExecuteOpenCypherQueryActionProcessor: ActionProcessorListResolver =
-  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-    [GraphDatabaseActionType.ExecuteOpenCypherQuery]:
-      getProcessCustomImplementation<GraphDatabaseExecuteOpenCypherQueryActionProcessor>(
-        qpqConfig,
-        askRunNeo4jOpenCypherQuery,
-        'Neo4j Cypher Query',
-        null,
-        () => new Date().toISOString(),
-        randomUUID
-      ),
-  });
+export const getGraphDatabaseExecuteOpenCypherQueryActionProcessor: ActionProcessorListResolver = async (
+  qpqConfig: QPQConfig,
+): Promise<ActionProcessorList> => ({
+  [GraphDatabaseActionType.ExecuteOpenCypherQuery]: getProcessCustomImplementation<GraphDatabaseExecuteOpenCypherQueryActionProcessor>(
+    qpqConfig,
+    askRunNeo4jOpenCypherQuery,
+    'Neo4j Cypher Query',
+    null,
+    () => new Date().toISOString(),
+    randomUUID,
+  ),
+});
