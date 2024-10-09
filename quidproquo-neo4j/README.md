@@ -29,13 +29,7 @@ export default [
 14. You should then be able to run queries using QPQ.
 
 ```
-const response = yield* askGraphDatabaseExecuteOpenCypherQuery(
-    'graph',
-    GraphDatabaseInstanceType.Read,
-    'MATCH (a) RETURN a LIMIT 10'
-);
-
-const response = yield* askGraphDatabaseExecuteOpenCypherQuery(
+const responseA = yield* askGraphDatabaseExecuteOpenCypherQuery(
     'graph',
     GraphDatabaseInstanceType.Write,
     `
@@ -49,9 +43,17 @@ const response = yield* askGraphDatabaseExecuteOpenCypherQuery(
         backpackProps: { brand: 'Fun', color: 'Red' },
     }
 );
+
+const responseB = yield* askGraphDatabaseExecuteOpenCypherQuery(
+    'graph',
+    GraphDatabaseInstanceType.Read,
+    'MATCH (a) RETURN a LIMIT 10'
+);
 ```
 
-15. note, to set a version, you can pass it via the config
+# Notes
+
+To set a version, you can pass it via the config
 
 ```
 import { defineGraphDatabaseNeo4j, Neo4jVersion } from  'quidproquo-neo4j';
