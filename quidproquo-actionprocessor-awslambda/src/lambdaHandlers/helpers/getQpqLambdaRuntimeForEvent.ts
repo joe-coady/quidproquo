@@ -18,6 +18,7 @@ import {
 import { getRuntimeCorrelation } from './getRuntimeCorrelation';
 
 import { getAwsActionProcessors } from '../../getActionProcessor';
+import { getCustomActionActionProcessor } from 'quidproquo-actionprocessor-node';
 
 const isSnsEvent = <T>(event: QpqFunctionExecutionEvent<T>): event is SNSEvent => {
   if (event && typeof event === 'object') {
@@ -46,6 +47,9 @@ export const getQpqLambdaRuntimeForEvent = <E extends QpqFunctionExecutionEvent<
       async () => ({
         ...(await getAwsActionProcessors(qpqConfig, dynamicModuleLoader)),
         ...(await getActionProcessorList(qpqConfig, dynamicModuleLoader)),
+
+        // Always done last, so they can ovveride the default ones if the user wants.
+        ...(await getCustomActionActionProcessor(qpqConfig, dynamicModuleLoader)),
       }),
       () => new Date().toISOString(),
       logger,

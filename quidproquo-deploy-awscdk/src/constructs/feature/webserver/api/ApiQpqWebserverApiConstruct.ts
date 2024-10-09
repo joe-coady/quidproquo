@@ -1,4 +1,4 @@
-import { aws_apigateway, aws_lambda } from 'aws-cdk-lib';
+import { aws_apigateway, aws_lambda, aws_ec2 } from 'aws-cdk-lib';
 
 import { Construct } from 'constructs';
 
@@ -9,6 +9,7 @@ import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqCons
 import { Function } from '../../../basic/Function';
 
 import { qpqCoreUtils } from 'quidproquo-core';
+import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 
 export interface ApiQpqWebserverApiConstructProps extends QpqConstructBlockProps {
   apiConfig: ApiQPQWebServerConfigSetting;
@@ -18,6 +19,12 @@ export interface ApiQpqWebserverApiConstructProps extends QpqConstructBlockProps
 export class ApiQpqWebserverApiConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: ApiQpqWebserverApiConstructProps) {
     super(scope, id, props);
+
+    const vpc = props.apiConfig.virtualNetworkName
+      ? aws_ec2.Vpc.fromLookup(this, 'vpc-lookup', {
+          vpcName: awsNamingUtils.getConfigRuntimeBootstrapResourceNameFromConfig(props.apiConfig.virtualNetworkName, props.qpqConfig),
+        })
+      : undefined;
 
     // Build Function
     const func = new Function(this, 'api-function', {
@@ -33,6 +40,8 @@ export class ApiQpqWebserverApiConstruct extends QpqConstructBlock {
       awsAccountId: props.awsAccountId,
 
       role: this.getServiceRole(),
+
+      vpc,
     });
 
     // Create a rest api

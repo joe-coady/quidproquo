@@ -47,6 +47,14 @@ export class QpqCoreRecurringScheduleConstruct extends QpqConstructBlock {
     });
 
     // Set the target as lambda function
-    cronRule.addTarget(new aws_events_targets.LambdaFunction(schedulerFunction.lambdaFunction));
+    cronRule.addTarget(
+      new aws_events_targets.LambdaFunction(schedulerFunction.lambdaFunction, {
+        event: aws_events.RuleTargetInput.fromObject({
+          source: 'custom.event.RecurringSchedule',
+          'detail-type': 'Recurring Schedule',
+          detail: props.scheduleConfig.metadata,
+        }),
+      }),
+    );
   }
 }

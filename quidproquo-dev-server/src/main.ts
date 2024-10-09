@@ -16,7 +16,7 @@ import {
   StoryResult,
 } from 'quidproquo';
 
-import { route } from './entry/route';
+import { route } from './implementations';
 import { getAllServiceConfigs } from './allServiceConfig';
 import { ExpressEvent, DevServerConfig } from './types';
 

@@ -4,7 +4,7 @@ import { StoryResult, StorySession, QpqRuntimeType, StorySessionUpdater, qpqCons
 
 import { resolveActionResult, resolveActionResultError, isErroredActionResult, actionResultError } from './logic/actionLogic';
 import { QPQConfig } from './config';
-import { ActionProcessorListResolver, DynamicModuleLoader, QpqLogger } from './types';
+import { ActionProcessorListResolver, AnyStory, DynamicModuleLoader, QpqLogger } from './types';
 
 import { getApplicationModuleName } from './qpqCoreUtils';
 
@@ -46,10 +46,7 @@ export const createRuntime = (
   dynamicModuleLoader: DynamicModuleLoader,
   initialTags?: string[],
 ) => {
-  async function resolveStory<TArgs extends Array<any>>(
-    story: (...args: TArgs) => ActionRequester<Action<any>, any, any>,
-    args: TArgs,
-  ): Promise<StoryResult<any>> {
+  async function resolveStory<TArgs extends Array<any>>(story: AnyStory<TArgs>, args: TArgs): Promise<StoryResult<any>> {
     const actionProcessors: ActionProcessorList = await getActionProcessors(qpqConfig, dynamicModuleLoader);
 
     const reader = story(...args);

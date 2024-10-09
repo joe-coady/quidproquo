@@ -6,6 +6,7 @@ export interface QPQConfigAdvancedApiSettings extends QPQConfigAdvancedSettings 
   subDomain?: string;
   buildPath?: string;
   cloudflareApiKeySecretName?: string;
+  virtualNetworkName?: string;
 }
 
 export interface ApiQPQWebServerConfigSetting extends QPQConfigSetting {
@@ -18,13 +19,11 @@ export interface ApiQPQWebServerConfigSetting extends QPQConfigSetting {
   deprecated: boolean;
 
   cloudflareApiKeySecretName?: string;
+
+  virtualNetworkName?: string;
 }
 
-export const defineApi = (
-  apiName: string,
-  rootDomain: string,
-  options?: QPQConfigAdvancedApiSettings,
-): ApiQPQWebServerConfigSetting => {
+export const defineApi = (apiName: string, rootDomain: string, options?: QPQConfigAdvancedApiSettings): ApiQPQWebServerConfigSetting => {
   return {
     configSettingType: QPQWebServerConfigSettingType.Api,
     uniqueKey: apiName,
@@ -38,5 +37,7 @@ export const defineApi = (
     deprecated: options?.deprecated || false,
 
     cloudflareApiKeySecretName: options?.cloudflareApiKeySecretName,
+
+    virtualNetworkName: options?.virtualNetworkName,
   };
 };

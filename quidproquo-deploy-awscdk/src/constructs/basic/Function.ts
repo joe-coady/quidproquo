@@ -2,7 +2,7 @@ import path from 'path';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
 import { Construct } from 'constructs';
-import { aws_lambda, aws_logs, aws_sns, aws_iam, aws_sns_subscriptions } from 'aws-cdk-lib';
+import { aws_lambda, aws_logs, aws_sns, aws_iam, aws_sns_subscriptions, aws_ec2 } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 
 import { getAwsServiceAccountInfoConfig } from 'quidproquo-config-aws';
@@ -32,6 +32,8 @@ export interface FunctionProps extends QpqConstructBlockProps {
   role?: aws_iam.IRole;
 
   reacreateOnFunctionNameChange?: boolean;
+
+  vpc?: aws_ec2.IVpc;
 }
 
 export class Function extends QpqConstructBlock {
@@ -72,6 +74,13 @@ export class Function extends QpqConstructBlock {
       logRetention: aws_logs.RetentionDays.ONE_WEEK,
 
       role: props.role,
+
+      vpc: props.vpc,
+      vpcSubnets: props.vpc
+        ? {
+            subnetType: aws_ec2.SubnetType.PRIVATE_WITH_EGRESS,
+          }
+        : undefined,
     });
 
     const region = qpqCoreUtils.getApplicationModuleDeployRegion(props.qpqConfig);

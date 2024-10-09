@@ -4,6 +4,7 @@ import { QPQWebServerConfigSettingType } from '../QPQConfig';
 
 export interface QPQConfigAdvancedServiceFunctionSettings extends QPQConfigAdvancedSettings {
   functionName?: string;
+  virtualNetworkName?: string;
 }
 
 export interface ServiceFunctionQPQWebServerConfigSetting extends QPQConfigSetting {
@@ -11,6 +12,7 @@ export interface ServiceFunctionQPQWebServerConfigSetting extends QPQConfigSetti
 
   buildPath: string;
   functionName: string;
+  virtualNetworkName?: string;
 }
 
 export const defineServiceFunction = (
@@ -29,5 +31,7 @@ export const defineServiceFunction = (
     runtime,
 
     functionName: functionName,
+
+    virtualNetworkName: options?.virtualNetworkName,
   };
 };

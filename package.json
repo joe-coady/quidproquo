@@ -29,6 +29,7 @@
     "quidproquo-webserver",
     "quidproquo-actionprocessor-node",
     "quidproquo-actionprocessor-awslambda",
+    "quidproquo-neo4j",
     "quidproquo-deploy-webpack",
     "quidproquo-deploy-awscdk",
     "quidproquo-web",

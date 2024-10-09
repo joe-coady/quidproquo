@@ -4,8 +4,7 @@ import { qpqWebServerUtils } from 'quidproquo-webserver';
 import { Construct } from 'constructs';
 import { QpqServiceStack, QpqServiceStackProps } from './base/QpqServiceStack';
 
-import { InfQpqServiceStack } from './InfQpqServiceStack';
-import { BootstrapQpqWebserverApiConstruct } from '../constructs';
+import { BootstrapQpqCoreVirtualNetworkConstruct, BootstrapQpqWebserverApiConstruct } from '../constructs';
 import { BSQpqLambdaWarmerEventConstructConstruct } from '../constructs/basic/BSQpqLambdaWarmerEventConstruct';
 
 export interface BootstrapQpqServiceStackProps extends QpqServiceStackProps {}
@@ -26,6 +25,16 @@ export class BootstrapQpqServiceStack extends QpqServiceStack {
           qpqConfig: props.qpqConfig,
 
           apiConfig: setting,
+        }),
+    );
+
+    const virtualNetworks = qpqCoreUtils.getVirualNetworkConfigs(props.qpqConfig).map(
+      (setting) =>
+        new BootstrapQpqCoreVirtualNetworkConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
+          awsAccountId: props.awsAccountId,
+          qpqConfig: props.qpqConfig,
+
+          virtualNetworkConfig: setting,
         }),
     );
   }

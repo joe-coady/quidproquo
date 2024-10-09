@@ -35,6 +35,7 @@ const extractors: Record<QpqRuntimeType, (sr: StoryResult<any>) => string> = {
   [QpqRuntimeType.RECURRING_SCHEDULE]: unknownGenericTextExtractor,
   [QpqRuntimeType.EVENT_SEO_OR]: seoORGenericTextExtractor,
   [QpqRuntimeType.EXECUTE_STORY]: unknownGenericTextExtractor,
+  [QpqRuntimeType.EXECUTE_IMPLEMENTATION_STORY]: unknownGenericTextExtractor,
   [QpqRuntimeType.SEND_EMAIL_EVENT]: unknownGenericTextExtractor,
 
   [QpqRuntimeType.AUTH_DEFINE_AUTH_CHALLENGE]: AUTH_DEFINE_AUTH_CHALLENGE_GenericTextExtractor,

@@ -23,6 +23,8 @@ import {
   ModuleQPQConfigSetting,
   ClaudeAIQPQConfigSetting,
   ApplicationBasePathQPQConfigSetting,
+  GraphDatabaseQPQConfigSetting,
+  VirtualNetworkQPQConfigSetting,
 } from './config';
 
 import {
@@ -233,14 +235,28 @@ export const getAllKeyValueStores = <T extends object = any>(qpqConfig: QPQConfi
   return keyValueStores;
 };
 
+export const getAllGraphDatabaseConfigs = (qpqConfig: QPQConfig): GraphDatabaseQPQConfigSetting[] => {
+  const graphDatabases = getConfigSettings<GraphDatabaseQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.graphDatabase);
+
+  return graphDatabases;
+};
+
 export const getDeployEventConfigs = (qpqConfig: QPQConfig): DeployEventsQPQConfigSetting[] => {
   const deployEvents = getConfigSettings<DeployEventsQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.deployEvent);
 
   return deployEvents;
 };
 
+export const getVirualNetworkConfigs = (qpqConfig: QPQConfig): VirtualNetworkQPQConfigSetting[] => {
+  return getConfigSettings<VirtualNetworkQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.virtualNetwork);
+};
+
 export const getOwnedKeyValueStores = <T extends object = any>(qpqConfig: QPQConfig): KeyValueStoreQPQConfigSetting<T>[] => {
   return getOwnedItems(getAllKeyValueStores(qpqConfig), qpqConfig);
+};
+
+export const getOwnedGraphDatabases = (qpqConfig: QPQConfig): GraphDatabaseQPQConfigSetting[] => {
+  return getOwnedItems(getAllGraphDatabaseConfigs(qpqConfig), qpqConfig);
 };
 
 export const getOwnedStorageDrives = (qpqConfig: QPQConfig): StorageDriveQPQConfigSetting[] => {

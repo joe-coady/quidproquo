@@ -1,9 +1,13 @@
 import { getStoryNameFromQpqFunctionRuntime } from '../../qpqCoreUtils';
 import { QpqFunctionRuntime } from '../../types';
-import { QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
+import { QPQConfigAdvancedSettings, QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
 
 export enum ScheduleTypeEnum {
   Recurring = 'Recurring',
+}
+
+export interface QPQConfigAdvancedScheduleSettings extends QPQConfigAdvancedSettings {
+  metadata?: Record<string, any>;
 }
 
 export interface ScheduleQPQConfigSetting extends QPQConfigSetting {
@@ -12,6 +16,7 @@ export interface ScheduleQPQConfigSetting extends QPQConfigSetting {
   runtime: QpqFunctionRuntime;
   cronExpression: string;
   buildPath: string;
+  metadata: Record<string, any>;
 }
 
 /**
@@ -74,7 +79,12 @@ export interface ScheduleQPQConfigSetting extends QPQConfigSetting {
  * @param {string} buildPath - The build path to the function's code.
  * @returns {ScheduleQPQConfigSetting} The configuration setting for the scheduled task.
  */
-export const defineRecurringSchedule = (cronExpression: string, runtime: QpqFunctionRuntime, buildPath: string): ScheduleQPQConfigSetting => {
+export const defineRecurringSchedule = (
+  cronExpression: string,
+  runtime: QpqFunctionRuntime,
+  buildPath: string,
+  options?: QPQConfigAdvancedScheduleSettings,
+): ScheduleQPQConfigSetting => {
   const uniqueKey = getStoryNameFromQpqFunctionRuntime(runtime);
 
   return {
@@ -88,5 +98,7 @@ export const defineRecurringSchedule = (cronExpression: string, runtime: QpqFunc
     cronExpression,
 
     buildPath,
+
+    metadata: options?.metadata || {},
   };
 };

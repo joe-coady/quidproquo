@@ -5,7 +5,6 @@ import { getWebserverActionProcessor as getAwsWebserverActionProcessor } from '.
 import {
   getCoreActionProcessor as getNodeCoreActionProcessor,
   getWebserverActionProcessor as getNodeWebserverActionProcessor,
-  getCustomActionActionProcessor,
 } from 'quidproquo-actionprocessor-node';
 
 export const getAwsActionProcessors: ActionProcessorListResolver = async (
@@ -18,9 +17,6 @@ export const getAwsActionProcessors: ActionProcessorListResolver = async (
 
     ...(await getAwsCoreActionProcessor(qpqConfig, dynamicModuleLoader)),
     ...(await getAwsWebserverActionProcessor(qpqConfig, dynamicModuleLoader)),
-
-    // Always done last, so they can ovveride the default ones if the user wants.
-    ...(await getCustomActionActionProcessor(qpqConfig, dynamicModuleLoader)),
   };
 
   return storyActionProcessor;
