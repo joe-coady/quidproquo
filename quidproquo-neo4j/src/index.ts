@@ -1,3 +1,1 @@
-export const tmp = () => {
-  return 3;
-};
+export * from './config';

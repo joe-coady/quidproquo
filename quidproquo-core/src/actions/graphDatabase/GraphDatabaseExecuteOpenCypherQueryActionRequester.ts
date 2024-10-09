@@ -12,7 +12,7 @@ export function* askGraphDatabaseExecuteOpenCypherQuery(
   graphDatabaseName: string,
   instance: GraphDatabaseInstanceType,
   openCypherQuery: GraphDatabaseExecuteOpenCypherQueryActionPayload['openCypherQuery'],
-  params: GraphDatabaseExecuteOpenCypherQueryActionPayload['params'],
+  params?: GraphDatabaseExecuteOpenCypherQueryActionPayload['params'],
 ): GraphDatabaseExecuteOpenCypherQueryActionRequester {
   return yield {
     type: GraphDatabaseActionType.ExecuteOpenCypherQuery,
