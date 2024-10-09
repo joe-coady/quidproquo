@@ -14,7 +14,7 @@ const getProcessGetRecords = (qpqConfig: QPQConfig): EventGetRecordsActionProces
     const internalEventRecord: InternalEventRecord = {
       time: eventBridgeEvent.time,
       correlation: context.awsRequestId,
-      detail: eventBridgeEvent.detail,
+      metadata: eventBridgeEvent.detail,
     };
 
     return actionResult([internalEventRecord]);
