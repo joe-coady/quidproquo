@@ -10,6 +10,7 @@ import {
 import { askGraphDatabaseForNeptuneGetEndpoints } from '../customActions';
 import { NeptuneCypherRequest, NeptuneCypherResponse } from './types';
 import { askConvertNeptuneCypherResponseToCypherResponse } from './converters/askConvertNeptuneCypherResponseToCypherResponse';
+import { convertQpqQueryToNeptune } from './utils';
 
 export function* askRunNeptuneOpenCypherQuery({
   graphDatabaseName,
@@ -24,8 +25,10 @@ export function* askRunNeptuneOpenCypherQuery({
     return yield* askThrowError(ErrorTypeEnum.GenericError, `No [${instance}] endpoint found`);
   }
 
+  const neptuneQuery = convertQpqQueryToNeptune(openCypherQuery);
+
   const response = yield* askNetworkRequest<NeptuneCypherRequest, NeptuneCypherResponse>('POST', `${graphEndpoint}/openCypher`, {
-    body: { query: openCypherQuery, parameters: params },
+    body: { query: neptuneQuery, parameters: params },
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',

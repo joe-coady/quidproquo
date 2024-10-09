@@ -9,10 +9,18 @@ import { QPQConfig, defineActionProcessors, defineParameter, defineRecurringSche
 //   name: string;
 // }
 
-export const defineGraphDatabaseNeo4j = (databaseName: string, apiBuildPath: string): QPQConfig => [
+export enum Neo4jVersion {
+  Version5 = 'version5',
+}
+
+export const defineGraphDatabaseNeo4j = (databaseName: string, apiBuildPath: string, version: Neo4jVersion = Neo4jVersion.Version5): QPQConfig => [
   defineParameter(`neo4j-${databaseName}-instance`),
   defineSecret(`neo4j-${databaseName}-password`),
-  defineActionProcessors(`full@${path.join(__dirname, '../../../actionProcessor/graphDatabaseOverride')}::getGraphDatabaseActionProcessor`),
+
+  defineActionProcessors(
+    `full@${path.join(__dirname, `../../../actionProcessor/graphDatabaseOverride/${version}`)}::getGraphDatabaseActionProcessor`,
+  ),
+
   defineRecurringSchedule(
     '0 0 * * ? *', // 12am every day (UTC)
     // '* * * * ? *', // every min (for testing)
