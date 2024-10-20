@@ -2,7 +2,6 @@ import {
   UserDirectoryReadAccessTokenActionProcessor,
   actionResult,
   QPQConfig,
-  qpqCoreUtils,
   UserDirectoryActionType,
   actionResultError,
   ErrorTypeEnum,
@@ -10,27 +9,25 @@ import {
   ActionProcessorList,
 } from 'quidproquo-core';
 
-import { getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
-
-import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
-import { decodeValidJwt } from '../../../logic/cognito/decodeValidJwt';
+import { decodeAccessToken } from '../../../logic/cognito/decodeAccessToken';
 
 const getProcessReadAccessToken = (qpqConfig: QPQConfig): UserDirectoryReadAccessTokenActionProcessor => {
-  return async ({ userDirectoryName, ignoreExpiration }, session) => {
-    const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
+  return async ({ userDirectoryName, ignoreExpiration }, { decodedAccessToken, accessToken }) => {
+    if (decodedAccessToken) {
+      if (!ignoreExpiration && decodedAccessToken.exp < Math.floor(Date.now() / 1000)) {
+        return actionResultError(ErrorTypeEnum.Invalid, 'Access has expired');
+      }
 
-    const userPoolId = await getExportedValue(getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig), region);
+      return actionResult(decodedAccessToken);
+    }
 
-    const authInfo = await decodeValidJwt(userPoolId, region, ignoreExpiration, session.accessToken);
+    const decodedAuthToken = await decodeAccessToken(userDirectoryName, qpqConfig, accessToken, ignoreExpiration);
 
-    if (!authInfo || !authInfo?.username) {
+    if (!decodedAuthToken || !decodedAuthToken.username) {
       return actionResultError(ErrorTypeEnum.Unauthorized, 'Invalid accessToken');
     }
 
-    return actionResult({
-      userId: authInfo.userId,
-      username: authInfo.username,
-    });
+    return actionResult(decodedAuthToken);
   };
 };
 

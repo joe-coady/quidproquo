@@ -7,9 +7,9 @@ import {
   ActionProcessorList,
 } from 'quidproquo-core';
 
-import { EventInput, InternalEventRecord } from './types';
+import { EventInput, InternalEventRecord, MatchResult } from './types';
 
-const getProcessGetStorySession = (qpqConfig: QPQConfig): EventGetStorySessionActionProcessor<EventInput, InternalEventRecord> => {
+const getProcessGetStorySession = (qpqConfig: QPQConfig): EventGetStorySessionActionProcessor<EventInput, InternalEventRecord, MatchResult> => {
   return async ({ qpqEventRecord, eventParams }) => {
     return actionResult(void 0);
   };

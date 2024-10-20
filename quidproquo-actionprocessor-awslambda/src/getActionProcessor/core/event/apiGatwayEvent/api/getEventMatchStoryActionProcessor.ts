@@ -40,13 +40,15 @@ const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProces
       );
     }
 
-    return actionResult({
+    const matchResult: MatchResult = {
       runtime: matchedRoute.route.runtime,
       runtimeOptions: matchedRoute.match.params || {},
 
       // TODO: Make this aware of the API that we are eventing
       config: qpqWebServerUtils.mergeAllRouteOptions('api', matchedRoute.route, qpqConfig),
-    });
+    };
+
+    return actionResult(matchResult);
   };
 };
 

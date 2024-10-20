@@ -7,13 +7,18 @@ import {
   ActionProcessorList,
 } from 'quidproquo-core';
 
+import { decodeAccessToken } from '../../../logic/cognito';
+
 const getProcessSetAccessToken = (qpqConfig: QPQConfig): UserDirectorySetAccessTokenActionProcessor => {
-  return async ({ accessToken }, session, aps, logger, updateSession) => {
+  return async ({ accessToken, userDirectoryName }, session, apl, logger, updateSession) => {
+    const decodedAccessToken = await decodeAccessToken(userDirectoryName, qpqConfig, accessToken, false);
+
     updateSession({
+      decodedAccessToken: decodedAccessToken,
       accessToken,
     });
 
-    return actionResult(void 0);
+    return actionResult(decodedAccessToken);
   };
 };
 

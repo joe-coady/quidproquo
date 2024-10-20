@@ -14,7 +14,6 @@ import { getCFExportNameUserPoolIdFromConfig, getCFExportNameUserPoolClientIdFro
 
 import { refreshToken as cognitoRefreshToken } from '../../../logic/cognito/refreshToken';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
-import { decodeValidJwt } from '../../../logic/cognito/decodeValidJwt';
 
 const getProcessRefreshToken = (qpqConfig: QPQConfig): UserDirectoryRefreshTokenActionProcessor => {
   return async ({ userDirectoryName, refreshToken }, session) => {
@@ -24,9 +23,7 @@ const getProcessRefreshToken = (qpqConfig: QPQConfig): UserDirectoryRefreshToken
 
     const userPoolClientId = await getExportedValue(getCFExportNameUserPoolClientIdFromConfig(userDirectoryName, qpqConfig), region);
 
-    const authInfo = await decodeValidJwt(userPoolId, region, true, session.accessToken);
-
-    if (!authInfo || !authInfo?.username) {
+    if (!session.decodedAccessToken || !session.decodedAccessToken.username) {
       return actionResultError(ErrorTypeEnum.Unauthorized, 'Invalid accessToken');
     }
 
@@ -34,7 +31,7 @@ const getProcessRefreshToken = (qpqConfig: QPQConfig): UserDirectoryRefreshToken
       userPoolId,
       userPoolClientId,
       qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig),
-      authInfo?.username,
+      session.decodedAccessToken.username,
       refreshToken,
     );
 

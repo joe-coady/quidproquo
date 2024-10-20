@@ -1,4 +1,4 @@
-import { QPQBinaryData } from 'quidproquo';
+import { QPQBinaryData } from 'quidproquo-core';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export interface ExpressEvent {

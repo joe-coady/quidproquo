@@ -8,9 +8,10 @@ import {
   askGetCurrentEpoch,
   UserDirectoryActionType,
   ActionHistory,
+  DecodedAccessToken,
+  UserDirectorySetAccessTokenActionPayload,
 } from 'quidproquo-core';
 import { LogMetadata } from '../entry/domain';
-import { decodeJWT } from '../../../utils';
 
 import {
   apiGenericTextExtractor,
@@ -53,19 +54,23 @@ const extractors: Record<QpqRuntimeType, (sr: StoryResult<any>) => string> = {
   [QpqRuntimeType.UNIT_TEST]: unknownGenericTextExtractor,
 };
 
-export const getAccessTokenFromSetAccessTokenActionInStoryResult = (storyResult: StoryResult<any>): string | undefined => {
-  const actionPayload: ActionHistory | undefined = storyResult.history.find((h) => h.act.type === UserDirectoryActionType.SetAccessToken);
+export const getDecodedAccessTokenFromSetAccessTokenActionInStoryResult = (storyResult: StoryResult<any>): DecodedAccessToken | undefined => {
+  const actionPayload: ActionHistory<UserDirectorySetAccessTokenActionPayload, DecodedAccessToken> | undefined = storyResult.history.find(
+    (h) => h.act.type === UserDirectoryActionType.SetAccessToken,
+  );
 
-  return actionPayload?.act.payload?.accessToken;
+  if (!actionPayload) {
+    return undefined;
+  }
+
+  return actionPayload.res;
 };
 
 export const storyResultToMetadata = (storyResult: StoryResult<any>, ttl?: number): LogMetadata => {
   // Add the generic text to the tag list
   const tags = [extractors[storyResult.runtimeType]?.(storyResult), ...storyResult.tags];
 
-  const accessToken = storyResult.session?.accessToken || getAccessTokenFromSetAccessTokenActionInStoryResult(storyResult);
-
-  const decodedToken = accessToken ? decodeJWT<{ sub?: string; userId?: string; username?: string; id?: string }>(accessToken) : null;
+  const decodedAccessToken = storyResult.session?.decodedAccessToken || getDecodedAccessTokenFromSetAccessTokenActionInStoryResult(storyResult);
 
   // Base metadata
   const metadata: LogMetadata = {
@@ -78,9 +83,7 @@ export const storyResultToMetadata = (storyResult: StoryResult<any>, ttl?: numbe
     executionTimeMs: new Date(storyResult.finishedAt).getTime() - new Date(storyResult.startedAt).getTime(),
     ttl,
 
-    // TODO: This is kinda not generic... but it's the best we can do for now
-    // we need to update this to be username or userid once we remove the access token from the session.
-    userInfo: decodedToken?.username || decodedToken?.userId || decodedToken?.sub || decodedToken?.id,
+    userInfo: decodedAccessToken?.username || decodedAccessToken?.userId,
   };
 
   // Extract error text

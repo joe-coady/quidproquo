@@ -1,19 +1,28 @@
-import { ErrorTypeEnum, QPQError } from './ErrorTypeEnum';
+import { QPQError } from './ErrorTypeEnum';
 import { Action } from './Action';
 import { QpqContext } from './QpqContextIdentifier';
+
+export interface DecodedAccessToken {
+  userId: string;
+  username: string;
+  // Unix timestamp (number of seconds since January 1, 1970 UTC).
+  exp: number;
+  roles?: string[];
+
+  userDirectory: string;
+  wasValid: boolean;
+}
 
 export interface StorySession {
   correlation?: string;
   depth: number;
 
-  // TODO: We will probably want to think about if we want this
-  // how we deal with refreshing it
-  // maybe storing a userid is better after we validate it
-  // but what if a event 3 weeks from now is run, but the user is deleted, but now
-  // still has access ?
+  // This token is never transfer cross storys
+  // can't access it via events or anything
+  accessToken?: string;
 
   // Decoded access token + roles token
-  accessToken?: string;
+  decodedAccessToken?: DecodedAccessToken;
 
   // Context
   context: QpqContext<any>;
@@ -67,9 +76,9 @@ export type AskResponseReturnType<T extends AskResponse<any>> = ExtractGenerator
 // qpq runtimes are built on stories
 export type qpqStory = <T = any>(...args: any[]) => AskResponse<T>;
 
-export interface ActionHistory<T = any> {
-  act: Action<T>;
-  res: any;
+export interface ActionHistory<P = any, R = any> {
+  act: Action<P>;
+  res: R;
   startedAt: string;
   finishedAt: string;
 }

@@ -7,9 +7,9 @@ import {
   ActionProcessorList,
 } from 'quidproquo-core';
 
-import { AnyQueueMessageWithSession, EventInput, InternalEventRecord } from './types';
+import { AnyQueueMessageWithSession, EventInput, InternalEventRecord, MatchResult } from './types';
 
-const getProcessGetStorySession = (qpqConfig: QPQConfig): EventGetStorySessionActionProcessor<EventInput, InternalEventRecord> => {
+const getProcessGetStorySession = (qpqConfig: QPQConfig): EventGetStorySessionActionProcessor<EventInput, InternalEventRecord, MatchResult> => {
   return async ({ qpqEventRecord, eventParams: [sqsEvent] }) => {
     // Find the src record and pull out the session from that if we can
     const srcRecord = sqsEvent.Records.find((r) => r.messageId === qpqEventRecord.id);

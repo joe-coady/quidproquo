@@ -1,4 +1,4 @@
-import { AnyEventMessage, askUserDirectoryDecodeAccessToken } from 'quidproquo-core';
+import { AnyEventMessage, askUserDirectorySetAccessToken } from 'quidproquo-core';
 
 import { websocketConnectionData } from '../../../data';
 import { adminUserDirectoryResourceName } from '../../../../../config';
@@ -12,7 +12,7 @@ export function* askProcessOnAuthenticate(id: string, accessToken: string) {
   const connection = yield* websocketConnectionData.askGetById(id);
 
   if (connection) {
-    const decodedAccessToken = yield* askUserDirectoryDecodeAccessToken(adminUserDirectoryResourceName, false, accessToken);
+    const decodedAccessToken = yield* askUserDirectorySetAccessToken(adminUserDirectoryResourceName, accessToken);
 
     yield* websocketConnectionData.askUpsert({
       ...connection,
@@ -20,7 +20,6 @@ export function* askProcessOnAuthenticate(id: string, accessToken: string) {
       userId: decodedAccessToken.userId,
       accessToken,
     });
-
-    // yield* askUserDirectorySetAccessToken(accessToken);
   }
 }
+5;

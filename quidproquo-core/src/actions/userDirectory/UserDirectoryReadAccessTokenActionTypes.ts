@@ -1,5 +1,6 @@
+import { DecodedAccessToken } from '../../types';
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
-import { UserDirectoryActionType, DecodedAccessToken } from './UserDirectoryActionType';
+import { UserDirectoryActionType } from './UserDirectoryActionType';
 
 // Payload
 export interface UserDirectoryReadAccessTokenActionPayload {
@@ -9,18 +10,11 @@ export interface UserDirectoryReadAccessTokenActionPayload {
 }
 
 // Action
-export interface UserDirectoryReadAccessTokenAction
-  extends Action<UserDirectoryReadAccessTokenActionPayload> {
+export interface UserDirectoryReadAccessTokenAction extends Action<UserDirectoryReadAccessTokenActionPayload> {
   type: UserDirectoryActionType.ReadAccessToken;
   payload: UserDirectoryReadAccessTokenActionPayload;
 }
 
 // Function Types
-export type UserDirectoryReadAccessTokenActionProcessor = ActionProcessor<
-  UserDirectoryReadAccessTokenAction,
-  DecodedAccessToken
->;
-export type UserDirectoryReadAccessTokenActionRequester = ActionRequester<
-  UserDirectoryReadAccessTokenAction,
-  DecodedAccessToken
->;
+export type UserDirectoryReadAccessTokenActionProcessor = ActionProcessor<UserDirectoryReadAccessTokenAction, DecodedAccessToken>;
+export type UserDirectoryReadAccessTokenActionRequester = ActionRequester<UserDirectoryReadAccessTokenAction, DecodedAccessToken>;

@@ -1,4 +1,4 @@
-import { HTTPEvent, HTTPEventResponse } from 'quidproquo-webserver';
+import { HTTPEvent, HTTPEventResponse, RouteOptions } from 'quidproquo-webserver';
 
 import { APIGatewayEvent, Context, APIGatewayProxyResult } from 'aws-lambda';
 import { MatchStoryResult } from 'quidproquo-core';
@@ -11,4 +11,4 @@ export type EventOutput = APIGatewayProxyResult;
 export type InternalEventRecord = HTTPEvent;
 export type InternalEventOutput = HTTPEventResponse;
 
-export type MatchResult = MatchStoryResult<any, any>;
+export type MatchResult = MatchStoryResult<Record<string, string>, RouteOptions>;

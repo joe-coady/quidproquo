@@ -1,14 +1,6 @@
 import { randomUUID } from 'crypto';
-import {
-  askProcessEvent,
-  createRuntime,
-  DynamicModuleLoader,
-  ErrorTypeEnum,
-  QPQConfig,
-  qpqCoreUtils,
-  QpqRuntimeType,
-  qpqWebServerUtils,
-} from 'quidproquo';
+import { askProcessEvent, createRuntime, DynamicModuleLoader, ErrorTypeEnum, QPQConfig, qpqCoreUtils, QpqRuntimeType } from 'quidproquo-core';
+import { qpqWebServerUtils } from 'quidproquo-webserver';
 import { getAwsActionProcessors, getLogger } from 'quidproquo-actionprocessor-awslambda';
 import { getCustomActionActionProcessor } from 'quidproquo-actionprocessor-node';
 

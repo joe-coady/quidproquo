@@ -49,7 +49,7 @@ export const createImplementationRuntime = (
     {
       context: session.context,
       depth: (session.depth || 0) + 1,
-      accessToken: session.accessToken,
+      decodedAccessToken: session.decodedAccessToken,
       correlation: session.correlation,
     },
     async () => actionProcessors,

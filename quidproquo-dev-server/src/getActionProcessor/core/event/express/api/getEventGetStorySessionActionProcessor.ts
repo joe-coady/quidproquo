@@ -5,22 +5,53 @@ import {
   ActionProcessorList,
   ActionProcessorListResolver,
   actionResult,
-  DynamicModuleLoader,
   EventActionType,
   EventGetStorySessionActionProcessor,
   QPQConfig,
 } from 'quidproquo-core';
+import { decodeAccessToken } from 'quidproquo-actionprocessor-awslambda';
 
-import { EventInput, InternalEventRecord } from './types';
+import { EventInput, InternalEventRecord, MatchResult } from './types';
+import { qpqWebServerUtils } from 'quidproquo-webserver';
 
-const getProcessGetStorySession =
-  (
-    qpqConfig: QPQConfig
-  ): EventGetStorySessionActionProcessor<EventInput, InternalEventRecord> =>
-  async ({ qpqEventRecord, eventParams }) =>
-    actionResult(void 0);
+const getProcessGetStorySession = (qpqConfig: QPQConfig): EventGetStorySessionActionProcessor<EventInput, InternalEventRecord, MatchResult> => {
+  return async ({ matchStoryResult, qpqEventRecord }, session) => {
+    const accessToken = qpqWebServerUtils.getAccessTokenFromHeaders(qpqEventRecord.headers);
 
-export const getEventGetStorySessionActionProcessor: ActionProcessorListResolver =
-  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-    [EventActionType.GetStorySession]: getProcessGetStorySession(qpqConfig),
-  });
+    if (!accessToken) {
+      return actionResult(void 0);
+    }
+
+    // if this endpoint has no auth settings, BUT we do have an access token
+    // then we want to just attempt to extract info for logs, but we will say that its
+    // wasValid = false
+    if (!matchStoryResult.config?.routeAuthSettings?.userDirectoryName) {
+      // If this endpoint is unauthenticated, then we will just decode it, and say it wasnt valid, for logs
+      const info = qpqWebServerUtils.decodeJWT<{ sub?: string; userId?: string; username?: string; id?: string; exp?: number }>(accessToken);
+
+      return actionResult({
+        ...session,
+
+        decodedAccessToken: {
+          exp: info?.exp || 0,
+          userDirectory: '',
+          userId: info?.sub || info?.id || info?.userId || info?.username || '',
+          username: info?.username || info?.userId || info?.sub || info?.id || '',
+          wasValid: false,
+        },
+      });
+    }
+
+    const decodedAccessToken = await decodeAccessToken(matchStoryResult.config.routeAuthSettings.userDirectoryName, qpqConfig, accessToken, true);
+
+    return actionResult({
+      ...session,
+
+      decodedAccessToken,
+    });
+  };
+};
+
+export const getEventGetStorySessionActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
+  [EventActionType.GetStorySession]: getProcessGetStorySession(qpqConfig),
+});

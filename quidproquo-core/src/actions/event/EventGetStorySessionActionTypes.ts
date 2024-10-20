@@ -1,26 +1,29 @@
 import { StorySession } from '../../types';
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
-import { EventActionType } from './EventActionType';
+import { AnyMatchStoryResult, EventActionType } from './EventActionType';
 
 // Payload
-export interface EventGetStorySessionActionPayload<EventParams extends Array<unknown>, QpqEventRecord> {
+export interface EventGetStorySessionActionPayload<EventParams extends Array<unknown>, QpqEventRecord, MSR extends AnyMatchStoryResult> {
   qpqEventRecord: QpqEventRecord;
   eventParams: EventParams;
+  matchStoryResult: MSR;
 }
 
 // Action
-export interface EventGetStorySessionAction<EventParams extends Array<unknown>, QpqEventRecord>
-  extends Action<EventGetStorySessionActionPayload<EventParams, QpqEventRecord>> {
+export interface EventGetStorySessionAction<EventParams extends Array<unknown>, QpqEventRecord, MSR extends AnyMatchStoryResult>
+  extends Action<EventGetStorySessionActionPayload<EventParams, QpqEventRecord, MSR>> {
   type: EventActionType.GetStorySession;
-  payload: EventGetStorySessionActionPayload<EventParams, QpqEventRecord>;
+  payload: EventGetStorySessionActionPayload<EventParams, QpqEventRecord, MSR>;
 }
 
 // Functions
-export type EventGetStorySessionActionProcessor<EventParams extends Array<unknown>, QpqEventRecord> = ActionProcessor<
-  EventGetStorySessionAction<EventParams, QpqEventRecord>,
-  StorySession | undefined
->;
-export type EventGetStorySessionActionRequester<EventParams extends Array<unknown>, QpqEventRecord> = ActionRequester<
-  EventGetStorySessionAction<EventParams, QpqEventRecord>,
-  StorySession | undefined
->;
+export type EventGetStorySessionActionProcessor<
+  EventParams extends Array<unknown>,
+  QpqEventRecord,
+  MSR extends AnyMatchStoryResult,
+> = ActionProcessor<EventGetStorySessionAction<EventParams, QpqEventRecord, MSR>, StorySession | undefined>;
+export type EventGetStorySessionActionRequester<
+  EventParams extends Array<unknown>,
+  QpqEventRecord,
+  MSR extends AnyMatchStoryResult,
+> = ActionRequester<EventGetStorySessionAction<EventParams, QpqEventRecord, MSR>, StorySession | undefined>;

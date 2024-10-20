@@ -24,12 +24,13 @@ const getProcessDecodeAccessToken = (qpqConfig: QPQConfig): UserDirectoryDecodeA
     const authInfo = await decodeValidJwt(userPoolId, region, ignoreExpiration, accessToken);
 
     if (!authInfo || !authInfo?.username) {
-      return actionResultError(ErrorTypeEnum.Unauthorized, 'Invalid accessToken');
+      return actionResultError(ErrorTypeEnum.Unauthorized, 'Invalid access token');
     }
 
     return actionResult({
-      userId: authInfo.userId,
-      username: authInfo.username,
+      ...authInfo,
+
+      userDirectory: userDirectoryName,
     });
   };
 };

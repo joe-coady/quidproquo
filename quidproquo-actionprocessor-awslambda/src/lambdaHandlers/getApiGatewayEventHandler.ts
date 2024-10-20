@@ -12,11 +12,8 @@ export const getApiGatewayEventHandler = (dynamicModuleLoader: DynamicModuleLoad
       console.log('event', JSON.stringify(event, null, 2));
       console.log(event);
 
-      const accessToken = qpqWebServerUtils.getAccessTokenFromHeaders(event.headers);
-
       return {
         depth: 0,
-        accessToken: accessToken,
         context: {},
       };
     },

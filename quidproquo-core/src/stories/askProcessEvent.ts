@@ -11,7 +11,7 @@ import {
 import { askMapParallel } from './array';
 
 import { askExecuteStory } from '../actions/system';
-import { AskResponse, EitherActionResult, LogLevelEnum, QPQError, StoryResult, StorySession } from '../types';
+import { AskResponse, EitherActionResult, LogLevelEnum } from '../types';
 
 import { askGetApplicationVersion } from './askGetApplicationVersion';
 import { askCatch } from './system/askCatch';
@@ -42,7 +42,7 @@ function* askProcessEventRecord<QpqEventRecord, MSR extends AnyMatchStoryResult,
     return getSuccessfulEitherActionResult(earlyExitQpqEventRecordResponse);
   }
 
-  const messageSession = yield* askEventGetStorySession<EventParams, QpqEventRecord>(eventArguments, qpqEventRecord);
+  const messageSession = yield* askEventGetStorySession<EventParams, QpqEventRecord, MSR>(eventArguments, qpqEventRecord, matchResultResult.result);
 
   // Execute the story
   const executeStoryResponse = yield* askCatch(

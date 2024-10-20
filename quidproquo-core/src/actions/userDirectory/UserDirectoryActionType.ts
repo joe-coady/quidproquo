@@ -44,11 +44,6 @@ export interface AuthenticateUserResponse {
   authenticationInfo?: AuthenticationInfo;
 }
 
-export interface DecodedAccessToken {
-  userId: string;
-  username: string;
-}
-
 export interface UserAttributes {
   /** The user's email address */
   email?: string;

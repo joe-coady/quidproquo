@@ -56,7 +56,7 @@ export const createRuntime = (
     let storySession: StorySession = {
       correlation: runtimeCorrelation,
       depth: callerSession.depth + 1,
-      accessToken: callerSession.accessToken,
+      decodedAccessToken: callerSession.decodedAccessToken,
       context: callerSession.context,
     };
 

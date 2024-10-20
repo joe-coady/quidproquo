@@ -21,17 +21,13 @@ Currently under development ~ Not for production
 
 #### Todo:
 
+- Remove auth tokens from session, use decoded token
 - Use module federation to dynamically load
   - actions
   - stories
   - business logic.
-- Retry support for actions
-- Action logging
-- Tests
-- Create QPQ App
 - Move into @quidproquo/\* packaged namespace
 - OpenApi support for controllers (validation)
-- share the action processor logic between lambdas (+ general cleanup)
 
 ### optimizations:
 
@@ -40,25 +36,26 @@ Currently under development ~ Not for production
     - we can queue them up, and let the owner lambda hold onto them until they are done, so we can do other things
     - it may shave 100ms off function calls
 
+### Cleanup
+
+- apiBuildPath - remove from all configs, pull from just the base config
+- aws region being passed into qpqconfig - should be from the awsconfig
+- linting / import orders for qpq packages
+  - eslint
+    - import order
+    - linting
+    - prettier
+
 #### Must haves
 
 - void response should be 204?
 - Remove aws region being passed into QpqConfig
 - QPQ Types package ~ Web / Node
 - Reduce the log lifetime for lambda to a week or two by default
-- Finish auth
 - Local Dev
-- import html file as strings for email templates
-- Add monad support to actions (allow return with error info)
-- eslint
-  - import order
-  - linting
-  - prettier
-- Set secrets script
 - AWS Migration scripts to copy resources between accounts / services
 - (if !fedmod logic) - create dynamic loaders for each lambda type to reduce lambda build sizes
 - ESLint plugin to make sure user yield\* before an askGenerator
-- keep lambda's warm by adding a polling event every x mins
 
 ### Federated Module Implementation Attempt
 

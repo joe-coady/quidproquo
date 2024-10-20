@@ -1,11 +1,8 @@
 import { verify, decode } from 'jsonwebtoken';
 import jwksClient from 'jwks-rsa';
+import { DecodedAccessToken } from 'quidproquo-core';
 
-export type AuthInfo = {
-  userId: string;
-  username: string;
-};
-
+// TODO: Check whey we need this? I think you should be able to get types from the lib?
 type JwtPayload = {
   sub: string;
   iss: string;
@@ -26,7 +23,7 @@ export const decodeValidJwt = async (
   region: string,
   ignoreExpiration: boolean,
   accessToken?: string,
-): Promise<AuthInfo | null> => {
+): Promise<Omit<DecodedAccessToken, 'userDirectory'> | null> => {
   if (!accessToken) {
     return null;
   }
@@ -49,10 +46,14 @@ export const decodeValidJwt = async (
       ignoreExpiration,
     }) as JwtPayload;
 
-    return {
+    const decodedAccessToken: Omit<DecodedAccessToken, 'userDirectory'> = {
       userId: payload.sub,
       username: payload.username,
+      exp: payload.exp,
+      wasValid: true,
     };
+
+    return decodedAccessToken;
   } catch (e) {
     console.log('Failed to decode jwt token', e);
     return null;
