@@ -4,8 +4,8 @@ export const adminUserDirectoryResourceName = 'qpq-admin';
 
 type QPQConfigAdvancedAdminUserDirectorySettings = Required<Pick<QPQConfigAdvancedUserDirectorySettings, 'owner'>>;
 
-export const defineAdminUserDirectory = (buildPath: string, options?: QPQConfigAdvancedAdminUserDirectorySettings): QPQConfig => {
-  const configs = [defineUserDirectory(adminUserDirectoryResourceName, buildPath, options)];
+export const defineAdminUserDirectory = (options?: QPQConfigAdvancedAdminUserDirectorySettings): QPQConfig => {
+  const configs = [defineUserDirectory(adminUserDirectoryResourceName, options)];
 
   return configs;
 };

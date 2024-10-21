@@ -25,7 +25,6 @@ export const defineGraphDatabaseNeo4j = (databaseName: string, apiBuildPath: str
     '0 0 * * ? *', // 12am every day (UTC)
     // '* * * * ? *', // every min (for testing)
     `full@${path.join(__dirname, '../../../entry/scheduledEvents/keepAlive')}::keepAlive`,
-    apiBuildPath,
     {
       metadata: {
         databaseName: databaseName,

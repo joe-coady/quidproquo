@@ -15,7 +15,6 @@ export interface ScheduleQPQConfigSetting extends QPQConfigSetting {
 
   runtime: QpqFunctionRuntime;
   cronExpression: string;
-  buildPath: string;
   metadata: Record<string, any>;
 }
 
@@ -82,7 +81,6 @@ export interface ScheduleQPQConfigSetting extends QPQConfigSetting {
 export const defineRecurringSchedule = (
   cronExpression: string,
   runtime: QpqFunctionRuntime,
-  buildPath: string,
   options?: QPQConfigAdvancedScheduleSettings,
 ): ScheduleQPQConfigSetting => {
   const uniqueKey = getStoryNameFromQpqFunctionRuntime(runtime);
@@ -96,8 +94,6 @@ export const defineRecurringSchedule = (
     runtime,
 
     cronExpression,
-
-    buildPath,
 
     metadata: options?.metadata || {},
   };

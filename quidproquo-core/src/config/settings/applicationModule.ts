@@ -1,4 +1,5 @@
 import { QPQConfig, QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
+import { defineApiBuildPath } from './apiBuildPath';
 import { defineApplication } from './applicationName';
 import { defineModule } from './moduleName';
 
@@ -16,9 +17,11 @@ export const defineApplicationModule = (
   moduleName: string,
   environment: string,
   configRoot: string,
+  apiBuildPath: string,
   deployRegion?: string,
   feature?: string,
 ): QPQConfig => [
   defineApplication(applicationName, environment, configRoot, deployRegion, feature),
   defineModule(moduleName),
+  defineApiBuildPath(apiBuildPath),
 ];

@@ -27,7 +27,7 @@ export const qpqExecuteLog = async (storyResult: StoryResult<any>, runtime: any,
 
   // Generate an empty story resolver
   const resolveStory = createRuntime(
-    [defineApplicationModule('Debugger', storyResult.moduleName, 'development', __dirname)],
+    [defineApplicationModule('Debugger', storyResult.moduleName, 'development', __dirname, './dist')],
     {
       correlation: storyResult.fromCorrelation,
       depth: storyResult.session.depth,

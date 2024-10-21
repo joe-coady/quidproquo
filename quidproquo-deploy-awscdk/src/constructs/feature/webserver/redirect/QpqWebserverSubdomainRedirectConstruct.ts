@@ -25,7 +25,6 @@ export class QpqWebserverSubdomainRedirectConstruct extends QpqConstructBlock {
     const feature = qpqCoreUtils.getApplicationModuleFeature(props.qpqConfig);
 
     const func = new Function(this, 'redirect', {
-      buildPath: qpqWebServerUtils.getRedirectApiBuildFullPath(props.qpqConfig, props.subdomainRedirectConfig),
       functionName: this.resourceName(`${props.subdomainRedirectConfig.subdomain}-redirect`),
       functionType: 'apiGatewayEventHandler_redirect',
       executorName: 'apiGatewayEventHandler_redirect',

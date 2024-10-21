@@ -17,7 +17,6 @@ export interface StorageDriveOptions {
 
 export interface QPQConfigAdvancedWebEntrySettings extends QPQConfigAdvancedSettings {
   buildPath?: string;
-  seoBuildPath?: string;
 
   storageDrive?: StorageDriveOptions;
 
@@ -42,7 +41,6 @@ export interface WebEntryQPQWebServerConfigSetting extends QPQConfigSetting {
   domain: WebDomainOptions;
 
   buildPath?: string;
-  seoBuildPath?: string;
   cacheSettingsName?: string;
   ignoreCache: string[];
 
@@ -53,10 +51,7 @@ export interface WebEntryQPQWebServerConfigSetting extends QPQConfigSetting {
   securityHeaders?: ResponseSecurityHeaders;
 }
 
-export const defineWebEntry = (
-  name: string,
-  options: QPQConfigAdvancedWebEntrySettings,
-): WebEntryQPQWebServerConfigSetting => ({
+export const defineWebEntry = (name: string, options: QPQConfigAdvancedWebEntrySettings): WebEntryQPQWebServerConfigSetting => ({
   configSettingType: QPQWebServerConfigSettingType.WebEntry,
   uniqueKey: name,
 
@@ -70,7 +65,7 @@ export const defineWebEntry = (
   domain: options.domain,
 
   buildPath: options?.buildPath,
-  seoBuildPath: options?.seoBuildPath,
+
   ignoreCache: options?.ignoreCache || [],
 
   compressFiles: options?.compressFiles ?? true,

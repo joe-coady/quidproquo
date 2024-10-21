@@ -4,7 +4,6 @@ import { QPQWebServerConfigSettingType } from '../QPQConfig';
 
 export interface QPQConfigAdvancedApiSettings extends QPQConfigAdvancedSettings {
   subDomain?: string;
-  buildPath?: string;
   cloudflareApiKeySecretName?: string;
   virtualNetworkName?: string;
 }
@@ -14,7 +13,6 @@ export interface ApiQPQWebServerConfigSetting extends QPQConfigSetting {
   rootDomain: string;
 
   apiName: string;
-  buildPath?: string;
 
   deprecated: boolean;
 
@@ -29,7 +27,6 @@ export const defineApi = (apiName: string, rootDomain: string, options?: QPQConf
     uniqueKey: apiName,
 
     apiSubdomain: options?.subDomain || apiName,
-    buildPath: options?.buildPath,
     rootDomain,
 
     apiName: apiName,

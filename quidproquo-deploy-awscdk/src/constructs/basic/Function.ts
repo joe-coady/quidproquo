@@ -13,7 +13,6 @@ import { qpqCoreUtils } from 'quidproquo-core';
 export interface FunctionProps extends QpqConstructBlockProps {
   functionName?: string;
 
-  buildPath: string;
   srcFilename?: string;
   functionType: string; // TODO: Rename this to subFolder / folder or something
   executorName: string; // TODO: Rename this to handlerName or something maybe?
@@ -58,7 +57,7 @@ export class Function extends QpqConstructBlock {
       memorySize: props.memoryInBytes || serviceInfo.lambdaMaxMemoryInMiB || 1024,
       layers: props.apiLayerVersions,
 
-      code: aws_lambda.Code.fromAsset(path.join(props.buildPath, props.functionType)),
+      code: aws_lambda.Code.fromAsset(path.join(qpqCoreUtils.getApiBuildPathFullPath(props.qpqConfig), props.functionType)),
       handler: `${handlerFile}.${props.executorName}`,
 
       environment: {

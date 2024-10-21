@@ -30,7 +30,7 @@ const logResourceName = 'qpq-logs';
 export const logReportsResourceName = 'qpq-log-reports';
 export const wsConnectionResourceName = 'qpq-admin-connections';
 
-export const defineLogs = (buildPath: string, rootDomain: string, services: string[], advancedSettings?: QPQConfigAdvancedLogSettings): QPQConfig => {
+export const defineLogs = (rootDomain: string, services: string[], advancedSettings?: QPQConfigAdvancedLogSettings): QPQConfig => {
   const routeAuthSettings = {
     routeAuthSettings: {
       userDirectoryName: adminUserDirectoryResourceName,
@@ -58,7 +58,6 @@ export const defineLogs = (buildPath: string, rootDomain: string, services: stri
 
     defineStorageDrive(logResourceName, {
       onEvent: {
-        buildPath,
         create: getServiceEntryQpqFunctionRuntime('log', 'storageDrive', 'onCreate::onCreate'),
       },
       deprecated: advancedSettings?.deprecated,
@@ -122,7 +121,6 @@ export const defineLogs = (buildPath: string, rootDomain: string, services: stri
     defineWebsocket(
       'wsadmin',
       rootDomain,
-      buildPath,
       {
         onConnect: getServiceEntryQpqFunctionRuntime('log', 'webSocket', 'onWebsocketEvent::onConnect'),
         onDisconnect: getServiceEntryQpqFunctionRuntime('log', 'webSocket', 'onWebsocketEvent::onDisconnect'),

@@ -15,7 +15,7 @@ export const defineDevServerConfig = (buildPath: string, advancedSettings?: QPQC
   const pathToRuntime = path.join(__dirname, '../../entry/serviceFunction/runCypherQuery');
 
   const graphAccessConfigs = vpcList.map((vpcName) =>
-    defineServiceFunction(buildPath, `full@${pathToRuntime}::runCypherQuery`, {
+    defineServiceFunction(`full@${pathToRuntime}::runCypherQuery`, {
       virtualNetworkName: vpcName,
       functionName: `graphQuery${vpcName}`,
     }),

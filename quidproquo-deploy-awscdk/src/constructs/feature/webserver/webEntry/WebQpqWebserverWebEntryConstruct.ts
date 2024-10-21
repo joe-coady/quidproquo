@@ -25,6 +25,7 @@ import { Construct } from 'constructs';
 
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
 import { QpqWebServerCacheConstruct } from '../cache/QpqWebServerCacheConstruct';
+import { qpqCoreUtils } from 'quidproquo-core';
 
 export interface WebQpqWebserverWebEntryConstructProps extends QpqConstructBlockProps {
   webEntryConfig: WebEntryQPQWebServerConfigSetting;
@@ -210,7 +211,7 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
 
     // if we have some ~ Build the edge lambdas and deploy
     if (seos.length > 0) {
-      const seoEntryBuildPath = qpqWebServerUtils.getWebEntrySeoFullPath(props.qpqConfig, props.webEntryConfig);
+      const seoEntryBuildPath = qpqCoreUtils.getApiBuildPathFullPath(props.qpqConfig);
 
       const edgeFunctionVR = new aws_cloudfront.experimental.EdgeFunction(this, `SEO-VR`, {
         functionName: this.qpqResourceName(props.webEntryConfig.name, 'SEO-VR'),

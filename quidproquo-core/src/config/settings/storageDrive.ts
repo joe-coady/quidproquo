@@ -84,8 +84,6 @@ export type StorageDriveLifecycleRule = {
 };
 
 export interface StorageDriveEvents {
-  buildPath: string;
-
   create?: QpqFunctionRuntime;
   delete?: QpqFunctionRuntime;
 }

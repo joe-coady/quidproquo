@@ -19,8 +19,6 @@ export interface QPQConfigAdvancedQueueSettings extends QPQConfigAdvancedSetting
 export interface QueueQPQConfigSetting extends QPQConfigSetting {
   name: string;
 
-  buildPath: string;
-
   batchSize: number;
   batchWindowInSeconds: number;
 
@@ -37,17 +35,11 @@ export interface QueueQPQConfigSetting extends QPQConfigSetting {
   maxConcurrentExecutions?: number;
 }
 
-export const defineQueue = (
-  name: string,
-  buildPath: string,
-  processors: QpqQueueProcessors,
-  options?: QPQConfigAdvancedQueueSettings,
-): QueueQPQConfigSetting => ({
+export const defineQueue = (name: string, processors: QpqQueueProcessors, options?: QPQConfigAdvancedQueueSettings): QueueQPQConfigSetting => ({
   configSettingType: QPQCoreConfigSettingType.queue,
   uniqueKey: name,
 
   name,
-  buildPath,
 
   batchSize: options?.batchSize || 0,
   batchWindowInSeconds: options?.batchWindowInSeconds || 5,

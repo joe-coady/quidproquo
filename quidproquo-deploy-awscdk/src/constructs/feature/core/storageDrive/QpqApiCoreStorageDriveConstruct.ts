@@ -26,8 +26,6 @@ export class QpqApiCoreStorageDriveConstruct extends QpqConstructBlock {
 
     if (props.storageDriveConfig.onEvent?.create) {
       const func = new Function(this, 'create', {
-        buildPath: qpqCoreUtils.getStorageDriveEntryFullPath(props.qpqConfig, props.storageDriveConfig),
-
         reacreateOnFunctionNameChange: true,
         functionName: this.qpqResourceName(props.storageDriveConfig.storageDrive, 's3Create'),
 
@@ -54,8 +52,6 @@ export class QpqApiCoreStorageDriveConstruct extends QpqConstructBlock {
 
     if (props.storageDriveConfig.onEvent?.delete) {
       const func = new Function(this, 'delete', {
-        buildPath: qpqCoreUtils.getStorageDriveEntryFullPath(props.qpqConfig, props.storageDriveConfig),
-
         reacreateOnFunctionNameChange: true,
         functionName: this.qpqResourceName(props.storageDriveConfig.storageDrive, 's3Delete'),
 

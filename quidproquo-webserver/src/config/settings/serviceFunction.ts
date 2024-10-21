@@ -10,13 +10,11 @@ export interface QPQConfigAdvancedServiceFunctionSettings extends QPQConfigAdvan
 export interface ServiceFunctionQPQWebServerConfigSetting extends QPQConfigSetting {
   runtime: QpqFunctionRuntime;
 
-  buildPath: string;
   functionName: string;
   virtualNetworkName?: string;
 }
 
 export const defineServiceFunction = (
-  buildPath: string,
   runtime: QpqFunctionRuntime,
   options?: QPQConfigAdvancedServiceFunctionSettings,
 ): ServiceFunctionQPQWebServerConfigSetting => {
@@ -25,8 +23,6 @@ export const defineServiceFunction = (
   return {
     configSettingType: QPQWebServerConfigSettingType.ServiceFunction,
     uniqueKey: functionName,
-
-    buildPath,
 
     runtime,
 

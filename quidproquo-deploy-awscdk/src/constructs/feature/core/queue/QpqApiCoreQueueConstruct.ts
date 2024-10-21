@@ -21,7 +21,6 @@ export class QpqApiCoreQueueConstruct extends QpqConstructBlock {
     super(scope, id, props);
 
     const queueFunction = new Function(this, props.queueConfig.uniqueKey, {
-      buildPath: qpqCoreUtils.getQueueEntryFullPath(props.qpqConfig, props.queueConfig),
       functionName: this.resourceName(`${props.queueConfig.uniqueKey}-queue`),
       functionType: 'sqsEvent_queueEvent',
       executorName: 'sqsEvent_queueEvent',

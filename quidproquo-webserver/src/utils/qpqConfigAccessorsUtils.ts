@@ -97,35 +97,6 @@ export const getWebEntryFullPath = (qpqConfig: QPQConfig, webEntryQPQWebServerCo
   return joinPaths(qpqCoreUtils.getConfigRoot(qpqConfig), webEntryQPQWebServerConfigSetting.buildPath || '');
 };
 
-export const getWebEntrySeoFullPath = (qpqConfig: QPQConfig, webEntryQPQWebServerConfigSetting: WebEntryQPQWebServerConfigSetting): string => {
-  // Throw an error if no SEO build path has been defined.
-  if (!webEntryQPQWebServerConfigSetting.seoBuildPath) {
-    throw new Error(`Please define a 'seoBuildPath' in your web entry [${webEntryQPQWebServerConfigSetting.name}]`);
-  }
-
-  return joinPaths(qpqCoreUtils.getConfigRoot(qpqConfig), webEntryQPQWebServerConfigSetting.seoBuildPath);
-};
-
-export const getApiEntryFullPath = (qpqConfig: QPQConfig, apiConfig: ApiQPQWebServerConfigSetting): string => {
-  const apiBuildPath = apiConfig.buildPath;
-
-  if (!apiBuildPath) {
-    throw new Error(`please define a build path for your api ${apiConfig.apiName}`);
-  }
-
-  return joinPaths(qpqCoreUtils.getConfigRoot(qpqConfig), apiBuildPath);
-};
-
-export const getWebsocketEntryFullPath = (qpqConfig: QPQConfig, websocketConfig: WebSocketQPQWebServerConfigSetting): string => {
-  const websocketBuildPath = websocketConfig.buildPath;
-
-  if (!websocketBuildPath) {
-    throw new Error(`please define a build path for your websocket [${websocketConfig.apiName}]`);
-  }
-
-  return joinPaths(qpqCoreUtils.getConfigRoot(qpqConfig), websocketBuildPath);
-};
-
 export const getWebsocketEntryByApiName = (apiName: string, qpqConfig: QPQConfig): WebSocketQPQWebServerConfigSetting => {
   const websocketSettings = getWebsocketSettings(qpqConfig);
 
@@ -136,16 +107,6 @@ export const getWebsocketEntryByApiName = (apiName: string, qpqConfig: QPQConfig
   }
 
   return websocketSetting;
-};
-
-export const getServiceFunctionFullPath = (qpqConfig: QPQConfig, serviceFunctionConfig: ServiceFunctionQPQWebServerConfigSetting): string => {
-  const buildPath = serviceFunctionConfig.buildPath;
-
-  if (!buildPath) {
-    throw new Error('please use defineWebEntry in your qpq config');
-  }
-
-  return joinPaths(qpqCoreUtils.getConfigRoot(qpqConfig), buildPath);
 };
 
 export const getRedirectApiBuildFullPath = (qpqConfig: QPQConfig, redirectConfig: SubdomainRedirectQPQWebServerConfigSetting): string => {

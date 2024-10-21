@@ -22,7 +22,7 @@ import {
   GlobalQPQConfigSetting,
   ModuleQPQConfigSetting,
   ClaudeAIQPQConfigSetting,
-  ApplicationBasePathQPQConfigSetting,
+  ApiBuildPathQPQConfigSetting,
   GraphDatabaseQPQConfigSetting,
   VirtualNetworkQPQConfigSetting,
 } from './config';
@@ -335,14 +335,14 @@ export const getAllSrcEntries = (qpqConfig: QPQConfig): QpqFunctionRuntime[] => 
   return result;
 };
 
-export const getApplicationBasePath = (qpqConfig: QPQConfig): string => {
-  const [basePath] = getConfigSettings<ApplicationBasePathQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.appBasePath);
+export const getApiBuildPath = (qpqConfig: QPQConfig): string => {
+  const [apiBuildPathConfig] = getConfigSettings<ApiBuildPathQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.apiBuildPath);
 
-  if (!basePath) {
-    throw new Error(`Can not find app base path use defineApplicationBasePath`);
+  if (!apiBuildPathConfig) {
+    throw new Error(`Can not find app base path use defineApiBuildPath or defineApplicationModule`);
   }
 
-  return basePath.basePath;
+  return apiBuildPathConfig.apiBuildPath;
 };
 
 export const getSrcPathFromQpqFunctionRuntime = (qpqFunctionRuntime: QpqFunctionRuntime): string => {
@@ -480,32 +480,15 @@ export const getUniqueKeyForSetting = (setting: QPQConfigSetting) => {
   return `${type}${key}`;
 };
 
-export const getScheduleEntryFullPath = (qpqConfig: QPQConfig, scheduleConfig: ScheduleQPQConfigSetting): string => {
-  return joinPaths(getConfigRoot(qpqConfig), scheduleConfig.buildPath);
-};
-
-export const getStorageDriveEntryFullPath = (qpqConfig: QPQConfig, storageDriveConfig: StorageDriveQPQConfigSetting): string => {
-  if (!storageDriveConfig.onEvent?.buildPath) {
-    throw new Error('Please specify a build path in your storage drive config (onEvent)');
-  }
-
-  return joinPaths(getConfigRoot(qpqConfig), storageDriveConfig.onEvent.buildPath);
-};
-
-export const getDeployEventFullPath = (qpqConfig: QPQConfig, deployEventConfig: DeployEventsQPQConfigSetting): string => {
-  return joinPaths(getConfigRoot(qpqConfig), deployEventConfig.buildPath);
-};
-
 export const getStorageDriveUploadFullPath = (qpqConfig: QPQConfig, storageDriveConfig: StorageDriveQPQConfigSetting): string => {
   return joinPaths(getConfigRoot(qpqConfig), storageDriveConfig.copyPath || '');
 };
 
-export const getQueueEntryFullPath = (qpqConfig: QPQConfig, queueConfig: QueueQPQConfigSetting): string => {
-  return joinPaths(getConfigRoot(qpqConfig), queueConfig.buildPath);
-};
+export const getApiBuildPathFullPath = (qpqConfig: QPQConfig): string => {
+  const configRoot = getConfigRoot(qpqConfig);
+  const apiBuildPath = getApiBuildPath(qpqConfig);
 
-export const getUserDirectoryEntryFullPath = (qpqConfig: QPQConfig, userDirectoryConfig: UserDirectoryQPQConfigSetting): string => {
-  return joinPaths(getConfigRoot(qpqConfig), userDirectoryConfig.buildPath);
+  return joinPaths(configRoot, apiBuildPath);
 };
 
 export const getQueueQueueProcessors = (name: string, qpqConfig: QPQConfig): QpqQueueProcessors => {

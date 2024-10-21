@@ -18,7 +18,7 @@ export interface Migration {
 
 export interface QPQConfigAdvancedMigrationSettings extends QPQConfigAdvancedSettings {}
 
-export const defineMigration = (buildPath: string, migrations: Migration[], options?: QPQConfigAdvancedMigrationSettings): QPQConfig => {
+export const defineMigration = (migrations: Migration[], options?: QPQConfigAdvancedMigrationSettings): QPQConfig => {
   return [
     // Define a global so we can access the migrations from the src
     defineGlobal('qpqMigrations', migrations),
@@ -27,12 +27,11 @@ export const defineMigration = (buildPath: string, migrations: Migration[], opti
     defineKeyValueStore('qpqMigrations', 'srcPath', ['deployType'], options),
 
     // Listen to deploy events
-    defineDeployEvent(buildPath, 'qpqMigrations', getServiceEntryQpqFunctionRuntime('migration', 'deployEvent', 'onDeploy::onDeploy')),
+    defineDeployEvent('qpqMigrations', getServiceEntryQpqFunctionRuntime('migration', 'deployEvent', 'onDeploy::onDeploy')),
 
     // Build up a queue where the src names are the event types
     defineQueue(
       'qpqMigrations',
-      buildPath,
       migrations.reduce(
         (acc, m) => ({
           ...acc,

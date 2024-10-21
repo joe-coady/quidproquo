@@ -26,7 +26,6 @@ export interface WebSocketQPQWebServerConfigSetting extends QPQConfigSetting {
   onRootDomain: boolean;
 
   apiName: string;
-  buildPath: string;
 
   eventProcessors: QpqWebSocketEventProcessors;
 
@@ -38,7 +37,6 @@ export interface WebSocketQPQWebServerConfigSetting extends QPQConfigSetting {
 export const defineWebsocket = (
   apiSubdomain: string,
   rootDomain: string,
-  buildPath: string,
   eventProcessors: QpqWebSocketEventProcessors,
   options?: QPQConfigAdvancedWebSocketSettings,
 ): WebSocketQPQWebServerConfigSetting => {
@@ -48,7 +46,6 @@ export const defineWebsocket = (
 
     apiSubdomain,
     rootDomain,
-    buildPath,
 
     eventProcessors,
 

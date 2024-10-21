@@ -1,12 +1,13 @@
 import { aws_ec2, aws_lambda } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
-import { ServiceFunctionQPQWebServerConfigSetting, qpqWebServerUtils } from 'quidproquo-webserver';
+import { ServiceFunctionQPQWebServerConfigSetting } from 'quidproquo-webserver';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
 import { Function } from '../../../basic/Function';
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
+import { qpqCoreUtils } from 'quidproquo-core';
 
 export interface QpqWebserverServiceFunctionConstructProps extends QpqConstructBlockProps {
   serviceFunctionConfig: ServiceFunctionQPQWebServerConfigSetting;
@@ -25,7 +26,6 @@ export class QpqWebserverServiceFunctionConstruct extends QpqConstructBlock {
 
     // Build Function
     const func = new Function(this, 'api-function', {
-      buildPath: qpqWebServerUtils.getServiceFunctionFullPath(props.qpqConfig, props.serviceFunctionConfig),
       functionName: this.resourceName(`${props.serviceFunctionConfig.functionName}-sfunc`),
       functionType: 'anyExecuteServiceFunctionEvent_serviceFunction',
       executorName: 'anyExecuteServiceFunctionEvent_serviceFunction',

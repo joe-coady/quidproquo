@@ -28,7 +28,6 @@ export class ApiQpqWebserverApiConstruct extends QpqConstructBlock {
 
     // Build Function
     const func = new Function(this, 'api-function', {
-      buildPath: qpqWebServerUtils.getApiEntryFullPath(props.qpqConfig, props.apiConfig),
       functionName: this.resourceName(`${props.apiConfig.apiName}-route`),
       functionType: 'apiGatewayEventHandler',
       executorName: 'apiGatewayEventHandler',

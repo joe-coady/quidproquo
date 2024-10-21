@@ -76,7 +76,6 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
       props.userDirectoryConfig.emailTemplates.verifyEmail
     ) {
       const customMessageTrigger = new Function(this, 'csm-msg-trigger-func', {
-        buildPath: qpqCoreUtils.getUserDirectoryEntryFullPath(props.qpqConfig, props.userDirectoryConfig),
         functionName: this.qpqResourceName(`${props.userDirectoryConfig.name}`, 'cm-trig'),
         functionType: 'customMessageTriggerEvent_customMessage',
         executorName: 'customMessageTriggerEvent_customMessage',
@@ -97,7 +96,6 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
 
     if (props.userDirectoryConfig.customAuthRuntime) {
       const defAuthChallengeTrigger = new Function(this, 'def-auth-challenge', {
-        buildPath: qpqCoreUtils.getUserDirectoryEntryFullPath(props.qpqConfig, props.userDirectoryConfig),
         functionName: this.qpqResourceName(`${props.userDirectoryConfig.name}`, 'cac-define'),
         functionType: 'customMessageTriggerEvent_defineAuthChallenge',
         executorName: 'customMessageTriggerEvent_defineAuthChallenge',
@@ -117,7 +115,6 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
 
       if (props.userDirectoryConfig.customAuthRuntime.createAuthChallenge) {
         const createAuthChallengeTrigger = new Function(this, 'create-auth-challenge', {
-          buildPath: qpqCoreUtils.getUserDirectoryEntryFullPath(props.qpqConfig, props.userDirectoryConfig),
           functionName: this.qpqResourceName(`${props.userDirectoryConfig.name}`, 'cac-create'),
           functionType: 'customMessageTriggerEvent_createAuthChallenge',
           executorName: 'customMessageTriggerEvent_createAuthChallenge',
@@ -137,7 +134,6 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
 
       if (props.userDirectoryConfig.customAuthRuntime.verifyAuthChallenge) {
         const verifyAuthChallengeTrigger = new Function(this, 'verify-auth-challenge', {
-          buildPath: qpqCoreUtils.getUserDirectoryEntryFullPath(props.qpqConfig, props.userDirectoryConfig),
           functionName: this.qpqResourceName(`${props.userDirectoryConfig.name}`, 'cac-verify'),
           functionType: 'customMessageTriggerEvent_verifyAuthChallenge',
           executorName: 'customMessageTriggerEvent_verifyAuthChallenge',
