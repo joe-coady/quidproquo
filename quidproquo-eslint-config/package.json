@@ -4,7 +4,12 @@
   "description": "eslint config for quidproquo projects.",
   "main": ".eslintrc.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "",
+    "clean": "",
+    "build": "",
+    "watch": "",
+    "lint": "",
+    "lint:fix": ""
   },
   "repository": {
     "type": "git",

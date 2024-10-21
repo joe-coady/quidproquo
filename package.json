@@ -9,7 +9,9 @@
     "login": "npm login",
     "publish": "npm publish --ws",
     "patch": "npm version patch --ws && npx ts-node ./scripts/applyPatch.ts",
-    "go": "npm run patch && npm run build && npm run publish"
+    "go": "npm run patch && npm run build && npm run publish",
+    "lint": "npm run lint --ws",
+    "lint:fix": "npm run lint:fix --ws"
   },
   "repository": {
     "type": "git",

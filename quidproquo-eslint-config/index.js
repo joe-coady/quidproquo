@@ -6,4 +6,5 @@ module.exports = {
     './config/overrides.js',
     './config/typescript.js',
   ],
+  ignorePatterns: ['node_modules/', 'dist/', 'build/', 'lib/'],
 };
