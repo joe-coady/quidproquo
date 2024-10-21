@@ -24,6 +24,7 @@
   "homepage": "https://github.com/joe-coady/quidproquo#readme",
   "workspaces": [
     "quidproquo-tsconfig",
+    "quidproquo-eslint-config",
     "quidproquo-core",
     "quidproquo-config-aws",
     "quidproquo-webserver",
