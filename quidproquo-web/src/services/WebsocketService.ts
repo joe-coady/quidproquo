@@ -101,7 +101,7 @@ export class WebsocketService {
 
   public unsubscribeAll() {
     for (const subscriptionType in this.subscriptions) {
-      if (this.subscriptions.hasOwnProperty(subscriptionType)) {
+      if (Object.prototype.hasOwnProperty.call(this.subscriptions, subscriptionType)) {
         this.subscriptions[subscriptionType as WebsocketServiceEvent].clear();
       }
     }
@@ -133,7 +133,7 @@ export class WebsocketService {
   private removeAllEventListeners() {
     if (this.socket) {
       for (const event in this.eventListeners) {
-        if (this.eventListeners.hasOwnProperty(event)) {
+        if (Object.prototype.hasOwnProperty.call(this.eventListeners, event)) {
           for (const listener of this.eventListeners[event]) {
             this.socket.removeEventListener(event, listener);
           }
