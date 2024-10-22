@@ -1,4 +1,3 @@
-
 export enum WebSocketEventType {
   Connect = 'CONNECT',
   Disconnect = 'DISCONNECT',
@@ -16,6 +15,6 @@ export type WebsocketEvent<T extends string | Blob | ArrayBuffer = string> = {
   sourceIp: string;
 
   body?: T;
-}
+};
 
 export type WebsocketEventResponse = void;

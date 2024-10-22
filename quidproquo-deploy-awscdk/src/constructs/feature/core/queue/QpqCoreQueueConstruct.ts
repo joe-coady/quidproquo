@@ -50,10 +50,7 @@ export class QpqCoreQueueConstruct extends QpqCoreQueueConstructBase {
   ): QpqCoreQueueConstructBase {
     const queueArn = `arn:aws:sqs:${qpqCoreUtils.getApplicationModuleDeployRegion(
       qpqConfig,
-    )}:${awsAccountId}:${awsNamingUtils.getConfigRuntimeResourceNameFromConfig(
-      queueConfig.name,
-      qpqConfig,
-    )}`;
+    )}:${awsAccountId}:${awsNamingUtils.getConfigRuntimeResourceNameFromConfig(queueConfig.name, qpqConfig)}`;
 
     class Import extends QpqCoreQueueConstructBase {
       queue = aws_sqs.Queue.fromQueueAttributes(scope, `${id}-${queueConfig.uniqueKey}`, {

@@ -2,23 +2,22 @@ import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-sec
 import { memoFuncAsync } from '../cache/memoFuncAsync';
 import { createAwsClient } from '../createAwsClient';
 
-export const getSecret = memoFuncAsync(
-  async (secretName: string, region: string): Promise<string> => {
-    const secretsManagerClient = createAwsClient(SecretsManagerClient, { region });
+export const getSecret = memoFuncAsync(async (secretName: string, region: string): Promise<string> => {
+  const secretsManagerClient = createAwsClient(SecretsManagerClient, {
+    region,
+  });
 
-    const response = await secretsManagerClient.send(
-      new GetSecretValueCommand({
-        SecretId: secretName,
-      }),
-    );
+  const response = await secretsManagerClient.send(
+    new GetSecretValueCommand({
+      SecretId: secretName,
+    }),
+  );
 
-    const secretValue = response.SecretString || '';
+  const secretValue = response.SecretString || '';
 
-    if (!secretValue) {
-      throw new Error(`Failed to get secret value for secret name: [${secretName}]`);
-    }
+  if (!secretValue) {
+    throw new Error(`Failed to get secret value for secret name: [${secretName}]`);
+  }
 
-    return secretValue;
-  },
-  60,
-);
+  return secretValue;
+}, 60);

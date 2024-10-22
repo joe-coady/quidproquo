@@ -19,10 +19,7 @@ export function* askFileListDirectory(
   };
 }
 
-export function* askFileListAllDirectory(
-  drive: string,
-  folderPath: string,
-): AskResponse<FileInfo[]> {
+export function* askFileListAllDirectory(drive: string, folderPath: string): AskResponse<FileInfo[]> {
   let pageToken: string | undefined;
   let fileInfos: FileInfo[] = [];
 

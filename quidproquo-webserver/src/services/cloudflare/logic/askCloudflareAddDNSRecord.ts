@@ -1,29 +1,14 @@
-import {
-  askLogCreate,
-  askNetworkRequest,
-  AskResponse,
-  askThrowError,
-  ErrorTypeEnum,
-  LogLevelEnum,
-} from 'quidproquo-core';
+import { askLogCreate, askNetworkRequest, AskResponse, askThrowError, ErrorTypeEnum, LogLevelEnum } from 'quidproquo-core';
 import { CloudflareResponse, CloudflareDNSRecord } from '../types';
 import { CloudflareDnsEntry } from '../../../types';
 
-export function* askCloudflareAddDNSRecord(
-  apiKey: string,
-  zoneId: string,
-  cnameName: string,
-  dnsEntryValue: CloudflareDnsEntry,
-): AskResponse<void> {
+export function* askCloudflareAddDNSRecord(apiKey: string, zoneId: string, cnameName: string, dnsEntryValue: CloudflareDnsEntry): AskResponse<void> {
   const requestBody = {
     type: dnsEntryValue.type, // Use the type from the dnsEntryValue
     name: cnameName,
     content: dnsEntryValue.value,
     ttl: 1, // Automatic TTL
-    proxied:
-      typeof dnsEntryValue.proxied === 'string'
-        ? (dnsEntryValue.proxied as string).toLowerCase() === 'true'
-        : Boolean(dnsEntryValue.proxied),
+    proxied: typeof dnsEntryValue.proxied === 'string' ? (dnsEntryValue.proxied as string).toLowerCase() === 'true' : Boolean(dnsEntryValue.proxied),
   };
 
   yield* askLogCreate(LogLevelEnum.Info, `type of proxied: [${typeof dnsEntryValue.proxied}]`);
@@ -52,9 +37,6 @@ export function* askCloudflareAddDNSRecord(
   console.log(JSON.stringify(response.data, null, 2));
 
   if (!response.data.success) {
-    yield* askThrowError(
-      ErrorTypeEnum.GenericError,
-      `Failed to add CNAME record: ${response.data.errors.map((e) => e.message).join(', ')}`,
-    );
+    yield* askThrowError(ErrorTypeEnum.GenericError, `Failed to add CNAME record: ${response.data.errors.map((e) => e.message).join(', ')}`);
   }
 }

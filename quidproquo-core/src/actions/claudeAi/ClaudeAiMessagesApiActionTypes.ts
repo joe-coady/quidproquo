@@ -15,11 +15,5 @@ export interface ClaudeAiMessagesApiAction extends Action<ClaudeAiMessagesApiAct
 }
 
 // Function Types
-export type ClaudeAiMessagesApiActionProcessor = ActionProcessor<
-  ClaudeAiMessagesApiAction,
-  Anthropic.Message
->;
-export type ClaudeAiMessagesApiActionRequester = ActionRequester<
-  ClaudeAiMessagesApiAction,
-  Anthropic.Message
->;
+export type ClaudeAiMessagesApiActionProcessor = ActionProcessor<ClaudeAiMessagesApiAction, Anthropic.Message>;
+export type ClaudeAiMessagesApiActionRequester = ActionRequester<ClaudeAiMessagesApiAction, Anthropic.Message>;

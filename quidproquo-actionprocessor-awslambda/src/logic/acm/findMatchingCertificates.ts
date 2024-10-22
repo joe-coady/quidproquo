@@ -26,10 +26,7 @@ export const findMatchingCertificates = async (
       const listResult = await acmClient.send(listCommand);
 
       for (const certificate of listResult.CertificateSummaryList || []) {
-        if (
-          certificate.CertificateArn &&
-          certificate.DomainName?.toLowerCase() === lowerCaseDomainName
-        ) {
+        if (certificate.CertificateArn && certificate.DomainName?.toLowerCase() === lowerCaseDomainName) {
           certificateArns.push(certificate.CertificateArn);
         }
       }

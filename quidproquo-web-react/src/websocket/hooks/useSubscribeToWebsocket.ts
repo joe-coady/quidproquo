@@ -3,10 +3,7 @@ import { useEffect } from 'react';
 import { useWebsocketApi } from './useWebsocketApi';
 import { WebSocketServiceSubscriptionFunction, WebsocketServiceEvent } from 'quidproquo-web';
 
-export const useSubscribeToWebsocket = (
-  subscriptionType: WebsocketServiceEvent,
-  callback: WebSocketServiceSubscriptionFunction,
-) => {
+export const useSubscribeToWebsocket = (subscriptionType: WebsocketServiceEvent, callback: WebSocketServiceSubscriptionFunction) => {
   const websocketService = useWebsocketApi();
 
   useEffect(() => {

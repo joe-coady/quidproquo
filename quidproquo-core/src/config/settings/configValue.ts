@@ -5,10 +5,7 @@ export interface ConfigValueQPQConfigSetting<T> extends QPQConfigSetting {
   configValue: T;
 }
 
-export const defineConfigValue = <T>(
-  configValueName: string,
-  configValue: T,
-): ConfigValueQPQConfigSetting<T> => ({
+export const defineConfigValue = <T>(configValueName: string, configValue: T): ConfigValueQPQConfigSetting<T> => ({
   configSettingType: QPQCoreConfigSettingType.configValue,
   uniqueKey: configValueName,
 

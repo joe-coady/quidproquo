@@ -4,16 +4,9 @@ import { RouteAuthSettings } from 'quidproquo-webserver';
 import { verifyJwt } from '../../../../logic/cognito/verifyJwt';
 import { getExportedValue } from '../../../../logic/cloudformation/getExportedValue';
 import { getApiKeys } from '../../../../logic/apiGateway/getApiKeys';
-import {
-  getCFExportNameUserPoolIdFromConfig,
-  getConfigRuntimeResourceName,
-} from '../../../../awsNamingUtils';
+import { getCFExportNameUserPoolIdFromConfig, getConfigRuntimeResourceName } from '../../../../awsNamingUtils';
 
-const isAuthValidForCognito = async (
-  qpqConfig: QPQConfig,
-  authSettings: RouteAuthSettings,
-  authHeader?: string | null,
-) => {
+const isAuthValidForCognito = async (qpqConfig: QPQConfig, authSettings: RouteAuthSettings, authHeader?: string | null) => {
   // If there are no auth settings ~ Its valid.
   if (!authSettings.userDirectoryName) {
     return true;
@@ -35,20 +28,13 @@ const isAuthValidForCognito = async (
   const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
 
   // Resolve the user pool id
-  const userPoolId = await getExportedValue(
-    getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig),
-    region,
-  );
+  const userPoolId = await getExportedValue(getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig), region);
 
   // Verify the token
   return await verifyJwt(accessToken, userPoolId, region, false);
 };
 
-const isAuthValidForApiKeys = async (
-  qpqConfig: QPQConfig,
-  authSettings: RouteAuthSettings,
-  apiKeyHeader?: string | null,
-): Promise<boolean> => {
+const isAuthValidForApiKeys = async (qpqConfig: QPQConfig, authSettings: RouteAuthSettings, apiKeyHeader?: string | null): Promise<boolean> => {
   const apiKeys = authSettings.apiKeys || [];
   if (apiKeys.length === 0) {
     return true;
@@ -67,13 +53,7 @@ const isAuthValidForApiKeys = async (
       const apiKeyApplication = apiKey.applicationName || application;
       const apiKeyService = apiKey.serviceName || service;
 
-      return getConfigRuntimeResourceName(
-        apiKey.name,
-        apiKeyApplication,
-        apiKeyService,
-        environment,
-        feature,
-      );
+      return getConfigRuntimeResourceName(apiKey.name, apiKeyApplication, apiKeyService, environment, feature);
     }),
   );
 

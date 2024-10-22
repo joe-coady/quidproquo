@@ -1,8 +1,6 @@
 import { StoryResultMetadataWithChildren } from '../../types';
 
-export const getTimeBounds = (
-  logs: StoryResultMetadataWithChildren[],
-): { earliestStartedAt: string; latestFinishedAt: string } => {
+export const getTimeBounds = (logs: StoryResultMetadataWithChildren[]): { earliestStartedAt: string; latestFinishedAt: string } => {
   let earliestStartedAt = '';
   let latestFinishedAt = '';
 
@@ -11,9 +9,7 @@ export const getTimeBounds = (
       earliestStartedAt = node.startedAt;
     }
 
-    const finishedAt = new Date(
-      new Date(node.startedAt).getTime() + node.executionTimeMs,
-    ).toISOString();
+    const finishedAt = new Date(new Date(node.startedAt).getTime() + node.executionTimeMs).toISOString();
     if (!latestFinishedAt || finishedAt > latestFinishedAt) {
       latestFinishedAt = finishedAt;
     }

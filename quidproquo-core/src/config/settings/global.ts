@@ -5,10 +5,7 @@ export interface GlobalQPQConfigSetting<T> extends QPQConfigSetting {
   value: T;
 }
 
-export const defineGlobal = <T>(
-  key: string,
-  value: T,
-): GlobalQPQConfigSetting<T> => ({
+export const defineGlobal = <T>(key: string, value: T): GlobalQPQConfigSetting<T> => ({
   configSettingType: QPQCoreConfigSettingType.global,
   uniqueKey: key,
 

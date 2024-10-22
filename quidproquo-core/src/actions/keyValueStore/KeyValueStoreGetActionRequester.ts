@@ -1,8 +1,5 @@
 import { KeyValueStoreActionType } from './KeyValueStoreActionType';
-import {
-  KeyValueStoreGetActionRequester,
-  KeyValueStoreGetOptions,
-} from './KeyValueStoreGetActionTypes';
+import { KeyValueStoreGetActionRequester, KeyValueStoreGetOptions } from './KeyValueStoreGetActionTypes';
 
 export function* askKeyValueStoreGet<Value>(
   keyValueStoreName: string,

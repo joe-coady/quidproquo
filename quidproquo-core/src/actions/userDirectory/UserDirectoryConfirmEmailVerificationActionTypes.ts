@@ -8,18 +8,11 @@ export interface UserDirectoryConfirmEmailVerificationActionPayload {
 }
 
 // Action
-export interface UserDirectoryConfirmEmailVerificationAction
-  extends Action<UserDirectoryConfirmEmailVerificationActionPayload> {
+export interface UserDirectoryConfirmEmailVerificationAction extends Action<UserDirectoryConfirmEmailVerificationActionPayload> {
   type: UserDirectoryActionType.ConfirmEmailVerification;
   payload: UserDirectoryConfirmEmailVerificationActionPayload;
 }
 
 // Function Types
-export type UserDirectoryConfirmEmailVerificationActionProcessor = ActionProcessor<
-  UserDirectoryConfirmEmailVerificationAction,
-  void
->;
-export type UserDirectoryConfirmEmailVerificationActionRequester = ActionRequester<
-  UserDirectoryConfirmEmailVerificationAction,
-  void
->;
+export type UserDirectoryConfirmEmailVerificationActionProcessor = ActionProcessor<UserDirectoryConfirmEmailVerificationAction, void>;
+export type UserDirectoryConfirmEmailVerificationActionRequester = ActionRequester<UserDirectoryConfirmEmailVerificationAction, void>;

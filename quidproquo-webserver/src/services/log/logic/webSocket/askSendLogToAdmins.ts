@@ -1,9 +1,6 @@
 import { AskResponse, StoryResultMetadata, askMapParallelBatch } from 'quidproquo-core';
 
-import {
-  WebSocketAdminServerEventMessageLogMetadata,
-  WebsocketAdminServerMessageEventType,
-} from './serverMessages';
+import { WebSocketAdminServerEventMessageLogMetadata, WebsocketAdminServerMessageEventType } from './serverMessages';
 
 import { websocketConnectionData } from '../../data';
 import { askSendMessage } from './askSendMessage';
@@ -18,11 +15,7 @@ export function* askSendLogToAdmins(log: StoryResultMetadata) {
 
   const connections = yield* websocketConnectionData.askGetAdminConnections();
 
-  yield* askMapParallelBatch(
-    connections,
-    10,
-    function* askSendLogOnConnection(connection): AskResponse<void> {
-      yield* askSendMessage(connection.id, logMessage);
-    },
-  );
+  yield* askMapParallelBatch(connections, 10, function* askSendLogOnConnection(connection): AskResponse<void> {
+    yield* askSendMessage(connection.id, logMessage);
+  });
 }

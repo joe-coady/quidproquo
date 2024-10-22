@@ -55,7 +55,10 @@ const getQpqAttributeObjectFromCognitoKeyValue = (key: string, value: string): U
 export const getQpqAttributesFromCognitoUserAttributes = (cognitoUserAttributes: { Name: string; Value: string }[]): UserAttributes => {
   // Map cognitoUserAttributes to your UserAttributes format
   const userAttributes: UserAttributes = cognitoUserAttributes.reduce((acc, { Name, Value }) => {
-    return { ...acc, ...getQpqAttributeObjectFromCognitoKeyValue(Name, Value) };
+    return {
+      ...acc,
+      ...getQpqAttributeObjectFromCognitoKeyValue(Name, Value),
+    };
   }, {} as UserAttributes);
 
   return userAttributes;

@@ -33,9 +33,7 @@ const buildDynamoQueryExpressionBetween = (query: KvsQueryCondition): string => 
     throw new Error(`Invalid query condition ${KvsQueryOperationType.Between}`);
   }
 
-  return `${getItemName(query.key)} BETWEEN ${getValueName(
-    query.valueA as string,
-  )} AND ${getValueName(query.valueB as string)}`;
+  return `${getItemName(query.key)} BETWEEN ${getValueName(query.valueA as string)} AND ${getValueName(query.valueB as string)}`;
 };
 
 const buildDynamoQueryExpressionEqual = (query: KvsQueryCondition): string => {
@@ -63,9 +61,7 @@ const buildDynamoQueryExpressionGreaterThanOrEqual = (query: KvsQueryCondition):
 };
 
 const buildDynamoQueryExpressionIn = (query: KvsQueryCondition): string => {
-  return `${getItemName(query.key)} IN (${(query.valueA as string[])
-    .map((v) => getValueName(v))
-    .join(', ')})`;
+  return `${getItemName(query.key)} IN (${(query.valueA as string[]).map((v) => getValueName(v)).join(', ')})`;
 };
 
 const buildDynamoQueryExpressionExists = (query: KvsQueryCondition): string => {
@@ -189,9 +185,7 @@ export const buildDynamoQueryExpression = (query?: KvsQueryOperation): string | 
   return buildDynamoQueryExpressionRoot(query);
 };
 
-export const buildExpressionAttributeValues = (
-  queries: (KvsQueryOperation | undefined)[],
-): Record<string, AttributeValue> | undefined => {
+export const buildExpressionAttributeValues = (queries: (KvsQueryOperation | undefined)[]): Record<string, AttributeValue> | undefined => {
   const values: Record<string, AttributeValue> = {};
 
   const traverse = (query: KvsQueryOperation) => {
@@ -217,9 +211,7 @@ export const buildExpressionAttributeValues = (
   return Object.keys(values).length > 0 ? values : undefined;
 };
 
-export const buildExpressionAttributeNames = (
-  queries: (KvsQueryOperation | undefined)[],
-): Record<string, string> | undefined => {
+export const buildExpressionAttributeNames = (queries: (KvsQueryOperation | undefined)[]): Record<string, string> | undefined => {
   const names: Record<string, string> = {};
 
   const traverse = (query: KvsQueryOperation) => {

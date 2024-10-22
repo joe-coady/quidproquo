@@ -26,9 +26,7 @@ export class InfQpqWebserverServiceDomainsConstruct extends QpqConstructBlock {
       .filter((we) => !we.onRootDomain)
       .map((we) => we.rootDomain);
 
-    const uniqueRootDomains = [
-      ...new Set([...webEntryRootDomains, ...domainProxyRootDomains, ...websocketRootDomains]),
-    ];
+    const uniqueRootDomains = [...new Set([...webEntryRootDomains, ...domainProxyRootDomains, ...websocketRootDomains])];
 
     for (const rootDomain of uniqueRootDomains) {
       new ServiceDomainConstruct(this, `domain-${rootDomain}`, {

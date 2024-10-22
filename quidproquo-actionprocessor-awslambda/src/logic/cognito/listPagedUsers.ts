@@ -1,23 +1,16 @@
 import { UserAttributes, QpqPagedData } from 'quidproquo-core';
 
-import {
-  CognitoIdentityProviderClient,
-  ListUsersCommand,
-  ListUsersResponse,
-} from '@aws-sdk/client-cognito-identity-provider';
-
+import { CognitoIdentityProviderClient, ListUsersCommand, ListUsersResponse } from '@aws-sdk/client-cognito-identity-provider';
 
 import { getQpqAttributesFromCognitoUserAttributes } from './cognitoAttributeMap';
 
 import { pageKeyToPaginationToken, paginationTokenToPageKey } from './utils';
 import { createAwsClient } from '../createAwsClient';
 
-export const listPagedUsers = async (
-  userPoolId: string,
-  region: string,
-  pageKey?: string,
-): Promise<QpqPagedData<UserAttributes>> => {
-  const cognitoClient = createAwsClient(CognitoIdentityProviderClient, { region });
+export const listPagedUsers = async (userPoolId: string, region: string, pageKey?: string): Promise<QpqPagedData<UserAttributes>> => {
+  const cognitoClient = createAwsClient(CognitoIdentityProviderClient, {
+    region,
+  });
 
   const response: ListUsersResponse = await cognitoClient.send(
     new ListUsersCommand({
@@ -27,13 +20,11 @@ export const listPagedUsers = async (
   );
 
   const users: UserAttributes[] = (response.Users || []).map((user) => {
-    const validAttributes = (user.Attributes || []).filter(
-      (attr) => attr.Name && attr.Value,
-    ) as {
+    const validAttributes = (user.Attributes || []).filter((attr) => attr.Name && attr.Value) as {
       Name: string;
       Value: string;
     }[];
-    
+
     return getQpqAttributesFromCognitoUserAttributes(validAttributes);
   });
 

@@ -5,5 +5,8 @@ import { createErrorEnumForAction } from '../../types';
 export const ConfigGetParameterErrorTypeEnum = createErrorEnumForAction(ConfigActionType.GetParameter, ['Throttling']);
 
 export function* askConfigGetParameter(parameterName: string): ConfigGetParameterActionRequester {
-  return yield { type: ConfigActionType.GetParameter, payload: { parameterName } };
+  return yield {
+    type: ConfigActionType.GetParameter,
+    payload: { parameterName },
+  };
 }

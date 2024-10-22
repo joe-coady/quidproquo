@@ -8,8 +8,7 @@ export const useErrorsByType = (logs: StoryResultMetadata[]) => {
     logs.forEach((log) => {
       if (log.error) {
         const errorText = log.error || '';
-        const truncatedErrorText =
-          errorText.length > 100 ? errorText.slice(0, 100) + '...' : errorText;
+        const truncatedErrorText = errorText.length > 100 ? errorText.slice(0, 100) + '...' : errorText;
 
         errorCounts[truncatedErrorText] = errorCounts[truncatedErrorText] || {
           count: 0,

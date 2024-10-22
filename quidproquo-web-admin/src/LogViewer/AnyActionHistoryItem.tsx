@@ -31,10 +31,10 @@ export const AnyActionHistoryItem = ({ historyItem }: AnyActionHistoryItemProps)
   const ActionComponent = legacy
     ? ActionHistoryItem
     : customActionsMap[historyItem.act.type]
-    ? customActionsMap[historyItem.act.type]
-    : actionComponentConfig
-    ? getGenericActionRenderer(actionComponentConfig[0], actionComponentConfig.slice(1))
-    : ActionHistoryItem;
+      ? customActionsMap[historyItem.act.type]
+      : actionComponentConfig
+        ? getGenericActionRenderer(actionComponentConfig[0], actionComponentConfig.slice(1))
+        : ActionHistoryItem;
 
   return (
     <>

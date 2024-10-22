@@ -37,12 +37,7 @@ export class ServiceDomainConstruct extends QpqConstructBlock {
     // search.example.com
     // search.development.example.com
     // search.joecoady.development.example.com
-    const serviceDomainName = qpqWebServerUtils.constructServiceDomainName(
-      props.rootDomain,
-      environment,
-      service,
-      feature,
-    );
+    const serviceDomainName = qpqWebServerUtils.constructServiceDomainName(props.rootDomain, environment, service, feature);
 
     console.log(`ServiceDomain: ${serviceDomainName} on apex - $${domainRoot}`);
 

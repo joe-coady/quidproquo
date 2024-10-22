@@ -1,9 +1,4 @@
-import {
-  QPQConfigSetting,
-  QPQConfigAdvancedSettings,
-  CrossModuleOwner,
-  qpqCoreUtils,
-} from 'quidproquo-core';
+import { QPQConfigSetting, QPQConfigAdvancedSettings, CrossModuleOwner, qpqCoreUtils } from 'quidproquo-core';
 
 import { QPQWebServerConfigSettingType, CacheSettings } from '../QPQConfig';
 
@@ -17,11 +12,7 @@ export interface CacheQPQWebServerConfigSetting extends QPQConfigSetting {
   cache: CacheSettings;
 }
 
-export const defineCache = (
-  name: string,
-  cache: CacheSettings,
-  options?: QPQConfigAdvancedCacheSettings,
-): CacheQPQWebServerConfigSetting => ({
+export const defineCache = (name: string, cache: CacheSettings, options?: QPQConfigAdvancedCacheSettings): CacheQPQWebServerConfigSetting => ({
   configSettingType: QPQWebServerConfigSettingType.Cache,
   uniqueKey: name,
 

@@ -7,21 +7,17 @@ export interface ServiceFunctionExecuteActionPayload<T> {
   functionName: string;
   payload: T;
   context: QpqContext<any>;
-  isAsync: boolean
+  isAsync: boolean;
 }
 
 // Action
-export interface ServiceFunctionExecuteAction<T>
-  extends Action<ServiceFunctionExecuteActionPayload<T>> {
+export interface ServiceFunctionExecuteAction<T> extends Action<ServiceFunctionExecuteActionPayload<T>> {
   type: ServiceFunctionActionType.Execute;
   payload: ServiceFunctionExecuteActionPayload<T>;
 }
 
 // Function Types
-export type ServiceFunctionExecuteActionProcessor<R, T> = ActionProcessor<
-  ServiceFunctionExecuteAction<T>,
-  R
->;
+export type ServiceFunctionExecuteActionProcessor<R, T> = ActionProcessor<ServiceFunctionExecuteAction<T>, R>;
 export type ServiceFunctionExecuteActionRequester<R, T> = ActionRequester<
   ServiceFunctionExecuteAction<T> | ContextListAction,
   R,

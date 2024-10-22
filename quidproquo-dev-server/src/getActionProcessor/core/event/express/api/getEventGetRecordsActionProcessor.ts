@@ -10,9 +10,7 @@ import {
 import { EventInput, InternalEventRecord } from './types';
 
 const getProcessGetRecords =
-  (
-    _qpqConfig: QPQConfig
-  ): EventGetRecordsActionProcessor<EventInput, InternalEventRecord> =>
+  (_qpqConfig: QPQConfig): EventGetRecordsActionProcessor<EventInput, InternalEventRecord> =>
   async ({ eventParams: [expressEvent] }) => {
     const path = expressEvent.path || '';
 
@@ -31,7 +29,6 @@ const getProcessGetRecords =
     return actionResult([internalEventRecord]);
   };
 
-export const getEventGetRecordsActionProcessor: ActionProcessorListResolver =
-  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-    [EventActionType.GetRecords]: getProcessGetRecords(qpqConfig),
-  });
+export const getEventGetRecordsActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
+  [EventActionType.GetRecords]: getProcessGetRecords(qpqConfig),
+});

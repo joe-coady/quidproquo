@@ -11,12 +11,7 @@ interface LogCorrelationsProps {
   treeApi: TreeApi;
 }
 
-export const LogCorrelations = ({
-  logCorrelation,
-  setSelectedLogCorrelation,
-  isVisible,
-  treeApi,
-}: LogCorrelationsProps) => {
+export const LogCorrelations = ({ logCorrelation, setSelectedLogCorrelation, isVisible, treeApi }: LogCorrelationsProps) => {
   return (
     <Box
       sx={{

@@ -9,7 +9,9 @@ import {
 import { MatchStoryResult } from 'quidproquo-core';
 
 type ApiGatwayEventWebsocketWithIdentity = APIGatewayProxyWebsocketEventV2WithRequestContext<
-  APIGatewayEventWebsocketRequestContextV2 & { identity: { sourceIp: string; userAgent: string } }
+  APIGatewayEventWebsocketRequestContextV2 & {
+    identity: { sourceIp: string; userAgent: string };
+  }
 >;
 
 // TODO: Don't use Globals like this

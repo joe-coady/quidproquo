@@ -11,18 +11,11 @@ export interface UserDirectoryConfirmForgotPasswordActionPayload {
 }
 
 // Action
-export interface UserDirectoryConfirmForgotPasswordAction
-  extends Action<UserDirectoryConfirmForgotPasswordActionPayload> {
+export interface UserDirectoryConfirmForgotPasswordAction extends Action<UserDirectoryConfirmForgotPasswordActionPayload> {
   type: UserDirectoryActionType.ConfirmForgotPassword;
   payload: UserDirectoryConfirmForgotPasswordActionPayload;
 }
 
 // Function Types
-export type UserDirectoryConfirmForgotPasswordActionProcessor = ActionProcessor<
-  UserDirectoryConfirmForgotPasswordAction,
-  AuthenticateUserResponse
->;
-export type UserDirectoryConfirmForgotPasswordActionRequester = ActionRequester<
-  UserDirectoryConfirmForgotPasswordAction,
-  AuthenticateUserResponse
->;
+export type UserDirectoryConfirmForgotPasswordActionProcessor = ActionProcessor<UserDirectoryConfirmForgotPasswordAction, AuthenticateUserResponse>;
+export type UserDirectoryConfirmForgotPasswordActionRequester = ActionRequester<UserDirectoryConfirmForgotPasswordAction, AuthenticateUserResponse>;

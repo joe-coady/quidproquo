@@ -19,7 +19,9 @@ export const createUser = async (
   clientId: string,
   createUserRequest: CreateUserRequest,
 ): Promise<AuthenticateUserResponse> => {
-  const cognitoClient = createAwsClient(CognitoIdentityProviderClient, { region });
+  const cognitoClient = createAwsClient(CognitoIdentityProviderClient, {
+    region,
+  });
 
   const params: AdminCreateUserCommandInput = {
     UserPoolId: userPoolId,

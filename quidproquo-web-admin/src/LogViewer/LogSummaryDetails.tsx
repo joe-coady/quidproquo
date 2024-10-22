@@ -1,9 +1,6 @@
 import { Typography } from '@mui/material';
 import { StoryResult } from 'quidproquo-core';
-import {
-  GenericFunctionRenderer,
-  genericFunctionRendererStyles,
-} from './actionComponents/genericActionRenderer/AnyVariableView';
+import { GenericFunctionRenderer, genericFunctionRendererStyles } from './actionComponents/genericActionRenderer/AnyVariableView';
 
 interface LogSummaryDetailsProps {
   log: StoryResult<any>;
@@ -26,16 +23,11 @@ export const LogSummaryDetails = ({ log }: LogSummaryDetailsProps) => {
             <div>// src: {log.tags.join(', ')}</div>
             {log.fromCorrelation && <div>// Caller: {log.fromCorrelation}</div>}
             <div>
-              // Total Runtime:{' '}
-              <span style={genericFunctionRendererStyles.highlightComment}>{totalRuntime} ms</span>
+              // Total Runtime: <span style={genericFunctionRendererStyles.highlightComment}>{totalRuntime} ms</span>
             </div>
             <div>// //////////////////////////////////////////////////////</div>
           </div>
-          <GenericFunctionRenderer
-            functionName={log.tags.join('::').split('::').pop() || 'unknown'}
-            args={log.input}
-            expanded={true}
-          />
+          <GenericFunctionRenderer functionName={log.tags.join('::').split('::').pop() || 'unknown'} args={log.input} expanded={true} />
         </pre>
       </div>
     </>

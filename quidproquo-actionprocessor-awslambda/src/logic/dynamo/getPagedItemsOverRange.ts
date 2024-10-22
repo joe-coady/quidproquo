@@ -18,12 +18,15 @@ export async function getPagedItemsOverRange(
 
   const queryParams: QueryCommandInput = {
     TableName: tableName,
-    KeyConditionExpression:
-      'runtimeType = :runtimeType AND startedAtWithCorrelation BETWEEN :startIsoDateTime AND :endIsoDateTime',
+    KeyConditionExpression: 'runtimeType = :runtimeType AND startedAtWithCorrelation BETWEEN :startIsoDateTime AND :endIsoDateTime',
     ExpressionAttributeValues: {
       ':runtimeType': { S: runtimeType },
-      ':startIsoDateTime': { S: startIsoDateTime + '#00000000-0000-0000-0000-000000000000' },
-      ':endIsoDateTime': { S: endIsoDateTime + '#ffffffff-ffff-ffff-ffff-ffffffffffff' },
+      ':startIsoDateTime': {
+        S: startIsoDateTime + '#00000000-0000-0000-0000-000000000000',
+      },
+      ':endIsoDateTime': {
+        S: endIsoDateTime + '#ffffffff-ffff-ffff-ffff-ffffffffffff',
+      },
     },
     ScanIndexForward: false,
   };

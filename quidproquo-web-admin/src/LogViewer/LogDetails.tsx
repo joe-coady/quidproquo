@@ -69,10 +69,7 @@ export const LogDetails = ({
           {history.map((historyItem, index) => (
             <TableRow key={`${index}`}>
               <TableCell sx={leftTableCell}>
-                <ActionHistoryItemTimeStamp
-                  startedAt={historyItem.startedAt}
-                  finishedAt={historyItem.finishedAt}
-                />
+                <ActionHistoryItemTimeStamp startedAt={historyItem.startedAt} finishedAt={historyItem.finishedAt} />
               </TableCell>
               <TableCell sx={rightTableCell}>
                 <AnyActionHistoryItem historyItem={historyItem} />

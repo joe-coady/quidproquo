@@ -16,11 +16,5 @@ export interface FileListDirectoryAction extends Action<FileListDirectoryActionP
 }
 
 // Function Types
-export type FileListDirectoryActionProcessor = ActionProcessor<
-  FileListDirectoryAction,
-  DirectoryList
->;
-export type FileListDirectoryActionRequester = ActionRequester<
-  FileListDirectoryAction,
-  DirectoryList
->;
+export type FileListDirectoryActionProcessor = ActionProcessor<FileListDirectoryAction, DirectoryList>;
+export type FileListDirectoryActionRequester = ActionRequester<FileListDirectoryAction, DirectoryList>;

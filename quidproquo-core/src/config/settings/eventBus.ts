@@ -1,10 +1,6 @@
 import { convertCrossModuleOwnerToGenericResourceNameOverride } from '../../qpqCoreUtils';
 import { CrossModuleOwner } from '../../types';
-import {
-  QPQConfigSetting,
-  QPQCoreConfigSettingType,
-  QPQConfigAdvancedSettings,
-} from '../QPQConfig';
+import { QPQConfigSetting, QPQCoreConfigSettingType, QPQConfigAdvancedSettings } from '../QPQConfig';
 
 export interface QPQConfigAdvancedEventBusSettings extends QPQConfigAdvancedSettings {
   owner?: CrossModuleOwner<'eventBusName'>;
@@ -18,10 +14,7 @@ export interface EventBusQPQConfigSetting extends QPQConfigSetting {
   owner?: CrossModuleOwner;
 }
 
-export const defineEventBus = (
-  name: string,
-  options?: QPQConfigAdvancedEventBusSettings,
-): EventBusQPQConfigSetting => ({
+export const defineEventBus = (name: string, options?: QPQConfigAdvancedEventBusSettings): EventBusQPQConfigSetting => ({
   configSettingType: QPQCoreConfigSettingType.eventBus,
   uniqueKey: name,
 

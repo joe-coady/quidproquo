@@ -1,4 +1,3 @@
- 
 import { StorageDriveEvent } from '../../../../types';
 import { askUpdateDatabaseFromLogFiles } from '../../logic/askUpdateDatabaseFromLogFiles';
 

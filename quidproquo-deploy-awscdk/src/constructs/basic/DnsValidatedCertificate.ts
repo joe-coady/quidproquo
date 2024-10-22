@@ -24,11 +24,7 @@ export class DnsValidatedCertificate extends QpqConstructBlock {
     super(scope, id, props);
 
     // Determine the apex domain
-    const apexDomain = qpqWebServerUtils.resolveApexDomainNameFromDomainConfig(
-      props.qpqConfig,
-      props.domain.rootDomain,
-      props.domain.onRootDomain,
-    );
+    const apexDomain = qpqWebServerUtils.resolveApexDomainNameFromDomainConfig(props.qpqConfig, props.domain.rootDomain, props.domain.onRootDomain);
 
     // Lookup the hosted zone
     this.hostedZone = aws_route53.HostedZone.fromLookup(this, 'MyHostedZone', {
@@ -36,14 +32,10 @@ export class DnsValidatedCertificate extends QpqConstructBlock {
     });
 
     // Generate domain names for all subdomains
-    this.domainNames =
-      props.domain.subDomainNames?.map((subDomain) => `${subDomain}.${apexDomain}`) || [];
+    this.domainNames = props.domain.subDomainNames?.map((subDomain) => `${subDomain}.${apexDomain}`) || [];
 
     // Include the apex domain if onRootDomain is true
-    if (
-      props.domain.onRootDomain &&
-      (!props.domain.subDomainNames || props.domain.subDomainNames.length === 0)
-    ) {
+    if (props.domain.onRootDomain && (!props.domain.subDomainNames || props.domain.subDomainNames.length === 0)) {
       this.domainNames.unshift(apexDomain);
     }
 

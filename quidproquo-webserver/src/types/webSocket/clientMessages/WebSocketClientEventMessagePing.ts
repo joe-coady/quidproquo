@@ -3,7 +3,4 @@ import { WebsocketClientMessageEventType } from '../WebsocketClientMessageEventT
 
 export type WebSocketClientEventPayloadPing = undefined;
 
-export type WebSocketClientEventMessagePing = EventMessage<
-  WebSocketClientEventPayloadPing,
-  WebsocketClientMessageEventType.Ping
->;
+export type WebSocketClientEventMessagePing = EventMessage<WebSocketClientEventPayloadPing, WebsocketClientMessageEventType.Ping>;

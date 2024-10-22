@@ -3,15 +3,7 @@ import { Typography, IconButton } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { useTruncatedText } from './hooks';
 
-const TruncatedText = ({
-  title,
-  text,
-  expanded,
-}: {
-  title: string;
-  text: string;
-  expanded: boolean;
-}) => {
+const TruncatedText = ({ title, text, expanded }: { title: string; text: string; expanded: boolean }) => {
   const { canTruncate, truncatedText, handleCopy } = useTruncatedText(text);
 
   return (

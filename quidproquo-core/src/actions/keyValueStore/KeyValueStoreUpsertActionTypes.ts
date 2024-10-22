@@ -14,18 +14,11 @@ export interface KeyValueStoreUpsertActionPayload<KvsItem> {
 }
 
 // Action
-export interface KeyValueStoreUpsertAction<KvsItem>
-  extends Action<KeyValueStoreUpsertActionPayload<KvsItem>> {
+export interface KeyValueStoreUpsertAction<KvsItem> extends Action<KeyValueStoreUpsertActionPayload<KvsItem>> {
   type: KeyValueStoreActionType.Upsert;
   payload: KeyValueStoreUpsertActionPayload<KvsItem>;
 }
 
 // Function Types
-export type KeyValueStoreUpsertActionProcessor<KvsItem> = ActionProcessor<
-  KeyValueStoreUpsertAction<KvsItem>,
-  void
->;
-export type KeyValueStoreUpsertActionRequester<KvsItem> = ActionRequester<
-  KeyValueStoreUpsertAction<KvsItem>,
-  void
->;
+export type KeyValueStoreUpsertActionProcessor<KvsItem> = ActionProcessor<KeyValueStoreUpsertAction<KvsItem>, void>;
+export type KeyValueStoreUpsertActionRequester<KvsItem> = ActionRequester<KeyValueStoreUpsertAction<KvsItem>, void>;

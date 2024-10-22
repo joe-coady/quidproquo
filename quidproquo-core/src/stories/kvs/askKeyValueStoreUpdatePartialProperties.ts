@@ -5,7 +5,9 @@ import { isValidKvsAdvancedDataType } from './utils';
 export function askKeyValueStoreUpdatePartialProperties<TModel extends Record<string, any>, PartitionKey extends keyof TModel>(
   keyValueStoreName: string,
   partitionKeyName: PartitionKey,
-  partialProperties: Partial<TModel> & { [key in PartitionKey]: TModel[PartitionKey] },
+  partialProperties: Partial<TModel> & {
+    [key in PartitionKey]: TModel[PartitionKey];
+  },
 ): AskResponse<TModel>;
 
 export function askKeyValueStoreUpdatePartialProperties<
@@ -15,7 +17,9 @@ export function askKeyValueStoreUpdatePartialProperties<
 >(
   keyValueStoreName: string,
   partitionKeyName: PartitionKey,
-  partialProperties: Partial<TModel> & { [key in PartitionKey]: TModel[PartitionKey] } & { [key in SortKey]: TModel[SortKey] },
+  partialProperties: Partial<TModel> & {
+    [key in PartitionKey]: TModel[PartitionKey];
+  } & { [key in SortKey]: TModel[SortKey] },
   sortKeyName: SortKey,
 ): AskResponse<TModel>;
 

@@ -77,32 +77,24 @@ export class ApiQpqServiceStack extends QpqServiceStack {
     // Redirects
     const redirects = qpqWebServerUtils.getSubdomainRedirects(props.qpqConfig).map(
       (setting) =>
-        new QpqWebserverSubdomainRedirectConstruct(
-          this,
-          qpqCoreUtils.getUniqueKeyForSetting(setting),
-          {
-            awsAccountId: props.awsAccountId,
-            qpqConfig: props.qpqConfig,
+        new QpqWebserverSubdomainRedirectConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
+          awsAccountId: props.awsAccountId,
+          qpqConfig: props.qpqConfig,
 
-            subdomainRedirectConfig: setting,
-          },
-        ),
+          subdomainRedirectConfig: setting,
+        }),
     );
 
     // Service Functions
     const serviceFunctions = qpqWebServerUtils.getAllServiceFunctions(props.qpqConfig).map(
       (setting) =>
-        new QpqWebserverServiceFunctionConstruct(
-          this,
-          qpqCoreUtils.getUniqueKeyForSetting(setting),
-          {
-            awsAccountId: props.awsAccountId,
-            qpqConfig: props.qpqConfig,
+        new QpqWebserverServiceFunctionConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
+          awsAccountId: props.awsAccountId,
+          qpqConfig: props.qpqConfig,
 
-            serviceFunctionConfig: setting,
-            apiLayerVersions: layers.layers,
-          },
-        ),
+          serviceFunctionConfig: setting,
+          apiLayerVersions: layers.layers,
+        }),
     );
 
     // Build websocket apis

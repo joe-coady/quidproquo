@@ -11,9 +11,7 @@ import { useFastCallback } from 'quidproquo-web-react';
  * @param {AnyAsyncFunction<T, U>} callback - The asynchronous function to be wrapped.
  * @returns {AnyAsyncFunction<T, U>} - The wrapped asynchronous function with loading triggers.
  */
-export function useAsyncLoading<T extends any[], U>(
-  callback: AnyAsyncFunction<T, U>,
-): AnyAsyncFunction<T, U> {
+export function useAsyncLoading<T extends any[], U>(callback: AnyAsyncFunction<T, U>): AnyAsyncFunction<T, U> {
   const { addLoading, removeLoading } = useLoadingApi();
 
   /**

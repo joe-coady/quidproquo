@@ -1,8 +1,4 @@
-import {
-  createContextIdentifier,
-  createContextProvider,
-  createContextReader,
-} from 'quidproquo-core';
+import { createContextIdentifier, createContextProvider, createContextReader } from 'quidproquo-core';
 
 export type WebsocketConnectionInfo = {
   connectionId?: string;
@@ -11,14 +7,8 @@ export type WebsocketConnectionInfo = {
 
 const websocketConnectionInfoContextDefaultValue: WebsocketConnectionInfo = {};
 
-export const websocketConnectionInfoContext = createContextIdentifier(
-  'websocket-connection-info',
-  websocketConnectionInfoContextDefaultValue,
-);
+export const websocketConnectionInfoContext = createContextIdentifier('websocket-connection-info', websocketConnectionInfoContextDefaultValue);
 
 export const askWebsocketReadConnectionInfo = createContextReader(websocketConnectionInfoContext);
 
-export const askWebsocketProvideConnectionInfo = createContextProvider(
-  websocketConnectionInfoContext,
-  (context: WebsocketConnectionInfo) => context,
-);
+export const askWebsocketProvideConnectionInfo = createContextProvider(websocketConnectionInfoContext, (context: WebsocketConnectionInfo) => context);

@@ -21,12 +21,5 @@ export interface EventBusSendMessageAction<T> extends Action<EventBusSendMessage
 }
 
 // Function Types
-export type EventBusSendMessageActionProcessor<T> = ActionProcessor<
-  EventBusSendMessageAction<T>,
-  void
->;
-export type EventBusSendMessageActionRequester<T> = ActionRequester<
-  EventBusSendMessageAction<T> | ContextListAction,
-  void,
-  QpqContext<any> | void
->;
+export type EventBusSendMessageActionProcessor<T> = ActionProcessor<EventBusSendMessageAction<T>, void>;
+export type EventBusSendMessageActionRequester<T> = ActionRequester<EventBusSendMessageAction<T> | ContextListAction, void, QpqContext<any> | void>;

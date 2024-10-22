@@ -9,12 +9,7 @@ export function* onConnect(event: WebsocketEvent): AskResponse<void> {
     {
       connectionId: event.connectionId,
     },
-    webSocketLogic.askProcessOnConnect(
-      event.connectionId,
-      event.requestTime,
-      event.requestTimeEpoch,
-      event.sourceIp,
-    ),
+    webSocketLogic.askProcessOnConnect(event.connectionId, event.requestTime, event.requestTimeEpoch, event.sourceIp),
   );
 }
 

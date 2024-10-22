@@ -4,5 +4,5 @@ export enum ConfigActionType {
   SetParameter = '@quidproquo-core/Config/SetParameter',
   GetParameters = '@quidproquo-core/Config/GetParameters',
   GetApplicationInfo = '@quidproquo-core/Config/GetApplicationInfo',
-  GetGlobal = '@quidproquo-core/Config/GetGlobal'
+  GetGlobal = '@quidproquo-core/Config/GetGlobal',
 }

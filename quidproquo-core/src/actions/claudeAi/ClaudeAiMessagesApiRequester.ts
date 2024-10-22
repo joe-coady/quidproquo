@@ -6,5 +6,8 @@ export function* askClaudeAiMessagesApi(
   body: Anthropic.Messages.MessageCreateParamsNonStreaming,
   apiKey: string,
 ): ClaudeAiMessagesApiActionRequester {
-  return yield { type: ClaudeAiActionType.MessagesApi, payload: { body, apiKey } };
+  return yield {
+    type: ClaudeAiActionType.MessagesApi,
+    payload: { body, apiKey },
+  };
 }

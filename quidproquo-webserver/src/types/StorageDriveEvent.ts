@@ -1,7 +1,6 @@
-
 export enum StorageDriveEventType {
   Create = 'Create',
-  Delete = 'Delete'
+  Delete = 'Delete',
 }
 
 export type StorageDriveEvent = {
@@ -9,6 +8,6 @@ export type StorageDriveEvent = {
   driveName: string;
 
   filePaths: string[];
-}
+};
 
 export type StorageDriveEventResponse = void;

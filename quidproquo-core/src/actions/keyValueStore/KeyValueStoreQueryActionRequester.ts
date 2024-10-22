@@ -1,8 +1,5 @@
 import { KeyValueStoreActionType } from './KeyValueStoreActionType';
-import {
-  KeyValueStoreQueryActionRequester,
-  KeyValueStoreQueryOptions,
-} from './KeyValueStoreQueryActionTypes';
+import { KeyValueStoreQueryActionRequester, KeyValueStoreQueryOptions } from './KeyValueStoreQueryActionTypes';
 
 import { KvsQueryOperation } from './types';
 

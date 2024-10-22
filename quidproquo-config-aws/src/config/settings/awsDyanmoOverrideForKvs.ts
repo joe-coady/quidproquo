@@ -9,8 +9,7 @@ import {
 
 import { QPQAwsConfigSettingType } from '../QPQConfig';
 
-export interface QPQConfigAdvancedAwsDyanmoOverrideForKvsSettings
-  extends QPQConfigAdvancedSettings {}
+export interface QPQConfigAdvancedAwsDyanmoOverrideForKvsSettings extends QPQConfigAdvancedSettings {}
 
 export interface AwsDyanmoOverrideForKvsQPQConfigSetting extends QPQConfigSetting {
   name: string;

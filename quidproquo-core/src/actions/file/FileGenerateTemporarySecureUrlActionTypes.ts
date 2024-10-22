@@ -9,18 +9,11 @@ export interface FileGenerateTemporarySecureUrlActionPayload {
 }
 
 // Action
-export interface FileGenerateTemporarySecureUrlAction
-  extends Action<FileGenerateTemporarySecureUrlActionPayload> {
+export interface FileGenerateTemporarySecureUrlAction extends Action<FileGenerateTemporarySecureUrlActionPayload> {
   type: FileActionType.GenerateTemporarySecureUrl;
   payload: FileGenerateTemporarySecureUrlActionPayload;
 }
 
 // Function Types
-export type FileGenerateTemporarySecureUrlActionProcessor = ActionProcessor<
-  FileGenerateTemporarySecureUrlAction,
-  string
->;
-export type FileGenerateTemporarySecureUrlActionRequester = ActionRequester<
-  FileGenerateTemporarySecureUrlAction,
-  string
->;
+export type FileGenerateTemporarySecureUrlActionProcessor = ActionProcessor<FileGenerateTemporarySecureUrlAction, string>;
+export type FileGenerateTemporarySecureUrlActionRequester = ActionRequester<FileGenerateTemporarySecureUrlAction, string>;

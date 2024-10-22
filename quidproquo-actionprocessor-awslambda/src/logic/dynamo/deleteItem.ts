@@ -1,8 +1,4 @@
-import {
-  DynamoDBClient,
-  DeleteItemCommand,
-  DeleteItemCommandInput,
-} from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, DeleteItemCommand, DeleteItemCommandInput } from '@aws-sdk/client-dynamodb';
 
 import { KvsCoreDataType } from 'quidproquo-core';
 import { buildAttributeValue } from './qpqDynamoOrm';

@@ -8,18 +8,11 @@ export interface UserDirectoryChangePasswordActionPayload {
 }
 
 // Action
-export interface UserDirectoryChangePasswordAction
-  extends Action<UserDirectoryChangePasswordActionPayload> {
+export interface UserDirectoryChangePasswordAction extends Action<UserDirectoryChangePasswordActionPayload> {
   type: UserDirectoryActionType.ChangePassword;
   payload: UserDirectoryChangePasswordActionPayload;
 }
 
 // Function Types
-export type UserDirectoryChangePasswordActionProcessor = ActionProcessor<
-  UserDirectoryChangePasswordAction,
-  void
->;
-export type UserDirectoryChangePasswordActionRequester = ActionRequester<
-  UserDirectoryChangePasswordAction,
-  void
->;
+export type UserDirectoryChangePasswordActionProcessor = ActionProcessor<UserDirectoryChangePasswordAction, void>;
+export type UserDirectoryChangePasswordActionRequester = ActionRequester<UserDirectoryChangePasswordAction, void>;

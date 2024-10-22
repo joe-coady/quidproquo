@@ -11,9 +11,7 @@ export const LogRawJson = ({ log }: LogRawJsonProps) => {
       <Typography variant="h6" gutterBottom>
         Raw JSON
       </Typography>
-      <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-        {JSON.stringify(log, null, 2)}
-      </pre>
+      <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{JSON.stringify(log, null, 2)}</pre>
     </Box>
   );
 };

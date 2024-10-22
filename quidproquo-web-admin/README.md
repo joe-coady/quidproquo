@@ -1,8 +1,7 @@
 # Quidproquo Web Logs - WIP - Not for production
 
-Welcome to Quidproquo Web Logs, an interface for viewing logs that happen in your server! This
-project is part of the Quidproquo platform, which deploys web servers to AWS but is platform
-independent.
+Welcome to Quidproquo Web Logs, an interface for viewing logs that happen in your server! This project is part of the Quidproquo platform, which
+deploys web servers to AWS but is platform independent.
 
 ## Features
 
@@ -15,8 +14,8 @@ With Quidproquo Web Logs, you can:
 
 ## Technologies Used
 
-Quidproquo Web Logs is built using React, a popular JavaScript library for building user interfaces.
-It uses Axios for making HTTP requests to the server and Moment.js for parsing and formatting dates.
+Quidproquo Web Logs is built using React, a popular JavaScript library for building user interfaces. It uses Axios for making HTTP requests to the
+server and Moment.js for parsing and formatting dates.
 
 ## Installation
 

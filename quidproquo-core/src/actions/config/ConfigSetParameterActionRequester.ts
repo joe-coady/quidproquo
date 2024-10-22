@@ -2,5 +2,8 @@ import { ConfigSetParameterActionRequester } from './ConfigSetParameterActionTyp
 import { ConfigActionType } from './ConfigActionType';
 
 export function* askConfigSetParameter(parameterName: string, parameterValue: string): ConfigSetParameterActionRequester {
-  return yield { type: ConfigActionType.SetParameter, payload: { parameterName, parameterValue } };
+  return yield {
+    type: ConfigActionType.SetParameter,
+    payload: { parameterName, parameterValue },
+  };
 }

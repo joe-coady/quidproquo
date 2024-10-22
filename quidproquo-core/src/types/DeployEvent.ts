@@ -14,6 +14,6 @@ export enum DeployEventStatusType {
 export type DeployEvent = {
   deployEventType: DeployEventType;
   deployEventStatusType: DeployEventStatusType;
-}
+};
 
 export type DeployEventResponse = void;

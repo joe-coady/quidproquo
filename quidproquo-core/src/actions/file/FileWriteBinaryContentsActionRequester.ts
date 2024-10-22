@@ -14,8 +14,8 @@ export function* askFileWriteBinaryContents(
       drive,
       filepath,
       data,
-      
-      storageDriveAdvancedWriteOptions
+
+      storageDriveAdvancedWriteOptions,
     },
   };
 }

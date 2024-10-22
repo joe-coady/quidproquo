@@ -13,8 +13,8 @@ export function* askFileWriteTextContents(
       drive,
       filepath,
       data,
-      
-      storageDriveAdvancedWriteOptions
+
+      storageDriveAdvancedWriteOptions,
     },
   };
 }

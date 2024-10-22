@@ -9,8 +9,7 @@ export interface UserDirectoryRequestEmailVerificationActionPayload {
 }
 
 // Action
-export interface UserDirectoryRequestEmailVerificationAction
-  extends Action<UserDirectoryRequestEmailVerificationActionPayload> {
+export interface UserDirectoryRequestEmailVerificationAction extends Action<UserDirectoryRequestEmailVerificationActionPayload> {
   type: UserDirectoryActionType.RequestEmailVerification;
   payload: UserDirectoryRequestEmailVerificationActionPayload;
 }

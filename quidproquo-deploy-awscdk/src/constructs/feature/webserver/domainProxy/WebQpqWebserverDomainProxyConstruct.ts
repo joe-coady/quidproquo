@@ -1,9 +1,4 @@
-import {
-  aws_cloudfront_origins,
-  aws_cloudfront,
-  aws_route53,
-  aws_route53_targets,
-} from 'aws-cdk-lib';
+import { aws_cloudfront_origins, aws_cloudfront, aws_route53, aws_route53_targets } from 'aws-cdk-lib';
 
 import { DomainProxyQPQWebServerConfigSetting, qpqWebServerUtils } from 'quidproquo-webserver';
 
@@ -56,19 +51,14 @@ export class WebQpqWebserverDomainProxyConstruct extends QpqConstructBlock {
           this,
           'cache',
           props.qpqConfig,
-          qpqWebServerUtils.getCacheConfigByName(
-            props.domainProxyConfig.cacheSettingsName,
-            props.qpqConfig,
-          ),
+          qpqWebServerUtils.getCacheConfigByName(props.domainProxyConfig.cacheSettingsName, props.qpqConfig),
           props.awsAccountId,
         ).cachePolicy
       : aws_cloudfront.CachePolicy.CACHING_DISABLED;
 
     // Create a CloudFront distribution using the S3 bucket as the origin
     // const distributionOrigin = new aws_cloudfront_origins.S3Origin(originBucket);
-    let distributionOrigin = new aws_cloudfront_origins.HttpOrigin(
-      props.domainProxyConfig.httpProxyDomain,
-    );
+    let distributionOrigin = new aws_cloudfront_origins.HttpOrigin(props.domainProxyConfig.httpProxyDomain);
 
     const viewerProtocolPolicy = convertDomainProxyViewerProtocolPolicyToAwsViewerProtocolPolicy(
       props.domainProxyConfig.domainProxyViewerProtocolPolicy,
@@ -92,10 +82,7 @@ export class WebQpqWebserverDomainProxyConstruct extends QpqConstructBlock {
 
     qpqDeployAwsCdkUtils.exportStackValue(
       this,
-      awsNamingUtils.getCFExportNameDistributionIdArnFromConfig(
-        props.domainProxyConfig.name,
-        props.qpqConfig,
-      ),
+      awsNamingUtils.getCFExportNameDistributionIdArnFromConfig(props.domainProxyConfig.name, props.qpqConfig),
       distribution.distributionId,
     );
 
@@ -103,9 +90,7 @@ export class WebQpqWebserverDomainProxyConstruct extends QpqConstructBlock {
       new aws_route53.ARecord(this, `${domainName}-web-alias`, {
         zone: dnsRecord.hostedZone,
         recordName: domainName,
-        target: aws_route53.RecordTarget.fromAlias(
-          new aws_route53_targets.CloudFrontTarget(distribution),
-        ),
+        target: aws_route53.RecordTarget.fromAlias(new aws_route53_targets.CloudFrontTarget(distribution)),
       });
     });
 

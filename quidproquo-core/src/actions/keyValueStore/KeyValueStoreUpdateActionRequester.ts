@@ -1,8 +1,5 @@
 import { KeyValueStoreActionType } from './KeyValueStoreActionType';
-import {
-  KeyValueStoreUpdateActionRequester,
-  KeyValueStoreUpdateOptions,
-} from './KeyValueStoreUpdateActionTypes';
+import { KeyValueStoreUpdateActionRequester, KeyValueStoreUpdateOptions } from './KeyValueStoreUpdateActionTypes';
 
 import { KvsCoreDataType, KvsUpdate } from './types';
 

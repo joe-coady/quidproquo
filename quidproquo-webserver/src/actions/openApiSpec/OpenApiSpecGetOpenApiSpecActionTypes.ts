@@ -5,17 +5,10 @@ import { OpenApiSpecActionType } from './OpenApiSpecActionType';
 export interface OpenApiSpecGetOpenApiSpecActionPayload {}
 
 // Action
-export interface OpenApiSpecGetOpenApiSpecAction
-  extends Action<OpenApiSpecGetOpenApiSpecActionPayload> {
+export interface OpenApiSpecGetOpenApiSpecAction extends Action<OpenApiSpecGetOpenApiSpecActionPayload> {
   type: OpenApiSpecActionType.GetOpenApiSpec;
 }
 
 // Function Types
-export type OpenApiSpecGetOpenApiSpecActionProcessor = ActionProcessor<
-  OpenApiSpecGetOpenApiSpecAction,
-  string
->;
-export type OpenApiSpecGetOpenApiSpecActionRequester = ActionRequester<
-  OpenApiSpecGetOpenApiSpecAction,
-  string
->;
+export type OpenApiSpecGetOpenApiSpecActionProcessor = ActionProcessor<OpenApiSpecGetOpenApiSpecAction, string>;
+export type OpenApiSpecGetOpenApiSpecActionRequester = ActionRequester<OpenApiSpecGetOpenApiSpecAction, string>;

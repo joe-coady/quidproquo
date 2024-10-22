@@ -91,10 +91,7 @@ export class QpqCoreEventBusConstruct extends QpqCoreEventBusConstructBase {
     );
 
     // TODO: remove this, its deprecated
-    const exportName = awsNamingUtils.getCFExportNameSnsTopicArnFromConfig(
-      props.eventBusConfig.name,
-      props.qpqConfig,
-    );
+    const exportName = awsNamingUtils.getCFExportNameSnsTopicArnFromConfig(props.eventBusConfig.name, props.qpqConfig);
     qpqDeployAwsCdkUtils.exportStackValue(this, exportName, this.topic.topicArn);
     // ///////// end todo
   }

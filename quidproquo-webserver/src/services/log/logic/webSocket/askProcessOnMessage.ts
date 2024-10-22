@@ -1,4 +1,3 @@
- 
 import { AnyEventMessage, AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
 
 import {
@@ -15,10 +14,7 @@ import {
 } from './messageProcessors';
 import { askAuthenticateConnection } from './askAuthenticateConnection';
 
-export function* askProcessOnMessage(
-  connectionId: string,
-  message: AnyEventMessage,
-): AskResponse<void> {
+export function* askProcessOnMessage(connectionId: string, message: AnyEventMessage): AskResponse<void> {
   if (isWebSocketAuthenticateMessage(message)) {
     if (message.payload.accessToken) {
       yield* askProcessOnAuthenticate(connectionId, message.payload.accessToken);
@@ -45,11 +41,7 @@ export function* askProcessOnMessage(
   yield* askAuthenticateConnection(connectionId);
 
   if (isWebSocketMarkLogCheckedMessage(message)) {
-    yield* askProcessOnMarkLogChecked(
-      connectionId,
-      message.payload.correlationId,
-      message.payload.checked,
-    );
+    yield* askProcessOnMarkLogChecked(connectionId, message.payload.correlationId, message.payload.checked);
 
     return;
   }
@@ -59,8 +51,5 @@ export function* askProcessOnMessage(
   }
 
   // This should never be hit.
-  yield* askThrowError(
-    ErrorTypeEnum.GenericError,
-    `Unabled to process [${(message as any)?.messageType}] WebSocket message`,
-  );
+  yield* askThrowError(ErrorTypeEnum.GenericError, `Unabled to process [${(message as any)?.messageType}] WebSocket message`);
 }

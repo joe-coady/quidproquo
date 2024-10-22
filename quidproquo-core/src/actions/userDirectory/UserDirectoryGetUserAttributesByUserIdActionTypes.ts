@@ -9,18 +9,11 @@ export interface UserDirectoryGetUserAttributesByUserIdActionPayload {
 }
 
 // Action
-export interface UserDirectoryGetUserAttributesByUserIdAction
-  extends Action<UserDirectoryGetUserAttributesByUserIdActionPayload> {
+export interface UserDirectoryGetUserAttributesByUserIdAction extends Action<UserDirectoryGetUserAttributesByUserIdActionPayload> {
   type: UserDirectoryActionType.GetUserAttributesByUserId;
   payload: UserDirectoryGetUserAttributesByUserIdActionPayload;
 }
 
 // Function Types
-export type UserDirectoryGetUserAttributesByUserIdActionProcessor = ActionProcessor<
-  UserDirectoryGetUserAttributesByUserIdAction,
-  UserAttributes
->;
-export type UserDirectoryGetUserAttributesByUserIdActionRequester = ActionRequester<
-  UserDirectoryGetUserAttributesByUserIdAction,
-  UserAttributes
->;
+export type UserDirectoryGetUserAttributesByUserIdActionProcessor = ActionProcessor<UserDirectoryGetUserAttributesByUserIdAction, UserAttributes>;
+export type UserDirectoryGetUserAttributesByUserIdActionRequester = ActionRequester<UserDirectoryGetUserAttributesByUserIdAction, UserAttributes>;

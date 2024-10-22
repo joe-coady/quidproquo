@@ -26,10 +26,6 @@ export class QpqWebserverApiKeyConstruct extends QpqConstructBlock {
       enabled: true,
     });
 
-    qpqDeployAwsCdkUtils.exportStackValue(
-      this,
-      awsNamingUtils.getCFExportNameApiKeyIdFromConfig(apiKeyConfig.name, props.qpqConfig),
-      apiKey.keyId,
-    );
+    qpqDeployAwsCdkUtils.exportStackValue(this, awsNamingUtils.getCFExportNameApiKeyIdFromConfig(apiKeyConfig.name, props.qpqConfig), apiKey.keyId);
   }
 }

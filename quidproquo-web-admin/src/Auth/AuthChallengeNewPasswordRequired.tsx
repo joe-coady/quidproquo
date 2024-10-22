@@ -6,7 +6,7 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import LockIcon from '@mui/icons-material/Lock';
 
-import { AsyncButton } from '../components'
+import { AsyncButton } from '../components';
 import { AuthState } from '../types';
 
 interface AuthChallengeNewPasswordRequiredProps {
@@ -15,12 +15,22 @@ interface AuthChallengeNewPasswordRequiredProps {
 }
 
 export function AuthChallengeNewPasswordRequired({ onRespondToAuthChallenge, authState }: AuthChallengeNewPasswordRequiredProps) {
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const arePasswordsMatching = newPassword === confirmPassword && newPassword !== '';
 
   return (
-    <Box sx={{ height: '100vh', width: '100%', p: 2, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+    <Box
+      sx={{
+        height: '100vh',
+        width: '100%',
+        p: 2,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
       <Box component="form" sx={{ width: '100%', maxWidth: 360 }}>
         <Grid container spacing={2}>
           <Grid item xs={12}>

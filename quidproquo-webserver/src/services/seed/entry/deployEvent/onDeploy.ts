@@ -1,4 +1,3 @@
- 
 import { AskResponse, DeployEvent, DeployEventResponse } from 'quidproquo-core';
 
 import * as onDeployLogic from '../../logic/onDeployLogic';

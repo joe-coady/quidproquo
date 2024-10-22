@@ -2,11 +2,7 @@ import { askNetworkRequest, AskResponse, askThrowError, ErrorTypeEnum } from 'qu
 
 import { CloudflareResponse } from '../types';
 
-export function* askCloudflareDeleteDNSRecord(
-  apiKey: string,
-  zoneId: string,
-  recordId: string,
-): AskResponse<void> {
+export function* askCloudflareDeleteDNSRecord(apiKey: string, zoneId: string, recordId: string): AskResponse<void> {
   const response = yield* askNetworkRequest<void, CloudflareResponse<void>>(
     'DELETE',
     `https://api.cloudflare.com/client/v4/zones/${zoneId}/dns_records/${recordId}`,
@@ -19,9 +15,6 @@ export function* askCloudflareDeleteDNSRecord(
   );
 
   if (response.status < 200 || response.status >= 300 || !response.data.success) {
-    yield* askThrowError(
-      ErrorTypeEnum.GenericError,
-      `Failed to delete DNS record: ${response.data.errors.join(', ')}`,
-    );
+    yield* askThrowError(ErrorTypeEnum.GenericError, `Failed to delete DNS record: ${response.data.errors.join(', ')}`);
   }
 }

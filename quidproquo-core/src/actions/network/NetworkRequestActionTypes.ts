@@ -1,10 +1,5 @@
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
-import {
-  NetworkActionType,
-  HTTPNetworkResponse,
-  HTTPMethod,
-  ResponseType,
-} from './NetworkActionType';
+import { NetworkActionType, HTTPNetworkResponse, HTTPMethod, ResponseType } from './NetworkActionType';
 
 // Payload
 export interface NetworkRequestActionPayload<T> {
@@ -25,11 +20,5 @@ export interface NetworkRequestAction<T> extends Action<NetworkRequestActionPayl
 }
 
 // Function Types
-export type NetworkRequestActionProcessor<T, R> = ActionProcessor<
-  NetworkRequestAction<T>,
-  HTTPNetworkResponse<R>
->;
-export type NetworkRequestActionRequester<T, R> = ActionRequester<
-  NetworkRequestAction<T>,
-  HTTPNetworkResponse<R>
->;
+export type NetworkRequestActionProcessor<T, R> = ActionProcessor<NetworkRequestAction<T>, HTTPNetworkResponse<R>>;
+export type NetworkRequestActionRequester<T, R> = ActionRequester<NetworkRequestAction<T>, HTTPNetworkResponse<R>>;

@@ -1,9 +1,5 @@
 import { CrossModuleOwner, KeyOf } from '../../types';
-import {
-  QPQConfigSetting,
-  QPQCoreConfigSettingType,
-  QPQConfigAdvancedSettings,
-} from '../QPQConfig';
+import { QPQConfigSetting, QPQCoreConfigSettingType, QPQConfigAdvancedSettings } from '../QPQConfig';
 
 // TODO: When we put validation on the QPQConfig, we need to make sure
 // Key Length and Data Type: DynamoDB has limitations on key length and data type.
@@ -22,10 +18,7 @@ export type KvsIndex<T extends object = any> = {
   sortKey?: KvsKey<T>;
 };
 
-export const kvsKey = <T extends object = any>(
-  key: KeyOf<T>,
-  type: KvsKeyType = 'string',
-): KvsKey<T> => ({
+export const kvsKey = <T extends object = any>(key: KeyOf<T>, type: KvsKeyType = 'string'): KvsKey<T> => ({
   key,
   type,
 });
@@ -39,9 +32,7 @@ type CompositeCompositeKvsIndex<T extends object = any> = {
 
 export type CompositeKvsIndex<T extends object = any> = KeyOf<T> | CompositeCompositeKvsIndex<T>;
 
-const convertCompositeKvsKeyToKvsKey = <T extends object = any>(
-  compositeKvsKey: CompositeKvsKey<T>,
-): KvsKey<T> => {
+const convertCompositeKvsKeyToKvsKey = <T extends object = any>(compositeKvsKey: CompositeKvsKey<T>): KvsKey<T> => {
   // Must be a keyof T
   if (typeof compositeKvsKey === 'string') {
     return kvsKey<T>(compositeKvsKey as KeyOf<T>, 'string');
@@ -57,9 +48,7 @@ const isCompositeKvsIndexACompositeCompositeKvsIndex = <T extends object = any>(
   return typeof compositeKvsIndex !== 'string';
 };
 
-const convertCompositeKvsIndexToKvsIndex = <T extends object = any>(
-  compositeKvsIndex: CompositeKvsIndex<T>,
-): KvsIndex<T> => {
+const convertCompositeKvsIndexToKvsIndex = <T extends object = any>(compositeKvsIndex: CompositeKvsIndex<T>): KvsIndex<T> => {
   if (!isCompositeKvsIndexACompositeCompositeKvsIndex<T>(compositeKvsIndex)) {
     return {
       partitionKey: kvsKey<T>(compositeKvsIndex, 'string'),
@@ -68,14 +57,11 @@ const convertCompositeKvsIndexToKvsIndex = <T extends object = any>(
 
   return {
     partitionKey: convertCompositeKvsKeyToKvsKey<T>(compositeKvsIndex.partitionKey),
-    sortKey: compositeKvsIndex.sortKey
-      ? convertCompositeKvsKeyToKvsKey<T>(compositeKvsIndex.sortKey)
-      : undefined,
+    sortKey: compositeKvsIndex.sortKey ? convertCompositeKvsKeyToKvsKey<T>(compositeKvsIndex.sortKey) : undefined,
   };
 };
 
-export interface QPQConfigAdvancedKeyValueStoreSettings<T extends object = any>
-  extends QPQConfigAdvancedSettings {
+export interface QPQConfigAdvancedKeyValueStoreSettings<T extends object = any> extends QPQConfigAdvancedSettings {
   indexes?: CompositeKvsIndex<T>[];
 
   global?: boolean;

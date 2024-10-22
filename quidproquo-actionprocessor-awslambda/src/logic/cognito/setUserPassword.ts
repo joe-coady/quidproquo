@@ -5,13 +5,10 @@ import {
 } from '@aws-sdk/client-cognito-identity-provider';
 import { createAwsClient } from '../createAwsClient';
 
-export const setUserPassword = async (
-  region: string,
-  userPoolId: string,
-  username: string,
-  password: string,
-) => {
-  const cognitoClient = createAwsClient(CognitoIdentityProviderClient, { region });
+export const setUserPassword = async (region: string, userPoolId: string, username: string, password: string) => {
+  const cognitoClient = createAwsClient(CognitoIdentityProviderClient, {
+    region,
+  });
 
   // There has to be a better way than this?
   const passwordParams: AdminSetUserPasswordCommandInput = {

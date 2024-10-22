@@ -2,15 +2,7 @@ export enum NetworkActionType {
   Request = '@quidproquo-core/Network/Request',
 }
 
-export type HTTPMethod =
-  | 'GET'
-  | 'HEAD'
-  | 'POST'
-  | 'PUT'
-  | 'DELETE'
-  | 'CONNECT'
-  | 'OPTIONS'
-  | 'PATCH';
+export type HTTPMethod = 'GET' | 'HEAD' | 'POST' | 'PUT' | 'DELETE' | 'CONNECT' | 'OPTIONS' | 'PATCH';
 
 export type ResponseType = 'binary' | 'json';
 

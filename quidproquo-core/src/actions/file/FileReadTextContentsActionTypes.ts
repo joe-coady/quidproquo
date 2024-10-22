@@ -14,11 +14,5 @@ export interface FileReadTextContentsAction extends Action<FileReadTextContentsA
 }
 
 // Function Types
-export type FileReadTextContentsActionProcessor = ActionProcessor<
-  FileReadTextContentsAction,
-  string
->;
-export type FileReadTextContentsActionRequester = ActionRequester<
-  FileReadTextContentsAction,
-  string
->;
+export type FileReadTextContentsActionProcessor = ActionProcessor<FileReadTextContentsAction, string>;
+export type FileReadTextContentsActionRequester = ActionRequester<FileReadTextContentsAction, string>;

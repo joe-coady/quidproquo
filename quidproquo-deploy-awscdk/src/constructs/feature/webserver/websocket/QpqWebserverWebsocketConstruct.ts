@@ -8,8 +8,6 @@ import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqCons
 import { exportStackValue } from '../../../../utils';
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 
-
-
 export interface QpqWebserverWebsocketConstructProps extends QpqConstructBlockProps {
   websocketConfig: WebSocketQPQWebServerConfigSetting;
 }
@@ -24,13 +22,6 @@ export class QpqWebserverWebsocketConstruct extends QpqConstructBlock {
       routeSelectionExpression: '$request.body.type',
     });
 
-    exportStackValue(
-      this,
-      awsNamingUtils.getCFExportNameWebsocketApiIdFromConfig(
-        props.websocketConfig.apiName,
-        props.qpqConfig,
-      ),
-      api.ref,
-    );
+    exportStackValue(this, awsNamingUtils.getCFExportNameWebsocketApiIdFromConfig(props.websocketConfig.apiName, props.qpqConfig), api.ref);
   }
 }

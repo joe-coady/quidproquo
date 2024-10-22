@@ -15,11 +15,5 @@ export interface UserDirectoryGetUsersAction extends Action<UserDirectoryGetUser
 }
 
 // Function Types
-export type UserDirectoryGetUsersActionProcessor = ActionProcessor<
-  UserDirectoryGetUsersAction,
-  QpqPagedData<UserAttributes>
->;
-export type UserDirectoryGetUsersActionRequester = ActionRequester<
-  UserDirectoryGetUsersAction,
-  QpqPagedData<UserAttributes>
->;
+export type UserDirectoryGetUsersActionProcessor = ActionProcessor<UserDirectoryGetUsersAction, QpqPagedData<UserAttributes>>;
+export type UserDirectoryGetUsersActionRequester = ActionRequester<UserDirectoryGetUsersAction, QpqPagedData<UserAttributes>>;

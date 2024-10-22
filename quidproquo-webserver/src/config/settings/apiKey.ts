@@ -24,10 +24,7 @@ export interface ApiKeyQPQWebServerConfigSetting extends QPQConfigSetting {
   apiKey: ApiKey;
 }
 
-export const defineApiKey = (
-  apiKeyName: string,
-  options?: QPQConfigAdvancedApiKeySettings,
-): ApiKeyQPQWebServerConfigSetting => {
+export const defineApiKey = (apiKeyName: string, options?: QPQConfigAdvancedApiKeySettings): ApiKeyQPQWebServerConfigSetting => {
   return {
     configSettingType: QPQWebServerConfigSettingType.ApiKey,
     uniqueKey: apiKeyName,

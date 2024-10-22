@@ -35,27 +35,19 @@ const getResponseFromErrorResult = (error: QPQError): InternalEventOutput => {
       errorType: error.errorType,
       errorText: error.errorText,
     },
-    statusCode
+    statusCode,
   );
 };
 
 const getProcessTransformResponseResult =
-  (
-    qpqConfig: QPQConfig
-  ): EventTransformResponseResultActionProcessor<
-    EventInput,
-    InternalEventOutput,
-    EventOutput
-  > =>
+  (qpqConfig: QPQConfig): EventTransformResponseResultActionProcessor<EventInput, InternalEventOutput, EventOutput> =>
   // We might need to JSON.stringify the body.
   async ({ eventParams, qpqEventRecordResponses }) => {
     const [record] = qpqEventRecordResponses;
     const [expressEvent] = eventParams;
 
     // If we have an error, we need to transform it to a response, otherwise we can just use the record as is
-    const successRecord = record.success
-      ? record.result
-      : getResponseFromErrorResult(record.error);
+    const successRecord = record.success ? record.result : getResponseFromErrorResult(record.error);
 
     const recordHeaders = successRecord.headers || {};
     const headers: HttpEventHeaders = {
@@ -71,8 +63,8 @@ const getProcessTransformResponseResult =
     });
   };
 
-export const getEventTransformResponseResultActionProcessor: ActionProcessorListResolver =
-  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-    [EventActionType.TransformResponseResult]:
-      getProcessTransformResponseResult(qpqConfig),
-  });
+export const getEventTransformResponseResultActionProcessor: ActionProcessorListResolver = async (
+  qpqConfig: QPQConfig,
+): Promise<ActionProcessorList> => ({
+  [EventActionType.TransformResponseResult]: getProcessTransformResponseResult(qpqConfig),
+});

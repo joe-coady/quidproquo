@@ -7,7 +7,7 @@ export const writeBinaryFile = async (
   key: string,
   data: QPQBinaryData,
   region: string,
-  storageClass: keyof typeof StorageClass
+  storageClass: keyof typeof StorageClass,
 ): Promise<void> => {
   const s3Client = createAwsClient(S3Client, { region });
 
@@ -19,7 +19,7 @@ export const writeBinaryFile = async (
       ContentType: data.mimetype,
       ContentDisposition: data.contentDisposition,
 
-      StorageClass: storageClass
+      StorageClass: storageClass,
     }),
   );
 };

@@ -10,7 +10,5 @@ export type WebSocketContextProps = {
 export const WebsocketProvider: React.FC<WebSocketContextProps> = ({ children, wsUrl }) => {
   const websocketManagement = useWebsocketManagement(wsUrl);
 
-  return (
-    <WebSocketContext.Provider value={websocketManagement}>{children}</WebSocketContext.Provider>
-  );
+  return <WebSocketContext.Provider value={websocketManagement}>{children}</WebSocketContext.Provider>;
 };

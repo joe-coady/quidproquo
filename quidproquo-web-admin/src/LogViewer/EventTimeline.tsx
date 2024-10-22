@@ -1,11 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Box, CircularProgress } from '@mui/material';
-import {
-  StoryResultMetadataWithChildren,
-  formatDuration,
-  getTimeBounds,
-  getTotalExecutionTime,
-} from 'quidproquo-core';
+import { StoryResultMetadataWithChildren, formatDuration, getTimeBounds, getTotalExecutionTime } from 'quidproquo-core';
 import { TreeApi } from './hooks';
 
 interface EventTimelineProps {
@@ -27,14 +22,7 @@ type TimelineEventProps = {
   totalParrentTimeOffsetMs: number;
 };
 
-const TimelineEvent = ({
-  event,
-  level,
-  setSelectedLogCorrelation,
-  scale,
-  parrentTimeOffsetMs,
-  totalParrentTimeOffsetMs,
-}: TimelineEventProps) => {
+const TimelineEvent = ({ event, level, setSelectedLogCorrelation, scale, parrentTimeOffsetMs, totalParrentTimeOffsetMs }: TimelineEventProps) => {
   const eventWidth = event.executionTimeMs * scale;
   const eventOffset = totalParrentTimeOffsetMs * scale;
   const totalTimeOffset = (event.executionTimeMs + totalParrentTimeOffsetMs) * scale;
@@ -63,8 +51,7 @@ const TimelineEvent = ({
         }}
         onClick={() => setSelectedLogCorrelation(event.correlation)}
       >
-        {event.moduleName}::{event.generic.split('::').pop()} - @{parrentTimeOffsetMs}ms -{' '}
-        {event.executionTimeMs}ms
+        {event.moduleName}::{event.generic.split('::').pop()} - @{parrentTimeOffsetMs}ms - {event.executionTimeMs}ms
       </div>
       {event.children.map((child: StoryResultMetadataWithChildren) => {
         const childDate = new Date(child.startedAt);
@@ -88,12 +75,7 @@ const TimelineEvent = ({
   );
 };
 
-export const EventTimeline: React.FC<EventTimelineProps> = ({
-  logCorrelation,
-  setSelectedLogCorrelation,
-  isVisible,
-  treeApi,
-}) => {
+export const EventTimeline: React.FC<EventTimelineProps> = ({ logCorrelation, setSelectedLogCorrelation, isVisible, treeApi }) => {
   const [scaleOffset, setScaleOffset] = useState(0.0);
   const [handleOnWheel, setHandleWheel] = useState<any>(() => () => {});
 
@@ -156,11 +138,7 @@ export const EventTimeline: React.FC<EventTimelineProps> = ({
         <i> of compute over </i>
         <b>{formatDuration(offsetMs)}</b>
       </div>
-      <div
-        ref={setTimelineRef}
-        onWheel={handleOnWheel}
-        style={{ width: '100%', height: 'calc(100% - 24px)' }}
-      >
+      <div ref={setTimelineRef} onWheel={handleOnWheel} style={{ width: '100%', height: 'calc(100% - 24px)' }}>
         {treeApi.treeDataWithNoQpqActions[0] && (
           <TimelineEvent
             event={treeApi.treeDataWithNoQpqActions[0]}

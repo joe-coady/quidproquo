@@ -8,9 +8,7 @@ interface ExpressionAttributeNameMap {
   [key: string]: string;
 }
 
-export const buildUpdateExpressionAttributeNames = (
-  updates: KvsUpdate,
-): ExpressionAttributeNameMap => {
+export const buildUpdateExpressionAttributeNames = (updates: KvsUpdate): ExpressionAttributeNameMap => {
   let attributeNames: ExpressionAttributeNameMap = {};
 
   for (let update of updates) {
@@ -36,9 +34,7 @@ export const buildUpdateExpressionAttributeNames = (
   return attributeNames;
 };
 
-export const buildUpdateExpressionAttributeValues = (
-  updates: KvsUpdate,
-): { [key: string]: AttributeValue } | undefined => {
+export const buildUpdateExpressionAttributeValues = (updates: KvsUpdate): { [key: string]: AttributeValue } | undefined => {
   let attributeValues: { [key: string]: AttributeValue } = {};
 
   for (let update of updates) {
@@ -110,10 +106,7 @@ const buildDynamoUpdateExpressionPart = (update: KvsUpdateAction, updateIndex: n
   }
 };
 
-export const buildDynamoUpdateExpressionForType = (
-  type: KvsUpdateActionType,
-  kvsUpdate: KvsUpdate,
-): string => {
+export const buildDynamoUpdateExpressionForType = (type: KvsUpdateActionType, kvsUpdate: KvsUpdate): string => {
   const actions = kvsUpdate.filter((update) => update.action === type);
 
   // If there are no actions of this type, return an empty string
@@ -121,9 +114,7 @@ export const buildDynamoUpdateExpressionForType = (
     return '';
   }
 
-  const expressions = actions
-    .map((update, index) => buildDynamoUpdateExpressionPart(update, index))
-    .join(', ');
+  const expressions = actions.map((update, index) => buildDynamoUpdateExpressionPart(update, index)).join(', ');
 
   switch (type) {
     case KvsUpdateActionType.Set:
@@ -140,12 +131,7 @@ export const buildDynamoUpdateExpressionForType = (
 };
 
 export const buildDynamoUpdateExpression = (updates: KvsUpdate): string => {
-  const updatesExpressions = [
-    KvsUpdateActionType.Set,
-    KvsUpdateActionType.Remove,
-    KvsUpdateActionType.Add,
-    KvsUpdateActionType.Delete,
-  ]
+  const updatesExpressions = [KvsUpdateActionType.Set, KvsUpdateActionType.Remove, KvsUpdateActionType.Add, KvsUpdateActionType.Delete]
     .map((kvsUpdateActionType) => buildDynamoUpdateExpressionForType(kvsUpdateActionType, updates))
     .filter((expression) => !!expression);
 

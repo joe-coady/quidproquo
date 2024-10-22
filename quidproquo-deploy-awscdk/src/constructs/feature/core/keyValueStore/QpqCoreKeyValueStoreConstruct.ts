@@ -28,9 +28,7 @@ export abstract class QpqCoreKeyValueStoreConstructBase extends QpqConstructBloc
   }
 }
 
-export const convertKvsKeyTypeToDynamodbAttributeType = (
-  kvsKeyType: KvsKey['type'],
-): aws_dynamodb.AttributeType => {
+export const convertKvsKeyTypeToDynamodbAttributeType = (kvsKeyType: KvsKey['type']): aws_dynamodb.AttributeType => {
   switch (kvsKeyType) {
     case 'string':
       return aws_dynamodb.AttributeType.STRING;
@@ -58,17 +56,10 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
     awsAccountId: string,
     keyValueStoreName: string,
   ): QpqCoreKeyValueStoreConstructBase {
-    const tableNameOverride = qpqConfigAwsUtils.getDynamoTableNameOverrride(
-      keyValueStoreName,
-      qpqConfig,
-    );
+    const tableNameOverride = qpqConfigAwsUtils.getDynamoTableNameOverrride(keyValueStoreName, qpqConfig);
 
     class Import extends QpqCoreKeyValueStoreConstructBase {
-      table = aws_dynamodb.Table.fromTableName(
-        this,
-        'table',
-        tableNameOverride || this.qpqResourceName(keyValueStoreName, 'kvs'),
-      );
+      table = aws_dynamodb.Table.fromTableName(this, 'table', tableNameOverride || this.qpqResourceName(keyValueStoreName, 'kvs'));
     }
 
     return new Import(scope, id, { qpqConfig, awsAccountId });
@@ -114,32 +105,19 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
 
     // If we have an override, lets use it instead
     // we still want to keep the above table created.
-    const tableNameOverride = qpqConfigAwsUtils.getDynamoTableNameOverrride(
-      props.keyValueStoreConfig.keyValueStoreName,
-      props.qpqConfig,
-    );
+    const tableNameOverride = qpqConfigAwsUtils.getDynamoTableNameOverrride(props.keyValueStoreConfig.keyValueStoreName, props.qpqConfig);
     if (tableNameOverride) {
       console.log('tableNameOverride', tableNameOverride);
       this.table = aws_dynamodb.Table.fromTableName(this, 'tablelink', tableNameOverride);
     }
   }
 
-  public static authorizeActionsForRole(
-    role: aws_iam.IRole,
-    kvsList: QpqCoreKeyValueStoreConstruct[],
-  ) {
+  public static authorizeActionsForRole(role: aws_iam.IRole, kvsList: QpqCoreKeyValueStoreConstruct[]) {
     if (kvsList.length > 0) {
       role.addToPrincipalPolicy(
         new aws_iam.PolicyStatement({
           effect: aws_iam.Effect.ALLOW,
-          actions: [
-            'dynamodb:GetItem',
-            'dynamodb:PutItem',
-            'dynamodb:Query',
-            'dynamodb:Scan',
-            'dynamodb:UpdateItem',
-            'dynamodb:DeleteItem',
-          ],
+          actions: ['dynamodb:GetItem', 'dynamodb:PutItem', 'dynamodb:Query', 'dynamodb:Scan', 'dynamodb:UpdateItem', 'dynamodb:DeleteItem'],
           resources: kvsList.map((kvs) => kvs.table.tableArn),
         }),
       );

@@ -12,18 +12,11 @@ export interface FileWriteBinaryContentsActionPayload {
 }
 
 // Action
-export interface FileWriteBinaryContentsAction
-  extends Action<FileWriteBinaryContentsActionPayload> {
+export interface FileWriteBinaryContentsAction extends Action<FileWriteBinaryContentsActionPayload> {
   type: FileActionType.WriteBinaryContents;
   payload: FileWriteBinaryContentsActionPayload;
 }
 
 // Function Types
-export type FileWriteBinaryContentsActionProcessor = ActionProcessor<
-  FileWriteBinaryContentsAction,
-  void
->;
-export type FileWriteBinaryContentsActionRequester = ActionRequester<
-  FileWriteBinaryContentsAction,
-  void
->;
+export type FileWriteBinaryContentsActionProcessor = ActionProcessor<FileWriteBinaryContentsAction, void>;
+export type FileWriteBinaryContentsActionRequester = ActionRequester<FileWriteBinaryContentsAction, void>;

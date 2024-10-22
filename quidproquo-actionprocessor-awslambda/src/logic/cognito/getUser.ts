@@ -1,9 +1,4 @@
-import {
-  CognitoIdentityProviderClient,
-  GetUserCommandInput,
-  GetUserCommand,
-  AttributeType,
-} from '@aws-sdk/client-cognito-identity-provider';
+import { CognitoIdentityProviderClient, GetUserCommandInput, GetUserCommand, AttributeType } from '@aws-sdk/client-cognito-identity-provider';
 import { createAwsClient } from '../createAwsClient';
 
 export interface UserAttributes {
@@ -19,10 +14,7 @@ export interface User {
   userAttributes: UserAttributes;
 }
 
-const getUserAttribute = (
-  attributeName: string,
-  userAttributes: AttributeType[],
-): string | undefined => {
+const getUserAttribute = (attributeName: string, userAttributes: AttributeType[]): string | undefined => {
   const lowerAttributeName = attributeName.toLowerCase();
 
   const attribute = userAttributes.find((k) => k.Name?.toLowerCase() === lowerAttributeName);
@@ -31,7 +23,9 @@ const getUserAttribute = (
 };
 
 export const getUser = async (accessToken: string, region: string): Promise<User> => {
-  const cognitoClient = createAwsClient(CognitoIdentityProviderClient, { region });
+  const cognitoClient = createAwsClient(CognitoIdentityProviderClient, {
+    region,
+  });
 
   const params: GetUserCommandInput = {
     AccessToken: accessToken,
@@ -40,10 +34,7 @@ export const getUser = async (accessToken: string, region: string): Promise<User
   const response = await cognitoClient.send(new GetUserCommand(params));
 
   const attributeTypes = (response.UserAttributes || []).filter((ua) => !!ua.Value);
-  const userAttributes = attributeTypes.reduce(
-    (acc, ua) => ({ ...acc, [ua.Name!]: ua.Value! }),
-    {},
-  );
+  const userAttributes = attributeTypes.reduce((acc, ua) => ({ ...acc, [ua.Name!]: ua.Value! }), {});
 
   const user: User = {
     username: response.Username!,

@@ -4,11 +4,7 @@ const coreConfigActionComponentMap: Record<string, string[]> = {
   ['@quidproquo-core/Config/GetParameter']: ['askConfigGetParameter', 'parameterName'],
   ['@quidproquo-core/Config/GetParameters']: ['askConfigGetParameters', 'parameterNames'],
   ['@quidproquo-core/Config/GetSecret']: ['askConfigGetSecret', 'secretName'],
-  ['@quidproquo-core/Config/SetParameter']: [
-    'askConfigSetParameter',
-    'parameterName',
-    'parameterValue',
-  ],
+  ['@quidproquo-core/Config/SetParameter']: ['askConfigSetParameter', 'parameterName', 'parameterValue'],
 };
 
 export default coreConfigActionComponentMap;

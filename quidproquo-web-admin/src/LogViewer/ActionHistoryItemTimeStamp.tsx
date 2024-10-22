@@ -5,10 +5,7 @@ interface ActionHistoryItemTimeStampProps {
   finishedAt: string;
 }
 
-export const ActionHistoryItemTimeStamp = ({
-  startedAt,
-  finishedAt,
-}: ActionHistoryItemTimeStampProps) => {
+export const ActionHistoryItemTimeStamp = ({ startedAt, finishedAt }: ActionHistoryItemTimeStampProps) => {
   const startDate = new Date(startedAt);
   const endDate = new Date(finishedAt);
   const executionTime = endDate.getTime() - startDate.getTime();

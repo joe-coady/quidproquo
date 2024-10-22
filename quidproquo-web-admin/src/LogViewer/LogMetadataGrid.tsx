@@ -1,10 +1,5 @@
 import LinearProgress from '@mui/material/LinearProgress';
-import {
-  DataGrid,
-  GridRenderCellParams,
-  GridColDef,
-  GridRowClassNameParams,
-} from '@mui/x-data-grid';
+import { DataGrid, GridRenderCellParams, GridColDef, GridRowClassNameParams } from '@mui/x-data-grid';
 import LogDialog from './LogDialog';
 import { useLogManagement } from './hooks';
 import { DataGridPagination, DateCell } from '../components';
@@ -49,13 +44,7 @@ type LogMetadataGridProps = {
 };
 
 export const LogMetadataGrid = ({ logs, isLoading }: LogMetadataGridProps) => {
-  const {
-    selectedLogCorrelation,
-    onRowClick,
-    clearSelectedLogCorrelation,
-    setSelectedLogCorrelation,
-    searchProgress,
-  } = useLogManagement();
+  const { selectedLogCorrelation, onRowClick, clearSelectedLogCorrelation, setSelectedLogCorrelation, searchProgress } = useLogManagement();
 
   const getRowClassName = (params: GridRowClassNameParams) => {
     return params.row.checked ? 'greenRow' : '';

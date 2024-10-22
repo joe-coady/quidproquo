@@ -47,7 +47,14 @@ export function LogViewer() {
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100%' }}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100vh',
+        width: '100%',
+      }}
+    >
       <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
         {tabs
           .filter((tab, index) => index === selectedTab)

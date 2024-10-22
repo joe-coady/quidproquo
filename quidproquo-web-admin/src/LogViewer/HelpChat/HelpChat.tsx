@@ -108,7 +108,14 @@ export const HelpChat: React.FC<HelpChatProps> = ({ logCorrelation }) => {
               }}
             >
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                <Avatar sx={{ mr: 1, bgcolor: message.isAi ? 'grey.500' : 'primary.dark' }}>{message.isAi ? <AndroidIcon /> : <PersonIcon />}</Avatar>
+                <Avatar
+                  sx={{
+                    mr: 1,
+                    bgcolor: message.isAi ? 'grey.500' : 'primary.dark',
+                  }}
+                >
+                  {message.isAi ? <AndroidIcon /> : <PersonIcon />}
+                </Avatar>
                 <Typography variant="subtitle2">{message.isAi ? 'AI Assistant' : 'You'}</Typography>
               </Box>
               <Markdown>{message.message}</Markdown>

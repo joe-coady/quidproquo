@@ -1,4 +1,3 @@
- 
 import { AskResponse, DeployEventStatusType, QpqFunctionRuntime, QueueMessage, askConfigGetGlobal, askQueueSendMessages } from 'quidproquo-core';
 
 export function* askProcessOnDeployCreate(): AskResponse<void> {

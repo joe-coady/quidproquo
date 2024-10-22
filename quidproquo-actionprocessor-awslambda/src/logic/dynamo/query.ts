@@ -5,11 +5,7 @@ import { convertDynamoMapToObject } from './convertObjectToDynamoMap';
 import { stringToLastEvaluatedKey } from './logs';
 import { itemsToQpqPagedData } from './utils/itemsToQpqPagedData';
 
-import {
-  buildExpressionAttributeValues,
-  buildExpressionAttributeNames,
-  buildDynamoQueryExpression,
-} from './qpqDynamoOrm';
+import { buildExpressionAttributeValues, buildExpressionAttributeNames, buildDynamoQueryExpression } from './qpqDynamoOrm';
 import { createAwsClient } from '../createAwsClient';
 
 export async function query<Item>(
@@ -46,8 +42,5 @@ export async function query<Item>(
   // TODO: Catch errors and throw QPQ ones
   const data = await dynamoDBClient.send(command);
 
-  return itemsToQpqPagedData<Item>(
-    (data.Items?.map((i) => convertDynamoMapToObject(i)) || []) as Item[],
-    data.LastEvaluatedKey,
-  );
+  return itemsToQpqPagedData<Item>((data.Items?.map((i) => convertDynamoMapToObject(i)) || []) as Item[], data.LastEvaluatedKey);
 }

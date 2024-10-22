@@ -10,18 +10,11 @@ export interface UserDirectorySetUserAttributesActionPayload {
 }
 
 // Action
-export interface UserDirectorySetUserAttributesAction
-  extends Action<UserDirectorySetUserAttributesActionPayload> {
+export interface UserDirectorySetUserAttributesAction extends Action<UserDirectorySetUserAttributesActionPayload> {
   type: UserDirectoryActionType.SetUserAttributes;
   payload: UserDirectorySetUserAttributesActionPayload;
 }
 
 // Function Types
-export type UserDirectorySetUserAttributesActionProcessor = ActionProcessor<
-  UserDirectorySetUserAttributesAction,
-  void
->;
-export type UserDirectorySetUserAttributesActionRequester = ActionRequester<
-  UserDirectorySetUserAttributesAction,
-  void
->;
+export type UserDirectorySetUserAttributesActionProcessor = ActionProcessor<UserDirectorySetUserAttributesAction, void>;
+export type UserDirectorySetUserAttributesActionRequester = ActionRequester<UserDirectorySetUserAttributesAction, void>;

@@ -1,16 +1,7 @@
-import {
-  PublishBatchCommand,
-  PublishBatchCommandInput,
-  SNSClient,
-  PublishBatchRequestEntry,
-} from '@aws-sdk/client-sns';
+import { PublishBatchCommand, PublishBatchCommandInput, SNSClient, PublishBatchRequestEntry } from '@aws-sdk/client-sns';
 import { createAwsClient } from '../createAwsClient';
 
-export const publishMessage = async (
-  topicArn: string,
-  region: string,
-  messages: string[],
-): Promise<void> => {
+export const publishMessage = async (topicArn: string, region: string, messages: string[]): Promise<void> => {
   const sqsClient = createAwsClient(SNSClient, { region });
 
   // Convert them to entries

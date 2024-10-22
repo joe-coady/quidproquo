@@ -67,13 +67,7 @@ export const LogSummary = ({ log }: LogSummaryProps) => {
       </Typography>
       <Typography>Correlation ID: {log.correlation}</Typography>
       <FormControlLabel
-        control={
-          checkedLoading ? (
-            <CircularProgress size={24} />
-          ) : (
-            <Checkbox checked={!!logMetadata?.checked} onChange={handleCheckboxChange} />
-          )
-        }
+        control={checkedLoading ? <CircularProgress size={24} /> : <Checkbox checked={!!logMetadata?.checked} onChange={handleCheckboxChange} />}
         label="Mark as done"
       />
     </Box>

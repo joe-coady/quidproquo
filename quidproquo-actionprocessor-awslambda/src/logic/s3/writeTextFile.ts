@@ -6,7 +6,7 @@ export const writeTextFile = async (
   key: string,
   data: string,
   region: string,
-  storageClass: keyof typeof StorageClass
+  storageClass: keyof typeof StorageClass,
 ): Promise<void> => {
   const s3Client = createAwsClient(S3Client, { region });
 
@@ -15,7 +15,7 @@ export const writeTextFile = async (
       Key: key,
       Bucket: bucketName,
       Body: Buffer.from(data),
-      StorageClass: storageClass
+      StorageClass: storageClass,
     }),
   );
 };

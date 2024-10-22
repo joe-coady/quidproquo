@@ -35,25 +35,11 @@ export abstract class QpqCoreSecretConstructBase extends QpqConstructBlock imple
 export class QpqCoreSecretConstruct extends QpqCoreSecretConstructBase {
   secret: aws_secretsmanager.ISecret;
 
-  static fromOtherStack(
-    scope: Construct,
-    id: string,
-    qpqConfig: QPQConfig,
-    secretConfig: SecretQPQConfigSetting,
-    awsAccountId: string,
-  ): QpqResource {
-    const secretName = awsNamingUtils.resolveConfigRuntimeResourceNameFromConfig(
-      secretConfig.key,
-      qpqConfig,
-      secretConfig.owner,
-    );
+  static fromOtherStack(scope: Construct, id: string, qpqConfig: QPQConfig, secretConfig: SecretQPQConfigSetting, awsAccountId: string): QpqResource {
+    const secretName = awsNamingUtils.resolveConfigRuntimeResourceNameFromConfig(secretConfig.key, qpqConfig, secretConfig.owner);
 
     class Import extends QpqCoreSecretConstructBase {
-      secret = aws_secretsmanager.Secret.fromSecretNameV2(
-        scope,
-        `${id}-${secretConfig.uniqueKey}`,
-        secretName,
-      );
+      secret = aws_secretsmanager.Secret.fromSecretNameV2(scope, `${id}-${secretConfig.uniqueKey}`, secretName);
     }
 
     return new Import(scope, id, { qpqConfig, awsAccountId });
@@ -71,27 +57,16 @@ export class QpqCoreSecretConstruct extends QpqCoreSecretConstructBase {
     qpqDeployAwsCdkUtils.applyEnvironmentTags(this.secret, props.qpqConfig);
   }
 
-  public static authorizeActionsForRole(
-    role: aws_iam.IRole,
-    secretConfigs: SecretQPQConfigSetting[],
-    qpqConfig: QPQConfig,
-  ) {
+  public static authorizeActionsForRole(role: aws_iam.IRole, secretConfigs: SecretQPQConfigSetting[], qpqConfig: QPQConfig) {
     if (secretConfigs.length > 0) {
       role.addToPrincipalPolicy(
         new aws_iam.PolicyStatement({
           effect: aws_iam.Effect.ALLOW,
           actions: ['secretsmanager:GetSecretValue'],
           resources: secretConfigs.map((secretConfig) => {
-            const { awsRegion, awsAccountId } = resolveAwsServiceAccountInfo(
-              qpqConfig,
-              secretConfig.owner,
-            );
+            const { awsRegion, awsAccountId } = resolveAwsServiceAccountInfo(qpqConfig, secretConfig.owner);
 
-            const secretName = awsNamingUtils.resolveConfigRuntimeResourceNameFromConfig(
-              secretConfig.key,
-              qpqConfig,
-              secretConfig.owner,
-            );
+            const secretName = awsNamingUtils.resolveConfigRuntimeResourceNameFromConfig(secretConfig.key, qpqConfig, secretConfig.owner);
 
             return `arn:aws:secretsmanager:${awsRegion}:${awsAccountId}:secret:${secretName}-*`;
           }),

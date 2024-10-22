@@ -8,10 +8,7 @@ const cache = new WeakMap<object, NodeCache>();
  * @param ttlInSeconds Time-to-live for the cached values in seconds.
  * @returns The memoized function.
  */
-export const memoFunc = <T extends (...args: any[]) => any>(
-  func: T,
-  ttlInSeconds: number = 3600,
-): T => {
+export const memoFunc = <T extends (...args: any[]) => any>(func: T, ttlInSeconds: number = 3600): T => {
   return ((...args: any[]) => {
     // Check if the function has a corresponding cache entry
     if (!cache.has(func)) {

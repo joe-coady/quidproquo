@@ -1,10 +1,7 @@
 import { KvsQueryOperation, askKeyValueStoreScan } from '../../actions';
 import { AskResponse, QpqPagedData } from '../../types';
 
-export function* askKeyValueStoreScanAll<T>(
-  storeName: string,
-  filterCondition?: KvsQueryOperation,
-): AskResponse<T[]> {
+export function* askKeyValueStoreScanAll<T>(storeName: string, filterCondition?: KvsQueryOperation): AskResponse<T[]> {
   const allData: T[] = [];
   let data: QpqPagedData<T> = {
     items: [],

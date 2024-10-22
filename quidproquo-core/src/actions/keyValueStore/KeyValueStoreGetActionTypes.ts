@@ -20,11 +20,5 @@ export interface KeyValueStoreGetAction<Value> extends Action<KeyValueStoreGetAc
 }
 
 // Function Types
-export type KeyValueStoreGetActionProcessor<Value> = ActionProcessor<
-  KeyValueStoreGetAction<Value>,
-  Value | null
->;
-export type KeyValueStoreGetActionRequester<Value> = ActionRequester<
-  KeyValueStoreGetAction<Value>,
-  Value | null
->;
+export type KeyValueStoreGetActionProcessor<Value> = ActionProcessor<KeyValueStoreGetAction<Value>, Value | null>;
+export type KeyValueStoreGetActionRequester<Value> = ActionRequester<KeyValueStoreGetAction<Value>, Value | null>;

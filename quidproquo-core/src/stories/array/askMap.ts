@@ -1,9 +1,6 @@
 import { AskResponse } from '../../types';
 
-export function* askMap<T, R>(
-  items: T[],
-  askCallback: (item: T, index: number, srcArray: T[]) => AskResponse<R>,
-): AskResponse<R[]> {
+export function* askMap<T, R>(items: T[], askCallback: (item: T, index: number, srcArray: T[]) => AskResponse<R>): AskResponse<R[]> {
   const mappedItems: R[] = [];
 
   let index = 0;

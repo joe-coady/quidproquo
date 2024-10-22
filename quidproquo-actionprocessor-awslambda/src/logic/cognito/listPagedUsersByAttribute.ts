@@ -15,7 +15,9 @@ export const listPagedUsersByAttribute = async (
   limit?: number,
   pageKey?: string,
 ): Promise<QpqPagedData<UserAttributes>> => {
-  const cognitoClient = createAwsClient(CognitoIdentityProviderClient, { region });
+  const cognitoClient = createAwsClient(CognitoIdentityProviderClient, {
+    region,
+  });
 
   const response: ListUsersResponse = await cognitoClient.send(
     new ListUsersCommand({

@@ -10,7 +10,6 @@ export const fromJsonWebsocketEventRequest = <T>(websocketJsonEvent: WebsocketEv
   return item;
 };
 
-
 export function* askFromJsonWebsocketEventRequest<T>(websocketJsonEvent: WebsocketEvent<string>): AskResponse<T> {
   if (!websocketJsonEvent.body) {
     yield* askThrowError(ErrorTypeEnum.Invalid, 'websocketJsonEvent.body is undefined');
@@ -18,4 +17,4 @@ export function* askFromJsonWebsocketEventRequest<T>(websocketJsonEvent: Websock
 
   const item: T = JSON.parse(websocketJsonEvent.body!);
   return item;
-};
+}

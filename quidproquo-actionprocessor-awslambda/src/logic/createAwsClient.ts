@@ -15,7 +15,9 @@ export function createAwsClient<T>(ClientClass: ClientConstructor<T>, args: any)
 
   // Check if the instance already exists in the cache
   if (!argsCache.has(argsKey)) {
-    const newClient = new ClientClass(args) as { send?: (...args: any[]) => any };
+    const newClient = new ClientClass(args) as {
+      send?: (...args: any[]) => any;
+    };
 
     // If the send method exists, wrap it with error handling so we can see it in the logs
     if (typeof newClient.send === 'function') {

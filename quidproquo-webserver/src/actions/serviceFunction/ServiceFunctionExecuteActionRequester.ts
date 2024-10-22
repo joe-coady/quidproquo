@@ -7,11 +7,11 @@ export function* askServiceFunctionExecute<R, T>(
   service: string,
   functionName: string,
   payload: T,
-  isAsync: boolean = false
+  isAsync: boolean = false,
 ): ServiceFunctionExecuteActionRequester<R, T> {
   // Read the context so we can send it with the queue message
   const context = (yield {
-    type: ContextActionType.List
+    type: ContextActionType.List,
   }) as QpqContext<any>;
 
   const result = (yield {
@@ -21,7 +21,7 @@ export function* askServiceFunctionExecute<R, T>(
       service,
       payload,
       context,
-      isAsync
+      isAsync,
     },
   }) as R;
 

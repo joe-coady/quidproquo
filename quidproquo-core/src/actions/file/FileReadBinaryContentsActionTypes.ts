@@ -15,11 +15,5 @@ export interface FileReadBinaryContentsAction extends Action<FileReadBinaryConte
 }
 
 // Function Types
-export type FileReadBinaryContentsActionProcessor = ActionProcessor<
-  FileReadBinaryContentsAction,
-  QPQBinaryData
->;
-export type FileReadBinaryContentsActionRequester = ActionRequester<
-  FileReadBinaryContentsAction,
-  QPQBinaryData
->;
+export type FileReadBinaryContentsActionProcessor = ActionProcessor<FileReadBinaryContentsAction, QPQBinaryData>;
+export type FileReadBinaryContentsActionRequester = ActionRequester<FileReadBinaryContentsAction, QPQBinaryData>;

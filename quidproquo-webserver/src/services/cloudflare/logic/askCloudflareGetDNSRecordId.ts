@@ -1,11 +1,7 @@
 import { askNetworkRequest, AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
 import { CloudflareResponse, CloudflareDNSRecord } from '../types';
 
-export function* askCloudflareGetDNSRecordId(
-  apiKey: string,
-  zoneId: string,
-  cnameName: string,
-): AskResponse<string | undefined> {
+export function* askCloudflareGetDNSRecordId(apiKey: string, zoneId: string, cnameName: string): AskResponse<string | undefined> {
   let page = 1;
   let total_pages = 0;
   let allRecords: CloudflareDNSRecord[] = [];
@@ -23,16 +19,11 @@ export function* askCloudflareGetDNSRecordId(
     );
 
     if (response.status < 200 || response.status >= 300) {
-      yield* askThrowError(
-        ErrorTypeEnum.GenericError,
-        `Error getting DNS record for [${cnameName}]`,
-      );
+      yield* askThrowError(ErrorTypeEnum.GenericError, `Error getting DNS record for [${cnameName}]`);
     }
 
     // Filter out all the non-CNAME and non-A records from the combined results
-    const filteredRecords = response.data.result.filter(
-      (record) => record.type === 'CNAME' || record.type === 'A',
-    );
+    const filteredRecords = response.data.result.filter((record) => record.type === 'CNAME' || record.type === 'A');
 
     allRecords = [...allRecords, ...filteredRecords];
     total_pages = response.data.result_info.total_pages;

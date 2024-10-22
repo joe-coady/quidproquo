@@ -9,18 +9,11 @@ export interface UserDirectoryForgotPasswordActionPayload {
 }
 
 // Action
-export interface UserDirectoryForgotPasswordAction
-  extends Action<UserDirectoryForgotPasswordActionPayload> {
+export interface UserDirectoryForgotPasswordAction extends Action<UserDirectoryForgotPasswordActionPayload> {
   type: UserDirectoryActionType.ForgotPassword;
   payload: UserDirectoryForgotPasswordActionPayload;
 }
 
 // Function Types
-export type UserDirectoryForgotPasswordActionProcessor = ActionProcessor<
-  UserDirectoryForgotPasswordAction,
-  AuthenticationDeliveryDetails
->;
-export type UserDirectoryForgotPasswordActionRequester = ActionRequester<
-  UserDirectoryForgotPasswordAction,
-  AuthenticationDeliveryDetails
->;
+export type UserDirectoryForgotPasswordActionProcessor = ActionProcessor<UserDirectoryForgotPasswordAction, AuthenticationDeliveryDetails>;
+export type UserDirectoryForgotPasswordActionRequester = ActionRequester<UserDirectoryForgotPasswordAction, AuthenticationDeliveryDetails>;

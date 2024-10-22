@@ -18,7 +18,10 @@ const getProcessGetRecords = (qpqConfig: QPQConfig): EventGetRecordsActionProces
       const cfRecordRequest = record.cf.request;
 
       const headers = Object.keys(cfRecordRequest.headers).reduce(
-        (acc, header) => ({ ...acc, [header]: cfRecordRequest.headers[header][0].value }),
+        (acc, header) => ({
+          ...acc,
+          [header]: cfRecordRequest.headers[header][0].value,
+        }),
         {},
       );
 

@@ -17,18 +17,11 @@ export interface KeyValueStoreUpdateActionPayload<Value> {
 }
 
 // Action
-export interface KeyValueStoreUpdateAction<Value>
-  extends Action<KeyValueStoreUpdateActionPayload<Value>> {
+export interface KeyValueStoreUpdateAction<Value> extends Action<KeyValueStoreUpdateActionPayload<Value>> {
   type: KeyValueStoreActionType.Update;
   payload: KeyValueStoreUpdateActionPayload<Value>;
 }
 
 // Function Types
-export type KeyValueStoreUpdateActionProcessor<Value> = ActionProcessor<
-  KeyValueStoreUpdateAction<Value>,
-  Value
->;
-export type KeyValueStoreUpdateActionRequester<Value> = ActionRequester<
-  KeyValueStoreUpdateAction<Value>,
-  Value
->;
+export type KeyValueStoreUpdateActionProcessor<Value> = ActionProcessor<KeyValueStoreUpdateAction<Value>, Value>;
+export type KeyValueStoreUpdateActionRequester<Value> = ActionRequester<KeyValueStoreUpdateAction<Value>, Value>;

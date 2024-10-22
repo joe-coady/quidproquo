@@ -60,8 +60,7 @@ export function* askClaudeSendChatMessage(correlationId: string): AskResponse<Lo
             {
               type: 'text',
               // if its the last message request a response in markdown
-              text:
-                index === allMessages.items.length - 1 ? `<markdown>${msg.message}` : msg.message,
+              text: index === allMessages.items.length - 1 ? `<markdown>${msg.message}` : msg.message,
             },
           ],
         };
@@ -79,10 +78,7 @@ export function* askClaudeSendChatMessage(correlationId: string): AskResponse<Lo
   });
 }
 
-export function* askLogSendChatMessage(
-  correlationId: string,
-  message: string,
-): AskResponse<LogChatMessage> {
+export function* askLogSendChatMessage(correlationId: string, message: string): AskResponse<LogChatMessage> {
   // Write the question to the message history
   yield* logChatMessageData.askUpsert({
     correlationId: correlationId,

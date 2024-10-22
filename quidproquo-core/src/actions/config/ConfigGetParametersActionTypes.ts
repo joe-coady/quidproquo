@@ -13,11 +13,5 @@ export interface ConfigGetParametersAction extends Action<ConfigGetParametersAct
 }
 
 // Function Types
-export type ConfigGetParametersActionProcessor = ActionProcessor<
-  ConfigGetParametersAction,
-  string[]
->;
-export type ConfigGetParametersActionRequester = ActionRequester<
-  ConfigGetParametersAction,
-  string[]
->;
+export type ConfigGetParametersActionProcessor = ActionProcessor<ConfigGetParametersAction, string[]>;
+export type ConfigGetParametersActionRequester = ActionRequester<ConfigGetParametersAction, string[]>;

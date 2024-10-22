@@ -2,13 +2,10 @@ import { ContextActionType } from '../context';
 import { QueueActionType } from './QueueActionType';
 import { QueueSendMessageActionRequester, QueueMessage } from './QueueSendMessageActionTypes';
 
-export function* askQueueSendMessages<T extends QueueMessage<any>>(
-  queueName: string,
-  ...queueMessages: T[]
-): QueueSendMessageActionRequester<T> {
+export function* askQueueSendMessages<T extends QueueMessage<any>>(queueName: string, ...queueMessages: T[]): QueueSendMessageActionRequester<T> {
   // Read the context so we can send it with the queue message
   const context = (yield {
-    type: ContextActionType.List
+    type: ContextActionType.List,
   })!;
 
   yield {
@@ -16,7 +13,7 @@ export function* askQueueSendMessages<T extends QueueMessage<any>>(
     payload: {
       queueMessages,
       queueName,
-      context
+      context,
     },
   };
 }

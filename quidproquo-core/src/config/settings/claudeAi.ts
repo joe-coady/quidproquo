@@ -1,9 +1,5 @@
 // Import the base configuration interfaces and types
-import {
-  QPQConfigSetting,
-  QPQCoreConfigSettingType,
-  QPQConfigAdvancedSettings,
-} from '../QPQConfig';
+import { QPQConfigSetting, QPQCoreConfigSettingType, QPQConfigAdvancedSettings } from '../QPQConfig';
 
 // Define an enum for model sizes
 export enum ClaudeAIModelSize {
@@ -25,10 +21,7 @@ export interface ClaudeAIQPQConfigSetting extends QPQConfigSetting {
 }
 
 // Function to define Claude AI config with optional advanced settings
-export const defineClaudeAI = (
-  name: string,
-  options?: QPQConfigAdvancedClaudeAISettings,
-): ClaudeAIQPQConfigSetting => ({
+export const defineClaudeAI = (name: string, options?: QPQConfigAdvancedClaudeAISettings): ClaudeAIQPQConfigSetting => ({
   configSettingType: QPQCoreConfigSettingType.claudeAi,
   uniqueKey: name,
 

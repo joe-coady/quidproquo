@@ -41,18 +41,10 @@ export class QpqCoreParameterConstruct extends QpqCoreParameterConstructBase {
     parameterConfig: ParameterQPQConfigSetting,
     awsAccountId: string,
   ): QpqResource {
-    const paramName = awsNamingUtils.resolveConfigRuntimeResourceNameFromConfig(
-      parameterConfig.key,
-      qpqConfig,
-      parameterConfig.owner,
-    );
+    const paramName = awsNamingUtils.resolveConfigRuntimeResourceNameFromConfig(parameterConfig.key, qpqConfig, parameterConfig.owner);
 
     class Import extends QpqCoreParameterConstructBase {
-      stringParameter = aws_ssm.StringParameter.fromStringParameterName(
-        scope,
-        `${id}-${parameterConfig.uniqueKey}`,
-        paramName,
-      );
+      stringParameter = aws_ssm.StringParameter.fromStringParameterName(scope, `${id}-${parameterConfig.uniqueKey}`, paramName);
     }
 
     return new Import(scope, id, { qpqConfig, awsAccountId });
@@ -73,27 +65,16 @@ export class QpqCoreParameterConstruct extends QpqCoreParameterConstructBase {
     qpqDeployAwsCdkUtils.applyEnvironmentTags(this.stringParameter, props.qpqConfig);
   }
 
-  public static authorizeActionsForRole(
-    role: aws_iam.IRole,
-    parameterConfigs: ParameterQPQConfigSetting[],
-    qpqConfig: QPQConfig,
-  ) {
+  public static authorizeActionsForRole(role: aws_iam.IRole, parameterConfigs: ParameterQPQConfigSetting[], qpqConfig: QPQConfig) {
     if (parameterConfigs.length > 0) {
       role.addToPrincipalPolicy(
         new aws_iam.PolicyStatement({
           effect: aws_iam.Effect.ALLOW,
           actions: ['ssm:GetParameter', 'ssm:GetParameters', 'ssm:DescribeParameters'],
           resources: parameterConfigs.map((parameterConfig) => {
-            const { awsRegion, awsAccountId } = resolveAwsServiceAccountInfo(
-              qpqConfig,
-              parameterConfig.owner,
-            );
+            const { awsRegion, awsAccountId } = resolveAwsServiceAccountInfo(qpqConfig, parameterConfig.owner);
 
-            const paramName = awsNamingUtils.resolveConfigRuntimeResourceNameFromConfig(
-              parameterConfig.key,
-              qpqConfig,
-              parameterConfig.owner,
-            );
+            const paramName = awsNamingUtils.resolveConfigRuntimeResourceNameFromConfig(parameterConfig.key, qpqConfig, parameterConfig.owner);
 
             return `arn:aws:ssm:${awsRegion}:${awsAccountId}:parameter/${paramName}`;
           }),

@@ -1,8 +1,5 @@
 import { KeyValueStoreActionType } from './KeyValueStoreActionType';
-import {
-  KeyValueStoreDeleteActionRequester,
-  KeyValueStoreDeleteOptions,
-} from './KeyValueStoreDeleteActionTypes';
+import { KeyValueStoreDeleteActionRequester, KeyValueStoreDeleteOptions } from './KeyValueStoreDeleteActionTypes';
 import { KvsCoreDataType } from './types';
 
 export function* askKeyValueStoreDelete(

@@ -12,12 +12,7 @@ export const getGenericActionRenderer =
     return (
       <>
         <pre style={genericFunctionRendererStyles.pre}>
-          <GenericFunctionRenderer
-            functionName={functionName}
-            args={args}
-            tooltipMap={tooltipMap}
-            expanded={expanded}
-          />
+          <GenericFunctionRenderer functionName={functionName} args={args} tooltipMap={tooltipMap} expanded={expanded} />
         </pre>
         <ActionResultDisplay historyItem={historyItem} expanded={expanded} />
       </>

@@ -6,10 +6,7 @@ import { QpqServiceStack, QpqServiceStackProps } from './base/QpqServiceStack';
 
 import { InfQpqServiceStack } from './InfQpqServiceStack';
 
-import {
-  WebQpqWebserverWebEntryConstruct,
-  WebQpqWebserverDomainProxyConstruct,
-} from '../constructs';
+import { WebQpqWebserverWebEntryConstruct, WebQpqWebserverDomainProxyConstruct } from '../constructs';
 
 export interface WebQpqServiceStackProps extends QpqServiceStackProps {
   infQpqServiceStack?: InfQpqServiceStack;
@@ -37,16 +34,12 @@ export class WebQpqServiceStack extends QpqServiceStack {
 
     const domainProxies = qpqWebServerUtils.getDomainProxyConfigs(props.qpqConfig).map(
       (setting) =>
-        new WebQpqWebserverDomainProxyConstruct(
-          this,
-          qpqCoreUtils.getUniqueKeyForSetting(setting),
-          {
-            awsAccountId: props.awsAccountId,
-            qpqConfig: props.qpqConfig,
+        new WebQpqWebserverDomainProxyConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
+          awsAccountId: props.awsAccountId,
+          qpqConfig: props.qpqConfig,
 
-            domainProxyConfig: setting,
-          },
-        ),
+          domainProxyConfig: setting,
+        }),
     );
   }
 }

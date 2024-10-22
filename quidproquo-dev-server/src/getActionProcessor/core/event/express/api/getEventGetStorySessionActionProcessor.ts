@@ -1,6 +1,3 @@
- 
- 
-
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
@@ -27,7 +24,13 @@ const getProcessGetStorySession = (qpqConfig: QPQConfig): EventGetStorySessionAc
     // wasValid = false
     if (!matchStoryResult.config?.routeAuthSettings?.userDirectoryName) {
       // If this endpoint is unauthenticated, then we will just decode it, and say it wasnt valid, for logs
-      const info = qpqWebServerUtils.decodeJWT<{ sub?: string; userId?: string; username?: string; id?: string; exp?: number }>(accessToken);
+      const info = qpqWebServerUtils.decodeJWT<{
+        sub?: string;
+        userId?: string;
+        username?: string;
+        id?: string;
+        exp?: number;
+      }>(accessToken);
 
       return actionResult({
         ...session,

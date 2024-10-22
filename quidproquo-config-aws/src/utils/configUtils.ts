@@ -9,9 +9,7 @@ import {
   QPQAwsConfigSettingType,
 } from '../config';
 
-export const getAwsServiceAccountInfoConfig = (
-  qpqConfig: QPQConfig,
-): AwsServiceAccountInfoQPQConfigSetting => {
+export const getAwsServiceAccountInfoConfig = (qpqConfig: QPQConfig): AwsServiceAccountInfoQPQConfigSetting => {
   const serviceAccountInfos = qpqCoreUtils.getConfigSettings<AwsServiceAccountInfoQPQConfigSetting>(
     qpqConfig,
     QPQAwsConfigSettingType.awsServiceAccountInfo,
@@ -32,10 +30,7 @@ export const getAwsServiceAccountInfoConfig = (
 export const getAwsServiceAccountInfos = (qpqConfig: QPQConfig): ServiceAccountInfo[] => {
   const awsServiceAccountInfoConfig = getAwsServiceAccountInfoConfig(qpqConfig);
 
-  const serviceInfos = [
-    ...awsServiceAccountInfoConfig.serviceInfoMap,
-    getLocalServiceAccountInfo(qpqConfig),
-  ];
+  const serviceInfos = [...awsServiceAccountInfoConfig.serviceInfoMap, getLocalServiceAccountInfo(qpqConfig)];
 
   const uniqueServices = serviceInfos.filter(
     (service, index, self) =>
@@ -53,18 +48,13 @@ export const getAwsServiceAccountInfos = (qpqConfig: QPQConfig): ServiceAccountI
 };
 
 export const getOwnedAwsAlarmConfigs = (qpqConfig: QPQConfig): AwsAlarmQPQConfigSetting[] => {
-  const alarmConfigs = qpqCoreUtils.getConfigSettings<AwsAlarmQPQConfigSetting>(
-    qpqConfig,
-    QPQAwsConfigSettingType.awsServiceAlarm,
-  );
+  const alarmConfigs = qpqCoreUtils.getConfigSettings<AwsAlarmQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.awsServiceAlarm);
 
   return qpqCoreUtils.getOwnedItems(alarmConfigs, qpqConfig);
 };
 
 export const getAwsAccountIds = (qpqConfig: QPQConfig): string[] => {
-  const uniqueAccountIds: string[] = [
-    ...new Set(getAwsServiceAccountInfos(qpqConfig).map((accountInfo) => accountInfo.awsAccountId)),
-  ];
+  const uniqueAccountIds: string[] = [...new Set(getAwsServiceAccountInfos(qpqConfig).map((accountInfo) => accountInfo.awsAccountId))];
 
   return uniqueAccountIds;
 };
@@ -85,25 +75,15 @@ export const getLocalServiceAccountInfo = (qpqConfig: QPQConfig): LocalServiceAc
   return serviceAccountInfo as LocalServiceAccountInfo;
 };
 
-export const resolveAwsServiceAccountInfo = (
-  qpqConfig: QPQConfig,
-  crossModuleOwner?: CrossModuleOwner,
-): ServiceAccountInfo => {
+export const resolveAwsServiceAccountInfo = (qpqConfig: QPQConfig, crossModuleOwner?: CrossModuleOwner): ServiceAccountInfo => {
   const localServiceInfo = getLocalServiceAccountInfo(qpqConfig);
 
   const targetModule: string = crossModuleOwner?.module || localServiceInfo.moduleName;
   const targetEnvironment: string = crossModuleOwner?.environment || localServiceInfo.environment;
-  const targetApplication: string =
-    crossModuleOwner?.application || localServiceInfo.applicationName;
+  const targetApplication: string = crossModuleOwner?.application || localServiceInfo.applicationName;
   const targetFeature: string | undefined = crossModuleOwner?.feature || localServiceInfo.feature;
 
-  return getAwsServiceAccountInfoByDeploymentInfo(
-    qpqConfig,
-    targetModule,
-    targetEnvironment,
-    targetFeature,
-    targetApplication,
-  );
+  return getAwsServiceAccountInfoByDeploymentInfo(qpqConfig, targetModule, targetEnvironment, targetFeature, targetApplication);
 };
 
 export const getAwsServiceAccountInfoByDeploymentInfo = (
@@ -119,23 +99,10 @@ export const getAwsServiceAccountInfoByDeploymentInfo = (
   const getMatchWeight = (serviceAccountInfo: ServiceAccountInfo) => {
     // Note: remember not to have overlapping weights
     return (
-      1.8 *
-        Number(
-          !serviceAccountInfo.applicationName ||
-            serviceAccountInfo.applicationName === targetApplication,
-        ) +
-      1.4 *
-        Number(
-          !serviceAccountInfo.environment || serviceAccountInfo.environment === targetEnvironment,
-        ) +
-      1.2 *
-        Number(!serviceAccountInfo.moduleName || serviceAccountInfo.moduleName === targetModule) +
-      1.1 *
-        Number(
-          !serviceAccountInfo.feature ||
-            (serviceAccountInfo.feature === targetFeature &&
-              !serviceAccountInfo.feature === !targetFeature),
-        )
+      1.8 * Number(!serviceAccountInfo.applicationName || serviceAccountInfo.applicationName === targetApplication) +
+      1.4 * Number(!serviceAccountInfo.environment || serviceAccountInfo.environment === targetEnvironment) +
+      1.2 * Number(!serviceAccountInfo.moduleName || serviceAccountInfo.moduleName === targetModule) +
+      1.1 * Number(!serviceAccountInfo.feature || (serviceAccountInfo.feature === targetFeature && !serviceAccountInfo.feature === !targetFeature))
     );
   };
 
@@ -155,9 +122,7 @@ export const getAwsServiceAccountInfoByDeploymentInfo = (
   const serviceAccountInfo = sortedAwsServiceAccountInfos.find((info) => info.weight > 0);
 
   if (!serviceAccountInfo) {
-    throw new Error(
-      `No aws service account info found for ${targetModule} ${targetEnvironment} ${targetFeature}`,
-    );
+    throw new Error(`No aws service account info found for ${targetModule} ${targetEnvironment} ${targetFeature}`);
   }
 
   return serviceAccountInfo.info;
@@ -168,9 +133,7 @@ export const getLambdaLayersWithFullPaths = (qpqConfig: QPQConfig): ApiLayer[] =
 
   return awsServiceAccountInfoConfig.apiLayers.map((layer: ApiLayer) => ({
     name: layer.name,
-    buildPath: layer.buildPath
-      ? joinPaths(qpqCoreUtils.getConfigRoot(qpqConfig), layer.buildPath)
-      : undefined,
+    buildPath: layer.buildPath ? joinPaths(qpqCoreUtils.getConfigRoot(qpqConfig), layer.buildPath) : undefined,
     layerArn: layer.layerArn,
   }));
 };
@@ -186,9 +149,7 @@ export const getDynamoTableNameOverrride = (srcKvsName: string, qpqConfig: QPQCo
   );
 
   // Find an override that matches the resource
-  const dynamoOverride = dynamoOverrides.find((override) =>
-    qpqCoreUtils.isSameResource(resource, override.kvsStore),
-  );
+  const dynamoOverride = dynamoOverrides.find((override) => qpqCoreUtils.isSameResource(resource, override.kvsStore));
 
   // If we found a matching resource, return the override
   if (dynamoOverride) {

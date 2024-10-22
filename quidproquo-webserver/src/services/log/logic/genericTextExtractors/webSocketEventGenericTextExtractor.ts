@@ -3,9 +3,7 @@ import { WebsocketEvent } from '../../../../types';
 
 export const webSocketEventGenericTextExtractor = (storyResult: StoryResult<any>): string => {
   if (storyResult.runtimeType === QpqRuntimeType.WEBSOCKET_EVENT) {
-    const transformEventParams = storyResult.history.find(
-      (h) => h.act.type === EventActionType.TransformEventParams,
-    );
+    const transformEventParams = storyResult.history.find((h) => h.act.type === EventActionType.TransformEventParams);
 
     if (!transformEventParams) {
       return 'no transformEventParams';

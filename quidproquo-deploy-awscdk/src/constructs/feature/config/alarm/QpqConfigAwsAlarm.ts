@@ -4,20 +4,14 @@ import * as cdk from 'aws-cdk-lib';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
-import {
-  AwsAlarmNamespace,
-  AwsAlarmOperator,
-  AwsAlarmQPQConfigSetting,
-} from 'quidproquo-config-aws';
+import { AwsAlarmNamespace, AwsAlarmOperator, AwsAlarmQPQConfigSetting } from 'quidproquo-config-aws';
 import { QpqCoreEventBusConstruct } from '../../core';
 
 export interface QpqConfigAwsAlarmConstructProps extends QpqConstructBlockProps {
   alarmConfig: AwsAlarmQPQConfigSetting;
 }
 
-function AwsAlarmOperatorToComparisonOperator(
-  operator: AwsAlarmOperator,
-): aws_cloudwatch.ComparisonOperator {
+function AwsAlarmOperatorToComparisonOperator(operator: AwsAlarmOperator): aws_cloudwatch.ComparisonOperator {
   switch (operator) {
     case AwsAlarmOperator.GreaterThanThreshold:
       return aws_cloudwatch.ComparisonOperator.GREATER_THAN_THRESHOLD;
@@ -56,13 +50,7 @@ export class QpqConfigAwsAlarmConstruct extends QpqConstructBlock {
       });
 
       props.alarmConfig.alarmSettings.onAlarm.publishToEventBus?.forEach((eventBusName) => {
-        const eventBus = QpqCoreEventBusConstruct.fromOtherStack(
-          scope,
-          'eventBus',
-          props.qpqConfig,
-          props.awsAccountId,
-          eventBusName,
-        );
+        const eventBus = QpqCoreEventBusConstruct.fromOtherStack(scope, 'eventBus', props.qpqConfig, props.awsAccountId, eventBusName);
 
         alarm.addAlarmAction(new aws_cloudwatch_actions.SnsAction(eventBus.topic));
       });

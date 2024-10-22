@@ -9,18 +9,11 @@ export interface AdminGetLogMetadataChildrenActionPayload {
 }
 
 // Action
-export interface AdminGetLogMetadataChildrenAction
-  extends Action<AdminGetLogMetadataChildrenActionPayload> {
+export interface AdminGetLogMetadataChildrenAction extends Action<AdminGetLogMetadataChildrenActionPayload> {
   type: AdminActionType.GetLogMetadataChildren;
   payload: AdminGetLogMetadataChildrenActionPayload;
 }
 
 // Function Types
-export type AdminGetLogMetadataChildrenActionProcessor = ActionProcessor<
-  AdminGetLogMetadataChildrenAction,
-  QpqLogList
->;
-export type AdminGetLogMetadataChildrenActionRequester = ActionRequester<
-  AdminGetLogMetadataChildrenAction,
-  QpqLogList
->;
+export type AdminGetLogMetadataChildrenActionProcessor = ActionProcessor<AdminGetLogMetadataChildrenAction, QpqLogList>;
+export type AdminGetLogMetadataChildrenActionRequester = ActionRequester<AdminGetLogMetadataChildrenAction, QpqLogList>;

@@ -3,10 +3,7 @@ import { createAwsClient } from '../createAwsClient';
 
 import { CloudflareDnsEntries } from 'quidproquo-webserver';
 
-export const getDomainValidationOptions = async (
-  certificateArn: string,
-  region: string,
-): Promise<CloudflareDnsEntries> => {
+export const getDomainValidationOptions = async (certificateArn: string, region: string): Promise<CloudflareDnsEntries> => {
   const acmClient = createAwsClient(ACMClient, {
     region,
   });

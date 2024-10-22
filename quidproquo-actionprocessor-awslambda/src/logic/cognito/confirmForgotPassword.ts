@@ -19,7 +19,9 @@ export const confirmForgotPassword = async (
   username: string,
   password: string,
 ): Promise<AuthenticateUserResponse> => {
-  const cognitoClient = createAwsClient(CognitoIdentityProviderClient, { region });
+  const cognitoClient = createAwsClient(CognitoIdentityProviderClient, {
+    region,
+  });
 
   const clientSecret = await getUserPoolClientSecret(userPoolId, clientId, region);
   const secretHash = calculateSecretHash(username, clientId, clientSecret);

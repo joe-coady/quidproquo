@@ -7,9 +7,7 @@ import {
 } from '../../../../../types';
 import { askSendMessage } from '../askSendMessage';
 
-export function isWebSocketPingMessage(
-  event: AnyEventMessage,
-): event is WebSocketClientEventMessagePing {
+export function isWebSocketPingMessage(event: AnyEventMessage): event is WebSocketClientEventMessagePing {
   return event.type === WebsocketClientMessageEventType.Ping;
 }
 

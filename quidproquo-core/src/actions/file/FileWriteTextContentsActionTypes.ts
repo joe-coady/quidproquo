@@ -16,11 +16,5 @@ export interface FileWriteTextContentsAction extends Action<FileWriteTextContent
 }
 
 // Function Types
-export type FileWriteTextContentsActionProcessor = ActionProcessor<
-  FileWriteTextContentsAction,
-  void
->;
-export type FileWriteTextContentsActionRequester = ActionRequester<
-  FileWriteTextContentsAction,
-  void
->;
+export type FileWriteTextContentsActionProcessor = ActionProcessor<FileWriteTextContentsAction, void>;
+export type FileWriteTextContentsActionRequester = ActionRequester<FileWriteTextContentsAction, void>;

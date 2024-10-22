@@ -1,1 +1,1 @@
-export * from "./askGetCurrentEpoch";
+export * from './askGetCurrentEpoch';

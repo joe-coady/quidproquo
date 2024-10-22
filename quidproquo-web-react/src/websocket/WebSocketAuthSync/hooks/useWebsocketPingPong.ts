@@ -2,10 +2,7 @@ import { useEffect } from 'react';
 
 import { useWebsocketSendEvent } from '../../hooks';
 
-import {
-  WebSocketClientEventMessagePing,
-  WebsocketClientMessageEventType,
-} from 'quidproquo-webserver';
+import { WebSocketClientEventMessagePing, WebsocketClientMessageEventType } from 'quidproquo-webserver';
 
 export const useWebsocketPingPong = () => {
   const sendMessage = useWebsocketSendEvent();

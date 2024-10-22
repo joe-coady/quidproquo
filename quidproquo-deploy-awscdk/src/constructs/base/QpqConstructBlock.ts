@@ -28,11 +28,7 @@ export class QpqConstructBlock extends Construct implements QpqResource {
   }
 
   resourceNameWithModuleOveride(name: string, module?: string) {
-    return awsNamingUtils.getConfigRuntimeResourceNameFromConfigWithServiceOverride(
-      name,
-      this.qpqConfig,
-      module,
-    );
+    return awsNamingUtils.getConfigRuntimeResourceNameFromConfigWithServiceOverride(name, this.qpqConfig, module);
   }
 
   qpqResourceName(name: string, resourceType: string) {
@@ -54,14 +50,9 @@ export class QpqConstructBlock extends Construct implements QpqResource {
 
   getServiceRole(): aws_iam.IRole {
     if (!this.serviceRole) {
-      this.serviceRole = aws_iam.Role.fromRoleName(
-        this,
-        'service-role',
-        this.resourceName('service-role'),
-        {
-          mutable: true,
-        },
-      );
+      this.serviceRole = aws_iam.Role.fromRoleName(this, 'service-role', this.resourceName('service-role'), {
+        mutable: true,
+      });
     }
 
     return this.serviceRole;

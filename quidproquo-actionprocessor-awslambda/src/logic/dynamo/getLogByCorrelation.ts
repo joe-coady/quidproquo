@@ -3,11 +3,7 @@ import { DynamoDBClient, QueryCommand, QueryCommandInput } from '@aws-sdk/client
 import { QpqRuntimeType, StoryResultMetadata } from 'quidproquo-core';
 import { createAwsClient } from '../createAwsClient';
 
-export async function getLogByCorrelation(
-  tableName: string,
-  region: string,
-  correlation: string,
-): Promise<StoryResultMetadata> {
+export async function getLogByCorrelation(tableName: string, region: string, correlation: string): Promise<StoryResultMetadata> {
   const dynamoDBClient = createAwsClient(DynamoDBClient, { region });
 
   const queryParams: QueryCommandInput = {

@@ -1,19 +1,14 @@
-import {
-  CognitoIdentityProviderClient,
-  ListUsersCommand,
-} from '@aws-sdk/client-cognito-identity-provider';
+import { CognitoIdentityProviderClient, ListUsersCommand } from '@aws-sdk/client-cognito-identity-provider';
 
 import { UserAttributes } from 'quidproquo-core';
 
 import { getQpqAttributesFromCognitoUserAttributes } from './cognitoAttributeMap';
 import { createAwsClient } from '../createAwsClient';
 
-export const getUserAttributesBySub = async (
-  userPoolId: string,
-  region: string,
-  sub: string,
-): Promise<UserAttributes> => {
-  const cognitoClient = createAwsClient(CognitoIdentityProviderClient, { region });
+export const getUserAttributesBySub = async (userPoolId: string, region: string, sub: string): Promise<UserAttributes> => {
+  const cognitoClient = createAwsClient(CognitoIdentityProviderClient, {
+    region,
+  });
 
   const response = await cognitoClient.send(
     new ListUsersCommand({

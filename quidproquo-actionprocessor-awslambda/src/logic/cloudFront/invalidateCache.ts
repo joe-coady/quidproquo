@@ -1,8 +1,4 @@
-import {
-  CloudFrontClient,
-  CreateInvalidationCommand,
-  CreateInvalidationCommandInput,
-} from '@aws-sdk/client-cloudfront';
+import { CloudFrontClient, CreateInvalidationCommand, CreateInvalidationCommandInput } from '@aws-sdk/client-cloudfront';
 
 import crypto from 'crypto';
 import { createAwsClient } from '../createAwsClient';
@@ -17,11 +13,7 @@ export const getInvalidationCallerReference = (paths: string[]): string => {
   return allPathHash + new Date().toISOString();
 };
 
-export const invalidateCache = async (
-  distributionId: string,
-  region: string,
-  paths: string[],
-): Promise<void> => {
+export const invalidateCache = async (distributionId: string, region: string, paths: string[]): Promise<void> => {
   const cloudFrontClient = createAwsClient(CloudFrontClient, { region });
 
   const input: CreateInvalidationCommandInput = {

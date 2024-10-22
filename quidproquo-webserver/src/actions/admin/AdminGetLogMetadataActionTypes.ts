@@ -13,11 +13,5 @@ export interface AdminGetLogMetadataAction extends Action<AdminGetLogMetadataAct
 }
 
 // Function Types
-export type AdminGetLogMetadataActionProcessor = ActionProcessor<
-  AdminGetLogMetadataAction,
-  StoryResultMetadata
->;
-export type AdminGetLogMetadataActionRequester = ActionRequester<
-  AdminGetLogMetadataAction,
-  StoryResultMetadata
->;
+export type AdminGetLogMetadataActionProcessor = ActionProcessor<AdminGetLogMetadataAction, StoryResultMetadata>;
+export type AdminGetLogMetadataActionRequester = ActionRequester<AdminGetLogMetadataAction, StoryResultMetadata>;

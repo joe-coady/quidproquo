@@ -32,9 +32,6 @@ export interface CloudflareDnsDeployEventDelete extends CloudflareDnsDeployEvent
   RequestType: CloudflareDnsDeployEventEnum.Delete;
 }
 
-export type CloudflareDnsDeployEvent =
-  | CloudflareDnsDeployEventCreate
-  | CloudflareDnsDeployEventUpdate
-  | CloudflareDnsDeployEventDelete;
+export type CloudflareDnsDeployEvent = CloudflareDnsDeployEventCreate | CloudflareDnsDeployEventUpdate | CloudflareDnsDeployEventDelete;
 
 export type CloudflareDnsDeployEventResponse = void;

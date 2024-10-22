@@ -8,18 +8,11 @@ export interface WebEntryInvalidateCacheActionPayload {
 }
 
 // Action
-export interface WebEntryInvalidateCacheAction
-  extends Action<WebEntryInvalidateCacheActionPayload> {
+export interface WebEntryInvalidateCacheAction extends Action<WebEntryInvalidateCacheActionPayload> {
   type: WebEntryActionType.InvalidateCache;
   payload: WebEntryInvalidateCacheActionPayload;
 }
 
 // Function Types
-export type WebEntryInvalidateCacheActionProcessor = ActionProcessor<
-  WebEntryInvalidateCacheAction,
-  void
->;
-export type WebEntryInvalidateCacheActionRequester = ActionRequester<
-  WebEntryInvalidateCacheAction,
-  void
->;
+export type WebEntryInvalidateCacheActionProcessor = ActionProcessor<WebEntryInvalidateCacheAction, void>;
+export type WebEntryInvalidateCacheActionRequester = ActionRequester<WebEntryInvalidateCacheAction, void>;

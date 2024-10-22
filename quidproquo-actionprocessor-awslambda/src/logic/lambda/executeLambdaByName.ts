@@ -1,12 +1,7 @@
 import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
 import { createAwsClient } from '../createAwsClient';
 
-export const executeLambdaByName = async <R>(
-  functionName: string,
-  region: string,
-  payload: any,
-  isAsync: boolean
-): Promise<R | undefined> => {
+export const executeLambdaByName = async <R>(functionName: string, region: string, payload: any, isAsync: boolean): Promise<R | undefined> => {
   const lambdaClient = createAwsClient(LambdaClient, { region });
 
   const encoder = new TextEncoder();

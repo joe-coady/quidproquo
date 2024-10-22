@@ -30,11 +30,5 @@ export interface KeyValueStoreQueryAction extends Action<KeyValueStoreQueryActio
 }
 
 // Function Types
-export type KeyValueStoreQueryActionProcessor<KvsItem> = ActionProcessor<
-  KeyValueStoreQueryAction,
-  QpqPagedData<KvsItem>
->;
-export type KeyValueStoreQueryActionRequester<KvsItem> = ActionRequester<
-  KeyValueStoreQueryAction,
-  QpqPagedData<KvsItem>
->;
+export type KeyValueStoreQueryActionProcessor<KvsItem> = ActionProcessor<KeyValueStoreQueryAction, QpqPagedData<KvsItem>>;
+export type KeyValueStoreQueryActionRequester<KvsItem> = ActionRequester<KeyValueStoreQueryAction, QpqPagedData<KvsItem>>;

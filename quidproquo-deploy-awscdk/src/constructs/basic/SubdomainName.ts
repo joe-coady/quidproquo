@@ -1,11 +1,6 @@
 import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
 import { Construct } from 'constructs';
-import {
-  aws_route53,
-  aws_certificatemanager,
-  aws_apigateway,
-  aws_route53_targets,
-} from 'aws-cdk-lib';
+import { aws_route53, aws_certificatemanager, aws_apigateway, aws_route53_targets } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 
 export interface SubdomainNameProps extends QpqConstructBlockProps {
@@ -41,9 +36,7 @@ export class SubdomainName extends QpqConstructBlock {
       endpointType: aws_apigateway.EndpointType.REGIONAL,
     });
 
-    this.targetARecord = aws_route53.RecordTarget.fromAlias(
-      new aws_route53_targets.ApiGatewayDomain(this.domainName),
-    );
+    this.targetARecord = aws_route53.RecordTarget.fromAlias(new aws_route53_targets.ApiGatewayDomain(this.domainName));
 
     new aws_route53.ARecord(this, 'a-record', {
       zone: apexHostedZone,

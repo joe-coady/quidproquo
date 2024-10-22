@@ -41,10 +41,7 @@ export interface DomainProxyQPQWebServerConfigSetting extends QPQConfigSetting {
   ignoreCache: string[];
 }
 
-export const defineDomainProxy = (
-  name: string,
-  options: QPQConfigAdvancedDomainProxySettings,
-): DomainProxyQPQWebServerConfigSetting => ({
+export const defineDomainProxy = (name: string, options: QPQConfigAdvancedDomainProxySettings): DomainProxyQPQWebServerConfigSetting => ({
   configSettingType: QPQWebServerConfigSettingType.DomainProxy,
   uniqueKey: name,
 

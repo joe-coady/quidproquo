@@ -21,9 +21,7 @@ export const listFiles = async (
   maxKeys: number = 1000,
   pageToken?: string,
 ): Promise<S3FileList> => {
-  const validatedPrefix = `${folder}${
-    folder.endsWith(filePathDelimiter) || !folder ? '' : filePathDelimiter
-  }`;
+  const validatedPrefix = `${folder}${folder.endsWith(filePathDelimiter) || !folder ? '' : filePathDelimiter}`;
   const bucketParams: ListObjectsV2CommandInput = {
     Bucket: bucketName,
     Delimiter: filePathDelimiter,

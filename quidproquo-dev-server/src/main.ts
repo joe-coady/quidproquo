@@ -1,6 +1,3 @@
- 
-
- 
 import bodyParser from 'body-parser';
 import express, { Express, Request, Response } from 'express';
 import multer from 'multer';
