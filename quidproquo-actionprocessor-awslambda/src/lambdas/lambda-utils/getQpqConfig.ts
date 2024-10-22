@@ -1,6 +1,6 @@
 import { QPQConfig } from 'quidproquo-core';
 
-// @ts-ignore - Special webpack file injected
+// @ts-expect-error - Special webpack file injected
 import { qpqConfig } from 'quidproquo-dynamic-loader';
 
 export const getQpqConfig = (): QPQConfig => {

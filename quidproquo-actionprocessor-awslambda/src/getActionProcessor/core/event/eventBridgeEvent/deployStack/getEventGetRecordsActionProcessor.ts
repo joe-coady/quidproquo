@@ -23,7 +23,7 @@ const getProcessGetRecords = (qpqConfig: QPQConfig): EventGetRecordsActionProces
     const status = eventBridgeEvent.detail['status-details'].status || '';
     const stackId = eventBridgeEvent.detail['stack-id'];
 
-    const regex = /:stack\/([^\/]+)/;
+    const regex = /:stack\/([^/]+)/;
     const match = stackId.match(regex);
 
     const stackName = match && match[1] ? match[1] : '';

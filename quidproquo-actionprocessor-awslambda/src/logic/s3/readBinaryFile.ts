@@ -2,11 +2,7 @@ import { QPQBinaryData } from 'quidproquo-core';
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 import { createAwsClient } from '../createAwsClient';
 
-export const readBinaryFile = async (
-  bucketName: string,
-  key: string,
-  region: string,
-): Promise<QPQBinaryData> => {
+export const readBinaryFile = async (bucketName: string, key: string, region: string): Promise<QPQBinaryData> => {
   const s3Client = createAwsClient(S3Client, { region });
 
   const response = await s3Client.send(
@@ -16,8 +12,14 @@ export const readBinaryFile = async (
     }),
   );
 
+  const base64Data = await response.Body?.transformToString('base64');
+
+  if (!base64Data) {
+    throw new Error('Unable to transform body to base64');
+  }
+
   return {
-    base64Data: await response.Body?.transformToString('base64')!,
+    base64Data: base64Data,
     mimetype: response.ContentType,
     filename: key.split('/').pop()!,
     contentDisposition: response.ContentDisposition,

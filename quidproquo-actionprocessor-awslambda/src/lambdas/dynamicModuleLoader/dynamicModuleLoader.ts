@@ -1,8 +1,6 @@
-// @ts-ignore - Special webpack file injected
+// @ts-expect-error - Special webpack file injected
 import { qpqDynamicModuleLoader } from 'quidproquo-dynamic-loader';
 
-export const dynamicModuleLoader = async <T = any>(
-  modulePath: string
-): Promise<T> => {
+export const dynamicModuleLoader = async <T = any>(modulePath: string): Promise<T> => {
   return qpqDynamicModuleLoader(modulePath);
 };

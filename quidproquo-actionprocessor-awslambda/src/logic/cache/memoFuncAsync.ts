@@ -8,10 +8,7 @@ const cache = new WeakMap<object, NodeCache>();
  * @param ttlInSeconds Time-to-live for the cached values in seconds.
  * @returns The memoized function.
  */
-export const memoFuncAsync = <T extends (...args: any[]) => any>(
-  func: T,
-  ttlInSeconds: number = 3600,
-): T => {
+export const memoFuncAsync = <T extends (...args: any[]) => any>(func: T, ttlInSeconds: number = 3600): T => {
   return (async (...args: any[]) => {
     if (!cache.has(func)) {
       cache.set(func, new NodeCache({ stdTTL: ttlInSeconds }));
@@ -24,13 +21,12 @@ export const memoFuncAsync = <T extends (...args: any[]) => any>(
       return nodeCache.get<T>(cacheKey);
     }
 
-    try {
-      // Await the result and then cache it
-      const result = await func(...args);
-      nodeCache.set(cacheKey, result);
-      return result;
-    } catch (err) {
-      throw err; // re-throw the error to be caught by caller
-    }
+    // Await the result
+    const result = await func(...args);
+
+    // and then cache it
+    nodeCache.set(cacheKey, result);
+
+    return result;
   }) as unknown as T;
 };
