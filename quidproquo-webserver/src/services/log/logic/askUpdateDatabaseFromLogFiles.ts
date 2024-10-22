@@ -103,7 +103,7 @@ export function* askUpdateDatabaseFromLogFile(storageDriveName: string, filesPat
   yield* logMetadataData.askUpsert(metadata);
 
   // Send errors to admins
-  if (!!metadata.error) {
+  if (metadata.error) {
     yield* askSendLogToAdmins(metadata);
   }
 }

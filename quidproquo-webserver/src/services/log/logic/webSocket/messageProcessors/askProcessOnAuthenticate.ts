@@ -22,4 +22,3 @@ export function* askProcessOnAuthenticate(id: string, accessToken: string) {
     });
   }
 }
-5;

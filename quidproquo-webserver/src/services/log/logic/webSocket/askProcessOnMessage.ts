@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import { AnyEventMessage, AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
 
 import {
