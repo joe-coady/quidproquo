@@ -2,7 +2,7 @@ import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
 import { DateActionType } from './DateActionType';
 
 // Payload
-export interface DateNowActionPayload {}
+export type DateNowActionPayload = undefined;
 
 // Action
 export interface DateNowAction extends Action<DateNowActionPayload> {

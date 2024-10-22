@@ -2,7 +2,7 @@ import { ErrorThrowErrorActionRequester } from './ErrorThrowErrorActionRequester
 import { ErrorActionType } from './ErrorActionType';
 import { ErrorTypeEnum, QPQError } from '../../types/ErrorTypeEnum';
 
-export function* askThrowError<T extends any>(
+export function* askThrowError<T>(
   errorType: QPQError['errorType'],
   errorText: QPQError['errorText'],
   errorStack?: QPQError['errorStack'],

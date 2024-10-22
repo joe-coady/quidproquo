@@ -2,7 +2,7 @@ import { GuidActionType } from './GuidActionType';
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
 
 // Payload
-export interface GuidNewActionPayload {}
+export type GuidNewActionPayload = undefined;
 
 // Action
 export interface GuidNewAction extends Action<GuidNewActionPayload> {

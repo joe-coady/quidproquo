@@ -47,7 +47,7 @@ import {
  * @returns {QPQConfigSetting[]} - The flattened array of QPQConfigSetting objects
  */
 export const flattenQpqConfig = (qpqConfig: QPQConfig): QPQConfigSetting[] => {
-  var environment = 'development';
+  let environment = 'development';
 
   /**
    * A recursive helper function that flattens an array of QPQConfigItem objects.

@@ -9,20 +9,13 @@ export interface ApplicationConfigInfo {
 }
 
 // Payload
-export interface ConfigGetApplicationInfoActionPayload {}
+export type ConfigGetApplicationInfoActionPayload = undefined;
 
 // Action
-export interface ConfigGetApplicationInfoAction
-  extends Action<ConfigGetApplicationInfoActionPayload> {
+export interface ConfigGetApplicationInfoAction extends Action<ConfigGetApplicationInfoActionPayload> {
   type: ConfigActionType.GetApplicationInfo;
 }
 
 // Function Types
-export type ConfigGetApplicationInfoActionProcessor = ActionProcessor<
-  ConfigGetApplicationInfoAction,
-  ApplicationConfigInfo
->;
-export type ConfigGetApplicationInfoActionRequester = ActionRequester<
-  ConfigGetApplicationInfoAction,
-  ApplicationConfigInfo
->;
+export type ConfigGetApplicationInfoActionProcessor = ActionProcessor<ConfigGetApplicationInfoAction, ApplicationConfigInfo>;
+export type ConfigGetApplicationInfoActionRequester = ActionRequester<ConfigGetApplicationInfoAction, ApplicationConfigInfo>;

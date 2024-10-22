@@ -23,7 +23,7 @@ export function* askFileListAllDirectory(
   drive: string,
   folderPath: string,
 ): AskResponse<FileInfo[]> {
-  var pageToken: string | undefined;
+  let pageToken: string | undefined;
   let fileInfos: FileInfo[] = [];
 
   while (true) {

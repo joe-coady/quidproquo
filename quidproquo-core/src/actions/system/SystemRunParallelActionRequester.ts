@@ -30,7 +30,7 @@ export function* askParallelDEPRECATED(stories: Array<any>): SystemRunParallelAc
 
     // Calculate real values
     let done = true;
-    for (var i = 0; i < stories.length; i++) {
+    for (let i = 0; i < stories.length; i++) {
       if (!actions[i].done) {
         actions[i] = itt[i].next(values[i]);
         if (!actions[i].done) {

@@ -7,6 +7,5 @@ export const GraphDatabaseInternalFieldNamesErrorTypeEnum = createErrorEnumForAc
 export function* askGraphDatabaseInternalFieldNames(): GraphDatabaseInternalFieldNamesActionRequester {
   return yield {
     type: GraphDatabaseActionType.InternalFieldNames,
-    payload: {},
   };
 }

@@ -1,6 +1,5 @@
 import { GraphDatabaseActionType } from './GraphDatabaseActionType';
 import { Action, ActionProcessor, ActionRequester } from '../../types';
-import { GraphCypherResponse } from '../../config';
 
 type GraphDatabaseInternalFieldNames = {
   internalId: string;
@@ -11,7 +10,7 @@ type GraphDatabaseInternalFieldNames = {
 };
 
 // Payload
-export interface GraphDatabaseInternalFieldNamesActionPayload {}
+export type GraphDatabaseInternalFieldNamesActionPayload = undefined;
 
 // Action
 export interface GraphDatabaseInternalFieldNamesAction extends Action<GraphDatabaseInternalFieldNamesActionPayload> {

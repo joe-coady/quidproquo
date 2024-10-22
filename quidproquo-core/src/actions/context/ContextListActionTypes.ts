@@ -3,7 +3,7 @@ import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
 import { ContextActionType } from './ContextActionType';
 
 // Payload
-export interface ContextListActionPayload {}
+export type ContextListActionPayload = undefined;
 
 // Action
 export interface ContextListAction extends Action<ContextListActionPayload> {

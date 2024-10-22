@@ -4,7 +4,7 @@ import { defineApplicationModule } from './config';
 
 export const qpqExecuteLog = async (storyResult: StoryResult<any>, runtime: any, overrides: ActionProcessorList = {}): Promise<StoryResult<any>> => {
   // Create a proxy that just resolves all actions to reading from the history
-  var logIndex = 0;
+  let logIndex = 0;
   const storyActionProcessor: ActionProcessorList = new Proxy(
     {},
     {
@@ -46,6 +46,8 @@ export const qpqExecuteLog = async (storyResult: StoryResult<any>, runtime: any,
   );
 
   // Execute it with the initial input
+  // We use a debugger here to catch code before it is executed
+  // eslint-disable-next-line no-debugger
   debugger;
   const result = await resolveStory(runtime, storyResult.input);
 
