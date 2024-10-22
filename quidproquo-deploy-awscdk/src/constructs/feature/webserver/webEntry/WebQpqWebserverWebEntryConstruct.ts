@@ -235,7 +235,7 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
         role: this.getServiceRole(),
       });
 
-      for (var seo of seos) {
+      for (let seo of seos) {
         // Deprecated edge lambdas are not added as a behavior, but they are still built
         if (seo.deprecated) {
           continue;

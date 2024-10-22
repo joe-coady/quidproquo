@@ -16,6 +16,7 @@ import {
   ApiQPQWebServerConfigSetting,
   QPQWebServerConfigSettingType,
   qpqWebServerUtils,
+  RouteQPQWebServerConfigSetting,
   WebEntryQPQWebServerConfigSetting,
 } from 'quidproquo-webserver';
 
@@ -142,6 +143,10 @@ export const getQqpTopicGrantables = (scope: Construct, id: string, qpqConfig: Q
   return eventBuses;
 };
 
+type RouteQPQWebServerConfigSettingWithUserDirectoryName = RouteQPQWebServerConfigSetting & {
+  options: { routeAuthSettings: { userDirectoryName: string } };
+};
+
 export const getQqpUserPoolGrantablesForApiConfig = (
   scope: Construct,
   id: string,
@@ -151,7 +156,7 @@ export const getQqpUserPoolGrantablesForApiConfig = (
 ): QpqResource[] => {
   const routesWithAuth = qpqWebServerUtils
     .getAllRoutesForApi(config.apiName, qpqConfig)
-    .filter((r) => r.options.routeAuthSettings?.userDirectoryName);
+    .filter((r): r is RouteQPQWebServerConfigSettingWithUserDirectoryName => !!r.options.routeAuthSettings?.userDirectoryName);
 
   const userDirectoryResources = routesWithAuth.map((route) => {
     return QpqInfCoreUserDirectoryConstruct.fromOtherStack(
@@ -159,7 +164,7 @@ export const getQqpUserPoolGrantablesForApiConfig = (
       `${id}-${qpqCoreUtils.getUniqueKeyForSetting(route)}-grantable-xserver`,
       qpqConfig,
       awsAccountId,
-      route.options.routeAuthSettings?.userDirectoryName!,
+      route.options.routeAuthSettings.userDirectoryName,
     );
   });
 
