@@ -8,7 +8,6 @@ export const useAsyncEffect = (effect: (isMounted: () => boolean) => Promise<voi
       try {
         return await effect(() => mountStatus.mounted);
       } catch (error) {
-        // eslint-disable-next-line no-console
         console.error('Error in useAsyncEffect:', error);
       }
     };
@@ -24,6 +23,5 @@ export const useAsyncEffect = (effect: (isMounted: () => boolean) => Promise<voi
         }
       });
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 };

@@ -15,7 +15,6 @@ const component: React.FC<WebSocketAuthSyncProps> = ({ children, accessToken }) 
   useWebsocketPingPong();
 
   // This fragment is not useless!
-  // eslint-disable-next-line react/jsx-no-useless-fragment
   return <>{children}</>;
 };
 
