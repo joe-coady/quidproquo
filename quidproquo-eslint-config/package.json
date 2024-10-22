@@ -2,7 +2,7 @@
   "name": "quidproquo-eslint-config",
   "version": "0.0.232",
   "description": "eslint config for quidproquo projects.",
-  "main": ".eslintrc.js",
+  "main": "eslint.config.mjs",
   "scripts": {
     "test": "",
     "clean": "",
@@ -20,5 +20,10 @@
   ],
   "author": "joecoady",
   "license": "ISC",
-  "devDependencies": {}
+  "devDependencies": {
+    "@eslint/js": "^9.13.0",
+    "eslint": "^9.13.0",
+    "globals": "^15.11.0",
+    "typescript-eslint": "^8.11.0"
+  }
 }
