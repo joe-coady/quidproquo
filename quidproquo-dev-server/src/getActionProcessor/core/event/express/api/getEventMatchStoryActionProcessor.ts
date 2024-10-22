@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import { awsLambdaUtils } from 'quidproquo-actionprocessor-awslambda';
 import {
   ActionProcessorList,
