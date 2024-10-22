@@ -9,7 +9,8 @@
     "build": "",
     "watch": "",
     "lint": "",
-    "lint:fix": ""
+    "lint:fix": "",
+    "format": ""
   },
   "repository": {
     "type": "git",

@@ -11,7 +11,8 @@
     "patch": "npm version patch --ws && npx ts-node ./scripts/applyPatch.ts",
     "go": "npm run patch && npm run build && npm run publish",
     "lint": "npm run lint --ws",
-    "lint:fix": "npm run lint:fix --ws"
+    "lint:fix": "npm run lint:fix --ws",
+    "format": "npm run format --ws"
   },
   "repository": {
     "type": "git",

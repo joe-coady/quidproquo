@@ -18,7 +18,8 @@
     "build:cjs": "tsc -p tsconfig.commonjs.json",
     "build:esm": "tsc -p tsconfig.esm.json",
     "lint": "npx eslint .",
-    "lint:fix": "npx eslint . --fix"
+    "lint:fix": "npx eslint . --fix",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\""
   },
   "repository": {
     "type": "git",
