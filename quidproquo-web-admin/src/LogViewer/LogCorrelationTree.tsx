@@ -22,10 +22,10 @@ const renderRectSvgNode =
     // TODO: Workout the nodeDateum type
     const color =
       nodeDatum.correlation === highlightCorrelationId
-        ? !!nodeDatum.error
+        ? nodeDatum.error
           ? '#8B0000'
           : '#00008B' // Very dark red for selected errors, dark blue for selected non-errors
-        : !!nodeDatum.error
+        : nodeDatum.error
           ? 'red'
           : 'white'; // Bright red for non-selected errors, white for non-selected non-errors
 
@@ -41,7 +41,7 @@ const renderRectSvgNode =
             return (
               <Fragment key={`${i}`}>
                 <rect x={x - 50} y={y - fontSize / 2 - 8} width="100" height={fontSize} fill={BACKGROUND_COLOR} strokeWidth="0" />
-                <text textAnchor="middle" fontSize={fontSize} fill={!!nodeDatum.error ? 'red' : 'black'} strokeWidth={0} y={y}>
+                <text textAnchor="middle" fontSize={fontSize} fill={nodeDatum.error ? 'red' : 'black'} strokeWidth={0} y={y}>
                   {text}
                 </text>
               </Fragment>

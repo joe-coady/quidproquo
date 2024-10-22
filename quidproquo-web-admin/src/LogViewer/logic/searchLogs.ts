@@ -11,7 +11,7 @@ export const searchLogs = async (searchParams: SearchParams, apiBaseUrl: string,
 
   const effectiveRuntimeTypes = searchParams.runtimeType === 'ALL' ? RuntimeTypes.filter((type) => type !== 'ALL') : [searchParams.runtimeType];
 
-  var progress = 0;
+  let progress = 0;
   const totalCount = effectiveRuntimeTypes.length;
 
   updateProgress(0);

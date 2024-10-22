@@ -17,7 +17,7 @@ export const useExternalData = <T>(url?: string): T | null => {
       return;
     }
 
-    var allowDataSet = true;
+    let allowDataSet = true;
     loadData().then((newData) => {
       if (allowDataSet) {
         setData(newData);

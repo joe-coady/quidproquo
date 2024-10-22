@@ -16,7 +16,7 @@ const LoadingBoxInternal = <T,>({ path, renderItem, renderLoading }: LoadingBoxP
   const isLoading = useIsLoading();
   const data: T | null = usePlatformDataFromPath<T>(path);
 
-  var reactNode: JSX.Element = <div>Error: Data could not be loaded</div>;
+  let reactNode: JSX.Element = <div>Error: Data could not be loaded</div>;
 
   if (isLoading) {
     reactNode = renderLoading ? (

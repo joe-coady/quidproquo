@@ -30,7 +30,7 @@ const getHoursSinceStartOfDay = (): number => {
 
 interface DashboardProps {}
 
-export const Dashboard: React.FC<DashboardProps> = ({}) => {
+export const Dashboard: React.FC<DashboardProps> = () => {
   const [realtimeLogs, setRealtimeLogs] = React.useState<StoryResultMetadata[]>([]);
 
   const { onSearch, logs: weeklyLogs } = useLogSearch();

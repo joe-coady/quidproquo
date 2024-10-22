@@ -17,9 +17,9 @@ export const getLogs = async (
   apiBaseUrl: string,
   accessToken?: string,
 ): Promise<StoryResultMetadata[]> => {
-  var logs: StoryResultMetadata[] = [];
-  var newLogs: QpqLogList;
-  var nextPageKey = undefined;
+  let logs: StoryResultMetadata[] = [];
+  let newLogs: QpqLogList;
+  let nextPageKey = undefined;
 
   const requestSpan = {
     startIsoDateTime,

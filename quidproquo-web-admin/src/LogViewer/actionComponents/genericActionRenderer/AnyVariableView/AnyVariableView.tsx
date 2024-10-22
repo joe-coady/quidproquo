@@ -8,7 +8,7 @@ export const genericFunctionRendererStyles = {
     padding: '10px', // Adding some padding for visual spacing
     borderRadius: '5px', // Optional: adds rounded corners to the <pre> tag
     whiteSpace: 'pre-wrap',
-    wordWrap: 'break-word' as 'break-word',
+    wordWrap: 'break-word',
   },
   functionName: { color: '#D0DC8B' }, // Function color
   stringValue: { color: '#CE834A' }, // String value color
