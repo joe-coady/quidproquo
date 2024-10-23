@@ -1,7 +1,6 @@
 import { AskResponse } from 'quidproquo-core';
 
 import * as logMetadataData from '../../entry/data/logMetadataData';
-
 import { askGetLoggedInUsername } from '../auth';
 import { askSendLogToAdmins } from '../webSocket';
 

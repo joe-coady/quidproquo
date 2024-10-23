@@ -1,5 +1,5 @@
-import { UserDirectoryConfirmForgotPasswordActionRequester } from './UserDirectoryConfirmForgotPasswordActionTypes';
 import { UserDirectoryActionType } from './UserDirectoryActionType';
+import { UserDirectoryConfirmForgotPasswordActionRequester } from './UserDirectoryConfirmForgotPasswordActionTypes';
 
 export function* askUserDirectoryConfirmForgotPassword(
   userDirectoryName: string,

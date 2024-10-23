@@ -1,4 +1,5 @@
-import { CognitoIdentityProviderClient, ChangePasswordCommand, ChangePasswordCommandInput } from '@aws-sdk/client-cognito-identity-provider';
+import { ChangePasswordCommand, ChangePasswordCommandInput,CognitoIdentityProviderClient } from '@aws-sdk/client-cognito-identity-provider';
+
 import { createAwsClient } from '../createAwsClient';
 
 export const changePassword = async (accessToken: string, previousPassword: string, proposedPassword: string, region: string): Promise<void> => {

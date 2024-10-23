@@ -1,6 +1,6 @@
-import { AnyAuthChallenge } from './types';
 import { Action, ActionProcessor, ActionRequester } from '../../types';
-import { UserDirectoryActionType, AuthenticateUserResponse } from './UserDirectoryActionType';
+import { AnyAuthChallenge } from './types';
+import { AuthenticateUserResponse,UserDirectoryActionType } from './UserDirectoryActionType';
 
 // Payload
 export interface UserDirectoryRespondToAuthChallengeActionPayload {

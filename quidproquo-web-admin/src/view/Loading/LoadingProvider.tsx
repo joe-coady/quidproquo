@@ -1,5 +1,6 @@
 import React from 'react';
-import { LoadingContext, LoadingApiContext, useLoadingManager } from './private';
+
+import { LoadingApiContext, LoadingContext, useLoadingManager } from './private';
 
 interface LoadingProviderProps {
   children: React.ReactNode;

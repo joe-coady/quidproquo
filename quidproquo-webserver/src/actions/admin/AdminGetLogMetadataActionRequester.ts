@@ -1,5 +1,5 @@
-import { AdminGetLogMetadataActionRequester } from './AdminGetLogMetadataActionTypes';
 import { AdminActionType } from './AdminActionType';
+import { AdminGetLogMetadataActionRequester } from './AdminGetLogMetadataActionTypes';
 
 export function* askAdminGetLogMetadata(correlationId: string): AdminGetLogMetadataActionRequester {
   return yield {

@@ -1,5 +1,5 @@
-import { AdminGetLogsActionRequester } from './AdminGetLogsActionTypes';
 import { AdminActionType } from './AdminActionType';
+import { AdminGetLogsActionRequester } from './AdminGetLogsActionTypes';
 
 export function* askAdminGetLogs(
   runtimeType: string,

@@ -1,10 +1,9 @@
-import { DynamoDBClient, QueryCommand, QueryCommandInput } from '@aws-sdk/client-dynamodb';
 import { QpqRuntimeType, StoryResultMetadata } from 'quidproquo-core';
-
 import { QpqLogList } from 'quidproquo-webserver';
+import { DynamoDBClient, QueryCommand, QueryCommandInput } from '@aws-sdk/client-dynamodb';
 
-import { lastEvaluatedKeyToString, stringToLastEvaluatedKey } from './logs';
 import { createAwsClient } from '../createAwsClient';
+import { lastEvaluatedKeyToString, stringToLastEvaluatedKey } from './logs';
 
 export async function getPagedItemsOverRange(
   tableName: string,

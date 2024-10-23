@@ -9,12 +9,10 @@ import {
   StoryResult,
   StorySession,
 } from 'quidproquo-core';
-
-import { ServiceFunctionExecuteActionProcessor, ServiceFunctionActionType, ExecuteServiceFunctionEvent } from 'quidproquo-webserver';
-
-import { executeLambdaByName } from '../../../logic/lambda/executeLambdaByName';
+import { ExecuteServiceFunctionEvent,ServiceFunctionActionType, ServiceFunctionExecuteActionProcessor } from 'quidproquo-webserver';
 
 import { getConfigRuntimeResourceName } from '../../../awsNamingUtils';
+import { executeLambdaByName } from '../../../logic/lambda/executeLambdaByName';
 
 type AnyExecuteServiceFunctionEventWithSession = ExecuteServiceFunctionEvent<any[]> & {
   storySession: StorySession;

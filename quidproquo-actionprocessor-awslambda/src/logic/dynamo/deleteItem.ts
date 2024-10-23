@@ -1,8 +1,8 @@
-import { DynamoDBClient, DeleteItemCommand, DeleteItemCommandInput } from '@aws-sdk/client-dynamodb';
-
 import { KvsCoreDataType } from 'quidproquo-core';
-import { buildAttributeValue } from './qpqDynamoOrm';
+import { DeleteItemCommand, DeleteItemCommandInput,DynamoDBClient } from '@aws-sdk/client-dynamodb';
+
 import { createAwsClient } from '../createAwsClient';
+import { buildAttributeValue } from './qpqDynamoOrm';
 
 export async function deleteItem(
   tableName: string,

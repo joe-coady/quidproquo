@@ -1,10 +1,10 @@
 import {
-  QPQConfig,
-  GraphDatabaseActionType,
-  ActionProcessorListResolver,
   ActionProcessorList,
-  GraphDatabaseInternalFieldNamesActionProcessor,
+  ActionProcessorListResolver,
   actionResult,
+  GraphDatabaseActionType,
+  GraphDatabaseInternalFieldNamesActionProcessor,
+  QPQConfig,
 } from 'quidproquo-core';
 
 const getProcessInternalFieldNames = (qpqConfig: QPQConfig): GraphDatabaseInternalFieldNamesActionProcessor => {

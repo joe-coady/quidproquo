@@ -1,5 +1,5 @@
 import { CrossModuleOwner, KeyOf } from '../../types';
-import { QPQConfigSetting, QPQCoreConfigSettingType, QPQConfigAdvancedSettings } from '../QPQConfig';
+import { QPQConfigAdvancedSettings,QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
 
 // TODO: When we put validation on the QPQConfig, we need to make sure
 // Key Length and Data Type: DynamoDB has limitations on key length and data type.

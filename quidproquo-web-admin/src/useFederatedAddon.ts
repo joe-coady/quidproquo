@@ -1,10 +1,9 @@
-import { useState, useEffect } from 'react';
-
+import { useEffect,useState } from 'react';
+import { useAuthAccessToken, useBaseUrlResolvers } from 'quidproquo-web-react';
 import { loadRemote, registerRemotes } from '@module-federation/enhanced/runtime';
 
-import { FederatedAddon } from './FederatedAddon';
 import { getFederationManifest } from './LogViewer/logic';
-import { useAuthAccessToken, useBaseUrlResolvers } from 'quidproquo-web-react';
+import { FederatedAddon } from './FederatedAddon';
 
 export function useFederatedAddon(): {
   addons: FederatedAddon[];

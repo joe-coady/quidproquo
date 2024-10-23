@@ -1,6 +1,5 @@
 import { getApiGatewayEventHandler } from '../lambdaHandlers';
-
-import { getQpqConfig } from './lambda-utils';
 import { dynamicModuleLoader } from './dynamicModuleLoader';
+import { getQpqConfig } from './lambda-utils';
 
 export const apiGatewayEventHandler = getApiGatewayEventHandler(dynamicModuleLoader, getQpqConfig());

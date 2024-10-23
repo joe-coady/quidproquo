@@ -1,6 +1,7 @@
-import { useWebsocketApi } from './useWebsocketApi';
 import { AnyEventMessage } from 'quidproquo-core';
+
 import { useFastCallback } from '../../hooks';
+import { useWebsocketApi } from './useWebsocketApi';
 
 export const useWebsocketSendEvent = () => {
   const websocketApi = useWebsocketApi();

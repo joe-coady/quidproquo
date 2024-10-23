@@ -1,11 +1,10 @@
-import { AskResponse, ErrorTypeEnum, QPQConfig, askMap, askThrowError } from 'quidproquo-core';
+import { askMap, AskResponse, askThrowError,ErrorTypeEnum, QPQConfig } from 'quidproquo-core';
 
-import { HTTPEvent, HttpEventHeaders } from '../types/HTTPEvent';
 import { RouteOptions, ServiceAllowedOrigin } from '../config/settings/route';
-
-import { getBaseDomainName } from './qpqConfigAccessorsUtils';
 import { qpqWebServerUtils } from '../qpqWebServerUtils';
-import { SeoEvent, qpqHeaderIsBot } from '../types';
+import { qpqHeaderIsBot,SeoEvent } from '../types';
+import { HTTPEvent, HttpEventHeaders } from '../types/HTTPEvent';
+import { getBaseDomainName } from './qpqConfigAccessorsUtils';
 
 export const getHeaderValue = (header: string, headers: HttpEventHeaders): string | null => {
   const headerAsLower = header.toLowerCase();

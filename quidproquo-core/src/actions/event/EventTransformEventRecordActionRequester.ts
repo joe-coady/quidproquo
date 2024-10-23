@@ -1,5 +1,5 @@
-import { EventTransformEventRecordActionRequester } from './EventTransformEventRecordActionTypes';
 import { EventActionType } from './EventActionType';
+import { EventTransformEventRecordActionRequester } from './EventTransformEventRecordActionTypes';
 
 export function* askEventTransformEventRecord<EventRecord, QpqEventRecord>(
   eventRecord: EventRecord,

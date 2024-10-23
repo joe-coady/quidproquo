@@ -1,4 +1,5 @@
 import { askKeyValueStoreQuery, askKeyValueStoreUpsert, AskResponse, kvsEqual, QpqPagedData } from 'quidproquo-core';
+
 import { LogChatMessage, LogMetadata } from '../domain';
 
 const logChatMessageStoreName = 'qpq-log-messages';

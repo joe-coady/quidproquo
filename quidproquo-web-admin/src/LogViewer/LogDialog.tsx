@@ -1,34 +1,32 @@
-import { getLogUrl } from './logic';
-
-import {
-  Dialog,
-  LinearProgress,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Tabs,
-  Tab,
-  AppBar,
-  useTheme,
-  FormControlLabel,
-  Checkbox,
-} from '@mui/material';
-
-import { LogCorrelations } from './LogCorrelations';
-import { LogDetails } from './LogDetails';
-import { LogSummary } from './LogSummary';
-import { LogRawJson } from './LogRawJson';
-import { HelpChat } from './HelpChat';
-import { EventTimeline } from './EventTimeline'; // Add this import
-
-import { useExternalData, usePlatformDataFromPath } from '../components/LoadingBox/hooks';
-import { useIsLoading } from '../view';
-import { apiRequestPost } from '../logic';
+import { useState } from 'react';
 import { StoryResult } from 'quidproquo-core';
 import { useBaseUrlResolvers } from 'quidproquo-web-react';
-import { useState } from 'react';
+import {
+  AppBar,
+  Button,
+  Checkbox,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControlLabel,
+  LinearProgress,
+  Tab,
+  Tabs,
+  useTheme,
+} from '@mui/material';
+
+import { useExternalData, usePlatformDataFromPath } from '../components/LoadingBox/hooks';
+import { apiRequestPost } from '../logic';
+import { useIsLoading } from '../view';
+import { EventTimeline } from './EventTimeline'; // Add this import
+import { HelpChat } from './HelpChat';
 import { useLogTreeData } from './hooks';
+import { LogCorrelations } from './LogCorrelations';
+import { LogDetails } from './LogDetails';
+import { getLogUrl } from './logic';
+import { LogRawJson } from './LogRawJson';
+import { LogSummary } from './LogSummary';
 
 interface LogDialogProps {
   open: boolean;

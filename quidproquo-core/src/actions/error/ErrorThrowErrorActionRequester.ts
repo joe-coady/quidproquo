@@ -1,6 +1,6 @@
-import { ErrorThrowErrorActionRequester } from './ErrorThrowErrorActionRequesterTypes';
-import { ErrorActionType } from './ErrorActionType';
 import { ErrorTypeEnum, QPQError } from '../../types/ErrorTypeEnum';
+import { ErrorActionType } from './ErrorActionType';
+import { ErrorThrowErrorActionRequester } from './ErrorThrowErrorActionRequesterTypes';
 
 export function* askThrowError<T>(
   errorType: QPQError['errorType'],

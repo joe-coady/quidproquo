@@ -1,6 +1,6 @@
+import crypto from 'crypto';
 import { CloudFrontClient, CreateInvalidationCommand, CreateInvalidationCommandInput } from '@aws-sdk/client-cloudfront';
 
-import crypto from 'crypto';
 import { createAwsClient } from '../createAwsClient';
 
 export const getInvalidationCallerReference = (paths: string[]): string => {

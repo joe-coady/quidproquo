@@ -1,5 +1,5 @@
-import { getSrcLoaderForQpqConfig } from './getSrcLoaderForQpqConfig';
 import { getModuleLoaderSrcForService } from './getModuleLoaderSrcForService';
+import { getSrcLoaderForQpqConfig } from './getSrcLoaderForQpqConfig';
 
 export const getQpqDyanmicLoaderSrcFromQpqConfigs = (qpqConfigs) => {
   const result = `

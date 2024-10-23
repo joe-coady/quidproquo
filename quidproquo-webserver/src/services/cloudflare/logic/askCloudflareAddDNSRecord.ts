@@ -1,6 +1,7 @@
 import { askLogCreate, askNetworkRequest, AskResponse, askThrowError, ErrorTypeEnum, LogLevelEnum } from 'quidproquo-core';
-import { CloudflareResponse, CloudflareDNSRecord } from '../types';
+
 import { CloudflareDnsEntry } from '../../../types';
+import { CloudflareDNSRecord,CloudflareResponse } from '../types';
 
 export function* askCloudflareAddDNSRecord(apiKey: string, zoneId: string, cnameName: string, dnsEntryValue: CloudflareDnsEntry): AskResponse<void> {
   const requestBody = {

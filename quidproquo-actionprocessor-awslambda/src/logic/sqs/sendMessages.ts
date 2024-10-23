@@ -1,6 +1,7 @@
-import { SendMessageBatchCommand, SQSClient, SendMessageBatchRequestEntry } from '@aws-sdk/client-sqs';
-import { getQueueUrl } from './getQueueUrl';
+import { SendMessageBatchCommand, SendMessageBatchRequestEntry,SQSClient } from '@aws-sdk/client-sqs';
+
 import { createAwsClient } from '../createAwsClient';
+import { getQueueUrl } from './getQueueUrl';
 
 export const sendMessages = async (queueName: string, region: string, messages: string[]): Promise<void> => {
   const sqsClient = createAwsClient(SQSClient, { region });

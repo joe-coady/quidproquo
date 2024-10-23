@@ -1,8 +1,8 @@
-import { CognitoIdentityProviderClient, AdminUpdateUserAttributesCommand, AttributeType } from '@aws-sdk/client-cognito-identity-provider';
 import { UserAttributes } from 'quidproquo-core';
+import { AdminUpdateUserAttributesCommand, AttributeType,CognitoIdentityProviderClient } from '@aws-sdk/client-cognito-identity-provider';
 
-import { getCognitoUserAttributesFromQpqUserAttributes } from './cognitoAttributeMap';
 import { createAwsClient } from '../createAwsClient';
+import { getCognitoUserAttributesFromQpqUserAttributes } from './cognitoAttributeMap';
 
 export const setUserAttributes = async (userPoolId: string, region: string, username: string, userAttributes: UserAttributes): Promise<void> => {
   const cognitoClient = createAwsClient(CognitoIdentityProviderClient, {

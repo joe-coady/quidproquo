@@ -1,5 +1,5 @@
+import { AnyMatchStoryResult,EventActionType } from './EventActionType';
 import { EventAutoRespondActionRequester } from './EventAutoRespondActionTypes';
-import { EventActionType, AnyMatchStoryResult } from './EventActionType';
 
 export function* askEventAutoRespond<QpqEventRecord, MSR extends AnyMatchStoryResult, QpqEventRecordResponse>(
   qpqEventRecord: QpqEventRecord,

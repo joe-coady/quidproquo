@@ -1,15 +1,13 @@
-import { aws_lambda, aws_apigatewayv2, aws_iam, aws_logs, aws_apigateway } from 'aws-cdk-lib';
+import { aws_apigateway,aws_apigatewayv2, aws_iam, aws_lambda, aws_logs } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-
-import { qpqCoreUtils } from 'quidproquo-core';
-import { WebSocketQPQWebServerConfigSetting, qpqWebServerUtils } from 'quidproquo-webserver';
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-
-import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
+import { qpqCoreUtils } from 'quidproquo-core';
+import { qpqWebServerUtils,WebSocketQPQWebServerConfigSetting } from 'quidproquo-webserver';
 
 import { importStackValue } from '../../../../utils';
-import { Function } from '../../../basic/Function';
+import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { SubdomainName } from '../../../basic';
+import { Function } from '../../../basic/Function';
 
 export interface QpqApiWebserverWebsocketConstructProps extends QpqConstructBlockProps {
   websocketConfig: WebSocketQPQWebServerConfigSetting;

@@ -1,4 +1,4 @@
-import { KvsQueryOperationType, KvsLogicalOperatorType } from './KvsQueryOperationType';
+import { KvsLogicalOperatorType,KvsQueryOperationType } from './KvsQueryOperationType';
 
 export type KvsCoreDataType = string | number;
 export type KvsBasicDataType = KvsCoreDataType | boolean;

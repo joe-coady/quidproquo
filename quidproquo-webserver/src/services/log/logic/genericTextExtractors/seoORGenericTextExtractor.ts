@@ -1,4 +1,5 @@
 import { EventActionType, QpqRuntimeType, StoryResult } from 'quidproquo-core';
+
 import { SeoEvent } from '../../../../types';
 
 export const seoORGenericTextExtractor = (storyResult: StoryResult<any>): string => {

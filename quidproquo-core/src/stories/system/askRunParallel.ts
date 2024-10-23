@@ -1,5 +1,5 @@
-import { AskResponse, AskResponseReturnType } from '../../types';
 import { askBatch } from '../../actions';
+import { AskResponse, AskResponseReturnType } from '../../types';
 
 export function* askRunParallel<T extends Array<AskResponse<any>>>(
   storyRuntimes: [...T],

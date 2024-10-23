@@ -1,5 +1,6 @@
 import { QPQBinaryData } from 'quidproquo-core';
-import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
+import { GetObjectCommand,S3Client } from '@aws-sdk/client-s3';
+
 import { createAwsClient } from '../createAwsClient';
 
 export const readBinaryFile = async (bucketName: string, key: string, region: string): Promise<QPQBinaryData> => {

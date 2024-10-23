@@ -1,6 +1,6 @@
-import { getLogs } from './getLogs';
-import { SearchParams } from '../types';
 import { RuntimeTypes } from '../constants';
+import { SearchParams } from '../types';
+import { getLogs } from './getLogs';
 
 export const searchLogs = async (searchParams: SearchParams, apiBaseUrl: string, accessToken?: string, callback?: (progress: number) => void) => {
   const updateProgress = (progress: number) => {

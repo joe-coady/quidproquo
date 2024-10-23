@@ -1,12 +1,11 @@
 import {
-  EventActionType,
-  QPQConfig,
-  EventAutoRespondActionProcessor,
-  actionResult,
-  ActionProcessorListResolver,
   ActionProcessorList,
+  ActionProcessorListResolver,
+  actionResult,
+  EventActionType,
+  EventAutoRespondActionProcessor,
+  QPQConfig,
 } from 'quidproquo-core';
-
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { isAuthValid } from '../../utils/isAuthValid';

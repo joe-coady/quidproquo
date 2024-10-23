@@ -1,11 +1,11 @@
 import {
+  ActionProcessorList,
+  ActionProcessorListResolver,
+  actionResult,
   ConfigActionType,
   ConfigGetGlobalActionProcessor,
-  actionResult,
   QPQConfig,
   qpqCoreUtils,
-  ActionProcessorListResolver,
-  ActionProcessorList,
 } from 'quidproquo-core';
 
 const getProcessConfigGetGlobal = (qpqConfig: QPQConfig): ConfigGetGlobalActionProcessor<any> => {

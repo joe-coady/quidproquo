@@ -1,4 +1,5 @@
 import { Action, ActionProcessor, ActionRequester } from 'quidproquo-core';
+
 import { WebEntryActionType } from './WebEntryActionType';
 
 // Payload

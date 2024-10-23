@@ -1,10 +1,9 @@
 import { aws_ec2 } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-
+import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { VirtualNetworkQPQConfigSetting } from 'quidproquo-core';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
-import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 
 export interface BootstrapQpqCoreVirtualNetworkConstructProps extends QpqConstructBlockProps {
   virtualNetworkConfig: VirtualNetworkQPQConfigSetting;

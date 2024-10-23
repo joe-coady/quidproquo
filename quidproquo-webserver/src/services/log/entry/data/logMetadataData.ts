@@ -19,6 +19,7 @@ import {
   StoryResultMetadata,
   StoryResultMetadataWithChildren,
 } from 'quidproquo-core';
+
 import { logReportsResourceName } from '../../../../config';
 import { LogMetadata } from '../domain';
 

@@ -1,2 +1,2 @@
-export * from './QpqCoreQueueConstruct';
 export * from './QpqApiCoreQueueConstruct';
+export * from './QpqCoreQueueConstruct';

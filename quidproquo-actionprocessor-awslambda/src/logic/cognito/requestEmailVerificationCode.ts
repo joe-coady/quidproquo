@@ -3,6 +3,7 @@ import {
   GetUserAttributeVerificationCodeCommand,
   GetUserAttributeVerificationCodeCommandInput,
 } from '@aws-sdk/client-cognito-identity-provider';
+
 import { createAwsClient } from '../createAwsClient';
 
 export const requestEmailVerificationCode = async (region: string, accessToken: string) => {

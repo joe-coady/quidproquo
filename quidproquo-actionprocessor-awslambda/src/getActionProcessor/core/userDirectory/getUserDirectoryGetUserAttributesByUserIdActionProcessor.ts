@@ -1,15 +1,14 @@
 import {
-  UserDirectoryGetUserAttributesByUserIdActionProcessor,
+  ActionProcessorList,
+  ActionProcessorListResolver,
   actionResult,
   QPQConfig,
   qpqCoreUtils,
   UserDirectoryActionType,
-  ActionProcessorList,
-  ActionProcessorListResolver,
+  UserDirectoryGetUserAttributesByUserIdActionProcessor,
 } from 'quidproquo-core';
 
 import { getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
-
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { getUserAttributesBySub } from '../../../logic/cognito/getUserAttributesBySub';
 

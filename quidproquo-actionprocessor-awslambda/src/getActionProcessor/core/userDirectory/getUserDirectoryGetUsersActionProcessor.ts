@@ -1,15 +1,14 @@
 import {
-  UserDirectoryGetUsersActionProcessor,
+  ActionProcessorList,
+  ActionProcessorListResolver,
   actionResult,
   QPQConfig,
   qpqCoreUtils,
   UserDirectoryActionType,
-  ActionProcessorList,
-  ActionProcessorListResolver,
+  UserDirectoryGetUsersActionProcessor,
 } from 'quidproquo-core';
 
 import { getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
-
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { listPagedUsers } from '../../../logic/cognito/listPagedUsers';
 

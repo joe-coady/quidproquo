@@ -1,5 +1,5 @@
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
-import { UserDirectoryActionType, UserAttributes } from './UserDirectoryActionType';
+import { UserAttributes,UserDirectoryActionType } from './UserDirectoryActionType';
 
 // Payload
 export interface UserDirectoryGetUserAttributesActionPayload {

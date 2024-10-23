@@ -1,7 +1,7 @@
-import { ErrorTypeEnum, askThrowError, askUserDirectorySetAccessToken } from 'quidproquo-core';
+import { askThrowError, askUserDirectorySetAccessToken,ErrorTypeEnum } from 'quidproquo-core';
 
-import { websocketConnectionData } from '../../data';
 import { adminUserDirectoryResourceName } from '../../../../config';
+import { websocketConnectionData } from '../../data';
 
 export function* askAuthenticateConnection(id: string) {
   const connection = yield* websocketConnectionData.askGetById(id);

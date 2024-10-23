@@ -1,5 +1,5 @@
-import { FileWriteTextContentsActionRequester } from './FileWriteTextContentsActionTypes';
 import { FileActionType, StorageDriveAdvancedWriteOptions } from './FileActionType';
+import { FileWriteTextContentsActionRequester } from './FileWriteTextContentsActionTypes';
 
 export function* askFileWriteTextContents(
   drive: string,

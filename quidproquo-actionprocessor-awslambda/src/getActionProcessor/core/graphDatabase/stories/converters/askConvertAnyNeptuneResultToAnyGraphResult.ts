@@ -1,8 +1,9 @@
-import { AnyGraphResult, AskResponse, ErrorTypeEnum, GraphScalarResult, askThrowError } from 'quidproquo-core';
+import { AnyGraphResult, AskResponse, askThrowError,ErrorTypeEnum, GraphScalarResult } from 'quidproquo-core';
+
 import { AnyNeptuneResult } from '../types';
 import { askConvertNeptuneNodeResultToGraphNodeResult } from './askConvertNeptuneNodeResultToGraphNodeResult';
 import { askConvertNeptuneRelationshipResultToGraphRelationshipResult } from './askConvertNeptuneRelationshipResultToGraphRelationshipResult';
-import { isNeptuneScalarResult, isNeptuneNodeResult, isNeptuneRelationshipResult } from './utils';
+import { isNeptuneNodeResult, isNeptuneRelationshipResult,isNeptuneScalarResult } from './utils';
 
 export function* askConvertAnyNeptuneResultToAnyGraphResult(anyNeptuneResult: AnyNeptuneResult): AskResponse<AnyGraphResult> {
   if (isNeptuneScalarResult(anyNeptuneResult)) {

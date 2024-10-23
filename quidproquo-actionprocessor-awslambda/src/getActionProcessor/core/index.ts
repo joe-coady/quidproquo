@@ -1,24 +1,24 @@
-export * from './file';
-export * from './keyValueStore';
-export * from './queue';
-export * from './userDirectory';
-export * from './eventBus';
-export * from './system';
 export * from './config';
 export * from './event';
+export * from './eventBus';
+export * from './file';
 export * from './graphDatabase';
-
-import { getFileActionProcessor } from './file';
-import { getKeyValueStoreActionProcessor } from './keyValueStore';
-import { getQueueActionProcessor } from './queue';
-import { getUserDirectoryActionProcessor } from './userDirectory';
-import { getEventBusActionProcessor } from './eventBus';
-import { getSystemActionProcessor } from './system';
-import { getConfigActionProcessor } from './config';
-import { getApiGatewayApiEventEventProcessor } from './event';
-import { getGraphDatabaseActionProcessor } from './graphDatabase';
+export * from './keyValueStore';
+export * from './queue';
+export * from './system';
+export * from './userDirectory';
 
 import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
+
+import { getConfigActionProcessor } from './config';
+import { getApiGatewayApiEventEventProcessor } from './event';
+import { getEventBusActionProcessor } from './eventBus';
+import { getFileActionProcessor } from './file';
+import { getGraphDatabaseActionProcessor } from './graphDatabase';
+import { getKeyValueStoreActionProcessor } from './keyValueStore';
+import { getQueueActionProcessor } from './queue';
+import { getSystemActionProcessor } from './system';
+import { getUserDirectoryActionProcessor } from './userDirectory';
 
 export const getCoreActionProcessor: ActionProcessorListResolver = async (
   qpqConfig: QPQConfig,

@@ -1,7 +1,6 @@
-import { QPQConfigSetting, HTTPMethod, QpqFunctionRuntime } from 'quidproquo-core';
+import { HTTPMethod, QPQConfigSetting, QpqFunctionRuntime } from 'quidproquo-core';
 
 import { QPQWebServerConfigSettingType } from '../QPQConfig';
-
 import { ApiKeyReference } from './apiKey';
 
 interface GenericRouteAuthSettings<T> {

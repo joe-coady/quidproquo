@@ -1,6 +1,6 @@
 import { StoryResultMetadata, StoryResultMetadataWithChildren } from 'quidproquo-core';
-import { cache } from '../../logic';
 
+import { cache } from '../../logic';
 import { fineLogDirectChildren } from './findLogDirectChildren';
 
 export const createHierarchy = cache(

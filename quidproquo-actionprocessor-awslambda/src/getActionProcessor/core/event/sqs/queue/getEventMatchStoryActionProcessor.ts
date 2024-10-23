@@ -1,18 +1,18 @@
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
+  actionResult,
+  actionResultError,
   ErrorTypeEnum,
   EventActionType,
   EventMatchStoryActionProcessor,
   QPQConfig,
-  QueueQPQConfigSetting,
-  actionResult,
-  actionResultError,
   qpqCoreUtils,
+  QueueQPQConfigSetting,
 } from 'quidproquo-core';
-import { InternalEventRecord, MatchResult } from './types';
 
 import { matchUrl } from '../../../../../awsLambdaUtils';
+import { InternalEventRecord, MatchResult } from './types';
 
 export const getQueueConfigSetting = (): QueueQPQConfigSetting => {
   const queueQPQConfigSetting: QueueQPQConfigSetting = JSON.parse(process.env.queueQPQConfigSetting as string);

@@ -1,16 +1,16 @@
 import {
-  UserDirectoryConfirmForgotPasswordActionProcessor,
+  ActionProcessorList,
+  ActionProcessorListResolver,
   actionResult,
   QPQConfig,
   qpqCoreUtils,
   UserDirectoryActionType,
-  ActionProcessorList,
-  ActionProcessorListResolver,
+  UserDirectoryConfirmForgotPasswordActionProcessor,
 } from 'quidproquo-core';
-import { getCFExportNameUserPoolIdFromConfig, getCFExportNameUserPoolClientIdFromConfig } from '../../../awsNamingUtils';
 
-import { confirmForgotPassword } from '../../../logic/cognito/confirmForgotPassword';
+import { getCFExportNameUserPoolClientIdFromConfig,getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
+import { confirmForgotPassword } from '../../../logic/cognito/confirmForgotPassword';
 
 const getProcessConfirmForgotPassword = (qpqConfig: QPQConfig): UserDirectoryConfirmForgotPasswordActionProcessor => {
   return async ({ userDirectoryName, code, username, password }) => {

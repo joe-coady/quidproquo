@@ -1,21 +1,19 @@
 import {
-  UserDirectoryRespondToAuthChallengeActionProcessor,
+  ActionProcessorList,
+  ActionProcessorListResolver,
   actionResult,
+  AnyAuthChallenge,
+  AuthenticateUserChallenge,
   QPQConfig,
   qpqCoreUtils,
   UserDirectoryActionType,
-  AnyAuthChallenge,
-  AuthenticateUserChallenge,
-  ActionProcessorList,
-  ActionProcessorListResolver,
+  UserDirectoryRespondToAuthChallengeActionProcessor,
 } from 'quidproquo-core';
-
-import { getCFExportNameUserPoolIdFromConfig, getCFExportNameUserPoolClientIdFromConfig } from '../../../awsNamingUtils';
-
-import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
-
-import { respondToAuthChallengeChallenge } from '../../../logic/cognito/respondToAuthChallengeChallenge';
 import { ChallengeNameType } from '@aws-sdk/client-cognito-identity-provider';
+
+import { getCFExportNameUserPoolClientIdFromConfig,getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
+import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
+import { respondToAuthChallengeChallenge } from '../../../logic/cognito/respondToAuthChallengeChallenge';
 
 const anyAuthChallengeToCognitoAttributes = (authChallenge: AnyAuthChallenge): Record<string, string> => {
   switch (authChallenge.challenge) {

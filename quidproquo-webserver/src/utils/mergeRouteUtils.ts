@@ -1,9 +1,7 @@
 import { QPQConfig } from 'quidproquo-core';
 
 import { RouteAuthSettings, RouteQPQWebServerConfigSetting } from '../config/settings/route';
-
 import { RouteOptions } from '../config/settings/route';
-
 import { getDefaultRouteSettings } from './qpqConfigAccessorsUtils';
 
 export const mergeRouteAuthSettings = (routeAuthSettingsA?: RouteAuthSettings, routeAuthSettingsB?: RouteAuthSettings): RouteAuthSettings => {

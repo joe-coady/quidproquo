@@ -1,31 +1,25 @@
-import path from 'path';
-
 import {
-  aws_lambda,
-  aws_s3,
-  aws_iam,
-  aws_cloudfront_origins,
   aws_cloudfront,
+  aws_cloudfront_origins,
+  aws_iam,
+  aws_lambda,
   aws_route53,
-  aws_s3_deployment,
   aws_route53_targets,
+  aws_s3,
+  aws_s3_deployment,
 } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
-
-import { WebEntryQPQWebServerConfigSetting, qpqWebServerUtils } from 'quidproquo-webserver';
-
-import { DnsValidatedCertificate } from '../../../basic/DnsValidatedCertificate';
-
-import { convertSecurityHeadersFromQpqSecurityHeaders } from './utils/securityHeaders';
-
-import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-
-import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { Construct } from 'constructs';
+import path from 'path';
+import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
+import { qpqCoreUtils } from 'quidproquo-core';
+import { qpqWebServerUtils,WebEntryQPQWebServerConfigSetting } from 'quidproquo-webserver';
 
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
+import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
+import { DnsValidatedCertificate } from '../../../basic/DnsValidatedCertificate';
 import { QpqWebServerCacheConstruct } from '../cache/QpqWebServerCacheConstruct';
-import { qpqCoreUtils } from 'quidproquo-core';
+import { convertSecurityHeadersFromQpqSecurityHeaders } from './utils/securityHeaders';
 
 export interface WebQpqWebserverWebEntryConstructProps extends QpqConstructBlockProps {
   webEntryConfig: WebEntryQPQWebServerConfigSetting;

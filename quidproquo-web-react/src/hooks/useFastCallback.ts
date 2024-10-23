@@ -1,4 +1,4 @@
-import { useRef, useCallback, DependencyList } from 'react';
+import { DependencyList,useCallback, useRef } from 'react';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 export function useFastCallback<T extends Function>(callback: T, deps?: DependencyList): T {

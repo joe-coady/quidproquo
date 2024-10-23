@@ -1,4 +1,4 @@
-import { qpqCoreUtils, QPQConfig } from 'quidproquo-core';
+import { QPQConfig,qpqCoreUtils } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 export function getSrcLoaderForQpqConfig(qpqConfig, moduleNameVariableName) {

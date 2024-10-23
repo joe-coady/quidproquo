@@ -1,17 +1,16 @@
-import { CreateUserRequest, AuthenticateUserResponse } from 'quidproquo-core';
+import { AuthenticateUserResponse,CreateUserRequest } from 'quidproquo-core';
 import {
-  CognitoIdentityProviderClient,
   AdminCreateUserCommand,
   AdminCreateUserCommandInput,
+  CognitoIdentityProviderClient,
   DeliveryMediumType,
   MessageActionType,
 } from '@aws-sdk/client-cognito-identity-provider';
 
-import { authenticateUser } from './authenticateUser';
-import { setUserPassword } from './setUserPassword';
-
-import { getCognitoUserAttributesFromQpqUserAttributes } from './cognitoAttributeMap';
 import { createAwsClient } from '../createAwsClient';
+import { authenticateUser } from './authenticateUser';
+import { getCognitoUserAttributesFromQpqUserAttributes } from './cognitoAttributeMap';
+import { setUserPassword } from './setUserPassword';
 
 export const createUser = async (
   userPoolId: string,

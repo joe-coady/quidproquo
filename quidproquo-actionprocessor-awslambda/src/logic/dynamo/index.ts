@@ -2,5 +2,5 @@ export * from './deleteItem';
 export * from './getAllItems';
 export * from './getItem';
 export * from './putItem';
-export * from './updateItem';
 export * from './query';
+export * from './updateItem';

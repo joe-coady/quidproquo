@@ -1,17 +1,13 @@
-import { aws_cloudfront_origins, aws_cloudfront, aws_route53, aws_route53_targets } from 'aws-cdk-lib';
-
-import { DomainProxyQPQWebServerConfigSetting, qpqWebServerUtils } from 'quidproquo-webserver';
-
-import { DnsValidatedCertificate } from '../../../basic/DnsValidatedCertificate';
-
-import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-
-import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
+import { aws_cloudfront, aws_cloudfront_origins, aws_route53, aws_route53_targets } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
+import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
+import { DomainProxyQPQWebServerConfigSetting, qpqWebServerUtils } from 'quidproquo-webserver';
+import { DomainProxyViewerProtocolPolicy } from 'quidproquo-webserver';
 
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
+import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
+import { DnsValidatedCertificate } from '../../../basic/DnsValidatedCertificate';
 import { QpqWebServerCacheConstruct } from '../cache/QpqWebServerCacheConstruct';
-import { DomainProxyViewerProtocolPolicy } from 'quidproquo-webserver';
 
 export interface WebQpqWebserverDomainProxyConstructProps extends QpqConstructBlockProps {
   domainProxyConfig: DomainProxyQPQWebServerConfigSetting;

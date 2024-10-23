@@ -1,7 +1,6 @@
-import { SeoEvent, SeoEventResponse, SeoEventRouteParams, SeoQPQWebServerConfigSetting } from 'quidproquo-webserver';
-
-import { CloudFrontRequestEvent, Context, CloudFrontRequestResult } from 'aws-lambda';
+import { CloudFrontRequestEvent, CloudFrontRequestResult,Context } from 'aws-lambda';
 import { MatchStoryResult } from 'quidproquo-core';
+import { SeoEvent, SeoEventResponse, SeoEventRouteParams, SeoQPQWebServerConfigSetting } from 'quidproquo-webserver';
 
 // Externals - The ins and outs of the external event
 export type EventInput = [CloudFrontRequestEvent, Context];

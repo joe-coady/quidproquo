@@ -1,4 +1,5 @@
 import { qpqCoreUtils } from 'quidproquo-core';
+
 import { getSrcLoaderForQpqConfig } from './getSrcLoaderForQpqConfig';
 
 export function getModuleLoaderSrcForService(qpqConfig, serviceNameVariableName, moduleNameVariableName) {

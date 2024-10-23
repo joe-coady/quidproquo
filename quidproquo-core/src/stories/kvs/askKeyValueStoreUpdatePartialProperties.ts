@@ -1,4 +1,4 @@
-import { KvsCoreDataType, KvsUpdateAction, askKeyValueStoreUpdate, kvsRemove, kvsSet, kvsUpdate } from '../../actions';
+import { askKeyValueStoreUpdate, KvsCoreDataType, kvsRemove, kvsSet, kvsUpdate,KvsUpdateAction } from '../../actions';
 import { AskResponse } from '../../types';
 import { isValidKvsAdvancedDataType } from './utils';
 

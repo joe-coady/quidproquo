@@ -1,5 +1,5 @@
-import { FileDeleteActionRequester } from './FileDeleteActionTypes';
 import { FileActionType } from './FileActionType';
+import { FileDeleteActionRequester } from './FileDeleteActionTypes';
 
 export function* askFileDelete(drive: string, filepaths: string[]): FileDeleteActionRequester {
   return yield {

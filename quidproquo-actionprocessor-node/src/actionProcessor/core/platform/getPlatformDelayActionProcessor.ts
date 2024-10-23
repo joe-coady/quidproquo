@@ -1,10 +1,10 @@
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
+  actionResult,
   PlatformActionType,
   PlatformDelayActionProcessor,
   QPQConfig,
-  actionResult,
 } from 'quidproquo-core';
 
 const getProcessPlatformDelay = (qpqConfig: QPQConfig): PlatformDelayActionProcessor => {

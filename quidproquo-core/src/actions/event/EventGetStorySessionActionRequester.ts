@@ -1,5 +1,5 @@
-import { EventGetStorySessionActionRequester } from './EventGetStorySessionActionTypes';
 import { AnyMatchStoryResult, EventActionType } from './EventActionType';
+import { EventGetStorySessionActionRequester } from './EventGetStorySessionActionTypes';
 
 export function* askEventGetStorySession<EventParams extends Array<unknown>, QpqEventRecord, MSR extends AnyMatchStoryResult>(
   eventParams: EventParams,

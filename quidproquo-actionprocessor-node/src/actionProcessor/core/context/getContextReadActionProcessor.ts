@@ -1,12 +1,12 @@
 import {
-  QPQConfig,
+  ActionProcessorList,
+  ActionProcessorListResolver,
   actionResult,
   ContextActionType,
   ContextReadActionProcessor,
+  QPQConfig,
   QpqContext,
   QpqContextIdentifier,
-  ActionProcessorListResolver,
-  ActionProcessorList,
 } from 'quidproquo-core';
 
 const getContextValue = (context: QpqContext<any>, contextIdentifier: QpqContextIdentifier<any>): any => {

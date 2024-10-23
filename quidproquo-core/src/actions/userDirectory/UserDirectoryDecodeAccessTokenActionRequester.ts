@@ -1,5 +1,5 @@
-import { UserDirectoryDecodeAccessTokenActionRequester } from './UserDirectoryDecodeAccessTokenActionTypes';
 import { UserDirectoryActionType } from './UserDirectoryActionType';
+import { UserDirectoryDecodeAccessTokenActionRequester } from './UserDirectoryDecodeAccessTokenActionTypes';
 
 export function* askUserDirectoryDecodeAccessToken(
   userDirectoryName: string,

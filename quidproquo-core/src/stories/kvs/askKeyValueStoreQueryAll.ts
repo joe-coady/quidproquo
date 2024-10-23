@@ -1,4 +1,4 @@
-import { KeyValueStoreQueryOptions, KvsQueryOperation, askKeyValueStoreQuery } from '../../actions';
+import { askKeyValueStoreQuery,KeyValueStoreQueryOptions, KvsQueryOperation } from '../../actions';
 import { AskResponse, QpqPagedData } from '../../types';
 
 type KeyValueStoreQueryAllOptions = Omit<KeyValueStoreQueryOptions, 'nextPageKey'>;

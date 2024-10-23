@@ -1,9 +1,8 @@
-import { TopSection } from './TopSection';
+import { TabViewBox } from '../components';
 import { useIsLoading } from '../view';
 import { useLogSearch } from './hooks';
-
 import { LogMetadataGrid } from './LogMetadataGrid';
-import { TabViewBox } from '../components';
+import { TopSection } from './TopSection';
 
 export const LogSearch = () => {
   const { searchParams, setSearchParams, onSearch, logs } = useLogSearch();

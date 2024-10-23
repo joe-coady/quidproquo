@@ -1,42 +1,40 @@
-import { joinPaths } from './utils';
-
 import {
+  ActionProcessorsQPQConfigSetting,
+  ApiBuildPathQPQConfigSetting,
+  ApplicationQPQConfigSetting,
+  ClaudeAIQPQConfigSetting,
+  DeployEventsQPQConfigSetting,
+  EmailTemplates,
+  EnvironmentSettingsQPQConfigSetting,
+  EventBusQPQConfigSetting,
+  GlobalQPQConfigSetting,
+  GraphDatabaseQPQConfigSetting,
+  KeyValueStoreQPQConfigSetting,
+  ModuleQPQConfigSetting,
+  ParameterQPQConfigSetting,
   QPQConfig,
+  QPQConfigItem,
   QPQConfigSetting,
   QPQCoreConfigSettingType,
-  QPQConfigItem,
-  EmailTemplates,
-  ApplicationQPQConfigSetting,
-  StorageDriveQPQConfigSetting,
-  EventBusQPQConfigSetting,
+  QpqQueueProcessors,
+  QueueQPQConfigSetting,
   ScheduleQPQConfigSetting,
   SecretQPQConfigSetting,
-  ParameterQPQConfigSetting,
-  QueueQPQConfigSetting,
-  QpqQueueProcessors,
-  ActionProcessorsQPQConfigSetting,
+  StorageDriveQPQConfigSetting,
   UserDirectoryQPQConfigSetting,
-  KeyValueStoreQPQConfigSetting,
-  EnvironmentSettingsQPQConfigSetting,
-  DeployEventsQPQConfigSetting,
-  GlobalQPQConfigSetting,
-  ModuleQPQConfigSetting,
-  ClaudeAIQPQConfigSetting,
-  ApiBuildPathQPQConfigSetting,
-  GraphDatabaseQPQConfigSetting,
   VirtualNetworkQPQConfigSetting,
 } from './config';
-
 import {
+  ConfigUrl,
   CrossModuleOwner,
   CrossServiceResourceName,
   CustomFullyQualifiedResource,
   FullyQualifiedResource,
-  ResourceName,
   KeyOf,
-  ConfigUrl,
   QpqFunctionRuntime,
+  ResourceName,
 } from './types';
+import { joinPaths } from './utils';
 
 /**
  * Flattens a QPQConfig array into a single array of QPQConfigSetting objects.

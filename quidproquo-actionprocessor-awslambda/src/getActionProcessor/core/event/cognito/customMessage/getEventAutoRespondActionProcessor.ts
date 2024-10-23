@@ -1,17 +1,17 @@
 import {
-  EventActionType,
-  QPQConfig,
-  EventAutoRespondActionProcessor,
+  ActionProcessorList,
+  ActionProcessorListResolver,
   actionResult,
-  qpqCoreUtils,
   actionResultError,
   ErrorTypeEnum,
-  ActionProcessorListResolver,
-  ActionProcessorList,
+  EventActionType,
+  EventAutoRespondActionProcessor,
+  QPQConfig,
+  qpqCoreUtils,
 } from 'quidproquo-core';
+import { EmailSendEventType } from 'quidproquo-webserver';
 
 import { GLOBAL_USER_DIRECTORY_NAME, InternalEventOutput, InternalEventRecord, MatchResult } from './types';
-import { EmailSendEventType } from 'quidproquo-webserver';
 
 const getProcessAutoRespond = (qpqConfig: QPQConfig): EventAutoRespondActionProcessor<InternalEventRecord, MatchResult, InternalEventOutput> => {
   const userDirectoryConfig = qpqCoreUtils.getUserDirectories(qpqConfig).find((ud) => ud.name === GLOBAL_USER_DIRECTORY_NAME);

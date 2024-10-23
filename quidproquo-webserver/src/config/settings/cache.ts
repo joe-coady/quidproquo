@@ -1,6 +1,6 @@
-import { QPQConfigSetting, QPQConfigAdvancedSettings, CrossModuleOwner, qpqCoreUtils } from 'quidproquo-core';
+import { CrossModuleOwner, QPQConfigAdvancedSettings, QPQConfigSetting, qpqCoreUtils } from 'quidproquo-core';
 
-import { QPQWebServerConfigSettingType, CacheSettings } from '../QPQConfig';
+import { CacheSettings,QPQWebServerConfigSettingType } from '../QPQConfig';
 
 export interface QPQConfigAdvancedCacheSettings extends QPQConfigAdvancedSettings {
   owner?: CrossModuleOwner<'cacheName'>;

@@ -1,14 +1,14 @@
 import {
-  EventActionType,
-  QPQConfig,
-  actionResult,
-  EventGetRecordsActionProcessor,
-  ActionProcessorListResolver,
   ActionProcessorList,
+  ActionProcessorListResolver,
+  actionResult,
+  EventActionType,
+  EventGetRecordsActionProcessor,
+  QPQConfig,
 } from 'quidproquo-core';
+import { WebSocketEventType } from 'quidproquo-webserver';
 
 import { EventInput, InternalEventRecord } from './types';
-import { WebSocketEventType } from 'quidproquo-webserver';
 
 const awsToQoqEventTypeMap = {
   MESSAGE: WebSocketEventType.Message,

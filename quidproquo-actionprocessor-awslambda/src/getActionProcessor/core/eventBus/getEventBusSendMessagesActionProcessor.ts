@@ -1,18 +1,17 @@
 import {
-  QPQConfig,
-  qpqCoreUtils,
-  EventBusMessage,
-  StorySession,
+  ActionProcessorList,
+  ActionProcessorListResolver,
   actionResultError,
   ErrorTypeEnum,
-  ActionProcessorListResolver,
-  ActionProcessorList,
+  EventBusMessage,
+  QPQConfig,
+  qpqCoreUtils,
+  StorySession,
 } from 'quidproquo-core';
-
-import { EventBusSendMessageActionProcessor, actionResult, EventBusActionType } from 'quidproquo-core';
-import { publishMessage } from '../../../logic/sns/publishMessage';
+import { actionResult, EventBusActionType,EventBusSendMessageActionProcessor } from 'quidproquo-core';
 
 import { getEventBusSnsTopicArn } from '../../../awsNamingUtils';
+import { publishMessage } from '../../../logic/sns/publishMessage';
 
 // TODO: Unify this once the lambda code moves from CDK to awslambda
 type AnyEventBusMessageWithSession = EventBusMessage<any> & {

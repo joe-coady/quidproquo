@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { formatDuration, getTimeBounds, getTotalExecutionTime,StoryResultMetadataWithChildren } from 'quidproquo-core';
 import { Box, CircularProgress } from '@mui/material';
-import { StoryResultMetadataWithChildren, formatDuration, getTimeBounds, getTotalExecutionTime } from 'quidproquo-core';
+
 import { TreeApi } from './hooks';
 
 interface EventTimelineProps {

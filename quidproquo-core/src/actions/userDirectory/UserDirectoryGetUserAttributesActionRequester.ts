@@ -1,6 +1,6 @@
-import { UserDirectoryGetUserAttributesActionRequester } from './UserDirectoryGetUserAttributesActionTypes';
-import { UserDirectoryActionType } from './UserDirectoryActionType';
 import { createErrorEnumForAction } from '../../types';
+import { UserDirectoryActionType } from './UserDirectoryActionType';
+import { UserDirectoryGetUserAttributesActionRequester } from './UserDirectoryGetUserAttributesActionTypes';
 
 export const UserDirectoryGetUserAttributesErrorTypeEnum = createErrorEnumForAction(UserDirectoryActionType.GetUserAttributes, ['UserNotFound']);
 

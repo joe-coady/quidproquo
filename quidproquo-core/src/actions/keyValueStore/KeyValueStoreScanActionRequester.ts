@@ -1,6 +1,5 @@
 import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 import { KeyValueStoreScanActionRequester } from './KeyValueStoreScanActionTypes';
-
 import { KvsQueryOperation } from './types';
 
 export function* askKeyValueStoreScan<KvsItem>(

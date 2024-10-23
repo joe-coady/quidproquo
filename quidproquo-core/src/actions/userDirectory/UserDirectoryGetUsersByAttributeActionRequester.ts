@@ -1,5 +1,5 @@
-import { UserDirectoryGetUsersByAttributeActionRequester } from './UserDirectoryGetUsersByAttributeActionTypes';
 import { UserAttributes, UserDirectoryActionType } from './UserDirectoryActionType';
+import { UserDirectoryGetUsersByAttributeActionRequester } from './UserDirectoryGetUsersByAttributeActionTypes';
 
 export function* askUserDirectoryGetUsersByAttribute(
   userDirectoryName: string,

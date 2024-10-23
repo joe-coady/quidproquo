@@ -1,5 +1,5 @@
-import { UserDirectoryConfirmEmailVerificationActionRequester } from './UserDirectoryConfirmEmailVerificationActionTypes';
 import { UserDirectoryActionType } from './UserDirectoryActionType';
+import { UserDirectoryConfirmEmailVerificationActionRequester } from './UserDirectoryConfirmEmailVerificationActionTypes';
 
 export function* askUserDirectoryConfirmEmailVerification(code: string, accessToken: string): UserDirectoryConfirmEmailVerificationActionRequester {
   return yield {

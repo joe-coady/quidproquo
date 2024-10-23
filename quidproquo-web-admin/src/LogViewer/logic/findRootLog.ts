@@ -1,4 +1,5 @@
 import { StoryResultMetadata } from 'quidproquo-core';
+
 import { apiRequestGet, cache } from '../../logic';
 
 export const findRootLog = cache(async function findRootLog(

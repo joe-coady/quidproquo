@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
-import { getIsLoadingFromLoadingCount } from '../logic';
 
 import { LoadingApi } from '../../types';
+import { getIsLoadingFromLoadingCount } from '../logic';
 
 export const useLoadingManager = (): [boolean, LoadingApi] => {
   const [isLoading, setIsLoading] = useState(false);

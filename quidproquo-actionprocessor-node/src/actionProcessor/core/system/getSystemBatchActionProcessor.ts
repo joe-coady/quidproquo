@@ -1,16 +1,16 @@
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
-  EitherActionResult,
-  QPQConfig,
-  SystemActionType,
-  SystemBatchActionProcessor,
   actionResult,
   actionResultError,
+  EitherActionResult,
   isErroredActionResult,
   processAction,
+  QPQConfig,
   resolveActionResult,
   resolveActionResultError,
+  SystemActionType,
+  SystemBatchActionProcessor,
 } from 'quidproquo-core';
 
 const getProcessSystemBatch = (qpqConfig: QPQConfig): SystemBatchActionProcessor<any[]> => {

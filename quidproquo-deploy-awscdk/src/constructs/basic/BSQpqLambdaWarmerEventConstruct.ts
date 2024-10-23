@@ -1,9 +1,8 @@
-import { aws_events, aws_sns, aws_events_targets } from 'aws-cdk-lib';
-
-import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
+import { aws_events, aws_events_targets,aws_sns } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { BootstrapResource } from '../../constants';
+import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
 
 export interface BSQpqLambdaWarmerEventConstructConstructProps extends QpqConstructBlockProps {}
 

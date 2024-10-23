@@ -1,15 +1,15 @@
 import {
-  FileExistsActionProcessor,
+  ActionProcessorList,
+  ActionProcessorListResolver,
   actionResult,
   FileActionType,
+  FileExistsActionProcessor,
   QPQConfig,
   qpqCoreUtils,
-  ActionProcessorListResolver,
-  ActionProcessorList,
 } from 'quidproquo-core';
 
-import { resolveStorageDriveBucketName } from './utils';
 import { objectExists } from '../../../logic/s3/s3Utils';
+import { resolveStorageDriveBucketName } from './utils';
 
 const getProcessFileExists = (qpqConfig: QPQConfig): FileExistsActionProcessor => {
   return async ({ drive, filepath }) => {

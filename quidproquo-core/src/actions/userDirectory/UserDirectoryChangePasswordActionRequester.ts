@@ -1,5 +1,5 @@
-import { UserDirectoryChangePasswordActionRequester } from './UserDirectoryChangePasswordActionTypes';
 import { UserDirectoryActionType } from './UserDirectoryActionType';
+import { UserDirectoryChangePasswordActionRequester } from './UserDirectoryChangePasswordActionTypes';
 
 export function* askUserDirectoryChangePassword(oldPassword: string, newPassword: string): UserDirectoryChangePasswordActionRequester {
   return yield {

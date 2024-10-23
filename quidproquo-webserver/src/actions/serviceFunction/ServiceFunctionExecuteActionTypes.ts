@@ -1,4 +1,5 @@
 import { Action, ActionProcessor, ActionRequester, ContextListAction, QpqContext } from 'quidproquo-core';
+
 import { ServiceFunctionActionType } from './ServiceFunctionActionType';
 
 // Payload

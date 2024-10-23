@@ -1,2 +1,2 @@
-export * from './logger';
 export * from './getQpqConfig';
+export * from './logger';

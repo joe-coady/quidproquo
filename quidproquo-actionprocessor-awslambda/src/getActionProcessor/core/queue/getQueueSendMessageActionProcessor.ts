@@ -1,8 +1,8 @@
 import { ActionProcessorList, ActionProcessorListResolver, QPQConfig, qpqCoreUtils, QueueMessage, StorySession } from 'quidproquo-core';
+import { actionResult, QueueActionType,QueueSendMessageActionProcessor } from 'quidproquo-core';
 
-import { resolveResourceName } from '../../../runtimeConfig/qpqAwsLambdaRuntimeConfigUtils';
-import { QueueSendMessageActionProcessor, actionResult, QueueActionType } from 'quidproquo-core';
 import { sendMessages } from '../../../logic/sqs/sendMessages';
+import { resolveResourceName } from '../../../runtimeConfig/qpqAwsLambdaRuntimeConfigUtils';
 
 // TODO: Unify this once the lambda code moves from CDK to awslambda
 type AnyQueueMessageWithSession = QueueMessage<any> & {

@@ -1,5 +1,5 @@
-import { WebsocketService } from 'quidproquo-web';
 import { useEffect, useState } from 'react';
+import { WebsocketService } from 'quidproquo-web';
 
 export const useWebsocketManagement = (wsUrl: string) => {
   const [websocketApi, setWebsocketApi] = useState<WebsocketService | null>(null);

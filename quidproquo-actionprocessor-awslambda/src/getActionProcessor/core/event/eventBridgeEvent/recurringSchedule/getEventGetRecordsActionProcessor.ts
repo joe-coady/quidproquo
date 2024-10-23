@@ -1,10 +1,10 @@
 import {
-  EventActionType,
-  QPQConfig,
-  actionResult,
-  EventGetRecordsActionProcessor,
-  ActionProcessorListResolver,
   ActionProcessorList,
+  ActionProcessorListResolver,
+  actionResult,
+  EventActionType,
+  EventGetRecordsActionProcessor,
+  QPQConfig,
 } from 'quidproquo-core';
 
 import { EventInput, InternalEventRecord } from './types';

@@ -1,9 +1,8 @@
+import LockIcon from '@mui/icons-material/Lock';
+import { Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
-import LockIcon from '@mui/icons-material/Lock';
-
-import { Typography } from '@mui/material';
 
 import { AsyncButton } from '../components';
 

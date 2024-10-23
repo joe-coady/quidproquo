@@ -1,6 +1,6 @@
-import { SystemActionType } from './SystemActionType';
-import { Action, ActionRequester, ActionProcessor } from '../../types/Action';
 import { QpqFunctionRuntime, StorySession } from '../../types';
+import { Action, ActionProcessor,ActionRequester } from '../../types/Action';
+import { SystemActionType } from './SystemActionType';
 
 // Payload
 export interface SystemExecuteStoryActionPayload<StoryInput extends Array<any>> {

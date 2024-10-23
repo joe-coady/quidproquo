@@ -1,9 +1,7 @@
 import { askConfigGetGlobal, askLogCreate } from '../actions';
-
-import { askCatch } from './system/askCatch';
-
-import { AskResponse } from '../types';
 import { qpqApplicationVersionGlobal } from '../constants';
+import { AskResponse } from '../types';
+import { askCatch } from './system/askCatch';
 
 export function* askGetApplicationVersion(): AskResponse<null | string> {
   const version = yield* askCatch(askConfigGetGlobal<string>(qpqApplicationVersionGlobal));

@@ -1,3 +1,4 @@
+import { decodeAccessToken } from 'quidproquo-actionprocessor-awslambda';
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
@@ -6,10 +7,9 @@ import {
   EventGetStorySessionActionProcessor,
   QPQConfig,
 } from 'quidproquo-core';
-import { decodeAccessToken } from 'quidproquo-actionprocessor-awslambda';
+import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { EventInput, InternalEventRecord, MatchResult } from './types';
-import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 const getProcessGetStorySession = (qpqConfig: QPQConfig): EventGetStorySessionActionProcessor<EventInput, InternalEventRecord, MatchResult> => {
   return async ({ matchStoryResult, qpqEventRecord }, session) => {

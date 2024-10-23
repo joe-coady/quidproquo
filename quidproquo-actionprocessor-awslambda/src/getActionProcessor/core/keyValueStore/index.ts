@@ -2,10 +2,10 @@ import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, 
 
 import { getKeyValueStoreDeleteActionProcessor } from './getKeyValueStoreDeleteActionProcessor';
 import { getKeyValueStoreGetActionProcessor } from './getKeyValueStoreGetActionProcessor';
-import { getKeyValueStoreUpsertActionProcessor } from './getKeyValueStoreUpsertActionProcessor';
-import { getKeyValueStoreUpdateActionProcessor } from './getKeyValueStoreUpdateActionProcessor';
 import { getKeyValueStoreQueryActionProcessor } from './getKeyValueStoreQueryActionProcessor';
 import { getKeyValueStoreScanActionProcessor } from './getKeyValueStoreScanActionProcessor';
+import { getKeyValueStoreUpdateActionProcessor } from './getKeyValueStoreUpdateActionProcessor';
+import { getKeyValueStoreUpsertActionProcessor } from './getKeyValueStoreUpsertActionProcessor';
 
 export const getKeyValueStoreActionProcessor: ActionProcessorListResolver = async (
   qpqConfig: QPQConfig,

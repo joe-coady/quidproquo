@@ -1,22 +1,21 @@
-import { QPQConfig, QpqFunctionRuntime, joinPaths, qpqCoreUtils } from 'quidproquo-core';
+import { joinPaths, QPQConfig, qpqCoreUtils,QpqFunctionRuntime } from 'quidproquo-core';
 
 import {
   ApiKeyQPQWebServerConfigSetting,
-  RouteQPQWebServerConfigSetting,
-  DnsQPQWebServerConfigSetting,
-  SeoQPQWebServerConfigSetting,
-  SubdomainRedirectQPQWebServerConfigSetting,
-  OpenApiQPQWebServerConfigSetting,
-  QPQWebServerConfigSettingType,
-  DefaultRouteOptionsQPQWebServerConfigSetting,
-  ServiceFunctionQPQWebServerConfigSetting,
-  WebSocketQPQWebServerConfigSetting,
   CacheQPQWebServerConfigSetting,
   CertificateQPQWebServerConfigSetting,
+  DefaultRouteOptionsQPQWebServerConfigSetting,
+  DnsQPQWebServerConfigSetting,
   DomainProxyQPQWebServerConfigSetting,
+  OpenApiQPQWebServerConfigSetting,
+  QPQWebServerConfigSettingType,
+  RouteQPQWebServerConfigSetting,
+  SeoQPQWebServerConfigSetting,
+  ServiceFunctionQPQWebServerConfigSetting,
+  SubdomainRedirectQPQWebServerConfigSetting,
+  WebSocketQPQWebServerConfigSetting,
 } from '../config';
-
-import { WebEntryQPQWebServerConfigSetting, ApiQPQWebServerConfigSetting } from '../config';
+import { ApiQPQWebServerConfigSetting,WebEntryQPQWebServerConfigSetting } from '../config';
 
 export const getAllRoutes = (qpqConfig: QPQConfig): RouteQPQWebServerConfigSetting[] => {
   const routes = qpqCoreUtils.getConfigSettings<RouteQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.Route);

@@ -1,14 +1,12 @@
-import { ParameterQPQConfigSetting, QPQConfig } from 'quidproquo-core';
-
-import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
-import { QpqResource } from '../../../base/QpqResource';
-
+import { aws_iam,aws_ssm } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { aws_ssm, aws_iam } from 'aws-cdk-lib';
-
-import * as qpqDeployAwsCdkUtils from '../../../../utils';
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { resolveAwsServiceAccountInfo } from 'quidproquo-config-aws';
+import { ParameterQPQConfigSetting, QPQConfig } from 'quidproquo-core';
+
+import * as qpqDeployAwsCdkUtils from '../../../../utils';
+import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
+import { QpqResource } from '../../../base/QpqResource';
 
 export interface QpqCoreParameterConstructProps extends QpqConstructBlockProps {
   parameterConfig: ParameterQPQConfigSetting;

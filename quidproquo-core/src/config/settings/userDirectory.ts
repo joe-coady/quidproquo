@@ -1,7 +1,6 @@
 import { convertCrossModuleOwnerToGenericResourceNameOverride } from '../../qpqCoreUtils';
 import { ConfigUrl, CrossModuleOwner } from '../../types';
-import { QPQConfigSetting, QPQCoreConfigSettingType, QPQConfigAdvancedSettings } from '../QPQConfig';
-
+import { QPQConfigAdvancedSettings,QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
 import { CustomAuthRuntime, EmailTemplates } from './emailTemplates';
 
 export type AuthDirectoryDnsRecord = {

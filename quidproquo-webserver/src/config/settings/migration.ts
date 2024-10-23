@@ -1,14 +1,15 @@
 import {
-  QPQConfig,
   defineDeployEvent,
-  defineKeyValueStore,
-  QpqFunctionRuntime,
-  DeployEventType,
-  defineQueue,
   defineGlobal,
+  defineKeyValueStore,
+  defineQueue,
+  DeployEventType,
+  QPQConfig,
   QPQConfigAdvancedSettings,
   qpqCoreUtils,
+  QpqFunctionRuntime,
 } from 'quidproquo-core';
+
 import { getServiceEntryQpqFunctionRuntime } from '../../services';
 
 export interface Migration {

@@ -1,6 +1,6 @@
-import { ErrorActionType } from './ErrorActionType';
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
 import { QPQError } from '../../types/ErrorTypeEnum';
+import { ErrorActionType } from './ErrorActionType';
 
 // Payload
 export type ErrorThrowErrorActionPayload = QPQError;

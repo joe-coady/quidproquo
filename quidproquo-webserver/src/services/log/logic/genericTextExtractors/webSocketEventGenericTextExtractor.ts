@@ -1,4 +1,5 @@
 import { EventActionType, QpqRuntimeType, StoryResult } from 'quidproquo-core';
+
 import { WebsocketEvent } from '../../../../types';
 
 export const webSocketEventGenericTextExtractor = (storyResult: StoryResult<any>): string => {

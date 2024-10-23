@@ -1,6 +1,4 @@
-import { qpqCoreUtils, QPQConfig, CrossModuleOwner, joinPaths } from 'quidproquo-core';
-
-import { ServiceAccountInfo, LocalServiceAccountInfo, ApiLayer } from '../types';
+import { CrossModuleOwner, joinPaths,QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
 import {
   AwsAlarmQPQConfigSetting,
@@ -8,6 +6,7 @@ import {
   AwsServiceAccountInfoQPQConfigSetting,
   QPQAwsConfigSettingType,
 } from '../config';
+import { ApiLayer,LocalServiceAccountInfo, ServiceAccountInfo } from '../types';
 
 export const getAwsServiceAccountInfoConfig = (qpqConfig: QPQConfig): AwsServiceAccountInfoQPQConfigSetting => {
   const serviceAccountInfos = qpqCoreUtils.getConfigSettings<AwsServiceAccountInfoQPQConfigSetting>(

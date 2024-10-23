@@ -1,6 +1,6 @@
+import { QpqRuntimeType, StoryResultMetadata } from 'quidproquo-core';
 import { DynamoDBClient, QueryCommand, QueryCommandInput } from '@aws-sdk/client-dynamodb';
 
-import { QpqRuntimeType, StoryResultMetadata } from 'quidproquo-core';
 import { createAwsClient } from '../createAwsClient';
 
 export async function getLogByCorrelation(tableName: string, region: string, correlation: string): Promise<StoryResultMetadata> {

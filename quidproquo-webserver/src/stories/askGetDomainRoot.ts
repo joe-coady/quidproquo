@@ -1,4 +1,5 @@
-import { AskResponse, askConfigGetApplicationInfo } from 'quidproquo-core';
+import { askConfigGetApplicationInfo,AskResponse } from 'quidproquo-core';
+
 import { getDomainRoot } from '../utils';
 
 export function* askGetDomainRoot(rootDomain: string): AskResponse<string> {

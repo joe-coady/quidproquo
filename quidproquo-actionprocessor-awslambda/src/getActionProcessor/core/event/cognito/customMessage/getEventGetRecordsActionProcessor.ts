@@ -1,13 +1,12 @@
 import {
-  EventActionType,
-  QPQConfig,
-  actionResult,
-  qpqCoreUtils,
-  EventGetRecordsActionProcessor,
-  ActionProcessorListResolver,
   ActionProcessorList,
+  ActionProcessorListResolver,
+  actionResult,
+  EventActionType,
+  EventGetRecordsActionProcessor,
+  QPQConfig,
+  qpqCoreUtils,
 } from 'quidproquo-core';
-
 import { EmailSendEventType } from 'quidproquo-webserver';
 
 import { EventInput, InternalEventRecord } from './types';

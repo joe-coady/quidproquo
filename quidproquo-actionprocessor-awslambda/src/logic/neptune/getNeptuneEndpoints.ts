@@ -1,6 +1,7 @@
-import { NeptuneClient, DescribeDBClustersCommand } from '@aws-sdk/client-neptune';
-import { createAwsClient } from '../createAwsClient';
+import { DescribeDBClustersCommand,NeptuneClient } from '@aws-sdk/client-neptune';
+
 import { GraphDatabaseEndpoints } from '../../getActionProcessor/core/graphDatabase/customActions/actions';
+import { createAwsClient } from '../createAwsClient';
 
 export const getNeptuneEndpoints = async (clusterIdentifier: string, region: string): Promise<GraphDatabaseEndpoints> => {
   const neptuneClient = createAwsClient(NeptuneClient, { region });

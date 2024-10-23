@@ -1,11 +1,12 @@
 import React from 'react';
-import { Tabs, Tab, CircularProgress } from '@mui/material';
+import { CircularProgress,Tab, Tabs } from '@mui/material';
 import Box from '@mui/material/Box';
-import { LogSearch } from './LogSearch';
-import { Dashboard } from './Dashboard';
-import { useFederatedAddon } from '../useFederatedAddon';
+
 import { FederatedTab } from '../FederatedAddon';
 import RandomView from '../tmp/RandomView';
+import { useFederatedAddon } from '../useFederatedAddon';
+import { Dashboard } from './Dashboard';
+import { LogSearch } from './LogSearch';
 
 export function useTabs(): {
   tabs: FederatedTab[];

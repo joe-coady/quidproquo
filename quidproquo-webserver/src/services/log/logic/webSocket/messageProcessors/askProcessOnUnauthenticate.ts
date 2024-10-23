@@ -1,6 +1,7 @@
 import { AnyEventMessage } from 'quidproquo-core';
-import { websocketConnectionData } from '../../../data';
+
 import { WebSocketClientEventMessageUnauthenticate, WebsocketClientMessageEventType } from '../../../../../types';
+import { websocketConnectionData } from '../../../data';
 
 export function isWebSocketUnauthenticateMessage(event: AnyEventMessage): event is WebSocketClientEventMessageUnauthenticate {
   return event.type === WebsocketClientMessageEventType.Unauthenticate;

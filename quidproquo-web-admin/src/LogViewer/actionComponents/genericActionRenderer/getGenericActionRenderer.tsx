@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { ActionComponent } from '../types';
 import ActionResultDisplay from './ActionResultDisplay';
 import { GenericFunctionRenderer, genericFunctionRendererStyles } from './AnyVariableView'; // Assuming this is the correct path

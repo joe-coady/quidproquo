@@ -1,11 +1,10 @@
 import { SQSEvent } from 'aws-lambda';
-
 import { QpqRuntimeType } from 'quidproquo-core';
 
-import { getQpqConfig } from './lambda-utils';
-import { dynamicModuleLoader } from './dynamicModuleLoader';
-import { getQpqLambdaRuntimeForEvent } from '../lambdaHandlers/helpers/getQpqLambdaRuntimeForEvent';
 import { getSqsQueueEventProcessor } from '../getActionProcessor';
+import { getQpqLambdaRuntimeForEvent } from '../lambdaHandlers/helpers/getQpqLambdaRuntimeForEvent';
+import { dynamicModuleLoader } from './dynamicModuleLoader';
+import { getQpqConfig } from './lambda-utils';
 
 // Default executor
 export const executeSQSEvent = getQpqLambdaRuntimeForEvent<SQSEvent>(

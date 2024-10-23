@@ -1,20 +1,19 @@
 import {
-  QPQConfig,
-  qpqCoreUtils,
-  KeyValueStoreUpsertActionProcessor,
+  ActionProcessorList,
+  ActionProcessorListResolver,
   actionResult,
-  KeyValueStoreActionType,
-  ErrorTypeEnum,
   actionResultError,
   actionResultErrorFromCaughtError,
-  ActionProcessorListResolver,
-  ActionProcessorList,
+  ErrorTypeEnum,
+  KeyValueStoreActionType,
+  KeyValueStoreUpsertActionProcessor,
+  QPQConfig,
+  qpqCoreUtils,
 } from 'quidproquo-core';
+import { KeyValueStoreUpsertErrorTypeEnum } from 'quidproquo-core';
 
 import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
-
 import { putItem } from '../../../logic/dynamo';
-import { KeyValueStoreUpsertErrorTypeEnum } from 'quidproquo-core';
 
 const getProcessKeyValueStoreUpsert = (qpqConfig: QPQConfig): KeyValueStoreUpsertActionProcessor<any> => {
   return async ({ keyValueStoreName, item, options }) => {

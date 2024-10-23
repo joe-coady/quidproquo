@@ -1,5 +1,6 @@
 import { askNetworkRequest, AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
-import { CloudflareResponse, CloudflareDNSRecord } from '../types';
+
+import { CloudflareDNSRecord,CloudflareResponse } from '../types';
 
 export function* askCloudflareGetDNSRecordId(apiKey: string, zoneId: string, cnameName: string): AskResponse<string | undefined> {
   let page = 1;

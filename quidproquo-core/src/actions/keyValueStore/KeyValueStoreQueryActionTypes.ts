@@ -1,9 +1,7 @@
-import { KeyValueStoreActionType } from './KeyValueStoreActionType';
-import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
-
-import { KvsQueryOperation } from './types';
-
 import { QpqPagedData } from '../../types';
+import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
+import { KeyValueStoreActionType } from './KeyValueStoreActionType';
+import { KvsQueryOperation } from './types';
 
 // Options Type
 export interface KeyValueStoreQueryOptions {

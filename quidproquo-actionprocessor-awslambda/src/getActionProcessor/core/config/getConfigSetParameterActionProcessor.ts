@@ -1,16 +1,15 @@
 import {
-  ConfigActionType,
-  ConfigSetParameterActionProcessor,
-  actionResult,
-  QPQConfig,
-  qpqCoreUtils,
   ActionProcessorList,
   ActionProcessorListResolver,
+  actionResult,
+  ConfigActionType,
+  ConfigSetParameterActionProcessor,
+  QPQConfig,
+  qpqCoreUtils,
 } from 'quidproquo-core';
 
-import { resolveParameterKey } from '../../../runtimeConfig/qpqAwsLambdaRuntimeConfigUtils';
-
 import { setParameter } from '../../../logic/parametersManager/setParameter';
+import { resolveParameterKey } from '../../../runtimeConfig/qpqAwsLambdaRuntimeConfigUtils';
 
 const getProcessConfigSetParameter = (qpqConfig: QPQConfig): ConfigSetParameterActionProcessor => {
   return async ({ parameterName, parameterValue }) => {

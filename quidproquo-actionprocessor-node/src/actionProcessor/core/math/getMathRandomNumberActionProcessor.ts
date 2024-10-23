@@ -1,10 +1,10 @@
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
+  actionResult,
   MathActionType,
   MathRandomNumberActionProcessor,
   QPQConfig,
-  actionResult,
 } from 'quidproquo-core';
 
 const getProcessMathRandomNumber = (qpqConfig: QPQConfig): MathRandomNumberActionProcessor => {

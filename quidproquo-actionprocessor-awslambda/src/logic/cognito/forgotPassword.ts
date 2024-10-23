@@ -1,10 +1,9 @@
 import { AuthenticationDeliveryDetails } from 'quidproquo-core';
-
 import { CognitoIdentityProviderClient, ForgotPasswordCommand, ForgotPasswordCommandInput } from '@aws-sdk/client-cognito-identity-provider';
 
+import { createAwsClient } from '../createAwsClient';
 import { calculateSecretHash } from './utils/calculateSecretHash';
 import { getUserPoolClientSecret } from './getUserPoolClientSecret';
-import { createAwsClient } from '../createAwsClient';
 
 export const forgotPassword = async (
   userPoolId: string,

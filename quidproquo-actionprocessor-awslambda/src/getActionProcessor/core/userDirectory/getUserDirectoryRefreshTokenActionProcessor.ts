@@ -1,19 +1,18 @@
 import {
-  UserDirectoryRefreshTokenActionProcessor,
+  ActionProcessorList,
+  ActionProcessorListResolver,
   actionResult,
+  actionResultError,
+  ErrorTypeEnum,
   QPQConfig,
   qpqCoreUtils,
   UserDirectoryActionType,
-  actionResultError,
-  ErrorTypeEnum,
-  ActionProcessorList,
-  ActionProcessorListResolver,
+  UserDirectoryRefreshTokenActionProcessor,
 } from 'quidproquo-core';
 
-import { getCFExportNameUserPoolIdFromConfig, getCFExportNameUserPoolClientIdFromConfig } from '../../../awsNamingUtils';
-
-import { refreshToken as cognitoRefreshToken } from '../../../logic/cognito/refreshToken';
+import { getCFExportNameUserPoolClientIdFromConfig,getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
+import { refreshToken as cognitoRefreshToken } from '../../../logic/cognito/refreshToken';
 
 const getProcessRefreshToken = (qpqConfig: QPQConfig): UserDirectoryRefreshTokenActionProcessor => {
   return async ({ userDirectoryName, refreshToken }, session) => {

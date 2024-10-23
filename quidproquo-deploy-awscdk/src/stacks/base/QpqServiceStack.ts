@@ -1,9 +1,7 @@
-import { Stack, StackProps, aws_lambda } from 'aws-cdk-lib';
-
+import { aws_lambda,Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-
-import { QPQConfig, qpqCoreUtils, QPQConfigSetting } from 'quidproquo-core';
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
+import { QPQConfig, QPQConfigSetting,qpqCoreUtils } from 'quidproquo-core';
 
 export interface QpqServiceStackProps {
   awsAccountId: string;

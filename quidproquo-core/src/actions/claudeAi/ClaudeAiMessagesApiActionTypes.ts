@@ -1,6 +1,7 @@
+import Anthropic from '@anthropic-ai/sdk';
+
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
 import { ClaudeAiActionType } from './ClaudeAiActionType';
-import Anthropic from '@anthropic-ai/sdk';
 
 // Payload
 export interface ClaudeAiMessagesApiActionPayload {

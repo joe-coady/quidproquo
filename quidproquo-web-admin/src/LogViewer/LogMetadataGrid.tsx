@@ -1,9 +1,10 @@
-import LinearProgress from '@mui/material/LinearProgress';
-import { DataGrid, GridRenderCellParams, GridColDef, GridRowClassNameParams } from '@mui/x-data-grid';
-import LogDialog from './LogDialog';
-import { useLogManagement } from './hooks';
-import { DataGridPagination, DateCell } from '../components';
 import { LogMetadata } from 'quidproquo-webserver';
+import LinearProgress from '@mui/material/LinearProgress';
+import { DataGrid, GridColDef, GridRenderCellParams, GridRowClassNameParams } from '@mui/x-data-grid';
+
+import { DataGridPagination, DateCell } from '../components';
+import { useLogManagement } from './hooks';
+import LogDialog from './LogDialog';
 
 const formatTime = (ms: number) => {
   if (ms < 1000) return `${ms}ms`;

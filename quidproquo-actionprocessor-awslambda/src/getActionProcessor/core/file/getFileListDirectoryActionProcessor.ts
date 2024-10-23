@@ -1,15 +1,15 @@
 import {
-  FileListDirectoryActionProcessor,
-  actionResult,
-  FileActionType,
-  QPQConfig,
-  qpqCoreUtils,
   ActionProcessorList,
   ActionProcessorListResolver,
+  actionResult,
+  FileActionType,
+  FileListDirectoryActionProcessor,
+  QPQConfig,
+  qpqCoreUtils,
 } from 'quidproquo-core';
 
-import { resolveStorageDriveBucketName } from './utils';
 import { listFiles } from '../../../logic/s3/s3Utils';
+import { resolveStorageDriveBucketName } from './utils';
 
 const getProcessFileListDirectory = (qpqConfig: QPQConfig): FileListDirectoryActionProcessor => {
   return async ({ drive, folderPath, maxFiles, pageToken }) => {

@@ -1,13 +1,12 @@
 import fs from 'fs';
 import path from 'path';
-
-import { S3Client, PutObjectCommand, PutObjectCommandInput } from '@aws-sdk/client-s3';
-
-import { StoryResult, qpqCoreUtils, QPQConfig, QpqLogger } from 'quidproquo-core';
+import { QPQConfig, qpqCoreUtils, QpqLogger,StoryResult } from 'quidproquo-core';
+import { PutObjectCommand, PutObjectCommandInput,S3Client } from '@aws-sdk/client-s3';
 
 const tempDirectory = '/tmp/qpqlogs';
 
-import { getAwsServiceAccountInfoConfig, getAwsServiceAccountInfoByDeploymentInfo } from 'quidproquo-config-aws';
+import { getAwsServiceAccountInfoByDeploymentInfo,getAwsServiceAccountInfoConfig } from 'quidproquo-config-aws';
+
 import { getConfigRuntimeResourceName } from '../../awsNamingUtils';
 
 export const storyLogger = async (result: StoryResult<any>, bucketName: string, region: string): Promise<void> => {

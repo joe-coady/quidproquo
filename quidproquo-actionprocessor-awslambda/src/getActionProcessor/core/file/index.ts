@@ -4,10 +4,10 @@ import { getFileDeleteActionProcessor } from './getFileDeleteActionProcessor';
 import { getFileExistsActionProcessor } from './getFileExistsActionProcessor';
 import { getFileGenerateTemporarySecureUrlActionProcessor } from './getFileGenerateTemporarySecureUrlActionProcessor';
 import { getFileListDirectoryActionProcessor } from './getFileListDirectoryActionProcessor';
-import { getFileReadTextContentsActionProcessor } from './getFileReadTextContentsActionProcessor';
-import { getFileWriteTextContentsActionProcessor } from './getFileWriteTextContentsActionProcessor';
 import { getFileReadBinaryContentsActionProcessor } from './getFileReadBinaryContentsActionProcessor';
+import { getFileReadTextContentsActionProcessor } from './getFileReadTextContentsActionProcessor';
 import { getFileWriteBinaryContentsActionProcessor } from './getFileWriteBinaryContentsActionProcessor';
+import { getFileWriteTextContentsActionProcessor } from './getFileWriteTextContentsActionProcessor';
 
 export const getFileActionProcessor: ActionProcessorListResolver = async (
   qpqConfig: QPQConfig,

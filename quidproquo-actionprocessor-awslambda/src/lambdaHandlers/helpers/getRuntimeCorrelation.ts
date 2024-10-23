@@ -1,4 +1,5 @@
 import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+
 import { randomGuid } from '../../awsLambdaUtils';
 
 export const getRuntimeCorrelation = (qpqConfig: QPQConfig): string => {

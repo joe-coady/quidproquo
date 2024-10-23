@@ -1,12 +1,10 @@
+import { Construct } from 'constructs';
 import { qpqCoreUtils } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
-import { Construct } from 'constructs';
+import { WebQpqWebserverDomainProxyConstruct,WebQpqWebserverWebEntryConstruct } from '../constructs';
 import { QpqServiceStack, QpqServiceStackProps } from './base/QpqServiceStack';
-
 import { InfQpqServiceStack } from './InfQpqServiceStack';
-
-import { WebQpqWebserverWebEntryConstruct, WebQpqWebserverDomainProxyConstruct } from '../constructs';
 
 export interface WebQpqServiceStackProps extends QpqServiceStackProps {
   infQpqServiceStack?: InfQpqServiceStack;

@@ -1,17 +1,14 @@
-import { Construct, IConstruct } from 'constructs';
-
 import * as cdk from 'aws-cdk-lib';
-
+import { Construct, IConstruct } from 'constructs';
 import {
+  ParameterQPQConfigSetting,
+  QPQConfig,
   QPQCoreConfigSettingType,
   qpqCoreUtils,
-  ParameterQPQConfigSetting,
-  StorageDriveQPQConfigSetting,
-  SecretQPQConfigSetting,
-  QPQConfig,
   QueueQPQConfigSetting,
+  SecretQPQConfigSetting,
+  StorageDriveQPQConfigSetting,
 } from 'quidproquo-core';
-
 import {
   ApiQPQWebServerConfigSetting,
   QPQWebServerConfigSettingType,
@@ -21,14 +18,14 @@ import {
 } from 'quidproquo-webserver';
 
 import {
-  QpqResource,
-  QpqCoreParameterConstruct,
-  QpqCoreSecretConstruct,
-  QpqCoreStorageDriveConstruct,
-  QpqCoreQueueConstruct,
-  QpqInfCoreUserDirectoryConstruct,
   QpqCoreEventBusConstruct,
   QpqCoreKeyValueStoreConstruct,
+  QpqCoreParameterConstruct,
+  QpqCoreQueueConstruct,
+  QpqCoreSecretConstruct,
+  QpqCoreStorageDriveConstruct,
+  QpqInfCoreUserDirectoryConstruct,
+  QpqResource,
 } from '../constructs';
 
 export const getQqpSecretGrantables = (scope: Construct, id: string, qpqConfig: QPQConfig, awsAccountId: string): QpqResource[] => {

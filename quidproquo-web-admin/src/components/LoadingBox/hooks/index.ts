@@ -1,2 +1,2 @@
-export * from './usePlatformDataFromPath';
 export * from './useExternalData';
+export * from './usePlatformDataFromPath';

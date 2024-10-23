@@ -1,8 +1,8 @@
 import { AnyEventMessage, askUserDirectorySetAccessToken } from 'quidproquo-core';
 
-import { websocketConnectionData } from '../../../data';
 import { adminUserDirectoryResourceName } from '../../../../../config';
 import { WebSocketClientEventMessageAuthenticate, WebsocketClientMessageEventType } from '../../../../../types';
+import { websocketConnectionData } from '../../../data';
 
 export function isWebSocketAuthenticateMessage(event: AnyEventMessage): event is WebSocketClientEventMessageAuthenticate {
   return event.type === WebsocketClientMessageEventType.Authenticate;

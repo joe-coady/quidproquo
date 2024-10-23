@@ -1,6 +1,6 @@
 import { ActionProcessorList, ActionProcessorListResolver, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { actionResult, FileActionType,FileDeleteActionProcessor } from 'quidproquo-core';
 
-import { FileDeleteActionProcessor, actionResult, FileActionType } from 'quidproquo-core';
 import { deleteFiles } from '../../../logic/s3/s3Utils';
 import { resolveStorageDriveBucketName } from './utils';
 

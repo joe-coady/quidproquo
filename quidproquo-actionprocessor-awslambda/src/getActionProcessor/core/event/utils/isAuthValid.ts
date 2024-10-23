@@ -1,10 +1,10 @@
 import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 import { RouteAuthSettings } from 'quidproquo-webserver';
 
-import { verifyJwt } from '../../../../logic/cognito/verifyJwt';
-import { getExportedValue } from '../../../../logic/cloudformation/getExportedValue';
-import { getApiKeys } from '../../../../logic/apiGateway/getApiKeys';
 import { getCFExportNameUserPoolIdFromConfig, getConfigRuntimeResourceName } from '../../../../awsNamingUtils';
+import { getApiKeys } from '../../../../logic/apiGateway/getApiKeys';
+import { getExportedValue } from '../../../../logic/cloudformation/getExportedValue';
+import { verifyJwt } from '../../../../logic/cognito/verifyJwt';
 
 const isAuthValidForCognito = async (qpqConfig: QPQConfig, authSettings: RouteAuthSettings, authHeader?: string | null) => {
   // If there are no auth settings ~ Its valid.

@@ -1,8 +1,8 @@
+import { StoryResultMetadataWithChildren } from 'quidproquo-core';
 import { Box } from '@mui/material';
 
-import { LogCorrelationTree } from './LogCorrelationTree';
-import { StoryResultMetadataWithChildren } from 'quidproquo-core';
 import { TreeApi } from './hooks';
+import { LogCorrelationTree } from './LogCorrelationTree';
 
 interface LogCorrelationsProps {
   logCorrelation: string;

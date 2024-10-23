@@ -5,9 +5,9 @@ import path from 'path';
 import { askProcessEvent, QPQConfig, qpqCoreUtils, qpqExecuteLog, QpqFunctionRuntime, QpqRuntimeType, StoryResult } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
-import { route } from './implementations';
 import { getAllServiceConfigs } from './allServiceConfig';
-import { ExpressEvent, DevServerConfig } from './types';
+import { route } from './implementations';
+import { DevServerConfig,ExpressEvent } from './types';
 
 const getServiceBaseDomain = (qpqConfig: QPQConfig, devServerConfig: DevServerConfig) =>
   qpqWebServerUtils.getDomainRoot(

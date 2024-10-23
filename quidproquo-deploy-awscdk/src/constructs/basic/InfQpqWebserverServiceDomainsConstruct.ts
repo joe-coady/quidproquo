@@ -1,8 +1,7 @@
+import { Construct } from 'constructs';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
-import { Construct } from 'constructs';
-
 import { ServiceDomainConstruct } from './ServiceDomain';
 
 export interface InfQpqWebserverServiceDomainsConstructProps extends QpqConstructBlockProps {}

@@ -1,13 +1,12 @@
 import {
-  EventActionType,
-  QPQConfig,
-  actionResult,
-  HTTPMethod,
-  EventGetRecordsActionProcessor,
-  ActionProcessorListResolver,
   ActionProcessorList,
+  ActionProcessorListResolver,
+  actionResult,
+  EventActionType,
+  EventGetRecordsActionProcessor,
+  HTTPMethod,
+  QPQConfig,
 } from 'quidproquo-core';
-
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { EventInput, InternalEventRecord } from './types';

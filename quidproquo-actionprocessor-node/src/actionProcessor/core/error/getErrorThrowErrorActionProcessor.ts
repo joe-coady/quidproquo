@@ -1,10 +1,10 @@
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
+  actionResultError,
   ErrorActionType,
   ErrorThrowErrorActionProcessor,
   QPQConfig,
-  actionResultError,
 } from 'quidproquo-core';
 
 const getProcessErrorThrowError = (qpqConfig: QPQConfig): ErrorThrowErrorActionProcessor => {

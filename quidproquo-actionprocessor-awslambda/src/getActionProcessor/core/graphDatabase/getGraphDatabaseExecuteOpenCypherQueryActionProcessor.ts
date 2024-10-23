@@ -1,13 +1,14 @@
 import {
+  ActionProcessorList,
+  ActionProcessorListResolver,
+  getProcessCustomImplementation,
+  GraphDatabaseActionType,
   GraphDatabaseExecuteOpenCypherQueryActionProcessor,
   QPQConfig,
-  GraphDatabaseActionType,
-  ActionProcessorListResolver,
-  ActionProcessorList,
-  getProcessCustomImplementation,
 } from 'quidproquo-core';
-import { getGraphDatabaseForNeptuneActionProcessor } from './customActions';
+
 import { randomGuid } from '../../../awsLambdaUtils';
+import { getGraphDatabaseForNeptuneActionProcessor } from './customActions';
 import { askRunNeptuneOpenCypherQuery } from './stories';
 
 export const getGraphDatabaseExecuteOpenCypherQueryActionProcessor: ActionProcessorListResolver = async (

@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+
 import { SearchParams } from '../types';
 
 export const useRequestsByService = (logs: any[], searchParams: SearchParams) => {

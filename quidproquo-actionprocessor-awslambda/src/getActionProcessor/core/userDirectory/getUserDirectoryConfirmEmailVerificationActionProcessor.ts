@@ -1,11 +1,11 @@
 import {
-  UserDirectoryConfirmEmailVerificationActionProcessor,
+  ActionProcessorList,
+  ActionProcessorListResolver,
   actionResult,
   QPQConfig,
   qpqCoreUtils,
   UserDirectoryActionType,
-  ActionProcessorListResolver,
-  ActionProcessorList,
+  UserDirectoryConfirmEmailVerificationActionProcessor,
 } from 'quidproquo-core';
 
 import { verifyUserEmail } from '../../../logic/cognito/verifyUserEmail';

@@ -1,5 +1,4 @@
 import path from 'path';
-
 import { QpqFunctionRuntime } from 'quidproquo-core';
 
 export const getServiceEntryQpqFunctionRuntime = (serviceName: string, entryType: string, runtime: `${string}::${string}`): QpqFunctionRuntime => {

@@ -1,5 +1,5 @@
-import { GuidActionType } from './GuidActionType';
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
+import { GuidActionType } from './GuidActionType';
 
 // Payload
 export type GuidNewActionPayload = undefined;

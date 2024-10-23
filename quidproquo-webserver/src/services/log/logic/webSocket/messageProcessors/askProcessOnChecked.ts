@@ -1,6 +1,6 @@
 import { AnyEventMessage } from 'quidproquo-core';
-import { WebSocketClientEventMessageMarkLogChecked, WebsocketClientMessageEventType } from '../../../../../types';
 
+import { WebSocketClientEventMessageMarkLogChecked, WebsocketClientMessageEventType } from '../../../../../types';
 import { askToggleLogChecked } from '../../logs';
 
 export function isWebSocketMarkLogCheckedMessage(event: AnyEventMessage): event is WebSocketClientEventMessageMarkLogChecked {

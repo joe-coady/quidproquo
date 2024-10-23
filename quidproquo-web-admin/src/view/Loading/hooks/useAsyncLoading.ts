@@ -1,7 +1,7 @@
-import { useLoadingApi } from './useLoadingApi';
+import { useFastCallback } from 'quidproquo-web-react';
 
 import { AnyAsyncFunction } from '../../types';
-import { useFastCallback } from 'quidproquo-web-react';
+import { useLoadingApi } from './useLoadingApi';
 
 /**
  * Custom hook that wraps an asynchronous function with loading triggers.

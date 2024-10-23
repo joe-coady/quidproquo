@@ -1,5 +1,7 @@
+import { actionResult, actionResultError } from './logic/actionLogic';
 import { QPQConfig } from './config';
 import { getApplicationModuleName } from './qpqCoreUtils';
+import { createRuntime } from './qpqRuntime';
 import {
   ActionProcessor,
   ActionProcessorList,
@@ -10,8 +12,6 @@ import {
   QpqRuntimeType,
   StorySession,
 } from './types';
-import { createRuntime } from './qpqRuntime';
-import { actionResult, actionResultError } from './logic/actionLogic';
 
 // export const getDateNow = () => new Date().toISOString();
 // export const randomGuid = () => new Date().toISOString();

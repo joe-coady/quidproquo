@@ -1,7 +1,7 @@
 import { ActionProcessorList, ActionProcessorListResolver, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { actionResult, KeyValueStoreActionType,KeyValueStoreDeleteActionProcessor } from 'quidproquo-core';
 
 import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
-import { KeyValueStoreDeleteActionProcessor, actionResult, KeyValueStoreActionType } from 'quidproquo-core';
 import { deleteItem } from '../../../logic/dynamo';
 
 const getProcessKeyValueStoreDelete = (qpqConfig: QPQConfig): KeyValueStoreDeleteActionProcessor => {

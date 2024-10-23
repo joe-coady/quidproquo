@@ -1,4 +1,5 @@
 import { StoryResultMetadataWithChildren } from 'quidproquo-core';
+
 import { apiRequestGet, externalRequestGet } from '../../logic';
 
 export const getLogHierarchy = async function findRootLog(

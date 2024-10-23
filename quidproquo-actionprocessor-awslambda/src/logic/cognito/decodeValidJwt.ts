@@ -1,4 +1,4 @@
-import { verify, decode } from 'jsonwebtoken';
+import { decode,verify } from 'jsonwebtoken';
 import jwksClient from 'jwks-rsa';
 import { DecodedAccessToken } from 'quidproquo-core';
 

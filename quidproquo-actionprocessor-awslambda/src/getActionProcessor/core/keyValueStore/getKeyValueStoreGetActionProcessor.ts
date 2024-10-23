@@ -1,7 +1,7 @@
 import { ActionProcessorList, ActionProcessorListResolver, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { actionResult, KeyValueStoreActionType,KeyValueStoreGetActionProcessor } from 'quidproquo-core';
 
 import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
-import { KeyValueStoreGetActionProcessor, actionResult, KeyValueStoreActionType } from 'quidproquo-core';
 import { getItem } from '../../../logic/dynamo';
 
 const getProcessKeyValueStoreGet = (qpqConfig: QPQConfig): KeyValueStoreGetActionProcessor<any> => {

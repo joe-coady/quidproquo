@@ -1,5 +1,5 @@
-import { UserDirectorySetUserAttributesActionRequester } from './UserDirectorySetUserAttributesActionTypes';
 import { UserAttributes, UserDirectoryActionType } from './UserDirectoryActionType';
+import { UserDirectorySetUserAttributesActionRequester } from './UserDirectorySetUserAttributesActionTypes';
 
 export function* askUserDirectorySetUserAttributes(
   userDirectoryName: string,

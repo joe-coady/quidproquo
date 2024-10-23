@@ -1,8 +1,8 @@
 // import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 
-import { qpqCoreUtils, QPQConfig } from 'quidproquo-core';
-
+import { QPQConfig,qpqCoreUtils } from 'quidproquo-core';
 import { Configuration } from 'webpack';
+
 import { QpqPlugin } from './plugins';
 
 type WebpackBuildMode = 'none' | 'development' | 'production';

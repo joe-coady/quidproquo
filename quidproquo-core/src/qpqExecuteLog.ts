@@ -1,6 +1,6 @@
-import { ActionProcessorList, StoryResult } from './types';
-import { createRuntime } from './qpqRuntime';
 import { defineApplicationModule } from './config';
+import { createRuntime } from './qpqRuntime';
+import { ActionProcessorList, StoryResult } from './types';
 
 export const qpqExecuteLog = async (storyResult: StoryResult<any>, runtime: any, overrides: ActionProcessorList = {}): Promise<StoryResult<any>> => {
   // Create a proxy that just resolves all actions to reading from the history

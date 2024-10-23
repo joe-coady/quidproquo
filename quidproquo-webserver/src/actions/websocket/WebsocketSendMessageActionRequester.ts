@@ -1,6 +1,7 @@
-import { WebsocketSendMessageActionRequester } from './WebsocketSendMessageActionTypes';
-import { WebsocketActionType } from './WebsocketActionType';
 import { createErrorEnumForAction } from 'quidproquo-core';
+
+import { WebsocketActionType } from './WebsocketActionType';
+import { WebsocketSendMessageActionRequester } from './WebsocketSendMessageActionTypes';
 
 export const WebsocketSendMessageErrorTypeEnum = createErrorEnumForAction(WebsocketActionType.SendMessage, ['Throttled', 'Disconnected']);
 

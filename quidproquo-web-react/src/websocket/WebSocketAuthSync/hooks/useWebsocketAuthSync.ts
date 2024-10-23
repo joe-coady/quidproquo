@@ -7,8 +7,8 @@ import {
   WebsocketClientMessageEventType,
 } from 'quidproquo-webserver';
 
-import { useSubscribeToWebsocket, useWebsocketApi, useWebsocketSendEvent } from '../../hooks';
 import { useFastCallback } from '../../../hooks';
+import { useSubscribeToWebsocket, useWebsocketApi, useWebsocketSendEvent } from '../../hooks';
 
 export const useWebsocketAuthSync = (accessToken: AuthenticationInfo['accessToken']) => {
   const sendMessage = useWebsocketSendEvent();

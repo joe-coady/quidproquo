@@ -1,10 +1,10 @@
 import {
-  EventActionType,
-  QPQConfig,
-  actionResult,
-  EventGetStorySessionActionProcessor,
-  ActionProcessorListResolver,
   ActionProcessorList,
+  ActionProcessorListResolver,
+  actionResult,
+  EventActionType,
+  EventGetStorySessionActionProcessor,
+  QPQConfig,
 } from 'quidproquo-core';
 
 import { AnyQueueMessageWithSession, EventInput, InternalEventRecord, MatchResult } from './types';

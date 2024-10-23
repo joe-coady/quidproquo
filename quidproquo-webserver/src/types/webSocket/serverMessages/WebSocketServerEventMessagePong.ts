@@ -1,4 +1,5 @@
 import { EventMessage } from 'quidproquo-core';
+
 import { WebsocketServerMessageEventType } from '../WebsocketServerMessageEventType';
 
 export type WebSocketServerEventPayloadPong = undefined;

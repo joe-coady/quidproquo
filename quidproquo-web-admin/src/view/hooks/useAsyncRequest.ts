@@ -1,8 +1,9 @@
-import { useAsyncLoading } from '../Loading';
-import { apiRequestGet, externalRequestGet } from '../../logic';
-import { AnyAsyncFunction } from '../types';
 import { useAuthAccessToken, useBaseUrlResolvers } from 'quidproquo-web-react';
 import { useFastCallback } from 'quidproquo-web-react';
+
+import { apiRequestGet, externalRequestGet } from '../../logic';
+import { useAsyncLoading } from '../Loading';
+import { AnyAsyncFunction } from '../types';
 
 /**
  * Custom hook for making a GET request to the platform API.

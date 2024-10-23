@@ -1,20 +1,19 @@
 import {
-  UserDirectoryAuthenticateUserActionProcessor,
+  ActionProcessorList,
+  ActionProcessorListResolver,
   actionResult,
   actionResultError,
+  actionResultErrorFromCaughtError,
   QPQConfig,
   qpqCoreUtils,
   UserDirectoryActionType,
-  actionResultErrorFromCaughtError,
+  UserDirectoryAuthenticateUserActionProcessor,
   UserDirectoryAuthenticateUserErrorTypeEnum,
-  ActionProcessorListResolver,
-  ActionProcessorList,
 } from 'quidproquo-core';
 
-import { getCFExportNameUserPoolIdFromConfig, getCFExportNameUserPoolClientIdFromConfig } from '../../../awsNamingUtils';
-
-import { authenticateUser } from '../../../logic/cognito/authenticateUser';
+import { getCFExportNameUserPoolClientIdFromConfig,getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
+import { authenticateUser } from '../../../logic/cognito/authenticateUser';
 
 const getProcessAuthenticateUser = (qpqConfig: QPQConfig): UserDirectoryAuthenticateUserActionProcessor => {
   return async (payload) => {

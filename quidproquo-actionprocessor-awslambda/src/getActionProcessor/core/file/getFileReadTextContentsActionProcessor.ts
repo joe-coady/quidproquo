@@ -1,15 +1,15 @@
 import {
-  FileReadTextContentsActionProcessor,
+  ActionProcessorList,
+  ActionProcessorListResolver,
   actionResult,
   FileActionType,
+  FileReadTextContentsActionProcessor,
   QPQConfig,
   qpqCoreUtils,
-  ActionProcessorListResolver,
-  ActionProcessorList,
 } from 'quidproquo-core';
 
-import { resolveStorageDriveBucketName } from './utils';
 import { readTextFile } from '../../../logic/s3/s3Utils';
+import { resolveStorageDriveBucketName } from './utils';
 
 const getProcessFileReadTextContents = (qpqConfig: QPQConfig): FileReadTextContentsActionProcessor => {
   return async ({ drive, filepath }) => {

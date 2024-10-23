@@ -1,5 +1,5 @@
-import { Construct } from 'constructs';
 import { aws_iam } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
 

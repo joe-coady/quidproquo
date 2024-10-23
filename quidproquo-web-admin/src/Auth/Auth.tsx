@@ -1,14 +1,13 @@
 import { ReactNode, useState } from 'react';
-
-import { login } from '../LogViewer/logic/login';
-import { respondToAuthChallenge } from '../LogViewer/logic/respondToAuthChallenge';
-
-import { Login } from './Login';
-import { AuthChallengeNewPasswordRequired } from './AuthChallengeNewPasswordRequired';
-import { AuthState } from '../types';
 import { authContext, useBaseUrlResolvers } from 'quidproquo-web-react';
 import { useRefreshTokens } from 'quidproquo-web-react';
+
+import { login } from '../LogViewer/logic/login';
 import { refreshTokens } from '../LogViewer/logic/refreshTokens';
+import { respondToAuthChallenge } from '../LogViewer/logic/respondToAuthChallenge';
+import { AuthState } from '../types';
+import { AuthChallengeNewPasswordRequired } from './AuthChallengeNewPasswordRequired';
+import { Login } from './Login';
 
 interface AuthProps {
   children?: ReactNode;

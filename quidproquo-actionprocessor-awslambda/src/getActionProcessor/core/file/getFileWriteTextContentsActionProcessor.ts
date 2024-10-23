@@ -1,16 +1,16 @@
 import {
-  FileWriteTextContentsActionProcessor,
+  ActionProcessorList,
+  ActionProcessorListResolver,
   actionResult,
   FileActionType,
+  FileWriteTextContentsActionProcessor,
   QPQConfig,
   qpqCoreUtils,
-  ActionProcessorListResolver,
-  ActionProcessorList,
 } from 'quidproquo-core';
 
-import { resolveStorageDriveBucketName } from './utils';
-import { writeTextFile } from '../../../logic/s3/s3Utils';
 import { getS3BucketStorageClassFromStorageDriveTier } from '../../../awsLambdaUtils';
+import { writeTextFile } from '../../../logic/s3/s3Utils';
+import { resolveStorageDriveBucketName } from './utils';
 
 const getProcessFileWriteTextContents = (qpqConfig: QPQConfig): FileWriteTextContentsActionProcessor => {
   return async ({ drive, filepath, data, storageDriveAdvancedWriteOptions }) => {

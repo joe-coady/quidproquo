@@ -1,4 +1,5 @@
 import { EventMessage } from 'quidproquo-core';
+
 import { WebsocketAdminClientMessageEventType } from '../WebsocketAdminClientMessageEventType';
 
 export type WebSocketAdminClientEventPayloadRefreshLogMetadata = {

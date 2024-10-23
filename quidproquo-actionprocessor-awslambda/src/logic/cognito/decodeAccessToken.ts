@@ -1,4 +1,5 @@
 import { DecodedAccessToken, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+
 import { getCFExportNameUserPoolIdFromConfig } from '../../awsNamingUtils';
 import { getExportedValue } from '../cloudformation/getExportedValue';
 import { decodeValidJwt } from './decodeValidJwt';

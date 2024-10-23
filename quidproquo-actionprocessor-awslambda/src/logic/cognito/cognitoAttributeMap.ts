@@ -1,4 +1,4 @@
-import { UserAttributes, CreateUserRequest } from 'quidproquo-core';
+import { CreateUserRequest,UserAttributes } from 'quidproquo-core';
 
 export const cognitoAttributeMap: Record<keyof UserAttributes, string> = {
   email: 'email',

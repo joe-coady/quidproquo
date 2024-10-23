@@ -1,17 +1,15 @@
 import { AuthenticateUserResponse } from 'quidproquo-core';
-
 import {
-  CognitoIdentityProviderClient,
   AdminInitiateAuthCommand,
   AdminInitiateAuthCommandInput,
   AuthFlowType,
+  CognitoIdentityProviderClient,
 } from '@aws-sdk/client-cognito-identity-provider';
 
-import { calculateSecretHash } from './utils/calculateSecretHash';
-import { getUserPoolClientSecret } from './getUserPoolClientSecret';
-
-import { cognitoAdminInitiateAuthResponseToQpqAuthenticationInfo } from './utils/transformCognitoResponse';
 import { createAwsClient } from '../createAwsClient';
+import { calculateSecretHash } from './utils/calculateSecretHash';
+import { cognitoAdminInitiateAuthResponseToQpqAuthenticationInfo } from './utils/transformCognitoResponse';
+import { getUserPoolClientSecret } from './getUserPoolClientSecret';
 
 export const refreshToken = async (
   userPoolId: string,

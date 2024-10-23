@@ -1,8 +1,9 @@
 import {
-  CognitoIdentityProviderClient,
-  AdminSetUserPasswordCommandInput,
   AdminSetUserPasswordCommand,
+  AdminSetUserPasswordCommandInput,
+  CognitoIdentityProviderClient,
 } from '@aws-sdk/client-cognito-identity-provider';
+
 import { createAwsClient } from '../createAwsClient';
 
 export const setUserPassword = async (region: string, userPoolId: string, username: string, password: string) => {

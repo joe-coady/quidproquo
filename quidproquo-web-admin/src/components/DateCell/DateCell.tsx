@@ -1,4 +1,5 @@
 import Typography from '@mui/material/Typography';
+
 import LastSeen from '../LastSeen/LastSeen';
 
 type DateCellProps =

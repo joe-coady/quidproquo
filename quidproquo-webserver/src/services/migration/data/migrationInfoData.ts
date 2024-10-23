@@ -1,4 +1,5 @@
 import { askKeyValueStoreQuery, askKeyValueStoreUpsert, AskResponse, kvsEqual } from 'quidproquo-core';
+
 import { MigrationInfo } from '../domain/Migration';
 
 const migrationStoreName = 'qpqMigrations';

@@ -1,8 +1,9 @@
-import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
-import { Construct } from 'constructs';
 import { aws_lambda } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { getLambdaLayersWithFullPaths } from 'quidproquo-config-aws';
+
+import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
 
 export interface LambdaLayersProps extends QpqConstructBlockProps {}
 

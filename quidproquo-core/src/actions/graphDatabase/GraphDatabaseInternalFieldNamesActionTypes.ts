@@ -1,5 +1,5 @@
-import { GraphDatabaseActionType } from './GraphDatabaseActionType';
 import { Action, ActionProcessor, ActionRequester } from '../../types';
+import { GraphDatabaseActionType } from './GraphDatabaseActionType';
 
 type GraphDatabaseInternalFieldNames = {
   internalId: string;

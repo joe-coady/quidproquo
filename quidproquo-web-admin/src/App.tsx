@@ -1,11 +1,12 @@
 import React from 'react';
-import CssBaseline from '@mui/material/CssBaseline';
-import { LogViewer } from './LogViewer';
-import { Auth } from './Auth/Auth';
-import { LoadingProvider } from './view';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { BaseUrlProvider, BaseUrlResolvers,WebsocketProvider } from 'quidproquo-web-react';
 import { BrowserRouter as Router } from 'react-router-dom';
-import { WebsocketProvider, BaseUrlProvider, BaseUrlResolvers } from 'quidproquo-web-react';
+import CssBaseline from '@mui/material/CssBaseline';
+import { createTheme,ThemeProvider } from '@mui/material/styles';
+
+import { Auth } from './Auth/Auth';
+import { LogViewer } from './LogViewer';
+import { LoadingProvider } from './view';
 import { WebSocketAuthProvider } from './WebSocketAuthProvider';
 
 const darkTheme = createTheme({

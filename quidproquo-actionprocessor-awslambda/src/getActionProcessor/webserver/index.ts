@@ -1,9 +1,9 @@
-import { getWebEntryActionProcessor } from './webEntry';
 import { getServiceFunctionActionProcessor } from './serviceFunction';
+import { getWebEntryActionProcessor } from './webEntry';
 import { getWebsocketActionProcessor } from './websocket';
 
-export * from './webEntry';
 export * from './serviceFunction';
+export * from './webEntry';
 export * from './websocket';
 
 import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';

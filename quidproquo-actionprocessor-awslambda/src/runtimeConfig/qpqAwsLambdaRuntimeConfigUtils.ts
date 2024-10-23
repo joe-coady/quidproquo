@@ -1,4 +1,5 @@
 import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+
 import { getConfigRuntimeResourceNameFromConfig, getConfigRuntimeResourceNameFromConfigWithServiceOverride } from '../awsNamingUtils';
 
 export const resolveResourceName = (resourceName: string, qpqConfig: QPQConfig) => {

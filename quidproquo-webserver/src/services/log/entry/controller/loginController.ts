@@ -1,9 +1,8 @@
 import { AskResponse, AuthenticateUserChallenge } from 'quidproquo-core';
-import { HTTPEvent, HTTPEventResponse } from '../../../../types';
 
 // TODO: Fix this import (name it up the chain)
 import { qpqWebServerUtils } from '../../../../index';
-
+import { HTTPEvent, HTTPEventResponse } from '../../../../types';
 import { authLogic } from '../../logic';
 
 export type LoginPayload = {

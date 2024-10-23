@@ -1,11 +1,9 @@
-import { ScheduleQPQConfigSetting, qpqCoreUtils } from 'quidproquo-core';
+import { aws_events, aws_events_targets, aws_lambda } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
 import { LambdaRuntimeConfig } from 'quidproquo-actionprocessor-awslambda';
+import { qpqCoreUtils,ScheduleQPQConfigSetting } from 'quidproquo-core';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
-
-import { Construct } from 'constructs';
-import { aws_events, aws_events_targets, aws_lambda } from 'aws-cdk-lib';
-
 import { Function } from '../../../basic/Function';
 
 export interface QpqCoreRecurringScheduleConstructProps extends QpqConstructBlockProps {

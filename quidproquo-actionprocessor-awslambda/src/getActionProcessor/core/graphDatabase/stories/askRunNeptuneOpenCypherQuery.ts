@@ -1,15 +1,16 @@
 import {
+  askNetworkRequest,
   AskResponse,
+  askThrowError,
   ErrorTypeEnum,
   GraphCypherResponse,
   GraphDatabaseExecuteOpenCypherQueryActionPayload,
-  askNetworkRequest,
-  askThrowError,
   GraphDatabaseInstanceType,
 } from 'quidproquo-core';
+
 import { askGraphDatabaseForNeptuneGetEndpoints } from '../customActions';
-import { NeptuneCypherRequest, NeptuneCypherResponse } from './types';
 import { askConvertNeptuneCypherResponseToCypherResponse } from './converters/askConvertNeptuneCypherResponseToCypherResponse';
+import { NeptuneCypherRequest, NeptuneCypherResponse } from './types';
 import { convertQpqQueryToNeptune } from './utils';
 
 export function* askRunNeptuneOpenCypherQuery({

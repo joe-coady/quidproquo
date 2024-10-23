@@ -1,8 +1,8 @@
-import { SystemActionType, SystemBatchActionPayload, askBatch, askThrowError } from '../../actions';
+import { askBatch, askThrowError,SystemActionType, SystemBatchActionPayload } from '../../actions';
 import { ContextActionType, ContextReadActionPayload } from '../../actions/context';
+import { getSuccessfulEitherActionResult } from '../../logic/actionLogic';
 import { askCatch, askMap } from '../../stories';
 import { Action, AskResponse, AskResponseReturnType, EitherActionResult, QpqContext, QpqContextIdentifier } from '../../types';
-import { getSuccessfulEitherActionResult } from '../../logic/actionLogic';
 
 function* askProcessAction<R>(action: Action<any>): AskResponse<R> {
   return (yield action) as R;

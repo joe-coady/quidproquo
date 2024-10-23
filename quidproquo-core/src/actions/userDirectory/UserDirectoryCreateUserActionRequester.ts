@@ -1,5 +1,5 @@
-import { UserDirectoryCreateUserActionRequester, CreateUserRequest } from './UserDirectoryCreateUserActionTypes';
 import { UserDirectoryActionType } from './UserDirectoryActionType';
+import { CreateUserRequest,UserDirectoryCreateUserActionRequester } from './UserDirectoryCreateUserActionTypes';
 
 export function* askUserDirectoryCreateUser(userDirectoryName: string, createUserRequest: CreateUserRequest): UserDirectoryCreateUserActionRequester {
   return yield {

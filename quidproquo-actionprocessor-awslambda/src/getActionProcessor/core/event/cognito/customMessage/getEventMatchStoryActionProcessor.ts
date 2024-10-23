@@ -1,16 +1,17 @@
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
+  actionResult,
+  actionResultError,
   ErrorTypeEnum,
   EventActionType,
   EventMatchStoryActionProcessor,
   QPQConfig,
-  actionResult,
-  actionResultError,
   qpqCoreUtils,
 } from 'quidproquo-core';
-import { InternalEventRecord, MatchResult } from './types';
 import { EmailSendEventType } from 'quidproquo-webserver';
+
+import { InternalEventRecord, MatchResult } from './types';
 
 // TODO: Don't use Globals like this
 const GLOBAL_USER_DIRECTORY_NAME = process.env.userDirectoryName!;

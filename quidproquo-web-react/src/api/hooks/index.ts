@@ -1,2 +1,2 @@
-export * from './useNetworkRequest';
 export * from './useAuthenticatedNetworkRequest';
+export * from './useNetworkRequest';

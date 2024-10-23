@@ -1,6 +1,6 @@
-import { Typography, IconButton } from '@mui/material';
-
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { IconButton,Typography } from '@mui/material';
+
 import { useTruncatedText } from './hooks';
 
 const TruncatedText = ({ title, text, expanded }: { title: string; text: string; expanded: boolean }) => {

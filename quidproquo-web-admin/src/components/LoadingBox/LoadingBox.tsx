@@ -1,10 +1,9 @@
 import React from 'react';
+import { Box, CircularProgress } from '@mui/material';
 
-import { usePlatformDataFromPath } from './hooks';
 import { useIsLoading } from '../../view';
 import { LoadingProvider } from '../../view';
-
-import { Box, CircularProgress } from '@mui/material';
+import { usePlatformDataFromPath } from './hooks';
 
 interface LoadingBoxProps<T> {
   path: string;

@@ -1,21 +1,19 @@
+import axios, { AxiosResponse } from 'axios';
+import { extension } from 'mime-types';
 import {
-  NetworkRequestActionProcessor,
+  ActionProcessorList,
+  ActionProcessorListResolver,
   actionResult,
-  NetworkActionType,
-  HTTPMethod,
-  NetworkRequestActionPayload,
   actionResultError,
   ErrorTypeEnum,
-  ResponseType,
+  HTTPMethod,
+  NetworkActionType,
+  NetworkRequestActionPayload,
+  NetworkRequestActionProcessor,
   QPQBinaryData,
-  ActionProcessorListResolver,
   QPQConfig,
-  ActionProcessorList,
+  ResponseType,
 } from 'quidproquo-core';
-
-import { extension } from 'mime-types';
-
-import axios, { AxiosResponse } from 'axios';
 
 const getAxiosResponseType = (responseType: ResponseType) => {
   if (responseType === 'binary') {

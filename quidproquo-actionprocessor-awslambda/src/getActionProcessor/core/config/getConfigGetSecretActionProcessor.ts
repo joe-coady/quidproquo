@@ -1,11 +1,11 @@
 import {
+  ActionProcessorList,
+  ActionProcessorListResolver,
+  actionResult,
   ConfigActionType,
   ConfigGetSecretActionProcessor,
-  actionResult,
   QPQConfig,
   qpqCoreUtils,
-  ActionProcessorListResolver,
-  ActionProcessorList,
 } from 'quidproquo-core';
 
 import { getSecret } from '../../../logic/secretsManager/getSecret';

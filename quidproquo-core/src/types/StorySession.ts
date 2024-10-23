@@ -1,5 +1,5 @@
-import { QPQError } from './ErrorTypeEnum';
 import { Action } from './Action';
+import { QPQError } from './ErrorTypeEnum';
 import { QpqContext } from './QpqContextIdentifier';
 
 export interface DecodedAccessToken {

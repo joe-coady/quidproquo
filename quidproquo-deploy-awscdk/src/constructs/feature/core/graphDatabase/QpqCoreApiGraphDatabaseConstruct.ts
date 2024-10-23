@@ -1,12 +1,12 @@
-import { GraphDatabaseQPQConfigSetting, QPQConfig } from 'quidproquo-core';
-import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
-import { qpqConfigAwsUtils, resolveAwsServiceAccountInfo } from 'quidproquo-config-aws';
-
-import { Construct } from 'constructs';
-import { aws_dynamodb, aws_iam, aws_ec2, aws_logs } from 'aws-cdk-lib';
-import * as aws_neptune from '@aws-cdk/aws-neptune-alpha';
+import { aws_dynamodb, aws_ec2, aws_iam, aws_logs } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
+import { Construct } from 'constructs';
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
+import { qpqConfigAwsUtils, resolveAwsServiceAccountInfo } from 'quidproquo-config-aws';
+import { GraphDatabaseQPQConfigSetting, QPQConfig } from 'quidproquo-core';
+import * as aws_neptune from '@aws-cdk/aws-neptune-alpha';
+
+import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
 export interface QpqCoreApiGraphDatabaseConstructProps extends QpqConstructBlockProps {
   graphDatabaseConfig: GraphDatabaseQPQConfigSetting;

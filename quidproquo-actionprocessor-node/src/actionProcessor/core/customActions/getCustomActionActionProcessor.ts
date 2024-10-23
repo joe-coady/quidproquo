@@ -1,4 +1,4 @@
-import { QPQConfig, ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, qpqCoreUtils } from 'quidproquo-core';
+import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
 const getProcessCustomAction = async (qpqConfig: QPQConfig, dynamicModuleLoader: DynamicModuleLoader): Promise<ActionProcessorList> => {
   try {

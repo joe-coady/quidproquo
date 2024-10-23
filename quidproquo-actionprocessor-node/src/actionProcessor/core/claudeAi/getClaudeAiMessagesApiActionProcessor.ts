@@ -1,16 +1,15 @@
-import Anthropic, { AuthenticationError } from '@anthropic-ai/sdk';
-
 import {
-  ErrorTypeEnum,
-  ClaudeAiMessagesApiActionProcessor,
-  actionResult,
-  ClaudeAiActionType,
-  actionResultError,
-  QPQConfig,
-  ActionProcessorListResolver,
   ActionProcessorList,
+  ActionProcessorListResolver,
+  actionResult,
+  actionResultError,
+  ClaudeAiActionType,
+  ClaudeAiMessagesApiActionProcessor,
   DynamicModuleLoader,
+  ErrorTypeEnum,
+  QPQConfig,
 } from 'quidproquo-core';
+import Anthropic, { AuthenticationError } from '@anthropic-ai/sdk';
 
 const getProcessMessagesApi = (qpqConfig: QPQConfig): ClaudeAiMessagesApiActionProcessor => {
   return async ({ body, apiKey }) => {

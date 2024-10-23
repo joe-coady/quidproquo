@@ -1,5 +1,6 @@
 import { AnyEventMessage, AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
 
+import { askAuthenticateConnection } from './askAuthenticateConnection';
 import {
   askProcessOnAuthenticate,
   askProcessOnMarkLogChecked,
@@ -12,7 +13,6 @@ import {
   isWebSocketRefreshLogMetadataMessage,
   isWebSocketUnauthenticateMessage,
 } from './messageProcessors';
-import { askAuthenticateConnection } from './askAuthenticateConnection';
 
 export function* askProcessOnMessage(connectionId: string, message: AnyEventMessage): AskResponse<void> {
   if (isWebSocketAuthenticateMessage(message)) {

@@ -1,5 +1,5 @@
-import { EventGetRecordsActionRequester } from './EventGetRecordsActionTypes';
 import { EventActionType } from './EventActionType';
+import { EventGetRecordsActionRequester } from './EventGetRecordsActionTypes';
 
 export function* askEventGetRecords<EventParams extends Array<unknown>, QpqEventRecord>(
   ...eventParams: EventParams

@@ -1,5 +1,5 @@
-import { QPQBinaryData } from '../../types/QPQBinaryData';
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
+import { QPQBinaryData } from '../../types/QPQBinaryData';
 import { FileActionType, StorageDriveAdvancedWriteOptions } from './FileActionType';
 
 // Payload

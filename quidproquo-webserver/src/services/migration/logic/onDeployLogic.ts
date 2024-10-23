@@ -1,15 +1,15 @@
 import {
+  askConfigGetGlobal,
+  askQueueSendMessages,
   AskResponse,
   DeployEventStatusType,
   DeployEventType,
+  qpqCoreUtils,
   QpqFunctionRuntime,
   QueueMessage,
-  askConfigGetGlobal,
-  askQueueSendMessages,
-  qpqCoreUtils,
 } from 'quidproquo-core';
-import { Migration } from '../../../config/settings/migration';
 
+import { Migration } from '../../../config/settings/migration';
 import * as migrationInfoData from '../data/migrationInfoData';
 
 export function* askProcessOnDeployCreate(): AskResponse<void> {

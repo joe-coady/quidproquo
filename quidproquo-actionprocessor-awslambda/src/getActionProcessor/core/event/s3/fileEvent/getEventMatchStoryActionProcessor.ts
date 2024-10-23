@@ -1,11 +1,12 @@
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
+  actionResult,
   EventActionType,
   EventMatchStoryActionProcessor,
   QPQConfig,
-  actionResult,
 } from 'quidproquo-core';
+
 import { GLOBAL_STORAGE_DRIVE_RUNTIME, InternalEventRecord, MatchResult } from './types';
 
 const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProcessor<InternalEventRecord, MatchResult> => {

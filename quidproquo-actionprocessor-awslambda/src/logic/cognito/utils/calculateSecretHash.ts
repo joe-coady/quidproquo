@@ -1,4 +1,5 @@
 import { createHmac } from 'crypto';
+
 import { memoFunc } from '../../cache/memoFunc';
 
 export const calculateSecretHash = memoFunc((username: string, clientId: string, clientSecret: string) => {

@@ -1,14 +1,15 @@
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
+  actionResult,
+  actionResultError,
   EventActionType,
   EventMatchStoryActionProcessor,
   QPQConfig,
-  actionResult,
-  actionResultError,
 } from 'quidproquo-core';
-import { InternalEventRecord, MatchResult } from './types';
+
 import { LambdaRuntimeConfig } from '../../../../../runtimeConfig/QPQAWSResourceMap';
+import { InternalEventRecord, MatchResult } from './types';
 
 // TODO: Clean this shit up
 const lambdaRuntimeConfig: LambdaRuntimeConfig = JSON.parse(process.env.lambdaRuntimeConfig || '{}');

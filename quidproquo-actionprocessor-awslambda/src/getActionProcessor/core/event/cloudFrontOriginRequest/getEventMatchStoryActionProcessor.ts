@@ -1,17 +1,17 @@
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
+  actionResult,
+  actionResultError,
   ErrorTypeEnum,
   EventActionType,
   EventMatchStoryActionProcessor,
   QPQConfig,
-  actionResult,
-  actionResultError,
 } from 'quidproquo-core';
-import { InternalEventRecord, MatchResult } from './types';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { matchUrl } from '../../../../awsLambdaUtils';
+import { InternalEventRecord, MatchResult } from './types';
 
 const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProcessor<InternalEventRecord, MatchResult> => {
   const seoConfigs = qpqWebServerUtils.getAllSeo(qpqConfig);

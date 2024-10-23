@@ -1,9 +1,10 @@
 import { askConfigGetSecret, AskResponse } from 'quidproquo-core';
+
 import { CloudflareDnsDeployEvent, CloudflareDnsDeployEventEnum, CloudflareDnsDeployEventResponse } from '../../../types';
-import { askCloudflareGetZoneId } from './askCloudflareGetZoneId';
-import { askCloudflareGetDNSRecordId } from './askCloudflareGetDNSRecordId';
-import { askCloudflareDeleteDNSRecord } from './askCloudflareDeleteDNSRecord';
 import { askCloudflareAddDNSRecord } from './askCloudflareAddDNSRecord';
+import { askCloudflareDeleteDNSRecord } from './askCloudflareDeleteDNSRecord';
+import { askCloudflareGetDNSRecordId } from './askCloudflareGetDNSRecordId';
+import { askCloudflareGetZoneId } from './askCloudflareGetZoneId';
 
 export function getDnsEntryName(dnsEntryName: string, rootDomain: string) {
   // Apparently you don't need to do this...

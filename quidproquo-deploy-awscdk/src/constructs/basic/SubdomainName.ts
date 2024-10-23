@@ -1,7 +1,8 @@
-import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
-import { Construct } from 'constructs';
-import { aws_route53, aws_certificatemanager, aws_apigateway, aws_route53_targets } from 'aws-cdk-lib';
+import { aws_apigateway, aws_certificatemanager, aws_route53, aws_route53_targets } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+
+import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
 
 export interface SubdomainNameProps extends QpqConstructBlockProps {
   subdomain: string;

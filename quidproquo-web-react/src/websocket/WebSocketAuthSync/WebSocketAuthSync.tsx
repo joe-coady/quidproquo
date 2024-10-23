@@ -1,7 +1,7 @@
 import { memo } from 'react';
+import { AuthenticationInfo } from 'quidproquo-core';
 
 import { useWebsocketAuthSync, useWebsocketPingPong } from './hooks';
-import { AuthenticationInfo } from 'quidproquo-core';
 
 export type WebSocketAuthSyncProps = {
   children: React.ReactNode;

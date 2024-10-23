@@ -1,6 +1,6 @@
-import { EventResolveCaughtErrorActionRequester } from './EventResolveCaughtErrorActionTypes';
-import { EventActionType } from './EventActionType';
 import { QPQError } from '../../types';
+import { EventActionType } from './EventActionType';
+import { EventResolveCaughtErrorActionRequester } from './EventResolveCaughtErrorActionTypes';
 
 export function* askEventResolveCaughtError<TransformedEventParams>(error: QPQError): EventResolveCaughtErrorActionRequester<TransformedEventParams> {
   return yield {

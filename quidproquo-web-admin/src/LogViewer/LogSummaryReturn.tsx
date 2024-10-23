@@ -1,5 +1,6 @@
-import { Typography } from '@mui/material';
 import { StoryResult } from 'quidproquo-core';
+import { Typography } from '@mui/material';
+
 import { AnyVariableView, genericFunctionRendererStyles } from './actionComponents';
 
 interface LogSummaryReturnProps {

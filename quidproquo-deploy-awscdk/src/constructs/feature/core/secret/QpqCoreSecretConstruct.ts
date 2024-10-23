@@ -1,15 +1,13 @@
-import { SecretQPQConfigSetting, QPQConfig } from 'quidproquo-core';
-import { resolveAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-
-import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
-import { QpqResource } from '../../../base/QpqResource';
-
-import { Construct } from 'constructs';
-import { aws_secretsmanager, aws_iam } from 'aws-cdk-lib';
+import { aws_iam,aws_secretsmanager } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
+import { resolveAwsServiceAccountInfo } from 'quidproquo-config-aws';
+import { QPQConfig,SecretQPQConfigSetting } from 'quidproquo-core';
 
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
+import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
+import { QpqResource } from '../../../base/QpqResource';
 
 export interface QpqCoreSecretConstructProps extends QpqConstructBlockProps {
   secretConfig: SecretQPQConfigSetting;

@@ -1,6 +1,5 @@
-import Busboy from 'busboy';
-
 import { APIGatewayEvent } from 'aws-lambda';
+import Busboy from 'busboy';
 import { QPQBinaryData } from 'quidproquo-core';
 
 interface MultipartFile {

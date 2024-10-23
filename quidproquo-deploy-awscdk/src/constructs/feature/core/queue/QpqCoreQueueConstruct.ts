@@ -1,14 +1,12 @@
-import { QueueQPQConfigSetting, qpqCoreUtils, QPQConfig } from 'quidproquo-core';
-
-import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
+import { aws_iam,aws_sqs } from 'aws-cdk-lib';
+import * as cdk from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { getAwsAccountIds } from 'quidproquo-config-aws';
+import { QPQConfig,qpqCoreUtils, QueueQPQConfigSetting } from 'quidproquo-core';
 
 import * as qpqDeployAwsCdkUtils from '../../../../utils/qpqDeployAwsCdkUtils';
-
-import { Construct } from 'constructs';
-import { aws_sqs, aws_iam } from 'aws-cdk-lib';
-import * as cdk from 'aws-cdk-lib';
-import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
+import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
 export interface QpqCoreQueueConstructProps extends QpqConstructBlockProps {
   queueConfig: QueueQPQConfigSetting;

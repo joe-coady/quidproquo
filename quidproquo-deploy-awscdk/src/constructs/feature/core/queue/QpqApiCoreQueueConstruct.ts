@@ -1,15 +1,13 @@
-import { QueueQPQConfigSetting, qpqCoreUtils, QPQConfig } from 'quidproquo-core';
+import { aws_lambda, aws_lambda_event_sources, aws_sns, aws_sns_subscriptions } from 'aws-cdk-lib';
+import * as cdk from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { getAwsServiceAccountInfoByDeploymentInfo } from 'quidproquo-config-aws';
+import { QPQConfig,qpqCoreUtils, QueueQPQConfigSetting } from 'quidproquo-core';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
-import { QpqCoreQueueConstruct } from './QpqCoreQueueConstruct';
-import { QpqCoreEventBusConstruct } from '../eventBus/QpqCoreEventBusConstruct';
-
 import { Function } from '../../../basic/Function';
-
-import { Construct } from 'constructs';
-import { aws_lambda_event_sources, aws_lambda, aws_sns, aws_sns_subscriptions } from 'aws-cdk-lib';
-import * as cdk from 'aws-cdk-lib';
-import { getAwsServiceAccountInfoByDeploymentInfo } from 'quidproquo-config-aws';
+import { QpqCoreEventBusConstruct } from '../eventBus/QpqCoreEventBusConstruct';
+import { QpqCoreQueueConstruct } from './QpqCoreQueueConstruct';
 
 export interface QpqApiCoreQueueConstructProps extends QpqConstructBlockProps {
   queueConfig: QueueQPQConfigSetting;

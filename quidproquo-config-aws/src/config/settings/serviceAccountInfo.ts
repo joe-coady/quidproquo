@@ -1,7 +1,6 @@
-import { QPQConfigSetting, QPQConfigAdvancedSettings } from 'quidproquo-core';
+import { QPQConfigAdvancedSettings,QPQConfigSetting } from 'quidproquo-core';
 
-import { ServiceAccountInfo, ApiLayer } from '../../types';
-
+import { ApiLayer,ServiceAccountInfo } from '../../types';
 import { QPQAwsConfigSettingType } from '../QPQConfig';
 
 export interface QPQConfigAdvancedAwsServiceAccountInfoSettings extends QPQConfigAdvancedSettings {

@@ -1,4 +1,5 @@
 import { ApiGatewayManagementApiClient, PostToConnectionCommand } from '@aws-sdk/client-apigatewaymanagementapi';
+
 import { createAwsClient } from '../createAwsClient';
 
 export const sendMessageToWebSocketConnection = async (apiId: string, connectionId: string, region: string, payload: any): Promise<void> => {

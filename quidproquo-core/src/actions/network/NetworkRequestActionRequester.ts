@@ -1,5 +1,5 @@
+import { HTTPMethod, HTTPRequestOptions,NetworkActionType } from './NetworkActionType';
 import { NetworkRequestActionRequester } from './NetworkRequestActionTypes';
-import { NetworkActionType, HTTPMethod, HTTPRequestOptions } from './NetworkActionType';
 
 export function* askNetworkRequest<T, R>(
   method: HTTPMethod,

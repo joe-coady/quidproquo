@@ -1,12 +1,12 @@
 import {
-  UserDirectoryReadAccessTokenActionProcessor,
+  ActionProcessorList,
+  ActionProcessorListResolver,
   actionResult,
-  QPQConfig,
-  UserDirectoryActionType,
   actionResultError,
   ErrorTypeEnum,
-  ActionProcessorListResolver,
-  ActionProcessorList,
+  QPQConfig,
+  UserDirectoryActionType,
+  UserDirectoryReadAccessTokenActionProcessor,
 } from 'quidproquo-core';
 
 import { decodeAccessToken } from '../../../logic/cognito/decodeAccessToken';

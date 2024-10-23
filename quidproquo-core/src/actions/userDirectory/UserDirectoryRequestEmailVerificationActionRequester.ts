@@ -1,5 +1,5 @@
-import { UserDirectoryRequestEmailVerificationActionRequester } from './UserDirectoryRequestEmailVerificationActionTypes';
 import { UserDirectoryActionType } from './UserDirectoryActionType';
+import { UserDirectoryRequestEmailVerificationActionRequester } from './UserDirectoryRequestEmailVerificationActionTypes';
 
 export function* askUserDirectoryRequestEmailVerification(
   userDirectoryName: string,

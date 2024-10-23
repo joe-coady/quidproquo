@@ -1,10 +1,10 @@
+import { aws_iam } from 'aws-cdk-lib';
+import { IGrantable, IRole } from 'aws-cdk-lib/aws-iam';
+import { Construct } from 'constructs';
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { QPQConfig } from 'quidproquo-core';
-import { Construct } from 'constructs';
 
 import { QpqResource } from './QpqResource';
-import { IGrantable, IRole } from 'aws-cdk-lib/aws-iam';
-import { aws_iam } from 'aws-cdk-lib';
 
 export interface QpqConstructBlockProps {
   awsAccountId: string;

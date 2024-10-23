@@ -1,5 +1,5 @@
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
-import { NetworkActionType, HTTPNetworkResponse, HTTPMethod, ResponseType } from './NetworkActionType';
+import { HTTPMethod, HTTPNetworkResponse, NetworkActionType, ResponseType } from './NetworkActionType';
 
 // Payload
 export interface NetworkRequestActionPayload<T> {

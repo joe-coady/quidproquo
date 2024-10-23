@@ -1,6 +1,5 @@
 import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 import { KeyValueStoreUpdateActionRequester, KeyValueStoreUpdateOptions } from './KeyValueStoreUpdateActionTypes';
-
 import { KvsCoreDataType, KvsUpdate } from './types';
 
 export function* askKeyValueStoreUpdate<Value>(

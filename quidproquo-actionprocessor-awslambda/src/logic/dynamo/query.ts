@@ -1,12 +1,11 @@
+import { KvsQueryOperation, QpqPagedData } from 'quidproquo-core';
 import { DynamoDBClient, QueryCommand, QueryCommandInput } from '@aws-sdk/client-dynamodb';
 
-import { KvsQueryOperation, QpqPagedData } from 'quidproquo-core';
+import { createAwsClient } from '../createAwsClient';
+import { itemsToQpqPagedData } from './utils/itemsToQpqPagedData';
 import { convertDynamoMapToObject } from './convertObjectToDynamoMap';
 import { stringToLastEvaluatedKey } from './logs';
-import { itemsToQpqPagedData } from './utils/itemsToQpqPagedData';
-
-import { buildExpressionAttributeValues, buildExpressionAttributeNames, buildDynamoQueryExpression } from './qpqDynamoOrm';
-import { createAwsClient } from '../createAwsClient';
+import { buildDynamoQueryExpression,buildExpressionAttributeNames, buildExpressionAttributeValues } from './qpqDynamoOrm';
 
 export async function query<Item>(
   tableName: string,

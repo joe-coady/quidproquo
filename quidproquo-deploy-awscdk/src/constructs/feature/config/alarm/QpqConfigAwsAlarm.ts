@@ -1,10 +1,9 @@
-import { aws_cloudwatch, aws_sns, aws_cloudwatch_actions } from 'aws-cdk-lib';
-import { Construct } from 'constructs';
+import { aws_cloudwatch, aws_cloudwatch_actions,aws_sns } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { AwsAlarmNamespace, AwsAlarmOperator, AwsAlarmQPQConfigSetting } from 'quidproquo-config-aws';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
-
-import { AwsAlarmNamespace, AwsAlarmOperator, AwsAlarmQPQConfigSetting } from 'quidproquo-config-aws';
 import { QpqCoreEventBusConstruct } from '../../core';
 
 export interface QpqConfigAwsAlarmConstructProps extends QpqConstructBlockProps {

@@ -1,11 +1,11 @@
 import {
-  UserDirectoryChangePasswordActionProcessor,
+  ActionProcessorList,
+  ActionProcessorListResolver,
   actionResult,
   QPQConfig,
   qpqCoreUtils,
   UserDirectoryActionType,
-  ActionProcessorList,
-  ActionProcessorListResolver,
+  UserDirectoryChangePasswordActionProcessor,
 } from 'quidproquo-core';
 
 import { changePassword } from '../../../logic/cognito/changePassword';

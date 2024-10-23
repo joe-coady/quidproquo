@@ -1,14 +1,14 @@
+import { SQSBatchItemFailure } from 'aws-lambda';
 import {
-  EventActionType,
-  QPQConfig,
-  EventTransformResponseResultActionProcessor,
-  actionResult,
-  ActionProcessorListResolver,
   ActionProcessorList,
+  ActionProcessorListResolver,
+  actionResult,
+  EventActionType,
+  EventTransformResponseResultActionProcessor,
+  QPQConfig,
 } from 'quidproquo-core';
 
 import { EventInput, EventOutput, InternalEventOutput, InternalEventRecord } from './types';
-import { SQSBatchItemFailure } from 'aws-lambda';
 
 const getProcessTransformResponseResult = (
   qpqConfig: QPQConfig,

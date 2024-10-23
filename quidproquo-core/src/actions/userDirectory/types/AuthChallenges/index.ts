@@ -1,3 +1,3 @@
 export * from './AuthChallengeBase';
-export * from './AuthenticateUserNewPasswordRequiredChallenge';
 export * from './AuthenticateUserCustomChallengeChallenge';
+export * from './AuthenticateUserNewPasswordRequiredChallenge';

@@ -1,11 +1,10 @@
+import { Construct } from 'constructs';
 import { qpqCoreUtils } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
-import { Construct } from 'constructs';
-import { QpqServiceStack, QpqServiceStackProps } from './base/QpqServiceStack';
-
 import { BootstrapQpqCoreVirtualNetworkConstruct, BootstrapQpqWebserverApiConstruct } from '../constructs';
 import { BSQpqLambdaWarmerEventConstructConstruct } from '../constructs/basic/BSQpqLambdaWarmerEventConstruct';
+import { QpqServiceStack, QpqServiceStackProps } from './base/QpqServiceStack';
 
 export interface BootstrapQpqServiceStackProps extends QpqServiceStackProps {}
 

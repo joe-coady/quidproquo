@@ -1,14 +1,11 @@
+import { aws_iam,aws_sns } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
+import { getAwsAccountIds } from 'quidproquo-config-aws';
 import { EventBusQPQConfigSetting, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
-import { getAwsAccountIds } from 'quidproquo-config-aws';
-
-import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
-
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
-
-import { Construct } from 'constructs';
-import { aws_sns, aws_iam } from 'aws-cdk-lib';
+import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
 export interface QpqCoreEventBusConstructProps extends QpqConstructBlockProps {
   eventBusConfig: EventBusQPQConfigSetting;

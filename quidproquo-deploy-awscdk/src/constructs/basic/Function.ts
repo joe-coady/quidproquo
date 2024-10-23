@@ -1,14 +1,12 @@
-import path from 'path';
-
-import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
-import { Construct } from 'constructs';
-import { aws_lambda, aws_logs, aws_sns, aws_iam, aws_sns_subscriptions, aws_ec2 } from 'aws-cdk-lib';
+import { aws_ec2,aws_iam, aws_lambda, aws_logs, aws_sns, aws_sns_subscriptions } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
-
+import { Construct } from 'constructs';
+import path from 'path';
 import { getAwsServiceAccountInfoConfig } from 'quidproquo-config-aws';
+import { qpqCoreUtils } from 'quidproquo-core';
 
 import { BootstrapResource } from '../../constants';
-import { qpqCoreUtils } from 'quidproquo-core';
+import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
 
 export interface FunctionProps extends QpqConstructBlockProps {
   functionName?: string;

@@ -7,11 +7,9 @@ import {
   QPQConfig,
   qpqCoreUtils,
 } from 'quidproquo-core';
-
-import { WebsocketSendMessageActionProcessor, WebsocketActionType, WebsocketSendMessageErrorTypeEnum } from 'quidproquo-webserver';
+import { WebsocketActionType, WebsocketSendMessageActionProcessor, WebsocketSendMessageErrorTypeEnum } from 'quidproquo-webserver';
 
 import { getCFExportNameWebsocketApiIdFromConfig } from '../../../awsNamingUtils';
-
 import { sendMessageToWebSocketConnection } from '../../../logic/apiGateway/websocketSendMessage';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 

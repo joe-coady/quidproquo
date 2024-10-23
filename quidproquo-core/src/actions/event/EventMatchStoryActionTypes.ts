@@ -1,5 +1,5 @@
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
-import { EventActionType, AnyMatchStoryResult } from './EventActionType';
+import { AnyMatchStoryResult,EventActionType } from './EventActionType';
 
 // Payload
 export interface EventMatchStoryActionPayload<QpqEventRecord> {

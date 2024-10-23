@@ -1,7 +1,7 @@
 import { ContextActionType, QpqContext } from 'quidproquo-core';
 
-import { ServiceFunctionExecuteActionRequester } from './ServiceFunctionExecuteActionTypes';
 import { ServiceFunctionActionType } from './ServiceFunctionActionType';
+import { ServiceFunctionExecuteActionRequester } from './ServiceFunctionExecuteActionTypes';
 
 export function* askServiceFunctionExecute<R, T>(
   service: string,

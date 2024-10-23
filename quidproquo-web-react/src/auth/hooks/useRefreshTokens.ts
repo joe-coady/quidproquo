@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+
 import { AuthState } from '../types';
 
 export const useRefreshTokens = (authState: AuthState, refreshTokens: (authState: AuthState) => void) => {

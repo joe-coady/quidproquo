@@ -1,4 +1,5 @@
 import { createErrorEnumForAction } from 'quidproquo-core';
+
 import { GraphDatabaseForNeptuneActionType } from './GraphDatabaseForNeptuneActionType';
 import { GraphDatabaseForNeptuneGetEndpointsActionRequester } from './GraphDatabaseForNeptuneGetEndpointsActionTypes';
 

@@ -1,5 +1,5 @@
-import { DataGrid as MuiDataGrid, GridColDef, GridValueGetterParams, GridRenderCellParams } from '@mui/x-data-grid';
 import { Box } from '@mui/material';
+import { DataGrid as MuiDataGrid, GridColDef, GridRenderCellParams,GridValueGetterParams } from '@mui/x-data-grid';
 
 export type DataGridColumDefinitions<T extends object> = {
   headerName: string;

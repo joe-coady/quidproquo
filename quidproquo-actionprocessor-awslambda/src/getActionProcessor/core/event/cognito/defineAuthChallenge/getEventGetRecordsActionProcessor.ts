@@ -1,16 +1,15 @@
 import {
-  EventActionType,
-  QPQConfig,
-  actionResult,
-  EventGetRecordsActionProcessor,
-  ActionProcessorListResolver,
   ActionProcessorList,
+  ActionProcessorListResolver,
+  actionResult,
+  EventActionType,
+  EventGetRecordsActionProcessor,
+  QPQConfig,
 } from 'quidproquo-core';
-
-import { EventInput, InternalEventRecord } from './types';
 
 import { getQpqAttributesFromCognitoStringMap } from '../../../../../logic/cognito/cognitoAttributeMap';
 import { getChallengeSessionFromCognitoTriggerEventSession } from '../utils';
+import { EventInput, InternalEventRecord } from './types';
 
 const getProcessGetRecords = (qpqConfig: QPQConfig): EventGetRecordsActionProcessor<EventInput, InternalEventRecord> => {
   return async ({ eventParams: [event, context] }) => {

@@ -1,4 +1,4 @@
-import { EventBridgeEvent, Context } from 'aws-lambda';
+import { Context,EventBridgeEvent } from 'aws-lambda';
 import { DeployEvent, DeployEventResponse, MatchStoryResult } from 'quidproquo-core';
 
 interface CloudFormationEventDetail {

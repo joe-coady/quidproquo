@@ -1,15 +1,14 @@
+import { KvsCoreDataType,KvsUpdate } from 'quidproquo-core';
 import { DynamoDBClient, ReturnValue, UpdateItemCommand, UpdateItemCommandInput } from '@aws-sdk/client-dynamodb';
 
-import { KvsUpdate, KvsCoreDataType } from 'quidproquo-core';
-
+import { createAwsClient } from '../createAwsClient';
+import { convertDynamoMapToObject } from './convertObjectToDynamoMap';
 import {
   buildAttributeValue,
   buildDynamoUpdateExpression,
   buildUpdateExpressionAttributeNames,
   buildUpdateExpressionAttributeValues,
 } from './qpqDynamoOrm';
-import { createAwsClient } from '../createAwsClient';
-import { convertDynamoMapToObject } from './convertObjectToDynamoMap';
 
 export async function updateItem<Item>(
   tableName: string,

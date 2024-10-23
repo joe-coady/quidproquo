@@ -1,8 +1,7 @@
 // import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 
 import path from 'path';
-
-import { qpqCoreUtils, QPQConfig } from 'quidproquo-core';
+import { QPQConfig,qpqCoreUtils } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 type WebpackBuildMode = 'none' | 'development' | 'production';
@@ -35,5 +34,5 @@ export const setupWebpackQPQRuntime = (qpqConfig: QPQConfig, buildPath: string):
 
 export const getResolveLoaderModules = () => [path.resolve(__dirname, 'loaders'), 'node_modules'];
 
-export * from './plugins';
 export * from './getWebpackConfigForQpq';
+export * from './plugins';

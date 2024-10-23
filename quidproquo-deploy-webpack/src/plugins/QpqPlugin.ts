@@ -1,6 +1,7 @@
 import { QPQConfig } from 'quidproquo-core';
 import { Compiler, WebpackPluginInstance } from 'webpack';
 import VirtualModulesPlugin from 'webpack-virtual-modules';
+
 import { getQpqDyanmicLoaderSrcFromQpqConfigs } from './getQpqDyanmicLoaderSrcFromQpqConfigs';
 
 interface QpqPluginOptions {

@@ -1,9 +1,8 @@
+import { Construct } from 'constructs';
 import { CertificateQPQWebServerConfigSetting } from 'quidproquo-webserver';
 
-import { DnsValidatedCertificate } from '../../../basic/DnsValidatedCertificate';
-
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
-import { Construct } from 'constructs';
+import { DnsValidatedCertificate } from '../../../basic/DnsValidatedCertificate';
 
 export interface QpqWebserverCertificateConstructProps extends QpqConstructBlockProps {
   certificateConfig: CertificateQPQWebServerConfigSetting;

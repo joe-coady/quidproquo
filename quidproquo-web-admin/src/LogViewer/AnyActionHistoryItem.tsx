@@ -1,15 +1,14 @@
-import { ActionHistory } from 'quidproquo-core';
-
-import { Typography, IconButton, Box, Tooltip } from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import HistoryIcon from '@mui/icons-material/History';
 import { useState } from 'react';
+import { ActionHistory } from 'quidproquo-core';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import HistoryIcon from '@mui/icons-material/History';
+import { Box, IconButton, Tooltip,Typography } from '@mui/material';
 
-import { ActionHistoryItem } from './ActionHistoryItem';
+import customActionsMap from './actionComponents/customActionsMap';
 import actionComponentMap from './logic/actionComponentMap';
 import { getGenericActionRenderer } from './actionComponents';
-import customActionsMap from './actionComponents/customActionsMap';
+import { ActionHistoryItem } from './ActionHistoryItem';
 
 interface AnyActionHistoryItemProps {
   historyItem: ActionHistory;

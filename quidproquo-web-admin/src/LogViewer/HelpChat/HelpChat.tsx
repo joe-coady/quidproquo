@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Box, TextField, Button, Avatar, Typography, Paper, CircularProgress } from '@mui/material';
-import { Person as PersonIcon, Android as AndroidIcon } from '@mui/icons-material';
-import { useAuthAccessToken, useBaseUrlResolvers } from 'quidproquo-web-react';
-import { apiRequestPost } from '../../logic';
-import { LogChatMessage, SendLogChatMessage, ListLogChatMessages } from '../../types';
+import React, { useEffect, useRef,useState } from 'react';
 import { QpqPagedData } from 'quidproquo-core';
+import { useAuthAccessToken, useBaseUrlResolvers } from 'quidproquo-web-react';
 import Markdown from 'react-markdown';
+import { Android as AndroidIcon,Person as PersonIcon } from '@mui/icons-material';
+import { Avatar, Box, Button, CircularProgress,Paper, TextField, Typography } from '@mui/material';
+
+import { apiRequestPost } from '../../logic';
+import { ListLogChatMessages,LogChatMessage, SendLogChatMessage } from '../../types';
 
 interface HelpChatProps {
   logCorrelation: string;

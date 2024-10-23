@@ -1,4 +1,5 @@
-import { S3Client, PutObjectCommand, StorageClass } from '@aws-sdk/client-s3';
+import { PutObjectCommand, S3Client, StorageClass } from '@aws-sdk/client-s3';
+
 import { createAwsClient } from '../createAwsClient';
 
 export const writeTextFile = async (

@@ -1,7 +1,6 @@
 import { AnyAuthChallenge } from './types';
-
-import { UserDirectoryRespondToAuthChallengeActionRequester } from './UserDirectoryRespondToAuthChallengeActionTypes';
 import { UserDirectoryActionType } from './UserDirectoryActionType';
+import { UserDirectoryRespondToAuthChallengeActionRequester } from './UserDirectoryRespondToAuthChallengeActionTypes';
 
 export function* askUserDirectoryRespondToAuthChallenge(
   userDirectoryName: string,

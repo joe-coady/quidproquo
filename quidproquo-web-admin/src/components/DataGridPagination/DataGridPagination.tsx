@@ -1,6 +1,5 @@
-import { gridPageCountSelector, gridPageSelector, useGridApiContext, useGridSelector } from '@mui/x-data-grid';
-
 import Pagination from '@mui/material/Pagination';
+import { gridPageCountSelector, gridPageSelector, useGridApiContext, useGridSelector } from '@mui/x-data-grid';
 
 export function DataGridPagination() {
   const apiRef = useGridApiContext();

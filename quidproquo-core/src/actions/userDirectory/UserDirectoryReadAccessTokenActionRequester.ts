@@ -1,5 +1,5 @@
-import { UserDirectoryReadAccessTokenActionRequester } from './UserDirectoryReadAccessTokenActionTypes';
 import { UserDirectoryActionType } from './UserDirectoryActionType';
+import { UserDirectoryReadAccessTokenActionRequester } from './UserDirectoryReadAccessTokenActionTypes';
 
 export function* askUserDirectoryReadAccessToken(userDirectoryName: string, ignoreExpiration: boolean): UserDirectoryReadAccessTokenActionRequester {
   return yield {

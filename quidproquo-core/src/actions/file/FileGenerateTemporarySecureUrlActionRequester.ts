@@ -1,5 +1,5 @@
-import { FileGenerateTemporarySecureUrlActionRequester } from './FileGenerateTemporarySecureUrlActionTypes';
 import { FileActionType } from './FileActionType';
+import { FileGenerateTemporarySecureUrlActionRequester } from './FileGenerateTemporarySecureUrlActionTypes';
 
 export function* askFileGenerateTemporarySecureUrl(
   drive: string,

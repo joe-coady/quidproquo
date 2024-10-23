@@ -1,7 +1,7 @@
 import { AnyEventMessage, AskResponse } from 'quidproquo-core';
-import { WebsocketEvent } from '../../../../types';
 
 import { askWebsocketProvideConnectionInfo } from '../../../../context';
+import { WebsocketEvent } from '../../../../types';
 import { webSocketLogic } from '../../logic';
 
 export function* onConnect(event: WebsocketEvent): AskResponse<void> {

@@ -1,23 +1,22 @@
+import { Construct } from 'constructs';
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import { qpqCoreUtils } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
-import { Construct } from 'constructs';
-import { QpqServiceStack, QpqServiceStackProps } from './base/QpqServiceStack';
-
-import { InfQpqServiceStack } from './InfQpqServiceStack';
 import {
-  LambdaLayers,
-  QpqCoreRecurringScheduleConstruct,
   ApiQpqWebserverApiConstruct,
+  LambdaLayers,
   QpqApiCoreQueueConstruct,
-  QpqWebserverSubdomainRedirectConstruct,
-  QpqWebserverServiceFunctionConstruct,
-  QpqApiWebserverWebsocketConstruct,
-  QpqCoreDeployEventConstruct,
   QpqApiCoreStorageDriveConstruct,
+  QpqApiWebserverWebsocketConstruct,
   QpqConfigAwsAlarmConstruct,
+  QpqCoreDeployEventConstruct,
+  QpqCoreRecurringScheduleConstruct,
+  QpqWebserverServiceFunctionConstruct,
+  QpqWebserverSubdomainRedirectConstruct,
 } from '../constructs';
-import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
+import { QpqServiceStack, QpqServiceStackProps } from './base/QpqServiceStack';
+import { InfQpqServiceStack } from './InfQpqServiceStack';
 
 export interface ApiQpqServiceStackProps extends QpqServiceStackProps {
   infQpqServiceStack?: InfQpqServiceStack;

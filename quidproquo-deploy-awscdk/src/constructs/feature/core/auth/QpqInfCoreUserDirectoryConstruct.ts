@@ -1,18 +1,15 @@
-import { AuthDirectoryFederatedProviderType, QPQConfig, UserDirectoryQPQConfigSetting, qpqCoreUtils } from 'quidproquo-core';
-import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-
-import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
-import { QpqResource } from '../../../base/QpqResource';
-
-import { Construct } from 'constructs';
-import { aws_iam, aws_cognito, aws_lambda, aws_route53, aws_route53_targets } from 'aws-cdk-lib';
+import { aws_cognito, aws_iam, aws_lambda, aws_route53, aws_route53_targets } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
+import { resolveAwsServiceAccountInfo } from 'quidproquo-config-aws';
+import { AuthDirectoryFederatedProviderType, QPQConfig, qpqCoreUtils,UserDirectoryQPQConfigSetting } from 'quidproquo-core';
 
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
-
-import { Function } from '../../../basic/Function';
-import { resolveAwsServiceAccountInfo } from 'quidproquo-config-aws';
+import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
+import { QpqResource } from '../../../base/QpqResource';
 import { DnsValidatedCertificate } from '../../../basic/DnsValidatedCertificate';
+import { Function } from '../../../basic/Function';
 
 export interface QpqInfCoreUserDirectoryConstructProps extends QpqConstructBlockProps {
   userDirectoryConfig: UserDirectoryQPQConfigSetting;

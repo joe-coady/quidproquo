@@ -1,9 +1,8 @@
+import { VerifyAuthChallengeResponseTriggerEvent } from 'aws-lambda';
 import { DynamicModuleLoader, QPQConfig, QpqRuntimeType } from 'quidproquo-core';
 
-import { VerifyAuthChallengeResponseTriggerEvent } from 'aws-lambda';
-
-import { getQpqLambdaRuntimeForEvent } from './helpers/getQpqLambdaRuntimeForEvent';
 import { getCognitoVerifyAuthChallengeEventProcessor } from '../getActionProcessor';
+import { getQpqLambdaRuntimeForEvent } from './helpers/getQpqLambdaRuntimeForEvent';
 
 export const getCustomMessageTriggerEvent_verifyAuthChallenge = (dynamicModuleLoader: DynamicModuleLoader, qpqConfig: QPQConfig) =>
   getQpqLambdaRuntimeForEvent<VerifyAuthChallengeResponseTriggerEvent>(

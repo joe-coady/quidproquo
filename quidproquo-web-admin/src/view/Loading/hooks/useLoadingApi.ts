@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 
-import { LoadingApi } from '../types';
 import { LoadingApiContext } from '../private';
+import { LoadingApi } from '../types';
 
 export const useLoadingApi = (): LoadingApi => {
   const loadingApi = useContext(LoadingApiContext);

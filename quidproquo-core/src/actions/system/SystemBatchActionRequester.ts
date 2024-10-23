@@ -1,6 +1,6 @@
+import { Action } from '../../types/Action';
 import { SystemActionType } from './SystemActionType';
 import { SystemBatchActionRequester } from './SystemBatchActionTypes';
-import { Action } from '../../types/Action';
 
 // TODO: Make typings better
 export function* askBatch<TReturn extends Array<any> = any[]>(actions: Action<any>[]): SystemBatchActionRequester<TReturn> {

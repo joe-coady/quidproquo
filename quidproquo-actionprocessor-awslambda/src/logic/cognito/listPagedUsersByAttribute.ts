@@ -1,11 +1,9 @@
-import { UserAttributes, QpqPagedData } from 'quidproquo-core';
-
+import { QpqPagedData,UserAttributes } from 'quidproquo-core';
 import { CognitoIdentityProviderClient, ListUsersCommand, ListUsersResponse } from '@aws-sdk/client-cognito-identity-provider';
 
-import { getQpqAttributesFromCognitoUserAttributes } from './cognitoAttributeMap';
-
-import { pageKeyToPaginationToken, paginationTokenToPageKey } from './utils';
 import { createAwsClient } from '../createAwsClient';
+import { getQpqAttributesFromCognitoUserAttributes } from './cognitoAttributeMap';
+import { pageKeyToPaginationToken, paginationTokenToPageKey } from './utils';
 
 export const listPagedUsersByAttribute = async (
   userPoolId: string,

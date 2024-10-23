@@ -1,8 +1,8 @@
+import { DynamicModuleLoader, QPQConfig, QpqRuntimeType, StorySession } from 'quidproquo-core';
 import { ExecuteServiceFunctionEvent } from 'quidproquo-webserver';
 
-import { DynamicModuleLoader, QPQConfig, QpqRuntimeType, StorySession } from 'quidproquo-core';
-import { getQpqLambdaRuntimeForEvent } from './helpers/getQpqLambdaRuntimeForEvent';
 import { getLambdaServiceFunctionEventProcessor } from '../getActionProcessor';
+import { getQpqLambdaRuntimeForEvent } from './helpers/getQpqLambdaRuntimeForEvent';
 
 // TODO: Unify this once the lambda code moves from CDK to awslambda
 type AnyExecuteServiceFunctionEventWithSession = ExecuteServiceFunctionEvent<any[]> & {

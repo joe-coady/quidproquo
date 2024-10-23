@@ -1,14 +1,15 @@
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
+  actionResult,
+  actionResultError,
   ErrorTypeEnum,
   EventActionType,
   EventMatchStoryActionProcessor,
   QPQConfig,
-  actionResult,
-  actionResultError,
   qpqCoreUtils,
 } from 'quidproquo-core';
+
 import { InternalEventRecord, MatchResult } from './types';
 
 // TODO: Globals? Are these bad....

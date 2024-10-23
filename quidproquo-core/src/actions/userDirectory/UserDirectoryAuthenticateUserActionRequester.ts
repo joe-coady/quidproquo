@@ -1,6 +1,6 @@
-import { UserDirectoryAuthenticateUserActionRequester, AuthenticateUserRequest } from './UserDirectoryAuthenticateUserActionTypes';
-import { UserDirectoryActionType } from './UserDirectoryActionType';
 import { createErrorEnumForAction } from '../../types';
+import { UserDirectoryActionType } from './UserDirectoryActionType';
+import { AuthenticateUserRequest,UserDirectoryAuthenticateUserActionRequester } from './UserDirectoryAuthenticateUserActionTypes';
 
 export const UserDirectoryAuthenticateUserErrorTypeEnum = createErrorEnumForAction(UserDirectoryActionType.AuthenticateUser, [
   'UserNotFound',

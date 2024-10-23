@@ -1,11 +1,11 @@
-import { ActionProcessorList, ActionProcessorListResolver, QPQConfig, DynamicModuleLoader } from 'quidproquo-core';
-import { getCoreActionProcessor as getAwsCoreActionProcessor } from './core';
-import { getWebserverActionProcessor as getAwsWebserverActionProcessor } from './webserver';
-
 import {
   getCoreActionProcessor as getNodeCoreActionProcessor,
   getWebserverActionProcessor as getNodeWebserverActionProcessor,
 } from 'quidproquo-actionprocessor-node';
+import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader,QPQConfig } from 'quidproquo-core';
+
+import { getCoreActionProcessor as getAwsCoreActionProcessor } from './core';
+import { getWebserverActionProcessor as getAwsWebserverActionProcessor } from './webserver';
 
 export const getAwsActionProcessors: ActionProcessorListResolver = async (
   qpqConfig: QPQConfig,

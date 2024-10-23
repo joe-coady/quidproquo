@@ -1,5 +1,5 @@
-import { MathActionType } from './MathActionType';
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
+import { MathActionType } from './MathActionType';
 
 // Payload
 export interface MathRandomNumberActionPayload {}

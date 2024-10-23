@@ -1,7 +1,8 @@
 import { HTTPNetworkResponse, NetworkRequestActionPayload } from 'quidproquo-core';
 import { preformNetworkRequest } from 'quidproquo-web';
-import { useFastCallback } from '../../hooks';
+
 import { useAuthAccessToken } from '../../auth';
+import { useFastCallback } from '../../hooks';
 
 export const useAuthenticatedNetworkRequest = <R>(payload: NetworkRequestActionPayload<any>): (() => Promise<HTTPNetworkResponse<R>>) => {
   const authToken = useAuthAccessToken();

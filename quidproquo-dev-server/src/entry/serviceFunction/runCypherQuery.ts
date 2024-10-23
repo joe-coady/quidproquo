@@ -1,8 +1,8 @@
 import {
+  askGraphDatabaseExecuteOpenCypherQuery,
   AskResponse,
   GraphCypherResponse,
   GraphDatabaseExecuteOpenCypherQueryActionPayload,
-  askGraphDatabaseExecuteOpenCypherQuery,
 } from 'quidproquo-core';
 import { ExecuteServiceFunctionEvent } from 'quidproquo-webserver';
 

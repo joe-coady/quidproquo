@@ -1,10 +1,9 @@
 import { ReactNode, useState } from 'react';
-
+import LockIcon from '@mui/icons-material/Lock';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import LockIcon from '@mui/icons-material/Lock';
 
 import { AsyncButton } from '../components';
 import { AuthState } from '../types';

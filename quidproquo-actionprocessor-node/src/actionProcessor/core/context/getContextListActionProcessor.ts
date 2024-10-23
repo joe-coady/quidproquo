@@ -1,10 +1,10 @@
 import {
-  QPQConfig,
+  ActionProcessorList,
+  ActionProcessorListResolver,
   actionResult,
   ContextActionType,
   ContextListActionProcessor,
-  ActionProcessorListResolver,
-  ActionProcessorList,
+  QPQConfig,
 } from 'quidproquo-core';
 
 const getProcessContextList = (qpqConfig: QPQConfig): ContextListActionProcessor => {

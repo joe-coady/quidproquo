@@ -1,9 +1,9 @@
 import {
-  QPQConfigSetting,
-  QPQConfigAdvancedSettings,
   CrossModuleOwner,
-  FullyQualifiedResource,
   CustomFullyQualifiedResource,
+  FullyQualifiedResource,
+  QPQConfigAdvancedSettings,
+  QPQConfigSetting,
   qpqCoreUtils,
 } from 'quidproquo-core';
 

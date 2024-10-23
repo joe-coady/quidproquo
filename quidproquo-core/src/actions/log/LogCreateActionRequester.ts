@@ -1,6 +1,6 @@
-import { LogCreateActionRequester } from './LogCreateActionTypes';
-import { LogActionType } from './LogActionType';
 import { LogLevelEnum } from '../../types/LogLevelEnum';
+import { LogActionType } from './LogActionType';
+import { LogCreateActionRequester } from './LogCreateActionTypes';
 
 export function* askLogCreate(logLevel: LogLevelEnum, msg: string, data?: any): LogCreateActionRequester {
   return yield {

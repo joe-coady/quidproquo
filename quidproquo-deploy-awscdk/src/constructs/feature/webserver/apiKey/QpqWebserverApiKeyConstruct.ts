@@ -1,12 +1,10 @@
 import { aws_apigateway, aws_lambda } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-
+import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { ApiKeyQPQWebServerConfigSetting, qpqWebServerUtils } from 'quidproquo-webserver';
 
-import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
-
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
-import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
+import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
 export interface QpqWebserverApiKeyConstructProps extends QpqConstructBlockProps {
   apiKeyConfig: ApiKeyQPQWebServerConfigSetting;

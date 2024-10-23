@@ -1,4 +1,5 @@
 import { AskResponse, GraphEntityType, GraphRelationshipResult } from 'quidproquo-core';
+
 import { NeptuneRelationshipResult } from '../types';
 
 export function* askConvertNeptuneRelationshipResultToGraphRelationshipResult(

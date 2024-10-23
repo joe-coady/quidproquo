@@ -1,4 +1,4 @@
-import { QPQConfigSetting, QPQConfigAdvancedSettings, QpqFunctionRuntime, qpqCoreUtils } from 'quidproquo-core';
+import { QPQConfigAdvancedSettings, QPQConfigSetting, qpqCoreUtils,QpqFunctionRuntime } from 'quidproquo-core';
 
 import { QPQWebServerConfigSettingType } from '../QPQConfig';
 

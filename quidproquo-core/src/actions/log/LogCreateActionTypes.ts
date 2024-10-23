@@ -1,6 +1,6 @@
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
-import { LogActionType } from './LogActionType';
 import { LogLevelEnum } from '../../types/LogLevelEnum';
+import { LogActionType } from './LogActionType';
 
 // Payload
 export interface LogCreateActionPayload {

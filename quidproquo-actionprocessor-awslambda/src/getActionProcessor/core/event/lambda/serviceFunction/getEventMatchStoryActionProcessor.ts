@@ -1,15 +1,16 @@
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
+  actionResult,
+  actionResultError,
   ErrorTypeEnum,
   EventActionType,
   EventMatchStoryActionProcessor,
   QPQConfig,
-  actionResult,
-  actionResultError,
 } from 'quidproquo-core';
-import { InternalEventRecord, MatchResult } from './types';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
+
+import { InternalEventRecord, MatchResult } from './types';
 
 const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProcessor<InternalEventRecord, MatchResult> => {
   const serviceFunctions = qpqWebServerUtils.getAllServiceFunctions(qpqConfig);

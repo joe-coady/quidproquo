@@ -1,7 +1,7 @@
-import { ACMClient, DescribeCertificateCommand } from '@aws-sdk/client-acm';
-import { createAwsClient } from '../createAwsClient';
-
 import { CloudflareDnsEntries } from 'quidproquo-webserver';
+import { ACMClient, DescribeCertificateCommand } from '@aws-sdk/client-acm';
+
+import { createAwsClient } from '../createAwsClient';
 
 export const getDomainValidationOptions = async (certificateArn: string, region: string): Promise<CloudflareDnsEntries> => {
   const acmClient = createAwsClient(ACMClient, {

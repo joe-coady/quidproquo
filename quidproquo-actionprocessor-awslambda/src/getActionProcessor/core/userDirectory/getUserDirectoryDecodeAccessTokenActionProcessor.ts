@@ -1,17 +1,16 @@
 import {
-  UserDirectoryDecodeAccessTokenActionProcessor,
+  ActionProcessorList,
+  ActionProcessorListResolver,
   actionResult,
+  actionResultError,
+  ErrorTypeEnum,
   QPQConfig,
   qpqCoreUtils,
   UserDirectoryActionType,
-  actionResultError,
-  ErrorTypeEnum,
-  ActionProcessorList,
-  ActionProcessorListResolver,
+  UserDirectoryDecodeAccessTokenActionProcessor,
 } from 'quidproquo-core';
 
 import { getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
-
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { decodeValidJwt } from '../../../logic/cognito/decodeValidJwt';
 

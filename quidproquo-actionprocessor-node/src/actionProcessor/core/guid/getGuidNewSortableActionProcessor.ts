@@ -1,13 +1,12 @@
-import { uuidv7 } from 'uuidv7';
-
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
+  actionResult,
   GuidActionType,
   GuidNewSortableActionProcessor,
   QPQConfig,
-  actionResult,
 } from 'quidproquo-core';
+import { uuidv7 } from 'uuidv7';
 
 const getProcessGuidNewSortable = (qpqConfig: QPQConfig): GuidNewSortableActionProcessor => {
   return async () => {

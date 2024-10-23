@@ -1,7 +1,7 @@
-import { QPQConfig, qpqCoreUtils, actionResultError, ErrorTypeEnum, ActionProcessorListResolver, ActionProcessorList } from 'quidproquo-core';
+import { ActionProcessorList,ActionProcessorListResolver, actionResultError, ErrorTypeEnum, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { actionResult, KeyValueStoreActionType,KeyValueStoreQueryActionProcessor } from 'quidproquo-core';
 
 import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
-import { KeyValueStoreQueryActionProcessor, actionResult, KeyValueStoreActionType } from 'quidproquo-core';
 import { query } from '../../../logic/dynamo';
 import { getDynamoTableIndexByConfigAndQuery } from '../../../logic/dynamo/qpqDynamoOrm';
 

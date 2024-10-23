@@ -1,13 +1,12 @@
 import { StoryResult } from 'quidproquo-core';
-import ConsoleLogViewer from './ConsoleLogViewer';
+import { Box, Table, TableBody, TableCell, TableRow, Typography } from '@mui/material';
 
 import { ActionHistoryItemTimeStamp } from './ActionHistoryItemTimeStamp';
+import { AnyActionHistoryItem } from './AnyActionHistoryItem';
+import ConsoleLogViewer from './ConsoleLogViewer';
+import { processLog } from './logic';
 import { LogSummaryDetails } from './LogSummaryDetails';
 import { LogSummaryReturn } from './LogSummaryReturn';
-
-import { Table, TableBody, TableCell, TableRow, Box, Typography } from '@mui/material';
-import { AnyActionHistoryItem } from './AnyActionHistoryItem';
-import { processLog } from './logic';
 
 interface LogDetailsProps {
   log: StoryResult<any>;

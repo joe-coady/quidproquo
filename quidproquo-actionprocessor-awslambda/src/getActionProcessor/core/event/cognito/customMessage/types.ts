@@ -1,7 +1,6 @@
-import { EmailSendEvent, EmailSendEventResponse, HTTPEvent, HTTPEventResponse } from 'quidproquo-webserver';
-
-import { CustomMessageTriggerEvent, Context } from 'aws-lambda';
+import { Context,CustomMessageTriggerEvent } from 'aws-lambda';
 import { MatchStoryResult } from 'quidproquo-core';
+import { EmailSendEvent, EmailSendEventResponse, HTTPEvent, HTTPEventResponse } from 'quidproquo-webserver';
 
 export const GLOBAL_USER_DIRECTORY_NAME = process.env.userDirectoryName!;
 

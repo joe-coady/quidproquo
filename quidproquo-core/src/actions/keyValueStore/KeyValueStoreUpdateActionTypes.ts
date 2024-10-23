@@ -1,6 +1,6 @@
-import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
-import { KvsUpdate, KvsCoreDataType } from './types';
+import { KeyValueStoreActionType } from './KeyValueStoreActionType';
+import { KvsCoreDataType,KvsUpdate } from './types';
 
 // Options Type
 export interface KeyValueStoreUpdateOptions {}

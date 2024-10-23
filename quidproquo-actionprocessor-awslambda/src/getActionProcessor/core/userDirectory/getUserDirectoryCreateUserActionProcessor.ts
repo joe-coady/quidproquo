@@ -1,17 +1,17 @@
 import {
-  UserDirectoryCreateUserActionProcessor,
+  ActionProcessorList,
+  ActionProcessorListResolver,
   actionResult,
+  AuthenticateUserResponse,
   QPQConfig,
   qpqCoreUtils,
   UserDirectoryActionType,
-  AuthenticateUserResponse,
-  ActionProcessorList,
-  ActionProcessorListResolver,
+  UserDirectoryCreateUserActionProcessor,
 } from 'quidproquo-core';
-import { getCFExportNameUserPoolIdFromConfig, getCFExportNameUserPoolClientIdFromConfig } from '../../../awsNamingUtils';
 
-import { createUser } from '../../../logic/cognito/createUser';
+import { getCFExportNameUserPoolClientIdFromConfig,getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
+import { createUser } from '../../../logic/cognito/createUser';
 
 const getProcessCreateUser = (qpqConfig: QPQConfig): UserDirectoryCreateUserActionProcessor => {
   return async (payload) => {

@@ -1,9 +1,9 @@
-import { useState, useMemo, useEffect } from 'react';
-import { SearchParams } from '../types';
-
-import { useOnSearch } from './useOnSearch';
-import { filterLogs, getOnRowClick } from '../logic';
+import { useEffect,useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+
+import { filterLogs, getOnRowClick } from '../logic';
+import { SearchParams } from '../types';
+import { useOnSearch } from './useOnSearch';
 
 declare global {
   interface Window {

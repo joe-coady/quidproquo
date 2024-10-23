@@ -1,12 +1,12 @@
 import {
-  QPQConfig,
+  ActionProcessorList,
+  ActionProcessorListResolver,
   actionResult,
+  ApplicationConfigInfo,
   ConfigActionType,
   ConfigGetApplicationInfoActionProcessor,
-  ApplicationConfigInfo,
+  QPQConfig,
   qpqCoreUtils,
-  ActionProcessorListResolver,
-  ActionProcessorList,
 } from 'quidproquo-core';
 
 const getProcessConfigGetApplicationConfig = (qpqConfig: QPQConfig): ConfigGetApplicationInfoActionProcessor => {

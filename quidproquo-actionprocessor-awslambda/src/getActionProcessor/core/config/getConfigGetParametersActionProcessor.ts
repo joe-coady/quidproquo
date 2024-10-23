@@ -1,19 +1,18 @@
 import {
+  ActionProcessorList,
+  ActionProcessorListResolver,
+  actionResult,
+  actionResultError,
+  actionResultErrorFromCaughtError,
   ConfigActionType,
   ConfigGetParametersActionProcessor,
-  actionResult,
+  ConfigGetParametersErrorTypeEnum,
   QPQConfig,
   qpqCoreUtils,
-  ActionProcessorListResolver,
-  ActionProcessorList,
-  actionResultErrorFromCaughtError,
-  actionResultError,
-  ConfigGetParametersErrorTypeEnum,
 } from 'quidproquo-core';
 
-import { resolveParameterKey } from '../../../runtimeConfig/qpqAwsLambdaRuntimeConfigUtils';
-
 import { getParameters } from '../../../logic/parametersManager/getParameters';
+import { resolveParameterKey } from '../../../runtimeConfig/qpqAwsLambdaRuntimeConfigUtils';
 
 const getProcessConfigGetParameters = (qpqConfig: QPQConfig): ConfigGetParametersActionProcessor => {
   return async ({ parameterNames }) => {

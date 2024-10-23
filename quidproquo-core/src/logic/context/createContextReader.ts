@@ -1,5 +1,5 @@
-import { AskResponse, QpqContextIdentifier } from '../../types';
 import { askContextRead } from '../../actions';
+import { AskResponse, QpqContextIdentifier } from '../../types';
 
 export function createContextReader<R>(contextIdentifier: QpqContextIdentifier<R>) {
   return function* askContextReadWrapper(): AskResponse<R> {

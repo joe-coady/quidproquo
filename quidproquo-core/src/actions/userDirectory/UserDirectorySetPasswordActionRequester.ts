@@ -1,5 +1,5 @@
-import { UserDirectorySetPasswordActionRequester } from './UserDirectorySetPasswordActionTypes';
 import { UserDirectoryActionType } from './UserDirectoryActionType';
+import { UserDirectorySetPasswordActionRequester } from './UserDirectorySetPasswordActionTypes';
 
 export function* askUserDirectorySetPassword(
   userDirectoryName: string,

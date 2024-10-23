@@ -1,9 +1,9 @@
-import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
+import { aws_certificatemanager,aws_route53 } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { aws_route53, aws_certificatemanager } from 'aws-cdk-lib';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import * as qpqDeployAwsCdkUtils from '../../utils';
+import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
 
 interface DomainConfig {
   rootDomain: string;

@@ -1,5 +1,5 @@
-import { PlatformActionType } from './PlatformActionType';
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
+import { PlatformActionType } from './PlatformActionType';
 
 // Payload
 export interface PlatformDelayActionPayload {

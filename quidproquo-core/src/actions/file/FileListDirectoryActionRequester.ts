@@ -1,6 +1,6 @@
-import { FileListDirectoryActionRequester } from './FileListDirectoryActionTypes';
-import { FileActionType, FileInfo } from './FileActionType';
 import { AskResponse } from '../../types/StorySession';
+import { FileActionType, FileInfo } from './FileActionType';
+import { FileListDirectoryActionRequester } from './FileListDirectoryActionTypes';
 
 export function* askFileListDirectory(
   drive: string,

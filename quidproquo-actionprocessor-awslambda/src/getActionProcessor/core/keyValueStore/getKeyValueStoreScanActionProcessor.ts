@@ -1,7 +1,7 @@
-import { QPQConfig, qpqCoreUtils, actionResultError, ErrorTypeEnum, ActionProcessorListResolver, ActionProcessorList } from 'quidproquo-core';
+import { ActionProcessorList,ActionProcessorListResolver, actionResultError, ErrorTypeEnum, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { actionResult, KeyValueStoreActionType,KeyValueStoreScanActionProcessor } from 'quidproquo-core';
 
 import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
-import { KeyValueStoreScanActionProcessor, actionResult, KeyValueStoreActionType } from 'quidproquo-core';
 import { scan } from '../../../logic/dynamo/scan';
 
 const getProcessKeyValueStoreScan = (qpqConfig: QPQConfig): KeyValueStoreScanActionProcessor<any> => {

@@ -1,8 +1,9 @@
 import { AnyEventMessage } from 'quidproquo-core';
+
 import {
   WebSocketClientEventMessagePing,
-  WebSocketServerEventMessagePong,
   WebsocketClientMessageEventType,
+  WebSocketServerEventMessagePong,
   WebsocketServerMessageEventType,
 } from '../../../../../types';
 import { askSendMessage } from '../askSendMessage';

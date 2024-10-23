@@ -7,8 +7,8 @@ import {
   UserDirectoryActionType,
   UserDirectorySetPasswordActionProcessor,
 } from 'quidproquo-core';
-import { getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 
+import { getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { setUserPassword } from '../../../logic/cognito/setUserPassword';
 

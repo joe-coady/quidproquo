@@ -1,16 +1,16 @@
 import {
-  EventActionType,
-  QPQConfig,
-  actionResult,
-  EventGetRecordsActionProcessor,
-  DeployEventType,
-  DeployEventStatusType,
-  ActionProcessorListResolver,
   ActionProcessorList,
+  ActionProcessorListResolver,
+  actionResult,
+  DeployEventStatusType,
+  DeployEventType,
+  EventActionType,
+  EventGetRecordsActionProcessor,
+  QPQConfig,
 } from 'quidproquo-core';
 
-import { EventInput, InternalEventRecord } from './types';
 import { getApiStackName, getWebStackName } from '../../../../../awsNamingUtils';
+import { EventInput, InternalEventRecord } from './types';
 
 const deployTypeMap: Record<string, DeployEventStatusType> = {
   UPDATE_COMPLETE: DeployEventStatusType.Update,

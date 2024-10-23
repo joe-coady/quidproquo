@@ -1,4 +1,5 @@
 import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+
 import { getConfigRuntimeResourceNameFromConfigWithServiceOverride } from '../../../../awsNamingUtils';
 
 export const resolveStorageDriveBucketName = (drive: string, qpqConfig: QPQConfig) => {

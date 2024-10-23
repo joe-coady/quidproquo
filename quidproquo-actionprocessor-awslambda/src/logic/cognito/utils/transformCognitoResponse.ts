@@ -1,6 +1,5 @@
-import { AuthenticateUserResponse, AuthenticationInfo, AuthenticateUserChallenge } from 'quidproquo-core';
-
-import { AuthenticationResultType, AdminInitiateAuthResponse, ChallengeNameType } from '@aws-sdk/client-cognito-identity-provider';
+import { AuthenticateUserChallenge,AuthenticateUserResponse, AuthenticationInfo } from 'quidproquo-core';
+import { AdminInitiateAuthResponse, AuthenticationResultType, ChallengeNameType } from '@aws-sdk/client-cognito-identity-provider';
 
 export const cognitoAuthenticationResultTypeToQpqAuthenticationInfo = (
   authResult: AuthenticationResultType,

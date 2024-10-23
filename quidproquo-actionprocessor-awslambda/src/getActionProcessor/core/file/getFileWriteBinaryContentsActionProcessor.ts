@@ -1,16 +1,16 @@
 import {
-  FileWriteBinaryContentsActionProcessor,
+  ActionProcessorList,
+  ActionProcessorListResolver,
   actionResult,
   FileActionType,
+  FileWriteBinaryContentsActionProcessor,
   QPQConfig,
   qpqCoreUtils,
-  ActionProcessorListResolver,
-  ActionProcessorList,
 } from 'quidproquo-core';
 
-import { resolveStorageDriveBucketName } from './utils';
-import { writeBinaryFile } from '../../../logic/s3/s3Utils';
 import { getS3BucketStorageClassFromStorageDriveTier } from '../../../awsLambdaUtils';
+import { writeBinaryFile } from '../../../logic/s3/s3Utils';
+import { resolveStorageDriveBucketName } from './utils';
 
 const getProcessFileWriteBinaryContents = (qpqConfig: QPQConfig): FileWriteBinaryContentsActionProcessor => {
   return async ({ drive, filepath, data, storageDriveAdvancedWriteOptions }) => {

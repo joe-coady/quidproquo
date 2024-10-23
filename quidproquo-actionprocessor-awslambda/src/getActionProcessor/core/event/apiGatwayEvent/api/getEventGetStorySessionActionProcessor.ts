@@ -1,16 +1,16 @@
 import {
-  EventActionType,
-  QPQConfig,
-  actionResult,
-  EventGetStorySessionActionProcessor,
-  ActionProcessorListResolver,
   ActionProcessorList,
+  ActionProcessorListResolver,
+  actionResult,
+  EventActionType,
+  EventGetStorySessionActionProcessor,
+  QPQConfig,
   StorySession,
 } from 'quidproquo-core';
-
-import { EventInput, InternalEventRecord, MatchResult } from './types';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
+
 import { decodeAccessToken } from '../../../../../logic/cognito';
+import { EventInput, InternalEventRecord, MatchResult } from './types';
 
 const getProcessGetStorySession = (qpqConfig: QPQConfig): EventGetStorySessionActionProcessor<EventInput, InternalEventRecord, MatchResult> => {
   return async ({ matchStoryResult, qpqEventRecord }, session) => {

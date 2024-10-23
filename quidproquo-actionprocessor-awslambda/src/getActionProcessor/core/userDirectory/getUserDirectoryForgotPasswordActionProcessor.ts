@@ -1,18 +1,18 @@
 import {
-  UserDirectoryForgotPasswordActionProcessor,
+  ActionProcessorList,
+  ActionProcessorListResolver,
   actionResult,
+  AuthenticateUserResponse,
+  AuthenticationDeliveryDetails,
   QPQConfig,
   qpqCoreUtils,
   UserDirectoryActionType,
-  AuthenticateUserResponse,
-  AuthenticationDeliveryDetails,
-  ActionProcessorListResolver,
-  ActionProcessorList,
+  UserDirectoryForgotPasswordActionProcessor,
 } from 'quidproquo-core';
-import { getCFExportNameUserPoolIdFromConfig, getCFExportNameUserPoolClientIdFromConfig } from '../../../awsNamingUtils';
 
-import { forgotPassword } from '../../../logic/cognito/forgotPassword';
+import { getCFExportNameUserPoolClientIdFromConfig,getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
+import { forgotPassword } from '../../../logic/cognito/forgotPassword';
 
 const getProcessForgotPassword = (qpqConfig: QPQConfig): UserDirectoryForgotPasswordActionProcessor => {
   return async ({ username, userDirectoryName }) => {

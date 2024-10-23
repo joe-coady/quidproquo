@@ -1,9 +1,8 @@
 import { memo, useMemo } from 'react';
-import ReactTimeAgo from 'react-time-ago';
-
 // TODO: Move this to global configs.
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en.json';
+import ReactTimeAgo from 'react-time-ago';
 TimeAgo.addDefaultLocale(en);
 
 const LastSeen = (props: any) => {

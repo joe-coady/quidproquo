@@ -1,17 +1,14 @@
-import path from 'path';
 import * as cdk from 'aws-cdk-lib';
-
-import { qpqCoreUtils } from 'quidproquo-core';
-import { SubdomainRedirectQPQWebServerConfigSetting, qpqWebServerUtils } from 'quidproquo-webserver';
-
-import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
-
+import { aws_apigateway,aws_lambda } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { aws_lambda, aws_apigateway } from 'aws-cdk-lib';
-import { SubdomainName } from '../../../basic/SubdomainName';
+import path from 'path';
+import { qpqCoreUtils } from 'quidproquo-core';
+import { qpqWebServerUtils,SubdomainRedirectQPQWebServerConfigSetting } from 'quidproquo-webserver';
 
-import { Function } from '../../../basic/Function';
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
+import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
+import { Function } from '../../../basic/Function';
+import { SubdomainName } from '../../../basic/SubdomainName';
 
 export interface QpqWebserverSubdomainRedirectConstructProps extends QpqConstructBlockProps {
   subdomainRedirectConfig: SubdomainRedirectQPQWebServerConfigSetting;

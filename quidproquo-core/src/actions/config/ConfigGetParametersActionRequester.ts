@@ -1,6 +1,6 @@
-import { ConfigGetParametersActionRequester } from './ConfigGetParametersActionTypes';
-import { ConfigActionType } from './ConfigActionType';
 import { createErrorEnumForAction } from '../../types';
+import { ConfigActionType } from './ConfigActionType';
+import { ConfigGetParametersActionRequester } from './ConfigGetParametersActionTypes';
 
 export const ConfigGetParametersErrorTypeEnum = createErrorEnumForAction(ConfigActionType.GetParameters, ['Throttling']);
 

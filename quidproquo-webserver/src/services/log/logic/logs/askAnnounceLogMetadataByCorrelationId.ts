@@ -1,7 +1,6 @@
 import { AskResponse } from 'quidproquo-core';
 
 import * as logMetadataData from '../../entry/data/logMetadataData';
-
 import { askSendLogToAdmins } from '../webSocket';
 
 export function* askAnnounceLogMetadataByCorrelationId(correlationId: string): AskResponse<void> {

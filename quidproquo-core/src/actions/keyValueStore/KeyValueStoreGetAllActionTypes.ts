@@ -1,5 +1,5 @@
-import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
+import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 
 // Options Type
 export interface KeyValueStoreGetAllOptions {

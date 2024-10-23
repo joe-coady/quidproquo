@@ -1,11 +1,9 @@
 import { ActionProcessorList, ActionProcessorListResolver, actionResult, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
-
-import { WebEntryInvalidateCacheActionProcessor, WebEntryActionType } from 'quidproquo-webserver';
+import { WebEntryActionType,WebEntryInvalidateCacheActionProcessor } from 'quidproquo-webserver';
 
 import { getCFExportNameDistributionIdArnFromConfig } from '../../../awsNamingUtils';
-
-import { invalidateCache } from '../../../logic/cloudFront/invalidateCache';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
+import { invalidateCache } from '../../../logic/cloudFront/invalidateCache';
 
 const getProcessInvalidateCache = (qpqConfig: QPQConfig): WebEntryInvalidateCacheActionProcessor => {
   return async ({ paths, webEntryName }) => {

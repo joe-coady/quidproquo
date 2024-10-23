@@ -1,4 +1,5 @@
 import { Action, ActionProcessor, ActionRequester } from 'quidproquo-core';
+
 import { GraphDatabaseForNeptuneActionType } from './GraphDatabaseForNeptuneActionType';
 
 export type GraphDatabaseEndpoints = {
