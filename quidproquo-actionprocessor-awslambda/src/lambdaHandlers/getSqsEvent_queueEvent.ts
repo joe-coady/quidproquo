@@ -1,5 +1,6 @@
-import { SQSEvent } from 'aws-lambda';
 import { DynamicModuleLoader, QPQConfig, QpqRuntimeType } from 'quidproquo-core';
+
+import { SQSEvent } from 'aws-lambda';
 
 import { getSqsQueueEventProcessor } from '../getActionProcessor';
 import { getQpqLambdaRuntimeForEvent } from './helpers/getQpqLambdaRuntimeForEvent';

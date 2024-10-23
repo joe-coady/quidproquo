@@ -1,5 +1,6 @@
-import { useState } from 'react';
 import { ActionHistory } from 'quidproquo-core';
+
+import { useState } from 'react';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import HistoryIcon from '@mui/icons-material/History';

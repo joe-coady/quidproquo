@@ -1,5 +1,6 @@
-import { useEffect } from 'react';
 import { WebSocketClientEventMessagePing, WebsocketClientMessageEventType } from 'quidproquo-webserver';
+
+import { useEffect } from 'react';
 
 import { useWebsocketSendEvent } from '../../hooks';
 

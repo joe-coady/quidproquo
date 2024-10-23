@@ -6,6 +6,7 @@ import {
   GuidNewSortableActionProcessor,
   QPQConfig,
 } from 'quidproquo-core';
+
 import { uuidv7 } from 'uuidv7';
 
 const getProcessGuidNewSortable = (qpqConfig: QPQConfig): GuidNewSortableActionProcessor => {

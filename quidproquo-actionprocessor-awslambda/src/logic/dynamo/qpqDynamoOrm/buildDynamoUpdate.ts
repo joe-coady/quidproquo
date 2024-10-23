@@ -1,5 +1,6 @@
 import { KvsUpdate,KvsUpdateAction, KvsUpdateActionType } from 'quidproquo-core';
 import { KvsAttributePath } from 'quidproquo-core';
+
 import { AttributeValue } from '@aws-sdk/client-dynamodb';
 
 import { buildAttributeValue,getItemName, getValueName } from './buildDynamoQuery';

@@ -1,5 +1,6 @@
-import { memo } from 'react';
 import { AuthenticationInfo } from 'quidproquo-core';
+
+import { memo } from 'react';
 
 import { useWebsocketAuthSync, useWebsocketPingPong } from './hooks';
 

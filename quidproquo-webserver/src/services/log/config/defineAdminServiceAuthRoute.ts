@@ -1,7 +1,6 @@
-import path from 'path';
 import { HTTPMethod, QpqFunctionRuntime } from 'quidproquo-core';
 
-import { ApiKeyReference, defineRoute,GenericRouteOptions } from '../../../config';
+import { ApiKeyReference, defineRoute, GenericRouteOptions } from '../../../config';
 import { getServiceEntryQpqFunctionRuntime } from '../../getServiceEntryQpqFunctionRuntime';
 
 export const defineAdminServiceAuthRoute = (

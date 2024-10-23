@@ -1,3 +1,7 @@
+import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
+import { qpqCoreUtils } from 'quidproquo-core';
+import { qpqWebServerUtils,WebEntryQPQWebServerConfigSetting } from 'quidproquo-webserver';
+
 import {
   aws_cloudfront,
   aws_cloudfront_origins,
@@ -11,9 +15,6 @@ import {
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import path from 'path';
-import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-import { qpqCoreUtils } from 'quidproquo-core';
-import { qpqWebServerUtils,WebEntryQPQWebServerConfigSetting } from 'quidproquo-webserver';
 
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';

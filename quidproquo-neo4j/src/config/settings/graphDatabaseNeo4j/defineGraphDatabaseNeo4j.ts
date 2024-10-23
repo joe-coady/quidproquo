@@ -1,5 +1,6 @@
-import path from 'path';
 import { defineActionProcessors, defineParameter, defineRecurringSchedule, defineSecret,QPQConfig } from 'quidproquo-core';
+
+import path from 'path';
 
 // export interface QPQConfigAdvancedGraphDatabaseNeo4jSettings extends QPQConfigAdvancedSettings {
 //   owner?: CrossModuleOwner<'graphDatabaseName'>;

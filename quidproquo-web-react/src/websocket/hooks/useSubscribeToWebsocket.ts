@@ -1,5 +1,6 @@
-import { useEffect } from 'react';
 import { WebsocketServiceEvent,WebSocketServiceSubscriptionFunction } from 'quidproquo-web';
+
+import { useEffect } from 'react';
 
 import { useWebsocketApi } from './useWebsocketApi';
 

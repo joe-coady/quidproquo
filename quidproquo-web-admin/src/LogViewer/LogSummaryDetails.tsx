@@ -1,4 +1,5 @@
 import { StoryResult } from 'quidproquo-core';
+
 import { Typography } from '@mui/material';
 
 import { GenericFunctionRenderer, genericFunctionRendererStyles } from './actionComponents/genericActionRenderer/AnyVariableView';

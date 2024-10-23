@@ -1,9 +1,10 @@
-import { aws_cloudfront,aws_s3 } from 'aws-cdk-lib';
-import * as cdk from 'aws-cdk-lib';
-import { Construct } from 'constructs';
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { QPQConfig } from 'quidproquo-core';
 import { CacheQPQWebServerConfigSetting, qpqHeaderIsBot } from 'quidproquo-webserver';
+
+import { aws_cloudfront,aws_s3 } from 'aws-cdk-lib';
+import * as cdk from 'aws-cdk-lib';
+import { Construct } from 'constructs';
 
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';

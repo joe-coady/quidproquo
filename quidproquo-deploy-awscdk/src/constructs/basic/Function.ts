@@ -1,9 +1,10 @@
+import { getAwsServiceAccountInfoConfig } from 'quidproquo-config-aws';
+import { qpqCoreUtils } from 'quidproquo-core';
+
 import { aws_ec2,aws_iam, aws_lambda, aws_logs, aws_sns, aws_sns_subscriptions } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import path from 'path';
-import { getAwsServiceAccountInfoConfig } from 'quidproquo-config-aws';
-import { qpqCoreUtils } from 'quidproquo-core';
 
 import { BootstrapResource } from '../../constants';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';

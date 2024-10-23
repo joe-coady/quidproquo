@@ -1,4 +1,5 @@
 import { KvsQueryOperation, QpqPagedData } from 'quidproquo-core';
+
 import { DynamoDBClient, QueryCommand, QueryCommandInput } from '@aws-sdk/client-dynamodb';
 
 import { createAwsClient } from '../createAwsClient';

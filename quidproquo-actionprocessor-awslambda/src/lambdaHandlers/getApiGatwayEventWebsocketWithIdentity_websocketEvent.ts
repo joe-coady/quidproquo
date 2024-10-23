@@ -1,5 +1,6 @@
-import { APIGatewayEventWebsocketRequestContextV2,APIGatewayProxyWebsocketEventV2WithRequestContext } from 'aws-lambda';
 import { DynamicModuleLoader, QPQConfig, QpqRuntimeType } from 'quidproquo-core';
+
+import { APIGatewayEventWebsocketRequestContextV2,APIGatewayProxyWebsocketEventV2WithRequestContext } from 'aws-lambda';
 
 import { getApiGatewayWebsocketEventEventProcessor } from '../getActionProcessor';
 import { getQpqLambdaRuntimeForEvent } from './helpers/getQpqLambdaRuntimeForEvent';

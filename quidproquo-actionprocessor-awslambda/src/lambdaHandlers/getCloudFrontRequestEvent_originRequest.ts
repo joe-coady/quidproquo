@@ -1,5 +1,6 @@
-import { CloudFrontRequestEvent } from 'aws-lambda';
 import { DynamicModuleLoader, QPQConfig, QpqRuntimeType } from 'quidproquo-core';
+
+import { CloudFrontRequestEvent } from 'aws-lambda';
 
 import { getCloudFrontOriginRequestEventProcessor } from '../getActionProcessor';
 import { getQpqLambdaRuntimeForEvent } from './helpers/getQpqLambdaRuntimeForEvent';

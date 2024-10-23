@@ -1,4 +1,5 @@
 import { StoryResult } from 'quidproquo-core';
+
 import { Box, Table, TableBody, TableCell, TableRow, Typography } from '@mui/material';
 
 import { ActionHistoryItemTimeStamp } from './ActionHistoryItemTimeStamp';

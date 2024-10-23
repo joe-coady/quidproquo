@@ -1,7 +1,8 @@
+import { QPQConfig, qpqCoreUtils, StorageDriveLifecycleRule, StorageDriveQPQConfigSetting, StorageDriveTransition } from 'quidproquo-core';
+
 import { aws_iam, aws_s3, aws_s3_deployment } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { QPQConfig, qpqCoreUtils, StorageDriveLifecycleRule, StorageDriveQPQConfigSetting, StorageDriveTransition } from 'quidproquo-core';
 
 import * as qpqDeployAwsCdkUtils from '../../../../utils/qpqDeployAwsCdkUtils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';

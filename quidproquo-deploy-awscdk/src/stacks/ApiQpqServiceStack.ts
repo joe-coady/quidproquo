@@ -1,7 +1,8 @@
-import { Construct } from 'constructs';
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import { qpqCoreUtils } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
+
+import { Construct } from 'constructs';
 
 import {
   ApiQpqWebserverApiConstruct,

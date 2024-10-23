@@ -1,5 +1,6 @@
-import { memo } from 'react';
 import { StoryResult } from 'quidproquo-core';
+
+import { memo } from 'react';
 import { ObjectInspector } from 'react-inspector';
 
 import { useConsoleLogViewer } from './hooks';

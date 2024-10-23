@@ -1,5 +1,6 @@
-import { useMemo } from 'react';
 import { StoryResult } from 'quidproquo-core';
+
+import { useMemo } from 'react';
 
 export const useConsoleLogViewer = (logs: StoryResult<any>['logs']) => {
   const formattedLogs = useMemo(() => {

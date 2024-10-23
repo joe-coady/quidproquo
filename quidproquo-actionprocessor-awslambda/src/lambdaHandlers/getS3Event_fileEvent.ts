@@ -1,5 +1,6 @@
-import { S3Event } from 'aws-lambda';
 import { DynamicModuleLoader, QPQConfig, QpqRuntimeType } from 'quidproquo-core';
+
+import { S3Event } from 'aws-lambda';
 
 import { getS3FileEventEventProcessor } from '../getActionProcessor';
 import { getQpqLambdaRuntimeForEvent } from './helpers/getQpqLambdaRuntimeForEvent';

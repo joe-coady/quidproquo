@@ -1,5 +1,6 @@
-import { CustomMessageTriggerEvent } from 'aws-lambda';
 import { DynamicModuleLoader, QPQConfig, QpqRuntimeType } from 'quidproquo-core';
+
+import { CustomMessageTriggerEvent } from 'aws-lambda';
 
 import { getCognitoCustomMessageEventProcessor } from '../getActionProcessor';
 import { getQpqLambdaRuntimeForEvent } from './helpers/getQpqLambdaRuntimeForEvent';

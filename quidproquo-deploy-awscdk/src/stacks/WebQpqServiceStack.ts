@@ -1,6 +1,7 @@
-import { Construct } from 'constructs';
 import { qpqCoreUtils } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
+
+import { Construct } from 'constructs';
 
 import { WebQpqWebserverDomainProxyConstruct,WebQpqWebserverWebEntryConstruct } from '../constructs';
 import { QpqServiceStack, QpqServiceStackProps } from './base/QpqServiceStack';

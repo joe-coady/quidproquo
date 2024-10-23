@@ -1,8 +1,9 @@
+import { getAwsServiceAccountInfoByDeploymentInfo } from 'quidproquo-config-aws';
+import { QPQConfig,qpqCoreUtils, QueueQPQConfigSetting } from 'quidproquo-core';
+
 import { aws_lambda, aws_lambda_event_sources, aws_sns, aws_sns_subscriptions } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { getAwsServiceAccountInfoByDeploymentInfo } from 'quidproquo-config-aws';
-import { QPQConfig,qpqCoreUtils, QueueQPQConfigSetting } from 'quidproquo-core';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { Function } from '../../../basic/Function';

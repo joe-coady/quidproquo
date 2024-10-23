@@ -1,8 +1,9 @@
-import { aws_ec2, aws_lambda } from 'aws-cdk-lib';
-import { Construct } from 'constructs';
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { qpqCoreUtils } from 'quidproquo-core';
 import { ServiceFunctionQPQWebServerConfigSetting } from 'quidproquo-webserver';
+
+import { aws_ec2, aws_lambda } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { Function } from '../../../basic/Function';

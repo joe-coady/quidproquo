@@ -1,6 +1,7 @@
 // import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 
 import { QPQConfig,qpqCoreUtils } from 'quidproquo-core';
+
 import { Configuration } from 'webpack';
 
 import { QpqPlugin } from './plugins';

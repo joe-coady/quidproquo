@@ -1,6 +1,7 @@
+import { qpqWebServerUtils } from 'quidproquo-webserver';
+
 import { aws_certificatemanager,aws_route53 } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import * as qpqDeployAwsCdkUtils from '../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';

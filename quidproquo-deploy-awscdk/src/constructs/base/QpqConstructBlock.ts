@@ -1,8 +1,9 @@
+import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
+import { QPQConfig } from 'quidproquo-core';
+
 import { aws_iam } from 'aws-cdk-lib';
 import { IGrantable, IRole } from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
-import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-import { QPQConfig } from 'quidproquo-core';
 
 import { QpqResource } from './QpqResource';
 

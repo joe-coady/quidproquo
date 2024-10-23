@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { AuthenticationInfo } from 'quidproquo-core';
 import { WebsocketServiceEvent } from 'quidproquo-web';
 import {
@@ -6,6 +5,8 @@ import {
   WebSocketClientEventMessageUnauthenticate,
   WebsocketClientMessageEventType,
 } from 'quidproquo-webserver';
+
+import { useEffect } from 'react';
 
 import { useFastCallback } from '../../../hooks';
 import { useSubscribeToWebsocket, useWebsocketApi, useWebsocketSendEvent } from '../../hooks';

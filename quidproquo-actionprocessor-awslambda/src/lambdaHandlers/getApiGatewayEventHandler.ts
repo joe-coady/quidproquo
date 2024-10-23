@@ -1,6 +1,7 @@
-import { APIGatewayEvent } from 'aws-lambda';
 import { DynamicModuleLoader, QPQConfig, QpqRuntimeType } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
+
+import { APIGatewayEvent } from 'aws-lambda';
 
 import { getApiGatewayApiEventEventProcessor } from '../getActionProcessor';
 import { getQpqLambdaRuntimeForEvent } from './helpers/getQpqLambdaRuntimeForEvent';

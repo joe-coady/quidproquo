@@ -1,6 +1,7 @@
+import { QPQConfig, qpqCoreUtils, QpqLogger,StoryResult } from 'quidproquo-core';
+
 import fs from 'fs';
 import path from 'path';
-import { QPQConfig, qpqCoreUtils, QpqLogger,StoryResult } from 'quidproquo-core';
 import { PutObjectCommand, PutObjectCommandInput,S3Client } from '@aws-sdk/client-s3';
 
 import { getConfigRuntimeResourceName } from '../../awsNamingUtils';

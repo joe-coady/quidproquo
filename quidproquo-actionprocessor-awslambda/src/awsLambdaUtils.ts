@@ -1,6 +1,7 @@
+import { StorageDriveTier } from 'quidproquo-core';
+
 import { randomUUID } from 'crypto';
 import { match } from 'node-match-path';
-import { StorageDriveTier } from 'quidproquo-core';
 import { StorageClass } from '@aws-sdk/client-s3';
 
 export const randomGuid = () => {

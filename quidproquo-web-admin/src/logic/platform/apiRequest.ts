@@ -1,5 +1,6 @@
-import axios from 'axios';
 import { BaseUrlResolver } from 'quidproquo-web-react';
+
+import axios from 'axios';
 
 const getHeaders = (accessToken?: string) => ({
   'Content-Type': 'application/json',

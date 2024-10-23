@@ -1,5 +1,6 @@
-import { DefineAuthChallengeTriggerEvent } from 'aws-lambda';
 import { ChallengeResult, ChallengeSession } from 'quidproquo-core';
+
+import { DefineAuthChallengeTriggerEvent } from 'aws-lambda';
 
 export const getChallengeSessionFromCognitoTriggerEventSession = (
   session: DefineAuthChallengeTriggerEvent['request']['session'],

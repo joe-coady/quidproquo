@@ -1,5 +1,6 @@
-import { APIGatewayEvent, Context } from 'aws-lambda';
 import { SubdomainRedirectQPQWebServerConfigSetting } from 'quidproquo-webserver';
+
+import { APIGatewayEvent, Context } from 'aws-lambda';
 
 const apiGatewayEventHandler_redirect = async (event: APIGatewayEvent, context: Context) => {
   console.log('event: ', JSON.stringify(event, null, 2));

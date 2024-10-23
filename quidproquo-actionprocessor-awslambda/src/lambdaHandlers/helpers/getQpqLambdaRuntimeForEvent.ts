@@ -1,5 +1,3 @@
-import { Context } from 'aws-lambda';
-import { SNSEvent } from 'aws-lambda';
 import { getCustomActionActionProcessor } from 'quidproquo-actionprocessor-node';
 import {
   ActionProcessorListResolver,
@@ -10,6 +8,9 @@ import {
   QpqRuntimeType,
   StorySession,
 } from 'quidproquo-core';
+
+import { Context } from 'aws-lambda';
+import { SNSEvent } from 'aws-lambda';
 
 import { getAwsActionProcessors } from '../../getActionProcessor';
 import { QpqFunctionExecutionEvent } from '../types';

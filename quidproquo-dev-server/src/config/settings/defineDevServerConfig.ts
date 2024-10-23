@@ -1,6 +1,7 @@
-import path from 'path';
 import { QPQConfig, QPQConfigAdvancedSettings } from 'quidproquo-core';
 import { defineServiceFunction } from 'quidproquo-webserver';
+
+import path from 'path';
 
 export interface QPQConfigAdvancedDevServerSettings extends QPQConfigAdvancedSettings {
   onlyDeploySafe?: boolean;

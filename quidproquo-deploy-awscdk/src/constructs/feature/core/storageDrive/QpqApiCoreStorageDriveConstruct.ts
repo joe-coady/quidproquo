@@ -1,6 +1,7 @@
+import { QPQConfig, qpqCoreUtils,StorageDriveQPQConfigSetting } from 'quidproquo-core';
+
 import { aws_lambda, aws_s3, aws_s3_notifications } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { QPQConfig, qpqCoreUtils,StorageDriveQPQConfigSetting } from 'quidproquo-core';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { Function } from '../../../basic/Function';

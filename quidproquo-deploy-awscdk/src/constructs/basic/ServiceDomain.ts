@@ -1,8 +1,9 @@
+import { QPQConfig,qpqCoreUtils } from 'quidproquo-core';
+import { qpqWebServerUtils } from 'quidproquo-webserver';
+
 import { aws_route53 } from 'aws-cdk-lib';
 import { IHostedZone } from 'aws-cdk-lib/aws-route53';
 import { Construct } from 'constructs';
-import { QPQConfig,qpqCoreUtils } from 'quidproquo-core';
-import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import * as qpqDeployAwsCdkUtils from '../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../base';

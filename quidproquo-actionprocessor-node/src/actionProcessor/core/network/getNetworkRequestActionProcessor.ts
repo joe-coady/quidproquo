@@ -1,5 +1,3 @@
-import axios, { AxiosResponse } from 'axios';
-import { extension } from 'mime-types';
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
@@ -14,6 +12,9 @@ import {
   QPQConfig,
   ResponseType,
 } from 'quidproquo-core';
+
+import axios, { AxiosResponse } from 'axios';
+import { extension } from 'mime-types';
 
 const getAxiosResponseType = (responseType: ResponseType) => {
   if (responseType === 'binary') {

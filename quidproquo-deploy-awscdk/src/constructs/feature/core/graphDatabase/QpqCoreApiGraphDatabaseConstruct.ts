@@ -1,9 +1,10 @@
-import { aws_dynamodb, aws_ec2, aws_iam, aws_logs } from 'aws-cdk-lib';
-import * as cdk from 'aws-cdk-lib';
-import { Construct } from 'constructs';
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { qpqConfigAwsUtils, resolveAwsServiceAccountInfo } from 'quidproquo-config-aws';
 import { GraphDatabaseQPQConfigSetting, QPQConfig } from 'quidproquo-core';
+
+import { aws_dynamodb, aws_ec2, aws_iam, aws_logs } from 'aws-cdk-lib';
+import * as cdk from 'aws-cdk-lib';
+import { Construct } from 'constructs';
 import * as aws_neptune from '@aws-cdk/aws-neptune-alpha';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';

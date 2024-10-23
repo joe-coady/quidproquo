@@ -1,9 +1,10 @@
-import { aws_iam,aws_sqs } from 'aws-cdk-lib';
-import * as cdk from 'aws-cdk-lib';
-import { Construct } from 'constructs';
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { getAwsAccountIds } from 'quidproquo-config-aws';
 import { QPQConfig,qpqCoreUtils, QueueQPQConfigSetting } from 'quidproquo-core';
+
+import { aws_iam,aws_sqs } from 'aws-cdk-lib';
+import * as cdk from 'aws-cdk-lib';
+import { Construct } from 'constructs';
 
 import * as qpqDeployAwsCdkUtils from '../../../../utils/qpqDeployAwsCdkUtils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';

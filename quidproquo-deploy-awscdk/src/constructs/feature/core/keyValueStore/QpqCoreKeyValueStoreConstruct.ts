@@ -1,8 +1,9 @@
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
+import { KeyValueStoreQPQConfigSetting, KvsKey, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+
 import { aws_dynamodb, aws_iam } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import { KeyValueStoreQPQConfigSetting, KvsKey, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
 import * as qpqDeployAwsCdkUtils from '../../../../utils/qpqDeployAwsCdkUtils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';

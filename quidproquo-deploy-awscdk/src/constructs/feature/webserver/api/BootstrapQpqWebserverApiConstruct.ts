@@ -1,6 +1,7 @@
+import { ApiQPQWebServerConfigSetting, qpqWebServerUtils } from 'quidproquo-webserver';
+
 import { aws_lambda } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { ApiQPQWebServerConfigSetting, qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { SubdomainName } from '../../../basic/SubdomainName';

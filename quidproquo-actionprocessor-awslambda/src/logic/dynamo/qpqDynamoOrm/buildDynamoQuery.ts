@@ -1,4 +1,3 @@
-import crypto from 'crypto';
 import {
   KvsAdvancedDataType,
   KvsLogicalOperator,
@@ -7,6 +6,8 @@ import {
   KvsQueryOperation,
   KvsQueryOperationType,
 } from 'quidproquo-core';
+
+import crypto from 'crypto';
 import { AttributeValue } from '@aws-sdk/client-dynamodb';
 
 // TODO: Come up with a better way of generating item name / values

@@ -1,6 +1,7 @@
+import { HTTPMethod, HTTPNetworkResponse,NetworkRequestActionPayload, QPQBinaryData, ResponseType } from 'quidproquo-core';
+
 import axios, { AxiosResponse } from 'axios';
 import { extension } from 'mime-types';
-import { HTTPMethod, HTTPNetworkResponse,NetworkRequestActionPayload, QPQBinaryData, ResponseType } from 'quidproquo-core';
 
 const getAxiosResponseType = (responseType: ResponseType) => {
   if (responseType === 'binary') {

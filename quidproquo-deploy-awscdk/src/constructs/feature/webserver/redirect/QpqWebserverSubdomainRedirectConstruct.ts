@@ -1,9 +1,10 @@
+import { qpqCoreUtils } from 'quidproquo-core';
+import { qpqWebServerUtils,SubdomainRedirectQPQWebServerConfigSetting } from 'quidproquo-webserver';
+
 import * as cdk from 'aws-cdk-lib';
 import { aws_apigateway,aws_lambda } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import path from 'path';
-import { qpqCoreUtils } from 'quidproquo-core';
-import { qpqWebServerUtils,SubdomainRedirectQPQWebServerConfigSetting } from 'quidproquo-webserver';
 
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';

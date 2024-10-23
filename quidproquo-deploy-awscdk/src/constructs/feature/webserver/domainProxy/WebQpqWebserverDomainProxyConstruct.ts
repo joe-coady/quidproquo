@@ -1,8 +1,9 @@
-import { aws_cloudfront, aws_cloudfront_origins, aws_route53, aws_route53_targets } from 'aws-cdk-lib';
-import { Construct } from 'constructs';
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { DomainProxyQPQWebServerConfigSetting, qpqWebServerUtils } from 'quidproquo-webserver';
 import { DomainProxyViewerProtocolPolicy } from 'quidproquo-webserver';
+
+import { aws_cloudfront, aws_cloudfront_origins, aws_route53, aws_route53_targets } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
 
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';

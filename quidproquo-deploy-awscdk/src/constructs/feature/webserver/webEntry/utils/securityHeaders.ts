@@ -1,5 +1,3 @@
-import { aws_cloudfront } from 'aws-cdk-lib';
-import * as cdk from 'aws-cdk-lib';
 import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 import {
   ContentSecurityPolicyEntry,
@@ -15,6 +13,9 @@ import {
   ResponseHeadersXSSProtection,
   ResponseSecurityHeaders,
 } from 'quidproquo-webserver';
+
+import { aws_cloudfront } from 'aws-cdk-lib';
+import * as cdk from 'aws-cdk-lib';
 
 export const convertStrictTransportSecurity = (
   strictTransportSecurity?: ResponseHeadersStrictTransportSecurity,

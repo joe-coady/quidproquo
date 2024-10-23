@@ -1,5 +1,3 @@
-import * as cdk from 'aws-cdk-lib';
-import { Construct, IConstruct } from 'constructs';
 import {
   ParameterQPQConfigSetting,
   QPQConfig,
@@ -16,6 +14,9 @@ import {
   RouteQPQWebServerConfigSetting,
   WebEntryQPQWebServerConfigSetting,
 } from 'quidproquo-webserver';
+
+import * as cdk from 'aws-cdk-lib';
+import { Construct, IConstruct } from 'constructs';
 
 import {
   QpqCoreEventBusConstruct,

@@ -1,5 +1,6 @@
-import { EventBridgeEvent } from 'aws-lambda';
 import { DynamicModuleLoader, QPQConfig, QpqRuntimeType } from 'quidproquo-core';
+
+import { EventBridgeEvent } from 'aws-lambda';
 
 import { getEventBridgeStackDeployEventActionProcessor } from '../getActionProcessor';
 import { getQpqLambdaRuntimeForEvent } from './helpers/getQpqLambdaRuntimeForEvent';

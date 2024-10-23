@@ -1,4 +1,3 @@
-import { SQSBatchItemFailure } from 'aws-lambda';
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
@@ -7,6 +6,8 @@ import {
   EventTransformResponseResultActionProcessor,
   QPQConfig,
 } from 'quidproquo-core';
+
+import { SQSBatchItemFailure } from 'aws-lambda';
 
 import { EventInput, EventOutput, InternalEventOutput, InternalEventRecord } from './types';
 

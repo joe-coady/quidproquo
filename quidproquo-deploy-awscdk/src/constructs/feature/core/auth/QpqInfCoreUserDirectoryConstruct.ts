@@ -1,9 +1,10 @@
-import { aws_cognito, aws_iam, aws_lambda, aws_route53, aws_route53_targets } from 'aws-cdk-lib';
-import * as cdk from 'aws-cdk-lib';
-import { Construct } from 'constructs';
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { resolveAwsServiceAccountInfo } from 'quidproquo-config-aws';
 import { AuthDirectoryFederatedProviderType, QPQConfig, qpqCoreUtils,UserDirectoryQPQConfigSetting } from 'quidproquo-core';
+
+import { aws_cognito, aws_iam, aws_lambda, aws_route53, aws_route53_targets } from 'aws-cdk-lib';
+import * as cdk from 'aws-cdk-lib';
+import { Construct } from 'constructs';
 
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';

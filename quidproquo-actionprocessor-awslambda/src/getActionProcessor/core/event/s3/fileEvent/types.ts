@@ -1,6 +1,7 @@
-import { Context,S3Event } from 'aws-lambda';
 import { MatchStoryResult, QpqFunctionRuntime } from 'quidproquo-core';
 import { StorageDriveEvent, StorageDriveEventResponse } from 'quidproquo-webserver';
+
+import { Context,S3Event } from 'aws-lambda';
 
 // Customs
 export const GLOBAL_STORAGE_DRIVE_NAME = process.env.storageDriveName!;

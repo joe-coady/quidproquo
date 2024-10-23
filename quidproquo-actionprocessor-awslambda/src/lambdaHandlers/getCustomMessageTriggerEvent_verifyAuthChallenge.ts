@@ -1,5 +1,6 @@
-import { VerifyAuthChallengeResponseTriggerEvent } from 'aws-lambda';
 import { DynamicModuleLoader, QPQConfig, QpqRuntimeType } from 'quidproquo-core';
+
+import { VerifyAuthChallengeResponseTriggerEvent } from 'aws-lambda';
 
 import { getCognitoVerifyAuthChallengeEventProcessor } from '../getActionProcessor';
 import { getQpqLambdaRuntimeForEvent } from './helpers/getQpqLambdaRuntimeForEvent';
