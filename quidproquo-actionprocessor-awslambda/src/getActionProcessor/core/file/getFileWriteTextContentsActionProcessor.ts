@@ -1,3 +1,4 @@
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
@@ -5,7 +6,6 @@ import {
   FileActionType,
   FileWriteTextContentsActionProcessor,
   QPQConfig,
-  qpqCoreUtils,
 } from 'quidproquo-core';
 
 import { getS3BucketStorageClassFromStorageDriveTier } from '../../../awsLambdaUtils';
@@ -20,7 +20,7 @@ const getProcessFileWriteTextContents = (qpqConfig: QPQConfig): FileWriteTextCon
       s3BucketName,
       filepath,
       data,
-      qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig),
+      qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig),
       getS3BucketStorageClassFromStorageDriveTier(storageDriveAdvancedWriteOptions?.storageDriveTier),
     );
 

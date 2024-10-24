@@ -160,10 +160,6 @@ export const getApplicationModuleEnvironment = (qpqConfig: QPQConfig): string =>
   return getApplicationConfigSetting(qpqConfig).environment || 'production';
 };
 
-export const getApplicationModuleDeployRegion = (qpqConfig: QPQConfig): string => {
-  return getApplicationConfigSetting(qpqConfig).deployRegion || 'us-east-1';
-};
-
 export const getStorageDrives = (configs: QPQConfig): StorageDriveQPQConfigSetting[] => {
   return getConfigSettings<StorageDriveQPQConfigSetting>(configs, QPQCoreConfigSettingType.storageDrive);
 };

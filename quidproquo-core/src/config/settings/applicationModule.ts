@@ -4,12 +4,7 @@ import { defineApplication } from './applicationName';
 import { defineModule } from './moduleName';
 
 export interface ApplicationModuleQPQConfigSetting extends QPQConfigSetting {
-  applicationName: string;
-  moduleName: string;
-  configRoot: string;
-  environment?: string;
-  deployRegion?: string;
-  feature?: string;
+  // Noop
 }
 
 export const defineApplicationModule = (
@@ -18,10 +13,14 @@ export const defineApplicationModule = (
   environment: string,
   configRoot: string,
   apiBuildPath: string,
-  deployRegion?: string,
   feature?: string,
 ): QPQConfig => [
-  defineApplication(applicationName, environment, configRoot, deployRegion, feature),
+  // App
+  defineApplication(applicationName, environment, configRoot, feature),
+
+  // Module
   defineModule(moduleName),
+
+  // Buildpath
   defineApiBuildPath(apiBuildPath),
 ];

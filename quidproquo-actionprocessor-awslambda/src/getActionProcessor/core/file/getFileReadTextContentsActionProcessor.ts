@@ -1,3 +1,4 @@
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
@@ -5,7 +6,6 @@ import {
   FileActionType,
   FileReadTextContentsActionProcessor,
   QPQConfig,
-  qpqCoreUtils,
 } from 'quidproquo-core';
 
 import { readTextFile } from '../../../logic/s3/s3Utils';
@@ -15,7 +15,7 @@ const getProcessFileReadTextContents = (qpqConfig: QPQConfig): FileReadTextConte
   return async ({ drive, filepath }) => {
     const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
 
-    return actionResult(await readTextFile(s3BucketName, filepath, qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig)));
+    return actionResult(await readTextFile(s3BucketName, filepath, qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig)));
   };
 };
 

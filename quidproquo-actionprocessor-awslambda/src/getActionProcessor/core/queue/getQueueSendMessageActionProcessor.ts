@@ -1,5 +1,6 @@
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import { ActionProcessorList, ActionProcessorListResolver, QPQConfig, qpqCoreUtils, QueueMessage, StorySession } from 'quidproquo-core';
-import { actionResult, QueueActionType,QueueSendMessageActionProcessor } from 'quidproquo-core';
+import { actionResult, QueueActionType, QueueSendMessageActionProcessor } from 'quidproquo-core';
 
 import { sendMessages } from '../../../logic/sqs/sendMessages';
 import { resolveResourceName } from '../../../runtimeConfig/qpqAwsLambdaRuntimeConfigUtils';
@@ -15,7 +16,7 @@ const getProcessQueueSendMessage = (qpqConfig: QPQConfig): QueueSendMessageActio
     const sqsQueueName = resolveResourceName(queueName, qpqConfig);
     await sendMessages(
       sqsQueueName,
-      qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig),
+      qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig),
       queueMessages.map((message) => {
         // Add the session info to the message
         const queueMessageWithSession: AnyQueueMessageWithSession = {

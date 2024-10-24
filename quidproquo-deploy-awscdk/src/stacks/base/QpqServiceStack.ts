@@ -1,7 +1,8 @@
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-import { QPQConfig, QPQConfigSetting,qpqCoreUtils } from 'quidproquo-core';
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
+import { QPQConfig, QPQConfigSetting, qpqCoreUtils } from 'quidproquo-core';
 
-import { aws_lambda,Stack, StackProps } from 'aws-cdk-lib';
+import { aws_lambda, Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 export interface QpqServiceStackProps {
@@ -17,7 +18,7 @@ export class QpqServiceStack extends Stack {
     super(scope, id, {
       env: {
         account: props.awsAccountId,
-        region: qpqCoreUtils.getApplicationModuleDeployRegion(props.qpqConfig),
+        region: qpqConfigAwsUtils.getApplicationModuleDeployRegion(props.qpqConfig),
       },
     });
 

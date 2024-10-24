@@ -1,3 +1,4 @@
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
@@ -5,14 +6,13 @@ import {
   AnyAuthChallenge,
   AuthenticateUserChallenge,
   QPQConfig,
-  qpqCoreUtils,
   UserDirectoryActionType,
   UserDirectoryRespondToAuthChallengeActionProcessor,
 } from 'quidproquo-core';
 
 import { ChallengeNameType } from '@aws-sdk/client-cognito-identity-provider';
 
-import { getCFExportNameUserPoolClientIdFromConfig,getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
+import { getCFExportNameUserPoolClientIdFromConfig, getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { respondToAuthChallengeChallenge } from '../../../logic/cognito/respondToAuthChallengeChallenge';
 
@@ -48,7 +48,7 @@ const anyAuthChallengeToCognitoChallengeName = (authChallenge: AnyAuthChallenge)
 
 const getProcessRespondToAuthChallenge = (qpqConfig: QPQConfig): UserDirectoryRespondToAuthChallengeActionProcessor => {
   return async ({ userDirectoryName, authChallenge }) => {
-    const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
+    const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const userPoolId = await getExportedValue(getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig), region);
 

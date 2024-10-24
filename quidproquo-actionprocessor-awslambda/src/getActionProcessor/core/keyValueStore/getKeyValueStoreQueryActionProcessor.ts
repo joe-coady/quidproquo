@@ -1,5 +1,6 @@
-import { ActionProcessorList,ActionProcessorListResolver, actionResultError, ErrorTypeEnum, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
-import { actionResult, KeyValueStoreActionType,KeyValueStoreQueryActionProcessor } from 'quidproquo-core';
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
+import { ActionProcessorList, ActionProcessorListResolver, actionResultError, ErrorTypeEnum, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { actionResult, KeyValueStoreActionType, KeyValueStoreQueryActionProcessor } from 'quidproquo-core';
 
 import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
 import { query } from '../../../logic/dynamo';
@@ -8,7 +9,7 @@ import { getDynamoTableIndexByConfigAndQuery } from '../../../logic/dynamo/qpqDy
 const getProcessKeyValueStoreQuery = (qpqConfig: QPQConfig): KeyValueStoreQueryActionProcessor<any> => {
   return async ({ keyValueStoreName, keyCondition, options }) => {
     const dynamoTableName = getKvsDynamoTableNameFromConfig(keyValueStoreName, qpqConfig, 'kvs');
-    const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
+    const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const storeConfig = qpqCoreUtils.getKeyValueStoreByName(qpqConfig, keyValueStoreName);
     if (!storeConfig) {

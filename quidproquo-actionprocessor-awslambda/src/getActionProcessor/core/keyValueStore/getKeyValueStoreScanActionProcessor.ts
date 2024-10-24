@@ -1,5 +1,6 @@
-import { ActionProcessorList,ActionProcessorListResolver, actionResultError, ErrorTypeEnum, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
-import { actionResult, KeyValueStoreActionType,KeyValueStoreScanActionProcessor } from 'quidproquo-core';
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
+import { ActionProcessorList, ActionProcessorListResolver, actionResultError, ErrorTypeEnum, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { actionResult, KeyValueStoreActionType, KeyValueStoreScanActionProcessor } from 'quidproquo-core';
 
 import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
 import { scan } from '../../../logic/dynamo/scan';
@@ -7,7 +8,7 @@ import { scan } from '../../../logic/dynamo/scan';
 const getProcessKeyValueStoreScan = (qpqConfig: QPQConfig): KeyValueStoreScanActionProcessor<any> => {
   return async ({ keyValueStoreName, filterCondition, nextPageKey }) => {
     const dynamoTableName = getKvsDynamoTableNameFromConfig(keyValueStoreName, qpqConfig, 'kvs');
-    const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
+    const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const items = await scan<any>(dynamoTableName, region, filterCondition, nextPageKey);
 

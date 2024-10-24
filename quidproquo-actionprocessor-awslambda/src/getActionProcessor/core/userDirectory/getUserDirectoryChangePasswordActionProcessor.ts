@@ -1,9 +1,9 @@
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
   actionResult,
   QPQConfig,
-  qpqCoreUtils,
   UserDirectoryActionType,
   UserDirectoryChangePasswordActionProcessor,
 } from 'quidproquo-core';
@@ -12,7 +12,7 @@ import { changePassword } from '../../../logic/cognito/changePassword';
 
 const getProcessChangePassword = (qpqConfig: QPQConfig): UserDirectoryChangePasswordActionProcessor => {
   return async ({ oldPassword, newPassword }, session) => {
-    const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
+    const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     await changePassword(session.accessToken!, oldPassword, newPassword, region);
 

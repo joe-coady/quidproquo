@@ -1,5 +1,6 @@
-import { ActionProcessorList, ActionProcessorListResolver, actionResultError, ErrorTypeEnum, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
-import { actionResult, FileActionType,FileGenerateTemporarySecureUrlActionProcessor } from 'quidproquo-core';
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
+import { ActionProcessorList, ActionProcessorListResolver, actionResultError, ErrorTypeEnum, QPQConfig } from 'quidproquo-core';
+import { actionResult, FileActionType, FileGenerateTemporarySecureUrlActionProcessor } from 'quidproquo-core';
 
 import { generatePresignedUrl } from '../../../logic/s3/generatePresignedUrl';
 import { resolveStorageDriveBucketName } from './utils';
@@ -8,7 +9,7 @@ const getProcessFileGenerateTemporarySecureUrl = (qpqConfig: QPQConfig): FileGen
   return async ({ drive, filepath, expirationMs }) => {
     try {
       const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
-      const url = await generatePresignedUrl(s3BucketName, filepath, qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig), expirationMs);
+      const url = await generatePresignedUrl(s3BucketName, filepath, qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig), expirationMs);
 
       return actionResult(url);
     } catch (error: any) {

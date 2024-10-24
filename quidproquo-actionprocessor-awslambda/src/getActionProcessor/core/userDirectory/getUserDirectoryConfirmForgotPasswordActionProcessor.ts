@@ -1,20 +1,20 @@
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
   actionResult,
   QPQConfig,
-  qpqCoreUtils,
   UserDirectoryActionType,
   UserDirectoryConfirmForgotPasswordActionProcessor,
 } from 'quidproquo-core';
 
-import { getCFExportNameUserPoolClientIdFromConfig,getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
+import { getCFExportNameUserPoolClientIdFromConfig, getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { confirmForgotPassword } from '../../../logic/cognito/confirmForgotPassword';
 
 const getProcessConfirmForgotPassword = (qpqConfig: QPQConfig): UserDirectoryConfirmForgotPasswordActionProcessor => {
   return async ({ userDirectoryName, code, username, password }) => {
-    const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
+    const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const userPoolId = await getExportedValue(getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig), region);
 

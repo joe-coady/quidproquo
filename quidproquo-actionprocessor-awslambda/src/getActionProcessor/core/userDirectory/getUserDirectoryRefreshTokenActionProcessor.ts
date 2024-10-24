@@ -1,3 +1,4 @@
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
@@ -5,18 +6,17 @@ import {
   actionResultError,
   ErrorTypeEnum,
   QPQConfig,
-  qpqCoreUtils,
   UserDirectoryActionType,
   UserDirectoryRefreshTokenActionProcessor,
 } from 'quidproquo-core';
 
-import { getCFExportNameUserPoolClientIdFromConfig,getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
+import { getCFExportNameUserPoolClientIdFromConfig, getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { refreshToken as cognitoRefreshToken } from '../../../logic/cognito/refreshToken';
 
 const getProcessRefreshToken = (qpqConfig: QPQConfig): UserDirectoryRefreshTokenActionProcessor => {
   return async ({ userDirectoryName, refreshToken }, session) => {
-    const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
+    const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const userPoolId = await getExportedValue(getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig), region);
 
@@ -29,7 +29,7 @@ const getProcessRefreshToken = (qpqConfig: QPQConfig): UserDirectoryRefreshToken
     const authResponse = await cognitoRefreshToken(
       userPoolId,
       userPoolClientId,
-      qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig),
+      qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig),
       session.decodedAccessToken.username,
       refreshToken,
     );

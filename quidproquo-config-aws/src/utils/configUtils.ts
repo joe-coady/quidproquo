@@ -1,4 +1,4 @@
-import { CrossModuleOwner, joinPaths,QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { CrossModuleOwner, joinPaths, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
 import {
   AwsAlarmQPQConfigSetting,
@@ -6,7 +6,7 @@ import {
   AwsServiceAccountInfoQPQConfigSetting,
   QPQAwsConfigSettingType,
 } from '../config';
-import { ApiLayer,LocalServiceAccountInfo, ServiceAccountInfo } from '../types';
+import { ApiLayer, LocalServiceAccountInfo, ServiceAccountInfo } from '../types';
 
 export const getAwsServiceAccountInfoConfig = (qpqConfig: QPQConfig): AwsServiceAccountInfoQPQConfigSetting => {
   const serviceAccountInfos = qpqCoreUtils.getConfigSettings<AwsServiceAccountInfoQPQConfigSetting>(
@@ -72,6 +72,16 @@ export const getLocalServiceAccountInfo = (qpqConfig: QPQConfig): LocalServiceAc
   };
 
   return serviceAccountInfo as LocalServiceAccountInfo;
+};
+
+export const getApplicationModuleDeployRegion = (qpqConfig: QPQConfig): string => {
+  const awsServiceAccountInfoConfig = getAwsServiceAccountInfoConfig(qpqConfig);
+  return awsServiceAccountInfoConfig.deployRegion;
+};
+
+export const getApplicationModuleDeployAccountId = (qpqConfig: QPQConfig): string => {
+  const awsServiceAccountInfoConfig = getAwsServiceAccountInfoConfig(qpqConfig);
+  return awsServiceAccountInfoConfig.deployAccountId;
 };
 
 export const resolveAwsServiceAccountInfo = (qpqConfig: QPQConfig, crossModuleOwner?: CrossModuleOwner): ServiceAccountInfo => {

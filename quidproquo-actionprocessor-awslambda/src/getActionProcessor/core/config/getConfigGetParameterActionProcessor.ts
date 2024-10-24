@@ -1,3 +1,4 @@
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
@@ -8,7 +9,6 @@ import {
   ConfigGetParameterActionProcessor,
   ConfigGetParameterErrorTypeEnum,
   QPQConfig,
-  qpqCoreUtils,
 } from 'quidproquo-core';
 
 import { getParameter } from '../../../logic/parametersManager/getParameter';
@@ -19,7 +19,7 @@ const getProcessConfigGetParameter = (qpqConfig: QPQConfig): ConfigGetParameterA
     const awsParameterKey = resolveParameterKey(parameterName, qpqConfig);
 
     try {
-      const parameterValue = await getParameter(awsParameterKey, qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig));
+      const parameterValue = await getParameter(awsParameterKey, qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig));
       return actionResult(parameterValue);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {

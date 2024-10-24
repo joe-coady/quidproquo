@@ -1,3 +1,4 @@
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
@@ -5,7 +6,6 @@ import {
   actionResultError,
   ErrorTypeEnum,
   QPQConfig,
-  qpqCoreUtils,
   UserDirectoryActionType,
   UserDirectoryDecodeAccessTokenActionProcessor,
 } from 'quidproquo-core';
@@ -16,7 +16,7 @@ import { decodeValidJwt } from '../../../logic/cognito/decodeValidJwt';
 
 const getProcessDecodeAccessToken = (qpqConfig: QPQConfig): UserDirectoryDecodeAccessTokenActionProcessor => {
   return async ({ userDirectoryName, accessToken, ignoreExpiration }) => {
-    const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
+    const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const userPoolId = await getExportedValue(getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig), region);
 

@@ -1,8 +1,8 @@
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-import { qpqCoreUtils } from 'quidproquo-core';
-import { qpqWebServerUtils,WebSocketQPQWebServerConfigSetting } from 'quidproquo-webserver';
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
+import { qpqWebServerUtils, WebSocketQPQWebServerConfigSetting } from 'quidproquo-webserver';
 
-import { aws_apigateway,aws_apigatewayv2, aws_iam, aws_lambda, aws_logs } from 'aws-cdk-lib';
+import { aws_apigateway, aws_apigatewayv2, aws_iam, aws_lambda, aws_logs } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { importStackValue } from '../../../../utils';
@@ -19,7 +19,7 @@ export class QpqApiWebserverWebsocketConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: QpqApiWebserverWebsocketConstructProps) {
     super(scope, id, props);
 
-    const region = qpqCoreUtils.getApplicationModuleDeployRegion(props.qpqConfig);
+    const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(props.qpqConfig);
 
     const apiId = importStackValue(awsNamingUtils.getCFExportNameWebsocketApiIdFromConfig(props.websocketConfig.apiName, props.qpqConfig));
 

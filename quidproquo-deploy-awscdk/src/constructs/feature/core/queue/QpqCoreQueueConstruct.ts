@@ -1,8 +1,9 @@
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { getAwsAccountIds } from 'quidproquo-config-aws';
-import { QPQConfig,qpqCoreUtils, QueueQPQConfigSetting } from 'quidproquo-core';
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
+import { QPQConfig, QueueQPQConfigSetting } from 'quidproquo-core';
 
-import { aws_iam,aws_sqs } from 'aws-cdk-lib';
+import { aws_iam, aws_sqs } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
@@ -47,7 +48,7 @@ export class QpqCoreQueueConstruct extends QpqCoreQueueConstructBase {
     queueConfig: QueueQPQConfigSetting,
     awsAccountId: string,
   ): QpqCoreQueueConstructBase {
-    const queueArn = `arn:aws:sqs:${qpqCoreUtils.getApplicationModuleDeployRegion(
+    const queueArn = `arn:aws:sqs:${qpqConfigAwsUtils.getApplicationModuleDeployRegion(
       qpqConfig,
     )}:${awsAccountId}:${awsNamingUtils.getConfigRuntimeResourceNameFromConfig(queueConfig.name, qpqConfig)}`;
 

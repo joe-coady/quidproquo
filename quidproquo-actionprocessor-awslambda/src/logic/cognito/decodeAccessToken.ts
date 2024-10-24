@@ -1,3 +1,4 @@
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import { DecodedAccessToken, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
 import { getCFExportNameUserPoolIdFromConfig } from '../../awsNamingUtils';
@@ -10,7 +11,7 @@ export const decodeAccessToken = async (
   accessToken?: string,
   ignoreExpiration: boolean = false,
 ): Promise<DecodedAccessToken> => {
-  const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
+  const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
   const userPoolId = await getExportedValue(getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig), region);
 
   const decodedAuthToken = await decodeValidJwt(userPoolId, region, ignoreExpiration, accessToken);

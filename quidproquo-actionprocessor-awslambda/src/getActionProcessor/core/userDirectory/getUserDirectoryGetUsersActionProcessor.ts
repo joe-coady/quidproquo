@@ -1,9 +1,9 @@
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
   actionResult,
   QPQConfig,
-  qpqCoreUtils,
   UserDirectoryActionType,
   UserDirectoryGetUsersActionProcessor,
 } from 'quidproquo-core';
@@ -14,7 +14,7 @@ import { listPagedUsers } from '../../../logic/cognito/listPagedUsers';
 
 const getProcessGetUsers = (qpqConfig: QPQConfig): UserDirectoryGetUsersActionProcessor => {
   return async ({ userDirectoryName, nextPageKey }, session) => {
-    const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
+    const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const userPoolId = await getExportedValue(getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig), region);
 

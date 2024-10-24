@@ -1,3 +1,4 @@
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
@@ -5,7 +6,6 @@ import {
   FileActionType,
   FileReadBinaryContentsActionProcessor,
   QPQConfig,
-  qpqCoreUtils,
 } from 'quidproquo-core';
 
 import { readBinaryFile } from '../../../logic/s3/s3Utils';
@@ -15,7 +15,7 @@ const getProcessFileReadBinaryContents = (qpqConfig: QPQConfig): FileReadBinaryC
   return async ({ drive, filepath }) => {
     const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
 
-    return actionResult(await readBinaryFile(s3BucketName, filepath, qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig)));
+    return actionResult(await readBinaryFile(s3BucketName, filepath, qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig)));
   };
 };
 

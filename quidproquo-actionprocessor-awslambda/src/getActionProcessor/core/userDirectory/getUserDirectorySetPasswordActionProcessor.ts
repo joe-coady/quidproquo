@@ -1,9 +1,9 @@
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
   actionResult,
   QPQConfig,
-  qpqCoreUtils,
   UserDirectoryActionType,
   UserDirectorySetPasswordActionProcessor,
 } from 'quidproquo-core';
@@ -14,7 +14,7 @@ import { setUserPassword } from '../../../logic/cognito/setUserPassword';
 
 const getProcessSetPassword = (qpqConfig: QPQConfig): UserDirectorySetPasswordActionProcessor => {
   return async ({ userDirectoryName, newPassword, username }, session) => {
-    const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
+    const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const userPoolId = await getExportedValue(getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig), region);
 

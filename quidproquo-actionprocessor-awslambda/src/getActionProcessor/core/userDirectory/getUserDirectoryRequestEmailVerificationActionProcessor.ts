@@ -1,9 +1,9 @@
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
   actionResult,
   QPQConfig,
-  qpqCoreUtils,
   UserDirectoryActionType,
   UserDirectoryRequestEmailVerificationActionProcessor,
 } from 'quidproquo-core';
@@ -12,7 +12,7 @@ import { requestEmailVerificationCode } from '../../../logic/cognito/requestEmai
 
 const getProcessRequestEmailVerification = (qpqConfig: QPQConfig): UserDirectoryRequestEmailVerificationActionProcessor => {
   return async ({ userDirectoryName, accessToken }) => {
-    const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
+    const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     await requestEmailVerificationCode(region, accessToken);
 

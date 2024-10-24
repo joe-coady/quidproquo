@@ -1,14 +1,17 @@
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
+  actionResult,
   actionResultError,
   ErrorTypeEnum,
+  EventBusActionType,
   EventBusMessage,
+  EventBusSendMessageActionProcessor,
   QPQConfig,
   qpqCoreUtils,
   StorySession,
 } from 'quidproquo-core';
-import { actionResult, EventBusActionType,EventBusSendMessageActionProcessor } from 'quidproquo-core';
 
 import { getEventBusSnsTopicArn } from '../../../awsNamingUtils';
 import { publishMessage } from '../../../logic/sns/publishMessage';
@@ -28,7 +31,7 @@ const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): EventBusSendMessag
     },
     session,
   ) => {
-    const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
+    const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const eventBusConfig = qpqCoreUtils.getEventBusConfigByName(eventBusName, qpqConfig);
 

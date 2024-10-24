@@ -1,7 +1,8 @@
 import { getAwsServiceAccountInfoConfig } from 'quidproquo-config-aws';
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import { qpqCoreUtils } from 'quidproquo-core';
 
-import { aws_ec2,aws_iam, aws_lambda, aws_logs, aws_sns, aws_sns_subscriptions } from 'aws-cdk-lib';
+import { aws_ec2, aws_iam, aws_lambda, aws_logs, aws_sns, aws_sns_subscriptions } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import path from 'path';
@@ -81,7 +82,7 @@ export class Function extends QpqConstructBlock {
         : undefined,
     });
 
-    const region = qpqCoreUtils.getApplicationModuleDeployRegion(props.qpqConfig);
+    const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(props.qpqConfig);
     const accountId = props.awsAccountId;
     const topicName = this.qpqBootstrapResourceName(BootstrapResource.WarmLambdas);
     const topicArn = `arn:aws:sns:${region}:${accountId}:${topicName}`;

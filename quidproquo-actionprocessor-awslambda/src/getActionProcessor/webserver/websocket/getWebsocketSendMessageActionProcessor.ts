@@ -1,3 +1,4 @@
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
@@ -5,7 +6,6 @@ import {
   actionResultError,
   actionResultErrorFromCaughtError,
   QPQConfig,
-  qpqCoreUtils,
 } from 'quidproquo-core';
 import { WebsocketActionType, WebsocketSendMessageActionProcessor, WebsocketSendMessageErrorTypeEnum } from 'quidproquo-webserver';
 
@@ -15,7 +15,7 @@ import { getExportedValue } from '../../../logic/cloudformation/getExportedValue
 
 const getProcessSendMessage = (qpqConfig: QPQConfig): WebsocketSendMessageActionProcessor<any> => {
   return async ({ connectionId, payload, websocketApiName }) => {
-    const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
+    const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const apiId = await getExportedValue(getCFExportNameWebsocketApiIdFromConfig(websocketApiName, qpqConfig), region);
 

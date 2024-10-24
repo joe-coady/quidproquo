@@ -1,3 +1,4 @@
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
@@ -11,13 +12,13 @@ import {
   UserDirectoryAuthenticateUserErrorTypeEnum,
 } from 'quidproquo-core';
 
-import { getCFExportNameUserPoolClientIdFromConfig,getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
+import { getCFExportNameUserPoolClientIdFromConfig, getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { authenticateUser } from '../../../logic/cognito/authenticateUser';
 
 const getProcessAuthenticateUser = (qpqConfig: QPQConfig): UserDirectoryAuthenticateUserActionProcessor => {
   return async (payload) => {
-    const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
+    const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
     const userPoolId = await getExportedValue(getCFExportNameUserPoolIdFromConfig(payload.userDirectoryName, qpqConfig), region);
     const userPoolClientId = await getExportedValue(getCFExportNameUserPoolClientIdFromConfig(payload.userDirectoryName, qpqConfig), region);
 
@@ -25,7 +26,7 @@ const getProcessAuthenticateUser = (qpqConfig: QPQConfig): UserDirectoryAuthenti
       const authResponse = await authenticateUser(
         userPoolId,
         userPoolClientId,
-        qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig),
+        qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig),
         payload.authenticateUserRequest.isCustom,
         payload.authenticateUserRequest.email,
         payload.authenticateUserRequest.password,

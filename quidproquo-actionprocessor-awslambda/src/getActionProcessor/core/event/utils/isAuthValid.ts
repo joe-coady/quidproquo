@@ -1,3 +1,4 @@
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 import { RouteAuthSettings } from 'quidproquo-webserver';
 
@@ -25,7 +26,7 @@ const isAuthValidForCognito = async (qpqConfig: QPQConfig, authSettings: RouteAu
 
   // Grab the user directory to auth against
   const userDirectoryName = authSettings.userDirectoryName!;
-  const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
+  const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
   // Resolve the user pool id
   const userPoolId = await getExportedValue(getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig), region);
@@ -40,8 +41,7 @@ const isAuthValidForApiKeys = async (qpqConfig: QPQConfig, authSettings: RouteAu
     return true;
   }
 
-  const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
-
+  const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
   const application = qpqCoreUtils.getApplicationName(qpqConfig);
   const service = qpqCoreUtils.getApplicationModuleName(qpqConfig);
   const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);

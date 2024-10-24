@@ -1,11 +1,5 @@
-import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
-  actionResult,
-  actionResultErrorFromCaughtError,
-  QPQConfig,
-  qpqCoreUtils,
-} from 'quidproquo-core';
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
+import { ActionProcessorList, ActionProcessorListResolver, actionResult, actionResultErrorFromCaughtError, QPQConfig } from 'quidproquo-core';
 
 import { getConfigRuntimeResourceNameFromConfig } from '../../../../../awsNamingUtils';
 import { getNeptuneEndpoints } from '../../../../../logic/neptune';
@@ -13,7 +7,7 @@ import { GraphDatabaseForNeptuneActionType, GraphDatabaseForNeptuneGetEndpointsA
 
 const getProcessGetEndpoints = (qpqConfig: QPQConfig): GraphDatabaseForNeptuneGetEndpointsActionProcessor => {
   return async ({ graphDatabaseName }) => {
-    const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
+    const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const databaseName = getConfigRuntimeResourceNameFromConfig(graphDatabaseName, qpqConfig);
 

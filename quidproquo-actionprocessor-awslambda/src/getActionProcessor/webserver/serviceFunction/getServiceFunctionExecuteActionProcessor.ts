@@ -1,3 +1,4 @@
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
@@ -6,10 +7,9 @@ import {
   EitherActionResult,
   QPQConfig,
   qpqCoreUtils,
-  StoryResult,
   StorySession,
 } from 'quidproquo-core';
-import { ExecuteServiceFunctionEvent,ServiceFunctionActionType, ServiceFunctionExecuteActionProcessor } from 'quidproquo-webserver';
+import { ExecuteServiceFunctionEvent, ServiceFunctionActionType, ServiceFunctionExecuteActionProcessor } from 'quidproquo-webserver';
 
 import { getConfigRuntimeResourceName } from '../../../awsNamingUtils';
 import { executeLambdaByName } from '../../../logic/lambda/executeLambdaByName';
@@ -20,7 +20,7 @@ type AnyExecuteServiceFunctionEventWithSession = ExecuteServiceFunctionEvent<any
 
 const getProcessExecute = (qpqConfig: QPQConfig): ServiceFunctionExecuteActionProcessor<any, any> => {
   return async ({ functionName, service, payload, context, isAsync }, session) => {
-    const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
+    const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const appName = qpqCoreUtils.getApplicationName(qpqConfig);
     const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);

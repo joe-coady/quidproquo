@@ -1,3 +1,4 @@
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
@@ -5,7 +6,6 @@ import {
   actionResultError,
   actionResultErrorFromCaughtError,
   QPQConfig,
-  qpqCoreUtils,
   UserDirectoryActionType,
   UserDirectoryGetUserAttributesActionProcessor,
   UserDirectoryGetUserAttributesErrorTypeEnum,
@@ -17,7 +17,7 @@ import { getUserAttributes } from '../../../logic/cognito/getUserAttributes';
 
 const getProcessGetUserAttributes = (qpqConfig: QPQConfig): UserDirectoryGetUserAttributesActionProcessor => {
   return async ({ userDirectoryName, username }) => {
-    const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
+    const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const userPoolId = await getExportedValue(getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig), region);
 

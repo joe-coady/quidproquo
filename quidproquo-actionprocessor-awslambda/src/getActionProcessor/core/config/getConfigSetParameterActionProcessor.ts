@@ -1,3 +1,4 @@
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
@@ -5,7 +6,6 @@ import {
   ConfigActionType,
   ConfigSetParameterActionProcessor,
   QPQConfig,
-  qpqCoreUtils,
 } from 'quidproquo-core';
 
 import { setParameter } from '../../../logic/parametersManager/setParameter';
@@ -15,7 +15,7 @@ const getProcessConfigSetParameter = (qpqConfig: QPQConfig): ConfigSetParameterA
   return async ({ parameterName, parameterValue }) => {
     const awsParameterKey = resolveParameterKey(parameterName, qpqConfig);
 
-    await setParameter(awsParameterKey, qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig), parameterValue);
+    await setParameter(awsParameterKey, qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig), parameterValue);
 
     return actionResult(void 0);
   };

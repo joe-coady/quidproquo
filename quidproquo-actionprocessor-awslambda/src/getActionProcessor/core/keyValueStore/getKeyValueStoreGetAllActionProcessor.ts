@@ -1,5 +1,6 @@
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import { ActionProcessorList, ActionProcessorListResolver, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
-import { actionResult, KeyValueStoreActionType,KeyValueStoreGetAllActionProcessor } from 'quidproquo-core';
+import { actionResult, KeyValueStoreActionType, KeyValueStoreGetAllActionProcessor } from 'quidproquo-core';
 
 import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
 import { getAllItems } from '../../../logic/dynamo';
@@ -7,7 +8,7 @@ import { getAllItems } from '../../../logic/dynamo';
 const getProcessKeyValueStoreGetAll = (qpqConfig: QPQConfig): KeyValueStoreGetAllActionProcessor<any> => {
   return async ({ keyValueStoreName }) => {
     const dynamoTableName = getKvsDynamoTableNameFromConfig(keyValueStoreName, qpqConfig, 'kvs');
-    const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
+    const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const result = await getAllItems(dynamoTableName, region);
 

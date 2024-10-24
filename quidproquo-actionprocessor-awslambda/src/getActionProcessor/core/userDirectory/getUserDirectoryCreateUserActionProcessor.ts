@@ -1,3 +1,4 @@
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
@@ -9,13 +10,13 @@ import {
   UserDirectoryCreateUserActionProcessor,
 } from 'quidproquo-core';
 
-import { getCFExportNameUserPoolClientIdFromConfig,getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
+import { getCFExportNameUserPoolClientIdFromConfig, getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { createUser } from '../../../logic/cognito/createUser';
 
 const getProcessCreateUser = (qpqConfig: QPQConfig): UserDirectoryCreateUserActionProcessor => {
   return async (payload) => {
-    const region = qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig);
+    const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const userPoolId = await getExportedValue(getCFExportNameUserPoolIdFromConfig(payload.userDirectoryName, qpqConfig), region);
 
@@ -23,7 +24,7 @@ const getProcessCreateUser = (qpqConfig: QPQConfig): UserDirectoryCreateUserActi
 
     const authResponse: AuthenticateUserResponse = await createUser(
       userPoolId,
-      qpqCoreUtils.getApplicationModuleDeployRegion(qpqConfig),
+      qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig),
       userPoolClientId,
       payload.createUserRequest,
     );
