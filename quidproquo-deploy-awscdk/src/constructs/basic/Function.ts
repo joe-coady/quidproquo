@@ -83,7 +83,8 @@ export class Function extends QpqConstructBlock {
     });
 
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(props.qpqConfig);
-    const accountId = props.awsAccountId;
+    const accountId = qpqConfigAwsUtils.getApplicationModuleDeployAccountId(props.qpqConfig);
+
     const topicName = this.qpqBootstrapResourceName(BootstrapResource.WarmLambdas);
     const topicArn = `arn:aws:sns:${region}:${accountId}:${topicName}`;
     const topic = aws_sns.Topic.fromTopicArn(this, 'ImportedTopic', topicArn);

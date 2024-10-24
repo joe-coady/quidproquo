@@ -2,7 +2,7 @@ import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import { qpqWebServerUtils, WebSocketQPQWebServerConfigSetting } from 'quidproquo-webserver';
 
-import { aws_apigateway, aws_apigatewayv2, aws_iam, aws_lambda, aws_logs } from 'aws-cdk-lib';
+import { aws_apigatewayv2, aws_iam, aws_lambda } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { importStackValue } from '../../../../utils';
@@ -20,6 +20,7 @@ export class QpqApiWebserverWebsocketConstruct extends QpqConstructBlock {
     super(scope, id, props);
 
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(props.qpqConfig);
+    const awsAccountId = qpqConfigAwsUtils.getApplicationModuleDeployAccountId(props.qpqConfig);
 
     const apiId = importStackValue(awsNamingUtils.getCFExportNameWebsocketApiIdFromConfig(props.websocketConfig.apiName, props.qpqConfig));
 
@@ -42,8 +43,6 @@ export class QpqApiWebserverWebsocketConstruct extends QpqConstructBlock {
 
       apiLayerVersions: props.apiLayerVersions,
 
-      awsAccountId: props.awsAccountId,
-
       environment: {
         websocketApiName: props.websocketConfig.apiName,
       },
@@ -56,7 +55,7 @@ export class QpqApiWebserverWebsocketConstruct extends QpqConstructBlock {
       new aws_iam.ServicePrincipal('apigateway.amazonaws.com', {
         conditions: {
           ArnLike: {
-            'aws:SourceArn': `arn:aws:execute-api:${region}:${props.awsAccountId}:${apiId}/*`,
+            'aws:SourceArn': `arn:aws:execute-api:${region}:${awsAccountId}:${apiId}/*`,
           },
         },
       }),
@@ -112,7 +111,6 @@ export class QpqApiWebserverWebsocketConstruct extends QpqConstructBlock {
       apexDomain,
       subdomain: props.websocketConfig.apiSubdomain,
       qpqConfig: props.qpqConfig,
-      awsAccountId: props.awsAccountId,
     });
 
     // Create a mapping between the custom domain name and the WebSocket API

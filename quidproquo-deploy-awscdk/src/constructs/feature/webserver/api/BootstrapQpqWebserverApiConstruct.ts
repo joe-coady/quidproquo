@@ -23,8 +23,6 @@ export class BootstrapQpqWebserverApiConstruct extends QpqConstructBlock {
       apexDomain,
       subdomain: props.apiConfig.apiSubdomain,
       qpqConfig: props.qpqConfig,
-
-      awsAccountId: props.awsAccountId,
     });
   }
 }

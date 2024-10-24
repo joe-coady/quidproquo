@@ -41,16 +41,12 @@ export abstract class QpqCoreQueueConstructBase extends QpqConstructBlock {
 export class QpqCoreQueueConstruct extends QpqCoreQueueConstructBase {
   queue: aws_sqs.IQueue;
 
-  static fromOtherStack(
-    scope: Construct,
-    id: string,
-    qpqConfig: QPQConfig,
-    queueConfig: QueueQPQConfigSetting,
-    awsAccountId: string,
-  ): QpqCoreQueueConstructBase {
+  static fromOtherStack(scope: Construct, id: string, qpqConfig: QPQConfig, queueConfig: QueueQPQConfigSetting): QpqCoreQueueConstructBase {
+    const accountId = qpqConfigAwsUtils.getApplicationModuleDeployAccountId(qpqConfig);
+
     const queueArn = `arn:aws:sqs:${qpqConfigAwsUtils.getApplicationModuleDeployRegion(
       qpqConfig,
-    )}:${awsAccountId}:${awsNamingUtils.getConfigRuntimeResourceNameFromConfig(queueConfig.name, qpqConfig)}`;
+    )}:${accountId}:${awsNamingUtils.getConfigRuntimeResourceNameFromConfig(queueConfig.name, qpqConfig)}`;
 
     class Import extends QpqCoreQueueConstructBase {
       queue = aws_sqs.Queue.fromQueueAttributes(scope, `${id}-${queueConfig.uniqueKey}`, {
@@ -58,7 +54,7 @@ export class QpqCoreQueueConstruct extends QpqCoreQueueConstructBase {
       });
     }
 
-    return new Import(scope, id, { qpqConfig, awsAccountId });
+    return new Import(scope, id, { qpqConfig });
   }
 
   constructor(scope: Construct, id: string, props: QpqCoreQueueConstructProps) {

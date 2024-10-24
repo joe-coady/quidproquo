@@ -1,12 +1,9 @@
 import { qpqCoreUtils } from 'quidproquo-core';
-import { qpqWebServerUtils,SubdomainRedirectQPQWebServerConfigSetting } from 'quidproquo-webserver';
+import { qpqWebServerUtils, SubdomainRedirectQPQWebServerConfigSetting } from 'quidproquo-webserver';
 
-import * as cdk from 'aws-cdk-lib';
-import { aws_apigateway,aws_lambda } from 'aws-cdk-lib';
+import { aws_apigateway } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import path from 'path';
 
-import * as qpqDeployAwsCdkUtils from '../../../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { Function } from '../../../basic/Function';
 import { SubdomainName } from '../../../basic/SubdomainName';
@@ -35,8 +32,6 @@ export class QpqWebserverSubdomainRedirectConstruct extends QpqConstructBlock {
         featureEnvironment: JSON.stringify(feature),
       },
 
-      awsAccountId: props.awsAccountId,
-
       role: this.getServiceRole(),
     });
 
@@ -59,7 +54,6 @@ export class QpqWebserverSubdomainRedirectConstruct extends QpqConstructBlock {
       subdomain: props.subdomainRedirectConfig.subdomain,
       apexDomain,
       qpqConfig: props.qpqConfig,
-      awsAccountId: props.awsAccountId,
     });
 
     // Map all requests to this service to /serviceName/*

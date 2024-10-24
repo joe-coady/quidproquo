@@ -1,6 +1,6 @@
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { resolveAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { AuthDirectoryFederatedProviderType, QPQConfig, qpqCoreUtils,UserDirectoryQPQConfigSetting } from 'quidproquo-core';
+import { AuthDirectoryFederatedProviderType, QPQConfig, qpqCoreUtils, UserDirectoryQPQConfigSetting } from 'quidproquo-core';
 
 import { aws_cognito, aws_iam, aws_lambda, aws_route53, aws_route53_targets } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
@@ -19,20 +19,14 @@ export interface QpqInfCoreUserDirectoryConstructProps extends QpqConstructBlock
 export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
   public userPool: aws_cognito.IUserPool;
 
-  static fromOtherStack(
-    scope: Construct,
-    id: string,
-    qpqConfig: QPQConfig,
-    awsAccountId: string,
-    userDirectoryName: string,
-  ): QpqInfCoreUserDirectoryConstruct {
+  static fromOtherStack(scope: Construct, id: string, qpqConfig: QPQConfig, userDirectoryName: string): QpqInfCoreUserDirectoryConstruct {
     const userPoolId = qpqDeployAwsCdkUtils.importStackValue(awsNamingUtils.getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig));
 
     class Import extends QpqConstructBlock {
       userPool = aws_cognito.UserPool.fromUserPoolId(this, 'pool-id', userPoolId);
     }
 
-    return new Import(scope, id, { qpqConfig, awsAccountId });
+    return new Import(scope, id, { qpqConfig });
   }
 
   constructor(scope: Construct, id: string, props: QpqInfCoreUserDirectoryConstructProps) {
@@ -84,8 +78,6 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
           userDirectoryName: props.userDirectoryConfig.name,
         },
 
-        awsAccountId: props.awsAccountId,
-
         role: this.getServiceRole(),
       });
 
@@ -104,8 +96,6 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
           userDirectoryName: props.userDirectoryConfig.name,
         },
 
-        awsAccountId: props.awsAccountId,
-
         role: this.getServiceRole(),
       });
 
@@ -123,8 +113,6 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
             userDirectoryName: props.userDirectoryConfig.name,
           },
 
-          awsAccountId: props.awsAccountId,
-
           role: this.getServiceRole(),
         });
         userPool.addTrigger(aws_cognito.UserPoolOperation.CREATE_AUTH_CHALLENGE, createAuthChallengeTrigger.lambdaFunction);
@@ -141,8 +129,6 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
           environment: {
             userDirectoryName: props.userDirectoryConfig.name,
           },
-
-          awsAccountId: props.awsAccountId,
 
           role: this.getServiceRole(),
         });
@@ -199,7 +185,6 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
           rootDomain: props.userDirectoryConfig.dnsRecord.rootDomain,
         },
 
-        awsAccountId: props.awsAccountId,
         qpqConfig: props.qpqConfig,
       });
 

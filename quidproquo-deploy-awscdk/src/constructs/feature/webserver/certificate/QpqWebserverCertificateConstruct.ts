@@ -20,7 +20,6 @@ export class QpqWebserverCertificateConstruct extends QpqConstructBlock {
         rootDomain: props.certificateConfig.rootDomain,
       },
 
-      awsAccountId: props.awsAccountId,
       qpqConfig: props.qpqConfig,
     });
   }

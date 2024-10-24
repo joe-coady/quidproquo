@@ -16,14 +16,14 @@ export interface QpqCoreApiGraphDatabaseConstructProps extends QpqConstructBlock
 export class QpqCoreApiGraphDatabaseConstruct extends QpqConstructBlock {
   cluster: aws_neptune.IDatabaseCluster;
 
-  static fromOtherStack(scope: Construct, id: string, qpqConfig: QPQConfig, awsAccountId: string, keyValueStoreName: string): QpqConstructBlock {
+  static fromOtherStack(scope: Construct, id: string, qpqConfig: QPQConfig, keyValueStoreName: string): QpqConstructBlock {
     const tableNameOverride = qpqConfigAwsUtils.getDynamoTableNameOverrride(keyValueStoreName, qpqConfig);
 
     class Import extends QpqConstructBlock {
       table = aws_dynamodb.Table.fromTableName(this, 'table', tableNameOverride || this.qpqResourceName(keyValueStoreName, 'kvs'));
     }
 
-    return new Import(scope, id, { qpqConfig, awsAccountId });
+    return new Import(scope, id, { qpqConfig });
   }
 
   constructor(scope: Construct, id: string, props: QpqCoreApiGraphDatabaseConstructProps) {

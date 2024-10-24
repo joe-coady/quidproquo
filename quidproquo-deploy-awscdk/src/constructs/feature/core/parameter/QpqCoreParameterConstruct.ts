@@ -2,7 +2,7 @@ import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { resolveAwsServiceAccountInfo } from 'quidproquo-config-aws';
 import { ParameterQPQConfigSetting, QPQConfig } from 'quidproquo-core';
 
-import { aws_iam,aws_ssm } from 'aws-cdk-lib';
+import { aws_iam, aws_ssm } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
@@ -33,20 +33,14 @@ export abstract class QpqCoreParameterConstructBase extends QpqConstructBlock {
 export class QpqCoreParameterConstruct extends QpqCoreParameterConstructBase {
   stringParameter: aws_ssm.IStringParameter;
 
-  static fromOtherStack(
-    scope: Construct,
-    id: string,
-    qpqConfig: QPQConfig,
-    parameterConfig: ParameterQPQConfigSetting,
-    awsAccountId: string,
-  ): QpqResource {
+  static fromOtherStack(scope: Construct, id: string, qpqConfig: QPQConfig, parameterConfig: ParameterQPQConfigSetting): QpqResource {
     const paramName = awsNamingUtils.resolveConfigRuntimeResourceNameFromConfig(parameterConfig.key, qpqConfig, parameterConfig.owner);
 
     class Import extends QpqCoreParameterConstructBase {
       stringParameter = aws_ssm.StringParameter.fromStringParameterName(scope, `${id}-${parameterConfig.uniqueKey}`, paramName);
     }
 
-    return new Import(scope, id, { qpqConfig, awsAccountId });
+    return new Import(scope, id, { qpqConfig });
   }
 
   constructor(scope: Construct, id: string, props: QpqCoreParameterConstructProps) {

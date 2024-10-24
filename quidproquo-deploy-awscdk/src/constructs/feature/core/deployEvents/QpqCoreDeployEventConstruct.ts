@@ -3,7 +3,6 @@ import { DeployEventsQPQConfigSetting, qpqCoreUtils } from 'quidproquo-core';
 import { aws_events, aws_events_targets, aws_lambda } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
-import * as qpqDeployAwsCdkUtils from '../../../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { Function } from '../../../basic/Function';
 
@@ -24,8 +23,6 @@ export class QpqCoreDeployEventConstruct extends QpqConstructBlock {
       qpqConfig: props.qpqConfig,
 
       apiLayerVersions: props.apiLayerVersions,
-
-      awsAccountId: props.awsAccountId,
 
       // 15 min timeout
       timeoutInSeconds: 15 * 60,

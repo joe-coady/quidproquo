@@ -34,7 +34,6 @@ export class ApiQpqServiceStack extends QpqServiceStack {
 
     // Build Lambda Layers
     const layers = new LambdaLayers(this, 'lambda-layers', {
-      awsAccountId: props.awsAccountId,
       qpqConfig: props.qpqConfig,
     });
 
@@ -42,7 +41,6 @@ export class ApiQpqServiceStack extends QpqServiceStack {
     const scheduleEvent = qpqCoreUtils.getScheduleEvents(props.qpqConfig).map(
       (setting) =>
         new QpqCoreRecurringScheduleConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
-          awsAccountId: props.awsAccountId,
           qpqConfig: props.qpqConfig,
 
           scheduleConfig: setting,
@@ -54,7 +52,6 @@ export class ApiQpqServiceStack extends QpqServiceStack {
     const apis = qpqWebServerUtils.getApiConfigs(props.qpqConfig).map(
       (setting) =>
         new ApiQpqWebserverApiConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
-          awsAccountId: props.awsAccountId,
           qpqConfig: props.qpqConfig,
 
           apiConfig: setting,
@@ -66,7 +63,6 @@ export class ApiQpqServiceStack extends QpqServiceStack {
     const queues = qpqCoreUtils.getQueues(props.qpqConfig).map(
       (setting) =>
         new QpqApiCoreQueueConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
-          awsAccountId: props.awsAccountId,
           qpqConfig: props.qpqConfig,
 
           queueConfig: setting,
@@ -78,7 +74,6 @@ export class ApiQpqServiceStack extends QpqServiceStack {
     const redirects = qpqWebServerUtils.getSubdomainRedirects(props.qpqConfig).map(
       (setting) =>
         new QpqWebserverSubdomainRedirectConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
-          awsAccountId: props.awsAccountId,
           qpqConfig: props.qpqConfig,
 
           subdomainRedirectConfig: setting,
@@ -89,7 +84,6 @@ export class ApiQpqServiceStack extends QpqServiceStack {
     const serviceFunctions = qpqWebServerUtils.getAllServiceFunctions(props.qpqConfig).map(
       (setting) =>
         new QpqWebserverServiceFunctionConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
-          awsAccountId: props.awsAccountId,
           qpqConfig: props.qpqConfig,
 
           serviceFunctionConfig: setting,
@@ -101,7 +95,6 @@ export class ApiQpqServiceStack extends QpqServiceStack {
     const websockets = qpqWebServerUtils.getOwnedWebsocketSettings(props.qpqConfig).map(
       (setting) =>
         new QpqApiWebserverWebsocketConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
-          awsAccountId: props.awsAccountId,
           qpqConfig: props.qpqConfig,
 
           websocketConfig: setting,
@@ -112,7 +105,6 @@ export class ApiQpqServiceStack extends QpqServiceStack {
     const deployEvents = qpqCoreUtils.getDeployEventConfigs(props.qpqConfig).map(
       (setting) =>
         new QpqCoreDeployEventConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
-          awsAccountId: props.awsAccountId,
           qpqConfig: props.qpqConfig,
 
           deployEventConfig: setting,
@@ -123,7 +115,6 @@ export class ApiQpqServiceStack extends QpqServiceStack {
     const storageDrives = qpqCoreUtils.getStorageDrives(props.qpqConfig).map(
       (setting) =>
         new QpqApiCoreStorageDriveConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
-          awsAccountId: props.awsAccountId,
           qpqConfig: props.qpqConfig,
 
           storageDriveConfig: setting,
@@ -135,7 +126,6 @@ export class ApiQpqServiceStack extends QpqServiceStack {
     const alarms = qpqConfigAwsUtils.getOwnedAwsAlarmConfigs(props.qpqConfig).map(
       (setting) =>
         new QpqConfigAwsAlarmConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
-          awsAccountId: props.awsAccountId,
           qpqConfig: props.qpqConfig,
 
           alarmConfig: setting,

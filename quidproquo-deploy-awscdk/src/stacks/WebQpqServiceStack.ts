@@ -3,7 +3,7 @@ import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { Construct } from 'constructs';
 
-import { WebQpqWebserverDomainProxyConstruct,WebQpqWebserverWebEntryConstruct } from '../constructs';
+import { WebQpqWebserverDomainProxyConstruct, WebQpqWebserverWebEntryConstruct } from '../constructs';
 import { QpqServiceStack, QpqServiceStackProps } from './base/QpqServiceStack';
 import { InfQpqServiceStack } from './InfQpqServiceStack';
 
@@ -24,7 +24,6 @@ export class WebQpqServiceStack extends QpqServiceStack {
     const webEntries = qpqWebServerUtils.getWebEntryConfigs(props.qpqConfig).map(
       (setting) =>
         new WebQpqWebserverWebEntryConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
-          awsAccountId: props.awsAccountId,
           qpqConfig: props.qpqConfig,
 
           webEntryConfig: setting,
@@ -34,7 +33,6 @@ export class WebQpqServiceStack extends QpqServiceStack {
     const domainProxies = qpqWebServerUtils.getDomainProxyConfigs(props.qpqConfig).map(
       (setting) =>
         new WebQpqWebserverDomainProxyConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
-          awsAccountId: props.awsAccountId,
           qpqConfig: props.qpqConfig,
 
           domainProxyConfig: setting,

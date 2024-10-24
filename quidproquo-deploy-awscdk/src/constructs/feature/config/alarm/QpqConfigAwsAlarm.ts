@@ -1,6 +1,6 @@
 import { AwsAlarmNamespace, AwsAlarmOperator, AwsAlarmQPQConfigSetting } from 'quidproquo-config-aws';
 
-import { aws_cloudwatch, aws_cloudwatch_actions,aws_sns } from 'aws-cdk-lib';
+import { aws_cloudwatch, aws_cloudwatch_actions, aws_sns } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
@@ -50,7 +50,7 @@ export class QpqConfigAwsAlarmConstruct extends QpqConstructBlock {
       });
 
       props.alarmConfig.alarmSettings.onAlarm.publishToEventBus?.forEach((eventBusName) => {
-        const eventBus = QpqCoreEventBusConstruct.fromOtherStack(scope, 'eventBus', props.qpqConfig, props.awsAccountId, eventBusName);
+        const eventBus = QpqCoreEventBusConstruct.fromOtherStack(scope, 'eventBus', props.qpqConfig, eventBusName);
 
         alarm.addAlarmAction(new aws_cloudwatch_actions.SnsAction(eventBus.topic));
       });

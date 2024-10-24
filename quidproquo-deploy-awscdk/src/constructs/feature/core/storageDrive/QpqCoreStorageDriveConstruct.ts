@@ -1,3 +1,4 @@
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import { QPQConfig, qpqCoreUtils, StorageDriveLifecycleRule, StorageDriveQPQConfigSetting, StorageDriveTransition } from 'quidproquo-core';
 
 import { aws_iam, aws_s3, aws_s3_deployment } from 'aws-cdk-lib';
@@ -52,13 +53,12 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
     id: string,
     qpqConfig: QPQConfig,
     storageDriveConfig: StorageDriveQPQConfigSetting,
-    awsAccountId: string,
   ): QpqCoreStorageDriveConstructBase {
     class Import extends QpqCoreStorageDriveConstructBase {
       bucket = aws_s3.Bucket.fromBucketName(scope, `${id}-${storageDriveConfig.uniqueKey}`, this.resourceName(storageDriveConfig.storageDrive));
     }
 
-    return new Import(scope, id, { qpqConfig, awsAccountId });
+    return new Import(scope, id, { qpqConfig });
   }
 
   constructor(scope: Construct, id: string, props: QpqCoreStorageDriveConstructProps) {
@@ -90,6 +90,8 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
 
     qpqDeployAwsCdkUtils.applyEnvironmentTags(this.bucket, props.qpqConfig);
 
+    const awsAccountId = qpqConfigAwsUtils.getApplicationModuleDeployAccountId(props.qpqConfig);
+
     // TODO: Only do this IF a cloud front dist wants to use it
     // same with cors above.
     this.bucket.addToResourcePolicy(
@@ -101,7 +103,7 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
         resources: [this.bucket.arnForObjects('*')],
         conditions: {
           StringLike: {
-            'AWS:SourceArn': `arn:aws:cloudfront::${props.awsAccountId}:distribution/*`,
+            'AWS:SourceArn': `arn:aws:cloudfront::${awsAccountId}:distribution/*`,
           },
         },
       }),

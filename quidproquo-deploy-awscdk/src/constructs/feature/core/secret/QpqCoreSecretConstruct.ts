@@ -1,8 +1,8 @@
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { resolveAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { QPQConfig,SecretQPQConfigSetting } from 'quidproquo-core';
+import { QPQConfig, SecretQPQConfigSetting } from 'quidproquo-core';
 
-import { aws_iam,aws_secretsmanager } from 'aws-cdk-lib';
+import { aws_iam, aws_secretsmanager } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
@@ -34,14 +34,14 @@ export abstract class QpqCoreSecretConstructBase extends QpqConstructBlock imple
 export class QpqCoreSecretConstruct extends QpqCoreSecretConstructBase {
   secret: aws_secretsmanager.ISecret;
 
-  static fromOtherStack(scope: Construct, id: string, qpqConfig: QPQConfig, secretConfig: SecretQPQConfigSetting, awsAccountId: string): QpqResource {
+  static fromOtherStack(scope: Construct, id: string, qpqConfig: QPQConfig, secretConfig: SecretQPQConfigSetting): QpqResource {
     const secretName = awsNamingUtils.resolveConfigRuntimeResourceNameFromConfig(secretConfig.key, qpqConfig, secretConfig.owner);
 
     class Import extends QpqCoreSecretConstructBase {
       secret = aws_secretsmanager.Secret.fromSecretNameV2(scope, `${id}-${secretConfig.uniqueKey}`, secretName);
     }
 
-    return new Import(scope, id, { qpqConfig, awsAccountId });
+    return new Import(scope, id, { qpqConfig });
   }
 
   constructor(scope: Construct, id: string, props: QpqCoreSecretConstructProps) {

@@ -1,3 +1,4 @@
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { Construct } from 'constructs';
@@ -30,7 +31,6 @@ export class InfQpqWebserverServiceDomainsConstruct extends QpqConstructBlock {
 
     for (const rootDomain of uniqueRootDomains) {
       new ServiceDomainConstruct(this, `domain-${rootDomain}`, {
-        awsAccountId: props.awsAccountId,
         qpqConfig: props.qpqConfig,
         rootDomain,
       });

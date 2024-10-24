@@ -39,7 +39,7 @@ export class WebQpqWebserverDomainProxyConstruct extends QpqConstructBlock {
         subDomainNames: props.domainProxyConfig.domain.subDomainNames,
         rootDomain: props.domainProxyConfig.domain.rootDomain,
       },
-      awsAccountId: props.awsAccountId,
+
       qpqConfig: props.qpqConfig,
     });
 
@@ -49,7 +49,6 @@ export class WebQpqWebserverDomainProxyConstruct extends QpqConstructBlock {
           'cache',
           props.qpqConfig,
           qpqWebServerUtils.getCacheConfigByName(props.domainProxyConfig.cacheSettingsName, props.qpqConfig),
-          props.awsAccountId,
         ).cachePolicy
       : aws_cloudfront.CachePolicy.CACHING_DISABLED;
 

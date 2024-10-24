@@ -29,13 +29,11 @@ export class InfQpqServiceStack extends QpqServiceStack {
 
     // Build the role for this service.
     const webserverRole = new WebserverRoll(this, 'webserverRoll', {
-      awsAccountId: props.awsAccountId,
       qpqConfig: props.qpqConfig,
     }).role;
 
     // Web entry foundations
     new InfQpqWebserverServiceDomainsConstruct(this, 'serviceDomains', {
-      awsAccountId: props.awsAccountId,
       qpqConfig: props.qpqConfig,
     });
 
@@ -43,7 +41,6 @@ export class InfQpqServiceStack extends QpqServiceStack {
     const storageDrives = qpqCoreUtils.getOwnedStorageDrives(props.qpqConfig).map(
       (setting) =>
         new QpqCoreStorageDriveConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
-          awsAccountId: props.awsAccountId,
           qpqConfig: props.qpqConfig,
 
           storageDriveConfig: setting,
@@ -56,7 +53,6 @@ export class InfQpqServiceStack extends QpqServiceStack {
     const parameters = qpqCoreUtils.getOwnedParameterConfigs(props.qpqConfig).map(
       (setting) =>
         new QpqCoreParameterConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
-          awsAccountId: props.awsAccountId,
           qpqConfig: props.qpqConfig,
 
           parameterConfig: setting,
@@ -69,7 +65,6 @@ export class InfQpqServiceStack extends QpqServiceStack {
     const secrets = qpqCoreUtils.getOwnedSecrets(props.qpqConfig).map(
       (setting) =>
         new QpqCoreSecretConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
-          awsAccountId: props.awsAccountId,
           qpqConfig: props.qpqConfig,
 
           secretConfig: setting,
@@ -82,7 +77,6 @@ export class InfQpqServiceStack extends QpqServiceStack {
     const queues = qpqCoreUtils.getQueues(props.qpqConfig).map(
       (setting) =>
         new QpqCoreQueueConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
-          awsAccountId: props.awsAccountId,
           qpqConfig: props.qpqConfig,
 
           queueConfig: setting,
@@ -96,7 +90,6 @@ export class InfQpqServiceStack extends QpqServiceStack {
     const userDirectories = ownedUserDirectoriesConfigs.map(
       (setting) =>
         new QpqInfCoreUserDirectoryConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
-          awsAccountId: props.awsAccountId,
           qpqConfig: props.qpqConfig,
 
           userDirectoryConfig: setting,
@@ -108,7 +101,6 @@ export class InfQpqServiceStack extends QpqServiceStack {
     const apiKeys = qpqWebServerUtils.getAllApiKeyConfigs(props.qpqConfig).map(
       (setting) =>
         new QpqWebserverApiKeyConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
-          awsAccountId: props.awsAccountId,
           qpqConfig: props.qpqConfig,
 
           apiKeyConfig: setting,
@@ -119,7 +111,6 @@ export class InfQpqServiceStack extends QpqServiceStack {
     const eventBusses = qpqCoreUtils.getOwnedEventBusConfigs(props.qpqConfig).map(
       (setting) =>
         new QpqCoreEventBusConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
-          awsAccountId: props.awsAccountId,
           qpqConfig: props.qpqConfig,
 
           eventBusConfig: setting,
@@ -130,7 +121,6 @@ export class InfQpqServiceStack extends QpqServiceStack {
     const keyValueStores = qpqCoreUtils.getOwnedKeyValueStores(props.qpqConfig).map(
       (setting) =>
         new QpqCoreKeyValueStoreConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
-          awsAccountId: props.awsAccountId,
           qpqConfig: props.qpqConfig,
 
           keyValueStoreConfig: setting,
@@ -144,7 +134,6 @@ export class InfQpqServiceStack extends QpqServiceStack {
     const graphDatabases = qpqCoreUtils.getOwnedGraphDatabases(props.qpqConfig).map(
       (setting) =>
         new QpqCoreApiGraphDatabaseConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
-          awsAccountId: props.awsAccountId,
           qpqConfig: props.qpqConfig,
 
           graphDatabaseConfig: setting,
@@ -157,7 +146,6 @@ export class InfQpqServiceStack extends QpqServiceStack {
     const websockets = qpqWebServerUtils.getOwnedWebsocketSettings(props.qpqConfig).map(
       (setting) =>
         new QpqWebserverWebsocketConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
-          awsAccountId: props.awsAccountId,
           qpqConfig: props.qpqConfig,
 
           websocketConfig: setting,
@@ -168,7 +156,6 @@ export class InfQpqServiceStack extends QpqServiceStack {
     const cache = qpqWebServerUtils.getAllOwnedCacheConfigs(props.qpqConfig).map(
       (setting) =>
         new QpqWebServerCacheConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
-          awsAccountId: props.awsAccountId,
           qpqConfig: props.qpqConfig,
 
           cacheConfig: setting,
@@ -179,7 +166,6 @@ export class InfQpqServiceStack extends QpqServiceStack {
     const certifcates = qpqWebServerUtils.getAllOwnedCertifcateConfigs(props.qpqConfig).map(
       (setting) =>
         new QpqWebserverCertificateConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
-          awsAccountId: props.awsAccountId,
           qpqConfig: props.qpqConfig,
 
           certificateConfig: setting,

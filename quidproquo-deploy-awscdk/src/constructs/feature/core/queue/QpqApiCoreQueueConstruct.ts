@@ -1,7 +1,6 @@
-import { getAwsServiceAccountInfoByDeploymentInfo } from 'quidproquo-config-aws';
-import { QPQConfig,qpqCoreUtils, QueueQPQConfigSetting } from 'quidproquo-core';
+import { QueueQPQConfigSetting } from 'quidproquo-core';
 
-import { aws_lambda, aws_lambda_event_sources, aws_sns, aws_sns_subscriptions } from 'aws-cdk-lib';
+import { aws_lambda, aws_lambda_event_sources, aws_sns_subscriptions } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
@@ -28,8 +27,6 @@ export class QpqApiCoreQueueConstruct extends QpqConstructBlock {
 
       apiLayerVersions: props.apiLayerVersions,
 
-      awsAccountId: props.awsAccountId,
-
       environment: {
         queueQPQConfigSetting: JSON.stringify(props.queueConfig),
       },
@@ -47,26 +44,10 @@ export class QpqApiCoreQueueConstruct extends QpqConstructBlock {
       role: this.getServiceRole(),
     });
 
-    const queueResource = QpqCoreQueueConstruct.fromOtherStack(this, 'queue', props.qpqConfig, props.queueConfig, props.awsAccountId);
+    const queueResource = QpqCoreQueueConstruct.fromOtherStack(this, 'queue', props.qpqConfig, props.queueConfig);
 
     props.queueConfig.eventBusSubscriptions.forEach((eventBusSubscription) => {
-      const eventBusConfig = qpqCoreUtils.getEventBusConfigByName(eventBusSubscription, props.qpqConfig);
-
-      const deploymentInfo = getAwsServiceAccountInfoByDeploymentInfo(
-        props.qpqConfig,
-        eventBusConfig?.owner?.module || qpqCoreUtils.getApplicationModuleName(props.qpqConfig),
-        eventBusConfig?.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(props.qpqConfig),
-        eventBusConfig?.owner?.feature ?? qpqCoreUtils.getApplicationModuleFeature(props.qpqConfig),
-        eventBusConfig?.owner?.application || qpqCoreUtils.getApplicationName(props.qpqConfig),
-      );
-
-      const eventBus = QpqCoreEventBusConstruct.fromOtherStack(
-        this,
-        `event-bus-${eventBusSubscription}`,
-        props.qpqConfig,
-        deploymentInfo.awsAccountId,
-        eventBusSubscription,
-      );
+      const eventBus = QpqCoreEventBusConstruct.fromOtherStack(this, `event-bus-${eventBusSubscription}`, props.qpqConfig, eventBusSubscription);
 
       eventBus.topic.addSubscription(
         new aws_sns_subscriptions.SqsSubscription(queueResource.queue, {

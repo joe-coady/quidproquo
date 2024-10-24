@@ -14,14 +14,12 @@ export class BootstrapQpqServiceStack extends QpqServiceStack {
     super(scope, id, props);
 
     new BSQpqLambdaWarmerEventConstructConstruct(this, 'LambdaWarmer', {
-      awsAccountId: props.awsAccountId,
       qpqConfig: props.qpqConfig,
     });
 
     const apis = qpqWebServerUtils.getApiConfigs(props.qpqConfig).map(
       (setting) =>
         new BootstrapQpqWebserverApiConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
-          awsAccountId: props.awsAccountId,
           qpqConfig: props.qpqConfig,
 
           apiConfig: setting,
@@ -31,7 +29,6 @@ export class BootstrapQpqServiceStack extends QpqServiceStack {
     const virtualNetworks = qpqCoreUtils.getVirualNetworkConfigs(props.qpqConfig).map(
       (setting) =>
         new BootstrapQpqCoreVirtualNetworkConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
-          awsAccountId: props.awsAccountId,
           qpqConfig: props.qpqConfig,
 
           virtualNetworkConfig: setting,

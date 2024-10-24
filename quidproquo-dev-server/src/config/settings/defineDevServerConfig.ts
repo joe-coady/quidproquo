@@ -8,7 +8,7 @@ export interface QPQConfigAdvancedDevServerSettings extends QPQConfigAdvancedSet
   vpcList?: string[];
 }
 
-export const defineDevServerConfig = (buildPath: string, advancedSettings?: QPQConfigAdvancedDevServerSettings): QPQConfig => {
+export const defineDevServerConfig = (advancedSettings?: QPQConfigAdvancedDevServerSettings): QPQConfig => {
   const onlyDeploySafe = advancedSettings?.onlyDeploySafe ?? true;
   const vpcList: string[] = advancedSettings?.vpcList || [];
 

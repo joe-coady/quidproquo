@@ -2,7 +2,7 @@ import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { qpqCoreUtils } from 'quidproquo-core';
 import { ApiQPQWebServerConfigSetting, qpqWebServerUtils } from 'quidproquo-webserver';
 
-import { aws_apigateway, aws_ec2,aws_lambda } from 'aws-cdk-lib';
+import { aws_apigateway, aws_ec2, aws_lambda } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
@@ -32,8 +32,6 @@ export class ApiQpqWebserverApiConstruct extends QpqConstructBlock {
       qpqConfig: props.qpqConfig,
 
       apiLayerVersions: props.apiLayerVersions,
-
-      awsAccountId: props.awsAccountId,
 
       role: this.getServiceRole(),
 

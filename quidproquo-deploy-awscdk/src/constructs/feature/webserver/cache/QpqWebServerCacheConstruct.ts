@@ -2,7 +2,7 @@ import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { QPQConfig } from 'quidproquo-core';
 import { CacheQPQWebServerConfigSetting, qpqHeaderIsBot } from 'quidproquo-webserver';
 
-import { aws_cloudfront,aws_s3 } from 'aws-cdk-lib';
+import { aws_cloudfront, aws_s3 } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
@@ -16,13 +16,7 @@ export interface QpqWebServerCacheConstructProps extends QpqConstructBlockProps 
 export class QpqWebServerCacheConstruct extends QpqConstructBlock {
   cachePolicy: aws_cloudfront.ICachePolicy;
 
-  static fromOtherStack(
-    scope: Construct,
-    id: string,
-    qpqConfig: QPQConfig,
-    cacheConfig: CacheQPQWebServerConfigSetting,
-    awsAccountId: string,
-  ): QpqWebServerCacheConstruct {
+  static fromOtherStack(scope: Construct, id: string, qpqConfig: QPQConfig, cacheConfig: CacheQPQWebServerConfigSetting): QpqWebServerCacheConstruct {
     const cachePolicyId = qpqDeployAwsCdkUtils.importStackValue(
       awsNamingUtils.getCFExportNameCachePolicyIdFromConfig(cacheConfig.name, qpqConfig, cacheConfig.owner?.module, cacheConfig.owner?.application),
     );
@@ -31,7 +25,7 @@ export class QpqWebServerCacheConstruct extends QpqConstructBlock {
       cachePolicy = aws_cloudfront.CachePolicy.fromCachePolicyId(scope, `${id}-${cacheConfig.uniqueKey}`, cachePolicyId);
     }
 
-    return new Import(scope, id, { qpqConfig, awsAccountId });
+    return new Import(scope, id, { qpqConfig });
   }
 
   constructor(scope: Construct, id: string, props: QpqWebServerCacheConstructProps) {

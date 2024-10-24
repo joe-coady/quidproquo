@@ -49,20 +49,14 @@ export const convertKvsKeyToDynamodbAttribute = (kvsKey: KvsKey): aws_dynamodb.A
 export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstructBase {
   table: aws_dynamodb.ITable;
 
-  static fromOtherStack(
-    scope: Construct,
-    id: string,
-    qpqConfig: QPQConfig,
-    awsAccountId: string,
-    keyValueStoreName: string,
-  ): QpqCoreKeyValueStoreConstructBase {
+  static fromOtherStack(scope: Construct, id: string, qpqConfig: QPQConfig, keyValueStoreName: string): QpqCoreKeyValueStoreConstructBase {
     const tableNameOverride = qpqConfigAwsUtils.getDynamoTableNameOverrride(keyValueStoreName, qpqConfig);
 
     class Import extends QpqCoreKeyValueStoreConstructBase {
       table = aws_dynamodb.Table.fromTableName(this, 'table', tableNameOverride || this.qpqResourceName(keyValueStoreName, 'kvs'));
     }
 
-    return new Import(scope, id, { qpqConfig, awsAccountId });
+    return new Import(scope, id, { qpqConfig });
   }
 
   constructor(scope: Construct, id: string, props: QpqCoreKeyValueStoreConstructProps) {

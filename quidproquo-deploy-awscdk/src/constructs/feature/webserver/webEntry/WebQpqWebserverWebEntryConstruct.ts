@@ -1,6 +1,7 @@
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import { qpqCoreUtils } from 'quidproquo-core';
-import { qpqWebServerUtils,WebEntryQPQWebServerConfigSetting } from 'quidproquo-webserver';
+import { qpqWebServerUtils, WebEntryQPQWebServerConfigSetting } from 'quidproquo-webserver';
 
 import {
   aws_cloudfront,
@@ -48,6 +49,8 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
         autoDeleteObjects: true,
       });
 
+      const awsAccountId = qpqConfigAwsUtils.getApplicationModuleDeployAccountId(props.qpqConfig);
+
       originBucket.addToResourcePolicy(
         new aws_iam.PolicyStatement({
           sid: 'AllowCloudFrontServicePrincipal',
@@ -57,7 +60,7 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
           resources: [originBucket.arnForObjects('*')],
           conditions: {
             StringLike: {
-              'AWS:SourceArn': `arn:aws:cloudfront::${props.awsAccountId}:distribution/*`,
+              'AWS:SourceArn': `arn:aws:cloudfront::${awsAccountId}:distribution/*`,
             },
           },
         }),
@@ -81,7 +84,6 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
         rootDomain: props.webEntryConfig.domain.rootDomain,
       },
 
-      awsAccountId: props.awsAccountId,
       qpqConfig: props.qpqConfig,
     });
 
@@ -107,7 +109,6 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
           'cache',
           props.qpqConfig,
           qpqWebServerUtils.getCacheConfigByName(props.webEntryConfig.cacheSettingsName, props.qpqConfig),
-          props.awsAccountId,
         ).cachePolicy
       : aws_cloudfront.CachePolicy.CACHING_DISABLED;
 
@@ -244,7 +245,6 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
               `seo-cache-${seo.uniqueKey}`,
               props.qpqConfig,
               qpqWebServerUtils.getCacheConfigByName(seo.cacheSettingsName, props.qpqConfig),
-              props.awsAccountId,
             ).cachePolicy
           : aws_cloudfront.CachePolicy.CACHING_DISABLED;
 

@@ -1,5 +1,4 @@
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-import { qpqCoreUtils } from 'quidproquo-core';
 import { ServiceFunctionQPQWebServerConfigSetting } from 'quidproquo-webserver';
 
 import { aws_ec2, aws_lambda } from 'aws-cdk-lib';
@@ -34,8 +33,6 @@ export class QpqWebserverServiceFunctionConstruct extends QpqConstructBlock {
       qpqConfig: props.qpqConfig,
 
       apiLayerVersions: props.apiLayerVersions,
-
-      awsAccountId: props.awsAccountId,
 
       role: this.getServiceRole(),
       vpc: vpc,

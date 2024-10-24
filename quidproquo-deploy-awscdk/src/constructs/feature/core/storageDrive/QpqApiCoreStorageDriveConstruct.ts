@@ -1,4 +1,4 @@
-import { QPQConfig, qpqCoreUtils,StorageDriveQPQConfigSetting } from 'quidproquo-core';
+import { QPQConfig, qpqCoreUtils, StorageDriveQPQConfigSetting } from 'quidproquo-core';
 
 import { aws_lambda, aws_s3, aws_s3_notifications } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
@@ -16,13 +16,7 @@ export class QpqApiCoreStorageDriveConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: QpqApiCoreStorageDriveConstructProps) {
     super(scope, id, props);
 
-    const bucket = QpqCoreStorageDriveConstruct.fromOtherStack(
-      scope,
-      `bucket-${id}`,
-      props.qpqConfig,
-      props.storageDriveConfig,
-      props.awsAccountId,
-    ).bucket;
+    const bucket = QpqCoreStorageDriveConstruct.fromOtherStack(scope, `bucket-${id}`, props.qpqConfig, props.storageDriveConfig).bucket;
 
     if (props.storageDriveConfig.onEvent?.create) {
       const func = new Function(this, 'create', {
@@ -35,8 +29,6 @@ export class QpqApiCoreStorageDriveConstruct extends QpqConstructBlock {
         qpqConfig: props.qpqConfig,
 
         apiLayerVersions: props.apiLayerVersions,
-
-        awsAccountId: props.awsAccountId,
 
         environment: {
           // Never change: storageDriveName ~ Its hard coded to stop logs being recursive
@@ -61,8 +53,6 @@ export class QpqApiCoreStorageDriveConstruct extends QpqConstructBlock {
         qpqConfig: props.qpqConfig,
 
         apiLayerVersions: props.apiLayerVersions,
-
-        awsAccountId: props.awsAccountId,
 
         environment: {
           // Never change: storageDriveName ~ Its hard coded to stop logs being recursive

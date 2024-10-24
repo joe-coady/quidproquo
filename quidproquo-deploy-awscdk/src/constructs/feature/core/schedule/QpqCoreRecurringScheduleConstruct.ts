@@ -1,5 +1,5 @@
 import { LambdaRuntimeConfig } from 'quidproquo-actionprocessor-awslambda';
-import { qpqCoreUtils,ScheduleQPQConfigSetting } from 'quidproquo-core';
+import { ScheduleQPQConfigSetting } from 'quidproquo-core';
 
 import { aws_events, aws_events_targets, aws_lambda } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
@@ -30,8 +30,6 @@ export class QpqCoreRecurringScheduleConstruct extends QpqConstructBlock {
           runtime: props.scheduleConfig.runtime,
         } as LambdaRuntimeConfig),
       },
-
-      awsAccountId: props.awsAccountId,
 
       // 15 min timeout
       timeoutInSeconds: 15 * 60,

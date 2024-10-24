@@ -2,7 +2,7 @@ import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { getAwsAccountIds } from 'quidproquo-config-aws';
 import { EventBusQPQConfigSetting, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
-import { aws_iam,aws_sns } from 'aws-cdk-lib';
+import { aws_iam, aws_sns } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
@@ -30,13 +30,7 @@ export abstract class QpqCoreEventBusConstructBase extends QpqConstructBlock {
 export class QpqCoreEventBusConstruct extends QpqCoreEventBusConstructBase {
   topic: aws_sns.ITopic;
 
-  static fromOtherStack(
-    scope: Construct,
-    id: string,
-    qpqConfig: QPQConfig,
-    awsAccountId: string,
-    eventBusSubscription: string,
-  ): QpqCoreEventBusConstructBase {
+  static fromOtherStack(scope: Construct, id: string, qpqConfig: QPQConfig, eventBusSubscription: string): QpqCoreEventBusConstructBase {
     const eventBusConfig = qpqCoreUtils.getEventBusConfigByName(eventBusSubscription, qpqConfig);
 
     const topicArn = awsNamingUtils.getEventBusSnsTopicArn(
@@ -52,7 +46,7 @@ export class QpqCoreEventBusConstruct extends QpqCoreEventBusConstructBase {
       topic = aws_sns.Topic.fromTopicArn(this, 'topic-arn', topicArn);
     }
 
-    return new Import(scope, id, { qpqConfig, awsAccountId });
+    return new Import(scope, id, { qpqConfig });
   }
 
   constructor(scope: Construct, id: string, props: QpqCoreEventBusConstructProps) {

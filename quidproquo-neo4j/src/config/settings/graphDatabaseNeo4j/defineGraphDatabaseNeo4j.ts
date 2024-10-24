@@ -1,4 +1,4 @@
-import { defineActionProcessors, defineParameter, defineRecurringSchedule, defineSecret,QPQConfig } from 'quidproquo-core';
+import { defineActionProcessors, defineParameter, defineRecurringSchedule, defineSecret, QPQConfig } from 'quidproquo-core';
 
 import path from 'path';
 
@@ -14,7 +14,7 @@ export enum Neo4jVersion {
   Version5 = 'version5',
 }
 
-export const defineGraphDatabaseNeo4j = (databaseName: string, apiBuildPath: string, version: Neo4jVersion = Neo4jVersion.Version5): QPQConfig => [
+export const defineGraphDatabaseNeo4j = (databaseName: string, version: Neo4jVersion = Neo4jVersion.Version5): QPQConfig => [
   defineParameter(`neo4j-${databaseName}-instance`),
   defineSecret(`neo4j-${databaseName}-password`),
 
