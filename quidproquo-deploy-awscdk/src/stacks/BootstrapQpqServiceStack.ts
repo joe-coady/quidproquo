@@ -1,9 +1,14 @@
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import { qpqCoreUtils } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { Construct } from 'constructs';
 
-import { BootstrapQpqCoreVirtualNetworkConstruct, BootstrapQpqWebserverApiConstruct } from '../constructs';
+import {
+  BootstrapQpqCoreVirtualNetworkConstruct,
+  BootstrapQpqWebserverApiConstruct,
+  QpqBootstrapConfigAwsOrganizationConstruct,
+} from '../constructs';
 import { BSQpqLambdaWarmerEventConstructConstruct } from '../constructs/basic/BSQpqLambdaWarmerEventConstruct';
 import { QpqServiceStack, QpqServiceStackProps } from './base/QpqServiceStack';
 
@@ -32,6 +37,15 @@ export class BootstrapQpqServiceStack extends QpqServiceStack {
           qpqConfig: props.qpqConfig,
 
           virtualNetworkConfig: setting,
+        }),
+    );
+
+    const organiaztions = qpqConfigAwsUtils.getAwsBootstrapOrganizationConfigs(props.qpqConfig).map(
+      (setting) =>
+        new QpqBootstrapConfigAwsOrganizationConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
+          qpqConfig: props.qpqConfig,
+
+          awsOrganizationConfig: setting,
         }),
     );
   }

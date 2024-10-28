@@ -3,6 +3,7 @@ import { CrossModuleOwner, joinPaths, QPQConfig, qpqCoreUtils } from 'quidproquo
 import {
   AwsAlarmQPQConfigSetting,
   AwsDyanmoOverrideForKvsQPQConfigSetting,
+  AwsOrganizationQPQConfigSetting,
   AwsServiceAccountInfoQPQConfigSetting,
   QPQAwsConfigSettingType,
 } from '../config';
@@ -24,6 +25,15 @@ export const getAwsServiceAccountInfoConfig = (qpqConfig: QPQConfig): AwsService
   }
 
   return serviceAccountInfos[0];
+};
+
+export const getAwsBootstrapOrganizationConfigs = (qpqConfig: QPQConfig): AwsOrganizationQPQConfigSetting[] => {
+  const awsOrganizationQPQConfigSettings = qpqCoreUtils.getConfigSettings<AwsOrganizationQPQConfigSetting>(
+    qpqConfig,
+    QPQAwsConfigSettingType.bootstrapAwsOrganization,
+  );
+
+  return awsOrganizationQPQConfigSettings;
 };
 
 export const getAwsServiceAccountInfos = (qpqConfig: QPQConfig): ServiceAccountInfo[] => {
