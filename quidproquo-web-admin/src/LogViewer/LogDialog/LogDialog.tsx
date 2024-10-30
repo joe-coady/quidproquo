@@ -17,17 +17,17 @@ import {
   useTheme,
 } from '@mui/material';
 
-import { useExternalData, usePlatformDataFromPath } from '../components/LoadingBox/hooks';
-import { apiRequestPost } from '../logic';
-import { useIsLoading } from '../view';
-import { EventTimeline } from './EventTimeline'; // Add this import
-import { HelpChat } from './HelpChat';
-import { useLogTreeData } from './hooks';
-import { LogCorrelations } from './LogCorrelations';
-import { LogDetails } from './LogDetails';
-import { getLogUrl } from './logic';
-import { LogRawJson } from './LogRawJson';
-import { LogSummary } from './LogSummary';
+import { useExternalData, usePlatformDataFromPath } from '../../components/LoadingBox/hooks';
+import { apiRequestPost } from '../../logic';
+import { useIsLoading } from '../../view';
+import { EventTimeline } from '../EventTimeline'; // Add this import
+import { HelpChat } from '../HelpChat';
+import { useLogTreeData } from '../hooks';
+import { LogCorrelations } from '../LogCorrelations';
+import { LogDetails } from '../LogDetails';
+import { getLogUrl } from '../logic';
+import { LogRawJson } from '../LogRawJson';
+import { LogSummary } from '../LogSummary';
 
 const getEmptyStorySession = (correlation: string): StoryResult<any> => {
   const noStoryResult: StoryResult<any> = {
@@ -79,7 +79,7 @@ const getTabStyle = (tabIndex: number, selectedTab: number) => ({
 
 const useLoadedStoryResult = (logCorrelation: string) => {
   const signedRequest = usePlatformDataFromPath<{ url: string; isColdStorage: boolean }>(getLogUrl(logCorrelation));
-  const log = useExternalData<StoryResult<any>>(signedRequest?.url) || getEmptyStorySession(logCorrelation);
+  const log = useExternalData<StoryResult<any>>(!signedRequest?.isColdStorage ? signedRequest?.url : '') || getEmptyStorySession(logCorrelation);
   const isLoading = useIsLoading();
 
   return {
@@ -149,6 +149,7 @@ const LogDialog = ({ logCorrelation, open, handleClose, setSelectedLogCorrelatio
           overflowY: 'scroll',
         }}
       >
+        {asyncLog.isLoading && <LinearProgress />}
         <div style={getTabStyle(selectedTab, 0)}>
           {!asyncLog.isLoading && (
             <>
@@ -170,7 +171,6 @@ const LogDialog = ({ logCorrelation, open, handleClose, setSelectedLogCorrelatio
               <LogDetails log={asyncLog.log} hideFastActions={hideFastActions} orderByDuration={orderByDuration} />
             </>
           )}
-          {asyncLog.isLoading && <LinearProgress />}
         </div>
         <div style={getTabStyle(selectedTab, 1)}>
           <LogCorrelations
@@ -188,14 +188,8 @@ const LogDialog = ({ logCorrelation, open, handleClose, setSelectedLogCorrelatio
             treeApi={treeApi}
           />
         </div>
-        <div style={getTabStyle(selectedTab, 3)}>
-          {!asyncLog.isLoading && <LogSummary log={asyncLog.log} />}
-          {asyncLog.isLoading && <LinearProgress />}
-        </div>
-        <div style={getTabStyle(selectedTab, 4)}>
-          {!asyncLog.isLoading && <LogRawJson log={asyncLog.log} />}
-          {asyncLog.isLoading && <LinearProgress />}
-        </div>
+        <div style={getTabStyle(selectedTab, 3)}>{!asyncLog.isLoading && <LogSummary log={asyncLog.log} />}</div>
+        <div style={getTabStyle(selectedTab, 4)}>{!asyncLog.isLoading && <LogRawJson log={asyncLog.log} />}</div>
         <div style={getTabStyle(selectedTab, 5)}>
           <HelpChat logCorrelation={logCorrelation} />
         </div>
