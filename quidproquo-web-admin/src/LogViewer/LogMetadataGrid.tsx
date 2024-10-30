@@ -5,7 +5,7 @@ import { DataGrid, GridColDef, GridRenderCellParams, GridRowClassNameParams } fr
 
 import { DataGridPagination, DateCell } from '../components';
 import { useLogManagement } from './hooks';
-import LogDialog from './LogDialog';
+import { LogDialog } from './LogDialog';
 
 const formatTime = (ms: number) => {
   if (ms < 1000) return `${ms}ms`;

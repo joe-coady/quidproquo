@@ -1,55 +1,16 @@
-import { QpqRuntimeType, StoryResult } from 'quidproquo-core';
-import { useBaseUrlResolvers } from 'quidproquo-web-react';
+import { useBaseUrlResolvers, useStateUpdater } from 'quidproquo-web-react';
 
-import { useState } from 'react';
-import {
-  AppBar,
-  Button,
-  Checkbox,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  FormControlLabel,
-  LinearProgress,
-  Tab,
-  Tabs,
-  useTheme,
-} from '@mui/material';
+import { AppBar, Button, Dialog, DialogActions, DialogContent, DialogTitle, LinearProgress, Tab, Tabs } from '@mui/material';
 
-import { useExternalData, usePlatformDataFromPath } from '../../components/LoadingBox/hooks';
 import { apiRequestPost } from '../../logic';
-import { useIsLoading } from '../../view';
 import { EventTimeline } from '../EventTimeline'; // Add this import
 import { HelpChat } from '../HelpChat';
 import { useLogTreeData } from '../hooks';
 import { LogCorrelations } from '../LogCorrelations';
-import { LogDetails } from '../LogDetails';
-import { getLogUrl } from '../logic';
 import { LogRawJson } from '../LogRawJson';
 import { LogSummary } from '../LogSummary';
-
-const getEmptyStorySession = (correlation: string): StoryResult<any> => {
-  const noStoryResult: StoryResult<any> = {
-    correlation,
-
-    finishedAt: new Date().toISOString(),
-    startedAt: new Date().toISOString(),
-
-    history: [],
-    input: ['Log cant be downloaded'],
-
-    moduleName: correlation.split('::')[0],
-    runtimeType: QpqRuntimeType.EXECUTE_STORY,
-    session: {
-      depth: 0,
-      context: {},
-    },
-    tags: ['Log unable to be downloaded'],
-  };
-
-  return noStoryResult;
-};
+import { useLoadedStoryResult, useLogDialogStateManagement } from './hooks';
+import { HelpTab, LogDetailsTab, NotesTab, RawTab, TimelineTab, TreeTab } from './tabs';
 
 interface LogDialogProps {
   open: boolean;
@@ -77,39 +38,20 @@ const getTabStyle = (tabIndex: number, selectedTab: number) => ({
   height: '100%',
 });
 
-const useLoadedStoryResult = (logCorrelation: string) => {
-  const signedRequest = usePlatformDataFromPath<{ url: string; isColdStorage: boolean }>(getLogUrl(logCorrelation));
-  const log = useExternalData<StoryResult<any>>(!signedRequest?.isColdStorage ? signedRequest?.url : '') || getEmptyStorySession(logCorrelation);
-  const isLoading = useIsLoading();
-
-  return {
-    isLoading: isLoading,
-    isColdStorage: !!signedRequest?.isColdStorage,
-    isOldLog: false,
-    log,
-  };
-};
-
-const LogDialog = ({ logCorrelation, open, handleClose, setSelectedLogCorrelation }: LogDialogProps) => {
+export const LogDialog = ({ logCorrelation, open, handleClose, setSelectedLogCorrelation }: LogDialogProps) => {
+  const [logDialogState, logDialogStateApi] = useLogDialogStateManagement();
   const asyncLog = useLoadedStoryResult(logCorrelation);
-
   const urlResolvers = useBaseUrlResolvers();
 
   const handleExecute = async () => {
-    if (asyncLog) {
+    if (asyncLog.log) {
       await apiRequestPost('http://localhost:8080/admin/service/log/execute', asyncLog.log, urlResolvers.getApiUrl());
     }
   };
 
-  const [selectedTab, setSelectedTab] = useState(0);
-  const [hideFastActions, setHideFastActions] = useState(false);
-  const [orderByDuration, setOrderByDuration] = useState(false);
-
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setSelectedTab(newValue);
+    logDialogStateApi.setSelectedTab(newValue);
   };
-
-  const theme = useTheme();
 
   const treeApi = useLogTreeData(logCorrelation, false);
 
@@ -133,7 +75,7 @@ const LogDialog = ({ logCorrelation, open, handleClose, setSelectedLogCorrelatio
     >
       <DialogTitle id="scroll-dialog-title">Log Details - {logCorrelation}</DialogTitle>
       <AppBar position="sticky" color="primary">
-        <Tabs value={selectedTab} onChange={handleTabChange} textColor="inherit" indicatorColor="secondary">
+        <Tabs value={logDialogState.selectedTab} onChange={handleTabChange} textColor="inherit" indicatorColor="secondary">
           <Tab label="Log Details" />
           <Tab label="Tree" />
           <Tab label="Timeline" />
@@ -150,56 +92,41 @@ const LogDialog = ({ logCorrelation, open, handleClose, setSelectedLogCorrelatio
         }}
       >
         {asyncLog.isLoading && <LinearProgress />}
-        <div style={getTabStyle(selectedTab, 0)}>
-          {!asyncLog.isLoading && (
-            <>
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row-reverse',
-                }}
-              >
-                <FormControlLabel
-                  control={<Checkbox checked={hideFastActions} onChange={(event) => setHideFastActions(event.target.checked)} />}
-                  label="Hide Fast Actions"
-                />
-                <FormControlLabel
-                  control={<Checkbox checked={orderByDuration} onChange={(event) => setOrderByDuration(event.target.checked)} />}
-                  label="Order by Duration"
-                />
-              </div>
-              <LogDetails log={asyncLog.log} hideFastActions={hideFastActions} orderByDuration={orderByDuration} />
-            </>
-          )}
+        <div style={getTabStyle(logDialogState.selectedTab, 0)}>
+          <LogDetailsTab log={asyncLog} logDialogState={logDialogState} logDialogStateApi={logDialogStateApi} />
         </div>
-        <div style={getTabStyle(selectedTab, 1)}>
-          <LogCorrelations
-            logCorrelation={logCorrelation}
+        <div style={getTabStyle(logDialogState.selectedTab, 1)}>
+          <TreeTab
+            log={asyncLog}
+            isVisible={logDialogState.selectedTab === 1}
+            treeApi={treeApi}
             setSelectedLogCorrelation={setSelectedLogCorrelation}
-            isVisible={selectedTab === 1}
+          />
+        </div>
+        <div style={getTabStyle(logDialogState.selectedTab, 2)}>
+          <TimelineTab
+            log={asyncLog}
+            setSelectedLogCorrelation={setSelectedLogCorrelation}
+            isVisible={logDialogState.selectedTab === 2}
             treeApi={treeApi}
           />
         </div>
-        <div style={getTabStyle(selectedTab, 2)}>
-          <EventTimeline
-            logCorrelation={logCorrelation}
-            setSelectedLogCorrelation={setSelectedLogCorrelation}
-            isVisible={selectedTab === 2}
-            treeApi={treeApi}
-          />
+        <div style={getTabStyle(logDialogState.selectedTab, 3)}>
+          <NotesTab log={asyncLog} />
         </div>
-        <div style={getTabStyle(selectedTab, 3)}>{!asyncLog.isLoading && <LogSummary log={asyncLog.log} />}</div>
-        <div style={getTabStyle(selectedTab, 4)}>{!asyncLog.isLoading && <LogRawJson log={asyncLog.log} />}</div>
-        <div style={getTabStyle(selectedTab, 5)}>
-          <HelpChat logCorrelation={logCorrelation} />
+        <div style={getTabStyle(logDialogState.selectedTab, 4)}>
+          <RawTab log={asyncLog} />
+        </div>
+        <div style={getTabStyle(logDialogState.selectedTab, 5)}>
+          <HelpTab log={asyncLog} />
         </div>
       </DialogContent>
 
       <DialogActions>
-        <Button style={getTabStyle(selectedTab, 1)} onClick={(event) => treeApi.refreshTreeData()} disabled={asyncLog.isLoading}>
+        <Button style={getTabStyle(logDialogState.selectedTab, 1)} onClick={(event) => treeApi.refreshTreeData()} disabled={asyncLog.isLoading}>
           Refresh Tree
         </Button>
-        <Button style={getTabStyle(selectedTab, 2)} onClick={(event) => treeApi.refreshTreeData()} disabled={asyncLog.isLoading}>
+        <Button style={getTabStyle(logDialogState.selectedTab, 2)} onClick={(event) => treeApi.refreshTreeData()} disabled={asyncLog.isLoading}>
           Refresh Timeline
         </Button>
         <Button
@@ -223,5 +150,3 @@ const LogDialog = ({ logCorrelation, open, handleClose, setSelectedLogCorrelatio
     </Dialog>
   );
 };
-
-export default LogDialog;
