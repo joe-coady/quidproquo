@@ -3,6 +3,7 @@ import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, 
 import { getFileDeleteActionProcessor } from './getFileDeleteActionProcessor';
 import { getFileExistsActionProcessor } from './getFileExistsActionProcessor';
 import { getFileGenerateTemporarySecureUrlActionProcessor } from './getFileGenerateTemporarySecureUrlActionProcessor';
+import { getFileIsColdStorageActionProcessor } from './getFileIsColdStorageActionProcessor';
 import { getFileListDirectoryActionProcessor } from './getFileListDirectoryActionProcessor';
 import { getFileReadBinaryContentsActionProcessor } from './getFileReadBinaryContentsActionProcessor';
 import { getFileReadTextContentsActionProcessor } from './getFileReadTextContentsActionProcessor';
@@ -16,6 +17,7 @@ export const getFileActionProcessor: ActionProcessorListResolver = async (
   ...(await getFileDeleteActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getFileExistsActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getFileGenerateTemporarySecureUrlActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getFileIsColdStorageActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getFileListDirectoryActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getFileReadTextContentsActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getFileWriteTextContentsActionProcessor(qpqConfig, dynamicModuleLoader)),

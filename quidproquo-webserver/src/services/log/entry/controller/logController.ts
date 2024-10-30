@@ -1,7 +1,15 @@
-import { askConfigGetGlobal,askFileGenerateTemporarySecureUrl, AskResponse, askThrowError, ErrorTypeEnum, QpqRuntimeType } from 'quidproquo-core';
+import {
+  askConfigGetGlobal,
+  askFileGenerateTemporarySecureUrl,
+  askFileIsColdStorage,
+  AskResponse,
+  askThrowError,
+  ErrorTypeEnum,
+  QpqRuntimeType,
+} from 'quidproquo-core';
 
 import { HTTPEvent, HTTPEventResponse } from '../../../../types';
-import { askFromJsonEventRequest,toJsonEventResponse } from '../../../../utils/httpEventUtils';
+import { askFromJsonEventRequest, toJsonEventResponse } from '../../../../utils/httpEventUtils';
 import { logsLogic } from '../../logic';
 import { askGetLogChatMessages } from '../../logic/askGetLogChatMessages';
 import { askLogSendChatMessage } from '../../logic/askLogSendChatMessage';
@@ -103,9 +111,15 @@ export function* downloadUrl(
     correlationId: string;
   },
 ) {
-  const url = yield* askFileGenerateTemporarySecureUrl('qpq-logs', `${params.correlationId}.json`, 1 * 60 * 1000);
+  const isColdStorageg = yield* askFileIsColdStorage('qpq-logs', `${params.correlationId}.json`);
 
-  return toJsonEventResponse({ url });
+  if (!isColdStorageg) {
+    const url = yield* askFileGenerateTemporarySecureUrl('qpq-logs', `${params.correlationId}.json`, 1 * 60 * 1000);
+
+    return toJsonEventResponse({ url, isColdStorage: false });
+  }
+
+  return toJsonEventResponse({ url: '', isColdStorage: true });
 }
 
 export function* sendChatMessage(event: HTTPEvent) {

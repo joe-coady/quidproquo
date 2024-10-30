@@ -1,5 +1,4 @@
 import { StorageDriveTier } from '../../config';
-import { CrossServiceResourceName, ResourceName } from '../../types';
 
 export enum FileActionType {
   ReadTextContents = '@quidproquo-core/File/ReadTextContents',
@@ -10,6 +9,7 @@ export enum FileActionType {
   ReadBinaryContents = '@quidproquo-core/File/ReadBinaryContents',
   WriteBinaryContents = '@quidproquo-core/File/WriteBinaryContents',
   GenerateTemporarySecureUrl = '@quidproquo-core/File/GenerateTemporarySecureUrl',
+  IsColdStorage = '@quidproquo-core/File/IsColdStorage',
 }
 
 export const filePathDelimiter = `/`;

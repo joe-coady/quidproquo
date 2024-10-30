@@ -1,4 +1,4 @@
-import { StoryResult } from 'quidproquo-core';
+import { QpqRuntimeType, StoryResult } from 'quidproquo-core';
 import { useBaseUrlResolvers } from 'quidproquo-web-react';
 
 import { useState } from 'react';
@@ -29,6 +29,28 @@ import { getLogUrl } from './logic';
 import { LogRawJson } from './LogRawJson';
 import { LogSummary } from './LogSummary';
 
+const getEmptyStorySession = (correlation: string): StoryResult<any> => {
+  const noStoryResult: StoryResult<any> = {
+    correlation,
+
+    finishedAt: new Date().toISOString(),
+    startedAt: new Date().toISOString(),
+
+    history: [],
+    input: ['Log cant be downloaded'],
+
+    moduleName: correlation.split('::')[0],
+    runtimeType: QpqRuntimeType.EXECUTE_STORY,
+    session: {
+      depth: 0,
+      context: {},
+    },
+    tags: ['Log unable to be downloaded'],
+  };
+
+  return noStoryResult;
+};
+
 interface LogDialogProps {
   open: boolean;
   logCorrelation: string;
@@ -55,16 +77,27 @@ const getTabStyle = (tabIndex: number, selectedTab: number) => ({
   height: '100%',
 });
 
-const LogDialog = ({ logCorrelation, open, handleClose, storyResultMetadatas, setSelectedLogCorrelation }: LogDialogProps) => {
-  const signedRequest = usePlatformDataFromPath<{ url: string }>(getLogUrl(logCorrelation));
-  const log = useExternalData<StoryResult<any>>(signedRequest?.url);
+const useLoadedStoryResult = (logCorrelation: string) => {
+  const signedRequest = usePlatformDataFromPath<{ url: string; isColdStorage: boolean }>(getLogUrl(logCorrelation));
+  const log = useExternalData<StoryResult<any>>(signedRequest?.url) || getEmptyStorySession(logCorrelation);
+  const isLoading = useIsLoading();
+
+  return {
+    isLoading: isLoading,
+    isColdStorage: !!signedRequest?.isColdStorage,
+    isOldLog: false,
+    log,
+  };
+};
+
+const LogDialog = ({ logCorrelation, open, handleClose, setSelectedLogCorrelation }: LogDialogProps) => {
+  const asyncLog = useLoadedStoryResult(logCorrelation);
+
   const urlResolvers = useBaseUrlResolvers();
 
-  const isLoading = useIsLoading() || !log;
-
   const handleExecute = async () => {
-    if (log) {
-      await apiRequestPost('http://localhost:8080/admin/service/log/execute', log, urlResolvers.getApiUrl());
+    if (asyncLog) {
+      await apiRequestPost('http://localhost:8080/admin/service/log/execute', asyncLog.log, urlResolvers.getApiUrl());
     }
   };
 
@@ -117,7 +150,7 @@ const LogDialog = ({ logCorrelation, open, handleClose, storyResultMetadatas, se
         }}
       >
         <div style={getTabStyle(selectedTab, 0)}>
-          {!isLoading && (
+          {!asyncLog.isLoading && (
             <>
               <div
                 style={{
@@ -134,10 +167,10 @@ const LogDialog = ({ logCorrelation, open, handleClose, storyResultMetadatas, se
                   label="Order by Duration"
                 />
               </div>
-              <LogDetails log={log!} hideFastActions={hideFastActions} orderByDuration={orderByDuration} />
+              <LogDetails log={asyncLog.log} hideFastActions={hideFastActions} orderByDuration={orderByDuration} />
             </>
           )}
-          {isLoading && <LinearProgress />}
+          {asyncLog.isLoading && <LinearProgress />}
         </div>
         <div style={getTabStyle(selectedTab, 1)}>
           <LogCorrelations
@@ -156,12 +189,12 @@ const LogDialog = ({ logCorrelation, open, handleClose, storyResultMetadatas, se
           />
         </div>
         <div style={getTabStyle(selectedTab, 3)}>
-          {!isLoading && <LogSummary log={log!} />}
-          {isLoading && <LinearProgress />}
+          {!asyncLog.isLoading && <LogSummary log={asyncLog.log} />}
+          {asyncLog.isLoading && <LinearProgress />}
         </div>
         <div style={getTabStyle(selectedTab, 4)}>
-          {!isLoading && <LogRawJson log={log!} />}
-          {isLoading && <LinearProgress />}
+          {!asyncLog.isLoading && <LogRawJson log={asyncLog.log} />}
+          {asyncLog.isLoading && <LinearProgress />}
         </div>
         <div style={getTabStyle(selectedTab, 5)}>
           <HelpChat logCorrelation={logCorrelation} />
@@ -169,23 +202,25 @@ const LogDialog = ({ logCorrelation, open, handleClose, storyResultMetadatas, se
       </DialogContent>
 
       <DialogActions>
-        <Button style={getTabStyle(selectedTab, 1)} onClick={(event) => treeApi.refreshTreeData()} disabled={isLoading}>
+        <Button style={getTabStyle(selectedTab, 1)} onClick={(event) => treeApi.refreshTreeData()} disabled={asyncLog.isLoading}>
           Refresh Tree
         </Button>
-        <Button style={getTabStyle(selectedTab, 2)} onClick={(event) => treeApi.refreshTreeData()} disabled={isLoading}>
+        <Button style={getTabStyle(selectedTab, 2)} onClick={(event) => treeApi.refreshTreeData()} disabled={asyncLog.isLoading}>
           Refresh Timeline
         </Button>
         <Button
           onClick={(event) => {
-            downloadJson(JSON.stringify(log, null, 2), `${log!.correlation}.json`);
+            if (asyncLog.log) {
+              downloadJson(JSON.stringify(asyncLog.log, null, 2), `${asyncLog.log.correlation}.json`);
+            }
             event.stopPropagation();
           }}
-          disabled={isLoading}
+          disabled={asyncLog.isLoading}
         >
           Download
         </Button>
-        {log && (
-          <Button onClick={handleExecute} disabled={isLoading}>
+        {asyncLog.log && (
+          <Button onClick={handleExecute} disabled={asyncLog.isLoading}>
             Execute
           </Button>
         )}

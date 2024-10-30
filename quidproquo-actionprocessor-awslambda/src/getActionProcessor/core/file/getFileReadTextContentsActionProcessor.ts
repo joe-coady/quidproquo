@@ -3,8 +3,11 @@ import {
   ActionProcessorList,
   ActionProcessorListResolver,
   actionResult,
+  actionResultError,
+  actionResultErrorFromCaughtError,
   FileActionType,
   FileReadTextContentsActionProcessor,
+  FileReadTextContentsErrorTypeEnum,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -13,9 +16,15 @@ import { resolveStorageDriveBucketName } from './utils';
 
 const getProcessFileReadTextContents = (qpqConfig: QPQConfig): FileReadTextContentsActionProcessor => {
   return async ({ drive, filepath }) => {
-    const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
+    try {
+      const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
 
-    return actionResult(await readTextFile(s3BucketName, filepath, qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig)));
+      return actionResult(await readTextFile(s3BucketName, filepath, qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig)));
+    } catch (error: unknown) {
+      return actionResultErrorFromCaughtError(error, {
+        InvalidObjectState: () => actionResultError(FileReadTextContentsErrorTypeEnum.InvalidStorageClass, 'File is in the wrong storage class'),
+      });
+    }
   };
 };
 

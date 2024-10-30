@@ -1,4 +1,14 @@
-import { askFileReadTextContents, askFilter, askMapParallelBatch,AskResponse, QpqPagedData, QpqRuntimeType } from 'quidproquo-core';
+import {
+  askCatch,
+  askDateNow,
+  askFileReadTextContents,
+  askFilter,
+  askMapParallelBatch,
+  AskResponse,
+  askSecondsElapsedFrom,
+  QpqPagedData,
+  QpqRuntimeType,
+} from 'quidproquo-core';
 
 import { askListLogs } from '../../entry/data/logMetadataData';
 import { LogMetadata } from '../../entry/domain';
@@ -20,6 +30,8 @@ export function* askGetLogs(
     nextPageKey: nextPageKey,
   };
 
+  const startTime = yield* askDateNow();
+
   do {
     const logPage = yield* askListLogs(
       runtimeType,
@@ -34,12 +46,9 @@ export function* askGetLogs(
     );
 
     const data = deep
-      ? yield* askMapParallelBatch(logPage.items, 10, function* askFilterDeep(log) {
-          try {
-            return yield* askFileReadTextContents('qpq-logs', `${log.correlation}.json`);
-          } catch {
-            return '';
-          }
+      ? yield* askMapParallelBatch(logPage.items, 10, function* askFilterDeep(log): AskResponse<string> {
+          const logData = yield* askCatch(askFileReadTextContents('qpq-logs', `${log.correlation}.json`));
+          return logData.success ? logData.result : '';
         })
       : [];
 
@@ -52,8 +61,8 @@ export function* askGetLogs(
     result.items.push(...filtered);
     result.nextPageKey = logPage.nextPageKey;
 
-    // Keep going until we get some items, if there are some to fetch
-  } while (result.nextPageKey && result.items.length < 3000);
+    // Keep going until we get some items, if there are some to fetch, also break out if this has been running longer then 15 seconds.
+  } while (result.nextPageKey && result.items.length < 3000 && (yield* askSecondsElapsedFrom(startTime)) < 15);
 
   return result;
 }
