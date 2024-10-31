@@ -1,4 +1,4 @@
-import { QPQConfig,qpqCoreUtils } from 'quidproquo-core';
+import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { aws_route53 } from 'aws-cdk-lib';
@@ -38,7 +38,7 @@ export class ServiceDomainConstruct extends QpqConstructBlock {
     // search.joecoady.development.example.com
     const serviceDomainName = qpqWebServerUtils.constructServiceDomainName(props.rootDomain, environment, service, feature);
 
-    console.log(`ServiceDomain: ${serviceDomainName} on apex - $${domainRoot}`);
+    console.log(`ServiceDomain: ${serviceDomainName} on apex - ${domainRoot}`);
 
     // Create the root hosted zone for our service
     const serviceHostedZone = new aws_route53.HostedZone(this, 'service-hosted-zone', {
