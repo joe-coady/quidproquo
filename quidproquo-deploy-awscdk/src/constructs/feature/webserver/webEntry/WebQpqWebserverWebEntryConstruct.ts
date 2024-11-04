@@ -87,22 +87,6 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
       qpqConfig: props.qpqConfig,
     });
 
-    const originAccessControl = new aws_cloudfront.CfnOriginAccessControl(
-      this,
-      `oac-${props.webEntryConfig.name}${props.webEntryConfig.domain.subDomainName}`,
-      {
-        originAccessControlConfig: {
-          name: this.resourceName(props.webEntryConfig.name),
-          originAccessControlOriginType: 's3',
-          signingBehavior: 'always',
-          signingProtocol: 'sigv4',
-
-          // the properties below are optional
-          description: `access to s3 bucket ${originBucket.bucketName}`,
-        },
-      },
-    );
-
     const cachePolicy = props.webEntryConfig.cacheSettingsName
       ? QpqWebServerCacheConstruct.fromOtherStack(
           this,
@@ -143,7 +127,8 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
       });
 
     // Create a CloudFront distribution using the S3 bucket as the origin
-    const distributionOrigin = new aws_cloudfront_origins.S3Origin(originBucket);
+    // const distributionOrigin = new aws_cloudfront_origins.S3Origin(originBucket);
+    const distributionOrigin = aws_cloudfront_origins.S3BucketOrigin.withOriginAccessControl(originBucket);
     const distribution = new aws_cloudfront.Distribution(this, 'MyDistribution', {
       defaultBehavior: {
         origin: distributionOrigin,
@@ -175,17 +160,6 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
       awsNamingUtils.getCFExportNameDistributionIdArnFromConfig(props.webEntryConfig.name, props.qpqConfig),
       distribution.distributionId,
     );
-
-    // TODO: Fix this when they add l2 support for origin access control settings
-
-    // Currently distribution don't have support for origin access control settings
-    // So we manually add it.
-    const cfnDistribution = distribution.node.defaultChild as aws_cloudfront.CfnDistribution;
-    cfnDistribution.addPropertyOverride('DistributionConfig.Origins.0.OriginAccessControlId', originAccessControl.getAtt('Id'));
-
-    // We need to null out the OriginAccessIdentity that it creates by default
-    // as the distribution cant work with both.
-    cfnDistribution.addPropertyOverride('DistributionConfig.Origins.0.S3OriginConfig.OriginAccessIdentity', '');
 
     new aws_route53.ARecord(this, `web-alias`, {
       zone: dnsRecord.hostedZone,
