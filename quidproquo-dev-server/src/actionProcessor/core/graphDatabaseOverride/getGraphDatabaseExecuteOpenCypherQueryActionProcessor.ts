@@ -1,3 +1,4 @@
+import { getServiceFunctionActionProcessor } from 'quidproquo-actionprocessor-awslambda';
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
@@ -45,13 +46,17 @@ const getGraphDatabaseExecuteOpenCypherStory = (qpqConfig: QPQConfig) => {
 
 export const getGraphDatabaseExecuteOpenCypherQueryActionProcessor: ActionProcessorListResolver = async (
   qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [GraphDatabaseActionType.ExecuteOpenCypherQuery]: getProcessCustomImplementation<GraphDatabaseExecuteOpenCypherQueryActionProcessor>(
-    qpqConfig,
-    getGraphDatabaseExecuteOpenCypherStory(qpqConfig),
-    'Neptune Cypher Query - dev server',
-    null,
-    () => new Date().toISOString(),
-    randomUUID,
-  ),
-});
+): Promise<ActionProcessorList> => {
+  return {
+    [GraphDatabaseActionType.ExecuteOpenCypherQuery]: getProcessCustomImplementation<GraphDatabaseExecuteOpenCypherQueryActionProcessor>(
+      qpqConfig,
+      getGraphDatabaseExecuteOpenCypherStory(qpqConfig),
+      'Neptune Cypher Query - dev server',
+      // Make sure the service functions that its trying to execute are in aws and not local
+      // as we use the service functions to proxy the queries though the VPC
+      getServiceFunctionActionProcessor,
+      () => new Date().toISOString(),
+      randomUUID,
+    ),
+  };
+};
