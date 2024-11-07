@@ -12,7 +12,7 @@ import {
 
 import { randomUUID } from 'crypto';
 
-import { getDevServerActionProcessors, getExpressApiEventEventProcessor } from '../../actionProcessor';
+import { getDevServerActionProcessors, getExpressApiEventEventProcessor } from '../actionProcessor';
 
 // TODO: Make this a util or something based on server time or something..
 const getDateNow = () => new Date().toISOString();
@@ -22,6 +22,7 @@ export const processEvent = async <E, ER>(
   qpqConfig: QPQConfig,
   dynamicModuleLoader: DynamicModuleLoader,
   getActionProcessors: ActionProcessorListResolver,
+  qpqRuntimeType: QpqRuntimeType,
 ): Promise<StoryResult<[E], ER>> => {
   const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
 
@@ -40,7 +41,7 @@ export const processEvent = async <E, ER>(
     getDateNow,
     logger,
     `${serviceName}::${randomUUID()}`,
-    QpqRuntimeType.API,
+    qpqRuntimeType,
     dynamicModuleLoader,
     [],
   );

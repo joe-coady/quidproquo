@@ -8,8 +8,8 @@ import path from 'path';
 
 import { getExpressApiEventEventProcessor } from '../actionProcessor';
 import { getAllServiceConfigs } from '../allServiceConfig';
+import { processEvent } from '../logic';
 import { DevServerConfig, ExpressEvent, ExpressEventResponse } from '../types';
-import { processEvent } from './apiRuntime';
 
 const getServiceBaseDomain = (qpqConfig: QPQConfig, devServerConfig: DevServerConfig) =>
   qpqWebServerUtils.getDomainRoot(
@@ -43,8 +43,8 @@ const getDynamicModuleLoader = (qpqConfig: QPQConfig, devServerConfig: DevServer
   return async (runtime: QpqFunctionRuntime): Promise<any> => devServerConfig.dynamicModuleLoader(serviceName, runtime);
 };
 
-export const apiRuntime = async (devServerConfig: DevServerConfig) => {
-  const allServiceConfig = await getAllServiceConfigs(devServerConfig);
+export const apiImplementation = async (devServerConfig: DevServerConfig) => {
+  const allServiceConfig = getAllServiceConfigs(devServerConfig);
 
   const app: Express = express();
 
@@ -152,6 +152,7 @@ export const apiRuntime = async (devServerConfig: DevServerConfig) => {
         apiConfig.qpqConfig,
         getDynamicModuleLoader(apiConfig.qpqConfig, devServerConfig),
         getExpressApiEventEventProcessor,
+        QpqRuntimeType.API,
       );
 
       if (response.result) {

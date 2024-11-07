@@ -1,4 +1,4 @@
-import { joinPaths, QPQConfig, qpqCoreUtils,QpqFunctionRuntime } from 'quidproquo-core';
+import { joinPaths, QPQConfig, qpqCoreUtils, QpqFunctionRuntime } from 'quidproquo-core';
 
 import {
   ApiKeyQPQWebServerConfigSetting,
@@ -15,7 +15,7 @@ import {
   SubdomainRedirectQPQWebServerConfigSetting,
   WebSocketQPQWebServerConfigSetting,
 } from '../config';
-import { ApiQPQWebServerConfigSetting,WebEntryQPQWebServerConfigSetting } from '../config';
+import { ApiQPQWebServerConfigSetting, WebEntryQPQWebServerConfigSetting } from '../config';
 
 export const getAllRoutes = (qpqConfig: QPQConfig): RouteQPQWebServerConfigSetting[] => {
   const routes = qpqCoreUtils.getConfigSettings<RouteQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.Route);
@@ -48,6 +48,12 @@ export const getAllServiceFunctions = (qpqConfig: QPQConfig): ServiceFunctionQPQ
   );
 
   return serviceFunctions;
+};
+
+export const getOwnedServiceFunctions = (qpqConfig: QPQConfig): ServiceFunctionQPQWebServerConfigSetting[] => {
+  const serviceFunctions = getAllServiceFunctions(qpqConfig);
+
+  return qpqCoreUtils.getOwnedItems(serviceFunctions, qpqConfig);
 };
 
 export const getAllOpenApiSpecs = (configs: QPQConfig): OpenApiQPQWebServerConfigSetting[] => {

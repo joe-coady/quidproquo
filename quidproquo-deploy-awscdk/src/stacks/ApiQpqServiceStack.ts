@@ -81,7 +81,7 @@ export class ApiQpqServiceStack extends QpqServiceStack {
     );
 
     // Service Functions
-    const serviceFunctions = qpqWebServerUtils.getAllServiceFunctions(props.qpqConfig).map(
+    const serviceFunctions = qpqWebServerUtils.getOwnedServiceFunctions(props.qpqConfig).map(
       (setting) =>
         new QpqWebserverServiceFunctionConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,

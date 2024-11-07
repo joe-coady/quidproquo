@@ -1,10 +1,12 @@
-import { QPQConfigAdvancedSettings, QPQConfigSetting, qpqCoreUtils,QpqFunctionRuntime } from 'quidproquo-core';
+import { CrossModuleOwner, QPQConfigAdvancedSettings, QPQConfigSetting, qpqCoreUtils, QpqFunctionRuntime } from 'quidproquo-core';
 
 import { QPQWebServerConfigSettingType } from '../QPQConfig';
 
 export interface QPQConfigAdvancedServiceFunctionSettings extends QPQConfigAdvancedSettings {
   functionName?: string;
   virtualNetworkName?: string;
+
+  owner?: CrossModuleOwner<'functionName'>;
 }
 
 export interface ServiceFunctionQPQWebServerConfigSetting extends QPQConfigSetting {
@@ -29,5 +31,7 @@ export const defineServiceFunction = (
     functionName: functionName,
 
     virtualNetworkName: options?.virtualNetworkName,
+
+    owner: qpqCoreUtils.convertCrossModuleOwnerToGenericResourceNameOverride(options?.owner),
   };
 };

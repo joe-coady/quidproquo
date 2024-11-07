@@ -4,6 +4,7 @@ import { ExecuteServiceFunctionEvent } from 'quidproquo-webserver';
 // Customs
 export type AnyExecuteServiceFunctionEventWithSession = ExecuteServiceFunctionEvent<any[]> & {
   storySession: StorySession;
+  serviceName: string;
 };
 
 // Externals - The ins and outs of the external event

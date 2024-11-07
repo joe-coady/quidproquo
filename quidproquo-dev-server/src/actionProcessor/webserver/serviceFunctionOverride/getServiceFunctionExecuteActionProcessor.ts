@@ -4,24 +4,19 @@ import {
   actionResult,
   actionResultError,
   DynamicModuleLoader,
-  EitherActionResult,
-  ErrorTypeEnum,
   QPQConfig,
-  StorySession,
+  StoryResult,
 } from 'quidproquo-core';
-import { ExecuteServiceFunctionEvent, ServiceFunctionActionType, ServiceFunctionExecuteActionProcessor } from 'quidproquo-webserver';
+import { ServiceFunctionActionType, ServiceFunctionExecuteActionProcessor } from 'quidproquo-webserver';
 
-import { processEvent } from '../../../implementations/apiRuntime';
-import { getNodeServiceFunctionEventProcessor } from '../../core';
-
-type AnyExecuteServiceFunctionEventWithSession = ExecuteServiceFunctionEvent<any[]> & {
-  storySession: StorySession;
-};
+import { eventBus } from '../../../logic/eventBus';
+import { AnyExecuteServiceFunctionEventWithSession } from '../../core/event/node/serviceFunction/types';
 
 const getProcessExecute = (qpqConfig: QPQConfig, dynamicModuleLoader: DynamicModuleLoader): ServiceFunctionExecuteActionProcessor<any, any> => {
   return async ({ functionName, service, payload, context, isAsync }, session) => {
     const serviceFunctionEvent: AnyExecuteServiceFunctionEventWithSession = {
       functionName: functionName,
+      serviceName: service,
       payload: payload,
       storySession: {
         ...session,
@@ -29,11 +24,9 @@ const getProcessExecute = (qpqConfig: QPQConfig, dynamicModuleLoader: DynamicMod
       },
     };
 
-    const eventPromise = processEvent<AnyExecuteServiceFunctionEventWithSession, any>(
+    const eventPromise: Promise<StoryResult<[AnyExecuteServiceFunctionEventWithSession], any>> = eventBus.publishAndWaitForResponse(
+      ServiceFunctionActionType.Execute,
       serviceFunctionEvent,
-      qpqConfig,
-      dynamicModuleLoader,
-      getNodeServiceFunctionEventProcessor,
     );
 
     if (isAsync) {
