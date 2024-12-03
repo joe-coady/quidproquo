@@ -10,9 +10,9 @@ import {
 } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
-import { InternalEventRecord, MatchResult } from './types';
+import { EventInput, InternalEventRecord, MatchResult } from './types';
 
-const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProcessor<InternalEventRecord, MatchResult> => {
+const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProcessor<InternalEventRecord, MatchResult, EventInput> => {
   const serviceFunctions = qpqWebServerUtils.getAllServiceFunctions(qpqConfig);
 
   return async ({ qpqEventRecord }) => {

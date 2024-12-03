@@ -26,7 +26,10 @@ export class QpqWebPlugin implements WebpackPluginInstance {
       feature: feature,
     };
 
+    console.log('Applying QpqWebPlugin with config:', applicationConfigInfo);
+
     new DefinePlugin({
+      [`process.env.QPQ_APPLICATION_CONFIG_INFO_${serviceName.toUpperCase()}`]: JSON.stringify(applicationConfigInfo),
       'process.env.QPQ_APPLICATION_CONFIG_INFO': JSON.stringify(applicationConfigInfo),
     }).apply(compiler);
   }

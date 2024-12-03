@@ -9,12 +9,12 @@ import {
 } from 'quidproquo-core';
 
 import { LambdaRuntimeConfig } from '../../../../../runtimeConfig/QPQAWSResourceMap';
-import { InternalEventRecord, MatchResult } from './types';
+import { EventInput, InternalEventRecord, MatchResult } from './types';
 
 // TODO: Clean this shit up
 const lambdaRuntimeConfig: LambdaRuntimeConfig = JSON.parse(process.env.lambdaRuntimeConfig || '{}');
 
-const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProcessor<InternalEventRecord, MatchResult> => {
+const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProcessor<InternalEventRecord, MatchResult, EventInput> => {
   return async ({ qpqEventRecord }) => {
     return actionResult<MatchResult>({
       runtime: lambdaRuntimeConfig.runtime,

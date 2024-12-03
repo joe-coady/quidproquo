@@ -17,6 +17,8 @@ import { eventBus } from '../../../logic/eventBus';
 export type AnyEventBusMessageWithSession = QueueMessage<any> & {
   storySession: StorySession;
 
+  eventBusName: string;
+
   targetApplication: string;
   targetEnvironment: string;
   targetModule: string;
@@ -35,7 +37,10 @@ const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): EventBusSendMessag
   ) => {
     const eventBusConfig = qpqCoreUtils.getEventBusConfigByName(eventBusName, qpqConfig);
     if (!eventBusConfig) {
-      return actionResultError(ErrorTypeEnum.NotFound, `Event bus ${eventBusName} not found`);
+      return actionResultError(
+        ErrorTypeEnum.NotFound,
+        `Event bus ${eventBusName} not found for service [${qpqCoreUtils.getApplicationModuleName(qpqConfig)}]`,
+      );
     }
 
     for (const eventBusMessage of eventBusMessages) {
@@ -43,7 +48,12 @@ const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): EventBusSendMessag
         payload: eventBusMessage.payload,
         type: eventBusMessage.type,
 
-        storySession: session,
+        storySession: {
+          ...session,
+          context,
+        },
+
+        eventBusName: eventBusConfig.name,
 
         targetApplication: eventBusConfig.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig),
         targetEnvironment: eventBusConfig.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),

@@ -8,11 +8,11 @@ import {
   EventMatchStoryActionProcessor,
   QPQConfig,
 } from 'quidproquo-core';
-import { qpqWebServerUtils,WebSocketEventType } from 'quidproquo-webserver';
+import { qpqWebServerUtils, WebSocketEventType } from 'quidproquo-webserver';
 
-import { GLOBAL_WEBSOCKET_API_NAME, InternalEventRecord, MatchResult } from './types';
+import { EventInput, GLOBAL_WEBSOCKET_API_NAME, InternalEventRecord, MatchResult } from './types';
 
-const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProcessor<InternalEventRecord, MatchResult> => {
+const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProcessor<InternalEventRecord, MatchResult, EventInput> => {
   const userDirectoryConfig = qpqWebServerUtils.getWebsocketEntryByApiName(GLOBAL_WEBSOCKET_API_NAME, qpqConfig);
 
   return async ({ qpqEventRecord }) => {

@@ -11,9 +11,9 @@ import {
 } from 'quidproquo-core';
 import { qpqWebServerUtils, RouteQPQWebServerConfigSetting } from 'quidproquo-webserver';
 
-import { InternalEventRecord, MatchResult } from './types';
+import { EventInput, InternalEventRecord, MatchResult } from './types';
 
-const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProcessor<InternalEventRecord, MatchResult> => {
+const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProcessor<InternalEventRecord, MatchResult, EventInput> => {
   const routes: RouteQPQWebServerConfigSetting[] = qpqWebServerUtils.getAllRoutes(qpqConfig);
 
   return async ({ qpqEventRecord }) => {

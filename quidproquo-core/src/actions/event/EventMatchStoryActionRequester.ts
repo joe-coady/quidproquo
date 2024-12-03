@@ -1,11 +1,12 @@
-import { AnyMatchStoryResult,EventActionType } from './EventActionType';
+import { AnyMatchStoryResult, EventActionType } from './EventActionType';
 import { EventMatchStoryActionRequester } from './EventMatchStoryActionTypes';
 
-export function* askEventMatchStory<QpqEventRecord, MSR extends AnyMatchStoryResult>(
+export function* askEventMatchStory<QpqEventRecord, MSR extends AnyMatchStoryResult, EventParams extends Array<unknown>>(
   qpqEventRecord: QpqEventRecord,
-): EventMatchStoryActionRequester<QpqEventRecord, MSR> {
+  eventParams: EventParams,
+): EventMatchStoryActionRequester<QpqEventRecord, MSR, EventParams> {
   return yield {
     type: EventActionType.MatchStory,
-    payload: { qpqEventRecord },
+    payload: { qpqEventRecord, eventParams },
   };
 }

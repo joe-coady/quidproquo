@@ -203,8 +203,17 @@ export const getOwnedEventBusConfigs = (qpqConfig: QPQConfig): EventBusQPQConfig
 };
 
 export const getEventBusConfigByName = (eventBusName: string, qpqConfig: QPQConfig): EventBusQPQConfigSetting | undefined => {
-  const eventBusConfig = getAllEventBusConfigs(qpqConfig).find((eb) => eb.name === eventBusName);
-  return eventBusConfig;
+  const allConfigs = getAllEventBusConfigs(qpqConfig);
+
+  console.log('allConfigs: ', JSON.stringify(allConfigs, null, 2));
+
+  const eventBusConfig = allConfigs.find((eb) => eb.owner?.resourceNameOverride === eventBusName);
+
+  if (eventBusConfig) {
+    return eventBusConfig;
+  }
+
+  return allConfigs.find((eb) => eb.name === eventBusName);
 };
 
 export const getOwnedItems = <T extends QPQConfigSetting>(settings: T[], qpqConfig: QPQConfig): T[] => {

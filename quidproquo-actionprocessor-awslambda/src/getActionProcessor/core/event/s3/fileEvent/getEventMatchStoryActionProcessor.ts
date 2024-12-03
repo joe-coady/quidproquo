@@ -7,9 +7,9 @@ import {
   QPQConfig,
 } from 'quidproquo-core';
 
-import { GLOBAL_STORAGE_DRIVE_RUNTIME, InternalEventRecord, MatchResult } from './types';
+import { EventInput, GLOBAL_STORAGE_DRIVE_RUNTIME, InternalEventRecord, MatchResult } from './types';
 
-const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProcessor<InternalEventRecord, MatchResult> => {
+const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProcessor<InternalEventRecord, MatchResult, EventInput> => {
   return async ({ qpqEventRecord }) => {
     return actionResult<MatchResult>({
       runtime: GLOBAL_STORAGE_DRIVE_RUNTIME,

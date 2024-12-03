@@ -19,7 +19,7 @@ function* askProcessEventRecord<QpqEventRecord, MSR extends AnyMatchStoryResult,
   eventArguments: EventParams,
 ): AskResponse<EitherActionResult<QpqEventRecordResponse>> {
   // Try and match a story to execute
-  const matchResultResult = yield* askCatch(askEventMatchStory<QpqEventRecord, MSR>(qpqEventRecord));
+  const matchResultResult = yield* askCatch(askEventMatchStory<QpqEventRecord, MSR, EventParams>(qpqEventRecord, eventArguments));
   if (!matchResultResult.success) {
     return getUnsuccessfulEitherActionResult(matchResultResult.error);
   }

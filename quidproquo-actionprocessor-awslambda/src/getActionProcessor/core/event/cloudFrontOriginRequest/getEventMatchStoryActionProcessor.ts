@@ -11,9 +11,9 @@ import {
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { matchUrl } from '../../../../awsLambdaUtils';
-import { InternalEventRecord, MatchResult } from './types';
+import { EventInput, InternalEventRecord, MatchResult } from './types';
 
-const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProcessor<InternalEventRecord, MatchResult> => {
+const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProcessor<InternalEventRecord, MatchResult, EventInput> => {
   const seoConfigs = qpqWebServerUtils.getAllSeo(qpqConfig);
 
   return async ({ qpqEventRecord }) => {

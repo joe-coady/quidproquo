@@ -1,14 +1,16 @@
-import { QPQConfig, qpqCoreUtils, QpqLogger,StoryResult } from 'quidproquo-core';
+import { QPQConfig, qpqCoreUtils, QpqLogger, StoryResult } from 'quidproquo-core';
 
 import fs from 'fs';
 import path from 'path';
-import { PutObjectCommand, PutObjectCommandInput,S3Client } from '@aws-sdk/client-s3';
+import { PutObjectCommand, PutObjectCommandInput, S3Client } from '@aws-sdk/client-s3';
 
 import { getConfigRuntimeResourceName } from '../../awsNamingUtils';
 
 const tempDirectory = '/tmp/qpqlogs';
 
-import { getAwsServiceAccountInfoByDeploymentInfo,getAwsServiceAccountInfoConfig } from 'quidproquo-config-aws';
+import { getAwsServiceAccountInfoByDeploymentInfo, getAwsServiceAccountInfoConfig } from 'quidproquo-config-aws';
+
+import { randomUUID } from 'crypto';
 
 export const storyLogger = async (result: StoryResult<any>, bucketName: string, region: string): Promise<void> => {
   try {
@@ -78,6 +80,8 @@ export const getLogger = (qpqConfig: QPQConfig): QpqLogger => {
   const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
   const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
 
+  console.log('Env for bucket: ', environment);
+
   // Workout the bucket name.
   const bucketName = getConfigRuntimeResourceName('qpq-logs', application, service, environment, feature);
 
@@ -101,9 +105,10 @@ export const getLogger = (qpqConfig: QPQConfig): QpqLogger => {
     waitToFinishWriting: async () => {
       console.log('logs.length', logs.length);
 
-      console.time('Writing Logs');
+      const id = randomUUID();
+      console.time(`Writing Logs ${id}`);
       await Promise.all(logs);
-      console.timeEnd('Writing Logs');
+      console.timeEnd(`Writing Logs ${id}`);
 
       console.log('done writing logs');
     },

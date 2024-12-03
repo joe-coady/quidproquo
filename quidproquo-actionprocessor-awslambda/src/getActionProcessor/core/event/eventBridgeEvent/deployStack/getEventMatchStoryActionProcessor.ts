@@ -10,12 +10,12 @@ import {
   qpqCoreUtils,
 } from 'quidproquo-core';
 
-import { InternalEventRecord, MatchResult } from './types';
+import { EventInput, InternalEventRecord, MatchResult } from './types';
 
 // TODO: Globals? Are these bad....
 const GLOBAL_DEPLOY_EVENT_NAME = process.env.deployEventConfigName!;
 
-const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProcessor<InternalEventRecord, MatchResult> => {
+const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProcessor<InternalEventRecord, MatchResult, EventInput> => {
   const deployConfig = qpqCoreUtils.getDeployEventConfigs(qpqConfig).find((c) => c.name === GLOBAL_DEPLOY_EVENT_NAME);
 
   return async ({ qpqEventRecord }) => {
