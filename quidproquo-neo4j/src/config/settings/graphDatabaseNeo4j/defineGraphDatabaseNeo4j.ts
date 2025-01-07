@@ -1,6 +1,4 @@
-import { defineActionProcessors, defineParameter, defineRecurringSchedule, defineSecret, QPQConfig } from 'quidproquo-core';
-
-import path from 'path';
+import { defineActionProcessors, defineParameter, defineRecurringSchedule, defineSecret, QPQConfig, QpqFunctionRuntime } from 'quidproquo-core';
 
 // export interface QPQConfigAdvancedGraphDatabaseNeo4jSettings extends QPQConfigAdvancedSettings {
 //   owner?: CrossModuleOwner<'graphDatabaseName'>;
@@ -14,18 +12,20 @@ export enum Neo4jVersion {
   Version5 = 'version5',
 }
 
+const fullQpqFunctionRuntime = (relativePath: string, functionName: string): QpqFunctionRuntime => {
+  return `full@${__dirname}/${relativePath}::${functionName}`;
+};
+
 export const defineGraphDatabaseNeo4j = (databaseName: string, version: Neo4jVersion = Neo4jVersion.Version5): QPQConfig => [
   defineParameter(`neo4j-${databaseName}-instance`),
   defineSecret(`neo4j-${databaseName}-password`),
 
-  defineActionProcessors(
-    `full@${path.join(__dirname, `../../../actionProcessor/graphDatabaseOverride/${version}`)}::getGraphDatabaseActionProcessor`,
-  ),
+  defineActionProcessors(fullQpqFunctionRuntime(`../../../actionProcessor/graphDatabaseOverride/${version}`, 'getGraphDatabaseActionProcessor')),
 
   defineRecurringSchedule(
     '0 0 * * ? *', // 12am every day (UTC)
     // '* * * * ? *', // every min (for testing)
-    `full@${path.join(__dirname, '../../../entry/scheduledEvents/keepAlive')}::keepAlive`,
+    fullQpqFunctionRuntime('../../../entry/scheduledEvents/keepAlive', 'keepAlive'),
     {
       metadata: {
         databaseName: databaseName,

@@ -54,6 +54,8 @@ export const apiImplementation = async (devServerConfig: DevServerConfig) => {
 
   const apiConfigs = allServiceConfig.map((qpqConfig) => getApiDomainsFromConfig(qpqConfig, devServerConfig)).flat();
 
+  console.log(apiConfigs.map((ac) => ac.devPath));
+
   const adminFrontend = path.join(__dirname, '../../..', 'node_modules', 'quidproquo-web-admin', 'lib');
 
   // Admin page
