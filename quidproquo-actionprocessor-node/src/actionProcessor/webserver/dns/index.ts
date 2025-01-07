@@ -1,10 +1,10 @@
 import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
 
-import { getDnsActionProcessor } from './dns';
+import { getDnsListActionProcessor } from './getDnsListActionProcessor';
 
-export const getWebserverActionProcessor: ActionProcessorListResolver = async (
+export const getDnsActionProcessor: ActionProcessorListResolver = async (
   qpqConfig: QPQConfig,
   dynamicModuleLoader: DynamicModuleLoader,
 ): Promise<ActionProcessorList> => ({
-  ...(await getDnsActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getDnsListActionProcessor(qpqConfig, dynamicModuleLoader)),
 });
