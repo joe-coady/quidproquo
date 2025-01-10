@@ -1,9 +1,7 @@
-import { useContext } from 'react';
-
-import { authContext } from '../authContext';
+import { useAuthAccessToken } from './useAuthAccessToken';
 
 export const useIsLoggedIn = () => {
-  const authState = useContext(authContext);
+  const accessToken = useAuthAccessToken();
 
-  return !!authState.authenticationInfo?.accessToken;
+  return !!accessToken;
 };
