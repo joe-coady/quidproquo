@@ -16,3 +16,4 @@ export * from './serviceFunction';
 export * from './subdomainRedirect';
 export * from './webEntry';
 export * from './websocket';
+export * from './webSocketQueue';

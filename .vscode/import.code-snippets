@@ -1,0 +1,9 @@
+{
+  "Import": {
+    "prefix": "#imp", 
+    "body": [
+      "import { ${2:module} } from '${1:pkg}';",
+    ],
+    "description": "Snippet for better imports in js",
+  },
+}
