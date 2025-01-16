@@ -1,4 +1,4 @@
-import { AskResponse } from 'quidproquo-core';
+import { askDecodeJson, AskResponse, isString } from 'quidproquo-core';
 
 import { askWebsocketProvideConnectionInfo } from '../../../../context';
 import { WebsocketEvent } from '../../../../types';
@@ -24,11 +24,11 @@ export function* onDisconnect(event: WebsocketEvent): AskResponse<void> {
 }
 
 export function* onMessage(event: WebsocketEvent): AskResponse<void> {
-  if (typeof event.body !== 'string') {
+  if (!isString(event.body)) {
     return;
   }
 
-  const message = JSON.parse(event.body) as AnyWebSocketQueueEventMessageWithCorrelation;
+  const message = yield* askDecodeJson<AnyWebSocketQueueEventMessageWithCorrelation>(event.body);
 
   yield* askWebsocketProvideConnectionInfo(
     {

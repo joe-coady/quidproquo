@@ -1,7 +1,8 @@
-import { AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
+import { AskResponse } from 'quidproquo-core';
 
 import { AnyWebSocketQueueEventMessageWithCorrelation } from '../../types';
-import { askAuthenticateConnection } from './askAuthenticateConnection';
+import { askBroadcastUnknownMessage } from './askBroadcastUnknownMessage';
+import { askTryAuthenticateConnection } from './askTryAuthenticateConnection';
 import {
   askProcessOnAuthenticate,
   askProcessOnPing,
@@ -35,18 +36,8 @@ export function* askProcessOnMessage(connectionId: string, message: AnyWebSocket
   }
 
   // Make sure any messages below have access to the authenticated user
-  yield* askAuthenticateConnection(connectionId);
+  yield* askTryAuthenticateConnection(connectionId);
 
-  // if (isWebSocketMarkLogCheckedMessage(message)) {
-  //   yield* askProcessOnMarkLogChecked(connectionId, message.payload.correlationId, message.payload.checked);
-
-  //   return;
-  // }
-
-  // if (isWebSocketRefreshLogMetadataMessage(message)) {
-  //   yield* askProcessOnRefreshLogMetadata(message.payload.correlationId);
-  // }
-
-  // This should never be hit.
-  yield* askThrowError(ErrorTypeEnum.GenericError, `Unabled to process [${(message as any)?.messageType}] WebSocket Queue Message`);
+  // Send the message to the event bus
+  yield* askBroadcastUnknownMessage(message);
 }
