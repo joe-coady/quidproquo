@@ -2,8 +2,11 @@ import { AskResponse, askUserDirectorySetAccessToken } from 'quidproquo-core';
 
 import { adminUserDirectoryResourceName } from '../../../../../config';
 import { webSocketConnectionData } from '../../../data';
-import { AnyWebSocketQueueEventMessageWithCorrelation } from '../../../types';
-import { WebSocketQueueClientEventMessageAuthenticate, WebSocketQueueClientMessageEventType } from '../clientMessages';
+import {
+  AnyWebSocketQueueEventMessageWithCorrelation,
+  WebSocketQueueClientEventMessageAuthenticate,
+  WebSocketQueueClientMessageEventType,
+} from '../../../types';
 
 export function isWebSocketAuthenticateMessage(
   event: AnyWebSocketQueueEventMessageWithCorrelation,

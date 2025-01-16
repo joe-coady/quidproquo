@@ -1,9 +1,9 @@
 import { AuthenticationInfo } from 'quidproquo-core';
 import { WebsocketServiceEvent } from 'quidproquo-web';
 import {
-  WebSocketClientEventMessageAuthenticate,
-  WebSocketClientEventMessageUnauthenticate,
-  WebsocketClientMessageEventType,
+  WebSocketQueueClientEventMessageAuthenticate,
+  WebSocketQueueClientEventMessageUnauthenticate,
+  WebSocketQueueClientMessageEventType,
 } from 'quidproquo-webserver';
 
 import { useEffect } from 'react';
@@ -21,8 +21,8 @@ export const useWebsocketAuthSync = (accessToken: AuthenticationInfo['accessToke
     }
 
     if (accessToken) {
-      const authMessage: WebSocketClientEventMessageAuthenticate = {
-        type: WebsocketClientMessageEventType.Authenticate,
+      const authMessage: WebSocketQueueClientEventMessageAuthenticate = {
+        type: WebSocketQueueClientMessageEventType.Authenticate,
         payload: {
           accessToken: accessToken,
         },
@@ -30,8 +30,8 @@ export const useWebsocketAuthSync = (accessToken: AuthenticationInfo['accessToke
 
       sendMessage(authMessage);
     } else {
-      const authMessage: WebSocketClientEventMessageUnauthenticate = {
-        type: WebsocketClientMessageEventType.Unauthenticate,
+      const authMessage: WebSocketQueueClientEventMessageUnauthenticate = {
+        type: WebSocketQueueClientMessageEventType.Unauthenticate,
       };
 
       sendMessage(authMessage);

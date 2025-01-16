@@ -1,12 +1,15 @@
 import { AnyEventMessage, AskResponse } from 'quidproquo-core';
 
 import { webSocketConnectionData } from '../../../data';
-import { AnyWebSocketQueueEventMessageWithCorrelation } from '../../../types';
-import { WebSocketQueueClientMessageEventType, WebSocketQueueEventMessageUnauthenticate } from '../clientMessages';
+import {
+  AnyWebSocketQueueEventMessageWithCorrelation,
+  WebSocketQueueClientEventMessageUnauthenticate,
+  WebSocketQueueClientMessageEventType,
+} from '../../../types';
 
 export function isWebSocketUnauthenticateMessage(
   event: AnyWebSocketQueueEventMessageWithCorrelation,
-): event is WebSocketQueueEventMessageUnauthenticate {
+): event is WebSocketQueueClientEventMessageUnauthenticate {
   return event.type === WebSocketQueueClientMessageEventType.Unauthenticate;
 }
 

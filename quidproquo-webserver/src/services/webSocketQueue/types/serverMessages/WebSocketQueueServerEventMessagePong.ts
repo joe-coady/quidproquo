@@ -1,4 +1,4 @@
-import { WebSocketQueueEventMessage } from '../../../types';
+import { WebSocketQueueEventMessage } from '../WebSocketQueueEventMessage';
 import { WebSocketQueueServerMessageEventType } from './WebSocketQueueServerMessageEventType';
 
 export type WebSocketQueueServerEventPayloadPong = undefined;

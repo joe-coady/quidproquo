@@ -1,6 +1,6 @@
-import { useEffect, useRef,useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-export function useRunEvery<T>(func: () => T, interval: number): T {
+export function useRunEvery<T>(func: () => T, intervalSeconds: number): T {
   const [value, setValue] = useState<T>(func);
   const intervalRef = useRef<number | null>(null);
 
@@ -8,7 +8,7 @@ export function useRunEvery<T>(func: () => T, interval: number): T {
     intervalRef.current = window.setInterval(() => {
       const newValue = func();
       setValue(newValue);
-    }, interval * 1000);
+    }, intervalSeconds * 1000);
 
     return () => {
       if (intervalRef.current !== null) {
@@ -16,7 +16,7 @@ export function useRunEvery<T>(func: () => T, interval: number): T {
         intervalRef.current = null;
       }
     };
-  }, [interval]);
+  }, [intervalSeconds]);
 
   return value;
 }

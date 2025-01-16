@@ -1,6 +1,6 @@
-import { AuthenticationInfo, EventMessage } from 'quidproquo-core';
+import { AuthenticationInfo } from 'quidproquo-core';
 
-import { WebSocketQueueEventMessage } from '../../../types';
+import { WebSocketQueueEventMessage } from '../WebSocketQueueEventMessage';
 import { WebSocketQueueClientMessageEventType } from './WebSocketQueueClientMessageEventType';
 
 export type WebSocketQueueClientEventPayloadAuthenticate = {

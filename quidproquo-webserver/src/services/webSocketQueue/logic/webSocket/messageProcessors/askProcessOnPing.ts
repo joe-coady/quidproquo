@@ -1,9 +1,13 @@
 import { AskResponse } from 'quidproquo-core';
 
-import { AnyWebSocketQueueEventMessageWithCorrelation } from '../../../types';
+import {
+  AnyWebSocketQueueEventMessageWithCorrelation,
+  WebSocketQueueClientEventMessagePing,
+  WebSocketQueueClientMessageEventType,
+  WebSocketQueueServerEventMessagePong,
+  WebSocketQueueServerMessageEventType,
+} from '../../../types';
 import { askSendMessage } from '../askSendMessage';
-import { WebSocketQueueClientEventMessagePing, WebSocketQueueClientMessageEventType } from '../clientMessages';
-import { WebSocketQueueServerEventMessagePong, WebSocketQueueServerMessageEventType } from '../serverMessages';
 
 export function isWebSocketPingMessage(event: AnyWebSocketQueueEventMessageWithCorrelation): event is WebSocketQueueClientEventMessagePing {
   return event.type === WebSocketQueueClientMessageEventType.Ping;
