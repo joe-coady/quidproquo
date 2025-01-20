@@ -6,3 +6,5 @@ export type CrossModuleOwner<T extends string = 'resourceNameOverride'> = {
 } & {
   [key in T]?: string;
 };
+
+export type CrossModuleOwnerWithNoResourceOverride = Omit<CrossModuleOwner, 'resourceNameOverride'>;

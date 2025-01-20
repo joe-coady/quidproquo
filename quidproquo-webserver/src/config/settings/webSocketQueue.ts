@@ -1,11 +1,20 @@
-import { CrossModuleOwner, defineGlobal, defineKeyValueStore, QPQConfig, QPQConfigAdvancedSettings, qpqCoreUtils } from 'quidproquo-core';
+import {
+  CrossModuleOwnerWithNoResourceOverride,
+  defineGlobal,
+  defineKeyValueStore,
+  QPQConfig,
+  QPQConfigAdvancedSettings,
+  qpqCoreUtils,
+} from 'quidproquo-core';
 
 import { getServiceEntryQpqFunctionRuntime } from '../../services';
 import { defineWebsocket } from './websocket';
 
 export interface QPQConfigAdvancedWebsocketQueueSettings extends QPQConfigAdvancedSettings {
-  keyValueStoreOwner?: CrossModuleOwner<'keyValueStoreName'>;
-  webSocketOwner?: CrossModuleOwner<'apiName'>;
+  // keyValueStoreOwner?: CrossModuleOwner<'keyValueStoreName'>;
+  // webSocketOwner?: CrossModuleOwner<'apiName'>;
+
+  owner?: CrossModuleOwnerWithNoResourceOverride;
 }
 
 export const defineWebSocketQueue = (
@@ -24,7 +33,7 @@ export const defineWebSocketQueue = (
     // Store To Save Connection Info
     defineKeyValueStore(kvsName, 'id', undefined, {
       indexes: ['userId'],
-      owner: qpqCoreUtils.convertCrossModuleOwnerToGenericResourceNameOverride(advancedSettings?.keyValueStoreOwner),
+      owner: qpqCoreUtils.convertCrossModuleOwnerToGenericResourceNameOverride(advancedSettings?.owner),
     }),
 
     // Actual web socket
@@ -38,7 +47,7 @@ export const defineWebSocketQueue = (
       },
       {
         apiName: apiName,
-        owner: qpqCoreUtils.convertCrossModuleOwnerToGenericResourceNameOverride(advancedSettings?.webSocketOwner),
+        owner: qpqCoreUtils.convertCrossModuleOwnerToGenericResourceNameOverride(advancedSettings?.owner),
       },
     ),
   ];
