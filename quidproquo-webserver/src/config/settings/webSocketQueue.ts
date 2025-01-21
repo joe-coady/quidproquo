@@ -15,6 +15,7 @@ export interface QPQConfigAdvancedWebsocketQueueSettings extends QPQConfigAdvanc
   // webSocketOwner?: CrossModuleOwner<'apiName'>;
 
   owner?: CrossModuleOwnerWithNoResourceOverride;
+  userDirectoryName?: string;
 }
 
 export const defineWebSocketQueue = (
@@ -29,6 +30,7 @@ export const defineWebSocketQueue = (
     defineGlobal('qpq-wsq-kvs-name', kvsName),
     defineGlobal('qpq-wsq-ws-api-name', apiName),
     defineGlobal('qpq-wsq-eb-name', eventBusName),
+    defineGlobal('qpq-wsq-ud-name', advancedSettings?.userDirectoryName || ''),
 
     // Store To Save Connection Info
     defineKeyValueStore(kvsName, 'id', undefined, {

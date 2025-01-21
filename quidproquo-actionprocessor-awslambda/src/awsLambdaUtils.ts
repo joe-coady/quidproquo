@@ -14,7 +14,8 @@ export interface UrlMatch {
 }
 
 export const matchUrl = (path: string, url: string): UrlMatch => {
-  console.log('Matching: ', path);
+  console.log('Matching (path): ', path);
+  console.log('Matching (url): ', url);
 
   // /attempt/{attemptUuid}/result/{test} => /attempt/:attemptUuid/result/:test
   const modifiedPath = path.replaceAll(/{(.+?)}/g, (m, g) => `:${g}`);

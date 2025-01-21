@@ -1,4 +1,4 @@
-import { askConfigGetGlobal, AskResponse } from 'quidproquo-core';
+import { askCatch, askConfigGetGlobal, AskResponse } from 'quidproquo-core';
 
 import { askWebsocketSendMessage } from '../../../../actions';
 import { askWebsocketReadConnectionInfo } from '../../../../context';
@@ -52,8 +52,15 @@ export function* askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend(
   }
 
   if (connectionId) {
-    yield* askSendAnyWebSocketQueueEventMessageWithCorrelationOnWebsocket(connectionId, payload);
-  } else if (userId) {
+    const response = yield* askCatch(askSendAnyWebSocketQueueEventMessageWithCorrelationOnWebsocket(connectionId, payload));
+
+    // If we sent the message, or we don't have a direct user to send it to, bail
+    if (response.success || !userId) {
+      return;
+    }
+  }
+
+  if (userId) {
     yield* askSendMessageToUser(userId, payload);
   } else {
     yield* askSendMessageToEveryone(payload);

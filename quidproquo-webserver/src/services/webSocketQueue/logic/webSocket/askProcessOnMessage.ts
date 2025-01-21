@@ -15,24 +15,18 @@ import {
 export function* askProcessOnMessage(connectionId: string, message: AnyWebSocketQueueEventMessageWithCorrelation): AskResponse<void> {
   if (isWebSocketAuthenticateMessage(message)) {
     if (message.payload.accessToken) {
-      yield* askProcessOnAuthenticate(connectionId, message.payload.accessToken);
+      return yield* askProcessOnAuthenticate(connectionId, message.payload.accessToken);
     } else {
-      yield* askProcessOnUnauthenticate(connectionId);
+      return yield* askProcessOnUnauthenticate(connectionId);
     }
-
-    return;
   }
 
   if (isWebSocketUnauthenticateMessage(message)) {
-    yield* askProcessOnUnauthenticate(connectionId);
-
-    return;
+    return yield* askProcessOnUnauthenticate(connectionId);
   }
 
   if (isWebSocketPingMessage(message)) {
-    yield* askProcessOnPing(connectionId);
-
-    return;
+    return yield* askProcessOnPing(connectionId);
   }
 
   // Make sure any messages below have access to the authenticated user
