@@ -14,6 +14,8 @@ export type WebsocketEvent<T extends string | Blob | ArrayBuffer = string> = {
   userAgent: string;
   sourceIp: string;
 
+  apiName: string;
+
   body?: T;
 };
 

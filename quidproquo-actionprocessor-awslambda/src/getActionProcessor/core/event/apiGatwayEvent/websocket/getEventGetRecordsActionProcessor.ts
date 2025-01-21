@@ -8,7 +8,7 @@ import {
 } from 'quidproquo-core';
 import { WebSocketEventType } from 'quidproquo-webserver';
 
-import { EventInput, InternalEventRecord } from './types';
+import { EventInput, GLOBAL_WEBSOCKET_API_NAME, InternalEventRecord } from './types';
 
 const awsToQoqEventTypeMap = {
   MESSAGE: WebSocketEventType.Message,
@@ -28,6 +28,8 @@ const getProcessGetRecords = (qpqConfig: QPQConfig): EventGetRecordsActionProces
       userAgent: websocketEvent.requestContext.identity.userAgent,
       requestTime: new Date(websocketEvent.requestContext.requestTimeEpoch).toISOString(),
       body: websocketEvent.body as string | Blob | ArrayBuffer | undefined,
+
+      apiName: GLOBAL_WEBSOCKET_API_NAME,
     };
 
     return actionResult([internalEventRecord]);
