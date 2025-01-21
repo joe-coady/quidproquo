@@ -1,4 +1,10 @@
-import { apiImplementation, eventBusImplementation, queueImplementation, serviceFunctionImplementation } from './implementations';
+import {
+  apiImplementation,
+  eventBusImplementation,
+  queueImplementation,
+  serviceFunctionImplementation,
+  webSocketImplementation,
+} from './implementations';
 import { DevServerConfig } from './types';
 
 export * from './implementations';
@@ -14,5 +20,7 @@ export const startDevServer = async (devServerConfig: DevServerConfig) => {
     eventBusImplementation(devServerConfig),
 
     queueImplementation(devServerConfig),
+
+    webSocketImplementation(devServerConfig),
   ]);
 };
