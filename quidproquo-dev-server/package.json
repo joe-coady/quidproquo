@@ -1,6 +1,6 @@
 {
   "name": "quidproquo-dev-server",
-  "version": "0.0.239",
+  "version": "0.0.240",
   "description": "",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
@@ -33,15 +33,15 @@
   "homepage": "https://github.com/joe-coady/quidproquo#readme",
   "dependencies": {
     "multer": "^1.4.5-lts.1",
-    "quidproquo-actionprocessor-awslambda": "0.0.239",
-    "quidproquo-actionprocessor-node": "0.0.239",
-    "quidproquo-core": "0.0.239",
-    "quidproquo-webserver": "0.0.239",
+    "quidproquo-actionprocessor-awslambda": "0.0.240",
+    "quidproquo-actionprocessor-node": "0.0.240",
+    "quidproquo-core": "0.0.240",
+    "quidproquo-webserver": "0.0.240",
     "ws": "^8.18.0"
   },
   "devDependencies": {
     "@types/multer": "^1.4.12",
-    "quidproquo-tsconfig": "0.0.239",
+    "quidproquo-tsconfig": "0.0.240",
     "typescript": "^4.9.3"
   }
 }
