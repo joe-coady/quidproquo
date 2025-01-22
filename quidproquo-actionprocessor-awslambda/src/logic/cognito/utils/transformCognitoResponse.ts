@@ -1,4 +1,4 @@
-import { AuthenticateUserChallenge,AuthenticateUserResponse, AuthenticationInfo } from 'quidproquo-core';
+import { AuthenticateUserChallenge, AuthenticateUserResponse, AuthenticationInfo } from 'quidproquo-core';
 
 import { AdminInitiateAuthResponse, AuthenticationResultType, ChallengeNameType } from '@aws-sdk/client-cognito-identity-provider';
 
@@ -45,8 +45,6 @@ export const cognitoAdminInitiateAuthResponseToQpqAuthenticationInfo = (
   authResponse: AdminInitiateAuthResponse,
   issueDateTime: string,
 ): AuthenticateUserResponse => {
-  console.log('authResponse XYZ', authResponse);
-
   const res: AuthenticateUserResponse = {
     session: authResponse.Session,
     challenge: cognitoChallengeNameTypeToQpqAuthenticateUserChallenge(authResponse.ChallengeName),

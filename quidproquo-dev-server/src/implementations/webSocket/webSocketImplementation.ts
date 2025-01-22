@@ -2,7 +2,7 @@ import { QPQConfig, qpqCoreUtils, QpqFunctionRuntime, QpqRuntimeType } from 'qui
 import { qpqWebServerUtils, WebSocketEventType, WebSocketQPQWebServerConfigSetting } from 'quidproquo-webserver';
 
 import { createServer } from 'http';
-import { RawData, WebSocketServer } from 'ws';
+import { RawData, WebSocket, WebSocketServer } from 'ws';
 
 import { getWsWebsocketEventEventProcessor } from '../../actionProcessor';
 import { processEvent } from '../../logic';
@@ -18,11 +18,36 @@ type WebSocketQPQWebServerConfigSettingMap = {
 
 type WebSocketQPQWebServerConfigSettingMapWithWebSocketServer = WebSocketQPQWebServerConfigSettingMap & {
   server: WebSocketServer;
+  connections: Record<string, WebSocket>;
 };
 
 const getDynamicModuleLoader = (qpqConfig: QPQConfig, devServerConfig: DevServerConfig) => {
   const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
   return async (runtime: QpqFunctionRuntime): Promise<any> => devServerConfig.dynamicModuleLoader(serviceName, runtime);
+};
+
+const globals: { allServers: WebSocketQPQWebServerConfigSettingMapWithWebSocketServer[] } = {
+  allServers: [],
+};
+
+const findConnection = (service: string, apiName: string) => {
+  const serverInfo = globals.allServers.find((s) => s.service === service && s.apiName === apiName);
+
+  return serverInfo;
+};
+
+export const sendMessageToWebSocketConnection = async (
+  service: string,
+  websocketApiName: string,
+  connectionId: string,
+  payload: any,
+): Promise<void> => {
+  const wsConnection = findConnection(service, websocketApiName)?.connections?.[connectionId];
+  if (!wsConnection) {
+    return;
+  }
+
+  wsConnection.send(JSON.stringify(payload));
 };
 
 const startServer = (
@@ -34,9 +59,12 @@ const startServer = (
   console.log(`WebSocket: ws://${devServerConfig.serverDomain}:${devServerConfig.webSocketPort}/${settingsMap.service}/${settingsMap.apiName}`);
 
   webSocketServer.on('connection', (ws, req) => {
-    const connectionId = req.headers['sec-websocket-key'] || crypto.randomUUID();
+    const connectionId: string = req.headers['sec-websocket-key'] || crypto.randomUUID();
     const sourceIp = req.socket.remoteAddress === '::1' || !req.socket.remoteAddress ? '127.0.0.1' : req.socket.remoteAddress;
     const userAgent = req.headers['user-agent'] || 'unknown agent';
+
+    const server = findConnection(settingsMap.service, settingsMap.apiName)!;
+    server.connections[connectionId] = ws;
 
     const processWsEvent = (wsEvent: WsEvent) =>
       processEvent<WsEvent, void>(
@@ -82,6 +110,8 @@ const startServer = (
     });
 
     ws.on('close', () => {
+      delete server.connections[connectionId];
+
       const onCloseEvent: WsEvent = {
         apiName: settingsMap.apiName,
         service: settingsMap.service,
@@ -102,6 +132,7 @@ const startServer = (
     ...settingsMap,
 
     server: webSocketServer,
+    connections: {},
   };
 };
 
@@ -134,12 +165,12 @@ export const webSocketImplementation = async (devServerConfig: DevServerConfig) 
 
   const server = createServer();
 
-  const allServers = webSocketQPQWebServerConfigSettingMaps.map((x) => startServer(x, devServerConfig));
+  globals.allServers = webSocketQPQWebServerConfigSettingMaps.map((x) => startServer(x, devServerConfig));
 
   server.on('upgrade', (request, socket, head) => {
     const { pathname } = new URL(request.url || '', 'wss://base.url');
 
-    const serverInfo = allServers.find((s) => pathname === `/${s.service}/${s.apiName}`);
+    const serverInfo = globals.allServers.find((s) => pathname === `/${s.service}/${s.apiName}`);
 
     if (serverInfo) {
       serverInfo.server.handleUpgrade(request, socket, head, (ws) => {

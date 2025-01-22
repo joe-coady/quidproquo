@@ -15,8 +15,6 @@ import { EventInput, InternalEventRecord, MatchResult } from './types';
 
 const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProcessor<InternalEventRecord, MatchResult, EventInput> => {
   return async ({ qpqEventRecord, eventParams: [event] }) => {
-    console.log('qpqEventRecord', JSON.stringify(qpqEventRecord, null, 2));
-
     const queueQueueProcessors = qpqCoreUtils.getQueueQueueProcessors(event.queueName, qpqConfig);
     const queueTypes = Object.keys(queueQueueProcessors).sort();
 

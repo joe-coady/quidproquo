@@ -205,8 +205,6 @@ export const getOwnedEventBusConfigs = (qpqConfig: QPQConfig): EventBusQPQConfig
 export const getEventBusConfigByName = (eventBusName: string, qpqConfig: QPQConfig): EventBusQPQConfigSetting | undefined => {
   const allConfigs = getAllEventBusConfigs(qpqConfig);
 
-  console.log('allConfigs: ', JSON.stringify(allConfigs, null, 2));
-
   const eventBusConfig = allConfigs.find((eb) => eb.owner?.resourceNameOverride === eventBusName);
 
   if (eventBusConfig) {

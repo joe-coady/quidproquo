@@ -1,19 +1,28 @@
-import { EventBusActionType, QPQConfig, qpqCoreUtils, QpqFunctionRuntime, QueueActionType } from 'quidproquo-core';
+// import { EventBusActionType, QPQConfig, qpqCoreUtils, QpqFunctionRuntime, QueueActionType } from 'quidproquo-core';
 
-import { v4 as uuidV4 } from 'uuid';
+// import { v4 as uuidV4 } from 'uuid';
 
-import { AnyQueueMessageWithSession } from '../actionProcessor/core/event/queue/types';
-import { AnyEventBusMessageWithSession } from '../actionProcessor/core/eventBus/getEventBusSendMessagesActionProcessor';
-import { eventBus } from '../logic';
+// import { AnyQueueMessageWithSession } from '../actionProcessor/core/event/queue/types';
+// import { AnyEventBusMessageWithSession } from '../actionProcessor/core/eventBus/getEventBusSendMessagesActionProcessor';
+// import { eventBus } from '../logic';
 import { DevServerConfig } from '../types';
 
+/*
 const processQueueEventBusSubscriptions = async (qpqConfig: QPQConfig, ebMessage: AnyEventBusMessageWithSession) => {
   const allEventBuses = qpqCoreUtils.getAllEventBusConfigs(qpqConfig).filter((ebc) => {
+    const thisService = qpqCoreUtils.getApplicationModuleName(qpqConfig);
+
+    const srcApplication = ebc.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig);
+    const srcEnvironment = ebc.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
+    const srcFeature = ebc.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+    const srcModule = ebc.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig);
+
     return (
-      (!ebc.owner?.application || ebc.owner?.application === ebMessage.targetApplication) &&
-      (!ebc.owner?.environment || ebc.owner?.environment === ebMessage.targetEnvironment) &&
-      (!ebc.owner?.module || ebc.owner?.module === ebMessage.targetModule) &&
-      ((!ebc.owner?.feature && !ebMessage.targetFeature) || ebc.owner?.feature === ebMessage.targetFeature)
+      srcApplication === ebMessage.targetApplication &&
+      srcEnvironment === ebMessage.targetEnvironment &&
+      thisService == srcModule &&
+      srcModule === ebMessage.targetModule &&
+      ((!srcFeature && !ebMessage.targetFeature) || srcFeature === ebMessage.targetFeature)
     );
   });
 
@@ -23,6 +32,8 @@ const processQueueEventBusSubscriptions = async (qpqConfig: QPQConfig, ebMessage
       return allEventBuses.some((eb) => ebsub === eb.owner?.resourceNameOverride || (!eb.owner?.resourceNameOverride && ebsub === eb.name));
     });
   });
+
+  console.log('allEventBuses: ', queues);
 
   for (const queue of queues) {
     const queueMessage: AnyQueueMessageWithSession = {
@@ -44,13 +55,15 @@ const processQueueEventBusSubscriptions = async (qpqConfig: QPQConfig, ebMessage
     eventBus.publish(QueueActionType.SendMessages, queueMessage);
   }
 };
+*/
 
 export const eventBusImplementation = async (devServerConfig: DevServerConfig) => {
-  eventBus.on(EventBusActionType.SendMessages, async (payload: AnyEventBusMessageWithSession, correlation: string) => {
-    for (const qpqConfig of devServerConfig.qpqConfigs) {
-      await processQueueEventBusSubscriptions(qpqConfig, payload);
-    }
-  });
+  // eventBus.on(EventBusActionType.SendMessages, async (payload: AnyEventBusMessageWithSession, correlation: string) => {
+  //   console.log('Event Buss Ready to process!');
+  //   for (const qpqConfig of devServerConfig.qpqConfigs) {
+  //     await processQueueEventBusSubscriptions(qpqConfig, payload);
+  //   }
+  // });
 
   // Never ends
   await new Promise(() => {});

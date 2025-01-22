@@ -31,6 +31,10 @@ class EventBus extends EventEmitter {
   }
 
   public async publish(eventType: string, payload: any): Promise<void> {
+    // console.log('------------------------------------------------------------');
+    // console.log('\n\nEventBus - publish: [', eventType, ']', '[', payload?.type, ']');
+    // console.log('------------------------------------------------------------');
+
     this.emit(eventType, payload);
   }
 }
