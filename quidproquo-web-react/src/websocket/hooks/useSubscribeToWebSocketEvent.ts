@@ -1,4 +1,4 @@
-import { AnyEventMessage, EventMessageTypeConstraint } from 'quidproquo-core';
+import { AnyEventMessage } from 'quidproquo-core';
 import { WebSocketServiceEventSubscriptionFunction } from 'quidproquo-web';
 
 import { useEffect } from 'react';
