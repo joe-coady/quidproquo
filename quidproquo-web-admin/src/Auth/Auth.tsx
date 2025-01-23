@@ -1,3 +1,4 @@
+import { AuthenticationInfo } from 'quidproquo-core';
 import { authContext, useBaseUrlResolvers } from 'quidproquo-web-react';
 import { useRefreshTokens } from 'quidproquo-web-react';
 
@@ -36,9 +37,9 @@ export const useAuth = () => {
     }
   };
 
-  const refresh = async (authState: AuthState): Promise<void> => {
+  const refresh = async (authInfo: AuthenticationInfo): Promise<void> => {
     try {
-      const result = await refreshTokens(authState, baseUrlResolvers.getApiUrl());
+      const result = await refreshTokens(authInfo, baseUrlResolvers.getApiUrl());
 
       setAuthState((currentAuthState) => ({
         ...currentAuthState,
@@ -91,7 +92,7 @@ export const useAuth = () => {
 export function Auth({ children }: AuthProps) {
   const { onLogin, authState, setUsername, setPassword, refreshTokens, onRespondToAuthChallenge } = useAuth();
 
-  useRefreshTokens(authState, refreshTokens);
+  useRefreshTokens(authState.authenticationInfo, refreshTokens);
 
   const isLoggedIn = !!authState.authenticationInfo?.accessToken;
 

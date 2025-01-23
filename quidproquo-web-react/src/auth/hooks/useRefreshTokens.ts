@@ -1,24 +1,27 @@
+import { AuthenticationInfo } from 'quidproquo-core';
+
 import { useEffect } from 'react';
 
-import { AuthState } from '../types';
-
-export const useRefreshTokens = (authState: AuthState, refreshTokens: (authState: AuthState) => void) => {
+export const useRefreshTokens = (
+  authenticationInfo: AuthenticationInfo | undefined,
+  refreshTokens: (authenticationInfo: AuthenticationInfo) => Promise<any>,
+) => {
   const refresh = () => {
-    const { refreshToken, expiresAt } = authState.authenticationInfo || {};
-
-    if (refreshToken && expiresAt) {
+    if (authenticationInfo && authenticationInfo.refreshToken && authenticationInfo.expiresAt) {
       const now = new Date().toISOString();
-      const timeToExpire = new Date(expiresAt).getTime() - new Date(now).getTime();
+      const timeToExpire = new Date(authenticationInfo.expiresAt).getTime() - new Date(now).getTime();
 
       // Refresh the token 10 minutes before it expires to ensure there's a buffer
       const bufferTime = 10 * 60 * 1000;
       const refreshTime = timeToExpire - bufferTime;
 
       if (refreshTime > 0) {
-        return setTimeout(() => refreshTokens(authState), refreshTime);
+        return setTimeout(() => {
+          refreshTokens(authenticationInfo);
+        }, refreshTime);
       } else {
         // If the token is already expired or very close to expiration, refresh immediately
-        refreshTokens(authState);
+        refreshTokens(authenticationInfo);
       }
     }
 
@@ -34,5 +37,5 @@ export const useRefreshTokens = (authState: AuthState, refreshTokens: (authState
         clearTimeout(timerId);
       }
     };
-  }, [authState, refreshTokens]);
+  }, [authenticationInfo, refreshTokens]);
 };
