@@ -1,5 +1,5 @@
 // Import the base configuration interfaces and types
-import { QPQConfigAdvancedSettings,QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
+import { QPQConfigAdvancedSettings, QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
 
 // Define an enum for model sizes
 export enum ClaudeAIModelSize {

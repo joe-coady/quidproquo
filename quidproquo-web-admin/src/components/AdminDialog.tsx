@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AppBar,Button, Dialog, DialogActions, DialogContent, DialogTitle, Tab, Tabs } from '@mui/material';
+import { AppBar, Button, Dialog, DialogActions, DialogContent, DialogTitle, Tab, Tabs } from '@mui/material';
 
 export const useAdminDialog = (tabs: string[], defaultTab: string) => {
   const [open, setIsOpen] = useState<boolean>(false);

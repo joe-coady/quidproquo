@@ -1,8 +1,8 @@
-import { askMap, AskResponse, askThrowError,ErrorTypeEnum, QPQConfig } from 'quidproquo-core';
+import { askMap, AskResponse, askThrowError, ErrorTypeEnum, QPQConfig } from 'quidproquo-core';
 
 import { RouteOptions, ServiceAllowedOrigin } from '../config/settings/route';
 import { qpqWebServerUtils } from '../qpqWebServerUtils';
-import { qpqHeaderIsBot,SeoEvent } from '../types';
+import { qpqHeaderIsBot, SeoEvent } from '../types';
 import { HTTPEvent, HttpEventHeaders } from '../types/HTTPEvent';
 import { getBaseDomainName } from './qpqConfigAccessorsUtils';
 

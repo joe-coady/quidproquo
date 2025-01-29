@@ -1,7 +1,7 @@
 import { MatchStoryResult } from 'quidproquo-core';
 import { HTTPEvent, HTTPEventResponse, RouteOptions } from 'quidproquo-webserver';
 
-import { APIGatewayEvent, APIGatewayProxyResult,Context } from 'aws-lambda';
+import { APIGatewayEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 
 // Externals - The ins and outs of the external event
 export type EventInput = [APIGatewayEvent, Context];

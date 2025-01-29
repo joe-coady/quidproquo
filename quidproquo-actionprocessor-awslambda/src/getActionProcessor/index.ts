@@ -2,7 +2,7 @@ import {
   getCoreActionProcessor as getNodeCoreActionProcessor,
   getWebserverActionProcessor as getNodeWebserverActionProcessor,
 } from 'quidproquo-actionprocessor-node';
-import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader,QPQConfig } from 'quidproquo-core';
+import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
 
 import { getCoreActionProcessor as getAwsCoreActionProcessor } from './core';
 import { getWebserverActionProcessor as getAwsWebserverActionProcessor } from './webserver';

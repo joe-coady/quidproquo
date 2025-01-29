@@ -1,6 +1,6 @@
-import { MatchStoryResult,VerifyAuthChallengeEvent, VerifyAuthChallengeEventResponse } from 'quidproquo-core';
+import { MatchStoryResult, VerifyAuthChallengeEvent, VerifyAuthChallengeEventResponse } from 'quidproquo-core';
 
-import { Context,VerifyAuthChallengeResponseTriggerEvent } from 'aws-lambda';
+import { Context, VerifyAuthChallengeResponseTriggerEvent } from 'aws-lambda';
 
 export const GLOBAL_USER_DIRECTORY_NAME = process.env.userDirectoryName!;
 

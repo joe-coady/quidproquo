@@ -1,5 +1,5 @@
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
-import { DirectoryList,FileActionType } from './FileActionType';
+import { DirectoryList, FileActionType } from './FileActionType';
 
 // Payload
 export interface FileListDirectoryActionPayload {

@@ -1,4 +1,4 @@
-import { InvokeCommand,LambdaClient } from '@aws-sdk/client-lambda';
+import { InvokeCommand, LambdaClient } from '@aws-sdk/client-lambda';
 
 import { createAwsClient } from '../createAwsClient';
 

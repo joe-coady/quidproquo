@@ -1,4 +1,4 @@
-import { HTTPMethod, HTTPNetworkResponse,NetworkRequestActionPayload, QPQBinaryData, ResponseType } from 'quidproquo-core';
+import { HTTPMethod, HTTPNetworkResponse, NetworkRequestActionPayload, QPQBinaryData, ResponseType } from 'quidproquo-core';
 
 import axios, { AxiosResponse } from 'axios';
 import { extension } from 'mime-types';

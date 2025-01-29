@@ -1,4 +1,4 @@
-import { askMapParallelBatch,AskResponse, StoryResultMetadata } from 'quidproquo-core';
+import { askMapParallelBatch, AskResponse, StoryResultMetadata } from 'quidproquo-core';
 
 import { websocketConnectionData } from '../../data';
 import { askSendMessage } from './askSendMessage';

@@ -1,4 +1,4 @@
-import { GetSecretValueCommand,SecretsManagerClient } from '@aws-sdk/client-secrets-manager';
+import { GetSecretValueCommand, SecretsManagerClient } from '@aws-sdk/client-secrets-manager';
 
 import { memoFuncAsync } from '../cache/memoFuncAsync';
 import { createAwsClient } from '../createAwsClient';

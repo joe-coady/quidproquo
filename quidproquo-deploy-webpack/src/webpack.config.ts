@@ -1,6 +1,6 @@
 // import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 
-import { QPQConfig,qpqCoreUtils } from 'quidproquo-core';
+import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import path from 'path';

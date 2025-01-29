@@ -1,4 +1,4 @@
-import { useEffect,useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { filterLogs, getOnRowClick } from '../logic';

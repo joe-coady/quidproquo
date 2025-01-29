@@ -1,5 +1,5 @@
-import { Bar, BarChart, CartesianGrid, Legend,Tooltip, XAxis, YAxis } from 'recharts';
-import { Paper,Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
+import { Bar, BarChart, CartesianGrid, Legend, Tooltip, XAxis, YAxis } from 'recharts';
+import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 
 import { useErrorsByType } from '../hooks/useErrorsByType';
 

@@ -1,4 +1,4 @@
-import { PublishBatchCommand, PublishBatchCommandInput, PublishBatchRequestEntry,SNSClient } from '@aws-sdk/client-sns';
+import { PublishBatchCommand, PublishBatchCommandInput, PublishBatchRequestEntry, SNSClient } from '@aws-sdk/client-sns';
 
 import { createAwsClient } from '../createAwsClient';
 

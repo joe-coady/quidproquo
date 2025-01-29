@@ -1,12 +1,12 @@
-import { QPQConfig, qpqCoreUtils, QpqLogger,StoryResult } from 'quidproquo-core';
+import { QPQConfig, qpqCoreUtils, QpqLogger, StoryResult } from 'quidproquo-core';
 
 import fs from 'fs';
 import path from 'path';
-import { PutObjectCommand, PutObjectCommandInput,S3Client } from '@aws-sdk/client-s3';
+import { PutObjectCommand, PutObjectCommandInput, S3Client } from '@aws-sdk/client-s3';
 
 const tempDirectory = '/tmp/qpqlogs';
 
-import { getAwsServiceAccountInfoByDeploymentInfo,getAwsServiceAccountInfoConfig } from 'quidproquo-config-aws';
+import { getAwsServiceAccountInfoByDeploymentInfo, getAwsServiceAccountInfoConfig } from 'quidproquo-config-aws';
 
 import { getConfigRuntimeResourceName } from '../../awsNamingUtils';
 

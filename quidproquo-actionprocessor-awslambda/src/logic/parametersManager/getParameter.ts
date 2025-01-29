@@ -1,4 +1,4 @@
-import { GetParameterCommand,SSMClient } from '@aws-sdk/client-ssm';
+import { GetParameterCommand, SSMClient } from '@aws-sdk/client-ssm';
 
 import { memoFuncAsync } from '../cache/memoFuncAsync';
 import { createAwsClient } from '../createAwsClient';

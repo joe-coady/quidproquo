@@ -1,4 +1,4 @@
-import { KvsAdvancedDataType, KvsUpdateAction,KvsUpdateActionType } from '../types';
+import { KvsAdvancedDataType, KvsUpdateAction, KvsUpdateActionType } from '../types';
 import { KvsAttributePath } from '../types/KvsAttributePath';
 export const kvsSet = (attributePath: KvsAttributePath, value: KvsAdvancedDataType): KvsUpdateAction => ({
   attributePath,

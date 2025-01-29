@@ -1,4 +1,4 @@
-import { askThrowError, askUserDirectorySetAccessToken,ErrorTypeEnum } from 'quidproquo-core';
+import { askThrowError, askUserDirectorySetAccessToken, ErrorTypeEnum } from 'quidproquo-core';
 
 import { adminUserDirectoryResourceName } from '../../../../config';
 import { websocketConnectionData } from '../../data';

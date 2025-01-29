@@ -1,5 +1,5 @@
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
-import { AuthenticationDeliveryDetails,UserDirectoryActionType } from './UserDirectoryActionType';
+import { AuthenticationDeliveryDetails, UserDirectoryActionType } from './UserDirectoryActionType';
 
 // Payload
 export interface UserDirectoryRequestEmailVerificationActionPayload {

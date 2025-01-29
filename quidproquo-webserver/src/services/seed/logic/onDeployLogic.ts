@@ -1,4 +1,4 @@
-import { askConfigGetGlobal, askQueueSendMessages,AskResponse, DeployEventStatusType, QpqFunctionRuntime, QueueMessage } from 'quidproquo-core';
+import { askConfigGetGlobal, askQueueSendMessages, AskResponse, DeployEventStatusType, QpqFunctionRuntime, QueueMessage } from 'quidproquo-core';
 
 export function* askProcessOnDeployCreate(): AskResponse<void> {
   const allSeeds = yield* askConfigGetGlobal<QpqFunctionRuntime[]>('qpqSeeds');

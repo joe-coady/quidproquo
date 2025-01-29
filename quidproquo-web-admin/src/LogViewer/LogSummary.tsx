@@ -12,7 +12,7 @@ import {
 } from 'quidproquo-webserver';
 
 import { useEffect, useState } from 'react';
-import { Box, Checkbox, CircularProgress,FormControlLabel, Typography } from '@mui/material';
+import { Box, Checkbox, CircularProgress, FormControlLabel, Typography } from '@mui/material';
 
 interface LogSummaryProps {
   log: StoryResult<any>;

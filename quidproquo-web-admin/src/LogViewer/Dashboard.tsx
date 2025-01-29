@@ -5,7 +5,7 @@ import { useSubscribeToWebSocketEvent } from 'quidproquo-web-react';
 import { LogMetadata, WebSocketAdminServerEventMessageLogMetadata, WebsocketAdminServerMessageEventType } from 'quidproquo-webserver';
 
 import React, { useEffect, useMemo } from 'react';
-import { Box, Grid, Paper,Typography } from '@mui/material';
+import { Box, Grid, Paper, Typography } from '@mui/material';
 
 import { TabViewBox } from '../components';
 import { useIsLoading } from '../view';

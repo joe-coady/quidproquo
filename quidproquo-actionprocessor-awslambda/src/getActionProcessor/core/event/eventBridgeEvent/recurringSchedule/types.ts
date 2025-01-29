@@ -1,6 +1,6 @@
 import { MatchStoryResult, ScheduledEventParams } from 'quidproquo-core';
 
-import { Context,EventBridgeEvent } from 'aws-lambda';
+import { Context, EventBridgeEvent } from 'aws-lambda';
 
 // Externals - The ins and outs of the external event
 export type EventInput = [EventBridgeEvent<any, any>, Context];

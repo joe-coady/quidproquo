@@ -1,4 +1,4 @@
-import { useAuthAccessToken, useBaseUrlResolvers,useFastCallback } from 'quidproquo-web-react';
+import { useAuthAccessToken, useBaseUrlResolvers, useFastCallback } from 'quidproquo-web-react';
 
 import { useState } from 'react';
 

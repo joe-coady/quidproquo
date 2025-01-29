@@ -1,5 +1,5 @@
-import { QPQConfig,qpqCoreUtils } from 'quidproquo-core';
-import { DnsQPQWebServerConfigSetting,qpqWebServerUtils } from 'quidproquo-webserver';
+import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { DnsQPQWebServerConfigSetting, qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { aws_route53 } from 'aws-cdk-lib';
 import { IHostedZone } from 'aws-cdk-lib/aws-route53';

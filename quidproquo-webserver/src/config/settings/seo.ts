@@ -1,6 +1,6 @@
 import { generateSimpleHash, QPQConfigAdvancedSettings, QPQConfigSetting, QpqFunctionRuntime } from 'quidproquo-core';
 
-import { CacheSettings,QPQWebServerConfigSettingType } from '../QPQConfig';
+import { CacheSettings, QPQWebServerConfigSettingType } from '../QPQConfig';
 
 export interface QPQConfigAdvancedSeoSettings extends QPQConfigAdvancedSettings {
   webEntry?: string;

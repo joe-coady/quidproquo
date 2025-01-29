@@ -1,4 +1,4 @@
-import { SendMessageBatchCommand, SendMessageBatchRequestEntry,SQSClient } from '@aws-sdk/client-sqs';
+import { SendMessageBatchCommand, SendMessageBatchRequestEntry, SQSClient } from '@aws-sdk/client-sqs';
 
 import { createAwsClient } from '../createAwsClient';
 import { getQueueUrl } from './getQueueUrl';

@@ -1,6 +1,6 @@
 import { QpqPagedData } from '../../types';
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
-import { UserAttributes,UserDirectoryActionType } from './UserDirectoryActionType';
+import { UserAttributes, UserDirectoryActionType } from './UserDirectoryActionType';
 
 // Payload
 export interface UserDirectoryGetUsersByAttributeActionPayload {

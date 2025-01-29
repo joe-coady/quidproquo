@@ -1,4 +1,4 @@
-import { ChangePasswordCommand, ChangePasswordCommandInput,CognitoIdentityProviderClient } from '@aws-sdk/client-cognito-identity-provider';
+import { ChangePasswordCommand, ChangePasswordCommandInput, CognitoIdentityProviderClient } from '@aws-sdk/client-cognito-identity-provider';
 
 import { createAwsClient } from '../createAwsClient';
 

@@ -1,6 +1,6 @@
 import { KvsCoreDataType } from 'quidproquo-core';
 
-import { DeleteItemCommand, DeleteItemCommandInput,DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { DeleteItemCommand, DeleteItemCommandInput, DynamoDBClient } from '@aws-sdk/client-dynamodb';
 
 import { createAwsClient } from '../createAwsClient';
 import { buildAttributeValue } from './qpqDynamoOrm';

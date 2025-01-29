@@ -1,5 +1,5 @@
 import { QpqFunctionRuntime } from '../../types';
-import { QPQConfigAdvancedSettings,QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
+import { QPQConfigAdvancedSettings, QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
 
 export interface QpqQueueProcessors {
   [type: string]: QpqFunctionRuntime;

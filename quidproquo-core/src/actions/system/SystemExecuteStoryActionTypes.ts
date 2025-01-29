@@ -1,5 +1,5 @@
 import { QpqFunctionRuntime, StorySession } from '../../types';
-import { Action, ActionProcessor,ActionRequester } from '../../types/Action';
+import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
 import { SystemActionType } from './SystemActionType';
 
 // Payload

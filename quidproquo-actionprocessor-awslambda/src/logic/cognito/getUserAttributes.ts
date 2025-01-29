@@ -1,6 +1,6 @@
 import { UserAttributes } from 'quidproquo-core';
 
-import { AdminGetUserCommand,CognitoIdentityProviderClient } from '@aws-sdk/client-cognito-identity-provider';
+import { AdminGetUserCommand, CognitoIdentityProviderClient } from '@aws-sdk/client-cognito-identity-provider';
 
 import { createAwsClient } from '../createAwsClient';
 import { getQpqAttributesFromCognitoUserAttributes } from './cognitoAttributeMap';

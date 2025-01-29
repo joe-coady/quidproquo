@@ -1,4 +1,4 @@
-import { askKeyValueStoreScan,KvsQueryOperation } from '../../actions';
+import { askKeyValueStoreScan, KvsQueryOperation } from '../../actions';
 import { AskResponse, QpqPagedData } from '../../types';
 
 export function* askKeyValueStoreScanAll<T>(storeName: string, filterCondition?: KvsQueryOperation): AskResponse<T[]> {

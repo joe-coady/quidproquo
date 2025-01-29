@@ -1,4 +1,4 @@
-import { AskResponse, askThrowError,ErrorTypeEnum } from 'quidproquo-core';
+import { AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
 
 import { WebsocketEvent } from '../types';
 

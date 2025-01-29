@@ -2,7 +2,7 @@ import { MatchStoryResult, QueueMessage, StorySession } from 'quidproquo-core';
 import { QueueEventResponse } from 'quidproquo-webserver';
 import { QueueEvent } from 'quidproquo-webserver';
 
-import { Context, SQSBatchResponse,SQSEvent } from 'aws-lambda';
+import { Context, SQSBatchResponse, SQSEvent } from 'aws-lambda';
 
 export type AnyQueueMessageWithSession = QueueMessage<any> & {
   storySession: StorySession;

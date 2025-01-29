@@ -1,6 +1,6 @@
 import { useAuthAccessToken, useBaseUrlResolvers } from 'quidproquo-web-react';
 
-import { useEffect,useState } from 'react';
+import { useEffect, useState } from 'react';
 import { loadRemote, registerRemotes } from '@module-federation/enhanced/runtime';
 
 import { getFederationManifest } from './LogViewer/logic';

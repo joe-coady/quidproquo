@@ -6,7 +6,7 @@ import { createAwsClient } from '../createAwsClient';
 import { itemsToQpqPagedData } from './utils/itemsToQpqPagedData';
 import { convertDynamoMapToObject } from './convertObjectToDynamoMap';
 import { stringToLastEvaluatedKey } from './logs';
-import { buildDynamoQueryExpression,buildExpressionAttributeNames, buildExpressionAttributeValues } from './qpqDynamoOrm';
+import { buildDynamoQueryExpression, buildExpressionAttributeNames, buildExpressionAttributeValues } from './qpqDynamoOrm';
 
 export async function scan<Item>(
   tableName: string,

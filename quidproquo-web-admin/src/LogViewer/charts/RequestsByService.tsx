@@ -1,4 +1,4 @@
-import { CartesianGrid, Legend,Line, LineChart, Tooltip, XAxis, YAxis } from 'recharts';
+import { CartesianGrid, Legend, Line, LineChart, Tooltip, XAxis, YAxis } from 'recharts';
 import { Typography } from '@mui/material';
 
 import { useRequestsByService } from '../hooks/useRequestsByService';

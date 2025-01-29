@@ -1,4 +1,4 @@
-import { ParameterType,PutParameterCommand, SSMClient } from '@aws-sdk/client-ssm';
+import { ParameterType, PutParameterCommand, SSMClient } from '@aws-sdk/client-ssm';
 
 import { createAwsClient } from '../createAwsClient';
 

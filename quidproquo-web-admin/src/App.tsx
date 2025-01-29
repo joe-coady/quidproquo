@@ -1,9 +1,9 @@
-import { BaseUrlProvider, BaseUrlResolvers,WebsocketProvider } from 'quidproquo-web-react';
+import { BaseUrlProvider, BaseUrlResolvers, WebsocketProvider } from 'quidproquo-web-react';
 
 import React from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import CssBaseline from '@mui/material/CssBaseline';
-import { createTheme,ThemeProvider } from '@mui/material/styles';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import { Auth } from './Auth/Auth';
 import { LogViewer } from './LogViewer';

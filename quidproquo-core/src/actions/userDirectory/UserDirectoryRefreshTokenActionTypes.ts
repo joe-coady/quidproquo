@@ -1,5 +1,5 @@
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
-import { AuthenticateUserResponse,UserDirectoryActionType } from './UserDirectoryActionType';
+import { AuthenticateUserResponse, UserDirectoryActionType } from './UserDirectoryActionType';
 
 // Payload
 export interface UserDirectoryRefreshTokenActionPayload {

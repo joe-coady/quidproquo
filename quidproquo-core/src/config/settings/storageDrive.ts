@@ -1,6 +1,6 @@
 import { convertCrossModuleOwnerToGenericResourceNameOverride } from '../../qpqCoreUtils';
 import { CrossModuleOwner, QpqFunctionRuntime } from '../../types';
-import { QPQConfigAdvancedSettings,QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
+import { QPQConfigAdvancedSettings, QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
 
 /**
  * Represents different storage tiers for a "storageDrive".

@@ -2,7 +2,7 @@ import { useAuthAccessToken } from 'quidproquo-web-react';
 
 import { ComponentType, memo } from 'react';
 
-import { AsyncButton, DataGrid, DataGridColumDefinitions,DateRangePicker, GridContainer, GridItem, TabViewBox, TextInput } from '../components';
+import { AsyncButton, DataGrid, DataGridColumDefinitions, DateRangePicker, GridContainer, GridItem, TabViewBox, TextInput } from '../components';
 
 const columns: DataGridColumDefinitions<any>[] = [
   {

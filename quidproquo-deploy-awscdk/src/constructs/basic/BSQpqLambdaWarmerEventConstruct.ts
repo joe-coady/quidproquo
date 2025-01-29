@@ -1,4 +1,4 @@
-import { aws_events, aws_events_targets,aws_sns } from 'aws-cdk-lib';
+import { aws_events, aws_events_targets, aws_sns } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { BootstrapResource } from '../../constants';

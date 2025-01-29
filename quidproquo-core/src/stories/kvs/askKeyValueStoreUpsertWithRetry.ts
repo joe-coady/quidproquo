@@ -1,4 +1,4 @@
-import { askKeyValueStoreUpsert, askThrowError,KeyValueStoreUpsertErrorTypeEnum, KeyValueStoreUpsertOptions } from '../../actions';
+import { askKeyValueStoreUpsert, askThrowError, KeyValueStoreUpsertErrorTypeEnum, KeyValueStoreUpsertOptions } from '../../actions';
 import { AskResponse } from '../../types';
 import { askRetry } from '../askRetry';
 

@@ -2,7 +2,7 @@ import { HTTPMethod, QpqFunctionRuntime } from 'quidproquo-core';
 
 import path from 'path';
 
-import { ApiKeyReference, defineRoute,GenericRouteOptions } from '../../../config';
+import { ApiKeyReference, defineRoute, GenericRouteOptions } from '../../../config';
 import { getServiceEntryQpqFunctionRuntime } from '../../getServiceEntryQpqFunctionRuntime';
 
 export const defineAdminServiceLogRoute = (

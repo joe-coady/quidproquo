@@ -1,4 +1,4 @@
-import { DescribeDBClustersCommand,NeptuneClient } from '@aws-sdk/client-neptune';
+import { DescribeDBClustersCommand, NeptuneClient } from '@aws-sdk/client-neptune';
 
 import { GraphDatabaseEndpoints } from '../../getActionProcessor/core/graphDatabase/customActions/actions';
 import { createAwsClient } from '../createAwsClient';

@@ -1,4 +1,4 @@
-import { useEffect,useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { SearchParams } from '../types';
 import { useOnSearch } from './useOnSearch';

@@ -1,6 +1,6 @@
 import { useAuthAccessToken, useBaseUrlResolvers } from 'quidproquo-web-react';
 
-import { useEffect, useMemo,useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { getServiceNames } from '../logic';
 

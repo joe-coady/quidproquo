@@ -1,4 +1,4 @@
-import { DeleteObjectsCommand, DeleteObjectsCommandInput,S3Client } from '@aws-sdk/client-s3';
+import { DeleteObjectsCommand, DeleteObjectsCommandInput, S3Client } from '@aws-sdk/client-s3';
 
 import { createAwsClient } from '../createAwsClient';
 

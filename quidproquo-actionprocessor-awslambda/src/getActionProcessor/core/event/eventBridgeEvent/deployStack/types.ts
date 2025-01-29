@@ -1,6 +1,6 @@
 import { DeployEvent, DeployEventResponse, MatchStoryResult } from 'quidproquo-core';
 
-import { Context,EventBridgeEvent } from 'aws-lambda';
+import { Context, EventBridgeEvent } from 'aws-lambda';
 
 interface CloudFormationEventDetail {
   'stack-id': string;

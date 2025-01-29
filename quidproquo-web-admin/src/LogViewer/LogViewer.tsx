@@ -1,5 +1,5 @@
 import React from 'react';
-import { CircularProgress,Tab, Tabs } from '@mui/material';
+import { CircularProgress, Tab, Tabs } from '@mui/material';
 import Box from '@mui/material/Box';
 
 import { FederatedTab } from '../FederatedAddon';

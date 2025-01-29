@@ -1,4 +1,4 @@
-import { askBatch, askThrowError,SystemActionType, SystemBatchActionPayload } from '../../actions';
+import { askBatch, askThrowError, SystemActionType, SystemBatchActionPayload } from '../../actions';
 import { ContextActionType, ContextReadActionPayload } from '../../actions/context';
 import { getSuccessfulEitherActionResult } from '../../logic/actionLogic';
 import { askCatch, askMap } from '../../stories';

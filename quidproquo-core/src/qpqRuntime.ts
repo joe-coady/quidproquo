@@ -1,7 +1,7 @@
-import { actionResultError,isErroredActionResult, resolveActionResult, resolveActionResultError } from './logic/actionLogic';
+import { actionResultError, isErroredActionResult, resolveActionResult, resolveActionResultError } from './logic/actionLogic';
 import { Action, ActionProcessorList, ActionProcessorResult, ActionRequester, EitherActionResult } from './types/Action';
 import { ErrorTypeEnum } from './types/ErrorTypeEnum';
-import { qpqConsoleLog,QpqRuntimeType, StoryResult, StorySession, StorySessionUpdater } from './types/StorySession';
+import { qpqConsoleLog, QpqRuntimeType, StoryResult, StorySession, StorySessionUpdater } from './types/StorySession';
 import { QPQConfig } from './config';
 import { getApplicationModuleName } from './qpqCoreUtils';
 import { ActionProcessorListResolver, AnyStory, DynamicModuleLoader, QpqLogger } from './types';

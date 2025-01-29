@@ -1,4 +1,4 @@
-import { KvsLogicalOperator, KvsLogicalOperatorType, KvsQueryCondition, KvsQueryOperation,KvsQueryOperationType } from '../types';
+import { KvsLogicalOperator, KvsLogicalOperatorType, KvsQueryCondition, KvsQueryOperation, KvsQueryOperationType } from '../types';
 
 const kvsExpression = (
   key: string,

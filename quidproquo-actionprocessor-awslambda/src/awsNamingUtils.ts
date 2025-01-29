@@ -1,5 +1,5 @@
 import { getAwsServiceAccountInfoByDeploymentInfo, qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import { CrossModuleOwner,QPQConfig, qpqCoreUtils, ResourceName } from 'quidproquo-core';
+import { CrossModuleOwner, QPQConfig, qpqCoreUtils, ResourceName } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 export const getGlobalConfigRuntimeResourceName = (resourceName: string, application: string, environment: string, feature?: string) => {

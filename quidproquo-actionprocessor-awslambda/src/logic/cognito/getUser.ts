@@ -1,4 +1,4 @@
-import { AttributeType,CognitoIdentityProviderClient, GetUserCommand, GetUserCommandInput } from '@aws-sdk/client-cognito-identity-provider';
+import { AttributeType, CognitoIdentityProviderClient, GetUserCommand, GetUserCommandInput } from '@aws-sdk/client-cognito-identity-provider';
 
 import { createAwsClient } from '../createAwsClient';
 

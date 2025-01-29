@@ -1,6 +1,6 @@
 import { KeyValueStoreQPQConfigSetting, KvsQueryOperation } from 'quidproquo-core';
 
-import { isKvsLogicalOperator,isKvsQueryCondition } from './buildDynamoQuery';
+import { isKvsLogicalOperator, isKvsQueryCondition } from './buildDynamoQuery';
 
 export const getDynamoTableIndexByConfigAndQuery = <T extends object = any>(
   setting: KeyValueStoreQPQConfigSetting,

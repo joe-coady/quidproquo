@@ -1,6 +1,6 @@
 import { DecodedAccessToken } from 'quidproquo-core';
 
-import { decode,verify } from 'jsonwebtoken';
+import { decode, verify } from 'jsonwebtoken';
 import jwksClient from 'jwks-rsa';
 
 // TODO: Check whey we need this? I think you should be able to get types from the lib?
