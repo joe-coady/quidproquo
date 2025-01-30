@@ -1,19 +1,25 @@
 import {
   ActionHistory,
+  addMillisecondsToTDateIso,
   askConfigGetGlobal,
   askFileReadTextContents,
   askGetCurrentEpoch,
+  askGetEpochStartTime,
   askMap,
   AskResponse,
   DecodedAccessToken,
+  LogActionType,
+  LogCreateAction,
+  LogCreateActionPayload,
   QpqRuntimeType,
   StoryResult,
   UserDirectoryActionType,
   UserDirectorySetAccessTokenActionPayload,
 } from 'quidproquo-core';
 
+import { askUpsert as askUpsertLogLog } from '../entry/data/logLogData';
 import * as logMetadataData from '../entry/data/logMetadataData';
-import { LogMetadata } from '../entry/domain';
+import { LogLog, LogMetadata } from '../entry/domain';
 import {
   apiGenericTextExtractor,
   AUTH_CREATE_AUTH_CHALLENGE_GenericTextExtractor,
@@ -95,16 +101,43 @@ export const storyResultToMetadata = (storyResult: StoryResult<any>, ttl?: numbe
   return metadata;
 };
 
+export function* askGetLogRecordsFromStoryResult(result: StoryResult<any>): AskResponse<ActionHistory<LogCreateActionPayload, void>[]> {
+  const logActions = result.history.filter((h) => h.act.type === LogActionType.Create);
+
+  return logActions;
+}
+
 export function* askUpdateDatabaseFromLogFile(storageDriveName: string, filesPath: string, ttl?: number): AskResponse<void> {
   const logFile = yield* askFileReadTextContents(storageDriveName, filesPath);
-  const metadata = storyResultToMetadata(JSON.parse(logFile), ttl);
 
+  const logObj: StoryResult<any> = JSON.parse(logFile);
+
+  const metadata = storyResultToMetadata(logObj, ttl);
   yield* logMetadataData.askUpsert(metadata);
 
   // Send errors to admins
   if (metadata.error) {
     yield* askSendLogToAdmins(metadata);
   }
+
+  const logActionHistories = yield* askGetLogRecordsFromStoryResult(logObj);
+  let currentTime = yield* askGetEpochStartTime();
+  const logLogs = logActionHistories.map((lac) => {
+    const timestamp = lac.startedAt === currentTime ? addMillisecondsToTDateIso(lac.startedAt, 1) : lac.startedAt;
+
+    const logLog: LogLog = {
+      type: lac.act.payload!.logLevel,
+      reason: lac.act.payload!.msg,
+      fromCorrelation: logObj.correlation,
+      timestamp,
+    };
+
+    currentTime = timestamp;
+
+    return logLog;
+  });
+
+  yield* askMap(logLogs, askUpsertLogLog);
 }
 
 export function* askUpdateDatabaseFromLogFiles(storageDriveName: string, filesPaths: string[]): AskResponse<void> {
