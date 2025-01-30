@@ -1,6 +1,4 @@
-import { QueueMessage } from 'quidproquo-core';
-
-import { QueueEvent } from '../../../types';
+import { QueueEvent, QueueMessage } from 'quidproquo-core';
 
 export type WebSocketQueueEvent<EventType, Payload> = QueueEvent<
   {

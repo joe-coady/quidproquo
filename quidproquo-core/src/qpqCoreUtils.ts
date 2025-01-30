@@ -11,6 +11,7 @@ import {
   GraphDatabaseQPQConfigSetting,
   KeyValueStoreQPQConfigSetting,
   ModuleQPQConfigSetting,
+  NotifyErrorQPQConfigSetting,
   ParameterQPQConfigSetting,
   QPQConfig,
   QPQConfigItem,
@@ -170,6 +171,10 @@ export const getStorageDriveByName = (storageDriveName: string, configs: QPQConf
 
 export const getQueues = (configs: QPQConfig): QueueQPQConfigSetting[] => {
   return getConfigSettings<QueueQPQConfigSetting>(configs, QPQCoreConfigSettingType.queue);
+};
+
+export const getNotifyErrorConfigs = (configs: QPQConfig): NotifyErrorQPQConfigSetting[] => {
+  return getConfigSettings<NotifyErrorQPQConfigSetting>(configs, QPQCoreConfigSettingType.notifyError);
 };
 
 export const getQueueByName = (configs: QPQConfig, name: string): QueueQPQConfigSetting | undefined => {

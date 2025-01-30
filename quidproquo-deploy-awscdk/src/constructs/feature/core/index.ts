@@ -3,6 +3,7 @@ export * from './deployEvents';
 export * from './eventBus';
 export * from './graphDatabase';
 export * from './keyValueStore';
+export * from './notifyError';
 export * from './parameter';
 export * from './queue';
 export * from './schedule';

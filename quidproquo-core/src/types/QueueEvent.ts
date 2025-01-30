@@ -1,4 +1,4 @@
-import { QueueMessage } from 'quidproquo-core';
+import { QueueMessage } from '../actions';
 
 export interface QueueEventTypeParams {
   [key: string]: string;

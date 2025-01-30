@@ -12,6 +12,7 @@ import {
   QpqApiWebserverWebsocketConstruct,
   QpqConfigAwsAlarmConstruct,
   QpqCoreDeployEventConstruct,
+  QpqCoreNotifyErrorConstruct,
   QpqCoreRecurringScheduleConstruct,
   QpqWebserverServiceFunctionConstruct,
   QpqWebserverSubdomainRedirectConstruct,
@@ -129,6 +130,15 @@ export class ApiQpqServiceStack extends QpqServiceStack {
           qpqConfig: props.qpqConfig,
 
           alarmConfig: setting,
+        }),
+    );
+
+    const notifyErrors = qpqCoreUtils.getNotifyErrorConfigs(props.qpqConfig).map(
+      (setting) =>
+        new QpqCoreNotifyErrorConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
+          qpqConfig: props.qpqConfig,
+
+          notifyErrorConfig: setting,
         }),
     );
   }

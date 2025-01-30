@@ -1,4 +1,15 @@
-import { defineGlobal, defineKeyValueStore, defineStorageDrive, QPQConfig, QPQConfigAdvancedSettings, StorageDriveTier } from 'quidproquo-core';
+import {
+  defineEventBus,
+  defineGlobal,
+  defineKeyValueStore,
+  defineNotifyError,
+  defineQueue,
+  defineStorageDrive,
+  NotifyErrorQueueEvents,
+  QPQConfig,
+  QPQConfigAdvancedSettings,
+  StorageDriveTier,
+} from 'quidproquo-core';
 
 import { defineAdminServiceAuthRoute, defineAdminServiceLogRoute, getServiceEntryQpqFunctionRuntime } from '../../services';
 import { adminUserDirectoryResourceName } from './adminUserDirectory';
@@ -127,6 +138,34 @@ export const defineLogs = (rootDomain: string, services: string[], advancedSetti
       },
       {
         apiName: 'wsadmin',
+      },
+    ),
+
+    defineEventBus('admin-notifier'),
+    defineNotifyError('admin-notifier', {
+      onAlarm: {
+        publishToEventBus: ['admin-notifier'],
+      },
+    }),
+    defineQueue(
+      'admin-alarms',
+      {
+        [NotifyErrorQueueEvents.Error]: getServiceEntryQpqFunctionRuntime('log', 'queueEvent', 'alarm::onError'),
+        [NotifyErrorQueueEvents.Timeout]: getServiceEntryQpqFunctionRuntime('log', 'queueEvent', 'alarm::onTimeout'),
+      },
+      {
+        eventBusSubscriptions: ['admin-notifier'],
+      },
+    ),
+    defineKeyValueStore(
+      `${logResourceName}-list`,
+      {
+        key: 'type',
+        type: 'number',
+      },
+      ['timestamp'],
+      {
+        deprecated: advancedSettings?.deprecated,
       },
     ),
   ];

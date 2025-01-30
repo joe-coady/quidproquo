@@ -20,6 +20,7 @@ export enum QPQCoreConfigSettingType {
   claudeAi = '@quidproquo-core/config/ClaudeAi',
   graphDatabase = '@quidproquo-core/config/GraphDatabase',
   virtualNetwork = '@quidproquo-core/config/VirtualNetwork',
+  notifyError = '@quidproquo-core/config/notifyError',
 }
 
 export interface QPQConfigSetting {

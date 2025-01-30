@@ -13,6 +13,7 @@ export * from './global';
 export * from './graphDatabase';
 export * from './keyValueStore';
 export * from './moduleName';
+export * from './notifyError';
 export * from './parameter';
 export * from './queue';
 export * from './schedule';

@@ -1,6 +1,4 @@
-import { MatchStoryResult, QueueMessage, StorySession } from 'quidproquo-core';
-import { QueueEventResponse } from 'quidproquo-webserver';
-import { QueueEvent } from 'quidproquo-webserver';
+import { MatchStoryResult, QueueEvent, QueueEventResponse, QueueMessage, StorySession } from 'quidproquo-core';
 
 export type AnyQueueMessageWithSession = QueueMessage<any> & {
   storySession: StorySession;
