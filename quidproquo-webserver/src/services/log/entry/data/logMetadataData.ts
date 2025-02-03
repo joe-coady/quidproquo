@@ -1,7 +1,7 @@
 import {
   askFileExists,
   askFileGenerateTemporarySecureUrl,
-  askFileWriteTextContents,
+  askFileWriteObjectJson,
   askKeyValueStoreQuery,
   askKeyValueStoreQueryAll,
   askKeyValueStoreUpdatePartialProperties,
@@ -131,7 +131,7 @@ export function* askGetHierarchiesByCorrelation(correlation: string, forceRefres
 
     if (!reportExists || forceRefresh) {
       const report = yield* askCreateHierarchy(root);
-      yield* askFileWriteTextContents(logReportsResourceName, rootReportFilename, JSON.stringify(report));
+      yield* askFileWriteObjectJson(logReportsResourceName, rootReportFilename, report);
     }
 
     return yield* askFileGenerateTemporarySecureUrl(logReportsResourceName, rootReportFilename, 1 * 60 * 1000);

@@ -6,8 +6,10 @@ import { getFileGenerateTemporarySecureUrlActionProcessor } from './getFileGener
 import { getFileIsColdStorageActionProcessor } from './getFileIsColdStorageActionProcessor';
 import { getFileListDirectoryActionProcessor } from './getFileListDirectoryActionProcessor';
 import { getFileReadBinaryContentsActionProcessor } from './getFileReadBinaryContentsActionProcessor';
+import { getFileReadObjectJsonActionProcessor } from './getFileReadObjectJsonActionProcessor';
 import { getFileReadTextContentsActionProcessor } from './getFileReadTextContentsActionProcessor';
 import { getFileWriteBinaryContentsActionProcessor } from './getFileWriteBinaryContentsActionProcessor';
+import { getFileWriteObjectJsonActionProcessor } from './getFileWriteObjectJsonActionProcessor';
 import { getFileWriteTextContentsActionProcessor } from './getFileWriteTextContentsActionProcessor';
 
 export const getFileActionProcessor: ActionProcessorListResolver = async (
@@ -20,7 +22,9 @@ export const getFileActionProcessor: ActionProcessorListResolver = async (
   ...(await getFileIsColdStorageActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getFileListDirectoryActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getFileReadTextContentsActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getFileReadObjectJsonActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getFileWriteTextContentsActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getFileReadBinaryContentsActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getFileWriteObjectJsonActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getFileWriteBinaryContentsActionProcessor(qpqConfig, dynamicModuleLoader)),
 });

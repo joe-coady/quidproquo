@@ -2,14 +2,13 @@ import {
   ActionHistory,
   addMillisecondsToTDateIso,
   askConfigGetGlobal,
-  askFileReadTextContents,
+  askFileReadObjectJson,
   askGetCurrentEpoch,
   askGetEpochStartTime,
   askMap,
   AskResponse,
   DecodedAccessToken,
   LogActionType,
-  LogCreateAction,
   LogCreateActionPayload,
   QpqRuntimeType,
   StoryResult,
@@ -108,9 +107,7 @@ export function* askGetLogRecordsFromStoryResult(result: StoryResult<any>): AskR
 }
 
 export function* askUpdateDatabaseFromLogFile(storageDriveName: string, filesPath: string, ttl?: number): AskResponse<void> {
-  const logFile = yield* askFileReadTextContents(storageDriveName, filesPath);
-
-  const logObj: StoryResult<any> = JSON.parse(logFile);
+  const logObj = yield* askFileReadObjectJson<StoryResult<any>>(storageDriveName, filesPath);
 
   const metadata = storyResultToMetadata(logObj, ttl);
   yield* logMetadataData.askUpsert(metadata);

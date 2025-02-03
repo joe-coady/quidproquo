@@ -1,5 +1,4 @@
 import { createErrorEnumForAction } from '../../types';
-import { UserDirectoryActionType } from '../userDirectory';
 import { FileActionType } from './FileActionType';
 import { FileReadTextContentsActionRequester } from './FileReadTextContentsActionTypes';
 

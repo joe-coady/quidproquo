@@ -3,6 +3,8 @@ import { StorageDriveTier } from '../../config';
 export enum FileActionType {
   ReadTextContents = '@quidproquo-core/File/ReadTextContents',
   WriteTextContents = '@quidproquo-core/File/WriteTextContents',
+  WriteObjectJson = '@quidproquo-core/File/WriteObjectJson',
+  ReadObjectJson = '@quidproquo-core/File/ReadObjectJson',
   ListDirectory = '@quidproquo-core/File/ListDirectory',
   Exists = '@quidproquo-core/File/Exists',
   Delete = '@quidproquo-core/File/Delete',
