@@ -11,7 +11,12 @@ import {
   StorageDriveTier,
 } from 'quidproquo-core';
 
-import { defineAdminServiceAuthRoute, defineAdminServiceLogRoute, getServiceEntryQpqFunctionRuntime } from '../../services';
+import {
+  defineAdminServiceAuthRoute,
+  defineAdminServiceLogLogRoute,
+  defineAdminServiceLogRoute,
+  getServiceEntryQpqFunctionRuntime,
+} from '../../services';
 import { adminUserDirectoryResourceName } from './adminUserDirectory';
 import { defineRoute } from './route';
 import { defineWebsocket } from './websocket';
@@ -114,6 +119,8 @@ export const defineLogs = (rootDomain: string, services: string[], advancedSetti
     defineAdminServiceAuthRoute('POST', '/refreshToken', 'refreshToken'),
     defineAdminServiceAuthRoute('POST', '/challenge', 'respondToAuthChallenge'),
 
+    defineAdminServiceLogLogRoute('POST', '/loglog/list', 'getLogLogs', routeAuthSettings),
+
     defineAdminServiceLogRoute('GET', '/admin/services', 'getServiceNames'),
     defineAdminServiceLogRoute('POST', '/log/list', 'getLogs', routeAuthSettings),
     defineAdminServiceLogRoute('GET', '/log/{correlationId}', 'getLog', routeAuthSettings),
@@ -152,6 +159,7 @@ export const defineLogs = (rootDomain: string, services: string[], advancedSetti
       {
         [NotifyErrorQueueEvents.Error]: getServiceEntryQpqFunctionRuntime('log', 'queueEvent', 'alarm::onError'),
         [NotifyErrorQueueEvents.Timeout]: getServiceEntryQpqFunctionRuntime('log', 'queueEvent', 'alarm::onTimeout'),
+        [NotifyErrorQueueEvents.Throttle]: getServiceEntryQpqFunctionRuntime('log', 'queueEvent', 'alarm::onThrottle'),
       },
       {
         eventBusSubscriptions: ['admin-notifier'],

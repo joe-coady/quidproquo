@@ -1,3 +1,6 @@
+import { getAllEnumValues, getLookupValues } from '../logic/lookup';
+import { Lookup } from './Lookup';
+
 // How important is the log
 //
 export enum LogLevelEnum {
@@ -43,3 +46,9 @@ export enum LogLevelEnum {
   // query with parameters in your code.
   Trace = 5,
 }
+
+export type LogLevelEnumLookup = Lookup<typeof LogLevelEnum>;
+
+export const allLogLevelEnumValues: LogLevelEnum[] = Object.values(LogLevelEnum) as LogLevelEnum[];
+
+export const logLevelEnumLookups: LogLevelEnumLookup[] = getLookupValues(LogLevelEnum);

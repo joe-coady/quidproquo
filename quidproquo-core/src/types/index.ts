@@ -13,6 +13,7 @@ export * from './ExcludeKeys';
 export * from './FullyQualifiedResource';
 export * from './KeyOf';
 export * from './LogLevelEnum';
+export * from './Lookup';
 export * from './NotifyErrorQueueEvent';
 export * from './QPQBinaryData';
 export * from './QpqContextIdentifier';

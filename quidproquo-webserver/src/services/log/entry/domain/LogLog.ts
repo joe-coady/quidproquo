@@ -6,6 +6,10 @@ export type LogLog = {
 
   reason: string;
 
+  // We sometimes create logs not from a service executing something (like a lambda error)
+  module?: string;
   fromCorrelation?: string;
+  logIndex?: number;
+
   ttl?: number;
 };

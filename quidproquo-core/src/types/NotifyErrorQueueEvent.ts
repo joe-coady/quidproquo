@@ -4,6 +4,7 @@ import { QueueEvent } from './QueueEvent';
 export enum NotifyErrorQueueEvents {
   Error = 'Error',
   Timeout = 'Timeout',
+  Throttle = 'Throttle',
   Unknown = 'Unknown',
 }
 
@@ -33,3 +34,13 @@ export interface NotifyErrorQueueTimeoutEventMessage extends QueueMessage<Notify
 }
 
 export type NotifyErrorQueueTimeoutQueueEvent = QueueEvent<NotifyErrorQueueTimeoutEventMessage>;
+
+// Throttle
+
+export type NotifyErrorQueueThrottleEventPayload = NotifyErrorQueueBaseEventPayload;
+
+export interface NotifyErrorQueueThrottleEventMessage extends QueueMessage<NotifyErrorQueueThrottleEventPayload> {
+  type: NotifyErrorQueueEvents.Throttle;
+}
+
+export type NotifyErrorQueueThrottleQueueEvent = QueueEvent<NotifyErrorQueueThrottleEventMessage>;

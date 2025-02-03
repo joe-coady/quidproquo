@@ -3,8 +3,8 @@ import { CircularProgress, Tab, Tabs } from '@mui/material';
 import Box from '@mui/material/Box';
 
 import { FederatedTab } from '../FederatedAddon';
-import RandomView from '../tmp/RandomView';
 import { useFederatedAddon } from '../useFederatedAddon';
+import { AdminLogs } from './AdminLogs';
 import { Dashboard } from './Dashboard';
 import { LogSearch } from './LogSearch';
 
@@ -20,8 +20,12 @@ export function useTabs(): {
     //   View: RandomView,
     // },
     {
-      name: 'Logs',
+      name: 'Events',
       View: LogSearch,
+    },
+    {
+      name: 'Logs',
+      View: AdminLogs,
     },
     {
       name: 'Errors',
@@ -30,7 +34,7 @@ export function useTabs(): {
     ...addons.map((addon) => addon.tab),
   ];
 
-  console.log('allTabs', allTabs);
+  console.log('allTabs - test', allTabs);
 
   return {
     tabs: allTabs,

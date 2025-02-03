@@ -4,24 +4,53 @@ import {
   actionResult,
   EventActionType,
   EventGetRecordsActionProcessor,
+  NotifyErrorQueueBaseEventPayload,
   NotifyErrorQueueErrorQueueEvent,
   NotifyErrorQueueEvents,
+  NotifyErrorQueueThrottleQueueEvent,
   NotifyErrorQueueTimeoutQueueEvent,
   QPQConfig,
+  QueueEvent,
 } from 'quidproquo-core';
 
 import { AnyQueueMessageWithSession, CloudWatchAlarmNotification, EventInput, InternalEventRecord } from './types';
 
-export function isCloudWatchAlarmNotification(obj: any): obj is CloudWatchAlarmNotification {
+function isCloudWatchAlarmNotification(obj: any): obj is CloudWatchAlarmNotification {
   return typeof obj === 'object' && !!obj.AlarmName && !!obj.Trigger;
 }
 
-export function isErrorsCloudWatchAlarmNotification(cwn: CloudWatchAlarmNotification): boolean {
+function isErrorsCloudWatchAlarmNotification(cwn: CloudWatchAlarmNotification): boolean {
   return cwn.Trigger.MetricName === 'Errors' && cwn.Trigger.Namespace === 'AWS/Lambda';
 }
 
-export function isTimeoutCloudWatchAlarmNotification(cwn: CloudWatchAlarmNotification): boolean {
+function isTimeoutCloudWatchAlarmNotification(cwn: CloudWatchAlarmNotification): boolean {
   return cwn.Trigger.MetricName === 'Timeout' && cwn.Trigger.Namespace === 'AWS/Lambda';
+}
+
+function isThrottlesCloudWatchAlarmNotification(cwn: CloudWatchAlarmNotification): boolean {
+  return cwn.Trigger.MetricName === 'Throttles' && cwn.Trigger.Namespace === 'AWS/Lambda';
+}
+
+function buildQueueBaseEvent(
+  messageId: string,
+  notifyErrorQueueEvents: NotifyErrorQueueEvents,
+  cloudWatchAlarmNotification: CloudWatchAlarmNotification,
+): QueueEvent<any> {
+  const payload: NotifyErrorQueueBaseEventPayload = {
+    newStateReason: cloudWatchAlarmNotification.NewStateReason,
+    newStateInAlarm: cloudWatchAlarmNotification.NewStateValue === 'ALARM',
+    oldStateInAlarm: cloudWatchAlarmNotification.OldStateValue === 'ALARM',
+  };
+
+  const queueEvent = {
+    id: messageId,
+    message: {
+      type: notifyErrorQueueEvents,
+      payload,
+    },
+  };
+
+  return queueEvent;
 }
 
 const getProcessGetRecords = (qpqConfig: QPQConfig): EventGetRecordsActionProcessor<EventInput, InternalEventRecord> => {
@@ -30,43 +59,40 @@ const getProcessGetRecords = (qpqConfig: QPQConfig): EventGetRecordsActionProces
       const parsedInternalEventRecord = JSON.parse(record.body) as AnyQueueMessageWithSession;
 
       if (isCloudWatchAlarmNotification(parsedInternalEventRecord)) {
+        // Error
         if (isErrorsCloudWatchAlarmNotification(parsedInternalEventRecord)) {
-          const queueEvent: NotifyErrorQueueErrorQueueEvent = {
-            id: record.messageId,
-            message: {
-              type: NotifyErrorQueueEvents.Error,
-              payload: {
-                newStateReason: parsedInternalEventRecord.NewStateReason,
-                newStateInAlarm: parsedInternalEventRecord.NewStateValue === 'ALARM',
-                oldStateInAlarm: parsedInternalEventRecord.OldStateValue === 'ALARM',
-              },
-            },
-          };
-
-          return queueEvent;
-        } else if (isTimeoutCloudWatchAlarmNotification(parsedInternalEventRecord)) {
-          const queueEvent: NotifyErrorQueueTimeoutQueueEvent = {
-            id: record.messageId,
-            message: {
-              type: NotifyErrorQueueEvents.Timeout,
-              payload: {
-                newStateReason: parsedInternalEventRecord.NewStateReason,
-                newStateInAlarm: parsedInternalEventRecord.NewStateValue === 'ALARM',
-                oldStateInAlarm: parsedInternalEventRecord.OldStateValue === 'ALARM',
-              },
-            },
-          };
+          const queueEvent: NotifyErrorQueueErrorQueueEvent = buildQueueBaseEvent(
+            record.messageId,
+            NotifyErrorQueueEvents.Error,
+            parsedInternalEventRecord,
+          );
 
           return queueEvent;
         }
 
-        const queueEvent: InternalEventRecord = {
-          id: record.messageId,
-          message: {
-            type: NotifyErrorQueueEvents.Unknown,
-            payload: {},
-          },
-        };
+        // Timeout
+        else if (isTimeoutCloudWatchAlarmNotification(parsedInternalEventRecord)) {
+          const queueEvent: NotifyErrorQueueTimeoutQueueEvent = buildQueueBaseEvent(
+            record.messageId,
+            NotifyErrorQueueEvents.Timeout,
+            parsedInternalEventRecord,
+          );
+
+          return queueEvent;
+        }
+
+        // Throttle
+        else if (isThrottlesCloudWatchAlarmNotification(parsedInternalEventRecord)) {
+          const queueEvent: NotifyErrorQueueThrottleQueueEvent = buildQueueBaseEvent(
+            record.messageId,
+            NotifyErrorQueueEvents.Throttle,
+            parsedInternalEventRecord,
+          );
+
+          return queueEvent;
+        }
+
+        const queueEvent: InternalEventRecord = buildQueueBaseEvent(record.messageId, NotifyErrorQueueEvents.Unknown, parsedInternalEventRecord);
 
         return queueEvent;
       }

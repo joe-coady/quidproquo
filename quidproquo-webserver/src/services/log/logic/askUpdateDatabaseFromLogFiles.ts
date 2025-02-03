@@ -122,13 +122,15 @@ export function* askUpdateDatabaseFromLogFile(storageDriveName: string, filesPat
 
   const logActionHistories = yield* askGetLogRecordsFromStoryResult(logObj);
   let currentTime = yield* askGetEpochStartTime();
-  const logLogs = logActionHistories.map((lac) => {
+  const logLogs = logActionHistories.map((lac, logIndex) => {
     const timestamp = lac.startedAt === currentTime ? addMillisecondsToTDateIso(lac.startedAt, 1) : lac.startedAt;
 
     const logLog: LogLog = {
       type: lac.act.payload!.logLevel,
       reason: lac.act.payload!.msg,
       fromCorrelation: logObj.correlation,
+      module: logObj.moduleName,
+      logIndex,
       timestamp,
     };
 
