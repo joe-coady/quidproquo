@@ -32,6 +32,7 @@
   },
   "homepage": "https://github.com/joe-coady/quidproquo#readme",
   "dependencies": {
+    "chalk": "^5.4.1",
     "multer": "^1.4.5-lts.1",
     "quidproquo-actionprocessor-awslambda": "0.0.241",
     "quidproquo-actionprocessor-node": "0.0.241",

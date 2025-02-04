@@ -44,8 +44,6 @@ const getProcessGetRecords = (qpqConfig: QPQConfig): EventGetRecordsActionProces
       internalEventRecord.files = await parseMultipartFormData(apiGatewayEvent);
     }
 
-    console.log(JSON.stringify(internalEventRecord, null, 2));
-
     return actionResult([internalEventRecord]);
   };
 };

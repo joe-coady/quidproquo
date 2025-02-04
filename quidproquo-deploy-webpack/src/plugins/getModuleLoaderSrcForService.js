@@ -7,7 +7,6 @@ export function getModuleLoaderSrcForService(qpqConfig, serviceNameVariableName,
 
   const result = `
   if (${serviceNameVariableName} === String.raw\`${serviceName}\`) {
-    console.log("Found Service: ", ${serviceNameVariableName});
     ${getSrcLoaderForQpqConfig(qpqConfig, moduleNameVariableName)}
   }
   `;

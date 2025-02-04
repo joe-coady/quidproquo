@@ -82,15 +82,11 @@ export const getLogger = (qpqConfig: QPQConfig): QpqLogger => {
   const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
   const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
 
-  console.log('Env for bucket: ', environment);
-
   // Workout the bucket name.
   const bucketName = getConfigRuntimeResourceName('qpq-logs', application, service, environment, feature);
 
   // Where is this bucket?
   const regionForBucket = getAwsServiceAccountInfoByDeploymentInfo(qpqConfig, service, environment, feature, application).awsRegion;
-
-  console.log('Bucket for logs: ', bucketName, regionForBucket);
 
   const logs: Promise<void>[] = [];
   let disabledLogCorrelations: string[] = [];
@@ -122,19 +118,10 @@ export const getLogger = (qpqConfig: QPQConfig): QpqLogger => {
       });
 
       logs.push(promise);
-
-      console.log('Added to logs', logs.length);
     },
 
     waitToFinishWriting: async () => {
-      console.log('logs.length', logs.length);
-
-      const id = randomUUID();
-      console.time(`Writing Logs ${id}`);
       await Promise.all(logs);
-      console.timeEnd(`Writing Logs ${id}`);
-
-      console.log('done writing logs');
     },
 
     moveToPermanentStorage: async () => {

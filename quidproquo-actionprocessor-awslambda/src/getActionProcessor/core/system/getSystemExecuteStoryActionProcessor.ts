@@ -31,11 +31,9 @@ const getProcessExecuteStory = <T extends Array<any>, R>(qpqConfig: QPQConfig): 
     updateSession: StorySessionUpdater,
     dynamicModuleLoader: DynamicModuleLoader,
   ): Promise<any> => {
-    console.log('Trying to load module');
     let story = await dynamicModuleLoader(payload.runtime);
-    console.log('After - Trying to load module');
+
     if (!story) {
-      console.log('No story');
       return actionResultError(ErrorTypeEnum.NotFound, `Unable to dynamically load: [${payload.runtime}]`);
     }
 

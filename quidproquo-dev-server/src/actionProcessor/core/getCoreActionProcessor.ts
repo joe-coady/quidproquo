@@ -2,6 +2,7 @@ import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, 
 
 import { getEventBusActionProcessor } from './eventBus';
 import { getGraphDatabaseActionProcessor } from './graphDatabaseOverride';
+import { getLogActionProcessor } from './log';
 import { getQueueActionProcessor } from './queue';
 
 export const getCoreActionProcessor: ActionProcessorListResolver = async (
@@ -11,4 +12,5 @@ export const getCoreActionProcessor: ActionProcessorListResolver = async (
   ...(await getGraphDatabaseActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getEventBusActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getQueueActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getLogActionProcessor(qpqConfig, dynamicModuleLoader)),
 });

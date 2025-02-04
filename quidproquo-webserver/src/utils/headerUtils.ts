@@ -75,26 +75,19 @@ export const getAllowedOrigins = (qpqConfig: QPQConfig, route: RouteOptions): st
   // Return the allowed origins
   const allAllowedOrigins = [rootDomain, ...defaultAllowedOrigins, ...routeAllowedOrigins].map((o) => o.toLowerCase());
 
-  console.log(allAllowedOrigins);
-
   return allAllowedOrigins;
 };
 
 export const getCorsHeaders = (qpqConfig: QPQConfig, route: RouteOptions, reqHeaders: HttpEventHeaders): HttpEventHeaders => {
   const origin = getHeaderValue('origin', reqHeaders) || '';
-  console.log('origin', origin);
 
   const allowedOrigins = getAllowedOrigins(qpqConfig, route);
-  console.log('allowedOrigins', allowedOrigins);
 
   const allowCredentials = !!route.routeAuthSettings?.userDirectoryName;
-  console.log('allowCredentials', allowCredentials);
 
   // If we have an auth endpoint, then we don't let wildcard origins access the API for security reasons
   const allowOrigin =
     (!allowCredentials ? allowedOrigins.find((ao) => origin === ao || ao === '*') : allowedOrigins.find((ao) => origin === ao)) || allowedOrigins[0];
-
-  console.log('allowOrigin', allowOrigin);
 
   return {
     'Access-Control-Allow-Headers': '*',
