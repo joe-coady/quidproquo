@@ -5,6 +5,7 @@ export * from './ConfigUrlDefinition';
 export * from './CrossModuleMessage';
 export * from './CrossModuleOwner';
 export * from './CrossServiceResourceName';
+export * from './DecomposedString';
 export * from './DeployEvent';
 export * from './DynamicModuleLoader';
 export * from './ErrorTypeEnum';

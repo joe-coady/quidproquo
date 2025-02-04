@@ -36,6 +36,7 @@ export const qpqExecuteLog = async (storyResult: StoryResult<any>, runtime: any,
     async () => storyActionProcessor,
     () => new Date().toISOString(),
     {
+      enableLogs: async () => {},
       log: async () => {},
       waitToFinishWriting: async () => {},
       moveToPermanentStorage: async () => {},

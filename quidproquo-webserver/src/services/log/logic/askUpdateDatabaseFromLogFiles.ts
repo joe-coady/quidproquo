@@ -1,7 +1,9 @@
 import {
   ActionHistory,
   addMillisecondsToTDateIso,
+  askCatch,
   askConfigGetGlobal,
+  askDateNow,
   askFileReadObjectJson,
   askGetCurrentEpoch,
   askGetEpochStartTime,
@@ -100,6 +102,27 @@ export const storyResultToMetadata = (storyResult: StoryResult<any>, ttl?: numbe
   return metadata;
 };
 
+export function* askErrorReadingStoryResultToMetadata(correlation: string): AskResponse<LogMetadata> {
+  // Add the generic text to the tag list
+  const errorText = 'Error loading story result';
+  const tags = [errorText];
+
+  // Base metadata
+  const metadata: LogMetadata = {
+    correlation: correlation,
+    moduleName: correlation.split('::')[0],
+    runtimeType: QpqRuntimeType.EXECUTE_STORY,
+    startedAt: yield* askDateNow(),
+    generic: tags.filter((t) => !!t).join(', '),
+    executionTimeMs: 0,
+
+    error: errorText,
+  };
+
+  // Return the metadata
+  return metadata;
+}
+
 export function* askGetLogRecordsFromStoryResult(result: StoryResult<any>): AskResponse<ActionHistory<LogCreateActionPayload, void>[]> {
   const logActions = result.history.filter((h) => h.act.type === LogActionType.Create);
 
@@ -107,17 +130,24 @@ export function* askGetLogRecordsFromStoryResult(result: StoryResult<any>): AskR
 }
 
 export function* askUpdateDatabaseFromLogFile(storageDriveName: string, filesPath: string, ttl?: number): AskResponse<void> {
-  const logObj = yield* askFileReadObjectJson<StoryResult<any>>(storageDriveName, filesPath);
+  const logObj = yield* askCatch(askFileReadObjectJson<StoryResult<any>>(storageDriveName, filesPath));
 
-  const metadata = storyResultToMetadata(logObj, ttl);
+  const metadata = logObj.success
+    ? storyResultToMetadata(logObj.result, ttl)
+    : yield* askErrorReadingStoryResultToMetadata(filesPath.split('.').slice(0, -1).join('.'));
+
   yield* logMetadataData.askUpsert(metadata);
 
   // Send errors to admins
-  if (metadata.error) {
+  if (metadata.error || !logObj.success) {
     yield* askSendLogToAdmins(metadata);
   }
 
-  const logActionHistories = yield* askGetLogRecordsFromStoryResult(logObj);
+  if (!logObj.success) {
+    return;
+  }
+
+  const logActionHistories = yield* askGetLogRecordsFromStoryResult(logObj.result);
   let currentTime = yield* askGetEpochStartTime();
   const logLogs = logActionHistories.map((lac, logIndex) => {
     const timestamp = lac.startedAt === currentTime ? addMillisecondsToTDateIso(lac.startedAt, 1) : lac.startedAt;
@@ -125,8 +155,8 @@ export function* askUpdateDatabaseFromLogFile(storageDriveName: string, filesPat
     const logLog: LogLog = {
       type: lac.act.payload!.logLevel,
       reason: lac.act.payload!.msg,
-      fromCorrelation: logObj.correlation,
-      module: logObj.moduleName,
+      fromCorrelation: logObj.result.correlation,
+      module: logObj.result.moduleName,
       logIndex,
       timestamp,
     };

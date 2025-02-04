@@ -1,4 +1,4 @@
-import { QPQConfig, qpqCoreUtils, QpqLogger, StoryResult } from 'quidproquo-core';
+import { LogActionType, QPQConfig, qpqCoreUtils, QpqLogger, StoryResult } from 'quidproquo-core';
 
 import fs from 'fs';
 import path from 'path';
@@ -9,6 +9,7 @@ import { getConfigRuntimeResourceName } from '../../awsNamingUtils';
 const tempDirectory = '/tmp/qpqlogs';
 
 import { getAwsServiceAccountInfoByDeploymentInfo, getAwsServiceAccountInfoConfig } from 'quidproquo-config-aws';
+import { filterLogHistoryByActionTypes } from 'quidproquo-core';
 
 import { randomUUID } from 'crypto';
 
@@ -24,8 +25,8 @@ export const storyLogger = async (result: StoryResult<any>, bucketName: string, 
     };
 
     await s3Client.send(new PutObjectCommand(commandParams));
-  } catch {
-    console.log(`Failed to log story result to S3 [${result.correlation}]`);
+  } catch (error) {
+    console.log(`Failed to log story result to S3 [${result.correlation}]:`, error);
   }
 };
 
@@ -69,6 +70,7 @@ export const getLogger = (qpqConfig: QPQConfig): QpqLogger => {
   // If we have no log service, just return nothing.
   if (!awsSettings.logServiceName || awsSettings.disableLogs || process.env.storageDriveName === 'qpq-logs') {
     return {
+      enableLogs: async () => {},
       log: async () => {},
       waitToFinishWriting: async () => {},
       moveToPermanentStorage: async () => {},
@@ -91,10 +93,24 @@ export const getLogger = (qpqConfig: QPQConfig): QpqLogger => {
   console.log('Bucket for logs: ', bucketName, regionForBucket);
 
   const logs: Promise<void>[] = [];
+  let disabledLogCorrelations: string[] = [];
 
   return {
+    enableLogs: async (enable: boolean, reason: string, correlation: string) => {
+      if (!enable) {
+        disabledLogCorrelations = [...disabledLogCorrelations, correlation];
+      } else {
+        disabledLogCorrelations = disabledLogCorrelations.filter((dlc) => dlc !== correlation);
+      }
+    },
+
     log: async (result: StoryResult<any>) => {
-      const promise = storyLogger(result, bucketName, regionForBucket).catch((e) => {
+      let modifyableResult = !disabledLogCorrelations.includes(result.correlation)
+        ? result
+        : { ...result, history: filterLogHistoryByActionTypes(result.history, [LogActionType.Create, LogActionType.DisableEventHistory]) };
+
+      // TODO: Filter and flatten histories log histories
+      const promise = storyLogger(modifyableResult, bucketName, regionForBucket).catch((e) => {
         console.log('Failed to log story result to S3', JSON.stringify(e, null, 2));
       });
 
@@ -102,6 +118,7 @@ export const getLogger = (qpqConfig: QPQConfig): QpqLogger => {
 
       console.log('Added to logs', logs.length);
     },
+
     waitToFinishWriting: async () => {
       console.log('logs.length', logs.length);
 
@@ -112,6 +129,7 @@ export const getLogger = (qpqConfig: QPQConfig): QpqLogger => {
 
       console.log('done writing logs');
     },
+
     moveToPermanentStorage: async () => {
       await moveLogsToPerminateStorage(bucketName, regionForBucket);
     },
