@@ -107,7 +107,14 @@ export const getLogger = (qpqConfig: QPQConfig): QpqLogger => {
     log: async (result: StoryResult<any>) => {
       let modifyableResult = !disabledLogCorrelations.includes(result.correlation)
         ? result
-        : { ...result, history: filterLogHistoryByActionTypes(result.history, [LogActionType.Create, LogActionType.DisableEventHistory]) };
+        : {
+            ...result,
+            history: filterLogHistoryByActionTypes(result.history, [
+              LogActionType.Create,
+              LogActionType.TemplateLiteral,
+              LogActionType.DisableEventHistory,
+            ]),
+          };
 
       // TODO: Filter and flatten histories log histories
       const promise = storyLogger(modifyableResult, bucketName, regionForBucket).catch((e) => {

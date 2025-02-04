@@ -32,9 +32,6 @@ function* askProcessEventRecord<QpqEventRecord, MSR extends AnyMatchStoryResult,
 
   // Return
   if (earlyExitQpqEventRecordResponse != null) {
-    // Log the early exit response
-    yield* askLogCreate(LogLevelEnum.Info, 'earlyExitResponse', earlyExitQpqEventRecordResponse);
-
     // return the result
     return getSuccessfulEitherActionResult(earlyExitQpqEventRecordResponse);
   }

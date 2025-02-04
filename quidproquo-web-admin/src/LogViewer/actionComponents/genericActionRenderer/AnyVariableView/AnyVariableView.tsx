@@ -25,9 +25,10 @@ export const genericFunctionRendererStyles = {
 type VariableViewProps = {
   value: any;
   expanded: boolean;
+  hideStringQuotes?: boolean;
 };
 
-export const StringVariableView = ({ value, expanded }: VariableViewProps) => {
+export const StringVariableView = ({ value, expanded, hideStringQuotes }: VariableViewProps) => {
   try {
     const jsonValue = JSON.parse(value);
     if (typeof jsonValue === 'number') {
@@ -44,6 +45,11 @@ export const StringVariableView = ({ value, expanded }: VariableViewProps) => {
     );
   } catch {
     const trimmedValue = value.length > 25 && !expanded ? `${value.slice(0, 25)}...` : value;
+
+    if (hideStringQuotes) {
+      return <span style={genericFunctionRendererStyles.stringValue}>{trimmedValue}</span>;
+    }
+
     return <span style={genericFunctionRendererStyles.stringValue}>"{trimmedValue}"</span>;
   }
 };
@@ -154,7 +160,7 @@ export const ObjectVariableView = ({ value, expanded }: VariableViewProps) => {
 };
 
 // Helper function to style values based on their type
-export const AnyVariableView = ({ value, expanded }: VariableViewProps) => {
+export const AnyVariableView = ({ value, expanded, hideStringQuotes }: VariableViewProps) => {
   if (value === undefined) {
     return <span style={genericFunctionRendererStyles.undefinedValue}>undefined</span>;
   } else if (value === null) {
@@ -164,7 +170,7 @@ export const AnyVariableView = ({ value, expanded }: VariableViewProps) => {
   } else if (typeof value === 'number') {
     return <span style={genericFunctionRendererStyles.numberValue}>{value}</span>;
   } else if (typeof value === 'string') {
-    return <StringVariableView value={value} expanded={expanded} />;
+    return <StringVariableView value={value} expanded={expanded} hideStringQuotes={hideStringQuotes} />;
   } else if (typeof value === 'object') {
     return <ObjectVariableView value={value} expanded={expanded} />;
   }

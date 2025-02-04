@@ -10,9 +10,12 @@ import {
   askMap,
   AskResponse,
   DecodedAccessToken,
+  decomposedStringToString,
   filterLogHistoryByActionTypes,
   LogActionType,
   LogCreateActionPayload,
+  LogLevelEnum,
+  LogTemplateLiteralActionPayload,
   QpqRuntimeType,
   StoryResult,
   UserDirectoryActionType,
@@ -124,10 +127,30 @@ export function* askErrorReadingStoryResultToMetadata(correlation: string): AskR
   return metadata;
 }
 
-export function* askGetLogRecordsFromStoryResult(result: StoryResult<any>): AskResponse<ActionHistory<LogCreateActionPayload, void>[]> {
-  const logActions = filterLogHistoryByActionTypes(result.history, [LogActionType.Create]);
+export function* askGetLogInfosFromStoryResult(result: StoryResult<any>): AskResponse<
+  {
+    logLevel: LogLevelEnum;
+    msg: string;
+    startedAt: string;
+  }[]
+> {
+  const logActions = filterLogHistoryByActionTypes(result.history, [LogActionType.Create, LogActionType.TemplateLiteral]);
 
-  return logActions;
+  return logActions.map((la) => {
+    if (la.act.type === LogActionType.TemplateLiteral) {
+      return {
+        logLevel: LogLevelEnum.Info,
+        msg: decomposedStringToString(la.act.payload?.messageParts),
+        startedAt: la.startedAt,
+      };
+    }
+
+    return {
+      logLevel: la.act.payload!.logLevel,
+      msg: la.act.payload!.msg,
+      startedAt: la.startedAt,
+    };
+  });
 }
 
 export function* askUpdateDatabaseFromLogFile(storageDriveName: string, filesPath: string, ttl?: number): AskResponse<void> {
@@ -148,14 +171,14 @@ export function* askUpdateDatabaseFromLogFile(storageDriveName: string, filesPat
     return;
   }
 
-  const logActionHistories = yield* askGetLogRecordsFromStoryResult(logObj.result);
+  const logActionHistories = yield* askGetLogInfosFromStoryResult(logObj.result);
   let currentTime = yield* askGetEpochStartTime();
   const logLogs = logActionHistories.map((lac, logIndex) => {
     const timestamp = lac.startedAt === currentTime ? addMillisecondsToTDateIso(lac.startedAt, 1) : lac.startedAt;
 
     const logLog: LogLog = {
-      type: lac.act.payload!.logLevel,
-      reason: lac.act.payload!.msg,
+      type: lac.logLevel,
+      reason: lac.msg,
       fromCorrelation: logObj.result.correlation,
       module: logObj.result.moduleName,
       logIndex,
