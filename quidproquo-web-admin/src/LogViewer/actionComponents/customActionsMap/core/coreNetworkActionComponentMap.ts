@@ -1,8 +1,10 @@
-import { CoreNetworkRequestCustomAction } from '../../custom/CoreNetworkRequestCustomAction';
+import { NetworkActionType } from 'quidproquo-core';
+
+import { CoreNetworkRequestCustomAction } from '../../custom';
 import { ActionComponent } from '../../types';
 
 const coreNetworkActionComponentMap: Record<string, ActionComponent> = {
-  ['@quidproquo-core/Network/Request']: CoreNetworkRequestCustomAction,
+  [NetworkActionType.Request]: CoreNetworkRequestCustomAction,
 };
 
 export default coreNetworkActionComponentMap;

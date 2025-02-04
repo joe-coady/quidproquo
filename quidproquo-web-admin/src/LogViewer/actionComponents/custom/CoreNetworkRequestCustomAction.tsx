@@ -1,8 +1,14 @@
+import { NetworkRequestActionPayload } from 'quidproquo-core';
+
 import { GenericFunctionRenderer, genericFunctionRendererStyles } from '../genericActionRenderer';
 import ActionResultDisplay from '../genericActionRenderer/ActionResultDisplay';
 import { ActionComponent } from '../types';
 
-export const CoreNetworkRequestCustomAction: ActionComponent = ({ historyItem, expanded }) => {
+export const CoreNetworkRequestCustomAction: ActionComponent<NetworkRequestActionPayload<any>> = ({ historyItem, expanded }) => {
+  if (!historyItem.act.payload) {
+    return null;
+  }
+
   return (
     <>
       <pre style={genericFunctionRendererStyles.pre}>

@@ -2,8 +2,6 @@ import { Lookup } from '../../types/Lookup';
 import { getLookupValues } from './getLookupValues';
 
 export function resolveLookupValues<T extends Record<string, any>>(lookups: Lookup<T>[], enumObj: T): Array<T[keyof T]> {
-  console.log(lookups, enumObj);
-
   const allValidKeys = getLookupValues(enumObj).filter((l) => l !== 'All');
 
   // Use all, or just the ones taht are in there...
