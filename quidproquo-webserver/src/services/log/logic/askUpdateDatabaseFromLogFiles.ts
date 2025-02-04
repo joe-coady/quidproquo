@@ -10,6 +10,7 @@ import {
   askMap,
   AskResponse,
   DecodedAccessToken,
+  filterLogHistoryByActionTypes,
   LogActionType,
   LogCreateActionPayload,
   QpqRuntimeType,
@@ -124,7 +125,7 @@ export function* askErrorReadingStoryResultToMetadata(correlation: string): AskR
 }
 
 export function* askGetLogRecordsFromStoryResult(result: StoryResult<any>): AskResponse<ActionHistory<LogCreateActionPayload, void>[]> {
-  const logActions = result.history.filter((h) => h.act.type === LogActionType.Create);
+  const logActions = filterLogHistoryByActionTypes(result.history, [LogActionType.Create]);
 
   return logActions;
 }
