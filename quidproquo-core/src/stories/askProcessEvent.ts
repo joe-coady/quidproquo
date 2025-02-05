@@ -1,4 +1,4 @@
-import { askLogCreate } from '../actions';
+import { askLogCreate, askThrowError } from '../actions';
 import {
   AnyMatchStoryResult,
   askEventAutoRespond,
@@ -73,5 +73,15 @@ export function* askProcessEvent<
     return yield* askProcessEventRecord<QpqEventRecord, MSR, QpqEventRecordResponse, EventParams>(record, eventArguments);
   });
 
-  return yield* askEventTransformResponseResult<EventParams, QpqEventRecordResponse, EventResponse>(processedRecords, ...eventArguments);
+  const transformedResponse = yield* askCatch(
+    askEventTransformResponseResult<EventParams, QpqEventRecordResponse, EventResponse>(processedRecords, ...eventArguments),
+  );
+
+  if (!transformedResponse.success) {
+    yield* askLogCreate(LogLevelEnum.Fatal, transformedResponse.error.errorText);
+
+    return yield* askThrowError(transformedResponse.error.errorType, transformedResponse.error.errorText, transformedResponse.error.errorStack);
+  }
+
+  return transformedResponse.result;
 }
