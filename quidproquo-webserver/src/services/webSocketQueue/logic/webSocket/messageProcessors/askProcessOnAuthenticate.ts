@@ -1,5 +1,7 @@
 import { askConfigGetGlobal, AskResponse, askUserDirectorySetAccessToken, DecodedAccessToken } from 'quidproquo-core';
 
+import { getWebSocketQueueGlobalConfigKeyForUserDirectoryName } from '../../../../../config';
+import { askWebsocketReadApiNameOrThrow } from '../../../../../context';
 import { webSocketConnectionData } from '../../../data';
 import {
   AnyWebSocketQueueEventMessageWithCorrelation,
@@ -18,7 +20,8 @@ export function* askProcessOnAuthenticate(connectionId: string, accessToken: str
   const connection = yield* webSocketConnectionData.askGetById(connectionId);
 
   if (connection) {
-    const userDirectoryName = yield* askConfigGetGlobal('qpq-wsq-ud-name');
+    const apiName = yield* askWebsocketReadApiNameOrThrow();
+    const userDirectoryName = yield* askConfigGetGlobal<string>(getWebSocketQueueGlobalConfigKeyForUserDirectoryName(apiName));
 
     if (userDirectoryName) {
       const decodedAccessToken: DecodedAccessToken = yield* askUserDirectorySetAccessToken(userDirectoryName, accessToken);

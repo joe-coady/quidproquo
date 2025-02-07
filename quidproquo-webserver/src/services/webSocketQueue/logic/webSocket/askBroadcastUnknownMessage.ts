@@ -1,5 +1,7 @@
 import { askConfigGetGlobal, askEventBusSendMessages, AskResponse, EventBusMessage } from 'quidproquo-core';
 
+import { getWebSocketQueueGlobalConfigKeyForEventBusName } from '../../../../config';
+import { askWebsocketReadApiNameOrThrow } from '../../../../context';
 import { AnyWebSocketQueueEventMessageWithCorrelation } from '../../types';
 
 export function* askBroadcastUnknownMessage({
@@ -7,7 +9,8 @@ export function* askBroadcastUnknownMessage({
   correlationId,
   ...anyWebSocketQueueEventMessage
 }: AnyWebSocketQueueEventMessageWithCorrelation): AskResponse<void> {
-  const eventBusName = yield* askConfigGetGlobal<string>('qpq-wsq-eb-name');
+  const apiName = yield* askWebsocketReadApiNameOrThrow();
+  const eventBusName = yield* askConfigGetGlobal<string>(getWebSocketQueueGlobalConfigKeyForEventBusName(apiName));
 
   yield* askEventBusSendMessages({
     eventBusName,

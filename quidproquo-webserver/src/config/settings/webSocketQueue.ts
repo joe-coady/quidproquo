@@ -11,11 +11,20 @@ import { getServiceEntryQpqFunctionRuntime } from '../../services';
 import { defineWebsocket } from './websocket';
 
 export interface QPQConfigAdvancedWebsocketQueueSettings extends QPQConfigAdvancedSettings {
-  // keyValueStoreOwner?: CrossModuleOwner<'keyValueStoreName'>;
-  // webSocketOwner?: CrossModuleOwner<'apiName'>;
-
   owner?: CrossModuleOwnerWithNoResourceOverride;
   userDirectoryName?: string;
+}
+
+export function getWebSocketQueueGlobalConfigKeyForEventBusName(apiName: string): string {
+  return `qpq-wsq-eb-name-${apiName}`;
+}
+
+export function getWebSocketQueueGlobalConfigKeyForUserDirectoryName(apiName: string): string {
+  return `qpq-wsq-kvs-name-${apiName}`;
+}
+
+export function getWebSocketQueueKeyValueStoreName(apiName: string): string {
+  return `qpq-wsq-${apiName}`;
 }
 
 export const defineWebSocketQueue = (
@@ -24,16 +33,13 @@ export const defineWebSocketQueue = (
   rootDomain: string,
   advancedSettings?: QPQConfigAdvancedWebsocketQueueSettings,
 ): QPQConfig => {
-  const kvsName = `wsq-${apiName}`;
-
   return [
-    defineGlobal('qpq-wsq-kvs-name', kvsName),
-    defineGlobal('qpq-wsq-ws-api-name', apiName),
-    defineGlobal('qpq-wsq-eb-name', eventBusName),
-    defineGlobal('qpq-wsq-ud-name', advancedSettings?.userDirectoryName || ''),
+    // User defined vars (stored in config)
+    defineGlobal(getWebSocketQueueGlobalConfigKeyForEventBusName(apiName), eventBusName),
+    defineGlobal(getWebSocketQueueGlobalConfigKeyForUserDirectoryName(apiName), advancedSettings?.userDirectoryName || ''),
 
     // Store To Save Connection Info
-    defineKeyValueStore(kvsName, 'id', undefined, {
+    defineKeyValueStore(getWebSocketQueueKeyValueStoreName(apiName), 'id', undefined, {
       indexes: ['userId'],
       owner: qpqCoreUtils.convertCrossModuleOwnerToGenericResourceNameOverride(advancedSettings?.owner),
     }),

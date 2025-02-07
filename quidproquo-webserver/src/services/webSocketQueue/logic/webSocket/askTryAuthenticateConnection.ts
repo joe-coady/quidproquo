@@ -1,9 +1,12 @@
 import { askConfigGetGlobal, AskResponse, askUserDirectorySetAccessToken } from 'quidproquo-core';
 
+import { getWebSocketQueueGlobalConfigKeyForUserDirectoryName } from '../../../../config';
+import { askWebsocketReadApiNameOrThrow } from '../../../../context';
 import { webSocketConnectionData } from '../../data';
 
 export function* askTryAuthenticateConnection(connectionId: string): AskResponse<void> {
-  const userDirectoryName = yield* askConfigGetGlobal<string>('qpq-wsq-ud-name');
+  const apiName = yield* askWebsocketReadApiNameOrThrow();
+  const userDirectoryName = yield* askConfigGetGlobal<string>(getWebSocketQueueGlobalConfigKeyForUserDirectoryName(apiName));
   if (!userDirectoryName) {
     return;
   }

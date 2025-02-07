@@ -1,5 +1,4 @@
 import {
-  askConfigGetGlobal,
   askKeyValueStoreDelete,
   askKeyValueStoreQueryAll,
   askKeyValueStoreScanAll,
@@ -8,12 +7,14 @@ import {
   kvsEqual,
 } from 'quidproquo-core';
 
+import { getWebSocketQueueKeyValueStoreName } from '../../../config';
+import { askWebsocketReadApiNameOrThrow } from '../../../context';
 import { Connection } from '../types';
 
 export function* askGetStoreName(): AskResponse<string> {
-  const apiName = yield* askConfigGetGlobal<string>('qpq-wsq-kvs-name');
+  const apiName = yield* askWebsocketReadApiNameOrThrow();
 
-  return apiName;
+  return getWebSocketQueueKeyValueStoreName(apiName || 'UNKNOWN-API');
 }
 
 export function* askGetConnectionsByUserId(userId: string): AskResponse<Connection[]> {

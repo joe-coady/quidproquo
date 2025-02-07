@@ -8,6 +8,7 @@ import { AnyWebSocketQueueEventMessageWithCorrelation } from '../../types';
 export function* onConnect(event: WebsocketEvent): AskResponse<void> {
   yield* askWebsocketProvideConnectionInfo(
     {
+      apiName: event.apiName,
       connectionId: event.connectionId,
     },
     webSocketQueueLogic.askProcessOnConnect(event.connectionId, event.requestTime, event.requestTimeEpoch, event.sourceIp),
@@ -17,6 +18,7 @@ export function* onConnect(event: WebsocketEvent): AskResponse<void> {
 export function* onDisconnect(event: WebsocketEvent): AskResponse<void> {
   yield* askWebsocketProvideConnectionInfo(
     {
+      apiName: event.apiName,
       connectionId: event.connectionId,
     },
     webSocketQueueLogic.askProcessOnDisconnect(event.connectionId),
@@ -32,6 +34,7 @@ export function* onMessage(event: WebsocketEvent): AskResponse<void> {
 
   yield* askWebsocketProvideConnectionInfo(
     {
+      apiName: event.apiName,
       connectionId: event.connectionId,
       correlationId: message.correlationId,
     },
