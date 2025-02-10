@@ -1,20 +1,27 @@
 import { askMapParallelBatch, AskResponse, StoryResultMetadata } from 'quidproquo-core';
 
-import { websocketConnectionData } from '../../data';
+import { askWebSocketQueueGetConnections } from '../../../webSocketQueue/logic/webSocket/askWebSocketQueueGetConnections';
 import { askSendMessage } from './askSendMessage';
-import { WebSocketAdminServerEventMessageLogMetadata, WebsocketAdminServerMessageEventType } from './serverMessages';
+import { WebSocketQueueQpqAdminServerEventMessageLogMetadata, WebSocketQueueQpqAdminServerMessageEventType } from './serverMessages';
 
 export function* askSendLogToAdmins(log: StoryResultMetadata) {
-  const logMessage: WebSocketAdminServerEventMessageLogMetadata = {
-    type: WebsocketAdminServerMessageEventType.LogMetadata,
+  const logMessage: WebSocketQueueQpqAdminServerEventMessageLogMetadata = {
+    type: WebSocketQueueQpqAdminServerMessageEventType.LogMetadata,
     payload: {
       log,
     },
   };
 
-  const connections = yield* websocketConnectionData.askGetAdminConnections();
+  let nextPageKey: string | undefined = undefined;
+  do {
+    const pageConnections = yield* askWebSocketQueueGetConnections('qpqadmin', true);
 
-  yield* askMapParallelBatch(connections, 10, function* askSendLogOnConnection(connection): AskResponse<void> {
-    yield* askSendMessage(connection.id, logMessage);
-  });
+    yield* askMapParallelBatch(pageConnections.items, 10, function* askSendLogOnConnection(connection): AskResponse<void> {
+      if (connection.userId) {
+        yield* askSendMessage(connection.id, logMessage);
+      }
+    });
+
+    nextPageKey = pageConnections.nextPageKey;
+  } while (nextPageKey);
 }

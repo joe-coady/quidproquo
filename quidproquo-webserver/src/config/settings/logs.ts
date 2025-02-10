@@ -16,10 +16,11 @@ import {
   defineAdminServiceLogLogRoute,
   defineAdminServiceLogRoute,
   getServiceEntryQpqFunctionRuntime,
+  WebsocketAdminClientMessageEventType,
 } from '../../services';
 import { adminUserDirectoryResourceName } from './adminUserDirectory';
-import { defineRoute } from './route';
 import { defineWebsocket } from './websocket';
+import { defineWebSocketQueue } from './webSocketQueue';
 
 // export type ManifestServiceUrlDefinition = QpqServiceContentSecurityPolicy & {
 //   protocol: 'http' | 'https'; // Only can be serverd via http
@@ -43,7 +44,6 @@ export interface QPQConfigAdvancedLogSettings extends QPQConfigAdvancedSettings 
 // This should be part of core
 const logResourceName = 'qpq-logs';
 export const logReportsResourceName = 'qpq-log-reports';
-export const wsConnectionResourceName = 'qpq-admin-connections';
 
 export const defineLogs = (rootDomain: string, services: string[], advancedSettings?: QPQConfigAdvancedLogSettings): QPQConfig => {
   const routeAuthSettings = {
@@ -111,10 +111,6 @@ export const defineLogs = (rootDomain: string, services: string[], advancedSetti
       deprecated: advancedSettings?.deprecated,
     }),
 
-    defineKeyValueStore(wsConnectionResourceName, 'id', undefined, {
-      indexes: ['userId'],
-    }),
-
     defineAdminServiceAuthRoute('POST', '/login', 'login'),
     defineAdminServiceAuthRoute('POST', '/refreshToken', 'refreshToken'),
     defineAdminServiceAuthRoute('POST', '/challenge', 'respondToAuthChallenge'),
@@ -145,9 +141,31 @@ export const defineLogs = (rootDomain: string, services: string[], advancedSetti
       },
       {
         apiName: 'wsadmin',
+        deprecated: true,
       },
     ),
 
+    // Web Sockets
+    defineEventBus('qpq-admin-wsq'),
+    defineQueue(
+      'qpq-admin-websockets',
+      {
+        [WebsocketAdminClientMessageEventType.MarkLogChecked]: getServiceEntryQpqFunctionRuntime('log', 'queueEvent', 'webSocket::onMarkLogChecked'),
+        [WebsocketAdminClientMessageEventType.RefreshLogMetadata]: getServiceEntryQpqFunctionRuntime(
+          'log',
+          'queueEvent',
+          'webSocket::onRefreshLogMetadata',
+        ),
+      },
+      {
+        eventBusSubscriptions: ['qpq-admin-wsq'],
+      },
+    ),
+    defineWebSocketQueue('qpq-admin-wsq', 'qpqadmin', rootDomain, {
+      userDirectoryName: adminUserDirectoryResourceName,
+    }),
+
+    // Alert Logger
     defineEventBus('admin-notifier'),
     defineNotifyError('admin-notifier', {
       onAlarm: {

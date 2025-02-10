@@ -5,5 +5,4 @@ export * from './ExecuteServiceFunctionEvent';
 export * from './HTTPEvent';
 export * from './SEOEvent';
 export * from './StorageDriveEvent';
-export * from './webSocket';
 export * from './WebsocketEvent';

@@ -65,7 +65,13 @@ const processQueueEventBusSubscriptions = async (qpqConfig: QPQConfig, ebMessage
         return allEventBuses.some((eb) => ebsub === eb.name);
       });
     })
-    .filter((q) => !q.owner?.module || q.owner?.module === thisServiceName);
+    .filter(
+      (q) =>
+        // The target is this service
+        (!q.owner?.module || q.owner?.module === thisServiceName) &&
+        // And we are subed to the message that its trying to get to
+        q.eventBusSubscriptions.includes(ebMessage.eventBusName),
+    );
 
   for (const queue of queues) {
     const queueMessage: AnyQueueMessageWithSession = {

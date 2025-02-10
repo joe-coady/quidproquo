@@ -2,13 +2,11 @@ import { StoryResult } from 'quidproquo-core';
 import { useSubscribeToWebSocketEvent, useWebsocketSendEvent } from 'quidproquo-web-react';
 import {
   LogMetadata,
-  WebSocketAdminClientEventPayloadRefreshLogMetadata,
   WebsocketAdminClientMessageEventType,
-  WebSocketAdminServerEventMessageLogMetadata,
-  WebSocketAdminServerEventMessageRefreshLogMetadata,
-  WebsocketAdminServerMessageEventType,
-  WebSocketClientEventMessageMarkLogChecked,
-  WebsocketClientMessageEventType,
+  WebSocketQueueClientEventMessageQpqAdminMarkLogChecked,
+  WebSocketQueueClientEventMessageQpqAdminRefreshLogMetadata,
+  WebSocketQueueQpqAdminServerEventMessageLogMetadata,
+  WebSocketQueueQpqAdminServerMessageEventType,
 } from 'quidproquo-webserver';
 
 import { useEffect, useState } from 'react';
@@ -27,8 +25,8 @@ export const LogSummary = ({ log }: LogSummaryProps) => {
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setCheckedLoading(true);
 
-    const checkEvent: WebSocketClientEventMessageMarkLogChecked = {
-      type: WebsocketClientMessageEventType.MarkLogChecked,
+    const checkEvent: WebSocketQueueClientEventMessageQpqAdminMarkLogChecked = {
+      type: WebsocketAdminClientMessageEventType.MarkLogChecked,
       payload: {
         correlationId: log.correlation,
         checked: event.target.checked,
@@ -39,8 +37,8 @@ export const LogSummary = ({ log }: LogSummaryProps) => {
   };
 
   useSubscribeToWebSocketEvent(
-    WebsocketAdminServerMessageEventType.LogMetadata,
-    (webSocketService, message: WebSocketAdminServerEventMessageLogMetadata) => {
+    WebSocketQueueQpqAdminServerMessageEventType.LogMetadata,
+    (_webSocketService, message: WebSocketQueueQpqAdminServerEventMessageLogMetadata) => {
       if (message.payload.log.correlation !== log.correlation) {
         return;
       }
@@ -51,14 +49,14 @@ export const LogSummary = ({ log }: LogSummaryProps) => {
   );
 
   useEffect(() => {
-    const checkEvent: WebSocketAdminServerEventMessageRefreshLogMetadata = {
+    const refreshEvent: WebSocketQueueClientEventMessageQpqAdminRefreshLogMetadata = {
       type: WebsocketAdminClientMessageEventType.RefreshLogMetadata,
       payload: {
         correlationId: log.correlation,
       },
     };
 
-    sendMessage(checkEvent);
+    sendMessage(refreshEvent);
   }, [log.correlation]);
 
   return (

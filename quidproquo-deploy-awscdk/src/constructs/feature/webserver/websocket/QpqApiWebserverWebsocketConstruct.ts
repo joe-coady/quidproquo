@@ -19,6 +19,11 @@ export class QpqApiWebserverWebsocketConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: QpqApiWebserverWebsocketConstructProps) {
     super(scope, id, props);
 
+    // Don't deploy when deprecated.
+    if (props.websocketConfig.deprecated) {
+      return;
+    }
+
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(props.qpqConfig);
     const awsAccountId = qpqConfigAwsUtils.getApplicationModuleDeployAccountId(props.qpqConfig);
 

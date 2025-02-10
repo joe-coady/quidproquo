@@ -1,7 +1,7 @@
-import { AnyEventMessage } from 'quidproquo-core';
+import { AnyEventMessage, askCatch } from 'quidproquo-core';
 
 import { askWebsocketSendMessage } from '../../../../actions';
 
 export function* askSendMessage<E extends AnyEventMessage>(connectionId: string, payload: E) {
-  yield* askWebsocketSendMessage('wsadmin', connectionId, payload);
+  yield* askCatch(askWebsocketSendMessage('qpqadmin', connectionId, payload));
 }

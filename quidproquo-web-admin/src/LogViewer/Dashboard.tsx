@@ -2,7 +2,7 @@ import { StoryResultMetadata } from 'quidproquo-core';
 import { uniqueBy } from 'quidproquo-web';
 import { useRunEvery, useThrottledMemo } from 'quidproquo-web-react';
 import { useSubscribeToWebSocketEvent } from 'quidproquo-web-react';
-import { LogMetadata, WebSocketAdminServerEventMessageLogMetadata, WebsocketAdminServerMessageEventType } from 'quidproquo-webserver';
+import { LogMetadata, WebSocketQueueQpqAdminServerEventMessageLogMetadata, WebSocketQueueQpqAdminServerMessageEventType } from 'quidproquo-webserver';
 
 import React, { useEffect, useMemo } from 'react';
 import { Box, Grid, Paper, Typography } from '@mui/material';
@@ -61,8 +61,8 @@ export const Dashboard: React.FC<DashboardProps> = () => {
   }, []);
 
   useSubscribeToWebSocketEvent(
-    WebsocketAdminServerMessageEventType.LogMetadata,
-    (webSocketService, message: WebSocketAdminServerEventMessageLogMetadata) => {
+    WebSocketQueueQpqAdminServerMessageEventType.LogMetadata,
+    (webSocketService, message: WebSocketQueueQpqAdminServerEventMessageLogMetadata) => {
       // Add the log to the list if its an error
       if (message.payload.log.error) {
         setRealtimeLogs((prevLogs) => [message.payload.log, ...prevLogs.filter((pl) => pl.correlation !== message.payload.log.correlation)]);
