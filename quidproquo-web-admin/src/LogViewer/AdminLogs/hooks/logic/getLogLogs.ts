@@ -8,7 +8,7 @@ export const getLogLogs = async (
   startIsoDateTime: string,
   endIsoDateTime: string,
   serviceFilter: string,
-  msgFilter: string,
+  reasonFilter: string,
   apiBaseUrl: string,
   accessToken?: string,
 ): Promise<LogLog[]> => {
@@ -20,7 +20,7 @@ export const getLogLogs = async (
     endIsoDateTime,
     logLevel,
     serviceFilter,
-    msgFilter,
+    reasonFilter,
   };
 
   do {

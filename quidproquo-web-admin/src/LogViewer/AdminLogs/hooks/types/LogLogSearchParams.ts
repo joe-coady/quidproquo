@@ -8,7 +8,7 @@ export interface LogLogSearchParams {
   startIsoDateTime: string;
   endIsoDateTime: string;
 
-  msgFilter: string;
+  reasonFilter: string;
 
   nextPageKey?: string;
 }

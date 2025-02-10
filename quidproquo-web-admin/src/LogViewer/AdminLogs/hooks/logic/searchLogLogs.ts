@@ -24,7 +24,7 @@ export const searchLogLogs = async (
         searchParams.startIsoDateTime,
         searchParams.endIsoDateTime,
         searchParams.serviceFilter,
-        searchParams.msgFilter,
+        searchParams.reasonFilter,
         apiBaseUrl,
         accessToken,
       ).finally(() => {

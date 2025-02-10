@@ -54,8 +54,8 @@ export function AdminLogSearchBar({ searchParams, setLogLogSearchParams, onSearc
     }
   };
 
-  const handleInfoFilterChange = (event: any) => {
-    setLogLogSearchParams((prev) => ({ ...prev, infoFilter: event.target.value }));
+  const handleReasonFilterChange = (event: any) => {
+    setLogLogSearchParams((prev) => ({ ...prev, reasonFilter: event.target.value }));
   };
 
   const handleQuickTimeSelect = (minutes: number) => {
@@ -155,9 +155,9 @@ export function AdminLogSearchBar({ searchParams, setLogLogSearchParams, onSearc
         <Grid item xs={10}>
           <FormControl fullWidth>
             <TextField
-              label="Reason"
-              value={searchParams.msgFilter}
-              onChange={handleInfoFilterChange}
+              label="Message"
+              value={searchParams.reasonFilter}
+              onChange={handleReasonFilterChange}
               InputLabelProps={{
                 shrink: true,
               }}

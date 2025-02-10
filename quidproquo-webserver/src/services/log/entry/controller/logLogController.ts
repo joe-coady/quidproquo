@@ -10,17 +10,17 @@ export interface GetLogLogSearchParams {
   startIsoDateTime: string;
   endIsoDateTime: string;
 
-  msgFilter: string;
+  reasonFilter: string;
   serviceFilter: string;
 
   nextPageKey?: string;
 }
 
 export function* getLogLogs(event: HTTPEvent, params: {}): AskResponse<HTTPEventResponse> {
-  const { nextPageKey, logLevel, startIsoDateTime, endIsoDateTime, serviceFilter, msgFilter } =
+  const { nextPageKey, logLevel, startIsoDateTime, endIsoDateTime, serviceFilter, reasonFilter } =
     yield* askFromJsonEventRequest<GetLogLogSearchParams>(event);
 
-  const logs = yield* logLogLogic.askGetLogLogs(logLevel, startIsoDateTime, endIsoDateTime, serviceFilter, msgFilter, nextPageKey);
+  const logs = yield* logLogLogic.askGetLogLogs(logLevel, startIsoDateTime, endIsoDateTime, serviceFilter, reasonFilter, nextPageKey);
 
   return toJsonEventResponse(logs);
 }

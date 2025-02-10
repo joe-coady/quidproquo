@@ -8,7 +8,7 @@ export function* askGetLogLogs(
   startIsoDateTime: string,
   endIsoDateTime: string,
   serviceFilter: string,
-  msgFilter: string,
+  reasonFilter: string,
   nextPageKey?: string,
 ): AskResponse<QpqPagedData<LogLog>> {
   const result: QpqPagedData<LogLog> = {
@@ -19,7 +19,7 @@ export function* askGetLogLogs(
   const startTime = yield* askDateNow();
 
   do {
-    const logPage = yield* askListLogLogs(logLevel, startIsoDateTime, endIsoDateTime, serviceFilter, msgFilter, result.nextPageKey);
+    const logPage = yield* askListLogLogs(logLevel, startIsoDateTime, endIsoDateTime, serviceFilter, reasonFilter, result.nextPageKey);
 
     result.items.push(...logPage.items);
     result.nextPageKey = logPage.nextPageKey;

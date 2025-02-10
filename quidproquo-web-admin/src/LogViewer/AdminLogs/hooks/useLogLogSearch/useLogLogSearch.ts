@@ -23,7 +23,7 @@ export const useLogLogSearch = () => {
       startIsoDateTime: isoDateThreeHoursAgo,
       endIsoDateTime: isoDateTomorrow,
 
-      msgFilter: '',
+      reasonFilter: '',
       serviceFilter: '',
     };
   });
