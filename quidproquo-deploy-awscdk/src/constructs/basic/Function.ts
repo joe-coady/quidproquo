@@ -1,13 +1,13 @@
 import { getAwsServiceAccountInfoConfig } from 'quidproquo-config-aws';
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import { qpqCoreUtils } from 'quidproquo-core';
 
 import { aws_ec2, aws_iam, aws_lambda, aws_logs, aws_sns, aws_sns_subscriptions } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import path from 'path';
+import { join } from 'upath';
 
 import { BootstrapResource } from '../../constants';
+import { qpqAwsCdkPathUtils } from '../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
 
 export interface FunctionProps extends QpqConstructBlockProps {
@@ -57,7 +57,7 @@ export class Function extends QpqConstructBlock {
       memorySize: props.memoryInBytes || serviceInfo.lambdaMaxMemoryInMiB || 1024,
       layers: props.apiLayerVersions,
 
-      code: aws_lambda.Code.fromAsset(path.join(qpqCoreUtils.getApiBuildPathFullPath(props.qpqConfig), props.functionType)),
+      code: aws_lambda.Code.fromAsset(join(qpqAwsCdkPathUtils.getApiBuildPathFullPath(props.qpqConfig), props.functionType)),
       handler: `${handlerFile}.${props.executorName}`,
 
       environment: {

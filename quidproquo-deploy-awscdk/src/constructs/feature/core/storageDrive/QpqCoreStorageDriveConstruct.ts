@@ -5,10 +5,10 @@ import { aws_iam, aws_s3, aws_s3_deployment } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
+import { qpqAwsCdkPathUtils } from '../../../../utils';
 import * as qpqDeployAwsCdkUtils from '../../../../utils/qpqDeployAwsCdkUtils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { QpqResource } from '../../../base/QpqResource';
-
 export interface QpqCoreStorageDriveConstructProps extends QpqConstructBlockProps {
   storageDriveConfig: StorageDriveQPQConfigSetting;
 }
@@ -122,7 +122,7 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
     // }
 
     if (props.storageDriveConfig.copyPath) {
-      const srcDir = qpqCoreUtils.getStorageDriveUploadFullPath(props.qpqConfig, props.storageDriveConfig);
+      const srcDir = qpqAwsCdkPathUtils.getStorageDriveUploadFullPath(props.qpqConfig, props.storageDriveConfig);
 
       new aws_s3_deployment.BucketDeployment(this, 'bucket-deploy', {
         sources: [aws_s3_deployment.Source.asset(srcDir)],

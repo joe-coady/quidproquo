@@ -486,17 +486,6 @@ export const getUniqueKeyForSetting = (setting: QPQConfigSetting) => {
   return `${type}${key}`;
 };
 
-export const getStorageDriveUploadFullPath = (qpqConfig: QPQConfig, storageDriveConfig: StorageDriveQPQConfigSetting): string => {
-  return joinPaths(getConfigRoot(qpqConfig), storageDriveConfig.copyPath || '');
-};
-
-export const getApiBuildPathFullPath = (qpqConfig: QPQConfig): string => {
-  const configRoot = getConfigRoot(qpqConfig);
-  const apiBuildPath = getApiBuildPath(qpqConfig);
-
-  return joinPaths(configRoot, apiBuildPath);
-};
-
 export const getQueueQueueProcessors = (name: string, qpqConfig: QPQConfig): QpqQueueProcessors => {
   const seoConfigs = getConfigSettings<QueueQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.queue);
 
