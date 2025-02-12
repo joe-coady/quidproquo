@@ -1,4 +1,4 @@
-import { CrossModuleOwner, joinPaths, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { CrossModuleOwner, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
 import {
   AwsAlarmQPQConfigSetting,
@@ -145,16 +145,6 @@ export const getAwsServiceAccountInfoByDeploymentInfo = (
   }
 
   return serviceAccountInfo.info;
-};
-
-export const getLambdaLayersWithFullPaths = (qpqConfig: QPQConfig): ApiLayer[] => {
-  const awsServiceAccountInfoConfig = getAwsServiceAccountInfoConfig(qpqConfig);
-
-  return awsServiceAccountInfoConfig.apiLayers.map((layer: ApiLayer) => ({
-    name: layer.name,
-    buildPath: layer.buildPath ? joinPaths(qpqCoreUtils.getConfigRoot(qpqConfig), layer.buildPath) : undefined,
-    layerArn: layer.layerArn,
-  }));
 };
 
 export const getDynamoTableNameOverrride = (srcKvsName: string, qpqConfig: QPQConfig): string => {

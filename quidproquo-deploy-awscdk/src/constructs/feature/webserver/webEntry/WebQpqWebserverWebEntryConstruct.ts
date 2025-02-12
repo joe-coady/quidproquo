@@ -70,7 +70,7 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
     }
 
     if (props.webEntryConfig.storageDrive.autoUpload) {
-      const webEntryBuildPath = qpqWebServerUtils.getWebEntryFullPath(props.qpqConfig, props.webEntryConfig);
+      const webEntryBuildPath = qpqAwsCdkPathUtils.getWebEntryFullPath(props.qpqConfig, props.webEntryConfig);
       new aws_s3_deployment.BucketDeployment(this, 'bucket-deploy', {
         sources: [aws_s3_deployment.Source.asset(webEntryBuildPath)],
         destinationBucket: originBucket,

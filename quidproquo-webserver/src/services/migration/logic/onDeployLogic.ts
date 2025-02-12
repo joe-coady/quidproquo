@@ -1,15 +1,6 @@
-import {
-  askConfigGetGlobal,
-  askQueueSendMessages,
-  AskResponse,
-  DeployEventStatusType,
-  DeployEventType,
-  qpqCoreUtils,
-  QpqFunctionRuntime,
-  QueueMessage,
-} from 'quidproquo-core';
+import { askConfigGetGlobal, askQueueSendMessages, AskResponse, DeployEventStatusType, DeployEventType, QueueMessage } from 'quidproquo-core';
 
-import { Migration } from '../../../config/settings/migration';
+import { getQpqMigrationQueueTypeFromQpqFunctionRuntime, Migration } from '../../../config/settings/migration';
 import * as migrationInfoData from '../data/migrationInfoData';
 
 export function* askProcessOnDeployCreate(): AskResponse<void> {
@@ -22,7 +13,7 @@ export function* askProcessOnDeployCreate(): AskResponse<void> {
     // We remove the leading slash for backward compatibility
     yield* migrationInfoData.askUpsert({
       deployType: migration.deployType,
-      srcPath: qpqCoreUtils.getSrcPathFromQpqFunctionRuntimeWithoutLeadingSlash(migration.runtime),
+      srcPath: getQpqMigrationQueueTypeFromQpqFunctionRuntime(migration.runtime),
     });
   }
 }
@@ -32,9 +23,8 @@ export function* askProcessOnDeployUpdate(deployEventType: DeployEventType): Ask
   const migrationsForThisDeploy = allMigrations.filter((m) => m.deployType === deployEventType);
 
   for (const migration of migrationsForThisDeploy) {
-    const migrationInfo = yield* migrationInfoData.askGetMigrationBySrcPath(
-      qpqCoreUtils.getSrcPathFromQpqFunctionRuntimeWithoutLeadingSlash(migration.runtime),
-    );
+    const srcPathType = getQpqMigrationQueueTypeFromQpqFunctionRuntime(migration.runtime);
+    const migrationInfo = yield* migrationInfoData.askGetMigrationBySrcPath(srcPathType);
 
     // Ignore if we have already run it.
     if (migrationInfo) {
@@ -43,7 +33,7 @@ export function* askProcessOnDeployUpdate(deployEventType: DeployEventType): Ask
 
     // Send a message to the queue to run the migration.
     const message: QueueMessage<undefined> = {
-      type: qpqCoreUtils.getSrcPathFromQpqFunctionRuntimeWithoutLeadingSlash(migration.runtime),
+      type: srcPathType,
       payload: undefined,
     };
 
@@ -52,7 +42,7 @@ export function* askProcessOnDeployUpdate(deployEventType: DeployEventType): Ask
     // Insert the migration into into the database
     yield* migrationInfoData.askUpsert({
       deployType: migration.deployType,
-      srcPath: qpqCoreUtils.getSrcPathFromQpqFunctionRuntimeWithoutLeadingSlash(migration.runtime),
+      srcPath: srcPathType,
     });
   }
 }

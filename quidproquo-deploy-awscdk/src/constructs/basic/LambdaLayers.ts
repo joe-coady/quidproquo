@@ -1,10 +1,22 @@
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-import { getLambdaLayersWithFullPaths } from 'quidproquo-config-aws';
+import { ApiLayer, getAwsServiceAccountInfoConfig } from 'quidproquo-config-aws';
+import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
 import { aws_lambda } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
+import path from 'path';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
+
+export const getLambdaLayersWithFullPaths = (qpqConfig: QPQConfig): ApiLayer[] => {
+  const awsServiceAccountInfoConfig = getAwsServiceAccountInfoConfig(qpqConfig);
+
+  return awsServiceAccountInfoConfig.apiLayers.map((layer: ApiLayer) => ({
+    name: layer.name,
+    buildPath: layer.buildPath ? path.join(qpqCoreUtils.getConfigRoot(qpqConfig), layer.buildPath) : undefined,
+    layerArn: layer.layerArn,
+  }));
+};
 
 export interface LambdaLayersProps extends QpqConstructBlockProps {}
 

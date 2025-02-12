@@ -4,9 +4,9 @@ import {
   defineKeyValueStore,
   defineQueue,
   DeployEventType,
+  isQpqFunctionRuntimeAbsolutePath,
   QPQConfig,
   QPQConfigAdvancedSettings,
-  qpqCoreUtils,
   QpqFunctionRuntime,
 } from 'quidproquo-core';
 
@@ -18,6 +18,23 @@ export interface Migration {
 }
 
 export interface QPQConfigAdvancedMigrationSettings extends QPQConfigAdvancedSettings {}
+
+function removeLeadingSlashs(text: string): string {
+  if (text.startsWith('/')) {
+    return removeLeadingSlashs(text.slice(1));
+  }
+
+  return text;
+}
+
+export function getQpqMigrationQueueTypeFromQpqFunctionRuntime(qpqFunctionRuntime: QpqFunctionRuntime): string {
+  if (isQpqFunctionRuntimeAbsolutePath(qpqFunctionRuntime)) {
+    return `${qpqFunctionRuntime.basePath}/${removeLeadingSlashs(qpqFunctionRuntime.relativePath)}`;
+  }
+
+  const [srcPath] = qpqFunctionRuntime.split('::');
+  return removeLeadingSlashs(srcPath);
+}
 
 export const defineMigration = (migrations: Migration[], options?: QPQConfigAdvancedMigrationSettings): QPQConfig => {
   return [
@@ -36,7 +53,7 @@ export const defineMigration = (migrations: Migration[], options?: QPQConfigAdva
       migrations.reduce(
         (acc, m) => ({
           ...acc,
-          [qpqCoreUtils.getSrcPathFromQpqFunctionRuntimeWithoutLeadingSlash(m.runtime)]: m.runtime,
+          [getQpqMigrationQueueTypeFromQpqFunctionRuntime(m.runtime)]: m.runtime,
         }),
         {},
       ),

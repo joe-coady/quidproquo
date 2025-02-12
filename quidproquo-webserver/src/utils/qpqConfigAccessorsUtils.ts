@@ -1,4 +1,4 @@
-import { joinPaths, QPQConfig, qpqCoreUtils, QpqFunctionRuntime } from 'quidproquo-core';
+import { QPQConfig, qpqCoreUtils, QpqFunctionRuntime } from 'quidproquo-core';
 
 import {
   ApiKeyQPQWebServerConfigSetting,
@@ -98,10 +98,6 @@ export const getWebEntry = (configs: QPQConfig): string => {
   return webEntry?.buildPath;
 };
 
-export const getWebEntryFullPath = (qpqConfig: QPQConfig, webEntryQPQWebServerConfigSetting: WebEntryQPQWebServerConfigSetting): string => {
-  return joinPaths(qpqCoreUtils.getConfigRoot(qpqConfig), webEntryQPQWebServerConfigSetting.buildPath || '');
-};
-
 export const getWebsocketEntryByApiName = (apiName: string, qpqConfig: QPQConfig): WebSocketQPQWebServerConfigSetting => {
   const websocketSettings = getWebsocketSettings(qpqConfig);
 
@@ -112,12 +108,6 @@ export const getWebsocketEntryByApiName = (apiName: string, qpqConfig: QPQConfig
   }
 
   return websocketSetting;
-};
-
-export const getRedirectApiBuildFullPath = (qpqConfig: QPQConfig, redirectConfig: SubdomainRedirectQPQWebServerConfigSetting): string => {
-  const apiEntry = redirectConfig.apiBuildPath;
-
-  return joinPaths(qpqCoreUtils.getConfigRoot(qpqConfig), apiEntry);
 };
 
 export const getSubdomainRedirects = (configs: QPQConfig): SubdomainRedirectQPQWebServerConfigSetting[] => {

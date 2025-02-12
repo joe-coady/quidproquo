@@ -37,7 +37,6 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.19.1",
-    "quidproquo-core": "0.0.244",
-    "upath": "^2.0.1"
+    "quidproquo-core": "0.0.244"
   }
 }

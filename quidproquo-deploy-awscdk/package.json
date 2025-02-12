@@ -43,7 +43,8 @@
     "quidproquo-actionprocessor-node": "0.0.244",
     "quidproquo-config-aws": "0.0.244",
     "quidproquo-core": "0.0.244",
-    "quidproquo-webserver": "0.0.244"
+    "quidproquo-webserver": "0.0.244",
+    "upath": "^2.0.1"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.109",

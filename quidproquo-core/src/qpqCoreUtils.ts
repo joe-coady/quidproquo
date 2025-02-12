@@ -35,7 +35,7 @@ import {
   QpqFunctionRuntime,
   ResourceName,
 } from './types';
-import { isQpqFunctionRuntimeAbsolutePath, isQpqFunctionRuntimeRelativePath, joinPaths } from './utils';
+import { isQpqFunctionRuntimeAbsolutePath } from './utils';
 
 /**
  * Flattens a QPQConfig array into a single array of QPQConfigSetting objects.
@@ -349,42 +349,6 @@ export const getApiBuildPath = (qpqConfig: QPQConfig): string => {
   }
 
   return apiBuildPathConfig.apiBuildPath;
-};
-
-export const getSrcPathFromQpqFunctionRuntime = (qpqFunctionRuntime: QpqFunctionRuntime): string => {
-  if (isQpqFunctionRuntimeAbsolutePath(qpqFunctionRuntime)) {
-    return joinPaths(qpqFunctionRuntime.basePath, qpqFunctionRuntime.relativePath);
-  }
-
-  const [srcPath] = qpqFunctionRuntime.split('::');
-
-  return srcPath;
-};
-
-export function getSrcPathFromQpqFunctionRuntimeWithoutLeadingSlash(runtime: QpqFunctionRuntime): string {
-  const srcPath = getSrcPathFromQpqFunctionRuntime(runtime);
-
-  if (srcPath.startsWith('/')) {
-    return srcPath.slice(1);
-  }
-
-  return srcPath;
-}
-
-export const getFullSrcPathFromQpqFunctionRuntime = (
-  qpqFunctionRuntime: QpqFunctionRuntime,
-  qpqConfig: QPQConfig,
-  configRootOverride?: string,
-): string => {
-  if (isQpqFunctionRuntimeAbsolutePath(qpqFunctionRuntime)) {
-    return joinPaths(qpqFunctionRuntime.basePath, qpqFunctionRuntime.relativePath);
-  }
-
-  const [srcPath] = qpqFunctionRuntime.split('::');
-
-  const configRoot = configRootOverride ?? getApplicationConfigRoot(qpqConfig);
-
-  return joinPaths(configRoot, srcPath);
 };
 
 export const getStoryNameFromQpqFunctionRuntime = (qpqFunctionRuntime: QpqFunctionRuntime): string => {
