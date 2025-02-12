@@ -35,7 +35,7 @@ import {
   QpqFunctionRuntime,
   ResourceName,
 } from './types';
-import { joinPaths } from './utils';
+import { isQpqFunctionRuntimeAbsolutePath, isQpqFunctionRuntimeRelativePath, joinPaths } from './utils';
 
 /**
  * Flattens a QPQConfig array into a single array of QPQConfigSetting objects.
@@ -352,11 +352,11 @@ export const getApiBuildPath = (qpqConfig: QPQConfig): string => {
 };
 
 export const getSrcPathFromQpqFunctionRuntime = (qpqFunctionRuntime: QpqFunctionRuntime): string => {
-  const [srcPath, _method] = qpqFunctionRuntime.split('::');
-
-  if (srcPath.startsWith('full@')) {
-    return srcPath.slice(5);
+  if (isQpqFunctionRuntimeAbsolutePath(qpqFunctionRuntime)) {
+    return joinPaths(qpqFunctionRuntime.basePath, qpqFunctionRuntime.relativePath);
   }
+
+  const [srcPath] = qpqFunctionRuntime.split('::');
 
   return srcPath;
 };
@@ -376,11 +376,11 @@ export const getFullSrcPathFromQpqFunctionRuntime = (
   qpqConfig: QPQConfig,
   configRootOverride?: string,
 ): string => {
-  const [srcPath, _method] = qpqFunctionRuntime.split('::');
-
-  if (srcPath.startsWith('full@')) {
-    return srcPath.slice(5);
+  if (isQpqFunctionRuntimeAbsolutePath(qpqFunctionRuntime)) {
+    return joinPaths(qpqFunctionRuntime.basePath, qpqFunctionRuntime.relativePath);
   }
+
+  const [srcPath] = qpqFunctionRuntime.split('::');
 
   const configRoot = configRootOverride ?? getApplicationConfigRoot(qpqConfig);
 
@@ -388,14 +388,21 @@ export const getFullSrcPathFromQpqFunctionRuntime = (
 };
 
 export const getStoryNameFromQpqFunctionRuntime = (qpqFunctionRuntime: QpqFunctionRuntime): string => {
+  if (isQpqFunctionRuntimeAbsolutePath(qpqFunctionRuntime)) {
+    return qpqFunctionRuntime.functionName;
+  }
+
   const [_srcPath, method] = qpqFunctionRuntime.split('::');
 
   return method;
 };
 
 export const getSrcFilenameFromQpqFunctionRuntime = (qpqFunctionRuntime: QpqFunctionRuntime): string => {
-  const [srcPath] = qpqFunctionRuntime.split('::');
+  if (isQpqFunctionRuntimeAbsolutePath(qpqFunctionRuntime)) {
+    return qpqFunctionRuntime.relativePath.split('/').pop() || '';
+  }
 
+  const [srcPath] = qpqFunctionRuntime.split('::');
   return srcPath.split('/').pop() || '';
 };
 

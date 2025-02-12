@@ -1,4 +1,5 @@
 import { QpqFunctionRuntime } from '../../types';
+import { getUniqueKeyFromQpqFunctionRuntime } from '../../utils';
 import { QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
 
 export interface ActionProcessorsQPQConfigSetting extends QPQConfigSetting {
@@ -7,7 +8,7 @@ export interface ActionProcessorsQPQConfigSetting extends QPQConfigSetting {
 
 export const defineActionProcessors = (getActionProcessors: QpqFunctionRuntime): ActionProcessorsQPQConfigSetting => ({
   configSettingType: QPQCoreConfigSettingType.actionProcessors,
-  uniqueKey: getActionProcessors,
+  uniqueKey: getUniqueKeyFromQpqFunctionRuntime(getActionProcessors),
 
   runtime: getActionProcessors,
 });

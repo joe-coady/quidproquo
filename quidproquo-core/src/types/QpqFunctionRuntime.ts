@@ -1,10 +1,15 @@
 /**
- * Represents a service function definition that can be either relative or absolute.
- * - Use the `full@` prefix for absolute paths.
- * - Omit the prefix for relative paths.
+ * Represents a runtime function definition that can be either relative or absolute.
  *
  * Example:
- * - Absolute: `full@E:/repo/project/src/service/entry/controller/admin::onAuthUpdate`
+ * - Absolute: { basePath: `E:/repo/project/src`, relativePath: `/service/entry/controller/admin::onAuthUpdate` }
  * - Relative: `/entry/controller/admin::onAuthUpdate`
  */
-export type QpqFunctionRuntime = `full@${string}::${string}` | `/${string}::${string}`;
+export type QpqFunctionRuntimeRelativePath = `/${string}::${string}`;
+export type QpqFunctionRuntimeAbsolutePath = {
+  basePath: string;
+  relativePath: string;
+  functionName: string;
+};
+
+export type QpqFunctionRuntime = QpqFunctionRuntimeAbsolutePath | QpqFunctionRuntimeRelativePath;

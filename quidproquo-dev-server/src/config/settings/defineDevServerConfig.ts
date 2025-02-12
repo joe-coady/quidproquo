@@ -12,13 +12,18 @@ export const defineDevServerConfig = (advancedSettings?: QPQConfigAdvancedDevSer
   const onlyDeploySafe = advancedSettings?.onlyDeploySafe ?? true;
   const vpcList: string[] = advancedSettings?.vpcList || [];
 
-  const pathToRuntime = path.join(__dirname, '../../entry/serviceFunction/runCypherQuery');
-
   const graphAccessConfigs = vpcList.map((vpcName) =>
-    defineServiceFunction(`full@${pathToRuntime}::runCypherQuery`, {
-      virtualNetworkName: vpcName,
-      functionName: `graphQuery${vpcName}`,
-    }),
+    defineServiceFunction(
+      {
+        basePath: __dirname,
+        relativePath: '../../entry/serviceFunction/runCypherQuery',
+        functionName: 'runCypherQuery',
+      },
+      {
+        virtualNetworkName: vpcName,
+        functionName: `graphQuery${vpcName}`,
+      },
+    ),
   );
 
   const alwaysSafeConfigs: QPQConfig = [...graphAccessConfigs];

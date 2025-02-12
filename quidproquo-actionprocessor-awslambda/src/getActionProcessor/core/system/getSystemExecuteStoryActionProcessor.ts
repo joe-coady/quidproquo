@@ -6,6 +6,7 @@ import {
   createRuntime,
   DynamicModuleLoader,
   ErrorTypeEnum,
+  getUniqueKeyFromQpqFunctionRuntime,
   QPQConfig,
   qpqCoreUtils,
   QpqLogger,
@@ -37,6 +38,8 @@ const getProcessExecuteStory = <T extends Array<any>, R>(qpqConfig: QPQConfig): 
       return actionResultError(ErrorTypeEnum.NotFound, `Unable to dynamically load: [${payload.runtime}]`);
     }
 
+    const functionKey = getUniqueKeyFromQpqFunctionRuntime(payload.runtime);
+
     const resolveStory = createRuntime(
       qpqConfig,
       {
@@ -52,7 +55,7 @@ const getProcessExecuteStory = <T extends Array<any>, R>(qpqConfig: QPQConfig): 
       `${moduleName}::${randomGuid()}`,
       QpqRuntimeType.EXECUTE_STORY,
       dynamicModuleLoader,
-      [payload.runtime],
+      [functionKey],
     );
     const storyResult = await resolveStory(story, payload.params);
 
@@ -60,7 +63,7 @@ const getProcessExecuteStory = <T extends Array<any>, R>(qpqConfig: QPQConfig): 
       return actionResultError(
         storyResult.error.errorType,
         storyResult.error.errorText,
-        storyResult.error.errorStack ? `${payload.runtime} -> [${storyResult.error.errorStack}]` : payload.runtime,
+        storyResult.error.errorStack ? `${functionKey} -> [${storyResult.error.errorStack}]` : functionKey,
       );
     }
 

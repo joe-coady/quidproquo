@@ -1,4 +1,12 @@
-import { askConfigGetGlobal, askQueueSendMessages, AskResponse, DeployEventStatusType, QpqFunctionRuntime, QueueMessage } from 'quidproquo-core';
+import {
+  askConfigGetGlobal,
+  askQueueSendMessages,
+  AskResponse,
+  DeployEventStatusType,
+  getUniqueKeyFromQpqFunctionRuntime,
+  QpqFunctionRuntime,
+  QueueMessage,
+} from 'quidproquo-core';
 
 export function* askProcessOnDeployCreate(): AskResponse<void> {
   const allSeeds = yield* askConfigGetGlobal<QpqFunctionRuntime[]>('qpqSeeds');
@@ -7,7 +15,7 @@ export function* askProcessOnDeployCreate(): AskResponse<void> {
   for (const seed of allSeeds) {
     // Send a message to the queue to run the migration.
     const message: QueueMessage<undefined> = {
-      type: seed,
+      type: getUniqueKeyFromQpqFunctionRuntime(seed),
       payload: undefined,
     };
 

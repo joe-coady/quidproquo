@@ -1,4 +1,4 @@
-import { HTTPMethod, QPQConfigSetting, QpqFunctionRuntime } from 'quidproquo-core';
+import { getUniqueKeyFromQpqFunctionRuntime, HTTPMethod, QPQConfigSetting, QpqFunctionRuntime } from 'quidproquo-core';
 
 import { QPQWebServerConfigSettingType } from '../QPQConfig';
 import { ApiKeyReference } from './apiKey';
@@ -68,7 +68,7 @@ export const defineRoute = (
 
   return {
     configSettingType: QPQWebServerConfigSettingType.Route,
-    uniqueKey: runtime,
+    uniqueKey: getUniqueKeyFromQpqFunctionRuntime(runtime),
 
     method,
     path,

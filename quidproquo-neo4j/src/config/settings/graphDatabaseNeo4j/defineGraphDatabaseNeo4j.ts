@@ -1,4 +1,11 @@
-import { defineActionProcessors, defineParameter, defineRecurringSchedule, defineSecret, QPQConfig, QpqFunctionRuntime } from 'quidproquo-core';
+import {
+  defineActionProcessors,
+  defineParameter,
+  defineRecurringSchedule,
+  defineSecret,
+  QPQConfig,
+  QpqFunctionRuntimeAbsolutePath,
+} from 'quidproquo-core';
 
 // export interface QPQConfigAdvancedGraphDatabaseNeo4jSettings extends QPQConfigAdvancedSettings {
 //   owner?: CrossModuleOwner<'graphDatabaseName'>;
@@ -12,8 +19,12 @@ export enum Neo4jVersion {
   Version5 = 'version5',
 }
 
-const fullQpqFunctionRuntime = (relativePath: string, functionName: string): QpqFunctionRuntime => {
-  return `full@${__dirname}/${relativePath}::${functionName}`;
+const fullQpqFunctionRuntime = (relativePath: string, functionName: string): QpqFunctionRuntimeAbsolutePath => {
+  return {
+    basePath: __dirname,
+    relativePath: relativePath,
+    functionName,
+  };
 };
 
 export const defineGraphDatabaseNeo4j = (databaseName: string, version: Neo4jVersion = Neo4jVersion.Version5): QPQConfig => [

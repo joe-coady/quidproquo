@@ -1,9 +1,16 @@
-import { joinPaths, QpqFunctionRuntime } from 'quidproquo-core';
+import { QpqFunctionRuntimeAbsolutePath } from 'quidproquo-core';
 
-export const getServiceEntryQpqFunctionRuntime = (serviceName: string, entryType: string, runtime: `${string}::${string}`): QpqFunctionRuntime => {
+export const getServiceEntryQpqFunctionRuntime = (
+  serviceName: string,
+  entryType: string,
+  // TODO: runtime should maybe be QpqFunctionRuntimeRelativePath
+  runtime: `${string}::${string}`,
+): QpqFunctionRuntimeAbsolutePath => {
   const [src, methodName] = runtime.split('::');
 
-  const fullSrc = joinPaths(__dirname, serviceName, 'entry', entryType, src);
-
-  return `full@${fullSrc}::${methodName}`;
+  return {
+    basePath: __dirname,
+    relativePath: `${serviceName}/entry/${entryType}/${src}`,
+    functionName: methodName,
+  };
 };
