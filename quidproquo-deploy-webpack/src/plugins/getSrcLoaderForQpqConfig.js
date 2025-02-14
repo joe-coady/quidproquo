@@ -15,42 +15,42 @@ export const getFullSrcPathFromQpqFunctionRuntime = (qpqFunctionRuntime, qpqConf
   return path.join(configRoot, srcPath);
 };
 
-export function getSrcLoaderForQpqConfig(qpqConfig, moduleNameVariableName) {
-  const uniqueSrcFiles = [...new Set([...qpqCoreUtils.getAllSrcEntries(qpqConfig), ...qpqWebServerUtils.getAllSrcEntries(qpqConfig)])];
+export function getSrcLoaderForQpqConfig(qpqConfig, qpqFunctionRuntimeVariableName) {
+  const allQpqFunctionRuntimes = [...qpqCoreUtils.getAllSrcEntries(qpqConfig), ...qpqWebServerUtils.getAllSrcEntries(qpqConfig)];
 
-  const caseStatements = [
-    ...uniqueSrcFiles.map((e) => {
-      const fullPath = getFullSrcPathFromQpqFunctionRuntime(e, qpqConfig);
-      const method = qpqCoreUtils.getStoryNameFromQpqFunctionRuntime(e);
-      const srcPath = fullPath.replace(/\\/g, '/');
+  const ifStatements = allQpqFunctionRuntimes.map((qpqFunctionRuntime) => {
+    const fullPath = getFullSrcPathFromQpqFunctionRuntime(qpqFunctionRuntime, qpqConfig);
+    const method = qpqCoreUtils.getStoryNameFromQpqFunctionRuntime(qpqFunctionRuntime);
+    const srcPath = path.posix.join(fullPath.replace(/\\/g, '/')); // Ensure proper path format
 
-      return `case String.raw\`${e}\`: {
-        const module = await require('${srcPath}');
-        if (!module) {
-          throw new Error('Unable to dynamically load module');
+    return `
+      if (typeof ${qpqFunctionRuntimeVariableName} === '${typeof qpqFunctionRuntime}' && !!${qpqFunctionRuntimeVariableName}) {
+        if (
+          ${
+            typeof qpqFunctionRuntime === 'string'
+              ? `(${qpqFunctionRuntimeVariableName} === String.raw\`${qpqFunctionRuntime}\`)`
+              : `(
+                ${qpqFunctionRuntimeVariableName}.basePath === String.raw\`${qpqFunctionRuntime.basePath}\` &&
+                ${qpqFunctionRuntimeVariableName}.relativePath === String.raw\`${qpqFunctionRuntime.relativePath}\` &&
+                ${qpqFunctionRuntimeVariableName}.functionName === String.raw\`${qpqFunctionRuntime.functionName}\`
+              )`
+          }
+        ) {
+          const module = await require('${srcPath}');
+          if (!module) {
+            throw new Error('Unable to dynamically load module');
+          }
+
+          const story = module['${method}'];
+          if (!story) {
+            throw new Error(\`Unable to dynamically load story: [${method}]\`);
+          }
+
+          return story;
         }
-
-        const story = module['${method}'];
-        if (!story) {
-          throw new Error(\`Unable to dynamically load story: [${method}]\`);
-        }
-
-        return story;
-      }`;
-    }),
-
-    `default: {
-      console.log("Can't find module from list");
-
-      throw new Error('Unable to dynamically load module, no matching file path, path must match exactly what is in qpqConfig.');
-    }`,
-  ];
-
-  const result = `
-  switch (${moduleNameVariableName}) {
-    ${caseStatements.join('\n')}
-  }
+      }
 `;
+  });
 
-  return result;
+  return ifStatements.join('\n');
 }

@@ -6,9 +6,9 @@ export function getModuleLoaderSrcForService(qpqConfig, serviceNameVariableName,
   const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
 
   const result = `
-  if (${serviceNameVariableName} === String.raw\`${serviceName}\`) {
-    ${getSrcLoaderForQpqConfig(qpqConfig, moduleNameVariableName)}
-  }
+    if (${serviceNameVariableName} === String.raw\`${serviceName}\`) {
+      ${getSrcLoaderForQpqConfig(qpqConfig, moduleNameVariableName)}
+    }
   `;
 
   return result;

@@ -1,7 +1,7 @@
 import { actionResultError, isErroredActionResult, resolveActionResult, resolveActionResultError } from './logic/actionLogic';
-import { Action, ActionProcessorList, ActionProcessorResult, ActionRequester, EitherActionResult } from './types/Action';
+import { Action, ActionProcessorList, ActionProcessorResult, EitherActionResult } from './types/Action';
 import { ErrorTypeEnum } from './types/ErrorTypeEnum';
-import { qpqConsoleLog, QpqRuntimeType, StoryResult, StorySession, StorySessionUpdater } from './types/StorySession';
+import { qpqConsoleLog, QpqRuntimeType, Story, StoryResult, StorySession, StorySessionUpdater } from './types/StorySession';
 import { QPQConfig } from './config';
 import { getApplicationModuleName } from './qpqCoreUtils';
 import { ActionProcessorListResolver, AnyStory, DynamicModuleLoader, QpqLogger } from './types';
@@ -188,10 +188,7 @@ export const createRuntime = (
     return storyResult;
   }
 
-  async function resolveStoryWithLogs<TArgs extends Array<any>>(
-    story: (...args: TArgs) => Generator<any, any, Action<any>>,
-    args: TArgs,
-  ): Promise<StoryResult<any>> {
+  async function resolveStoryWithLogs<TArgs extends Array<any>>(story: Story<TArgs, any>, args: TArgs): Promise<StoryResult<any>> {
     const logs: any[] = [];
     const oldConsoleLog = console.log;
 

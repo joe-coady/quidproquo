@@ -32,6 +32,22 @@ export type StorySessionUpdater = (newSession: Partial<StorySession>) => void;
 
 export type AskResponse<T> = Generator<Action<any>, T, any>;
 
+export type Story<TArgs extends any[], R> = (...args: TArgs) => AskResponse<R>;
+export type StoryResolver<S extends Story<any, any>> = (story: S) => StoryResult<Parameters<S>, AskResponseReturnType<ReturnType<S>>>;
+
+// function* test(msg: string): AskResponse<number> {
+//   return parseInt(msg);
+// }
+
+// function DoThing<S extends Story<any, any>>(story: S): (...args: Parameters<S>) => AskResponseReturnType<ReturnType<S>> {
+//   return (...args: Parameters<S>) => {
+//     return (() => {}) as any;
+//   };
+// }
+
+// const runTest = DoThing(test);
+// const num = runTest('a');
+
 /**
  * Utility Type: ExtractGeneratorReturnType
  *
