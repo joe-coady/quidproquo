@@ -1,6 +1,6 @@
 {
   "name": "quidproquo-actionprocessor-awslambda",
-  "version": "0.0.246",
+  "version": "0.0.247",
   "description": "",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
@@ -55,9 +55,9 @@
     "lodash": "^4.17.21",
     "node-cache": "^5.1.2",
     "node-match-path": "^0.6.3",
-    "quidproquo-config-aws": "0.0.246",
-    "quidproquo-core": "0.0.246",
-    "quidproquo-webserver": "0.0.246"
+    "quidproquo-config-aws": "0.0.247",
+    "quidproquo-core": "0.0.247",
+    "quidproquo-webserver": "0.0.247"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.109",
@@ -65,7 +65,7 @@
     "@types/jsonwebtoken": "^9.0.2",
     "@types/lodash": "^4.14.194",
     "@types/node": "^18.11.9",
-    "quidproquo-tsconfig": "0.0.246",
+    "quidproquo-tsconfig": "0.0.247",
     "typescript": "^4.9.3"
   }
 }
