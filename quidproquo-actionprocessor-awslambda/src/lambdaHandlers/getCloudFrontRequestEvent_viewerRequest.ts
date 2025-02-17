@@ -6,9 +6,9 @@ export const viewerRequestEventHandler = async (event: CloudFrontRequestEvent, c
   console.log(JSON.stringify(event));
 
   const request = event.Records[0].cf.request;
-  const headers = request.headers;
+  const headers = request.headers || {};
 
-  const userAgent = headers['user-agent'][0]?.value || 'unknown';
+  const userAgent = headers['user-agent']?.[0]?.value || 'unknown';
 
   // let isBot = userAgent.match(/bot|crawl|spider|slurp|facebot|facebookexternalhit/i);
 

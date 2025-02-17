@@ -7,10 +7,10 @@ export function* askProcessOnThrottle(error: NotifyErrorQueueTimeoutEventPayload
   const inError = error.newStateInAlarm;
   const startEnd = inError ? '(Start)' : '(End)';
   const message = `Throttle (${startEnd}) - ${error.newStateReason}`;
-  const logLevel: LogLevelEnum = inError ? LogLevelEnum.Fatal : LogLevelEnum.Info;
+  // const logLevel: LogLevelEnum = inError ? LogLevelEnum.Fatal : LogLevelEnum.Info;
 
   const logLog: LogLog = {
-    type: logLevel,
+    type: LogLevelEnum.Warn,
     reason: message,
     timestamp: yield* askDateNow(),
   };
