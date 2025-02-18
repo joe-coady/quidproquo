@@ -33,7 +33,7 @@ export type StorySessionUpdater = (newSession: Partial<StorySession>) => void;
 export type AskResponse<T> = Generator<Action<any>, T, any>;
 
 export type Story<TArgs extends any[], R> = (...args: TArgs) => AskResponse<R>;
-export type StoryResolver<S extends Story<any, any>> = (story: S) => StoryResult<Parameters<S>, AskResponseReturnType<ReturnType<S>>>;
+export type StoryResolver = <S extends Story<any, any>>(story: S) => (...args: Parameters<S>) => Promise<AskResponseReturnType<ReturnType<S>>>;
 
 // function* test(msg: string): AskResponse<number> {
 //   return parseInt(msg);
@@ -111,7 +111,9 @@ export enum QpqRuntimeType {
   DEPLOY_EVENT = 'DEPLOY_EVENT',
   STORAGEDRIVE_EVENT = 'STORAGEDRIVE_EVENT',
   CLOUD_FLARE_DEPLOY = 'CLOUD_FLARE_DEPLOY',
+
   UNIT_TEST = 'UNIT_TEST',
+  UI = 'UI',
 
   SEND_EMAIL_EVENT = 'SEND_EMAIL_EVENT',
 

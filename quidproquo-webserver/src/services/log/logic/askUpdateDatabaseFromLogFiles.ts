@@ -61,6 +61,7 @@ const extractors: Record<QpqRuntimeType, (sr: StoryResult<any>) => string> = {
 
   [QpqRuntimeType.CLOUD_FLARE_DEPLOY]: unknownGenericTextExtractor,
 
+  [QpqRuntimeType.UI]: unknownGenericTextExtractor,
   [QpqRuntimeType.UNIT_TEST]: unknownGenericTextExtractor,
 };
 
