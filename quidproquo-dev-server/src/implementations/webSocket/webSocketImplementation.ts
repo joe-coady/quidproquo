@@ -92,8 +92,6 @@ const startServer = (
     ws.on('error', console.error);
 
     ws.on('message', (data: RawData, isBinary) => {
-      console.log('isBinary: ', isBinary);
-
       const onMessageEvent: WsEvent = {
         apiName: settingsMap.apiName,
         service: settingsMap.service,
