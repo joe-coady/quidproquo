@@ -1,21 +1,23 @@
 import { AskResponseReturnType, Story } from 'quidproquo-core';
 
-import { useMemo, useReducer, useState } from 'react';
+import { useMemo, useState } from 'react';
 
+import { QpqBubbleReducer, useBubblingReducer } from '../useBubbleReducer';
 import { useQpq } from '../useQpq';
 import { getStateDispatchActionListResolver } from './actionProcessor';
 
 export function useQpqReducer<TState, TAction, TApi extends Record<string, Story<any, any>>>(
-  reducer: React.Reducer<TState, TAction>,
-  initialState: TState,
   apiGenerators: TApi,
+  reducer: QpqBubbleReducer<TState, TAction> = (s) => [s, false],
+  initialState: TState = {} as TState,
 ): [
-  TState,
   {
     [K in keyof TApi]: (...args: Parameters<TApi[K]>) => Promise<AskResponseReturnType<ReturnType<TApi[K]>>>;
   },
+  TState,
+  (action: any) => void,
 ] {
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [state, dispatch] = useBubblingReducer(reducer, initialState);
 
   // Api generators CAN NEVER CHANGE and are memoized to prevent unnecessary re-renders.
   const [memoedApiGenerators] = useState(() => apiGenerators);
@@ -38,5 +40,5 @@ export function useQpqReducer<TState, TAction, TApi extends Record<string, Story
     };
   }, [resolver]);
 
-  return [state, api];
+  return [api, state, dispatch];
 }
