@@ -14,5 +14,6 @@ export * from './math';
 export * from './network';
 export * from './platform';
 export * from './queue';
+export * from './state';
 export * from './system';
 export * from './userDirectory';
