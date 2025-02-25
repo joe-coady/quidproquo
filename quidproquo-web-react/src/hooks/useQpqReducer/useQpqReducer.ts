@@ -1,3 +1,4 @@
+/* 
 import { AskResponseReturnType, Story } from 'quidproquo-core';
 
 import { useMemo, useState } from 'react';
@@ -51,3 +52,9 @@ export function useQpqReducer<
 
   return [api, state, dispatch];
 }
+
+*/
+
+export const useQpqReducer = () => {
+  // NOOP
+};
