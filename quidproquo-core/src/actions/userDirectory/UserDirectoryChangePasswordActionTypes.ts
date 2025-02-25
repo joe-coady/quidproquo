@@ -5,6 +5,7 @@ import { UserDirectoryActionType } from './UserDirectoryActionType';
 export interface UserDirectoryChangePasswordActionPayload {
   oldPassword: string;
   newPassword: string;
+  accessToken: string;
 }
 
 // Action

@@ -11,10 +11,10 @@ import {
 import { changePassword } from '../../../logic/cognito/changePassword';
 
 const getProcessChangePassword = (qpqConfig: QPQConfig): UserDirectoryChangePasswordActionProcessor => {
-  return async ({ oldPassword, newPassword }, session) => {
+  return async ({ oldPassword, newPassword, accessToken }) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
-    await changePassword(session.accessToken!, oldPassword, newPassword, region);
+    await changePassword(accessToken, oldPassword, newPassword, region);
 
     return actionResult(void 0);
   };
