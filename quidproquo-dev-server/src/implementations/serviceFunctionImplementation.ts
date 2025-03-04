@@ -22,6 +22,7 @@ export const serviceFunctionImplementation = async (devServerConfig: DevServerCo
       getDynamicModuleLoader(qpqConfig!, devServerConfig),
       getNodeServiceFunctionEventProcessor,
       QpqRuntimeType.SERVICE_FUNCTION_EXE,
+      (e: AnyExecuteServiceFunctionEventWithSession) => e.storySession,
     );
 
     if (correlation) {

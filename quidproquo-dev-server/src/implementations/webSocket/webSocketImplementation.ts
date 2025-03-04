@@ -73,6 +73,10 @@ const startServer = (
         getDynamicModuleLoader(settingsMap.qpqConfig, devServerConfig),
         getWsWebsocketEventEventProcessor,
         QpqRuntimeType.WEBSOCKET_EVENT,
+        () => ({
+          depth: 0,
+          context: {},
+        }),
       );
 
     const onConnectEvent: WsEvent = {

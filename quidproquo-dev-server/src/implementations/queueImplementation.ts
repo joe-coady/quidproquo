@@ -37,6 +37,7 @@ const processQueueMessages = async (qpqConfig: QPQConfig, payload: AnyQueueMessa
     getDynamicModuleLoader(qpqConfig, devServerConfig),
     getQueueEventProcessor,
     QpqRuntimeType.QUEUE_EVENT,
+    (e: AnyQueueMessageWithSession) => e.storySession,
   );
 };
 

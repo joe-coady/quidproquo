@@ -8,6 +8,7 @@ import {
   qpqCoreUtils,
   QpqRuntimeType,
   StoryResult,
+  StorySession,
 } from 'quidproquo-core';
 
 import { randomUUID } from 'crypto';
@@ -23,6 +24,7 @@ export const processEvent = async <E, ER>(
   dynamicModuleLoader: DynamicModuleLoader,
   getActionProcessors: ActionProcessorListResolver,
   qpqRuntimeType: QpqRuntimeType,
+  getStorySession: (event: E) => StorySession,
 ): Promise<StoryResult<[E], ER>> => {
   const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
 
@@ -30,10 +32,7 @@ export const processEvent = async <E, ER>(
 
   const resolveStory = createRuntime(
     qpqConfig,
-    {
-      depth: 0,
-      context: {},
-    },
+    getStorySession(expressEvent),
     async () => ({
       ...(await getDevServerActionProcessors(qpqConfig, dynamicModuleLoader)),
       ...(await getActionProcessors(qpqConfig, dynamicModuleLoader)),
