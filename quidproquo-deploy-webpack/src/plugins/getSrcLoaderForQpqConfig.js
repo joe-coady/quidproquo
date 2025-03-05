@@ -43,7 +43,7 @@ export function getSrcLoaderForQpqConfig(qpqConfig, qpqFunctionRuntimeVariableNa
 
           const story = module['${method}'];
           if (!story) {
-            throw new Error(\`Unable to dynamically load story: [${method}]\`);
+            throw new Error(\`Unable to dynamically load story: [${method}] in ['${srcPath}']\`);
           }
 
           return story;

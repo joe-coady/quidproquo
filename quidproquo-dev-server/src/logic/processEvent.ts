@@ -1,4 +1,5 @@
 import { getLogger } from 'quidproquo-actionprocessor-awslambda';
+import { getCustomActionActionProcessor } from 'quidproquo-actionprocessor-node';
 import {
   ActionProcessorListResolver,
   askProcessEvent,
@@ -36,6 +37,9 @@ export const processEvent = async <E, ER>(
     async () => ({
       ...(await getDevServerActionProcessors(qpqConfig, dynamicModuleLoader)),
       ...(await getActionProcessors(qpqConfig, dynamicModuleLoader)),
+
+      // Always done last, so they can ovveride the default ones if the user wants.
+      ...(await getCustomActionActionProcessor(qpqConfig, dynamicModuleLoader)),
     }),
     getDateNow,
     logger,

@@ -8,3 +8,10 @@ export type DevServerConfig = {
   dynamicModuleLoader: <T = any>(serviceName: string, modulePath: QpqFunctionRuntime) => Promise<T>;
   qpqConfigs: QPQConfig[];
 };
+
+export type DevServerConfigOverrides = {
+  allServices?: QPQConfig;
+  byService?: {
+    [key: string]: QPQConfig;
+  };
+};

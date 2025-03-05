@@ -1,3 +1,5 @@
+import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+
 import {
   apiImplementation,
   eventBusImplementation,
@@ -5,22 +7,44 @@ import {
   serviceFunctionImplementation,
   webSocketImplementation,
 } from './implementations';
-import { DevServerConfig } from './types';
+import { DevServerConfig, DevServerConfigOverrides } from './types';
 
 export * from './implementations';
 
-export const startDevServer = async (devServerConfig: DevServerConfig) => {
+export const getDevConfigs = (qpqConfigs: QPQConfig[], devServerConfigOverrides?: DevServerConfigOverrides): QPQConfig[] => {
+  return qpqConfigs.map((qpqConfig) => {
+    return [
+      // Base config
+      ...qpqConfig,
+
+      // all service override
+      ...(devServerConfigOverrides?.allServices || []),
+
+      // specific service override
+      ...((devServerConfigOverrides?.byService || {})[qpqCoreUtils.getApplicationModuleName(qpqConfig)] || []),
+    ];
+  });
+};
+
+export const startDevServer = async (devServerConfig: DevServerConfig, devServerConfigOverrides?: DevServerConfigOverrides) => {
   console.log('Starting QPQ Dev Server!!!');
 
+  // Add ovverrides for dev server
+  const updatedDevServerConfig: DevServerConfig = {
+    ...devServerConfig,
+
+    qpqConfigs: getDevConfigs(devServerConfig.qpqConfigs),
+  };
+
   await Promise.all([
-    apiImplementation(devServerConfig),
+    apiImplementation(updatedDevServerConfig),
 
-    serviceFunctionImplementation(devServerConfig),
+    serviceFunctionImplementation(updatedDevServerConfig),
 
-    eventBusImplementation(devServerConfig),
+    eventBusImplementation(updatedDevServerConfig),
 
-    queueImplementation(devServerConfig),
+    queueImplementation(updatedDevServerConfig),
 
-    webSocketImplementation(devServerConfig),
+    webSocketImplementation(updatedDevServerConfig),
   ]);
 };
