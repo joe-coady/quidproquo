@@ -1,6 +1,6 @@
 {
   "name": "quidproquo-web-react",
-  "version": "0.0.249",
+  "version": "0.0.250",
   "description": "",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
@@ -32,10 +32,10 @@
   },
   "homepage": "https://github.com/joe-coady/quidproquo#readme",
   "devDependencies": {
-    "quidproquo-core": "0.0.249",
-    "quidproquo-tsconfig": "0.0.249",
-    "quidproquo-webserver": "0.0.249",
-    "quidproquo-web": "0.0.249",
+    "quidproquo-core": "0.0.250",
+    "quidproquo-tsconfig": "0.0.250",
+    "quidproquo-webserver": "0.0.250",
+    "quidproquo-web": "0.0.250",
     "typescript": "^4.9.3"
   },
   "peerDependencies": {

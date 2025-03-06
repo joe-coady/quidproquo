@@ -1,6 +1,6 @@
 {
   "name": "quidproquo-deploy-webpack",
-  "version": "0.0.249",
+  "version": "0.0.250",
   "description": "",
   "main": "./lib/commonjs/webpack.config.js",
   "module": "./lib/esm/webpack.config.js",
@@ -33,11 +33,11 @@
   "homepage": "https://github.com/joe-coady/quidproquo#readme",
   "dependencies": {
     "path-browserify": "^1.0.1",
-    "quidproquo-actionprocessor-awslambda": "0.0.249",
-    "quidproquo-actionprocessor-node": "0.0.249",
-    "quidproquo-core": "0.0.249",
-    "quidproquo-deploy-awscdk": "0.0.249",
-    "quidproquo-webserver": "0.0.249",
+    "quidproquo-actionprocessor-awslambda": "0.0.250",
+    "quidproquo-actionprocessor-node": "0.0.250",
+    "quidproquo-core": "0.0.250",
+    "quidproquo-deploy-awscdk": "0.0.250",
+    "quidproquo-webserver": "0.0.250",
     "webpack-virtual-modules": "^0.6.2"
   },
   "devDependencies": {
@@ -48,7 +48,7 @@
     "@types/node": "^20.2.1",
     "@types/prettier": "2.6.0",
     "babel-loader": "^9.1.2",
-    "quidproquo-tsconfig": "0.0.249",
+    "quidproquo-tsconfig": "0.0.250",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.4"
   },
