@@ -1,14 +1,32 @@
-import { EventActionType, QpqRuntimeType, StoryResult } from 'quidproquo-core';
+import {
+  ActionProcessorResult,
+  EventActionType,
+  isErroredActionResult,
+  QpqRuntimeType,
+  resolveActionResult,
+  resolveActionResultError,
+  StoryResult,
+} from 'quidproquo-core';
 
 import { HTTPEvent } from '../../../../types';
 
-export const apiGenericTextExtractor = (storyResult: StoryResult<any>): string => {
+export const apiGenericTextExtractor = (storyResult: StoryResult<any>): string[] => {
   if (storyResult.runtimeType === QpqRuntimeType.API) {
-    const transformEventParams = storyResult.history.find((h) => h.act.type === EventActionType.TransformEventParams);
+    const getRecordsHistory = storyResult.history.find((h) => h.act.type === EventActionType.GetRecords);
 
-    const result = transformEventParams?.res as [HTTPEvent] | undefined;
-    return (result?.[0].path || '') + ' ' + (result?.[0].sourceIp || '');
+    if (!getRecordsHistory) {
+      return [];
+    }
+
+    const actionResult: ActionProcessorResult<HTTPEvent[]> = getRecordsHistory.res;
+
+    if (!isErroredActionResult(actionResult)) {
+      const httpEvents = resolveActionResult(actionResult);
+      return httpEvents.flatMap((event) => `${event.method}::${event.path} - [${event.sourceIp}]`);
+    }
+
+    return [resolveActionResultError(actionResult).errorText];
   }
 
-  return '';
+  return [];
 };

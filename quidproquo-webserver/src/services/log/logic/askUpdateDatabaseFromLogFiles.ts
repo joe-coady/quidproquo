@@ -38,7 +38,7 @@ import {
 } from './genericTextExtractors';
 import { askSendLogToAdmins } from './webSocket';
 
-const extractors: Record<QpqRuntimeType, (sr: StoryResult<any>) => string> = {
+const extractors: Record<QpqRuntimeType, (sr: StoryResult<any>) => string[]> = {
   [QpqRuntimeType.API]: apiGenericTextExtractor,
   [QpqRuntimeType.QUEUE_EVENT]: queueEventGenericTextExtractor,
   [QpqRuntimeType.SERVICE_FUNCTION_EXE]: serviceFunctionExeGenericTextExtractor,
@@ -79,7 +79,7 @@ export const getDecodedAccessTokenFromSetAccessTokenActionInStoryResult = (story
 
 export const storyResultToMetadata = (storyResult: StoryResult<any>, ttl?: number): LogMetadata => {
   // Add the generic text to the tag list
-  const tags = [extractors[storyResult.runtimeType]?.(storyResult), ...storyResult.tags];
+  const tags = [...(extractors[storyResult.runtimeType]?.(storyResult) || []), ...storyResult.tags];
 
   const decodedAccessToken = storyResult.session?.decodedAccessToken || getDecodedAccessTokenFromSetAccessTokenActionInStoryResult(storyResult);
 
