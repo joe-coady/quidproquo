@@ -4,8 +4,8 @@ import { GenericFunctionRenderer, genericFunctionRendererStyles } from '../gener
 import ActionResultDisplay from '../genericActionRenderer/ActionResultDisplay';
 import { ActionComponent } from '../types';
 
-export const CoreNetworkRequestCustomAction: ActionComponent<NetworkRequestActionPayload<any>> = ({ historyItem, expanded }) => {
-  if (!historyItem.act.payload) {
+export const CoreNetworkRequestCustomAction: ActionComponent<NetworkRequestActionPayload<any>> = ({ action, result, expanded }) => {
+  if (!action.payload) {
     return null;
   }
 
@@ -15,21 +15,21 @@ export const CoreNetworkRequestCustomAction: ActionComponent<NetworkRequestActio
         <GenericFunctionRenderer
           functionName={'askNetworkRequest'}
           args={[
-            historyItem.act.payload.method,
-            historyItem.act.payload.url,
+            action.payload.method,
+            action.payload.url,
             {
-              body: historyItem.act.payload.body,
-              headers: historyItem.act.payload.headers,
-              basePath: historyItem.act.payload.basePath,
-              params: historyItem.act.payload.params,
-              responseType: historyItem.act.payload.responseType,
+              body: action.payload.body,
+              headers: action.payload.headers,
+              basePath: action.payload.basePath,
+              params: action.payload.params,
+              responseType: action.payload.responseType,
             },
           ]}
           tooltipMap={['method', 'url', 'httpRequestOptions']}
           expanded={expanded}
         />
       </pre>
-      <ActionResultDisplay historyItem={historyItem} expanded={expanded} />
+      <ActionResultDisplay action={action} result={result} expanded={expanded} />
     </>
   );
 };

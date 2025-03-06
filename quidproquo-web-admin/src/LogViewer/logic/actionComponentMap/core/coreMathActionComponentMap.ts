@@ -1,5 +1,7 @@
+import { MathActionType } from 'quidproquo-core';
+
 const coreMathActionComponentMap: Record<string, string[]> = {
-  ['@quidproquo-core/Math/RandomNumber']: ['askRandomNumber'],
+  [MathActionType.RandomNumber]: ['askRandomNumber'],
 };
 
 export default coreMathActionComponentMap;

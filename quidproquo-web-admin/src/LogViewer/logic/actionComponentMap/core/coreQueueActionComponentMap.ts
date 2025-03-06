@@ -1,5 +1,7 @@
+import { QueueActionType } from 'quidproquo-core';
+
 const coreQueueActionComponentMap: Record<string, string[]> = {
-  ['@quidproquo-core/Queue/SendMessage']: ['askQueueSendMessages', 'queueName', 'queueMessages'],
+  [QueueActionType.SendMessages]: ['askQueueSendMessages', 'queueName', 'queueMessages'],
 };
 
 export default coreQueueActionComponentMap;

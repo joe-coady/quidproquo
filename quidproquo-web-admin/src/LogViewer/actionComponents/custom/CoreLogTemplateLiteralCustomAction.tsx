@@ -7,14 +7,14 @@ import Alert from '@mui/material/Alert';
 import { AnyVariableView } from '../genericActionRenderer';
 import { ActionComponent } from '../types';
 
-export const CoreLogTemplateLiteralCustomAction: ActionComponent<LogTemplateLiteralActionPayload> = ({ historyItem, expanded }) => {
-  if (!historyItem.act?.payload) {
+export const CoreLogTemplateLiteralCustomAction: ActionComponent<LogTemplateLiteralActionPayload> = ({ action, expanded }) => {
+  if (!action.payload) {
     return null;
   }
 
   const {
     messageParts: [strings, values],
-  } = historyItem.act.payload;
+  } = action.payload;
 
   return (
     <Box sx={{ width: '100%', my: 1 }}>

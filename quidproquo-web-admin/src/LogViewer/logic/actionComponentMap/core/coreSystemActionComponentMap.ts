@@ -1,6 +1,8 @@
+import { SystemActionType } from 'quidproquo-core';
+
 const coreSystemActionComponentMap: Record<string, string[]> = {
-  ['@quidproquo-core/System/Batch']: ['askBatch', 'actions'],
-  ['@quidproquo-core/System/ExecuteStory']: ['askExecuteStory', 'type', 'src', 'runtime', 'params'],
+  [SystemActionType.Batch]: ['askBatch', 'actions'],
+  [SystemActionType.ExecuteStory]: ['askExecuteStory', 'runtime', 'params', 'storySession'],
 };
 
 export default coreSystemActionComponentMap;

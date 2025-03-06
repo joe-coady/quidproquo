@@ -1,8 +1,11 @@
+import { EventActionType } from 'quidproquo-core';
+
 const coreEventActionComponentMap: Record<string, string[]> = {
-  ['@quidproquo-core/event/TransformEventParams']: ['askEventTransformEventParams', 'eventParams'],
-  ['@quidproquo-core/event/TransformResponseResult']: ['askEventTransformResponseResult', 'response', 'transformedEventParams'],
-  ['@quidproquo-core/event/AutoRespond']: ['askEventAutoRespond', 'transformedEventParams', 'matchResult'],
-  ['@quidproquo-core/event/MatchStory']: ['askEventMatchStory', 'transformedEventParams'],
+  [EventActionType.TransformEventParams]: ['askEventTransformEventParams', 'eventParams'],
+  [EventActionType.TransformResponseResult]: ['askEventTransformResponseResult', 'qpqEventRecordResponses', 'eventParams'],
+  [EventActionType.AutoRespond]: ['askEventAutoRespond', 'qpqEventRecord', 'matchResult'],
+  [EventActionType.MatchStory]: ['askEventMatchStory', 'qpqEventRecord', 'eventParams'],
+  [EventActionType.GetRecords]: ['askEventGetRecords', 'eventParams'],
 };
 
 export default coreEventActionComponentMap;

@@ -3,10 +3,8 @@ import { ActionComponent } from '../types';
 import { genericFunctionRendererStyles } from './AnyVariableView';
 import { AnyVariableView } from './AnyVariableView';
 
-const ActionResultDisplay: ActionComponent = ({ historyItem, expanded }) => {
-  const result = historyItem.res || [];
-  const successResult = result[0];
-  const errorResult = result[1];
+const ActionResultDisplay: ActionComponent = ({ result, expanded }) => {
+  const [successResult, errorResult] = result || [];
 
   return (
     <>

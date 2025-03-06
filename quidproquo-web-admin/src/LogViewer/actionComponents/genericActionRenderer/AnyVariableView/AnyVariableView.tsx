@@ -141,7 +141,18 @@ export const ObjectVariableView = ({ value, expanded }: VariableViewProps) => {
   return !expanded ? (
     <>
       <span>{'{ '}</span>
-      {cleanObjectKeys.join(', ')}
+      {/* {objectKeysWithArrayCounts.join(', ')} */}
+      {cleanObjectKeys.map((key, index) => (
+        <span key={key}>
+          {key}
+          {Array.isArray(cleanObject[key]) && !expanded && (
+            <>
+              <span>:</span> <ArrayVariableView value={cleanObject[key]} expanded={false} />
+            </>
+          )}
+          {index < cleanObjectKeys.length - 1 && ', '}
+        </span>
+      ))}
       <span>{' }'}</span>
     </>
   ) : (

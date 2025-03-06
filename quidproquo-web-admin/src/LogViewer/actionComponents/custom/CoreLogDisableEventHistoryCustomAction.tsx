@@ -5,12 +5,12 @@ import Alert from '@mui/material/Alert';
 
 import { ActionComponent } from '../types';
 
-export const CoreLogDisableEventHistoryCustomAction: ActionComponent<LogDisableEventHistoryActionPayload> = ({ historyItem }) => {
-  if (!historyItem.act?.payload) {
+export const CoreLogDisableEventHistoryCustomAction: ActionComponent<LogDisableEventHistoryActionPayload> = ({ action }) => {
+  if (!action.payload) {
     return null;
   }
 
-  const { reason } = historyItem.act.payload;
+  const { reason } = action.payload;
 
   return (
     <Box sx={{ width: '100%', my: 1 }}>

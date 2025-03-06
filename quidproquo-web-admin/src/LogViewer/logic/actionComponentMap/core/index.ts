@@ -8,7 +8,6 @@ import coreEventBusActionComponentMap from './coreEventBusActionComponentMap';
 import coreFileActionComponentMap from './coreFileActionComponentMap';
 import coreGuidActionComponentMap from './coreGuidActionComponentMap';
 import coreKeyValueStoreActionComponentMap from './coreKeyValueStoreActionComponentMap';
-import coreLogActionComponentMap from './coreLogActionComponentMap';
 import coreMathActionComponentMap from './coreMathActionComponentMap';
 import corePlatformActionComponentMap from './corePlatformActionComponentMap';
 import coreQueueActionComponentMap from './coreQueueActionComponentMap';
@@ -26,7 +25,6 @@ export default {
   ...coreFileActionComponentMap,
   ...coreGuidActionComponentMap,
   ...coreKeyValueStoreActionComponentMap,
-  ...coreLogActionComponentMap,
   ...coreMathActionComponentMap,
   ...corePlatformActionComponentMap,
   ...coreQueueActionComponentMap,

@@ -1,5 +1,7 @@
+import { DateActionType } from 'quidproquo-core';
+
 const coreDateActionComponentMap: Record<string, string[]> = {
-  ['@quidproquo-core/Date/Now']: ['askDateNow'],
+  [DateActionType.Now]: ['askDateNow'],
 };
 
 export default coreDateActionComponentMap;

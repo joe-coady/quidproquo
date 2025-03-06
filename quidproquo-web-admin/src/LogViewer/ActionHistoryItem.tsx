@@ -1,15 +1,16 @@
-import { ActionHistory } from 'quidproquo-core';
+import { Action } from 'quidproquo-core';
 
 import TruncatedText from './TruncatedText';
 
 interface ActionHistoryItemProps {
-  historyItem: ActionHistory;
+  action: Action<any>;
+  result: any;
   expanded: boolean;
 }
 
-export const ActionHistoryItem = ({ historyItem, expanded }: ActionHistoryItemProps) => {
-  const inputText = JSON.stringify(historyItem.act.payload, null, 2);
-  const outputText = JSON.stringify(historyItem.res, null, 2);
+export const ActionHistoryItem = ({ action, result, expanded }: ActionHistoryItemProps) => {
+  const inputText = JSON.stringify(action.payload, null, 2);
+  const outputText = JSON.stringify(result, null, 2);
 
   return (
     <>

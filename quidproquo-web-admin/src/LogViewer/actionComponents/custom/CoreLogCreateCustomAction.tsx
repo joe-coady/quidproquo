@@ -23,12 +23,12 @@ const getSeverity = (logLevel: LogLevelEnum): AlertColor => {
   }
 };
 
-export const CoreLogCreateCustomAction: ActionComponent<LogCreateActionPayload> = ({ historyItem, expanded }) => {
-  if (!historyItem.act?.payload) {
+export const CoreLogCreateCustomAction: ActionComponent<LogCreateActionPayload> = ({ action, expanded }) => {
+  if (!action.payload) {
     return null;
   }
 
-  const { logLevel, msg, data } = historyItem.act.payload;
+  const { logLevel, msg, data } = action.payload;
 
   return (
     <Box sx={{ width: '100%', my: 1 }}>

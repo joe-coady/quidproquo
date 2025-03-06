@@ -3,7 +3,7 @@ import { StoryResult } from 'quidproquo-core';
 import { Box, Table, TableBody, TableCell, TableRow, Typography } from '@mui/material';
 
 import { ActionHistoryItemTimeStamp } from './ActionHistoryItemTimeStamp';
-import { AnyActionHistoryItem } from './AnyActionHistoryItem';
+import { AnyActionHistoryItem } from './ActionRender';
 import ConsoleLogViewer from './ConsoleLogViewer';
 import { processLog } from './logic';
 import { LogSummaryDetails } from './LogSummaryDetails';
@@ -72,7 +72,8 @@ export const LogDetails = ({
                 <ActionHistoryItemTimeStamp startedAt={historyItem.startedAt} finishedAt={historyItem.finishedAt} />
               </TableCell>
               <TableCell sx={rightTableCell}>
-                <AnyActionHistoryItem historyItem={historyItem} />
+                {historyItem.act && <AnyActionHistoryItem action={historyItem.act} result={historyItem.res} />}
+                {!historyItem.act && <div>No Action</div>}
               </TableCell>
             </TableRow>
           ))}
