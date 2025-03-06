@@ -1,5 +1,4 @@
-/* 
-import { AskResponseReturnType, Story } from 'quidproquo-core';
+import { AskResponse, AskResponseReturnType, Story } from 'quidproquo-core';
 
 import { useMemo, useState } from 'react';
 
@@ -14,7 +13,9 @@ type RemoveAskPrefix<K extends string> = K extends `ask${infer R}` ? Uncapitaliz
 // We extract only string keys and then use a conditional type to infer parameters and return type.
 type MappedApi<TApi extends Record<`ask${string}`, Story<any, any>>> = {
   [K in Extract<keyof TApi, string> as RemoveAskPrefix<K>]: TApi[K] extends (...args: infer P) => infer R
-    ? (...args: P) => Promise<AskResponseReturnType<R>>
+    ? R extends AskResponse<any>
+      ? (...args: P) => Promise<AskResponseReturnType<R>>
+      : never
     : never;
 };
 
@@ -52,9 +53,3 @@ export function useQpqReducer<
 
   return [api, state, dispatch];
 }
-
-*/
-
-export const useQpqReducer = () => {
-  // NOOP
-};
