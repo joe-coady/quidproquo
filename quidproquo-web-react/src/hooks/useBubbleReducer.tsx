@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext, useRef, useState } from 'react';
+import { createContext, memo, ReactNode, useCallback, useContext, useRef, useState } from 'react';
 
 // Define the bubble reducer type
 export type QpqBubbleReducer<S, A> = (prevState: S, action: A) => [S, boolean];
@@ -11,7 +11,7 @@ const BubbleReducerDispatchContext = createContext<(action: any) => void>((_acti
 export const useBubblingReducer = <TState, TAction>(
   reducer: QpqBubbleReducer<TState, TAction>,
   initialState: TState,
-): [TState, (action: TAction) => void] => {
+): [TState, (action: TAction) => void, () => TState] => {
   const ref = useRef(initialState);
 
   // Use useState so we can leverage functional updates
@@ -21,7 +21,7 @@ export const useBubblingReducer = <TState, TAction>(
   const parentDispatch = useContext(BubbleReducerDispatchContext);
 
   // Custom Dispatch using functional updates
-  const dispatch = (action: TAction): void => {
+  const dispatch = useCallback((action: TAction): void => {
     const [newState, preventBubble] = reducer(ref.current, action);
 
     if (preventBubble) {
@@ -31,11 +31,15 @@ export const useBubblingReducer = <TState, TAction>(
     } else {
       parentDispatch(action);
     }
-  };
+  }, []);
 
-  return [state, dispatch];
+  const getState = useCallback((): TState => ref.current, []);
+
+  return [state, dispatch, getState];
 };
 
-export const BubbleReducerDispatchProvider = ({ children, dispatch }: { children: ReactNode; dispatch: (action: any) => void }) => (
+export const BubbleReducerDispatchProviderComponent = ({ children, dispatch }: { children: ReactNode; dispatch: (action: any) => void }) => (
   <BubbleReducerDispatchContext.Provider value={dispatch}>{children}</BubbleReducerDispatchContext.Provider>
 );
+
+export const BubbleReducerDispatchProvider = memo(BubbleReducerDispatchProviderComponent);

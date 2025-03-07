@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 
 import { QpqBubbleReducer, useBubblingReducer } from '../useBubbleReducer';
 import { useQpq } from '../useQpq';
-import { getStateDispatchActionListResolver } from './actionProcessor';
+import { getStateActionProcessor } from './actionProcessor';
 
 // Helper type to remap keys from "askXyz" to "xyz" (with lowercase first letter)
 type RemoveAskPrefix<K extends string> = K extends `ask${infer R}` ? Uncapitalize<R> : never;
@@ -29,14 +29,15 @@ export function useQpqReducer<
   reducer: QpqBubbleReducer<TState, TAction> = (s) => [s, false],
   initialState: TState = {} as TState,
 ): [MappedApi<TApi>, TState, (action: any) => void] {
-  const [state, dispatch] = useBubblingReducer(reducer, initialState);
+  const [state, dispatch, getCurrentState] = useBubblingReducer(reducer, initialState);
 
   // Api generators are memoized to prevent unnecessary re-renders.
   const [memoedApiGenerators] = useState(() => apiGenerators);
-  const resolver = useQpq(getStateDispatchActionListResolver(dispatch));
+  const resolver = useQpq(getStateActionProcessor(dispatch, getCurrentState));
 
   // Wrap and remap each API generator using the resolver.
   const api = useMemo(() => {
+    console.log('new api');
     const wrapped = {} as MappedApi<TApi>;
     for (const key in memoedApiGenerators) {
       if (Object.prototype.hasOwnProperty.call(memoedApiGenerators, key)) {
