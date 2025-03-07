@@ -1,6 +1,7 @@
 import { AskResponse, askStateRead, AuthenticateUserResponse } from 'quidproquo-core';
 
-import { askPlatformRequest, askSetAuthToken } from '../../../platformLogic';
+import { askPlatformRequest, askSaveAuthToken } from '../../../platformLogic';
+import { askAuthUISetAuthInfo } from '../authActionCreator';
 import { AuthLoginPayload, AuthState } from '../authTypes';
 
 export function* askAuthLogin(): AskResponse<void> {
@@ -17,5 +18,6 @@ export function* askAuthLogin(): AskResponse<void> {
     return;
   }
 
-  yield* askSetAuthToken(response.data);
+  yield* askSaveAuthToken(response.data);
+  yield* askAuthUISetAuthInfo(response.data);
 }

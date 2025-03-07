@@ -5,7 +5,6 @@ import { AuthEffect, AuthEffects, AuthState } from './authTypes';
 export const authInitalState: AuthState = {
   username: '',
   password: '',
-  isLoggedIn: false,
 };
 
 export const authReducer = buildMutableEffectReducer<AuthState, AuthEffects>({
@@ -15,5 +14,9 @@ export const authReducer = buildMutableEffectReducer<AuthState, AuthEffects>({
 
   [AuthEffect.SetPassword]: (state, password) => {
     state.password = password;
+  },
+
+  [AuthEffect.SetAuthInfo]: (state, authenticateUserResponse) => {
+    state.authenticateUserResponse = authenticateUserResponse;
   },
 });

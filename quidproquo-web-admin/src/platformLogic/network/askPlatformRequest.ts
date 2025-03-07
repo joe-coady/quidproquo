@@ -1,6 +1,6 @@
 import { askContextRead, askNetworkRequest, HTTPMethod, HTTPRequestOptions } from 'quidproquo-core';
 
-import { askGetAuthToken } from '../config';
+import { askLoadAuthToken } from '../config';
 import { baseUrlsContext } from '../contexts';
 import { askUIShowError, askUIStartLoading, askUIStopLoading } from '../effects';
 
@@ -9,7 +9,7 @@ export function* askPlatformRequest<T, R>(method: HTTPMethod, url: string, httpR
 
   yield* askUIStartLoading();
 
-  const authInfo = yield* askGetAuthToken();
+  const authInfo = yield* askLoadAuthToken();
 
   const headers = {
     ...(httpRequestOptions?.headers || {}),

@@ -34,8 +34,6 @@ export function useTabs(): {
     ...addons.map((addon) => addon.tab),
   ];
 
-  console.log('allTabs - test', allTabs);
-
   return {
     tabs: allTabs,
     loading,

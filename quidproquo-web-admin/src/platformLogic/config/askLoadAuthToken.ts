@@ -1,6 +1,6 @@
 import { askCatch, askConfigGetParameter, AskResponse, AuthenticateUserChallenge, AuthenticateUserResponse } from 'quidproquo-core';
 
-export function* askGetAuthToken(): AskResponse<AuthenticateUserResponse> {
+export function* askLoadAuthToken(): AskResponse<AuthenticateUserResponse> {
   const authTokenParam = yield* askCatch(askConfigGetParameter('authToken'));
 
   if (!authTokenParam.success) {

@@ -1,6 +1,6 @@
 import { AskResponse, AskResponseReturnType, Story } from 'quidproquo-core';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { QpqBubbleReducer, useBubblingReducer } from '../useBubbleReducer';
 import { useQpq } from '../useQpq';
@@ -28,6 +28,7 @@ export function useQpqReducer<
   apiGenerators: TApi,
   reducer: QpqBubbleReducer<TState, TAction> = (s) => [s, false],
   initialState: TState = {} as TState,
+  mainStory?: Story<any, any>,
 ): [MappedApi<TApi>, TState, (action: any) => void] {
   const [state, dispatch, getCurrentState] = useBubblingReducer(reducer, initialState);
 
@@ -37,7 +38,6 @@ export function useQpqReducer<
 
   // Wrap and remap each API generator using the resolver.
   const api = useMemo(() => {
-    console.log('new api');
     const wrapped = {} as MappedApi<TApi>;
     for (const key in memoedApiGenerators) {
       if (Object.prototype.hasOwnProperty.call(memoedApiGenerators, key)) {
@@ -51,6 +51,12 @@ export function useQpqReducer<
     }
     return wrapped;
   }, [resolver, memoedApiGenerators]);
+
+  useEffect(() => {
+    if (mainStory) {
+      resolver(mainStory)();
+    }
+  }, []);
 
   return [api, state, dispatch];
 }

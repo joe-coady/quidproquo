@@ -1,2 +1,2 @@
-export * from './askGetAuthToken';
-export * from './askSetAuthToken';
+export * from './askLoadAuthToken';
+export * from './askSaveAuthToken';
