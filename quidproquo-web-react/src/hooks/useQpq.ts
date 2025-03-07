@@ -1,4 +1,4 @@
-import { getCoreActionProcessor } from 'quidproquo-actionprocessor-node';
+import { getWebActionProcessors } from 'quidproquo-actionprocessor-web';
 import {
   ActionProcessorListResolver,
   AskResponseReturnType,
@@ -10,10 +10,13 @@ import {
   StoryResolver,
 } from 'quidproquo-core';
 
+import { useQpqContextValues } from './useQpqReducer';
+
 // WIP ~ useFastCallback, wack things like loggers in a context, try to only make once instance of the runtime.
 // Also don't create every refresh.. useMemo / useCallback etc
 
 export function useQpq(getActionProcessors: ActionProcessorListResolver = async () => ({})): StoryResolver {
+  const qpqContextValues = useQpqContextValues();
   const logger = {
     enableLogs: async () => {},
     log: async () => {},
@@ -25,10 +28,10 @@ export function useQpq(getActionProcessors: ActionProcessorListResolver = async 
     [defineModule('UI')],
     {
       depth: 0,
-      context: {},
+      context: qpqContextValues,
     },
     async (qpqConfig, dynamicModuleLoader) => ({
-      ...(await getCoreActionProcessor(qpqConfig, dynamicModuleLoader)),
+      ...(await getWebActionProcessors(qpqConfig, dynamicModuleLoader)),
       ...(await getActionProcessors(qpqConfig, dynamicModuleLoader)),
     }),
     () => new Date().toISOString(),

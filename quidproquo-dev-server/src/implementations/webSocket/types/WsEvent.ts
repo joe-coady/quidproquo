@@ -1,4 +1,4 @@
-import { WebSocketEventType } from 'quidproquo';
+import { WebSocketEventType } from 'quidproquo-webserver';
 
 export type WsEvent = {
   apiName: string;
