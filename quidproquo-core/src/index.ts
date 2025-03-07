@@ -5,7 +5,7 @@ export * from './logic';
 export * from './logic/actionLogic';
 export * as qpqCoreUtils from './qpqCoreUtils';
 export * from './qpqExecuteLog';
-export * from './qpqRuntime';
+export * from './runtime';
 export * from './stories';
 export * from './types';
 export * from './utils';

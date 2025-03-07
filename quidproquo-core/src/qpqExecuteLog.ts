@@ -1,5 +1,5 @@
 import { defineApplicationModule } from './config';
-import { createRuntime } from './qpqRuntime';
+import { createRuntime } from './runtime';
 import { ActionProcessorList, StoryResult } from './types';
 
 export const qpqExecuteLog = async (storyResult: StoryResult<any>, runtime: any, overrides: ActionProcessorList = {}): Promise<StoryResult<any>> => {

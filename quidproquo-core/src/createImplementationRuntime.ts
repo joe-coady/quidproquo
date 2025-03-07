@@ -1,7 +1,7 @@
 import { actionResult, actionResultError } from './logic/actionLogic';
 import { QPQConfig } from './config';
 import { getApplicationModuleName } from './qpqCoreUtils';
-import { createRuntime } from './qpqRuntime';
+import { createRuntime } from './runtime';
 import {
   ActionProcessor,
   ActionProcessorList,
