@@ -62,7 +62,6 @@ const LogCorrelationTreeComponent = ({
   const [translate, setTranslate] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
-    console.log(isVisible, 'isVisible');
     if (treeContainer.current && isVisible) {
       const { clientWidth } = treeContainer.current;
       setTranslate({ x: clientWidth / 2, y: 40 });
