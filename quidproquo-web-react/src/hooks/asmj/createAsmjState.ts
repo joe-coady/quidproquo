@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { atom, useAtom } from 'jotai';
 
 import { QpqBubbleReducer } from '../useBubbleReducer';
@@ -10,6 +11,7 @@ export type QpqAsmjState<TState, TAction, TApi extends QpqApi> = {
   reducer: QpqBubbleReducer<TState, TAction>;
   initialState: TState;
   api: TApi;
+  state: TState;
 };
 type AsmjStateGetter<TState, TAction, TApi extends QpqApi> = (name?: string) => QpqAsmjState<TState, TAction, TApi>;
 
@@ -20,21 +22,25 @@ export function createAsmjState<TState, TAction, TApi extends QpqApi>(
   initialState: TState,
   reducer: QpqBubbleReducer<TState, TAction> = (s) => [s, false],
 ): AsmjAtom<TState, TAction, TApi> {
-  const namedAtoms = new Map<string, CustomJotaiReducerAtom<TState>>();
+  const namedAtoms = new Map<string, QpqAsmjState<TState, TAction, TApi>>();
 
   const getCustomNamedAtom: AsmjStateGetter<TState, TAction, TApi> = (name?: string): QpqAsmjState<TState, TAction, TApi> => {
     const actualName = name ? name : '$$qpq-default$$';
     if (!namedAtoms.has(actualName)) {
       console.log('Creating Atom: ', actualName);
-      namedAtoms.set(actualName, atom(initialState));
+
+      const winAtom: QpqAsmjState<TState, TAction, TApi> = {
+        atom: atom(initialState),
+        reducer,
+        initialState,
+        api: api,
+        state: initialState,
+      };
+
+      namedAtoms.set(actualName, winAtom);
     }
 
-    return {
-      atom: namedAtoms.get(actualName)!,
-      reducer,
-      initialState,
-      api: api,
-    };
+    return namedAtoms.get(actualName)!;
   };
 
   return getCustomNamedAtom;
@@ -43,8 +49,23 @@ export function createAsmjState<TState, TAction, TApi extends QpqApi>(
 export function useAsmjState<TState, TAction, TApi extends QpqApi>(
   atom: AsmjAtom<TState, TAction, TApi>,
   name?: string,
-): [TState, (newState: TState) => void] {
+): [TState, (newState: TState) => void, () => TState] {
   const [state, setState] = useAtom(atom(name).atom);
 
-  return [state, setState];
+  const setStateWrapper = useCallback(
+    (newState: TState) => {
+      const info = atom(name);
+      info.state = newState;
+
+      setState(newState);
+    },
+    [setState],
+  );
+
+  const getState = useCallback((): TState => {
+    const state = atom(name).state;
+    return state;
+  }, [atom]);
+
+  return [state, setStateWrapper, getState];
 }

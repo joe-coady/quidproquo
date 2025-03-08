@@ -17,14 +17,14 @@ export const useBubblingReducer = <TState, TAction, TApi extends QpqApi>(
   name?: string,
 ): [TState, (action: TAction) => void, () => TState] => {
   const atomInfo = atom(name);
-  const [state, setState] = useAsmjState(atom, name);
+  const [state, setState, getState] = useAsmjState(atom, name);
 
   // Get the parent dispatch from the context
   const parentDispatch = useContext(BubbleReducerDispatchContext);
 
   // Custom Dispatch using functional updates
   const dispatch = useFastCallback((action: TAction): void => {
-    const [newState, preventBubble] = atomInfo.reducer(state, action);
+    const [newState, preventBubble] = atomInfo.reducer(getState(), action);
 
     if (preventBubble) {
       setState(newState);
@@ -32,8 +32,6 @@ export const useBubblingReducer = <TState, TAction, TApi extends QpqApi>(
       parentDispatch(action);
     }
   });
-
-  const getState = useFastCallback((): TState => state);
 
   return [state, dispatch, getState];
 };
