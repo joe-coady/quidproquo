@@ -3,7 +3,7 @@ import { Story } from 'quidproquo-core';
 import { useEffect, useMemo, useState } from 'react';
 
 import { useQpq } from '../useQpq';
-import { getStateActionProcessor } from '../useQpqReducer/actionProcessor';
+import { getStateActionProcessor } from './actionProcessor';
 import { QpqApi, QpqMappedApi } from './QpqMappedApi';
 import { useQpqRuntimeBubblingReducer } from './QpqRuntimeEffectCatcher';
 import { QpqRuntimeDefinition } from '.';
