@@ -1,21 +1,25 @@
-import { AskResponse, AskResponseReturnType, Story } from 'quidproquo-core';
+import { Story } from 'quidproquo-core';
 
 import { useEffect, useMemo, useState } from 'react';
 
-import { AsmjAtom } from '../asmj';
-import { QpqApi, QpqMappedApi, RemoveQpqAskPrefix } from '../asmj/QpqMappedApi';
-import { useBubblingReducer } from '../useBubbleReducer';
 import { useQpq } from '../useQpq';
-import { getStateActionProcessor } from './actionProcessor';
+import { getStateActionProcessor } from '../useQpqReducer/actionProcessor';
+import { QpqApi, QpqMappedApi } from './QpqMappedApi';
+import { useQpqRuntimeBubblingReducer } from './QpqRuntimeEffectCatcher';
+import { QpqRuntimeDefinition } from '.';
 
-export function useQpqReducer<
+export function useQpqRuntime<
   TState,
   TAction,
   // Constrain TApi so that all keys must start with "ask"
   TApi extends QpqApi,
->(atom: AsmjAtom<TState, TAction, TApi>, mainStory?: Story<any, any>, name?: string): [QpqMappedApi<TApi>, TState, (action: any) => void] {
+>(
+  atom: QpqRuntimeDefinition<TState, TAction, TApi>,
+  mainStory?: Story<any, any>,
+  name?: string,
+): [QpqMappedApi<TApi>, TState, (action: any) => void] {
   const atomInfo = atom(name);
-  const [state, dispatch, getCurrentState] = useBubblingReducer<TState, TAction, TApi>(atom, name);
+  const [state, dispatch, getCurrentState] = useQpqRuntimeBubblingReducer<TState, TAction, TApi>(atom, name);
 
   // Api generators are memoized to prevent unnecessary re-renders.
   const [memoedApiGenerators] = useState(() => atomInfo.api);

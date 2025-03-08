@@ -1,5 +1,5 @@
 import { AuthenticateUserChallenge } from 'quidproquo-core';
-import { authContext, BubbleQpqReducerActions, createAsmjState, useQpqReducer } from 'quidproquo-web-react';
+import { authContext, createQpqRuntimeDefinition, QpqRuntimeEffectCatcher, useQpqRuntime } from 'quidproquo-web-react';
 
 import { ReactNode, useEffect } from 'react';
 
@@ -13,23 +13,23 @@ interface AuthProps {
   children?: ReactNode;
 }
 
-const atom = createAsmjState(authLogic, authInitalState, authReducer);
+const authRuntime = createQpqRuntimeDefinition(authLogic, authInitalState, authReducer);
 
 export function Auth({ children }: AuthProps) {
-  const [api, state, dispatch] = useQpqReducer(atom, askAuthMain);
+  const [api, state, dispatch] = useQpqRuntime(authRuntime, askAuthMain);
 
   const isAuthenticated = isLoggedOn(state);
 
   if (state.authenticateUserResponse?.challenge === AuthenticateUserChallenge.NEW_PASSWORD_REQUIRED) {
     return (
-      <BubbleQpqReducerActions dispatch={dispatch}>
+      <QpqRuntimeEffectCatcher runtime={authRuntime}>
         <AuthChallengeNewPasswordRequired authState={state}></AuthChallengeNewPasswordRequired>
-      </BubbleQpqReducerActions>
+      </QpqRuntimeEffectCatcher>
     );
   }
 
   return (
-    <BubbleQpqReducerActions dispatch={dispatch}>
+    <QpqRuntimeEffectCatcher runtime={authRuntime}>
       {!isAuthenticated && (
         <Login
           setUsername={api.authUISetUsername}
@@ -52,6 +52,6 @@ export function Auth({ children }: AuthProps) {
           {children}
         </authContext.Provider>
       )}
-    </BubbleQpqReducerActions>
+    </QpqRuntimeEffectCatcher>
   );
 }

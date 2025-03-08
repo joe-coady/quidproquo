@@ -1,8 +1,8 @@
 import { useCallback } from 'react';
 import { atom, useAtom } from 'jotai';
 
-import { QpqBubbleReducer } from '../useBubbleReducer';
 import { QpqApi } from './QpqMappedApi';
+import { QpqBubbleReducer } from './QpqRuntimeEffectCatcher';
 
 // Define the function type for retrieving atoms
 type CustomJotaiReducerAtom<TState> = ReturnType<typeof atom<TState>>;
@@ -15,13 +15,13 @@ export type QpqAsmjState<TState, TAction, TApi extends QpqApi> = {
 };
 type AsmjStateGetter<TState, TAction, TApi extends QpqApi> = (name?: string) => QpqAsmjState<TState, TAction, TApi>;
 
-export type AsmjAtom<TState, TAction, TApi extends QpqApi> = AsmjStateGetter<TState, TAction, TApi>;
+export type QpqRuntimeDefinition<TState, TAction, TApi extends QpqApi> = AsmjStateGetter<TState, TAction, TApi>;
 
-export function createAsmjState<TState, TAction, TApi extends QpqApi>(
+export function createQpqRuntimeDefinition<TState, TAction, TApi extends QpqApi>(
   api: TApi,
   initialState: TState,
   reducer: QpqBubbleReducer<TState, TAction> = (s) => [s, false],
-): AsmjAtom<TState, TAction, TApi> {
+): QpqRuntimeDefinition<TState, TAction, TApi> {
   const namedAtoms = new Map<string, QpqAsmjState<TState, TAction, TApi>>();
 
   const getCustomNamedAtom: AsmjStateGetter<TState, TAction, TApi> = (name?: string): QpqAsmjState<TState, TAction, TApi> => {
@@ -46,8 +46,8 @@ export function createAsmjState<TState, TAction, TApi extends QpqApi>(
   return getCustomNamedAtom;
 }
 
-export function useAsmjState<TState, TAction, TApi extends QpqApi>(
-  atom: AsmjAtom<TState, TAction, TApi>,
+export function useQpqRuntimeState<TState, TAction, TApi extends QpqApi>(
+  atom: QpqRuntimeDefinition<TState, TAction, TApi>,
   name?: string,
 ): [TState, (newState: TState) => void, () => TState] {
   const [state, setState] = useAtom(atom(name).atom);
