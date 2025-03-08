@@ -78,7 +78,7 @@ export async function resolveStory<TArgs extends Array<any>>(
         finishedAt: getTimeNow(),
       };
 
-      console.log(`${action.type}: took ${new Date(historyEntry.finishedAt).getTime() - new Date(historyEntry.startedAt).getTime()}ms`);
+      // console.log(`${action.type}: took ${new Date(historyEntry.finishedAt).getTime() - new Date(historyEntry.startedAt).getTime()}ms`);
       response.history.push(historyEntry);
 
       if (isErroredActionResult(actionResult) && !action.returnErrors) {
@@ -131,6 +131,6 @@ export async function resolveStory<TArgs extends Array<any>>(
     result: storyProgress.value,
   };
 
-  console.log(`story took ${new Date(storyResult.finishedAt).getTime() - new Date(storyResult.startedAt).getTime()}ms`);
+  // console.log(`story took ${new Date(storyResult.finishedAt).getTime() - new Date(storyResult.startedAt).getTime()}ms`);
   return storyResult;
 }

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
-import { useQpqReducer } from 'quidproquo-web-react';
+import { createAsmjState, useQpqReducer } from 'quidproquo-web-react';
 
 import LockIcon from '@mui/icons-material/Lock';
 import Box from '@mui/material/Box';
@@ -15,8 +15,10 @@ interface AuthChallengeNewPasswordRequiredProps {
   authState: AuthState;
 }
 
+const atom = createAsmjState(authChallengeLogic, authChallengeInitalState, authChallengeReducer);
+
 export function AuthChallengeNewPasswordRequired({ authState }: AuthChallengeNewPasswordRequiredProps) {
-  const [api, state] = useQpqReducer(authChallengeLogic, authChallengeReducer, authChallengeInitalState);
+  const [api, state] = useQpqReducer(atom);
   const arePasswordsMatching = state.passwordA === state.passwordB && state.passwordA !== '';
 
   if (!authState.authenticateUserResponse || !authState.authenticateUserResponse.challenge || !authState.authenticateUserResponse.session) {

@@ -1,5 +1,5 @@
 import { AuthenticateUserChallenge } from 'quidproquo-core';
-import { authContext, BubbleQpqReducerActions, useQpqReducer } from 'quidproquo-web-react';
+import { authContext, BubbleQpqReducerActions, createAsmjState, useQpqReducer } from 'quidproquo-web-react';
 
 import { ReactNode, useEffect } from 'react';
 
@@ -13,8 +13,10 @@ interface AuthProps {
   children?: ReactNode;
 }
 
+const atom = createAsmjState(authLogic, authInitalState, authReducer);
+
 export function Auth({ children }: AuthProps) {
-  const [api, state, dispatch] = useQpqReducer(authLogic, authReducer, authInitalState, askAuthMain);
+  const [api, state, dispatch] = useQpqReducer(atom, askAuthMain);
 
   const isAuthenticated = isLoggedOn(state);
 

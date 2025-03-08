@@ -1,4 +1,8 @@
-import { createContext, memo, ReactNode, useCallback, useContext, useRef, useState } from 'react';
+import { createContext, memo, ReactNode, useContext } from 'react';
+
+import { QpqApi } from './asmj/QpqMappedApi';
+import { AsmjAtom, useAsmjState } from './asmj';
+import { useFastCallback } from './useFastCallback';
 
 // Define the bubble reducer type
 export type QpqBubbleReducer<S, A> = (prevState: S, action: A) => [S, boolean];
@@ -8,32 +12,28 @@ const BubbleReducerDispatchContext = createContext<(action: any) => void>((_acti
   // NOOP
 });
 
-export const useBubblingReducer = <TState, TAction>(
-  reducer: QpqBubbleReducer<TState, TAction>,
-  initialState: TState,
+export const useBubblingReducer = <TState, TAction, TApi extends QpqApi>(
+  atom: AsmjAtom<TState, TAction, TApi>,
+  name?: string,
 ): [TState, (action: TAction) => void, () => TState] => {
-  const ref = useRef(initialState);
-
-  // Use useState so we can leverage functional updates
-  const [state, setState] = useState(ref.current);
+  const atomInfo = atom(name);
+  const [state, setState] = useAsmjState(atom, name);
 
   // Get the parent dispatch from the context
   const parentDispatch = useContext(BubbleReducerDispatchContext);
 
   // Custom Dispatch using functional updates
-  const dispatch = useCallback((action: TAction): void => {
-    const [newState, preventBubble] = reducer(ref.current, action);
+  const dispatch = useFastCallback((action: TAction): void => {
+    const [newState, preventBubble] = atomInfo.reducer(state, action);
 
     if (preventBubble) {
-      // If the action was handled, update state
-      ref.current = newState;
       setState(newState);
     } else {
       parentDispatch(action);
     }
-  }, []);
+  });
 
-  const getState = useCallback((): TState => ref.current, []);
+  const getState = useFastCallback((): TState => state);
 
   return [state, dispatch, getState];
 };
