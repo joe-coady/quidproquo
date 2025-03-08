@@ -1,4 +1,4 @@
-import { AskResponse, askStateRead, AuthenticateUserResponse } from 'quidproquo-core';
+import { AskResponse, askStateRead, AuthenticateUserChallenge, AuthenticateUserResponse } from 'quidproquo-core';
 
 import { askPlatformRequest, askSaveAuthToken } from '../../../platformLogic';
 import { askAuthUISetAuthInfo } from '../authActionCreator';
@@ -18,6 +18,13 @@ export function* askAuthLogin(): AskResponse<void> {
     return;
   }
 
-  yield* askSaveAuthToken(response.data);
+  if (response.data.challenge === AuthenticateUserChallenge.NONE) {
+    yield* askSaveAuthToken(response.data);
+  } else {
+    yield* askSaveAuthToken({
+      challenge: AuthenticateUserChallenge.NONE,
+    });
+  }
+
   yield* askAuthUISetAuthInfo(response.data);
 }

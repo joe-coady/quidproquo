@@ -1,3 +1,3 @@
 export * from './Auth';
-export * from './AuthChallengeNewPasswordRequired';
+export * from './AuthChallengeNewPasswordRequired/AuthChallengeNewPasswordRequired';
 export * from './Login';

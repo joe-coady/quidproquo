@@ -1,22 +1,27 @@
-import { ReactNode, useState } from 'react';
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
+import { useQpqReducer } from 'quidproquo-web-react';
+
 import LockIcon from '@mui/icons-material/Lock';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
-import { AsyncButton } from '../components';
-import { AuthState } from '../types';
+import { AsyncButton } from '../../components';
+import { AuthState } from '../logic';
+import { authChallengeInitalState, authChallengeLogic, authChallengeReducer } from './logic';
 
 interface AuthChallengeNewPasswordRequiredProps {
-  onRespondToAuthChallenge: (password: string) => Promise<void>;
   authState: AuthState;
 }
 
-export function AuthChallengeNewPasswordRequired({ onRespondToAuthChallenge, authState }: AuthChallengeNewPasswordRequiredProps) {
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const arePasswordsMatching = newPassword === confirmPassword && newPassword !== '';
+export function AuthChallengeNewPasswordRequired({ authState }: AuthChallengeNewPasswordRequiredProps) {
+  const [api, state] = useQpqReducer(authChallengeLogic, authChallengeReducer, authChallengeInitalState);
+  const arePasswordsMatching = state.passwordA === state.passwordB && state.passwordA !== '';
+
+  if (!authState.authenticateUserResponse || !authState.authenticateUserResponse.challenge || !authState.authenticateUserResponse.session) {
+    return <div>Error, missing challenge / session</div>;
+  }
 
   return (
     <Box
@@ -46,8 +51,8 @@ export function AuthChallengeNewPasswordRequired({ onRespondToAuthChallenge, aut
               label="New Password"
               type="password"
               autoFocus
-              value={newPassword}
-              onChange={(event) => setNewPassword(event.target.value)}
+              value={state.passwordA}
+              onChange={(event) => api.authChallengeSetPasswordA(event.target.value)}
             />
           </Grid>
           <Grid item xs={12}>
@@ -57,12 +62,21 @@ export function AuthChallengeNewPasswordRequired({ onRespondToAuthChallenge, aut
               id="confirmPassword"
               label="Confirm Password"
               type="password"
-              value={confirmPassword}
-              onChange={(event) => setConfirmPassword(event.target.value)}
+              value={state.passwordB}
+              onChange={(event) => api.authChallengeSetPasswordB(event.target.value)}
             />
           </Grid>
           <Grid item xs={12}>
-            <AsyncButton onClick={() => onRespondToAuthChallenge(confirmPassword)} disabled={!arePasswordsMatching}>
+            <AsyncButton
+              onClick={() =>
+                api.authChallengeSendPasswords(
+                  authState.authenticateUserResponse?.challenge!,
+                  authState.authenticateUserResponse?.session!,
+                  authState.username,
+                )
+              }
+              disabled={!arePasswordsMatching}
+            >
               Update Password
             </AsyncButton>
           </Grid>

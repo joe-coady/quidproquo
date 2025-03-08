@@ -1,7 +1,9 @@
+import { AuthenticateUserChallenge } from 'quidproquo-core';
 import { authContext, BubbleQpqReducerActions, useQpqReducer } from 'quidproquo-web-react';
 
 import { ReactNode, useEffect } from 'react';
 
+import { AuthChallengeNewPasswordRequired } from './AuthChallengeNewPasswordRequired/AuthChallengeNewPasswordRequired';
 import { isLoggedOn } from './logic/isLoggedOn';
 import { askAuthMain } from './logic/runtime/askAuthMain';
 import { authInitalState, authLogic, authReducer } from './logic';
@@ -15,6 +17,14 @@ export function Auth({ children }: AuthProps) {
   const [api, state, dispatch] = useQpqReducer(authLogic, authReducer, authInitalState, askAuthMain);
 
   const isAuthenticated = isLoggedOn(state);
+
+  if (state.authenticateUserResponse?.challenge === AuthenticateUserChallenge.NEW_PASSWORD_REQUIRED) {
+    return (
+      <BubbleQpqReducerActions dispatch={dispatch}>
+        <AuthChallengeNewPasswordRequired authState={state}></AuthChallengeNewPasswordRequired>
+      </BubbleQpqReducerActions>
+    );
+  }
 
   return (
     <BubbleQpqReducerActions dispatch={dispatch}>
