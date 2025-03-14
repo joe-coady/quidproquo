@@ -1,21 +1,41 @@
-import { EventActionType, QpqRuntimeType, StoryResult } from 'quidproquo-core';
+import {
+  ActionProcessorResult,
+  EventActionType,
+  isErroredActionResult,
+  QpqRuntimeType,
+  resolveActionResult,
+  resolveActionResultError,
+  StoryResult,
+} from 'quidproquo-core';
 
-import { WebsocketEvent } from '../../../../types';
+import { WebsocketEvent, WebSocketEventType } from '../../../../types';
 
 export const webSocketEventGenericTextExtractor = (storyResult: StoryResult<any>): string[] => {
   if (storyResult.runtimeType === QpqRuntimeType.WEBSOCKET_EVENT) {
-    const transformEventParams = storyResult.history.find((h) => h.act.type === EventActionType.TransformEventParams);
+    const getRecordsHistory = storyResult.history.find((h) => h.act.type === EventActionType.GetRecords);
 
-    if (!transformEventParams) {
-      return ['no transformEventParams'];
+    if (!getRecordsHistory) {
+      return [`no ${EventActionType.GetRecords}`];
     }
 
-    const result = transformEventParams.res as [WebsocketEvent];
-    const connectionId = result[0]?.connectionId || 'unknown';
-    const ip = result[0]?.sourceIp || 'unknown';
-    const event = result[0]?.eventType || 'unknown';
+    const actionResult: ActionProcessorResult<WebsocketEvent[]> = getRecordsHistory.res;
 
-    return [`${event} ${connectionId} ${ip}`];
+    if (!isErroredActionResult(actionResult)) {
+      const webSocketEvents = resolveActionResult(actionResult);
+      return webSocketEvents.flatMap((event) => {
+        const connectionId = event.connectionId || 'unknown';
+        const ip = event.sourceIp || 'unknown';
+        const eventType = event.eventType || 'unknown';
+        const customMessage = JSON.parse(event.body || '{}');
+
+        const messageType =
+          event.eventType === WebSocketEventType.Message ? '::' + (customMessage.type || customMessage.messageType || 'unknown') : '';
+
+        return `${eventType}${messageType} ${connectionId} ${ip}`;
+      });
+    }
+
+    return [resolveActionResultError(actionResult).errorText];
   }
 
   return [''];
