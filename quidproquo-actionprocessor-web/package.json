@@ -37,6 +37,7 @@
     "mime-types": "^2.1.35",
     "quidproquo-actionprocessor-js": "0.0.253",
     "quidproquo-core": "0.0.253",
+    "quidproquo-web": "0.0.253",
     "quidproquo-webserver": "0.0.253",
     "uuid": "^9.0.0",
     "uuidv7": "^1.0.1"

@@ -6,6 +6,7 @@ import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, 
 
 import {
   getCoreActionProcessor as getWebCoreActionProcessor,
+  getWebActionProcessor,
   getWebserverActionProcessor as getWebWebserverActionProcessor,
 } from './actionProcessor';
 
@@ -18,4 +19,6 @@ export const getWebActionProcessors: ActionProcessorListResolver = async (
 
   ...(await getWebCoreActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getWebWebserverActionProcessor(qpqConfig, dynamicModuleLoader)),
+
+  ...(await getWebActionProcessor(qpqConfig, dynamicModuleLoader)),
 });
