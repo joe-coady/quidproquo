@@ -1,4 +1,4 @@
-import { createContext, memo, ReactNode, useContext } from 'react';
+import { createContext, memo, ReactNode, useContext, useMemo } from 'react';
 
 import { useFastCallback } from '../useFastCallback';
 import { QpqApi } from './QpqMappedApi';
@@ -21,7 +21,8 @@ export const useQpqRuntimeBubblingReducer = <TState, TAction, TApi extends QpqAp
   runtimeDefinition: QpqRuntimeDefinition<TState, TAction, TApi>,
   name?: string,
 ): [TState, (action: TAction) => void, () => TState] => {
-  const runtimeDefinitionInfo = runtimeDefinition(name);
+  const runtimeDefinitionInfo = useMemo(() => runtimeDefinition(name), [runtimeDefinition, name]);
+
   const [state, setState, getState] = useQpqRuntimeState(runtimeDefinition, name);
 
   // Get the parent dispatch from the context

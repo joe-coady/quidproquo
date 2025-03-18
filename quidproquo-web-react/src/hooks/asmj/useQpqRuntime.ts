@@ -18,7 +18,8 @@ export function useQpqRuntime<
   mainStory?: Story<any, any>,
   name?: string,
 ): [QpqMappedApi<TApi>, TState, (action: any) => void] {
-  const atomInfo = atom(name);
+  const atomInfo = useMemo(() => atom(name), [atom, name]);
+
   const [state, dispatch, getCurrentState] = useQpqRuntimeBubblingReducer<TState, TAction, TApi>(atom, name);
 
   // Api generators are memoized to prevent unnecessary re-renders.
