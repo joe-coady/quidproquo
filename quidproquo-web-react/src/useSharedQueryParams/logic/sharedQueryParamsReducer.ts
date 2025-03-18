@@ -7,7 +7,7 @@ export const sharedQueryParamsInitalState: SharedQueryParamsState = {
 };
 
 export const sharedQueryParamsReducer = buildMutableEffectReducer<SharedQueryParamsState, SharedQueryParamsEffects>({
-  [SharedQueryParamsEffect.SetParam]: (state, { key, value }) => {
-    state[key] = value;
+  [SharedQueryParamsEffect.SetParam]: (state, { key, values }) => {
+    state[key] = values;
   },
 });

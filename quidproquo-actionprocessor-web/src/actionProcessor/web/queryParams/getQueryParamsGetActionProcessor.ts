@@ -4,9 +4,9 @@ import { QueryParamsActionType, QueryParamsGetActionProcessor } from 'quidproquo
 const getProcessQueryParamsGet = (qpqConfig: QPQConfig): QueryParamsGetActionProcessor => {
   return async ({ key }) => {
     const urlParams = new URLSearchParams(window.location.search);
-    const value = urlParams.get(key) || undefined;
+    const values = urlParams.getAll(key);
 
-    return actionResult(value);
+    return actionResult(values);
   };
 };
 

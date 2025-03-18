@@ -5,7 +5,7 @@ import { QueryParamsActionType } from './QueryParamsActionType';
 // Payload
 export type QueryParamsSetActionPayload = {
   key: string;
-  value: string;
+  values: string[];
   createHistoryEntry: boolean;
 };
 

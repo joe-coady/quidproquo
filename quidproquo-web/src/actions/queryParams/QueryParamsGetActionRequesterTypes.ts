@@ -14,5 +14,5 @@ export interface QueryParamsGetAction extends Action<QueryParamsGetActionPayload
 }
 
 // Function Types
-export type QueryParamsGetActionProcessor = ActionProcessor<QueryParamsGetAction, string | undefined>;
-export type QueryParamsGetActionRequester = ActionRequester<QueryParamsGetAction, string | undefined>;
+export type QueryParamsGetActionProcessor = ActionProcessor<QueryParamsGetAction, string[]>;
+export type QueryParamsGetActionRequester = ActionRequester<QueryParamsGetAction, string[]>;

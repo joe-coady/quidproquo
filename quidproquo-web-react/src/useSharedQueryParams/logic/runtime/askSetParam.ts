@@ -1,8 +1,9 @@
-import { askDelay, AskResponse } from 'quidproquo-core';
+import { AskResponse } from 'quidproquo-core';
+import { askQueryParamsSet } from 'quidproquo-web';
 
 import { askSharedQueryParamsUISetParam } from '../sharedQueryParamsActionCreator';
 
-export function* askSetParam(key: string, value: string): AskResponse<void> {
-  // TODO: Implement this function
-  yield* askSharedQueryParamsUISetParam(key, value);
+export function* askSetParam(key: string, values: string[]): AskResponse<void> {
+  yield* askQueryParamsSet(key, values, false);
+  yield* askSharedQueryParamsUISetParam(key, values);
 }

@@ -1,3 +1,5 @@
+// import { askSyncParams, sharedQueryParamsRuntime, useQpqRuntime } from 'quidproquo-web-react';
+
 import { useState } from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Autocomplete, IconButton, Menu } from '@mui/material';
@@ -23,6 +25,8 @@ export interface TopSectionProps {
 }
 
 export function TopSection({ searchParams, setSearchParams, onSearch }: TopSectionProps) {
+  // const [api, state] = useQpqRuntime(sharedQueryParamsRuntime, askSyncParams);
+
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const serviceOptions = useServiceNames();

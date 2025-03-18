@@ -2,14 +2,16 @@ import { ActionProcessorList, ActionProcessorListResolver, actionResult, QPQConf
 import { QueryParamsActionType, QueryParamsSetActionProcessor } from 'quidproquo-web';
 
 const getProcessQueryParamsSet = (qpqConfig: QPQConfig): QueryParamsSetActionProcessor => {
-  return async ({ key, value, createHistoryEntry }) => {
+  return async ({ key, values, createHistoryEntry }) => {
     const url = new URL(window.location.href);
     const urlParams = new URLSearchParams(url.search);
 
-    if (value === undefined || value === null || value === '') {
+    // Ensure values is an array and remove key if empty
+    if (values.length === 0) {
       urlParams.delete(key);
     } else {
-      urlParams.set(key, value);
+      urlParams.delete(key);
+      values.forEach((value) => urlParams.append(key, value));
     }
 
     const newUrl = `${url.pathname}?${urlParams.toString()}`;
