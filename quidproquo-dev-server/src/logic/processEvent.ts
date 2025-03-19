@@ -46,6 +46,7 @@ export const processEvent = async <E, ER>(
     `${serviceName}::${randomUUID()}`,
     qpqRuntimeType,
     dynamicModuleLoader,
+    undefined,
     [],
   );
 

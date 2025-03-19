@@ -59,6 +59,7 @@ export const createImplementationRuntime = (
     `${moduleName}::${randomGuid()}`,
     QpqRuntimeType.EXECUTE_IMPLEMENTATION_STORY,
     dynamicModuleLoader,
+    undefined,
     tags,
   );
 

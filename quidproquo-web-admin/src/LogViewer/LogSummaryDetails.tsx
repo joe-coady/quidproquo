@@ -1,4 +1,4 @@
-import { StoryResult } from 'quidproquo-core';
+import { getUniqueKeyFromQpqFunctionRuntime, StoryResult } from 'quidproquo-core';
 
 import { Typography } from '@mui/material';
 
@@ -10,6 +10,7 @@ interface LogSummaryDetailsProps {
 
 export const LogSummaryDetails = ({ log }: LogSummaryDetailsProps) => {
   const totalRuntime = new Date(log.finishedAt).getTime() - new Date(log.startedAt).getTime();
+  const functionKey = log.qpqFunctionRuntimeInfo ? getUniqueKeyFromQpqFunctionRuntime(log.qpqFunctionRuntimeInfo) : 'unknownMahLord';
 
   return (
     <>
@@ -22,14 +23,14 @@ export const LogSummaryDetails = ({ log }: LogSummaryDetailsProps) => {
         <pre style={genericFunctionRendererStyles.pre}>
           <div style={genericFunctionRendererStyles.commentBlock}>
             <div>// //////////////////////////////////////////////////////</div>
-            <div>// src: {log.tags.join(', ')}</div>
+            <div>// src: {functionKey}</div>
             {log.fromCorrelation && <div>// Caller: {log.fromCorrelation}</div>}
             <div>
               // Total Runtime: <span style={genericFunctionRendererStyles.highlightComment}>{totalRuntime} ms</span>
             </div>
             <div>// //////////////////////////////////////////////////////</div>
           </div>
-          <GenericFunctionRenderer functionName={log.tags.join('::').split('::').pop() || 'unknown'} args={log.input} expanded={true} />
+          <GenericFunctionRenderer functionName={functionKey.split('::').pop() || 'unknown'} args={log.input} expanded={true} />
         </pre>
       </div>
     </>

@@ -13,9 +13,7 @@ import {
   decomposedStringToString,
   filterLogHistoryByActionTypes,
   LogActionType,
-  LogCreateActionPayload,
   LogLevelEnum,
-  LogTemplateLiteralActionPayload,
   QpqRuntimeType,
   StoryResult,
   UserDirectoryActionType,
@@ -95,6 +93,8 @@ export const storyResultToMetadata = (storyResult: StoryResult<any>, ttl?: numbe
     ttl,
 
     userInfo: decodedAccessToken?.username || decodedAccessToken?.userId,
+
+    qpqFunctionRuntimeInfo: storyResult.qpqFunctionRuntimeInfo,
   };
 
   // Extract error text

@@ -1,5 +1,5 @@
 import { QPQConfig } from '../config';
-import { QpqLogger } from '../types';
+import { QpqFunctionRuntime, QpqLogger } from '../types';
 import { ActionProcessorList } from '../types/Action';
 import { qpqConsoleLog, QpqRuntimeType, Story, StoryResult, StorySession, StorySessionUpdater } from '../types/StorySession';
 import { resolveStory } from './resolveStory';
@@ -15,6 +15,7 @@ export async function resolveStoryWithLogs<TArgs extends Array<any>>(
   runtimeCorrelation: string,
   runtimeType: QpqRuntimeType,
   dynamicModuleLoader: any,
+  qpqFunctionRuntimeInfo?: QpqFunctionRuntime,
   initialTags?: string[],
 ): Promise<StoryResult<any>> {
   const logs: any[] = [];
@@ -38,6 +39,7 @@ export async function resolveStoryWithLogs<TArgs extends Array<any>>(
       runtimeCorrelation,
       runtimeType,
       dynamicModuleLoader,
+      qpqFunctionRuntimeInfo,
       initialTags,
     );
 

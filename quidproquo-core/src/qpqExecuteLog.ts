@@ -1,30 +1,37 @@
-import { defineApplicationModule } from './config';
+import { defineApplicationModule, QPQConfig } from './config';
 import { createRuntime } from './runtime';
 import { ActionProcessorList, StoryResult } from './types';
 
-export const qpqExecuteLog = async (storyResult: StoryResult<any>, runtime: any, overrides: ActionProcessorList = {}): Promise<StoryResult<any>> => {
-  // Create a proxy that just resolves all actions to reading from the history
-  let logIndex = 0;
-  const storyActionProcessor: ActionProcessorList = new Proxy(
-    {},
-    {
-      get: (target: any, property: any) => {
-        if (overrides[property]) {
-          return overrides[property];
-        }
+export const createDebugLogActionProcessor = (storyResult: StoryResult<any>, overrides: ActionProcessorList = {}) => {
+  return async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => {
+    let logIndex = 0;
+    const storyActionProcessor: ActionProcessorList = new Proxy(
+      {},
+      {
+        get: (target: any, property: any) => {
+          // This gets called by children async functions, which unwraps promises, so we need to return nothing for a then...
+          if (property === 'then') {
+            return undefined;
+          }
 
-        // TODO: We wan't a debug version of batch...
-        //       but i think we need to move the node imps to core
+          if (overrides[property]) {
+            return overrides[property];
+          }
 
-        return async () => {
-          const res = storyResult.history[logIndex].res;
-          logIndex = logIndex + 1;
-          return res;
-        };
+          return async () => {
+            const res = storyResult.history[logIndex]?.res;
+            logIndex = logIndex + 1;
+            return res;
+          };
+        },
       },
-    },
-  );
+    );
 
+    return storyActionProcessor;
+  };
+};
+
+export const qpqExecuteLog = async (storyResult: StoryResult<any>, runtime: any, overrides: ActionProcessorList = {}): Promise<StoryResult<any>> => {
   // Generate an empty story resolver
   const resolveStory = createRuntime(
     [defineApplicationModule('Debugger', storyResult.moduleName, 'development', __dirname, './dist')],
@@ -33,7 +40,7 @@ export const qpqExecuteLog = async (storyResult: StoryResult<any>, runtime: any,
       depth: storyResult.session.depth,
       context: storyResult.session.context,
     },
-    async () => storyActionProcessor,
+    createDebugLogActionProcessor(storyResult, overrides),
     () => new Date().toISOString(),
     {
       enableLogs: async () => {},
@@ -44,6 +51,7 @@ export const qpqExecuteLog = async (storyResult: StoryResult<any>, runtime: any,
     storyResult.correlation,
     storyResult.runtimeType,
     async () => null,
+    storyResult.qpqFunctionRuntimeInfo,
   );
 
   // Execute it with the initial input

@@ -1,8 +1,7 @@
 import { QPQConfig } from '../config';
 import { isErroredActionResult, resolveActionResult, resolveActionResultError } from '../logic/actionLogic';
-import { buildQPQError } from '../logic/error';
 import { getApplicationModuleName } from '../qpqCoreUtils';
-import { QpqLogger } from '../types';
+import { QpqFunctionRuntime, QpqLogger } from '../types';
 import { Action, ActionProcessorList } from '../types/Action';
 import { ErrorTypeEnum } from '../types/ErrorTypeEnum';
 import { QpqRuntimeType, Story, StoryResult, StorySession, StorySessionUpdater } from '../types/StorySession';
@@ -19,6 +18,7 @@ export async function resolveStory<TArgs extends Array<any>>(
   runtimeCorrelation: string,
   runtimeType: QpqRuntimeType,
   dynamicModuleLoader: any,
+  qpqFunctionRuntimeInfo?: QpqFunctionRuntime,
   initialTags?: string[],
 ): Promise<StoryResult<any>> {
   const actionProcessors: ActionProcessorList = await getActionProcessors(qpqConfig, dynamicModuleLoader);
@@ -48,6 +48,7 @@ export async function resolveStory<TArgs extends Array<any>>(
     fromCorrelation: callerSession.correlation,
     runtimeType: runtimeType,
     logs: [],
+    qpqFunctionRuntimeInfo,
   };
 
   // Enforce maximum depth

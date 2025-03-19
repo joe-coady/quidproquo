@@ -55,7 +55,8 @@ const getProcessExecuteStory = <T extends Array<any>, R>(qpqConfig: QPQConfig): 
       `${moduleName}::${randomGuid()}`,
       QpqRuntimeType.EXECUTE_STORY,
       dynamicModuleLoader,
-      [functionKey],
+      payload.runtime,
+      [],
     );
     const storyResult = await resolveStory(story, payload.params);
 

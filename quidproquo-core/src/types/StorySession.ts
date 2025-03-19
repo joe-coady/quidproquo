@@ -1,6 +1,7 @@
 import { Action } from './Action';
 import { QPQError } from './ErrorTypeEnum';
 import { QpqContext } from './QpqContextIdentifier';
+import { QpqFunctionRuntime } from './QpqFunctionRuntime';
 
 export interface DecodedAccessToken {
   userId: string;
@@ -160,6 +161,9 @@ export interface StoryResult<TArgs extends Array<any>, TResult = any> {
 
   // Impure Logs
   logs?: qpqConsoleLog[];
+
+  // What was the function runtime that this was executed against
+  qpqFunctionRuntimeInfo?: QpqFunctionRuntime;
 }
 
 export type StoryResultMetadata = {
@@ -178,6 +182,8 @@ export type StoryResultMetadata = {
   executionTimeMs: number;
 
   userInfo?: string;
+
+  qpqFunctionRuntimeInfo?: QpqFunctionRuntime;
 };
 
 export type StoryResultMetadataWithChildren = StoryResultMetadata & {

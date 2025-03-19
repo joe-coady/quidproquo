@@ -1,5 +1,5 @@
 import { QPQConfig } from '../config';
-import { QpqLogger } from '../types';
+import { QpqFunctionRuntime, QpqLogger } from '../types';
 import { ActionProcessorListResolver } from '../types';
 import { QpqRuntimeType, Story, StorySession } from '../types/StorySession';
 import { resolveStoryWithLogs } from './resolveStoryWithLogs';
@@ -13,6 +13,7 @@ export const createRuntime = (
   runtimeCorrelation: string,
   runtimeType: QpqRuntimeType,
   dynamicModuleLoader: any,
+  qpqFunctionRuntimeInfo?: QpqFunctionRuntime,
   initialTags?: string[],
 ) => {
   // Return a function that wraps resolveStoryWithLogs with the provided runtime context
@@ -28,6 +29,7 @@ export const createRuntime = (
       runtimeCorrelation,
       runtimeType,
       dynamicModuleLoader,
+      qpqFunctionRuntimeInfo,
       initialTags,
     );
 };

@@ -104,15 +104,9 @@ export const apiImplementation = async (devServerConfig: DevServerConfig) => {
     // TODO: Get list of services from config dynamically
     const serviceLog: StoryResult<any> = req.body;
 
-    let runtimeModule = askProcessEvent;
-
-    if (serviceLog.runtimeType === QpqRuntimeType.EXECUTE_STORY) {
-      const [srcEntry, module] = serviceLog.tags[0].split('::');
-
-      const loadedModule = await devServerConfig.dynamicModuleLoader(serviceLog.moduleName, srcEntry as QpqFunctionRuntime);
-
-      runtimeModule = loadedModule[module];
-    }
+    let runtimeModule = serviceLog.qpqFunctionRuntimeInfo
+      ? await devServerConfig.dynamicModuleLoader(serviceLog.moduleName, serviceLog.qpqFunctionRuntimeInfo)
+      : askProcessEvent;
 
     const result = await qpqExecuteLog(serviceLog, runtimeModule);
     res.json(result);
