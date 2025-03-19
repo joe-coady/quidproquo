@@ -12,7 +12,8 @@
     "go": "npm run patch && npm run build && npm run publish",
     "lint": "npm run lint --ws",
     "lint:fix": "npm run lint:fix --ws",
-    "format": "npm run format --ws"
+    "format": "npm run format --ws",
+    "watch:all": "npx turbo run watch"
   },
   "repository": {
     "type": "git",
@@ -25,6 +26,7 @@
     "url": "https://github.com/joe-coady/quidproquo/issues"
   },
   "homepage": "https://github.com/joe-coady/quidproquo#readme",
+  "packageManager": "npm@10.7.0",
   "workspaces": [
     "quidproquo-tsconfig",
     "quidproquo-eslint-config",
