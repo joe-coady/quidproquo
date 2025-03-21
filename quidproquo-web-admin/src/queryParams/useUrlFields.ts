@@ -1,3 +1,4 @@
+import { LogLevelEnum, LogLevelEnumLookup } from 'quidproquo-core';
 import { askSyncParams, sharedQueryParamsRuntime, useFieldBinding, useQpqRuntime } from 'quidproquo-web-react';
 
 import { useCallback } from 'react';
@@ -9,6 +10,8 @@ import {
   endDateQueryParamComputed,
   errorQueryParamComputed,
   infoQueryParamComputed,
+  logLevelQueryParamComputed,
+  msgQueryParamComputed,
   runtimeTypeQueryParamComputed,
   serviceQueryParamComputed,
   startDateQueryParamComputed,
@@ -55,12 +58,20 @@ export const useUrlFields = () => {
     api.setParam('info', [value]);
   });
 
+  const [msg, handleMsgOnChange] = useFieldBinding(msgQueryParamComputed, (value: string) => {
+    api.setParam('msg', [value]);
+  });
+
   const [error, handleErrorOnChange] = useFieldBinding(errorQueryParamComputed, (value: string) => {
     api.setParam('error', [value]);
   });
 
   const [deep, handleDeepOnChange] = useFieldBinding(deepQueryParamComputed, (value: string) => {
     api.setParam('deep', [value]);
+  });
+
+  const [logLevel, handleLogLevelOnChange] = useFieldBinding(logLevelQueryParamComputed, (value: LogLevelEnumLookup) => {
+    api.setParam('logLevel', [`${value}`]);
   });
 
   const [tab, handleTabOnChange] = useFieldBinding(
@@ -104,12 +115,16 @@ export const useUrlFields = () => {
     handleUserOnChange,
     info,
     handleInfoOnChange,
+    msg,
+    handleMsgOnChange,
     deep,
     handleDeepOnChange,
     error,
     handleErrorOnChange,
     tab,
     handleTabOnChange,
+    logLevel,
+    handleLogLevelOnChange,
 
     correlation,
     clearCorrelation,

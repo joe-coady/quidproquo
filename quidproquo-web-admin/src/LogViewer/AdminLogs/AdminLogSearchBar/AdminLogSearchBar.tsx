@@ -1,5 +1,4 @@
 import { logLevelEnumLookups } from 'quidproquo-core';
-import { LogLevelEnumLookup } from 'quidproquo-core';
 
 import { useState } from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -8,69 +7,38 @@ import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import { Box } from '@mui/system';
 import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
 import { AsyncButton } from '../../../components';
+import { useUrlFields } from '../../../queryParams';
 import { useServiceNames } from '../../hooks';
-import { LogLogSearchParams } from '../hooks/types';
 
 export interface AdminLogSearchBarProps {
-  searchParams: LogLogSearchParams;
-  setLogLogSearchParams: (setter: (searchParams: LogLogSearchParams) => LogLogSearchParams) => void;
   onSearch: () => Promise<any>;
 }
 
-export function AdminLogSearchBar({ searchParams, setLogLogSearchParams, onSearch }: AdminLogSearchBarProps) {
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
+export function AdminLogSearchBar({ onSearch }: AdminLogSearchBarProps) {
   const serviceOptions = useServiceNames();
 
-  const handleRuntimeTypeChange = (event: SelectChangeEvent<string>) => {
-    setLogLogSearchParams((prevLogLogSearchParams) => ({
-      ...prevLogLogSearchParams,
-      logLevelLookup: event.target.value as LogLevelEnumLookup,
-    }));
-  };
+  const {
+    service,
+    handleServiceOnChange,
+    startDate,
+    handleStartDateChange,
+    endDate,
+    handleEndDateChange,
+    msg,
+    handleMsgOnChange,
+    updateStartAndEndTimeSpan,
+    logLevel,
+    handleLogLevelOnChange,
+  } = useUrlFields();
 
-  const handleStartDateChange = (value: Date | null) => {
-    if (value) {
-      setLogLogSearchParams((prevLogLogSearchParams) => ({
-        ...prevLogLogSearchParams,
-        startIsoDateTime: value.toISOString(),
-      }));
-    }
-  };
-
-  const handleEndDateChange = (value: Date | null) => {
-    if (value) {
-      setLogLogSearchParams((prevLogLogSearchParams) => ({
-        ...prevLogLogSearchParams,
-        endIsoDateTime: value.toISOString(),
-      }));
-    }
-  };
-
-  const handleReasonFilterChange = (event: any) => {
-    setLogLogSearchParams((prev) => ({ ...prev, reasonFilter: event.target.value }));
-  };
-
-  const handleQuickTimeSelect = (minutes: number) => {
-    const now = new Date();
-    const startDate = new Date(now.getTime() - minutes * 60000);
-    const endDate = new Date(now.getTime() + 7 * 24 * 60 * 60000);
-
-    setLogLogSearchParams((prevLogLogSearchParams) => ({
-      ...prevLogLogSearchParams,
-      startIsoDateTime: startDate.toISOString(),
-      endIsoDateTime: endDate.toISOString(),
-    }));
-
-    setAnchorEl(null);
-  };
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleQuickTimeClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -80,11 +48,9 @@ export function AdminLogSearchBar({ searchParams, setLogLogSearchParams, onSearc
     setAnchorEl(null);
   };
 
-  const handleServiceChange = (event: any, value: any) => {
-    setLogLogSearchParams((prevLogLogSearchParams) => ({
-      ...prevLogLogSearchParams,
-      serviceFilter: value ? value.value : '',
-    }));
+  const handleQuickTimeSelect = (minutes: number) => {
+    updateStartAndEndTimeSpan(minutes);
+    handleQuickTimeClose();
   };
 
   return (
@@ -92,14 +58,8 @@ export function AdminLogSearchBar({ searchParams, setLogLogSearchParams, onSearc
       <Grid container columns={12} spacing={2}>
         <Grid item xs={3}>
           <FormControl fullWidth>
-            <InputLabel id="runtime-select-label">Runtime Type</InputLabel>
-            <Select
-              labelId="runtime-select-label"
-              id="demo-simple-select"
-              value={searchParams.logLevelLookup}
-              label="Log Level"
-              onChange={handleRuntimeTypeChange}
-            >
+            <InputLabel id="runtime-select-label">Log Level</InputLabel>
+            <Select labelId="runtime-select-label" id="demo-simple-select" value={logLevel} label="Log Level" onChange={handleLogLevelOnChange}>
               {logLevelEnumLookups.map((key) => (
                 <MenuItem key={key} value={key}>
                   {key}
@@ -111,9 +71,10 @@ export function AdminLogSearchBar({ searchParams, setLogLogSearchParams, onSearc
         <Grid item xs={3}>
           <FormControl fullWidth>
             <Autocomplete
-              options={serviceOptions}
               getOptionLabel={(option) => option.label}
-              onChange={handleServiceChange}
+              options={serviceOptions}
+              value={serviceOptions.find((o) => o.value === service) || null}
+              onChange={handleServiceOnChange}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -129,7 +90,7 @@ export function AdminLogSearchBar({ searchParams, setLogLogSearchParams, onSearc
         <Grid item xs={3}>
           <Box position="relative">
             <FormControl fullWidth>
-              <DateTimePicker label="Start DateTime" value={new Date(searchParams.startIsoDateTime)} onChange={handleStartDateChange} />
+              <DateTimePicker label="Start DateTime" value={startDate} onChange={handleStartDateChange} />
             </FormControl>
             <IconButton
               aria-label="quick time select"
@@ -149,15 +110,15 @@ export function AdminLogSearchBar({ searchParams, setLogLogSearchParams, onSearc
         </Grid>
         <Grid item xs={3}>
           <FormControl fullWidth>
-            <DateTimePicker label="End DateTime" value={new Date(searchParams.endIsoDateTime)} onChange={handleEndDateChange} />
+            <DateTimePicker label="End DateTime" value={endDate} onChange={handleEndDateChange} />
           </FormControl>
         </Grid>
         <Grid item xs={10}>
           <FormControl fullWidth>
             <TextField
               label="Message"
-              value={searchParams.reasonFilter}
-              onChange={handleReasonFilterChange}
+              value={msg}
+              onChange={handleMsgOnChange}
               InputLabelProps={{
                 shrink: true,
               }}

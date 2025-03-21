@@ -5,12 +5,12 @@ import { AdminLogSearchBar } from './AdminLogSearchBar';
 import { useLogLogSearch } from './hooks';
 
 export const AdminLogs = () => {
-  const { logLogs, searchParams, setSearchParams, searchProgress, onSearch } = useLogLogSearch();
+  const { logLogs, searchProgress, onSearch } = useLogLogSearch();
   const isLoading = useIsLoading();
 
   return (
     <TabViewBox
-      header={() => <AdminLogSearchBar onSearch={onSearch} searchParams={searchParams} setLogLogSearchParams={setSearchParams} />}
+      header={() => <AdminLogSearchBar onSearch={onSearch} />}
       body={() => <AdminLogGrid logs={logLogs} isLoading={isLoading} searchProgress={searchProgress} />}
     />
   );

@@ -1,4 +1,4 @@
-import { QpqRuntimeType } from 'quidproquo-core';
+import { LogLevelEnum, LogLevelEnumLookup, logLevelEnumLookups, QpqRuntimeType } from 'quidproquo-core';
 import { createQpqRuntimeComputed, sharedQueryParamsRuntime } from 'quidproquo-web-react';
 
 export const infoFilterQueryParamComputed = createQpqRuntimeComputed(sharedQueryParamsRuntime, (state) => state.infoFilter || '');
@@ -10,10 +10,16 @@ export const runtimeTypeQueryParamComputed = createQpqRuntimeComputed(
 
 export const userQueryParamComputed = createQpqRuntimeComputed(sharedQueryParamsRuntime, (state): string => state.user?.[0] || '');
 export const infoQueryParamComputed = createQpqRuntimeComputed(sharedQueryParamsRuntime, (state): string => state.info?.[0] || '');
+export const msgQueryParamComputed = createQpqRuntimeComputed(sharedQueryParamsRuntime, (state): string => state.msg?.[0] || '');
 export const errorQueryParamComputed = createQpqRuntimeComputed(sharedQueryParamsRuntime, (state): string => state.error?.[0] || '');
 export const deepQueryParamComputed = createQpqRuntimeComputed(sharedQueryParamsRuntime, (state): string => state.deep?.[0] || '');
 export const correlationQueryParamComputed = createQpqRuntimeComputed(sharedQueryParamsRuntime, (state): string => state.correlation?.[0] || '');
 export const tabQueryParamComputed = createQpqRuntimeComputed(sharedQueryParamsRuntime, (state): number => parseInt(state.tab?.[0] || '0'));
+
+export const logLevelQueryParamComputed = createQpqRuntimeComputed(
+  sharedQueryParamsRuntime,
+  (state): LogLevelEnumLookup => (state.logLevel?.[0] || 'All') as LogLevelEnumLookup,
+);
 
 export const serviceQueryParamComputed = createQpqRuntimeComputed(sharedQueryParamsRuntime, (state): string => state.service?.[0] || '');
 
