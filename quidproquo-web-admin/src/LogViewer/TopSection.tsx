@@ -1,5 +1,3 @@
-// import { askSyncParams, sharedQueryParamsRuntime, useQpqRuntime } from 'quidproquo-web-react';
-
 import { useState } from 'react';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Autocomplete, IconButton, Menu } from '@mui/material';
@@ -7,90 +5,45 @@ import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import { Box } from '@mui/system';
 import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
 import { AsyncButton } from '../components';
+import { useUrlFields } from '../queryParams';
 import { RuntimeTypes } from './constants';
 import { useServiceNames } from './hooks';
-import { SearchParams } from './types';
 
 export interface TopSectionProps {
-  searchParams: SearchParams;
-  setSearchParams: (setter: (searchParams: SearchParams) => SearchParams) => void;
   onSearch: () => Promise<any>;
 }
 
-export function TopSection({ searchParams, setSearchParams, onSearch }: TopSectionProps) {
-  // const [api, state] = useQpqRuntime(sharedQueryParamsRuntime, askSyncParams);
-
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
+export function TopSection({ onSearch }: TopSectionProps) {
   const serviceOptions = useServiceNames();
 
-  const handleRuntimeTypeChange = (event: SelectChangeEvent<string>) => {
-    setSearchParams((prevSearchParams) => ({
-      ...prevSearchParams,
-      runtimeType: event.target.value,
-    }));
-  };
+  const {
+    runtimeType,
+    handleRuntimeTypeOnChange,
+    service,
+    handleServiceOnChange,
+    startDate,
+    handleStartDateChange,
+    endDate,
+    handleEndDateChange,
+    user,
+    handleUserOnChange,
+    info,
+    handleInfoOnChange,
+    deep,
+    handleDeepOnChange,
+    error,
+    handleErrorOnChange,
+    updateStartAndEndTimeSpan,
+  } = useUrlFields();
 
-  const handleStartDateChange = (value: Date | null) => {
-    if (value) {
-      setSearchParams((prevSearchParams) => ({
-        ...prevSearchParams,
-        startIsoDateTime: value.toISOString(),
-      }));
-    }
-  };
-
-  const handleEndDateChange = (value: Date | null) => {
-    if (value) {
-      setSearchParams((prevSearchParams) => ({
-        ...prevSearchParams,
-        endIsoDateTime: value.toISOString(),
-      }));
-    }
-  };
-
-  const handleErrorFilterChange = (event: any) => {
-    setSearchParams((prevSearchParams) => ({
-      ...prevSearchParams,
-      errorFilter: event.target.value,
-    }));
-  };
-
-  const handleUserFilterChange = (event: any) => {
-    setSearchParams((prevSearchParams) => ({
-      ...prevSearchParams,
-      userFilter: event.target.value,
-    }));
-  };
-
-  const handleInfoFilterChange = (event: any) => {
-    setSearchParams((prev) => ({ ...prev, infoFilter: event.target.value }));
-  };
-
-  const handleDeepSearchChange = (event: any) => {
-    setSearchParams((prev) => ({ ...prev, deep: event.target.value }));
-  };
-
-  const handleQuickTimeSelect = (minutes: number) => {
-    const now = new Date();
-    const startDate = new Date(now.getTime() - minutes * 60000);
-    const endDate = new Date(now.getTime() + 7 * 24 * 60 * 60000);
-
-    setSearchParams((prevSearchParams) => ({
-      ...prevSearchParams,
-      startIsoDateTime: startDate.toISOString(),
-      endIsoDateTime: endDate.toISOString(),
-    }));
-
-    setAnchorEl(null);
-  };
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleQuickTimeClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -100,11 +53,9 @@ export function TopSection({ searchParams, setSearchParams, onSearch }: TopSecti
     setAnchorEl(null);
   };
 
-  const handleServiceChange = (event: any, value: any) => {
-    setSearchParams((prevSearchParams) => ({
-      ...prevSearchParams,
-      serviceFilter: value ? value.value : '',
-    }));
+  const handleQuickTimeSelect = (minutes: number) => {
+    updateStartAndEndTimeSpan(minutes);
+    handleQuickTimeClose();
   };
 
   return (
@@ -116,9 +67,9 @@ export function TopSection({ searchParams, setSearchParams, onSearch }: TopSecti
             <Select
               labelId="runtime-select-label"
               id="demo-simple-select"
-              value={searchParams.runtimeType}
+              value={runtimeType}
               label="Runtime Type"
-              onChange={handleRuntimeTypeChange}
+              onChange={handleRuntimeTypeOnChange}
             >
               {RuntimeTypes.map((key) => (
                 <MenuItem key={key} value={key}>
@@ -131,9 +82,10 @@ export function TopSection({ searchParams, setSearchParams, onSearch }: TopSecti
         <Grid item xs={2}>
           <FormControl fullWidth>
             <Autocomplete
-              options={serviceOptions}
               getOptionLabel={(option) => option.label}
-              onChange={handleServiceChange}
+              options={serviceOptions}
+              value={serviceOptions.find((o) => o.value === service) || null}
+              onChange={handleServiceOnChange}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -149,7 +101,7 @@ export function TopSection({ searchParams, setSearchParams, onSearch }: TopSecti
         <Grid item xs={2}>
           <Box position="relative">
             <FormControl fullWidth>
-              <DateTimePicker label="Start DateTime" value={new Date(searchParams.startIsoDateTime)} onChange={handleStartDateChange} />
+              <DateTimePicker label="Start DateTime" value={startDate} onChange={handleStartDateChange} />
             </FormControl>
             <IconButton
               aria-label="quick time select"
@@ -169,15 +121,15 @@ export function TopSection({ searchParams, setSearchParams, onSearch }: TopSecti
         </Grid>
         <Grid item xs={2}>
           <FormControl fullWidth>
-            <DateTimePicker label="End DateTime" value={new Date(searchParams.endIsoDateTime)} onChange={handleEndDateChange} />
+            <DateTimePicker label="End DateTime" value={endDate} onChange={handleEndDateChange} />
           </FormControl>
         </Grid>
         <Grid item xs={4}>
           <FormControl fullWidth>
             <TextField
               label="User"
-              value={searchParams.userFilter}
-              onChange={handleUserFilterChange}
+              value={user}
+              onChange={handleUserOnChange}
               InputLabelProps={{
                 shrink: true,
               }}
@@ -188,8 +140,8 @@ export function TopSection({ searchParams, setSearchParams, onSearch }: TopSecti
           <FormControl fullWidth>
             <TextField
               label="Info"
-              value={searchParams.infoFilter}
-              onChange={handleInfoFilterChange}
+              value={info}
+              onChange={handleInfoOnChange}
               InputLabelProps={{
                 shrink: true,
               }}
@@ -200,8 +152,8 @@ export function TopSection({ searchParams, setSearchParams, onSearch }: TopSecti
           <FormControl fullWidth>
             <TextField
               label="Error Filter"
-              value={searchParams.errorFilter}
-              onChange={handleErrorFilterChange}
+              value={error}
+              onChange={handleErrorOnChange}
               InputLabelProps={{
                 shrink: true,
               }}
@@ -212,8 +164,8 @@ export function TopSection({ searchParams, setSearchParams, onSearch }: TopSecti
           <FormControl fullWidth>
             <TextField
               label="Deep Search"
-              value={searchParams.deep}
-              onChange={handleDeepSearchChange}
+              value={deep}
+              onChange={handleDeepOnChange}
               placeholder="Use with caution, reduce results with above fields first, this is a contains search on the log JSON, so it will be slow."
               InputLabelProps={{
                 shrink: true,

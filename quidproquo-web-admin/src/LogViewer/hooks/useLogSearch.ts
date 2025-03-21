@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { SearchParams } from '../types';
+import { useUrlFields } from '../../queryParams';
 import { useOnSearch } from './useOnSearch';
 
 declare global {
@@ -10,6 +10,8 @@ declare global {
 }
 
 export const useLogSearch = () => {
+  const { runtimeType, service, startDate, endDate, user, info, deep, error } = useUrlFields();
+
   const [logs, setLogs] = useState<any>([]);
 
   useEffect(() => {
@@ -20,34 +22,23 @@ export const useLogSearch = () => {
     console.log('logs attached to window, try: viewLog(logs[0])');
   }, []);
 
-  const [searchParamsState, setSearchParamsState] = useState<SearchParams>(() => {
-    const currentDate = new Date();
-
-    const threeHoursAgo = new Date(currentDate.getTime() - 3 * 60 * 60 * 1000);
-    const isoDateThreeHoursAgo = threeHoursAgo.toISOString();
-
-    const tomorrow = new Date(currentDate.getTime() + 24 * 60 * 60 * 1000);
-    const isoDateTomorrow = tomorrow.toISOString();
-
-    return {
-      runtimeType: 'EXECUTE_STORY',
-      startIsoDateTime: isoDateThreeHoursAgo,
-      endIsoDateTime: isoDateTomorrow,
-      errorFilter: '',
-      infoFilter: '',
-      serviceFilter: '',
-      userFilter: '',
-      deep: '',
+  const [searchProgress, onSearch] = useOnSearch(
+    {
+      runtimeType,
+      startIsoDateTime: startDate.toISOString(),
+      endIsoDateTime: endDate.toISOString(),
+      errorFilter: error,
+      infoFilter: info,
+      serviceFilter: service,
+      userFilter: user,
+      deep: deep,
       onlyErrors: false,
-    };
-  });
-
-  const [searchProgress, onSearch] = useOnSearch(searchParamsState, setLogs);
+    },
+    setLogs,
+  );
 
   return {
     logs,
-    searchParams: searchParamsState,
-    setSearchParams: setSearchParamsState,
     searchProgress,
     onSearch,
   };

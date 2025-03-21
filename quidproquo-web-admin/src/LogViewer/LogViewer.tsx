@@ -3,6 +3,7 @@ import { CircularProgress, Tab, Tabs } from '@mui/material';
 import Box from '@mui/material/Box';
 
 import { FederatedTab } from '../FederatedAddon';
+import { useUrlFields } from '../queryParams';
 import { useFederatedAddon } from '../useFederatedAddon';
 import { AdminLogs } from './AdminLogs';
 import { Dashboard } from './Dashboard';
@@ -41,13 +42,9 @@ export function useTabs(): {
 }
 
 export function LogViewer() {
-  const [selectedTab, setSelectedTab] = React.useState(0);
-
   const { tabs, loading } = useTabs();
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setSelectedTab(newValue);
-  };
+  const { tab, handleTabOnChange } = useUrlFields();
 
   return (
     <Box
@@ -60,7 +57,7 @@ export function LogViewer() {
     >
       <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
         {tabs
-          .filter((tab, index) => index === selectedTab)
+          .filter((t, index) => index === tab)
           .map((tab) => (
             <tab.View key={tab.name} />
           ))}
@@ -75,7 +72,7 @@ export function LogViewer() {
           zIndex: 1,
         }}
       >
-        <Tabs value={selectedTab} onChange={handleTabChange} centered>
+        <Tabs value={tab} onChange={handleTabOnChange} centered>
           {tabs.map((tab, index) => (
             <Tab key={tab.name} label={tab.name} />
           ))}

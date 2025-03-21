@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { getServiceNames } from '../logic';
 
-type AutoCompleteOption = {
+export type AutoCompleteOption = {
   label: string;
   value: string;
 };

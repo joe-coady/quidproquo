@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
+import { useUrlFields } from '../../queryParams';
 import { filterLogs, getOnRowClick } from '../logic';
 import { SearchParams } from '../types';
 import { useOnSearch } from './useOnSearch';
@@ -13,23 +14,14 @@ declare global {
 }
 
 export const useLogManagement = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const selectedLogCorrelation = searchParams.get('correlation') || '';
-
-  const setSelectedLogCorrelation = (correlation: string) => {
-    if (correlation) {
-      setSearchParams({ correlation });
-    } else {
-      setSearchParams({});
-    }
-  };
+  const { runtimeType, service, startDate, endDate, user, info, deep, error, correlation, setCorrelation, clearCorrelation } = useUrlFields();
 
   const [logs, setLogs] = useState<any>([]);
 
   useEffect(() => {
     window.logs = logs;
     window.viewLog = (log: any) => {
-      setSelectedLogCorrelation(log.correlation);
+      setCorrelation(log.correlation);
     };
   }, [logs]);
 
@@ -37,46 +29,36 @@ export const useLogManagement = () => {
     console.log('logs attached to window, try: viewLog(logs[0])');
   }, []);
 
-  const [searchParamsState, setSearchParamsState] = useState<SearchParams>(() => {
-    const currentDate = new Date();
-
-    const threeHoursAgo = new Date(currentDate.getTime() - 3 * 60 * 60 * 1000);
-    const isoDateThreeHoursAgo = threeHoursAgo.toISOString();
-
-    const tomorrow = new Date(currentDate.getTime() + 24 * 60 * 60 * 1000);
-    const isoDateTomorrow = tomorrow.toISOString();
-
-    return {
-      runtimeType: 'EXECUTE_STORY',
-      startIsoDateTime: isoDateThreeHoursAgo,
-      endIsoDateTime: isoDateTomorrow,
-      errorFilter: '',
-      infoFilter: '',
-      serviceFilter: '',
-      userFilter: '',
-      deep: '',
+  const searchParams = useMemo(
+    () => ({
+      runtimeType,
+      startIsoDateTime: startDate.toISOString(),
+      endIsoDateTime: endDate.toISOString(),
+      errorFilter: error,
+      infoFilter: info,
+      serviceFilter: service,
+      userFilter: user,
+      deep: deep,
 
       onlyErrors: false,
-    };
-  });
+    }),
+    [runtimeType, startDate, endDate, error, info, service, user, deep],
+  );
 
-  const [searchProgress, onSearch] = useOnSearch(searchParamsState, setLogs);
+  const [searchProgress, onSearch] = useOnSearch(searchParams, setLogs);
 
-  const filteredLogs = useMemo(() => filterLogs(searchParamsState.errorFilter, logs), [searchParamsState.errorFilter, logs]);
+  const filteredLogs = useMemo(() => filterLogs(error, logs), [error, logs]);
 
-  const onRowClick = getOnRowClick(setSelectedLogCorrelation);
-  const clearSelectedLogCorrelation = () => setSelectedLogCorrelation('');
+  const onRowClick = getOnRowClick(setCorrelation);
 
   return {
-    selectedLogCorrelation,
+    selectedLogCorrelation: correlation,
     logs,
-    searchParams: searchParamsState,
-    setSearchParams: setSearchParamsState,
     onSearch,
     filteredLogs,
     onRowClick,
-    clearSelectedLogCorrelation,
-    setSelectedLogCorrelation,
+    clearSelectedLogCorrelation: clearCorrelation,
+    setSelectedLogCorrelation: setCorrelation,
     searchProgress,
   };
 };

@@ -13,7 +13,22 @@
     "lint": "npm run lint --ws",
     "lint:fix": "npm run lint:fix --ws",
     "format": "npm run format --ws",
-    "watch:all": "npx turbo run watch"
+    "watch-all": "npx npm-run-all --parallel watch:*",
+    "watch:quidproquo-core": "npm run watch -w quidproquo-core",
+    "watch:quidproquo-webserver": "npm run watch -w quidproquo-webserver",
+    "watch:quidproquo-config-aws": "npm run watch -w quidproquo-config-aws",
+    "watch:quidproquo-actionprocessor-js": "npm run watch -w quidproquo-actionprocessor-js",
+    "watch:quidproquo-actionprocessor-node": "npm run watch -w quidproquo-actionprocessor-node",
+    "watch:quidproquo-actionprocessor-awslambda": "npm run watch -w quidproquo-actionprocessor-awslambda",
+    "watch:quidproquo-neo4j": "npm run watch -w quidproquo-neo4j",
+    "watch:quidproquo-deploy-webpack": "npm run watch -w quidproquo-deploy-webpack",
+    "watch:quidproquo-deploy-awscdk": "npm run watch -w quidproquo-deploy-awscdk",
+    "watch:quidproquo-web": "npm run watch -w quidproquo-web",
+    "watch:quidproquo-actionprocessor-web": "npm run watch -w quidproquo-actionprocessor-web",
+    "watch:quidproquo-web-react": "npm run watch -w quidproquo-web-react",
+    "watch:quidproquo-web-admin": "npm run watch -w quidproquo-web-admin",
+    "watch:quidproquo-dev-server": "npm run watch -w quidproquo-dev-server",
+    "watch:quidproquo": "npm run watch -w quidproquo"
   },
   "repository": {
     "type": "git",

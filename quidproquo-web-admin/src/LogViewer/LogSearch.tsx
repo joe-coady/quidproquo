@@ -5,13 +5,8 @@ import { LogMetadataGrid } from './LogMetadataGrid';
 import { TopSection } from './TopSection';
 
 export const LogSearch = () => {
-  const { searchParams, setSearchParams, onSearch, logs } = useLogSearch();
+  const { onSearch, logs } = useLogSearch();
   const isLoading = useIsLoading();
 
-  return (
-    <TabViewBox
-      header={() => <TopSection searchParams={searchParams} setSearchParams={setSearchParams} onSearch={onSearch} />}
-      body={() => <LogMetadataGrid logs={logs} isLoading={isLoading} />}
-    />
-  );
+  return <TabViewBox header={() => <TopSection onSearch={onSearch} />} body={() => <LogMetadataGrid logs={logs} isLoading={isLoading} />} />;
 };
