@@ -18,7 +18,7 @@ const getWebpackBuildMode = (qpqConfig: QPQConfig): WebpackBuildMode => {
   return 'production';
 };
 
-export const getWebpackConfig = (qpqConfig: QPQConfig, buildPath: string, entries: Record<string, string>): Configuration => {
+export const getWebpackConfig = (qpqConfig: QPQConfig, buildPath: string, entries: Record<string, string>, nodeModulePath: string): Configuration => {
   return {
     entry: entries,
 
@@ -45,7 +45,7 @@ export const getWebpackConfig = (qpqConfig: QPQConfig, buildPath: string, entrie
       },
     },
 
-    plugins: [new QpqPlugin({ qpqConfigs: [qpqConfig] })],
+    plugins: [new QpqPlugin({ qpqConfigs: [qpqConfig], nodeModulePath })],
 
     module: {
       rules: [
@@ -59,5 +59,5 @@ export const getWebpackConfig = (qpqConfig: QPQConfig, buildPath: string, entrie
   };
 };
 
-export const getAllWebpackConfig = (qpqConfig: QPQConfig, entries: Record<string, string>, outputPath?: string) =>
-  getWebpackConfig(qpqConfig, outputPath || 'build', entries);
+export const getAllWebpackConfig = (qpqConfig: QPQConfig, entries: Record<string, string>, outputPath?: string, nodeModulePath?: string) =>
+  getWebpackConfig(qpqConfig, outputPath || 'build', entries, nodeModulePath || 'node_modules');
