@@ -1,5 +1,5 @@
-import { getStoryNameFromQpqFunctionRuntime } from '../../qpqCoreUtils';
-import { QpqFunctionRuntime } from '../../types';
+import { convertCrossModuleOwnerToGenericResourceNameOverride, getStoryNameFromQpqFunctionRuntime } from '../../qpqCoreUtils';
+import { CrossModuleOwner, QpqFunctionRuntime } from '../../types';
 import { QPQConfigAdvancedSettings, QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
 
 export enum ScheduleTypeEnum {
@@ -8,6 +8,7 @@ export enum ScheduleTypeEnum {
 
 export interface QPQConfigAdvancedScheduleSettings extends QPQConfigAdvancedSettings {
   metadata?: Record<string, any>;
+  owner?: CrossModuleOwner<'recurringSchedule'>;
 }
 
 export interface ScheduleQPQConfigSetting extends QPQConfigSetting {
@@ -16,6 +17,8 @@ export interface ScheduleQPQConfigSetting extends QPQConfigSetting {
   runtime: QpqFunctionRuntime;
   cronExpression: string;
   metadata: Record<string, any>;
+
+  owner?: CrossModuleOwner;
 }
 
 /**
@@ -96,5 +99,7 @@ export const defineRecurringSchedule = (
     cronExpression,
 
     metadata: options?.metadata || {},
+
+    owner: convertCrossModuleOwnerToGenericResourceNameOverride(options?.owner),
   };
 };

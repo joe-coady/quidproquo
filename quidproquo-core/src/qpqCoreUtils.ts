@@ -312,6 +312,10 @@ export const getScheduleEvents = (configs: QPQConfig): ScheduleQPQConfigSetting[
   return getConfigSettings<ScheduleQPQConfigSetting>(configs, QPQCoreConfigSettingType.schedule);
 };
 
+export const getOwnedScheduleEvents = (qpqConfig: QPQConfig): ScheduleQPQConfigSetting[] => {
+  return getOwnedItems(getScheduleEvents(qpqConfig), qpqConfig);
+};
+
 export const getQueueSrcEntries = (configs: QPQConfig): QpqFunctionRuntime[] => {
   const queueConfigs = getConfigSettings<QueueQPQConfigSetting>(configs, QPQCoreConfigSettingType.queue);
 

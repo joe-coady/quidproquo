@@ -39,7 +39,7 @@ export class ApiQpqServiceStack extends QpqServiceStack {
     });
 
     // Schedule Events
-    const scheduleEvent = qpqCoreUtils.getScheduleEvents(props.qpqConfig).map(
+    const scheduleEvent = qpqCoreUtils.getOwnedScheduleEvents(props.qpqConfig).map(
       (setting) =>
         new QpqCoreRecurringScheduleConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
           qpqConfig: props.qpqConfig,
