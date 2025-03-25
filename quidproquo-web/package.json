@@ -35,6 +35,6 @@
     "quidproquo-core": "0.0.254",
     "quidproquo-tsconfig": "0.0.254",
     "quidproquo-webserver": "0.0.254",
-    "typescript": "^4.9.3"
+    "typescript": "^5.8.2"
   }
 }

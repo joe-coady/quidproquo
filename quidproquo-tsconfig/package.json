@@ -24,6 +24,6 @@
   },
   "homepage": "https://github.com/joe-coady/quidproquo#readme",
   "devDependencies": {
-    "typescript": "^4.9.3"
+    "typescript": "^5.8.2"
   }
 }
