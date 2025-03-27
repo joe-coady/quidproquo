@@ -1,6 +1,6 @@
 {
   "name": "quidproquo-actionprocessor-web",
-  "version": "0.0.254",
+  "version": "0.0.255",
   "description": "",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
@@ -35,17 +35,17 @@
     "@anthropic-ai/sdk": "^0.19.1",
     "axios": "^1.2.1",
     "mime-types": "^2.1.35",
-    "quidproquo-actionprocessor-js": "0.0.254",
-    "quidproquo-core": "0.0.254",
-    "quidproquo-web": "0.0.254",
-    "quidproquo-webserver": "0.0.254",
+    "quidproquo-actionprocessor-js": "0.0.255",
+    "quidproquo-core": "0.0.255",
+    "quidproquo-web": "0.0.255",
+    "quidproquo-webserver": "0.0.255",
     "uuid": "^9.0.0",
     "uuidv7": "^1.0.1"
   },
   "devDependencies": {
     "@types/mime-types": "^2.1.1",
     "@types/uuid": "^9.0.0",
-    "quidproquo-tsconfig": "0.0.254",
+    "quidproquo-tsconfig": "0.0.255",
     "typescript": "^5.8.2"
   }
 }
