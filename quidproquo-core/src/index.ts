@@ -3,6 +3,7 @@ export * from './config';
 export * from './createImplementationRuntime';
 export * from './logic';
 export * from './logic/actionLogic';
+export * from './proiseify';
 export * as qpqCoreUtils from './qpqCoreUtils';
 export * from './qpqExecuteLog';
 export * from './runtime';

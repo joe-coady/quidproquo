@@ -5,6 +5,7 @@ export * from './applicationName';
 export * from './applicationVersion';
 export * from './claudeAi';
 export * from './configValue';
+export * from './definePromiseMode';
 export * from './deployEvent';
 export * from './emailTemplates';
 export * from './environmentSettings';
