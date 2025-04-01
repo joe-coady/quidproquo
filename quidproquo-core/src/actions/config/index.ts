@@ -9,5 +9,7 @@ export * from './ConfigGetParametersActionRequester';
 export * from './ConfigGetParametersActionTypes';
 export * from './ConfigGetSecretActionRequester';
 export * from './ConfigGetSecretActionTypes';
+export * from './ConfigListParametersActionRequester';
+export * from './ConfigListParametersActionTypes';
 export * from './ConfigSetParameterActionRequester';
 export * from './ConfigSetParameterActionTypes';

@@ -1,12 +1,14 @@
 import { defineEventBus, defineQueue, QPQConfig } from 'quidproquo-core';
 
 import { WebsocketAdminClientMessageEventType } from '../../../services';
+import { adminUserDirectoryResourceName } from '../adminUserDirectory';
+import { defineWebSocketQueue } from '../webSocketQueue';
 
-export const defineExposeAdminAdvancedSettings = (eventBusOwner: string): QPQConfig => {
+export const defineExposeAdminAdvancedSettings = (ownerModule: string, rootDomain: string): QPQConfig => {
   const configs: QPQConfig = [
     defineEventBus('qpq-admin-wsq', {
       owner: {
-        module: eventBusOwner,
+        module: ownerModule,
       },
     }),
     defineQueue(
@@ -22,6 +24,12 @@ export const defineExposeAdminAdvancedSettings = (eventBusOwner: string): QPQCon
         eventBusSubscriptions: ['qpq-admin-wsq'],
       },
     ),
+    defineWebSocketQueue('qpq-admin-wsq', 'qpqadmin', rootDomain, {
+      userDirectoryName: adminUserDirectoryResourceName,
+      owner: {
+        module: ownerModule,
+      },
+    }),
   ];
 
   return configs;

@@ -160,9 +160,6 @@ export const defineLogs = (rootDomain: string, services: string[], advancedSetti
         eventBusSubscriptions: ['qpq-admin-wsq'],
       },
     ),
-    defineWebSocketQueue('qpq-admin-wsq', 'qpqadmin', rootDomain, {
-      userDirectoryName: adminUserDirectoryResourceName,
-    }),
 
     // Alert Logger
     defineEventBus('admin-notifier'),
