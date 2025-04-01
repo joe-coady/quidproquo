@@ -173,6 +173,10 @@ export const getQueues = (configs: QPQConfig): QueueQPQConfigSetting[] => {
   return getConfigSettings<QueueQPQConfigSetting>(configs, QPQCoreConfigSettingType.queue);
 };
 
+export const getOwnedQueues = (configs: QPQConfig): QueueQPQConfigSetting[] => {
+  return getOwnedItems(getQueues(configs), configs);
+};
+
 export const getNotifyErrorConfigs = (configs: QPQConfig): NotifyErrorQPQConfigSetting[] => {
   return getConfigSettings<NotifyErrorQPQConfigSetting>(configs, QPQCoreConfigSettingType.notifyError);
 };
