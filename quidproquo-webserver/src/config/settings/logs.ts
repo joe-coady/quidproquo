@@ -146,7 +146,6 @@ export const defineLogs = (rootDomain: string, services: string[], advancedSetti
     ),
 
     // Web Sockets
-    defineEventBus('qpq-admin-wsq'),
     defineQueue(
       'qpq-admin-websockets',
       {

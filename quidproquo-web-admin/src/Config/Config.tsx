@@ -1,5 +1,9 @@
+import { useWebsocketSendEvent } from 'quidproquo-web-react';
+import { WebsocketAdminClientMessageEventType, WebSocketQueueClientEventMessageQpqAdminConfigSyncRequest } from 'quidproquo-webserver';
+
 import React, { useState } from 'react';
 import { Box, CssBaseline, Drawer, List, ListItem, ListItemButton, ListItemText, Tab, Tabs, TextField, Toolbar, Typography } from '@mui/material';
+import { useOnMount } from '@mui/x-data-grid/internals';
 
 import { useServiceNames } from '../LogViewer/hooks';
 
@@ -12,6 +16,17 @@ export function Config() {
   const [tabIndex, setTabIndex] = useState(0);
   const [search, setSearch] = useState('');
   const services = useServiceNames();
+
+  const sendMessage = useWebsocketSendEvent();
+
+  useOnMount(() => {
+    const configSyncRequestEvent: WebSocketQueueClientEventMessageQpqAdminConfigSyncRequest = {
+      type: WebsocketAdminClientMessageEventType.ConfigSyncRequest,
+      payload: {},
+    };
+
+    sendMessage(configSyncRequestEvent);
+  });
 
   const handleServiceClick = (service: string) => {
     setSelectedServiceOverride(service);

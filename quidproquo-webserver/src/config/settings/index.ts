@@ -4,6 +4,7 @@ export * from './apiKey';
 export * from './cache';
 export * from './certificate';
 export * from './defaultRouteOptions';
+export * from './defineExposeAdminAdvancedSettings';
 export * from './dns';
 export * from './domainProxy';
 export * from './logs';
