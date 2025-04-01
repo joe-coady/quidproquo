@@ -6,7 +6,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import { Auth } from '../Auth/Auth';
-import { LogViewer } from '../LogViewer';
+import { MainLayout } from '../components';
 import { BaseUrls, baseUrlsContext } from '../platformLogic/contexts';
 import { LoadingProvider } from '../view';
 import { WebSocketAuthProvider } from '../WebSocketAuthProvider';
@@ -40,7 +40,7 @@ export const App: React.FC<AppProps> = ({ urlResolvers }) => {
               <Auth>
                 <WebsocketProvider wsUrl={urlResolvers.getWsUrl()}>
                   <WebSocketAuthProvider>
-                    <LogViewer />
+                    <MainLayout />
                   </WebSocketAuthProvider>
                 </WebsocketProvider>
               </Auth>

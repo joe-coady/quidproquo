@@ -10,5 +10,6 @@ export * from './GridItem';
 export * from './LastSeen';
 export * from './LoadingBox';
 export * from './LoadingSpinner';
+export * from './MainLayout';
 export * from './TabViewBox';
 export * from './TextInput';

@@ -1,8 +1,7 @@
-import { ComponentType, MemoExoticComponent } from 'react';
-
 export type FederatedTab = {
   name: string;
-  View: ComponentType | MemoExoticComponent<ComponentType>;
+  View: React.ComponentType;
+  icon?: React.ReactElement;
 };
 
 export type FederatedAddon = {
