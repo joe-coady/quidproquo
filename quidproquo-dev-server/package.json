@@ -1,6 +1,6 @@
 {
   "name": "quidproquo-dev-server",
-  "version": "0.0.255",
+  "version": "0.0.256",
   "description": "",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
@@ -34,15 +34,15 @@
   "dependencies": {
     "chalk": "^4.1.2",
     "multer": "^1.4.5-lts.1",
-    "quidproquo-actionprocessor-awslambda": "0.0.255",
-    "quidproquo-actionprocessor-node": "0.0.255",
-    "quidproquo-core": "0.0.255",
-    "quidproquo-webserver": "0.0.255",
+    "quidproquo-actionprocessor-awslambda": "0.0.256",
+    "quidproquo-actionprocessor-node": "0.0.256",
+    "quidproquo-core": "0.0.256",
+    "quidproquo-webserver": "0.0.256",
     "ws": "^8.18.0"
   },
   "devDependencies": {
     "@types/multer": "^1.4.12",
-    "quidproquo-tsconfig": "0.0.255",
+    "quidproquo-tsconfig": "0.0.256",
     "typescript": "^5.8.2"
   }
 }
