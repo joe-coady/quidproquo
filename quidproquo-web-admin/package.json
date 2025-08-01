@@ -34,7 +34,7 @@
   "dependencies": {
     "@emotion/react": "^11.10.8",
     "@emotion/styled": "^11.10.8",
-    "@module-federation/enhanced": "^0.8.9",
+    "@module-federation/enhanced": "^0.17.1",
     "@mui/icons-material": "^5.11.16",
     "@mui/lab": "^5.0.0-alpha.128",
     "@mui/material": "^5.12.2",
@@ -78,7 +78,7 @@
     "typescript": "^5.8.2",
     "webpack": "^5.98.0",
     "webpack-cli": "^5.0.2",
-    "webpack-dev-server": "^4.13.3"
+    "webpack-dev-server": "^5.2.2"
   },
   "peerDependencies": {
     "react": ">=18.3.1"
