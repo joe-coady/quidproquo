@@ -4,6 +4,7 @@ import {
   apiImplementation,
   eventBusImplementation,
   fileStorageImplementation,
+  fileWatcherImplementation,
   queueImplementation,
   serviceFunctionImplementation,
   webSocketImplementation,
@@ -59,5 +60,6 @@ export const startDevServer = async (devServerConfig: DevServerConfig, devServer
     webSocketImplementation(resolvedDevServerConfig),
     
     fileStorageImplementation(resolvedDevServerConfig),
+    fileWatcherImplementation(resolvedDevServerConfig),
   ]);
 };
