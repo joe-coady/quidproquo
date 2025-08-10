@@ -6,7 +6,7 @@ import { RawData, WebSocket, WebSocketServer } from 'ws';
 
 import { getWsWebsocketEventEventProcessor } from '../../actionProcessor';
 import { processEvent } from '../../logic';
-import { DevServerConfig } from '../../types';
+import { ResolvedDevServerConfig } from '../../types';
 import { WsEvent } from './types';
 
 type WebSocketQPQWebServerConfigSettingMap = {
@@ -21,7 +21,7 @@ type WebSocketQPQWebServerConfigSettingMapWithWebSocketServer = WebSocketQPQWebS
   connections: Record<string, WebSocket>;
 };
 
-const getDynamicModuleLoader = (qpqConfig: QPQConfig, devServerConfig: DevServerConfig) => {
+const getDynamicModuleLoader = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig) => {
   const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
   return async (runtime: QpqFunctionRuntime): Promise<any> => devServerConfig.dynamicModuleLoader(serviceName, runtime);
 };
@@ -52,7 +52,7 @@ export const sendMessageToWebSocketConnection = async (
 
 const startServer = (
   settingsMap: WebSocketQPQWebServerConfigSettingMap,
-  devServerConfig: DevServerConfig,
+  devServerConfig: ResolvedDevServerConfig,
 ): WebSocketQPQWebServerConfigSettingMapWithWebSocketServer => {
   const webSocketServer = new WebSocketServer({ noServer: true });
 
@@ -77,6 +77,7 @@ const startServer = (
           depth: 0,
           context: {},
         }),
+        devServerConfig,
       );
 
     const onConnectEvent: WsEvent = {
@@ -158,7 +159,7 @@ const getWebSocketQPQWebServerConfigSettingMaps = (qpqConfigs: QPQConfig[]): Web
     );
 };
 
-export const webSocketImplementation = async (devServerConfig: DevServerConfig) => {
+export const webSocketImplementation = async (devServerConfig: ResolvedDevServerConfig) => {
   if (!devServerConfig.webSocketPort) {
     return;
   }

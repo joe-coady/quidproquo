@@ -9,16 +9,16 @@ import path from 'path';
 import { getExpressApiEventEventProcessor } from '../actionProcessor';
 import { getAllServiceConfigs } from '../allServiceConfig';
 import { processEvent } from '../logic';
-import { DevServerConfig, ExpressEvent, ExpressEventResponse } from '../types';
+import { ResolvedDevServerConfig, ExpressEvent, ExpressEventResponse } from '../types';
 
-const getServiceBaseDomain = (qpqConfig: QPQConfig, devServerConfig: DevServerConfig) =>
+const getServiceBaseDomain = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig) =>
   qpqWebServerUtils.getDomainRoot(
     `${devServerConfig.serverDomain}:${devServerConfig.serverPort}`,
     qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
     qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
   );
 
-const getApiDomainsFromConfig = (qpqConfig: QPQConfig, devServerConfig: DevServerConfig) => {
+const getApiDomainsFromConfig = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig) => {
   const baseDomain = getServiceBaseDomain(qpqConfig, devServerConfig);
 
   const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
@@ -38,12 +38,12 @@ const getApiDomainsFromConfig = (qpqConfig: QPQConfig, devServerConfig: DevServe
   return apiDomains;
 };
 
-const getDynamicModuleLoader = (qpqConfig: QPQConfig, devServerConfig: DevServerConfig) => {
+const getDynamicModuleLoader = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig) => {
   const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
   return async (runtime: QpqFunctionRuntime): Promise<any> => devServerConfig.dynamicModuleLoader(serviceName, runtime);
 };
 
-export const apiImplementation = async (devServerConfig: DevServerConfig) => {
+export const apiImplementation = async (devServerConfig: ResolvedDevServerConfig) => {
   const allServiceConfig = getAllServiceConfigs(devServerConfig);
 
   const app: Express = express();
@@ -153,6 +153,7 @@ export const apiImplementation = async (devServerConfig: DevServerConfig) => {
           depth: 0,
           context: {},
         }),
+        devServerConfig,
       );
 
       if (response.result) {

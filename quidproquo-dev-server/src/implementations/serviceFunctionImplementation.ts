@@ -4,14 +4,14 @@ import { ServiceFunctionActionType } from 'quidproquo-webserver';
 import { getNodeServiceFunctionEventProcessor } from '../actionProcessor';
 import { AnyExecuteServiceFunctionEventWithSession } from '../actionProcessor/core/event/node/serviceFunction/types';
 import { eventBus, processEvent } from '../logic';
-import { DevServerConfig } from '../types';
+import { ResolvedDevServerConfig } from '../types';
 
-const getDynamicModuleLoader = (qpqConfig: QPQConfig, devServerConfig: DevServerConfig) => {
+const getDynamicModuleLoader = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig) => {
   const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
   return async (runtime: QpqFunctionRuntime): Promise<any> => devServerConfig.dynamicModuleLoader(serviceName, runtime);
 };
 
-export const serviceFunctionImplementation = async (devServerConfig: DevServerConfig) => {
+export const serviceFunctionImplementation = async (devServerConfig: ResolvedDevServerConfig) => {
   eventBus.on(ServiceFunctionActionType.Execute, async (payload: AnyExecuteServiceFunctionEventWithSession, correlation: string) => {
     // We need to find the qpqConfig for this service.
     const qpqConfig = devServerConfig.qpqConfigs.find((qpqConfig) => qpqCoreUtils.getApplicationModuleName(qpqConfig) === payload.serviceName);
@@ -23,6 +23,7 @@ export const serviceFunctionImplementation = async (devServerConfig: DevServerCo
       getNodeServiceFunctionEventProcessor,
       QpqRuntimeType.SERVICE_FUNCTION_EXE,
       (e: AnyExecuteServiceFunctionEventWithSession) => e.storySession,
+      devServerConfig,
     );
 
     if (correlation) {

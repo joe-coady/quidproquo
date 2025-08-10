@@ -5,7 +5,7 @@
 // import { AnyQueueMessageWithSession } from '../actionProcessor/core/event/queue/types';
 // import { AnyEventBusMessageWithSession } from '../actionProcessor/core/eventBus/getEventBusSendMessagesActionProcessor';
 // import { eventBus } from '../logic';
-import { DevServerConfig } from '../types';
+import { ResolvedDevServerConfig } from '../types';
 
 /*
 const processQueueEventBusSubscriptions = async (qpqConfig: QPQConfig, ebMessage: AnyEventBusMessageWithSession) => {
@@ -57,7 +57,7 @@ const processQueueEventBusSubscriptions = async (qpqConfig: QPQConfig, ebMessage
 };
 */
 
-export const eventBusImplementation = async (devServerConfig: DevServerConfig) => {
+export const eventBusImplementation = async (devServerConfig: ResolvedDevServerConfig) => {
   // eventBus.on(EventBusActionType.SendMessages, async (payload: AnyEventBusMessageWithSession, correlation: string) => {
   //   console.log('Event Buss Ready to process!');
   //   for (const qpqConfig of devServerConfig.qpqConfigs) {

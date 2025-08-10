@@ -15,6 +15,7 @@ import {
 import { randomUUID } from 'crypto';
 
 import { getDevServerActionProcessors, getExpressApiEventEventProcessor } from '../actionProcessor';
+import { ResolvedDevServerConfig } from '../types';
 
 // TODO: Make this a util or something based on server time or something..
 const getDateNow = () => new Date().toISOString();
@@ -26,6 +27,7 @@ export const processEvent = async <E, ER>(
   getActionProcessors: ActionProcessorListResolver,
   qpqRuntimeType: QpqRuntimeType,
   getStorySession: (event: E) => StorySession,
+  devServerConfig: ResolvedDevServerConfig,
 ): Promise<StoryResult<[E], ER>> => {
   const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
 
@@ -35,7 +37,7 @@ export const processEvent = async <E, ER>(
     qpqConfig,
     getStorySession(expressEvent),
     async () => ({
-      ...(await getDevServerActionProcessors(qpqConfig, dynamicModuleLoader)),
+      ...(await getDevServerActionProcessors(qpqConfig, dynamicModuleLoader, devServerConfig)),
       ...(await getActionProcessors(qpqConfig, dynamicModuleLoader)),
 
       // Always done last, so they can ovveride the default ones if the user wants.

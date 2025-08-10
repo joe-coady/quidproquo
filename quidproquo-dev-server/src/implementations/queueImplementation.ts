@@ -6,14 +6,14 @@ import { getQueueEventProcessor } from '../actionProcessor/core/event/queue';
 import { AnyQueueMessageWithSession } from '../actionProcessor/core/event/queue/types';
 import { AnyEventBusMessageWithSession } from '../actionProcessor/core/eventBus/getEventBusSendMessagesActionProcessor';
 import { eventBus, processEvent } from '../logic';
-import { DevServerConfig } from '../types';
+import { ResolvedDevServerConfig } from '../types';
 
-const getDynamicModuleLoader = (qpqConfig: QPQConfig, devServerConfig: DevServerConfig) => {
+const getDynamicModuleLoader = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig) => {
   const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
   return async (runtime: QpqFunctionRuntime): Promise<any> => devServerConfig.dynamicModuleLoader(serviceName, runtime);
 };
 
-const processQueueMessages = async (qpqConfig: QPQConfig, payload: AnyQueueMessageWithSession, devServerConfig: DevServerConfig) => {
+const processQueueMessages = async (qpqConfig: QPQConfig, payload: AnyQueueMessageWithSession, devServerConfig: ResolvedDevServerConfig) => {
   if (payload.targetEnvironment !== qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig)) {
     return;
   }
@@ -38,6 +38,7 @@ const processQueueMessages = async (qpqConfig: QPQConfig, payload: AnyQueueMessa
     getQueueEventProcessor,
     QpqRuntimeType.QUEUE_EVENT,
     (e: AnyQueueMessageWithSession) => e.storySession,
+    devServerConfig,
   );
 };
 
@@ -120,7 +121,7 @@ const processQueueEventBusSubscriptions = async (qpqConfig: QPQConfig, ebMessage
   // console.log('------------------------');
 };
 
-export const queueImplementation = async (devServerConfig: DevServerConfig) => {
+export const queueImplementation = async (devServerConfig: ResolvedDevServerConfig) => {
   eventBus.on(QueueActionType.SendMessages, async (payload: AnyQueueMessageWithSession, correlation: string) => {
     for (const qpqConfig of devServerConfig.qpqConfigs) {
       await processQueueMessages(qpqConfig, payload, devServerConfig);
