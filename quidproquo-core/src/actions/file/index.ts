@@ -5,6 +5,8 @@ export * from './FileExistsActionRequester';
 export * from './FileExistsActionTypes';
 export * from './FileGenerateTemporarySecureUrlActionRequester';
 export * from './FileGenerateTemporarySecureUrlActionTypes';
+export * from "./FileGenerateTemporaryUploadSecureUrlActionRequester";
+export * from "./FileGenerateTemporaryUploadSecureUrlActionTypes";
 export * from './FileIsColdStorageActionRequester';
 export * from './FileIsColdStorageActionTypes';
 export * from './FileListDirectoryActionRequester';

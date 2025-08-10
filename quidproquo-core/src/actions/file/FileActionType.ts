@@ -11,6 +11,7 @@ export enum FileActionType {
   ReadBinaryContents = '@quidproquo-core/File/ReadBinaryContents',
   WriteBinaryContents = '@quidproquo-core/File/WriteBinaryContents',
   GenerateTemporarySecureUrl = '@quidproquo-core/File/GenerateTemporarySecureUrl',
+  GenerateTemporaryUploadSecureUrl = '@quidproquo-core/File/GenerateTemporaryUploadSecureUrl',
   IsColdStorage = '@quidproquo-core/File/IsColdStorage',
 }
 

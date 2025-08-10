@@ -27,7 +27,7 @@ export const getDevConfigs = (qpqConfigs: QPQConfig[], devServerConfigOverrides?
 };
 
 export const startDevServer = async (devServerConfig: DevServerConfig, devServerConfigOverrides?: DevServerConfigOverrides) => {
-  console.log('Starting QPQ Dev Server!!!');
+  console.log('Starting QPQ Dev Server!!! - this is a note');
 
   // Add ovverrides for dev server
   const updatedDevServerConfig: DevServerConfig = {

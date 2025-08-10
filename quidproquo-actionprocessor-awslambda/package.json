@@ -47,6 +47,7 @@
     "@aws-sdk/client-sqs": "^3.744.0",
     "@aws-sdk/client-ssm": "^3.744.0",
     "@aws-sdk/s3-request-presigner": "^3.744.0",
+    "@aws-sdk/s3-presigned-post": "^3.744.0",
     "aws-jwt-verify": "^3.4.0",
     "aws-sdk": "^2.1322.0",
     "busboy": "^1.6.0",
