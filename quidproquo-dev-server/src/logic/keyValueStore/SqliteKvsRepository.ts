@@ -65,6 +65,7 @@ export class SqliteKvsRepository {
     await this.db.exec('PRAGMA synchronous = NORMAL');
     await this.db.exec('PRAGMA cache_size = 10000');
     await this.db.exec('PRAGMA temp_store = MEMORY');
+    await this.db.exec('PRAGMA busy_timeout = 5000'); // Wait up to 5 seconds for locks
 
     this.initialized = true;
   }
@@ -547,36 +548,30 @@ export class SqliteKvsRepository {
     const { pk, sk } = this.buildKeyFromItem(item, storeConfig);
     const tableName = this.getTableName(keyValueStoreName);
     
-    await this.db!.run('BEGIN IMMEDIATE');
+    // Get existing item for index updates
+    const existingSql = sk !== null
+      ? `SELECT data FROM ${tableName} WHERE pk = ? AND sk = ?`
+      : `SELECT data FROM ${tableName} WHERE pk = ?`;
     
-    try {
-      const existingSql = sk !== null
-        ? `SELECT data FROM ${tableName} WHERE pk = ? AND sk = ?`
-        : `SELECT data FROM ${tableName} WHERE pk = ?`;
-      
-      const existingParams = sk !== null ? [pk, sk] : [pk];
-      const existingRow = await this.db!.get(existingSql, existingParams);
-      const oldItem = existingRow ? JSON.parse(existingRow.data) : null;
-      
-      const sql = sk !== null
-        ? `INSERT OR REPLACE INTO ${tableName} (pk, sk, data) VALUES (?, ?, ?)`
-        : `INSERT OR REPLACE INTO ${tableName} (pk, data) VALUES (?, ?)`;
-      
-      const params = sk !== null
-        ? [pk, sk, JSON.stringify(item)]
-        : [pk, JSON.stringify(item)];
-      
-      await this.db!.run(sql, params);
-      
-      await this.updateIndexes(keyValueStoreName, oldItem, item, pk, sk);
-      
-      await this.db!.run('COMMIT');
-      
-      return item;
-    } catch (error) {
-      await this.db!.run('ROLLBACK');
-      throw error;
-    }
+    const existingParams = sk !== null ? [pk, sk] : [pk];
+    const existingRow = await this.db!.get(existingSql, existingParams);
+    const oldItem = existingRow ? JSON.parse(existingRow.data) : null;
+    
+    // Upsert the item - SQLite will handle locking automatically
+    const sql = sk !== null
+      ? `INSERT OR REPLACE INTO ${tableName} (pk, sk, data) VALUES (?, ?, ?)`
+      : `INSERT OR REPLACE INTO ${tableName} (pk, data) VALUES (?, ?)`;
+    
+    const params = sk !== null
+      ? [pk, sk, JSON.stringify(item)]
+      : [pk, JSON.stringify(item)];
+    
+    await this.db!.run(sql, params);
+    
+    // Update indexes
+    await this.updateIndexes(keyValueStoreName, oldItem, item, pk, sk);
+    
+    return item;
   }
 
   async update(
@@ -595,44 +590,37 @@ export class SqliteKvsRepository {
     const tableName = this.getTableName(keyValueStoreName);
     const hasSortKey = storeConfig.sortKeys.length > 0;
     
-    await this.db!.run('BEGIN IMMEDIATE');
+    // Get current item
+    const selectSql = hasSortKey && sortKey !== undefined
+      ? `SELECT data FROM ${tableName} WHERE pk = ? AND sk = ?`
+      : `SELECT data FROM ${tableName} WHERE pk = ?`;
     
-    try {
-      const selectSql = hasSortKey && sortKey !== undefined
-        ? `SELECT data FROM ${tableName} WHERE pk = ? AND sk = ?`
-        : `SELECT data FROM ${tableName} WHERE pk = ?`;
-      
-      const selectParams = hasSortKey && sortKey !== undefined ? [key, sortKey] : [key];
-      
-      const row = await this.db!.get(selectSql, selectParams);
-      
-      if (!row) {
-        await this.db!.run('ROLLBACK');
-        return null;
-      }
-      
-      const currentItem = JSON.parse(row.data);
-      const updatedItem = this.applyUpdateToItem(currentItem, updates);
-      
-      const updateSql = hasSortKey && sortKey !== undefined
-        ? `UPDATE ${tableName} SET data = ? WHERE pk = ? AND sk = ?`
-        : `UPDATE ${tableName} SET data = ? WHERE pk = ?`;
-      
-      const updateParams = hasSortKey && sortKey !== undefined
-        ? [JSON.stringify(updatedItem), key, sortKey]
-        : [JSON.stringify(updatedItem), key];
-      
-      await this.db!.run(updateSql, updateParams);
-      
-      await this.updateIndexes(keyValueStoreName, currentItem, updatedItem, key, sortKey || null);
-      
-      await this.db!.run('COMMIT');
-      
-      return updatedItem;
-    } catch (error) {
-      await this.db!.run('ROLLBACK');
-      throw error;
+    const selectParams = hasSortKey && sortKey !== undefined ? [key, sortKey] : [key];
+    
+    const row = await this.db!.get(selectSql, selectParams);
+    
+    if (!row) {
+      return null;
     }
+    
+    const currentItem = JSON.parse(row.data);
+    const updatedItem = this.applyUpdateToItem(currentItem, updates);
+    
+    // Update the item - SQLite will handle locking automatically
+    const updateSql = hasSortKey && sortKey !== undefined
+      ? `UPDATE ${tableName} SET data = ? WHERE pk = ? AND sk = ?`
+      : `UPDATE ${tableName} SET data = ? WHERE pk = ?`;
+    
+    const updateParams = hasSortKey && sortKey !== undefined
+      ? [JSON.stringify(updatedItem), key, sortKey]
+      : [JSON.stringify(updatedItem), key];
+    
+    await this.db!.run(updateSql, updateParams);
+    
+    // Update indexes
+    await this.updateIndexes(keyValueStoreName, currentItem, updatedItem, key, sortKey || null);
+    
+    return updatedItem;
   }
 
   async delete(keyValueStoreName: string, key: string): Promise<boolean> {
@@ -646,40 +634,33 @@ export class SqliteKvsRepository {
     const { pk, sk } = this.buildKeyFromKeyString(key, storeConfig);
     const tableName = this.getTableName(keyValueStoreName);
     
-    await this.db!.run('BEGIN IMMEDIATE');
+    // Get item for index cleanup
+    const selectSql = sk !== null
+      ? `SELECT data FROM ${tableName} WHERE pk = ? AND sk = ?`
+      : `SELECT data FROM ${tableName} WHERE pk = ?`;
     
-    try {
-      const selectSql = sk !== null
-        ? `SELECT data FROM ${tableName} WHERE pk = ? AND sk = ?`
-        : `SELECT data FROM ${tableName} WHERE pk = ?`;
-      
-      const selectParams = sk !== null ? [pk, sk] : [pk];
-      const row = await this.db!.get(selectSql, selectParams);
-      
-      if (!row) {
-        await this.db!.run('ROLLBACK');
-        return false;
-      }
-      
-      const oldItem = JSON.parse(row.data);
-      
-      const deleteSql = sk !== null
-        ? `DELETE FROM ${tableName} WHERE pk = ? AND sk = ?`
-        : `DELETE FROM ${tableName} WHERE pk = ?`;
-      
-      const deleteParams = sk !== null ? [pk, sk] : [pk];
-      
-      const result = await this.db!.run(deleteSql, deleteParams);
-      
-      await this.updateIndexes(keyValueStoreName, oldItem, null, pk, sk);
-      
-      await this.db!.run('COMMIT');
-      
-      return result.changes! > 0;
-    } catch (error) {
-      await this.db!.run('ROLLBACK');
-      throw error;
+    const selectParams = sk !== null ? [pk, sk] : [pk];
+    const row = await this.db!.get(selectSql, selectParams);
+    
+    if (!row) {
+      return false;
     }
+    
+    const oldItem = JSON.parse(row.data);
+    
+    // Delete the item - SQLite will handle locking automatically
+    const deleteSql = sk !== null
+      ? `DELETE FROM ${tableName} WHERE pk = ? AND sk = ?`
+      : `DELETE FROM ${tableName} WHERE pk = ?`;
+    
+    const deleteParams = sk !== null ? [pk, sk] : [pk];
+    
+    const result = await this.db!.run(deleteSql, deleteParams);
+    
+    // Update indexes
+    await this.updateIndexes(keyValueStoreName, oldItem, null, pk, sk);
+    
+    return result.changes! > 0;
   }
 
   async close(): Promise<void> {
