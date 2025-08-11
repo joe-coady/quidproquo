@@ -1,4 +1,3 @@
-import { decodeAccessToken } from 'quidproquo-actionprocessor-awslambda';
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
@@ -8,6 +7,7 @@ import {
   QPQConfig,
 } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
+import { decodeAccessTokenForDev } from '../../../../../logic/auth/decodeAccessTokenForDev';
 
 import { EventInput, InternalEventRecord, MatchResult } from './types';
 
@@ -45,7 +45,17 @@ const getProcessGetStorySession = (qpqConfig: QPQConfig): EventGetStorySessionAc
       });
     }
 
-    const decodedAccessToken = await decodeAccessToken(matchStoryResult.config.routeAuthSettings.userDirectoryName, qpqConfig, accessToken, true);
+    // Use dev-optimized decoder that doesn't make AWS API calls
+    // TODO: THIS NEEDS TO BE CHANGED TO USE THE "AUTH" api in a custom implementation!
+    const decodedAccessToken = decodeAccessTokenForDev(
+      matchStoryResult.config.routeAuthSettings.userDirectoryName,
+      accessToken,
+      true
+    );
+
+    if (!decodedAccessToken) {
+      throw new Error('Unable to decode access token');
+    }
 
     return actionResult({
       ...session,
