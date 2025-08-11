@@ -1,4 +1,3 @@
-import { getLogger } from 'quidproquo-actionprocessor-awslambda';
 import { getCustomActionActionProcessor } from 'quidproquo-actionprocessor-node';
 import {
   ActionProcessorListResolver,
@@ -16,6 +15,7 @@ import { randomUUID } from 'crypto';
 
 import { getDevServerActionProcessors, getExpressApiEventEventProcessor } from '../actionProcessor';
 import { ResolvedDevServerConfig } from '../types';
+import { getDevServerLogger } from '../implementations/logger';
 
 // TODO: Make this a util or something based on server time or something..
 const getDateNow = () => new Date().toISOString();
@@ -31,11 +31,12 @@ export const processEvent = async <E, ER>(
 ): Promise<StoryResult<[E], ER>> => {
   const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
 
-  const logger = getLogger(qpqConfig);
+  const storySession = getStorySession(expressEvent);
+  const logger = getDevServerLogger(qpqConfig, devServerConfig, storySession);
 
   const resolveStory = createRuntime(
     qpqConfig,
-    getStorySession(expressEvent),
+    storySession,
     async () => ({
       ...(await getDevServerActionProcessors(qpqConfig, dynamicModuleLoader, devServerConfig)),
       ...(await getActionProcessors(qpqConfig, dynamicModuleLoader)),

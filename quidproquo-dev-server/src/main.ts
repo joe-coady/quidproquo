@@ -46,6 +46,8 @@ export const startDevServer = async (devServerConfig: DevServerConfig, devServer
       secureUrlPort: devServerConfig.fileStorageConfig?.secureUrlPort || 3001,
       secureUrlSecret: devServerConfig.fileStorageConfig?.secureUrlSecret || crypto.randomBytes(32).toString('hex'),
     },
+    
+    logServiceName: devServerConfig.logServiceName,
   };
 
   await Promise.all([

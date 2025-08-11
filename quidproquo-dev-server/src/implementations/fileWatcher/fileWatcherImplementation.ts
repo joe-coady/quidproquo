@@ -7,7 +7,7 @@ import { ResolvedDevServerConfig } from '../../types';
 import { getDevServerActionProcessors } from '../../actionProcessor';
 import { getCustomActionActionProcessor } from 'quidproquo-actionprocessor-node';
 import { randomUUID } from 'crypto';
-import { getLogger } from 'quidproquo-actionprocessor-awslambda';
+import { getDevServerLogger } from '../logger';
 
 interface FileEventPayload {
   service: string;
@@ -85,7 +85,6 @@ export const fileWatcherImplementation = async (devServerConfig: ResolvedDevServ
     functionRuntime: any
   ) => {
     const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
-    const logger = getLogger(qpqConfig);
     
     // Create a story session for the event with storage event context
     const storySession: StorySession = {
@@ -98,6 +97,8 @@ export const fileWatcherImplementation = async (devServerConfig: ResolvedDevServ
       },
       depth: 0
     };
+    
+    const logger = getDevServerLogger(qpqConfig, devServerConfig, storySession);
     
     // Create event data to pass to the function matching StorageDriveEvent structure
     const eventData: StorageDriveEvent = {

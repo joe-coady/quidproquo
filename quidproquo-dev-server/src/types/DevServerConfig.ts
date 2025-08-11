@@ -23,6 +23,9 @@ export type DevServerConfig = {
   
   // File storage configuration (optional)
   fileStorageConfig?: OptionalFileStorageConfig;
+  
+  // Service name to use for logging (optional)
+  logServiceName?: string;
 };
 
 // Resolved config with required file storage
@@ -37,6 +40,9 @@ export type ResolvedDevServerConfig = {
   
   // File storage configuration (required with all defaults filled)
   fileStorageConfig: FileStorageConfig;
+  
+  // Service name to use for logging (optional)
+  logServiceName?: string;
 };
 
 export type DevServerConfigOverrides = {
