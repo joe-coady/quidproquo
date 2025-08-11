@@ -39,10 +39,13 @@
     "quidproquo-actionprocessor-node": "0.0.256",
     "quidproquo-core": "0.0.256",
     "quidproquo-webserver": "0.0.256",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7",
     "ws": "^8.18.0"
   },
   "devDependencies": {
     "@types/multer": "^1.4.12",
+    "@types/sqlite3": "^3.1.11",
     "quidproquo-tsconfig": "0.0.256",
     "typescript": "^5.8.2"
   }

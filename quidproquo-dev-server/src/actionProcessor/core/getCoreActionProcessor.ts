@@ -5,6 +5,7 @@ import { getEventBusActionProcessor } from './eventBus';
 import { getGraphDatabaseActionProcessor } from './graphDatabaseOverride';
 import { getLogActionProcessor } from './log';
 import { getQueueActionProcessor } from './queue';
+import { getKeyValueStoreActionProcessor } from './keyValueStore';
 import { ResolvedDevServerConfig } from '../../types';
 
 export const getCoreActionProcessor = async (
@@ -18,5 +19,6 @@ export const getCoreActionProcessor = async (
     ...(await getQueueActionProcessor(qpqConfig, dynamicModuleLoader)),
     ...(await getLogActionProcessor(qpqConfig, dynamicModuleLoader)),
     ...(await getFileActionProcessor(devServerConfig.fileStorageConfig)(qpqConfig, dynamicModuleLoader)),
+    ...(await getKeyValueStoreActionProcessor(devServerConfig)(qpqConfig, dynamicModuleLoader)),
   };
 };
