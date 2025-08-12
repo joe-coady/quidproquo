@@ -1,0 +1,22 @@
+{
+  "extends": "./quidproquo-tsconfig/tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "types": ["node"],
+    "moduleResolution": "node"
+  },
+  "include": [
+    "./vitest-env.d.ts",
+    "**/src/**/*.test.ts",
+    "**/src/**/*.spec.ts",
+    "quidproquo-testing/src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/lib/**",
+    "**/dist/**"
+  ]
+}

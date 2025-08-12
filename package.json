@@ -17,6 +17,7 @@
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
+    "test:types": "tsc --build tsconfig.test.json",
     "watch-all": "npx npm-run-all --parallel watch:*",
     "watch:quidproquo-core": "npm run watch -w quidproquo-core",
     "watch:quidproquo-webserver": "npm run watch -w quidproquo-webserver",

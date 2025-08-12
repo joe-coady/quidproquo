@@ -1,8 +1,9 @@
 {
   "extends": "quidproquo-tsconfig/tsconfig.commonjs.json",
   "compilerOptions": {
-    "outDir": "./lib/commonjs"
+    "outDir": "./lib/commonjs",
+    "skipLibCheck": true
   },
   "include": ["src"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "**/*.test.ts", "**/*.spec.ts"]
 }

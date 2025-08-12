@@ -32,6 +32,7 @@
   },
   "homepage": "https://github.com/joe-coady/quidproquo#readme",
   "devDependencies": {
+    "@types/node": "^24.2.1",
     "quidproquo-tsconfig": "0.0.256",
     "typescript": "^5.8.2"
   },

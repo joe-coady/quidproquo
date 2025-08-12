@@ -6,6 +6,18 @@
   "module": "./lib/esm/index.js",
   "types": "./lib/esm/index.d.ts",
   "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./lib/esm/index.d.ts",
+      "import": "./lib/esm/index.js",
+      "require": "./lib/commonjs/index.js"
+    },
+    "./vitest": {
+      "types": "./lib/esm/vitest.d.ts",
+      "import": "./lib/esm/vitest.js",
+      "require": "./lib/commonjs/vitest.js"
+    }
+  },
   "files": [
     "lib/**/*"
   ],
@@ -33,6 +45,15 @@
   "homepage": "https://github.com/joe-coady/quidproquo#readme",
   "devDependencies": {
     "quidproquo-tsconfig": "0.0.256",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.2",
+    "vitest": "^3.2.4"
+  },
+  "peerDependencies": {
+    "vitest": ">=0.34.0"
+  },
+  "peerDependenciesMeta": {
+    "vitest": {
+      "optional": true
+    }
   }
 }
