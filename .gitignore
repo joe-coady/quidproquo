@@ -17,3 +17,7 @@ node_modules/
 tests/**/*
 
 @mf-types
+
+# Test coverage reports
+.coverage/
+coverage/

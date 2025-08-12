@@ -9,7 +9,26 @@ const packagesToSkip = [
 export default defineConfig({
   test: {
     projects: packageJson.workspaces.filter(
-      workspace => !packagesToSkip.includes(workspace)
-    )
+      (workspace: string) => !packagesToSkip.includes(workspace)
+    ),
+    coverage: {
+      reportsDirectory: './.coverage',
+      reporter: ['text', 'html', 'json'],
+      exclude: [
+        '**/lib/**',
+        '**/node_modules/**',
+        '**/dist/**',
+        '**/*.config.*',
+        '**/coverage/**',
+        '**/.coverage/**',
+        '**/scripts/**',
+        '**/*.test.ts',
+        '**/*.spec.ts'
+      ],
+      include: [
+        '**/src/**/*.ts',
+        '**/src/**/*.tsx'
+      ]
+    }
   }
 })
