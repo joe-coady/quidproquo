@@ -6,6 +6,7 @@ import {
   FileIsColdStorageActionProcessor,
   QPQConfig,
 } from 'quidproquo-core';
+
 import { FileStorageConfig } from './types';
 
 const getProcessFileIsColdStorage = (config: FileStorageConfig) => (qpqConfig: QPQConfig): FileIsColdStorageActionProcessor => {

@@ -1,8 +1,8 @@
 import { getAwsActionProcessors } from 'quidproquo-actionprocessor-awslambda';
 import { getCustomActionActionProcessor } from 'quidproquo-actionprocessor-node';
 import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
-import { ResolvedDevServerConfig } from '../types';
 
+import { ResolvedDevServerConfig } from '../types';
 import { getCoreActionProcessor } from './core';
 import { getWebserverActionProcessor } from './webserver';
 

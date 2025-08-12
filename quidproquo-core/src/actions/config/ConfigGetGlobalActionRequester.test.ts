@@ -1,7 +1,9 @@
-import { describe, it, expect } from 'vitest'
 import { expectGenerator } from 'quidproquo-testing'
-import { askConfigGetGlobal } from './ConfigGetGlobalActionRequester'
+
+import { describe, expect,it } from 'vitest'
+
 import { ConfigActionType } from './ConfigActionType'
+import { askConfigGetGlobal } from './ConfigGetGlobalActionRequester'
 
 describe('ConfigGetGlobalActionRequester', () => {
   describe('askConfigGetGlobal', () => {

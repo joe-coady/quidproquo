@@ -1,22 +1,22 @@
-import * as sqlite3 from 'sqlite3';
-import * as sqlite from 'sqlite';
-import * as path from 'path';
-import * as fs from 'fs';
 import { 
-  KvsQueryOperation, 
-  KvsLogicalOperator, 
-  KvsQueryCondition, 
-  KvsQueryOperationType,
-  KvsLogicalOperatorType,
+  KeyValueStoreQPQConfigSetting,
   KvsAdvancedDataType,
+  KvsAttributePath,
+  KvsLogicalOperator, 
+  KvsLogicalOperatorType,
+  KvsQueryCondition, 
+  KvsQueryOperation, 
+  KvsQueryOperationType,
   KvsUpdate,
   KvsUpdateActionType,
-  KvsAttributePath,
-  QpqPagedData,
   QPQConfig,
   qpqCoreUtils,
-  KeyValueStoreQPQConfigSetting
-} from 'quidproquo-core';
+  QpqPagedData} from 'quidproquo-core';
+
+import * as fs from 'fs';
+import * as path from 'path';
+import * as sqlite from 'sqlite';
+import * as sqlite3 from 'sqlite3';
 
 interface KvsItem {
   [key: string]: any;
@@ -250,7 +250,7 @@ export class SqliteKvsRepository {
           params: [`%${condition.valueA}%`]
         };
         
-      case KvsQueryOperationType.In:
+      case KvsQueryOperationType.In: {
         const inValues = condition.valueA as any[];
         const placeholders = inValues.map(() => '?').join(', ');
         paramIndex.value += inValues.length;
@@ -258,6 +258,7 @@ export class SqliteKvsRepository {
           sql: `${columnName} IN (${placeholders})`,
           params: inValues
         };
+      }
         
       case KvsQueryOperationType.Exists:
         return {
@@ -291,7 +292,7 @@ export class SqliteKvsRepository {
           this.removeNestedValue(updatedItem, pathArray);
           break;
           
-        case KvsUpdateActionType.Add:
+        case KvsUpdateActionType.Add: {
           const currentValue = this.getNestedValue(updatedItem, pathArray);
           if (typeof currentValue === 'number' && typeof update.value === 'number') {
             this.setNestedValue(updatedItem, pathArray, currentValue + update.value);
@@ -301,14 +302,16 @@ export class SqliteKvsRepository {
             this.setNestedValue(updatedItem, pathArray, update.value);
           }
           break;
+        }
           
-        case KvsUpdateActionType.Delete:
+        case KvsUpdateActionType.Delete: {
           const existing = this.getNestedValue(updatedItem, pathArray);
           if (Array.isArray(existing) && Array.isArray(update.value)) {
             const filtered = existing.filter(item => !(update.value as any[]).includes(item));
             this.setNestedValue(updatedItem, pathArray, filtered);
           }
           break;
+        }
       }
     }
     

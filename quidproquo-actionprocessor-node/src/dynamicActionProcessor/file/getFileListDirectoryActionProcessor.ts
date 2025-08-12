@@ -11,10 +11,12 @@ import {
   QPQConfig,
   qpqCoreUtils,
 } from 'quidproquo-core';
+
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { resolveFilePath } from './utils';
+
 import { FileStorageConfig } from './types';
+import { resolveFilePath } from './utils';
 
 const getProcessFileListDirectory = (config: FileStorageConfig) => (qpqConfig: QPQConfig): FileListDirectoryActionProcessor => {
   const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);

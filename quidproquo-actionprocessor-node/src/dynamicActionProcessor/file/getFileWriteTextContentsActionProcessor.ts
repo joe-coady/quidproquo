@@ -9,9 +9,11 @@ import {
   QPQConfig,
   qpqCoreUtils,
 } from 'quidproquo-core';
+
 import * as fs from 'fs/promises';
-import { resolveFilePath, ensureParentDirectoryExists } from './utils';
+
 import { FileStorageConfig } from './types';
+import { ensureParentDirectoryExists,resolveFilePath } from './utils';
 
 const getProcessFileWriteTextContents = (
   qpqConfig: QPQConfig,

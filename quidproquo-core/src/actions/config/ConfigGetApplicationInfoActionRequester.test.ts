@@ -1,7 +1,9 @@
-import { describe, it, expect } from 'vitest'
 import { expectGenerator } from 'quidproquo-testing'
-import { askConfigGetApplicationInfo } from './ConfigGetApplicationInfoActionRequester'
+
+import { describe, expect,it } from 'vitest'
+
 import { ConfigActionType } from './ConfigActionType'
+import { askConfigGetApplicationInfo } from './ConfigGetApplicationInfoActionRequester'
 
 describe('ConfigGetApplicationInfoActionRequester', () => {
 

@@ -14,8 +14,8 @@ import {
 import { randomUUID } from 'crypto';
 
 import { getDevServerActionProcessors, getExpressApiEventEventProcessor } from '../actionProcessor';
-import { ResolvedDevServerConfig } from '../types';
 import { getDevServerLogger } from '../implementations/logger';
+import { ResolvedDevServerConfig } from '../types';
 
 // TODO: Make this a util or something based on server time or something..
 const getDateNow = () => new Date().toISOString();

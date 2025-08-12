@@ -9,9 +9,11 @@ import {
   QPQConfig,
   qpqCoreUtils,
 } from 'quidproquo-core';
+
 import * as fs from 'fs/promises';
-import { resolveFilePath } from './utils';
+
 import { FileStorageConfig } from './types';
+import { resolveFilePath } from './utils';
 
 const getProcessFileReadObjectJson = (config: FileStorageConfig) => (qpqConfig: QPQConfig): FileReadObjectJsonActionProcessor<any> => {
   const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);

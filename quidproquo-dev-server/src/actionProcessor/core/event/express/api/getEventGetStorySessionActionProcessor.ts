@@ -7,8 +7,8 @@ import {
   QPQConfig,
 } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
-import { decodeAccessTokenForDev } from '../../../../../logic/auth/decodeAccessTokenForDev';
 
+import { decodeAccessTokenForDev } from '../../../../../logic/auth/decodeAccessTokenForDev';
 import { EventInput, InternalEventRecord, MatchResult } from './types';
 
 const getProcessGetStorySession = (qpqConfig: QPQConfig): EventGetStorySessionActionProcessor<EventInput, InternalEventRecord, MatchResult> => {

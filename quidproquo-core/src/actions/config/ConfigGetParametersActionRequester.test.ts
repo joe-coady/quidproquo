@@ -1,7 +1,9 @@
-import { describe, it, expect } from 'vitest'
 import { expectGenerator } from 'quidproquo-testing'
-import { askConfigGetParameters, ConfigGetParametersErrorTypeEnum } from './ConfigGetParametersActionRequester'
+
+import { describe, expect,it } from 'vitest'
+
 import { ConfigActionType } from './ConfigActionType'
+import { askConfigGetParameters, ConfigGetParametersErrorTypeEnum } from './ConfigGetParametersActionRequester'
 
 describe('ConfigGetParametersActionRequester', () => {
   describe('askConfigGetParameters', () => {

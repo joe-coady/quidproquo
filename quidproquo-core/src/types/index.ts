@@ -22,6 +22,7 @@ export * from './QpqFunctionRuntime';
 export * from './QpqLogger';
 export * from './QpqPagedData';
 export * from './QueueEvent';
+export * from "./Readonlyify";
 export * from './ScheduledEvent';
 export * from './StorySession';
 export * from './UnboundLogicStory';

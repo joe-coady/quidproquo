@@ -9,6 +9,7 @@ import {
   QPQConfig,
   qpqCoreUtils,
 } from 'quidproquo-core';
+
 import { createSecureUrlToken, getSecureUrlBaseUrl } from './secureUrlUtils';
 import { FileStorageConfig } from './types';
 import { resolveFilePath } from './utils';
