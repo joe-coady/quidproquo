@@ -13,6 +13,10 @@
     "lint": "npm run lint --ws",
     "lint:fix": "npm run lint:fix --ws",
     "format": "npm run format --ws",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
     "watch-all": "npx npm-run-all --parallel watch:*",
     "watch:quidproquo-core": "npm run watch -w quidproquo-core",
     "watch:quidproquo-webserver": "npm run watch -w quidproquo-webserver",
@@ -63,6 +67,10 @@
     "quidproquo"
   ],
   "devDependencies": {
-    "prettier": "^3.0.3"
+    "@vitest/ui": "^3.2.4",
+    "jsdom": "^26.1.0",
+    "prettier": "^3.0.3",
+    "vite": "^7.1.2",
+    "vitest": "^3.2.4"
   }
 }
