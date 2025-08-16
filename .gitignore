@@ -21,3 +21,5 @@ tests/**/*
 # Test coverage reports
 .coverage/
 coverage/
+
+dist/

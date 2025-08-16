@@ -1,0 +1,15 @@
+{
+  "name": "federation-poc",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "install:all": "cd app1 && npm install && cd ../app2 && npm install",
+    "build:all": "cd app1 && npm run build && cd ../app2 && npm run build",
+    "start:app1": "cd app1 && npm start",
+    "start:app2": "cd app2 && npm start",
+    "demo": "npm run install:all && npm run build:all && concurrently \"npm run start:app1\" \"npm run start:app2\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
