@@ -5,4 +5,5 @@ export * from './fileWatcher';
 export * from './logger';
 export * from './queueImplementation';
 export * from './serviceFunctionImplementation';
+export * from './tinkerImplementation';
 export * from './webSocket';

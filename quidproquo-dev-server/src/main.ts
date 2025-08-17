@@ -5,6 +5,7 @@ import path from 'path';
 
 import {
   apiImplementation,
+  createTinkerInterface,
   eventBusImplementation,
   fileStorageImplementation,
   fileWatcherImplementation,
@@ -12,7 +13,7 @@ import {
   serviceFunctionImplementation,
   webSocketImplementation,
 } from './implementations';
-import { DevServerConfig, DevServerConfigOverrides,ResolvedDevServerConfig } from './types';
+import { DevServerConfig, DevServerConfigOverrides, ResolvedDevServerConfig, TinkerInterface, TinkerOptions } from './types';
 
 export * from './implementations';
 
@@ -31,13 +32,10 @@ export const getDevConfigs = (qpqConfigs: QPQConfig[], devServerConfigOverrides?
   });
 };
 
-export const startDevServer = async (devServerConfig: DevServerConfig, devServerConfigOverrides?: DevServerConfigOverrides) => {
-  console.log('Starting QPQ Dev Server!!! - this is a note');
-
+const resolveDevServerConfig = (devServerConfig: DevServerConfig, devServerConfigOverrides?: DevServerConfigOverrides): ResolvedDevServerConfig => {
   const runtimePath = devServerConfig.runtimePath || '.qpq-runtime';
 
-  // Resolve the config with all defaults filled
-  const resolvedDevServerConfig: ResolvedDevServerConfig = {
+  return {
     ...devServerConfig,
     runtimePath,
     qpqConfigs: getDevConfigs(devServerConfig.qpqConfigs, devServerConfigOverrides),
@@ -48,9 +46,15 @@ export const startDevServer = async (devServerConfig: DevServerConfig, devServer
       secureUrlPort: devServerConfig.fileStorageConfig?.secureUrlPort || 3001,
       secureUrlSecret: devServerConfig.fileStorageConfig?.secureUrlSecret || crypto.randomBytes(32).toString('hex'),
     },
-    
+
     logServiceName: devServerConfig.logServiceName,
   };
+};
+
+export const startDevServer = async (devServerConfig: DevServerConfig, devServerConfigOverrides?: DevServerConfigOverrides) => {
+  console.log('Starting QPQ Dev Server!!! - this is a note');
+
+  const resolvedDevServerConfig = resolveDevServerConfig(devServerConfig, devServerConfigOverrides);
 
   await Promise.all([
     apiImplementation(resolvedDevServerConfig),
@@ -62,8 +66,37 @@ export const startDevServer = async (devServerConfig: DevServerConfig, devServer
     queueImplementation(resolvedDevServerConfig),
 
     webSocketImplementation(resolvedDevServerConfig),
-    
+
     fileStorageImplementation(resolvedDevServerConfig),
     fileWatcherImplementation(resolvedDevServerConfig),
   ]);
+};
+
+export const startTinker = async (
+  devServerConfig: DevServerConfig,
+  devServerConfigOverrides?: DevServerConfigOverrides,
+  tinkerOptions?: TinkerOptions
+): Promise<TinkerInterface> => {
+  console.log('Starting QPQ Tinker Environment...');
+
+  const resolvedDevServerConfig = resolveDevServerConfig(devServerConfig, devServerConfigOverrides);
+
+  // Start all implementations without awaiting (they run forever)
+  // Just fire them off in the background
+  if (tinkerOptions?.includeHttpServer) {
+    apiImplementation(resolvedDevServerConfig);
+  }
+  
+  serviceFunctionImplementation(resolvedDevServerConfig);
+  eventBusImplementation(resolvedDevServerConfig);
+  queueImplementation(resolvedDevServerConfig);
+  webSocketImplementation(resolvedDevServerConfig);
+  fileStorageImplementation(resolvedDevServerConfig);
+  fileWatcherImplementation(resolvedDevServerConfig);
+  
+  // Give implementations a moment to initialize
+  await new Promise(resolve => setTimeout(resolve, 100));
+
+  // Create and return the tinker interface
+  return createTinkerInterface(resolvedDevServerConfig, tinkerOptions);
 };
