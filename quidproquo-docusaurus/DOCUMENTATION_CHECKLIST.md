@@ -5,54 +5,54 @@ This checklist tracks documentation progress for every feature in the Quidproquo
 ## Homepage & Introduction
 
 ### Main Landing Page
-- [ ] What is Quidproquo?
-  - [ ] Core philosophy and principles
-  - [ ] Problem it solves
-  - [ ] Target audience
-- [ ] Why Quidproquo?
-  - [ ] Platform abstraction benefits
-  - [ ] Write once, deploy anywhere approach
-  - [ ] Comparison with traditional frameworks
-- [ ] Key Features & Benefits
-  - [ ] Complete execution logging and observability
-  - [ ] Event replay capability
-  - [ ] Time-travel debugging
-  - [ ] Deterministic execution
-  - [ ] Platform-agnostic architecture
-  - [ ] Generator-based composition
-  - [ ] Pure functional approach
-- [ ] Use Cases
-  - [ ] Microservices
-  - [ ] Serverless applications
-  - [ ] API development
-  - [ ] Event-driven systems
-  - [ ] Multi-cloud deployments
-- [ ] Architecture Overview
-  - [ ] Action/Processor pattern
-  - [ ] Story composition
-  - [ ] Runtime abstraction
-  - [ ] Platform adapters
-- [ ] Quick Start Example
-  - [ ] Simple "Hello World" story
-  - [ ] Basic API example
-  - [ ] Deployment options
+- [x] What is Quidproquo?
+  - [x] Core philosophy and principles
+  - [x] Problem it solves
+  - [x] Target audience
+- [x] Why Quidproquo?
+  - [x] Platform abstraction benefits
+  - [x] Write once, deploy anywhere approach
+  - [x] Comparison with traditional frameworks
+- [x] Key Features & Benefits
+  - [x] Complete execution logging and observability
+  - [x] Event replay capability
+  - [x] Time-travel debugging
+  - [x] Deterministic execution
+  - [x] Platform-agnostic architecture
+  - [x] Generator-based composition
+  - [x] Pure functional approach
+- [x] Use Cases
+  - [x] Microservices
+  - [x] Serverless applications
+  - [x] API development
+  - [x] Event-driven systems
+  - [x] Multi-cloud deployments
+- [x] Architecture Overview
+  - [x] Action/Processor pattern
+  - [x] Story composition
+  - [x] Runtime abstraction
+  - [x] Platform adapters
+- [x] Quick Start Example
+  - [x] Simple "Hello World" story
+  - [x] Basic API example
+  - [x] Deployment options
 
 ## Core Actions (`quidproquo-core/src/actions`)
 
 ### Claude AI Actions
-- [ ] ClaudeAiMessagesApi - Send messages to Claude AI
-  - [ ] Action types and payloads
-  - [ ] Usage examples
-  - [ ] Integration patterns
+- [x] ClaudeAiMessagesApi - Send messages to Claude AI
+  - [x] Action types and payloads
+  - [x] Usage examples
+  - [x] Integration patterns
 
 ### Config Actions
-- [ ] ConfigGetApplicationInfo - Get application metadata
-- [ ] ConfigGetGlobal - Retrieve global configuration values
-- [ ] ConfigGetParameter - Get configuration parameters
-- [ ] ConfigGetParameters - Get multiple parameters
-- [ ] ConfigGetSecret - Retrieve secrets securely
-- [ ] ConfigListParameters - List available parameters
-- [ ] ConfigSetParameter - Set configuration parameters
+- [x] ConfigGetApplicationInfo - Get application metadata
+- [x] ConfigGetGlobal - Retrieve global configuration values
+- [x] ConfigGetParameter - Get configuration parameters
+- [x] ConfigGetParameters - Get multiple parameters
+- [x] ConfigGetSecret - Retrieve secrets securely
+- [x] ConfigListParameters - List available parameters
+- [x] ConfigSetParameter - Set configuration parameters
 
 ### Context Actions
 - [ ] ContextList - List context values
@@ -86,18 +86,18 @@ This checklist tracks documentation progress for every feature in the Quidproquo
 - [ ] Event routing
 
 ### File Actions
-- [ ] FileDelete - Delete files
-- [ ] FileExists - Check file existence
-- [ ] FileGenerateTemporarySecureUrl - Generate download URLs
-- [ ] FileGenerateTemporaryUploadSecureUrl - Generate upload URLs
-- [ ] FileIsColdStorage - Check cold storage status
-- [ ] FileListDirectory - List directory contents
-- [ ] FileReadBinaryContents - Read binary files
-- [ ] FileReadObjectJson - Read JSON files
-- [ ] FileReadTextContents - Read text files
-- [ ] FileWriteBinaryContents - Write binary files
-- [ ] FileWriteObjectJson - Write JSON files
-- [ ] FileWriteTextContents - Write text files
+- [x] FileDelete - Delete files
+- [x] FileExists - Check file existence
+- [x] FileGenerateTemporarySecureUrl - Generate download URLs
+- [x] FileGenerateTemporaryUploadSecureUrl - Generate upload URLs
+- [x] FileIsColdStorage - Check cold storage status
+- [x] FileListDirectory - List directory contents
+- [x] FileReadBinaryContents - Read binary files
+- [x] FileReadObjectJson - Read JSON files
+- [x] FileReadTextContents - Read text files
+- [x] FileWriteBinaryContents - Write binary files
+- [x] FileWriteObjectJson - Write JSON files
+- [x] FileWriteTextContents - Write text files
 
 ### Graph Database Actions
 - [ ] GraphDatabaseExecuteOpenCypherQuery - Execute Cypher queries
@@ -495,5 +495,5 @@ Use this checklist to systematically document each feature. When documenting:
 5. Add links between related topics
 
 Total items: ~330+
-Completed: 0
-Progress: 0%
+Completed: ~50
+Progress: ~15%
