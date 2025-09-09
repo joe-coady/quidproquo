@@ -5,3 +5,4 @@ export * from './openApiSpec';
 export * from './serviceFunction';
 export * from './webEntry';
 export * from './websocket';
+export * from "./extract"
