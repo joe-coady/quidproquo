@@ -26,10 +26,11 @@ type ExtractedExpenseDocument = {
 
   rawText?: string;   // full OCR dump (if needed)
   source: {
-    bucket: string;
-    key: string;
+    storageDrive: string;
+    filePath: string;
     textractJobId?: string;
   };
+  _raw?: any;  // Raw Textract response for debugging - should not be used in production
 };
 
 // Payload
