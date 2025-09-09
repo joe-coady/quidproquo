@@ -101,6 +101,12 @@ export class WebserverRoll extends QpqConstructBlock {
         ],
         resources: ['*'],
       },
+
+      {
+        sid: 'TextractDocumentProcessing',
+        actions: ['textract:*'],
+        resources: ['*'],
+      },
     ];
 
     policies.forEach((policy) => {
