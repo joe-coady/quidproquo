@@ -18,6 +18,12 @@ module.exports = {
       },
     ],
   },
+  ignoreWarnings: [
+    {
+      module: /@module-federation/,
+      message: /Failed to parse source map/,
+    },
+  ],
   output: {
     publicPath: 'auto',
     path: path.resolve(__dirname, 'dist'),

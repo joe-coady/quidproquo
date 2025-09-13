@@ -56,6 +56,13 @@ export const getWebpackConfig = (qpqConfig: QPQConfig, buildPath: string, entrie
         },
       ],
     },
+
+    ignoreWarnings: [
+      {
+        module: /@module-federation/,
+        message: /Failed to parse source map/,
+      },
+    ],
   };
 };
 
