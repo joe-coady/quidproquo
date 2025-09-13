@@ -6,7 +6,7 @@ import TerminalIcon from '@mui/icons-material/Terminal';
 
 import { Config } from '../../../Config';
 import { FederatedTab } from '../../../FederatedAddon';
-import { AdminLogs } from '../../../LogViewer/AdminLogs';
+import { AdminLogs } from '../../../LogViewer/AdminLogs/AdminLogs';
 import { Dashboard } from '../../../LogViewer/Dashboard';
 import { LogSearch } from '../../../LogViewer/LogSearch';
 import { useFederatedAddon } from '../../../useFederatedAddon';

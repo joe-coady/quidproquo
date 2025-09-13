@@ -4,9 +4,9 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { useQpq } from '../useQpq';
 import { getStateActionProcessor } from './actionProcessor';
+import { useQpqRuntimeBubblingReducer } from './bubbleReducer';
+import { QpqRuntimeDefinition } from './createQpqRuntimeDefinition';
 import { QpqApi, QpqMappedApi } from './QpqMappedApi';
-import { useQpqRuntimeBubblingReducer } from './QpqRuntimeEffectCatcher';
-import { QpqRuntimeDefinition } from '.';
 
 export function useQpqRuntime<
   TState,

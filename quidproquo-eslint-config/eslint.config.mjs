@@ -6,7 +6,7 @@ import pluginJs from '@eslint/js';
 import { overrides } from './config/overrides.mjs';
 
 export default [
-  { ignores: ['dist/', 'lib/'] },
+  { ignores: ['**/dist/**', '**/lib/**', '**/node_modules/**', '**/*.d.ts'] },
   { files: ['**/*.{js,mjs,cjs,ts}'] },
   { languageOptions: { globals: { ...globals.browser, ...globals.node } } },
   pluginJs.configs.recommended,

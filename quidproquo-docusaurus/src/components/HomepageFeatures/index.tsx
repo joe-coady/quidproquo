@@ -1,6 +1,7 @@
-import type {ReactNode} from 'react';
 import clsx from 'clsx';
+import type {ReactNode} from 'react';
 import Heading from '@theme/Heading';
+
 import styles from './styles.module.css';
 
 type FeatureItem = {

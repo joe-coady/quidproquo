@@ -1,3 +1,5 @@
+
+
 import {
   askFileExists,
   askFileGenerateTemporarySecureUrl,
@@ -20,11 +22,11 @@ import {
   StoryResultMetadataWithChildren,
 } from 'quidproquo-core';
 
-import { logReportsResourceName } from '../../../../config';
-import { LogMetadata } from '../domain';
+import { logReportsResourceName } from '../../../../config/settings/logs';
+import { LogMetadata } from '../domain/LogMetadata';
+
 
 const metadataStoreName = 'qpq-logs';
-
 export function* askUpsert(logMetadata: LogMetadata): AskResponse<void> {
   yield* askKeyValueStoreUpsert(metadataStoreName, logMetadata);
 }

@@ -3,7 +3,8 @@ import { LogMetadata } from 'quidproquo-webserver';
 import LinearProgress from '@mui/material/LinearProgress';
 import { DataGrid, GridColDef, GridRenderCellParams, GridRowClassNameParams } from '@mui/x-data-grid';
 
-import { DataGridPagination, DateCell } from '../components';
+import { DataGridPagination } from '../components/DataGridPagination/DataGridPagination';
+import { DateCell } from '../components/DateCell/DateCell';
 import { useLogManagement } from './hooks';
 import { LogDialog } from './LogDialog';
 

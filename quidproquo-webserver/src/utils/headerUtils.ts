@@ -1,10 +1,9 @@
 import { askMap, AskResponse, askThrowError, ErrorTypeEnum, QPQConfig } from 'quidproquo-core';
 
 import { RouteOptions, ServiceAllowedOrigin } from '../config/settings/route';
-import { qpqWebServerUtils } from '../qpqWebServerUtils';
 import { qpqHeaderIsBot, SeoEvent } from '../types';
 import { HTTPEvent, HttpEventHeaders } from '../types/HTTPEvent';
-import { getBaseDomainName } from './qpqConfigAccessorsUtils';
+import { getBaseDomainName, getDefaultRouteSettings } from './qpqConfigAccessorsUtils';
 
 export const getHeaderValue = (header: string, headers: HttpEventHeaders): string | null => {
   const headerAsLower = header.toLowerCase();
@@ -62,7 +61,7 @@ export const getAllowedOrigins = (qpqConfig: QPQConfig, route: RouteOptions): st
   const rootDomain = `https://${baseDomain}`;
 
   // generic settings
-  const defaultRouteSettings = qpqWebServerUtils.getDefaultRouteSettings(qpqConfig);
+  const defaultRouteSettings = getDefaultRouteSettings(qpqConfig);
 
   const defaultAllowedOrigins = defaultRouteSettings.reduce(
     (acc, cur) => [...acc, ...(cur.routeOptions.allowedOrigins || []).map((ao) => convertContentSecurityPolicyEntryToString(baseDomain, ao))],

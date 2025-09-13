@@ -11,13 +11,11 @@ import {
   StorageDriveTier,
 } from 'quidproquo-core';
 
-import {
-  defineAdminServiceAuthRoute,
-  defineAdminServiceLogLogRoute,
-  defineAdminServiceLogRoute,
-  getServiceEntryQpqFunctionRuntime,
-  WebsocketAdminClientMessageEventType,
-} from '../../services';
+import { getServiceEntryQpqFunctionRuntime } from '../../services/getServiceEntryQpqFunctionRuntime';
+import { defineAdminServiceAuthRoute } from '../../services/log/config/defineAdminServiceAuthRoute';
+import { defineAdminServiceLogLogRoute } from '../../services/log/config/defineAdminServiceLogLogRoute';
+import { defineAdminServiceLogRoute } from '../../services/log/config/defineAdminServiceLogRoute';
+import { WebsocketAdminClientMessageEventType } from '../../services/log/logic/webSocket/clientMessages/WebSocketQueueQpqAdminClientMessageEventType';
 import { adminUserDirectoryResourceName } from './adminUserDirectory';
 import { defineWebsocket } from './websocket';
 import { defineWebSocketQueue } from './webSocketQueue';
@@ -82,11 +80,11 @@ export const defineLogs = (rootDomain: string, services: string[], advancedSetti
           transitions:
             (advancedSettings?.coldStorageAfterDays || 0) > 0
               ? [
-                  {
-                    storageDriveTier: StorageDriveTier.DEEP_COLD_STORAGE,
-                    transitionAfterDays: advancedSettings!.coldStorageAfterDays!,
-                  },
-                ]
+                {
+                  storageDriveTier: StorageDriveTier.DEEP_COLD_STORAGE,
+                  transitionAfterDays: advancedSettings!.coldStorageAfterDays!,
+                },
+              ]
               : undefined,
           deleteAfterDays: logRetentionDays,
         },

@@ -1,5 +1,5 @@
-import { TabViewBox } from '../components';
-import { useIsLoading } from '../view';
+import { TabViewBox } from '../components/TabViewBox';
+import { useIsLoading } from '../view/Loading/hooks/useIsLoading';
 import { useLogSearch } from './hooks';
 import { LogMetadataGrid } from './LogMetadataGrid';
 import { TopSection } from './TopSection';

@@ -1,5 +1,5 @@
-import * as http from 'http';
 import * as fs from 'fs';
+import * as http from 'http';
 import * as path from 'path';
 import { loadRemote } from '@module-federation/enhanced/runtime';
 

@@ -7,8 +7,8 @@ import { LogMetadata, WebSocketQueueQpqAdminServerEventMessageLogMetadata, WebSo
 import React, { useEffect, useMemo } from 'react';
 import { Box, Grid, Paper, Typography } from '@mui/material';
 
-import { TabViewBox } from '../components';
-import { useIsLoading } from '../view';
+import { TabViewBox } from '../components/TabViewBox';
+import { useIsLoading } from '../view/Loading/hooks/useIsLoading';
 import { useLogSearch } from './hooks';
 import { LogMetadataGrid } from './LogMetadataGrid';
 

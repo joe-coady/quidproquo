@@ -2,7 +2,7 @@ import { BottomNavigation, BottomNavigationAction, CircularProgress } from '@mui
 import Box from '@mui/material/Box';
 
 import { useUrlFields } from '../../queryParams';
-import { useTabs } from './hooks';
+import { useTabs } from './hooks/useTabs';
 
 export function MainLayout() {
   const { tabs, loading } = useTabs();

@@ -1,6 +1,6 @@
 import { defineEventBus, defineQueue, QPQConfig } from 'quidproquo-core';
 
-import { WebsocketAdminClientMessageEventType } from '../../../services';
+import { WebsocketAdminClientMessageEventType } from '../../../services/log/logic/webSocket/clientMessages/WebSocketQueueQpqAdminClientMessageEventType';
 import { adminUserDirectoryResourceName } from '../adminUserDirectory';
 import { defineWebSocketQueue } from '../webSocketQueue';
 

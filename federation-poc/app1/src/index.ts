@@ -1,8 +1,8 @@
-import * as http from 'http';
 import * as fs from 'fs';
-import * as path from 'path';
+import * as http from 'http';
 import { createRequire } from 'module';
-import { registerPlugins, loadRemote } from '@module-federation/enhanced/runtime';
+import * as path from 'path';
+import { loadRemote, registerPlugins } from '@module-federation/enhanced/runtime';
 
 // @ts-ignore - no types for this yet
 const nodePlugin = require('@module-federation/node/runtimePlugin');

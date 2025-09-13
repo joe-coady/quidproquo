@@ -1,4 +1,5 @@
 import { createErrorEnumForAction } from 'quidproquo-core';
+
 import { ExtractActionType } from './ExtractActionType';
 import { ExtractExpenseActionRequester } from './ExtractExpenseActionTypes';
 

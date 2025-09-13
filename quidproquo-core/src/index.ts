@@ -4,7 +4,7 @@ export * from './createImplementationRuntime';
 export * from './logic';
 export * from './logic/actionLogic';
 export * from './proiseify';
-export * as qpqCoreUtils from './qpqCoreUtils';
+export * from "./qpqCoreUtilsLib";
 export * from './qpqExecuteLog';
 export * from './runtime';
 export * from './stories';

@@ -10,9 +10,9 @@ import {
   QpqPagedData,
 } from 'quidproquo-core';
 
-import { getWebSocketQueueKeyValueStoreName } from '../../../config';
-import { askWebsocketReadApiNameOrThrow } from '../../../context';
-import { Connection } from '../types';
+import { getWebSocketQueueKeyValueStoreName } from '../../../config/settings/webSocketQueue';
+import { askWebsocketReadApiNameOrThrow } from '../../../context/websocketConnectionInfoContext';
+import { Connection } from '../types/Connection';
 
 export function* askGetStoreName(apiNameOverride?: string): AskResponse<string> {
   const apiName = apiNameOverride || (yield* askWebsocketReadApiNameOrThrow());

@@ -2,8 +2,8 @@ import { useCallback, useMemo } from 'react';
 import { atom, useAtom } from 'jotai';
 import { selectAtom } from 'jotai/utils';
 
+import { QpqBubbleReducer } from './bubbleReducer';
 import { QpqApi } from './QpqMappedApi';
-import { QpqBubbleReducer } from './QpqRuntimeEffectCatcher';
 
 // Define the function type for retrieving atoms
 type CustomJotaiReducerAtom<TState> = ReturnType<typeof atom<TState>>;

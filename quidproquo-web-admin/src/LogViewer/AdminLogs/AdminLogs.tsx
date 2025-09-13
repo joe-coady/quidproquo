@@ -1,7 +1,7 @@
-import { TabViewBox } from '../../components';
-import { useIsLoading } from '../../view';
-import { AdminLogGrid } from './AdminLogGrid';
-import { AdminLogSearchBar } from './AdminLogSearchBar';
+import { TabViewBox } from '../../components/TabViewBox';
+import { useIsLoading } from '../../view/Loading/hooks/useIsLoading';
+import { AdminLogGrid } from './AdminLogGrid/AdminLogGrid';
+import { AdminLogSearchBar } from './AdminLogSearchBar/AdminLogSearchBar';
 import { useLogLogSearch } from './hooks';
 
 export const AdminLogs = () => {

@@ -40,5 +40,22 @@
     "javascriptreact",
     "typescript",
     "typescriptreact"
+  ],
+  "typescript.preferences.includePackageJsonAutoImports": "off",
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "typescript.preferences.includeFileExtensions": "always",
+  "typescript.preferences.autoImportFileExcludePatterns": [
+    "**/index.ts",
+    "**/index.js",
+    "**/index.d.ts",
+    "**/index"
+  ],
+  "javascript.preferences.importModuleSpecifier": "relative",
+  "javascript.preferences.includeFileExtensions": "always",
+  "javascript.preferences.autoImportFileExcludePatterns": [
+    "**/index.ts",
+    "**/index.js",
+    "**/index.d.ts",
+    "**/index"
   ]
 }

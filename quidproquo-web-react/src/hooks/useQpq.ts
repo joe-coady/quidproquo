@@ -12,7 +12,7 @@ import {
 
 import { useCallback, useMemo } from 'react';
 
-import { useQpqContextValues } from './asmj';
+import { useQpqContextValues } from './asmj/QpqContextProvider';
 
 // WIP ~ useFastCallback, wack things like loggers in a context, try to only make once instance of the runtime.
 // Also don't create every refresh.. useMemo / useCallback etc

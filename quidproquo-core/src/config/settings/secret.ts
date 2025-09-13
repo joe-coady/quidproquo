@@ -1,6 +1,6 @@
-import { convertCrossModuleOwnerToGenericResourceNameOverride } from '../../qpqCoreUtils';
 import { CrossModuleOwner } from '../../types';
 import { QPQConfigAdvancedSettings, QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
+import { convertCrossModuleOwnerToGenericResourceNameOverride } from '../utils/crossModuleUtils';
 
 export interface QPQConfigAdvancedSecretSettings extends QPQConfigAdvancedSettings {
   owner?: CrossModuleOwner<'secretName'>;

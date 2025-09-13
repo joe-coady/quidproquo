@@ -359,15 +359,6 @@ export const getApiBuildPath = (qpqConfig: QPQConfig): string => {
   return apiBuildPathConfig.apiBuildPath;
 };
 
-export const getStoryNameFromQpqFunctionRuntime = (qpqFunctionRuntime: QpqFunctionRuntime): string => {
-  if (isQpqFunctionRuntimeAbsolutePath(qpqFunctionRuntime)) {
-    return qpqFunctionRuntime.functionName;
-  }
-
-  const [_srcPath, method] = qpqFunctionRuntime.split('::');
-
-  return method;
-};
 
 export const getSrcFilenameFromQpqFunctionRuntime = (qpqFunctionRuntime: QpqFunctionRuntime): string => {
   if (isQpqFunctionRuntimeAbsolutePath(qpqFunctionRuntime)) {
@@ -473,26 +464,6 @@ export const getQueueQueueProcessors = (name: string, qpqConfig: QPQConfig): Qpq
   return queueConfig?.qpqQueueProcessors || {};
 };
 
-export const convertCrossModuleOwnerToGenericResourceNameOverride = <T extends string>(
-  owner?: CrossModuleOwner<T>,
-): CrossModuleOwner<'resourceNameOverride'> | undefined => {
-  if (!owner) {
-    return undefined;
-  }
-
-  type KeyType = keyof typeof owner;
-  const key: KeyType = Array.from(Object.keys(owner)).find(
-    (k) => k !== 'module' && k !== 'application' && k !== 'feature' && k !== 'environment',
-  ) as any as KeyType;
-
-  const resourceName = owner[key as T];
-  const { [key]: _, ...otherProps } = owner;
-
-  return {
-    ...otherProps,
-    resourceNameOverride: resourceName,
-  };
-};
 
 export const convertCustomFullyQualifiedResourceToGeneric = <T extends string>(resource: CustomFullyQualifiedResource<T>): FullyQualifiedResource => {
   type KeyType = KeyOf<CustomFullyQualifiedResource<T>>;

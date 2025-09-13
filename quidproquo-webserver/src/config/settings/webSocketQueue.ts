@@ -7,7 +7,7 @@ import {
   qpqCoreUtils,
 } from 'quidproquo-core';
 
-import { getServiceEntryQpqFunctionRuntime } from '../../services';
+import { getServiceEntryQpqFunctionRuntime } from '../../services/getServiceEntryQpqFunctionRuntime';
 import { defineWebsocket } from './websocket';
 
 export interface QPQConfigAdvancedWebsocketQueueSettings extends QPQConfigAdvancedSettings {

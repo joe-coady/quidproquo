@@ -1,6 +1,7 @@
-import { convertCrossModuleOwnerToGenericResourceNameOverride, getStoryNameFromQpqFunctionRuntime } from '../../qpqCoreUtils';
 import { CrossModuleOwner, QpqFunctionRuntime } from '../../types';
 import { QPQConfigAdvancedSettings, QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
+import { convertCrossModuleOwnerToGenericResourceNameOverride } from '../utils/crossModuleUtils';
+import { getStoryNameFromQpqFunctionRuntime } from '../utils/qpqFunctionRuntimeUtils';
 
 export enum ScheduleTypeEnum {
   Recurring = 'Recurring',
