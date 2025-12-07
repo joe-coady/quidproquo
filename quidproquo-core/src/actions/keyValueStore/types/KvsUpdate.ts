@@ -7,6 +7,8 @@ export type KvsUpdateAction = {
   attributePath: KvsAttributePath;
   action: KvsUpdateActionType;
   value?: KvsAdvancedDataType;
+  /** Used by Increment action to specify the default value when attribute doesn't exist */
+  defaultValue?: KvsAdvancedDataType;
 };
 
 // Type for multiple update actions

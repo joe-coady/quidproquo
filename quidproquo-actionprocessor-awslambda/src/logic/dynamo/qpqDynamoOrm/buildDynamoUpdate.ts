@@ -43,6 +43,11 @@ export const buildUpdateExpressionAttributeValues = (updates: KvsUpdate): { [key
       const valuePlaceholder = getValueName(update.value);
       attributeValues[valuePlaceholder] = buildAttributeValue(update.value);
     }
+    // Include defaultValue for Increment actions
+    if (update.defaultValue !== undefined && update.defaultValue !== null) {
+      const defaultPlaceholder = getValueName(update.defaultValue);
+      attributeValues[defaultPlaceholder] = buildAttributeValue(update.defaultValue);
+    }
   }
 
   return Object.keys(attributeValues).length > 0 ? attributeValues : undefined;
@@ -76,6 +81,27 @@ const buildDynamoUpdateExpressionDelete = (update: KvsUpdateAction): string => {
   }
 };
 
+const buildDynamoUpdateExpressionSetIfNotExists = (update: KvsUpdateAction): string => {
+  if (update.value === undefined || update.value === null) {
+    throw new Error("Value must be provided for 'SetIfNotExists' action");
+  }
+
+  const attrPath = getNestedItemName(update.attributePath);
+  return `${attrPath} = if_not_exists(${attrPath}, ${getValueName(update.value)})`;
+};
+
+const buildDynamoUpdateExpressionIncrement = (update: KvsUpdateAction): string => {
+  if (update.value === undefined || update.value === null) {
+    throw new Error("Increment value must be provided for 'Increment' action");
+  }
+  if (update.defaultValue === undefined || update.defaultValue === null) {
+    throw new Error("Default value must be provided for 'Increment' action");
+  }
+
+  const attrPath = getNestedItemName(update.attributePath);
+  return `${attrPath} = if_not_exists(${attrPath}, ${getValueName(update.defaultValue)}) + ${getValueName(update.value)}`;
+};
+
 const getNestedItemName = (attributePath: KvsAttributePath): string => {
   if (Array.isArray(attributePath)) {
     let path = '';
@@ -102,41 +128,46 @@ const buildDynamoUpdateExpressionPart = (update: KvsUpdateAction, updateIndex: n
       return buildDynamoUpdateExpressionAdd(update);
     case KvsUpdateActionType.Delete:
       return buildDynamoUpdateExpressionDelete(update);
+    case KvsUpdateActionType.SetIfNotExists:
+      return buildDynamoUpdateExpressionSetIfNotExists(update);
+    case KvsUpdateActionType.Increment:
+      return buildDynamoUpdateExpressionIncrement(update);
     default:
       throw new Error(`Invalid update action type: ${update.action}`);
   }
 };
 
-export const buildDynamoUpdateExpressionForType = (type: KvsUpdateActionType, kvsUpdate: KvsUpdate): string => {
-  const actions = kvsUpdate.filter((update) => update.action === type);
+// Types that generate SET expressions
+const SET_ACTION_TYPES = [
+  KvsUpdateActionType.Set,
+  KvsUpdateActionType.SetIfNotExists,
+  KvsUpdateActionType.Increment
+];
 
-  // If there are no actions of this type, return an empty string
+const buildDynamoUpdateExpressionForClause = (
+  clause: 'SET' | 'REMOVE' | 'ADD' | 'DELETE',
+  actionTypes: KvsUpdateActionType[],
+  kvsUpdate: KvsUpdate,
+): string => {
+  const actions = kvsUpdate.filter((update) => actionTypes.includes(update.action));
+
   if (actions.length === 0) {
     return '';
   }
 
   const expressions = actions.map((update, index) => buildDynamoUpdateExpressionPart(update, index)).join(', ');
-
-  switch (type) {
-    case KvsUpdateActionType.Set:
-      return `SET ${expressions}`;
-    case KvsUpdateActionType.Remove:
-      return `REMOVE ${expressions}`;
-    case KvsUpdateActionType.Add:
-      return `ADD ${expressions}`;
-    case KvsUpdateActionType.Delete:
-      return `DELETE ${expressions}`;
-    default:
-      throw new Error(`Invalid update action type: ${type}`);
-  }
+  return `${clause} ${expressions}`;
 };
 
 export const buildDynamoUpdateExpression = (updates: KvsUpdate): string => {
-  const updatesExpressions = [KvsUpdateActionType.Set, KvsUpdateActionType.Remove, KvsUpdateActionType.Add, KvsUpdateActionType.Delete]
-    .map((kvsUpdateActionType) => buildDynamoUpdateExpressionForType(kvsUpdateActionType, updates))
-    .filter((expression) => !!expression);
+  const clauses = [
+    buildDynamoUpdateExpressionForClause('SET', SET_ACTION_TYPES, updates),
+    buildDynamoUpdateExpressionForClause('REMOVE', [KvsUpdateActionType.Remove], updates),
+    buildDynamoUpdateExpressionForClause('ADD', [KvsUpdateActionType.Add], updates),
+    buildDynamoUpdateExpressionForClause('DELETE', [KvsUpdateActionType.Delete], updates),
+  ].filter((expression) => !!expression);
 
-  const result = updatesExpressions.join(' ');
+  const result = clauses.join(' ');
   console.log('Update Expression: ', result);
 
   return result;

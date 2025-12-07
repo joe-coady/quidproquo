@@ -60,7 +60,7 @@ export enum KvsLogicalOperatorType {
 }
 
 /**
- * The `KvsUpdateActionType` enum represents the four types of update actions in DynamoDB.
+ * The `KvsUpdateActionType` enum represents the types of update actions in DynamoDB.
  */
 export enum KvsUpdateActionType {
   /**
@@ -84,4 +84,17 @@ export enum KvsUpdateActionType {
    * Note: This action only applies to set and list data types.
    */
   Delete = 'Delete',
+
+  /**
+   * The `SetIfNotExists` action sets an attribute only if it does not already exist.
+   * Corresponds to DynamoDB's `if_not_exists(path, value)` function.
+   */
+  SetIfNotExists = 'SetIfNotExists',
+
+  /**
+   * The `Increment` action atomically increments a numeric attribute.
+   * If the attribute does not exist, it is initialized to the default value before incrementing.
+   * Corresponds to DynamoDB's `SET path = if_not_exists(path, default) + increment`.
+   */
+  Increment = 'Increment',
 }
