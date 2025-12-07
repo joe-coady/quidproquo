@@ -37,11 +37,7 @@ const getProcessKeyValueStoreUpdate = (
         sortKey ? String(sortKey) : undefined,
         updates
       );
-      
-      if (result === null) {
-        return actionResultError('ResourceNotFound', `Item with key '${key}' not found`);
-      }
-      
+
       return actionResult(result);
     } catch (error: any) {
       if (error.message?.includes('not found')) {

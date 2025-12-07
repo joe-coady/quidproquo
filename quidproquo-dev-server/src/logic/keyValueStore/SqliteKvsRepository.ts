@@ -279,19 +279,19 @@ export class SqliteKvsRepository {
 
   private applyUpdateToItem(item: any, updates: KvsUpdate): any {
     const updatedItem = { ...item };
-    
+
     for (const update of updates) {
       const pathArray = this.getPathArray(update.attributePath);
-      
+
       switch (update.action) {
         case KvsUpdateActionType.Set:
           this.setNestedValue(updatedItem, pathArray, update.value);
           break;
-          
+
         case KvsUpdateActionType.Remove:
           this.removeNestedValue(updatedItem, pathArray);
           break;
-          
+
         case KvsUpdateActionType.Add: {
           const currentValue = this.getNestedValue(updatedItem, pathArray);
           if (typeof currentValue === 'number' && typeof update.value === 'number') {
@@ -303,7 +303,7 @@ export class SqliteKvsRepository {
           }
           break;
         }
-          
+
         case KvsUpdateActionType.Delete: {
           const existing = this.getNestedValue(updatedItem, pathArray);
           if (Array.isArray(existing) && Array.isArray(update.value)) {
@@ -312,9 +312,26 @@ export class SqliteKvsRepository {
           }
           break;
         }
+
+        case KvsUpdateActionType.SetIfNotExists: {
+          const currentValue = this.getNestedValue(updatedItem, pathArray);
+          if (currentValue === undefined || currentValue === null) {
+            this.setNestedValue(updatedItem, pathArray, update.value);
+          }
+          break;
+        }
+
+        case KvsUpdateActionType.Increment: {
+          const currentValue = this.getNestedValue(updatedItem, pathArray);
+          const baseValue = (currentValue === undefined || currentValue === null)
+            ? (update.defaultValue as number)
+            : currentValue;
+          this.setNestedValue(updatedItem, pathArray, baseValue + (update.value as number));
+          break;
+        }
       }
     }
-    
+
     return updatedItem;
   }
 
@@ -584,45 +601,61 @@ export class SqliteKvsRepository {
     updates: KvsUpdate
   ): Promise<any> {
     await this.ensureTable(keyValueStoreName);
-    
+
     const storeConfig = qpqCoreUtils.getKeyValueStoreByName(this.qpqConfig, keyValueStoreName);
     if (!storeConfig) {
       throw new Error(`Key value store '${keyValueStoreName}' not found`);
     }
-    
+
     const tableName = this.getTableName(keyValueStoreName);
     const hasSortKey = storeConfig.sortKeys.length > 0;
-    
+
     // Get current item
     const selectSql = hasSortKey && sortKey !== undefined
       ? `SELECT data FROM ${tableName} WHERE pk = ? AND sk = ?`
       : `SELECT data FROM ${tableName} WHERE pk = ?`;
-    
+
     const selectParams = hasSortKey && sortKey !== undefined ? [key, sortKey] : [key];
-    
+
     const row = await this.db!.get(selectSql, selectParams);
-    
-    if (!row) {
-      return null;
-    }
-    
-    const currentItem = JSON.parse(row.data);
+
+    // If item doesn't exist, create a base item with just the keys (like DynamoDB UpdateItem)
+    const currentItem = row
+      ? JSON.parse(row.data)
+      : {
+          [storeConfig.partitionKey.key]: key,
+          ...(hasSortKey && sortKey !== undefined ? { [storeConfig.sortKeys[0].key]: sortKey } : {}),
+        };
+
     const updatedItem = this.applyUpdateToItem(currentItem, updates);
-    
-    // Update the item - SQLite will handle locking automatically
-    const updateSql = hasSortKey && sortKey !== undefined
-      ? `UPDATE ${tableName} SET data = ? WHERE pk = ? AND sk = ?`
-      : `UPDATE ${tableName} SET data = ? WHERE pk = ?`;
-    
-    const updateParams = hasSortKey && sortKey !== undefined
-      ? [JSON.stringify(updatedItem), key, sortKey]
-      : [JSON.stringify(updatedItem), key];
-    
-    await this.db!.run(updateSql, updateParams);
-    
+
+    if (row) {
+      // Update existing item
+      const updateSql = hasSortKey && sortKey !== undefined
+        ? `UPDATE ${tableName} SET data = ? WHERE pk = ? AND sk = ?`
+        : `UPDATE ${tableName} SET data = ? WHERE pk = ?`;
+
+      const updateParams = hasSortKey && sortKey !== undefined
+        ? [JSON.stringify(updatedItem), key, sortKey]
+        : [JSON.stringify(updatedItem), key];
+
+      await this.db!.run(updateSql, updateParams);
+    } else {
+      // Insert new item
+      const insertSql = hasSortKey && sortKey !== undefined
+        ? `INSERT INTO ${tableName} (pk, sk, data) VALUES (?, ?, ?)`
+        : `INSERT INTO ${tableName} (pk, data) VALUES (?, ?)`;
+
+      const insertParams = hasSortKey && sortKey !== undefined
+        ? [key, sortKey, JSON.stringify(updatedItem)]
+        : [key, JSON.stringify(updatedItem)];
+
+      await this.db!.run(insertSql, insertParams);
+    }
+
     // Update indexes
-    await this.updateIndexes(keyValueStoreName, currentItem, updatedItem, key, sortKey || null);
-    
+    await this.updateIndexes(keyValueStoreName, row ? JSON.parse(row.data) : null, updatedItem, key, sortKey || null);
+
     return updatedItem;
   }
 
