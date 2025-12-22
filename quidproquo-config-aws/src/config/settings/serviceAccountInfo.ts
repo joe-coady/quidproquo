@@ -10,6 +10,7 @@ export interface QPQConfigAdvancedAwsServiceAccountInfoSettings extends QPQConfi
   logServiceName?: string;
 
   disableLogs?: boolean;
+  disableLambdaWarming?: boolean;
 }
 
 export interface AwsServiceAccountInfoQPQConfigSetting extends QPQConfigSetting {
@@ -24,6 +25,7 @@ export interface AwsServiceAccountInfoQPQConfigSetting extends QPQConfigSetting 
   lambdaMaxMemoryInMiB: number;
 
   disableLogs: boolean;
+  disableLambdaWarming: boolean;
 }
 
 export const defineAwsServiceAccountInfo = (
@@ -47,4 +49,5 @@ export const defineAwsServiceAccountInfo = (
   logServiceName: options?.logServiceName,
 
   disableLogs: !!options?.disableLogs,
+  disableLambdaWarming: !!options?.disableLambdaWarming,
 });

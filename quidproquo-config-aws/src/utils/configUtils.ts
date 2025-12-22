@@ -147,6 +147,11 @@ export const getAwsServiceAccountInfoByDeploymentInfo = (
   return serviceAccountInfo.info;
 };
 
+export const isLambdaWarmingDisabled = (qpqConfig: QPQConfig): boolean => {
+  const awsServiceAccountInfoConfig = getAwsServiceAccountInfoConfig(qpqConfig);
+  return awsServiceAccountInfoConfig.disableLambdaWarming;
+};
+
 export const getDynamoTableNameOverrride = (srcKvsName: string, qpqConfig: QPQConfig): string => {
   // Get the key value store config
   const resource = qpqCoreUtils.getKeyValueStoreFullyQualifiedResourceName(srcKvsName, qpqConfig);

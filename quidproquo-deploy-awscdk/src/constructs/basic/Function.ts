@@ -82,13 +82,15 @@ export class Function extends QpqConstructBlock {
         : undefined,
     });
 
-    const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(props.qpqConfig);
-    const accountId = qpqConfigAwsUtils.getApplicationModuleDeployAccountId(props.qpqConfig);
+    if (!qpqConfigAwsUtils.isLambdaWarmingDisabled(props.qpqConfig)) {
+      const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(props.qpqConfig);
+      const accountId = qpqConfigAwsUtils.getApplicationModuleDeployAccountId(props.qpqConfig);
 
-    const topicName = this.qpqBootstrapResourceName(BootstrapResource.WarmLambdas);
-    const topicArn = `arn:aws:sns:${region}:${accountId}:${topicName}`;
-    const topic = aws_sns.Topic.fromTopicArn(this, 'ImportedTopic', topicArn);
+      const topicName = this.qpqBootstrapResourceName(BootstrapResource.WarmLambdas);
+      const topicArn = `arn:aws:sns:${region}:${accountId}:${topicName}`;
+      const topic = aws_sns.Topic.fromTopicArn(this, 'ImportedTopic', topicArn);
 
-    topic.addSubscription(new aws_sns_subscriptions.LambdaSubscription(this.lambdaFunction));
+      topic.addSubscription(new aws_sns_subscriptions.LambdaSubscription(this.lambdaFunction));
+    }
   }
 }
