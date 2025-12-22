@@ -53,7 +53,11 @@
     "allowJs": true,
 
     // Generates a .d.ts file for the TypeScript files
-    "declaration": true
+    "declaration": true,
+
+    // allow dot notation when accessing properties defined using an index signature
+    "noPropertyAccessFromIndexSignature": false
+
   },  
   
   // Exclude the node_modules directory to improve performance
