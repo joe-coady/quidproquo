@@ -3,9 +3,9 @@ import { CrossModuleOwner, QPQConfigAdvancedSettings, QPQConfigSetting, qpqCoreU
 import { QPQWebServerConfigSettingType } from '../QPQConfig';
 
 export interface QpqWebSocketEventProcessors {
-  onConnect: QpqFunctionRuntime;
-  onDisconnect: QpqFunctionRuntime;
-  onMessage: QpqFunctionRuntime;
+  onConnect?: QpqFunctionRuntime;
+  onDisconnect?: QpqFunctionRuntime;
+  onMessage?: QpqFunctionRuntime;
 
   // [type: string]: QpqSourceEntry;
 }

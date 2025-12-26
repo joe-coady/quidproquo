@@ -1,4 +1,4 @@
-import { QPQConfig, qpqCoreUtils, QpqFunctionRuntime } from 'quidproquo-core';
+import { isDefined, QPQConfig, qpqCoreUtils, QpqFunctionRuntime } from 'quidproquo-core';
 
 import {
   ApiKeyQPQWebServerConfigSetting,
@@ -63,11 +63,9 @@ export const getAllOpenApiSpecs = (configs: QPQConfig): OpenApiQPQWebServerConfi
 };
 
 export const getAllWebsocketSrcEntries = (qpqConfig: QPQConfig): QpqFunctionRuntime[] => {
-  return getOwnedWebsocketSettings(qpqConfig).flatMap((s) => [
-    s.eventProcessors.onConnect,
-    s.eventProcessors.onDisconnect,
-    s.eventProcessors.onMessage,
-  ]);
+  return getOwnedWebsocketSettings(qpqConfig)
+    .flatMap((s) => [s.eventProcessors.onConnect, s.eventProcessors.onDisconnect, s.eventProcessors.onMessage])
+    .filter(isDefined);
 };
 
 // Used in bundlers to know where and what to build and index
