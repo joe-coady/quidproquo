@@ -3,7 +3,7 @@ import { StateActionType } from './StateActionType';
 
 // Payload
 export type StateReadActionPayload = {
-  path: string;
+  path?: string;
 };
 
 // Action
