@@ -14,3 +14,7 @@ export type QpqMappedApi<TApi extends QpqApi> = {
       : never
     : never;
 };
+
+export const combineQpqApis = <TApiA extends QpqApi, TApiB extends QpqApi>(apiA: TApiA, apiB: TApiB): TApiA & TApiB => {
+  return { ...apiA, ...apiB };
+};
