@@ -1,3 +1,4 @@
+export * from './array';
 export * from './functions';
 export * from './hash';
 export * from './logs';
