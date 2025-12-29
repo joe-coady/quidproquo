@@ -1,6 +1,7 @@
 import { getWebActionProcessors } from 'quidproquo-actionprocessor-web';
 import {
   ActionProcessorListResolver,
+  AskResponse,
   AskResponseReturnType,
   createRuntime,
   defineModule,
@@ -10,9 +11,27 @@ import {
   StoryResolver,
 } from 'quidproquo-core';
 
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import { useQpqContextValues } from './asmj/QpqContextProvider';
+
+function* withVersionCheck<R>(story: AskResponse<R>, versionRef: React.RefObject<number>, capturedVersion: number): AskResponse<R | undefined> {
+  let nextValue: any = undefined;
+
+  while (true) {
+    if (versionRef.current !== capturedVersion) {
+      return undefined;
+    }
+
+    const { value, done } = story.next(nextValue);
+
+    if (done) {
+      return value;
+    }
+
+    nextValue = yield value;
+  }
+}
 
 // WIP ~ useFastCallback, wack things like loggers in a context, try to only make once instance of the runtime.
 // Also don't create every refresh.. useMemo / useCallback etc
@@ -26,6 +45,13 @@ const logger = {
 
 export function useQpq(getActionProcessors: ActionProcessorListResolver = async () => ({})): StoryResolver {
   const qpqContextValues = useQpqContextValues();
+  const versionRef = useRef(0);
+
+  useEffect(() => {
+    return () => {
+      versionRef.current++;
+    };
+  }, []);
 
   const resolveStory = useMemo(
     () =>
@@ -53,7 +79,9 @@ export function useQpq(getActionProcessors: ActionProcessorListResolver = async 
   const qpq = useCallback(
     function getStoryExecutor<S extends Story<any, any>>(story: S): (...args: Parameters<S>) => Promise<AskResponseReturnType<ReturnType<S>>> {
       return async (...args: Parameters<S>) => {
-        const result = await resolveStory(story, args);
+        const capturedVersion = versionRef.current;
+        const wrappedStory = (...storyArgs: Parameters<S>) => withVersionCheck(story(...storyArgs), versionRef, capturedVersion);
+        const result = await resolveStory(wrappedStory, args);
 
         if (result.error) {
           throw new Error(result.error.errorText);
