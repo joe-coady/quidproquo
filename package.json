@@ -4,11 +4,12 @@
   "description": "JS Library for building web servers using pure functions and generators.",
   "main": "index.js",
   "scripts": {
+    "link": "npm exec --ws -- npm link",
     "build": "npm run build --ws",
     "clean": "npm run clean --ws",
     "login": "npm login",
     "publish": "npm publish --ws",
-    "patch": "npm version patch --ws && npx ts-node ./scripts/applyPatch.ts",
+    "patch": "npm version patch --ws && npx tsx ./scripts/applyPatch.ts",
     "go": "npm run patch && npm run build && npm run publish",
     "lint": "npm run lint --ws",
     "lint:fix": "npm run lint:fix --ws",
@@ -69,6 +70,7 @@
   ],
   "devDependencies": {
     "@vitest/coverage-v8": "^3.2.4",
+    "tsx": "^4.21.0",
     "@vitest/ui": "^3.2.4",
     "jsdom": "^26.1.0",
     "prettier": "^3.0.3",

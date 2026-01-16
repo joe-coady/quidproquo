@@ -51,7 +51,6 @@
     "@aws-sdk/s3-request-presigner": "^3.744.0",
     "@types/aws-lambda": "^8.10.109",
     "aws-jwt-verify": "^3.4.0",
-    "aws-sdk": "^2.1322.0",
     "busboy": "^1.6.0",
     "jsonwebtoken": "^9.0.0",
     "jwks-rsa": "^3.0.1",

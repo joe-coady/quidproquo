@@ -51,7 +51,6 @@
     "@types/node": "^22.13.13",
     "@types/prettier": "2.6.0",
     "quidproquo-tsconfig": "0.0.258",
-    "ts-node": "^10.9.1",
     "typescript": "^5.8.2"
   }
 }
