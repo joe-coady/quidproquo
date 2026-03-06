@@ -4,17 +4,17 @@ import { Action, AskResponse, AskResponseReturnType, EitherActionResult } from '
 import { askMap } from '../array/askMap';
 import { askCatch } from './askCatch';
 
-export type ActionOverrideHandler<TPayload = any, TResult = any> = (payload: TPayload) => AskResponse<TResult>;
+export type ActionOverrideHandler<TAction extends Action<any> = Action<any>, TResult = any> = (action: TAction) => AskResponse<TResult>;
 
 export type ActionOverrideMap = {
-  [actionType: string]: ActionOverrideHandler;
+  [actionType: string]: ActionOverrideHandler<any, any>;
 };
 
 function* askProcessAction<R>(action: Action<any>): AskResponse<R> {
   return (yield action) as R;
 }
 
-function getSuccessfulEitherActionResultIfRequired<T, ReturnErrors extends boolean>(
+export function getSuccessfulEitherActionResultIfRequired<T, ReturnErrors extends boolean>(
   value: T,
   returnErrors?: ReturnErrors,
 ): ReturnErrors extends true ? EitherActionResult<T> : T {
@@ -37,9 +37,9 @@ export function* askOverrideActions<T extends AskResponse<any>>(
     // If this action type has an override handler
     if (overrides[action.type]) {
       const handler = overrides[action.type];
-      const result = yield* handler(action.payload);
+      const result = yield* handler(action);
 
-      nextResult = storyIterator.next(getSuccessfulEitherActionResultIfRequired(result, action.returnErrors));
+      nextResult = storyIterator.next(result);
       continue;
     }
 
