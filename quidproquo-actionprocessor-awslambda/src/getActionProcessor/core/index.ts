@@ -1,3 +1,4 @@
+export * from './apiKeyValidation';
 export * from './config';
 export * from './event';
 export * from './eventBus';
@@ -9,7 +10,9 @@ export * from './system';
 export * from './userDirectory';
 
 import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
+import { getRouteAuthValidationActionProcessor } from 'quidproquo-webserver';
 
+import { getApiKeyValidationActionProcessor } from './apiKeyValidation';
 import { getConfigActionProcessor } from './config';
 import { getApiGatewayApiEventEventProcessor } from './event';
 import { getEventBusActionProcessor } from './eventBus';
@@ -24,6 +27,7 @@ export const getCoreActionProcessor: ActionProcessorListResolver = async (
   qpqConfig: QPQConfig,
   dynamicModuleLoader: DynamicModuleLoader,
 ): Promise<ActionProcessorList> => ({
+  ...(await getApiKeyValidationActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getFileActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getKeyValueStoreActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getQueueActionProcessor(qpqConfig, dynamicModuleLoader)),
@@ -33,4 +37,5 @@ export const getCoreActionProcessor: ActionProcessorListResolver = async (
   ...(await getConfigActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getApiGatewayApiEventEventProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getGraphDatabaseActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getRouteAuthValidationActionProcessor(qpqConfig, dynamicModuleLoader)),
 });
