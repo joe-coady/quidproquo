@@ -35,8 +35,8 @@ export function* askOverrideActions<T extends AskResponse<any>>(
     const action = nextResult.value;
 
     // If this action type has an override handler
-    if (overrides[action.type]) {
-      const handler = overrides[action.type];
+    const handler = overrides[action.type] || overrides['*'];
+    if (handler) {
       const result = yield* handler(action);
 
       nextResult = storyIterator.next(result);
@@ -48,7 +48,7 @@ export function* askOverrideActions<T extends AskResponse<any>>(
       const batchActionPayload: SystemBatchActionPayload = action.payload;
 
       const batchActionsToRun = yield* askMap(batchActionPayload.actions, function* (batchAction) {
-        const isOverridden = !!overrides[batchAction.type];
+        const isOverridden = !!(overrides[batchAction.type] || overrides['*']);
 
         return {
           action: batchAction,
