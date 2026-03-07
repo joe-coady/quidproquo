@@ -28,6 +28,7 @@ import {
   AUTH_CREATE_AUTH_CHALLENGE_GenericTextExtractor,
   AUTH_DEFINE_AUTH_CHALLENGE_GenericTextExtractor,
   AUTH_VERIFY_AUTH_CHALLENGE_GenericTextExtractor,
+  deployEventGenericTextExtractor,
   queueEventGenericTextExtractor,
   seoORGenericTextExtractor,
   serviceFunctionExeGenericTextExtractor,
@@ -53,7 +54,7 @@ const extractors: Record<QpqRuntimeType, (sr: StoryResult<any>) => string[]> = {
 
   [QpqRuntimeType.WEBSOCKET_EVENT]: webSocketEventGenericTextExtractor,
 
-  [QpqRuntimeType.DEPLOY_EVENT]: unknownGenericTextExtractor,
+  [QpqRuntimeType.DEPLOY_EVENT]: deployEventGenericTextExtractor,
 
   [QpqRuntimeType.STORAGEDRIVE_EVENT]: unknownGenericTextExtractor,
 

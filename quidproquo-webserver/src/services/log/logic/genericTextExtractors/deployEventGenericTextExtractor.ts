@@ -1,5 +1,6 @@
 import {
   ActionProcessorResult,
+  DeployEvent,
   EventActionType,
   isErroredActionResult,
   QpqRuntimeType,
@@ -8,21 +9,19 @@ import {
   StoryResult,
 } from 'quidproquo-core';
 
-import { SeoEvent } from '../../../../types';
-
-export const seoORGenericTextExtractor = (storyResult: StoryResult<any>): string[] => {
-  if (storyResult.runtimeType === QpqRuntimeType.EVENT_SEO_OR) {
+export const deployEventGenericTextExtractor = (storyResult: StoryResult<any>): string[] => {
+  if (storyResult.runtimeType === QpqRuntimeType.DEPLOY_EVENT) {
     const getRecordsHistory = storyResult.history.find((h) => h.act.type === EventActionType.GetRecords);
 
     if (!getRecordsHistory) {
       return [];
     }
 
-    const actionResult: ActionProcessorResult<SeoEvent[]> = getRecordsHistory.res;
+    const actionResult: ActionProcessorResult<DeployEvent[]> = getRecordsHistory.res;
 
     if (!isErroredActionResult(actionResult)) {
-      const seoEvents = resolveActionResult(actionResult);
-      return seoEvents.flatMap((event) => event.path || '');
+      const deployEvents = resolveActionResult(actionResult);
+      return deployEvents.flatMap((event) => `${event.deployEventType}::${event.deployEventStatusType}`);
     }
 
     return [resolveActionResultError(actionResult).errorText];
