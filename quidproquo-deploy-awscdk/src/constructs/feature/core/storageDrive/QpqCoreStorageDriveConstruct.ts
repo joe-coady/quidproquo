@@ -64,8 +64,6 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
   constructor(scope: Construct, id: string, props: QpqCoreStorageDriveConstructProps) {
     super(scope, id, props);
 
-    console.log(JSON.stringify(props.storageDriveConfig.lifecycleRules?.map(convertStorageDriveLifecycleRuleToAwsS3LifecycleRule), null, 2));
-
     this.bucket = new aws_s3.Bucket(this, 'bucket', {
       bucketName: this.resourceName(props.storageDriveConfig.storageDrive),
 

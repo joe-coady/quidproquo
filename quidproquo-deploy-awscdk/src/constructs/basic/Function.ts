@@ -70,7 +70,10 @@ export class Function extends QpqConstructBlock {
       // TODO: Make this optional
       tracing: aws_lambda.Tracing.DISABLED,
 
-      logRetention: aws_logs.RetentionDays.ONE_WEEK,
+      logGroup: new aws_logs.LogGroup(this, 'LogGroup', {
+        retention: aws_logs.RetentionDays.ONE_WEEK,
+        removalPolicy: cdk.RemovalPolicy.DESTROY,
+      }),
 
       role: props.role,
 

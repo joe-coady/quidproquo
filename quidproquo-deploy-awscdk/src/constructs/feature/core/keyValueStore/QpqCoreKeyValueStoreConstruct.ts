@@ -71,7 +71,9 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
       billingMode: aws_dynamodb.BillingMode.PAY_PER_REQUEST,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       timeToLiveAttribute: props.keyValueStoreConfig.ttlAttribute,
-      pointInTimeRecovery: props.keyValueStoreConfig.enableMonthlyRollingBackups,
+      pointInTimeRecoverySpecification: props.keyValueStoreConfig.enableMonthlyRollingBackups
+        ? { pointInTimeRecoveryEnabled: true }
+        : undefined,
     });
 
     qpqDeployAwsCdkUtils.applyEnvironmentTags(table, props.qpqConfig);
