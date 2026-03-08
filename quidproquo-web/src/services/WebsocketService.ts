@@ -32,6 +32,11 @@ export class WebsocketService {
   private eventListeners: { [key: string]: WebSocketEventListenerFunction[] } = {};
   private isDestroyed: boolean = false;
   private pendingMessages: WebsocketSendPayload[] = [];
+
+  private reconnectAttempts: number = 0;
+  private static readonly BASE_RECONNECT_MS = 1000;
+  private static readonly MAX_RECONNECT_MS = 60_000;
+
   private subscriptions: Subscriptions = {
     [WebsocketServiceEvent.OPEN]: new Map(),
     [WebsocketServiceEvent.CLOSE]: new Map(),
@@ -145,14 +150,28 @@ export class WebsocketService {
   }
 
   private reconnectIfNotDestroyed() {
+    const baseDelay = Math.min(
+      WebsocketService.BASE_RECONNECT_MS * Math.pow(2, this.reconnectAttempts),
+      WebsocketService.MAX_RECONNECT_MS,
+    );
+
+    // Add jitter: ±25% of base delay to prevent thundering herd
+    const jitter = baseDelay * 0.25 * (Math.random() * 2 - 1);
+    const delay = Math.max(0, baseDelay + jitter);
+
+    this.reconnectAttempts++;
+
+    console.log("Delay: ", delay);
+
     setTimeout(() => {
       if (!this.isDestroyed) {
         this.connect();
       }
-    }, 1000);
+    }, delay);
   }
 
   private onConnect() {
+    this.reconnectAttempts = 0;
     this.notifySubscribers(WebsocketServiceEvent.OPEN);
     const messages = this.pendingMessages;
     this.pendingMessages = [];
