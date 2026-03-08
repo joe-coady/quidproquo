@@ -65,7 +65,7 @@ export function* askOverrideActions<T extends AskResponse<any>>(
 
     // Check if we have an override for this specific action type, or a "*" wildcard catch-all.
     // The specific type takes priority over the wildcard because we check it first.
-    const handler = overrides[action.type] || overrides['*'];
+    const handler = overrides[action.type] || (action.type !== SystemActionType.Batch ? overrides['*'] : undefined);
     if (handler) {
       // We have an override! Run the user's handler instead of letting the runtime process it.
       // The handler is itself a story (generator), so we yield* into it to run it.

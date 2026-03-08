@@ -16,7 +16,12 @@ export async function processAction(
     if (!processor) {
       throw new Error(`Unable to process action: ${action?.type} from [${Object.keys(actionProcessors).join(', ')}]`);
     }
-    return await processor(action.payload, session, actionProcessors, logger, updateSession, dynamicModuleLoader);
+
+    // Merge any context carried on the action into the session
+    // This allows context providers to propagate values to sub-runtimes
+    const effectiveSession = { ...session, context: { ...session.context, ...action.context } };
+
+    return await processor(action.payload, effectiveSession, actionProcessors, logger, updateSession, dynamicModuleLoader);
   } catch (e: unknown) {
     if (e instanceof Error) {
       const errorName = (e as any).name;
