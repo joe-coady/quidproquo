@@ -1,6 +1,7 @@
 import { QPQConfig } from '../config';
 import { DynamicModuleLoader } from './DynamicModuleLoader';
 import { QPQError } from './ErrorTypeEnum';
+import { QpqContext } from './QpqContextIdentifier';
 import { QpqLogger } from './QpqLogger';
 import { ExtractGeneratorReturnType, StoryResult, StorySession, StorySessionUpdater } from './StorySession';
 
@@ -11,6 +12,7 @@ export interface Action<T> {
   payload?: T;
 
   returnErrors?: boolean;
+  context?: QpqContext<any>;
 }
 
 // Result tuple ~ Either result or error
