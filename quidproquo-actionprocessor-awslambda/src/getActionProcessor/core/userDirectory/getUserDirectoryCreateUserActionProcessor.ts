@@ -3,7 +3,9 @@ import {
   ActionProcessorList,
   ActionProcessorListResolver,
   actionResult,
+  actionResultError,
   AuthenticateUserResponse,
+  ErrorTypeEnum,
   QPQConfig,
   qpqCoreUtils,
   UserDirectoryActionType,
@@ -13,6 +15,7 @@ import {
 import { getCFExportNameUserPoolClientIdFromConfig, getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { createUser } from '../../../logic/cognito/createUser';
+import { resolveUsernameByPreferredUsername } from '../../../logic/cognito/resolveUsernameByPreferredUsername';
 
 const getProcessCreateUser = (qpqConfig: QPQConfig): UserDirectoryCreateUserActionProcessor => {
   return async (payload) => {
@@ -22,9 +25,14 @@ const getProcessCreateUser = (qpqConfig: QPQConfig): UserDirectoryCreateUserActi
 
     const userPoolClientId = await getExportedValue(getCFExportNameUserPoolClientIdFromConfig(payload.userDirectoryName, qpqConfig), region);
 
+    const resolvedUsername = await resolveUsernameByPreferredUsername(userPoolId, region, payload.createUserRequest.email);
+    if (resolvedUsername !== payload.createUserRequest.email) {
+      return actionResultError(ErrorTypeEnum.Conflict, 'An account with this email already exists');
+    }
+
     const authResponse: AuthenticateUserResponse = await createUser(
       userPoolId,
-      qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig),
+      region,
       userPoolClientId,
       payload.createUserRequest,
     );
