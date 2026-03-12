@@ -1,6 +1,6 @@
 {
   "name": "quidproquo-deploy-awscdk",
-  "version": "0.0.260",
+  "version": "0.0.261",
   "description": "",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
@@ -38,11 +38,11 @@
     "constructs": "^10.4.2",
     "esbuild": "^0.25.8",
     "liquidjs": "^10.7.0",
-    "quidproquo-actionprocessor-awslambda": "0.0.260",
-    "quidproquo-actionprocessor-node": "0.0.260",
-    "quidproquo-config-aws": "0.0.260",
-    "quidproquo-core": "0.0.260",
-    "quidproquo-webserver": "0.0.260",
+    "quidproquo-actionprocessor-awslambda": "0.0.261",
+    "quidproquo-actionprocessor-node": "0.0.261",
+    "quidproquo-config-aws": "0.0.261",
+    "quidproquo-core": "0.0.261",
+    "quidproquo-webserver": "0.0.261",
     "upath": "^2.0.1"
   },
   "devDependencies": {
@@ -50,7 +50,7 @@
     "@types/babel__traverse": "7.18.2",
     "@types/node": "^22.13.13",
     "@types/prettier": "2.6.0",
-    "quidproquo-tsconfig": "0.0.260",
+    "quidproquo-tsconfig": "0.0.261",
     "typescript": "^5.8.2"
   }
 }
