@@ -14,6 +14,7 @@ import {
 import { getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { getUserAttributes } from '../../../logic/cognito/getUserAttributes';
+import { resolveUsernameByPreferredUsername } from '../../../logic/cognito/resolveUsernameByPreferredUsername';
 
 const getProcessGetUserAttributes = (qpqConfig: QPQConfig): UserDirectoryGetUserAttributesActionProcessor => {
   return async ({ userDirectoryName, username }) => {
@@ -22,7 +23,9 @@ const getProcessGetUserAttributes = (qpqConfig: QPQConfig): UserDirectoryGetUser
     const userPoolId = await getExportedValue(getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig), region);
 
     try {
-      const userAttributes = await getUserAttributes(userPoolId, region, username);
+      const resolvedUsername = await resolveUsernameByPreferredUsername(userPoolId, region, username);
+
+      const userAttributes = await getUserAttributes(userPoolId, region, resolvedUsername);
 
       return actionResult(userAttributes);
     } catch (error: unknown) {

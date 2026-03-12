@@ -12,6 +12,7 @@ import {
 import { getCFExportNameUserPoolClientIdFromConfig, getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { forgotPassword } from '../../../logic/cognito/forgotPassword';
+import { resolveUsernameByPreferredUsername } from '../../../logic/cognito/resolveUsernameByPreferredUsername';
 
 const getProcessForgotPassword = (qpqConfig: QPQConfig): UserDirectoryForgotPasswordActionProcessor => {
   return async ({ username, userDirectoryName }) => {
@@ -21,11 +22,13 @@ const getProcessForgotPassword = (qpqConfig: QPQConfig): UserDirectoryForgotPass
 
     const userPoolClientId = await getExportedValue(getCFExportNameUserPoolClientIdFromConfig(userDirectoryName, qpqConfig), region);
 
+    const resolvedUsername = await resolveUsernameByPreferredUsername(userPoolId, region, username);
+
     const authResponse: AuthenticationDeliveryDetails = await forgotPassword(
       userPoolId,
       userPoolClientId,
-      qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig),
-      username,
+      region,
+      resolvedUsername,
     );
 
     return actionResult(authResponse);

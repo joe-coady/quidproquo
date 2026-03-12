@@ -15,6 +15,7 @@ import {
 import { getCFExportNameUserPoolClientIdFromConfig, getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { authenticateUser } from '../../../logic/cognito/authenticateUser';
+import { resolveUsernameByPreferredUsername } from '../../../logic/cognito/resolveUsernameByPreferredUsername';
 
 const getProcessAuthenticateUser = (qpqConfig: QPQConfig): UserDirectoryAuthenticateUserActionProcessor => {
   return async (payload) => {
@@ -23,12 +24,14 @@ const getProcessAuthenticateUser = (qpqConfig: QPQConfig): UserDirectoryAuthenti
     const userPoolClientId = await getExportedValue(getCFExportNameUserPoolClientIdFromConfig(payload.userDirectoryName, qpqConfig), region);
 
     try {
+      const resolvedUsername = await resolveUsernameByPreferredUsername(userPoolId, region, payload.authenticateUserRequest.email);
+
       const authResponse = await authenticateUser(
         userPoolId,
         userPoolClientId,
-        qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig),
+        region,
         payload.authenticateUserRequest.isCustom,
-        payload.authenticateUserRequest.email,
+        resolvedUsername,
         payload.authenticateUserRequest.password,
       );
 

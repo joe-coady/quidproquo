@@ -11,6 +11,7 @@ import {
 import { getCFExportNameUserPoolClientIdFromConfig, getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { confirmForgotPassword } from '../../../logic/cognito/confirmForgotPassword';
+import { resolveUsernameByPreferredUsername } from '../../../logic/cognito/resolveUsernameByPreferredUsername';
 
 const getProcessConfirmForgotPassword = (qpqConfig: QPQConfig): UserDirectoryConfirmForgotPasswordActionProcessor => {
   return async ({ userDirectoryName, code, username, password }) => {
@@ -20,7 +21,9 @@ const getProcessConfirmForgotPassword = (qpqConfig: QPQConfig): UserDirectoryCon
 
     const userPoolClientId = await getExportedValue(getCFExportNameUserPoolClientIdFromConfig(userDirectoryName, qpqConfig), region);
 
-    const authResponse = await confirmForgotPassword(userPoolId, userPoolClientId, region, code, username, password);
+    const resolvedUsername = await resolveUsernameByPreferredUsername(userPoolId, region, username);
+
+    const authResponse = await confirmForgotPassword(userPoolId, userPoolClientId, region, code, resolvedUsername, password);
 
     return actionResult(authResponse);
   };

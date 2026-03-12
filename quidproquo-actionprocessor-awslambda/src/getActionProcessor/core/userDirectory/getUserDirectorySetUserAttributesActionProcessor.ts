@@ -10,6 +10,7 @@ import {
 
 import { getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
+import { resolveUsernameByPreferredUsername } from '../../../logic/cognito/resolveUsernameByPreferredUsername';
 import { setUserAttributes } from '../../../logic/cognito/setUserAttributes';
 
 const getProcessSetUserAttributes = (qpqConfig: QPQConfig): UserDirectorySetUserAttributesActionProcessor => {
@@ -18,7 +19,9 @@ const getProcessSetUserAttributes = (qpqConfig: QPQConfig): UserDirectorySetUser
 
     const userPoolId = await getExportedValue(getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig), region);
 
-    await setUserAttributes(userPoolId, region, username, userAttributes);
+    const resolvedUsername = await resolveUsernameByPreferredUsername(userPoolId, region, username);
+
+    await setUserAttributes(userPoolId, region, resolvedUsername, userAttributes);
 
     return actionResult(void 0);
   };
