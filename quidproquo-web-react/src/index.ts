@@ -1,5 +1,6 @@
 import 'symbol-observable';
 
+export * from './actionProcessor';
 export * from './api';
 export * from './auth';
 export * from './baseUrl';

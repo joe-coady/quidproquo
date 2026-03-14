@@ -1,12 +1,14 @@
-import { Story } from 'quidproquo-core';
+import { ActionProcessorListResolver, Story } from 'quidproquo-core';
 
-import { useEffect, useMemo, useState } from 'react';
+import { Dispatch, useEffect, useMemo, useState } from 'react';
 
 import { useQpq } from '../useQpq';
 import { getStateActionProcessor } from './actionProcessor';
 import { useQpqRuntimeBubblingReducer } from './bubbleReducer';
 import { QpqRuntimeDefinition } from './createQpqRuntimeDefinition';
 import { QpqApi, QpqMappedApi } from './QpqMappedApi';
+
+export type ActionProcessorListResolverFactory<TState = any> = (dispatch: Dispatch<any>, getCurrentState: () => TState) => ActionProcessorListResolver;
 
 export function useQpqRuntime<
   TState,
@@ -17,6 +19,7 @@ export function useQpqRuntime<
   atom: QpqRuntimeDefinition<TState, TAction, TApi>,
   mainStory?: Story<any, any>,
   name?: string,
+  getActionProcessors: ActionProcessorListResolverFactory<TState> = () => async () => ({}),
 ): [QpqMappedApi<TApi>, TState, (action: any) => void] {
   const atomInfo = useMemo(() => atom(name), [atom, name]);
 
@@ -24,7 +27,13 @@ export function useQpqRuntime<
 
   // Api generators are memoized to prevent unnecessary re-renders.
   const [memoedApiGenerators] = useState(() => atomInfo.api);
-  const resolver = useQpq(getStateActionProcessor(dispatch, getCurrentState));
+
+  const mergedProcessors: ActionProcessorListResolver = async (qpqConfig, dynamicModuleLoader) => ({
+    ...(await getStateActionProcessor(dispatch, getCurrentState)(qpqConfig, dynamicModuleLoader)),
+    ...(await getActionProcessors(dispatch, getCurrentState)(qpqConfig, dynamicModuleLoader)),
+  });
+
+  const resolver = useQpq(mergedProcessors);
 
   // Wrap and remap each API generator using the resolver.
   const api = useMemo(() => {
