@@ -1,7 +1,7 @@
 import { askBatch, askThrowError, SystemActionType, SystemBatchActionPayload } from '../../actions';
 import { getSuccessfulEitherActionResult } from '../../logic/actionLogic';
 import { Action, AskResponse, AskResponseReturnType, EitherActionResult } from '../../types';
-import { askMap } from '../array/askMap';
+import { askMapParallel } from '../array/askMapParallel';
 import { askCatch } from './askCatch';
 
 // A function that takes an action and returns a story (generator) that produces the override result.
@@ -92,7 +92,7 @@ export function* askOverrideActions<T extends AskResponse<any>>(
       // Go through every action in the batch one by one using askMap.
       // For each action, we figure out if we need to handle it ourselves (override or nested batch)
       // or if we can leave it for the runtime to process in the remaining batch.
-      const batchActionsToRun = yield* askMap(batchActionPayload.actions, function* (batchAction) {
+      const batchActionsToRun = yield* askMapParallel(batchActionPayload.actions, function* (batchAction) {
         // Does this individual action have an override handler (specific type or wildcard)?
         const isOverridden = !!(overrides[batchAction.type] || overrides['*']);
 
