@@ -13,6 +13,7 @@ import {
 
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 
+import { useActionProcessors } from '../actionProcessor';
 import { useQpqContextValues } from './asmj/QpqContextProvider';
 
 function* withVersionCheck<R>(story: AskResponse<R>, versionRef: React.RefObject<number>, capturedVersion: number): AskResponse<R | undefined> {
@@ -45,6 +46,7 @@ const logger = {
 
 export function useQpq(getActionProcessors: ActionProcessorListResolver = async () => ({})): StoryResolver {
   const qpqContextValues = useQpqContextValues();
+  const contextGetActionProcessors = useActionProcessors();
   const versionRef = useRef(0);
 
   useEffect(() => {
@@ -63,6 +65,7 @@ export function useQpq(getActionProcessors: ActionProcessorListResolver = async 
         },
         async (qpqConfig, dynamicModuleLoader) => ({
           ...(await getWebActionProcessors(qpqConfig, dynamicModuleLoader)),
+          ...(await contextGetActionProcessors(qpqConfig, dynamicModuleLoader)),
           ...(await getActionProcessors(qpqConfig, dynamicModuleLoader)),
         }),
         () => new Date().toISOString(),
