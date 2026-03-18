@@ -2,22 +2,22 @@ import { AskResponse } from 'quidproquo-core';
 
 import { askServiceRequest } from './ServiceRequestActionRequester';
 
-export interface ServiceRequester<TPayload> {
-  (payload: TPayload): AskResponse<void>;
+export interface ServiceRequester<TPayload, TResponse> {
+  (payload: TPayload): AskResponse<TResponse>;
   serviceRequest: { serviceName: string; method: string };
 }
 
-export const createServiceRequester = <TPayload>(
+export const createServiceRequester = <TPayload, TResponse = void>(
   serviceName: string,
-  method: string
+  method: string,
 ) => {
   const requester = function* askWrapServiceRequest(
-    payload: TPayload
-  ): AskResponse<void> {
-    yield* askServiceRequest(serviceName, method, payload);
+    payload: TPayload,
+  ): AskResponse<TResponse> {
+    return yield* askServiceRequest(serviceName, method, payload);
   };
 
   requester.serviceRequest = { serviceName, method };
 
-  return requester as ServiceRequester<TPayload>;
+  return requester as ServiceRequester<TPayload, TResponse>;
 };

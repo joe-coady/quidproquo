@@ -19,8 +19,12 @@ export function useQpqWebsocketQueueRuntime<
   mainStory?: Story<any, any>,
   name?: string,
   getActionProcessors?: ActionProcessorListResolverFactory<TState>,
-): [QpqMappedApi<TApi>, TState, (action: any) => void, (event: Omit<AnyWebSocketQueueEventMessageWithCorrelation, 'correlationId'>) => void] {
-  const sendEventRef = useRef<((event: Omit<AnyWebSocketQueueEventMessageWithCorrelation, 'correlationId'>) => void) | null>(null);
+): [
+  QpqMappedApi<TApi>,
+  TState, (action: any) => void,
+  (event: Omit<AnyWebSocketQueueEventMessageWithCorrelation, 'correlationId'>) => Promise<any>
+] {
+  const sendEventRef = useRef<((event: Omit<AnyWebSocketQueueEventMessageWithCorrelation, 'correlationId'>) => Promise<any>) | null>(null);
 
   const mergedFactory: ActionProcessorListResolverFactory<TState> = (dispatch, getCurrentState) => {
     const serviceResolver = async () => getServiceRequestActionProcessor(sendEventRef);
