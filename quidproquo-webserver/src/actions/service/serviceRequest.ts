@@ -1,8 +1,9 @@
 import {
+  askCatch,
   AskResponse,
   QueueEvent,
   QueueEventResponse,
-  QueueMessage,
+  QueueMessage
 } from 'quidproquo-core';
 
 import { askWebsocketReadConnectionInfo } from '../../context';
@@ -21,7 +22,7 @@ export const serviceRequest = <R extends ServiceRequester<any, any>>(
   const { method } = requester.serviceRequest;
 
   const wrapper = function* wrapper(event: QueueEvent<QueueMessage<any>>) {
-    const result = yield* runtime(event.message.payload);
+    const result = yield* askCatch(runtime(event.message.payload));
 
     const { connectionId, correlationId } =
       yield* askWebsocketReadConnectionInfo();

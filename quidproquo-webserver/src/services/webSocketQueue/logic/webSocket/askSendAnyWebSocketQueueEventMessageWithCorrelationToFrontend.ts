@@ -1,6 +1,6 @@
 import { askCatch, AskResponse } from 'quidproquo-core';
 
-import { askWebsocketSendMessage } from '../../../../actions';
+import { askWebsocketSendMessage } from '../../../../actions/websocket/WebsocketSendMessageActionRequester';
 import { askWebsocketReadApiNameOrThrow, askWebsocketReadConnectionInfo } from '../../../../context';
 import { webSocketConnectionData } from '../../data';
 import { AnyWebSocketQueueEventMessageWithCorrelation } from '../../types';
