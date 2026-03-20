@@ -186,7 +186,7 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
       const edgeFunctionVR = new aws_cloudfront.experimental.EdgeFunction(this, `SEO-VR`, {
         functionName: this.qpqResourceName(props.webEntryConfig.name, 'SEO-VR'),
         timeout: cdk.Duration.seconds(5),
-        runtime: aws_lambda.Runtime.NODEJS_18_X,
+        runtime: aws_lambda.Runtime.NODEJS_20_X,
 
         code: aws_lambda.Code.fromAsset(path.join(seoEntryBuildPath, 'cloudFrontRequestEvent_viewerRequest')),
         handler: 'index.cloudFrontRequestEvent_viewerRequest',
@@ -195,7 +195,7 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
       const edgeFunctionOR = new aws_cloudfront.experimental.EdgeFunction(this, `SEO-OR`, {
         functionName: this.qpqResourceName(props.webEntryConfig.name, 'SEO-OR'),
         timeout: cdk.Duration.seconds(30),
-        runtime: aws_lambda.Runtime.NODEJS_18_X,
+        runtime: aws_lambda.Runtime.NODEJS_20_X,
 
         memorySize: 1024,
 
