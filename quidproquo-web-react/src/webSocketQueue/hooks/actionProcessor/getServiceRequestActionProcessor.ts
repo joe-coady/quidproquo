@@ -1,5 +1,5 @@
  
-import { ActionProcessorList, actionResult } from 'quidproquo-core';
+import { ActionProcessorList, actionResult, actionResultError } from 'quidproquo-core';
 import { AnyWebSocketQueueEventMessageWithCorrelation, ServiceActionType } from 'quidproquo-webserver';
 
 import { RefObject } from 'react';
@@ -17,6 +17,11 @@ export const getServiceRequestActionProcessor = (
     payload: any;
   }) => {
     const response = await sendEventRef.current?.({ type: `qpq/serviceRequest/${serviceName}/${method}`, payload } as any);
-    return actionResult(response);
+
+    if (response && !response.success) {
+      return actionResultError(response.error.errorType, response.error.errorText, response.error.errorStack);
+    }
+
+    return actionResult(response?.result);
   },
 });
