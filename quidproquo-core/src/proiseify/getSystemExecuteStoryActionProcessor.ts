@@ -15,6 +15,7 @@ import {
   Story,
   StorySession,
   StorySessionUpdater,
+  StreamRegistry,
 } from '../types';
 
 export const getDateNow = () => new Date().toISOString();
@@ -36,8 +37,8 @@ export function qpqPromisify<S extends Story<any, any>>(
       while (!storyProgress.done) {
         const action = storyProgress.value;
 
-        const [payload, session, actionProcessors, logger, updateSession, dynamicModuleLoader] = runtimeInfo;
-        const actionResult = await processAction(action, actionProcessors, session, logger, updateSession, dynamicModuleLoader);
+        const [payload, session, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry] = runtimeInfo;
+        const actionResult = await processAction(action, actionProcessors, session, logger, updateSession, dynamicModuleLoader, streamRegistry);
 
         const isSuccess = !isErroredActionResult(actionResult);
 
@@ -80,6 +81,7 @@ const getProcessExecuteStory = <T extends Array<any>, R>(qpqConfig: QPQConfig): 
     logger: QpqLogger,
     updateSession: StorySessionUpdater,
     dynamicModuleLoader: DynamicModuleLoader,
+    streamRegistry: StreamRegistry,
   ): Promise<any> => {
     let story = await dynamicModuleLoader(payload.runtime);
     if (!story) {
@@ -87,7 +89,7 @@ const getProcessExecuteStory = <T extends Array<any>, R>(qpqConfig: QPQConfig): 
     }
 
     try {
-      const qpqPromisifyRuntime: QpqPromisifyRuntime = [payload, session, actionProcessors, logger, updateSession, dynamicModuleLoader];
+      const qpqPromisifyRuntime: QpqPromisifyRuntime = [payload, session, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry];
       const result = await story(...payload.params, getRun(qpqPromisifyRuntime));
 
       return actionResult<R>(result);

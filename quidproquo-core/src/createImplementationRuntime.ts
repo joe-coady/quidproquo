@@ -11,6 +11,7 @@ import {
   QpqLogger,
   QpqRuntimeType,
   StorySession,
+  StreamRegistry,
 } from './types';
 
 // export const getDateNow = () => new Date().toISOString();
@@ -41,6 +42,7 @@ export const createImplementationRuntime = (
   actionProcessors: ActionProcessorList,
   logger: QpqLogger,
   dynamicModuleLoader: DynamicModuleLoader,
+  streamRegistry?: StreamRegistry,
 ): ReturnType<typeof createRuntime> => {
   const moduleName = getApplicationModuleName(qpqConfig);
 
@@ -61,6 +63,7 @@ export const createImplementationRuntime = (
     dynamicModuleLoader,
     undefined,
     tags,
+    streamRegistry,
   );
 
   return resolveStory;
@@ -74,7 +77,7 @@ export const getProcessCustomImplementation = <T extends ActionProcessor<any, an
   getDateNow: () => string,
   getNewGuid: () => string,
 ): T => {
-  const actionProcesor: ActionProcessor<any, any> = async (payload, session, actionProcessorList, logger, updateSession, dynamicModuleLoader) => {
+  const actionProcesor: ActionProcessor<any, any> = async (payload, session, actionProcessorList, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
     const resolveStory = createImplementationRuntime(
       qpqConfig,
       [tag],
@@ -87,6 +90,7 @@ export const getProcessCustomImplementation = <T extends ActionProcessor<any, an
       },
       logger,
       dynamicModuleLoader,
+      streamRegistry,
     );
 
     const storyResult = await resolveStory(story, [payload]);

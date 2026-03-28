@@ -9,6 +9,7 @@ import { getFileListDirectoryActionProcessor } from './getFileListDirectoryActio
 import { getFileReadBinaryContentsActionProcessor } from './getFileReadBinaryContentsActionProcessor';
 import { getFileReadObjectJsonActionProcessor } from './getFileReadObjectJsonActionProcessor';
 import { getFileReadTextContentsActionProcessor } from './getFileReadTextContentsActionProcessor';
+import { getFileStreamOpenActionProcessor } from './getFileStreamOpenActionProcessor';
 import { getFileWriteBinaryContentsActionProcessor } from './getFileWriteBinaryContentsActionProcessor';
 import { getFileWriteObjectJsonActionProcessor } from './getFileWriteObjectJsonActionProcessor';
 import { getFileWriteTextContentsActionProcessor } from './getFileWriteTextContentsActionProcessor';
@@ -36,6 +37,7 @@ export const getFileActionProcessor = (
     ...(await getFileGenerateTemporarySecureUrlActionProcessor(fileStorageConfig)(qpqConfig, dynamicModuleLoader)),
     ...(await getFileGenerateTemporaryUploadSecureUrlActionProcessor(fileStorageConfig)(qpqConfig, dynamicModuleLoader)),
     ...(await getFileIsColdStorageActionProcessor(fileStorageConfig)(qpqConfig, dynamicModuleLoader)),
+    ...(await getFileStreamOpenActionProcessor(fileStorageConfig)(qpqConfig, dynamicModuleLoader)),
   });
 };
 

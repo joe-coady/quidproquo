@@ -5,3 +5,4 @@ export * from './error';
 export * from './logHistory';
 export * from './lookup';
 export * from './stateEffects';
+export * from './stream';

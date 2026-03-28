@@ -14,11 +14,11 @@ import {
 } from 'quidproquo-core';
 
 const getProcessSystemBatch = (qpqConfig: QPQConfig): SystemBatchActionProcessor<any[]> => {
-  return async (payload, session, actionProcessors, logger, updateSession, dynamicModuleLoader) => {
+  return async (payload, session, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
     // console.log('~~~~~~~~~~~ RUNNING BATCH ~~~~~~~~~: ', payload);
 
     const batchRes = await Promise.all(
-      payload.actions.map((a: any) => processAction(a, actionProcessors, session, logger, updateSession, dynamicModuleLoader)),
+      payload.actions.map((a: any) => processAction(a, actionProcessors, session, logger, updateSession, dynamicModuleLoader, streamRegistry)),
     );
 
     // console.log('~~~~~~~~~~~ RESULT BATCH ~~~~~~~~~: ', batchRes);

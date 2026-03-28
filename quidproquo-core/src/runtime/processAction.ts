@@ -1,5 +1,5 @@
 import { actionResultError } from '../logic/actionLogic';
-import { DynamicModuleLoader, QpqLogger, StorySession } from '../types';
+import { DynamicModuleLoader, QpqLogger, StorySession, StreamRegistry } from '../types';
 import { Action, ActionProcessorList, ActionProcessorResult } from '../types/Action';
 import { ErrorTypeEnum } from '../types/ErrorTypeEnum';
 
@@ -10,6 +10,7 @@ export async function processAction(
   logger: QpqLogger,
   updateSession: (session: Partial<StorySession>) => void,
   dynamicModuleLoader: DynamicModuleLoader,
+  streamRegistry: StreamRegistry,
 ): Promise<ActionProcessorResult<any>> {
   try {
     const processor = actionProcessors?.[action?.type];
@@ -21,7 +22,7 @@ export async function processAction(
     // This allows context providers to propagate values to sub-runtimes
     const effectiveSession = { ...session, context: { ...session.context, ...action.context } };
 
-    return await processor(action.payload, effectiveSession, actionProcessors, logger, updateSession, dynamicModuleLoader);
+    return await processor(action.payload, effectiveSession, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry);
   } catch (e: unknown) {
     if (e instanceof Error) {
       const errorName = (e as any).name;

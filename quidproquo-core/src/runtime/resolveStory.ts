@@ -1,7 +1,8 @@
 import { QPQConfig } from '../config';
 import { isErroredActionResult, resolveActionResult, resolveActionResultError } from '../logic/actionLogic';
+import { createStreamRegistry } from '../logic/stream';
 import { getApplicationModuleName } from '../qpqCoreUtils';
-import { QpqFunctionRuntime, QpqLogger } from '../types';
+import { QpqFunctionRuntime, QpqLogger, StreamRegistry } from '../types';
 import { Action, ActionProcessorList } from '../types/Action';
 import { ErrorTypeEnum } from '../types/ErrorTypeEnum';
 import { QpqRuntimeType, Story, StoryResult, StorySession, StorySessionUpdater } from '../types/StorySession';
@@ -20,8 +21,10 @@ export async function resolveStory<TArgs extends Array<any>>(
   dynamicModuleLoader: any,
   qpqFunctionRuntimeInfo?: QpqFunctionRuntime,
   initialTags?: string[],
+  streamRegistry?: StreamRegistry,
 ): Promise<StoryResult<any>> {
   const actionProcessors: ActionProcessorList = await getActionProcessors(qpqConfig, dynamicModuleLoader);
+  const registry = streamRegistry ?? createStreamRegistry();
   const reader = story(...args);
 
   let storyProgress: IteratorResult<Action<any>, any> | null = null;
@@ -70,7 +73,7 @@ export async function resolveStory<TArgs extends Array<any>>(
       const action = storyProgress.value;
       const executionTime = getTimeNow();
 
-      const actionResult = await processAction(action, actionProcessors, storySession, logger, updateSession, dynamicModuleLoader);
+      const actionResult = await processAction(action, actionProcessors, storySession, logger, updateSession, dynamicModuleLoader, registry);
 
       const historyEntry = {
         act: action,

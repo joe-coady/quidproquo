@@ -20,8 +20,8 @@ const getProcessRouteAuthValidationDecode = (qpqConfig: QPQConfig): RouteAuthVal
     generateUUID,
   );
 
-  return async (payload, session, actionProcessorList, logger, updateSession, dynamicModuleLoader) => {
-    const [result, error] = await decodeAuth(payload, session, actionProcessorList, logger, updateSession, dynamicModuleLoader);
+  return async (payload, session, actionProcessorList, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
+    const [result, error] = await decodeAuth(payload, session, actionProcessorList, logger, updateSession, dynamicModuleLoader, streamRegistry);
 
     if (error) {
       return actionResult(null);

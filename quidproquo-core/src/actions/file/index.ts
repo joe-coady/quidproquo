@@ -17,6 +17,8 @@ export * from './FileReadObjectJsonActionRequester';
 export * from './FileReadObjectJsonActionTypes';
 export * from './FileReadTextContentsActionRequester';
 export * from './FileReadTextContentsActionTypes';
+export * from './FileStreamOpenActionTypes';
+export * from './FileStreamOpenRequester';
 export * from './FileWriteBinaryContentsActionRequester';
 export * from './FileWriteBinaryContentsActionTypes';
 export * from './FileWriteObjectJsonActionRequester';

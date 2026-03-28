@@ -9,6 +9,7 @@ import { getFileListDirectoryActionProcessor } from './getFileListDirectoryActio
 import { getFileReadBinaryContentsActionProcessor } from './getFileReadBinaryContentsActionProcessor';
 import { getFileReadObjectJsonActionProcessor } from './getFileReadObjectJsonActionProcessor';
 import { getFileReadTextContentsActionProcessor } from './getFileReadTextContentsActionProcessor';
+import { getFileStreamOpenActionProcessor } from './getFileStreamOpenActionProcessor';
 import { getFileWriteBinaryContentsActionProcessor } from './getFileWriteBinaryContentsActionProcessor';
 import { getFileWriteObjectJsonActionProcessor } from './getFileWriteObjectJsonActionProcessor';
 import { getFileWriteTextContentsActionProcessor } from './getFileWriteTextContentsActionProcessor';
@@ -29,4 +30,5 @@ export const getFileActionProcessor: ActionProcessorListResolver = async (
   ...(await getFileReadBinaryContentsActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getFileWriteObjectJsonActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getFileWriteBinaryContentsActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getFileStreamOpenActionProcessor(qpqConfig, dynamicModuleLoader)),
 });
