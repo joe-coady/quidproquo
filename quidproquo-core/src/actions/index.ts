@@ -8,6 +8,7 @@ export * from './eventBus';
 export * from './file';
 export * from './graphDatabase';
 export * from './guid';
+export * from './inlineFunction';
 export * from './keyValueStore';
 export * from './log';
 export * from './math';
