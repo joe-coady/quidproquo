@@ -26,5 +26,6 @@ export * from './QueueEvent';
 export * from './Readonlyify';
 export * from './ScheduledEvent';
 export * from './StorySession';
+export * from './StreamRegistry';
 export * from './UnboundLogicStory';
 export * from './utils';

@@ -10,6 +10,7 @@ import { getLogActionProcessor } from './log';
 import { getMathActionProcessor } from './math';
 import { getNetworkActionProcessor } from './network';
 import { getPlatformActionProcessor } from './platform';
+import { getStreamActionProcessor } from './stream';
 import { getSystemActionProcessor } from './system';
 
 export * from './claudeAi';
@@ -22,6 +23,7 @@ export * from './log';
 export * from './math';
 export * from './network';
 export * from './platform';
+export * from './stream';
 export * from './system';
 
 // Custom actions is not done here, as it has to be done last after all
@@ -41,5 +43,6 @@ export const getCoreActionProcessor: ActionProcessorListResolver = async (
   ...(await getMathActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getNetworkActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getPlatformActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getStreamActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getSystemActionProcessor(qpqConfig, dynamicModuleLoader)),
 });

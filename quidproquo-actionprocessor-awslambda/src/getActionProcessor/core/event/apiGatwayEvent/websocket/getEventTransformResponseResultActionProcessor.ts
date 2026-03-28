@@ -36,10 +36,10 @@ const getProcessTransformResponseResult = (
     EventTransformResponseResultActionProcessor<EventInput, InternalEventOutput, EventOutput>
   >(qpqConfig, askTransformResponseStory, 'Transform Errored Websocket Response', null, () => new Date().toISOString(), randomGuid);
 
-  return async (payload, session, actionProcessors, logger, updateSession, dynamicModuleLoader) => {
+  return async (payload, session, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
     if (payload.qpqEventRecordResponses.some((r) => !r.success)) {
       // We only wan't to run this for errors, because a custom imp is slower then a regular imp
-      return await errorCustomImplementation(payload, session, actionProcessors, logger, updateSession, dynamicModuleLoader);
+      return await errorCustomImplementation(payload, session, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry);
     }
 
     return actionResult<EventOutput>({
