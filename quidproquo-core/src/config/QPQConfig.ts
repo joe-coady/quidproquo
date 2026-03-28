@@ -21,6 +21,7 @@ export enum QPQCoreConfigSettingType {
   graphDatabase = '@quidproquo-core/config/GraphDatabase',
   virtualNetwork = '@quidproquo-core/config/VirtualNetwork',
   notifyError = '@quidproquo-core/config/notifyError',
+  inlineFunction = '@quidproquo-core/config/InlineFunction',
 }
 
 export interface QPQConfigSetting {

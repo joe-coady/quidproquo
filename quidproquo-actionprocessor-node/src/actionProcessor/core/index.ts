@@ -6,6 +6,7 @@ import { getContextActionProcessor } from './context';
 import { getDateActionProcessor } from './date';
 import { getErrorActionProcessor } from './error';
 import { getGuidProcessor } from './guid';
+import { getInlineFunctionActionProcessor } from './inlineFunction';
 import { getLogActionProcessor } from './log';
 import { getMathActionProcessor } from './math';
 import { getNetworkActionProcessor } from './network';
@@ -19,6 +20,7 @@ export * from './context';
 export * from './date';
 export * from './error';
 export * from './guid';
+export * from './inlineFunction';
 export * from './log';
 export * from './math';
 export * from './network';
@@ -45,4 +47,5 @@ export const getCoreActionProcessor: ActionProcessorListResolver = async (
   ...(await getPlatformActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getStreamActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getSystemActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getInlineFunctionActionProcessor(qpqConfig, dynamicModuleLoader)),
 });

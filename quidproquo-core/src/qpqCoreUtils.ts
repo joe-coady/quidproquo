@@ -9,6 +9,7 @@ import {
   EventBusQPQConfigSetting,
   GlobalQPQConfigSetting,
   GraphDatabaseQPQConfigSetting,
+  InlineFunctionQPQConfigSetting,
   KeyValueStoreQPQConfigSetting,
   ModuleQPQConfigSetting,
   NotifyErrorQPQConfigSetting,
@@ -335,6 +336,14 @@ export const getUserDirectorySrcEntries = (qpqConfig: QPQConfig): QpqFunctionRun
     .filter((se) => !!se);
 };
 
+export const getAllInlineFunctions = (qpqConfig: QPQConfig): InlineFunctionQPQConfigSetting[] => {
+  return getConfigSettings<InlineFunctionQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.inlineFunction);
+};
+
+export const getOwnedInlineFunctions = (qpqConfig: QPQConfig): InlineFunctionQPQConfigSetting[] => {
+  return getOwnedItems(getAllInlineFunctions(qpqConfig), qpqConfig);
+};
+
 // Used in bundlers to know where and what to build and index
 export const getAllSrcEntries = (qpqConfig: QPQConfig): QpqFunctionRuntime[] => {
   const result = [
@@ -344,6 +353,7 @@ export const getAllSrcEntries = (qpqConfig: QPQConfig): QpqFunctionRuntime[] => 
     ...getUserDirectorySrcEntries(qpqConfig),
     ...getDeployEventConfigs(qpqConfig).map((r) => r.runtime),
     ...getStorageDrives(qpqConfig).flatMap((sd) => [sd.onEvent?.create, sd.onEvent?.delete].filter((r) => !!r) as QpqFunctionRuntime[]),
+    ...getAllInlineFunctions(qpqConfig).map((f) => f.runtime),
   ];
 
   return result;
