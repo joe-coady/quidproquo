@@ -1,5 +1,4 @@
-import { Action, ActionProcessor, ActionRequester, CrossModuleMessage, QpqContext } from '../../types';
-import { ContextListAction } from '../context';
+import { Action, ActionProcessor, ActionRequester, CrossModuleMessage } from '../../types';
 import { EventBusActionType } from './EventBusActionType';
 
 export type EventBusMessage<T> = CrossModuleMessage<T>;
@@ -10,9 +9,7 @@ export interface EventBusSendMessageOptions<T> {
 }
 
 // Payload
-export interface EventBusSendMessageActionPayload<T> extends EventBusSendMessageOptions<T> {
-  context: QpqContext<any>;
-}
+export interface EventBusSendMessageActionPayload<T> extends EventBusSendMessageOptions<T> {}
 
 // Action
 export interface EventBusSendMessageAction<T> extends Action<EventBusSendMessageActionPayload<T>> {
@@ -22,4 +19,4 @@ export interface EventBusSendMessageAction<T> extends Action<EventBusSendMessage
 
 // Function Types
 export type EventBusSendMessageActionProcessor<T> = ActionProcessor<EventBusSendMessageAction<T>, void>;
-export type EventBusSendMessageActionRequester<T> = ActionRequester<EventBusSendMessageAction<T> | ContextListAction, void, QpqContext<any> | void>;
+export type EventBusSendMessageActionRequester<T> = ActionRequester<EventBusSendMessageAction<T>, void>;
