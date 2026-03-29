@@ -13,15 +13,12 @@ import { eventBus } from '../../../logic/eventBus';
 import { AnyExecuteServiceFunctionEventWithSession } from '../../core/event/node/serviceFunction/types';
 
 const getProcessExecute = (qpqConfig: QPQConfig, dynamicModuleLoader: DynamicModuleLoader): ServiceFunctionExecuteActionProcessor<any, any> => {
-  return async ({ functionName, service, payload, context, isAsync }, session) => {
+  return async ({ functionName, service, payload, isAsync }, session) => {
     const serviceFunctionEvent: AnyExecuteServiceFunctionEventWithSession = {
       functionName: functionName,
       serviceName: service,
       payload: payload,
-      storySession: {
-        ...session,
-        context,
-      },
+      storySession: session,
     };
 
     const eventPromise: Promise<StoryResult<[AnyExecuteServiceFunctionEventWithSession], any>> = eventBus.publishAndWaitForResponse(

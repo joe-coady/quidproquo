@@ -19,7 +19,7 @@ type AnyExecuteServiceFunctionEventWithSession = ExecuteServiceFunctionEvent<any
 };
 
 const getProcessExecute = (qpqConfig: QPQConfig): ServiceFunctionExecuteActionProcessor<any, any> => {
-  return async ({ functionName, service, payload, context, isAsync }, session) => {
+  return async ({ functionName, service, payload, isAsync }, session) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const appName = qpqCoreUtils.getApplicationName(qpqConfig);
@@ -31,10 +31,7 @@ const getProcessExecute = (qpqConfig: QPQConfig): ServiceFunctionExecuteActionPr
     const serviceFunctionEvent: AnyExecuteServiceFunctionEventWithSession = {
       functionName: functionName,
       payload: payload,
-      storySession: {
-        ...session,
-        context,
-      },
+      storySession: session,
     };
 
     const result = await executeLambdaByName<EitherActionResult<any>>(awsFunctionName, region, serviceFunctionEvent, isAsync);

@@ -30,8 +30,6 @@ const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): EventBusSendMessag
     {
       eventBusName,
       eventBusMessages,
-
-      context,
     },
     session,
   ) => {
@@ -48,10 +46,7 @@ const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): EventBusSendMessag
         payload: eventBusMessage.payload,
         type: eventBusMessage.type,
 
-        storySession: {
-          ...session,
-          context,
-        },
+        storySession: session,
 
         eventBusName: eventBusConfig.name,
 

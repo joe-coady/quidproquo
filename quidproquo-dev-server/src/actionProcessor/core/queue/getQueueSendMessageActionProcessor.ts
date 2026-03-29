@@ -7,7 +7,7 @@ import { eventBus } from '../../../logic/eventBus';
 import { AnyQueueMessageWithSession } from '../event/queue/types';
 
 const getProcessQueueSendMessage = (qpqConfig: QPQConfig): QueueSendMessageActionProcessor<any> => {
-  return async ({ queueName, queueMessages, context }, session) => {
+  return async ({ queueName, queueMessages }, session) => {
     const queueConfig = qpqCoreUtils.getQueueByName(qpqConfig, queueName);
     if (!queueConfig) {
       return actionResultError(ErrorTypeEnum.NotFound, `Queue ${queueName} not found`);
@@ -18,10 +18,7 @@ const getProcessQueueSendMessage = (qpqConfig: QPQConfig): QueueSendMessageActio
         payload: queueMessage.payload,
         type: queueMessage.type,
 
-        storySession: {
-          ...session,
-          context,
-        },
+        storySession: session,
 
         messageId: uuidV4(),
         queueName: queueName,
