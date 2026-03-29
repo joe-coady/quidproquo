@@ -73,25 +73,31 @@ const getProcessAiPromptStream = (qpqConfig: QPQConfig): AiPromptStreamActionPro
     }
 
     try {
-      const { textStream } = streamText({
+      const { fullStream } = streamText({
         model: bedrock(bedrockModelId),
         system: payload.system,
-        prompt: payload.prompt,
+        prompt: payload.messages ?? payload.prompt,
         tools: Object.keys(aiTools).length > 0 ? aiTools : undefined,
         stopWhen: stepCountIs(10),
       });
 
       const streamId = `ai-prompt-${Date.now()}-${randomGuid()}`;
 
-      async function* textIterator(): AsyncIterableIterator<string> {
-        for await (const chunk of textStream) {
-          yield chunk;
+      async function* aiStreamIterator(): AsyncIterableIterator<string> {
+        for await (const part of fullStream) {
+          if (part.type === 'text-delta') {
+            yield JSON.stringify({ type: 'text-delta', text: part.text });
+          } else if (part.type === 'tool-call') {
+            yield JSON.stringify({ type: 'tool-call', toolName: part.toolName, input: part.input });
+          } else if (part.type === 'tool-result') {
+            yield JSON.stringify({ type: 'tool-result', toolName: part.toolName, output: part.output });
+          }
         }
       }
 
-      streamRegistry.register(streamId, textIterator());
+      streamRegistry.register(streamId, aiStreamIterator());
 
-      return actionResult({ id: streamId, encoding: 'text' as const });
+      return actionResult({ id: streamId, encoding: 'json' as const });
     } catch (error) {
       if (error instanceof Error) {
         return actionResultError(ErrorTypeEnum.GenericError, error.message);
