@@ -32,6 +32,7 @@
   },
   "homepage": "https://github.com/joe-coady/quidproquo#readme",
   "dependencies": {
+    "@ai-sdk/amazon-bedrock": "^4.0.83",
     "@aws-sdk/client-acm": "^3.744.0",
     "@aws-sdk/client-api-gateway": "^3.744.0",
     "@aws-sdk/client-apigatewaymanagementapi": "^3.744.0",
@@ -50,6 +51,7 @@
     "@aws-sdk/s3-presigned-post": "^3.744.0",
     "@aws-sdk/s3-request-presigner": "^3.744.0",
     "@types/aws-lambda": "^8.10.109",
+    "ai": "^6.0.141",
     "aws-jwt-verify": "^3.4.0",
     "busboy": "^1.6.0",
     "jsonwebtoken": "^9.0.0",
