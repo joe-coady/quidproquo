@@ -31,5 +31,9 @@ export function* askStreamRead<E extends StreamEncoding>(
     return { ...rawChunk, data: decodeBase64ToUint8Array(rawChunk.data) } as StreamChunk<StreamDataType<E>>;
   }
 
+  if (handle.encoding === 'json') {
+    return { ...rawChunk, data: JSON.parse(rawChunk.data) } as StreamChunk<StreamDataType<E>>;
+  }
+
   return rawChunk as StreamChunk<StreamDataType<E>>;
 }

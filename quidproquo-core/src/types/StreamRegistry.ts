@@ -1,6 +1,10 @@
-export type StreamEncoding = 'text' | 'binary';
+export type StreamEncoding = 'text' | 'binary' | 'json';
 
-export type StreamDataType<E extends StreamEncoding> = E extends 'text' ? string : Uint8Array;
+export type StreamDataType<E extends StreamEncoding> =
+  E extends 'text' ? string :
+  E extends 'binary' ? Uint8Array :
+  E extends 'json' ? unknown :
+  never;
 
 export interface StreamHandle<E extends StreamEncoding = StreamEncoding> {
   id: string;
