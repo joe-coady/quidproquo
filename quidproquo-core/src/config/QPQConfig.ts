@@ -1,6 +1,7 @@
 import { CrossModuleOwner } from '../types';
 
 export enum QPQCoreConfigSettingType {
+  ai = '@quidproquo-core/config/Ai',
   appName = '@quidproquo-core/config/AppName',
   moduleName = '@quidproquo-core/config/moduleName',
   storageDrive = '@quidproquo-core/config/storageDrive',

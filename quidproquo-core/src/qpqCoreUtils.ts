@@ -1,5 +1,6 @@
 import {
   ActionProcessorsQPQConfigSetting,
+  AiQPQConfigSetting,
   ApiBuildPathQPQConfigSetting,
   ApplicationQPQConfigSetting,
   ClaudeAIQPQConfigSetting,
@@ -198,6 +199,10 @@ export const getAllEventBusConfigs = (qpqConfig: QPQConfig): EventBusQPQConfigSe
   const eventBuses = getConfigSettings<EventBusQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.eventBus);
 
   return eventBuses;
+};
+
+export const getAllAiConfigs = (qpqConfig: QPQConfig): AiQPQConfigSetting[] => {
+  return getConfigSettings<AiQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.ai);
 };
 
 export const getAllClaudeAiConfigs = (qpqConfig: QPQConfig): ClaudeAIQPQConfigSetting[] => {
