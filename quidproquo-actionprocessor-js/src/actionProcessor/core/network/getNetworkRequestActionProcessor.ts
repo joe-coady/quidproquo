@@ -21,6 +21,10 @@ const getAxiosResponseType = (responseType: ResponseType) => {
     return 'arraybuffer';
   }
 
+  if (responseType === 'text') {
+    return 'text';
+  }
+
   return 'json';
 };
 
