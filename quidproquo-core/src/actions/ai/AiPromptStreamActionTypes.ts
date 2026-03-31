@@ -3,6 +3,7 @@ import { StreamHandle } from '../../types/StreamRegistry';
 import { AiActionType } from './AiActionType';
 import { AiMessage } from './AiMessage';
 import { AiModel } from './AiModel';
+import { AiStreamPart } from './AiStreamPart';
 
 export interface AiPromptStreamActionPayload {
   model: AiModel;
@@ -18,4 +19,4 @@ export interface AiPromptStreamAction extends Action<AiPromptStreamActionPayload
 }
 
 export type AiPromptStreamActionProcessor = ActionProcessor<AiPromptStreamAction, StreamHandle<'json'>>;
-export type AiPromptStreamActionRequester = ActionRequester<AiPromptStreamAction, StreamHandle<'json'>>;
+export type AiPromptStreamActionRequester = ActionRequester<AiPromptStreamAction, StreamHandle<'json', AiStreamPart>>;

@@ -11,10 +11,10 @@ const decodeBase64ToUint8Array = (base64: string): Uint8Array => {
   return bytes;
 };
 
-export function* askStreamRead<E extends StreamEncoding>(
-  handle: StreamHandle<E>,
+export function* askStreamRead<E extends StreamEncoding, T = unknown>(
+  handle: StreamHandle<E, T>,
   noWait?: boolean,
-): StreamReadActionRequester<E> {
+): StreamReadActionRequester<E, T> {
   const rawChunk: StreamChunk<string> = yield {
     type: StreamActionType.Read,
     payload: {
@@ -24,16 +24,16 @@ export function* askStreamRead<E extends StreamEncoding>(
   };
 
   if (!rawChunk.data || rawChunk.done || rawChunk.skipped) {
-    return rawChunk as StreamChunk<StreamDataType<E>>;
+    return rawChunk as StreamChunk<StreamDataType<E, T>>;
   }
 
   if (handle.encoding === 'binary') {
-    return { ...rawChunk, data: decodeBase64ToUint8Array(rawChunk.data) } as StreamChunk<StreamDataType<E>>;
+    return { ...rawChunk, data: decodeBase64ToUint8Array(rawChunk.data) } as StreamChunk<StreamDataType<E, T>>;
   }
 
   if (handle.encoding === 'json') {
-    return { ...rawChunk, data: JSON.parse(rawChunk.data) } as StreamChunk<StreamDataType<E>>;
+    return { ...rawChunk, data: JSON.parse(rawChunk.data) } as StreamChunk<StreamDataType<E, T>>;
   }
 
-  return rawChunk as StreamChunk<StreamDataType<E>>;
+  return rawChunk as StreamChunk<StreamDataType<E, T>>;
 }
