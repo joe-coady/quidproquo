@@ -18,8 +18,8 @@ export interface StreamReadAction extends Action<StreamReadActionPayload> {
 export type StreamReadActionProcessor = ActionProcessor<StreamReadAction, StreamChunk<string>>;
 
 // Requester: TReturn is the converted type, TQPQReturn is the raw wire type
-export type StreamReadActionRequester<E extends StreamEncoding = StreamEncoding> = ActionRequester<
+export type StreamReadActionRequester<E extends StreamEncoding = StreamEncoding, T = unknown> = ActionRequester<
   StreamReadAction,
-  StreamChunk<StreamDataType<E>>,
+  StreamChunk<StreamDataType<E, T>>,
   StreamChunk<string>
 >;
