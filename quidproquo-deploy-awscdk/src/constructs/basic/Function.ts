@@ -53,7 +53,7 @@ export class Function extends QpqConstructBlock {
       functionName: props.functionName,
       timeout: cdk.Duration.seconds(props.timeoutInSeconds || 25),
 
-      runtime: aws_lambda.Runtime.NODEJS_18_X,
+      runtime: aws_lambda.Runtime.NODEJS_20_X,
       memorySize: props.memoryInBytes || serviceInfo.lambdaMaxMemoryInMiB || 1024,
       layers: props.apiLayerVersions,
 
@@ -65,7 +65,9 @@ export class Function extends QpqConstructBlock {
         ...(props.environment || {}),
       },
 
-      reservedConcurrentExecutions: props.reservedConcurrentExecutions,
+      reservedConcurrentExecutions: qpqConfigAwsUtils.isReservedConcurrencyDisabled(props.qpqConfig)
+        ? undefined
+        : props.reservedConcurrentExecutions,
 
       // TODO: Make this optional
       tracing: aws_lambda.Tracing.DISABLED,

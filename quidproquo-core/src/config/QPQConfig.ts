@@ -1,6 +1,7 @@
 import { CrossModuleOwner } from '../types';
 
 export enum QPQCoreConfigSettingType {
+  ai = '@quidproquo-core/config/Ai',
   appName = '@quidproquo-core/config/AppName',
   moduleName = '@quidproquo-core/config/moduleName',
   storageDrive = '@quidproquo-core/config/storageDrive',
@@ -21,6 +22,7 @@ export enum QPQCoreConfigSettingType {
   graphDatabase = '@quidproquo-core/config/GraphDatabase',
   virtualNetwork = '@quidproquo-core/config/VirtualNetwork',
   notifyError = '@quidproquo-core/config/notifyError',
+  inlineFunction = '@quidproquo-core/config/InlineFunction',
 }
 
 export interface QPQConfigSetting {

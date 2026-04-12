@@ -1,8 +1,10 @@
 import { QPQConfig } from '../config';
 import { DynamicModuleLoader } from './DynamicModuleLoader';
 import { QPQError } from './ErrorTypeEnum';
+import { QpqContext } from './QpqContextIdentifier';
 import { QpqLogger } from './QpqLogger';
 import { ExtractGeneratorReturnType, StoryResult, StorySession, StorySessionUpdater } from './StorySession';
+import { StreamRegistry } from './StreamRegistry';
 
 // Action ~ Think redux action
 // They must have a type, and an optional payload
@@ -11,6 +13,7 @@ export interface Action<T> {
   payload?: T;
 
   returnErrors?: boolean;
+  context?: QpqContext<any>;
 }
 
 // Result tuple ~ Either result or error
@@ -39,6 +42,7 @@ export type ActionProcessor<TAction extends Action<any>, TReturn = any> = (
   logger: QpqLogger,
   updateSession: StorySessionUpdater,
   dynamicModuleLoader: DynamicModuleLoader,
+  streamRegistry: StreamRegistry,
 ) => AsyncActionProcessorResult<TReturn>;
 
 // Generator<

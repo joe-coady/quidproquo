@@ -1,4 +1,5 @@
 export * from './actionProcessors';
+export * from './ai';
 export * from './apiBuildPath';
 export * from './applicationModule';
 export * from './applicationName';
@@ -12,6 +13,7 @@ export * from './environmentSettings';
 export * from './eventBus';
 export * from './global';
 export * from './graphDatabase';
+export * from './inlineFunction';
 export * from './keyValueStore';
 export * from './moduleName';
 export * from './notifyError';

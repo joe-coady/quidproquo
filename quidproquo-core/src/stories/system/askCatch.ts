@@ -1,6 +1,9 @@
 import { AskResponse, AskResponseReturnType, EitherActionResult, ErrorTypeEnum } from '../../types';
 
-export function* askCatch<T extends AskResponse<any>>(storyIterator: T): AskResponse<EitherActionResult<AskResponseReturnType<T>>> {
+export function* askCatch<T extends AskResponse<any>>(
+  storyIterator: T,
+  finallyIterator?: AskResponse<any>,
+): AskResponse<EitherActionResult<AskResponseReturnType<T>>> {
   try {
     let nextResult = storyIterator.next();
 
@@ -37,5 +40,9 @@ export function* askCatch<T extends AskResponse<any>>(storyIterator: T): AskResp
         errorStack: e?.stack,
       },
     };
+  } finally {
+    if (finallyIterator) {
+      yield* finallyIterator;
+    }
   }
 }

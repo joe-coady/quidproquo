@@ -4,7 +4,7 @@ export enum NetworkActionType {
 
 export type HTTPMethod = 'GET' | 'HEAD' | 'POST' | 'PUT' | 'DELETE' | 'CONNECT' | 'OPTIONS' | 'PATCH';
 
-export type ResponseType = 'binary' | 'json';
+export type ResponseType = 'binary' | 'json' | 'text';
 
 export interface HTTPRequestOptions<T> {
   basePath?: string;

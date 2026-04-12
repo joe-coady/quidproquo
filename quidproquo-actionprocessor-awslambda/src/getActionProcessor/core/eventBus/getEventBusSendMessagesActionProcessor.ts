@@ -26,8 +26,6 @@ const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): EventBusSendMessag
     {
       eventBusName,
       eventBusMessages,
-
-      context,
     },
     session,
   ) => {
@@ -55,10 +53,7 @@ const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): EventBusSendMessag
       eventBusMessages.map((message) => {
         const eventBusMessageWithSession: AnyEventBusMessageWithSession = {
           ...message,
-          storySession: {
-            ...session,
-            context,
-          },
+          storySession: session,
         };
 
         return JSON.stringify(eventBusMessageWithSession);

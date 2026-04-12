@@ -13,6 +13,7 @@ export enum FileActionType {
   GenerateTemporarySecureUrl = '@quidproquo-core/File/GenerateTemporarySecureUrl',
   GenerateTemporaryUploadSecureUrl = '@quidproquo-core/File/GenerateTemporaryUploadSecureUrl',
   IsColdStorage = '@quidproquo-core/File/IsColdStorage',
+  StreamOpen = '@quidproquo-core/File/StreamOpen',
 }
 
 export const filePathDelimiter = `/`;

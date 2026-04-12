@@ -40,9 +40,7 @@ export const getWebpackConfig = (qpqConfig: QPQConfig, buildPath: string, entrie
 
     resolve: {
       extensions: ['.ts', '.tsx', '.js', '.json'],
-      fallback: {
-        crypto: false,
-      },
+      fallback: {},
     },
 
     plugins: [new QpqPlugin({ qpqConfigs: [qpqConfig], nodeModulePath })],

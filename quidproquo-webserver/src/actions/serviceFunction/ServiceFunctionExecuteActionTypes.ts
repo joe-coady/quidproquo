@@ -1,4 +1,4 @@
-import { Action, ActionProcessor, ActionRequester, ContextListAction, QpqContext } from 'quidproquo-core';
+import { Action, ActionProcessor, ActionRequester } from 'quidproquo-core';
 
 import { ServiceFunctionActionType } from './ServiceFunctionActionType';
 
@@ -7,7 +7,6 @@ export interface ServiceFunctionExecuteActionPayload<T> {
   service: string;
   functionName: string;
   payload: T;
-  context: QpqContext<any>;
   isAsync: boolean;
 }
 
@@ -19,8 +18,4 @@ export interface ServiceFunctionExecuteAction<T> extends Action<ServiceFunctionE
 
 // Function Types
 export type ServiceFunctionExecuteActionProcessor<R, T> = ActionProcessor<ServiceFunctionExecuteAction<T>, R>;
-export type ServiceFunctionExecuteActionRequester<R, T> = ActionRequester<
-  ServiceFunctionExecuteAction<T> | ContextListAction,
-  R,
-  QpqContext<any> | R
->;
+export type ServiceFunctionExecuteActionRequester<R, T> = ActionRequester<ServiceFunctionExecuteAction<T>, R>;
