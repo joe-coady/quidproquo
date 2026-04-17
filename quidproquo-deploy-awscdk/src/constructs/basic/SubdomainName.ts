@@ -1,17 +1,21 @@
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
+import { qpqWebServerUtils } from 'quidproquo-webserver';
+
 import { aws_apigateway, aws_certificatemanager, aws_route53, aws_route53_targets } from 'aws-cdk-lib';
-import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
+import { lookupDomainCertificate } from './DomainCertificateLookup';
 
 export interface SubdomainNameProps extends QpqConstructBlockProps {
   subdomain: string;
   apexDomain: string;
+  rootDomain: string;
 }
 
 export class SubdomainName extends QpqConstructBlock {
   public readonly domainName: aws_apigateway.DomainName;
-  public readonly certificate: aws_certificatemanager.Certificate;
+  public readonly certificate: aws_certificatemanager.ICertificate;
   public readonly targetARecord: aws_route53.RecordTarget;
   public readonly deployDomain: string;
 
@@ -20,15 +24,18 @@ export class SubdomainName extends QpqConstructBlock {
 
     this.deployDomain = `${props.subdomain}.${props.apexDomain}`;
 
+    // Always look up the root hosted zone (e.g. development.quidproquojs.com), not
+    // a per-service sub-zone. The FQDN may include the service name (e.g.
+    // ws.shell.development.quidproquojs.com) but the A record lives in the root zone.
+    const hostedZoneDomain = qpqWebServerUtils.resolveDomainRoot(props.rootDomain, props.qpqConfig);
     const apexHostedZone = aws_route53.HostedZone.fromLookup(this, 'hosted-zone', {
-      domainName: props.apexDomain,
+      domainName: hostedZoneDomain,
     });
 
-    this.certificate = new aws_certificatemanager.Certificate(this, 'certificate', {
-      domainName: this.deployDomain,
-      certificateName: `${this.deployDomain}-cert`,
-      validation: aws_certificatemanager.CertificateValidation.fromDns(apexHostedZone),
-    });
+    // Regional API Gateway custom domains need a cert in the deploy region.
+    // Look it up from SSM, written by the matching DomainCertificateStack during the domain phase.
+    const deployRegion = qpqConfigAwsUtils.getApplicationModuleDeployRegion(props.qpqConfig);
+    this.certificate = lookupDomainCertificate(this, deployRegion, props.subdomain);
 
     this.domainName = new aws_apigateway.DomainName(this, 'domain-name', {
       domainName: this.deployDomain,

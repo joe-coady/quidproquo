@@ -5,6 +5,7 @@ import {
   AwsDyanmoOverrideForKvsQPQConfigSetting,
   AwsOrganizationQPQConfigSetting,
   AwsServiceAccountInfoQPQConfigSetting,
+  DomainCertificateQPQConfigSetting,
   QPQAwsConfigSettingType,
 } from '../config';
 import { ApiLayer, LocalServiceAccountInfo, ServiceAccountInfo } from '../types';
@@ -155,6 +156,17 @@ export const isLambdaWarmingDisabled = (qpqConfig: QPQConfig): boolean => {
 export const isReservedConcurrencyDisabled = (qpqConfig: QPQConfig): boolean => {
   const awsServiceAccountInfoConfig = getAwsServiceAccountInfoConfig(qpqConfig);
   return awsServiceAccountInfoConfig.disableReservedConcurrency;
+};
+
+export const getDomainCertificateConfigs = (qpqConfig: QPQConfig): DomainCertificateQPQConfigSetting[] => {
+  return qpqCoreUtils.getConfigSettings<DomainCertificateQPQConfigSetting>(
+    qpqConfig,
+    QPQAwsConfigSettingType.awsDomainCertificate,
+  );
+};
+
+export const getDomainCertificateArnSsmParameterName = (region: string): string => {
+  return `/qpq/domain/certificate-arn/${region}`;
 };
 
 export const getDynamoTableNameOverrride = (srcKvsName: string, qpqConfig: QPQConfig): string => {

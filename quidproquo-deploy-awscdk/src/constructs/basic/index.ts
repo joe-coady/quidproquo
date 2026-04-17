@@ -1,3 +1,4 @@
+export * from './DomainCertificateLookup';
 export * from './Function';
 export * from './InfQpqWebserverServiceDomainsConstruct';
 export * from './LambdaLayers';

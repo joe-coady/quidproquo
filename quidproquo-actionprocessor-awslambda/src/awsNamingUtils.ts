@@ -274,3 +274,17 @@ export const getBootstrapStackName = (qpqConfig: QPQConfig) => {
 
   return `${baseName}-bs`;
 };
+
+export const getDomainStackName = (qpqConfig: QPQConfig) => {
+  const appName = qpqCoreUtils.getApplicationName(qpqConfig);
+  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
+  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+
+  const baseName = `${appName}-${environment}`;
+
+  if (feature) {
+    return `${baseName}-${feature}-domain`;
+  }
+
+  return `${baseName}-domain`;
+};

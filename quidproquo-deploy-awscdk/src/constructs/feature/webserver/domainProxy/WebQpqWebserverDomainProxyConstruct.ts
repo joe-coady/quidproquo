@@ -7,7 +7,7 @@ import { Construct } from 'constructs';
 
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
-import { DnsValidatedCertificate } from '../../../basic/DnsValidatedCertificate';
+import { lookupDomainCertificate } from '../../../basic/DomainCertificateLookup';
 import { QpqWebServerCacheConstruct } from '../cache/QpqWebServerCacheConstruct';
 
 export interface WebQpqWebserverDomainProxyConstructProps extends QpqConstructBlockProps {
@@ -33,15 +33,24 @@ export class WebQpqWebserverDomainProxyConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: WebQpqWebserverDomainProxyConstructProps) {
     super(scope, id, props);
 
-    const dnsRecord = new DnsValidatedCertificate(this, 'validcert', {
-      domain: {
-        onRootDomain: props.domainProxyConfig.domain.onRootDomain,
-        subDomainNames: props.domainProxyConfig.domain.subDomainNames,
-        rootDomain: props.domainProxyConfig.domain.rootDomain,
-      },
+    const apexDomain = qpqWebServerUtils.resolveApexDomainNameFromDomainConfig(
+      props.qpqConfig,
+      props.domainProxyConfig.domain.rootDomain,
+      props.domainProxyConfig.domain.onRootDomain,
+    );
 
-      qpqConfig: props.qpqConfig,
+    const hostedZone = aws_route53.HostedZone.fromLookup(this, 'apex-zone', {
+      domainName: apexDomain,
     });
+
+    const domainNames: string[] = (props.domainProxyConfig.domain.subDomainNames ?? []).map(
+      (subDomain) => `${subDomain}.${apexDomain}`,
+    );
+    if (props.domainProxyConfig.domain.onRootDomain && domainNames.length === 0) {
+      domainNames.unshift(apexDomain);
+    }
+
+    const certificate = lookupDomainCertificate(this, 'us-east-1', props.domainProxyConfig.name);
 
     const cachePolicy = props.domainProxyConfig.cacheSettingsName
       ? QpqWebServerCacheConstruct.fromOtherStack(
@@ -70,8 +79,8 @@ export class WebQpqWebserverDomainProxyConstruct extends QpqConstructBlock {
         viewerProtocolPolicy,
       },
 
-      domainNames: dnsRecord.domainNames,
-      certificate: dnsRecord.certificate,
+      domainNames,
+      certificate,
     });
 
     qpqDeployAwsCdkUtils.applyEnvironmentTags(distribution, props.qpqConfig);
@@ -82,9 +91,9 @@ export class WebQpqWebserverDomainProxyConstruct extends QpqConstructBlock {
       distribution.distributionId,
     );
 
-    dnsRecord.domainNames.forEach((domainName) => {
+    domainNames.forEach((domainName) => {
       new aws_route53.ARecord(this, `${domainName}-web-alias`, {
-        zone: dnsRecord.hostedZone,
+        zone: hostedZone,
         recordName: domainName,
         target: aws_route53.RecordTarget.fromAlias(new aws_route53_targets.CloudFrontTarget(distribution)),
       });

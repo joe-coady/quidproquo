@@ -114,6 +114,7 @@ export class QpqApiWebserverWebsocketConstruct extends QpqConstructBlock {
     // Create subdomain
     const subdomain = new SubdomainName(this, 'subdomain', {
       apexDomain,
+      rootDomain: props.websocketConfig.rootDomain,
       subdomain: props.websocketConfig.apiSubdomain,
       qpqConfig: props.qpqConfig,
     });
@@ -122,7 +123,7 @@ export class QpqApiWebserverWebsocketConstruct extends QpqConstructBlock {
     new aws_apigatewayv2.CfnApiMapping(this, 'websocket-api-mapping', {
       apiId: apiId,
       domainName: subdomain.domainName.domainName,
-      stage: stage.stageName,
+      stage: stage.ref,
     });
   }
 }
