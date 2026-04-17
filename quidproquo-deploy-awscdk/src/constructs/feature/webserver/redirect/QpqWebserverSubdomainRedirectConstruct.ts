@@ -50,8 +50,10 @@ export class QpqWebserverSubdomainRedirectConstruct extends QpqConstructBlock {
       ? qpqWebServerUtils.getBaseDomainName(props.qpqConfig)
       : qpqWebServerUtils.getServiceDomainName(props.qpqConfig);
 
+    const dnsConfig = qpqWebServerUtils.getDnsConfigs(props.qpqConfig)[0];
     const serviceDomainName = new SubdomainName(this, 'service-domain-name', {
       subdomain: props.subdomainRedirectConfig.subdomain,
+      rootDomain: dnsConfig.dnsBase,
       apexDomain,
       qpqConfig: props.qpqConfig,
     });

@@ -19,7 +19,7 @@ import path from 'path';
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
 import { qpqAwsCdkPathUtils } from '../../../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
-import { DnsValidatedCertificate } from '../../../basic/DnsValidatedCertificate';
+import { lookupDomainCertificate } from '../../../basic/DomainCertificateLookup';
 import { QpqWebServerCacheConstruct } from '../cache/QpqWebServerCacheConstruct';
 import { convertSecurityHeadersFromQpqSecurityHeaders } from './utils/securityHeaders';
 
@@ -77,15 +77,24 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
       });
     }
 
-    const dnsRecord = new DnsValidatedCertificate(this, 'validcert', {
-      domain: {
-        onRootDomain: props.webEntryConfig.domain.onRootDomain,
-        subDomainNames: props.webEntryConfig.domain.subDomainName ? [props.webEntryConfig.domain.subDomainName] : undefined,
-        rootDomain: props.webEntryConfig.domain.rootDomain,
-      },
+    const apexDomain = qpqWebServerUtils.resolveApexDomainNameFromDomainConfig(
+      props.qpqConfig,
+      props.webEntryConfig.domain.rootDomain,
+      props.webEntryConfig.domain.onRootDomain,
+    );
 
-      qpqConfig: props.qpqConfig,
+    const hostedZone = aws_route53.HostedZone.fromLookup(this, 'apex-zone', {
+      domainName: apexDomain,
     });
+
+    const domainNames: string[] = props.webEntryConfig.domain.subDomainName
+      ? [`${props.webEntryConfig.domain.subDomainName}.${apexDomain}`]
+      : [];
+    if (props.webEntryConfig.domain.onRootDomain && domainNames.length === 0) {
+      domainNames.unshift(apexDomain);
+    }
+
+    const certificate = lookupDomainCertificate(this, 'us-east-1', props.webEntryConfig.name);
 
     const cachePolicy = props.webEntryConfig.cacheSettingsName
       ? QpqWebServerCacheConstruct.fromOtherStack(
@@ -140,8 +149,8 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
         responseHeadersPolicy: responseHeaderPolicy,
       },
 
-      domainNames: dnsRecord.domainNames,
-      certificate: dnsRecord.certificate,
+      domainNames,
+      certificate,
       defaultRootObject: props.webEntryConfig.indexRoot,
 
       // redirect errors to root page and let spa sort it
@@ -162,8 +171,8 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
     );
 
     new aws_route53.ARecord(this, `web-alias`, {
-      zone: dnsRecord.hostedZone,
-      recordName: dnsRecord.domainNames[0],
+      zone: hostedZone,
+      recordName: domainNames[0],
       target: aws_route53.RecordTarget.fromAlias(new aws_route53_targets.CloudFrontTarget(distribution)),
     });
 

@@ -1,6 +1,7 @@
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { resolveAwsServiceAccountInfo } from 'quidproquo-config-aws';
 import { AuthDirectoryFederatedProviderType, QPQConfig, qpqCoreUtils, UserDirectoryQPQConfigSetting } from 'quidproquo-core';
+import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { aws_cognito, aws_iam, aws_lambda, aws_route53, aws_route53_targets } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
@@ -9,7 +10,7 @@ import { Construct } from 'constructs';
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { QpqResource } from '../../../base/QpqResource';
-import { DnsValidatedCertificate } from '../../../basic/DnsValidatedCertificate';
+import { lookupDomainCertificate } from '../../../basic/DomainCertificateLookup';
 import { Function } from '../../../basic/Function';
 
 export interface QpqInfCoreUserDirectoryConstructProps extends QpqConstructBlockProps {
@@ -178,29 +179,33 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
     });
 
     if (props.userDirectoryConfig.dnsRecord) {
-      const dnsRecord = new DnsValidatedCertificate(this, 'validcert', {
-        domain: {
-          onRootDomain: true,
-          subDomainNames: [props.userDirectoryConfig.dnsRecord.subdomain],
-          rootDomain: props.userDirectoryConfig.dnsRecord.rootDomain,
-        },
+      // Cognito custom domains use CloudFront under the hood, so the cert must be in us-east-1.
+      const apexDomain = qpqWebServerUtils.resolveApexDomainNameFromDomainConfig(
+        props.qpqConfig,
+        props.userDirectoryConfig.dnsRecord.rootDomain,
+        true,
+      );
 
-        qpqConfig: props.qpqConfig,
+      const hostedZone = aws_route53.HostedZone.fromLookup(this, 'apex-zone', {
+        domainName: apexDomain,
       });
+
+      const fullDomain = `${props.userDirectoryConfig.dnsRecord.subdomain}.${apexDomain}`;
+      const certificate = lookupDomainCertificate(this, 'us-east-1', props.userDirectoryConfig.name);
 
       const userPoolDomain = new aws_cognito.UserPoolDomain(this, 'user-pool-domain', {
         userPool: this.userPool,
 
         // Full custom domain
         customDomain: {
-          certificate: dnsRecord.certificate,
-          domainName: dnsRecord.domainNames[0],
+          certificate,
+          domainName: fullDomain,
         },
       });
 
       new aws_route53.ARecord(this, 'CognitoDomainAliasRecord', {
-        zone: dnsRecord.hostedZone,
-        recordName: dnsRecord.domainNames[0],
+        zone: hostedZone,
+        recordName: fullDomain,
         target: aws_route53.RecordTarget.fromAlias(new aws_route53_targets.UserPoolDomainTarget(userPoolDomain)),
       });
     }
