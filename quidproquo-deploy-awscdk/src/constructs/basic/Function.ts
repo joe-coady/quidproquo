@@ -69,8 +69,7 @@ export class Function extends QpqConstructBlock {
         ? undefined
         : props.reservedConcurrentExecutions,
 
-      // TODO: Make this optional
-      tracing: aws_lambda.Tracing.DISABLED,
+      tracing: qpqConfigAwsUtils.isTracingDisabled(props.qpqConfig) ? aws_lambda.Tracing.DISABLED : aws_lambda.Tracing.ACTIVE,
 
       logGroup: new aws_logs.LogGroup(this, 'LogGroup', {
         retention: aws_logs.RetentionDays.ONE_YEAR,
