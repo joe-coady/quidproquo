@@ -111,9 +111,9 @@ export function* downloadUrl(
     correlationId: string;
   },
 ) {
-  const isColdStorageg = yield* askFileIsColdStorage('qpq-logs', `${params.correlationId}.json`);
+  const isColdStorage = yield* askFileIsColdStorage('qpq-logs', `${params.correlationId}.json`);
 
-  if (!isColdStorageg) {
+  if (!isColdStorage) {
     const url = yield* askFileGenerateTemporarySecureUrl('qpq-logs', `${params.correlationId}.json`, 1 * 60 * 1000);
 
     return toJsonEventResponse({ url, isColdStorage: false });
