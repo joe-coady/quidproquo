@@ -71,7 +71,10 @@ export class SqliteKvsRepository {
   }
 
   private getTableName(keyValueStoreName: string): string {
-    const serviceName = qpqCoreUtils.getApplicationModuleName(this.qpqConfig);
+    const storeConfig = qpqCoreUtils.getKeyValueStoreByName(this.qpqConfig, keyValueStoreName);
+    const serviceName =
+      storeConfig?.owner?.module ??
+      qpqCoreUtils.getApplicationModuleName(this.qpqConfig);
     return `qpq_kvs_${serviceName}_${keyValueStoreName}`.replace(/-/g, '_');
   }
 
