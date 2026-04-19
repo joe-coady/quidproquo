@@ -33,7 +33,7 @@ export class LambdaLayers extends QpqConstructBlock {
         ? new aws_lambda.LayerVersion(this, `${layer.name}-layer`, {
             layerVersionName: awsNamingUtils.getQpqRuntimeResourceNameFromConfig(layer.name, props.qpqConfig),
             code: new aws_lambda.AssetCode(layer.buildPath),
-            compatibleRuntimes: [aws_lambda.Runtime.NODEJS_20_X],
+            compatibleRuntimes: [aws_lambda.Runtime.NODEJS_22_X],
           })
         : aws_lambda.LayerVersion.fromLayerVersionArn(this, `${layer.name}-layer-ref`, layer.layerArn!);
     });
