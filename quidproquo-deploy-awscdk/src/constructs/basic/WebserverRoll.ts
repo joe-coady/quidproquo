@@ -57,13 +57,6 @@ export class WebserverRoll extends QpqConstructBlock {
         resources: ['arn:aws:lambda:*:*:function:*sfunc*'],
       },
 
-      // Read/write storage-drive buckets (file action processors, story logs).
-      {
-        sid: 'S3BucketOperations',
-        actions: ['s3:GetObject', 's3:PutObject', 's3:ListBucket', 's3:DeleteObject'],
-        resources: ['arn:aws:s3:::*'],
-      },
-
       // Push messages to websocket clients via API Gateway Management API.
       {
         sid: 'APIGatewayManageConnections',

@@ -1,3 +1,4 @@
+import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import { QPQConfig, qpqCoreUtils, StorageDriveLifecycleRule, StorageDriveQPQConfigSetting, StorageDriveTransition } from 'quidproquo-core';
 
@@ -129,15 +130,36 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
     }
   }
 
-  public static authorizeActionsForRole(role: aws_iam.IRole, storageDrives: QpqCoreStorageDriveConstruct[]) {
-    if (storageDrives.length > 0) {
-      role.addToPrincipalPolicy(
-        new aws_iam.PolicyStatement({
-          effect: aws_iam.Effect.ALLOW,
-          actions: ['s3:GetObject', 's3:PutObject', 's3:DeleteObject', 's3:ListBucket'],
-          resources: storageDrives.flatMap((sd) => [sd.bucket.bucketArn, sd.bucket.arnForObjects('*')]),
-        }),
+  public static authorizeActionsForRole(role: aws_iam.IRole, qpqConfig: QPQConfig, ownedStorageDrives: QpqCoreStorageDriveConstruct[]) {
+    // CDK-known ARNs for drives created in this stack.
+    const ownedArns = ownedStorageDrives.flatMap((sd) => [sd.bucket.bucketArn, sd.bucket.arnForObjects('*')]);
+
+    // Deterministically-computed ARNs for drives declared in this service's
+    // config but owned by another service. Uses the same naming path as
+    // `resolveStorageDriveBucketName` so no CDK cross-stack ref is created.
+    const allDriveConfigs = qpqCoreUtils.getStorageDrives(qpqConfig);
+    const ownedDriveConfigs = qpqCoreUtils.getOwnedStorageDrives(qpqConfig);
+    const foreignDriveConfigs = allDriveConfigs.filter((cfg) => !ownedDriveConfigs.includes(cfg));
+
+    const foreignArns = foreignDriveConfigs.flatMap((cfg) => {
+      const bucketName = awsNamingUtils.getConfigRuntimeResourceNameFromConfigWithServiceOverride(
+        cfg.owner?.resourceNameOverride || cfg.storageDrive,
+        qpqConfig,
+        cfg.owner?.module,
       );
-    }
+      const bucketArn = `arn:aws:s3:::${bucketName}`;
+      return [bucketArn, `${bucketArn}/*`];
+    });
+
+    const resources = [...ownedArns, ...foreignArns];
+    if (resources.length === 0) return;
+
+    role.addToPrincipalPolicy(
+      new aws_iam.PolicyStatement({
+        effect: aws_iam.Effect.ALLOW,
+        actions: ['s3:GetObject', 's3:PutObject', 's3:DeleteObject', 's3:ListBucket'],
+        resources,
+      }),
+    );
   }
 }

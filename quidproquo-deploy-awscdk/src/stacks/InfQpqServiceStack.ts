@@ -46,7 +46,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
           storageDriveConfig: setting,
         }),
     );
-    QpqCoreStorageDriveConstruct.authorizeActionsForRole(webserverRole, storageDrives);
+    QpqCoreStorageDriveConstruct.authorizeActionsForRole(webserverRole, props.qpqConfig, storageDrives);
     // end storage drives
 
     // Build the parameters
