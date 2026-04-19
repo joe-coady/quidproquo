@@ -23,6 +23,7 @@ import {
   QueueQPQConfigSetting,
   ScheduleQPQConfigSetting,
   SecretQPQConfigSetting,
+  ServiceSettingsQPQConfigSetting,
   StorageDriveQPQConfigSetting,
   UserDirectoryQPQConfigSetting,
   VirtualNetworkQPQConfigSetting,
@@ -49,6 +50,7 @@ import { isQpqFunctionRuntimeAbsolutePath } from './utils';
  */
 export const flattenQpqConfig = (qpqConfig: QPQConfig): QPQConfigSetting[] => {
   let environment = 'development';
+  let service: string | undefined;
 
   /**
    * A recursive helper function that flattens an array of QPQConfigItem objects.
@@ -67,11 +69,29 @@ export const flattenQpqConfig = (qpqConfig: QPQConfig): QPQConfigSetting[] => {
           environment = (item as ApplicationQPQConfigSetting).environment || 'development';
         }
 
+        // If its a moduleName config item, update the service variable
+        else if (item.configSettingType === QPQCoreConfigSettingType.moduleName) {
+          service = (item as ModuleQPQConfigSetting).moduleName;
+        }
+
         // Otherwise if its an environmentSettings config item, flatten out the child settings
         // for the current environment, falling back to the '*' key if present.
         else if (item.configSettingType === QPQCoreConfigSettingType.environmentSettings) {
           const envSetting = item as EnvironmentSettingsQPQConfigSetting;
           const settings = envSetting.settingsByEnvironment[environment] ?? envSetting.settingsByEnvironment['*'] ?? [];
+
+          return flatten(settings, acc);
+        }
+
+        // Otherwise if its a serviceSettings config item, flatten out the child settings
+        // for the current service, falling back to the '*' key if present.
+        else if (item.configSettingType === QPQCoreConfigSettingType.serviceSettings) {
+          if (!service) {
+            throw new Error('defineServiceSettings requires a module to be set first via defineModule (usually through defineApplicationModule)');
+          }
+
+          const svcSetting = item as ServiceSettingsQPQConfigSetting;
+          const settings = svcSetting.settingsByService[service] ?? svcSetting.settingsByService['*'] ?? [];
 
           return flatten(settings, acc);
         }
