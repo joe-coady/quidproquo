@@ -3,7 +3,11 @@ import { qpqCoreUtils } from 'quidproquo-core';
 
 import { Construct } from 'constructs';
 
-import { BootstrapQpqCoreVirtualNetworkConstruct, QpqBootstrapConfigAwsOrganizationConstruct } from '../constructs';
+import {
+  BootstrapQpqCoreVirtualNetworkConstruct,
+  QpqBootstrapConfigAwsOrganizationConstruct,
+  QpqBootstrapConfigCloudTrailConstruct,
+} from '../constructs';
 import { BSQpqLambdaWarmerEventConstructConstruct } from '../constructs/basic/BSQpqLambdaWarmerEventConstruct';
 import { QpqServiceStack, QpqServiceStackProps } from './base/QpqServiceStack';
 
@@ -32,6 +36,15 @@ export class BootstrapQpqServiceStack extends QpqServiceStack {
           qpqConfig: props.qpqConfig,
 
           awsOrganizationConfig: setting,
+        }),
+    );
+
+    const cloudTrails = qpqConfigAwsUtils.getBootstrapCloudTrailConfigs(props.qpqConfig).map(
+      (setting) =>
+        new QpqBootstrapConfigCloudTrailConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
+          qpqConfig: props.qpqConfig,
+
+          cloudTrailConfig: setting,
         }),
     );
   }

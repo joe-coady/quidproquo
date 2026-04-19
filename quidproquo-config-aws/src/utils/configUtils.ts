@@ -5,6 +5,7 @@ import {
   AwsDyanmoOverrideForKvsQPQConfigSetting,
   AwsOrganizationQPQConfigSetting,
   AwsServiceAccountInfoQPQConfigSetting,
+  BootstrapCloudTrailQPQConfigSetting,
   DomainCertificateQPQConfigSetting,
   QPQAwsConfigSettingType,
 } from '../config';
@@ -36,6 +37,12 @@ export const getAwsBootstrapOrganizationConfigs = (qpqConfig: QPQConfig): AwsOrg
 
   return awsOrganizationQPQConfigSettings;
 };
+
+export const getBootstrapCloudTrailConfigs = (qpqConfig: QPQConfig): BootstrapCloudTrailQPQConfigSetting[] =>
+  qpqCoreUtils.getConfigSettings<BootstrapCloudTrailQPQConfigSetting>(
+    qpqConfig,
+    QPQAwsConfigSettingType.bootstrapCloudTrail,
+  );
 
 export const getAwsServiceAccountInfos = (qpqConfig: QPQConfig): ServiceAccountInfo[] => {
   const awsServiceAccountInfoConfig = getAwsServiceAccountInfoConfig(qpqConfig);
