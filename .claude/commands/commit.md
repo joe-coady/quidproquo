@@ -39,9 +39,11 @@ When you find one, append a bullet under the `## vNext` heading in `breaking-cha
 
 The bullet should:
 
+- Be written for a **consumer** of the package, not for someone reading the internals. Say what they have to change in their own code to migrate — nothing more.
 - State the old and new shape concretely (e.g. `foo(a, b)` → `foo({ a, b })`).
 - Note the migration in one line if it isn't obvious.
 - Stay terse — one dot point per change, no prose paragraphs.
+- **Do not** mention internal mechanics (which helper the replacement delegates to under the hood, which resources it emits internally, refactor reasons, etc.) unless that detail is genuinely required for a caller to migrate.
 
 If `breaking-changes.md` doesn't exist yet, or there is no `## vNext` heading, **stop and ask the user** rather than creating one yourself.
 

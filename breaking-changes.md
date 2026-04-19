@@ -7,5 +7,5 @@ assembled quickly.
 
 - `defineEnvironmentSettings` now takes a single `settingsByEnvironment: Record<string, QPQConfig>` map instead of `(environment, settings)`. Use
   `'*'` as a catch-all key for settings that apply to any environment. All call sites using the old two-arg form must be updated.
-- `defineLogs(rootDomain, services, advancedSettings?)` is removed from `quidproquo-webserver`. Use `defineAdminSettings(logServiceName, rootDomain, advancedSettings?)` instead — the service list moves into `advancedSettings.services`, and admin-only resources are now scoped to `logServiceName` via `defineServiceSettings`.
-- `defineExposeAdminAdvancedSettings(ownerModule, rootDomain)` is removed from `quidproquo-webserver`. Its resources (admin event bus, config queue, websocket queue, foreign-ref logs drive) are now emitted automatically by `defineAdminSettings` for every service that calls it; delete any direct calls to the old helper.
+- `defineLogs(rootDomain, services, advancedSettings?)` is removed from `quidproquo-webserver`. Replace with `defineAdminSettings(logServiceName, rootDomain, advancedSettings?)` — the service list moves into `advancedSettings.services`.
+- `defineExposeAdminAdvancedSettings(ownerModule, rootDomain)` is removed from `quidproquo-webserver`. Delete the call — every service that calls `defineAdminSettings` now gets these resources automatically.
