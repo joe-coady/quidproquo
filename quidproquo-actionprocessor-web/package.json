@@ -34,7 +34,6 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.19.1",
     "axios": "^1.2.1",
-    "mime-types": "^2.1.35",
     "quidproquo-actionprocessor-js": "0.0.263",
     "quidproquo-core": "0.0.263",
     "quidproquo-web": "0.0.263",
@@ -43,7 +42,6 @@
     "uuidv7": "^1.0.1"
   },
   "devDependencies": {
-    "@types/mime-types": "^2.1.1",
     "@types/uuid": "^9.0.0",
     "quidproquo-tsconfig": "0.0.263",
     "typescript": "^5.8.2"
