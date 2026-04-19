@@ -1,4 +1,4 @@
-import { ConfigUrl, CrossModuleOwner } from '../../types';
+import { CrossModuleOwner } from '../../types';
 import { QPQConfigAdvancedSettings, QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
 import { convertCrossModuleOwnerToGenericResourceNameOverride } from '../utils/crossModuleUtils';
 import { CustomAuthRuntime, EmailTemplates } from './emailTemplates';
@@ -6,32 +6,6 @@ import { CustomAuthRuntime, EmailTemplates } from './emailTemplates';
 export type AuthDirectoryDnsRecord = {
   subdomain: string;
   rootDomain: string;
-};
-
-export enum AuthDirectoryFederatedProviderType {
-  Facebook = 'facebook',
-  Google = 'google',
-}
-
-export type AuthDirectoryFacebookFederatedProvider = {
-  type: AuthDirectoryFederatedProviderType.Facebook;
-
-  clientId: string;
-  clientSecret: string;
-};
-
-export type AuthDirectoryGoogleFederatedProvider = {
-  type: AuthDirectoryFederatedProviderType.Google;
-
-  clientId: string;
-  clientSecret: string;
-};
-
-export type AnyAuthDirectoryFederatedProvider = AuthDirectoryFacebookFederatedProvider | AuthDirectoryGoogleFederatedProvider;
-
-export type AuthDirectoryOAuth = {
-  callbacks?: ConfigUrl[];
-  federatedProviders?: AnyAuthDirectoryFederatedProvider[];
 };
 
 export interface QPQConfigAdvancedUserDirectorySettings extends QPQConfigAdvancedSettings {
@@ -44,8 +18,6 @@ export interface QPQConfigAdvancedUserDirectorySettings extends QPQConfigAdvance
   owner?: CrossModuleOwner<'userDirectoryName'>;
 
   dnsRecord?: AuthDirectoryDnsRecord;
-
-  oAuth?: AuthDirectoryOAuth;
 
   customAuthRuntime?: CustomAuthRuntime;
 }
@@ -62,7 +34,6 @@ export interface UserDirectoryQPQConfigSetting extends QPQConfigSetting {
   owner?: CrossModuleOwner;
 
   dnsRecord?: AuthDirectoryDnsRecord;
-  oAuth?: AuthDirectoryOAuth;
 
   customAuthRuntime?: CustomAuthRuntime;
 }
@@ -84,7 +55,6 @@ export const defineUserDirectory = (name: string, options?: QPQConfigAdvancedUse
   },
 
   dnsRecord: options?.dnsRecord,
-  oAuth: options?.oAuth,
   customAuthRuntime: options?.customAuthRuntime,
 
   owner: convertCrossModuleOwnerToGenericResourceNameOverride(options?.owner),
