@@ -71,13 +71,6 @@ export class WebserverRoll extends QpqConstructBlock {
         resources: ['*'],
       },
 
-      // Read/write key-value store (DynamoDB) tables used by QPQ services.
-      {
-        sid: 'DynamoDBTableOperations',
-        actions: ['dynamodb:GetItem', 'dynamodb:Scan', 'dynamodb:Query', 'dynamodb:PutItem', 'dynamodb:UpdateItem', 'dynamodb:DeleteItem'],
-        resources: ['arn:aws:dynamodb:*:*:table/*'],
-      },
-
       // Standard Lambda logging + log retrieval for the `askGetLogs` flow.
       {
         sid: 'CloudWatchLogsManagement',

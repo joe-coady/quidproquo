@@ -1,3 +1,4 @@
+import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import { KeyValueStoreQPQConfigSetting, KvsKey, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
@@ -108,15 +109,32 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
     }
   }
 
-  public static authorizeActionsForRole(role: aws_iam.IRole, kvsList: QpqCoreKeyValueStoreConstruct[]) {
-    if (kvsList.length > 0) {
-      role.addToPrincipalPolicy(
-        new aws_iam.PolicyStatement({
-          effect: aws_iam.Effect.ALLOW,
-          actions: ['dynamodb:GetItem', 'dynamodb:PutItem', 'dynamodb:Query', 'dynamodb:Scan', 'dynamodb:UpdateItem', 'dynamodb:DeleteItem'],
-          resources: kvsList.map((kvs) => kvs.table.tableArn),
-        }),
-      );
-    }
+  public static authorizeActionsForRole(role: aws_iam.IRole, qpqConfig: QPQConfig, ownedKvsList: QpqCoreKeyValueStoreConstruct[]) {
+    // CDK-known ARNs for tables created in this stack (+ GSI ARNs).
+    const ownedArns = ownedKvsList.flatMap((kvs) => [kvs.table.tableArn, `${kvs.table.tableArn}/index/*`]);
+
+    // Deterministically-computed ARNs for KVSs declared in this service's
+    // config but owned by another service. Uses the same naming path as
+    // `getKvsDynamoTableNameFromConfig` so no CDK cross-stack ref is created.
+    const allKvsConfigs = qpqCoreUtils.getAllKeyValueStores(qpqConfig);
+    const ownedKvsConfigs = qpqCoreUtils.getOwnedKeyValueStores(qpqConfig);
+    const foreignKvsConfigs = allKvsConfigs.filter((cfg) => !ownedKvsConfigs.includes(cfg));
+
+    const foreignArns = foreignKvsConfigs.flatMap((cfg) => {
+      const tableName = awsNamingUtils.getKvsDynamoTableNameFromConfig(cfg.keyValueStoreName, qpqConfig, 'kvs');
+      const tableArn = `arn:aws:dynamodb:*:*:table/${tableName}`;
+      return [tableArn, `${tableArn}/index/*`];
+    });
+
+    const resources = [...ownedArns, ...foreignArns];
+    if (resources.length === 0) return;
+
+    role.addToPrincipalPolicy(
+      new aws_iam.PolicyStatement({
+        effect: aws_iam.Effect.ALLOW,
+        actions: ['dynamodb:GetItem', 'dynamodb:PutItem', 'dynamodb:Query', 'dynamodb:Scan', 'dynamodb:UpdateItem', 'dynamodb:DeleteItem'],
+        resources,
+      }),
+    );
   }
 }

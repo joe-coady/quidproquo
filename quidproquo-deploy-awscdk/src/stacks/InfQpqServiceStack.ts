@@ -126,7 +126,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
           keyValueStoreConfig: setting,
         }),
     );
-    QpqCoreKeyValueStoreConstruct.authorizeActionsForRole(webserverRole, keyValueStores);
+    QpqCoreKeyValueStoreConstruct.authorizeActionsForRole(webserverRole, props.qpqConfig, keyValueStores);
     // end key value store
 
     // Graph Databases
