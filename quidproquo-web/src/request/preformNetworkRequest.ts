@@ -1,7 +1,14 @@
-import { HTTPMethod, HTTPNetworkResponse, NetworkRequestActionPayload, QPQBinaryData, ResponseType } from 'quidproquo-core';
+import {
+  getExtensionForMimeType,
+  getMimeTypeFromContentType,
+  HTTPMethod,
+  HTTPNetworkResponse,
+  NetworkRequestActionPayload,
+  QPQBinaryData,
+  ResponseType,
+} from 'quidproquo-core';
 
 import axios, { AxiosResponse } from 'axios';
-import { extension } from 'mime-types';
 
 const getAxiosResponseType = (responseType: ResponseType) => {
   if (responseType === 'binary') {
@@ -16,7 +23,7 @@ const transformResponse = (payload: NetworkRequestActionPayload<any>, response: 
     const headers = response.headers || {};
     const mimeType = headers['content-type'] || 'application/octet-stream';
 
-    const filename = headers['content-disposition']?.match(/filename="([^"]+)"/)?.[1] || `file.${extension(mimeType)}`;
+    const filename = headers['content-disposition']?.match(/filename="([^"]+)"/)?.[1] || `file.${getExtensionForMimeType(getMimeTypeFromContentType(mimeType))}`;
 
     return {
       ...response,
