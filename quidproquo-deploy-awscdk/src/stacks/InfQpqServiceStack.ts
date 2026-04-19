@@ -95,7 +95,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
           userDirectoryConfig: setting,
         }),
     );
-    QpqInfCoreUserDirectoryConstruct.authorizeActionsForRole(webserverRole, ownedUserDirectoriesConfigs, userDirectories, props.qpqConfig);
+    QpqInfCoreUserDirectoryConstruct.authorizeAdminActionsForRole(webserverRole, ownedUserDirectoriesConfigs, userDirectories, props.qpqConfig);
 
     // Api Keys
     const apiKeys = qpqWebServerUtils.getAllApiKeyConfigs(props.qpqConfig).map(

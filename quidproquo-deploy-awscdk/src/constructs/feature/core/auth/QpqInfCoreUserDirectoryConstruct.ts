@@ -235,7 +235,12 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
     );
   }
 
-  public static authorizeActionsForRole(
+  // Grants admin Cognito actions for pools this service owns. Services that
+  // only reference a foreign user directory get no Cognito IAM from here —
+  // token validation runs against the pool's public JWKs over HTTPS and needs
+  // no IAM. Call sites must pass only owned directories (see
+  // `qpqCoreUtils.getOwnedUserDirectories`).
+  public static authorizeAdminActionsForRole(
     role: aws_iam.IRole,
     userDirectoryConfigs: UserDirectoryQPQConfigSetting[],
     userDirectoryConstructs: QpqInfCoreUserDirectoryConstruct[],
