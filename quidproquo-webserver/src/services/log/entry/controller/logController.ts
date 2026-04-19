@@ -5,6 +5,7 @@ import {
   AskResponse,
   askThrowError,
   ErrorTypeEnum,
+  QPQ_LOGS_STORAGE_DRIVE_NAME,
   QpqRuntimeType,
 } from 'quidproquo-core';
 
@@ -111,10 +112,10 @@ export function* downloadUrl(
     correlationId: string;
   },
 ) {
-  const isColdStorage = yield* askFileIsColdStorage('qpq-logs', `${params.correlationId}.json`);
+  const isColdStorage = yield* askFileIsColdStorage(QPQ_LOGS_STORAGE_DRIVE_NAME, `${params.correlationId}.json`);
 
   if (!isColdStorage) {
-    const url = yield* askFileGenerateTemporarySecureUrl('qpq-logs', `${params.correlationId}.json`, 1 * 60 * 1000);
+    const url = yield* askFileGenerateTemporarySecureUrl(QPQ_LOGS_STORAGE_DRIVE_NAME, `${params.correlationId}.json`, 1 * 60 * 1000);
 
     return toJsonEventResponse({ url, isColdStorage: false });
   }

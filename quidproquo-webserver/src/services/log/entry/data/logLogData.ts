@@ -12,12 +12,13 @@ import {
   kvsOr,
   KvsQueryOperation,
   LogLevelEnum,
+  QPQ_LOGS_STORAGE_DRIVE_NAME,
   QpqPagedData,
 } from 'quidproquo-core';
 
 import { LogLog } from '../domain';
 
-const storeName = `${'qpq-logs'}-list`;
+const storeName = `${QPQ_LOGS_STORAGE_DRIVE_NAME}-list`;
 
 export function* askUpsert(logLog: LogLog): AskResponse<void> {
   yield* askKeyValueStoreUpsert(storeName, logLog);

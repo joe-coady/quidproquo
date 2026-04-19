@@ -1,4 +1,4 @@
-import { LogActionType, QPQConfig, qpqCoreUtils, QpqLogger, StoryResult } from 'quidproquo-core';
+import { LogActionType, QPQ_LOGS_STORAGE_DRIVE_NAME, QPQConfig, qpqCoreUtils, QpqLogger, StoryResult } from 'quidproquo-core';
 
 import fs from 'fs';
 import path from 'path';
@@ -68,7 +68,7 @@ export const getLogger = (qpqConfig: QPQConfig): QpqLogger => {
   const awsSettings = getAwsServiceAccountInfoConfig(qpqConfig);
 
   // If we have no log service, just return nothing.
-  if (!awsSettings.logServiceName || awsSettings.disableLogs || process.env.storageDriveName === 'qpq-logs') {
+  if (!awsSettings.logServiceName || awsSettings.disableLogs || process.env.storageDriveName === QPQ_LOGS_STORAGE_DRIVE_NAME) {
     return {
       enableLogs: async () => {},
       log: async () => {},
@@ -83,7 +83,7 @@ export const getLogger = (qpqConfig: QPQConfig): QpqLogger => {
   const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
 
   // Workout the bucket name.
-  const bucketName = getConfigRuntimeResourceName('qpq-logs', application, service, environment, feature);
+  const bucketName = getConfigRuntimeResourceName(QPQ_LOGS_STORAGE_DRIVE_NAME, application, service, environment, feature);
 
   // Where is this bucket?
   const regionForBucket = getAwsServiceAccountInfoByDeploymentInfo(qpqConfig, service, environment, feature, application).awsRegion;

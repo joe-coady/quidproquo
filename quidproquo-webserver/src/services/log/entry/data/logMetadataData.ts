@@ -16,17 +16,18 @@ import {
   kvsEqual,
   kvsExists,
   KvsQueryCondition,
+  QPQ_LOG_REPORTS_STORAGE_DRIVE_NAME,
+  QPQ_LOGS_STORAGE_DRIVE_NAME,
   QpqPagedData,
   QpqRuntimeType,
   StoryResultMetadata,
   StoryResultMetadataWithChildren,
 } from 'quidproquo-core';
 
-import { logReportsResourceName } from '../../../../config/settings/logs';
 import { LogMetadata } from '../domain/LogMetadata';
 
 
-const metadataStoreName = 'qpq-logs';
+const metadataStoreName = QPQ_LOGS_STORAGE_DRIVE_NAME;
 export function* askUpsert(logMetadata: LogMetadata): AskResponse<void> {
   yield* askKeyValueStoreUpsert(metadataStoreName, logMetadata);
 }
@@ -129,14 +130,14 @@ export function* askGetHierarchiesByCorrelation(correlation: string, forceRefres
   const root = yield* askFindRootLog(correlation);
   if (root) {
     const rootReportFilename = `${root.correlation}-tree.json`;
-    const reportExists = yield* askFileExists(logReportsResourceName, rootReportFilename);
+    const reportExists = yield* askFileExists(QPQ_LOG_REPORTS_STORAGE_DRIVE_NAME, rootReportFilename);
 
     if (!reportExists || forceRefresh) {
       const report = yield* askCreateHierarchy(root);
-      yield* askFileWriteObjectJson(logReportsResourceName, rootReportFilename, report);
+      yield* askFileWriteObjectJson(QPQ_LOG_REPORTS_STORAGE_DRIVE_NAME, rootReportFilename, report);
     }
 
-    return yield* askFileGenerateTemporarySecureUrl(logReportsResourceName, rootReportFilename, 1 * 60 * 1000);
+    return yield* askFileGenerateTemporarySecureUrl(QPQ_LOG_REPORTS_STORAGE_DRIVE_NAME, rootReportFilename, 1 * 60 * 1000);
   }
 
   return undefined;

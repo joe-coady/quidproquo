@@ -1,4 +1,4 @@
-import { filterLogHistoryByActionTypes, LogActionType, QPQConfig, qpqCoreUtils, QpqLogger, StoryResult, StorySession } from 'quidproquo-core';
+import { filterLogHistoryByActionTypes, LogActionType, QPQ_LOGS_STORAGE_DRIVE_NAME, QPQConfig, qpqCoreUtils, QpqLogger, StoryResult, StorySession } from 'quidproquo-core';
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
@@ -7,10 +7,10 @@ import { ResolvedDevServerConfig } from '../types';
 
 export const getDevServerLogger = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig, storySession?: StorySession): QpqLogger => {
   // Check if we're processing a storage event from the qpq-logs drive
-  const isProcessingLogDriveEvent = storySession?.context?.storageEvent?.drive === 'qpq-logs';
+  const isProcessingLogDriveEvent = storySession?.context?.storageEvent?.drive === QPQ_LOGS_STORAGE_DRIVE_NAME;
 
   // If we have no log service, or we're processing logs drive events, return a no-op logger
-  if (!devServerConfig.logServiceName || isProcessingLogDriveEvent || process.env.storageDriveName === 'qpq-logs') {
+  if (!devServerConfig.logServiceName || isProcessingLogDriveEvent || process.env.storageDriveName === QPQ_LOGS_STORAGE_DRIVE_NAME) {
     return {
       enableLogs: async () => { },
       log: async () => { },
@@ -23,7 +23,7 @@ export const getDevServerLogger = (qpqConfig: QPQConfig, devServerConfig: Resolv
   const storagePath = devServerConfig.fileStorageConfig.storagePath;
 
   // Construct the log directory path: {storagePath}/{logServiceName}/qpq-logs/
-  const logDirectory = path.join(storagePath, logServiceName, 'qpq-logs');
+  const logDirectory = path.join(storagePath, logServiceName, QPQ_LOGS_STORAGE_DRIVE_NAME);
 
   const logs: Promise<void>[] = [];
   let disabledLogCorrelations: string[] = [];
