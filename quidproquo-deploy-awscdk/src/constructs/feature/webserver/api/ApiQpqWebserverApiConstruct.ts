@@ -2,7 +2,8 @@ import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { qpqCoreUtils } from 'quidproquo-core';
 import { ApiQPQWebServerConfigSetting, qpqWebServerUtils } from 'quidproquo-webserver';
 
-import { aws_apigateway, aws_ec2, aws_lambda } from 'aws-cdk-lib';
+import { aws_apigateway, aws_ec2, aws_lambda, aws_logs } from 'aws-cdk-lib';
+import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
@@ -38,14 +39,37 @@ export class ApiQpqWebserverApiConstruct extends QpqConstructBlock {
       vpc,
     });
 
+    const accessLogGroup = new aws_logs.LogGroup(this, 'access-logs', {
+      retention: aws_logs.RetentionDays.ONE_YEAR,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+
     // Create a rest api
     const api = new aws_apigateway.LambdaRestApi(this, 'lambda-rest-api', {
       restApiName: this.resourceName(`${props.apiConfig.apiName}-rest-api`),
       handler: func.lambdaFunction,
       binaryMediaTypes: ['*/*'],
       proxy: true,
-      cloudWatchRole: false,
+      cloudWatchRole: true,
+      cloudWatchRoleRemovalPolicy: cdk.RemovalPolicy.DESTROY,
       endpointTypes: [aws_apigateway.EndpointType.REGIONAL],
+      deployOptions: {
+        accessLogDestination: new aws_apigateway.LogGroupLogDestination(accessLogGroup),
+        accessLogFormat: aws_apigateway.AccessLogFormat.jsonWithStandardFields({
+          caller: false,
+          httpMethod: true,
+          ip: true,
+          protocol: true,
+          requestTime: true,
+          resourcePath: true,
+          responseLength: true,
+          status: true,
+          user: false,
+        }),
+        loggingLevel: aws_apigateway.MethodLoggingLevel.ERROR,
+        metricsEnabled: true,
+        dataTraceEnabled: false,
+      },
     });
 
     const baseDomain = qpqWebServerUtils.resolveDomainRoot(props.apiConfig.rootDomain, props.qpqConfig);
