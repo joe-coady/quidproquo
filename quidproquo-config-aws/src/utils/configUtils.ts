@@ -165,6 +165,11 @@ export const isReservedConcurrencyDisabled = (qpqConfig: QPQConfig): boolean => 
   return awsServiceAccountInfoConfig.disableReservedConcurrency;
 };
 
+export const isTracingDisabled = (qpqConfig: QPQConfig): boolean => {
+  const awsServiceAccountInfoConfig = getAwsServiceAccountInfoConfig(qpqConfig);
+  return awsServiceAccountInfoConfig.disableTracing;
+};
+
 export const getDomainCertificateConfigs = (qpqConfig: QPQConfig): DomainCertificateQPQConfigSetting[] => {
   return qpqCoreUtils.getConfigSettings<DomainCertificateQPQConfigSetting>(
     qpqConfig,
