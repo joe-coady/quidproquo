@@ -19,8 +19,6 @@ import { defineAdminServiceLogLogRoute } from '../../services/log/config/defineA
 import { defineAdminServiceLogRoute } from '../../services/log/config/defineAdminServiceLogRoute';
 import { WebsocketAdminClientMessageEventType } from '../../services/log/logic/webSocket/clientMessages/WebSocketQueueQpqAdminClientMessageEventType';
 import { adminUserDirectoryResourceName } from './adminUserDirectory';
-import { defineWebsocket } from './websocket';
-import { defineWebSocketQueue } from './webSocketQueue';
 
 // export type ManifestServiceUrlDefinition = QpqServiceContentSecurityPolicy & {
 //   protocol: 'http' | 'https'; // Only can be serverd via http
@@ -122,20 +120,6 @@ export const defineLogs = (rootDomain: string, services: string[], advancedSetti
     defineGlobal('claudeAi-api-key', advancedSettings?.claudeAiApiKeySecretName || ''),
 
     defineKeyValueStore('qpq-log-messages', 'correlationId', ['timestamp']),
-
-    defineWebsocket(
-      'wsadmin',
-      rootDomain,
-      {
-        onConnect: getServiceEntryQpqFunctionRuntime('log', 'webSocket', 'onWebsocketEvent::onConnect'),
-        onDisconnect: getServiceEntryQpqFunctionRuntime('log', 'webSocket', 'onWebsocketEvent::onDisconnect'),
-        onMessage: getServiceEntryQpqFunctionRuntime('log', 'webSocket', 'onWebsocketEvent::onMessage'),
-      },
-      {
-        apiName: 'wsadmin',
-        deprecated: true,
-      },
-    ),
 
     // Web Sockets
     defineQueue(
