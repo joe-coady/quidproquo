@@ -7,7 +7,6 @@ import {
   FileActionType,
   FileWriteTextContentsActionProcessor,
   QPQConfig,
-  qpqCoreUtils,
 } from 'quidproquo-core';
 
 import * as fs from 'fs/promises';
@@ -19,11 +18,9 @@ const getProcessFileWriteTextContents = (
   qpqConfig: QPQConfig,
   config: FileStorageConfig
 ): FileWriteTextContentsActionProcessor => {
-  const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
-
   return async ({ drive, filepath, data }) => {
     try {
-      const fullPath = resolveFilePath(config, serviceName, drive, filepath);
+      const fullPath = resolveFilePath(config, qpqConfig, drive, filepath);
       await ensureParentDirectoryExists(fullPath);
       await fs.writeFile(fullPath, data, 'utf8');
       return actionResult(void 0);

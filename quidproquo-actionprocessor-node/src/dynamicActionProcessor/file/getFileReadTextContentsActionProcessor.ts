@@ -7,7 +7,6 @@ import {
   FileActionType,
   FileReadTextContentsActionProcessor,
   QPQConfig,
-  qpqCoreUtils,
 } from 'quidproquo-core';
 
 import * as fs from 'fs/promises';
@@ -19,11 +18,9 @@ const getProcessFileReadTextContents = (
   qpqConfig: QPQConfig,
   config: FileStorageConfig
 ): FileReadTextContentsActionProcessor => {
-  const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
-
   return async ({ drive, filepath }) => {
     try {
-      const fullPath = resolveFilePath(config, serviceName, drive, filepath);
+      const fullPath = resolveFilePath(config, qpqConfig, drive, filepath);
       const content = await fs.readFile(fullPath, 'utf8');
       return actionResult(content);
     } catch (error: any) {
