@@ -68,9 +68,10 @@ export const flattenQpqConfig = (qpqConfig: QPQConfig): QPQConfigSetting[] => {
         }
 
         // Otherwise if its an environmentSettings config item, flatten out the child settings
+        // for the current environment, falling back to the '*' key if present.
         else if (item.configSettingType === QPQCoreConfigSettingType.environmentSettings) {
           const envSetting = item as EnvironmentSettingsQPQConfigSetting;
-          const settings = envSetting.environment === environment ? envSetting.settings : [];
+          const settings = envSetting.settingsByEnvironment[environment] ?? envSetting.settingsByEnvironment['*'] ?? [];
 
           return flatten(settings, acc);
         }
