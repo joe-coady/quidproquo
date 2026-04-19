@@ -9,15 +9,10 @@ import { getQpqLambdaRuntimeForEvent } from './helpers/getQpqLambdaRuntimeForEve
 export const getApiGatewayEventHandler = (dynamicModuleLoader: DynamicModuleLoader, qpqConfig: QPQConfig) =>
   getQpqLambdaRuntimeForEvent<APIGatewayEvent>(
     QpqRuntimeType.API,
-    (event) => {
-      console.log('event', JSON.stringify(event, null, 2));
-      console.log(event);
-
-      return {
-        depth: 0,
-        context: {},
-      };
-    },
+    () => ({
+      depth: 0,
+      context: {},
+    }),
     getApiGatewayApiEventEventProcessor,
     dynamicModuleLoader,
     qpqConfig,
