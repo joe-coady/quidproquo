@@ -73,7 +73,7 @@ export class Function extends QpqConstructBlock {
       tracing: aws_lambda.Tracing.DISABLED,
 
       logGroup: new aws_logs.LogGroup(this, 'LogGroup', {
-        retention: aws_logs.RetentionDays.ONE_WEEK,
+        retention: aws_logs.RetentionDays.ONE_YEAR,
         removalPolicy: cdk.RemovalPolicy.DESTROY,
       }),
 
