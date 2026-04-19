@@ -1,4 +1,5 @@
-export function decodeJWT<T>(token: string): T | null {
+/** Base64-decodes the JWT payload WITHOUT signature verification. Never use for authorization. */
+export function unsafeDecodeJWTPayload<T>(token: string): T | null {
   try {
     const base64Url = token.split('.')[1]; // Get the payload part of the token
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');

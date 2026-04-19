@@ -4,7 +4,7 @@ import { askRouteAuthValidationDecode } from '../actions/routeAuthValidation';
 import { RouteAuthSettings } from '../config/settings/route';
 import { HTTPEvent } from '../types/HTTPEvent';
 import { getAccessTokenFromHeaders } from '../utils/headerUtils';
-import { decodeJWT } from '../utils/jwtUtils';
+import { unsafeDecodeJWTPayload } from '../utils/jwtUtils';
 
 export interface GetHttpApiEventStorySessionPayload {
   event: HTTPEvent;
@@ -26,7 +26,7 @@ export function* askGetHttpApiEventStorySession({
   // If this endpoint has no auth settings, BUT we do have an access token
   // then we want to just attempt to extract info for logs, but we will say that its wasValid = false
   if (!routeAuthSettings?.userDirectoryName) {
-    const info = decodeJWT<{
+    const info = unsafeDecodeJWTPayload<{
       sub?: string;
       userId?: string;
       username?: string;

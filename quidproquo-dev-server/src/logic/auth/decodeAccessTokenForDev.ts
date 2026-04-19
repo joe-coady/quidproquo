@@ -25,7 +25,7 @@ export const decodeAccessTokenForDev = (
 
   try {
     // Just decode the JWT without verification (dev only!)
-    const decoded = qpqWebServerUtils.decodeJWT<{
+    const decoded = qpqWebServerUtils.unsafeDecodeJWTPayload<{
       sub?: string;
       userId?: string;
       username?: string;

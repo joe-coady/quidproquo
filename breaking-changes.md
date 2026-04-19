@@ -22,3 +22,4 @@ assembled quickly.
 - Dev-server SQLite tables for key-value stores declared with `owner.module` are now stored under the owner's service prefix. If you have existing
   local data for foreign-owned KVSs, rename tables from `qpq_kvs_<callerService>_<name>` to `qpq_kvs_<ownerModule>_<name>`.
 - `defineUserDirectory(name, options?)` in `quidproquo-core` now defaults `selfSignUpEnabled` to `false` (was effectively always `true` — the previous default couldn't be overridden due to a bug). If you rely on self-serve user signup, pass `selfSignUpEnabled: true` explicitly.
+- `decodeJWT<T>(token)` in `quidproquo-webserver` is renamed to `unsafeDecodeJWTPayload<T>(token)`. Same arguments and behavior — it base64-decodes the payload without verifying the signature, so it must never be used for authorization. Update call sites.
