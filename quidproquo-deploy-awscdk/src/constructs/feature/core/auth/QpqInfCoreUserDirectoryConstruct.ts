@@ -39,6 +39,13 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       userPoolName: userPoolName,
       selfSignUpEnabled: props.userDirectoryConfig.selfSignUpEnabled,
+      passwordPolicy: {
+        minLength: 12,
+        requireLowercase: true,
+        requireUppercase: true,
+        requireDigits: true,
+        requireSymbols: true,
+      },
       standardAttributes: {
         email: {
           required: true,
