@@ -1,6 +1,6 @@
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { resolveAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { AuthDirectoryFederatedProviderType, QPQConfig, qpqCoreUtils, UserDirectoryQPQConfigSetting } from 'quidproquo-core';
+import { QPQConfig, UserDirectoryQPQConfigSetting } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { aws_cognito, aws_iam, aws_lambda, aws_route53, aws_route53_targets } from 'aws-cdk-lib';
@@ -150,41 +150,6 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
       this.userPool.userPoolId,
     );
 
-    const federatedProviders = props.userDirectoryConfig.oAuth?.federatedProviders || [];
-    federatedProviders.forEach((fp) => {
-      if (fp.type === AuthDirectoryFederatedProviderType.Facebook) {
-        new aws_cognito.UserPoolIdentityProviderFacebook(this, fp.clientId, {
-          userPool: this.userPool,
-          clientId: fp.clientId,
-          clientSecret: fp.clientSecret,
-
-          scopes: ['public_profile', 'email'],
-          attributeMapping: {
-            email: aws_cognito.ProviderAttribute.FACEBOOK_EMAIL,
-            givenName: aws_cognito.ProviderAttribute.FACEBOOK_FIRST_NAME,
-            familyName: aws_cognito.ProviderAttribute.FACEBOOK_LAST_NAME,
-            middleName: aws_cognito.ProviderAttribute.FACEBOOK_MIDDLE_NAME,
-            birthdate: aws_cognito.ProviderAttribute.FACEBOOK_BIRTHDAY,
-            profilePicture: aws_cognito.ProviderAttribute.other('picture'),
-          },
-        });
-      } else if (fp.type === AuthDirectoryFederatedProviderType.Google) {
-        new aws_cognito.UserPoolIdentityProviderGoogle(this, fp.clientId, {
-          userPool: this.userPool,
-          clientId: fp.clientId,
-          clientSecret: fp.clientSecret,
-          scopes: ['profile', 'email'],
-          attributeMapping: {
-            email: aws_cognito.ProviderAttribute.GOOGLE_EMAIL,
-            givenName: aws_cognito.ProviderAttribute.GOOGLE_NAME,
-            familyName: aws_cognito.ProviderAttribute.GOOGLE_FAMILY_NAME,
-            birthdate: aws_cognito.ProviderAttribute.GOOGLE_BIRTHDAYS,
-            profilePicture: aws_cognito.ProviderAttribute.GOOGLE_PICTURE,
-          },
-        });
-      }
-    });
-
     if (props.userDirectoryConfig.dnsRecord) {
       // Cognito custom domains use CloudFront under the hood, so the cert must be in us-east-1.
       const apexDomain = qpqWebServerUtils.resolveApexDomainNameFromDomainConfig(
@@ -224,14 +189,6 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
       authFlows: {
         adminUserPassword: true,
         custom: !!props.userDirectoryConfig.customAuthRuntime,
-      },
-      supportedIdentityProviders: federatedProviders.map((fp) =>
-        fp.type === AuthDirectoryFederatedProviderType.Facebook
-          ? aws_cognito.UserPoolClientIdentityProvider.FACEBOOK
-          : aws_cognito.UserPoolClientIdentityProvider.GOOGLE,
-      ),
-      oAuth: {
-        callbackUrls: props.userDirectoryConfig.oAuth?.callbacks?.map((cb) => qpqCoreUtils.getFullUrlFromConfigUrl(cb, props.qpqConfig)),
       },
     });
 
