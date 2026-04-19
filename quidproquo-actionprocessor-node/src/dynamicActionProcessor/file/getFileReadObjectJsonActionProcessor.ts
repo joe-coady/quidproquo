@@ -7,7 +7,6 @@ import {
   FileActionType,
   FileReadObjectJsonActionProcessor,
   QPQConfig,
-  qpqCoreUtils,
 } from 'quidproquo-core';
 
 import * as fs from 'fs/promises';
@@ -16,11 +15,9 @@ import { FileStorageConfig } from './types';
 import { resolveFilePath } from './utils';
 
 const getProcessFileReadObjectJson = (config: FileStorageConfig) => (qpqConfig: QPQConfig): FileReadObjectJsonActionProcessor<any> => {
-  const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
-
   return async ({ drive, filepath }) => {
     try {
-      const fullPath = resolveFilePath(config, serviceName, drive, filepath);
+      const fullPath = resolveFilePath(config, qpqConfig, drive, filepath);
       const content = await fs.readFile(fullPath, 'utf8');
       const jsonObject = JSON.parse(content);
       return actionResult(jsonObject);

@@ -7,7 +7,6 @@ import {
   FileActionType,
   FileGenerateTemporaryUploadSecureUrlActionProcessor,
   QPQConfig,
-  qpqCoreUtils,
 } from 'quidproquo-core';
 
 import { createSecureUrlToken, getSecureUrlBaseUrl } from './secureUrlUtils';
@@ -18,15 +17,13 @@ const getProcessFileGenerateTemporaryUploadSecureUrl = (
   qpqConfig: QPQConfig,
   config: FileStorageConfig
 ): FileGenerateTemporaryUploadSecureUrlActionProcessor => {
-  const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
-
   return async ({ drive, filepath, expirationMs, contentType }) => {
     try {
       const expiresAt = Date.now() + expirationMs;
-      
+
       // Create a token for upload
       const token = createSecureUrlToken({
-        fullFilepath: resolveFilePath(config, serviceName, drive, filepath),
+        fullFilepath: resolveFilePath(config, qpqConfig, drive, filepath),
         operation: 'upload',
         expiresAt,
         contentType,

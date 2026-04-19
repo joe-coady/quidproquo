@@ -7,7 +7,6 @@ import {
   FileActionType,
   FileWriteBinaryContentsActionProcessor,
   QPQConfig,
-  qpqCoreUtils,
 } from 'quidproquo-core';
 
 import * as fs from 'fs/promises';
@@ -16,11 +15,9 @@ import { FileStorageConfig } from './types';
 import { ensureParentDirectoryExists,resolveFilePath } from './utils';
 
 const getProcessFileWriteBinaryContents = (config: FileStorageConfig) => (qpqConfig: QPQConfig): FileWriteBinaryContentsActionProcessor => {
-  const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
-
   return async ({ drive, filepath, data }) => {
     try {
-      const fullPath = resolveFilePath(config, serviceName, drive, filepath);
+      const fullPath = resolveFilePath(config, qpqConfig, drive, filepath);
       await ensureParentDirectoryExists(fullPath);
       
       // Convert QPQBinaryData to Buffer

@@ -7,7 +7,6 @@ import {
   FileActionType,
   FileExistsActionProcessor,
   QPQConfig,
-  qpqCoreUtils,
 } from 'quidproquo-core';
 
 import * as fs from 'fs/promises';
@@ -19,11 +18,9 @@ const getProcessFileExists = (
   qpqConfig: QPQConfig,
   config: FileStorageConfig
 ): FileExistsActionProcessor => {
-  const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
-
   return async ({ drive, filepath }) => {
     try {
-      const fullPath = resolveFilePath(config, serviceName, drive, filepath);
+      const fullPath = resolveFilePath(config, qpqConfig, drive, filepath);
 
       try {
         await fs.access(fullPath);

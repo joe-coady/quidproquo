@@ -7,7 +7,6 @@ import {
   FileActionType,
   FileGenerateTemporarySecureUrlActionProcessor,
   QPQConfig,
-  qpqCoreUtils,
 } from 'quidproquo-core';
 
 import { createSecureUrlToken, getSecureUrlBaseUrl } from './secureUrlUtils';
@@ -18,13 +17,11 @@ const getProcessFileGenerateTemporarySecureUrl = (
   qpqConfig: QPQConfig,
   config: FileStorageConfig
 ): FileGenerateTemporarySecureUrlActionProcessor => {
-  const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
-  
   return async ({ drive, filepath, expirationMs }) => {
-    try {      
+    try {
       // Create a token for download
       const token = createSecureUrlToken({
-        fullFilepath: resolveFilePath(config, serviceName, drive, filepath),
+        fullFilepath: resolveFilePath(config, qpqConfig, drive, filepath),
         operation: 'download',
         expiresAt: Date.now() + expirationMs,
       }, config.secureUrlSecret);

@@ -7,7 +7,6 @@ import {
   FileActionType,
   FileStreamOpenActionProcessor,
   QPQConfig,
-  qpqCoreUtils,
 } from 'quidproquo-core';
 
 import * as fs from 'fs';
@@ -33,11 +32,9 @@ const getProcessFileStreamOpen = (
   qpqConfig: QPQConfig,
   config: FileStorageConfig,
 ): FileStreamOpenActionProcessor => {
-  const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
-
   return async ({ drive, filepath, encoding, chunkSize }, session, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
     try {
-      const fullPath = resolveFilePath(config, serviceName, drive, filepath);
+      const fullPath = resolveFilePath(config, qpqConfig, drive, filepath);
       const isText = encoding === 'text';
       const highWaterMark = chunkSize ?? 65536;
       const readStream = fs.createReadStream(fullPath, isText ? { encoding: 'utf8', highWaterMark } : { highWaterMark });

@@ -7,7 +7,6 @@ import {
   FileActionType,
   FileDeleteActionProcessor,
   QPQConfig,
-  qpqCoreUtils,
 } from 'quidproquo-core';
 
 import * as fs from 'fs/promises';
@@ -19,15 +18,13 @@ const getProcessFileDelete = (
   qpqConfig: QPQConfig,
   config: FileStorageConfig
 ): FileDeleteActionProcessor => {
-    const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
-
   return async ({ drive, filepaths }) => {
     const deletedFiles: string[] = [];
     const errors: string[] = [];
-    
+
     for (const filepath of filepaths) {
       try {
-        const fullPath = resolveFilePath(config, serviceName, drive, filepath);
+        const fullPath = resolveFilePath(config, qpqConfig, drive, filepath);
         
         await fs.unlink(fullPath);
         deletedFiles.push(filepath);

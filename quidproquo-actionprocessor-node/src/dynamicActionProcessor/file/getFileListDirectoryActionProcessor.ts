@@ -9,7 +9,6 @@ import {
   FileInfo,
   FileListDirectoryActionProcessor,
   QPQConfig,
-  qpqCoreUtils,
 } from 'quidproquo-core';
 
 import * as fs from 'fs/promises';
@@ -19,11 +18,9 @@ import { FileStorageConfig } from './types';
 import { resolveFilePath } from './utils';
 
 const getProcessFileListDirectory = (config: FileStorageConfig) => (qpqConfig: QPQConfig): FileListDirectoryActionProcessor => {
-  const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
-
   return async ({ drive, folderPath, maxFiles, pageToken }) => {
     try {
-      const fullPath = resolveFilePath(config, serviceName, drive, folderPath || '');
+      const fullPath = resolveFilePath(config, qpqConfig, drive, folderPath || '');
 
       // Read all entries in the directory
       const entries = await fs.readdir(fullPath, { withFileTypes: true });
