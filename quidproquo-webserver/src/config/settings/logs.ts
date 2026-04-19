@@ -6,6 +6,8 @@ import {
   defineQueue,
   defineStorageDrive,
   NotifyErrorQueueEvents,
+  QPQ_LOG_REPORTS_STORAGE_DRIVE_NAME,
+  QPQ_LOGS_STORAGE_DRIVE_NAME,
   QPQConfig,
   QPQConfigAdvancedSettings,
   StorageDriveTier,
@@ -35,14 +37,6 @@ export interface QPQConfigAdvancedLogSettings extends QPQConfigAdvancedSettings 
   claudeAiApiKeySecretName?: string;
 }
 
-// NEVER EVER CHANGE THIS NAME
-// if you do, you might get logs generated from the logging service
-// which would be recursive and bad
-// its hard coded in the lambda code (TODO: remove the hard coding in lambda)
-// This should be part of core
-const logResourceName = 'qpq-logs';
-export const logReportsResourceName = 'qpq-log-reports';
-
 export const defineLogs = (rootDomain: string, services: string[], advancedSettings?: QPQConfigAdvancedLogSettings): QPQConfig => {
   const routeAuthSettings = {
     routeAuthSettings: {
@@ -69,7 +63,7 @@ export const defineLogs = (rootDomain: string, services: string[], advancedSetti
     defineGlobal('qpq-serviceNames', services),
     defineGlobal('qpq-log-retention-days', logRetentionDays),
 
-    defineStorageDrive(logResourceName, {
+    defineStorageDrive(QPQ_LOGS_STORAGE_DRIVE_NAME, {
       onEvent: {
         create: getServiceEntryQpqFunctionRuntime('log', 'storageDrive', 'onCreate::onCreate'),
       },
@@ -91,7 +85,7 @@ export const defineLogs = (rootDomain: string, services: string[], advancedSetti
       ],
     }),
 
-    defineStorageDrive(logReportsResourceName, {
+    defineStorageDrive(QPQ_LOG_REPORTS_STORAGE_DRIVE_NAME, {
       deprecated: advancedSettings?.deprecated,
       lifecycleRules: [
         {
@@ -100,7 +94,7 @@ export const defineLogs = (rootDomain: string, services: string[], advancedSetti
       ],
     }),
 
-    defineKeyValueStore(logResourceName, 'correlation', [], {
+    defineKeyValueStore(QPQ_LOGS_STORAGE_DRIVE_NAME, 'correlation', [], {
       indexes: [
         { partitionKey: 'runtimeType', sortKey: 'startedAt' },
         { partitionKey: 'fromCorrelation', sortKey: 'startedAt' },
@@ -178,7 +172,7 @@ export const defineLogs = (rootDomain: string, services: string[], advancedSetti
       },
     ),
     defineKeyValueStore(
-      `${logResourceName}-list`,
+      `${QPQ_LOGS_STORAGE_DRIVE_NAME}-list`,
       {
         key: 'type',
         type: 'number',
