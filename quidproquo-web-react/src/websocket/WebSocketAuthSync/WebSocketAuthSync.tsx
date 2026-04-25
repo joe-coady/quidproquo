@@ -3,6 +3,7 @@ import { AuthenticationInfo } from 'quidproquo-core';
 import { memo } from 'react';
 
 import { useWebsocketAuthSync, useWebsocketPingPong } from './hooks';
+import { WebSocketAuthContext } from './WebSocketAuthContext';
 
 export type WebSocketAuthSyncProps = {
   children: React.ReactNode;
@@ -10,13 +11,16 @@ export type WebSocketAuthSyncProps = {
 };
 
 const component: React.FC<WebSocketAuthSyncProps> = ({ children, accessToken }) => {
-  useWebsocketAuthSync(accessToken);
+  const isAuthenticated = useWebsocketAuthSync(accessToken);
 
   // Keep the active websocket alive
   useWebsocketPingPong();
 
-  // This fragment is not useless!
-  return <>{children}</>;
+  return (
+    <WebSocketAuthContext.Provider value={isAuthenticated}>
+      {children}
+    </WebSocketAuthContext.Provider>
+  );
 };
 
 export const WebSocketAuthSync = memo(component);
