@@ -1,6 +1,5 @@
 import { WebsocketService, WebsocketServiceEvent } from 'quidproquo-web';
-import { AnyWebSocketQueueEventMessageWithCorrelation, WebSocketQueueServerMessageEventType } from 'quidproquo-webserver';
-import { WebSocketQueueServerEventMessageServiceRequestResponse } from 'quidproquo-webserver/lib/commonjs/services/webSocketQueue/types/serverMessages/WebSocketQueueServerEventMessageServiceRequestResponse';
+import { AnyWebSocketQueueEventMessageWithCorrelation, WebSocketQueueServerEventMessageServiceRequestResponse, WebSocketQueueServerMessageEventType } from 'quidproquo-webserver';
 
 import { useRef } from 'react';
 

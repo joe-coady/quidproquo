@@ -1,4 +1,4 @@
-import { askConfigGetGlobal, AskResponse, askUserDirectorySetAccessToken, DecodedAccessToken } from 'quidproquo-core';
+import { askCatch, askConfigGetGlobal, AskResponse, askUserDirectorySetAccessToken, DecodedAccessToken } from 'quidproquo-core';
 
 import { getWebSocketQueueGlobalConfigKeyForUserDirectoryName } from '../../../../../config';
 import { askWebsocketReadApiNameOrThrow } from '../../../../../context';
@@ -7,8 +7,12 @@ import {
   AnyWebSocketQueueEventMessageWithCorrelation,
   WebSocketQueueClientEventMessageAuthenticate,
   WebSocketQueueClientMessageEventType,
+  WebSocketQueueServerEventMessageAuthenticated,
+  WebSocketQueueServerEventMessageUnauthenticated,
+  WebSocketQueueServerMessageEventType,
 } from '../../../types';
 import { askBroadcastUnknownMessage } from '../askBroadcastUnknownMessage';
+import { askSendMessage } from '../askSendMessage';
 
 export function isWebSocketAuthenticateMessage(
   event: AnyWebSocketQueueEventMessageWithCorrelation,
@@ -24,7 +28,16 @@ export function* askProcessOnAuthenticate(connectionId: string, accessToken: str
     const userDirectoryName = yield* askConfigGetGlobal<string>(getWebSocketQueueGlobalConfigKeyForUserDirectoryName(apiName));
 
     if (userDirectoryName) {
-      const decodedAccessToken: DecodedAccessToken = yield* askUserDirectorySetAccessToken(userDirectoryName, accessToken);
+      const result = yield* askCatch(askUserDirectorySetAccessToken(userDirectoryName, accessToken));
+
+      if (!result.success) {
+        yield* askSendMessage(connectionId, {
+          type: WebSocketQueueServerMessageEventType.Unauthenticated,
+        } satisfies WebSocketQueueServerEventMessageUnauthenticated);
+        return;
+      }
+
+      const decodedAccessToken: DecodedAccessToken = result.result;
 
       yield* webSocketConnectionData.askUpsert({
         ...connection,
@@ -32,6 +45,10 @@ export function* askProcessOnAuthenticate(connectionId: string, accessToken: str
         userId: decodedAccessToken.userId,
         accessToken,
       });
+
+      yield* askSendMessage(connectionId, {
+        type: WebSocketQueueServerMessageEventType.Authenticated,
+      } satisfies WebSocketQueueServerEventMessageAuthenticated);
 
       // Send a websocket message to the event buss WITHOUT an access token
       const webSocketQueueClientEventMessageAuthenticate: WebSocketQueueClientEventMessageAuthenticate = {
