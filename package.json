@@ -53,6 +53,7 @@
     "quidproquo-eslint-config",
     "quidproquo-core",
     "quidproquo-webserver",
+    "quidproquo-xstate",
     "quidproquo-config-aws",
     "quidproquo-actionprocessor-js",
     "quidproquo-actionprocessor-node",
