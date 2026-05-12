@@ -2,7 +2,7 @@ import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import { KeyValueStoreQPQConfigSetting, KvsKey, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
-import { aws_dynamodb, aws_iam } from 'aws-cdk-lib';
+import { aws_dynamodb, aws_iam, aws_kms } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
@@ -65,6 +65,18 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
 
     const [primarySortKey] = props.keyValueStoreConfig.sortKeys;
 
+    let tableEncryption: aws_dynamodb.TableEncryption | undefined;
+    let encryptionKey: aws_kms.IKey | undefined;
+    if (props.keyValueStoreConfig.encryption) {
+      const kmsCfg = qpqConfigAwsUtils.getAwsKmsKeyForKeyValueStore(props.qpqConfig, props.keyValueStoreConfig);
+      if (kmsCfg) {
+        encryptionKey = aws_kms.Key.fromKeyArn(this, 'enc-key', kmsCfg.arn);
+        tableEncryption = aws_dynamodb.TableEncryption.CUSTOMER_MANAGED;
+      } else {
+        tableEncryption = aws_dynamodb.TableEncryption.AWS_MANAGED;
+      }
+    }
+
     const table = new aws_dynamodb.Table(this, 'table', {
       tableName: this.qpqResourceName(props.keyValueStoreConfig.keyValueStoreName, 'kvs'),
       partitionKey: convertKvsKeyToDynamodbAttribute(props.keyValueStoreConfig.partitionKey),
@@ -75,6 +87,8 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
       pointInTimeRecoverySpecification: props.keyValueStoreConfig.enableMonthlyRollingBackups
         ? { pointInTimeRecoveryEnabled: true }
         : undefined,
+      encryption: tableEncryption,
+      encryptionKey,
     });
 
     qpqDeployAwsCdkUtils.applyEnvironmentTags(table, props.qpqConfig);
@@ -136,5 +150,22 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
         resources,
       }),
     );
+
+    // Grant KMS permissions for any encrypted KVSs (owned or foreign) whose
+    // customer-managed key is declared in this service's config.
+    const kmsArns = [...ownedKvsConfigs, ...foreignKvsConfigs]
+      .filter((cfg) => cfg.encryption)
+      .map((cfg) => qpqConfigAwsUtils.getAwsKmsKeyForKeyValueStore(qpqConfig, cfg)?.arn)
+      .filter((arn): arn is string => Boolean(arn));
+
+    if (kmsArns.length > 0) {
+      role.addToPrincipalPolicy(
+        new aws_iam.PolicyStatement({
+          effect: aws_iam.Effect.ALLOW,
+          actions: ['kms:Decrypt', 'kms:GenerateDataKey*', 'kms:DescribeKey', 'kms:Encrypt', 'kms:ReEncrypt*'],
+          resources: [...new Set(kmsArns)],
+        }),
+      );
+    }
   }
 }
