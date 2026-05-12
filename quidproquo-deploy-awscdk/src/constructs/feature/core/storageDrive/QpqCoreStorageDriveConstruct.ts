@@ -2,7 +2,7 @@ import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import { QPQConfig, qpqCoreUtils, StorageDriveLifecycleRule, StorageDriveQPQConfigSetting, StorageDriveTransition } from 'quidproquo-core';
 
-import { aws_iam, aws_s3, aws_s3_deployment } from 'aws-cdk-lib';
+import { aws_iam, aws_kms, aws_s3, aws_s3_deployment } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
@@ -65,6 +65,18 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
   constructor(scope: Construct, id: string, props: QpqCoreStorageDriveConstructProps) {
     super(scope, id, props);
 
+    let bucketEncryption: aws_s3.BucketEncryption = aws_s3.BucketEncryption.UNENCRYPTED;
+    let encryptionKey: aws_kms.IKey | undefined;
+    if (props.storageDriveConfig.encryption) {
+      const kmsCfg = qpqConfigAwsUtils.getAwsKmsKeyForStorageDrive(props.qpqConfig, props.storageDriveConfig);
+      if (kmsCfg) {
+        encryptionKey = aws_kms.Key.fromKeyArn(this, 'enc-key', kmsCfg.arn);
+        bucketEncryption = aws_s3.BucketEncryption.KMS;
+      } else {
+        bucketEncryption = aws_s3.BucketEncryption.S3_MANAGED;
+      }
+    }
+
     this.bucket = new aws_s3.Bucket(this, 'bucket', {
       bucketName: this.resourceName(props.storageDriveConfig.storageDrive),
 
@@ -85,6 +97,10 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
       ],
 
       lifecycleRules: props.storageDriveConfig.lifecycleRules?.map(convertStorageDriveLifecycleRuleToAwsS3LifecycleRule),
+
+      encryption: bucketEncryption,
+      encryptionKey,
+      bucketKeyEnabled: bucketEncryption === aws_s3.BucketEncryption.KMS,
     });
 
     qpqDeployAwsCdkUtils.applyEnvironmentTags(this.bucket, props.qpqConfig);
@@ -161,5 +177,22 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
         resources,
       }),
     );
+
+    // Grant KMS permissions for any encrypted drives (owned or foreign) whose
+    // customer-managed key is declared in this service's config.
+    const kmsArns = [...ownedDriveConfigs, ...foreignDriveConfigs]
+      .filter((cfg) => cfg.encryption)
+      .map((cfg) => qpqConfigAwsUtils.getAwsKmsKeyForStorageDrive(qpqConfig, cfg)?.arn)
+      .filter((arn): arn is string => Boolean(arn));
+
+    if (kmsArns.length > 0) {
+      role.addToPrincipalPolicy(
+        new aws_iam.PolicyStatement({
+          effect: aws_iam.Effect.ALLOW,
+          actions: ['kms:Decrypt', 'kms:GenerateDataKey*', 'kms:DescribeKey', 'kms:Encrypt', 'kms:ReEncrypt*'],
+          resources: [...new Set(kmsArns)],
+        }),
+      );
+    }
   }
 }

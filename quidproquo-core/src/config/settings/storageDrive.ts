@@ -96,6 +96,8 @@ export interface QPQConfigAdvancedStorageDriveSettings extends QPQConfigAdvanced
 
   lifecycleRules?: StorageDriveLifecycleRule[];
 
+  encryption?: boolean;
+
   owner?: CrossModuleOwner<'storageDriveName'>;
 }
 
@@ -107,6 +109,8 @@ export interface StorageDriveQPQConfigSetting extends QPQConfigSetting {
   onEvent?: StorageDriveEvents;
 
   lifecycleRules?: StorageDriveLifecycleRule[];
+
+  encryption: boolean;
 }
 
 export const defineStorageDrive = (storageDrive: string, options?: QPQConfigAdvancedStorageDriveSettings): StorageDriveQPQConfigSetting => ({
@@ -122,6 +126,8 @@ export const defineStorageDrive = (storageDrive: string, options?: QPQConfigAdva
   onEvent: options?.onEvent,
 
   lifecycleRules: options?.lifecycleRules,
+
+  encryption: options?.encryption ?? false,
 
   owner: convertCrossModuleOwnerToGenericResourceNameOverride(options?.owner),
 });
