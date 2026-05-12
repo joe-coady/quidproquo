@@ -5,6 +5,7 @@ assembled quickly.
 
 ## vNext
 
+- `StorageDriveQPQConfigSetting` and `KeyValueStoreQPQConfigSetting` in `quidproquo-core` now have a required `encryption: boolean` field. If you construct these settings directly (rather than via `defineStorageDrive` / `defineKeyValueStore`), add `encryption: false` to existing literals.
 - `defineEnvironmentSettings` now takes a single `settingsByEnvironment: Record<string, QPQConfig>` map instead of `(environment, settings)`. Use
   `'*'` as a catch-all key for settings that apply to any environment. All call sites using the old two-arg form must be updated.
 - `defineLogs(rootDomain, services, advancedSettings?)` is removed from `quidproquo-webserver`. Replace with

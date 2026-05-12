@@ -5,4 +5,5 @@ export enum QPQAwsConfigSettingType {
   bootstrapAwsOrganization = '@quidproquo-aws/config/bootstrapAwsOrganization',
   bootstrapCloudTrail = '@quidproquo-aws/config/bootstrapCloudTrail',
   awsDomainCertificate = '@quidproquo-aws/config/awsDomainCertificate',
+  awsKmsKey = '@quidproquo-aws/config/awsKmsKey',
 }

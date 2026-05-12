@@ -71,6 +71,8 @@ export interface QPQConfigAdvancedKeyValueStoreSettings<T extends object = any> 
   ttlAttribute?: string;
 
   enableMonthlyRollingBackups?: boolean;
+
+  encryption?: boolean;
 }
 
 export interface KeyValueStoreQPQConfigSetting<T extends object = any> extends QPQConfigSetting {
@@ -86,6 +88,8 @@ export interface KeyValueStoreQPQConfigSetting<T extends object = any> extends Q
   ttlAttribute?: string;
 
   enableMonthlyRollingBackups: boolean;
+
+  encryption: boolean;
 }
 
 export const defineKeyValueStore = <T extends object = any>(
@@ -113,4 +117,6 @@ export const defineKeyValueStore = <T extends object = any>(
   ttlAttribute: options?.ttlAttribute,
 
   enableMonthlyRollingBackups: options?.enableMonthlyRollingBackups ?? false,
+
+  encryption: options?.encryption ?? false,
 });
