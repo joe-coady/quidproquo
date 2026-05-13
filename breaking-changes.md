@@ -5,6 +5,7 @@ assembled quickly.
 
 ## vNext
 
+- `InfQpqWebserverServiceDomainsConstruct`, `ServiceDomainConstruct`, `QpqWebserverDomainConstruct`, and `getEnvironmentDomainName` are removed from `quidproquo-deploy-awscdk`. Service stacks no longer create their own hosted zones — declare the apex zone in your bootstrap stack and let services resolve it via SSM. If you used these constructs directly in custom stacks, delete the call sites.
 - `StorageDriveQPQConfigSetting` and `KeyValueStoreQPQConfigSetting` in `quidproquo-core` now have a required `encryption: boolean` field. If you construct these settings directly (rather than via `defineStorageDrive` / `defineKeyValueStore`), add `encryption: false` to existing literals.
 - `defineEnvironmentSettings` now takes a single `settingsByEnvironment: Record<string, QPQConfig>` map instead of `(environment, settings)`. Use
   `'*'` as a catch-all key for settings that apply to any environment. All call sites using the old two-arg form must be updated.
