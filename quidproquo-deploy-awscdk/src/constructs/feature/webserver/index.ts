@@ -1,7 +1,6 @@
 export * from './api';
 export * from './apiKey';
 export * from './certificate';
-export * from './domain';
 export * from './domainProxy';
 export * from './redirect';
 export * from './serviceFunction';
