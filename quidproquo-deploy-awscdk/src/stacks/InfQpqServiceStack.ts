@@ -4,7 +4,7 @@ import { qpqWebServerUtils } from 'quidproquo-webserver';
 import { Construct } from 'constructs';
 
 import {
-  InfQpqWebserverServiceDomainsConstruct,
+  QpqCoreAiConstruct,
   QpqCoreApiGraphDatabaseConstruct,
   QpqCoreEventBusConstruct,
   QpqCoreKeyValueStoreConstruct,
@@ -31,11 +31,6 @@ export class InfQpqServiceStack extends QpqServiceStack {
     const webserverRole = new WebserverRoll(this, 'webserverRoll', {
       qpqConfig: props.qpqConfig,
     }).role;
-
-    // Web entry foundations
-    new InfQpqWebserverServiceDomainsConstruct(this, 'serviceDomains', {
-      qpqConfig: props.qpqConfig,
-    });
 
     // Build the storage drives
     const storageDrives = qpqCoreUtils.getOwnedStorageDrives(props.qpqConfig).map(
@@ -141,6 +136,10 @@ export class InfQpqServiceStack extends QpqServiceStack {
     );
     QpqCoreApiGraphDatabaseConstruct.authorizeActionsForRole(webserverRole, allGraphDatabaseConfigs, props.qpqConfig);
     // end key value store
+
+    // AI (Bedrock)
+    QpqCoreAiConstruct.authorizeActionsForRole(webserverRole, qpqCoreUtils.getAllAiConfigs(props.qpqConfig));
+    // end AI
 
     // Build websocket apis
     const websockets = qpqWebServerUtils.getOwnedWebsocketSettings(props.qpqConfig).map(
