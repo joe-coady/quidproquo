@@ -1,4 +1,3 @@
-import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
@@ -6,76 +5,27 @@ import {
   actionResultError,
   AiActionType,
   AiPromptActionProcessor,
-  askInlineFunctionExecute,
-  createImplementationRuntime,
-  DynamicModuleLoader,
   ErrorTypeEnum,
   QPQConfig,
-  qpqCoreUtils,
 } from 'quidproquo-core';
 
-import { generateText, jsonSchema, stepCountIs } from 'ai';
-import { createAmazonBedrock } from '@ai-sdk/amazon-bedrock';
+import { generateText, stepCountIs } from 'ai';
 
-import { randomGuid } from '../../../awsLambdaUtils';
-import { bedrockModelMap } from './aiModelMap';
+import { prepareAiPromptCall } from './logic';
 
 const getProcessAiPrompt = (qpqConfig: QPQConfig): AiPromptActionProcessor => {
   return async (payload, session, actionProcessorList, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
-    const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
-    const bedrock = createAmazonBedrock({ region });
-    const bedrockModelId = bedrockModelMap[payload.model];
-
-    if (!bedrockModelId) {
-      return actionResultError(ErrorTypeEnum.NotImplemented, `Unsupported AI model: ${payload.model}`);
-    }
-
-    // Build tools from defineAi config if aiName is provided
-    const aiTools: Record<string, any> = {};
-
-    if (payload.aiName) {
-      const aiConfigs = qpqCoreUtils.getAllAiConfigs(qpqConfig);
-      const aiConfig = aiConfigs.find((c) => c.aiName === payload.aiName);
-
-      if (!aiConfig) {
-        return actionResultError(ErrorTypeEnum.NotFound, `AI config not found: ${payload.aiName}`);
-      }
-
-      for (const toolDef of aiConfig.tools) {
-        aiTools[toolDef.name] = {
-          description: toolDef.description,
-          inputSchema: jsonSchema(toolDef.inputSchema),
-          execute: async (args: unknown) => {
-            const resolveStory = createImplementationRuntime(
-              qpqConfig,
-              [`AI Tool: ${toolDef.name}`],
-              () => new Date().toISOString(),
-              randomGuid,
-              session,
-              actionProcessorList,
-              logger,
-              dynamicModuleLoader,
-              streamRegistry,
-            );
-
-            const storyResult = await resolveStory(askInlineFunctionExecute, [toolDef.executor, args]);
-
-            if (storyResult.error) {
-              throw new Error(storyResult.error.errorText);
-            }
-
-            return storyResult.result;
-          },
-        };
-      }
+    const prepared = prepareAiPromptCall(qpqConfig, payload, session, actionProcessorList, logger, dynamicModuleLoader, streamRegistry);
+    if ('error' in prepared) {
+      return actionResultError(prepared.error.type, prepared.error.message);
     }
 
     try {
       const result = await generateText({
-        model: bedrock(bedrockModelId),
+        model: prepared.model,
         system: payload.system,
         prompt: payload.prompt,
-        tools: Object.keys(aiTools).length > 0 ? aiTools : undefined,
+        tools: prepared.tools,
         stopWhen: stepCountIs(10),
       });
 

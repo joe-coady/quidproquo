@@ -23,5 +23,6 @@ export * from './mapAiStreamToolInputEnd';
 export * from './mapAiStreamToolInputStart';
 export * from './mapAiStreamToolOutputDenied';
 export * from './mapAiStreamToolResult';
+export * from './prepareAiPromptCall';
 export * from './toAiStreamUsage';
 export * from './toErrorMessage';
