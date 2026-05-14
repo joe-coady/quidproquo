@@ -19,6 +19,7 @@ import { createAmazonBedrock } from '@ai-sdk/amazon-bedrock';
 
 import { randomGuid } from '../../../awsLambdaUtils';
 import { bedrockModelMap } from './aiModelMap';
+import { mapAiStreamPart } from './logic';
 
 const getProcessAiPromptStream = (qpqConfig: QPQConfig): AiPromptStreamActionProcessor => {
   return async (payload, session, actionProcessorList, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
@@ -79,19 +80,17 @@ const getProcessAiPromptStream = (qpqConfig: QPQConfig): AiPromptStreamActionPro
         prompt: payload.messages ?? payload.prompt,
         tools: Object.keys(aiTools).length > 0 ? aiTools : undefined,
         stopWhen: stepCountIs(10),
+        // streamText swallows errors by default to keep the server alive — surface them to CloudWatch.
+        onError: ({ error }) => {
+          console.error('AI prompt stream error:', error);
+        },
       });
 
       const streamId = `ai-prompt-${Date.now()}-${randomGuid()}`;
 
       async function* aiStreamIterator(): AsyncIterableIterator<string> {
         for await (const part of fullStream) {
-          if (part.type === 'text-delta') {
-            yield JSON.stringify({ type: 'text-delta', text: part.text });
-          } else if (part.type === 'tool-call') {
-            yield JSON.stringify({ type: 'tool-call', toolName: part.toolName, input: part.input });
-          } else if (part.type === 'tool-result') {
-            yield JSON.stringify({ type: 'tool-result', toolName: part.toolName, output: part.output });
-          }
+          yield JSON.stringify(mapAiStreamPart(part));
         }
       }
 
