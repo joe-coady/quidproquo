@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+- `AiStreamPart` in `quidproquo-core` now covers 23 variants (was 3: `text-delta`, `tool-call`, `tool-result`) and is discriminated by the new `AiStreamPartType` enum instead of raw string literals. Wire format (the `type` strings) is unchanged, but if you switch on `part.type` in TS, prefer `AiStreamPartType.TextDelta` etc. over string literals.
+- Variants in `AiStreamPart` gained required fields: `AiStreamTextDelta` adds `id: string`; `AiStreamToolCall` adds `toolCallId: string`; `AiStreamToolResult` adds `toolCallId: string` and `input: unknown`. If you construct these parts yourself (rather than only consuming them from the stream), supply the new fields.
 - `InfQpqWebserverServiceDomainsConstruct`, `ServiceDomainConstruct`, `QpqWebserverDomainConstruct`, and `getEnvironmentDomainName` are removed from `quidproquo-deploy-awscdk`. Service stacks no longer create their own hosted zones — declare the apex zone in your bootstrap stack and let services resolve it via SSM. If you used these constructs directly in custom stacks, delete the call sites.
 - `StorageDriveQPQConfigSetting` and `KeyValueStoreQPQConfigSetting` in `quidproquo-core` now have a required `encryption: boolean` field. If you construct these settings directly (rather than via `defineStorageDrive` / `defineKeyValueStore`), add `encryption: false` to existing literals.
 - `defineEnvironmentSettings` now takes a single `settingsByEnvironment: Record<string, QPQConfig>` map instead of `(environment, settings)`. Use
