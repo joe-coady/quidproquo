@@ -7,4 +7,5 @@ export * from './context';
 export * from './dateTime';
 export * from './json';
 export * from './kvs';
+export * from './stream';
 export * from './system';
