@@ -3,7 +3,7 @@ import { StreamHandle } from '../../types/StreamRegistry';
 import { AiActionType } from './AiActionType';
 import { AiMessage } from './AiMessage';
 import { AiModel } from './AiModel';
-import { AiStreamPart } from './AiStreamPart';
+import { AiStreamPart } from './types';
 
 export interface AiPromptStreamActionPayload {
   model: AiModel;
