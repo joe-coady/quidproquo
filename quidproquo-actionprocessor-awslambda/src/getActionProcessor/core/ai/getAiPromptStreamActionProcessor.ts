@@ -25,8 +25,8 @@ const getProcessAiPromptStream = (qpqConfig: QPQConfig): AiPromptStreamActionPro
   return async (payload, session, actionProcessorList, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
     const bedrock = createAmazonBedrock({ region });
-    const bedrockModelId = bedrockModelMap[payload.model];
 
+    const bedrockModelId = bedrockModelMap[payload.model];
     if (!bedrockModelId) {
       return actionResultError(ErrorTypeEnum.NotImplemented, `Unsupported AI model: ${payload.model}`);
     }
@@ -58,10 +58,8 @@ const getProcessAiPromptStream = (qpqConfig: QPQConfig): AiPromptStreamActionPro
               dynamicModuleLoader,
               streamRegistry,
             );
-
-            const storyResult = await resolveStory(function* () {
-              return yield* askInlineFunctionExecute(toolDef.executor, args);
-            }, []);
+            
+            const storyResult = await resolveStory(askInlineFunctionExecute, [toolDef.executor, args]);
 
             if (storyResult.error) {
               throw new Error(storyResult.error.errorText);
@@ -82,6 +80,7 @@ const getProcessAiPromptStream = (qpqConfig: QPQConfig): AiPromptStreamActionPro
         stopWhen: stepCountIs(10),
         // streamText swallows errors by default to keep the server alive — surface them to CloudWatch.
         onError: ({ error }) => {
+          // todo yeild this out
           console.error('AI prompt stream error:', error);
         },
       });
