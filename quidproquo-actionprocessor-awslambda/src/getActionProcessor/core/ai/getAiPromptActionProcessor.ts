@@ -58,9 +58,7 @@ const getProcessAiPrompt = (qpqConfig: QPQConfig): AiPromptActionProcessor => {
               streamRegistry,
             );
 
-            const storyResult = await resolveStory(function* () {
-              return yield* askInlineFunctionExecute(toolDef.executor, args);
-            }, []);
+            const storyResult = await resolveStory(askInlineFunctionExecute, [toolDef.executor, args]);
 
             if (storyResult.error) {
               throw new Error(storyResult.error.errorText);
