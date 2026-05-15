@@ -87,51 +87,72 @@ export const fileStorageImplementation = async (devServerConfig: ResolvedDevServ
     }
   });
   
-  // Secure upload endpoint
+  const writeUploadFromToken = async (
+    token: string | undefined,
+    buffer: Buffer | undefined,
+    res: Response
+  ): Promise<void> => {
+    if (!token) {
+      console.log('Upload attempt with missing token');
+      res.status(400).json({ error: 'Missing token parameter' });
+      return;
+    }
+
+    const tokenData = verifySecureUrlToken(token, devServerConfig.fileStorageConfig.secureUrlSecret);
+
+    if (!tokenData) {
+      console.log('Upload attempt with invalid/expired token');
+      res.status(401).json({ error: 'Invalid or expired token' });
+      return;
+    }
+
+    console.log(`Valid upload token for ${tokenData.fullFilepath}`);
+
+    if (tokenData.operation !== 'upload') {
+      res.status(403).json({ error: 'Invalid token operation' });
+      return;
+    }
+
+    if (!buffer || buffer.length === 0) {
+      res.status(400).json({ error: 'No file body received' });
+      return;
+    }
+
+    await ensureParentDirectoryExists(tokenData.fullFilepath);
+    await fs.writeFile(tokenData.fullFilepath, buffer);
+
+    res.json({
+      success: true,
+      message: 'File uploaded successfully',
+      filepath: tokenData.fullFilepath,
+      size: buffer.length
+    });
+  };
+
+  // Secure upload endpoint — PUT with raw body (matches S3 presigned PUT contract)
+  app.put(
+    '/secure-upload',
+    express.raw({ type: '*/*', limit: '500mb' }),
+    async (req: Request, res: Response): Promise<void> => {
+      try {
+        await writeUploadFromToken(req.query.token as string, req.body, res);
+      } catch (error) {
+        console.error('Error in secure-upload (PUT):', error);
+        res.status(500).json({ error: 'Internal server error' });
+      }
+    }
+  );
+
+  // Secure upload endpoint — legacy POST + multipart (kept for backwards compatibility)
   app.post('/secure-upload', upload.single('file'), async (req: Request, res: Response): Promise<void> => {
     try {
-      const token = req.query.token as string;
-      
-      if (!token) {
-        console.log('Upload attempt with missing token');
-        res.status(400).json({ error: 'Missing token parameter' });
-        return;
-      }
-      
-      const tokenData = verifySecureUrlToken(token, devServerConfig.fileStorageConfig.secureUrlSecret);
-      
-      if (!tokenData) {
-        console.log('Upload attempt with invalid/expired token');
-        res.status(401).json({ error: 'Invalid or expired token' });
-        return;
-      }
-      
-      console.log(`Valid upload token for ${tokenData.fullFilepath}`);
-      
-      if (tokenData.operation !== 'upload') {
-        res.status(403).json({ error: 'Invalid token operation' });
-        return;
-      }
-      
       if (!req.file) {
         res.status(400).json({ error: 'No file uploaded' });
         return;
       }
-      
-      // Ensure parent directory exists
-      await ensureParentDirectoryExists(tokenData.fullFilepath);
-
-      // Write the file
-      await fs.writeFile(tokenData.fullFilepath, req.file.buffer);
-
-      res.json({
-        success: true,
-        message: 'File uploaded successfully',
-        filepath: tokenData.fullFilepath,
-        size: req.file.size
-      });
+      await writeUploadFromToken(req.query.token as string, req.file.buffer, res);
     } catch (error) {
-      console.error('Error in secure-upload:', error);
+      console.error('Error in secure-upload (POST):', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
