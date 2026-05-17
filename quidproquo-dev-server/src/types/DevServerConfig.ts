@@ -9,6 +9,10 @@ export interface OptionalFileStorageConfig {
   secureUrlSecret?: string;
 }
 
+export type DevServerDelayConfig =
+  | number
+  | { default?: number; [actionType: string]: number | undefined };
+
 // Input config with optional file storage
 export type DevServerConfig = {
   serverDomain: 'localhost';
@@ -23,9 +27,13 @@ export type DevServerConfig = {
   
   // File storage configuration (optional)
   fileStorageConfig?: OptionalFileStorageConfig;
-  
+
   // Service name to use for logging (optional)
   logServiceName?: string;
+
+  // Artificial latency added before each action processor runs.
+  // Number = same ms for all actions; map = per-action-type with optional `default` fallback.
+  delay?: DevServerDelayConfig;
 };
 
 // Resolved config with required file storage
@@ -40,9 +48,12 @@ export type ResolvedDevServerConfig = {
   
   // File storage configuration (required with all defaults filled)
   fileStorageConfig: FileStorageConfig;
-  
+
   // Service name to use for logging (optional)
   logServiceName?: string;
+
+  // Pass-through of DevServerConfig.delay; resolved at processor-wrap time.
+  delay?: DevServerDelayConfig;
 };
 
 export type DevServerConfigOverrides = {
