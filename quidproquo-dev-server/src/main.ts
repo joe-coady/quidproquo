@@ -48,6 +48,8 @@ const resolveDevServerConfig = (devServerConfig: DevServerConfig, devServerConfi
     },
 
     logServiceName: devServerConfig.logServiceName,
+
+    delay: devServerConfig.delay,
   };
 };
 
