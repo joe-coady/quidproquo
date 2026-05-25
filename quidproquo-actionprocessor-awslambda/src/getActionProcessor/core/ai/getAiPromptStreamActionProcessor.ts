@@ -12,7 +12,7 @@ import {
 import { stepCountIs, streamText } from 'ai';
 
 import { randomGuid } from '../../../awsLambdaUtils';
-import { mapAiStreamPart, prepareAiPromptCall } from './logic';
+import { mapAiStreamPart, prepareAiPromptCall, toSdkMessages } from './logic';
 
 const getProcessAiPromptStream = (qpqConfig: QPQConfig): AiPromptStreamActionProcessor => {
   return async (payload, session, actionProcessorList, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
@@ -21,11 +21,15 @@ const getProcessAiPromptStream = (qpqConfig: QPQConfig): AiPromptStreamActionPro
       return actionResultError(prepared.error.type, prepared.error.message);
     }
 
+    const promptOrMessages = payload.messages
+      ? { messages: toSdkMessages(payload.messages) }
+      : { prompt: payload.prompt };
+
     try {
       const { fullStream } = streamText({
         model: prepared.model,
         system: payload.system,
-        prompt: payload.messages ?? payload.prompt,
+        ...promptOrMessages,
         tools: prepared.tools,
         stopWhen: stepCountIs(10),
         // streamText swallows errors by default to keep the server alive — surface them to CloudWatch.

@@ -2,12 +2,18 @@ import { ActionProcessorList } from 'quidproquo-core';
 
 import { DevServerDelayConfig } from '../types';
 
-const resolveDelayMs = (delay: DevServerDelayConfig, actionType: string): number => {
+export const resolveDelayMs = (delay: DevServerDelayConfig | undefined, actionType: string): number => {
+  if (delay === undefined) return 0;
   if (typeof delay === 'number') return delay;
   return delay[actionType] ?? delay.default ?? 0;
 };
 
 const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+export const delayForAction = async (delay: DevServerDelayConfig | undefined, actionType: string): Promise<void> => {
+  const ms = resolveDelayMs(delay, actionType);
+  if (ms > 0) await sleep(ms);
+};
 
 export const withProcessorDelay = (
   processors: ActionProcessorList,
