@@ -26,3 +26,4 @@ export * from './mapAiStreamToolResult';
 export * from './prepareAiPromptCall';
 export * from './toAiStreamUsage';
 export * from './toErrorMessage';
+export * from './toSdkMessages';
