@@ -1,10 +1,12 @@
 import { resolveFilePath, verifySecureUrlToken } from 'quidproquo-actionprocessor-node';
+import { FileActionType } from 'quidproquo-core';
 
 import express, { Express, Request, Response } from 'express';
 import * as fs from 'fs/promises';
 import multer from 'multer';
 import * as path from 'path';
 
+import { delayForAction } from '../logic/withProcessorDelay';
 import { ResolvedDevServerConfig } from '../types';
 
 const ensureParentDirectoryExists = async (filePath: string): Promise<void> => {
@@ -62,7 +64,9 @@ export const fileStorageImplementation = async (devServerConfig: ResolvedDevServ
         res.status(403).json({ error: 'Invalid token operation' });
         return;
       }
-      
+
+      await delayForAction(devServerConfig.delay, FileActionType.GenerateTemporarySecureUrl);
+
       try {
         // Check if file exists
         await fs.access(tokenData.fullFilepath);
@@ -117,6 +121,8 @@ export const fileStorageImplementation = async (devServerConfig: ResolvedDevServ
       res.status(400).json({ error: 'No file body received' });
       return;
     }
+
+    await delayForAction(devServerConfig.delay, FileActionType.GenerateTemporaryUploadSecureUrl);
 
     await ensureParentDirectoryExists(tokenData.fullFilepath);
     await fs.writeFile(tokenData.fullFilepath, buffer);
