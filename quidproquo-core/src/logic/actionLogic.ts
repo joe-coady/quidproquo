@@ -54,7 +54,7 @@ export const actionResultErrorFromCaughtError = (error: unknown, errorMap: Error
     }
 
     console.log(`Error: ${errorName}`);
-    return actionResultError(ErrorTypeEnum.GenericError, 'An unexpected error occurred.');
+    return actionResultError(ErrorTypeEnum.GenericError, `An unexpected error occurred [${errorName}].`);
   }
 
   console.log('Caught non-error:', error);
