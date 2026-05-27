@@ -3,8 +3,11 @@ import {
   ActionProcessorList,
   ActionProcessorListResolver,
   actionResult,
+  actionResultError,
+  actionResultErrorFromCaughtError,
   ConfigActionType,
   ConfigGetSecretActionProcessor,
+  ConfigGetSecretErrorTypeEnum,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -14,9 +17,16 @@ import { resolveSecretResourceName } from './utils';
 const getProcessConfigGetSecret = (qpqConfig: QPQConfig): ConfigGetSecretActionProcessor => {
   return async ({ secretName }) => {
     const awsSecretKey = resolveSecretResourceName(secretName, qpqConfig);
-    const secretValue = await getSecret(awsSecretKey, qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig));
 
-    return actionResult(secretValue);
+    try {
+      const secretValue = await getSecret(awsSecretKey, qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig));
+      return actionResult(secretValue);
+    } catch (error: unknown) {
+      return actionResultErrorFromCaughtError(error, {
+        ResourceNotFoundException: () => actionResultError(ConfigGetSecretErrorTypeEnum.ResourceNotFound, `Secret not found: [${secretName}]`),
+        ThrottlingException: () => actionResultError(ConfigGetSecretErrorTypeEnum.Throttling, 'Throttling: Rate exceeded'),
+      });
+    }
   };
 };
 
