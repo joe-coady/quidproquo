@@ -3,8 +3,8 @@ import { ConfigActionType } from './ConfigActionType';
 import { ConfigGetSecretActionRequester } from './ConfigGetSecretActionTypes';
 
 export const ConfigGetSecretErrorTypeEnum = createErrorEnumForAction(ConfigActionType.GetSecret, [
-  'ResourceNotFound',
-  'Throttling',
+  'ResourceNotFound', // secret does not exist
+  'Throttling', // request rate exceeded
 ]);
 
 export function* askConfigGetSecret(secretName: string): ConfigGetSecretActionRequester {
