@@ -3,9 +3,10 @@ import {
   ActionProcessorListResolver,
   actionResult,
   actionResultError,
+  actionResultErrorFromCaughtError,
   ConfigActionType,
   ConfigSetParameterActionProcessor,
-  ErrorTypeEnum,
+  ConfigSetParameterErrorTypeEnum,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -16,7 +17,9 @@ const getProcessConfigSetParameter = (qpqConfig: QPQConfig): ConfigSetParameterA
 
       return actionResult(void 0);
     } catch (error: unknown) {
-      return actionResultError(ErrorTypeEnum.GenericError, `Failed to save parameter '${parameterName}' to Local Storage.`);
+      return actionResultErrorFromCaughtError(error, {
+        QuotaExceededError: () => actionResultError(ConfigSetParameterErrorTypeEnum.QuotaExceeded, `Local Storage quota exceeded saving parameter '${parameterName}'.`),
+      });
     }
   };
 };
