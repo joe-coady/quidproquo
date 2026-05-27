@@ -34,6 +34,14 @@ For each `[ ]` item:
      'AnotherError',
    ]);
    ```
+   Always write the values array multiline — **one enum value per line**, even
+   when there is only one — so additions stay one-line diffs:
+   ```ts
+   [
+     'x',
+     'y',
+   ]
+   ```
 2. **Find every processor for that action** and add the catch mapping. Search the
    processor packages for the action's type
    (`grep -rl "<ActionType>.<X>" quidproquo-actionprocessor-*/src`). An action may
@@ -71,13 +79,8 @@ so the list is complete. "Already implemented" is done.
 
 These processors call AWS / HTTP / external services and can throw named errors.
 
-### AI
-- [ ] askAiPrompt — quidproquo-core/src/actions/ai/AiPromptActionRequester.ts
-- [ ] askAiPromptStream — quidproquo-core/src/actions/ai/AiPromptStreamActionRequester.ts
-- [ ] askClaudeAiMessagesApi — quidproquo-core/src/actions/claudeAi/ClaudeAiMessagesApiRequester.ts
-
 ### Config (external — SSM / Secrets Manager)
-- [ ] askConfigGetSecret — quidproquo-core/src/actions/config/ConfigGetSecretActionRequester.ts
+- [x] askConfigGetSecret — quidproquo-core/src/actions/config/ConfigGetSecretActionRequester.ts
 - [ ] askConfigSetParameter — quidproquo-core/src/actions/config/ConfigSetParameterActionRequester.ts
 
 ### File / storage (S3)
@@ -126,6 +129,11 @@ These processors call AWS / HTTP / external services and can throw named errors.
 - [ ] askUserDirectoryRespondToAuthChallenge — quidproquo-core/src/actions/userDirectory/UserDirectoryRespondToAuthChallengeActionRequester.ts
 - [ ] askUserDirectorySetPassword — quidproquo-core/src/actions/userDirectory/UserDirectorySetPasswordActionRequester.ts
 - [ ] askUserDirectorySetUserAttributes — quidproquo-core/src/actions/userDirectory/UserDirectorySetUserAttributesActionRequester.ts
+
+### AI (moved down)
+- [ ] askAiPrompt — quidproquo-core/src/actions/ai/AiPromptActionRequester.ts
+- [ ] askAiPromptStream — quidproquo-core/src/actions/ai/AiPromptStreamActionRequester.ts
+- [ ] askClaudeAiMessagesApi — quidproquo-core/src/actions/claudeAi/ClaudeAiMessagesApiRequester.ts
 
 ---
 
