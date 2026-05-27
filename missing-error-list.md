@@ -35,11 +35,12 @@ For each `[ ]` item:
    ]);
    ```
    Always write the values array multiline — **one enum value per line**, even
-   when there is only one — so additions stay one-line diffs:
+   when there is only one — so additions stay one-line diffs. Give every value a
+   short trailing `//` comment saying what it means (one line, terse):
    ```ts
    [
-     'x',
-     'y',
+     'x', // what x means
+     'y', // what y means
    ]
    ```
 2. **Find every processor for that action** and add the catch mapping. Search the
@@ -81,7 +82,7 @@ These processors call AWS / HTTP / external services and can throw named errors.
 
 ### Config (external — SSM / Secrets Manager)
 - [x] askConfigGetSecret — quidproquo-core/src/actions/config/ConfigGetSecretActionRequester.ts
-- [ ] askConfigSetParameter — quidproquo-core/src/actions/config/ConfigSetParameterActionRequester.ts
+- [x] askConfigSetParameter — quidproquo-core/src/actions/config/ConfigSetParameterActionRequester.ts
 
 ### File / storage (S3)
 - [ ] askFileDelete — quidproquo-core/src/actions/file/FileDeleteActionRequester.ts

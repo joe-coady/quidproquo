@@ -3,8 +3,11 @@ import {
   ActionProcessorList,
   ActionProcessorListResolver,
   actionResult,
+  actionResultError,
+  actionResultErrorFromCaughtError,
   ConfigActionType,
   ConfigSetParameterActionProcessor,
+  ConfigSetParameterErrorTypeEnum,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -15,9 +18,15 @@ const getProcessConfigSetParameter = (qpqConfig: QPQConfig): ConfigSetParameterA
   return async ({ parameterName, parameterValue }) => {
     const awsParameterKey = resolveParameterKey(parameterName, qpqConfig);
 
-    await setParameter(awsParameterKey, qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig), parameterValue);
-
-    return actionResult(void 0);
+    try {
+      await setParameter(awsParameterKey, qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig), parameterValue);
+      return actionResult(void 0);
+    } catch (error: unknown) {
+      return actionResultErrorFromCaughtError(error, {
+        ThrottlingException: () => actionResultError(ConfigSetParameterErrorTypeEnum.Throttling, 'Throttling: Rate exceeded'),
+        ParameterLimitExceeded: () => actionResultError(ConfigSetParameterErrorTypeEnum.QuotaExceeded, 'Parameter store limit exceeded'),
+      });
+    }
   };
 };
 
