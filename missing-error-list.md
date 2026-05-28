@@ -86,7 +86,7 @@ These processors call AWS / HTTP / external services and can throw named errors.
 
 ### File / storage (S3)
 - [x] askFileDelete — quidproquo-core/src/actions/file/FileDeleteActionRequester.ts
-- [ ] askFileExists — quidproquo-core/src/actions/file/FileExistsActionRequester.ts
+- [x] askFileExists — quidproquo-core/src/actions/file/FileExistsActionRequester.ts
 - [ ] askFileGenerateTemporarySecureUrl — quidproquo-core/src/actions/file/FileGenerateTemporarySecureUrlActionRequester.ts
 - [ ] askFileGenerateTemporaryUploadSecureUrl — quidproquo-core/src/actions/file/FileGenerateTemporaryUploadSecureUrlActionRequester.ts
 - [ ] askFileIsColdStorage — quidproquo-core/src/actions/file/FileIsColdStorageActionRequester.ts
