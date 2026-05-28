@@ -6,6 +6,7 @@ import {
   ErrorTypeEnum,
   FileActionType,
   FileExistsActionProcessor,
+  FileExistsErrorTypeEnum,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -25,8 +26,15 @@ const getProcessFileExists = (
       try {
         await fs.access(fullPath);
         return actionResult(true);
-      } catch {
-        return actionResult(false);
+      } catch (error: any) {
+        // Missing file is a definitive false; permission problems must surface.
+        if (error.code === 'ENOENT') {
+          return actionResult(false);
+        }
+        if (error.code === 'EACCES') {
+          return actionResultError(FileExistsErrorTypeEnum.AccessDenied, `Access denied checking file existence: ${filepath}`);
+        }
+        throw error;
       }
     } catch (error: any) {
       return actionResultError(ErrorTypeEnum.GenericError, `Error checking file existence: ${error.message}`);

@@ -5,6 +5,7 @@ assembled quickly.
 
 ## vNext
 
+- `askFileExists` no longer returns `false` for every failure. It still returns `false` when the file genuinely does not exist (S3 404 / `ENOENT`), but a permission failure now raises a `FileExistsErrorTypeEnum.AccessDenied` error instead of silently returning `false`. If you relied on `false` meaning "missing or inaccessible", handle the error case.
 - `AiStreamPart` in `quidproquo-core` now covers 23 variants (was 3: `text-delta`, `tool-call`, `tool-result`) and is discriminated by the new `AiStreamPartType` enum instead of raw string literals. Wire format (the `type` strings) is unchanged, but if you switch on `part.type` in TS, prefer `AiStreamPartType.TextDelta` etc. over string literals.
 - Variants in `AiStreamPart` gained required fields: `AiStreamTextDelta` adds `id: string`; `AiStreamToolCall` adds `toolCallId: string`; `AiStreamToolResult` adds `toolCallId: string` and `input: unknown`. If you construct these parts yourself (rather than only consuming them from the stream), supply the new fields.
 - `InfQpqWebserverServiceDomainsConstruct`, `ServiceDomainConstruct`, `QpqWebserverDomainConstruct`, and `getEnvironmentDomainName` are removed from `quidproquo-deploy-awscdk`. Service stacks no longer create their own hosted zones — declare the apex zone in your bootstrap stack and let services resolve it via SSM. If you used these constructs directly in custom stacks, delete the call sites.
