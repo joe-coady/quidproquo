@@ -6,6 +6,7 @@ import {
   ErrorTypeEnum,
   FileActionType,
   FileDeleteActionProcessor,
+  FileDeleteErrorTypeEnum,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -20,12 +21,12 @@ const getProcessFileDelete = (
 ): FileDeleteActionProcessor => {
   return async ({ drive, filepaths }) => {
     const deletedFiles: string[] = [];
-    const errors: string[] = [];
+    const errors: { filepath: string; error: any }[] = [];
 
     for (const filepath of filepaths) {
       try {
         const fullPath = resolveFilePath(config, qpqConfig, drive, filepath);
-        
+
         await fs.unlink(fullPath);
         deletedFiles.push(filepath);
       } catch (error: any) {
@@ -33,15 +34,19 @@ const getProcessFileDelete = (
         if (error.code === 'ENOENT') {
           deletedFiles.push(filepath);
         } else {
-          errors.push(`Failed to delete ${filepath}: ${error.message}`);
+          errors.push({ filepath, error });
         }
       }
     }
-    
+
     if (errors.length > 0 && deletedFiles.length === 0) {
-      return actionResultError(ErrorTypeEnum.GenericError, `Failed to delete files: ${errors.join(', ')}`);
+      // EACCES maps to the same typed error the S3 processor returns for AccessDenied
+      if (errors.some(({ error }) => error.code === 'EACCES')) {
+        return actionResultError(FileDeleteErrorTypeEnum.AccessDenied, 'Access denied deleting files');
+      }
+      return actionResultError(ErrorTypeEnum.GenericError, `Failed to delete files: ${errors.map(({ filepath, error }) => `Failed to delete ${filepath}: ${error.message}`).join(', ')}`);
     }
-    
+
     return actionResult(deletedFiles);
   };
 };
