@@ -13,14 +13,16 @@ import { Construct } from 'constructs';
  *
  * @param scope      CDK construct scope (typically the service stack/construct)
  * @param certRegion 'us-east-1' for CloudFront, deploy region for regional resources
+ * @param rootDomain The same un-prefixed apex passed to the matching defineDomainCertificate entry
  * @param idSuffix   Unique suffix for the CDK construct id (scope-local)
  */
 export const lookupDomainCertificate = (
   scope: Construct,
   certRegion: string,
+  rootDomain: string,
   idSuffix: string,
 ): aws_certificatemanager.ICertificate => {
-  const paramName = qpqConfigAwsUtils.getDomainCertificateArnSsmParameterName(certRegion);
+  const paramName = qpqConfigAwsUtils.getDomainCertificateArnSsmParameterName(certRegion, rootDomain);
   const certArn = aws_ssm.StringParameter.valueForStringParameter(scope, paramName);
   return aws_certificatemanager.Certificate.fromCertificateArn(scope, `domain-cert-${idSuffix}`, certArn);
 };
