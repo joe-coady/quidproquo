@@ -35,7 +35,7 @@ export class SubdomainName extends QpqConstructBlock {
     // Regional API Gateway custom domains need a cert in the deploy region.
     // Look it up from SSM, written by the matching DomainCertificateStack during the domain phase.
     const deployRegion = qpqConfigAwsUtils.getApplicationModuleDeployRegion(props.qpqConfig);
-    this.certificate = lookupDomainCertificate(this, deployRegion, props.subdomain);
+    this.certificate = lookupDomainCertificate(this, deployRegion, props.rootDomain, props.subdomain);
 
     this.domainName = new aws_apigateway.DomainName(this, 'domain-name', {
       domainName: this.deployDomain,

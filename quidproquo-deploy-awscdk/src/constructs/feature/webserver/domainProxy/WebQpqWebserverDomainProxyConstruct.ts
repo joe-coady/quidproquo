@@ -50,7 +50,7 @@ export class WebQpqWebserverDomainProxyConstruct extends QpqConstructBlock {
       domainNames.unshift(apexDomain);
     }
 
-    const certificate = lookupDomainCertificate(this, 'us-east-1', props.domainProxyConfig.name);
+    const certificate = lookupDomainCertificate(this, 'us-east-1', props.domainProxyConfig.domain.rootDomain, props.domainProxyConfig.name);
 
     const cachePolicy = props.domainProxyConfig.cacheSettingsName
       ? QpqWebServerCacheConstruct.fromOtherStack(

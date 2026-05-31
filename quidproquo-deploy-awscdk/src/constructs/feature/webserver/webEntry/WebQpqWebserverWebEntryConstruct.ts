@@ -94,7 +94,7 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
       domainNames.unshift(apexDomain);
     }
 
-    const certificate = lookupDomainCertificate(this, 'us-east-1', props.webEntryConfig.name);
+    const certificate = lookupDomainCertificate(this, 'us-east-1', props.webEntryConfig.domain.rootDomain, props.webEntryConfig.name);
 
     const cachePolicy = props.webEntryConfig.cacheSettingsName
       ? QpqWebServerCacheConstruct.fromOtherStack(

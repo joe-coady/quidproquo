@@ -62,7 +62,7 @@ export class DomainCertificateStack extends Stack {
     });
     this.certificate = certificate;
 
-    const paramName = qpqConfigAwsUtils.getDomainCertificateArnSsmParameterName(certRegion);
+    const paramName = qpqConfigAwsUtils.getDomainCertificateArnSsmParameterName(certRegion, props.certificateConfig.rootDomain);
 
     if (certRegion === deployRegion) {
       new aws_ssm.StringParameter(this, 'arn-ssm', {
