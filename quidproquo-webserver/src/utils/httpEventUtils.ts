@@ -31,7 +31,7 @@ export function* askFromJsonEventRequest<T>(httpJsonEvent: HTTPEvent): AskRespon
   const json = rawFromJsonEventRequest(httpJsonEvent);
 
   if (!json) {
-    return yield* askThrowError(ErrorTypeEnum.BadRequest, 'Unable to parse undefined json from event.');
+    return yield* askThrowError(ErrorTypeEnum.BadRequest, 'Unable to parse undefined json from HTTPEvent.');
   }
 
   // Parse the json out here...
@@ -39,7 +39,7 @@ export function* askFromJsonEventRequest<T>(httpJsonEvent: HTTPEvent): AskRespon
     const item: T = JSON.parse(json);
     return item;
   } catch {
-    return yield* askThrowError(ErrorTypeEnum.BadRequest, 'Unable to parse incoming json from event.');
+    return yield* askThrowError(ErrorTypeEnum.BadRequest, 'Unable to parse incoming json from HTTPEvent.');
   }
 }
 
