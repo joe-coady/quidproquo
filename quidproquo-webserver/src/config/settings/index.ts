@@ -5,6 +5,7 @@ export * from './cache';
 export * from './certificate';
 export * from './defaultRouteOptions';
 export * from './defineAdminSettings';
+export * from './defineAuthSystem';
 export * from './dns';
 export * from './domainProxy';
 export * from './migration';
