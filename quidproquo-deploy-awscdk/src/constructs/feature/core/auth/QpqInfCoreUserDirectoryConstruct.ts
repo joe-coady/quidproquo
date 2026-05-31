@@ -163,7 +163,7 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
       });
 
       const fullDomain = `${props.userDirectoryConfig.dnsRecord.subdomain}.${apexDomain}`;
-      const certificate = lookupDomainCertificate(this, 'us-east-1', props.userDirectoryConfig.name);
+      const certificate = lookupDomainCertificate(this, 'us-east-1', props.userDirectoryConfig.dnsRecord.rootDomain, props.userDirectoryConfig.name);
 
       const userPoolDomain = new aws_cognito.UserPoolDomain(this, 'user-pool-domain', {
         userPool: this.userPool,

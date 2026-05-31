@@ -179,8 +179,9 @@ export const getDomainCertificateConfigs = (qpqConfig: QPQConfig): DomainCertifi
   );
 };
 
-export const getDomainCertificateArnSsmParameterName = (region: string): string => {
-  return `/qpq/domain/certificate-arn/${region}`;
+export const getDomainCertificateArnSsmParameterName = (region: string, rootDomain: string): string => {
+  const sanitizedRoot = rootDomain.replace(/\./g, '-');
+  return `/qpq/domain/certificate-arn/${region}/${sanitizedRoot}`;
 };
 
 export const getAwsKmsKeys = (qpqConfig: QPQConfig): AwsKmsKeyQPQConfigSetting[] => {
