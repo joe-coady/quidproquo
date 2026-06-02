@@ -21,7 +21,11 @@ export async function processAction(
     // Merge any context carried on the action into the session
     // This allows context providers to propagate values to sub-runtimes
     // TODO: We need todo the same thing with auth, currently we mutate the runtime when set new auth.
-    const effectiveSession = { ...session, context: { ...session.context, ...action.context } };
+    const effectiveSession = {
+      ...session,
+      context: { ...session.context, ...action.context },
+      localContext: { ...session.localContext, ...action.localContext },
+    };
 
     return await processor(action.payload, effectiveSession, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry);
   } catch (e: unknown) {

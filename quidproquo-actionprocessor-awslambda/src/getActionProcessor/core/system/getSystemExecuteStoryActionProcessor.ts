@@ -44,6 +44,7 @@ const getProcessExecuteStory = <T extends Array<any>, R>(qpqConfig: QPQConfig): 
       qpqConfig,
       {
         context: payload.storySession?.context || session.context,
+        localContext: payload.storySession?.localContext || session.localContext,
         depth: (payload.storySession?.depth || session.depth || 0) + 1,
         decodedAccessToken: payload.storySession?.decodedAccessToken || session.decodedAccessToken,
         correlation: payload.storySession?.correlation || session.correlation,

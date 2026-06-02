@@ -22,6 +22,11 @@ export function* askContextProvideValue<R, T extends AskResponse<any>>(
     },
 
     [ContextActionType.List]: function* (action:  ContextListAction) {
+      // Local context is not part of the cross-service context list; stay transparent.
+      if (contextIdentifier.local) {
+        return yield action;
+      }
+
       if (cache === null) {
         const parentContextValues = (yield {
           type: ContextActionType.List,
@@ -38,11 +43,13 @@ export function* askContextProvideValue<R, T extends AskResponse<any>>(
     },
 
     '*': function* (action) {
+      // Local context rides in a separate bag that is stripped at service boundaries.
+      const contextKey = contextIdentifier.local ? 'localContext' : 'context';
       return yield {
         ...action,
-        context: {
+        [contextKey]: {
           [contextIdentifier.uniqueName]: value,
-          ...(action.context || {}),
+          ...action[contextKey],
         }
       };
     },
