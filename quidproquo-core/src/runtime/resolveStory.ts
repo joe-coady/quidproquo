@@ -33,6 +33,7 @@ export async function resolveStory<TArgs extends Array<any>>(
     depth: callerSession.depth + 1,
     decodedAccessToken: callerSession.decodedAccessToken,
     context: callerSession.context,
+    localContext: callerSession.localContext,
   };
 
   const updateSession: StorySessionUpdater = (newSession: Partial<StorySession>): void => {

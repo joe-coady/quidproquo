@@ -1,4 +1,4 @@
-import { ActionProcessorList, ActionProcessorListResolver, actionResultError, ErrorTypeEnum, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { ActionProcessorList, ActionProcessorListResolver, actionResultError, ErrorTypeEnum, QPQConfig, qpqCoreUtils, toCrossServiceSession } from 'quidproquo-core';
 import { actionResult, QueueActionType, QueueSendMessageActionProcessor } from 'quidproquo-core';
 
 import { v4 as uuidV4 } from 'uuid';
@@ -18,7 +18,7 @@ const getProcessQueueSendMessage = (qpqConfig: QPQConfig): QueueSendMessageActio
         payload: queueMessage.payload,
         type: queueMessage.type,
 
-        storySession: session,
+        storySession: toCrossServiceSession(session),
 
         messageId: uuidV4(),
         queueName: queueName,

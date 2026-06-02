@@ -15,7 +15,8 @@ const getContextValue = (context: QpqContext<any>, contextIdentifier: QpqContext
 
 const getProcessContextRead = (qpqConfig: QPQConfig): ContextReadActionProcessor<any> => {
   return async ({ contextIdentifier }, session) => {
-    return actionResult(getContextValue(session.context, contextIdentifier));
+    const context = contextIdentifier.local ? session.localContext || {} : session.context;
+    return actionResult(getContextValue(context, contextIdentifier));
   };
 };
 

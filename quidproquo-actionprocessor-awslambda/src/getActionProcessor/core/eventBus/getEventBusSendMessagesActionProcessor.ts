@@ -11,6 +11,7 @@ import {
   QPQConfig,
   qpqCoreUtils,
   StorySession,
+  toCrossServiceSession,
 } from 'quidproquo-core';
 
 import { getEventBusSnsTopicArn } from '../../../awsNamingUtils';
@@ -53,7 +54,7 @@ const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): EventBusSendMessag
       eventBusMessages.map((message) => {
         const eventBusMessageWithSession: AnyEventBusMessageWithSession = {
           ...message,
-          storySession: session,
+          storySession: toCrossServiceSession(session),
         };
 
         return JSON.stringify(eventBusMessageWithSession);

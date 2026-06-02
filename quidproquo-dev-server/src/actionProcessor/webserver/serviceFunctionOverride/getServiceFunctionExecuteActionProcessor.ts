@@ -6,6 +6,7 @@ import {
   DynamicModuleLoader,
   QPQConfig,
   StoryResult,
+  toCrossServiceSession,
 } from 'quidproquo-core';
 import { ServiceFunctionActionType, ServiceFunctionExecuteActionProcessor } from 'quidproquo-webserver';
 
@@ -18,7 +19,7 @@ const getProcessExecute = (qpqConfig: QPQConfig, dynamicModuleLoader: DynamicMod
       functionName: functionName,
       serviceName: service,
       payload: payload,
-      storySession: session,
+      storySession: toCrossServiceSession(session),
     };
 
     const eventPromise: Promise<StoryResult<[AnyExecuteServiceFunctionEventWithSession], any>> = eventBus.publishAndWaitForResponse(

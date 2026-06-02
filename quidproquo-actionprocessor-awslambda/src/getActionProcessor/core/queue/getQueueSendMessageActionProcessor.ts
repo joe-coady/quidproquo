@@ -1,6 +1,6 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import { ActionProcessorList, ActionProcessorListResolver, QPQConfig, qpqCoreUtils, QueueMessage, StorySession } from 'quidproquo-core';
-import { actionResult, QueueActionType, QueueSendMessageActionProcessor } from 'quidproquo-core';
+import { actionResult, QueueActionType, QueueSendMessageActionProcessor, toCrossServiceSession } from 'quidproquo-core';
 
 import { sendMessages } from '../../../logic/sqs/sendMessages';
 import { resolveResourceName } from '../../../runtimeConfig/qpqAwsLambdaRuntimeConfigUtils';
@@ -21,7 +21,7 @@ const getProcessQueueSendMessage = (qpqConfig: QPQConfig): QueueSendMessageActio
         // Add the session info to the message
         const queueMessageWithSession: AnyQueueMessageWithSession = {
           ...message,
-          storySession: session,
+          storySession: toCrossServiceSession(session),
         };
 
         return JSON.stringify(queueMessageWithSession);
