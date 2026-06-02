@@ -10,6 +10,7 @@ import {
   qpqCoreUtils,
   QueueMessage,
   StorySession,
+  toCrossServiceSession,
 } from 'quidproquo-core';
 
 import { eventBus } from '../../../logic/eventBus';
@@ -46,7 +47,7 @@ const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): EventBusSendMessag
         payload: eventBusMessage.payload,
         type: eventBusMessage.type,
 
-        storySession: session,
+        storySession: toCrossServiceSession(session),
 
         eventBusName: eventBusConfig.name,
 
