@@ -1,51 +1,21 @@
+import { getCoreActionProcessor as getJsCoreActionProcessor } from 'quidproquo-actionprocessor-js';
 import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
 
-import { getClaudeAiActionProcessor } from './claudeAi';
-import { getConfigActionProcessor } from './config';
-import { getContextActionProcessor } from './context';
-import { getDateActionProcessor } from './date';
-import { getErrorActionProcessor } from './error';
-import { getGuidProcessor } from './guid';
 import { getInlineFunctionActionProcessor } from './inlineFunction';
-import { getLogActionProcessor } from './log';
-import { getMathActionProcessor } from './math';
-import { getNetworkActionProcessor } from './network';
-import { getPlatformActionProcessor } from './platform';
 import { getStreamActionProcessor } from './stream';
-import { getSystemActionProcessor } from './system';
 
-export * from './claudeAi';
-export * from './config';
-export * from './context';
-export * from './date';
-export * from './error';
-export * from './guid';
+// The shared core processors (config, context, claudeAi, date, error, guid, log,
+// math, network, platform, system, customActions) are owned by
+// quidproquo-actionprocessor-js. Node builds on top of js and only adds the
+// processors that need a Node runtime (stream, inlineFunction).
 export * from './inlineFunction';
-export * from './log';
-export * from './math';
-export * from './network';
-export * from './platform';
 export * from './stream';
-export * from './system';
-
-// Custom actions is not done here, as it has to be done last after all
-export * from './customActions';
 
 export const getCoreActionProcessor: ActionProcessorListResolver = async (
   qpqConfig: QPQConfig,
   dynamicModuleLoader: DynamicModuleLoader,
 ): Promise<ActionProcessorList> => ({
-  ...(await getConfigActionProcessor(qpqConfig, dynamicModuleLoader)),
-  ...(await getContextActionProcessor(qpqConfig, dynamicModuleLoader)),
-  ...(await getClaudeAiActionProcessor(qpqConfig, dynamicModuleLoader)),
-  ...(await getDateActionProcessor(qpqConfig, dynamicModuleLoader)),
-  ...(await getErrorActionProcessor(qpqConfig, dynamicModuleLoader)),
-  ...(await getGuidProcessor(qpqConfig, dynamicModuleLoader)),
-  ...(await getLogActionProcessor(qpqConfig, dynamicModuleLoader)),
-  ...(await getMathActionProcessor(qpqConfig, dynamicModuleLoader)),
-  ...(await getNetworkActionProcessor(qpqConfig, dynamicModuleLoader)),
-  ...(await getPlatformActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getJsCoreActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getStreamActionProcessor(qpqConfig, dynamicModuleLoader)),
-  ...(await getSystemActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getInlineFunctionActionProcessor(qpqConfig, dynamicModuleLoader)),
 });
