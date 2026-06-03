@@ -36,6 +36,7 @@
     "chokidar": "^4.0.3",
     "multer": "^1.4.5-lts.1",
     "quidproquo-actionprocessor-awslambda": "0.0.263",
+    "quidproquo-actionprocessor-js": "0.0.263",
     "quidproquo-actionprocessor-node": "0.0.263",
     "quidproquo-core": "0.0.263",
     "quidproquo-webserver": "0.0.263",

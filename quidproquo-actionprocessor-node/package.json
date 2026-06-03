@@ -34,6 +34,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.19.1",
     "axios": "^1.2.1",
+    "quidproquo-actionprocessor-js": "0.0.263",
     "quidproquo-core": "0.0.263",
     "quidproquo-webserver": "0.0.263",
     "uuid": "^9.0.0",

@@ -1,4 +1,4 @@
-import { getCustomActionActionProcessor } from 'quidproquo-actionprocessor-node';
+import { getCustomActionActionProcessor } from 'quidproquo-actionprocessor-js';
 import { askExecuteStory, createRuntime, DynamicModuleLoader, QPQConfig, qpqCoreUtils, QpqRuntimeType, StorySession } from 'quidproquo-core';
 import { StorageDriveEvent, StorageDriveEventType } from 'quidproquo-webserver';
 
