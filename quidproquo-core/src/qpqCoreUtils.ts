@@ -439,6 +439,17 @@ export const getGlobalConfigValue = <T>(qpqConfig: QPQConfig, name: string): T =
   return global.value;
 };
 
+// Resolves a global by name, giving precedence to globals declared on the
+// executing function (functionGlobals) before falling back to the service-wide
+// config global. Throws (via getGlobalConfigValue) if the name is found in neither.
+export const resolveGlobalValue = <T>(qpqConfig: QPQConfig, functionGlobals: Record<string, unknown> | undefined, name: string): T => {
+  if (functionGlobals && Object.prototype.hasOwnProperty.call(functionGlobals, name)) {
+    return functionGlobals[name] as T;
+  }
+
+  return getGlobalConfigValue<T>(qpqConfig, name);
+};
+
 export const getUserDirectories = (configs: QPQConfig): UserDirectoryQPQConfigSetting[] => {
   const userDirectories = getConfigSettings<UserDirectoryQPQConfigSetting>(configs, QPQCoreConfigSettingType.userDirectory);
 
