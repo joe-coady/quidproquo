@@ -1,8 +1,8 @@
 import { QpqFunctionRuntime } from '../../types';
-import { isQpqFunctionRuntimeAbsolutePath } from '../../utils';
+import { isQpqFunctionRuntimeAdvanced } from '../../utils';
 
 export const getStoryNameFromQpqFunctionRuntime = (qpqFunctionRuntime: QpqFunctionRuntime): string => {
-  if (isQpqFunctionRuntimeAbsolutePath(qpqFunctionRuntime)) {
+  if (isQpqFunctionRuntimeAdvanced(qpqFunctionRuntime)) {
     return qpqFunctionRuntime.functionName;
   }
 
