@@ -1,8 +1,8 @@
 import { QpqFunctionRuntime } from '../../types';
-import { isQpqFunctionRuntimeAbsolutePath } from './isQpqFunctionRuntimeAbsolutePath';
+import { isQpqFunctionRuntimeAdvanced } from './isQpqFunctionRuntimeAdvanced';
 
 export function getUniqueKeyFromQpqFunctionRuntime(qpqFunctionRuntime: QpqFunctionRuntime): string {
-  if (isQpqFunctionRuntimeAbsolutePath(qpqFunctionRuntime)) {
+  if (isQpqFunctionRuntimeAdvanced(qpqFunctionRuntime)) {
     return `${qpqFunctionRuntime.basePath}/${qpqFunctionRuntime.relativePath}::${qpqFunctionRuntime.functionName}`;
   }
 

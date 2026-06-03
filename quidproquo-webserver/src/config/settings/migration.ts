@@ -4,7 +4,7 @@ import {
   defineKeyValueStore,
   defineQueue,
   DeployEventType,
-  isQpqFunctionRuntimeAbsolutePath,
+  isQpqFunctionRuntimeAdvanced,
   QPQConfig,
   QPQConfigAdvancedSettings,
   QpqFunctionRuntime,
@@ -28,7 +28,7 @@ function removeLeadingSlashs(text: string): string {
 }
 
 export function getQpqMigrationQueueTypeFromQpqFunctionRuntime(qpqFunctionRuntime: QpqFunctionRuntime): string {
-  if (isQpqFunctionRuntimeAbsolutePath(qpqFunctionRuntime)) {
+  if (isQpqFunctionRuntimeAdvanced(qpqFunctionRuntime)) {
     return `${qpqFunctionRuntime.basePath}/${removeLeadingSlashs(qpqFunctionRuntime.relativePath)}`;
   }
 
