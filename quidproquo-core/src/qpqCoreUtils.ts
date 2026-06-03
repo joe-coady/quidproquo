@@ -38,7 +38,7 @@ import {
   QpqFunctionRuntime,
   ResourceName,
 } from './types';
-import { isQpqFunctionRuntimeAbsolutePath } from './utils';
+import { isQpqFunctionRuntimeAdvanced } from './utils';
 
 /**
  * Flattens a QPQConfig array into a single array of QPQConfigSetting objects.
@@ -397,7 +397,7 @@ export const getApiBuildPath = (qpqConfig: QPQConfig): string => {
 
 
 export const getSrcFilenameFromQpqFunctionRuntime = (qpqFunctionRuntime: QpqFunctionRuntime): string => {
-  if (isQpqFunctionRuntimeAbsolutePath(qpqFunctionRuntime)) {
+  if (isQpqFunctionRuntimeAdvanced(qpqFunctionRuntime)) {
     return qpqFunctionRuntime.relativePath.split('/').pop() || '';
   }
 

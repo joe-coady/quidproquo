@@ -1,11 +1,11 @@
-import { QpqFunctionRuntimeAbsolutePath } from 'quidproquo-core';
+import { QpqFunctionRuntimeAdvanced } from 'quidproquo-core';
 
 export const getServiceEntryQpqFunctionRuntime = (
   serviceName: string,
   entryType: string,
   // TODO: runtime should maybe be QpqFunctionRuntimeRelativePath
   runtime: `${string}::${string}`,
-): QpqFunctionRuntimeAbsolutePath => {
+): QpqFunctionRuntimeAdvanced => {
   const [src, methodName] = runtime.split('::');
 
   return {
