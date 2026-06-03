@@ -6,6 +6,7 @@ import { QpqFunctionRuntime, QpqLogger, StreamRegistry } from '../types';
 import { Action, ActionProcessorList } from '../types/Action';
 import { ErrorTypeEnum } from '../types/ErrorTypeEnum';
 import { QpqRuntimeType, Story, StoryResult, StorySession, StorySessionUpdater } from '../types/StorySession';
+import { isQpqFunctionRuntimeAdvanced } from '../utils';
 import { processAction } from './processAction';
 
 export async function resolveStory<TArgs extends Array<any>>(
@@ -34,6 +35,8 @@ export async function resolveStory<TArgs extends Array<any>>(
     decodedAccessToken: callerSession.decodedAccessToken,
     context: callerSession.context,
     localContext: callerSession.localContext,
+    functionGlobals:
+      qpqFunctionRuntimeInfo && isQpqFunctionRuntimeAdvanced(qpqFunctionRuntimeInfo) ? qpqFunctionRuntimeInfo.globals : undefined,
   };
 
   const updateSession: StorySessionUpdater = (newSession: Partial<StorySession>): void => {
