@@ -1,4 +1,4 @@
-import { getCustomActionActionProcessor } from 'quidproquo-actionprocessor-node';
+import { getCustomActionActionProcessor } from 'quidproquo-actionprocessor-js';
 import {
   ActionProcessorListResolver,
   askProcessEvent,
