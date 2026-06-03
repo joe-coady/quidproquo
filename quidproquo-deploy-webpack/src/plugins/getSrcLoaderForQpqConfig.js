@@ -1,10 +1,10 @@
-import { isQpqFunctionRuntimeAbsolutePath, qpqCoreUtils } from 'quidproquo-core';
+import { isQpqFunctionRuntimeAdvanced, qpqCoreUtils } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import path from 'path';
 
 export const getFullSrcPathFromQpqFunctionRuntime = (qpqFunctionRuntime, qpqConfig) => {
-  if (isQpqFunctionRuntimeAbsolutePath(qpqFunctionRuntime)) {
+  if (isQpqFunctionRuntimeAdvanced(qpqFunctionRuntime)) {
     return path.join(qpqFunctionRuntime.basePath, qpqFunctionRuntime.relativePath);
   }
 
