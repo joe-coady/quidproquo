@@ -1,6 +1,5 @@
 import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
 
-import { getConfigGetGlobalActionProcessor } from './getConfigGetGlobalActionProcessor';
 import { getConfigGetParameterActionProcessor } from './getConfigGetParameterActionProcessor';
 import { getConfigGetParametersActionProcessor } from './getConfigGetParametersActionProcessor';
 import { getConfigGetSecretActionProcessor } from './getConfigGetSecretActionProcessor';
@@ -11,7 +10,6 @@ export const getConfigActionProcessor: ActionProcessorListResolver = async (
   qpqConfig: QPQConfig,
   dynamicModuleLoader: DynamicModuleLoader,
 ): Promise<ActionProcessorList> => ({
-  ...(await getConfigGetGlobalActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getConfigGetParameterActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getConfigGetParametersActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getConfigGetSecretActionProcessor(qpqConfig, dynamicModuleLoader)),

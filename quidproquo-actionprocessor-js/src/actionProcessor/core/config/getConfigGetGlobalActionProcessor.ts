@@ -9,8 +9,8 @@ import {
 } from 'quidproquo-core';
 
 const getProcessConfigGetGlobal = (qpqConfig: QPQConfig): ConfigGetGlobalActionProcessor<any> => {
-  return async ({ globalName }) => {
-    const globalValue = qpqCoreUtils.getGlobalConfigValue(qpqConfig, globalName);
+  return async ({ globalName }, session) => {
+    const globalValue = qpqCoreUtils.resolveGlobalValue(qpqConfig, session.functionGlobals, globalName);
     return actionResult(globalValue);
   };
 };

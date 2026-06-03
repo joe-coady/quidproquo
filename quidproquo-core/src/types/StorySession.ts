@@ -31,6 +31,10 @@ export interface StorySession {
   // Service-local context, this is never transferred across a service boundary
   // (queue / event bus / service function), but does flow to in-process sub-runtimes.
   localContext?: QpqContext<any>;
+
+  // Globals declared on the executing function's QpqFunctionRuntimeAdvanced.
+  // Set per-runtime from qpqFunctionRuntimeInfo; never inherited from the caller.
+  functionGlobals?: Record<string, unknown>;
 }
 
 export type StorySessionUpdater = (newSession: Partial<StorySession>) => void;
