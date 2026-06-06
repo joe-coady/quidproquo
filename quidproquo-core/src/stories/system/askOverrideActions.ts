@@ -23,11 +23,17 @@ function* askProcessAction<R>(action: Action<any>): AskResponse<R> {
   return (yield action) as R;
 }
 
-// When an action has returnErrors set to true (because askCatch wrapped it),
-// the caller expects the result to come back wrapped in { success: true, result: value }.
-// Normally the runtime does this wrapping automatically, but when we override an action
-// we bypass the runtime entirely, so we need to do the wrapping ourselves.
-// If returnErrors is false/undefined, we just return the value as-is.
+// Shapes a handler's OWN computed value into what the story expects.
+//
+// When an action has returnErrors set to true (because askCatch wrapped it), the story expects the
+// result wrapped in { success: true, result: value }. The runtime normally does this, but an override
+// bypasses the runtime — so a handler that returns a value it computed itself must shape it with this
+// helper (passing the action's returnErrors). If returnErrors is false/undefined it returns the value
+// unchanged.
+//
+// Handlers that simply RELAY the action with `return yield action` must NOT call this: the value they
+// get back from the parent is already in the right shape (raw, or an EitherActionResult when the
+// action carried returnErrors), and the engine forwards a handler's return value verbatim.
 export function getSuccessfulEitherActionResultIfRequired<T, ReturnErrors extends boolean>(
   value: T,
   returnErrors?: ReturnErrors,
@@ -69,14 +75,13 @@ export function* askOverrideActions<T extends AskResponse<any>>(
     if (handler) {
       // We have an override! Run the user's handler instead of letting the runtime process it.
       // The handler is itself a story (generator), so we yield* into it to run it.
-      const result = yield* handler(action);
-
-      // Now we need to feed the result back to the story that yielded the action.
-      // IMPORTANT: if askCatch wrapped this action, it will have returnErrors: true,
-      // which means the story expects the result wrapped as { success: true, result: value }.
-      // Normally the runtime does this wrapping, but since we bypassed the runtime,
-      // we have to do it ourselves using getSuccessfulEitherActionResultIfRequired.
-      nextResult = storyIterator.next(getSuccessfulEitherActionResultIfRequired(result, action.returnErrors));
+      //
+      // We feed the handler's return value to the story VERBATIM — we never reshape it. That is what
+      // lets a handler relay an action with a bare `return yield action`: the value it gets back from
+      // the parent (raw, or an EitherActionResult when the action carries returnErrors, e.g. under
+      // askCatch) is already exactly what the story expects. A handler that instead returns its OWN
+      // computed value is responsible for shaping it (see getSuccessfulEitherActionResultIfRequired).
+      nextResult = storyIterator.next(yield* handler(action));
 
       // Skip to the next iteration of the while loop to process the next yielded action
       continue;

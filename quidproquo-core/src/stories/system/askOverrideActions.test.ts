@@ -427,14 +427,16 @@ describe('askOverrideActions', () => {
   // ─── returnErrors handling ───────────────────────────────────────────────
 
   describe('returnErrors handling', () => {
-    it('wraps override result in EitherActionResult when returnErrors is true', () => {
+    it('a handler shapes its own value for returnErrors via getSuccessfulEitherActionResultIfRequired', () => {
       function* story(): AskResponse<EitherActionResult<number>> {
         return (yield { type: MathActionType.RandomNumber, returnErrors: true }) as EitherActionResult<number>;
       }
 
       const overrides: ActionOverrideMap = {
-        [MathActionType.RandomNumber]: function* () {
-          return MOCK_RANDOM;
+        [MathActionType.RandomNumber]: function* (action) {
+          // The engine forwards a handler's return verbatim, so a handler that produces its own
+          // value must shape it for returnErrors itself.
+          return getSuccessfulEitherActionResultIfRequired(MOCK_RANDOM, action.returnErrors);
         },
       };
 
@@ -624,8 +626,9 @@ describe('askOverrideActions', () => {
       }
 
       const overrides: ActionOverrideMap = {
-        [MathActionType.RandomNumber]: function* () {
-          return MOCK_RANDOM;
+        [MathActionType.RandomNumber]: function* (action) {
+          // Own value -> shape it for the returnErrors askCatch added.
+          return getSuccessfulEitherActionResultIfRequired(MOCK_RANDOM, action.returnErrors);
         },
       };
 
@@ -1314,5 +1317,80 @@ describe('askOverrideActions', () => {
 
       expect(result).toEqual([MOCK_RANDOM, MOCK_DATE, MOCK_GUID, MOCK_RANDOM, MOCK_DATE]);
     });
+  });
+});
+
+// ─── Relay handlers (`return yield action`) ─────────────────────────────────────
+// The engine forwards a handler's return value VERBATIM. A handler that relays an action with a bare
+// `return yield action` therefore gets the parent's result delivered to the story unchanged — raw
+// when the action has no returnErrors, or an EitherActionResult (success OR failure) when it does.
+// No special wrapping is needed for relays; only handlers returning their OWN value must shape it.
+
+describe('relay handlers (return yield action)', () => {
+  it('relays a raw value from the parent (no returnErrors)', () => {
+    function* story(): AskResponse<number> {
+      return yield* askRandomNumber();
+    }
+
+    const overrides: ActionOverrideMap = {
+      [MathActionType.RandomNumber]: function* (action) {
+        return yield action;
+      },
+    };
+
+    const { result } = simulateRuntime(askOverrideActions(story(), overrides), defaultResponses);
+    expect(result).toBe(MOCK_RANDOM);
+  });
+
+  it('relays a success EitherActionResult under askCatch with a single wrap', () => {
+    function* story(): AskResponse<EitherActionResult<number>> {
+      return yield* askCatch(askRandomNumber());
+    }
+
+    const overrides: ActionOverrideMap = {
+      [MathActionType.RandomNumber]: function* (action) {
+        return yield action;
+      },
+    };
+
+    const { result } = simulateRuntime(askOverrideActions(story(), overrides), defaultResponses);
+    // Single wrap — NOT { success: true, result: { success: true, result: MOCK_RANDOM } }
+    expect(result).toEqual({ success: true, result: MOCK_RANDOM });
+  });
+
+  it('relays a failure EitherActionResult under askCatch instead of masking it as success', () => {
+    function* story(): AskResponse<EitherActionResult<number>> {
+      return yield* askCatch(askRandomNumber());
+    }
+
+    const overrides: ActionOverrideMap = {
+      [MathActionType.RandomNumber]: function* (action) {
+        return yield action;
+      },
+    };
+
+    const { result } = simulateRuntime(askOverrideActions(story(), overrides), {
+      ...defaultResponses,
+      [MathActionType.RandomNumber]: simulatorError('GenericError', 'boom'),
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.error.errorText).toBe('boom');
+  });
+
+  it('a handler that returns its OWN value must shape it for returnErrors', () => {
+    function* story(): AskResponse<EitherActionResult<number>> {
+      return yield* askCatch(askRandomNumber());
+    }
+
+    const overrides: ActionOverrideMap = {
+      [MathActionType.RandomNumber]: function* (action) {
+        // Own computed value, not a relay -> shape it.
+        return getSuccessfulEitherActionResultIfRequired(0.5, action.returnErrors);
+      },
+    };
+
+    const { result } = simulateRuntime(askOverrideActions(story(), overrides), defaultResponses);
+    expect(result).toEqual({ success: true, result: 0.5 });
   });
 });
