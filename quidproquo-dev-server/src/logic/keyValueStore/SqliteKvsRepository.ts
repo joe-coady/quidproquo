@@ -159,11 +159,24 @@ export class SqliteKvsRepository {
     return { pk, sk: skParts.join('#') || null };
   }
 
-  private buildWhereClause(operation: KvsQueryOperation, paramIndex: { value: number }): QueryParams {
+  // Whether a store's (single) sort key is declared numeric. Numeric sort keys
+  // are stored as TEXT (`String(value)`), so to match DynamoDB's numeric ordering
+  // we must CAST them — otherwise `sk` sorts lexically (10 lands between 1 and 2).
+  private isSortKeyNumeric(storeConfig: KeyValueStoreQPQConfigSetting): boolean {
+    return storeConfig.sortKeys.length > 0 && storeConfig.sortKeys[0].type === 'number';
+  }
+
+  // The SQL expression for the `sk` column — cast to a number when the sort key
+  // is numeric so ORDER BY and range comparisons are numeric, not lexical.
+  private skColumnExpr(skIsNumeric: boolean): string {
+    return skIsNumeric ? 'CAST(sk AS REAL)' : 'sk';
+  }
+
+  private buildWhereClause(operation: KvsQueryOperation, paramIndex: { value: number }, skIsNumeric: boolean): QueryParams {
     if ('operation' in operation && operation.operation in KvsLogicalOperatorType) {
       const logicalOp = operation as KvsLogicalOperator;
-      const conditions = logicalOp.conditions.map(cond => 
-        this.buildWhereClause(cond, paramIndex)
+      const conditions = logicalOp.conditions.map(cond =>
+        this.buildWhereClause(cond, paramIndex, skIsNumeric)
       );
       
       const sqlParts = conditions.map(c => `(${c.sql})`);
@@ -178,9 +191,12 @@ export class SqliteKvsRepository {
     }
 
     const condition = operation as KvsQueryCondition;
-    const columnName = condition.key === 'pk' || condition.key === 'sk' 
-      ? condition.key 
-      : `json_extract(data, '$.${condition.key}')`;
+    const columnName =
+      condition.key === 'pk'
+        ? 'pk'
+        : condition.key === 'sk'
+          ? this.skColumnExpr(skIsNumeric)
+          : `json_extract(data, '$.${condition.key}')`;
 
     switch (condition.operation) {
       case KvsQueryOperationType.Equal:
@@ -462,31 +478,34 @@ export class SqliteKvsRepository {
     sortAscending: boolean = true
   ): Promise<QpqPagedData<any>> {
     await this.ensureTable(keyValueStoreName);
-    
+
     const tableName = this.getTableName(keyValueStoreName);
+    const storeConfig = qpqCoreUtils.getKeyValueStoreByName(this.qpqConfig, keyValueStoreName);
+    const skIsNumeric = !!storeConfig && this.isSortKeyNumeric(storeConfig);
+    const skColumn = this.skColumnExpr(skIsNumeric);
     const paramIndex = { value: 0 };
-    
-    const keyClause = this.buildWhereClause(keyCondition, paramIndex);
-    const filterClause = filter ? this.buildWhereClause(filter, paramIndex) : null;
-    
+
+    const keyClause = this.buildWhereClause(keyCondition, paramIndex, skIsNumeric);
+    const filterClause = filter ? this.buildWhereClause(filter, paramIndex, skIsNumeric) : null;
+
     let sql = `SELECT pk, sk, data FROM ${tableName} WHERE ${keyClause.sql}`;
     let params = [...keyClause.params];
-    
+
     if (filterClause) {
       sql += ` AND ${filterClause.sql}`;
       params.push(...filterClause.params);
     }
-    
+
     if (nextPageKey) {
       const lastKey = JSON.parse(Buffer.from(nextPageKey, 'base64').toString());
-      sql += ` AND (pk > ? OR (pk = ? AND sk > ?))`;
-      params.push(lastKey.pk, lastKey.pk, lastKey.sk || '');
+      sql += ` AND (pk > ? OR (pk = ? AND ${skColumn} > ?))`;
+      params.push(lastKey.pk, lastKey.pk, skIsNumeric ? Number(lastKey.sk ?? 0) : (lastKey.sk || ''));
     }
-    
+
     sql += ` ORDER BY pk ${sortAscending ? 'ASC' : 'DESC'}`;
-    
+
     if (sortAscending !== undefined) {
-      sql += `, sk ${sortAscending ? 'ASC' : 'DESC'}`;
+      sql += `, ${skColumn} ${sortAscending ? 'ASC' : 'DESC'}`;
     }
     
     const queryLimit = (limit || 100) + 1;
@@ -517,27 +536,30 @@ export class SqliteKvsRepository {
     limit?: number
   ): Promise<QpqPagedData<any>> {
     await this.ensureTable(keyValueStoreName);
-    
+
     const tableName = this.getTableName(keyValueStoreName);
+    const storeConfig = qpqCoreUtils.getKeyValueStoreByName(this.qpqConfig, keyValueStoreName);
+    const skIsNumeric = !!storeConfig && this.isSortKeyNumeric(storeConfig);
+    const skColumn = this.skColumnExpr(skIsNumeric);
     const paramIndex = { value: 0 };
-    
+
     let sql = `SELECT pk, sk, data FROM ${tableName}`;
     let params: any[] = [];
-    
+
     if (filter) {
-      const filterClause = this.buildWhereClause(filter, paramIndex);
+      const filterClause = this.buildWhereClause(filter, paramIndex, skIsNumeric);
       sql += ` WHERE ${filterClause.sql}`;
       params = filterClause.params;
     }
-    
+
     if (nextPageKey) {
       const lastKey = JSON.parse(Buffer.from(nextPageKey, 'base64').toString());
       const wherePrefix = filter ? ' AND' : ' WHERE';
-      sql += `${wherePrefix} (pk > ? OR (pk = ? AND sk > ?))`;
-      params.push(lastKey.pk, lastKey.pk, lastKey.sk || '');
+      sql += `${wherePrefix} (pk > ? OR (pk = ? AND ${skColumn} > ?))`;
+      params.push(lastKey.pk, lastKey.pk, skIsNumeric ? Number(lastKey.sk ?? 0) : (lastKey.sk || ''));
     }
-    
-    sql += ' ORDER BY pk ASC, sk ASC';
+
+    sql += ` ORDER BY pk ASC, ${skColumn} ASC`;
     
     const queryLimit = (limit || 100) + 1;
     sql += ` LIMIT ${queryLimit}`;
