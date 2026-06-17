@@ -15,6 +15,12 @@ export const useQpqContextValues = (): QpqContext<any> => {
   return useContext(qpqReactContext);
 };
 
+export const useQpqContextValue = <T,>(contextIdentifier: QpqContextIdentifier<T>): T => {
+  const context = useQpqContextValues();
+
+  return contextIdentifier.uniqueName in context ? context[contextIdentifier.uniqueName] : contextIdentifier.defaultValue;
+};
+
 export const QpqContextProvider = <T,>({ contextIdentifier, value, children }: QpqContextProviderProps<T>) => {
   // Get the parent context value
   const parentContext = useContext(qpqReactContext);
