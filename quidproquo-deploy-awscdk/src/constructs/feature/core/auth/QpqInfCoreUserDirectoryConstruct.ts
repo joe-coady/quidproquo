@@ -1,6 +1,6 @@
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { resolveAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { QPQConfig, UserDirectoryQPQConfigSetting } from 'quidproquo-core';
+import { QPQConfig, UserDirectoryMfaMode, UserDirectoryMfaSecondFactor, UserDirectoryQPQConfigSetting } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { aws_cognito, aws_iam, aws_lambda, aws_route53, aws_route53_targets } from 'aws-cdk-lib';
@@ -16,6 +16,18 @@ import { Function } from '../../../basic/Function';
 export interface QpqInfCoreUserDirectoryConstructProps extends QpqConstructBlockProps {
   userDirectoryConfig: UserDirectoryQPQConfigSetting;
 }
+
+const mapMfaMode = (mode: UserDirectoryMfaMode): aws_cognito.Mfa => {
+  switch (mode) {
+    case UserDirectoryMfaMode.required:
+      return aws_cognito.Mfa.REQUIRED;
+    case UserDirectoryMfaMode.optional:
+      return aws_cognito.Mfa.OPTIONAL;
+    case UserDirectoryMfaMode.off:
+    default:
+      return aws_cognito.Mfa.OFF;
+  }
+};
 
 export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
   public userPool: aws_cognito.IUserPool;
@@ -39,6 +51,12 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       userPoolName: userPoolName,
       selfSignUpEnabled: props.userDirectoryConfig.selfSignUpEnabled,
+      mfa: mapMfaMode(props.userDirectoryConfig.mfa.mode),
+      // Derived from the config's enabled factors. Ignored by Cognito when mfa is OFF.
+      mfaSecondFactor: {
+        otp: (props.userDirectoryConfig.mfa.secondFactors ?? []).includes(UserDirectoryMfaSecondFactor.totp),
+        sms: false,
+      },
       passwordPolicy: {
         minLength: 12,
         requireLowercase: true,
