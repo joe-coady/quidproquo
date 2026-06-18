@@ -7,4 +7,8 @@ export enum AuthenticateUserChallenge {
   RESET_PASSWORD = 'RESET_PASSWORD',
 
   CUSTOM_CHALLENGE = 'CUSTOM_CHALLENGE',
+
+  // TOTP (authenticator app) code required to complete sign-in for an
+  // already-enrolled user.
+  SOFTWARE_TOKEN_MFA = 'SOFTWARE_TOKEN_MFA',
 }

@@ -28,6 +28,11 @@ const anyAuthChallengeToCognitoAttributes = (authChallenge: AnyAuthChallenge): R
         ANSWER: JSON.stringify(authChallenge.challengeAnswer),
       };
 
+    case AuthenticateUserChallenge.SOFTWARE_TOKEN_MFA:
+      return {
+        SOFTWARE_TOKEN_MFA_CODE: authChallenge.mfaCode,
+      };
+
     default:
       return {};
   }
@@ -40,6 +45,9 @@ const anyAuthChallengeToCognitoChallengeName = (authChallenge: AnyAuthChallenge)
 
     case AuthenticateUserChallenge.CUSTOM_CHALLENGE:
       return ChallengeNameType.CUSTOM_CHALLENGE;
+
+    case AuthenticateUserChallenge.SOFTWARE_TOKEN_MFA:
+      return ChallengeNameType.SOFTWARE_TOKEN_MFA;
 
     default:
       throw new Error(`Unknown challenge`);

@@ -5,6 +5,7 @@ assembled quickly.
 
 ## vNext
 
+- `askRespondToAuthChallenge(username, challenge, session, newPassword)` in `quidproquo-webserver` is now `askRespondToAuthChallenge(authChallenge: AnyAuthChallenge)`. Pass a single challenge object, e.g. `{ challenge: AuthenticateUserChallenge.NEW_PASSWORD_REQUIRED, username, session, newPassword }`.
 - `UserDirectoryQPQConfigSetting` in `quidproquo-core` now has a required `mfa: UserDirectoryMfaSettings` field (`{ mode: UserDirectoryMfaMode; secondFactors?: UserDirectoryMfaSecondFactor[] }`). If you construct this setting directly (rather than via `defineUserDirectory`), add `mfa: { mode: UserDirectoryMfaMode.off }` to existing literals.
 - `askFileExists` no longer returns `false` for every failure. It still returns `false` when the file genuinely does not exist (S3 404 / `ENOENT`), but a permission failure now raises a `FileExistsErrorTypeEnum.AccessDenied` error instead of silently returning `false`. If you relied on `false` meaning "missing or inaccessible", handle the error case.
 - `AiStreamPart` in `quidproquo-core` now covers 23 variants (was 3: `text-delta`, `tool-call`, `tool-result`) and is discriminated by the new `AiStreamPartType` enum instead of raw string literals. Wire format (the `type` strings) is unchanged, but if you switch on `part.type` in TS, prefer `AiStreamPartType.TextDelta` etc. over string literals.

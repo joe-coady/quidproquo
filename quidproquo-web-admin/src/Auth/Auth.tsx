@@ -4,6 +4,7 @@ import { authContext, createQpqRuntimeDefinition, QpqRuntimeEffectCatcher, useQp
 import { ReactNode, useEffect } from 'react';
 
 import { AuthChallengeNewPasswordRequired } from './AuthChallengeNewPasswordRequired/AuthChallengeNewPasswordRequired';
+import { AuthChallengeSoftwareTokenMfa } from './AuthChallengeSoftwareTokenMfa/AuthChallengeSoftwareTokenMfa';
 import { isLoggedOn } from './logic/isLoggedOn';
 import { askAuthMain } from './logic/runtime/askAuthMain';
 import { authInitalState, authLogic, authReducer } from './logic';
@@ -24,6 +25,14 @@ export function Auth({ children }: AuthProps) {
     return (
       <QpqRuntimeEffectCatcher runtime={authRuntime}>
         <AuthChallengeNewPasswordRequired authState={state}></AuthChallengeNewPasswordRequired>
+      </QpqRuntimeEffectCatcher>
+    );
+  }
+
+  if (state.authenticateUserResponse?.challenge === AuthenticateUserChallenge.SOFTWARE_TOKEN_MFA) {
+    return (
+      <QpqRuntimeEffectCatcher runtime={authRuntime}>
+        <AuthChallengeSoftwareTokenMfa authState={state}></AuthChallengeSoftwareTokenMfa>
       </QpqRuntimeEffectCatcher>
     );
   }
