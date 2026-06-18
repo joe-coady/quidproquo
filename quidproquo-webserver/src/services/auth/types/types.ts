@@ -17,6 +17,12 @@ export type NewPasswordChallengePayload = ChallengePayload & {
   newPassword: string;
 };
 
+export type MfaChallengePayload = ChallengePayload & {
+  mfaCode: string;
+};
+
+export type AnyChallengePayload = NewPasswordChallengePayload | MfaChallengePayload;
+
 export type ForgotPasswordPayload = {
   username: string;
 };

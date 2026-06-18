@@ -1,17 +1,44 @@
-import { AskResponse, AuthenticateUserChallenge } from 'quidproquo-core';
+import { AnyAuthChallenge, AskResponse, AuthenticateUserChallenge } from 'quidproquo-core';
 
 // TODO: Fix this import (name it up the chain)
 import { qpqWebServerUtils } from '../../../../index';
 import { HTTPEvent, HTTPEventResponse } from '../../../../types';
 import { authLogic } from '../../logic';
 import {
+  AnyChallengePayload,
   ChangePasswordPayload,
   ConfirmForgotPasswordPayload,
   ForgotPasswordPayload,
+  isMfaChallengePayload,
+  isNewPasswordChallengePayload,
   LoginPayload,
-  NewPasswordChallengePayload,
   RefreshPayload,
 } from '../../types';
+
+// Maps the wire payload (discriminated by `challenge`) onto the core auth
+// challenge shape. The type guards narrow `payload`, so no manual casts are
+// needed. Add a branch here as new challenge types are supported.
+const challengePayloadToAuthChallenge = (payload: AnyChallengePayload): AnyAuthChallenge => {
+  if (isNewPasswordChallengePayload(payload)) {
+    return {
+      challenge: AuthenticateUserChallenge.NEW_PASSWORD_REQUIRED,
+      username: payload.email,
+      session: payload.session,
+      newPassword: payload.newPassword,
+    };
+  }
+
+  if (isMfaChallengePayload(payload)) {
+    return {
+      challenge: AuthenticateUserChallenge.SOFTWARE_TOKEN_MFA,
+      username: payload.email,
+      session: payload.session,
+      mfaCode: payload.mfaCode,
+    };
+  }
+
+  throw new Error(`Unsupported auth challenge: ${(payload as AnyChallengePayload).challenge}`);
+};
 
 export function* login(event: HTTPEvent): AskResponse<HTTPEventResponse> {
   const { username, password } = yield* qpqWebServerUtils.askFromJsonEventRequest<LoginPayload>(event);
@@ -30,15 +57,9 @@ export function* refreshToken(event: HTTPEvent): AskResponse<HTTPEventResponse> 
 }
 
 export function* respondToAuthChallenge(event: HTTPEvent): AskResponse<HTTPEventResponse> {
-  const authChallenge = yield* qpqWebServerUtils.askFromJsonEventRequest<NewPasswordChallengePayload>(event);
+  const payload = yield* qpqWebServerUtils.askFromJsonEventRequest<AnyChallengePayload>(event);
 
-  // TODO: Make this more generic ~ Currently we only support one challenge
-  const response = yield* authLogic.askRespondToAuthChallenge(
-    authChallenge.email,
-    AuthenticateUserChallenge.NEW_PASSWORD_REQUIRED,
-    authChallenge.session,
-    authChallenge.newPassword,
-  );
+  const response = yield* authLogic.askRespondToAuthChallenge(challengePayloadToAuthChallenge(payload));
 
   return qpqWebServerUtils.toJsonEventResponse(response);
 }

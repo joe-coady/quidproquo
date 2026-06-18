@@ -33,6 +33,7 @@ export const cognitoChallengeNameTypeToQpqAuthenticateUserChallenge = (
   const map: Record<string, AuthenticateUserChallenge | string> = {
     [ChallengeNameType.NEW_PASSWORD_REQUIRED]: AuthenticateUserChallenge.NEW_PASSWORD_REQUIRED,
     [ChallengeNameType.CUSTOM_CHALLENGE]: AuthenticateUserChallenge.CUSTOM_CHALLENGE,
+    [ChallengeNameType.SOFTWARE_TOKEN_MFA]: AuthenticateUserChallenge.SOFTWARE_TOKEN_MFA,
   };
 
   // TODO: handle the NOT-IMP cases
