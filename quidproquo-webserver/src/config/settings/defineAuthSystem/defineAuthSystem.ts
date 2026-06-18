@@ -1,4 +1,4 @@
-import { defineGlobal, defineServiceSettings, defineUserDirectory, EmailTemplates, QPQConfig } from 'quidproquo-core';
+import { defineGlobal, defineServiceSettings, defineUserDirectory, EmailTemplates, QPQConfig, UserDirectoryMfaSettings } from 'quidproquo-core';
 
 import { AUTH_USER_DIRECTORY_GLOBAL_KEY } from '../../../services/auth/config';
 import { defineAuthServiceRoute } from '../../../services/auth/config/defineAuthServiceRoute';
@@ -9,6 +9,8 @@ export interface AuthSystemOptions {
   selfSignUpEnabled?: boolean;
 
   emailTemplates?: EmailTemplates;
+
+  mfa?: UserDirectoryMfaSettings;
 
   // Path prefix applied to every auth route, e.g. '/auth' => '/auth/login'.
   basePath?: string;
@@ -35,6 +37,7 @@ export const defineAuthSystem = (service: string, directoryName: string, options
       phoneRequired: options?.phoneRequired,
       selfSignUpEnabled: options?.selfSignUpEnabled,
       emailTemplates: options?.emailTemplates,
+      mfa: options?.mfa,
       owner: { module: service },
     }),
 

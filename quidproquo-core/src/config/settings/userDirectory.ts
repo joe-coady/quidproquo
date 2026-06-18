@@ -8,6 +8,24 @@ export type AuthDirectoryDnsRecord = {
   rootDomain: string;
 };
 
+export enum UserDirectoryMfaMode {
+  off = 'off',
+  optional = 'optional',
+  required = 'required',
+}
+
+export enum UserDirectoryMfaSecondFactor {
+  totp = 'totp',
+  // sms = 'sms', // future — additionally needs phone + SNS role infra.
+}
+
+export interface UserDirectoryMfaSettings {
+  mode: UserDirectoryMfaMode;
+
+  // Enabled second factors. Defaults to [totp] when omitted.
+  secondFactors?: UserDirectoryMfaSecondFactor[];
+}
+
 export interface QPQConfigAdvancedUserDirectorySettings extends QPQConfigAdvancedSettings {
   phoneRequired?: boolean;
 
@@ -20,6 +38,8 @@ export interface QPQConfigAdvancedUserDirectorySettings extends QPQConfigAdvance
   dnsRecord?: AuthDirectoryDnsRecord;
 
   customAuthRuntime?: CustomAuthRuntime;
+
+  mfa?: UserDirectoryMfaSettings;
 }
 
 export interface UserDirectoryQPQConfigSetting extends QPQConfigSetting {
@@ -36,6 +56,8 @@ export interface UserDirectoryQPQConfigSetting extends QPQConfigSetting {
   dnsRecord?: AuthDirectoryDnsRecord;
 
   customAuthRuntime?: CustomAuthRuntime;
+
+  mfa: UserDirectoryMfaSettings;
 }
 
 export const defineUserDirectory = (name: string, options?: QPQConfigAdvancedUserDirectorySettings): UserDirectoryQPQConfigSetting => ({
@@ -56,6 +78,11 @@ export const defineUserDirectory = (name: string, options?: QPQConfigAdvancedUse
 
   dnsRecord: options?.dnsRecord,
   customAuthRuntime: options?.customAuthRuntime,
+
+  mfa: {
+    mode: options?.mfa?.mode ?? UserDirectoryMfaMode.off,
+    secondFactors: options?.mfa?.secondFactors?.length ? options.mfa.secondFactors : [UserDirectoryMfaSecondFactor.totp],
+  },
 
   owner: convertCrossModuleOwnerToGenericResourceNameOverride(options?.owner),
 });
