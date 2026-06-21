@@ -20,6 +20,12 @@ const DIVISIONS: Division[] = [
  * Past dates are negative, future dates are positive.
  */
 export const formatTimeAgo = (date: Date, now: Date = new Date(), locale?: string | string[]): string => {
+  // An invalid date (e.g. new Date('')) has a NaN time, which Intl.RelativeTimeFormat
+  // rejects — guard so callers never have to.
+  if (Number.isNaN(date.getTime())) {
+    return '';
+  }
+
   const formatter = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
 
   // Seconds between the two dates; negative for the past.
