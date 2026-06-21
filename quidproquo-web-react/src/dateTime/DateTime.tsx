@@ -19,6 +19,8 @@ export type DateTimeProps = DateInput & {
   hideTimeAgo?: boolean;
   /** Render each part on its own line instead of inline. Defaults to true. */
   isMultiline?: boolean;
+  /** What to render when the date is missing/invalid (e.g. an empty isoDateTime). Defaults to "—". */
+  placeholder?: React.ReactNode;
   className?: string;
 };
 
@@ -62,12 +64,13 @@ const toDate = (props: DateInput): Date => {
 };
 
 const component: React.FC<DateTimeProps> = (props) => {
-  const { locale, dateTimeFormatOptions, showTimeAgo = true, hideDate = false, hideTime = false, hideTimeAgo = false, isMultiline = true, className } = props;
+  const { locale, dateTimeFormatOptions, showTimeAgo = true, hideDate = false, hideTime = false, hideTimeAgo = false, isMultiline = true, placeholder = '—', className } = props;
 
   // Stable primitive key so a fresh props object doesn't churn the memo.
   const dateKey = 'isoDateTime' in props ? props.isoDateTime : 'unixTimestampMs' in props ? props.unixTimestampMs : props.date.getTime();
 
   const date = useMemo(() => toDate(props), [dateKey]);
+  const isValidDate = !Number.isNaN(date.getTime());
 
   const formattedDate = useMemo(
     () => (hideDate ? '' : date.toLocaleDateString(locale, pickOptions(dateTimeFormatOptions, DATE_OPTION_KEYS) ?? DEFAULT_DATE_OPTIONS)),
@@ -83,6 +86,12 @@ const component: React.FC<DateTimeProps> = (props) => {
 
   const formattedDateTime = [formattedDate, formattedTime].filter(Boolean).join(' ');
   const displayTimeAgo = showTimeAgo && !hideTimeAgo;
+
+  // A missing/invalid date (e.g. an empty isoDateTime) renders the placeholder instead of
+  // an "Invalid Date" string or crashing the relative-time formatter.
+  if (!isValidDate) {
+    return <time className={className}>{placeholder}</time>;
+  }
 
   return (
     <time dateTime={date.toISOString()} title={date.toLocaleString(locale)} className={className}>
