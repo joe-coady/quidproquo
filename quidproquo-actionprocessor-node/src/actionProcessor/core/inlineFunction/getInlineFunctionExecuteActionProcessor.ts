@@ -51,6 +51,7 @@ const getProcessExecute = <R, T>(qpqConfig: QPQConfig): InlineFunctionExecuteAct
       qpqConfig,
       {
         context: session.context,
+        localContext: session.localContext,
         depth: (session.depth || 0) + 1,
         decodedAccessToken: session.decodedAccessToken,
         correlation: session.correlation,
