@@ -71,10 +71,33 @@ export const fileStorageImplementation = async (devServerConfig: ResolvedDevServ
         // Check if file exists
         await fs.access(tokenData.fullFilepath);
         
-        // Set appropriate headers
+        // Mirror real S3: serve the object's stored mimetype + content-disposition (written as a
+        // sidecar by the binary-write processor) so e.g. a PDF renders inline instead of force-
+        // downloading. No sidecar → fall back to the generic attachment download.
         const filename = path.basename(tokenData.fullFilepath);
-        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-        
+        let contentDisposition = `attachment; filename="${filename}"`;
+        let contentType: string | undefined;
+        try {
+          const meta = JSON.parse(
+            await fs.readFile(`${tokenData.fullFilepath}.qpqmeta.json`, 'utf8')
+          );
+          if (meta.mimetype) {
+            contentType = meta.mimetype;
+          }
+          if (meta.contentDisposition === 'inline') {
+            contentDisposition = 'inline';
+          } else if (meta.contentDisposition) {
+            contentDisposition = `${meta.contentDisposition}; filename="${filename}"`;
+          }
+        } catch {
+          // No sidecar metadata → keep the default attachment behaviour.
+        }
+
+        if (contentType) {
+          res.setHeader('Content-Type', contentType);
+        }
+        res.setHeader('Content-Disposition', contentDisposition);
+
         // Stream the file
         const fileBuffer = await fs.readFile(tokenData.fullFilepath);
         res.send(fileBuffer);
