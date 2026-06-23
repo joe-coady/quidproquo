@@ -23,7 +23,17 @@ const getProcessFileWriteBinaryContents = (config: FileStorageConfig) => (qpqCon
       // Convert QPQBinaryData to Buffer
       const buffer = Buffer.from(data.base64Data, 'base64');
       await fs.writeFile(fullPath, buffer);
-      
+
+      if (data.mimetype || data.contentDisposition) {
+        await fs.writeFile(
+          `${fullPath}.qpqmeta.json`,
+          JSON.stringify({
+            mimetype: data.mimetype,
+            contentDisposition: data.contentDisposition,
+          })
+        );
+      }
+
       return actionResult(void 0);
     } catch (error: any) {
       return actionResultError(ErrorTypeEnum.GenericError, `Error writing binary file: ${error.message}`);
