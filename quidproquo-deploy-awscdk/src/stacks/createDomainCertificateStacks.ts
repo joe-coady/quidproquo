@@ -53,10 +53,18 @@ export const createDomainCertificateStacks = (
 
   return configs.map((certificateConfig) => {
     const sanitizedRoot = certificateConfig.rootDomain.replace(/\./g, '-');
+
+    // The construct id keeps the region so the two stacks an apex can need — a us-east-1
+    // CloudFront cert and a regional API cert — stay distinct siblings under the same scope.
+    // The deployed CloudFormation name drops it: each stack lands in its own region (see env
+    // in DomainCertificateStack), and within a region an apex has exactly one merged cert
+    // config, so `<prefix>-cert-<apex>` is already unique where AWS requires it.
     const stackId = `${idPrefix}-cert-${sanitizedRoot}-${certificateConfig.region}`;
+    const stackName = `${idPrefix}-cert-${sanitizedRoot}`;
     return new DomainCertificateStack(scope, stackId, {
       qpqConfig,
       certificateConfig,
+      stackName,
     });
   });
 };
