@@ -3,6 +3,7 @@ import { authContext, createQpqRuntimeDefinition, QpqRuntimeEffectCatcher, useQp
 
 import { ReactNode, useEffect } from 'react';
 
+import { AuthChallengeMfaSetup } from './AuthChallengeMfaSetup/AuthChallengeMfaSetup';
 import { AuthChallengeNewPasswordRequired } from './AuthChallengeNewPasswordRequired/AuthChallengeNewPasswordRequired';
 import { AuthChallengeSoftwareTokenMfa } from './AuthChallengeSoftwareTokenMfa/AuthChallengeSoftwareTokenMfa';
 import { isLoggedOn } from './logic/isLoggedOn';
@@ -33,6 +34,14 @@ export function Auth({ children }: AuthProps) {
     return (
       <QpqRuntimeEffectCatcher runtime={authRuntime}>
         <AuthChallengeSoftwareTokenMfa authState={state}></AuthChallengeSoftwareTokenMfa>
+      </QpqRuntimeEffectCatcher>
+    );
+  }
+
+  if (state.authenticateUserResponse?.challenge === AuthenticateUserChallenge.MFA_SETUP) {
+    return (
+      <QpqRuntimeEffectCatcher runtime={authRuntime}>
+        <AuthChallengeMfaSetup authState={state}></AuthChallengeMfaSetup>
       </QpqRuntimeEffectCatcher>
     );
   }

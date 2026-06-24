@@ -11,4 +11,8 @@ export enum AuthenticateUserChallenge {
   // TOTP (authenticator app) code required to complete sign-in for an
   // already-enrolled user.
   SOFTWARE_TOKEN_MFA = 'SOFTWARE_TOKEN_MFA',
+
+  // The pool requires MFA but the user has no authenticator enrolled yet. They
+  // must associate a software token (TOTP), verify a code, then complete login.
+  MFA_SETUP = 'MFA_SETUP',
 }

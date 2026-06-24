@@ -6,10 +6,12 @@ import { HTTPEvent, HTTPEventResponse } from '../../../../types';
 import { authLogic } from '../../logic';
 import {
   AnyChallengePayload,
+  AssociateSoftwareTokenPayload,
   ChangePasswordPayload,
   ConfirmForgotPasswordPayload,
   ForgotPasswordPayload,
   isMfaChallengePayload,
+  isMfaSetupChallengePayload,
   isNewPasswordChallengePayload,
   LoginPayload,
   RefreshPayload,
@@ -31,6 +33,15 @@ const challengePayloadToAuthChallenge = (payload: AnyChallengePayload): AnyAuthC
   if (isMfaChallengePayload(payload)) {
     return {
       challenge: AuthenticateUserChallenge.SOFTWARE_TOKEN_MFA,
+      username: payload.email,
+      session: payload.session,
+      mfaCode: payload.mfaCode,
+    };
+  }
+
+  if (isMfaSetupChallengePayload(payload)) {
+    return {
+      challenge: AuthenticateUserChallenge.MFA_SETUP,
       username: payload.email,
       session: payload.session,
       mfaCode: payload.mfaCode,
@@ -60,6 +71,14 @@ export function* respondToAuthChallenge(event: HTTPEvent): AskResponse<HTTPEvent
   const payload = yield* qpqWebServerUtils.askFromJsonEventRequest<AnyChallengePayload>(event);
 
   const response = yield* authLogic.askRespondToAuthChallenge(challengePayloadToAuthChallenge(payload));
+
+  return qpqWebServerUtils.toJsonEventResponse(response);
+}
+
+export function* associateSoftwareToken(event: HTTPEvent): AskResponse<HTTPEventResponse> {
+  const { session } = yield* qpqWebServerUtils.askFromJsonEventRequest<AssociateSoftwareTokenPayload>(event);
+
+  const response = yield* authLogic.askAssociateSoftwareToken(session);
 
   return qpqWebServerUtils.toJsonEventResponse(response);
 }

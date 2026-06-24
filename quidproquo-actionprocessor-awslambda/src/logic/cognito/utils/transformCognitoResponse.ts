@@ -34,6 +34,7 @@ export const cognitoChallengeNameTypeToQpqAuthenticateUserChallenge = (
     [ChallengeNameType.NEW_PASSWORD_REQUIRED]: AuthenticateUserChallenge.NEW_PASSWORD_REQUIRED,
     [ChallengeNameType.CUSTOM_CHALLENGE]: AuthenticateUserChallenge.CUSTOM_CHALLENGE,
     [ChallengeNameType.SOFTWARE_TOKEN_MFA]: AuthenticateUserChallenge.SOFTWARE_TOKEN_MFA,
+    [ChallengeNameType.MFA_SETUP]: AuthenticateUserChallenge.MFA_SETUP,
   };
 
   // TODO: handle the NOT-IMP cases

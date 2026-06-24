@@ -1,5 +1,7 @@
 export * from './types';
 export * from './UserDirectoryActionType';
+export * from './UserDirectoryAssociateSoftwareTokenActionRequester';
+export * from './UserDirectoryAssociateSoftwareTokenActionTypes';
 export * from './UserDirectoryAuthenticateUserActionRequester';
 export * from './UserDirectoryAuthenticateUserActionTypes';
 export * from './UserDirectoryChangePasswordActionRequester';

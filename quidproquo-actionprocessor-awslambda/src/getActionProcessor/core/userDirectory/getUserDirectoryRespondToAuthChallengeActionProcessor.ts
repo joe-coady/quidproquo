@@ -15,6 +15,7 @@ import { ChallengeNameType } from '@aws-sdk/client-cognito-identity-provider';
 import { getCFExportNameUserPoolClientIdFromConfig, getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { respondToAuthChallengeChallenge } from '../../../logic/cognito/respondToAuthChallengeChallenge';
+import { verifySoftwareToken } from '../../../logic/cognito/verifySoftwareToken';
 
 const anyAuthChallengeToCognitoAttributes = (authChallenge: AnyAuthChallenge): Record<string, string> => {
   switch (authChallenge.challenge) {
@@ -33,6 +34,11 @@ const anyAuthChallengeToCognitoAttributes = (authChallenge: AnyAuthChallenge): R
         SOFTWARE_TOKEN_MFA_CODE: authChallenge.mfaCode,
       };
 
+    // MFA_SETUP completes with just USERNAME/SESSION — the TOTP code is consumed
+    // by the preceding VerifySoftwareToken call, not by RespondToAuthChallenge.
+    case AuthenticateUserChallenge.MFA_SETUP:
+      return {};
+
     default:
       return {};
   }
@@ -49,6 +55,9 @@ const anyAuthChallengeToCognitoChallengeName = (authChallenge: AnyAuthChallenge)
     case AuthenticateUserChallenge.SOFTWARE_TOKEN_MFA:
       return ChallengeNameType.SOFTWARE_TOKEN_MFA;
 
+    case AuthenticateUserChallenge.MFA_SETUP:
+      return ChallengeNameType.MFA_SETUP;
+
     default:
       throw new Error(`Unknown challenge`);
   }
@@ -62,12 +71,19 @@ const getProcessRespondToAuthChallenge = (qpqConfig: QPQConfig): UserDirectoryRe
 
     const userPoolClientId = await getExportedValue(getCFExportNameUserPoolClientIdFromConfig(userDirectoryName, qpqConfig), region);
 
+    // MFA_SETUP must verify the TOTP code first; Cognito returns a fresh session
+    // that is then used to complete the challenge and issue tokens.
+    let session = authChallenge.session;
+    if (authChallenge.challenge === AuthenticateUserChallenge.MFA_SETUP) {
+      session = await verifySoftwareToken(region, session, authChallenge.mfaCode);
+    }
+
     const response = await respondToAuthChallengeChallenge(
       userPoolId,
       userPoolClientId,
       region,
       authChallenge.username,
-      authChallenge.session,
+      session,
       anyAuthChallengeToCognitoChallengeName(authChallenge),
       anyAuthChallengeToCognitoAttributes(authChallenge),
     );
