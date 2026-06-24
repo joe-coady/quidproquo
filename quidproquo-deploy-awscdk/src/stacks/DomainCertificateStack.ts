@@ -9,6 +9,8 @@ import { Construct } from 'constructs';
 export interface DomainCertificateStackProps {
   qpqConfig: QPQConfig;
   certificateConfig: DomainCertificateQPQConfigSetting;
+
+  stackName?: string;
 }
 
 const buildDomainNames = (resolvedApex: string, certificateConfig: DomainCertificateQPQConfigSetting): string[] => {
@@ -36,6 +38,7 @@ export class DomainCertificateStack extends Stack {
     const certRegion = props.certificateConfig.region;
 
     super(scope, id, {
+      stackName: props.stackName,
       env: {
         region: certRegion,
         account: deployAccountId,
