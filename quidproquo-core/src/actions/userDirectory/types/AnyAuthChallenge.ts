@@ -1,5 +1,6 @@
 import {
   AuthenticateUserCustomChallengeChallenge,
+  AuthenticateUserMfaSetupChallenge,
   AuthenticateUserNewPasswordRequiredChallenge,
   AuthenticateUserSoftwareTokenMfaChallenge,
 } from './AuthChallenges';
@@ -7,4 +8,5 @@ import {
 export type AnyAuthChallenge =
   | AuthenticateUserNewPasswordRequiredChallenge
   | AuthenticateUserCustomChallengeChallenge<any>
-  | AuthenticateUserSoftwareTokenMfaChallenge;
+  | AuthenticateUserSoftwareTokenMfaChallenge
+  | AuthenticateUserMfaSetupChallenge;

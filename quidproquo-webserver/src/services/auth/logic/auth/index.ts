@@ -1,3 +1,4 @@
+export * from './askAssociateSoftwareToken';
 export * from './askChangePassword';
 export * from './askConfirmForgotPassword';
 export * from './askForgotPassword';

@@ -49,6 +49,7 @@ export const defineAuthSystem = (service: string, directoryName: string, options
         defineAuthServiceRoute('POST', `${basePath}/login`, 'login', routeOptions),
         defineAuthServiceRoute('POST', `${basePath}/refreshToken`, 'refreshToken', routeOptions),
         defineAuthServiceRoute('POST', `${basePath}/challenge`, 'respondToAuthChallenge', routeOptions),
+        defineAuthServiceRoute('POST', `${basePath}/associateSoftwareToken`, 'associateSoftwareToken', routeOptions),
         defineAuthServiceRoute('POST', `${basePath}/forgotPassword`, 'forgotPassword', routeOptions),
         defineAuthServiceRoute('POST', `${basePath}/forgotPassword/confirm`, 'confirmForgotPassword', routeOptions),
 
