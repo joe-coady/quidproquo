@@ -2,6 +2,7 @@ import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, 
 
 import { getApiRequestActionProcessor } from './api';
 import { getQueryParamsActionProcessor } from './queryParams';
+import { getWindowActionProcessor } from './window';
 
 export * from './api';
 
@@ -11,4 +12,5 @@ export const getWebActionProcessor: ActionProcessorListResolver = async (
 ): Promise<ActionProcessorList> => ({
   ...(await getApiRequestActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getQueryParamsActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getWindowActionProcessor(qpqConfig, dynamicModuleLoader)),
 });
