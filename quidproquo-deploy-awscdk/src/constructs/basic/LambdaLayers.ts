@@ -1,4 +1,4 @@
-import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
+import { awsNamingUtils, getLogExtensionLayerPath } from 'quidproquo-actionprocessor-awslambda';
 import { ApiLayer, getAwsServiceAccountInfoConfig } from 'quidproquo-config-aws';
 import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
@@ -28,7 +28,7 @@ export class LambdaLayers extends QpqConstructBlock {
 
     const apiLayers = getLambdaLayersWithFullPaths(props.qpqConfig);
 
-    this.layers = apiLayers.map((layer) => {
+    const userLayers = apiLayers.map((layer) => {
       return layer.buildPath
         ? new aws_lambda.LayerVersion(this, `${layer.name}-layer`, {
             layerVersionName: awsNamingUtils.getQpqRuntimeResourceNameFromConfig(layer.name, props.qpqConfig),
@@ -37,5 +37,15 @@ export class LambdaLayers extends QpqConstructBlock {
           })
         : aws_lambda.LayerVersion.fromLayerVersionArn(this, `${layer.name}-layer-ref`, layer.layerArn!);
     });
+
+    // Always-on: the qpq-log-extension ships story logs to S3 off the function's
+    // response path. Attached to every function via apiLayerVersions.
+    const logExtensionLayer = new aws_lambda.LayerVersion(this, 'qpq-log-extension-layer', {
+      layerVersionName: awsNamingUtils.getQpqRuntimeResourceNameFromConfig('qpq-log-extension', props.qpqConfig),
+      code: new aws_lambda.AssetCode(getLogExtensionLayerPath()),
+      compatibleRuntimes: [aws_lambda.Runtime.NODEJS_22_X],
+    });
+
+    this.layers = [...userLayers, logExtensionLayer];
   }
 }

@@ -1,3 +1,4 @@
+import { QPQ_LOG_EXTENSION_PORT } from 'quidproquo-actionprocessor-awslambda';
 import { getAwsServiceAccountInfoConfig } from 'quidproquo-config-aws';
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 
@@ -62,6 +63,9 @@ export class Function extends QpqConstructBlock {
 
       environment: {
         AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
+        // Tells the handler the qpq-log-extension is present, so it POSTs logs to
+        // the extension (off the response path) instead of awaiting S3 directly.
+        QPQ_LOG_EXTENSION_PORT,
         ...(props.environment || {}),
       },
 
