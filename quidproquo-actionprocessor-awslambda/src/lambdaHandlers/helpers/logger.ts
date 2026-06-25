@@ -13,10 +13,8 @@ import { filterLogHistoryByActionTypes } from 'quidproquo-core';
 
 import { randomUUID } from 'crypto';
 
-export const storyLogger = async (result: StoryResult<any>, bucketName: string, region: string): Promise<void> => {
+export const storyLogger = async (result: StoryResult<any>, bucketName: string, s3Client: S3Client): Promise<void> => {
   try {
-    const s3Client = new S3Client({ region });
-
     const commandParams: PutObjectCommandInput = {
       Key: `${result.correlation}.json`,
       Bucket: bucketName,
@@ -48,12 +46,14 @@ export const moveLogsToPerminateStorage = async (bucketName: string, region: str
     await fs.promises.mkdir(tempDirectory, { recursive: true });
     const files = await fs.promises.readdir(tempDirectory);
 
+    const s3Client = new S3Client({ region });
+
     for (const file of files) {
       const filePath = path.join(tempDirectory, file);
       const data = await fs.promises.readFile(filePath, 'utf-8');
       const result: StoryResult<any> = JSON.parse(data);
 
-      await storyLogger(result, bucketName, region);
+      await storyLogger(result, bucketName, s3Client);
 
       await fs.promises.unlink(filePath);
       console.log(`Moved log file [${file}] to S3 and deleted from temporary directory`);
@@ -71,7 +71,7 @@ export const getLogger = (qpqConfig: QPQConfig): QpqLogger => {
   if (!awsSettings.logServiceName || awsSettings.disableLogs || process.env.storageDriveName === QPQ_LOGS_STORAGE_DRIVE_NAME) {
     return {
       enableLogs: async () => {},
-      log: async () => {},
+      log: () => {},
       waitToFinishWriting: async () => {},
       moveToPermanentStorage: async () => {},
     };
@@ -88,6 +88,7 @@ export const getLogger = (qpqConfig: QPQConfig): QpqLogger => {
   // Where is this bucket?
   const regionForBucket = getAwsServiceAccountInfoByDeploymentInfo(qpqConfig, service, environment, feature, application).awsRegion;
 
+  const s3Client = new S3Client({ region: regionForBucket });
   const logs: Promise<void>[] = [];
   let disabledLogCorrelations: string[] = [];
 
@@ -100,22 +101,27 @@ export const getLogger = (qpqConfig: QPQConfig): QpqLogger => {
       }
     },
 
-    log: async (result: StoryResult<any>) => {
-      let modifyableResult = !disabledLogCorrelations.includes(result.correlation)
-        ? result
-        : {
-            ...result,
-            history: filterLogHistoryByActionTypes(result.history, [
-              LogActionType.Create,
-              LogActionType.TemplateLiteral,
-              LogActionType.DisableEventHistory,
-            ]),
-          };
+    log: (result: StoryResult<any>) => {
+      // Defer all work (including JSON.stringify) to a microtask so the caller is not blocked.
+      // The promise is tracked in `logs` and awaited by waitToFinishWriting at the end.
+      const promise = Promise.resolve()
+        .then(async () => {
+          const modifyableResult = !disabledLogCorrelations.includes(result.correlation)
+            ? result
+            : {
+                ...result,
+                history: filterLogHistoryByActionTypes(result.history, [
+                  LogActionType.Create,
+                  LogActionType.TemplateLiteral,
+                  LogActionType.DisableEventHistory,
+                ]),
+              };
 
-      // TODO: Filter and flatten histories log histories
-      const promise = storyLogger(modifyableResult, bucketName, regionForBucket).catch((e) => {
-        console.log('Failed to log story result to S3', JSON.stringify(e, null, 2));
-      });
+          await storyLogger(modifyableResult, bucketName, s3Client);
+        })
+        .catch((e) => {
+          console.log('Failed to log story result to S3', JSON.stringify(e, null, 2));
+        });
 
       logs.push(promise);
     },
