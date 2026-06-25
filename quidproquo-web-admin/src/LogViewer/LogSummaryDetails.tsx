@@ -1,6 +1,9 @@
 import { getUniqueKeyFromQpqFunctionRuntime, StoryResult } from 'quidproquo-core';
 
-import { Typography } from '@mui/material';
+import { useState } from 'react';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Box, IconButton, Tooltip, Typography } from '@mui/material';
 
 import { GenericFunctionRenderer, genericFunctionRendererStyles } from './actionComponents/genericActionRenderer/AnyVariableView';
 
@@ -9,16 +12,23 @@ interface LogSummaryDetailsProps {
 }
 
 export const LogSummaryDetails = ({ log }: LogSummaryDetailsProps) => {
+  const [expanded, setExpanded] = useState(false);
+
   const totalRuntime = new Date(log.finishedAt).getTime() - new Date(log.startedAt).getTime();
   const functionKey = log.qpqFunctionRuntimeInfo ? getUniqueKeyFromQpqFunctionRuntime(log.qpqFunctionRuntimeInfo) : 'unknownMahLord';
 
   return (
     <>
-      <div>
+      <Box display="flex" alignItems="center">
         <Typography variant="h5" gutterBottom>
           {log.runtimeType} - {log.moduleName}
         </Typography>
-      </div>
+        <Tooltip title={expanded ? 'Collapse' : 'Expand'}>
+          <IconButton size="small" onClick={() => setExpanded(!expanded)}>
+            {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+          </IconButton>
+        </Tooltip>
+      </Box>
       <div>
         <pre style={genericFunctionRendererStyles.pre}>
           <div style={genericFunctionRendererStyles.commentBlock}>
@@ -30,7 +40,7 @@ export const LogSummaryDetails = ({ log }: LogSummaryDetailsProps) => {
             </div>
             <div>// //////////////////////////////////////////////////////</div>
           </div>
-          <GenericFunctionRenderer functionName={functionKey.split('::').pop() || 'unknown'} args={log.input} expanded={true} />
+          <GenericFunctionRenderer functionName={functionKey.split('::').pop() || 'unknown'} args={log.input} expanded={expanded} />
         </pre>
       </div>
     </>
