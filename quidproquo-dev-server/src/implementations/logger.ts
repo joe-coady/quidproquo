@@ -13,7 +13,7 @@ export const getDevServerLogger = (qpqConfig: QPQConfig, devServerConfig: Resolv
   if (!devServerConfig.logServiceName || isProcessingLogDriveEvent || process.env.storageDriveName === QPQ_LOGS_STORAGE_DRIVE_NAME) {
     return {
       enableLogs: async () => { },
-      log: async () => { },
+      log: () => { },
       waitToFinishWriting: async () => { },
       moveToPermanentStorage: async () => { },
     };
@@ -51,22 +51,27 @@ export const getDevServerLogger = (qpqConfig: QPQConfig, devServerConfig: Resolv
       }
     },
 
-    log: async (result: StoryResult<any>) => {
-      let modifiableResult = !disabledLogCorrelations.includes(result.correlation)
-        ? result
-        : {
-          ...result,
-          history: filterLogHistoryByActionTypes(result.history, [
-            LogActionType.Create,
-            LogActionType.TemplateLiteral,
-            LogActionType.DisableEventHistory,
-          ]),
-        };
+    log: (result: StoryResult<any>) => {
+      // Defer all work to a microtask so the caller is not blocked.
+      // The promise is tracked in `logs` and awaited by waitToFinishWriting at the end.
+      const promise = Promise.resolve()
+        .then(async () => {
+          const modifiableResult = !disabledLogCorrelations.includes(result.correlation)
+            ? result
+            : {
+              ...result,
+              history: filterLogHistoryByActionTypes(result.history, [
+                LogActionType.Create,
+                LogActionType.TemplateLiteral,
+                LogActionType.DisableEventHistory,
+              ]),
+            };
 
-      // Create a promise for this log write and add it to the array
-      const promise = writeLogFile(modifiableResult).catch((e) => {
-        console.log('Failed to log story result', JSON.stringify(e, null, 2));
-      });
+          await writeLogFile(modifiableResult);
+        })
+        .catch((e) => {
+          console.log('Failed to log story result', JSON.stringify(e, null, 2));
+        });
 
       logs.push(promise);
     },
