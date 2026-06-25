@@ -46,7 +46,7 @@ export async function resolveStoryWithLogs<TArgs extends Array<any>>(
     );
 
     storyResult.logs = logs;
-    await logger.log(storyResult);
+    logger.log(storyResult);
     return storyResult;
   } finally {
     console.log = oldConsoleLog;
