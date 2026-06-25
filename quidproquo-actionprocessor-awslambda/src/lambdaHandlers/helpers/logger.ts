@@ -5,13 +5,12 @@ import path from 'path';
 import { PutObjectCommand, PutObjectCommandInput, S3Client } from '@aws-sdk/client-s3';
 
 import { getConfigRuntimeResourceName } from '../../awsNamingUtils';
+import { LOG_EXTENSION_PORT } from '../../lambdaExtensions/logExtensionPort';
 
 const tempDirectory = '/tmp/qpqlogs';
 
 import { getAwsServiceAccountInfoByDeploymentInfo, getAwsServiceAccountInfoConfig } from 'quidproquo-config-aws';
 import { filterLogHistoryByActionTypes } from 'quidproquo-core';
-
-import { randomUUID } from 'crypto';
 
 export const storyLogger = async (result: StoryResult<any>, bucketName: string, s3Client: S3Client): Promise<void> => {
   try {
@@ -146,11 +145,10 @@ export const getS3Logger = (qpqConfig: QPQConfig): QpqLogger => {
 // is unreachable, so a log is never silently dropped.
 export const getS3LoggerViaExtension = (qpqConfig: QPQConfig): QpqLogger => {
   const { bucketName, regionForBucket } = resolveLogTarget(qpqConfig);
-  const extensionPort = process.env.QPQ_LOG_EXTENSION_PORT;
   const s3Client = new S3Client({ region: regionForBucket });
 
   const sendToExtension = async (result: StoryResult<any>): Promise<void> => {
-    const res = await fetch(`http://127.0.0.1:${extensionPort}/log`, {
+    const res = await fetch(`http://127.0.0.1:${LOG_EXTENSION_PORT}/log`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -185,7 +183,12 @@ export const getLogger = (qpqConfig: QPQConfig): QpqLogger => {
     return noopLogger;
   }
 
-  // Prefer the extension (off-thread) when the deploy attached it; otherwise log
-  // directly to S3.
-  return process.env.QPQ_LOG_EXTENSION_PORT ? getS3LoggerViaExtension(qpqConfig) : getS3Logger(qpqConfig);
+  // instantLogs forces the synchronous direct-to-S3 path, bypassing the extension.
+  if (awsSettings.instantLogs) {
+    return getS3Logger(qpqConfig);
+  }
+
+  // Use the off-response-path extension when running inside a real Lambda (where it
+  // is always attached); otherwise log directly to S3.
+  return process.env.AWS_LAMBDA_RUNTIME_API ? getS3LoggerViaExtension(qpqConfig) : getS3Logger(qpqConfig);
 };
