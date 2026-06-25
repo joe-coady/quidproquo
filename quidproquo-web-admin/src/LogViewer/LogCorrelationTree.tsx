@@ -1,3 +1,5 @@
+import { QpqRuntimeType } from 'quidproquo-core';
+
 import { Fragment, memo, useEffect, useRef, useState } from 'react';
 import { Tree, TreeNodeDatum } from 'react-d3-tree';
 import { Box, CircularProgress } from '@mui/material';
@@ -29,10 +31,20 @@ const renderRectSvgNode =
           ? 'red'
           : 'white'; // Bright red for non-selected errors, white for non-selected non-errors
 
+    // For story runtime types, collapse the runtimeType line away so the generic
+    // info takes its place — other runtime types keep their full label stack.
+    const isStoryRuntimeType =
+      nodeDatum.runtimeType === QpqRuntimeType.EXECUTE_STORY || nodeDatum.runtimeType === QpqRuntimeType.EXECUTE_IMPLEMENTATION_STORY;
+
+    const displayText = (nodeDatum.generic || '').split('::').pop();
+    const textLines = isStoryRuntimeType
+      ? [nodeDatum.moduleName, displayText, nodeDatum.error || '']
+      : [nodeDatum.moduleName, nodeDatum.runtimeType, displayText, nodeDatum.error || ''];
+
     return (
       <g>
         <circle r={10} fill={color} x="10" y="10" onClick={() => setSelectedLogCorrelation(nodeDatum.correlation)} />
-        {[nodeDatum.moduleName, nodeDatum.runtimeType, (nodeDatum.generic || '').split('::').pop(), nodeDatum.error || '']
+        {textLines
           .filter((t) => !!t)
           .map((text, i) => {
             const x = 0;
