@@ -92,6 +92,45 @@ export const getLogger = (qpqConfig: QPQConfig): QpqLogger => {
   const logs: Promise<void>[] = [];
   let disabledLogCorrelations: string[] = [];
 
+  // When the qpq-log-extension layer is attached, the deploy sets this env var.
+  // We then hand the log to the extension (a fast local POST) instead of awaiting
+  // the S3 PutObject, so the function response is not blocked on S3.
+  const extensionPort = process.env.QPQ_LOG_EXTENSION_PORT;
+
+  const sendToExtension = async (result: StoryResult<any>): Promise<void> => {
+    const res = await fetch(`http://127.0.0.1:${extensionPort}/log`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        bucketName,
+        region: regionForBucket,
+        key: `${result.correlation}.json`,
+        body: JSON.stringify(result),
+        storageClass: 'INTELLIGENT_TIERING',
+      }),
+    });
+
+    if (!res.ok) {
+      throw new Error(`extension responded ${res.status}`);
+    }
+  };
+
+  const writeLog = async (result: StoryResult<any>): Promise<void> => {
+    if (!extensionPort) {
+      await storyLogger(result, bucketName, s3Client);
+      return;
+    }
+
+    // Extension present: hand off the log; fall back to direct S3 if it is
+    // unreachable so we never silently drop a log.
+    try {
+      await sendToExtension(result);
+    } catch (error) {
+      console.log(`qpq-log-extension unreachable, writing [${result.correlation}] to S3 directly:`, error);
+      await storyLogger(result, bucketName, s3Client);
+    }
+  };
+
   return {
     enableLogs: async (enable: boolean, reason: string, correlation: string) => {
       if (!enable) {
@@ -117,7 +156,7 @@ export const getLogger = (qpqConfig: QPQConfig): QpqLogger => {
                 ]),
               };
 
-          await storyLogger(modifyableResult, bucketName, s3Client);
+          await writeLog(modifyableResult);
         })
         .catch((e) => {
           console.log('Failed to log story result to S3', JSON.stringify(e, null, 2));

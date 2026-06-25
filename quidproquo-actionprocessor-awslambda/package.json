@@ -12,10 +12,11 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "npx rimraf lib && npx rimraf node_modules",
-    "build": "npm run clean && npm run build:esm && npm run build:cjs",
+    "build": "npm run clean && npm run build:esm && npm run build:cjs && npm run build:extension",
     "watch": "tsc -p tsconfig.esm.json -w",
     "build:cjs": "tsc -p tsconfig.commonjs.json",
     "build:esm": "tsc -p tsconfig.esm.json",
+    "build:extension": "node scripts/buildLogExtensionLayer.mjs",
     "lint": "npx eslint .",
     "lint:fix": "npx eslint . --fix",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\""
@@ -69,6 +70,7 @@
     "@types/jsonwebtoken": "^9.0.2",
     "@types/lodash": "^4.14.194",
     "@types/node": "^22.13.13",
+    "esbuild": "^0.25.8",
     "quidproquo-tsconfig": "0.0.263",
     "typescript": "^5.8.2"
   }
