@@ -91,8 +91,14 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
       cors: [
         {
           allowedOrigins: ['*'],
-          allowedMethods: [aws_s3.HttpMethods.GET, aws_s3.HttpMethods.HEAD],
+          allowedMethods: [
+            aws_s3.HttpMethods.GET,
+            aws_s3.HttpMethods.HEAD,
+            aws_s3.HttpMethods.PUT,
+            aws_s3.HttpMethods.POST,
+          ],
           allowedHeaders: ['*'],
+          exposedHeaders: ['ETag'],
         },
       ],
 
