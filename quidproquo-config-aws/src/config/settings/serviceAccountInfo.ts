@@ -13,6 +13,7 @@ export interface QPQConfigAdvancedAwsServiceAccountInfoSettings extends QPQConfi
   disableLambdaWarming?: boolean;
   disableReservedConcurrency?: boolean;
   disableTracing?: boolean;
+  instantLogs?: boolean;
 }
 
 export interface AwsServiceAccountInfoQPQConfigSetting extends QPQConfigSetting {
@@ -30,6 +31,7 @@ export interface AwsServiceAccountInfoQPQConfigSetting extends QPQConfigSetting 
   disableLambdaWarming: boolean;
   disableReservedConcurrency: boolean;
   disableTracing: boolean;
+  instantLogs: boolean;
 }
 
 export const defineAwsServiceAccountInfo = (
@@ -56,4 +58,5 @@ export const defineAwsServiceAccountInfo = (
   disableLambdaWarming: !!options?.disableLambdaWarming,
   disableReservedConcurrency: !!options?.disableReservedConcurrency,
   disableTracing: !!options?.disableTracing,
+  instantLogs: !!options?.instantLogs,
 });
