@@ -12,7 +12,3 @@ import path from 'path';
 export const getLogExtensionLayerPath = (): string => {
   return path.resolve(__dirname, '..', '..', 'extension-layer');
 };
-
-// The localhost port the function handler uses to talk to the extension.
-// Set as an env var on every function so the handler knows the extension is present.
-export const QPQ_LOG_EXTENSION_PORT = '9009';

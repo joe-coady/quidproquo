@@ -24,11 +24,13 @@
 import { createServer, IncomingMessage, ServerResponse } from 'http';
 import { PutObjectCommand, PutObjectCommandInput, S3Client } from '@aws-sdk/client-s3';
 
+import { LOG_EXTENSION_PORT } from '../logExtensionPort';
+
 const EXTENSION_NAME = 'qpq-log-extension';
 const API_VERSION = '2020-01-01';
 
-// The handler talks to us here. Keep in sync with the QPQ_LOG_EXTENSION_PORT env var.
-const HTTP_PORT = parseInt(process.env.QPQ_LOG_EXTENSION_PORT || '9009', 10);
+// The handler talks to us here. Hardcoded on both ends — see logExtensionPort.ts.
+const HTTP_PORT = LOG_EXTENSION_PORT;
 
 // host:port of the Lambda Extensions/Runtime API. Always present in a real Lambda.
 const RUNTIME_API = process.env.AWS_LAMBDA_RUNTIME_API;
