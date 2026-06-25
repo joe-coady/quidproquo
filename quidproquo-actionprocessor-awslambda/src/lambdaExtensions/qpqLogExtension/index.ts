@@ -1,20 +1,22 @@
 /**
  * qpq-log-extension
  *
- * An external AWS Lambda extension that ships story-result logs to S3 OFF the
- * function's response path.
+ * External AWS Lambda extension that ships story-result logs to S3 OFF the
+ * function's response path, without ever writing user data to disk.
  *
- * How it works:
- *  1. Registers with the Lambda Extensions API (INVOKE + SHUTDOWN events).
- *  2. Runs a tiny HTTP server on 127.0.0.1:<port>. The function handler POSTs a
- *     log payload to it (cheap, ~1ms) instead of awaiting the S3 PutObject.
- *  3. The PutObject is started immediately and runs in the background. Because
- *     of the 2021 Lambda change, the function response is returned to the caller
- *     as soon as the handler completes -- it does NOT wait for the extension. So
- *     the S3 write happens after the caller already has its response.
- *  4. On each INVOKE we drain in-flight writes (bounds memory / billed duration),
- *     and on SHUTDOWN we drain everything so nothing buffered is lost when the
- *     execution environment is torn down.
+ *  - The handler POSTs a log to us (cheap, ~1ms) instead of awaiting S3. Per AWS
+ *    the response is returned to the caller as soon as the runtime finishes; it
+ *    does not wait for this extension.
+ *  - We hold the payload in process MEMORY only -- never /tmp or disk, which is
+ *    shared across the sandbox and would be a place other code could read user
+ *    data from. Memory is isolated and discarded on teardown.
+ *  - We ship to S3 with bounded retries + backoff, so transient errors/throttling
+ *    don't drop a log.
+ *  - We flush on every INVOKE (clears backlog while CPU is hot) and on SHUTDOWN
+ *    (last chance before SIGKILL; AWS sends SHUTDOWN even on crash/timeout).
+ *
+ * Accepted residual: if this process is hard-killed with logs still queued, or S3
+ * is down through the whole shutdown window, those logs are lost.
  *
  * Authored in TS, bundled to a single CJS file by scripts/buildLogExtensionLayer.mjs.
  */
@@ -31,12 +33,22 @@ const HTTP_PORT = parseInt(process.env.QPQ_LOG_EXTENSION_PORT || '9009', 10);
 // host:port of the Lambda Extensions/Runtime API. Always present in a real Lambda.
 const RUNTIME_API = process.env.AWS_LAMBDA_RUNTIME_API;
 
-// Allows the local harness to point the S3 client at a fake endpoint.
+// Lets the local harness point the S3 client at a fake endpoint.
 const S3_ENDPOINT = process.env.QPQ_LOG_EXTENSION_S3_ENDPOINT || undefined;
 
-const log = (...args: any[]) => console.log(`[${EXTENSION_NAME}]`, ...args);
+// Optional artificial delay before each PutObject, for testing slow writes. Off
+// (0) by default so production is never slowed.
+const TEST_DELAY_MS = parseInt(process.env.QPQ_LOG_EXTENSION_TEST_DELAY_MS || '0', 10);
 
-type LogPayload = {
+// Bounded retries so a flush can't run away and stays within the ~2s shutdown
+// window. Backoff is attempt^2 * base.
+const MAX_SHIP_ATTEMPTS = 3;
+const RETRY_BASE_MS = 100;
+
+const log = (...args: any[]) => console.log(`[${EXTENSION_NAME}]`, ...args);
+const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+type LogEnvelope = {
   bucketName: string;
   region: string;
   key: string;
@@ -58,38 +70,76 @@ const getS3Client = (region: string): S3Client => {
   return client;
 };
 
-// In-flight S3 writes. Drained on INVOKE and SHUTDOWN.
-const inFlight = new Set<Promise<void>>();
+// --- In-memory queue ------------------------------------------------------
+// Logs awaiting a successful ship. Keyed by S3 key so a retried log can't be
+// queued twice. Held in memory only -- never persisted to disk.
+const pending = new Map<string, LogEnvelope>();
 
-const shipToS3 = (payload: LogPayload): Promise<void> => {
-  const client = getS3Client(payload.region);
+const shipEnvelope = async (envelope: LogEnvelope): Promise<boolean> => {
+  const client = getS3Client(envelope.region);
 
-  const promise = client
-    .send(
-      new PutObjectCommand({
-        Bucket: payload.bucketName,
-        Key: payload.key,
-        Body: payload.body,
-        StorageClass: payload.storageClass ?? 'INTELLIGENT_TIERING',
-      }),
-    )
-    .then(() => {
-      log(`shipped ${payload.key} -> ${payload.bucketName}`);
-    })
-    .catch((error) => {
-      log(`failed to ship ${payload.key}:`, error?.message || error);
-    })
-    .finally(() => {
-      inFlight.delete(promise);
-    });
-
-  inFlight.add(promise);
-  return promise;
+  for (let attempt = 1; attempt <= MAX_SHIP_ATTEMPTS; attempt++) {
+    try {
+      if (TEST_DELAY_MS > 0) await sleep(TEST_DELAY_MS);
+      await client.send(
+        new PutObjectCommand({
+          Bucket: envelope.bucketName,
+          Key: envelope.key,
+          Body: envelope.body,
+          StorageClass: envelope.storageClass ?? 'INTELLIGENT_TIERING',
+        }),
+      );
+      return true;
+    } catch (error: any) {
+      if (attempt === MAX_SHIP_ATTEMPTS) {
+        log(`failed to ship ${envelope.key} after ${attempt} attempts:`, error?.message || error);
+        return false;
+      }
+      await sleep(RETRY_BASE_MS * attempt * attempt);
+    }
+  }
+  return false;
 };
 
-const drain = async (): Promise<void> => {
-  if (inFlight.size === 0) return;
-  await Promise.all([...inFlight]);
+// Single-flight, but every caller awaits TRUE completion: while a flush runs,
+// flush() returns that same in-flight promise (and flags a re-scan), so
+// `await flush()` never resolves with a ship still outstanding. That is what
+// makes the SHUTDOWN drain safe -- process.exit must not run mid-write.
+let activeFlush: Promise<void> | null = null;
+let rerun = false;
+
+const runFlushLoop = async (): Promise<void> => {
+  // Yield once so `activeFlush = runFlushLoop()` is assigned before this body can
+  // reach its finally; otherwise an empty (synchronous) run would null
+  // activeFlush before the assignment, leaving a stale resolved promise.
+  await Promise.resolve();
+  try {
+    do {
+      rerun = false;
+      // Ship the whole snapshot concurrently -- logs are independent and a
+      // backlog must drain within the short shutdown window. The queue is
+      // bounded by traffic between flushes, so this stays small.
+      await Promise.all(
+        [...pending.values()].map(async (envelope) => {
+          if (await shipEnvelope(envelope)) {
+            pending.delete(envelope.key);
+            log(`shipped ${envelope.key} -> ${envelope.bucketName}`);
+          }
+          // On failure leave it queued; the next flush retries it.
+        }),
+      );
+    } while (rerun);
+  } finally {
+    activeFlush = null;
+  }
+};
+
+const flush = (): Promise<void> => {
+  rerun = true; // ensure an in-flight loop re-scans for anything queued mid-run
+  if (!activeFlush) {
+    activeFlush = runFlushLoop();
+  }
+  return activeFlush;
 };
 
 // --- Extensions API -------------------------------------------------------
@@ -134,31 +184,36 @@ const nextEvent = async (extensionId: string): Promise<any> => {
 
 // --- Local HTTP server (handler -> extension) -----------------------------
 
-const startHttpServer = (): Promise<void> => {
-  return new Promise((resolve) => {
-    const server = createServer((req: IncomingMessage, res: ServerResponse) => {
+const readBody = (req: IncomingMessage): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const chunks: Buffer[] = [];
+    req.on('data', (c) => chunks.push(c));
+    req.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
+    req.on('error', reject);
+  });
+
+const startHttpServer = (): Promise<void> =>
+  new Promise((resolve) => {
+    const server = createServer(async (req: IncomingMessage, res: ServerResponse) => {
       if (req.method === 'POST' && req.url === '/log') {
-        const chunks: Buffer[] = [];
-        req.on('data', (c) => chunks.push(c));
-        req.on('end', () => {
-          try {
-            const payload = JSON.parse(Buffer.concat(chunks).toString('utf8')) as LogPayload;
-            // Start the S3 write immediately, ack the handler right away.
-            shipToS3(payload);
-            res.writeHead(202, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ queued: true }));
-          } catch (error: any) {
-            log('bad /log payload:', error?.message || error);
-            res.writeHead(400);
-            res.end();
-          }
-        });
+        try {
+          const envelope = JSON.parse(await readBody(req)) as LogEnvelope;
+          // Queue in memory and ack immediately; ship in the background.
+          pending.set(envelope.key, envelope);
+          res.writeHead(202, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ queued: true }));
+          void flush();
+        } catch (error: any) {
+          log('bad /log payload:', error?.message || error);
+          res.writeHead(400);
+          res.end();
+        }
         return;
       }
 
       if (req.method === 'GET' && req.url === '/health') {
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ ok: true, inFlight: inFlight.size }));
+        res.end(JSON.stringify({ ok: true, pending: pending.size }));
         return;
       }
 
@@ -171,7 +226,6 @@ const startHttpServer = (): Promise<void> => {
       resolve();
     });
   });
-};
 
 // --- Main loop ------------------------------------------------------------
 
@@ -183,22 +237,20 @@ const main = async (): Promise<void> => {
   await startHttpServer();
   const extensionId = await register();
 
-   
   while (true) {
     const event = await nextEvent(extensionId);
 
     if (event?.eventType === 'SHUTDOWN') {
-      log('shutdown received, draining', inFlight.size, 'writes');
-      await drain();
-      log('drained, exiting');
-      // The HTTP server keeps the event loop alive; exit explicitly so the
-      // process terminates promptly once we have flushed.
+      log('shutdown received, flushing', pending.size, 'queued log(s)');
+      await flush();
+      log('flush complete, exiting');
+      // The HTTP server keeps the event loop alive; exit explicitly.
       process.exit(0);
     }
 
-    // INVOKE: flush anything queued so far. Adds to billed duration, not to the
-    // caller's response latency.
-    await drain();
+    // INVOKE: flush the queue while we have CPU. Adds to billed duration, not to
+    // the caller's response latency.
+    await flush();
   }
 };
 

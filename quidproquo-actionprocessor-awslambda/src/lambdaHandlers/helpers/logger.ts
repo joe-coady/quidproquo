@@ -64,38 +64,90 @@ export const moveLogsToPerminateStorage = async (bucketName: string, region: str
   }
 };
 
-export const getLogger = (qpqConfig: QPQConfig): QpqLogger => {
-  const awsSettings = getAwsServiceAccountInfoConfig(qpqConfig);
+const noopLogger: QpqLogger = {
+  enableLogs: async () => {},
+  log: () => {},
+  waitToFinishWriting: async () => {},
+  moveToPermanentStorage: async () => {},
+};
 
-  // If we have no log service, just return nothing.
-  if (!awsSettings.logServiceName || awsSettings.disableLogs || process.env.storageDriveName === QPQ_LOGS_STORAGE_DRIVE_NAME) {
-    return {
-      enableLogs: async () => {},
-      log: () => {},
-      waitToFinishWriting: async () => {},
-      moveToPermanentStorage: async () => {},
-    };
-  }
-
-  const service = awsSettings.logServiceName;
+// Resolves which S3 bucket (and its region) story logs go to for this config.
+const resolveLogTarget = (qpqConfig: QPQConfig): { bucketName: string; regionForBucket: string } => {
+  const service = getAwsServiceAccountInfoConfig(qpqConfig).logServiceName!;
   const application = qpqCoreUtils.getApplicationName(qpqConfig);
   const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
   const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
 
-  // Workout the bucket name.
   const bucketName = getConfigRuntimeResourceName(QPQ_LOGS_STORAGE_DRIVE_NAME, application, service, environment, feature);
-
-  // Where is this bucket?
   const regionForBucket = getAwsServiceAccountInfoByDeploymentInfo(qpqConfig, service, environment, feature, application).awsRegion;
 
-  const s3Client = new S3Client({ region: regionForBucket });
+  return { bucketName, regionForBucket };
+};
+
+// Shared plumbing for both loggers: defers each log to a microtask, applies the
+// disabled-correlation history filter, and tracks the promises so
+// waitToFinishWriting can await them. Only `ship` (how a log reaches S3) differs.
+const createBufferedLogger = (bucketName: string, regionForBucket: string, ship: (result: StoryResult<any>) => Promise<void>): QpqLogger => {
   const logs: Promise<void>[] = [];
   let disabledLogCorrelations: string[] = [];
 
-  // When the qpq-log-extension layer is attached, the deploy sets this env var.
-  // We then hand the log to the extension (a fast local POST) instead of awaiting
-  // the S3 PutObject, so the function response is not blocked on S3.
+  return {
+    enableLogs: async (enable: boolean, reason: string, correlation: string) => {
+      disabledLogCorrelations = enable
+        ? disabledLogCorrelations.filter((dlc) => dlc !== correlation)
+        : [...disabledLogCorrelations, correlation];
+    },
+
+    log: (result: StoryResult<any>) => {
+      // Defer all work (including JSON.stringify) to a microtask so the caller is not blocked.
+      const promise = Promise.resolve()
+        .then(() => {
+          const modifyableResult = !disabledLogCorrelations.includes(result.correlation)
+            ? result
+            : {
+                ...result,
+                history: filterLogHistoryByActionTypes(result.history, [
+                  LogActionType.Create,
+                  LogActionType.TemplateLiteral,
+                  LogActionType.DisableEventHistory,
+                ]),
+              };
+
+          return ship(modifyableResult);
+        })
+        .catch((e) => {
+          console.log('Failed to log story result to S3', JSON.stringify(e, null, 2));
+        });
+
+      logs.push(promise);
+    },
+
+    waitToFinishWriting: async () => {
+      await Promise.all(logs);
+    },
+
+    moveToPermanentStorage: async () => {
+      await moveLogsToPerminateStorage(bucketName, regionForBucket);
+    },
+  };
+};
+
+// Logs straight to S3: the handler awaits the PutObject itself. Simple and fully
+// durable, but the invoke waits on S3. No extension required.
+export const getS3Logger = (qpqConfig: QPQConfig): QpqLogger => {
+  const { bucketName, regionForBucket } = resolveLogTarget(qpqConfig);
+  const s3Client = new S3Client({ region: regionForBucket });
+
+  return createBufferedLogger(bucketName, regionForBucket, (result) => storyLogger(result, bucketName, s3Client));
+};
+
+// Logs via the qpq-log-extension: a fast local HTTP POST hands the log off so the
+// response is not blocked on S3. Falls back to a direct S3 write if the extension
+// is unreachable, so a log is never silently dropped.
+export const getS3LoggerViaExtension = (qpqConfig: QPQConfig): QpqLogger => {
+  const { bucketName, regionForBucket } = resolveLogTarget(qpqConfig);
   const extensionPort = process.env.QPQ_LOG_EXTENSION_PORT;
+  const s3Client = new S3Client({ region: regionForBucket });
 
   const sendToExtension = async (result: StoryResult<any>): Promise<void> => {
     const res = await fetch(`http://127.0.0.1:${extensionPort}/log`, {
@@ -115,62 +167,25 @@ export const getLogger = (qpqConfig: QPQConfig): QpqLogger => {
     }
   };
 
-  const writeLog = async (result: StoryResult<any>): Promise<void> => {
-    if (!extensionPort) {
-      await storyLogger(result, bucketName, s3Client);
-      return;
-    }
-
-    // Extension present: hand off the log; fall back to direct S3 if it is
-    // unreachable so we never silently drop a log.
+  return createBufferedLogger(bucketName, regionForBucket, async (result) => {
     try {
       await sendToExtension(result);
     } catch (error) {
       console.log(`qpq-log-extension unreachable, writing [${result.correlation}] to S3 directly:`, error);
       await storyLogger(result, bucketName, s3Client);
     }
-  };
+  });
+};
 
-  return {
-    enableLogs: async (enable: boolean, reason: string, correlation: string) => {
-      if (!enable) {
-        disabledLogCorrelations = [...disabledLogCorrelations, correlation];
-      } else {
-        disabledLogCorrelations = disabledLogCorrelations.filter((dlc) => dlc !== correlation);
-      }
-    },
+export const getLogger = (qpqConfig: QPQConfig): QpqLogger => {
+  const awsSettings = getAwsServiceAccountInfoConfig(qpqConfig);
 
-    log: (result: StoryResult<any>) => {
-      // Defer all work (including JSON.stringify) to a microtask so the caller is not blocked.
-      // The promise is tracked in `logs` and awaited by waitToFinishWriting at the end.
-      const promise = Promise.resolve()
-        .then(async () => {
-          const modifyableResult = !disabledLogCorrelations.includes(result.correlation)
-            ? result
-            : {
-                ...result,
-                history: filterLogHistoryByActionTypes(result.history, [
-                  LogActionType.Create,
-                  LogActionType.TemplateLiteral,
-                  LogActionType.DisableEventHistory,
-                ]),
-              };
+  // If we have no log service, just return nothing.
+  if (!awsSettings.logServiceName || awsSettings.disableLogs || process.env.storageDriveName === QPQ_LOGS_STORAGE_DRIVE_NAME) {
+    return noopLogger;
+  }
 
-          await writeLog(modifyableResult);
-        })
-        .catch((e) => {
-          console.log('Failed to log story result to S3', JSON.stringify(e, null, 2));
-        });
-
-      logs.push(promise);
-    },
-
-    waitToFinishWriting: async () => {
-      await Promise.all(logs);
-    },
-
-    moveToPermanentStorage: async () => {
-      await moveLogsToPerminateStorage(bucketName, regionForBucket);
-    },
-  };
+  // Prefer the extension (off-thread) when the deploy attached it; otherwise log
+  // directly to S3.
+  return process.env.QPQ_LOG_EXTENSION_PORT ? getS3LoggerViaExtension(qpqConfig) : getS3Logger(qpqConfig);
 };
