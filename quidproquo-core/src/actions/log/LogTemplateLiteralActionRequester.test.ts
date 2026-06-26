@@ -1,0 +1,29 @@
+import { describe, expect, it } from 'vitest';
+
+import { captureRequester } from '../../testing';
+import { LogActionType } from './LogActionType';
+import { askLogTemplateLiteral } from './LogTemplateLiteralActionRequester';
+
+describe('askLogTemplateLiteral', () => {
+  it('yields a TemplateLiteral action splitting strings and variables into messageParts', () => {
+    const { action } = captureRequester(askLogTemplateLiteral`user ${'alice'} did ${'login'}`);
+
+    expect(action).toEqual({
+      type: LogActionType.TemplateLiteral,
+      payload: {
+        messageParts: [['user ', ' did ', ''], ['alice', 'login']],
+      },
+    });
+  });
+
+  it('yields an empty variables list when there are no interpolations', () => {
+    const { action } = captureRequester(askLogTemplateLiteral`static message`);
+
+    expect(action).toEqual({
+      type: LogActionType.TemplateLiteral,
+      payload: {
+        messageParts: [['static message'], []],
+      },
+    });
+  });
+});
