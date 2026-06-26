@@ -9,6 +9,7 @@ export * from "./qpqCoreUtilsLib";
 export * from './qpqExecuteLog';
 export * from './runtime';
 export * from './stories';
+export * from './testing';
 export * from './types';
 export * from './utils';
 export * from './validators';
