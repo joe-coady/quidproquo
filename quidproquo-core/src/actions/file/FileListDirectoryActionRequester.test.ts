@@ -1,0 +1,79 @@
+import { describe, expect, it } from 'vitest';
+
+import { captureRequester, runStory } from '../../testing';
+import { FileActionType, FileInfo } from './FileActionType';
+import { askFileListAllDirectory, askFileListDirectory } from './FileListDirectoryActionRequester';
+import { FileListDirectoryAction } from './FileListDirectoryActionTypes';
+
+describe('askFileListDirectory', () => {
+  it('yields a ListDirectory action carrying the drive, folder, page token and max files', () => {
+    const { action } = captureRequester(askFileListDirectory('drive', 'folder', 50, 'next'));
+
+    expect(action).toEqual({
+      type: FileActionType.ListDirectory,
+      payload: { drive: 'drive', folderPath: 'folder', pageToken: 'next', maxFiles: 50 },
+    });
+  });
+
+  it('defaults maxFiles to 1000 and leaves the page token undefined when omitted', () => {
+    const { action } = captureRequester(askFileListDirectory('drive', 'folder'));
+
+    expect(action.payload).toEqual({ drive: 'drive', folderPath: 'folder', pageToken: undefined, maxFiles: 1000 });
+  });
+
+  it('returns the value the runtime resolves', () => {
+    const directoryInfo = { fileInfos: [], pageToken: undefined };
+    const { returned } = captureRequester(askFileListDirectory('drive', 'folder'), directoryInfo);
+
+    expect(returned).toBe(directoryInfo);
+  });
+});
+
+describe('askFileListAllDirectory', () => {
+  const file = (filepath: string): FileInfo => ({ filepath, drive: 'drive', isDir: false });
+
+  it('accumulates file infos across pages until the page token runs out', () => {
+    const pages: Record<string, { fileInfos: FileInfo[]; pageToken?: string }> = {
+      first: { fileInfos: [file('a'), file('b')], pageToken: 'p2' },
+      p2: { fileInfos: [file('c')], pageToken: 'p3' },
+      p3: { fileInfos: [file('d')], pageToken: undefined },
+    };
+
+    let cursor = 'first';
+    const result = runStory(askFileListAllDirectory('drive', 'folder'), {
+      [FileActionType.ListDirectory]: () => {
+        const page = pages[cursor];
+        cursor = page.pageToken ?? 'done';
+        return page;
+      },
+    });
+
+    expect(result).toEqual([file('a'), file('b'), file('c'), file('d')]);
+  });
+
+  it('forwards the previous page token on each follow-up request', () => {
+    const tokens: (string | undefined)[] = [];
+    const pages: { fileInfos: FileInfo[]; pageToken?: string }[] = [
+      { fileInfos: [file('a')], pageToken: 'next' },
+      { fileInfos: [file('b')], pageToken: undefined },
+    ];
+
+    let index = 0;
+    runStory(askFileListAllDirectory('drive', 'folder'), {
+      [FileActionType.ListDirectory]: (action: FileListDirectoryAction) => {
+        tokens.push(action.payload.pageToken);
+        return pages[index++];
+      },
+    });
+
+    expect(tokens).toEqual([undefined, 'next']);
+  });
+
+  it('returns a single page of files when there is no page token', () => {
+    const result = runStory(askFileListAllDirectory('drive', 'folder'), {
+      [FileActionType.ListDirectory]: { fileInfos: [file('only')], pageToken: undefined },
+    });
+
+    expect(result).toEqual([file('only')]);
+  });
+});

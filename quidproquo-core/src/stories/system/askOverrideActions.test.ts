@@ -204,7 +204,7 @@ describe('askOverrideActions', () => {
     });
 
     it('yields multiple non-overridden actions in sequence', () => {
-      function* story(): AskResponse<[number, number, string]> {
+      function* story(): AskResponse<[number, string, string]> {
         const r = yield* askRandomNumber();
         const d = yield* askDateNow();
         const g = yield* askNewGuid();
@@ -335,7 +335,7 @@ describe('askOverrideActions', () => {
     });
 
     it('override result feeds back to story correctly, story continues', () => {
-      function* story(): AskResponse<{ random: number; date: number }> {
+      function* story(): AskResponse<{ random: number; date: string }> {
         const random = yield* askRandomNumber();
         const date = yield* askDateNow();
         return { random, date };
@@ -360,7 +360,7 @@ describe('askOverrideActions', () => {
     });
 
     it('mixed overridden and non-overridden actions across multiple yields', () => {
-      function* story(): AskResponse<[number, number, string]> {
+      function* story(): AskResponse<[number, string, string]> {
         const r = yield* askRandomNumber(); // overridden
         const d = yield* askDateNow(); // passthrough
         const g = yield* askNewGuid(); // overridden
@@ -486,7 +486,7 @@ describe('askOverrideActions', () => {
 
   describe('batch scenarios', () => {
     it('batch with no overrides passes all actions to runtime', () => {
-      function* story(): AskResponse<[number, number]> {
+      function* story(): AskResponse<[number, string]> {
         return yield* askRunParallel([askRandomNumber(), askDateNow()]);
       }
 
@@ -499,7 +499,7 @@ describe('askOverrideActions', () => {
     });
 
     it('batch with all actions overridden handles everything internally', () => {
-      function* story(): AskResponse<[number, number]> {
+      function* story(): AskResponse<[number, string]> {
         return yield* askRunParallel([askRandomNumber(), askDateNow()]);
       }
 
@@ -526,7 +526,7 @@ describe('askOverrideActions', () => {
     });
 
     it('mixed batch: some overridden, some passthrough — correct order', () => {
-      function* story(): AskResponse<[number, number]> {
+      function* story(): AskResponse<[number, string]> {
         return yield* askRunParallel([askRandomNumber(), askDateNow()]);
       }
 
@@ -546,7 +546,7 @@ describe('askOverrideActions', () => {
     });
 
     it('three-way batch with middle one overridden', () => {
-      function* story(): AskResponse<[number, number, string]> {
+      function* story(): AskResponse<[number, string, string]> {
         return yield* askRunParallel([askRandomNumber(), askDateNow(), askNewGuid()]);
       }
 
@@ -565,7 +565,7 @@ describe('askOverrideActions', () => {
     });
 
     it('batch runtime failure without returnErrors triggers askThrowError', () => {
-      function* story(): AskResponse<[number, number]> {
+      function* story(): AskResponse<[number, string]> {
         return yield* askRunParallel([askRandomNumber(), askDateNow()]);
       }
 
@@ -591,7 +591,7 @@ describe('askOverrideActions', () => {
     });
 
     it('batch runtime failure with returnErrors passes error back to story', () => {
-      function* story(): AskResponse<EitherActionResult<[number, number]>> {
+      function* story(): AskResponse<EitherActionResult<[number, string]>> {
         return yield* askCatch(askRunParallel([askRandomNumber(), askDateNow()]));
       }
 
@@ -660,7 +660,7 @@ describe('askOverrideActions', () => {
     });
 
     it('askCatch + askRunParallel + partial override', () => {
-      function* story(): AskResponse<EitherActionResult<[number, number]>> {
+      function* story(): AskResponse<EitherActionResult<[number, string]>> {
         return yield* askCatch(askRunParallel([askRandomNumber(), askDateNow()]));
       }
 
@@ -679,7 +679,7 @@ describe('askOverrideActions', () => {
     });
 
     it('askCatch + askRunParallel + all overridden', () => {
-      function* story(): AskResponse<EitherActionResult<[number, number, string]>> {
+      function* story(): AskResponse<EitherActionResult<[number, string, string]>> {
         return yield* askCatch(
           askRunParallel([askRandomNumber(), askDateNow(), askNewGuid()]),
         );
@@ -710,11 +710,11 @@ describe('askOverrideActions', () => {
 
   describe('nested batch scenarios', () => {
     it('batch containing a nested batch with overridden inner actions', () => {
-      function* innerStory(): AskResponse<[number, number]> {
+      function* innerStory(): AskResponse<[number, string]> {
         return yield* askRunParallel([askRandomNumber(), askDateNow()]);
       }
 
-      function* story(): AskResponse<[[number, number], string]> {
+      function* story(): AskResponse<[[number, string], string]> {
         return yield* askRunParallel([innerStory(), askNewGuid()]);
       }
 
@@ -737,11 +737,11 @@ describe('askOverrideActions', () => {
         return yield* askRandomNumber();
       }
 
-      function* level2(): AskResponse<[number, number]> {
+      function* level2(): AskResponse<[number, string]> {
         return yield* askRunParallel([level1(), askDateNow()]);
       }
 
-      function* story(): AskResponse<[[number, number], string]> {
+      function* story(): AskResponse<[[number, string], string]> {
         return yield* askRunParallel([level2(), askNewGuid()]);
       }
 
@@ -760,11 +760,11 @@ describe('askOverrideActions', () => {
     });
 
     it('nested batch with all actions overridden at every level', () => {
-      function* innerStory(): AskResponse<[number, number]> {
+      function* innerStory(): AskResponse<[number, string]> {
         return yield* askRunParallel([askRandomNumber(), askDateNow()]);
       }
 
-      function* story(): AskResponse<[[number, number], string]> {
+      function* story(): AskResponse<[[number, string], string]> {
         return yield* askRunParallel([innerStory(), askNewGuid()]);
       }
 
@@ -789,11 +789,11 @@ describe('askOverrideActions', () => {
     });
 
     it('nested batch with askCatch at every level', () => {
-      function* innerStory(): AskResponse<EitherActionResult<[number, number]>> {
+      function* innerStory(): AskResponse<EitherActionResult<[number, string]>> {
         return yield* askCatch(askRunParallel([askRandomNumber(), askDateNow()]));
       }
 
-      function* story(): AskResponse<EitherActionResult<[EitherActionResult<[number, number]>, string]>> {
+      function* story(): AskResponse<EitherActionResult<[EitherActionResult<[number, string]>, string]>> {
         return yield* askCatch(askRunParallel([innerStory(), askNewGuid()]));
       }
 
@@ -819,7 +819,7 @@ describe('askOverrideActions', () => {
 
   describe('wildcard behavior', () => {
     it('wildcard does NOT intercept batch actions', () => {
-      function* story(): AskResponse<[number, number]> {
+      function* story(): AskResponse<[number, string]> {
         return yield* askRunParallel([askRandomNumber(), askDateNow()]);
       }
 
@@ -840,11 +840,11 @@ describe('askOverrideActions', () => {
     });
 
     it('wildcard catches actions inside nested batches', () => {
-      function* innerStory(): AskResponse<[number, number]> {
+      function* innerStory(): AskResponse<[number, string]> {
         return yield* askRunParallel([askRandomNumber(), askDateNow()]);
       }
 
-      function* story(): AskResponse<[[number, number], string]> {
+      function* story(): AskResponse<[[number, string], string]> {
         return yield* askRunParallel([innerStory(), askNewGuid()]);
       }
 
@@ -866,7 +866,7 @@ describe('askOverrideActions', () => {
     });
 
     it('specific overrides take priority over wildcard inside batches', () => {
-      function* story(): AskResponse<[number, number, string]> {
+      function* story(): AskResponse<[number, string, string]> {
         return yield* askRunParallel([askRandomNumber(), askDateNow(), askNewGuid()]);
       }
 
@@ -941,7 +941,7 @@ describe('askOverrideActions', () => {
     });
 
     it('wildcard does NOT catch batch but specific batch override does', () => {
-      function* story(): AskResponse<[number, number]> {
+      function* story(): AskResponse<[number, string]> {
         return yield* askRunParallel([askRandomNumber(), askDateNow()]);
       }
 
@@ -959,7 +959,7 @@ describe('askOverrideActions', () => {
       expect(wildResult).toEqual(['wild', 'wild']);
 
       // Specific batch override: intercepts the batch itself
-      function* story2(): AskResponse<[number, number]> {
+      function* story2(): AskResponse<[number, string]> {
         return yield* askRunParallel([askRandomNumber(), askDateNow()]);
       }
 
@@ -1034,7 +1034,7 @@ describe('askOverrideActions', () => {
 
     it('chained overrides work when story yields multiple actions', () => {
       // Overrides DO intercept actions yielded directly by the story
-      function* story(): AskResponse<[number, number]> {
+      function* story(): AskResponse<[number, string]> {
         const random = yield* askRandomNumber(); // overridden
         const date = yield* askDateNow(); // also overridden
         return [random, date];
@@ -1087,11 +1087,11 @@ describe('askOverrideActions', () => {
     });
 
     it('askCatch wrapping askOverrideActions with parallel + nested + failure', () => {
-      function* innerStory(): AskResponse<[number, number]> {
+      function* innerStory(): AskResponse<[number, string]> {
         return yield* askRunParallel([askRandomNumber(), askDateNow()]);
       }
 
-      function* story(): AskResponse<EitherActionResult<[[number, number], string]>> {
+      function* story(): AskResponse<EitherActionResult<[[number, string], string]>> {
         return yield* askCatch(askRunParallel([innerStory(), askNewGuid()]));
       }
 
@@ -1115,9 +1115,9 @@ describe('askOverrideActions', () => {
       // Second: failure case (DateNow fails)
       // When DateNow fails inside a nested batch without its own askCatch,
       // the error propagates as askThrowError, which the outer askCatch should catch
-      function* story2(): AskResponse<EitherActionResult<[[number, number], string]>> {
+      function* story2(): AskResponse<EitherActionResult<[[number, string], string]>> {
         return yield* askCatch(askRunParallel([
-          (function* (): AskResponse<[number, number]> {
+          (function* (): AskResponse<[number, string]> {
             return yield* askRunParallel([askRandomNumber(), askDateNow()]);
           })(),
           askNewGuid(),
@@ -1152,7 +1152,7 @@ describe('askOverrideActions', () => {
       }
 
       // Outer override intercepts DateNow, inner override intercepts Random
-      function* story(): AskResponse<[number, number]> {
+      function* story(): AskResponse<[string, number]> {
         const date = yield* askDateNow();
         const random = yield* askOverrideActions(innerStory(), {
           [MathActionType.RandomNumber]: function* () {
