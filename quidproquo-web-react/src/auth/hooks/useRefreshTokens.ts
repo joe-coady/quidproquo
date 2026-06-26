@@ -2,10 +2,15 @@ import { AuthenticationInfo } from 'quidproquo-core';
 
 import { useEffect } from 'react';
 
+import { useFastCallback } from '../../hooks/useFastCallback';
+
 export const useRefreshTokens = (
   authenticationInfo: AuthenticationInfo | undefined,
   refreshTokens: (authenticationInfo: AuthenticationInfo) => Promise<any>,
 ) => {
+
+  const stableRefreshTokens = useFastCallback(refreshTokens);
+
   const refresh = () => {
     if (authenticationInfo && authenticationInfo.refreshToken && authenticationInfo.expiresAt) {
       const now = new Date().toISOString();
@@ -17,11 +22,11 @@ export const useRefreshTokens = (
 
       if (refreshTime > 0) {
         return setTimeout(() => {
-          refreshTokens(authenticationInfo);
+          stableRefreshTokens(authenticationInfo);
         }, refreshTime);
       } else {
         // If the token is already expired or very close to expiration, refresh immediately
-        refreshTokens(authenticationInfo);
+        stableRefreshTokens(authenticationInfo);
       }
     }
 
@@ -37,5 +42,11 @@ export const useRefreshTokens = (
         clearTimeout(timerId);
       }
     };
-  }, [authenticationInfo, refreshTokens]);
+    // Key on the stable primitives that actually drive a refresh, not the
+    // authenticationInfo object itself. Callers commonly derive that object
+    // fresh on every render (e.g. an unmemoized selector), so depending on its
+    // reference would re-run this effect every render — and when the token is
+    // expired/near-expiry the "refresh immediately" branch would then fire a
+    // network refresh on every render, an unbounded loop.
+  }, [authenticationInfo?.expiresAt, authenticationInfo?.refreshToken]);
 };
