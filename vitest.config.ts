@@ -9,6 +9,9 @@ const packagesToSkip = [
 
 export default defineConfig({
   test: {
+    // Hide console output from passing tests (the library logs on expected error paths),
+    // but keep it for failing tests so debugging output is never lost.
+    silent: 'passed-only',
     projects: packageJson.workspaces.filter(
       (workspace: string) => !packagesToSkip.includes(workspace)
     ),
