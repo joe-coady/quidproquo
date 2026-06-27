@@ -52,6 +52,11 @@ export const apiImplementation = async (devServerConfig: ResolvedDevServerConfig
 
   app.use(bodyParser.json({ limit: '50mb' }));
 
+  // Keep form-urlencoded bodies as the raw string so they reach handlers verbatim — exactly
+  // as API Gateway delivers them. Parsing to an object would be re-serialised as JSON below
+  // (see the `event.body` assignment), which urlencoded handlers (e.g. OAuth /token) can't read.
+  app.use(bodyParser.text({ type: 'application/x-www-form-urlencoded', limit: '50mb' }));
+
   const apiConfigs = allServiceConfig.map((qpqConfig) => getApiDomainsFromConfig(qpqConfig, devServerConfig)).flat();
 
   console.log(apiConfigs.map((ac) => ac.devPath));
