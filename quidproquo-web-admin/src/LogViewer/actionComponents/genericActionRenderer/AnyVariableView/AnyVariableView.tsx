@@ -28,30 +28,79 @@ type VariableViewProps = {
   hideStringQuotes?: boolean;
 };
 
-export const StringVariableView = ({ value, expanded, hideStringQuotes }: VariableViewProps) => {
+// Try to parse a string as JSON. We reject bare numbers so that plain numeric
+// strings (which JSON.parse happily accepts) keep rendering as strings.
+const tryParseJson = (text: string): { ok: true; value: any } | { ok: false } => {
   try {
-    const jsonValue = JSON.parse(value);
-    if (typeof jsonValue === 'number') {
-      throw new Error('Not a JSON string');
+    const value = JSON.parse(text);
+    if (typeof value === 'number') {
+      return { ok: false };
     }
+    return { ok: true, value };
+  } catch {
+    return { ok: false };
+  }
+};
 
+// base64 decoding succeeds on plenty of random strings, so the JSON parse below
+// is what actually makes this specific - it only matches if the string is BOTH
+// valid base64 AND decodes to valid JSON.
+const base64Pattern = /^[A-Za-z0-9+/]+={0,2}$/;
+
+const tryDecodeBase64 = (text: string): string | undefined => {
+  // Cheap structural gate: canonical base64 uses only this charset and its length
+  // is a multiple of 4. This also skips obvious non-base64 (anything with {, ", spaces).
+  if (text.length === 0 || text.length % 4 !== 0 || !base64Pattern.test(text)) {
+    return undefined;
+  }
+
+  try {
+    const decoded = atob(text);
+    // Round-trip to reject non-canonical base64 that atob would otherwise accept.
+    if (btoa(decoded) !== text) {
+      return undefined;
+    }
+    return decoded;
+  } catch {
+    return undefined;
+  }
+};
+
+export const StringVariableView = ({ value, expanded, hideStringQuotes }: VariableViewProps) => {
+  const asJson = tryParseJson(value);
+  if (asJson.ok) {
     return (
       <>
         <span style={genericFunctionRendererStyles.jsonComment}>
           {'<'}json{'>'}
         </span>
-        <AnyVariableView value={jsonValue} expanded={expanded} />
+        <AnyVariableView value={asJson.value} expanded={expanded} />
       </>
     );
-  } catch {
-    const trimmedValue = value.length > 25 && !expanded ? `${value.slice(0, 25)}...` : value;
-
-    if (hideStringQuotes) {
-      return <span style={genericFunctionRendererStyles.stringValue}>{trimmedValue}</span>;
-    }
-
-    return <span style={genericFunctionRendererStyles.stringValue}>"{trimmedValue}"</span>;
   }
+
+  const decoded = tryDecodeBase64(value);
+  if (decoded !== undefined) {
+    const asBase64Json = tryParseJson(decoded);
+    if (asBase64Json.ok) {
+      return (
+        <>
+          <span style={genericFunctionRendererStyles.jsonComment}>
+            {'<'}base64-json{'>'}
+          </span>
+          <AnyVariableView value={asBase64Json.value} expanded={expanded} />
+        </>
+      );
+    }
+  }
+
+  const trimmedValue = value.length > 25 && !expanded ? `${value.slice(0, 25)}...` : value;
+
+  if (hideStringQuotes) {
+    return <span style={genericFunctionRendererStyles.stringValue}>{trimmedValue}</span>;
+  }
+
+  return <span style={genericFunctionRendererStyles.stringValue}>"{trimmedValue}"</span>;
 };
 
 export const ArrayVariableView = ({ value, expanded }: VariableViewProps) => {
