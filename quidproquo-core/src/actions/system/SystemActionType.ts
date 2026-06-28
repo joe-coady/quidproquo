@@ -7,6 +7,7 @@
 export enum SystemActionType {
   Batch = '@quidproquo-core/System/Batch',
   ExecuteStory = '@quidproquo-core/System/ExecuteStory',
+  GetRuntimeCorrelation = '@quidproquo-core/System/GetRuntimeCorrelation',
 
   // This isn't needed as its just a hybrid runtime method for SystemBatch
   // RunParallel = '@quidproquo-core/System/RunParallel',
