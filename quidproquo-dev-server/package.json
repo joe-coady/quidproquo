@@ -11,7 +11,7 @@
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "clean": "npx rimraf lib && npx rimraf node_modules",
+    "clean": "npx rimraf lib",
     "build": "npm run clean && npm run build:esm && npm run build:cjs",
     "watch": "tsc -p tsconfig.commonjs.json -w",
     "build:cjs": "tsc -p tsconfig.commonjs.json",
@@ -32,8 +32,10 @@
   },
   "homepage": "https://github.com/joe-coady/quidproquo#readme",
   "dependencies": {
+    "body-parser": "^1.20.3",
     "chalk": "^4.1.2",
     "chokidar": "^4.0.3",
+    "express": "^4.21.2",
     "multer": "^1.4.5-lts.1",
     "quidproquo-actionprocessor-awslambda": "0.0.263",
     "quidproquo-actionprocessor-js": "0.0.263",
@@ -45,8 +47,10 @@
     "ws": "^8.18.0"
   },
   "devDependencies": {
+    "@types/express": "^4.17.21",
     "@types/multer": "^1.4.12",
     "@types/sqlite3": "^3.1.11",
+    "@types/ws": "^8.18.1",
     "quidproquo-tsconfig": "0.0.263",
     "typescript": "^5.8.2"
   }

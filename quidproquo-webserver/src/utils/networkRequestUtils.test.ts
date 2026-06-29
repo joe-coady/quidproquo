@@ -66,6 +66,16 @@ describe('executeNetworkRequest', () => {
     });
   });
 
+  it('preserves the basePath path segment when joining a root-absolute endpoint', async () => {
+    fetchMock.mockResolvedValue(fakeResponse({ body: { ok: true } }));
+
+    await executeNetworkRequest(
+      buildPayload({ basePath: 'http://localhost:8080/api/template', url: '/v1/templates', params: undefined }),
+    );
+
+    expect(fetchMock.mock.calls[0][0]).toBe('http://localhost:8080/api/template/v1/templates');
+  });
+
   it.each([
     ['POST'],
     ['PUT'],

@@ -1,64 +1,76 @@
-# Quidproquo Web Logs - WIP - Not for production
+# quidproquo-web-admin — WIP, not for production
 
-Welcome to Quidproquo Web Logs, an interface for viewing logs that happen in your server! This project is part of the Quidproquo platform, which
-deploys web servers to AWS but is platform independent.
+A React admin UI for Quidproquo backends — log viewing, config inspection, and
+auth, wired to your deployed QPQ services.
 
-## Features
+This package is a **React component library**, not a standalone app. It ships
+dual CommonJS/ESM builds (plus type declarations) compiled with `tsc`. There is
+no bundler — you import `<App />` into your own host application and build/serve
+it however you like. React (`>=18.3.1`) is a peer dependency, so the host owns
+the React instance.
 
-With Quidproquo Web Logs, you can:
+## Install
 
-- View a list of logs.
-- Filter logs by date and time.
-- Search logs by keyword.
-- View detailed information for each log entry.
-
-## Technologies Used
-
-Quidproquo Web Logs is built using React, a popular JavaScript library for building user interfaces. It uses Axios for making HTTP requests to the
-server and Moment.js for parsing and formatting dates.
-
-## Installation
-
-To install Quidproquo Web Logs, follow these steps:
-
-1. Clone this repository to your local machine.
-2. Navigate to the project directory.
-3. Run `npm install` to install the required dependencies.
-4. Run `npm start` to start the development server.
+```bash
+npm install quidproquo-web-admin
+```
 
 ## Usage
 
-To use Quidproquo Web Logs, follow these steps:
+Mount `<App />`, telling it how to resolve the URLs of your deployed QPQ
+services:
 
-1. Open your web browser and navigate to the URL of the Quidproquo Web Logs interface.
-2. Log in with your Quidproquo credentials.
-3. Select the web server whose logs you want to view.
-4. Use the date and time filters to narrow down the list of logs.
-5. Use the search bar to search for logs by keyword.
-6. Click on a log entry to view detailed information about it.
+```tsx
+import { App } from 'quidproquo-web-admin';
+import { BaseUrlResolvers } from 'quidproquo-web-react';
+import { createRoot } from 'react-dom/client';
 
-## Contributing
+const urlResolvers: BaseUrlResolvers = {
+  getApiUrl: () => 'https://api.example.com',
+  getWsUrl: () => 'wss://ws.example.com',
+};
 
-If you'd like to contribute to Quidproquo Web Logs, please follow these steps:
+createRoot(document.getElementById('root')!).render(<App urlResolvers={urlResolvers} />);
+```
 
-1. Fork this repository to your own GitHub account.
-2. Clone your forked repository to your local machine.
-3. Make your changes and test them locally.
-4. Push your changes to your forked repository on GitHub.
-5. Submit a pull request to the original repository.
+## Addons
+
+The admin UI can be extended with addon tabs. `quidproquo-web-admin` does not
+own the loading mechanism — the host application supplies a `loadAddons`
+function (module federation, dynamic `import()`, a static array, whatever you
+like), and the admin renders whatever addons it returns.
+
+```tsx
+import { App, createAddon, LoadFederatedAddons } from 'quidproquo-web-admin';
+
+const MyTab = () => <div>Hello from an addon</div>;
+
+const loadAddons: LoadFederatedAddons = async ({ baseUrlResolvers, accessToken }) => [
+  createAddon('My Tab', MyTab),
+];
+
+<App urlResolvers={urlResolvers} loadAddons={loadAddons} />;
+```
+
+When `loadAddons` is omitted, no addons are loaded.
+
+## Build
+
+```bash
+# from the repo root
+npm run build -w quidproquo-web-admin
+```
+
+This runs `tsc` twice, emitting:
+
+- `lib/esm` — ES modules (`module`, `types`)
+- `lib/commonjs` — CommonJS (`main`)
+
+```bash
+# watch ESM during development
+npm run watch -w quidproquo-web-admin
+```
 
 ## License
 
-Quidproquo Web Logs is licensed under the MIT License. See `LICENSE` for more information.
-
-## Acknowledgments
-
-- The Quidproquo team for their support and feedback.
-
-### Note
-
-Currently under development ~ Not for production
-
-### References
-
-https://levelup.gitconnected.com/full-guide-start-react-app-from-scratch-2e1579ac6868
+MIT

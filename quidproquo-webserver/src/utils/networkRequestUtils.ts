@@ -16,8 +16,20 @@ const unsupportedMethods: HTTPMethod[] = ['CONNECT'];
 // Methods that must not carry a request body.
 const bodylessMethods: HTTPMethod[] = ['GET', 'HEAD'];
 
+// Matches axios' isAbsoluteURL: protocol (http:) or protocol-relative (//host).
+const isAbsoluteUrl = (url: string): boolean => /^([a-z][a-z\d+\-.]*:)?\/\//i.test(url);
+
+// Join basePath + url like axios' combineURLs (path concatenation), NOT URL
+// resolution. `new URL('/v1/x', 'http://host/api/svc')` drops the base path
+// because a leading-slash url is root-absolute; we want '.../api/svc/v1/x'.
+const combineUrls = (basePath: string, url: string): string =>
+  url ? `${basePath.replace(/\/+$/, '')}/${url.replace(/^\/+/, '')}` : basePath;
+
 const buildRequestUrl = (payload: NetworkRequestActionPayload<any>): string => {
-  const url = payload.basePath ? new URL(payload.url, payload.basePath) : new URL(payload.url);
+  const fullUrl =
+    payload.basePath && !isAbsoluteUrl(payload.url) ? combineUrls(payload.basePath, payload.url) : payload.url;
+
+  const url = new URL(fullUrl);
 
   Object.entries(payload.params || {}).forEach(([key, value]) => {
     url.searchParams.append(key, value);
