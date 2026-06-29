@@ -27,6 +27,12 @@ describe('aiStreamPartMappers', () => {
       { type: AiStreamPartType.File, file: { base64: 'AAA', mediaType: 'image/png' } },
     ],
     [
+      'reasoning-file',
+      { type: 'reasoning-file', file: { base64: 'BBB', mediaType: 'application/octet-stream' } },
+      { type: AiStreamPartType.ReasoningFile, file: { base64: 'BBB', mediaType: 'application/octet-stream' } },
+    ],
+    ['custom', { type: 'custom', kind: 'provider.event' }, { type: AiStreamPartType.Custom, kind: 'provider.event' }],
+    [
       'source',
       { type: 'source', sourceType: 'url', id: 's1', url: 'http://x', title: 't', mediaType: 'text/html', filename: 'f' },
       {
@@ -67,6 +73,11 @@ describe('aiStreamPartMappers', () => {
       'tool-approval-request',
       { type: 'tool-approval-request', approvalId: 'a1', toolCall: { toolCallId: 'c1', toolName: 'calc', input: { a: 1 } } },
       { type: AiStreamPartType.ToolApprovalRequest, approvalId: 'a1', toolCallId: 'c1', toolName: 'calc', input: { a: 1 } },
+    ],
+    [
+      'tool-approval-response',
+      { type: 'tool-approval-response', approvalId: 'a1', approved: true, reason: 'ok', toolCall: { toolCallId: 'c1', toolName: 'calc', input: { a: 1 } } },
+      { type: AiStreamPartType.ToolApprovalResponse, approvalId: 'a1', toolCallId: 'c1', toolName: 'calc', approved: true, reason: 'ok' },
     ],
   ])('maps a %s part', (type: string, part: unknown, expected: unknown) => {
     const mapper = aiStreamPartMappers[type as keyof typeof aiStreamPartMappers] as (p: unknown) => unknown;

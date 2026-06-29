@@ -2,6 +2,7 @@ import { AiStreamPart } from 'quidproquo-core';
 
 import { AiSdkStreamPart, AiSdkStreamPartOfType } from '../types';
 import { mapAiStreamAbort } from './mapAiStreamAbort';
+import { mapAiStreamCustom } from './mapAiStreamCustom';
 import { mapAiStreamError } from './mapAiStreamError';
 import { mapAiStreamFilePart } from './mapAiStreamFilePart';
 import { mapAiStreamFinish } from './mapAiStreamFinish';
@@ -9,6 +10,7 @@ import { mapAiStreamFinishStep } from './mapAiStreamFinishStep';
 import { mapAiStreamRaw } from './mapAiStreamRaw';
 import { mapAiStreamReasoningDelta } from './mapAiStreamReasoningDelta';
 import { mapAiStreamReasoningEnd } from './mapAiStreamReasoningEnd';
+import { mapAiStreamReasoningFilePart } from './mapAiStreamReasoningFilePart';
 import { mapAiStreamReasoningStart } from './mapAiStreamReasoningStart';
 import { mapAiStreamSourcePart } from './mapAiStreamSourcePart';
 import { mapAiStreamStart } from './mapAiStreamStart';
@@ -17,6 +19,7 @@ import { mapAiStreamTextDelta } from './mapAiStreamTextDelta';
 import { mapAiStreamTextEnd } from './mapAiStreamTextEnd';
 import { mapAiStreamTextStart } from './mapAiStreamTextStart';
 import { mapAiStreamToolApprovalRequest } from './mapAiStreamToolApprovalRequest';
+import { mapAiStreamToolApprovalResponse } from './mapAiStreamToolApprovalResponse';
 import { mapAiStreamToolCall } from './mapAiStreamToolCall';
 import { mapAiStreamToolError } from './mapAiStreamToolError';
 import { mapAiStreamToolInputDelta } from './mapAiStreamToolInputDelta';
@@ -39,6 +42,8 @@ export const aiStreamPartMappers: AiStreamPartMappers = {
   'raw': mapAiStreamRaw,
   'source': mapAiStreamSourcePart,
   'file': mapAiStreamFilePart,
+  'reasoning-file': mapAiStreamReasoningFilePart,
+  'custom': mapAiStreamCustom,
   'text-start': mapAiStreamTextStart,
   'text-end': mapAiStreamTextEnd,
   'text-delta': mapAiStreamTextDelta,
@@ -53,4 +58,5 @@ export const aiStreamPartMappers: AiStreamPartMappers = {
   'tool-error': mapAiStreamToolError,
   'tool-output-denied': mapAiStreamToolOutputDenied,
   'tool-approval-request': mapAiStreamToolApprovalRequest,
+  'tool-approval-response': mapAiStreamToolApprovalResponse,
 };
