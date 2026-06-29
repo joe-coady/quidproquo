@@ -5,6 +5,7 @@ assembled quickly.
 
 ## vNext
 
+- `generateUUID` is removed from `quidproquo-webserver`. Use `generateUuid` from `quidproquo-core` instead (same v4 UUID, note the lowercase `uuid`).
 - `QpqLogger.log` in `quidproquo-core` now returns `void` instead of `Promise<void>` — it fires the write off in the background. If you awaited or chained on `logger.log(result)`, drop the `await`/`.then` and call `logger.waitToFinishWriting()` when you need to know writes have flushed.
 - `QPQ_LOG_EXTENSION_PORT` is removed from `quidproquo-actionprocessor-awslambda`. The log-extension port is now hardcoded internally on both ends — delete any import of it.
 - `askRespondToAuthChallenge(username, challenge, session, newPassword)` in `quidproquo-webserver` is now `askRespondToAuthChallenge(authChallenge: AnyAuthChallenge)`. Pass a single challenge object, e.g. `{ challenge: AuthenticateUserChallenge.NEW_PASSWORD_REQUIRED, username, session, newPassword }`.

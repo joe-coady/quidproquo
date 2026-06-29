@@ -1,6 +1,4 @@
-import { EventBusActionType, QPQConfig, qpqCoreUtils, QpqFunctionRuntime, QpqRuntimeType, QueueActionType } from 'quidproquo-core';
-
-import { v4 as uuidV4 } from 'uuid';
+import { EventBusActionType, generateUuid, QPQConfig, qpqCoreUtils, QpqFunctionRuntime, QpqRuntimeType, QueueActionType } from 'quidproquo-core';
 
 import { getQueueEventProcessor } from '../actionProcessor/core/event/queue';
 import { AnyQueueMessageWithSession } from '../actionProcessor/core/event/queue/types';
@@ -110,7 +108,7 @@ const processQueueEventBusSubscriptions = async (qpqConfig: QPQConfig, ebMessage
       targetFeature: queue.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
       targetModule: queue.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig),
 
-      messageId: uuidV4(),
+      messageId: generateUuid(),
     };
 
     // console.log(JSON.stringify(queueMessage, null, 2));

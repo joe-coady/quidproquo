@@ -5,3 +5,4 @@ export * from './logs';
 export * from './mimeTypes';
 export * from './path';
 export * from './types';
+export * from './uuid';

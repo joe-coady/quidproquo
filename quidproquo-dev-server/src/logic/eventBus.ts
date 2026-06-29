@@ -1,6 +1,7 @@
 // EventBus.ts
+import { generateUuid } from 'quidproquo-core';
+
 import { EventEmitter } from 'events';
-import { v4 as uuidv4 } from 'uuid';
 
 class EventBus extends EventEmitter {
   private static instance: EventBus;
@@ -18,7 +19,7 @@ class EventBus extends EventEmitter {
 
   public async publishAndWaitForResponse(eventType: string, payload: any): Promise<any> {
     return new Promise((resolve) => {
-      const responseCorrelation = uuidv4();
+      const responseCorrelation = generateUuid();
 
       // Listen for the response once
       this.once(responseCorrelation, (response) => {

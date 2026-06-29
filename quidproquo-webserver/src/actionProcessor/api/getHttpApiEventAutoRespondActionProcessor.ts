@@ -4,6 +4,7 @@ import {
   actionResult,
   EventActionType,
   EventAutoRespondActionProcessor,
+  generateUuid,
   getProcessCustomImplementation,
   MatchStoryResult,
   QPQConfig,
@@ -13,7 +14,6 @@ import { RouteOptions } from '../../config/settings/route';
 import { askValidateRouteAuth, ValidateRouteAuthPayload } from '../../stories/askValidateRouteAuth';
 import { HTTPEvent, HTTPEventResponse } from '../../types/HTTPEvent';
 import { getCorsHeaders } from '../../utils/headerUtils';
-import { generateUUID } from '../../utils/uuidUtils';
 
 type InternalMatchResult = MatchStoryResult<any, RouteOptions>;
 
@@ -24,7 +24,7 @@ const getProcessAutoRespond = (qpqConfig: QPQConfig): EventAutoRespondActionProc
     'API Auth Validation',
     null,
     () => new Date().toISOString(),
-    generateUUID,
+    generateUuid,
   );
 
   return async ({ qpqEventRecord, matchResult }, session, actionProcessorList, logger, updateSession, dynamicModuleLoader) => {
