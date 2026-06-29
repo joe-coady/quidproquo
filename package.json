@@ -11,6 +11,7 @@
     "publish": "npm publish --ws",
     "patch": "npm version patch --ws && npx tsx ./scripts/applyPatch.ts",
     "go": "npm run patch && npm run build && npm run publish",
+    "validate": "npm run lint && npm run build && npm run test && npm run test:types",
     "lint": "npm run lint --ws",
     "lint:fix": "npm run lint:fix --ws",
     "format": "npm run format --ws",

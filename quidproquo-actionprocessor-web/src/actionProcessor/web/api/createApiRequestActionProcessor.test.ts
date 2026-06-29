@@ -7,8 +7,8 @@ import { createApiRequestActionProcessor, getApiRequestActionProcessor } from '.
 
 const preformNetworkRequest = vi.hoisted(() => vi.fn());
 
-vi.mock('quidproquo-web', async (importOriginal: <T>() => Promise<T>) => ({
-  ...(await importOriginal<typeof import('quidproquo-web')>()),
+vi.mock('quidproquo-webserver', async (importOriginal: <T>() => Promise<T>) => ({
+  ...(await importOriginal<typeof import('quidproquo-webserver')>()),
   preformNetworkRequest,
 }));
 

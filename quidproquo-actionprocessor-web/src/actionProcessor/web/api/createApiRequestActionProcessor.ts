@@ -1,5 +1,6 @@
 import { ActionProcessorList, ActionProcessorListResolver, actionResult } from 'quidproquo-core';
-import { ApiActionType, ApiRequestActionProcessor, preformNetworkRequest } from 'quidproquo-web';
+import { ApiActionType, ApiRequestActionProcessor } from 'quidproquo-web';
+import { preformNetworkRequest } from 'quidproquo-webserver';
 
 export interface ApiRequestActionProcessorOptions {
   // Resolve the base url for a given service. The default ignores the service name

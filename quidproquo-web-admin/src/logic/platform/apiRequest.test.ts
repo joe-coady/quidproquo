@@ -2,15 +2,11 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { apiRequestGet, apiRequestPost, externalRequestGet } from './apiRequest';
 
-const get = vi.fn();
-const post = vi.fn();
-const create = vi.fn(() => ({ get, post }));
+const { preformNetworkRequest } = vi.hoisted(() => ({ preformNetworkRequest: vi.fn() }));
 
-vi.mock('axios', () => ({
-  default: {
-    create: (...args: unknown[]) => create(...args),
-  },
-}));
+vi.mock('quidproquo-webserver', () => ({ preformNetworkRequest }));
+
+const okResponse = (data: unknown) => ({ headers: {}, status: 200, statusText: 'OK', data });
 
 afterEach(() => {
   vi.clearAllMocks();
@@ -18,28 +14,40 @@ afterEach(() => {
 
 describe('apiRequestPost', () => {
   it('posts the body and returns the response data', async () => {
-    post.mockResolvedValue({ data: { ok: true } });
+    preformNetworkRequest.mockResolvedValue(okResponse({ ok: true }));
 
     const result = await apiRequestPost('/path', { a: 1 }, 'https://api', 'token');
 
-    expect(create).toHaveBeenCalledWith({
-      baseURL: 'https://api',
+    expect(preformNetworkRequest).toHaveBeenCalledWith({
+      method: 'POST',
+      url: '/path',
+      basePath: 'https://api',
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer token' },
+      body: { a: 1 },
+      responseType: 'json',
     });
-    expect(post).toHaveBeenCalledWith('/path', { a: 1 });
     expect(result).toEqual({ ok: true });
+  });
+
+  it('throws when the response has a non-success status', async () => {
+    preformNetworkRequest.mockResolvedValue({ headers: {}, status: 500, statusText: 'Internal Server Error', data: 'boom' });
+
+    await expect(apiRequestPost('/path', { a: 1 }, 'https://api')).rejects.toThrow();
   });
 });
 
 describe('apiRequestGet', () => {
   it('omits the Authorization header when no token is given', async () => {
-    get.mockResolvedValue({ data: ['x'] });
+    preformNetworkRequest.mockResolvedValue(okResponse(['x']));
 
     const result = await apiRequestGet('/path', 'https://api');
 
-    expect(create).toHaveBeenCalledWith({
-      baseURL: 'https://api',
+    expect(preformNetworkRequest).toHaveBeenCalledWith({
+      method: 'GET',
+      url: '/path',
+      basePath: 'https://api',
       headers: { 'Content-Type': 'application/json' },
+      responseType: 'json',
     });
     expect(result).toEqual(['x']);
   });
@@ -47,12 +55,16 @@ describe('apiRequestGet', () => {
 
 describe('externalRequestGet', () => {
   it('gets the url without a base url', async () => {
-    get.mockResolvedValue({ data: { id: 1 } });
+    preformNetworkRequest.mockResolvedValue(okResponse({ id: 1 }));
 
     const result = await externalRequestGet('https://external/thing');
 
-    expect(create).toHaveBeenCalledWith({ headers: { 'Content-Type': 'application/json' } });
-    expect(get).toHaveBeenCalledWith('https://external/thing');
+    expect(preformNetworkRequest).toHaveBeenCalledWith({
+      method: 'GET',
+      url: 'https://external/thing',
+      headers: { 'Content-Type': 'application/json' },
+      responseType: 'json',
+    });
     expect(result).toEqual({ id: 1 });
   });
 });

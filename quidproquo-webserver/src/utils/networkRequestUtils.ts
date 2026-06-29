@@ -15,15 +15,20 @@ const getAxiosResponseType = (responseType: ResponseType) => {
     return 'arraybuffer';
   }
 
+  if (responseType === 'text') {
+    return 'text';
+  }
+
   return 'json';
 };
 
 const transformResponse = (payload: NetworkRequestActionPayload<any>, response: AxiosResponse<any, any>): AxiosResponse<any, QPQBinaryData> => {
   if (payload.responseType === 'binary') {
     const headers = response.headers || {};
-    const mimeType = headers['content-type'] || 'application/octet-stream';
+    const mimeType = String(headers['content-type'] || 'application/octet-stream');
 
-    const filename = headers['content-disposition']?.match(/filename="([^"]+)"/)?.[1] || `file.${getExtensionForMimeType(getMimeTypeFromContentType(mimeType))}`;
+    const contentDisposition = String(headers['content-disposition'] || '');
+    const filename = contentDisposition.match(/filename="([^"]+)"/)?.[1] || `file.${getExtensionForMimeType(getMimeTypeFromContentType(mimeType))}`;
 
     return {
       ...response,
@@ -142,41 +147,26 @@ const requestMethodMap: Record<HTTPMethod, (payload: NetworkRequestActionPayload
 const convertAxiosHeadersToRecord = (headers: AxiosResponse['headers']): Record<string, string> => {
   const record: Record<string, string> = {};
 
-  Object.keys(headers).forEach((key) => {
-    record[key] = headers[key];
+  Object.keys(headers || {}).forEach((key) => {
+    record[key] = String(headers[key]);
   });
 
   return record;
 };
 
-export const preformNetworkRequest = async <R>(payload: NetworkRequestActionPayload<any>): Promise<HTTPNetworkResponse<R>> => {
+export const executeNetworkRequest = async <R>(payload: NetworkRequestActionPayload<any>): Promise<HTTPNetworkResponse<R>> => {
   const requestMethod = requestMethodMap[payload.method];
 
   if (!requestMethod) {
-    throw new Error(`Request not implemented [payload.method]`);
+    throw new Error(`Request method not implemented [${payload.method}]`);
   }
 
-  try {
-    const response = await requestMethod(payload);
+  const response = await requestMethod(payload);
 
-    const httpNetworkResponse: HTTPNetworkResponse<R> = {
-      headers: convertAxiosHeadersToRecord(response.headers),
-      status: response.status,
-      statusText: response.statusText,
-      data: response.data,
-    };
-
-    return httpNetworkResponse;
-  } catch (err: any) {
-    console.log(err);
-
-    const errorResponse: HTTPNetworkResponse<R> = {
-      headers: {},
-      status: 500,
-      statusText: 'Internal Server Error',
-      data: err.stack,
-    };
-
-    return errorResponse;
-  }
+  return {
+    headers: convertAxiosHeadersToRecord(response.headers),
+    status: response.status,
+    statusText: response.statusText,
+    data: response.data,
+  };
 };

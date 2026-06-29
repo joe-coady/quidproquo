@@ -1,5 +1,5 @@
 import { HTTPNetworkResponse, NetworkRequestActionPayload } from 'quidproquo-core';
-import { preformNetworkRequest } from 'quidproquo-web';
+import { preformNetworkRequest } from 'quidproquo-webserver';
 
 import { useFastCallback } from '../../hooks';
 
