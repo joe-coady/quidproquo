@@ -1,4 +1,5 @@
 import { AiStreamAbort } from './AiStreamAbort';
+import { AiStreamCustom } from './AiStreamCustom';
 import { AiStreamError } from './AiStreamError';
 import { AiStreamFilePart } from './AiStreamFilePart';
 import { AiStreamFinish } from './AiStreamFinish';
@@ -6,6 +7,7 @@ import { AiStreamFinishStep } from './AiStreamFinishStep';
 import { AiStreamRaw } from './AiStreamRaw';
 import { AiStreamReasoningDelta } from './AiStreamReasoningDelta';
 import { AiStreamReasoningEnd } from './AiStreamReasoningEnd';
+import { AiStreamReasoningFilePart } from './AiStreamReasoningFilePart';
 import { AiStreamReasoningStart } from './AiStreamReasoningStart';
 import { AiStreamSourcePart } from './AiStreamSourcePart';
 import { AiStreamStart } from './AiStreamStart';
@@ -14,6 +16,7 @@ import { AiStreamTextDelta } from './AiStreamTextDelta';
 import { AiStreamTextEnd } from './AiStreamTextEnd';
 import { AiStreamTextStart } from './AiStreamTextStart';
 import { AiStreamToolApprovalRequest } from './AiStreamToolApprovalRequest';
+import { AiStreamToolApprovalResponse } from './AiStreamToolApprovalResponse';
 import { AiStreamToolCall } from './AiStreamToolCall';
 import { AiStreamToolError } from './AiStreamToolError';
 import { AiStreamToolInputDelta } from './AiStreamToolInputDelta';
@@ -37,6 +40,8 @@ export type AiStreamPart =
   | AiStreamRaw
   | AiStreamSourcePart
   | AiStreamFilePart
+  | AiStreamReasoningFilePart
+  | AiStreamCustom
   | AiStreamTextStart
   | AiStreamTextEnd
   | AiStreamTextDelta
@@ -50,4 +55,5 @@ export type AiStreamPart =
   | AiStreamToolResult
   | AiStreamToolError
   | AiStreamToolOutputDenied
-  | AiStreamToolApprovalRequest;
+  | AiStreamToolApprovalRequest
+  | AiStreamToolApprovalResponse;

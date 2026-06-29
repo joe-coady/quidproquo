@@ -35,6 +35,12 @@ export enum AiStreamPartType {
   /** The model produced a file artifact (e.g. generated image). */
   File = 'file',
 
+  /** The model produced a reasoning file artifact (e.g. an encrypted reasoning trace). */
+  ReasoningFile = 'reasoning-file',
+
+  /** A provider-specific custom event — identified by `kind`, with no higher-level mapping. */
+  Custom = 'custom',
+
   /** Beginning of a contiguous text block. Pair with `TextEnd` via shared `id`. */
   TextStart = 'text-start',
 
@@ -76,4 +82,7 @@ export enum AiStreamPartType {
 
   /** The model is requesting permission to execute a tool — awaiting approve/deny. */
   ToolApprovalRequest = 'tool-approval-request',
+
+  /** The approve/deny decision for a prior {@link ToolApprovalRequest}. */
+  ToolApprovalResponse = 'tool-approval-response',
 }
