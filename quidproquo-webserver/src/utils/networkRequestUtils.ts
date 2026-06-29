@@ -5,168 +5,110 @@ import {
   HTTPNetworkResponse,
   NetworkRequestActionPayload,
   QPQBinaryData,
-  ResponseType,
 } from 'quidproquo-core';
 
-import axios, { AxiosResponse } from 'axios';
+// Outgoing requests abort after this many milliseconds.
+const REQUEST_TIMEOUT_MS = 25000;
 
-const getAxiosResponseType = (responseType: ResponseType) => {
-  if (responseType === 'binary') {
-    return 'arraybuffer';
-  }
+// fetch cannot issue these methods - mirror the previous "not implemented" behaviour.
+const unsupportedMethods: HTTPMethod[] = ['CONNECT'];
 
-  if (responseType === 'text') {
-    return 'text';
-  }
+// Methods that must not carry a request body.
+const bodylessMethods: HTTPMethod[] = ['GET', 'HEAD'];
 
-  return 'json';
+const buildRequestUrl = (payload: NetworkRequestActionPayload<any>): string => {
+  const url = payload.basePath ? new URL(payload.url, payload.basePath) : new URL(payload.url);
+
+  Object.entries(payload.params || {}).forEach(([key, value]) => {
+    url.searchParams.append(key, value);
+  });
+
+  return url.toString();
 };
 
-const transformResponse = (payload: NetworkRequestActionPayload<any>, response: AxiosResponse<any, any>): AxiosResponse<any, QPQBinaryData> => {
-  if (payload.responseType === 'binary') {
-    const headers = response.headers || {};
-    const mimeType = String(headers['content-type'] || 'application/octet-stream');
+const hasHeader = (headers: Record<string, string>, name: string): boolean =>
+  Object.keys(headers).some((key) => key.toLowerCase() === name.toLowerCase());
 
-    const contentDisposition = String(headers['content-disposition'] || '');
+const buildRequestInit = (payload: NetworkRequestActionPayload<any>, signal: AbortSignal): RequestInit => {
+  const headers: Record<string, string> = { ...(payload.headers || {}) };
+
+  let body: string | undefined;
+  if (payload.body !== undefined && !bodylessMethods.includes(payload.method)) {
+    if (typeof payload.body === 'string') {
+      body = payload.body;
+    } else {
+      body = JSON.stringify(payload.body);
+
+      if (!hasHeader(headers, 'content-type')) {
+        headers['Content-Type'] = 'application/json';
+      }
+    }
+  }
+
+  return { method: payload.method, headers, body, signal };
+};
+
+const parseResponseData = async (payload: NetworkRequestActionPayload<any>, response: Response): Promise<any> => {
+  if (payload.responseType === 'binary') {
+    const buffer = Buffer.from(await response.arrayBuffer());
+    const mimeType = response.headers.get('content-type') || 'application/octet-stream';
+
+    const contentDisposition = response.headers.get('content-disposition') || '';
     const filename = contentDisposition.match(/filename="([^"]+)"/)?.[1] || `file.${getExtensionForMimeType(getMimeTypeFromContentType(mimeType))}`;
 
     return {
-      ...response,
-      data: {
-        base64Data: Buffer.from(response.data).toString('base64'),
-        mimetype: mimeType,
-        filename,
-      } as QPQBinaryData,
-    };
+      base64Data: buffer.toString('base64'),
+      mimetype: mimeType,
+      filename,
+    } as QPQBinaryData;
   }
 
-  return response;
+  const text = await response.text();
+
+  if (payload.responseType === 'text') {
+    return text;
+  }
+
+  // json
+  if (!text) {
+    return undefined;
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return text;
+  }
 };
 
-const axiosInstance = axios.create({
-  timeout: 25000,
-  headers: {
-    // Fixes: https://github.com/axios/axios/issues/5346
-    'Accept-Encoding': 'gzip,deflate,compress',
-  },
-  validateStatus: () => true,
-});
-
-const processNetworkRequestGet = async (payload: NetworkRequestActionPayload<any>): Promise<AxiosResponse<any, any>> => {
-  const response = await axiosInstance.get(payload.url, {
-    baseURL: payload.basePath,
-    headers: payload.headers,
-    params: payload.params,
-    responseType: getAxiosResponseType(payload.responseType),
-  });
-
-  return transformResponse(payload, response);
-};
-
-const processNetworkRequestPost = async (payload: NetworkRequestActionPayload<any>): Promise<AxiosResponse<any, any>> => {
-  const response = await axiosInstance.post(payload.url, payload.body, {
-    baseURL: payload.basePath,
-    headers: payload.headers,
-    params: payload.params,
-    responseType: getAxiosResponseType(payload.responseType),
-  });
-
-  return transformResponse(payload, response);
-};
-
-const processNetworkRequestDelete = async (payload: NetworkRequestActionPayload<any>): Promise<AxiosResponse<any, any>> => {
-  const response = await axiosInstance.delete(payload.url, {
-    baseURL: payload.basePath,
-    headers: payload.headers,
-    params: payload.params,
-    responseType: getAxiosResponseType(payload.responseType),
-  });
-
-  return transformResponse(payload, response);
-};
-
-const processNetworkRequestHead = async (payload: NetworkRequestActionPayload<any>): Promise<AxiosResponse<any, any>> => {
-  const response = await axiosInstance.head(payload.url, {
-    baseURL: payload.basePath,
-    headers: payload.headers,
-    params: payload.params,
-    responseType: getAxiosResponseType(payload.responseType),
-  });
-
-  return transformResponse(payload, response);
-};
-
-const processNetworkRequestOptions = async (payload: NetworkRequestActionPayload<any>): Promise<AxiosResponse<any, any>> => {
-  const response = await axiosInstance.options(payload.url, {
-    baseURL: payload.basePath,
-    headers: payload.headers,
-    params: payload.params,
-    responseType: getAxiosResponseType(payload.responseType),
-  });
-
-  return transformResponse(payload, response);
-};
-
-const processNetworkRequestPut = async (payload: NetworkRequestActionPayload<any>): Promise<AxiosResponse<any, any>> => {
-  const response = await axiosInstance.put(payload.url, payload.body, {
-    baseURL: payload.basePath,
-    headers: payload.headers,
-    params: payload.params,
-    responseType: getAxiosResponseType(payload.responseType),
-  });
-
-  return transformResponse(payload, response);
-};
-
-const processNetworkRequestPatch = async (payload: NetworkRequestActionPayload<any>): Promise<AxiosResponse<any, any>> => {
-  const response = await axiosInstance.patch(payload.url, payload.body, {
-    baseURL: payload.basePath,
-    headers: payload.headers,
-    params: payload.params,
-    responseType: getAxiosResponseType(payload.responseType),
-  });
-
-  return transformResponse(payload, response);
-};
-
-const processNetworkRequestConnect = async (payload: NetworkRequestActionPayload<any>): Promise<AxiosResponse<any, any>> => {
-  throw new Error('Function not implemented.');
-};
-
-const requestMethodMap: Record<HTTPMethod, (payload: NetworkRequestActionPayload<any>) => Promise<AxiosResponse<any, any>>> = {
-  GET: processNetworkRequestGet,
-  POST: processNetworkRequestPost,
-  DELETE: processNetworkRequestDelete,
-  HEAD: processNetworkRequestHead,
-  OPTIONS: processNetworkRequestOptions,
-  PUT: processNetworkRequestPut,
-  PATCH: processNetworkRequestPatch,
-  CONNECT: processNetworkRequestConnect,
-};
-
-const convertAxiosHeadersToRecord = (headers: AxiosResponse['headers']): Record<string, string> => {
+const headersToRecord = (headers: Headers): Record<string, string> => {
   const record: Record<string, string> = {};
 
-  Object.keys(headers || {}).forEach((key) => {
-    record[key] = String(headers[key]);
+  headers.forEach((value, key) => {
+    record[key] = value;
   });
 
   return record;
 };
 
 export const executeNetworkRequest = async <R>(payload: NetworkRequestActionPayload<any>): Promise<HTTPNetworkResponse<R>> => {
-  const requestMethod = requestMethodMap[payload.method];
-
-  if (!requestMethod) {
+  if (unsupportedMethods.includes(payload.method)) {
     throw new Error(`Request method not implemented [${payload.method}]`);
   }
 
-  const response = await requestMethod(payload);
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
-  return {
-    headers: convertAxiosHeadersToRecord(response.headers),
-    status: response.status,
-    statusText: response.statusText,
-    data: response.data,
-  };
+  try {
+    const response = await fetch(buildRequestUrl(payload), buildRequestInit(payload, controller.signal));
+
+    return {
+      headers: headersToRecord(response.headers),
+      status: response.status,
+      statusText: response.statusText,
+      data: await parseResponseData(payload, response),
+    };
+  } finally {
+    clearTimeout(timeout);
+  }
 };

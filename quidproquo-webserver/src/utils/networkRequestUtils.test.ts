@@ -1,22 +1,31 @@
 import type { HTTPMethod, NetworkRequestActionPayload } from 'quidproquo-core';
 
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { executeNetworkRequest } from './networkRequestUtils';
 
-const axiosInstance = vi.hoisted(() => ({
-  get: vi.fn(),
-  post: vi.fn(),
-  delete: vi.fn(),
-  head: vi.fn(),
-  options: vi.fn(),
-  put: vi.fn(),
-  patch: vi.fn(),
-}));
+const fetchMock = vi.fn();
 
-vi.mock('axios', () => ({
-  default: { create: () => axiosInstance },
-}));
+interface FakeResponseInit {
+  status?: number;
+  statusText?: string;
+  headers?: Record<string, string>;
+  body?: unknown;
+}
+
+// A minimal stand-in for the parts of `Response` the implementation consumes,
+// giving precise control over headers without the real Response auto-populating them.
+const fakeResponse = ({ status = 200, statusText = 'OK', headers = {}, body }: FakeResponseInit) =>
+  ({
+    status,
+    statusText,
+    headers: new Headers(headers),
+    text: async () => (typeof body === 'string' ? body : JSON.stringify(body)),
+    arrayBuffer: async () => {
+      const buffer = Buffer.isBuffer(body) ? body : Buffer.from(String(body));
+      return buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
+    },
+  }) as unknown as Response;
 
 const buildPayload = (overrides: Partial<NetworkRequestActionPayload<any>> = {}): NetworkRequestActionPayload<any> =>
   ({
@@ -29,30 +38,26 @@ const buildPayload = (overrides: Partial<NetworkRequestActionPayload<any>> = {})
     ...overrides,
   }) as NetworkRequestActionPayload<any>;
 
-const okResponse = (overrides: Record<string, any> = {}) => ({
-  headers: { 'content-type': 'application/json' },
-  status: 200,
-  statusText: 'OK',
-  data: { hello: 'world' },
-  ...overrides,
+beforeEach(() => {
+  vi.stubGlobal('fetch', fetchMock);
 });
 
 afterEach(() => {
-  vi.clearAllMocks();
+  vi.unstubAllGlobals();
+  fetchMock.mockReset();
 });
 
 describe('executeNetworkRequest', () => {
-  it('issues a GET with the resolved request config and returns the response fields', async () => {
-    axiosInstance.get.mockResolvedValue(okResponse());
+  it('issues a GET to the resolved url with params and returns the response fields', async () => {
+    fetchMock.mockResolvedValue(fakeResponse({ headers: { 'content-type': 'application/json' }, body: { hello: 'world' } }));
 
     const result = await executeNetworkRequest(buildPayload());
 
-    expect(axiosInstance.get).toHaveBeenCalledWith('/resource', {
-      baseURL: 'https://api.example.com',
-      headers: { authorization: 'token' },
-      params: { page: '1' },
-      responseType: 'json',
-    });
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(url).toBe('https://api.example.com/resource?page=1');
+    expect(init).toMatchObject({ method: 'GET', headers: { authorization: 'token' } });
+    expect(init.body).toBeUndefined();
+
     expect(result).toEqual({
       headers: { 'content-type': 'application/json' },
       status: 200,
@@ -61,56 +66,57 @@ describe('executeNetworkRequest', () => {
     });
   });
 
-  it('normalizes header values to a plain string record', async () => {
-    axiosInstance.get.mockResolvedValue(okResponse({ headers: { 'content-type': 'application/json', 'content-length': 42 } }));
-
-    const result = await executeNetworkRequest(buildPayload());
-
-    expect(result.headers).toEqual({ 'content-type': 'application/json', 'content-length': '42' });
-  });
-
   it.each([
-    ['POST', 'post'],
-    ['PUT', 'put'],
-    ['PATCH', 'patch'],
-  ] as const)('forwards the body for a %s request', async (method: HTTPMethod, fn: 'post' | 'put' | 'patch') => {
-    axiosInstance[fn].mockResolvedValue(okResponse());
+    ['POST'],
+    ['PUT'],
+    ['PATCH'],
+  ] as const)('serializes a json body and sets content-type for a %s request', async (method: HTTPMethod) => {
+    fetchMock.mockResolvedValue(fakeResponse({ body: { ok: true } }));
 
     await executeNetworkRequest(buildPayload({ method, body: { name: 'bob' } }));
 
-    expect(axiosInstance[fn]).toHaveBeenCalledWith('/resource', { name: 'bob' }, expect.objectContaining({ responseType: 'json' }));
+    const [, init] = fetchMock.mock.calls[0];
+    expect(init.method).toBe(method);
+    expect(init.body).toBe(JSON.stringify({ name: 'bob' }));
+    expect(init.headers['Content-Type']).toBe('application/json');
+  });
+
+  it('leaves a string body untouched and does not override an existing content-type', async () => {
+    fetchMock.mockResolvedValue(fakeResponse({ body: { ok: true } }));
+
+    await executeNetworkRequest(buildPayload({ method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: 'raw' }));
+
+    const [, init] = fetchMock.mock.calls[0];
+    expect(init.body).toBe('raw');
+    expect(init.headers['Content-Type']).toBe('text/plain');
   });
 
   it.each([
-    ['DELETE', 'delete'],
-    ['HEAD', 'head'],
-    ['OPTIONS', 'options'],
-  ] as const)('issues a bodyless %s request', async (method: HTTPMethod, fn: 'delete' | 'head' | 'options') => {
-    axiosInstance[fn].mockResolvedValue(okResponse());
+    ['DELETE'],
+    ['HEAD'],
+    ['OPTIONS'],
+  ] as const)('issues a %s request', async (method: HTTPMethod) => {
+    fetchMock.mockResolvedValue(fakeResponse({ body: { ok: true } }));
 
     const result = await executeNetworkRequest(buildPayload({ method }));
 
-    expect(axiosInstance[fn]).toHaveBeenCalledWith('/resource', expect.objectContaining({ responseType: 'json' }));
+    expect(fetchMock.mock.calls[0][1].method).toBe(method);
     expect(result.status).toBe(200);
   });
 
-  it.each([
-    ['binary', 'arraybuffer'],
-    ['text', 'text'],
-    ['json', 'json'],
-  ] as const)('maps the %s response type to the %s axios response type', async (responseType: string, axiosResponseType: string) => {
-    axiosInstance.get.mockResolvedValue(okResponse({ data: Buffer.from('hello'), headers: { 'content-type': 'image/png' } }));
+  it('returns the raw text for a text response type', async () => {
+    fetchMock.mockResolvedValue(fakeResponse({ headers: { 'content-type': 'text/plain' }, body: 'plain text' }));
 
-    await executeNetworkRequest(buildPayload({ responseType: responseType as any }));
+    const result = await executeNetworkRequest(buildPayload({ responseType: 'text' }));
 
-    expect(axiosInstance.get).toHaveBeenCalledWith('/resource', expect.objectContaining({ responseType: axiosResponseType }));
+    expect(result.data).toBe('plain text');
   });
 
   it('decodes a binary response and derives the filename from content-disposition', async () => {
-    axiosInstance.get.mockResolvedValue(
-      okResponse({
-        data: Buffer.from('hello'),
+    fetchMock.mockResolvedValue(
+      fakeResponse({
         headers: { 'content-type': 'image/png', 'content-disposition': 'attachment; filename="pic.png"' },
+        body: Buffer.from('hello'),
       }),
     );
 
@@ -124,7 +130,7 @@ describe('executeNetworkRequest', () => {
   });
 
   it('defaults the mimetype and filename for a binary response without headers', async () => {
-    axiosInstance.get.mockResolvedValue(okResponse({ data: Buffer.from('hello'), headers: {} }));
+    fetchMock.mockResolvedValue(fakeResponse({ body: Buffer.from('hello') }));
 
     const result = await executeNetworkRequest(buildPayload({ responseType: 'binary' }));
     const data = result.data as { mimetype: string; filename: string };
@@ -133,11 +139,22 @@ describe('executeNetworkRequest', () => {
     expect(data.filename.startsWith('file.')).toBe(true);
   });
 
-  it('throws for an unsupported method', async () => {
-    await expect(executeNetworkRequest(buildPayload({ method: 'TRACE' as HTTPMethod }))).rejects.toThrow();
+  it('targets an absolute url when no basePath is given', async () => {
+    fetchMock.mockResolvedValue(fakeResponse({ body: { ok: true } }));
+
+    await executeNetworkRequest(buildPayload({ basePath: undefined, url: 'https://external/thing', params: undefined }));
+
+    expect(fetchMock.mock.calls[0][0]).toBe('https://external/thing');
   });
 
-  it('throws for a CONNECT request', async () => {
+  it('throws for an unsupported CONNECT method', async () => {
     await expect(executeNetworkRequest(buildPayload({ method: 'CONNECT' }))).rejects.toThrow();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('propagates a rejected fetch', async () => {
+    fetchMock.mockRejectedValue(new Error('network down'));
+
+    await expect(executeNetworkRequest(buildPayload())).rejects.toThrow('network down');
   });
 });
