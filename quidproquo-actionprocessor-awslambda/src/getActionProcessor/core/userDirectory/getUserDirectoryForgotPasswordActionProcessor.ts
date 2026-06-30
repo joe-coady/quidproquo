@@ -3,10 +3,13 @@ import {
   ActionProcessorList,
   ActionProcessorListResolver,
   actionResult,
+  actionResultError,
+  actionResultErrorFromCaughtError,
   AuthenticationDeliveryDetails,
   QPQConfig,
   UserDirectoryActionType,
   UserDirectoryForgotPasswordActionProcessor,
+  UserDirectoryForgotPasswordErrorTypeEnum,
 } from 'quidproquo-core';
 
 import { getCFExportNameUserPoolClientIdFromConfig, getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
@@ -24,14 +27,21 @@ const getProcessForgotPassword = (qpqConfig: QPQConfig): UserDirectoryForgotPass
 
     const resolvedUsername = await resolveUsernameByPreferredUsername(userPoolId, region, username);
 
-    const authResponse: AuthenticationDeliveryDetails = await forgotPassword(
-      userPoolId,
-      userPoolClientId,
-      region,
-      resolvedUsername,
-    );
+    try {
+      const authResponse: AuthenticationDeliveryDetails = await forgotPassword(
+        userPoolId,
+        userPoolClientId,
+        region,
+        resolvedUsername,
+      );
 
-    return actionResult(authResponse);
+      return actionResult(authResponse);
+    } catch (error: unknown) {
+      return actionResultErrorFromCaughtError(error, {
+        UserNotFoundException: () => actionResultError(UserDirectoryForgotPasswordErrorTypeEnum.UserNotFound, 'No account found for this user'),
+        LimitExceededException: () => actionResultError(UserDirectoryForgotPasswordErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
+      });
+    }
   };
 };
 

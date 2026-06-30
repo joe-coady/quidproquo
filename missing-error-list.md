@@ -43,6 +43,13 @@ For each `[ ]` item:
      'y', // what y means
    ]
    ```
+   **The enum is the complete catalog of what the action can throw.** Every
+   `actionResultError` in the processor must reference a value on *this* action's
+   enum — **never the generic `ErrorTypeEnum`** (no `ErrorTypeEnum.Conflict`,
+   `.NotFound`, etc.). If a failure needs a generic-sounding name like `Conflict`,
+   add it as a value on the action enum so a reader can look at the enum alone and
+   see every error the action can produce. This includes pre-check / non-`catch`
+   error returns, not just the mapped SDK errors.
 2. **Find every processor for that action** and add the catch mapping. Search the
    processor packages for the action's type
    (`grep -rl "<ActionType>.<X>" quidproquo-actionprocessor-*/src`). An action may
@@ -131,7 +138,7 @@ These processors call AWS / HTTP / external services and can throw named errors.
 - [x] askUserDirectoryConfirmEmailVerification — quidproquo-core/src/actions/userDirectory/UserDirectoryConfirmEmailVerificationActionRequester.ts
 - [x] askUserDirectoryConfirmForgotPassword — quidproquo-core/src/actions/userDirectory/UserDirectoryConfirmForgotPasswordActionRequester.ts
 - [x] askUserDirectoryCreateUser — quidproquo-core/src/actions/userDirectory/UserDirectoryCreateUserActionRequester.ts
-- [ ] askUserDirectoryForgotPassword — quidproquo-core/src/actions/userDirectory/UserDirectoryForgotPasswordActionRequester.ts
+- [x] askUserDirectoryForgotPassword — quidproquo-core/src/actions/userDirectory/UserDirectoryForgotPasswordActionRequester.ts
 - [ ] askUserDirectoryGetUserAttributesByUserId — quidproquo-core/src/actions/userDirectory/UserDirectoryGetUserAttributesByUserIdActionRequester.ts
 - [ ] askUserDirectoryGetUsers — quidproquo-core/src/actions/userDirectory/UserDirectoryGetUsersActionRequester.ts
 - [ ] askUserDirectoryGetUsersByAttribute — quidproquo-core/src/actions/userDirectory/UserDirectoryGetUsersByAttributeActionRequester.ts
