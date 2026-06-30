@@ -1,6 +1,14 @@
+import { createErrorEnumForAction } from '../../types';
 import { AskResponse } from '../../types/StorySession';
 import { FileActionType, FileInfo } from './FileActionType';
 import { FileListDirectoryActionRequester } from './FileListDirectoryActionTypes';
+
+export const FileListDirectoryErrorTypeEnum = createErrorEnumForAction(FileActionType.ListDirectory, [
+  'AccessDenied', // caller lacks permission to list the directory
+  'DirectoryNotFound', // no directory exists at the given folderPath
+  'NotADirectory', // the folderPath points at a file, not a directory
+  'DriveNotFound', // storage drive does not exist
+]);
 
 export function* askFileListDirectory(
   drive: string,
