@@ -112,7 +112,7 @@ These processors call AWS / HTTP / external services and can throw named errors.
 - [x] askFileWriteTextContents — quidproquo-core/src/actions/file/FileWriteTextContentsActionRequester.ts
 
 ### Key-Value Store (DynamoDB)
-- [ ] askKeyValueStoreDelete — quidproquo-core/src/actions/keyValueStore/KeyValueStoreDeleteActionRequester.ts
+- [x] askKeyValueStoreDelete — quidproquo-core/src/actions/keyValueStore/KeyValueStoreDeleteActionRequester.ts
 - [ ] askKeyValueStoreGet — quidproquo-core/src/actions/keyValueStore/KeyValueStoreGetActionRequester.ts
 - [ ] askKeyValueStoreGetAll — quidproquo-core/src/actions/keyValueStore/KeyValueStoreGetAllActionRequester.ts
 - [ ] askKeyValueStoreQuery — quidproquo-core/src/actions/keyValueStore/KeyValueStoreQueryActionRequester.ts

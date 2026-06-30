@@ -1,6 +1,6 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import { ActionProcessorList, ActionProcessorListResolver, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
-import { actionResult, KeyValueStoreActionType, KeyValueStoreDeleteActionProcessor } from 'quidproquo-core';
+import { actionResult, actionResultError, actionResultErrorFromCaughtError, KeyValueStoreActionType, KeyValueStoreDeleteActionProcessor, KeyValueStoreDeleteErrorTypeEnum } from 'quidproquo-core';
 
 import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
 import { deleteItem } from '../../../logic/dynamo';
@@ -12,9 +12,16 @@ const getProcessKeyValueStoreDelete = (qpqConfig: QPQConfig): KeyValueStoreDelet
 
     const storeConfig = qpqCoreUtils.getKeyValueStoreByName(qpqConfig, keyValueStoreName)!;
 
-    await deleteItem(dynamoTableName, region, key, storeConfig.partitionKey.key, sortKey, storeConfig.sortKeys[0]?.key);
+    try {
+      await deleteItem(dynamoTableName, region, key, storeConfig.partitionKey.key, sortKey, storeConfig.sortKeys[0]?.key);
 
-    return actionResult(void 0);
+      return actionResult(void 0);
+    } catch (error: unknown) {
+      return actionResultErrorFromCaughtError(error, {
+        InternalServerError: () => actionResultError(KeyValueStoreDeleteErrorTypeEnum.ServiceUnavailable, 'KVS Service Unavailable'),
+        ResourceNotFoundException: () => actionResultError(KeyValueStoreDeleteErrorTypeEnum.ResourceNotFound, 'KVS Resource Not Found'),
+      });
+    }
   };
 };
 
