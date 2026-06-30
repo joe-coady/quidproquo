@@ -6,6 +6,7 @@ import {
   ErrorTypeEnum,
   FileActionType,
   FileWriteTextContentsActionProcessor,
+  FileWriteTextContentsErrorTypeEnum,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -25,6 +26,9 @@ const getProcessFileWriteTextContents = (
       await fs.writeFile(fullPath, data, 'utf8');
       return actionResult(void 0);
     } catch (error: any) {
+      if (error.code === 'EACCES') {
+        return actionResultError(FileWriteTextContentsErrorTypeEnum.AccessDenied, `Access denied writing file: ${filepath}`);
+      }
       return actionResultError(ErrorTypeEnum.GenericError, `Error writing file: ${error.message}`);
     }
   };
