@@ -10,6 +10,7 @@ import {
   QPQConfig,
 } from 'quidproquo-core';
 
+import { randomUUID } from 'crypto';
 import * as fs from 'fs';
 import { Readable } from 'stream';
 
@@ -39,7 +40,7 @@ const getProcessFileStreamOpen = (
       const isText = encoding === 'text';
       const highWaterMark = chunkSize ?? 65536;
       const readStream = fs.createReadStream(fullPath, isText ? { encoding: 'utf8', highWaterMark } : { highWaterMark });
-      const streamId = `file-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      const streamId = `file-${randomUUID()}`;
 
       const iterator = isText ? textStreamIterator(readStream) : binaryStreamIterator(readStream);
       streamRegistry.register(streamId, iterator);

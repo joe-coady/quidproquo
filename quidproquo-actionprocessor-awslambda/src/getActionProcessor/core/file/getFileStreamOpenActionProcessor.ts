@@ -15,6 +15,7 @@ import {
 import { Readable } from 'stream';
 import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
 
+import { randomGuid } from '../../../awsLambdaUtils';
 import { createAwsClient } from '../../../logic/createAwsClient';
 import { resolveStorageDriveBucketName } from './utils';
 
@@ -58,7 +59,7 @@ const getProcessFileStreamOpen = (qpqConfig: QPQConfig): FileStreamOpenActionPro
         return actionResultError(ErrorTypeEnum.GenericError, `Empty response body for: ${filepath}`);
       }
 
-      const streamId = `s3-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      const streamId = `s3-${randomGuid()}`;
       const isText = encoding === 'text';
       const size = chunkSize ?? 65536;
       const transform = isText
