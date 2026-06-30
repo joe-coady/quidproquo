@@ -3,9 +3,12 @@ import {
   ActionProcessorList,
   ActionProcessorListResolver,
   actionResult,
+  actionResultError,
+  actionResultErrorFromCaughtError,
   QPQConfig,
   UserDirectoryActionType,
   UserDirectorySetPasswordActionProcessor,
+  UserDirectorySetPasswordErrorTypeEnum,
 } from 'quidproquo-core';
 
 import { getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
@@ -21,9 +24,18 @@ const getProcessSetPassword = (qpqConfig: QPQConfig): UserDirectorySetPasswordAc
 
     const resolvedUsername = await resolveUsernameByPreferredUsername(userPoolId, region, username);
 
-    await setUserPassword(region, userPoolId, resolvedUsername, newPassword);
+    try {
+      await setUserPassword(region, userPoolId, resolvedUsername, newPassword);
 
-    return actionResult(void 0);
+      return actionResult(void 0);
+    } catch (error: unknown) {
+      return actionResultErrorFromCaughtError(error, {
+        UserNotFoundException: () => actionResultError(UserDirectorySetPasswordErrorTypeEnum.UserNotFound, 'No account found for this user'),
+        InvalidPasswordException: () => actionResultError(UserDirectorySetPasswordErrorTypeEnum.InvalidNewPassword, 'Password does not meet the password policy'),
+        LimitExceededException: () => actionResultError(UserDirectorySetPasswordErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
+        TooManyRequestsException: () => actionResultError(UserDirectorySetPasswordErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
+      });
+    }
   };
 };
 
