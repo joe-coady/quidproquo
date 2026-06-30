@@ -93,6 +93,15 @@ For each `[ ]` item:
    }
    ```
    Don't mutate `.name` on an inline `new Error(...)`.
+
+   **SDKs with `instanceof`-checkable error classes.** Some SDKs (e.g.
+   `@anthropic-ai/sdk`) discriminate failures by error *class* + a numeric
+   `status`, not a string `name`/`code` — so `actionResultErrorFromCaughtError`
+   can't key on them. For these, map with explicit `if (error instanceof XError)`
+   branches returning action-enum values, and keep a final
+   `ErrorTypeEnum.GenericError` fallthrough (mirroring the helper's safety net).
+   This is the one place a generic `ErrorTypeEnum` is allowed — the unmapped
+   catch-all, never a known/mapped error.
 4. **Don't guess the AWS error names.** Map the ones you know; everything else
    already falls through to `GenericError` with `[<code ?? name>]` in the message
    (`processAction.ts` is the universal safety net). Run the path, watch for
@@ -165,8 +174,7 @@ These processors call AWS / HTTP / external services and can throw named errors.
 - [x] askUserDirectorySetUserAttributes — quidproquo-core/src/actions/userDirectory/UserDirectorySetUserAttributesActionRequester.ts
 
 ### AI (moved down)
-- [ ] askAiPromptStream — quidproquo-core/src/actions/ai/AiPromptStreamActionRequester.ts
-- [ ] askClaudeAiMessagesApi — quidproquo-core/src/actions/claudeAi/ClaudeAiMessagesApiRequester.ts
+- [x] askClaudeAiMessagesApi — quidproquo-core/src/actions/claudeAi/ClaudeAiMessagesApiRequester.ts
 
 ---
 
@@ -227,6 +235,7 @@ Processors that *do* call external services, but whose failures can't be keyed b
 them). Deferred rather than forced.
 
 - askAiPrompt — quidproquo-core/src/actions/ai/AiPromptActionRequester.ts (Bedrock via the Vercel `ai` SDK wraps failures in `APICallError` — name `AI_APICallError`, discriminator is the numeric `statusCode` (e.g. 429), which the helper can't key on; the existing catch already returns `GenericError` with the real `error.message`)
+- askAiPromptStream — quidproquo-core/src/actions/ai/AiPromptStreamActionRequester.ts (same Bedrock/AI-SDK path as askAiPrompt; worse — `streamText` swallows generation errors via `onError` and the rest surface inside the async iterator consumed later via `askStreamRead`, not synchronously in the processor)
 
 ---
 
