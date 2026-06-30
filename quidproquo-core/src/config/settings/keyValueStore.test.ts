@@ -25,7 +25,7 @@ describe('defineKeyValueStore', () => {
       global: false,
       owner: undefined,
       ttlAttribute: undefined,
-      enableMonthlyRollingBackups: false,
+      disablePointInTimeRecovery: false,
       encryption: false,
     });
   });

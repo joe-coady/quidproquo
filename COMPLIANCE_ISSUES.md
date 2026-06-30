@@ -9,9 +9,6 @@ Legend: `[ ]` = still open, `[x]` = fixed. Items tagged **PARTIAL** have had pro
 
 ## Open — easiest first
 
-[ ] 8.2 DynamoDB point-in-time recovery optional — off by default. `(effort: trivial)`
-PITR is enabled only when `enableMonthlyRollingBackups` is set; flip the default so PITR is on (at least for production).
-
 [ ] 2.1 JWT decoded without signature verification — **PARTIAL**; renamed and documented, behaviour unchanged. `(effort: easy)`
 `unsafeDecodeJWTPayload` still base64-decodes with no signature check and the dev path calls it. Production uses RS256 + JWKS, so the remaining work is auditing/guarding call sites to ensure it's never used for authorization outside dev.
 
@@ -92,6 +89,9 @@ Operational/error logging uses raw `console.log`/`console.error` with no consist
 Admin Cognito actions are granted only when a service owns user directories (`getOwnedUserDirectories`), and `resources` is scoped to exactly those pools' ARNs (`...:userpool/${userpoolId}`) in `authorizeAdminActionsForRole`. A service that only references a foreign directory gets no Cognito IAM — token validation runs against the pool's public JWKs over HTTPS and needs none. The old "every Lambda gets admin on every pool" behaviour is gone.
 
 > **Note:** Now only the service that owns a user pool can administer it, scoped to that pool's ARN. All functions in the owning service share one role by design (single-shared-role-per-service model), so intra-service per-function least privilege is intentionally not split out.
+
+[x] 8.2 DynamoDB point-in-time recovery optional — now on by default, opt-out.
+`QpqCoreKeyValueStoreConstruct.ts` sets `pointInTimeRecoveryEnabled: !disablePointInTimeRecovery`, so PITR (35-day continuous backups) is on by default. The old `enableMonthlyRollingBackups` config field (which only ever gated PITR, and was misnamed) was replaced with `disablePointInTimeRecovery?: boolean` in `keyValueStore.ts` as an explicit per-table escape hatch.
 
 [x] 7.5 CSP connect-src too broad — now scoped to specific bucket domains.
 `securityHeaders.ts` no longer appends the `https://*.amazonaws.com` wildcard. A new `getStorageDriveConnectSrcDomains(qpqConfig)` enumerates the service's storage drives (owned + referenced) via `qpqCoreUtils.getStorageDrives`, computes each deterministic bucket name (`awsNamingUtils.getConfigRuntimeResourceNameFromConfigWithServiceOverride`) and the owner's region (`resolveAwsServiceAccountInfo`), and emits one `https://<bucket>.s3.<region>.amazonaws.com` entry per drive — the exact virtual-hosted endpoints the browser uses for presigned (secure) URLs. The browser hits no other `amazonaws.com` endpoints (API via custom domain, Cognito server-side), so nothing else needs allowing. Also removed a stray `console.log` that dumped the CSP on every synth.

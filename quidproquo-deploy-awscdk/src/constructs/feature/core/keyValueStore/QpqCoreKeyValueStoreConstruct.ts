@@ -84,9 +84,8 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
       billingMode: aws_dynamodb.BillingMode.PAY_PER_REQUEST,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       timeToLiveAttribute: props.keyValueStoreConfig.ttlAttribute,
-      pointInTimeRecoverySpecification: props.keyValueStoreConfig.enableMonthlyRollingBackups
-        ? { pointInTimeRecoveryEnabled: true }
-        : undefined,
+      // PITR on by default (35-day continuous backups / point-in-time restore); opt out per-table via config.
+      pointInTimeRecoverySpecification: { pointInTimeRecoveryEnabled: !props.keyValueStoreConfig.disablePointInTimeRecovery },
       encryption: tableEncryption,
       encryptionKey,
     });
