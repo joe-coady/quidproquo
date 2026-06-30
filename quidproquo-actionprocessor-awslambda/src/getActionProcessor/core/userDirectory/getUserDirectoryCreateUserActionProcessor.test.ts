@@ -1,5 +1,5 @@
 import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { buildTestQpqConfig, defineUserDirectory, ErrorTypeEnum, UserDirectoryActionType } from 'quidproquo-core';
+import { buildTestQpqConfig, defineUserDirectory, UserDirectoryActionType, UserDirectoryCreateUserErrorTypeEnum } from 'quidproquo-core';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -46,7 +46,7 @@ describe('getUserDirectoryCreateUserActionProcessor', () => {
 
     const [, error] = await invoke(processor);
 
-    expect(error?.errorType).toBe(ErrorTypeEnum.Conflict);
+    expect(error?.errorType).toBe(UserDirectoryCreateUserErrorTypeEnum.Conflict);
     expect(createUser).not.toHaveBeenCalled();
   });
 });

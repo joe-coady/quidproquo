@@ -1,4 +1,4 @@
-import { buildTestQpqConfig, ClaudeAiActionType, ErrorTypeEnum, resolveActionResult,resolveActionResultError } from 'quidproquo-core';
+import { buildTestQpqConfig, ClaudeAiActionType, ClaudeAiMessagesApiErrorTypeEnum, ErrorTypeEnum, resolveActionResult,resolveActionResultError } from 'quidproquo-core';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -17,7 +17,25 @@ vi.mock('@anthropic-ai/sdk', () => {
     constructor(public options: { apiKey?: string }) {}
   }
 
-  return { default: Anthropic, AuthenticationError: MockAuthenticationError };
+  // The processor instanceof-checks every SDK error class it imports, so the mock
+  // must export each one (unused classes still need to resolve as named exports).
+  class APIConnectionError extends Error {}
+  class BadRequestError extends Error {}
+  class InternalServerError extends Error {}
+  class PermissionDeniedError extends Error {}
+  class RateLimitError extends Error {}
+  class UnprocessableEntityError extends Error {}
+
+  return {
+    default: Anthropic,
+    AuthenticationError: MockAuthenticationError,
+    APIConnectionError,
+    BadRequestError,
+    InternalServerError,
+    PermissionDeniedError,
+    RateLimitError,
+    UnprocessableEntityError,
+  };
 });
 
 describe('getClaudeAiMessagesApiActionProcessor', () => {
@@ -48,7 +66,7 @@ describe('getClaudeAiMessagesApiActionProcessor', () => {
 
     const result = await processor({ body, apiKey: 'sk-test' }, undefined as any);
 
-    expect(resolveActionResultError(result)).toEqual({ errorType: ErrorTypeEnum.Unauthorized, errorText: 'Invalid API key.', errorStack: undefined });
+    expect(resolveActionResultError(result)).toEqual({ errorType: ClaudeAiMessagesApiErrorTypeEnum.Unauthorized, errorText: 'Invalid API key.', errorStack: undefined });
   });
 
   it('maps a generic error to its message', async () => {

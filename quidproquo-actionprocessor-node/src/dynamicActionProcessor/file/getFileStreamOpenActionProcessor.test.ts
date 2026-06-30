@@ -1,4 +1,4 @@
-import { createStreamRegistry, ErrorTypeEnum, FileActionType, resolveActionResult, resolveActionResultError, StreamRegistry } from 'quidproquo-core';
+import { createStreamRegistry, ErrorTypeEnum, FileActionType, FileStreamOpenErrorTypeEnum, resolveActionResult, resolveActionResultError, StreamRegistry } from 'quidproquo-core';
 
 import * as fs from 'fs';
 import { Readable } from 'stream';
@@ -42,14 +42,14 @@ describe('getFileStreamOpenActionProcessor', () => {
     expect((await registry.read(handle.id)).data).toBe(Buffer.from('hi').toString('base64'));
   });
 
-  it('returns NotFound when the file does not exist', async () => {
+  it('returns FileNotFound when the file does not exist', async () => {
     vi.mocked(fs.createReadStream).mockImplementation(() => {
       throw errorWithCode('ENOENT');
     });
 
     const result = await invoke({ encoding: 'text' }, createStreamRegistry());
 
-    expect(resolveActionResultError(result).errorType).toBe(ErrorTypeEnum.NotFound);
+    expect(resolveActionResultError(result).errorType).toBe(FileStreamOpenErrorTypeEnum.FileNotFound);
   });
 
   it('returns GenericError for any other failure', async () => {

@@ -31,13 +31,13 @@ describe('getNetworkRequestActionProcessor', () => {
     expect(resolveActionResult(result)).toEqual(response);
   });
 
-  it('maps a rejected request to a generic error carrying the stack', async () => {
+  it('maps an unmapped rejected request to a generic error keyed by its name', async () => {
     const error = new Error('network down');
     executeNetworkRequest.mockRejectedValue(error);
     const processor = await resolve();
 
     const result = await processor({ method: 'GET', url: '/x', responseType: 'json' });
 
-    expect(resolveActionResultError(result)).toEqual({ errorType: ErrorTypeEnum.GenericError, errorText: error.stack, errorStack: undefined });
+    expect(resolveActionResultError(result)).toEqual({ errorType: ErrorTypeEnum.GenericError, errorText: 'An unexpected error occurred [Error].', errorStack: undefined });
   });
 });

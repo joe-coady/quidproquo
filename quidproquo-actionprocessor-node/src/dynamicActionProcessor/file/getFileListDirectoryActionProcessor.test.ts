@@ -1,4 +1,4 @@
-import { ErrorTypeEnum, FileActionType, resolveActionResult, resolveActionResultError } from 'quidproquo-core';
+import { FileActionType, FileListDirectoryErrorTypeEnum, resolveActionResult, resolveActionResultError } from 'quidproquo-core';
 
 import * as fs from 'fs/promises';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -51,27 +51,27 @@ describe('getFileListDirectoryActionProcessor', () => {
     expect(list.pageToken).toBeUndefined();
   });
 
-  it('returns NotFound when the directory is missing', async () => {
+  it('returns DirectoryNotFound when the directory is missing', async () => {
     vi.mocked(fs.readdir).mockRejectedValue(errorWithCode('ENOENT'));
 
     const result = await invoke({ folderPath: 'nope', maxFiles: 10 });
 
-    expect(resolveActionResultError(result).errorType).toBe(ErrorTypeEnum.NotFound);
+    expect(resolveActionResultError(result).errorType).toBe(FileListDirectoryErrorTypeEnum.DirectoryNotFound);
   });
 
-  it('returns GenericError when the path is not a directory', async () => {
+  it('returns NotADirectory when the path is not a directory', async () => {
     vi.mocked(fs.readdir).mockRejectedValue(errorWithCode('ENOTDIR'));
 
     const result = await invoke({ folderPath: 'file.txt', maxFiles: 10 });
 
-    expect(resolveActionResultError(result).errorType).toBe(ErrorTypeEnum.GenericError);
+    expect(resolveActionResultError(result).errorType).toBe(FileListDirectoryErrorTypeEnum.NotADirectory);
   });
 
-  it('returns GenericError for any other failure', async () => {
+  it('returns AccessDenied when permission is denied', async () => {
     vi.mocked(fs.readdir).mockRejectedValue(errorWithCode('EACCES'));
 
     const result = await invoke({ folderPath: 'x', maxFiles: 10 });
 
-    expect(resolveActionResultError(result).errorType).toBe(ErrorTypeEnum.GenericError);
+    expect(resolveActionResultError(result).errorType).toBe(FileListDirectoryErrorTypeEnum.AccessDenied);
   });
 });
