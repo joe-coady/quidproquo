@@ -6,6 +6,7 @@ import {
   ErrorTypeEnum,
   FileActionType,
   FileStreamOpenActionProcessor,
+  FileStreamOpenErrorTypeEnum,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -46,7 +47,7 @@ const getProcessFileStreamOpen = (
       return actionResult({ id: streamId, encoding });
     } catch (error: any) {
       if (error.code === 'ENOENT') {
-        return actionResultError(ErrorTypeEnum.NotFound, `File not found: ${filepath}`);
+        return actionResultError(FileStreamOpenErrorTypeEnum.FileNotFound, `File not found: ${filepath}`);
       }
       return actionResultError(ErrorTypeEnum.GenericError, `Error opening file stream: ${error.message}`);
     }

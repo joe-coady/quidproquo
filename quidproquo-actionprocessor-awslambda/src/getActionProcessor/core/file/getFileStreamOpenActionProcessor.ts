@@ -8,6 +8,7 @@ import {
   ErrorTypeEnum,
   FileActionType,
   FileStreamOpenActionProcessor,
+  FileStreamOpenErrorTypeEnum,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -68,7 +69,11 @@ const getProcessFileStreamOpen = (qpqConfig: QPQConfig): FileStreamOpenActionPro
 
       return actionResult({ id: streamId, encoding });
     } catch (error: unknown) {
-      return actionResultErrorFromCaughtError(error, {});
+      return actionResultErrorFromCaughtError(error, {
+        InvalidObjectState: () => actionResultError(FileStreamOpenErrorTypeEnum.InvalidStorageClass, 'File is in the wrong storage class'),
+        NoSuchKey: () => actionResultError(FileStreamOpenErrorTypeEnum.FileNotFound, `File not found: ${filepath}`),
+        NotFound: () => actionResultError(FileStreamOpenErrorTypeEnum.FileNotFound, `File not found: ${filepath}`),
+      });
     }
   };
 };
