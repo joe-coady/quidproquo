@@ -3,7 +3,7 @@ import {
   ActionProcessorListResolver,
   actionResult,
   actionResultError,
-  ErrorTypeEnum,
+  actionResultErrorFromCaughtError,
   FileActionType,
   FileReadBinaryContentsActionProcessor,
   FileReadBinaryContentsErrorTypeEnum,
@@ -31,11 +31,10 @@ const getProcessFileReadBinaryContents = (config: FileStorageConfig) => (qpqConf
       };
       
       return actionResult(binaryData);
-    } catch (error: any) {
-      if (error.code === 'ENOENT') {
-        return actionResultError(FileReadBinaryContentsErrorTypeEnum.FileNotFound, `File not found: ${filepath}`);
-      }
-      return actionResultError(ErrorTypeEnum.GenericError, `Error reading binary file: ${error.message}`);
+    } catch (error: unknown) {
+      return actionResultErrorFromCaughtError(error, {
+        ENOENT: () => actionResultError(FileReadBinaryContentsErrorTypeEnum.FileNotFound, `File not found: ${filepath}`), // node fs code
+      });
     }
   };
 };

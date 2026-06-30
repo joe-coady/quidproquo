@@ -3,6 +3,7 @@ import {
   ActionProcessorListResolver,
   actionResult,
   actionResultError,
+  actionResultErrorFromCaughtError,
   ErrorTypeEnum,
   FileActionType,
   FileReadTextContentsActionProcessor,
@@ -23,11 +24,10 @@ const getProcessFileReadTextContents = (
       const fullPath = resolveFilePath(config, qpqConfig, drive, filepath);
       const content = await fs.readFile(fullPath, 'utf8');
       return actionResult(content);
-    } catch (error: any) {
-      if (error.code === 'ENOENT') {
-        return actionResultError(ErrorTypeEnum.NotFound, `File not found: ${filepath}`);
-      }
-      return actionResultError(ErrorTypeEnum.GenericError, `Error reading file: ${error.message}`);
+    } catch (error: unknown) {
+      return actionResultErrorFromCaughtError(error, {
+        ENOENT: () => actionResultError(ErrorTypeEnum.NotFound, `File not found: ${filepath}`), // node fs code
+      });
     }
   };
 };

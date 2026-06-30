@@ -3,7 +3,7 @@ import {
   ActionProcessorListResolver,
   actionResult,
   actionResultError,
-  ErrorTypeEnum,
+  actionResultErrorFromCaughtError,
   FileActionType,
   FileStreamOpenActionProcessor,
   FileStreamOpenErrorTypeEnum,
@@ -46,11 +46,10 @@ const getProcessFileStreamOpen = (
       streamRegistry.register(streamId, iterator);
 
       return actionResult({ id: streamId, encoding });
-    } catch (error: any) {
-      if (error.code === 'ENOENT') {
-        return actionResultError(FileStreamOpenErrorTypeEnum.FileNotFound, `File not found: ${filepath}`);
-      }
-      return actionResultError(ErrorTypeEnum.GenericError, `Error opening file stream: ${error.message}`);
+    } catch (error: unknown) {
+      return actionResultErrorFromCaughtError(error, {
+        ENOENT: () => actionResultError(FileStreamOpenErrorTypeEnum.FileNotFound, `File not found: ${filepath}`), // node fs code
+      });
     }
   };
 };

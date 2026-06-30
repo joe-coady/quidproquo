@@ -3,7 +3,7 @@ import {
   ActionProcessorListResolver,
   actionResult,
   actionResultError,
-  ErrorTypeEnum,
+  actionResultErrorFromCaughtError,
   FileActionType,
   FileWriteObjectJsonActionProcessor,
   FileWriteObjectJsonErrorTypeEnum,
@@ -23,11 +23,10 @@ const getProcessFileWriteObjectJson = (config: FileStorageConfig) => (qpqConfig:
       const jsonString = JSON.stringify(data, null, 2);
       await fs.writeFile(fullPath, jsonString, 'utf8');
       return actionResult(void 0);
-    } catch (error: any) {
-      if (error.code === 'EACCES') {
-        return actionResultError(FileWriteObjectJsonErrorTypeEnum.AccessDenied, `Access denied writing file: ${filepath}`);
-      }
-      return actionResultError(ErrorTypeEnum.GenericError, `Error writing JSON file: ${error.message}`);
+    } catch (error: unknown) {
+      return actionResultErrorFromCaughtError(error, {
+        EACCES: () => actionResultError(FileWriteObjectJsonErrorTypeEnum.AccessDenied, `Access denied writing file: ${filepath}`), // node fs code
+      });
     }
   };
 };

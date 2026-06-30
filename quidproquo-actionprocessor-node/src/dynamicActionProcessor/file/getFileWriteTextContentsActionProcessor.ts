@@ -3,7 +3,7 @@ import {
   ActionProcessorListResolver,
   actionResult,
   actionResultError,
-  ErrorTypeEnum,
+  actionResultErrorFromCaughtError,
   FileActionType,
   FileWriteTextContentsActionProcessor,
   FileWriteTextContentsErrorTypeEnum,
@@ -25,11 +25,10 @@ const getProcessFileWriteTextContents = (
       await ensureParentDirectoryExists(fullPath);
       await fs.writeFile(fullPath, data, 'utf8');
       return actionResult(void 0);
-    } catch (error: any) {
-      if (error.code === 'EACCES') {
-        return actionResultError(FileWriteTextContentsErrorTypeEnum.AccessDenied, `Access denied writing file: ${filepath}`);
-      }
-      return actionResultError(ErrorTypeEnum.GenericError, `Error writing file: ${error.message}`);
+    } catch (error: unknown) {
+      return actionResultErrorFromCaughtError(error, {
+        EACCES: () => actionResultError(FileWriteTextContentsErrorTypeEnum.AccessDenied, `Access denied writing file: ${filepath}`), // node fs code
+      });
     }
   };
 };

@@ -3,8 +3,8 @@ import {
   ActionProcessorListResolver,
   actionResult,
   actionResultError,
+  actionResultErrorFromCaughtError,
   DirectoryList,
-  ErrorTypeEnum,
   FileActionType,
   FileInfo,
   FileListDirectoryActionProcessor,
@@ -55,17 +55,12 @@ const getProcessFileListDirectory = (config: FileStorageConfig) => (qpqConfig: Q
       }
       
       return actionResult(result);
-    } catch (error: any) {
-      if (error.code === 'ENOENT') {
-        return actionResultError(FileListDirectoryErrorTypeEnum.DirectoryNotFound, `Directory not found: ${folderPath}`);
-      }
-      if (error.code === 'ENOTDIR') {
-        return actionResultError(FileListDirectoryErrorTypeEnum.NotADirectory, `Path is not a directory: ${folderPath}`);
-      }
-      if (error.code === 'EACCES') {
-        return actionResultError(FileListDirectoryErrorTypeEnum.AccessDenied, `Access denied listing directory: ${folderPath}`);
-      }
-      return actionResultError(ErrorTypeEnum.GenericError, `Error listing directory: ${error.message}`);
+    } catch (error: unknown) {
+      return actionResultErrorFromCaughtError(error, {
+        ENOENT: () => actionResultError(FileListDirectoryErrorTypeEnum.DirectoryNotFound, `Directory not found: ${folderPath}`), // node fs code
+        ENOTDIR: () => actionResultError(FileListDirectoryErrorTypeEnum.NotADirectory, `Path is not a directory: ${folderPath}`), // node fs code
+        EACCES: () => actionResultError(FileListDirectoryErrorTypeEnum.AccessDenied, `Access denied listing directory: ${folderPath}`), // node fs code
+      });
     }
   };
 };

@@ -3,7 +3,7 @@ import {
   ActionProcessorListResolver,
   actionResult,
   actionResultError,
-  ErrorTypeEnum,
+  actionResultErrorFromCaughtError,
   FileActionType,
   FileWriteBinaryContentsActionProcessor,
   FileWriteBinaryContentsErrorTypeEnum,
@@ -36,11 +36,10 @@ const getProcessFileWriteBinaryContents = (config: FileStorageConfig) => (qpqCon
       }
 
       return actionResult(void 0);
-    } catch (error: any) {
-      if (error.code === 'EACCES') {
-        return actionResultError(FileWriteBinaryContentsErrorTypeEnum.AccessDenied, `Access denied writing file: ${filepath}`);
-      }
-      return actionResultError(ErrorTypeEnum.GenericError, `Error writing binary file: ${error.message}`);
+    } catch (error: unknown) {
+      return actionResultErrorFromCaughtError(error, {
+        EACCES: () => actionResultError(FileWriteBinaryContentsErrorTypeEnum.AccessDenied, `Access denied writing file: ${filepath}`), // node fs code
+      });
     }
   };
 };

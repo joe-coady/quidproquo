@@ -3,6 +3,7 @@ import {
   ActionProcessorListResolver,
   actionResult,
   actionResultError,
+  actionResultErrorFromCaughtError,
   ErrorTypeEnum,
   FileActionType,
   FileReadObjectJsonActionProcessor,
@@ -21,14 +22,11 @@ const getProcessFileReadObjectJson = (config: FileStorageConfig) => (qpqConfig: 
       const content = await fs.readFile(fullPath, 'utf8');
       const jsonObject = JSON.parse(content);
       return actionResult(jsonObject);
-    } catch (error: any) {
-      if (error.code === 'ENOENT') {
-        return actionResultError(ErrorTypeEnum.NotFound, `File not found: ${filepath}`);
-      }
-      if (error instanceof SyntaxError) {
-        return actionResultError(ErrorTypeEnum.GenericError, `Invalid JSON in file: ${filepath}`);
-      }
-      return actionResultError(ErrorTypeEnum.GenericError, `Error reading JSON file: ${error.message}`);
+    } catch (error: unknown) {
+      return actionResultErrorFromCaughtError(error, {
+        ENOENT: () => actionResultError(ErrorTypeEnum.NotFound, `File not found: ${filepath}`), // node fs code
+        SyntaxError: () => actionResultError(ErrorTypeEnum.GenericError, `Invalid JSON in file: ${filepath}`), // JSON.parse failure
+      });
     }
   };
 };
