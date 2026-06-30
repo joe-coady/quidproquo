@@ -3,9 +3,12 @@ import {
   ActionProcessorList,
   ActionProcessorListResolver,
   actionResult,
+  actionResultError,
+  actionResultErrorFromCaughtError,
   QPQConfig,
   UserDirectoryActionType,
   UserDirectoryConfirmForgotPasswordActionProcessor,
+  UserDirectoryConfirmForgotPasswordErrorTypeEnum,
 } from 'quidproquo-core';
 
 import { getCFExportNameUserPoolClientIdFromConfig, getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
@@ -23,9 +26,19 @@ const getProcessConfirmForgotPassword = (qpqConfig: QPQConfig): UserDirectoryCon
 
     const resolvedUsername = await resolveUsernameByPreferredUsername(userPoolId, region, username);
 
-    const authResponse = await confirmForgotPassword(userPoolId, userPoolClientId, region, code, resolvedUsername, password);
+    try {
+      const authResponse = await confirmForgotPassword(userPoolId, userPoolClientId, region, code, resolvedUsername, password);
 
-    return actionResult(authResponse);
+      return actionResult(authResponse);
+    } catch (error: unknown) {
+      return actionResultErrorFromCaughtError(error, {
+        CodeMismatchException: () => actionResultError(UserDirectoryConfirmForgotPasswordErrorTypeEnum.InvalidCode, 'Confirmation code is incorrect'),
+        ExpiredCodeException: () => actionResultError(UserDirectoryConfirmForgotPasswordErrorTypeEnum.ExpiredCode, 'Confirmation code has expired'),
+        InvalidPasswordException: () =>
+          actionResultError(UserDirectoryConfirmForgotPasswordErrorTypeEnum.InvalidNewPassword, 'New password does not meet the password policy'),
+        LimitExceededException: () => actionResultError(UserDirectoryConfirmForgotPasswordErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
+      });
+    }
   };
 };
 
