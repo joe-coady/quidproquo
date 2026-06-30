@@ -3,9 +3,12 @@ import {
   ActionProcessorList,
   ActionProcessorListResolver,
   actionResult,
+  actionResultError,
+  actionResultErrorFromCaughtError,
   QPQConfig,
   UserDirectoryActionType,
   UserDirectoryGetUsersByAttributeActionProcessor,
+  UserDirectoryGetUsersByAttributeErrorTypeEnum,
 } from 'quidproquo-core';
 
 import { getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
@@ -18,9 +21,17 @@ const getProcessGetUsersByAttribute = (qpqConfig: QPQConfig): UserDirectoryGetUs
 
     const userPoolId = await getExportedValue(getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig), region);
 
-    const userAttributes = await listPagedUsersByAttribute(userPoolId, region, attribueName, attribueValue, limit, nextPageKey);
+    try {
+      const userAttributes = await listPagedUsersByAttribute(userPoolId, region, attribueName, attribueValue, limit, nextPageKey);
 
-    return actionResult(userAttributes);
+      return actionResult(userAttributes);
+    } catch (error: unknown) {
+      return actionResultErrorFromCaughtError(error, {
+        InvalidParameterException: () =>
+          actionResultError(UserDirectoryGetUsersByAttributeErrorTypeEnum.InvalidSearchParameters, 'The search attribute, value, limit, or page key is invalid'),
+        TooManyRequestsException: () => actionResultError(UserDirectoryGetUsersByAttributeErrorTypeEnum.LimitExceeded, 'Too many requests, please try again later'),
+      });
+    }
   };
 };
 
