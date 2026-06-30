@@ -4,10 +4,10 @@ import {
   ActionProcessorListResolver,
   actionResult,
   actionResultError,
-  ErrorTypeEnum,
   QPQConfig,
   UserDirectoryActionType,
   UserDirectoryDecodeAccessTokenActionProcessor,
+  UserDirectoryDecodeAccessTokenErrorTypeEnum,
 } from 'quidproquo-core';
 
 import { getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
@@ -23,7 +23,7 @@ const getProcessDecodeAccessToken = (qpqConfig: QPQConfig): UserDirectoryDecodeA
     const authInfo = await decodeValidJwt(userPoolId, region, ignoreExpiration, accessToken);
 
     if (!authInfo || !authInfo?.username) {
-      return actionResultError(ErrorTypeEnum.Unauthorized, 'Invalid access token');
+      return actionResultError(UserDirectoryDecodeAccessTokenErrorTypeEnum.Unauthorized, 'Invalid access token');
     }
 
     return actionResult({

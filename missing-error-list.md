@@ -183,10 +183,7 @@ These processors call AWS / HTTP / external services and can throw named errors.
 May or may not make a fallible external call depending on the processor. Confirm
 before implementing or skipping.
 
-- [ ] askInlineFunctionExecute — quidproquo-core/src/actions/inlineFunction/InlineFunctionExecuteActionRequester.ts — invokes a function (local vs. remote lambda?)
-- [ ] askConfigGetGlobal — quidproquo-core/src/actions/config/ConfigGetGlobalActionRequester.ts — likely resolved from in-memory config, not SSM
-- [ ] askConfigGetApplicationInfo — quidproquo-core/src/actions/config/ConfigGetApplicationInfoActionRequester.ts — likely in-memory / env
-- [ ] askUserDirectoryDecodeAccessToken — quidproquo-core/src/actions/userDirectory/UserDirectoryDecodeAccessTokenActionRequester.ts — local JWT decode (may fetch JWKS to verify?)
+- [x] askUserDirectoryDecodeAccessToken — quidproquo-core/src/actions/userDirectory/UserDirectoryDecodeAccessTokenActionRequester.ts — verifies JWT against Cognito JWKS, but `decodeValidJwt` swallows all failures to `null`, so the action's only caller-branchable error is `Unauthorized` (made action-specific; no try/catch needed)
 - [ ] askExecuteStory — quidproquo-core/src/actions/system/SystemExecuteStoryActionRequester.ts — system action; may invoke a runtime/lambda
 
 ---
@@ -195,6 +192,8 @@ before implementing or skipping.
 
 Processors do no external call, so there is no named error to translate.
 
+- askConfigGetGlobal — quidproquo-core/src/actions/config/ConfigGetGlobalActionRequester.ts (js processor resolves the value in-memory via `qpqCoreUtils.resolveGlobalValue` — `functionGlobals` or in-memory config; no SSM/external call)
+- askConfigGetApplicationInfo — quidproquo-core/src/actions/config/ConfigGetApplicationInfoActionRequester.ts (js processor reads in-memory config metadata — environment/feature/module/name via `qpqCoreUtils`; no external call)
 - askContextRead — quidproquo-core/src/actions/context/ContextReadActionRequester.ts
 - askDateNow — quidproquo-core/src/actions/date/DateNowActionRequester.ts
 - askThrowError — quidproquo-core/src/actions/error/ErrorThrowErrorActionRequester.ts (this *is* the throw mechanism)
@@ -211,6 +210,7 @@ Processors do no external call, so there is no named error to translate.
 - askUserDirectorySetAccessToken — quidproquo-core/src/actions/userDirectory/UserDirectorySetAccessTokenActionRequester.ts (sets token in context)
 - askStreamClose — quidproquo-core/src/actions/stream/StreamCloseRequester.ts (in-memory `streamRegistry.close`: Map get/delete + un-awaited `iterator.return?.()`; cannot throw, no-ops on missing id)
 - askStreamRead — quidproquo-core/src/actions/stream/StreamReadRequester.ts (in-memory `streamRegistry.read`: only known throw is a generic `Error('Stream not found')` with no discriminable code/name; opaque producer rejections already fall through to GenericError — no platform/SDK named error to translate)
+- askInlineFunctionExecute — quidproquo-core/src/actions/inlineFunction/InlineFunctionExecuteActionRequester.ts (node processor makes no external call — it runs a nested story **in-process** via `createRuntime` and forwards that story's own already-typed error; error surface is unbounded passthrough, so no catalog enum is possible. `NotFound` guards for missing config/module stay generic.)
 
 ### Event domain — internal transforms (N/A)
 
