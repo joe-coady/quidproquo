@@ -6,6 +6,7 @@ import {
   ErrorTypeEnum,
   FileActionType,
   FileWriteBinaryContentsActionProcessor,
+  FileWriteBinaryContentsErrorTypeEnum,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -36,6 +37,9 @@ const getProcessFileWriteBinaryContents = (config: FileStorageConfig) => (qpqCon
 
       return actionResult(void 0);
     } catch (error: any) {
+      if (error.code === 'EACCES') {
+        return actionResultError(FileWriteBinaryContentsErrorTypeEnum.AccessDenied, `Access denied writing file: ${filepath}`);
+      }
       return actionResultError(ErrorTypeEnum.GenericError, `Error writing binary file: ${error.message}`);
     }
   };
