@@ -6,6 +6,7 @@ import {
   ErrorTypeEnum,
   FileActionType,
   FileWriteObjectJsonActionProcessor,
+  FileWriteObjectJsonErrorTypeEnum,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -23,6 +24,9 @@ const getProcessFileWriteObjectJson = (config: FileStorageConfig) => (qpqConfig:
       await fs.writeFile(fullPath, jsonString, 'utf8');
       return actionResult(void 0);
     } catch (error: any) {
+      if (error.code === 'EACCES') {
+        return actionResultError(FileWriteObjectJsonErrorTypeEnum.AccessDenied, `Access denied writing file: ${filepath}`);
+      }
       return actionResultError(ErrorTypeEnum.GenericError, `Error writing JSON file: ${error.message}`);
     }
   };
