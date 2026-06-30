@@ -1,6 +1,6 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import { ActionProcessorList, ActionProcessorListResolver, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
-import { actionResult, KeyValueStoreActionType, KeyValueStoreUpdateActionProcessor } from 'quidproquo-core';
+import { actionResult, actionResultError, actionResultErrorFromCaughtError, KeyValueStoreActionType, KeyValueStoreUpdateActionProcessor, KeyValueStoreUpdateErrorTypeEnum } from 'quidproquo-core';
 
 import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
 import { updateItem } from '../../../logic/dynamo';
@@ -12,9 +12,16 @@ const getProcessKeyValueStoreUpdate = (qpqConfig: QPQConfig): KeyValueStoreUpdat
 
     const storeConfig = qpqCoreUtils.getKeyValueStoreByName(qpqConfig, keyValueStoreName)!;
 
-    const item = await updateItem(dynamoTableName, region, updates, storeConfig.partitionKey.key, key, storeConfig.sortKeys[0]?.key, sortKey);
+    try {
+      const item = await updateItem(dynamoTableName, region, updates, storeConfig.partitionKey.key, key, storeConfig.sortKeys[0]?.key, sortKey);
 
-    return actionResult(item);
+      return actionResult(item);
+    } catch (error: unknown) {
+      return actionResultErrorFromCaughtError(error, {
+        InternalServerError: () => actionResultError(KeyValueStoreUpdateErrorTypeEnum.ServiceUnavailable, 'KVS Service Unavailable'),
+        ResourceNotFoundException: () => actionResultError(KeyValueStoreUpdateErrorTypeEnum.ResourceNotFound, 'KVS Resource Not Found'),
+      });
+    }
   };
 };
 
