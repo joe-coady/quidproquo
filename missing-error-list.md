@@ -124,7 +124,7 @@ These processors call AWS / HTTP / external services and can throw named errors.
 - [x] askQueueSendMessages — quidproquo-core/src/actions/queue/QueueSendMessageActionRequester.ts
 
 ### Network (HTTP)
-- [ ] askNetworkRequest — quidproquo-core/src/actions/network/NetworkRequestActionRequester.ts
+- [x] askNetworkRequest — quidproquo-core/src/actions/network/NetworkRequestActionRequester.ts
 
 ### Stream
 - [ ] askStreamClose — quidproquo-core/src/actions/stream/StreamCloseRequester.ts

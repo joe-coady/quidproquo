@@ -3,9 +3,10 @@ import {
   ActionProcessorListResolver,
   actionResult,
   actionResultError,
-  ErrorTypeEnum,
+  actionResultErrorFromCaughtError,
   NetworkActionType,
   NetworkRequestActionProcessor,
+  NetworkRequestErrorTypeEnum,
   QPQConfig,
 } from 'quidproquo-core';
 import { executeNetworkRequest } from 'quidproquo-webserver';
@@ -16,9 +17,10 @@ const getProcessNetworkRequest = (qpqConfig: QPQConfig): NetworkRequestActionPro
 
     try {
       return actionResult(await executeNetworkRequest(payload));
-    } catch (err: any) {
-      console.log(err);
-      return actionResultError(ErrorTypeEnum.GenericError, err.stack);
+    } catch (error: unknown) {
+      return actionResultErrorFromCaughtError(error, {
+        AbortError: () => actionResultError(NetworkRequestErrorTypeEnum.Timeout, 'Network request timed out'),
+      });
     }
   };
 };
