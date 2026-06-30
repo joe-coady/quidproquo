@@ -121,7 +121,7 @@ These processors call AWS / HTTP / external services and can throw named errors.
 
 ### Event Bus / Queue (SNS / EventBridge / SQS)
 - [x] askEventBusSendMessages — quidproquo-core/src/actions/eventBus/EventBusSendMessageActionRequester.ts
-- [ ] askQueueSendMessages — quidproquo-core/src/actions/queue/QueueSendMessageActionRequester.ts
+- [x] askQueueSendMessages — quidproquo-core/src/actions/queue/QueueSendMessageActionRequester.ts
 
 ### Network (HTTP)
 - [ ] askNetworkRequest — quidproquo-core/src/actions/network/NetworkRequestActionRequester.ts
