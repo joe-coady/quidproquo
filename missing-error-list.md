@@ -130,7 +130,7 @@ These processors call AWS / HTTP / external services and can throw named errors.
 - [x] askUserDirectoryChangePassword — quidproquo-core/src/actions/userDirectory/UserDirectoryChangePasswordActionRequester.ts
 - [x] askUserDirectoryConfirmEmailVerification — quidproquo-core/src/actions/userDirectory/UserDirectoryConfirmEmailVerificationActionRequester.ts
 - [x] askUserDirectoryConfirmForgotPassword — quidproquo-core/src/actions/userDirectory/UserDirectoryConfirmForgotPasswordActionRequester.ts
-- [ ] askUserDirectoryCreateUser — quidproquo-core/src/actions/userDirectory/UserDirectoryCreateUserActionRequester.ts
+- [x] askUserDirectoryCreateUser — quidproquo-core/src/actions/userDirectory/UserDirectoryCreateUserActionRequester.ts
 - [ ] askUserDirectoryForgotPassword — quidproquo-core/src/actions/userDirectory/UserDirectoryForgotPasswordActionRequester.ts
 - [ ] askUserDirectoryGetUserAttributesByUserId — quidproquo-core/src/actions/userDirectory/UserDirectoryGetUserAttributesByUserIdActionRequester.ts
 - [ ] askUserDirectoryGetUsers — quidproquo-core/src/actions/userDirectory/UserDirectoryGetUsersActionRequester.ts
