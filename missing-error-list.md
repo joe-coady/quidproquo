@@ -77,13 +77,29 @@ For each `[ ]` item:
      });
    }
    ```
-3. **Don't guess the AWS error names.** Map the ones you know; everything else
+   **Hand-thrown not-found / guard errors.** When the platform call *succeeds*
+   but the logic itself throws (e.g. Cognito `ListUsers` returns an empty list
+   rather than throwing for no match), a bare `new Error('...')` is **not
+   mappable** — its `name` is the useless generic `'Error'` and it has no `code`.
+   Define a small named `Error` subclass in the logic file with a discriminable
+   `readonly code`, and key the processor map on that code:
+   ```ts
+   export class UserNotFoundError extends Error {
+     readonly code = 'USER_NOT_FOUND';
+     constructor() {
+       super('User not found');
+       this.name = 'UserNotFoundError';
+     }
+   }
+   ```
+   Don't mutate `.name` on an inline `new Error(...)`.
+4. **Don't guess the AWS error names.** Map the ones you know; everything else
    already falls through to `GenericError` with `[<code ?? name>]` in the message
    (`processAction.ts` is the universal safety net). Run the path, watch for
    `[SomeException]` / `[ENOENT]` in the result, and promote real keys as they
    show up.
-4. **Build** the touched packages (`npm run build -w <package>`) and tick the box.
-5. **Commit** that single action, then move to the next item.
+5. **Build** the touched packages (`npm run build -w <package>`) and tick the box.
+6. **Commit** that single action, then move to the next item.
 
 **Reference implementations to copy from:**
 - Requester side — `quidproquo-core/src/actions/keyValueStore/KeyValueStoreUpsertActionRequester.ts`
@@ -139,7 +155,7 @@ These processors call AWS / HTTP / external services and can throw named errors.
 - [x] askUserDirectoryConfirmForgotPassword — quidproquo-core/src/actions/userDirectory/UserDirectoryConfirmForgotPasswordActionRequester.ts
 - [x] askUserDirectoryCreateUser — quidproquo-core/src/actions/userDirectory/UserDirectoryCreateUserActionRequester.ts
 - [x] askUserDirectoryForgotPassword — quidproquo-core/src/actions/userDirectory/UserDirectoryForgotPasswordActionRequester.ts
-- [ ] askUserDirectoryGetUserAttributesByUserId — quidproquo-core/src/actions/userDirectory/UserDirectoryGetUserAttributesByUserIdActionRequester.ts
+- [x] askUserDirectoryGetUserAttributesByUserId — quidproquo-core/src/actions/userDirectory/UserDirectoryGetUserAttributesByUserIdActionRequester.ts
 - [ ] askUserDirectoryGetUsers — quidproquo-core/src/actions/userDirectory/UserDirectoryGetUsersActionRequester.ts
 - [ ] askUserDirectoryGetUsersByAttribute — quidproquo-core/src/actions/userDirectory/UserDirectoryGetUsersByAttributeActionRequester.ts
 - [ ] askUserDirectoryRefreshToken — quidproquo-core/src/actions/userDirectory/UserDirectoryRefreshTokenActionRequester.ts
