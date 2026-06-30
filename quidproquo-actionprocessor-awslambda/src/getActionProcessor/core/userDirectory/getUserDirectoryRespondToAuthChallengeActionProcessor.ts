@@ -3,11 +3,14 @@ import {
   ActionProcessorList,
   ActionProcessorListResolver,
   actionResult,
+  actionResultError,
+  actionResultErrorFromCaughtError,
   AnyAuthChallenge,
   AuthenticateUserChallenge,
   QPQConfig,
   UserDirectoryActionType,
   UserDirectoryRespondToAuthChallengeActionProcessor,
+  UserDirectoryRespondToAuthChallengeErrorTypeEnum,
 } from 'quidproquo-core';
 
 import { ChallengeNameType } from '@aws-sdk/client-cognito-identity-provider';
@@ -74,21 +77,35 @@ const getProcessRespondToAuthChallenge = (qpqConfig: QPQConfig): UserDirectoryRe
     // MFA_SETUP must verify the TOTP code first; Cognito returns a fresh session
     // that is then used to complete the challenge and issue tokens.
     let session = authChallenge.session;
-    if (authChallenge.challenge === AuthenticateUserChallenge.MFA_SETUP) {
-      session = await verifySoftwareToken(region, session, authChallenge.mfaCode);
+
+    try {
+      if (authChallenge.challenge === AuthenticateUserChallenge.MFA_SETUP) {
+        session = await verifySoftwareToken(region, session, authChallenge.mfaCode);
+      }
+
+      const response = await respondToAuthChallengeChallenge(
+        userPoolId,
+        userPoolClientId,
+        region,
+        authChallenge.username,
+        session,
+        anyAuthChallengeToCognitoChallengeName(authChallenge),
+        anyAuthChallengeToCognitoAttributes(authChallenge),
+      );
+
+      return actionResult(response);
+    } catch (error: unknown) {
+      return actionResultErrorFromCaughtError(error, {
+        CodeMismatchException: () => actionResultError(UserDirectoryRespondToAuthChallengeErrorTypeEnum.InvalidCode, 'The supplied code is incorrect'),
+        EnableSoftwareTokenMFAException: () => actionResultError(UserDirectoryRespondToAuthChallengeErrorTypeEnum.InvalidCode, 'The supplied code is incorrect'),
+        ExpiredCodeException: () => actionResultError(UserDirectoryRespondToAuthChallengeErrorTypeEnum.ExpiredCode, 'The supplied code has expired'),
+        InvalidPasswordException: () =>
+          actionResultError(UserDirectoryRespondToAuthChallengeErrorTypeEnum.InvalidNewPassword, 'New password does not meet the password policy'),
+        NotAuthorizedException: () => actionResultError(UserDirectoryRespondToAuthChallengeErrorTypeEnum.Unauthorized, 'The challenge session is invalid or has expired'),
+        LimitExceededException: () => actionResultError(UserDirectoryRespondToAuthChallengeErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
+        TooManyRequestsException: () => actionResultError(UserDirectoryRespondToAuthChallengeErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
+      });
     }
-
-    const response = await respondToAuthChallengeChallenge(
-      userPoolId,
-      userPoolClientId,
-      region,
-      authChallenge.username,
-      session,
-      anyAuthChallengeToCognitoChallengeName(authChallenge),
-      anyAuthChallengeToCognitoAttributes(authChallenge),
-    );
-
-    return actionResult(response);
   };
 };
 
