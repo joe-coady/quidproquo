@@ -57,10 +57,24 @@ For each `[ ]` item:
      });
    }
    ```
+   **The map keys on `error.code` first, then `error.name`** — both live in the
+   same flat map and never collide (a node error's `name` is the useless generic
+   `'Error'`, while its meaningful identifier is `error.code`). So the node `fs`
+   processors map the OS code directly — no more `if (error.code === 'EACCES')`
+   ladders — alongside the AWS SDK `name` handlers:
+   ```ts
+   } catch (error) {
+     return actionResultErrorFromCaughtError(error, {
+       EACCES: () => actionResultError(<Name>ErrorTypeEnum.AccessDenied, '...'), // node fs code
+       AccessDenied: () => actionResultError(<Name>ErrorTypeEnum.AccessDenied, '...'), // AWS SDK name
+     });
+   }
+   ```
 3. **Don't guess the AWS error names.** Map the ones you know; everything else
-   already falls through to `GenericError` with `[errorName]` in the message
+   already falls through to `GenericError` with `[<code ?? name>]` in the message
    (`processAction.ts` is the universal safety net). Run the path, watch for
-   `[SomeException]` in the result, and promote real names as they show up.
+   `[SomeException]` / `[ENOENT]` in the result, and promote real keys as they
+   show up.
 4. **Build** the touched packages (`npm run build -w <package>`) and tick the box.
 5. **Commit** that single action, then move to the next item.
 
