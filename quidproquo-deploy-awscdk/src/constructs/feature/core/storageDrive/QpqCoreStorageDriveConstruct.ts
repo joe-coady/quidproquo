@@ -88,6 +88,9 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
 
+      // Keep prior object versions so a bad deploy / accidental overwrite can be rolled back
+      versioned: true,
+
       cors: [
         {
           allowedOrigins: ['*'],

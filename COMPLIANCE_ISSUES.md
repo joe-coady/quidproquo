@@ -12,9 +12,6 @@ Legend: `[ ]` = still open, `[x]` = fixed. Items tagged **PARTIAL** have had pro
 [ ] 8.2 DynamoDB point-in-time recovery optional — off by default. `(effort: trivial)`
 PITR is enabled only when `enableMonthlyRollingBackups` is set; flip the default so PITR is on (at least for production).
 
-[ ] 6.2 No S3 versioning on any bucket — `versioned` never set. `(effort: easy)`
-Set `versioned: true` on the web-entry and storage-drive buckets. Combined with `DESTROY` + `autoDeleteObjects: true`, a bad deploy currently has no rollback.
-
 [ ] 7.5 CSP connect-src too broad — allows any AWS endpoint. `(effort: easy)`
 `securityHeaders.ts` appends `https://*.amazonaws.com` to `connect-src`; narrow it to the specific bucket/API domains.
 
@@ -98,6 +95,9 @@ Operational/error logging uses raw `console.log`/`console.error` with no consist
 Admin Cognito actions are granted only when a service owns user directories (`getOwnedUserDirectories`), and `resources` is scoped to exactly those pools' ARNs (`...:userpool/${userpoolId}`) in `authorizeAdminActionsForRole`. A service that only references a foreign directory gets no Cognito IAM — token validation runs against the pool's public JWKs over HTTPS and needs none. The old "every Lambda gets admin on every pool" behaviour is gone.
 
 > **Note:** Now only the service that owns a user pool can administer it, scoped to that pool's ARN. All functions in the owning service share one role by design (single-shared-role-per-service model), so intra-service per-function least privilege is intentionally not split out.
+
+[x] 6.2 No S3 versioning on any bucket — now versioned by default.
+`versioned: true` is set on both the storage-drive bucket (`QpqCoreStorageDriveConstruct.ts`) and the web-entry bucket (`WebQpqWebserverWebEntryConstruct.ts`), so a bad deploy or accidental overwrite can be rolled back. `autoDeleteObjects: true` still purges all versions on `cdk destroy`, so teardown is unaffected. (Full data-loss-on-`destroy` is tracked separately under 8.1.)
 
 [x] 8.3 .gitignore missing .env patterns — patterns added.
 `.gitignore` now ignores `.env`, `.env.local`, and `.env.*.local` so local secret files can't be committed accidentally. (No `.env` files were already tracked.)

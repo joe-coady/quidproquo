@@ -47,6 +47,9 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
         // Allow bucket to auto delete upon cdk:Destroy
         removalPolicy: cdk.RemovalPolicy.DESTROY,
         autoDeleteObjects: true,
+
+        // Keep prior object versions so a bad deploy / accidental overwrite can be rolled back
+        versioned: true,
       });
 
       const awsAccountId = qpqConfigAwsUtils.getApplicationModuleDeployAccountId(props.qpqConfig);
