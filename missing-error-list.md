@@ -184,7 +184,6 @@ May or may not make a fallible external call depending on the processor. Confirm
 before implementing or skipping.
 
 - [x] askUserDirectoryDecodeAccessToken — quidproquo-core/src/actions/userDirectory/UserDirectoryDecodeAccessTokenActionRequester.ts — verifies JWT against Cognito JWKS, but `decodeValidJwt` swallows all failures to `null`, so the action's only caller-branchable error is `Unauthorized` (made action-specific; no try/catch needed)
-- [ ] askExecuteStory — quidproquo-core/src/actions/system/SystemExecuteStoryActionRequester.ts — system action; may invoke a runtime/lambda
 
 ---
 
@@ -211,6 +210,7 @@ Processors do no external call, so there is no named error to translate.
 - askStreamClose — quidproquo-core/src/actions/stream/StreamCloseRequester.ts (in-memory `streamRegistry.close`: Map get/delete + un-awaited `iterator.return?.()`; cannot throw, no-ops on missing id)
 - askStreamRead — quidproquo-core/src/actions/stream/StreamReadRequester.ts (in-memory `streamRegistry.read`: only known throw is a generic `Error('Stream not found')` with no discriminable code/name; opaque producer rejections already fall through to GenericError — no platform/SDK named error to translate)
 - askInlineFunctionExecute — quidproquo-core/src/actions/inlineFunction/InlineFunctionExecuteActionRequester.ts (node processor makes no external call — it runs a nested story **in-process** via `createRuntime` and forwards that story's own already-typed error; error surface is unbounded passthrough, so no catalog enum is possible. `NotFound` guards for missing config/module stay generic.)
+- askExecuteStory — quidproquo-core/src/actions/system/SystemExecuteStoryActionRequester.ts (awslambda processor — same shape as askInlineFunctionExecute: runs a nested story **in-process** via `createRuntime` and forwards that story's own already-typed error; no external call, unbounded passthrough. `NotFound` guard for module load stays generic.)
 
 ### Event domain — internal transforms (N/A)
 
