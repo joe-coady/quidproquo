@@ -3,9 +3,12 @@ import {
   ActionProcessorList,
   ActionProcessorListResolver,
   actionResult,
+  actionResultError,
+  actionResultErrorFromCaughtError,
   QPQConfig,
   UserDirectoryActionType,
   UserDirectoryChangePasswordActionProcessor,
+  UserDirectoryChangePasswordErrorTypeEnum,
 } from 'quidproquo-core';
 
 import { changePassword } from '../../../logic/cognito/changePassword';
@@ -14,9 +17,17 @@ const getProcessChangePassword = (qpqConfig: QPQConfig): UserDirectoryChangePass
   return async ({ oldPassword, newPassword, accessToken }) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
-    await changePassword(accessToken, oldPassword, newPassword, region);
+    try {
+      await changePassword(accessToken, oldPassword, newPassword, region);
 
-    return actionResult(void 0);
+      return actionResult(void 0);
+    } catch (error: unknown) {
+      return actionResultErrorFromCaughtError(error, {
+        NotAuthorizedException: () => actionResultError(UserDirectoryChangePasswordErrorTypeEnum.IncorrectPassword, 'Current password is incorrect'),
+        InvalidPasswordException: () => actionResultError(UserDirectoryChangePasswordErrorTypeEnum.InvalidNewPassword, 'New password does not meet the password policy'),
+        LimitExceededException: () => actionResultError(UserDirectoryChangePasswordErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
+      });
+    }
   };
 };
 

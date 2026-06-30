@@ -127,7 +127,7 @@ These processors call AWS / HTTP / external services and can throw named errors.
 - [x] askNetworkRequest — quidproquo-core/src/actions/network/NetworkRequestActionRequester.ts
 
 ### User Directory (Cognito)
-- [ ] askUserDirectoryChangePassword — quidproquo-core/src/actions/userDirectory/UserDirectoryChangePasswordActionRequester.ts
+- [x] askUserDirectoryChangePassword — quidproquo-core/src/actions/userDirectory/UserDirectoryChangePasswordActionRequester.ts
 - [ ] askUserDirectoryConfirmEmailVerification — quidproquo-core/src/actions/userDirectory/UserDirectoryConfirmEmailVerificationActionRequester.ts
 - [ ] askUserDirectoryConfirmForgotPassword — quidproquo-core/src/actions/userDirectory/UserDirectoryConfirmForgotPasswordActionRequester.ts
 - [ ] askUserDirectoryCreateUser — quidproquo-core/src/actions/userDirectory/UserDirectoryCreateUserActionRequester.ts
