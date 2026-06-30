@@ -126,9 +126,6 @@ These processors call AWS / HTTP / external services and can throw named errors.
 ### Network (HTTP)
 - [x] askNetworkRequest — quidproquo-core/src/actions/network/NetworkRequestActionRequester.ts
 
-### Stream
-- [ ] askStreamRead — quidproquo-core/src/actions/stream/StreamReadRequester.ts
-
 ### User Directory (Cognito)
 - [ ] askUserDirectoryChangePassword — quidproquo-core/src/actions/userDirectory/UserDirectoryChangePasswordActionRequester.ts
 - [ ] askUserDirectoryConfirmEmailVerification — quidproquo-core/src/actions/userDirectory/UserDirectoryConfirmEmailVerificationActionRequester.ts
@@ -183,6 +180,7 @@ Processors do no external call, so there is no named error to translate.
 - askUserDirectoryReadAccessToken — quidproquo-core/src/actions/userDirectory/UserDirectoryReadAccessTokenActionRequester.ts (reads token from context)
 - askUserDirectorySetAccessToken — quidproquo-core/src/actions/userDirectory/UserDirectorySetAccessTokenActionRequester.ts (sets token in context)
 - askStreamClose — quidproquo-core/src/actions/stream/StreamCloseRequester.ts (in-memory `streamRegistry.close`: Map get/delete + un-awaited `iterator.return?.()`; cannot throw, no-ops on missing id)
+- askStreamRead — quidproquo-core/src/actions/stream/StreamReadRequester.ts (in-memory `streamRegistry.read`: only known throw is a generic `Error('Stream not found')` with no discriminable code/name; opaque producer rejections already fall through to GenericError — no platform/SDK named error to translate)
 
 ### Event domain — internal transforms (N/A)
 
