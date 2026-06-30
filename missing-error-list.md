@@ -165,7 +165,6 @@ These processors call AWS / HTTP / external services and can throw named errors.
 - [x] askUserDirectorySetUserAttributes — quidproquo-core/src/actions/userDirectory/UserDirectorySetUserAttributesActionRequester.ts
 
 ### AI (moved down)
-- [ ] askAiPrompt — quidproquo-core/src/actions/ai/AiPromptActionRequester.ts
 - [ ] askAiPromptStream — quidproquo-core/src/actions/ai/AiPromptStreamActionRequester.ts
 - [ ] askClaudeAiMessagesApi — quidproquo-core/src/actions/claudeAi/ClaudeAiMessagesApiRequester.ts
 
@@ -218,6 +217,16 @@ Shape the incoming lambda event in-process; no external SDK call.
 - askEventTransformEventRecord — quidproquo-core/src/actions/event/EventTransformEventRecordActionRequester.ts
 - askEventTransformEventRecord (response) — quidproquo-core/src/actions/event/EventTransformEventRecordResponseActionRequester.ts
 - askEventTransformResponseResult — quidproquo-core/src/actions/event/EventTransformResponseResultActionRequester.ts
+
+---
+
+## Skipped — external IO, errors not cleanly mappable
+
+Processors that *do* call external services, but whose failures can't be keyed by
+`error.code` / `error.name` (so `actionResultErrorFromCaughtError` can't translate
+them). Deferred rather than forced.
+
+- askAiPrompt — quidproquo-core/src/actions/ai/AiPromptActionRequester.ts (Bedrock via the Vercel `ai` SDK wraps failures in `APICallError` — name `AI_APICallError`, discriminator is the numeric `statusCode` (e.g. 429), which the helper can't key on; the existing catch already returns `GenericError` with the real `error.message`)
 
 ---
 
