@@ -91,7 +91,7 @@ These processors call AWS / HTTP / external services and can throw named errors.
 - [x] askFileGenerateTemporaryUploadSecureUrl — quidproquo-core/src/actions/file/FileGenerateTemporaryUploadSecureUrlActionRequester.ts
 - [x] askFileIsColdStorage — quidproquo-core/src/actions/file/FileIsColdStorageActionRequester.ts
 - [x] askFileListDirectory — quidproquo-core/src/actions/file/FileListDirectoryActionRequester.ts
-- [ ] askFileReadBinaryContents — quidproquo-core/src/actions/file/FileReadBinaryContentsActionRequester.ts
+- [x] askFileReadBinaryContents — quidproquo-core/src/actions/file/FileReadBinaryContentsActionRequester.ts
 - [ ] askFileStreamOpen — quidproquo-core/src/actions/file/FileStreamOpenRequester.ts
 - [ ] askFileWriteBinaryContents — quidproquo-core/src/actions/file/FileWriteBinaryContentsActionRequester.ts
 - [ ] askFileWriteObjectJson — quidproquo-core/src/actions/file/FileWriteObjectJsonActionRequester.ts

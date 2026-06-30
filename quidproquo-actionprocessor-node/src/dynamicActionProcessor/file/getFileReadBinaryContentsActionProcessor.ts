@@ -6,6 +6,7 @@ import {
   ErrorTypeEnum,
   FileActionType,
   FileReadBinaryContentsActionProcessor,
+  FileReadBinaryContentsErrorTypeEnum,
   QPQBinaryData,
   QPQConfig,
 } from 'quidproquo-core';
@@ -32,7 +33,7 @@ const getProcessFileReadBinaryContents = (config: FileStorageConfig) => (qpqConf
       return actionResult(binaryData);
     } catch (error: any) {
       if (error.code === 'ENOENT') {
-        return actionResultError(ErrorTypeEnum.NotFound, `File not found: ${filepath}`);
+        return actionResultError(FileReadBinaryContentsErrorTypeEnum.FileNotFound, `File not found: ${filepath}`);
       }
       return actionResultError(ErrorTypeEnum.GenericError, `Error reading binary file: ${error.message}`);
     }
