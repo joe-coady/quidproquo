@@ -1,3 +1,5 @@
+import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
+import { resolveAwsServiceAccountInfo } from 'quidproquo-config-aws';
 import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 import {
   ContentSecurityPolicyEntry,
@@ -61,6 +63,27 @@ export const convertContentSecurityPolicyEntryToString = (qpqConfig: QPQConfig, 
   return fullDomain;
 };
 
+// Builds the exact virtual-hosted S3 endpoints the browser needs in `connect-src`
+// so it can fetch/upload presigned ("secure") URLs. Each storage drive (owned or
+// referenced from another service) resolves to a deterministic bucket name and its
+// owner's region, mirroring the enumeration in
+// `QpqCoreStorageDriveConstruct.authorizeActionsForRole`. This replaces the previous
+// `https://*.amazonaws.com` wildcard, which allowed connections to any AWS endpoint.
+const getStorageDriveConnectSrcDomains = (qpqConfig: QPQConfig): string[] => {
+  const domains = qpqCoreUtils.getStorageDrives(qpqConfig).map((cfg) => {
+    const bucketName = awsNamingUtils.getConfigRuntimeResourceNameFromConfigWithServiceOverride(
+      cfg.owner?.resourceNameOverride || cfg.storageDrive,
+      qpqConfig,
+      cfg.owner?.module,
+    );
+    const { awsRegion } = resolveAwsServiceAccountInfo(qpqConfig, cfg.owner);
+
+    return `https://${bucketName}.s3.${awsRegion}.amazonaws.com`;
+  });
+
+  return [...new Set(domains)];
+};
+
 export const convertContentSecurityPolicy = (
   qpqConfig: QPQConfig,
   contentSecurityPolicy?: ResponseHeadersContentSecurityPolicy,
@@ -75,25 +98,16 @@ export const convertContentSecurityPolicy = (
   const contentSecurityPolicyCopy: Record<string, ContentSecurityPolicyEntry[]> = {
     ...contentSecurityPolicy.contentSecurityPolicy,
 
-    // Auto add the secure urls for s3
-    // TODO: Do a better url like the one below
-    // https://*.s3.${region}.amazonaws.com
-    // Or even better:
-    // https://${bucketName}.s3.${region}.amazonaws.com
-    // even better better could be to proxy secure links with a new web proxy and it would hide the bucket.
-    'connect-src': [...(contentSecurityPolicy.contentSecurityPolicy['connect-src'] || []), 'https://*.amazonaws.com'],
+    // Auto add the secure (presigned) S3 endpoints for this service's storage drives,
+    // scoped to the specific bucket + region instead of a wildcard.
+    'connect-src': [...(contentSecurityPolicy.contentSecurityPolicy['connect-src'] || []), ...getStorageDriveConnectSrcDomains(qpqConfig)],
   };
 
   return {
     contentSecurityPolicy: Object.keys(contentSecurityPolicyCopy)
-      .map((directive) => {
-        const result = [
-          directive,
-          ...contentSecurityPolicyCopy[directive].map((cspe) => convertContentSecurityPolicyEntryToString(qpqConfig, cspe)),
-        ].join(' ');
-        console.log(directive, result);
-        return result;
-      })
+      .map((directive) =>
+        [directive, ...contentSecurityPolicyCopy[directive].map((cspe) => convertContentSecurityPolicyEntryToString(qpqConfig, cspe))].join(' '),
+      )
       .join('; '),
     override: contentSecurityPolicy.override,
   };
