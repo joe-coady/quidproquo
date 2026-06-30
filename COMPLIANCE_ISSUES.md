@@ -9,9 +9,6 @@ Legend: `[ ]` = still open, `[x]` = fixed. Items tagged **PARTIAL** have had pro
 
 ## Open — easiest first
 
-[ ] 8.3 .gitignore missing .env patterns — only `.envrc.ps1` ignored. `(effort: trivial)`
-Add `.env`, `.env.local`, and `.env.*.local` patterns so local secret files can't be committed accidentally.
-
 [ ] 8.2 DynamoDB point-in-time recovery optional — off by default. `(effort: trivial)`
 PITR is enabled only when `enableMonthlyRollingBackups` is set; flip the default so PITR is on (at least for production).
 
@@ -101,6 +98,9 @@ Operational/error logging uses raw `console.log`/`console.error` with no consist
 Admin Cognito actions are granted only when a service owns user directories (`getOwnedUserDirectories`), and `resources` is scoped to exactly those pools' ARNs (`...:userpool/${userpoolId}`) in `authorizeAdminActionsForRole`. A service that only references a foreign directory gets no Cognito IAM — token validation runs against the pool's public JWKs over HTTPS and needs none. The old "every Lambda gets admin on every pool" behaviour is gone.
 
 > **Note:** Now only the service that owns a user pool can administer it, scoped to that pool's ARN. All functions in the owning service share one role by design (single-shared-role-per-service model), so intra-service per-function least privilege is intentionally not split out.
+
+[x] 8.3 .gitignore missing .env patterns — patterns added.
+`.gitignore` now ignores `.env`, `.env.local`, and `.env.*.local` so local secret files can't be committed accidentally. (No `.env` files were already tracked.)
 
 [x] 1.3 No password policy on Cognito user pool — now configured.
 `QpqInfCoreUserDirectoryConstruct.ts` sets `passwordPolicy` with `minLength: 12` and requires lowercase, uppercase, digits, and symbols.
