@@ -116,7 +116,7 @@ These processors call AWS / HTTP / external services and can throw named errors.
 - [x] askKeyValueStoreGet — quidproquo-core/src/actions/keyValueStore/KeyValueStoreGetActionRequester.ts
 - [x] askKeyValueStoreGetAll — quidproquo-core/src/actions/keyValueStore/KeyValueStoreGetAllActionRequester.ts
 - [x] askKeyValueStoreQuery — quidproquo-core/src/actions/keyValueStore/KeyValueStoreQueryActionRequester.ts
-- [ ] askKeyValueStoreScan — quidproquo-core/src/actions/keyValueStore/KeyValueStoreScanActionRequester.ts
+- [x] askKeyValueStoreScan — quidproquo-core/src/actions/keyValueStore/KeyValueStoreScanActionRequester.ts
 - [ ] askKeyValueStoreUpdate — quidproquo-core/src/actions/keyValueStore/KeyValueStoreUpdateActionRequester.ts
 
 ### Event Bus / Queue (SNS / EventBridge / SQS)
