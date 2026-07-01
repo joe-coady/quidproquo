@@ -6,6 +6,7 @@
   "scripts": {
     "link": "npm exec --ws -- npm link",
     "build": "npm run build --ws",
+    "build:lite": "npx tsx ./scripts/buildLite.ts",
     "clean": "npm run clean --ws",
     "login": "npm login",
     "publish": "npm publish --ws",
@@ -16,6 +17,7 @@
     "lint:fix": "npm run lint:fix --ws",
     "format": "npm run format --ws",
     "test": "vitest run",
+    "test:lite": "vitest run --changed",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage --coverage.reporter=text-summary",
