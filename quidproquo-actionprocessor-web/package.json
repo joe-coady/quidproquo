@@ -1,6 +1,6 @@
 {
   "name": "quidproquo-actionprocessor-web",
-  "version": "0.0.263",
+  "version": "0.1.0",
   "description": "",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
@@ -33,14 +33,14 @@
   "homepage": "https://github.com/joe-coady/quidproquo#readme",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.19.1",
-    "quidproquo-actionprocessor-js": "0.0.263",
-    "quidproquo-core": "0.0.263",
-    "quidproquo-web": "0.0.263",
-    "quidproquo-webserver": "0.0.263",
+    "quidproquo-actionprocessor-js": "0.1.0",
+    "quidproquo-core": "0.1.0",
+    "quidproquo-web": "0.1.0",
+    "quidproquo-webserver": "0.1.0",
     "uuidv7": "^1.0.1"
   },
   "devDependencies": {
-    "quidproquo-tsconfig": "0.0.263",
+    "quidproquo-tsconfig": "0.1.0",
     "typescript": "^5.8.2"
   }
 }
