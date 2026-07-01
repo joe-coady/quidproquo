@@ -27,6 +27,13 @@ const getProcessRefreshToken = (qpqConfig: QPQConfig): UserDirectoryRefreshToken
       return actionResultError(UserDirectoryRefreshTokenErrorTypeEnum.Unauthorized, 'Invalid accessToken');
     }
 
+    // NOTE: we intentionally do NOT gate on decodedAccessToken.wasValid here.
+    // Refresh must accept a signature-valid-but-expired access token (that's the
+    // point of refreshing), and wasValid folds in the expiry check. The trust
+    // anchor for this operation is the refreshToken itself: Cognito's
+    // REFRESH_TOKEN_AUTH validates it and the SECRET_HASH binds it to `username`,
+    // so a forged/unverified username cannot mint tokens for another user.
+
     try {
       const authResponse = await cognitoRefreshToken(
         userPoolId,
