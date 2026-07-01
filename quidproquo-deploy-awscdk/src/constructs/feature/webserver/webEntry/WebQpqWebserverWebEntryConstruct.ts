@@ -1,11 +1,9 @@
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import { qpqWebServerUtils, WebEntryQPQWebServerConfigSetting } from 'quidproquo-webserver';
 
 import {
   aws_cloudfront,
   aws_cloudfront_origins,
-  aws_iam,
   aws_lambda,
   aws_route53,
   aws_route53_targets,
@@ -52,22 +50,11 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
         versioned: true,
       });
 
-      const awsAccountId = qpqConfigAwsUtils.getApplicationModuleDeployAccountId(props.qpqConfig);
-
-      originBucket.addToResourcePolicy(
-        new aws_iam.PolicyStatement({
-          sid: 'AllowCloudFrontServicePrincipal',
-          effect: aws_iam.Effect.ALLOW,
-          principals: [new aws_iam.ServicePrincipal('cloudfront.amazonaws.com')],
-          actions: ['s3:GetObject'],
-          resources: [originBucket.arnForObjects('*')],
-          conditions: {
-            StringLike: {
-              'AWS:SourceArn': `arn:aws:cloudfront::${awsAccountId}:distribution/*`,
-            },
-          },
-        }),
-      );
+      // No manual CloudFront bucket policy here: because this bucket is owned by
+      // this stack, `S3BucketOrigin.withOriginAccessControl` (below) auto-adds a
+      // policy scoped to this exact distribution's ARN (StringEquals on
+      // AWS:SourceArn). Adding one manually would only re-broaden it to
+      // `distribution/*`.
     } else {
       originBucket = aws_s3.Bucket.fromBucketName(this, 'src-bucket-lookup', this.resourceName(props.webEntryConfig.storageDrive.sourceStorageDrive));
     }

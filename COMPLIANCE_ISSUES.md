@@ -12,8 +12,8 @@ Legend: `[ ]` = still open, `[x]` = fixed. Items tagged **PARTIAL** have had pro
 [ ] 2.1 JWT decoded without signature verification — **PARTIAL**; renamed and documented, behaviour unchanged. `(effort: easy)`
 `unsafeDecodeJWTPayload` still base64-decodes with no signature check and the dev path calls it. Production uses RS256 + JWKS, so the remaining work is auditing/guarding call sites to ensure it's never used for authorization outside dev.
 
-[ ] 6.4 CloudFront S3 policy allows any distribution in the account — wildcard `distribution/*`. `(effort: easy)`
-Both `WebQpqWebserverWebEntryConstruct.ts` and `QpqCoreStorageDriveConstruct.ts` set `AWS:SourceArn` to `distribution/*`; scope it to the specific distribution ARN created in the same construct.
+[ ] 6.4 CloudFront S3 policy allows any distribution in the account — **PARTIAL**; web-entry bucket now scoped to its exact distribution, storage-drive bucket constrained by cross-stack boundary. `(effort: easy)`
+`WebQpqWebserverWebEntryConstruct.ts` no longer adds a manual `distribution/*` statement for the bucket it owns: `S3BucketOrigin.withOriginAccessControl` (CDK) auto-adds a policy scoped to that exact distribution's ARN (`StringEquals` on `AWS:SourceArn`), so the redundant broader statement was removed. `QpqCoreStorageDriveConstruct.ts` still uses account-scoped `distribution/*` because its bucket is consumed by a distribution in a *separate* service/deploy phase (imported by name → CDK can't auto-scope it, and the consuming distribution's AWS-generated ID isn't knowable here and can't be cross-referenced per the separate-deploys rule). Account-scoped `distribution/*` is the pragmatic ceiling for that path.
 
 [ ] 7.1 Overly permissive CORS — wildcards in headers, S3, and CloudFront. `(effort: easy)`
 `headerUtils.ts`, S3 CORS, and CloudFront all use `*`. Replace with explicit allowed origins, headers, and methods (likely driven from config). Authenticated routes already reject wildcard origins.
