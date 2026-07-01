@@ -12,6 +12,13 @@ import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqCons
 import { QpqResource } from '../../../base/QpqResource';
 export interface QpqCoreStorageDriveConstructProps extends QpqConstructBlockProps {
   storageDriveConfig: StorageDriveQPQConfigSetting;
+
+  /**
+   * Resolved browser origins for the bucket's CORS policy. Computed by the
+   * (web-aware) caller so this core construct stays domain-agnostic. Defaults
+   * to '*' when omitted (headless/core-only deployments have no browser origin).
+   */
+  corsAllowedOrigins?: string[];
 }
 
 export abstract class QpqCoreStorageDriveConstructBase extends QpqConstructBlock implements QpqResource {
@@ -93,7 +100,7 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
 
       cors: [
         {
-          allowedOrigins: ['*'],
+          allowedOrigins: props.corsAllowedOrigins ?? ['*'],
           allowedMethods: [
             aws_s3.HttpMethods.GET,
             aws_s3.HttpMethods.HEAD,

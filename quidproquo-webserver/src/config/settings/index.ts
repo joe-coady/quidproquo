@@ -15,6 +15,7 @@ export * from './seed';
 export * from './seo';
 export * from './serviceFunction';
 export * from './stateDispatchOverWebsockets';
+export * from './storageDriveCorsSettings';
 export * from './subdomainRedirect';
 export * from './webEntry';
 export * from './websocket';

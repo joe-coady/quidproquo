@@ -13,6 +13,7 @@ import { defineOpenApi } from '../config/settings/openApi';
 import { defineRoute } from '../config/settings/route';
 import { defineSeo } from '../config/settings/seo';
 import { defineServiceFunction } from '../config/settings/serviceFunction';
+import { defineStorageDriveCorsSettings } from '../config/settings/storageDriveCorsSettings';
 import { defineSubdomainRedirect } from '../config/settings/subdomainRedirect';
 import { defineWebEntry, WebDomainOptions } from '../config/settings/webEntry';
 import { defineWebsocket } from '../config/settings/websocket';
@@ -40,6 +41,7 @@ import {
   getOwnedServiceFunctions,
   getOwnedWebsocketSettings,
   getServiceDomainName,
+  getStorageDriveCorsAllowedOrigins,
   getSubdomainRedirects,
   getWebEntry,
   getWebEntryConfigs,
@@ -172,6 +174,34 @@ describe('domain name helpers', () => {
   it('resolves the domain root from the application module', () => {
     const config = buildTestQpqConfig([], { environment: 'staging' });
     expect(resolveDomainRoot('example.com', config)).toBe('staging.example.com');
+  });
+});
+
+describe('getStorageDriveCorsAllowedOrigins', () => {
+  it('scopes to the service domain (apex + subdomain wildcard) when no cors setting is declared', () => {
+    const config = buildTestQpqConfig([defineDns('example.com')], { environment: 'production' });
+    expect(getStorageDriveCorsAllowedOrigins(config, 'uploads')).toEqual(['https://example.com', 'https://*.example.com']);
+  });
+
+  it('honours an explicit defineStorageDriveCorsSettings for the matching drive', () => {
+    const config = buildTestQpqConfig(
+      [defineDns('example.com'), defineStorageDriveCorsSettings('uploads', ['https://app.other.com'])],
+      { environment: 'production' },
+    );
+    expect(getStorageDriveCorsAllowedOrigins(config, 'uploads')).toEqual(['https://app.other.com']);
+  });
+
+  it('ignores cors settings declared for a different drive', () => {
+    const config = buildTestQpqConfig(
+      [defineDns('example.com'), defineStorageDriveCorsSettings('other', ['https://app.other.com'])],
+      { environment: 'production' },
+    );
+    expect(getStorageDriveCorsAllowedOrigins(config, 'uploads')).toEqual(['https://example.com', 'https://*.example.com']);
+  });
+
+  it('falls back to wildcard when the service declares no domain', () => {
+    const config = buildTestQpqConfig();
+    expect(getStorageDriveCorsAllowedOrigins(config, 'uploads')).toEqual(['*']);
   });
 });
 

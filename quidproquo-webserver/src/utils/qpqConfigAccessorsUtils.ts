@@ -12,6 +12,7 @@ import {
   RouteQPQWebServerConfigSetting,
   SeoQPQWebServerConfigSetting,
   ServiceFunctionQPQWebServerConfigSetting,
+  StorageDriveCorsSettingsQPQWebServerConfigSetting,
   SubdomainRedirectQPQWebServerConfigSetting,
   WebSocketQPQWebServerConfigSetting,
 } from '../config';
@@ -187,6 +188,33 @@ export const getServiceDomainName = (qpqConfig: QPQConfig): string => {
   const domainBase = getBaseDomainName(qpqConfig);
 
   return `${service}.${domainBase}`;
+};
+
+/**
+ * Browser origins allowed to read/write a storage drive's objects cross-origin
+ * (e.g. presigned uploads/downloads), looked up by the drive's name. An explicit
+ * `defineStorageDriveCorsSettings` wins; otherwise scope to this service's own
+ * domain (apex + one-level subdomain wildcard, which S3 CORS supports). Falls
+ * back to '*' only when the service declares no domain at all.
+ */
+export const getStorageDriveCorsAllowedOrigins = (qpqConfig: QPQConfig, storageDriveName: string): string[] => {
+  const corsSetting = qpqCoreUtils
+    .getConfigSettings<StorageDriveCorsSettingsQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.StorageDriveCorsSettings)
+    .find((setting) => setting.storageDriveName === storageDriveName);
+
+  if (corsSetting) {
+    return corsSetting.allowedOrigins;
+  }
+
+  // No DNS base configured => nothing browser-facing => allow any origin.
+  // (getBaseDomainName still returns an env prefix like `development.` here,
+  // so key off the raw dns base to detect "no domain at all".)
+  if (!getDomainName(qpqConfig)) {
+    return ['*'];
+  }
+
+  const baseDomain = getBaseDomainName(qpqConfig);
+  return [`https://${baseDomain}`, `https://*.${baseDomain}`];
 };
 
 export const resolveApexDomainNameFromDomainConfig = (qpqConfig: QPQConfig, rootDomain: string, onRootDomain: boolean): string => {

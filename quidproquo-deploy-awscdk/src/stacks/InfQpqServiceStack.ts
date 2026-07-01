@@ -39,6 +39,8 @@ export class InfQpqServiceStack extends QpqServiceStack {
           qpqConfig: props.qpqConfig,
 
           storageDriveConfig: setting,
+
+          corsAllowedOrigins: qpqWebServerUtils.getStorageDriveCorsAllowedOrigins(props.qpqConfig, setting.storageDrive),
         }),
     );
     QpqCoreStorageDriveConstruct.authorizeActionsForRole(webserverRole, props.qpqConfig, storageDrives);
