@@ -8,6 +8,7 @@ import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import * as qpqDeployAwsCdkUtils from '../../../../utils/qpqDeployAwsCdkUtils';
+import { createDefaultResourceAlarm } from '../../../base/createDefaultResourceAlarm';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
 export interface QpqCoreQueueConstructProps extends QpqConstructBlockProps {
@@ -60,6 +61,11 @@ export class QpqCoreQueueConstruct extends QpqCoreQueueConstructBase {
   constructor(scope: Construct, id: string, props: QpqCoreQueueConstructProps) {
     super(scope, id, props);
 
+    const deadLetterQueue = new aws_sqs.Queue(this, 'DeadLetterQueue', {
+      queueName: this.resourceName(`${props.queueConfig.name}-dead`),
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+
     this.queue = new aws_sqs.Queue(this, 'MainQueue', {
       queueName: this.resourceName(props.queueConfig.name),
       visibilityTimeout: cdk.Duration.seconds(props.queueConfig.ttRetryInSeconds),
@@ -67,14 +73,29 @@ export class QpqCoreQueueConstruct extends QpqCoreQueueConstructBase {
 
       deadLetterQueue: {
         maxReceiveCount: props.queueConfig.maxTries,
-        queue: new aws_sqs.Queue(this, 'DeadLetterQueue', {
-          queueName: this.resourceName(`${props.queueConfig.name}-dead`),
-          removalPolicy: cdk.RemovalPolicy.DESTROY,
-        }),
+        queue: deadLetterQueue,
       },
     });
 
     qpqDeployAwsCdkUtils.applyEnvironmentTags(this.queue, props.qpqConfig);
+
+    // Default alarms (opt-in via defineNotifyError): a growing backlog on the
+    // main queue, and anything landing in the dead-letter queue (failed messages).
+    createDefaultResourceAlarm(this, props.qpqConfig, {
+      id: 'default-alarm-oldest-message',
+      alarmName: this.resourceName(`${props.queueConfig.name}-oldest-message`),
+      metric: this.queue.metricApproximateAgeOfOldestMessage({ period: cdk.Duration.minutes(1), statistic: 'Maximum' }),
+      threshold: 15 * 60, // oldest message older than 15 minutes => backlog
+      evaluationPeriods: 3,
+      datapointsToAlarm: 3,
+    });
+    createDefaultResourceAlarm(this, props.qpqConfig, {
+      id: 'default-alarm-dead-letter',
+      alarmName: this.resourceName(`${props.queueConfig.name}-dead-letter`),
+      metric: deadLetterQueue.metricApproximateNumberOfMessagesVisible({ period: cdk.Duration.minutes(1), statistic: 'Maximum' }),
+      threshold: 1, // any message in the DLQ is worth a look
+      evaluationPeriods: 1,
+    });
 
     const accountIds = getAwsAccountIds(props.qpqConfig);
 

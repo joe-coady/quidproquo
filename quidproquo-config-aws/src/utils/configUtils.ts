@@ -9,6 +9,8 @@ import {
   AwsServiceAccountInfoQPQConfigSetting,
   BootstrapCloudTrailQPQConfigSetting,
   DomainCertificateQPQConfigSetting,
+  EventBusQuickSubscription,
+  EventBusQuickSubscriptionQPQConfigSetting,
   QPQAwsConfigSettingType,
 } from '../config';
 import { ApiLayer, LocalServiceAccountInfo, ServiceAccountInfo } from '../types';
@@ -70,6 +72,24 @@ export const getOwnedAwsAlarmConfigs = (qpqConfig: QPQConfig): AwsAlarmQPQConfig
   const alarmConfigs = qpqCoreUtils.getConfigSettings<AwsAlarmQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.awsServiceAlarm);
 
   return qpqCoreUtils.getOwnedItems(alarmConfigs, qpqConfig);
+};
+
+/**
+ * Direct SNS subscribers (email / webhook) declared for a given event bus.
+ * Additive across calls. Pass the bus's `owner` (from its `defineEventBus`) to
+ * disambiguate: an owner-tagged quick-sub binds only to the matching owner's bus,
+ * while an owner-less one matches any bus with that name (simple single-service case).
+ */
+export const getEventBusQuickSubscriptions = (
+  qpqConfig: QPQConfig,
+  eventBusName: string,
+  busOwner?: CrossModuleOwner,
+): EventBusQuickSubscription[] => {
+  return qpqCoreUtils
+    .getConfigSettings<EventBusQuickSubscriptionQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.awsEventBusQuickSubscription)
+    .filter((setting) => setting.eventBusName === eventBusName)
+    .filter((setting) => !setting.owner || qpqCoreUtils.isSameCrossModuleOwner(setting.owner, busOwner))
+    .flatMap((setting) => setting.subscriptions);
 };
 
 export const getAwsAccountIds = (qpqConfig: QPQConfig): string[] => {

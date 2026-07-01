@@ -6,6 +6,7 @@ import { aws_apigateway, aws_ec2, aws_lambda, aws_logs } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
+import { createDefaultResourceAlarm } from '../../../base/createDefaultResourceAlarm';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { Function } from '../../../basic/Function';
 
@@ -70,6 +71,16 @@ export class ApiQpqWebserverApiConstruct extends QpqConstructBlock {
         metricsEnabled: true,
         dataTraceEnabled: false,
       },
+    });
+
+    // Default alarm (opt-in via defineNotifyError): server-side (5XX) errors
+    // reaching clients. 4XX is caller error, so not alarmed by default.
+    createDefaultResourceAlarm(this, props.qpqConfig, {
+      id: 'default-alarm-5xx',
+      alarmName: this.resourceName(`${props.apiConfig.apiName}-5xx`),
+      metric: api.metricServerError({ period: cdk.Duration.minutes(1), statistic: 'Sum' }),
+      threshold: 1,
+      evaluationPeriods: 1,
     });
 
     const baseDomain = qpqWebServerUtils.resolveDomainRoot(props.apiConfig.rootDomain, props.qpqConfig);

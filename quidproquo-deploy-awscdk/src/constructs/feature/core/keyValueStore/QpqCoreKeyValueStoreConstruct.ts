@@ -7,6 +7,7 @@ import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import * as qpqDeployAwsCdkUtils from '../../../../utils/qpqDeployAwsCdkUtils';
+import { createDefaultResourceAlarm } from '../../../base/createDefaultResourceAlarm';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
 export interface QpqCoreKeyValueStoreConstructProps extends QpqConstructBlockProps {
@@ -91,6 +92,23 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
     });
 
     qpqDeployAwsCdkUtils.applyEnvironmentTags(table, props.qpqConfig);
+
+    // Default alarms (opt-in via defineNotifyError): read/write throttling means
+    // the table is rejecting requests (hot partition / capacity), user-visible.
+    createDefaultResourceAlarm(this, props.qpqConfig, {
+      id: 'default-alarm-read-throttle',
+      alarmName: this.resourceName(`${props.keyValueStoreConfig.keyValueStoreName}-read-throttle`),
+      metric: table.metric('ReadThrottleEvents', { period: cdk.Duration.minutes(1), statistic: 'Sum' }),
+      threshold: 1,
+      evaluationPeriods: 1,
+    });
+    createDefaultResourceAlarm(this, props.qpqConfig, {
+      id: 'default-alarm-write-throttle',
+      alarmName: this.resourceName(`${props.keyValueStoreConfig.keyValueStoreName}-write-throttle`),
+      metric: table.metric('WriteThrottleEvents', { period: cdk.Duration.minutes(1), statistic: 'Sum' }),
+      threshold: 1,
+      evaluationPeriods: 1,
+    });
 
     // Do local secondary indexes
     for (let i = 1; i < props.keyValueStoreConfig.sortKeys.length; i++) {

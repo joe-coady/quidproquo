@@ -6,4 +6,5 @@ export enum QPQAwsConfigSettingType {
   bootstrapCloudTrail = '@quidproquo-aws/config/bootstrapCloudTrail',
   awsDomainCertificate = '@quidproquo-aws/config/awsDomainCertificate',
   awsKmsKey = '@quidproquo-aws/config/awsKmsKey',
+  awsEventBusQuickSubscription = '@quidproquo-aws/config/awsEventBusQuickSubscription',
 }

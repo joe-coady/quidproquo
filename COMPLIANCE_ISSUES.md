@@ -27,9 +27,6 @@ Add a default operational dashboard per service (request rate, error rate, laten
 [ ] 13.5 No anomaly detection — none configured. `(effort: medium)`
 Enable CloudWatch `AnomalyDetector` on critical metrics (Lambda duration, API latency, error rates) so slow leaks, degradation, and cost creep get surfaced.
 
-[ ] 13.3 Alert routing has no subscribers — alarms fire into a void. `(effort: medium)`
-`QpqCoreNotifyError.ts` routes alarms to an SNS topic with no external subscribers. Add configurable SNS subscriptions (email/HTTPS webhook/Lambda) and document PagerDuty/Slack/OpsGenie patterns.
-
 [ ] 8.1 DESTROY removal policy on all stateful resources — hardcoded, not environment-aware. `(effort: medium)`
 `RemovalPolicy.DESTROY` is hardcoded on S3 (+ `autoDeleteObjects`), DynamoDB, Cognito, and log groups. Introduce an environment-aware toggle defaulting to `RETAIN`/`SNAPSHOT` for production.
 
@@ -44,9 +41,6 @@ Add VPC flow logs (CloudWatch/S3), VPC endpoints (S3/DynamoDB/Secrets Manager), 
 
 [ ] 5.1 No security groups defined — zero `SecurityGroup` constructs. `(effort: medium-hard)`
 Lambdas in VPCs use the default security group. Create explicit security groups with minimal ingress/egress rules per service, exposed through config.
-
-[ ] 13.1 Alarm framework defined but not auto-instantiated — fully opt-in. `(effort: medium-hard)`
-Alarms only come from user-defined configs and the construct currently only supports the Lambda namespace. Auto-instantiate sensible defaults per resource (Lambda errors ≥ 1, API 5xx ≥ 1, DynamoDB throttles ≥ 1, SQS message age) and extend namespace support.
 
 [ ] 1.1 Wildcard IAM permissions on shared service role — **PARTIAL**; data-plane wildcards removed, control-plane remain. `(effort: medium-hard)`
 `sns:Publish`, `apigateway:GET`, `cloudfront:CreateInvalidation`, and `execute-api:ManageConnections` still use `resources: ['*']`. Scope these to specific ARNs and move toward per-function/per-domain roles instead of one shared role.
@@ -78,6 +72,12 @@ Operational/error logging uses raw `console.log`/`console.error` with no consist
 ---
 
 ## Fixed
+
+[x] 13.1 Alarm framework — namespace support completed + per-resource default alarms auto-instantiated.
+The alarm config schema already modelled Lambda/ApiGateway/DynamoDb/Sqs, but the construct only handled Lambda (`else throw`). Since the alarm is built entirely from the shared `BaseAwsAlarmQPQConfigSetting` fields, the per-namespace branch was pointless — removed it, so `QpqConfigAwsAlarmConstruct` is now namespace-agnostic (all four + any future namespace work from config). Deleted a byte-identical dead duplicate at `feature/core/alarm`. For auto-instantiation, a shared `createDefaultResourceAlarm(scope, qpqConfig, props)` helper creates sensible per-resource default alarms and routes them to the service's error-notification bus (reusing `defineNotifyError`'s target — no new routing concept). Opt-in: no-op unless a `defineNotifyError` is declared. Wired in: SQS (`ApproximateAgeOfOldestMessage` backlog + any dead-letter message), DynamoDB (`ReadThrottleEvents`/`WriteThrottleEvents`), API Gateway (`5XXError`). Per-resource dimensions are required for these because API/DynamoDB/SQS publish no account-level metric rollup (unlike Lambda). Lambda stays covered by the existing account-aggregate Errors/Throttles alarms in `QpqCoreNotifyError`.
+
+[x] 13.3 Alert routing has no subscribers — event buses can now fan out to external endpoints.
+A new AWS config setting `defineEventBusQuickSubscription(eventBusName, EventBusQuickSubscription[])` (in `quidproquo-config-aws`) declares direct SNS subscribers per bus — `{ type: 'email', email }` or `{ type: 'url', url }` (incident webhook, http/https auto-detected). `QpqCoreEventBusConstruct` resolves them via `qpqConfigAwsUtils.getEventBusQuickSubscriptions(qpqConfig, busName, busOwner)` and maps to SNS `EmailSubscription`/`UrlSubscription`. Supports an `owner` (mirroring `defineEventBus`) so a quick-sub declared in a shared app-level config binds only to the matching owner's bus (owner-less quick-subs match by name, for the single-service case); only the bus's owning service applies subscriptions, preserving the "owner controls subscribers" trust boundary. Combined with alarm routing (`onAlarm.publishToEventBus`) this is how alerts reach a human/PagerDuty/Slack/OpsGenie out-of-band. Deliberately lives in config-aws, NOT on core's `defineEventBus`: direct email/webhook delivery with no compute is an SNS-specific capability, not a portable event-bus concept (other runtimes would need the bus→queue→function pattern). Same layering rule as the storage-drive CORS setting — platform-specific concerns sit in the platform's config layer, keyed by the resource name, resolved at deploy.
 
 [x] 2.1 JWT decoded without signature verification — audit complete; `unsafeDecodeJWTPayload` confirmed never used for authorization, and the guards that enforce this are in place and tested.
 Full call-site audit: every authorization/trust decision uses the signature-validated decode (`askRouteAuthValidationDecode` → `decodeValidJwt`, RS256+JWKS), never the unsafe base64 decode. (1) HTTP route auth (`askValidateRouteAuth`) rejects `!decoded.wasValid` — covered by `askValidateRouteAuth.test.ts` ("rejects when the token decodes but is not valid" with `wasValid: false`). (2) WebSocket auth (`askProcessOnAuthenticate`) authenticates via `askUserDirectorySetAccessToken` → `decodeValidJwt` (Cognito-validated). (3) `unsafeDecodeJWTPayload` has exactly two callers: the dev path (`decodeAccessTokenForDev`, dev-only) and the no-auth-route branch of `askGetHttpApiEventStorySession`, which stamps `wasValid: false` and is used only to enrich logs — pinned by `askGetHttpApiEventStorySession.test.ts`. (4) The only non-logging consumer of a possibly-unverified `username` is the token-refresh processor; it can't gate on `wasValid` (refresh must accept signature-valid-but-*expired* tokens), but the trust anchor there is the refresh token itself — Cognito's `REFRESH_TOKEN_AUTH` validates it and `SECRET_HASH` binds it to the username, so a forged username cannot mint another user's tokens (documented inline). Residual contract (not a framework bug): on a *no-auth* route, `session.decodedAccessToken` carries unverified identity with `wasValid: false`, so user business logic must check `wasValid` before trusting `userId`/`username` for anything security-sensitive.
