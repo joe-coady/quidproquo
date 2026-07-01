@@ -113,12 +113,11 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
         // },
         securityHeadersBehavior: convertSecurityHeadersFromQpqSecurityHeaders(props.qpqConfig, props.webEntryConfig.securityHeaders),
 
-        // TODO: Expose this to config.
         corsBehavior: {
           accessControlAllowCredentials: false,
           accessControlAllowHeaders: ['Origin', 'Access-Control-Request-Headers', 'Access-Control-Request-Method'],
           accessControlAllowMethods: ['GET', 'HEAD', 'OPTIONS'],
-          accessControlAllowOrigins: ['*'],
+          accessControlAllowOrigins: qpqWebServerUtils.resolveServiceScopedCorsAllowedOrigins(props.qpqConfig, props.webEntryConfig.corsAllowedOrigins),
           accessControlExposeHeaders: ['*'],
           accessControlMaxAge: cdk.Duration.seconds(600),
           originOverride: true,

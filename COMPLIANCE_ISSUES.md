@@ -15,9 +15,6 @@ Legend: `[ ]` = still open, `[x]` = fixed. Items tagged **PARTIAL** have had pro
 [ ] 6.4 CloudFront S3 policy allows any distribution in the account — **PARTIAL**; web-entry bucket now scoped to its exact distribution, storage-drive bucket constrained by cross-stack boundary. `(effort: easy)`
 `WebQpqWebserverWebEntryConstruct.ts` no longer adds a manual `distribution/*` statement for the bucket it owns: `S3BucketOrigin.withOriginAccessControl` (CDK) auto-adds a policy scoped to that exact distribution's ARN (`StringEquals` on `AWS:SourceArn`), so the redundant broader statement was removed. `QpqCoreStorageDriveConstruct.ts` still uses account-scoped `distribution/*` because its bucket is consumed by a distribution in a *separate* service/deploy phase (imported by name → CDK can't auto-scope it, and the consuming distribution's AWS-generated ID isn't knowable here and can't be cross-referenced per the separate-deploys rule). Account-scoped `distribution/*` is the pragmatic ceiling for that path.
 
-[ ] 7.1 Overly permissive CORS — wildcards in headers, S3, and CloudFront. `(effort: easy)`
-`headerUtils.ts`, S3 CORS, and CloudFront all use `*`. Replace with explicit allowed origins, headers, and methods (likely driven from config). Authenticated routes already reject wildcard origins.
-
 [ ] 12.2 No AWS Shield Advanced — only default Shield Standard. `(effort: easy)`
 Mostly a cost/decision item: evaluate and optionally enable Shield Advanced for production workloads with SLA requirements. Minimal code.
 
@@ -84,6 +81,9 @@ Operational/error logging uses raw `console.log`/`console.error` with no consist
 ---
 
 ## Fixed
+
+[x] 7.1 Overly permissive CORS — all three wildcard sites now scoped/config-driven with a domain-derived default.
+Three surfaces, all addressed. (1) **API** (`headerUtils.ts`): dropped `Access-Control-Allow-Headers: *` / `Allow-Methods: *` — also a latent bug, since literal `*` is invalid once `Allow-Credentials: true`, so authenticated preflights carrying `Authorization`/custom headers were failing. It now reflects the preflight's `Access-Control-Request-Headers`/`-Method` with explicit fallbacks and widens `Vary`; origin allowlisting was already correct. (2) **S3 storage-drive bucket**: CORS is web-only, so it lives entirely in the webserver layer (core `defineStorageDrive` untouched). New `defineStorageDriveCorsSettings(storageDriveName, allowedOrigins)` setting; `qpqWebServerUtils.getStorageDriveCorsAllowedOrigins` resolves it; the core `QpqCoreStorageDriveConstruct` stays domain-agnostic (takes a resolved `corsAllowedOrigins` prop, default `['*']`) and `InfQpqServiceStack` injects it by drive name. (3) **CloudFront web-entry** `ResponseHeadersPolicy`: new `corsAllowedOrigins?` on `defineWebEntry`, applied to `accessControlAllowOrigins`. Shared `resolveServiceScopedCorsAllowedOrigins(qpqConfig, explicit?)` backs both (2) and (3): explicit list wins, else scope to the service domain (`https://<domain>` + `https://*.<domain>`, an S3/CloudFront-supported single-level wildcard), else `['*']` when no DNS base is configured. Pass `['*']` explicitly to restore allow-any-origin (e.g. public-CDN / cross-origin-font web entries).
 
 [x] 1.2 Overly broad Cognito permissions — now scoped to owned user pools (by design).
 Admin Cognito actions are granted only when a service owns user directories (`getOwnedUserDirectories`), and `resources` is scoped to exactly those pools' ARNs (`...:userpool/${userpoolId}`) in `authorizeAdminActionsForRole`. A service that only references a foreign directory gets no Cognito IAM — token validation runs against the pool's public JWKs over HTTPS and needs none. The old "every Lambda gets admin on every pool" behaviour is gone.

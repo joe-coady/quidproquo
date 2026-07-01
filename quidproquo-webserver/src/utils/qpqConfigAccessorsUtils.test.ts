@@ -49,6 +49,7 @@ import {
   getWebsocketSettings,
   resolveApexDomainNameFromDomainConfig,
   resolveDomainRoot,
+  resolveServiceScopedCorsAllowedOrigins,
 } from './qpqConfigAccessorsUtils';
 
 const cacheSettings: CacheSettings = { minTTLInSeconds: 1, maxTTLInSeconds: 100, defaultTTLInSeconds: 10, mustRevalidate: false };
@@ -174,6 +175,22 @@ describe('domain name helpers', () => {
   it('resolves the domain root from the application module', () => {
     const config = buildTestQpqConfig([], { environment: 'staging' });
     expect(resolveDomainRoot('example.com', config)).toBe('staging.example.com');
+  });
+});
+
+describe('resolveServiceScopedCorsAllowedOrigins', () => {
+  it('returns explicit origins untouched', () => {
+    const config = buildTestQpqConfig([defineDns('example.com')], { environment: 'production' });
+    expect(resolveServiceScopedCorsAllowedOrigins(config, ['https://app.other.com'])).toEqual(['https://app.other.com']);
+  });
+
+  it('scopes to the service domain (apex + subdomain wildcard) when unset', () => {
+    const config = buildTestQpqConfig([defineDns('example.com')], { environment: 'production' });
+    expect(resolveServiceScopedCorsAllowedOrigins(config)).toEqual(['https://example.com', 'https://*.example.com']);
+  });
+
+  it('falls back to wildcard when the service declares no domain', () => {
+    expect(resolveServiceScopedCorsAllowedOrigins(buildTestQpqConfig())).toEqual(['*']);
   });
 });
 

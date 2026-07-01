@@ -191,30 +191,38 @@ export const getServiceDomainName = (qpqConfig: QPQConfig): string => {
 };
 
 /**
- * Browser origins allowed to read/write a storage drive's objects cross-origin
- * (e.g. presigned uploads/downloads), looked up by the drive's name. An explicit
- * `defineStorageDriveCorsSettings` wins; otherwise scope to this service's own
- * domain (apex + one-level subdomain wildcard, which S3 CORS supports). Falls
- * back to '*' only when the service declares no domain at all.
+ * Resolve browser CORS origins for a service resource. An explicit list wins;
+ * otherwise scope to this service's own domain (apex + one-level subdomain
+ * wildcard, which S3/CloudFront both support). Falls back to '*' only when the
+ * service declares no domain at all (nothing browser-facing).
+ *
+ * Note: key off the raw dns base (`getDomainName`) to detect "no domain" —
+ * `getBaseDomainName` still returns an env prefix like `development.` here.
  */
-export const getStorageDriveCorsAllowedOrigins = (qpqConfig: QPQConfig, storageDriveName: string): string[] => {
-  const corsSetting = qpqCoreUtils
-    .getConfigSettings<StorageDriveCorsSettingsQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.StorageDriveCorsSettings)
-    .find((setting) => setting.storageDriveName === storageDriveName);
-
-  if (corsSetting) {
-    return corsSetting.allowedOrigins;
+export const resolveServiceScopedCorsAllowedOrigins = (qpqConfig: QPQConfig, explicitOrigins?: string[]): string[] => {
+  if (explicitOrigins) {
+    return explicitOrigins;
   }
 
-  // No DNS base configured => nothing browser-facing => allow any origin.
-  // (getBaseDomainName still returns an env prefix like `development.` here,
-  // so key off the raw dns base to detect "no domain at all".)
   if (!getDomainName(qpqConfig)) {
     return ['*'];
   }
 
   const baseDomain = getBaseDomainName(qpqConfig);
   return [`https://${baseDomain}`, `https://*.${baseDomain}`];
+};
+
+/**
+ * Browser origins allowed to read/write a storage drive's objects cross-origin
+ * (e.g. presigned uploads/downloads), looked up by the drive's name. An explicit
+ * `defineStorageDriveCorsSettings` wins; otherwise the service-scoped default.
+ */
+export const getStorageDriveCorsAllowedOrigins = (qpqConfig: QPQConfig, storageDriveName: string): string[] => {
+  const corsSetting = qpqCoreUtils
+    .getConfigSettings<StorageDriveCorsSettingsQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.StorageDriveCorsSettings)
+    .find((setting) => setting.storageDriveName === storageDriveName);
+
+  return resolveServiceScopedCorsAllowedOrigins(qpqConfig, corsSetting?.allowedOrigins);
 };
 
 export const resolveApexDomainNameFromDomainConfig = (qpqConfig: QPQConfig, rootDomain: string, onRootDomain: boolean): string => {
