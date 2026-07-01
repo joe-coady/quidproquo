@@ -101,6 +101,44 @@ describe('executeNetworkRequest', () => {
     expect(init.headers['Content-Type']).toBe('text/plain');
   });
 
+  // Regression: JSON.stringify(Blob | ArrayBuffer | ...) yields "{}", which silently
+  // corrupted binary uploads (presigned S3 PUTs). Raw bodies must pass through as-is.
+  it('passes a Blob body through untouched instead of JSON-stringifying it to "{}"', async () => {
+    fetchMock.mockResolvedValue(fakeResponse({ body: '' }));
+
+    // A File would exercise the same path — File extends Blob.
+    const blob = new Blob(['\x89PNG fake binary'], { type: 'image/png' });
+    await executeNetworkRequest(buildPayload({ method: 'PUT', headers: { 'Content-Type': 'image/png' }, body: blob, responseType: 'text' }));
+
+    const [, init] = fetchMock.mock.calls[0];
+    expect(init.body).toBe(blob);
+    expect(init.headers['Content-Type']).toBe('image/png');
+  });
+
+  it.each([
+    ['an ArrayBuffer', new Uint8Array([1, 2, 3]).buffer],
+    ['a typed array', new Uint8Array([1, 2, 3])],
+  ] as const)('passes %s body through untouched and does not add a content-type', async (_label: string, body: ArrayBuffer | Uint8Array) => {
+    fetchMock.mockResolvedValue(fakeResponse({ body: '' }));
+
+    await executeNetworkRequest(buildPayload({ method: 'PUT', body, responseType: 'text' }));
+
+    const [, init] = fetchMock.mock.calls[0];
+    expect(init.body).toBe(body);
+    expect(init.headers['Content-Type']).toBeUndefined();
+  });
+
+  it('form-encodes a URLSearchParams body and sets the form content-type', async () => {
+    fetchMock.mockResolvedValue(fakeResponse({ body: { ok: true } }));
+
+    const params = new URLSearchParams({ a: '1', b: '2' });
+    await executeNetworkRequest(buildPayload({ method: 'POST', headers: {}, body: params }));
+
+    const [, init] = fetchMock.mock.calls[0];
+    expect(init.body).toBe('a=1&b=2');
+    expect(init.headers['Content-Type']).toBe('application/x-www-form-urlencoded;charset=utf-8');
+  });
+
   it.each([
     ['DELETE'],
     ['HEAD'],
