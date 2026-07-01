@@ -108,6 +108,27 @@ describe('getCorsHeaders', () => {
 
     expect(headers['Access-Control-Allow-Credentials']).toBe('true');
   });
+
+  it('reflects the preflight-requested headers and method instead of a wildcard', () => {
+    const config = prodConfig();
+    const headers = getCorsHeaders(config, {}, {
+      origin: 'https://example.com',
+      'access-control-request-headers': 'authorization,x-custom',
+      'access-control-request-method': 'PUT',
+    });
+
+    expect(headers['Access-Control-Allow-Headers']).toBe('authorization,x-custom');
+    expect(headers['Access-Control-Allow-Methods']).toBe('PUT');
+    expect(headers['Access-Control-Allow-Headers']).not.toBe('*');
+  });
+
+  it('falls back to explicit header and method lists when the request omits them', () => {
+    const config = prodConfig();
+    const headers = getCorsHeaders(config, {}, { origin: 'https://example.com' });
+
+    expect(headers['Access-Control-Allow-Headers']).toBe('Authorization, Content-Type');
+    expect(headers['Access-Control-Allow-Methods']).toBe('GET, POST, PUT, PATCH, DELETE, OPTIONS');
+  });
 });
 
 describe('isBot', () => {
