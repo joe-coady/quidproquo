@@ -2,21 +2,36 @@ import {
   ActionProcessorList,
   ActionProcessorListResolver,
   actionResult,
+  actionResultErrorFromCaughtError,
   QPQConfig,
   UserDirectoryActionType,
   UserDirectoryGetUserAttributesActionProcessor,
 } from 'quidproquo-core';
 
-import { createDevUserAttributes } from '../../../logic/auth/devAuth';
+import { resolveDevUserDirectory } from '../../../logic/auth/devAuth';
+import { upsertDevUser } from '../../../logic/auth/jsonUserStore';
+import { ResolvedDevServerConfig } from '../../../types';
 
-const getProcessGetUserAttributes = (_qpqConfig: QPQConfig): UserDirectoryGetUserAttributesActionProcessor => {
-  return async ({ username }) => {
-    return actionResult(createDevUserAttributes(username));
+const getProcessGetUserAttributes = (
+  qpqConfig: QPQConfig,
+  devServerConfig: ResolvedDevServerConfig,
+): UserDirectoryGetUserAttributesActionProcessor => {
+  return async ({ userDirectoryName, username }) => {
+    try {
+      // First access by email creates the user store entry
+      const userDirectory = resolveDevUserDirectory(userDirectoryName, qpqConfig);
+
+      return actionResult(await upsertDevUser(devServerConfig.runtimePath, userDirectory, username));
+    } catch (error: unknown) {
+      return actionResultErrorFromCaughtError(error, {});
+    }
   };
 };
 
-export const getUserDirectoryGetUserAttributesActionProcessor: ActionProcessorListResolver = async (
+export const getUserDirectoryGetUserAttributesActionProcessor = (
+  devServerConfig: ResolvedDevServerConfig,
+): ActionProcessorListResolver => async (
   qpqConfig: QPQConfig,
 ): Promise<ActionProcessorList> => ({
-  [UserDirectoryActionType.GetUserAttributes]: getProcessGetUserAttributes(qpqConfig),
+  [UserDirectoryActionType.GetUserAttributes]: getProcessGetUserAttributes(qpqConfig, devServerConfig),
 });

@@ -1,8 +1,8 @@
 import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
 import { randomUUID } from 'crypto';
-import { promises as fs } from 'fs';
-import * as path from 'path';
+
+import { readJsonFileStore, writeJsonFileStore } from '../jsonFileStore';
 
 // Offline stand-in for SSM Parameter Store / Secrets Manager. Values live in
 // hand-editable JSON files under the dev server runtime path, one file per
@@ -10,9 +10,6 @@ import * as path from 'path';
 //
 //   <runtimePath>/parameters/<serviceName>.json   { "myParam": "value" }
 //   <runtimePath>/secrets/<serviceName>.json      { "myApiKey": "<guid>" }
-//
-// Files are re-read on every access so edits made while the server is running
-// take effect immediately.
 
 export enum ConfigStoreDirectory {
   parameters = 'parameters',
@@ -45,23 +42,12 @@ const resolveSecretStorageLocation = (secretName: string, qpqConfig: QPQConfig):
   };
 };
 
-const getStoreFilePath = (runtimePath: string, storeDirectory: ConfigStoreDirectory, serviceName: string): string =>
-  path.join(runtimePath, storeDirectory, `${serviceName}.json`);
-
 export const readConfigStoreFile = async (
   runtimePath: string,
   storeDirectory: ConfigStoreDirectory,
   serviceName: string,
 ): Promise<Record<string, string>> => {
-  try {
-    const raw = await fs.readFile(getStoreFilePath(runtimePath, storeDirectory, serviceName), 'utf8');
-    return JSON.parse(raw);
-  } catch (error: any) {
-    if (error?.code === 'ENOENT') {
-      return {};
-    }
-    throw error;
-  }
+  return readJsonFileStore<string>(runtimePath, storeDirectory, serviceName);
 };
 
 export const writeConfigStoreValue = async (
@@ -71,11 +57,9 @@ export const writeConfigStoreValue = async (
   key: string,
   value: string,
 ): Promise<void> => {
-  const filePath = getStoreFilePath(runtimePath, storeDirectory, serviceName);
   const values = await readConfigStoreFile(runtimePath, storeDirectory, serviceName);
 
-  await fs.mkdir(path.dirname(filePath), { recursive: true });
-  await fs.writeFile(filePath, JSON.stringify({ ...values, [key]: value }, null, 2));
+  await writeJsonFileStore(runtimePath, storeDirectory, serviceName, { ...values, [key]: value });
 };
 
 const getOrSeedConfigStoreValue = async (

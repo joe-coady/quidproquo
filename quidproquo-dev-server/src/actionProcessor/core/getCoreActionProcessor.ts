@@ -27,6 +27,6 @@ export const getCoreActionProcessor = async (
     ...(await getFileActionProcessor(devServerConfig.fileStorageConfig)(qpqConfig, dynamicModuleLoader)),
     ...(await getKeyValueStoreActionProcessor(devServerConfig)(qpqConfig, dynamicModuleLoader)),
     ...(await getRouteAuthValidationActionProcessor(qpqConfig, dynamicModuleLoader)),
-    ...(await getUserDirectoryActionProcessor(qpqConfig, dynamicModuleLoader)),
+    ...(await getUserDirectoryActionProcessor(devServerConfig)(qpqConfig, dynamicModuleLoader)),
   };
 };
