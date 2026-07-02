@@ -1,6 +1,6 @@
 {
   "name": "quidproquo-dev-server",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
@@ -37,11 +37,11 @@
     "chokidar": "^4.0.3",
     "express": "^4.21.2",
     "multer": "^1.4.5-lts.1",
-    "quidproquo-actionprocessor-awslambda": "0.1.0",
-    "quidproquo-actionprocessor-js": "0.1.0",
-    "quidproquo-actionprocessor-node": "0.1.0",
-    "quidproquo-core": "0.1.0",
-    "quidproquo-webserver": "0.1.0",
+    "quidproquo-actionprocessor-awslambda": "0.1.1",
+    "quidproquo-actionprocessor-js": "0.1.1",
+    "quidproquo-actionprocessor-node": "0.1.1",
+    "quidproquo-core": "0.1.1",
+    "quidproquo-webserver": "0.1.1",
     "sqlite": "^5.1.1",
     "sqlite3": "^6.0.1",
     "ws": "^8.18.0"
@@ -51,7 +51,7 @@
     "@types/multer": "^1.4.12",
     "@types/sqlite3": "^5.1.0",
     "@types/ws": "^8.18.1",
-    "quidproquo-tsconfig": "0.1.0",
+    "quidproquo-tsconfig": "0.1.1",
     "typescript": "^5.8.2"
   }
 }
