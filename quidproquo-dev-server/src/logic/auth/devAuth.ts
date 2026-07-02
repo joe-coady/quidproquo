@@ -1,4 +1,11 @@
-import { AuthenticateUserChallenge, AuthenticateUserResponse, AuthenticationInfo, UserAttributes } from 'quidproquo-core';
+import {
+  AuthenticateUserChallenge,
+  AuthenticateUserResponse,
+  AuthenticationInfo,
+  generateUuidV5,
+  UserAttributes,
+  UuidNamespace,
+} from 'quidproquo-core';
 
 /**
  * Dev server auth helpers.
@@ -20,13 +27,33 @@ const base64UrlEncode = (value: object): string => Buffer.from(JSON.stringify(va
 
 export const resolveDevUsername = (username?: string | null): string => username || DEV_USER_EMAIL;
 
+// Fixed namespace so userIds stay stable across dev server restarts.
+const devUserIdNamespace = generateUuidV5('quidproquo-dev-server/user-id', UuidNamespace.url);
+
+const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// Derives a deterministic userId from the login, so the same email is always the
+// same user in dev. Emails are compared case-insensitively, hence the lowercase.
+// A value that is already a userId (e.g. from getUserAttributesByUserId) passes
+// through unchanged rather than being re-hashed.
+export const createDevUserId = (username?: string | null): string => {
+  const resolvedUsername = resolveDevUsername(username);
+
+  if (uuidRegex.test(resolvedUsername)) {
+    return resolvedUsername.toLowerCase();
+  }
+
+  return generateUuidV5(resolvedUsername.trim().toLowerCase(), devUserIdNamespace);
+};
+
 export const createDevJwt = (username?: string | null, expiresInSeconds: number = DEV_ACCESS_TOKEN_EXPIRY_SECONDS): string => {
   const resolvedUsername = resolveDevUsername(username);
   const iat = Math.floor(Date.now() / 1000);
 
   const header = { alg: 'none', typ: 'JWT' };
   const payload = {
-    sub: resolvedUsername,
+    // Like Cognito: sub carries the userId, username/email carry the login
+    sub: createDevUserId(resolvedUsername),
     username: resolvedUsername,
     email: resolvedUsername,
     iat,
@@ -52,12 +79,16 @@ export const createDevAuthResponse = (username?: string | null): AuthenticateUse
   };
 };
 
-export const createDevUserAttributes = (username?: string | null): UserAttributes => {
-  const resolvedUsername = resolveDevUsername(username);
+export const createDevUserAttributes = (usernameOrUserId?: string | null): UserAttributes => {
+  const resolved = resolveDevUsername(usernameOrUserId);
+
+  // A userId can't be reversed back to its email and the dev server keeps no
+  // user store, so lookups by userId fall back to the dev user email.
+  const isUserId = uuidRegex.test(resolved);
 
   return {
-    userId: resolvedUsername,
-    email: resolvedUsername,
+    userId: createDevUserId(resolved),
+    email: isUserId ? DEV_USER_EMAIL : resolved,
     emailVerified: true,
   };
 };
