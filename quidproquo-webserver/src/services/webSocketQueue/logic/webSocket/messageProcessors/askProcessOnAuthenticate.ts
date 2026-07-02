@@ -23,40 +23,48 @@ export function isWebSocketAuthenticateMessage(
 export function* askProcessOnAuthenticate(connectionId: string, accessToken: string): AskResponse<void> {
   const connection = yield* webSocketConnectionData.askGetById(connectionId);
 
-  if (connection) {
-    const apiName = yield* askWebsocketReadApiNameOrThrow();
-    const userDirectoryName = yield* askConfigGetGlobal<string>(getWebSocketQueueGlobalConfigKeyForUserDirectoryName(apiName));
+  // No connection record (e.g. the connect event hasn't been processed yet) —
+  // tell the client rather than dropping the request silently, so it can
+  // distinguish "not authenticated" from "no reply".
+  if (!connection) {
+    yield* askSendMessage(connectionId, {
+      type: WebSocketQueueServerMessageEventType.Unauthenticated,
+    } satisfies WebSocketQueueServerEventMessageUnauthenticated);
+    return;
+  }
 
-    if (userDirectoryName) {
-      const result = yield* askCatch(askUserDirectorySetAccessToken(userDirectoryName, accessToken));
+  const apiName = yield* askWebsocketReadApiNameOrThrow();
+  const userDirectoryName = yield* askConfigGetGlobal<string>(getWebSocketQueueGlobalConfigKeyForUserDirectoryName(apiName));
 
-      if (!result.success) {
-        yield* askSendMessage(connectionId, {
-          type: WebSocketQueueServerMessageEventType.Unauthenticated,
-        } satisfies WebSocketQueueServerEventMessageUnauthenticated);
-        return;
-      }
+  if (userDirectoryName) {
+    const result = yield* askCatch(askUserDirectorySetAccessToken(userDirectoryName, accessToken));
 
-      const decodedAccessToken: DecodedAccessToken = result.result;
-
-      yield* webSocketConnectionData.askUpsert({
-        ...connection,
-
-        userId: decodedAccessToken.userId,
-        accessToken,
-      });
-
+    if (!result.success) {
       yield* askSendMessage(connectionId, {
-        type: WebSocketQueueServerMessageEventType.Authenticated,
-      } satisfies WebSocketQueueServerEventMessageAuthenticated);
-
-      // Send a websocket message to the event buss WITHOUT an access token
-      const webSocketQueueClientEventMessageAuthenticate: WebSocketQueueClientEventMessageAuthenticate = {
-        type: WebSocketQueueClientMessageEventType.Authenticate,
-        payload: {},
-      };
-
-      yield* askBroadcastUnknownMessage(webSocketQueueClientEventMessageAuthenticate);
+        type: WebSocketQueueServerMessageEventType.Unauthenticated,
+      } satisfies WebSocketQueueServerEventMessageUnauthenticated);
+      return;
     }
+
+    const decodedAccessToken: DecodedAccessToken = result.result;
+
+    yield* webSocketConnectionData.askUpsert({
+      ...connection,
+
+      userId: decodedAccessToken.userId,
+      accessToken,
+    });
+
+    yield* askSendMessage(connectionId, {
+      type: WebSocketQueueServerMessageEventType.Authenticated,
+    } satisfies WebSocketQueueServerEventMessageAuthenticated);
+
+    // Send a websocket message to the event buss WITHOUT an access token
+    const webSocketQueueClientEventMessageAuthenticate: WebSocketQueueClientEventMessageAuthenticate = {
+      type: WebSocketQueueClientMessageEventType.Authenticate,
+      payload: {},
+    };
+
+    yield* askBroadcastUnknownMessage(webSocketQueueClientEventMessageAuthenticate);
   }
 }
