@@ -1,12 +1,17 @@
+import { useQpqRuntime } from 'quidproquo-web-react';
+
+import LogoutIcon from '@mui/icons-material/Logout';
 import { BottomNavigation, BottomNavigationAction, CircularProgress } from '@mui/material';
 import Box from '@mui/material/Box';
 
+import { authRuntime } from '../../Auth/logic';
 import { useUrlFields } from '../../queryParams';
 import { useTabs } from './hooks/useTabs';
 
 export function MainLayout() {
   const { tabs, loading } = useTabs();
   const { tab, handleTabOnChange } = useUrlFields();
+  const [authApi] = useQpqRuntime(authRuntime);
 
   return (
     <Box
@@ -33,7 +38,12 @@ export function MainLayout() {
 
       <BottomNavigation
         value={tab}
-        onChange={(event, newValue) => handleTabOnChange(event, newValue)}
+        onChange={(event, newValue) => {
+          // The trailing Logout / Loading actions are not tabs
+          if (newValue < tabs.length) {
+            handleTabOnChange(event, newValue);
+          }
+        }}
         showLabels
         sx={{
           position: 'fixed',
@@ -50,6 +60,7 @@ export function MainLayout() {
           <BottomNavigationAction key={t.name} label={t.name} icon={t.icon} />
         ))}
         {loading && <BottomNavigationAction label="Loading" icon={<CircularProgress size={18} />} disabled />}
+        <BottomNavigationAction label="Logout" icon={<LogoutIcon />} onClick={() => authApi.authLogout()} />
       </BottomNavigation>
     </Box>
   );
