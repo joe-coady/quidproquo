@@ -61,7 +61,7 @@ export const defineAdminSettings = (
     }),
 
     defineQueue(
-      'qpq-admin-ws-config',
+      'qpqadmin-wscfg',
       {
         [WebsocketAdminClientMessageEventType.ConfigSyncRequest]: {
           basePath: __dirname,
