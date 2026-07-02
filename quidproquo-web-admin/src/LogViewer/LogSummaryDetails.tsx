@@ -11,11 +11,14 @@ interface LogSummaryDetailsProps {
   log: StoryResult<any>;
 }
 
+const runtimeTypeToCamelCase = (runtimeType: string): string =>
+  runtimeType.toLowerCase().replace(/_(\w)/g, (_, char) => char.toUpperCase());
+
 export const LogSummaryDetails = ({ log }: LogSummaryDetailsProps) => {
   const [expanded, setExpanded] = useState(false);
 
   const totalRuntime = new Date(log.finishedAt).getTime() - new Date(log.startedAt).getTime();
-  const functionKey = log.qpqFunctionRuntimeInfo ? getUniqueKeyFromQpqFunctionRuntime(log.qpqFunctionRuntimeInfo) : 'unknownMahLord';
+  const functionKey = log.qpqFunctionRuntimeInfo ? getUniqueKeyFromQpqFunctionRuntime(log.qpqFunctionRuntimeInfo) : runtimeTypeToCamelCase(log.runtimeType);
 
   return (
     <>
