@@ -6,7 +6,7 @@
   "scripts": {
     "link": "npm exec --ws -- npm link",
     "build": "npm run build --ws",
-    "build:lite": "npx tsx ./scripts/buildLite.ts",
+    "build:lite": "npx tsx ./scripts/runLite.ts build",
     "clean": "npm run clean --ws",
     "login": "npm login",
     "publish": "npm publish --ws",
@@ -15,6 +15,7 @@
     "validate": "npm run lint && npm run build && npm run test && npm run test:types",
     "lint": "npm run lint --ws",
     "lint:fix": "npm run lint:fix --ws",
+    "lint:fix:lite": "npx tsx ./scripts/runLite.ts lint:fix",
     "format": "npm run format --ws",
     "test": "vitest run",
     "test:lite": "vitest run --changed",
