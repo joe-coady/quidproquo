@@ -1,0 +1,20 @@
+import { createServiceRequester } from 'quidproquo-webserver';
+
+import { askEventDocAiChatList } from '../data/askEventDocAiChatList';
+import type { EventDocAiChatListPayload, EventDocAiChatSummary } from '../models';
+import { askEventDocAiContextRead } from '../module';
+import { eventDocAiServiceRequest } from './eventDocAiServiceRequest';
+
+const askChatListRequest = createServiceRequester<
+  EventDocAiChatListPayload,
+  EventDocAiChatSummary[]
+>('eventDocAi', 'ChatList');
+
+export const onChatList = eventDocAiServiceRequest(
+  askChatListRequest,
+  function* askOnChatList() {
+    const { docId } = yield* askEventDocAiContextRead();
+
+    return yield* askEventDocAiChatList(docId);
+  }
+);
