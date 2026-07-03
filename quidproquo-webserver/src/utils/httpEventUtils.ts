@@ -43,6 +43,16 @@ export function* askFromJsonEventRequest<T>(httpJsonEvent: HTTPEvent): AskRespon
   }
 }
 
+export const readUriQueryParamFromEvent = (event: HTTPEvent, paramName: string): string | undefined => {
+  const rawValue = event.query[paramName];
+
+  if (!rawValue) {
+    return undefined;
+  }
+
+  return Array.isArray(rawValue) ? rawValue[0] : rawValue;
+};
+
 export const toJsonEventResponse = (item: any, status: number = 200): HTTPEventResponse => {
   return {
     status,

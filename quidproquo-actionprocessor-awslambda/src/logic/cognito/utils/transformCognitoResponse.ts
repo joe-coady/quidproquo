@@ -1,4 +1,4 @@
-import { AuthenticateUserChallenge, AuthenticateUserResponse, AuthenticationInfo } from 'quidproquo-core';
+import { AuthenticateUserChallenge, AuthenticateUserResponse, AuthenticationInfo, getQpqIsoDateTimeFromDate } from 'quidproquo-core';
 
 import { AdminInitiateAuthResponse, AuthenticationResultType, ChallengeNameType } from '@aws-sdk/client-cognito-identity-provider';
 
@@ -10,7 +10,7 @@ export const cognitoAuthenticationResultTypeToQpqAuthenticationInfo = (
   let issueDate = new Date(issueDateTime);
   issueDate.setSeconds(issueDate.getSeconds() + (authResult.ExpiresIn || 0));
 
-  const expiresAt = issueDate.toISOString();
+  const expiresAt = getQpqIsoDateTimeFromDate(issueDate);
 
   return {
     accessToken: authResult.AccessToken,

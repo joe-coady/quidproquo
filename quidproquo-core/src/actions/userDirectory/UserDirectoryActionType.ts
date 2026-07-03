@@ -1,3 +1,4 @@
+import { QpqIsoDateTime } from '../../types/QpqIsoDateTime';
 import { AuthenticateUserChallenge } from './types';
 
 export enum UserDirectoryActionType {
@@ -25,7 +26,7 @@ export enum UserDirectoryActionType {
 export interface AuthenticationInfo {
   accessToken?: string;
   expirationDurationInSeconds?: number;
-  expiresAt?: string;
+  expiresAt?: QpqIsoDateTime;
   idToken?: string;
   refreshToken?: string;
   tokenType?: string;

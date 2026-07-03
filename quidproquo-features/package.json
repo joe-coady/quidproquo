@@ -10,7 +10,7 @@
     "lib/**/*"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest run",
     "clean": "npx rimraf lib && npx rimraf node_modules",
     "build": "npm run clean && npm run build:esm && npm run build:cjs",
     "watch": "tsc -p tsconfig.commonjs.json -w",
@@ -32,7 +32,10 @@
   },
   "homepage": "https://github.com/joe-coady/quidproquo#readme",
   "dependencies": {
-    "quidproquo-core": "0.1.1"
+    "quidproquo-core": "0.1.1",
+    "quidproquo-webserver": "0.1.1",
+    "zod": "^3.25.76",
+    "zod-validation-error": "^1.1.0"
   },
   "devDependencies": {
     "quidproquo-tsconfig": "0.1.1",

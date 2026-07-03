@@ -2,8 +2,8 @@ import { askDateNow } from '../../actions';
 import { AskResponse, AskResponseReturnType } from '../../types';
 
 export function* askSecondsElapsedFrom(
-  startTime: AskResponseReturnType<ReturnType<typeof askDateNow>>,
-  endTime?: AskResponseReturnType<ReturnType<typeof askDateNow>>,
+    startTime: AskResponseReturnType<ReturnType<typeof askDateNow>>,
+    endTime?: AskResponseReturnType<ReturnType<typeof askDateNow>>,
 ): AskResponse<number> {
   const currentDateTime = endTime || (yield* askDateNow());
 

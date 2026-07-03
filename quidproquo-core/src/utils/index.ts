@@ -1,4 +1,5 @@
 export * from './array';
+export * from './dateTime';
 export * from './functions';
 export * from './hash';
 export * from './logs';

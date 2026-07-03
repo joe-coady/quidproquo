@@ -29,8 +29,9 @@ describe('isWebSocketAuthenticateMessage', () => {
 });
 
 describe('askProcessOnAuthenticate', () => {
-  it('does nothing when the connection does not exist', () => {
+  it('notifies the connection it is unauthenticated when the connection does not exist', () => {
     let setAccessTokenCalled = false;
+    const sends: any[] = [];
 
     runStory(askProcessOnAuthenticate('c1', 'token-1'), {
       [ContextActionType.Read]: { apiName: 'demo' },
@@ -39,8 +40,13 @@ describe('askProcessOnAuthenticate', () => {
         setAccessTokenCalled = true;
         return { userId: 'u1' };
       },
+      [WebsocketActionType.SendMessage]: (action: any) => {
+        sends.push(action.payload.payload.type);
+        return undefined;
+      },
     });
 
+    expect(sends).toEqual([WebSocketQueueServerMessageEventType.Unauthenticated]);
     expect(setAccessTokenCalled).toBe(false);
   });
 

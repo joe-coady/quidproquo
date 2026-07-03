@@ -3,6 +3,7 @@ import {
   AuthenticateUserResponse,
   AuthenticationInfo,
   generateUuidV5,
+  getQpqIsoDateTimeFromDate,
   QPQConfig,
   qpqCoreUtils,
   UuidNamespace,
@@ -90,7 +91,7 @@ export const createDevAuthResponse = (userDirectory: DevUserDirectory, username?
     idToken: createDevJwt(userDirectory, username),
     refreshToken: createDevJwt(userDirectory, username, DEV_REFRESH_TOKEN_EXPIRY_SECONDS),
     expirationDurationInSeconds: DEV_ACCESS_TOKEN_EXPIRY_SECONDS,
-    expiresAt: new Date(Date.now() + DEV_ACCESS_TOKEN_EXPIRY_SECONDS * 1000).toISOString(),
+    expiresAt: getQpqIsoDateTimeFromDate(new Date(Date.now() + DEV_ACCESS_TOKEN_EXPIRY_SECONDS * 1000)),
     tokenType: 'Bearer',
   };
 

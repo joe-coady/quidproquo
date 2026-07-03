@@ -1,0 +1,31 @@
+import { AskResponse } from 'quidproquo-core';
+import { HTTPEvent, HTTPEventResponse, qpqWebServerUtils } from 'quidproquo-webserver';
+
+import { askEventDocProvideStoreFromGlobals } from '../../globals/askEventDocProvideStoreFromGlobals';
+import { askEventDocResolveActor } from '../../globals/askEventDocResolveActor';
+import { askEventDocEventAppend } from '../../logic/askEventDocEventAppend';
+import { EventDocEventInput } from '../../models';
+import { askEventDocParseBody } from '../askEventDocParseBody';
+
+function* askEventDocStoreAppendEvent(
+  event: HTTPEvent,
+  modelId: string
+): AskResponse<HTTPEventResponse> {
+  const actor = yield* askEventDocResolveActor();
+
+  const input = yield* askEventDocParseBody<EventDocEventInput>(event);
+
+  const stored = yield* askEventDocEventAppend(modelId, input, actor);
+
+  return qpqWebServerUtils.toJsonEventResponse(stored);
+}
+
+/** POST {basePath}/{id}/events — append a client event to the model's log. */
+export function* appendEvent(
+  event: HTTPEvent,
+  params: { id: string }
+): AskResponse<HTTPEventResponse> {
+  return yield* askEventDocProvideStoreFromGlobals(
+    askEventDocStoreAppendEvent(event, params.id)
+  );
+}

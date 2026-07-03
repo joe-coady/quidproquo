@@ -100,7 +100,7 @@ describe('apiGatwayEvent/api getEventTransformResponseResultActionProcessor', ()
     expect((response as any).statusCode).toBe(200);
     expect((response as any).body).toBe('ok');
     expect((response as any).headers['x-custom']).toBe('v');
-    expect((response as any).headers['Access-Control-Allow-Headers']).toBe('*');
+    expect((response as any).headers['Access-Control-Allow-Headers']).toBe('Authorization, Content-Type');
   });
 
   it('returns an empty body for HEAD requests', async () => {

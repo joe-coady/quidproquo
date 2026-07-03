@@ -7,6 +7,7 @@ import {
   askFromJsonEventRequest,
   fromJsonEventRequest,
   rawFromJsonEventRequest,
+  readUriQueryParamFromEvent,
   toCdnResponse,
   toHtmlResponse,
   toJsonEventResponse,
@@ -64,6 +65,24 @@ describe('askFromJsonEventRequest', () => {
     } catch (e) {
       expect((e as StoryError).errorType).toBe(ErrorTypeEnum.BadRequest);
     }
+  });
+});
+
+describe('readUriQueryParamFromEvent', () => {
+  it('returns a single string value', () => {
+    expect(readUriQueryParamFromEvent(buildEvent({ query: { limit: '10' } }), 'limit')).toBe('10');
+  });
+
+  it('returns the first value of a multi-value param', () => {
+    expect(readUriQueryParamFromEvent(buildEvent({ query: { tag: ['a', 'b'] } }), 'tag')).toBe('a');
+  });
+
+  it('returns undefined for a missing param', () => {
+    expect(readUriQueryParamFromEvent(buildEvent({ query: {} }), 'limit')).toBeUndefined();
+  });
+
+  it('returns undefined for an empty value', () => {
+    expect(readUriQueryParamFromEvent(buildEvent({ query: { limit: '' } }), 'limit')).toBeUndefined();
   });
 });
 

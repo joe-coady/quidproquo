@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+- `DateNowActionProcessor`/`DateNowActionRequester` in `quidproquo-core` now resolve to `QpqIsoDateTime` instead of `string`. If you implement `DateNowActionProcessor` yourself, return `getQpqIsoDateTimeFromDate(date)` instead of `date.toISOString()`.
+- `AuthenticationInfo.expiresAt` in `quidproquo-core` is now typed `QpqIsoDateTime` instead of `string`. Still a plain ISO string at runtime; construct it with `getQpqIsoDateTimeFromDate` instead of a raw `.toISOString()`.
 - `preformNetworkRequest` is removed from `quidproquo-web`. Import it from `quidproquo-webserver` instead (same signature).
 - `generateUUID` is removed from `quidproquo-webserver`. Use `generateUuid` from `quidproquo-core` instead (same v4 UUID, note the lowercase `uuid`).
 - `QpqLogger.log` in `quidproquo-core` now returns `void` instead of `Promise<void>` — it fires the write off in the background. If you awaited or chained on `logger.log(result)`, drop the `await`/`.then` and call `logger.waitToFinishWriting()` when you need to know writes have flushed.

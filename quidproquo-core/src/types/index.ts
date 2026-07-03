@@ -27,5 +27,6 @@ export * from './Readonlyify';
 export * from './ScheduledEvent';
 export * from './StorySession';
 export * from './StreamRegistry';
+export * from './QpqIsoDateTime';
 export * from './UnboundLogicStory';
 export * from './utils';
