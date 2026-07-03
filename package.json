@@ -76,7 +76,8 @@
     "quidproquo-web-admin",
     "quidproquo-testing",
     "quidproquo-dev-server",
-    "quidproquo"
+    "quidproquo",
+    "quidproquo-features"
   ],
   "devDependencies": {
     "@types/node": "^26.1.0",
