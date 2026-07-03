@@ -18,6 +18,7 @@ import {
   EVENT_DOC_AI_MODEL_GLOBAL,
   EVENT_DOC_AI_NAME_GLOBAL,
   EVENT_DOC_AI_SERVICE_NAME_GLOBAL,
+  EVENT_DOC_AI_SYSTEM_PROMPT_GENERATOR_GLOBAL,
   EVENT_DOC_AI_SYSTEM_PROMPT_GLOBAL,
 } from '../constants/eventDocAiGlobalNames';
 import { eventDocAiQueueName } from '../constants/eventDocAiQueueName';
@@ -46,6 +47,7 @@ export const defineEventDocAi = ({
   aiName = `${storeName}-ai`,
   model = AiModel.ClaudeSonnet46,
   systemPrompt,
+  systemPromptGenerator,
   tools = [],
 }: EventDocAiOptions): QPQConfig => {
   const store = buildEventDocStore({ storeName, type });
@@ -69,6 +71,7 @@ export const defineEventDocAi = ({
     [EVENT_DOC_AI_NAME_GLOBAL]: aiName,
     [EVENT_DOC_AI_MODEL_GLOBAL]: model,
     [EVENT_DOC_AI_SYSTEM_PROMPT_GLOBAL]: systemPrompt ?? '',
+    [EVENT_DOC_AI_SYSTEM_PROMPT_GENERATOR_GLOBAL]: systemPromptGenerator ?? '',
   };
 
   const runtime = (functionName: string): QpqFunctionRuntimeAdvanced => ({

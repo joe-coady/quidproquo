@@ -15,6 +15,11 @@ export type EventDocAiOptions = {
   // Defaults to AiModel.ClaudeSonnet46.
   model?: AiModel;
   systemPrompt?: string;
+  // A defineInlineFunction name invoked on every turn to build the system
+  // prompt (receives EventDocAiSystemPromptInput, returns the prompt string).
+  // Lets the prompt carry live document state. A non-empty result overrides
+  // `systemPrompt`; an empty result falls back to it.
+  systemPromptGenerator?: string;
   // Tool executors are defineInlineFunction names registered by the caller.
   tools?: AiToolDefinition[];
 };

@@ -1,14 +1,15 @@
-import { type AiModel, askAiPromptStream, askConfigGetGlobal, AskResponse, askStreamMap } from 'quidproquo-core';
+import { type AiModel, askAiPromptStream, askConfigGetGlobal, askInlineFunctionExecute, AskResponse, askStreamMap } from 'quidproquo-core';
 
 import {
   EVENT_DOC_AI_MODEL_GLOBAL,
   EVENT_DOC_AI_NAME_GLOBAL,
+  EVENT_DOC_AI_SYSTEM_PROMPT_GENERATOR_GLOBAL,
   EVENT_DOC_AI_SYSTEM_PROMPT_GLOBAL,
 } from '../constants/eventDocAiGlobalNames';
 import { askEventDocAiChatHistoryLoad } from '../data/askEventDocAiChatHistoryLoad';
 import { askEventDocAiChatHistorySave } from '../data/askEventDocAiChatHistorySave';
 import { askEventDocAiChatTouch } from '../data/askEventDocAiChatTouch';
-import type { EventDocAiChatMessage, EventDocAiChatSendResult } from '../models';
+import type { EventDocAiChatMessage, EventDocAiChatSendResult, EventDocAiSystemPromptInput } from '../models';
 import {
   askUIEventDocAiAppendChatMessage,
   askUIEventDocAiAppendStreamChunk,
@@ -21,6 +22,29 @@ import {
 const DEFAULT_SYSTEM_PROMPT =
   'You are a helpful assistant. Use tools when appropriate.';
 
+// The turn's system prompt, freshest source first: the configured generator
+// inline function (built per-turn so it can carry live document state), else
+// the static configured prompt, else the default. Never persisted — the chat
+// history stores messages only.
+function* askEventDocAiSystemPromptResolve(docId: string): AskResponse<string> {
+  const generatorFn = yield* askConfigGetGlobal<string>(
+    EVENT_DOC_AI_SYSTEM_PROMPT_GENERATOR_GLOBAL
+  );
+
+  const generatedPrompt = generatorFn
+    ? yield* askInlineFunctionExecute<string, EventDocAiSystemPromptInput>(
+        generatorFn,
+        { docId }
+      )
+    : '';
+
+  const configuredPrompt = yield* askConfigGetGlobal<string>(
+    EVENT_DOC_AI_SYSTEM_PROMPT_GLOBAL
+  );
+
+  return generatedPrompt || configuredPrompt || DEFAULT_SYSTEM_PROMPT;
+}
+
 // One conversational turn. Stream parts are a TRANSPORT-ONLY concept: each part
 // is dispatched to the UI as it arrives (the live typing view), then the
 // completed reply is folded into durable segments, saved, dispatched as the
@@ -32,9 +56,7 @@ export function* askEventDocAiProcessSend(
 ): AskResponse<EventDocAiChatSendResult> {
   const aiName = yield* askConfigGetGlobal<string>(EVENT_DOC_AI_NAME_GLOBAL);
   const model = yield* askConfigGetGlobal<AiModel>(EVENT_DOC_AI_MODEL_GLOBAL);
-  const configuredPrompt = yield* askConfigGetGlobal<string>(
-    EVENT_DOC_AI_SYSTEM_PROMPT_GLOBAL
-  );
+  const systemPrompt = yield* askEventDocAiSystemPromptResolve(docId);
 
   const fullHistory = [
     ...(yield* askEventDocAiChatHistoryLoad(docId, chatId)),
@@ -47,7 +69,7 @@ export function* askEventDocAiProcessSend(
   // session context (provided in eventDocAiServiceRequest) and read the
   // trusted id there.
   const streamHandle = yield* askAiPromptStream(model, message, {
-    system: configuredPrompt || DEFAULT_SYSTEM_PROMPT,
+    system: systemPrompt,
     aiName,
     messages: chatMessagesToAiMessages(fullHistory),
   });

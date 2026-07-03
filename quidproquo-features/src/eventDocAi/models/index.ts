@@ -8,4 +8,5 @@ export * from './EventDocAiChatSummary';
 export * from './EventDocAiContext';
 export * from './EventDocAiDocRef';
 export * from './EventDocAiMessageSegment';
+export * from './EventDocAiSystemPromptInput';
 export * from './EventDocAiToolUse';
