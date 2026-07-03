@@ -4,9 +4,9 @@ import {
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
-  ErrorTypeEnum,
   KeyValueStoreActionType,
   KeyValueStoreUpsertActionProcessor,
+  KeyValueStoreUpsertErrorTypeEnum,
   QPQConfig,
   qpqCoreUtils} from 'quidproquo-core';
 
@@ -41,7 +41,7 @@ const getProcessKeyValueStoreUpsert = (
         return actionResultError('ResourceNotFound', error.message);
       }
       return actionResultErrorFromCaughtError(error, {
-        ConditionalCheckFailedException: () => actionResultError(ErrorTypeEnum.Conflict, 'KVS item already exists'),
+        ConditionalCheckFailedException: () => actionResultError(KeyValueStoreUpsertErrorTypeEnum.Conflict, 'KVS item already exists'),
       });
     }
   };

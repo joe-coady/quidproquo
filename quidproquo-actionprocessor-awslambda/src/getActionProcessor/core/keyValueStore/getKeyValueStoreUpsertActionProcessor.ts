@@ -50,7 +50,7 @@ const getProcessKeyValueStoreUpsert = (qpqConfig: QPQConfig): KeyValueStoreUpser
       return actionResultErrorFromCaughtError(error, {
         InternalServerError: () => actionResultError(KeyValueStoreUpsertErrorTypeEnum.ServiceUnavailable, 'KVS Service Unavailable'),
         ResourceNotFoundException: () => actionResultError(KeyValueStoreUpsertErrorTypeEnum.ResourceNotFound, 'KVS Resource Not Found'),
-        ConditionalCheckFailedException: () => actionResultError(ErrorTypeEnum.Conflict, 'KVS item already exists'),
+        ConditionalCheckFailedException: () => actionResultError(KeyValueStoreUpsertErrorTypeEnum.Conflict, 'KVS item already exists'),
       });
     }
   };
