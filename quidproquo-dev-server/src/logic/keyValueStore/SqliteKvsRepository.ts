@@ -582,40 +582,65 @@ export class SqliteKvsRepository {
     };
   }
 
-  async upsert(keyValueStoreName: string, item: any): Promise<any> {
+  async upsert(keyValueStoreName: string, item: any, options?: { ifNotExists?: boolean }): Promise<any> {
     await this.ensureTable(keyValueStoreName);
-    
+
     const storeConfig = qpqCoreUtils.getKeyValueStoreByName(this.qpqConfig, keyValueStoreName);
     if (!storeConfig) {
       throw new Error(`Key value store '${keyValueStoreName}' not found`);
     }
-    
+
     const { pk, sk } = this.buildKeyFromItem(item, storeConfig);
     const tableName = this.getTableName(keyValueStoreName);
-    
+
+    // Conditional insert (attribute_not_exists parity with DynamoDB): an
+    // atomic INSERT that ignores on primary-key conflict; zero changed rows
+    // means a concurrent writer won the key.
+    if (options?.ifNotExists) {
+      const insertSql = sk !== null
+        ? `INSERT OR IGNORE INTO ${tableName} (pk, sk, data) VALUES (?, ?, ?)`
+        : `INSERT OR IGNORE INTO ${tableName} (pk, data) VALUES (?, ?)`;
+
+      const insertParams = sk !== null
+        ? [pk, sk, JSON.stringify(item)]
+        : [pk, JSON.stringify(item)];
+
+      const result = await this.db!.run(insertSql, insertParams);
+
+      if (!result.changes) {
+        const conflictError = new Error(`KVS item already exists in '${keyValueStoreName}'`);
+        conflictError.name = 'ConditionalCheckFailedException';
+        throw conflictError;
+      }
+
+      await this.updateIndexes(keyValueStoreName, null, item, pk, sk);
+
+      return item;
+    }
+
     // Get existing item for index updates
     const existingSql = sk !== null
       ? `SELECT data FROM ${tableName} WHERE pk = ? AND sk = ?`
       : `SELECT data FROM ${tableName} WHERE pk = ?`;
-    
+
     const existingParams = sk !== null ? [pk, sk] : [pk];
     const existingRow = await this.db!.get(existingSql, existingParams);
     const oldItem = existingRow ? JSON.parse(existingRow.data) : null;
-    
+
     // Upsert the item - SQLite will handle locking automatically
     const sql = sk !== null
       ? `INSERT OR REPLACE INTO ${tableName} (pk, sk, data) VALUES (?, ?, ?)`
       : `INSERT OR REPLACE INTO ${tableName} (pk, data) VALUES (?, ?)`;
-    
+
     const params = sk !== null
       ? [pk, sk, JSON.stringify(item)]
       : [pk, JSON.stringify(item)];
-    
+
     await this.db!.run(sql, params);
-    
+
     // Update indexes
     await this.updateIndexes(keyValueStoreName, oldItem, item, pk, sk);
-    
+
     return item;
   }
 

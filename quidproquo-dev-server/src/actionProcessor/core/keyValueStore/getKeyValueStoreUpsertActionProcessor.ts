@@ -1,12 +1,13 @@
-import { 
-  ActionProcessorList, 
-  ActionProcessorListResolver, 
-  actionResult, 
+import {
+  ActionProcessorList,
+  ActionProcessorListResolver,
+  actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
-  KeyValueStoreActionType, 
-  KeyValueStoreUpsertActionProcessor, 
-  QPQConfig, 
+  ErrorTypeEnum,
+  KeyValueStoreActionType,
+  KeyValueStoreUpsertActionProcessor,
+  QPQConfig,
   qpqCoreUtils} from 'quidproquo-core';
 
 import { SqliteKvsRepository } from '../../../logic/keyValueStore/SqliteKvsRepository';
@@ -28,16 +29,20 @@ const getProcessKeyValueStoreUpsert = (
   qpqConfig: QPQConfig,
   devServerConfig: ResolvedDevServerConfig
 ): KeyValueStoreUpsertActionProcessor<any> => {
-  return async ({ keyValueStoreName, item }) => {
+  return async ({ keyValueStoreName, item, options }) => {
     try {
       const repository = getRepository(qpqConfig, devServerConfig);
-      const result = await repository.upsert(keyValueStoreName, item);
+      const result = await repository.upsert(keyValueStoreName, item, {
+        ifNotExists: options?.ifNotExists,
+      });
       return actionResult(result);
     } catch (error: any) {
       if (error.message?.includes('not found')) {
         return actionResultError('ResourceNotFound', error.message);
       }
-      return actionResultErrorFromCaughtError(error, {});
+      return actionResultErrorFromCaughtError(error, {
+        ConditionalCheckFailedException: () => actionResultError(ErrorTypeEnum.Conflict, 'KVS item already exists'),
+      });
     }
   };
 };
