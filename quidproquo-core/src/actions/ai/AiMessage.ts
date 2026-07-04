@@ -3,12 +3,24 @@ export interface AiTextPart {
   text: string;
 }
 
-export interface AiFilePart {
+export interface AiFileUrlPart {
   type: 'file';
   url: string;
   mediaType: string;
   filename?: string;
 }
+
+// References a file on a storage drive — resolved to file contents by the action
+// processor at prompt time, so no presigned url ever enters logs or session state.
+export interface AiFileDrivePart {
+  type: 'file';
+  drive: string;
+  filepath: string;
+  mediaType: string;
+  filename?: string;
+}
+
+export type AiFilePart = AiFileUrlPart | AiFileDrivePart;
 
 export interface AiToolCallPart {
   type: 'tool-call';

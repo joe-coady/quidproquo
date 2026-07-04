@@ -11,7 +11,7 @@ import {
 
 import { generateText, stepCountIs } from 'ai';
 
-import { prepareAiPromptCall, toSdkMessages } from './logic';
+import { createDriveFileResolver, prepareAiPromptCall, toSdkMessages } from './logic';
 
 const getProcessAiPrompt = (qpqConfig: QPQConfig): AiPromptActionProcessor => {
   return async (payload, session, actionProcessorList, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
@@ -20,11 +20,16 @@ const getProcessAiPrompt = (qpqConfig: QPQConfig): AiPromptActionProcessor => {
       return actionResultError(prepared.error.type, prepared.error.message);
     }
 
-    const promptOrMessages = payload.messages
-      ? { messages: toSdkMessages(payload.messages) }
-      : { prompt: payload.prompt };
-
     try {
+      const promptOrMessages = payload.messages
+        ? {
+            messages: await toSdkMessages(
+              payload.messages,
+              createDriveFileResolver(qpqConfig, session, actionProcessorList, logger, dynamicModuleLoader, streamRegistry),
+            ),
+          }
+        : { prompt: payload.prompt };
+
       const result = await generateText({
         model: prepared.model,
         system: payload.system,
@@ -44,8 +49,6 @@ const getProcessAiPrompt = (qpqConfig: QPQConfig): AiPromptActionProcessor => {
   };
 };
 
-export const getAiPromptActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
+export const getAiPromptActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
   [AiActionType.Prompt]: getProcessAiPrompt(qpqConfig),
 });

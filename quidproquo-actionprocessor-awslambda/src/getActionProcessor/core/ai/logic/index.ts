@@ -1,4 +1,5 @@
 export * from './aiStreamPartMappers';
+export * from './createDriveFileResolver';
 export * from './mapAiStreamAbort';
 export * from './mapAiStreamCustom';
 export * from './mapAiStreamError';

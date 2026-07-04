@@ -1,44 +1,53 @@
 import {
   AiAssistantMessage,
   AiAssistantMessagePart,
+  AiFilePart,
   AiMessage,
   AiToolMessage,
   AiToolResultPart,
   AiUserMessage,
   AiUserMessagePart,
+  QPQBinaryData,
 } from 'quidproquo-core';
 
-import type {
-  AssistantModelMessage,
-  ModelMessage,
-  ToolModelMessage,
-  UserModelMessage,
-} from 'ai';
+import type { AssistantModelMessage, ModelMessage, ToolModelMessage, UserModelMessage } from 'ai';
 
-const mapUserPart = (part: AiUserMessagePart) => {
+export type AiDriveFileResolver = (drive: string, filepath: string) => Promise<QPQBinaryData>;
+
+const mapFilePart = async (part: AiFilePart, resolveDriveFile: AiDriveFileResolver) => {
+  if ('url' in part) {
+    return {
+      type: 'file' as const,
+      data: new URL(part.url),
+      mediaType: part.mediaType,
+      filename: part.filename,
+    };
+  }
+
+  const binary = await resolveDriveFile(part.drive, part.filepath);
+
+  return {
+    type: 'file' as const,
+    data: binary.base64Data,
+    mediaType: part.mediaType,
+    filename: part.filename ?? binary.filename,
+  };
+};
+
+const mapUserPart = async (part: AiUserMessagePart, resolveDriveFile: AiDriveFileResolver) => {
   if (part.type === 'text') {
     return { type: 'text' as const, text: part.text };
   }
 
-  return {
-    type: 'file' as const,
-    data: new URL(part.url),
-    mediaType: part.mediaType,
-    filename: part.filename,
-  };
+  return mapFilePart(part, resolveDriveFile);
 };
 
-const mapAssistantPart = (part: AiAssistantMessagePart) => {
+const mapAssistantPart = async (part: AiAssistantMessagePart, resolveDriveFile: AiDriveFileResolver) => {
   switch (part.type) {
     case 'text':
       return { type: 'text' as const, text: part.text };
     case 'file':
-      return {
-        type: 'file' as const,
-        data: new URL(part.url),
-        mediaType: part.mediaType,
-        filename: part.filename,
-      };
+      return mapFilePart(part, resolveDriveFile);
     case 'tool-call':
       return {
         type: 'tool-call' as const,
@@ -72,20 +81,20 @@ const mapToolResult = (part: AiToolResultPart) => {
   };
 };
 
-const mapUserMessage = (message: AiUserMessage): UserModelMessage => {
+const mapUserMessage = async (message: AiUserMessage, resolveDriveFile: AiDriveFileResolver): Promise<UserModelMessage> => {
   if (typeof message.content === 'string') {
     return { role: 'user', content: message.content };
   }
 
-  return { role: 'user', content: message.content.map(mapUserPart) };
+  return { role: 'user', content: await Promise.all(message.content.map((part) => mapUserPart(part, resolveDriveFile))) };
 };
 
-const mapAssistantMessage = (message: AiAssistantMessage): AssistantModelMessage => {
+const mapAssistantMessage = async (message: AiAssistantMessage, resolveDriveFile: AiDriveFileResolver): Promise<AssistantModelMessage> => {
   if (typeof message.content === 'string') {
     return { role: 'assistant', content: message.content };
   }
 
-  return { role: 'assistant', content: message.content.map(mapAssistantPart) };
+  return { role: 'assistant', content: await Promise.all(message.content.map((part) => mapAssistantPart(part, resolveDriveFile))) };
 };
 
 const mapToolMessage = (message: AiToolMessage): ToolModelMessage => ({
@@ -93,14 +102,16 @@ const mapToolMessage = (message: AiToolMessage): ToolModelMessage => ({
   content: message.content.map(mapToolResult),
 });
 
-export const toSdkMessages = (messages: AiMessage[]): ModelMessage[] =>
-  messages.map((message) => {
-    switch (message.role) {
-      case 'user':
-        return mapUserMessage(message);
-      case 'assistant':
-        return mapAssistantMessage(message);
-      case 'tool':
-        return mapToolMessage(message);
-    }
-  });
+export const toSdkMessages = (messages: AiMessage[], resolveDriveFile: AiDriveFileResolver): Promise<ModelMessage[]> =>
+  Promise.all(
+    messages.map((message) => {
+      switch (message.role) {
+        case 'user':
+          return mapUserMessage(message, resolveDriveFile);
+        case 'assistant':
+          return mapAssistantMessage(message, resolveDriveFile);
+        case 'tool':
+          return mapToolMessage(message);
+      }
+    }),
+  );

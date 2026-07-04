@@ -8,7 +8,8 @@ import { mapAiStreamPart, prepareAiPromptCall } from './logic';
 
 vi.mock('./logic', () => ({
   prepareAiPromptCall: vi.fn(),
-  toSdkMessages: vi.fn(() => [{ role: 'user', content: 'mapped' }]),
+  createDriveFileResolver: vi.fn(() => vi.fn()),
+  toSdkMessages: vi.fn(async () => [{ role: 'user', content: 'mapped' }]),
   mapAiStreamPart: vi.fn(() => ({ mapped: true })),
 }));
 

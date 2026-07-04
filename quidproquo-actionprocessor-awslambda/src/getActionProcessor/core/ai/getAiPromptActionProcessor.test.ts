@@ -8,7 +8,8 @@ import { prepareAiPromptCall, toSdkMessages } from './logic';
 
 vi.mock('./logic', () => ({
   prepareAiPromptCall: vi.fn(),
-  toSdkMessages: vi.fn(() => [{ role: 'user', content: 'mapped' }]),
+  createDriveFileResolver: vi.fn(() => vi.fn()),
+  toSdkMessages: vi.fn(async () => [{ role: 'user', content: 'mapped' }]),
 }));
 
 const generateText = vi.fn();
