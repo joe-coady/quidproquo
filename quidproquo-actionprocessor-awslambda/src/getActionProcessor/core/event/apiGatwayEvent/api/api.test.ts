@@ -80,7 +80,14 @@ describe('apiGatwayEvent/api getEventMatchStoryActionProcessor', () => {
   it('matches the request to a configured route', async () => {
     const runtime = { src: 'handler', runtimeType: 'Function' } as any;
     const config = buildTestQpqConfig([
-      { configSettingType: QPQWebServerConfigSettingType.Route, uniqueKey: 'GET/users', path: '/users', method: 'GET', runtime, options: { allowedOrigins: [] } } as any,
+      {
+        configSettingType: QPQWebServerConfigSettingType.Route,
+        uniqueKey: 'GET/users',
+        path: '/users',
+        method: 'GET',
+        runtime,
+        options: { allowedOrigins: [] },
+      } as any,
     ]);
     const processor = await resolveEventProcessor(getEventMatchStoryActionProcessor, EventActionType.MatchStory, config);
 

@@ -5,13 +5,7 @@ import * as path from 'path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { fileConfig } from '../../testing/fileProcessorTestHelpers';
-import {
-  ensureDirectoryExists,
-  ensureParentDirectoryExists,
-  isStorageDriveNameValid,
-  resolveDriveServiceName,
-  resolveFilePath,
-} from './utils';
+import { ensureDirectoryExists, ensureParentDirectoryExists, isStorageDriveNameValid, resolveDriveServiceName, resolveFilePath } from './utils';
 
 vi.mock('fs/promises');
 
@@ -43,9 +37,7 @@ describe('resolveDriveServiceName', () => {
   });
 
   it('returns the owning module for a shared drive', () => {
-    const qpqConfig = buildTestQpqConfig([
-      defineStorageDrive('shared', { owner: { module: 'owner-module', storageDriveName: 'shared' } }),
-    ]);
+    const qpqConfig = buildTestQpqConfig([defineStorageDrive('shared', { owner: { module: 'owner-module', storageDriveName: 'shared' } })]);
 
     expect(resolveDriveServiceName('shared', qpqConfig)).toBe('owner-module');
   });

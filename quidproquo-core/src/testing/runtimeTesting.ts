@@ -54,5 +54,7 @@ export const buildActionProcessorList = (processors: Record<string, ActionProces
 
 // Wraps a processor map (or a plain map) in the resolver shape resolveStory/createRuntime
 // expect: an async function ignoring its (config, loader) args and returning the list.
-export const buildActionProcessorResolver = (processors: Record<string, ActionProcessor<any, any>>): ActionProcessorListResolver =>
-  async () => buildActionProcessorList(processors);
+export const buildActionProcessorResolver =
+  (processors: Record<string, ActionProcessor<any, any>>): ActionProcessorListResolver =>
+  async () =>
+    buildActionProcessorList(processors);

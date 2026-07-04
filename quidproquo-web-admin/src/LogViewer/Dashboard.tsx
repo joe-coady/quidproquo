@@ -97,7 +97,7 @@ export const Dashboard: React.FC<DashboardProps> = () => {
         </Grid>
       </Grid>
       <Box sx={{ flex: 1, overflow: 'auto' }}>
-        <LogMetadataGrid logs={allLogs} isLoading={isLoading} />
+        <LogMetadataGrid isLoading={isLoading} logs={allLogs} />
       </Box>
     </TabViewBox>
   );

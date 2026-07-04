@@ -45,7 +45,8 @@ describe('useQpqWebsocketQueueRuntime', () => {
     const runtime = createQpqRuntimeDefinition<State, { type: 'set'; value: number }, typeof api>(api, { value: 0 }, reducer);
 
     const { result } = renderHook(() => useQpqWebsocketQueueRuntime(runtime, undefined, 'queue'), {
-      wrapper: ({ children }: { children: ReactNode }) => createElement(WebSocketContext.Provider, { value: service as unknown as WebsocketService }, children),
+      wrapper: ({ children }: { children: ReactNode }) =>
+        createElement(WebSocketContext.Provider, { value: service as unknown as WebsocketService }, children),
     });
 
     const [mappedApi, , , sendEvent] = result.current;
@@ -58,7 +59,8 @@ describe('useQpqWebsocketQueueRuntime', () => {
     const runtime = createQpqRuntimeDefinition<State, { type: 'set'; value: number }, typeof api>(api, { value: 0 }, reducer);
 
     const { result } = renderHook(() => useQpqWebsocketQueueRuntime(runtime, undefined, 'queue-dispatch'), {
-      wrapper: ({ children }: { children: ReactNode }) => createElement(WebSocketContext.Provider, { value: service as unknown as WebsocketService }, children),
+      wrapper: ({ children }: { children: ReactNode }) =>
+        createElement(WebSocketContext.Provider, { value: service as unknown as WebsocketService }, children),
     });
 
     act(() => {

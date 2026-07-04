@@ -11,23 +11,24 @@ interface LogSummaryDetailsProps {
   log: StoryResult<any>;
 }
 
-const runtimeTypeToCamelCase = (runtimeType: string): string =>
-  runtimeType.toLowerCase().replace(/_(\w)/g, (_, char) => char.toUpperCase());
+const runtimeTypeToCamelCase = (runtimeType: string): string => runtimeType.toLowerCase().replace(/_(\w)/g, (_, char) => char.toUpperCase());
 
 export const LogSummaryDetails = ({ log }: LogSummaryDetailsProps) => {
   const [expanded, setExpanded] = useState(false);
 
   const totalRuntime = new Date(log.finishedAt).getTime() - new Date(log.startedAt).getTime();
-  const functionKey = log.qpqFunctionRuntimeInfo ? getUniqueKeyFromQpqFunctionRuntime(log.qpqFunctionRuntimeInfo) : runtimeTypeToCamelCase(log.runtimeType);
+  const functionKey = log.qpqFunctionRuntimeInfo
+    ? getUniqueKeyFromQpqFunctionRuntime(log.qpqFunctionRuntimeInfo)
+    : runtimeTypeToCamelCase(log.runtimeType);
 
   return (
     <>
-      <Box display="flex" alignItems="center">
-        <Typography variant="h5" gutterBottom>
+      <Box alignItems="center" display="flex">
+        <Typography gutterBottom variant="h5">
           {log.runtimeType} - {log.moduleName}
         </Typography>
         <Tooltip title={expanded ? 'Collapse' : 'Expand'}>
-          <IconButton size="small" onClick={() => setExpanded(!expanded)}>
+          <IconButton onClick={() => setExpanded(!expanded)} size="small">
             {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
           </IconButton>
         </Tooltip>
@@ -43,7 +44,7 @@ export const LogSummaryDetails = ({ log }: LogSummaryDetailsProps) => {
             </div>
             <div>// //////////////////////////////////////////////////////</div>
           </div>
-          <GenericFunctionRenderer functionName={functionKey.split('::').pop() || 'unknown'} args={log.input} expanded={expanded} />
+          <GenericFunctionRenderer args={log.input} expanded={expanded} functionName={functionKey.split('::').pop() || 'unknown'} />
         </pre>
       </div>
     </>

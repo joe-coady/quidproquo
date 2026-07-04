@@ -7,11 +7,6 @@ import { EventDocEventValidator } from './types/EventDocEventValidator';
 // Lets one event type stack a lifecycle rule and a payload rule, e.g.
 // `all(requireDraft, requireUpperSnakeCode)`.
 export const all =
-  <S extends EventDocDocument>(
-    ...validators: EventDocEventValidator<S>[]
-  ): EventDocEventValidator<S> =>
+  <S extends EventDocDocument>(...validators: EventDocEventValidator<S>[]): EventDocEventValidator<S> =>
   (event, state) =>
-    validators.reduce<Nullable<string>>(
-      (reason, validate) => reason ?? validate(event, state),
-      null
-    );
+    validators.reduce<Nullable<string>>((reason, validate) => reason ?? validate(event, state), null);

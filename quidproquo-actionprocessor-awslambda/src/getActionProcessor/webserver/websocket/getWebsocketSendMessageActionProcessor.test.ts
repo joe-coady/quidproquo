@@ -27,8 +27,7 @@ const resolveProcessor = async () => {
   return processors[WebsocketActionType.SendMessage];
 };
 
-const invoke = (processor: any) =>
-  invokeProcessor(processor, { connectionId: 'c1', payload: { hi: true }, websocketApiName: 'api' });
+const invoke = (processor: any) => invokeProcessor(processor, { connectionId: 'c1', payload: { hi: true }, websocketApiName: 'api' });
 
 describe('getWebsocketSendMessageActionProcessor', () => {
   beforeEach(() => {

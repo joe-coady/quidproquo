@@ -3,9 +3,7 @@ import { EventDocDocument, EventDocStatus } from '../models';
 // Base-field defaults a module spreads into its initial state so it declares only its
 // own slice. Real logs always open with INIT_STATE, which overlays the true identity +
 // timestamps; these defaults only ever surface for an empty log.
-export const createEventDocInitialDocumentState = (
-  schemaVersion: number
-): EventDocDocument => ({
+export const createEventDocInitialDocumentState = (schemaVersion: number): EventDocDocument => ({
   schemaVersion,
   id: '',
   code: '',

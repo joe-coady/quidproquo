@@ -28,8 +28,12 @@ const getProcessGetUsersByAttribute = (qpqConfig: QPQConfig): UserDirectoryGetUs
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         InvalidParameterException: () =>
-          actionResultError(UserDirectoryGetUsersByAttributeErrorTypeEnum.InvalidSearchParameters, 'The search attribute, value, limit, or page key is invalid'),
-        TooManyRequestsException: () => actionResultError(UserDirectoryGetUsersByAttributeErrorTypeEnum.LimitExceeded, 'Too many requests, please try again later'),
+          actionResultError(
+            UserDirectoryGetUsersByAttributeErrorTypeEnum.InvalidSearchParameters,
+            'The search attribute, value, limit, or page key is invalid',
+          ),
+        TooManyRequestsException: () =>
+          actionResultError(UserDirectoryGetUsersByAttributeErrorTypeEnum.LimitExceeded, 'Too many requests, please try again later'),
       });
     }
   };

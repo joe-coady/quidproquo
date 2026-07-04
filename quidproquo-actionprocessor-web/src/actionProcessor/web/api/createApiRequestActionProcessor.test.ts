@@ -72,8 +72,6 @@ describe('createApiRequestActionProcessor', () => {
 
     await processor(buildRequest());
 
-    expect(preformNetworkRequest).toHaveBeenCalledWith(
-      expect.objectContaining({ headers: { 'x-call': 'override', authorization: 'Bearer t' } }),
-    );
+    expect(preformNetworkRequest).toHaveBeenCalledWith(expect.objectContaining({ headers: { 'x-call': 'override', authorization: 'Bearer t' } }));
   });
 });

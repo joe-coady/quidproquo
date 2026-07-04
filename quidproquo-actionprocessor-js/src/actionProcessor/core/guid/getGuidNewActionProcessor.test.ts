@@ -1,4 +1,4 @@
-import { buildTestQpqConfig, GuidActionType,resolveActionResult } from 'quidproquo-core';
+import { buildTestQpqConfig, GuidActionType, resolveActionResult } from 'quidproquo-core';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -14,7 +14,10 @@ vi.mock('quidproquo-core', async (importActual: () => Promise<typeof import('qui
 
 describe('getGuidNewActionProcessor', () => {
   it('returns a v4 uuid', async () => {
-    const processor = (await getGuidNewActionProcessor(buildTestQpqConfig(), async () => null))[GuidActionType.New] as (p: any, ...rest: any[]) => Promise<any>;
+    const processor = (await getGuidNewActionProcessor(buildTestQpqConfig(), async () => null))[GuidActionType.New] as (
+      p: any,
+      ...rest: any[]
+    ) => Promise<any>;
 
     const result = await processor(undefined, undefined as any);
 

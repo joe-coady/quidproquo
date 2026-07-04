@@ -1,16 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { KvsUpdateActionType } from '../types';
-import {
-  kvsAdd,
-  kvsDecrement,
-  kvsDelete,
-  kvsIncrement,
-  kvsRemove,
-  kvsSet,
-  kvsSetIfNotExists,
-  kvsUpdate,
-} from './kvsUpdateExpression';
+import { kvsAdd, kvsDecrement, kvsDelete, kvsIncrement, kvsRemove, kvsSet, kvsSetIfNotExists, kvsUpdate } from './kvsUpdateExpression';
 
 describe('kvsUpdateExpression', () => {
   it('builds a Set action carrying the path and value', () => {

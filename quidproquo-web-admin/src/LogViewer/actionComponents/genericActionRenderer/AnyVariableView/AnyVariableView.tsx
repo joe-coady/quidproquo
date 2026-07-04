@@ -74,7 +74,7 @@ export const StringVariableView = ({ value, expanded, hideStringQuotes }: Variab
         <span style={genericFunctionRendererStyles.jsonComment}>
           {'<'}json{'>'}
         </span>
-        <AnyVariableView value={asJson.value} expanded={expanded} />
+        <AnyVariableView expanded={expanded} value={asJson.value} />
       </>
     );
   }
@@ -88,7 +88,7 @@ export const StringVariableView = ({ value, expanded, hideStringQuotes }: Variab
           <span style={genericFunctionRendererStyles.jsonComment}>
             {'<'}base64-json{'>'}
           </span>
-          <AnyVariableView value={asBase64Json.value} expanded={expanded} />
+          <AnyVariableView expanded={expanded} value={asBase64Json.value} />
         </>
       );
     }
@@ -123,7 +123,7 @@ export const ArrayVariableView = ({ value, expanded }: VariableViewProps) => {
         <div style={{ paddingLeft: 10 }}>
           {value.map((item: any, index: number) => (
             <div key={index}>
-              <AnyVariableView value={item} expanded={expanded} />,
+              <AnyVariableView expanded={expanded} value={item} />,
             </div>
           ))}
         </div>
@@ -142,11 +142,11 @@ export const ArrayVariableView = ({ value, expanded }: VariableViewProps) => {
 };
 
 export const KvsQueryConditionVariableView = ({ value, expanded }: VariableViewProps) => {
-  return <GenericFunctionRenderer functionName={`kvs${value.operation}`} args={[value.key, value.valueA]} expanded={expanded} />;
+  return <GenericFunctionRenderer args={[value.key, value.valueA]} expanded={expanded} functionName={`kvs${value.operation}`} />;
 };
 
 export const KvsLogicalOperatorVariableView = ({ value, expanded }: VariableViewProps) => {
-  return <GenericFunctionRenderer functionName={`kvs${value.operation}`} args={[value.conditions]} expanded={expanded} />;
+  return <GenericFunctionRenderer args={[value.conditions]} expanded={expanded} functionName={`kvs${value.operation}`} />;
 };
 
 export const EmptyObjectVariableView = ({ value, expanded }: VariableViewProps) => {
@@ -163,25 +163,25 @@ export const EmptyObjectVariableView = ({ value, expanded }: VariableViewProps) 
 
 export const QpqBinaryDataVariableView = ({ value, expanded }: VariableViewProps) => {
   return (
-    <img src={`data:${value.mimeType || 'image/jpeg'};base64,${value.base64Data}`} alt="Binary Data" style={{ width: '100px', height: 'auto' }} />
+    <img alt="Binary Data" src={`data:${value.mimeType || 'image/jpeg'};base64,${value.base64Data}`} style={{ width: '100px', height: 'auto' }} />
   );
 };
 
 export const ObjectVariableView = ({ value, expanded }: VariableViewProps) => {
   if (Array.isArray(value)) {
-    return <ArrayVariableView value={value} expanded={expanded} />;
+    return <ArrayVariableView expanded={expanded} value={value} />;
   }
 
   const objectKeys = Object.keys(value);
 
   if (value.operation && value.key && objectKeys.length <= 4) {
-    return <KvsQueryConditionVariableView value={value} expanded={expanded} />;
+    return <KvsQueryConditionVariableView expanded={expanded} value={value} />;
   } else if (value.operation && value.conditions && objectKeys.length == 2) {
-    return <KvsLogicalOperatorVariableView value={value} expanded={expanded} />;
+    return <KvsLogicalOperatorVariableView expanded={expanded} value={value} />;
   } else if (objectKeys.length == 0) {
-    return <EmptyObjectVariableView value={value} expanded={expanded} />;
+    return <EmptyObjectVariableView expanded={expanded} value={value} />;
   } else if (value.base64Data && value.filename) {
-    return <QpqBinaryDataVariableView value={value} expanded={expanded} />;
+    return <QpqBinaryDataVariableView expanded={expanded} value={value} />;
   }
 
   const cleanObject = JSON.parse(JSON.stringify(value));
@@ -196,7 +196,7 @@ export const ObjectVariableView = ({ value, expanded }: VariableViewProps) => {
           {key}
           {Array.isArray(cleanObject[key]) && !expanded && (
             <>
-              <span>:</span> <ArrayVariableView value={cleanObject[key]} expanded={false} />
+              <span>:</span> <ArrayVariableView expanded={false} value={cleanObject[key]} />
             </>
           )}
           {index < cleanObjectKeys.length - 1 && ', '}
@@ -210,7 +210,7 @@ export const ObjectVariableView = ({ value, expanded }: VariableViewProps) => {
       <div style={{ paddingLeft: 10 }}>
         {cleanObjectKeys.map((key, index) => (
           <div key={key}>
-            {key}: <AnyVariableView value={cleanObject[key]} expanded={expanded} />,
+            {key}: <AnyVariableView expanded={expanded} value={cleanObject[key]} />,
           </div>
         ))}
       </div>
@@ -230,9 +230,9 @@ export const AnyVariableView = ({ value, expanded, hideStringQuotes }: VariableV
   } else if (typeof value === 'number') {
     return <span style={genericFunctionRendererStyles.numberValue}>{value}</span>;
   } else if (typeof value === 'string') {
-    return <StringVariableView value={value} expanded={expanded} hideStringQuotes={hideStringQuotes} />;
+    return <StringVariableView expanded={expanded} hideStringQuotes={hideStringQuotes} value={value} />;
   } else if (typeof value === 'object') {
-    return <ObjectVariableView value={value} expanded={expanded} />;
+    return <ObjectVariableView expanded={expanded} value={value} />;
   }
 
   // Fallback for other types, using normal text color
@@ -253,7 +253,7 @@ const renderBasicArg = (arg: string, value: any, index: number, expanded: boolea
   return (
     <React.Fragment key={arg}>
       <span title={tooltipText}>
-        <AnyVariableView value={value} expanded={expanded} />
+        <AnyVariableView expanded={expanded} value={value} />
       </span>
     </React.Fragment>
   );

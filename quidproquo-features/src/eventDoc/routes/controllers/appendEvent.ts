@@ -7,10 +7,7 @@ import { askEventDocEventAppend } from '../../logic/askEventDocEventAppend';
 import { EventDocEventInput } from '../../models';
 import { askEventDocParseBody } from '../askEventDocParseBody';
 
-function* askEventDocStoreAppendEvent(
-  event: HTTPEvent,
-  modelId: string
-): AskResponse<HTTPEventResponse> {
+function* askEventDocStoreAppendEvent(event: HTTPEvent, modelId: string): AskResponse<HTTPEventResponse> {
   const actor = yield* askEventDocResolveActor();
 
   const input = yield* askEventDocParseBody<EventDocEventInput>(event);
@@ -21,11 +18,6 @@ function* askEventDocStoreAppendEvent(
 }
 
 /** POST {basePath}/{id}/events — append a client event to the model's log. */
-export function* appendEvent(
-  event: HTTPEvent,
-  params: { id: string }
-): AskResponse<HTTPEventResponse> {
-  return yield* askEventDocProvideStoreFromGlobals(
-    askEventDocStoreAppendEvent(event, params.id)
-  );
+export function* appendEvent(event: HTTPEvent, params: { id: string }): AskResponse<HTTPEventResponse> {
+  return yield* askEventDocProvideStoreFromGlobals(askEventDocStoreAppendEvent(event, params.id));
 }

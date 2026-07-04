@@ -206,10 +206,7 @@ describe('askContextProvideValue', () => {
       return [a, b];
     }
 
-    const { result } = simulateRuntime(
-      askContextProvideValue(ctxA, 'AAA', askContextProvideValue(ctxB, 'BBB', story())),
-      {},
-    );
+    const { result } = simulateRuntime(askContextProvideValue(ctxA, 'AAA', askContextProvideValue(ctxB, 'BBB', story())), {});
     expect(result).toEqual(['AAA', 'BBB']);
   });
 });

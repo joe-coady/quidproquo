@@ -9,7 +9,11 @@ const { executeNetworkRequest } = vi.hoisted(() => ({ executeNetworkRequest: vi.
 vi.mock('quidproquo-webserver', () => ({ executeNetworkRequest }));
 
 describe('getNetworkRequestActionProcessor', () => {
-  const resolve = async () => (await getNetworkRequestActionProcessor(buildTestQpqConfig(), async () => null))[NetworkActionType.Request] as (p: any, ...rest: any[]) => Promise<any>;
+  const resolve = async () =>
+    (await getNetworkRequestActionProcessor(buildTestQpqConfig(), async () => null))[NetworkActionType.Request] as (
+      p: any,
+      ...rest: any[]
+    ) => Promise<any>;
 
   beforeEach(() => {
     vi.spyOn(console, 'log').mockImplementation(() => {});
@@ -38,6 +42,10 @@ describe('getNetworkRequestActionProcessor', () => {
 
     const result = await processor({ method: 'GET', url: '/x', responseType: 'json' });
 
-    expect(resolveActionResultError(result)).toEqual({ errorType: ErrorTypeEnum.GenericError, errorText: 'An unexpected error occurred [Error].', errorStack: undefined });
+    expect(resolveActionResultError(result)).toEqual({
+      errorType: ErrorTypeEnum.GenericError,
+      errorText: 'An unexpected error occurred [Error].',
+      errorStack: undefined,
+    });
   });
 });

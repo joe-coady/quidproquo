@@ -4,10 +4,7 @@ import { HTTPEvent, HTTPEventResponse, qpqWebServerUtils } from 'quidproquo-webs
 import { askEventDocEventList } from '../../data/askEventDocEventList';
 import { askEventDocProvideStoreFromGlobals } from '../../globals/askEventDocProvideStoreFromGlobals';
 
-function* askEventDocStoreListEvents(
-  event: HTTPEvent,
-  modelId: string
-): AskResponse<HTTPEventResponse> {
+function* askEventDocStoreListEvents(event: HTTPEvent, modelId: string): AskResponse<HTTPEventResponse> {
   const limit = qpqWebServerUtils.readUriQueryParamFromEvent(event, 'limit');
   const nextPageKey = qpqWebServerUtils.readUriQueryParamFromEvent(event, 'nextPageKey');
   const afterIndex = qpqWebServerUtils.readUriQueryParamFromEvent(event, 'afterIndex');
@@ -21,11 +18,6 @@ function* askEventDocStoreListEvents(
   return qpqWebServerUtils.toJsonEventResponse(page);
 }
 
-export function* listEvents(
-  event: HTTPEvent,
-  params: { id: string }
-): AskResponse<HTTPEventResponse> {
-  return yield* askEventDocProvideStoreFromGlobals(
-    askEventDocStoreListEvents(event, params.id)
-  );
+export function* listEvents(event: HTTPEvent, params: { id: string }): AskResponse<HTTPEventResponse> {
+  return yield* askEventDocProvideStoreFromGlobals(askEventDocStoreListEvents(event, params.id));
 }

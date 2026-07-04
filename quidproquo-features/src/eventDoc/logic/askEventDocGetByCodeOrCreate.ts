@@ -15,7 +15,7 @@ export function* askEventDocGetByCodeOrCreate(
   code: string,
   name: string,
   actor: EventDocEventActor,
-  ownerUserId?: string
+  ownerUserId?: string,
 ): AskResponse<EventDocSummary> {
   const existing = yield* askEventDocGetByCode(code, ownerUserId);
   if (existing) {

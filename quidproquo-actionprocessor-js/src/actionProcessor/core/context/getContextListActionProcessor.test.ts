@@ -6,7 +6,10 @@ import { getContextListActionProcessor } from './getContextListActionProcessor';
 
 describe('getContextListActionProcessor', () => {
   it('returns the whole shared context', async () => {
-    const processor = (await getContextListActionProcessor(buildTestQpqConfig(), async () => null))[ContextActionType.List] as (p: any, ...rest: any[]) => Promise<any>;
+    const processor = (await getContextListActionProcessor(buildTestQpqConfig(), async () => null))[ContextActionType.List] as (
+      p: any,
+      ...rest: any[]
+    ) => Promise<any>;
     const context = { tenant: 'acme', region: 'us-east-1' };
 
     const result = await processor(undefined, buildTestStorySession({ context }));

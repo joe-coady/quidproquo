@@ -37,22 +37,14 @@ describe('event-doc selectors', () => {
     });
 
     it('returns the highest version regardless of array order', () => {
-      const m = model([
-        v(1, '2026-01-01T00:00:00.000Z'),
-        v(3),
-        v(2, '2026-02-01T00:00:00.000Z'),
-      ]);
+      const m = model([v(1, '2026-01-01T00:00:00.000Z'), v(3), v(2, '2026-02-01T00:00:00.000Z')]);
       expect(latestVersion(m)?.version).toBe(3);
     });
   });
 
   describe('latestPublished', () => {
     it('ignores the unpublished tail draft', () => {
-      const m = model([
-        v(1, '2026-01-01T00:00:00.000Z'),
-        v(2, '2026-02-01T00:00:00.000Z'),
-        v(3),
-      ]);
+      const m = model([v(1, '2026-01-01T00:00:00.000Z'), v(2, '2026-02-01T00:00:00.000Z'), v(3)]);
       expect(latestPublished(m)?.version).toBe(2);
     });
 
@@ -70,15 +62,11 @@ describe('event-doc selectors', () => {
     ]);
 
     it('resolves the newest version published at or before the clock', () => {
-      expect(publishedAsOf(m, iso('2026-02-15T00:00:00.000Z'))?.version).toBe(
-        2
-      );
+      expect(publishedAsOf(m, iso('2026-02-15T00:00:00.000Z'))?.version).toBe(2);
     });
 
     it('is inclusive of the exact publish instant (<=)', () => {
-      expect(publishedAsOf(m, iso('2026-02-10T00:00:00.000Z'))?.version).toBe(
-        2
-      );
+      expect(publishedAsOf(m, iso('2026-02-10T00:00:00.000Z'))?.version).toBe(2);
     });
 
     it('returns undefined before any version was published', () => {
@@ -86,9 +74,7 @@ describe('event-doc selectors', () => {
     });
 
     it('never resolves to the draft even with a far-future clock', () => {
-      expect(publishedAsOf(m, iso('2030-01-01T00:00:00.000Z'))?.version).toBe(
-        3
-      );
+      expect(publishedAsOf(m, iso('2030-01-01T00:00:00.000Z'))?.version).toBe(3);
     });
   });
 
@@ -99,10 +85,7 @@ describe('event-doc selectors', () => {
     });
 
     it('returns undefined when the tail is published', () => {
-      const m = model([
-        v(1, '2026-01-01T00:00:00.000Z'),
-        v(2, '2026-02-01T00:00:00.000Z'),
-      ]);
+      const m = model([v(1, '2026-01-01T00:00:00.000Z'), v(2, '2026-02-01T00:00:00.000Z')]);
       expect(draftVersion(m)).toBeNull();
     });
   });

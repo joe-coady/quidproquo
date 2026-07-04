@@ -10,9 +10,7 @@ describe('askConvertAnyNeptuneResultToAnyGraphResult', () => {
   });
 
   it('converts a node result', () => {
-    const result = runStory(
-      askConvertAnyNeptuneResultToAnyGraphResult({ '~entityType': 'node', '~id': 'n1', '~labels': ['L'], '~properties': {} }),
-    );
+    const result = runStory(askConvertAnyNeptuneResultToAnyGraphResult({ '~entityType': 'node', '~id': 'n1', '~labels': ['L'], '~properties': {} }));
 
     expect(result).toEqual({ $entityType: GraphEntityType.Node, $id: 'n1', $labels: ['L'], $properties: {} });
   });

@@ -5,9 +5,9 @@ import { describe, expect, it } from 'vitest';
 import { defineAdminSettings } from './defineAdminSettings';
 
 const findOwnedGlobal = (config: QPQConfig, service: string, key: string): unknown => {
-  const serviceSettings = config.find(
-    (s) => (s as QPQConfigSetting).configSettingType === QPQCoreConfigSettingType.serviceSettings,
-  ) as unknown as { settingsByService: Record<string, QPQConfigSetting[]> };
+  const serviceSettings = config.find((s) => (s as QPQConfigSetting).configSettingType === QPQCoreConfigSettingType.serviceSettings) as unknown as {
+    settingsByService: Record<string, QPQConfigSetting[]>;
+  };
 
   const global = serviceSettings.settingsByService[service].find(
     (s) => s.configSettingType === QPQCoreConfigSettingType.global && (s as GlobalQPQConfigSetting<unknown>).key === key,

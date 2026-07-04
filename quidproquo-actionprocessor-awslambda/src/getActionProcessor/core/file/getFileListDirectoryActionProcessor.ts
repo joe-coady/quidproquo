@@ -19,7 +19,13 @@ const getProcessFileListDirectory = (qpqConfig: QPQConfig): FileListDirectoryAct
     const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
 
     try {
-      const s3FileList = await listFiles(s3BucketName, qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig), folderPath, maxFiles, pageToken);
+      const s3FileList = await listFiles(
+        s3BucketName,
+        qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig),
+        folderPath,
+        maxFiles,
+        pageToken,
+      );
 
       // Add the drive onto the list
       const fileInfos = s3FileList.fileInfos.map((s3fi) => ({

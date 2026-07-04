@@ -56,10 +56,9 @@ const getProcessStateMachineCreate = (qpqConfig: QPQConfig): StateMachineCreateA
     entity[smConfig.stateField] = initialSnapshot;
 
     // Persist to KVS
-    const upsertResult = await resolveStory(
-      function* () { yield* askKeyValueStoreUpsert(smConfig.keyValueStoreName, entity); },
-      [],
-    );
+    const upsertResult = await resolveStory(function* () {
+      yield* askKeyValueStoreUpsert(smConfig.keyValueStoreName, entity);
+    }, []);
     if (upsertResult.error) {
       return actionResultError(upsertResult.error.errorType, upsertResult.error.errorText);
     }

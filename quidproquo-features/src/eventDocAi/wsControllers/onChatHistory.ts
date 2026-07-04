@@ -5,16 +5,10 @@ import type { EventDocAiChatHistoryPayload, EventDocAiChatMessage } from '../mod
 import { askEventDocAiContextRead } from '../module';
 import { eventDocAiServiceRequest } from './eventDocAiServiceRequest';
 
-const askChatHistoryRequest = createServiceRequester<
-  EventDocAiChatHistoryPayload,
-  EventDocAiChatMessage[]
->('eventDocAi', 'ChatHistory');
+const askChatHistoryRequest = createServiceRequester<EventDocAiChatHistoryPayload, EventDocAiChatMessage[]>('eventDocAi', 'ChatHistory');
 
-export const onChatHistory = eventDocAiServiceRequest(
-  askChatHistoryRequest,
-  function* askOnChatHistory(payload) {
-    const { docId } = yield* askEventDocAiContextRead();
+export const onChatHistory = eventDocAiServiceRequest(askChatHistoryRequest, function* askOnChatHistory(payload) {
+  const { docId } = yield* askEventDocAiContextRead();
 
-    return yield* askEventDocAiChatHistoryLoad(docId, payload.chatId);
-  }
-);
+  return yield* askEventDocAiChatHistoryLoad(docId, payload.chatId);
+});

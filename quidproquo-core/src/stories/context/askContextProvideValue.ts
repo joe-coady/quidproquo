@@ -23,7 +23,7 @@ export function* askContextProvideValue<R, T extends AskResponse<any>>(
       return yield action;
     },
 
-    [ContextActionType.List]: function* (action:  ContextListAction) {
+    [ContextActionType.List]: function* (action: ContextListAction) {
       // Local context is not part of the cross-service context list; stay transparent.
       if (contextIdentifier.local) {
         return yield action;

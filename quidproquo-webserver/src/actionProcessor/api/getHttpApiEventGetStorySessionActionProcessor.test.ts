@@ -18,11 +18,7 @@ import { getHttpApiEventGetStorySessionActionProcessor } from './getHttpApiEvent
 
 const qpqConfig = buildTestQpqConfig();
 
-const invoke = async (
-  qpqEventRecord: Partial<HTTPEvent>,
-  config: RouteOptions,
-  processors: Record<string, any> = {},
-) => {
+const invoke = async (qpqEventRecord: Partial<HTTPEvent>, config: RouteOptions, processors: Record<string, any> = {}) => {
   const map = await getHttpApiEventGetStorySessionActionProcessor(qpqConfig, noopDynamicModuleLoader);
   const processor = map[EventActionType.GetStorySession];
 

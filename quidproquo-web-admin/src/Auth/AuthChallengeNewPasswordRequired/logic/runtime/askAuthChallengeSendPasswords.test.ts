@@ -1,12 +1,4 @@
-import {
-  ConfigActionType,
-  ContextActionType,
-  DateActionType,
-  GuidActionType,
-  NetworkActionType,
-  runStory,
-  StateActionType,
-} from 'quidproquo-core';
+import { ConfigActionType, ContextActionType, DateActionType, GuidActionType, NetworkActionType, runStory, StateActionType } from 'quidproquo-core';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -46,7 +38,10 @@ describe('askAuthChallengeSendPasswords', () => {
     const dispatched: string[] = [];
     const setParams: unknown[] = [];
 
-    runStory(askAuthChallengeSendPasswords('NEW_PASSWORD_REQUIRED', 'sess', 'joe@x.com'), baseMocks(dispatched, setParams, { status: 400, data: {} }));
+    runStory(
+      askAuthChallengeSendPasswords('NEW_PASSWORD_REQUIRED', 'sess', 'joe@x.com'),
+      baseMocks(dispatched, setParams, { status: 400, data: {} }),
+    );
 
     expect(setParams).toHaveLength(0);
   });

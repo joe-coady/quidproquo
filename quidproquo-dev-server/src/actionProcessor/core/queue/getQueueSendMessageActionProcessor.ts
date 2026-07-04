@@ -1,4 +1,13 @@
-import { ActionProcessorList, ActionProcessorListResolver, actionResultError, ErrorTypeEnum, generateUuid, QPQConfig, qpqCoreUtils, toCrossServiceSession } from 'quidproquo-core';
+import {
+  ActionProcessorList,
+  ActionProcessorListResolver,
+  actionResultError,
+  ErrorTypeEnum,
+  generateUuid,
+  QPQConfig,
+  qpqCoreUtils,
+  toCrossServiceSession,
+} from 'quidproquo-core';
 import { actionResult, QueueActionType, QueueSendMessageActionProcessor } from 'quidproquo-core';
 
 import { eventBus } from '../../../logic/eventBus';

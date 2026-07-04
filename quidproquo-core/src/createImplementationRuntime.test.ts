@@ -2,7 +2,14 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { actionResult, isErroredActionResult, resolveActionResult, resolveActionResultError } from './logic/actionLogic';
 import { buildTestQpqConfig } from './testing/configTesting';
-import { buildActionProcessorList, buildTestStorySession, createStubLogger, getTestTimeNow, noopDynamicModuleLoader, testRandomGuid } from './testing/runtimeTesting';
+import {
+  buildActionProcessorList,
+  buildTestStorySession,
+  createStubLogger,
+  getTestTimeNow,
+  noopDynamicModuleLoader,
+  testRandomGuid,
+} from './testing/runtimeTesting';
 import { AskResponse, QpqRuntimeType } from './types/StorySession';
 import { createImplementationRuntime, getProcessCustomImplementation } from './createImplementationRuntime';
 
@@ -37,7 +44,15 @@ describe('createImplementationRuntime', () => {
 
 describe('getProcessCustomImplementation', () => {
   const invoke = (processor: any, payload: any) =>
-    processor(payload, buildTestStorySession(), buildActionProcessorList({ Echo: async (p: string) => actionResult(p) }), createStubLogger(), () => {}, noopDynamicModuleLoader, {} as any);
+    processor(
+      payload,
+      buildTestStorySession(),
+      buildActionProcessorList({ Echo: async (p: string) => actionResult(p) }),
+      createStubLogger(),
+      () => {},
+      noopDynamicModuleLoader,
+      {} as any,
+    );
 
   it('returns actionResult of the story result on success', async () => {
     function* story(msg: string): AskResponse<string> {

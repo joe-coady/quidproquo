@@ -15,10 +15,7 @@ import { setSending } from './stateUpdaters/setSending';
 import { upsertChat } from './stateUpdaters/upsertChat';
 import type { EventDocAiState } from './EventDocAiState';
 
-export const eventDocAiReducer = buildEffectReducer<
-  EventDocAiState,
-  EventDocAiEffects
->({
+export const eventDocAiReducer = buildEffectReducer<EventDocAiState, EventDocAiEffects>({
   [EventDocAiEffect.SetChats]: setChats,
   [EventDocAiEffect.UpsertChat]: upsertChat,
   [EventDocAiEffect.SetActiveChat]: setActiveChat,

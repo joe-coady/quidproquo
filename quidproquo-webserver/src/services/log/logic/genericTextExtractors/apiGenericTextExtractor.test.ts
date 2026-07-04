@@ -20,7 +20,14 @@ describe('apiGenericTextExtractor', () => {
   it('extracts method, path and source ip for each event', () => {
     const result = apiGenericTextExtractor(
       buildStoryResult({
-        history: [getRecordsHistory(actionResult([httpEvent({ method: 'GET', path: '/users', sourceIp: '1.2.3.4' }), httpEvent({ method: 'POST', path: '/login', sourceIp: '5.6.7.8' })]))],
+        history: [
+          getRecordsHistory(
+            actionResult([
+              httpEvent({ method: 'GET', path: '/users', sourceIp: '1.2.3.4' }),
+              httpEvent({ method: 'POST', path: '/login', sourceIp: '5.6.7.8' }),
+            ]),
+          ),
+        ],
       }),
     );
 

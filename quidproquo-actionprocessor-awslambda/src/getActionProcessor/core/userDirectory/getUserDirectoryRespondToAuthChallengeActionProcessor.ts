@@ -96,14 +96,19 @@ const getProcessRespondToAuthChallenge = (qpqConfig: QPQConfig): UserDirectoryRe
       return actionResult(response);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        CodeMismatchException: () => actionResultError(UserDirectoryRespondToAuthChallengeErrorTypeEnum.InvalidCode, 'The supplied code is incorrect'),
-        EnableSoftwareTokenMFAException: () => actionResultError(UserDirectoryRespondToAuthChallengeErrorTypeEnum.InvalidCode, 'The supplied code is incorrect'),
+        CodeMismatchException: () =>
+          actionResultError(UserDirectoryRespondToAuthChallengeErrorTypeEnum.InvalidCode, 'The supplied code is incorrect'),
+        EnableSoftwareTokenMFAException: () =>
+          actionResultError(UserDirectoryRespondToAuthChallengeErrorTypeEnum.InvalidCode, 'The supplied code is incorrect'),
         ExpiredCodeException: () => actionResultError(UserDirectoryRespondToAuthChallengeErrorTypeEnum.ExpiredCode, 'The supplied code has expired'),
         InvalidPasswordException: () =>
           actionResultError(UserDirectoryRespondToAuthChallengeErrorTypeEnum.InvalidNewPassword, 'New password does not meet the password policy'),
-        NotAuthorizedException: () => actionResultError(UserDirectoryRespondToAuthChallengeErrorTypeEnum.Unauthorized, 'The challenge session is invalid or has expired'),
-        LimitExceededException: () => actionResultError(UserDirectoryRespondToAuthChallengeErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
-        TooManyRequestsException: () => actionResultError(UserDirectoryRespondToAuthChallengeErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
+        NotAuthorizedException: () =>
+          actionResultError(UserDirectoryRespondToAuthChallengeErrorTypeEnum.Unauthorized, 'The challenge session is invalid or has expired'),
+        LimitExceededException: () =>
+          actionResultError(UserDirectoryRespondToAuthChallengeErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
+        TooManyRequestsException: () =>
+          actionResultError(UserDirectoryRespondToAuthChallengeErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
       });
     }
   };

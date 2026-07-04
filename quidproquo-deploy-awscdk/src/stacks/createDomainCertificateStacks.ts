@@ -44,11 +44,7 @@ const mergeConfigsByRegionAndDomain = (configs: DomainCertificateQPQConfigSettin
  * user has to do. Exposed here as an escape hatch for advanced setups that want to manage the
  * cert stack siblings themselves.
  */
-export const createDomainCertificateStacks = (
-  scope: Construct,
-  qpqConfig: QPQConfig,
-  idPrefix: string,
-): DomainCertificateStack[] => {
+export const createDomainCertificateStacks = (scope: Construct, qpqConfig: QPQConfig, idPrefix: string): DomainCertificateStack[] => {
   const configs = mergeConfigsByRegionAndDomain(qpqConfigAwsUtils.getDomainCertificateConfigs(qpqConfig));
 
   return configs.map((certificateConfig) => {

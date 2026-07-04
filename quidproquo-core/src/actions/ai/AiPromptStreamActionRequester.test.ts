@@ -9,9 +9,7 @@ describe('askAiPromptStream', () => {
   it('yields a PromptStream action with the model, prompt and options', () => {
     const messages = [{ role: 'user', content: 'hi' }] as any;
 
-    const { action } = captureRequester(
-      askAiPromptStream(AiModel.ClaudeSonnet45, 'stream it', { system: 'be helpful', aiName: 'bob', messages }),
-    );
+    const { action } = captureRequester(askAiPromptStream(AiModel.ClaudeSonnet45, 'stream it', { system: 'be helpful', aiName: 'bob', messages }));
 
     expect(action).toEqual({
       type: AiActionType.PromptStream,

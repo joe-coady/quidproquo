@@ -1,13 +1,14 @@
-import { 
-  ActionProcessorList, 
-  ActionProcessorListResolver, 
-  actionResult, 
+import {
+  ActionProcessorList,
+  ActionProcessorListResolver,
+  actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
-  KeyValueStoreActionType, 
-  KeyValueStoreScanActionProcessor, 
-  QPQConfig, 
-  qpqCoreUtils} from 'quidproquo-core';
+  KeyValueStoreActionType,
+  KeyValueStoreScanActionProcessor,
+  QPQConfig,
+  qpqCoreUtils,
+} from 'quidproquo-core';
 
 import { SqliteKvsRepository } from '../../../logic/keyValueStore/SqliteKvsRepository';
 import { ResolvedDevServerConfig } from '../../../types';
@@ -16,18 +17,15 @@ const repositoryInstances = new Map<string, SqliteKvsRepository>();
 
 const getRepository = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): SqliteKvsRepository => {
   const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
-  
+
   if (!repositoryInstances.has(serviceName)) {
     repositoryInstances.set(serviceName, new SqliteKvsRepository(devServerConfig.runtimePath, qpqConfig));
   }
-  
+
   return repositoryInstances.get(serviceName)!;
 };
 
-const getProcessKeyValueStoreScan = (
-  qpqConfig: QPQConfig,
-  devServerConfig: ResolvedDevServerConfig
-): KeyValueStoreScanActionProcessor<any> => {
+const getProcessKeyValueStoreScan = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): KeyValueStoreScanActionProcessor<any> => {
   return async ({ keyValueStoreName, filterCondition, nextPageKey }) => {
     try {
       const repository = getRepository(qpqConfig, devServerConfig);
@@ -35,7 +33,7 @@ const getProcessKeyValueStoreScan = (
         keyValueStoreName,
         filterCondition,
         nextPageKey,
-        undefined // limit is not in the scan payload, using default
+        undefined, // limit is not in the scan payload, using default
       );
       return actionResult(result);
     } catch (error: any) {
@@ -47,11 +45,8 @@ const getProcessKeyValueStoreScan = (
   };
 };
 
-export const getKeyValueStoreScanActionProcessor = (
-  devServerConfig: ResolvedDevServerConfig
-): ActionProcessorListResolver => async (
-  qpqConfig: QPQConfig,
-  _dynamicModuleLoader: any
-): Promise<ActionProcessorList> => ({
-  [KeyValueStoreActionType.Scan]: getProcessKeyValueStoreScan(qpqConfig, devServerConfig),
-});
+export const getKeyValueStoreScanActionProcessor =
+  (devServerConfig: ResolvedDevServerConfig): ActionProcessorListResolver =>
+  async (qpqConfig: QPQConfig, _dynamicModuleLoader: any): Promise<ActionProcessorList> => ({
+    [KeyValueStoreActionType.Scan]: getProcessKeyValueStoreScan(qpqConfig, devServerConfig),
+  });

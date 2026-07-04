@@ -11,15 +11,11 @@ import { buildEventDocAiMethodName } from './buildEventDocAiMethodName';
 // never appear in composites or request call sites. The backend wrapper
 // (eventDocAiServiceRequest) strips the docId back off and re-provides it as
 // context around the handler.
-export function* askEventDocAiServiceRequest<TPayload, TResponse>(
-  method: string,
-  payload: TPayload
-): AskResponse<TResponse> {
+export function* askEventDocAiServiceRequest<TPayload, TResponse>(method: string, payload: TPayload): AskResponse<TResponse> {
   const { serviceName, type, docId } = yield* askEventDocAiContextRead();
 
-  return yield* askServiceRequest<TPayload & EventDocAiDocRef, TResponse>(
-    serviceName,
-    buildEventDocAiMethodName(type, method),
-    { ...payload, docId }
-  );
+  return yield* askServiceRequest<TPayload & EventDocAiDocRef, TResponse>(serviceName, buildEventDocAiMethodName(type, method), {
+    ...payload,
+    docId,
+  });
 }

@@ -40,7 +40,10 @@ describe('eventBridgeEvent/recurringSchedule getEventTransformResponseResultActi
   it('propagates a failed record as an error result', async () => {
     const processor = await resolveEventProcessor(getEventTransformResponseResultActionProcessor, EventActionType.TransformResponseResult);
 
-    const [, error] = await processor({ eventParams: [{}], qpqEventRecordResponses: [{ success: false, error: { errorType: ErrorTypeEnum.GenericError, errorText: 'boom' } }] });
+    const [, error] = await processor({
+      eventParams: [{}],
+      qpqEventRecordResponses: [{ success: false, error: { errorType: ErrorTypeEnum.GenericError, errorText: 'boom' } }],
+    });
 
     expect(error?.errorType).toBe(ErrorTypeEnum.GenericError);
   });

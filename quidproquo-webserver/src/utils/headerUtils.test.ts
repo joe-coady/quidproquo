@@ -21,10 +21,7 @@ import {
 const buildEvent = (headers: HttpEventHeaders): HTTPEvent => ({ headers }) as HTTPEvent;
 
 const prodConfig = (route?: RouteOptions) =>
-  buildTestQpqConfig(
-    [defineDns('example.com'), ...(route ? [defineDefaultRouteOptions('default', route)] : [])],
-    { environment: 'production' },
-  );
+  buildTestQpqConfig([defineDns('example.com'), ...(route ? [defineDefaultRouteOptions('default', route)] : [])], { environment: 'production' });
 
 describe('getHeaderValue', () => {
   it('looks up a header case-insensitively', () => {
@@ -74,9 +71,7 @@ describe('convertContentSecurityPolicyEntryToString', () => {
   });
 
   it('builds a service origin from an api and service', () => {
-    expect(convertContentSecurityPolicyEntryToString('example.com', { api: 'api', service: 'billing' })).toBe(
-      'https://api.billing.example.com',
-    );
+    expect(convertContentSecurityPolicyEntryToString('example.com', { api: 'api', service: 'billing' })).toBe('https://api.billing.example.com');
   });
 
   it('falls back to the base domain and omits the service when absent', () => {
@@ -111,11 +106,15 @@ describe('getCorsHeaders', () => {
 
   it('reflects the preflight-requested headers and method instead of a wildcard', () => {
     const config = prodConfig();
-    const headers = getCorsHeaders(config, {}, {
-      origin: 'https://example.com',
-      'access-control-request-headers': 'authorization,x-custom',
-      'access-control-request-method': 'PUT',
-    });
+    const headers = getCorsHeaders(
+      config,
+      {},
+      {
+        origin: 'https://example.com',
+        'access-control-request-headers': 'authorization,x-custom',
+        'access-control-request-method': 'PUT',
+      },
+    );
 
     expect(headers['Access-Control-Allow-Headers']).toBe('authorization,x-custom');
     expect(headers['Access-Control-Allow-Methods']).toBe('PUT');

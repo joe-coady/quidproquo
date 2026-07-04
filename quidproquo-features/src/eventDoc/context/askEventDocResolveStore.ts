@@ -10,7 +10,7 @@ export function* askEventDocResolveStore(): AskResponse<EventDocStore> {
   if (!store.storeName || !store.type) {
     return yield* askThrowError(
       ErrorTypeEnum.GenericError,
-      'EventDoc store context was not provided. Wrap the call in askEventDocStoreProvide({ storeName, type }, ...).'
+      'EventDoc store context was not provided. Wrap the call in askEventDocStoreProvide({ storeName, type }, ...).',
     );
   }
 

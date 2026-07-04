@@ -38,7 +38,10 @@ const DEFAULT_TIME_OPTIONS: Intl.DateTimeFormatOptions = {
 const DATE_OPTION_KEYS: (keyof Intl.DateTimeFormatOptions)[] = ['weekday', 'era', 'year', 'month', 'day'];
 const TIME_OPTION_KEYS: (keyof Intl.DateTimeFormatOptions)[] = ['hour', 'minute', 'second', 'dayPeriod', 'timeZoneName'];
 
-const pickOptions = (options: Intl.DateTimeFormatOptions | undefined, keys: (keyof Intl.DateTimeFormatOptions)[]): Intl.DateTimeFormatOptions | undefined => {
+const pickOptions = (
+  options: Intl.DateTimeFormatOptions | undefined,
+  keys: (keyof Intl.DateTimeFormatOptions)[],
+): Intl.DateTimeFormatOptions | undefined => {
   if (!options) {
     return undefined;
   }
@@ -64,7 +67,17 @@ const toDate = (props: DateInput): Date => {
 };
 
 const component: React.FC<DateTimeProps> = (props) => {
-  const { locale, dateTimeFormatOptions, showTimeAgo = true, hideDate = false, hideTime = false, hideTimeAgo = false, isMultiline = true, placeholder = '—', className } = props;
+  const {
+    locale,
+    dateTimeFormatOptions,
+    showTimeAgo = true,
+    hideDate = false,
+    hideTime = false,
+    hideTimeAgo = false,
+    isMultiline = true,
+    placeholder = '—',
+    className,
+  } = props;
 
   // Stable primitive key so a fresh props object doesn't churn the memo.
   const dateKey = 'isoDateTime' in props ? props.isoDateTime : 'unixTimestampMs' in props ? props.unixTimestampMs : props.date.getTime();
@@ -94,7 +107,7 @@ const component: React.FC<DateTimeProps> = (props) => {
   }
 
   return (
-    <time dateTime={date.toISOString()} title={date.toLocaleString(locale)} className={className}>
+    <time className={className} dateTime={date.toISOString()} title={date.toLocaleString(locale)}>
       {isMultiline ? (
         <>
           {formattedDateTime ? <div>{formattedDateTime}</div> : null}

@@ -15,10 +15,7 @@ import { effectiveAsOf } from './selectors/effectiveAsOf';
  * events to get the published, as-of-`clock` state — the generic backbone of a "render published"
  * flow, mirroring `askEventDocGetPublishedAsOf` (which returns the version pointer, not its events).
  */
-export function* askEventDocPublishedEventsAsOf(
-  id: string,
-  clock: QpqIsoDateTime
-): AskResponse<Nullable<EventDocEvent[]>> {
+export function* askEventDocPublishedEventsAsOf(id: string, clock: QpqIsoDateTime): AskResponse<Nullable<EventDocEvent[]>> {
   const summary = yield* askEventDocGetById(id);
   if (!summary || summary.deletedAt) {
     return null;
@@ -31,7 +28,5 @@ export function* askEventDocPublishedEventsAsOf(
 
   const events = yield* askEventDocEventListAll(id);
 
-  return events.filter(
-    (event) => event.payload.metadata.index <= version.eventIndex
-  );
+  return events.filter((event) => event.payload.metadata.index <= version.eventIndex);
 }

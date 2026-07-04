@@ -43,7 +43,7 @@ const renderRectSvgNode =
 
     return (
       <g>
-        <circle r={10} fill={color} x="10" y="10" onClick={() => setSelectedLogCorrelation(nodeDatum.correlation)} />
+        <circle fill={color} onClick={() => setSelectedLogCorrelation(nodeDatum.correlation)} r={10} x="10" y="10" />
         {textLines
           .filter((t) => !!t)
           .map((text, i) => {
@@ -52,8 +52,8 @@ const renderRectSvgNode =
             const fontSize = i === 0 ? 30 : 15;
             return (
               <Fragment key={`${i}`}>
-                <rect x={x - 50} y={y - fontSize / 2 - 8} width="100" height={fontSize} fill={BACKGROUND_COLOR} strokeWidth="0" />
-                <text textAnchor="middle" fontSize={fontSize} fill={nodeDatum.error ? 'red' : 'black'} strokeWidth={0} y={y}>
+                <rect fill={BACKGROUND_COLOR} height={fontSize} strokeWidth="0" width="100" x={x - 50} y={y - fontSize / 2 - 8} />
+                <text fill={nodeDatum.error ? 'red' : 'black'} fontSize={fontSize} strokeWidth={0} textAnchor="middle" y={y}>
                   {text}
                 </text>
               </Fragment>

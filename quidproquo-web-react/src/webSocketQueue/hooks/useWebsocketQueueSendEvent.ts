@@ -1,14 +1,16 @@
 import { WebsocketService, WebsocketServiceEvent } from 'quidproquo-web';
-import { AnyWebSocketQueueEventMessageWithCorrelation, WebSocketQueueServerEventMessageServiceRequestResponse, WebSocketQueueServerMessageEventType } from 'quidproquo-webserver';
+import {
+  AnyWebSocketQueueEventMessageWithCorrelation,
+  WebSocketQueueServerEventMessageServiceRequestResponse,
+  WebSocketQueueServerMessageEventType,
+} from 'quidproquo-webserver';
 
 import { useRef } from 'react';
 
 import { useFastCallback } from '../../hooks';
 import { useSubscribeToWebsocket, useWebsocketApi } from '../../websocket';
 
-export const useWebsocketQueueSendEvent = <
-  TSend extends AnyWebSocketQueueEventMessageWithCorrelation,
->(
+export const useWebsocketQueueSendEvent = <TSend extends AnyWebSocketQueueEventMessageWithCorrelation>(
   onCorrelatedMessage?: (event: AnyWebSocketQueueEventMessageWithCorrelation) => void,
 ) => {
   const websocketApi = useWebsocketApi();
@@ -29,7 +31,7 @@ export const useWebsocketQueueSendEvent = <
         const resolve = pendingResolversRef.current.get(parsed.correlationId);
         if (resolve) {
           resolve((parsed as WebSocketQueueServerEventMessageServiceRequestResponse).payload);
-          
+
           pendingResolversRef.current.delete(parsed.correlationId);
           activeCorrelationsRef.current.delete(parsed.correlationId);
         }

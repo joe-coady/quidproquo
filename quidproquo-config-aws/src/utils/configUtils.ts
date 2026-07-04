@@ -43,10 +43,7 @@ export const getAwsBootstrapOrganizationConfigs = (qpqConfig: QPQConfig): AwsOrg
 };
 
 export const getBootstrapCloudTrailConfigs = (qpqConfig: QPQConfig): BootstrapCloudTrailQPQConfigSetting[] =>
-  qpqCoreUtils.getConfigSettings<BootstrapCloudTrailQPQConfigSetting>(
-    qpqConfig,
-    QPQAwsConfigSettingType.bootstrapCloudTrail,
-  );
+  qpqCoreUtils.getConfigSettings<BootstrapCloudTrailQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.bootstrapCloudTrail);
 
 export const getAwsServiceAccountInfos = (qpqConfig: QPQConfig): ServiceAccountInfo[] => {
   const awsServiceAccountInfoConfig = getAwsServiceAccountInfoConfig(qpqConfig);
@@ -193,10 +190,7 @@ export const isTracingDisabled = (qpqConfig: QPQConfig): boolean => {
 };
 
 export const getDomainCertificateConfigs = (qpqConfig: QPQConfig): DomainCertificateQPQConfigSetting[] => {
-  return qpqCoreUtils.getConfigSettings<DomainCertificateQPQConfigSetting>(
-    qpqConfig,
-    QPQAwsConfigSettingType.awsDomainCertificate,
-  );
+  return qpqCoreUtils.getConfigSettings<DomainCertificateQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.awsDomainCertificate);
 };
 
 export const getDomainCertificateArnSsmParameterName = (region: string, rootDomain: string): string => {

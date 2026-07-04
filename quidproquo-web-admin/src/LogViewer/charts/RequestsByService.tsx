@@ -14,10 +14,10 @@ export const RequestsByService = ({ logs, searchParams }: RequestsByServiceProps
 
   return (
     <>
-      <Typography variant="h5" gutterBottom>
+      <Typography gutterBottom variant="h5">
         Requests by Service
       </Typography>
-      <LineChart width={1200} height={300} data={data}>
+      <LineChart data={data} height={300} width={1200}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="time" />
         <YAxis />
@@ -26,7 +26,7 @@ export const RequestsByService = ({ logs, searchParams }: RequestsByServiceProps
         {Object.keys(data[0] || {})
           .filter((key) => key !== 'time')
           .map((service) => (
-            <Line key={service} type="monotone" dataKey={service} stroke={`#${Math.floor(Math.random() * 16777215).toString(16)}`} />
+            <Line key={service} dataKey={service} stroke={`#${Math.floor(Math.random() * 16777215).toString(16)}`} type="monotone" />
           ))}
       </LineChart>
     </>

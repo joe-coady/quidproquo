@@ -11,7 +11,10 @@ describe('askLogTemplateLiteral', () => {
     expect(action).toEqual({
       type: LogActionType.TemplateLiteral,
       payload: {
-        messageParts: [['user ', ' did ', ''], ['alice', 'login']],
+        messageParts: [
+          ['user ', ' did ', ''],
+          ['alice', 'login'],
+        ],
       },
     });
   });

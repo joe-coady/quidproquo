@@ -25,13 +25,7 @@ type AnyEventBusMessageWithSession = EventBusMessage<any> & {
 };
 
 const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): EventBusSendMessageActionProcessor<any> => {
-  return async (
-    {
-      eventBusName,
-      eventBusMessages,
-    },
-    session,
-  ) => {
+  return async ({ eventBusName, eventBusMessages }, session) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const eventBusConfig = qpqCoreUtils.getEventBusConfigByName(eventBusName, qpqConfig);

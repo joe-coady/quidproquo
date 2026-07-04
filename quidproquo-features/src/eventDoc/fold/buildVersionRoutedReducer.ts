@@ -7,9 +7,7 @@ import { EventDocEvent } from '../models';
 // reducer always sees its own shape. Unknown/missing version returns [state, false]
 // (skipped on replay, per combineQpqReducers/replayEffects semantics).
 export const buildVersionRoutedReducer =
-  <TState>(
-    reducersByVersion: Record<number, QpqReducer<TState, EventDocEvent>>
-  ): QpqReducer<TState, EventDocEvent> =>
+  <TState>(reducersByVersion: Record<number, QpqReducer<TState, EventDocEvent>>): QpqReducer<TState, EventDocEvent> =>
   (state, effect) => {
     const version = effect?.payload?.metadata?.version;
     const reducer = version == null ? undefined : reducersByVersion[version];

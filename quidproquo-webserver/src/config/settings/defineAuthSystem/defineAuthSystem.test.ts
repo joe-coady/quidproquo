@@ -7,9 +7,7 @@ import { RouteQPQWebServerConfigSetting } from '../route';
 import { defineAuthSystem } from './defineAuthSystem';
 
 const routePaths = (settings: QPQConfigSetting[]): string[] =>
-  settings
-    .filter((s) => s.configSettingType === QPQWebServerConfigSettingType.Route)
-    .map((s) => (s as RouteQPQWebServerConfigSetting).path);
+  settings.filter((s) => s.configSettingType === QPQWebServerConfigSettingType.Route).map((s) => (s as RouteQPQWebServerConfigSetting).path);
 
 describe('defineAuthSystem', () => {
   it('declares the user directory at the top level and gates the routes behind the service', () => {

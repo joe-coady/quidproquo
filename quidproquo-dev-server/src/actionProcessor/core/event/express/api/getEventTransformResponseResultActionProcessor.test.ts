@@ -13,9 +13,7 @@ const invoke = async (qpqEventRecordResponses: any) => {
 
 describe('getEventTransformResponseResultActionProcessor (express)', () => {
   it('maps a success record onto the express response, merging CORS headers', async () => {
-    const result = await invoke([
-      { success: true, result: { status: 201, body: 'created', isBase64Encoded: false, headers: { 'x-custom': 'y' } } },
-    ]);
+    const result = await invoke([{ success: true, result: { status: 201, body: 'created', isBase64Encoded: false, headers: { 'x-custom': 'y' } } }]);
 
     const output = resolveActionResult(result);
     expect(output.statusCode).toBe(201);

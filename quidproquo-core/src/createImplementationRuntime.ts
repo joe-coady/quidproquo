@@ -77,7 +77,15 @@ export const getProcessCustomImplementation = <T extends ActionProcessor<any, an
   getDateNow: () => string,
   getNewGuid: () => string,
 ): T => {
-  const actionProcesor: ActionProcessor<any, any> = async (payload, session, actionProcessorList, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
+  const actionProcesor: ActionProcessor<any, any> = async (
+    payload,
+    session,
+    actionProcessorList,
+    logger,
+    updateSession,
+    dynamicModuleLoader,
+    streamRegistry,
+  ) => {
     const resolveStory = createImplementationRuntime(
       qpqConfig,
       [tag],

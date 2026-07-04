@@ -1,6 +1,14 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import { ActionProcessorList, ActionProcessorListResolver, QPQConfig, qpqCoreUtils, QueueMessage, StorySession } from 'quidproquo-core';
-import { actionResult, actionResultError, actionResultErrorFromCaughtError, QueueActionType, QueueSendMessageActionProcessor, QueueSendMessagesErrorTypeEnum, toCrossServiceSession } from 'quidproquo-core';
+import {
+  actionResult,
+  actionResultError,
+  actionResultErrorFromCaughtError,
+  QueueActionType,
+  QueueSendMessageActionProcessor,
+  QueueSendMessagesErrorTypeEnum,
+  toCrossServiceSession,
+} from 'quidproquo-core';
 
 import { sendMessages } from '../../../logic/sqs/sendMessages';
 import { resolveResourceName } from '../../../runtimeConfig/qpqAwsLambdaRuntimeConfigUtils';

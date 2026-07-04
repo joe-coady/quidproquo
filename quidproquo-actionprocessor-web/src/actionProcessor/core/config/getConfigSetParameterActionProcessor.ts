@@ -18,7 +18,8 @@ const getProcessConfigSetParameter = (qpqConfig: QPQConfig): ConfigSetParameterA
       return actionResult(void 0);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        QuotaExceededError: () => actionResultError(ConfigSetParameterErrorTypeEnum.QuotaExceeded, `Local Storage quota exceeded saving parameter '${parameterName}'.`),
+        QuotaExceededError: () =>
+          actionResultError(ConfigSetParameterErrorTypeEnum.QuotaExceeded, `Local Storage quota exceeded saving parameter '${parameterName}'.`),
       });
     }
   };

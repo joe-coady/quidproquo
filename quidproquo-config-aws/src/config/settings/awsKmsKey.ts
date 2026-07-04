@@ -19,12 +19,7 @@ export interface AwsKmsKeyQPQConfigSetting extends QPQConfigSetting {
   kmsOwner: AwsKmsKeyOwner;
 }
 
-export const defineAwsKmsKey = (
-  keyname: string,
-  arn: string,
-  type: AwsKmsKeyTargetType,
-  owner: AwsKmsKeyOwner,
-): AwsKmsKeyQPQConfigSetting => ({
+export const defineAwsKmsKey = (keyname: string, arn: string, type: AwsKmsKeyTargetType, owner: AwsKmsKeyOwner): AwsKmsKeyQPQConfigSetting => ({
   configSettingType: QPQAwsConfigSettingType.awsKmsKey,
   uniqueKey: keyname,
 

@@ -5,16 +5,10 @@ import type { EventDocAiChatSendPayload, EventDocAiChatSendResult } from '../mod
 import { askEventDocAiContextRead } from '../module';
 import { eventDocAiServiceRequest } from './eventDocAiServiceRequest';
 
-const askChatSendRequest = createServiceRequester<
-  EventDocAiChatSendPayload,
-  EventDocAiChatSendResult
->('eventDocAi', 'ChatSend');
+const askChatSendRequest = createServiceRequester<EventDocAiChatSendPayload, EventDocAiChatSendResult>('eventDocAi', 'ChatSend');
 
-export const onChatSend = eventDocAiServiceRequest(
-  askChatSendRequest,
-  function* askOnChatSend(payload) {
-    const { docId } = yield* askEventDocAiContextRead();
+export const onChatSend = eventDocAiServiceRequest(askChatSendRequest, function* askOnChatSend(payload) {
+  const { docId } = yield* askEventDocAiContextRead();
 
-    return yield* askEventDocAiProcessSend(docId, payload.chatId, payload.message);
-  }
-);
+  return yield* askEventDocAiProcessSend(docId, payload.chatId, payload.message, payload.attachments);
+});

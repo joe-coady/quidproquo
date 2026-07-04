@@ -16,7 +16,10 @@ describe('getDnsListActionProcessor', () => {
   });
 
   it('returns an empty list when no dns settings are configured', async () => {
-    const processor = (await getDnsListActionProcessor(buildTestQpqConfig(), async () => null))[DnsActionType.List] as (p: any, ...rest: any[]) => Promise<any>;
+    const processor = (await getDnsListActionProcessor(buildTestQpqConfig(), async () => null))[DnsActionType.List] as (
+      p: any,
+      ...rest: any[]
+    ) => Promise<any>;
 
     const result = await processor(undefined, undefined as any);
 

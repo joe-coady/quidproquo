@@ -28,10 +28,8 @@ const getProcessSetUserAttributes = (
   };
 };
 
-export const getUserDirectorySetUserAttributesActionProcessor = (
-  devServerConfig: ResolvedDevServerConfig,
-): ActionProcessorListResolver => async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [UserDirectoryActionType.SetUserAttributes]: getProcessSetUserAttributes(qpqConfig, devServerConfig),
-});
+export const getUserDirectorySetUserAttributesActionProcessor =
+  (devServerConfig: ResolvedDevServerConfig): ActionProcessorListResolver =>
+  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
+    [UserDirectoryActionType.SetUserAttributes]: getProcessSetUserAttributes(qpqConfig, devServerConfig),
+  });

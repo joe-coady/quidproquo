@@ -8,13 +8,5 @@ import { maxByVersion } from './maxByVersion';
  * a version's own `publishedAt` to render it as-was, or `now` for latest).
  * ISO-8601 timestamps compare correctly as strings.
  */
-export const publishedAsOf = (
-  model: EventDocSummary,
-  clock: QpqIsoDateTime
-): Nullable<EventDocVersion> =>
-  maxByVersion(
-    model.versions.filter(
-      (version) =>
-        version.publishedAt !== undefined && version.publishedAt <= clock
-    )
-  );
+export const publishedAsOf = (model: EventDocSummary, clock: QpqIsoDateTime): Nullable<EventDocVersion> =>
+  maxByVersion(model.versions.filter((version) => version.publishedAt !== undefined && version.publishedAt <= clock));

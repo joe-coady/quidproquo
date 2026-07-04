@@ -1,4 +1,4 @@
-import { buildTestQpqConfig, LogActionType, LogLevelEnum,resolveActionResult } from 'quidproquo-core';
+import { buildTestQpqConfig, LogActionType, LogLevelEnum, resolveActionResult } from 'quidproquo-core';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -9,7 +9,8 @@ describe('getLogCreateActionProcessor', () => {
     vi.restoreAllMocks();
   });
 
-  const resolve = async () => (await getLogCreateActionProcessor(buildTestQpqConfig(), async () => null))[LogActionType.Create] as (p: any, ...rest: any[]) => Promise<any>;
+  const resolve = async () =>
+    (await getLogCreateActionProcessor(buildTestQpqConfig(), async () => null))[LogActionType.Create] as (p: any, ...rest: any[]) => Promise<any>;
 
   it('logs the level and message and succeeds', async () => {
     const log = vi.spyOn(console, 'log').mockImplementation(() => {});

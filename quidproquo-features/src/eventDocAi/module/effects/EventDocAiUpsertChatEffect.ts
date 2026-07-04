@@ -7,7 +7,4 @@ export type UpsertChatPayload = {
   chat: EventDocAiChatSummary;
 };
 
-export type EventDocAiUpsertChatEffect = Effect<
-  EventDocAiEffect.UpsertChat,
-  UpsertChatPayload
->;
+export type EventDocAiUpsertChatEffect = Effect<EventDocAiEffect.UpsertChat, UpsertChatPayload>;

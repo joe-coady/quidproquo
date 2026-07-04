@@ -40,11 +40,7 @@ const calculateLogRetentionDays = (advancedSettings?: QPQConfigAdvancedLogSettin
   return Math.max(advancedSettings.logRetentionDays, coldStorageExtension);
 };
 
-export const defineAdminSettings = (
-  logServiceName: string,
-  rootDomain: string,
-  advancedSettings?: QPQConfigAdvancedLogSettings,
-): QPQConfig => {
+export const defineAdminSettings = (logServiceName: string, rootDomain: string, advancedSettings?: QPQConfigAdvancedLogSettings): QPQConfig => {
   const routeAuthSettings = {
     routeAuthSettings: {
       userDirectoryName: adminUserDirectoryResourceName,
@@ -120,14 +116,9 @@ export const defineAdminSettings = (
 
         defineKeyValueStore('qpq-log-messages', 'correlationId', ['timestamp']),
 
-        defineKeyValueStore(
-          `${QPQ_LOGS_STORAGE_DRIVE_NAME}-list`,
-          { key: 'type', type: 'number' },
-          ['timestamp'],
-          {
-            deprecated: advancedSettings?.deprecated,
-          },
-        ),
+        defineKeyValueStore(`${QPQ_LOGS_STORAGE_DRIVE_NAME}-list`, { key: 'type', type: 'number' }, ['timestamp'], {
+          deprecated: advancedSettings?.deprecated,
+        }),
 
         defineAdminServiceAuthRoute('POST', '/login', 'login'),
         defineAdminServiceAuthRoute('POST', '/refreshToken', 'refreshToken'),
@@ -148,7 +139,11 @@ export const defineAdminSettings = (
         defineQueue(
           'qpq-admin-websockets',
           {
-            [WebsocketAdminClientMessageEventType.MarkLogChecked]: getServiceEntryQpqFunctionRuntime('log', 'queueEvent', 'webSocket::onMarkLogChecked'),
+            [WebsocketAdminClientMessageEventType.MarkLogChecked]: getServiceEntryQpqFunctionRuntime(
+              'log',
+              'queueEvent',
+              'webSocket::onMarkLogChecked',
+            ),
             [WebsocketAdminClientMessageEventType.RefreshLogMetadata]: getServiceEntryQpqFunctionRuntime(
               'log',
               'queueEvent',

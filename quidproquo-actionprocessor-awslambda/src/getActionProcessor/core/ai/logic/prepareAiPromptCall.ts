@@ -28,8 +28,7 @@ type BedrockProvider = ReturnType<typeof createAmazonBedrock>;
 type BedrockLanguageModel = ReturnType<BedrockProvider>;
 
 export type PrepareAiPromptCallResult =
-  | { error: { type: ErrorTypeEnum; message: string } }
-  | { model: BedrockLanguageModel; tools: Record<string, any> | undefined };
+  { error: { type: ErrorTypeEnum; message: string } } | { model: BedrockLanguageModel; tools: Record<string, any> | undefined };
 
 export const prepareAiPromptCall = (
   qpqConfig: QPQConfig,

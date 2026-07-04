@@ -8,10 +8,7 @@ import { eventDocSummaryReducer } from './eventDocSummaryReducer';
 // event (a published version lands on its PUBLISH event; the open draft tracks the log
 // head). That head is the cutoff to fold/render the version: events with index <= it.
 // Used incrementally by the backend append handler.
-export const applyEventDocSummaryEvent = (
-  model: EventDocSummary,
-  event: EventDocEvent
-): EventDocSummary => {
+export const applyEventDocSummaryEvent = (model: EventDocSummary, event: EventDocEvent): EventDocSummary => {
   const [next] = eventDocSummaryReducer(model, event);
   const { index, createdAt, createdBy } = event.payload.metadata;
   const tail = next.versions.length - 1;
@@ -20,8 +17,6 @@ export const applyEventDocSummaryEvent = (
     ...next,
     updatedAt: createdAt,
     updatedBy: createdBy.userId,
-    versions: next.versions.map((version, i) =>
-      i === tail ? { ...version, eventIndex: index } : version
-    ),
+    versions: next.versions.map((version, i) => (i === tail ? { ...version, eventIndex: index } : version)),
   };
 };

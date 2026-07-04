@@ -12,6 +12,5 @@ const WILDCARD = '*';
 export const validateEventDocEvent = <S extends EventDocDocument>(
   validators: EventDocEventValidators<S>,
   event: EventDocEvent,
-  state: S
-): Nullable<string> =>
-  (validators[event.type] ?? validators[WILDCARD])?.(event, state) ?? null;
+  state: S,
+): Nullable<string> => (validators[event.type] ?? validators[WILDCARD])?.(event, state) ?? null;

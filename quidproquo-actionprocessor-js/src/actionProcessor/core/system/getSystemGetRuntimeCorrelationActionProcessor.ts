@@ -13,6 +13,8 @@ const getProcessSystemGetRuntimeCorrelation = (qpqConfig: QPQConfig): SystemGetR
   };
 };
 
-export const getSystemGetRuntimeCorrelationActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
+export const getSystemGetRuntimeCorrelationActionProcessor: ActionProcessorListResolver = async (
+  qpqConfig: QPQConfig,
+): Promise<ActionProcessorList> => ({
   [SystemActionType.GetRuntimeCorrelation]: getProcessSystemGetRuntimeCorrelation(qpqConfig),
 });

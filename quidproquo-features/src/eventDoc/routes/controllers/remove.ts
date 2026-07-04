@@ -5,9 +5,7 @@ import { askEventDocProvideStoreFromGlobals } from '../../globals/askEventDocPro
 import { askEventDocResolveUserId } from '../../globals/askEventDocResolveUserId';
 import { askEventDocSoftDelete } from '../../logic/askEventDocSoftDelete';
 
-function* askEventDocStoreSoftDelete(
-  id: string
-): AskResponse<HTTPEventResponse> {
+function* askEventDocStoreSoftDelete(id: string): AskResponse<HTTPEventResponse> {
   const userId = yield* askEventDocResolveUserId();
 
   const model = yield* askEventDocSoftDelete(id, userId);
@@ -15,11 +13,6 @@ function* askEventDocStoreSoftDelete(
 }
 
 /** DELETE {basePath}/{id} — soft-delete the model (`delete` is reserved, so the entry is `remove`). */
-export function* remove(
-  event: HTTPEvent,
-  params: { id: string }
-): AskResponse<HTTPEventResponse> {
-  return yield* askEventDocProvideStoreFromGlobals(
-    askEventDocStoreSoftDelete(params.id)
-  );
+export function* remove(event: HTTPEvent, params: { id: string }): AskResponse<HTTPEventResponse> {
+  return yield* askEventDocProvideStoreFromGlobals(askEventDocStoreSoftDelete(params.id));
 }

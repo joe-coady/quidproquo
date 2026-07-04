@@ -10,13 +10,5 @@ import { maxByVersion } from './maxByVersion';
  * takes effect), so a publish scheduled for the future stays invisible until its effective
  * time. Returns null when nothing is yet effective. ISO-8601 timestamps compare as strings.
  */
-export const effectiveAsOf = (
-  model: EventDocSummary,
-  clock: QpqIsoDateTime
-): Nullable<EventDocVersion> =>
-  maxByVersion(
-    model.versions.filter(
-      (version) =>
-        version.effectiveFrom !== undefined && version.effectiveFrom <= clock
-    )
-  );
+export const effectiveAsOf = (model: EventDocSummary, clock: QpqIsoDateTime): Nullable<EventDocVersion> =>
+  maxByVersion(model.versions.filter((version) => version.effectiveFrom !== undefined && version.effectiveFrom <= clock));

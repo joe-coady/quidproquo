@@ -1,15 +1,7 @@
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { qpqWebServerUtils, WebEntryQPQWebServerConfigSetting } from 'quidproquo-webserver';
 
-import {
-  aws_cloudfront,
-  aws_cloudfront_origins,
-  aws_lambda,
-  aws_route53,
-  aws_route53_targets,
-  aws_s3,
-  aws_s3_deployment,
-} from 'aws-cdk-lib';
+import { aws_cloudfront, aws_cloudfront_origins, aws_lambda, aws_route53, aws_route53_targets, aws_s3, aws_s3_deployment } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import path from 'path';
@@ -77,9 +69,7 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
       domainName: apexDomain,
     });
 
-    const domainNames: string[] = props.webEntryConfig.domain.subDomainName
-      ? [`${props.webEntryConfig.domain.subDomainName}.${apexDomain}`]
-      : [];
+    const domainNames: string[] = props.webEntryConfig.domain.subDomainName ? [`${props.webEntryConfig.domain.subDomainName}.${apexDomain}`] : [];
     if (props.webEntryConfig.domain.onRootDomain && domainNames.length === 0) {
       domainNames.unshift(apexDomain);
     }
@@ -117,7 +107,10 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
           accessControlAllowCredentials: false,
           accessControlAllowHeaders: ['Origin', 'Access-Control-Request-Headers', 'Access-Control-Request-Method'],
           accessControlAllowMethods: ['GET', 'HEAD', 'OPTIONS'],
-          accessControlAllowOrigins: qpqWebServerUtils.resolveServiceScopedCorsAllowedOrigins(props.qpqConfig, props.webEntryConfig.corsAllowedOrigins),
+          accessControlAllowOrigins: qpqWebServerUtils.resolveServiceScopedCorsAllowedOrigins(
+            props.qpqConfig,
+            props.webEntryConfig.corsAllowedOrigins,
+          ),
           accessControlExposeHeaders: ['*'],
           accessControlMaxAge: cdk.Duration.seconds(600),
           originOverride: true,

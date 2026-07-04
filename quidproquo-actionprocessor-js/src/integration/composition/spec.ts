@@ -231,23 +231,17 @@ export const generateContext = (depth: number, keys: string[] = ['k1', 'k2']): S
 
 // override (by leaf type or wildcard) over ok/fail leaves, wrapped in catch/parallel.
 export const generateOverride = (depth: number): Spec[] =>
-  subtrees(
-    depth,
-    [{ kind: 'ok' }, { kind: 'fail' }],
-    (sub) => (['ok', 'fail', '*'] as OverrideTarget[]).flatMap((target) => sub.map((child): Spec => ({ kind: 'override', target, child }))),
+  subtrees(depth, [{ kind: 'ok' }, { kind: 'fail' }], (sub) =>
+    (['ok', 'fail', '*'] as OverrideTarget[]).flatMap((target) => sub.map((child): Spec => ({ kind: 'override', target, child }))),
   );
 
 // Everything together: ok/fail/read leaves under provide + override + catch + parallel.
 // Override targets leaf types only (not the wildcard, which would also intercept reads).
 export const generateCombined = (depth: number, keys: string[] = ['k1', 'k2']): Spec[] =>
-  subtrees(
-    depth,
-    [{ kind: 'ok' }, { kind: 'fail' }, ...keys.map((key): Spec => ({ kind: 'read', scope: 'global', key }))],
-    (sub) => [
-      ...keys.flatMap((key) => sub.map((child): Spec => ({ kind: 'provide', scope: 'global', key, child }))),
-      ...(['ok', 'fail'] as OverrideTarget[]).flatMap((target) => sub.map((child): Spec => ({ kind: 'override', target, child }))),
-    ],
-  );
+  subtrees(depth, [{ kind: 'ok' }, { kind: 'fail' }, ...keys.map((key): Spec => ({ kind: 'read', scope: 'global', key }))], (sub) => [
+    ...keys.flatMap((key) => sub.map((child): Spec => ({ kind: 'provide', scope: 'global', key, child }))),
+    ...(['ok', 'fail'] as OverrideTarget[]).flatMap((target) => sub.map((child): Spec => ({ kind: 'override', target, child }))),
+  ]);
 
 // Single-chain "towers": every control-flow wrapper stacked `depth` deep, cycling so each
 // primitive appears many times down one chain. One tower per (rotation × leaf), which varies

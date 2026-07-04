@@ -9,11 +9,7 @@ export interface AskAiPromptOptions {
   messages?: AiMessage[];
 }
 
-export function* askAiPrompt(
-  model: AiModel,
-  prompt: string,
-  options?: AskAiPromptOptions,
-): AiPromptActionRequester {
+export function* askAiPrompt(model: AiModel, prompt: string, options?: AskAiPromptOptions): AiPromptActionRequester {
   return yield {
     type: AiActionType.Prompt,
     payload: {

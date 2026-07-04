@@ -22,12 +22,10 @@ const isAbsoluteUrl = (url: string): boolean => /^([a-z][a-z\d+\-.]*:)?\/\//i.te
 // Join basePath + url like axios' combineURLs (path concatenation), NOT URL
 // resolution. `new URL('/v1/x', 'http://host/api/svc')` drops the base path
 // because a leading-slash url is root-absolute; we want '.../api/svc/v1/x'.
-const combineUrls = (basePath: string, url: string): string =>
-  url ? `${basePath.replace(/\/+$/, '')}/${url.replace(/^\/+/, '')}` : basePath;
+const combineUrls = (basePath: string, url: string): string => (url ? `${basePath.replace(/\/+$/, '')}/${url.replace(/^\/+/, '')}` : basePath);
 
 const buildRequestUrl = (payload: NetworkRequestActionPayload<any>): string => {
-  const fullUrl =
-    payload.basePath && !isAbsoluteUrl(payload.url) ? combineUrls(payload.basePath, payload.url) : payload.url;
+  const fullUrl = payload.basePath && !isAbsoluteUrl(payload.url) ? combineUrls(payload.basePath, payload.url) : payload.url;
 
   const url = new URL(fullUrl);
 
@@ -56,10 +54,8 @@ const isArrayBufferView = (body: unknown): body is ArrayBufferView<ArrayBuffer> 
 // Covers File too, which extends Blob.
 const isBlob = (body: unknown): body is Blob => typeof Blob !== 'undefined' && body instanceof Blob;
 const isFormData = (body: unknown): body is FormData => typeof FormData !== 'undefined' && body instanceof FormData;
-const isUrlSearchParams = (body: unknown): body is URLSearchParams =>
-  typeof URLSearchParams !== 'undefined' && body instanceof URLSearchParams;
-const isReadableStream = (body: unknown): body is ReadableStream =>
-  typeof ReadableStream !== 'undefined' && body instanceof ReadableStream;
+const isUrlSearchParams = (body: unknown): body is URLSearchParams => typeof URLSearchParams !== 'undefined' && body instanceof URLSearchParams;
+const isReadableStream = (body: unknown): body is ReadableStream => typeof ReadableStream !== 'undefined' && body instanceof ReadableStream;
 
 // A non-null object (arrays included) — the payloads we JSON-serialise.
 const isObjectPayload = (body: unknown): boolean => body !== null && typeof body === 'object';

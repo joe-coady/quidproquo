@@ -49,7 +49,10 @@ describe('s3/fileEvent getEventTransformResponseResultActionProcessor', () => {
 
   it('returns a generic error when any file failed', async () => {
     const processor = await resolveEventProcessor(getEventTransformResponseResultActionProcessor, EventActionType.TransformResponseResult);
-    const responses = [{ success: true, result: {} }, { success: false, error: { errorType: ErrorTypeEnum.GenericError, errorText: 'x' } }];
+    const responses = [
+      { success: true, result: {} },
+      { success: false, error: { errorType: ErrorTypeEnum.GenericError, errorText: 'x' } },
+    ];
 
     const [, error] = await processor({ eventParams: [{}], qpqEventRecordResponses: responses });
 

@@ -7,7 +7,10 @@ import { getFileGenerateTemporarySecureUrlActionProcessor } from './getFileGener
 import { verifySecureUrlToken } from './secureUrlUtils';
 
 const invoke = (filepath: string) =>
-  runFileAction(getFileGenerateTemporarySecureUrlActionProcessor(fileConfig), FileActionType.GenerateTemporarySecureUrl, { filepath, expirationMs: 60_000 });
+  runFileAction(getFileGenerateTemporarySecureUrlActionProcessor(fileConfig), FileActionType.GenerateTemporarySecureUrl, {
+    filepath,
+    expirationMs: 60_000,
+  });
 
 describe('getFileGenerateTemporarySecureUrlActionProcessor', () => {
   it('returns a signed download url for the resolved file', async () => {

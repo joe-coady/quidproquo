@@ -88,13 +88,13 @@ export class QpqCoreEventBusConstruct extends QpqCoreEventBusConstructBase {
     qpqConfigAwsUtils
       .getEventBusQuickSubscriptions(props.qpqConfig, props.eventBusConfig.name, props.eventBusConfig.owner)
       .forEach((subscription) => {
-      if (subscription.type === EventBusQuickSubscriptionType.email) {
-        this.topic.addSubscription(new aws_sns_subscriptions.EmailSubscription(subscription.email));
-      } else {
-        // UrlSubscription infers http vs https from the url prefix.
-        this.topic.addSubscription(new aws_sns_subscriptions.UrlSubscription(subscription.url));
-      }
-    });
+        if (subscription.type === EventBusQuickSubscriptionType.email) {
+          this.topic.addSubscription(new aws_sns_subscriptions.EmailSubscription(subscription.email));
+        } else {
+          // UrlSubscription infers http vs https from the url prefix.
+          this.topic.addSubscription(new aws_sns_subscriptions.UrlSubscription(subscription.url));
+        }
+      });
 
     // TODO: remove this, its deprecated
     const exportName = awsNamingUtils.getCFExportNameSnsTopicArnFromConfig(props.eventBusConfig.name, props.qpqConfig);

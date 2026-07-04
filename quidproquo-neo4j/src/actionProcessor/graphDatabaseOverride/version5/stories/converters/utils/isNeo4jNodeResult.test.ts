@@ -8,9 +8,7 @@ describe('isNeo4jNodeResult', () => {
   });
 
   it('returns false for a relationship object', () => {
-    expect(
-      isNeo4jNodeResult({ elementId: '1', startNodeElementId: '2', endNodeElementId: '3', type: 'KNOWS', properties: {} }),
-    ).toBe(false);
+    expect(isNeo4jNodeResult({ elementId: '1', startNodeElementId: '2', endNodeElementId: '3', type: 'KNOWS', properties: {} })).toBe(false);
   });
 
   it.each([

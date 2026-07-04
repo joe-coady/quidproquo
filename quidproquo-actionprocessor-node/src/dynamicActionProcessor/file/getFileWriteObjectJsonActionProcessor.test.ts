@@ -8,7 +8,8 @@ import { getFileWriteObjectJsonActionProcessor } from './getFileWriteObjectJsonA
 
 vi.mock('fs/promises');
 
-const invoke = (data: unknown) => runFileAction(getFileWriteObjectJsonActionProcessor(fileConfig), FileActionType.WriteObjectJson, { filepath: 'sub/data.json', data });
+const invoke = (data: unknown) =>
+  runFileAction(getFileWriteObjectJsonActionProcessor(fileConfig), FileActionType.WriteObjectJson, { filepath: 'sub/data.json', data });
 
 afterEach(() => {
   vi.clearAllMocks();

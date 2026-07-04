@@ -22,10 +22,8 @@ const getProcessConfigGetParameter = (qpqConfig: QPQConfig, devServerConfig: Res
   };
 };
 
-export const getConfigGetParameterActionProcessor = (
-  devServerConfig: ResolvedDevServerConfig,
-): ActionProcessorListResolver => async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [ConfigActionType.GetParameter]: getProcessConfigGetParameter(qpqConfig, devServerConfig),
-});
+export const getConfigGetParameterActionProcessor =
+  (devServerConfig: ResolvedDevServerConfig): ActionProcessorListResolver =>
+  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
+    [ConfigActionType.GetParameter]: getProcessConfigGetParameter(qpqConfig, devServerConfig),
+  });

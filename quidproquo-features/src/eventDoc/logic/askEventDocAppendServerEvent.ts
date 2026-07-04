@@ -16,13 +16,9 @@ export function* askEventDocAppendServerEvent<T>(
   type: string,
   data: T,
   version: number,
-  actor: EventDocEventActor
+  actor: EventDocEventActor,
 ): AskResponse<EventDocEvent> {
   const clientMessageId = yield* askNewGuid();
 
-  return yield* askEventDocEventAppend(
-    modelId,
-    { type, payload: { data, metadata: { version, clientMessageId } } },
-    actor
-  );
+  return yield* askEventDocEventAppend(modelId, { type, payload: { data, metadata: { version, clientMessageId } } }, actor);
 }

@@ -6,7 +6,10 @@ import { getConfigGetGlobalActionProcessor } from './getConfigGetGlobalActionPro
 
 describe('getConfigGetGlobalActionProcessor', () => {
   const resolve = async (settings = [defineGlobal('region', 'us-east-1')]) =>
-    (await getConfigGetGlobalActionProcessor(buildTestQpqConfig(settings), async () => null))[ConfigActionType.GetGlobal] as (p: any, ...rest: any[]) => Promise<any>;
+    (await getConfigGetGlobalActionProcessor(buildTestQpqConfig(settings), async () => null))[ConfigActionType.GetGlobal] as (
+      p: any,
+      ...rest: any[]
+    ) => Promise<any>;
 
   it('returns the config global value when no function global overrides it', async () => {
     const processor = await resolve();

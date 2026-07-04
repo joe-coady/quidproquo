@@ -12,10 +12,10 @@ export const ErrorsByType = ({ logs }: ErrorsByTypeProps) => {
 
   return (
     <>
-      <Typography variant="h5" gutterBottom>
+      <Typography gutterBottom variant="h5">
         Errors by Type
       </Typography>
-      <BarChart width={1200} height={300} data={data}>
+      <BarChart data={data} height={300} width={1200}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="errorText" />
         <YAxis />

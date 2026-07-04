@@ -32,7 +32,9 @@ describe('lambda/serviceFunction getEventMatchStoryActionProcessor', () => {
 
   it('returns the runtime for a matching service function', async () => {
     const runtime = { src: 'doThing' };
-    const config = buildTestQpqConfig([{ configSettingType: QPQWebServerConfigSettingType.ServiceFunction, functionName: 'doThing', runtime } as any]);
+    const config = buildTestQpqConfig([
+      { configSettingType: QPQWebServerConfigSettingType.ServiceFunction, functionName: 'doThing', runtime } as any,
+    ]);
     const processor = await resolveEventProcessor(getEventMatchStoryActionProcessor, EventActionType.MatchStory, config);
 
     const [match] = await processor({ qpqEventRecord: { functionName: 'doThing' } });

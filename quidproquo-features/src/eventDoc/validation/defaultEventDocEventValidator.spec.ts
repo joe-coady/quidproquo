@@ -31,22 +31,14 @@ describe('defaultEventDocEventValidator', () => {
 
   it('rejects a domain edit once the document is published', () => {
     const published = [init(), ev(Publish)];
-    expect(
-      defaultEventDocEventValidator(ev('ADD_NODE'), published)
-    ).toBeTruthy();
-    expect(
-      defaultEventDocEventValidator(ev('REMOVE_NODE'), published)
-    ).toBeTruthy();
-    expect(
-      defaultEventDocEventValidator(ev('MOVE_NODE'), published)
-    ).toBeTruthy();
+    expect(defaultEventDocEventValidator(ev('ADD_NODE'), published)).toBeTruthy();
+    expect(defaultEventDocEventValidator(ev('REMOVE_NODE'), published)).toBeTruthy();
+    expect(defaultEventDocEventValidator(ev('MOVE_NODE'), published)).toBeTruthy();
   });
 
   it('allows only CREATE_DRAFT to branch a new draft off a published document', () => {
     const published = [init(), ev(Publish)];
-    expect(
-      defaultEventDocEventValidator(ev(CreateDraft), published)
-    ).toBeNull();
+    expect(defaultEventDocEventValidator(ev(CreateDraft), published)).toBeNull();
   });
 
   it('re-allows edits after a new draft is branched', () => {

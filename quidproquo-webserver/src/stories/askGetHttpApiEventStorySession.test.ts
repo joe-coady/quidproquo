@@ -13,7 +13,7 @@ const encodeJwt = (payload: object): string => {
   return `header.${body}.signature`;
 };
 
-const buildEvent = (headers: Record<string, string> = {}) => ({ headers } as unknown as HTTPEvent);
+const buildEvent = (headers: Record<string, string> = {}) => ({ headers }) as unknown as HTTPEvent;
 
 describe('askGetHttpApiEventStorySession', () => {
   it('returns undefined when there is no access token', () => {
@@ -22,9 +22,7 @@ describe('askGetHttpApiEventStorySession', () => {
 
   it('decodes the token for logging only when the route has no user directory', () => {
     const token = encodeJwt({ sub: 'u1', username: 'alice', exp: 99 });
-    const result = runStory(
-      askGetHttpApiEventStorySession({ event: buildEvent({ authorization: `Bearer ${token}` }), session }),
-    );
+    const result = runStory(askGetHttpApiEventStorySession({ event: buildEvent({ authorization: `Bearer ${token}` }), session }));
 
     expect(result?.decodedAccessToken).toEqual({
       exp: 99,

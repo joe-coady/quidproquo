@@ -7,4 +7,12 @@ import { ActionProcessor, buildTestStorySession, DynamicModuleLoader, StorySessi
 // module loader and stream registry are all inert stubs. `session` can be overridden for
 // the rare test that asserts on the correlation it carries.
 export const invokeProcessor = (process: ActionProcessor<any>, payload: unknown, session: StorySession = buildTestStorySession()) =>
-  process(payload as any, session, {}, undefined as any, () => {}, (() => null) as unknown as DynamicModuleLoader, undefined as unknown as StreamRegistry);
+  process(
+    payload as any,
+    session,
+    {},
+    undefined as any,
+    () => {},
+    (() => null) as unknown as DynamicModuleLoader,
+    undefined as unknown as StreamRegistry,
+  );

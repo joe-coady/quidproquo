@@ -11,12 +11,12 @@ const ActionResultDisplay: ActionComponent = ({ result, expanded }) => {
       {successResult !== undefined && !errorResult && (
         <pre style={genericFunctionRendererStyles.pre}>
           <span>Result: </span>
-          <AnyVariableView value={successResult} expanded={expanded} />
+          <AnyVariableView expanded={expanded} value={successResult} />
         </pre>
       )}
       {errorResult !== undefined && (
         <pre style={genericFunctionRendererStyles.pre}>
-          <AnyVariableView value={errorResult} expanded={expanded} />
+          <AnyVariableView expanded={expanded} value={errorResult} />
         </pre>
       )}
     </>

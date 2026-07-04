@@ -50,7 +50,11 @@ describe('getServiceFunctionExecuteActionProcessor', () => {
 
   it('returns success undefined immediately and does not await the response when isAsync', async () => {
     let resolved = false;
-    (eventBus.publishAndWaitForResponse as any).mockReturnValue(new Promise(() => { resolved = true; }));
+    (eventBus.publishAndWaitForResponse as any).mockReturnValue(
+      new Promise(() => {
+        resolved = true;
+      }),
+    );
     const process = await getProcessor();
 
     const result = await invokeProcessor(process, { functionName: 'f', service: 's', payload: {}, isAsync: true });

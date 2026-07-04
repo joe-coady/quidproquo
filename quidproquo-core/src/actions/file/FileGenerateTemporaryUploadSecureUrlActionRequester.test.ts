@@ -6,9 +6,7 @@ import { askFileGenerateTemporaryUploadSecureUrl } from './FileGenerateTemporary
 
 describe('askFileGenerateTemporaryUploadSecureUrl', () => {
   it('yields a GenerateTemporaryUploadSecureUrl action carrying the advanced content type', () => {
-    const { action } = captureRequester(
-      askFileGenerateTemporaryUploadSecureUrl('drive', 'path/file.txt', 60000, { contentType: 'image/png' }),
-    );
+    const { action } = captureRequester(askFileGenerateTemporaryUploadSecureUrl('drive', 'path/file.txt', 60000, { contentType: 'image/png' }));
 
     expect(action).toEqual({
       type: FileActionType.GenerateTemporaryUploadSecureUrl,

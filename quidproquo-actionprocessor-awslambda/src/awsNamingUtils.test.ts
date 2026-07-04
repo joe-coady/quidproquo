@@ -109,9 +109,7 @@ describe('getQpqRuntimeResourceNameFromConfig', () => {
   });
 
   it('honours a cross-service resource name service override', () => {
-    expect(getQpqRuntimeResourceNameFromConfig({ name: 'res', service: 'auth' }, buildTestQpqConfig())).toBe(
-      'res-test-app-auth-development-qpq',
-    );
+    expect(getQpqRuntimeResourceNameFromConfig({ name: 'res', service: 'auth' }, buildTestQpqConfig())).toBe('res-test-app-auth-development-qpq');
   });
 });
 
@@ -151,9 +149,7 @@ describe('cloudformation export names', () => {
   it('builds the user pool client export name from the user directory config', () => {
     const config = buildTestQpqConfig([defineUserDirectory('users')]);
 
-    expect(getCFExportNameUserPoolClientIdFromConfig('users', config)).toBe(
-      'users-test-app-test-module-development-qpquser-pool-client-id-export',
-    );
+    expect(getCFExportNameUserPoolClientIdFromConfig('users', config)).toBe('users-test-app-test-module-development-qpquser-pool-client-id-export');
   });
 
   it('builds the websocket api export name from the websocket config', () => {

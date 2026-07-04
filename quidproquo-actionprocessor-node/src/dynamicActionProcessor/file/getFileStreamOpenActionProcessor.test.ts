@@ -1,4 +1,12 @@
-import { createStreamRegistry, ErrorTypeEnum, FileActionType, FileStreamOpenErrorTypeEnum, resolveActionResult, resolveActionResultError, StreamRegistry } from 'quidproquo-core';
+import {
+  createStreamRegistry,
+  ErrorTypeEnum,
+  FileActionType,
+  FileStreamOpenErrorTypeEnum,
+  resolveActionResult,
+  resolveActionResultError,
+  StreamRegistry,
+} from 'quidproquo-core';
 
 import * as fs from 'fs';
 import { Readable } from 'stream';

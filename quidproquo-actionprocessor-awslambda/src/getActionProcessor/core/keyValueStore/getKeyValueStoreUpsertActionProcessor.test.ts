@@ -17,8 +17,7 @@ const resolveProcessor = async (withStore = true) => {
   return processors[KeyValueStoreActionType.Upsert];
 };
 
-const invoke = (processor: any, options?: any) =>
-  invokeProcessor(processor, { keyValueStoreName: 'users', item: { pk: '1' }, options });
+const invoke = (processor: any, options?: any) => invokeProcessor(processor, { keyValueStoreName: 'users', item: { pk: '1' }, options });
 
 describe('getKeyValueStoreUpsertActionProcessor', () => {
   beforeEach(() => {

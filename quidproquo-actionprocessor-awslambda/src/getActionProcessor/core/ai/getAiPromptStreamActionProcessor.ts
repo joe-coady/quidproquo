@@ -65,8 +65,6 @@ const getProcessAiPromptStream = (qpqConfig: QPQConfig): AiPromptStreamActionPro
   };
 };
 
-export const getAiPromptStreamActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
+export const getAiPromptStreamActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
   [AiActionType.PromptStream]: getProcessAiPromptStream(qpqConfig),
 });

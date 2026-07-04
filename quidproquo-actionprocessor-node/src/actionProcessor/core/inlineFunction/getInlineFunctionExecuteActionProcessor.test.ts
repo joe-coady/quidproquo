@@ -19,11 +19,7 @@ const qpqConfig = buildTestQpqConfig([defineInlineFunction('/entry/fn::handler')
 const session = { correlation: 'corr-0', depth: 0, context: {}, localContext: {} } as any;
 const logger = createStubLogger();
 
-const invoke = async (
-  payload: { functionName: string; payload: unknown },
-  actionProcessors: Record<string, any>,
-  dynamicModuleLoader: any,
-) => {
+const invoke = async (payload: { functionName: string; payload: unknown }, actionProcessors: Record<string, any>, dynamicModuleLoader: any) => {
   const processors = await getInlineFunctionExecuteActionProcessor(qpqConfig, async () => null);
   const process = processors[InlineFunctionActionType.Execute] as (p: any, ...rest: any[]) => Promise<any>;
   return process(payload, session, actionProcessors, logger, undefined, dynamicModuleLoader, createStreamRegistry());

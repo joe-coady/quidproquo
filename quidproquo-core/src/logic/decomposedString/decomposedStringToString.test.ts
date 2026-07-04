@@ -5,7 +5,10 @@ import { decomposedStringToString } from './decomposedStringToString';
 
 describe('decomposedStringToString', () => {
   it('interleaves literal segments with stringified values', () => {
-    const decomposed: DecomposedString = [['Hello ', ', you are ', '!'], ['Alice', 42]];
+    const decomposed: DecomposedString = [
+      ['Hello ', ', you are ', '!'],
+      ['Alice', 42],
+    ];
 
     expect(decomposedStringToString(decomposed)).toBe('Hello Alice, you are 42!');
   });

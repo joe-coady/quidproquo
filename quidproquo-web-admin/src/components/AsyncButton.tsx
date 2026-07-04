@@ -26,13 +26,13 @@ export function AsyncButton({ onClick, children, disabled, type }: AsyncButtonPr
 
   return (
     <Button
-      onClick={handleLogin}
-      fullWidth
-      variant="contained"
       color="primary"
       disabled={loading || disabled}
+      fullWidth
+      onClick={handleLogin}
       style={{ maxHeight: '100%', height: '4em' }}
       type={type}
+      variant="contained"
     >
       {loading ? <CircularProgress size={24} /> : children}
     </Button>

@@ -9,9 +9,9 @@ const buildStoryResult = makeStoryResultBuilder(QpqRuntimeType.AUTH_VERIFY_AUTH_
 
 describe('AUTH_VERIFY_AUTH_CHALLENGE_GenericTextExtractor', () => {
   it('extracts the trigger source from the first input', () => {
-    expect(AUTH_VERIFY_AUTH_CHALLENGE_GenericTextExtractor(buildStoryResult({ input: [{ triggerSource: 'VerifyAuthChallengeResponse_Authentication' }] }))).toEqual([
-      'VerifyAuthChallengeResponse_Authentication',
-    ]);
+    expect(
+      AUTH_VERIFY_AUTH_CHALLENGE_GenericTextExtractor(buildStoryResult({ input: [{ triggerSource: 'VerifyAuthChallengeResponse_Authentication' }] })),
+    ).toEqual(['VerifyAuthChallengeResponse_Authentication']);
   });
 
   it('falls back to unknown when the trigger source is missing', () => {

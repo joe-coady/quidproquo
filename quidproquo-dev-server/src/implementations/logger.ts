@@ -1,4 +1,13 @@
-import { filterLogHistoryByActionTypes, LogActionType, QPQ_LOGS_STORAGE_DRIVE_NAME, QPQConfig, qpqCoreUtils, QpqLogger, StoryResult, StorySession } from 'quidproquo-core';
+import {
+  filterLogHistoryByActionTypes,
+  LogActionType,
+  QPQ_LOGS_STORAGE_DRIVE_NAME,
+  QPQConfig,
+  qpqCoreUtils,
+  QpqLogger,
+  StoryResult,
+  StorySession,
+} from 'quidproquo-core';
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
@@ -12,10 +21,10 @@ export const getDevServerLogger = (qpqConfig: QPQConfig, devServerConfig: Resolv
   // If we have no log service, or we're processing logs drive events, return a no-op logger
   if (!devServerConfig.logServiceName || isProcessingLogDriveEvent || process.env.storageDriveName === QPQ_LOGS_STORAGE_DRIVE_NAME) {
     return {
-      enableLogs: async () => { },
-      log: () => { },
-      waitToFinishWriting: async () => { },
-      moveToPermanentStorage: async () => { },
+      enableLogs: async () => {},
+      log: () => {},
+      waitToFinishWriting: async () => {},
+      moveToPermanentStorage: async () => {},
     };
   }
 
@@ -59,13 +68,13 @@ export const getDevServerLogger = (qpqConfig: QPQConfig, devServerConfig: Resolv
           const modifiableResult = !disabledLogCorrelations.includes(result.correlation)
             ? result
             : {
-              ...result,
-              history: filterLogHistoryByActionTypes(result.history, [
-                LogActionType.Create,
-                LogActionType.TemplateLiteral,
-                LogActionType.DisableEventHistory,
-              ]),
-            };
+                ...result,
+                history: filterLogHistoryByActionTypes(result.history, [
+                  LogActionType.Create,
+                  LogActionType.TemplateLiteral,
+                  LogActionType.DisableEventHistory,
+                ]),
+              };
 
           await writeLogFile(modifiableResult);
         })

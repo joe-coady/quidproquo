@@ -12,20 +12,13 @@ import { askEventDocSeedInitState } from './askEventDocSeedInitState';
  * (the queryable view) from it via the record reducer — the same path every later
  * append uses, so create and append can't drift.
  */
-export function* askEventDocCreate(
-  name: string,
-  code: string,
-  actor: EventDocEventActor
-): AskResponse<EventDocSummary> {
+export function* askEventDocCreate(name: string, code: string, actor: EventDocEventActor): AskResponse<EventDocSummary> {
   const { type } = yield* askEventDocResolveStore();
   const id = yield* askNewGuid();
 
   const initEvent = yield* askEventDocSeedInitState(id, code, name, actor);
 
-  const model = applyEventDocSummaryEvent(
-    createEventDocSummarySeed(type),
-    initEvent
-  );
+  const model = applyEventDocSummaryEvent(createEventDocSummarySeed(type), initEvent);
 
   yield* askValidateModelOrThrowError(model, eventDocSummarySchema);
   yield* askEventDocUpsert(model);

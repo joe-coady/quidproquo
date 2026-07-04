@@ -10,7 +10,8 @@ vi.mock('fs/promises');
 
 const base64Data = Buffer.from('binary').toString('base64');
 
-const invoke = (data: Record<string, unknown>) => runFileAction(getFileWriteBinaryContentsActionProcessor(fileConfig), FileActionType.WriteBinaryContents, { filepath: 'sub/pic.bin', data });
+const invoke = (data: Record<string, unknown>) =>
+  runFileAction(getFileWriteBinaryContentsActionProcessor(fileConfig), FileActionType.WriteBinaryContents, { filepath: 'sub/pic.bin', data });
 
 afterEach(() => {
   vi.clearAllMocks();

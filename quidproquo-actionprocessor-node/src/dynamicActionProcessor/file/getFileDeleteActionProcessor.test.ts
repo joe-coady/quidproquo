@@ -48,9 +48,7 @@ describe('getFileDeleteActionProcessor', () => {
   });
 
   it('reports the deleted files when only some deletions fail', async () => {
-    vi.mocked(fs.unlink)
-      .mockResolvedValueOnce(undefined)
-      .mockRejectedValueOnce(errorWithCode('EACCES'));
+    vi.mocked(fs.unlink).mockResolvedValueOnce(undefined).mockRejectedValueOnce(errorWithCode('EACCES'));
 
     const result = await invoke(['ok.txt', 'denied.txt']);
 

@@ -8,8 +8,8 @@ describe('getUniqueKeyFromQpqFunctionRuntime', () => {
   });
 
   it('composes a key from the advanced runtime parts', () => {
-    expect(
-      getUniqueKeyFromQpqFunctionRuntime({ basePath: '/base', relativePath: 'service/entry', functionName: 'onAuth' }),
-    ).toBe('/base/service/entry::onAuth');
+    expect(getUniqueKeyFromQpqFunctionRuntime({ basePath: '/base', relativePath: 'service/entry', functionName: 'onAuth' })).toBe(
+      '/base/service/entry::onAuth',
+    );
   });
 });

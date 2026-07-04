@@ -10,31 +10,25 @@ import { eventDocAiServiceRequest } from './eventDocAiServiceRequest';
 // Placeholder requester: serviceRequest only stores its method for
 // defineServiceRequests-style map building, which defineEventDocAi bypasses
 // (it keys the queue processors directly). The generics still type the handler.
-const askChatCreateRequest = createServiceRequester<
-  EventDocAiChatCreatePayload,
-  EventDocAiChatSummary
->('eventDocAi', 'ChatCreate');
+const askChatCreateRequest = createServiceRequester<EventDocAiChatCreatePayload, EventDocAiChatSummary>('eventDocAi', 'ChatCreate');
 
-export const onChatCreate = eventDocAiServiceRequest(
-  askChatCreateRequest,
-  function* askOnChatCreate(payload) {
-    const actor = yield* askEventDocResolveActor();
-    const { docId } = yield* askEventDocAiContextRead();
+export const onChatCreate = eventDocAiServiceRequest(askChatCreateRequest, function* askOnChatCreate(payload) {
+  const actor = yield* askEventDocResolveActor();
+  const { docId } = yield* askEventDocAiContextRead();
 
-    const chatId = yield* askNewGuid();
-    const now = yield* askDateNow();
+  const chatId = yield* askNewGuid();
+  const now = yield* askDateNow();
 
-    const chat: EventDocAiChatSummary = {
-      docId,
-      chatId,
-      name: payload.name ?? 'New chat',
-      createdAt: now,
-      updatedAt: now,
-      createdByUserId: actor.userId,
-    };
+  const chat: EventDocAiChatSummary = {
+    docId,
+    chatId,
+    name: payload.name ?? 'New chat',
+    createdAt: now,
+    updatedAt: now,
+    createdByUserId: actor.userId,
+  };
 
-    yield* askEventDocAiChatUpsert(chat);
+  yield* askEventDocAiChatUpsert(chat);
 
-    return chat;
-  }
-);
+  return chat;
+});

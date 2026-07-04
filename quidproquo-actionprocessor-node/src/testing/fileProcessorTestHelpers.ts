@@ -1,4 +1,11 @@
-import { ActionProcessorList, ActionProcessorListResolver, buildTestQpqConfig, defineStorageDrive, DynamicModuleLoader, FileActionType } from 'quidproquo-core';
+import {
+  ActionProcessorList,
+  ActionProcessorListResolver,
+  buildTestQpqConfig,
+  defineStorageDrive,
+  DynamicModuleLoader,
+  FileActionType,
+} from 'quidproquo-core';
 
 import { FileStorageConfig } from '../dynamicActionProcessor/file/types';
 
@@ -23,7 +30,11 @@ export const resolveFileProcessors = (resolver: ActionProcessorListResolver): Pr
   resolver(qpqConfig, (() => null) as unknown as DynamicModuleLoader);
 
 // Resolves and invokes a single file action processor for the 'media' drive.
-export const runFileAction = async (resolver: ActionProcessorListResolver, actionType: FileActionType, payload: Record<string, unknown>): Promise<any> => {
+export const runFileAction = async (
+  resolver: ActionProcessorListResolver,
+  actionType: FileActionType,
+  payload: Record<string, unknown>,
+): Promise<any> => {
   const processors = await resolveFileProcessors(resolver);
   const process = processors[actionType] as (payload: Record<string, unknown>) => Promise<any>;
   return process({ drive: 'media', ...payload });

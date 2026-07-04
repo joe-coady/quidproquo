@@ -46,8 +46,10 @@ const getProcessRefreshToken = (qpqConfig: QPQConfig): UserDirectoryRefreshToken
       return actionResult(authResponse);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        NotAuthorizedException: () => actionResultError(UserDirectoryRefreshTokenErrorTypeEnum.Unauthorized, 'Refresh token is invalid or has expired'),
-        TooManyRequestsException: () => actionResultError(UserDirectoryRefreshTokenErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
+        NotAuthorizedException: () =>
+          actionResultError(UserDirectoryRefreshTokenErrorTypeEnum.Unauthorized, 'Refresh token is invalid or has expired'),
+        TooManyRequestsException: () =>
+          actionResultError(UserDirectoryRefreshTokenErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
       });
     }
   };

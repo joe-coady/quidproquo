@@ -6,5 +6,5 @@ import { z } from 'zod';
 // this package is the zod home).
 export const DateISOSchema = z.custom<QpqIsoDateTime>(
   (val) => typeof val === 'string' && getValidQpqIsoDateTime(val) !== undefined,
-  'Invalid DateISO'
+  'Invalid DateISO',
 );

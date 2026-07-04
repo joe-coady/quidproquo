@@ -15,10 +15,7 @@ export const delayForAction = async (delay: DevServerDelayConfig | undefined, ac
   if (ms > 0) await sleep(ms);
 };
 
-export const withProcessorDelay = (
-  processors: ActionProcessorList,
-  delay: DevServerDelayConfig | undefined,
-): ActionProcessorList => {
+export const withProcessorDelay = (processors: ActionProcessorList, delay: DevServerDelayConfig | undefined): ActionProcessorList => {
   if (delay === undefined) return processors;
 
   return Object.fromEntries(

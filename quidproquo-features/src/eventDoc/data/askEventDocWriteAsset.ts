@@ -10,18 +10,11 @@ const FALLBACK_MIMETYPE = 'application/octet-stream';
 // presigned upload flow (askEventDocGenerateAssetUploadUrl) — for when the backend itself holds the
 // bytes (e.g. a rendered PDF) and no client round-trip is needed. Assumes the store context is
 // provided (wrap in askEventDocProvideStore); the download route serves it back via the same key.
-export function* askEventDocWriteAsset(
-  docId: string,
-  binary: QPQBinaryData
-): AskResponse<EventDocAssetRef> {
+export function* askEventDocWriteAsset(docId: string, binary: QPQBinaryData): AskResponse<EventDocAssetRef> {
   const { storageDriveName } = yield* askEventDocResolveStore();
   const guid = yield* askNewGuid();
 
-  yield* askFileWriteBinaryContents(
-    storageDriveName,
-    `${docId}/assets/${guid}`,
-    binary
-  );
+  yield* askFileWriteBinaryContents(storageDriveName, `${docId}/assets/${guid}`, binary);
 
   return {
     guid,

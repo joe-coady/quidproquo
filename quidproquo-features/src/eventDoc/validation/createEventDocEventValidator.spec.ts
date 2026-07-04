@@ -31,10 +31,7 @@ const init = () => ev(InitState, { id: 'd1', code: 'C', name: 'N' });
 const domainValidators: EventDocEventValidators = {
   ROTATE: () => null,
 };
-const validate = createEventDocEventValidator(
-  foldEventDocBase,
-  domainValidators
-);
+const validate = createEventDocEventValidator(foldEventDocBase, domainValidators);
 
 describe('createEventDocEventValidator', () => {
   it('composes the reserved guard: an un-overridden edit is rejected on a published doc', () => {

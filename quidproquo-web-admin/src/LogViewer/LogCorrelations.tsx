@@ -27,8 +27,8 @@ export const LogCorrelations = ({ logCorrelation, setSelectedLogCorrelation, isV
       <LogCorrelationTree
         correlationId={logCorrelation}
         highlightCorrelationId={logCorrelation}
-        setSelectedLogCorrelation={setSelectedLogCorrelation}
         isVisible={isVisible}
+        setSelectedLogCorrelation={setSelectedLogCorrelation}
         treeApi={treeApi}
       />
     </Box>

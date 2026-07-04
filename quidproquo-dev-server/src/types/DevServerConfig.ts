@@ -9,22 +9,20 @@ export interface OptionalFileStorageConfig {
   secureUrlSecret?: string;
 }
 
-export type DevServerDelayConfig =
-  | number
-  | { default?: number; [actionType: string]: number | undefined };
+export type DevServerDelayConfig = number | { default?: number; [actionType: string]: number | undefined };
 
 // Input config with optional file storage
 export type DevServerConfig = {
   serverDomain: 'localhost';
   serverPort: number;
   webSocketPort?: number;
-  
+
   // Base path for all dev server files, default: '.qpq-runtime'
   runtimePath?: string;
 
   dynamicModuleLoader: <T = any>(serviceName: string, modulePath: QpqFunctionRuntime) => Promise<T>;
   qpqConfigs: QPQConfig[];
-  
+
   // File storage configuration (optional)
   fileStorageConfig?: OptionalFileStorageConfig;
 
@@ -45,7 +43,7 @@ export type ResolvedDevServerConfig = {
 
   dynamicModuleLoader: <T = any>(serviceName: string, modulePath: QpqFunctionRuntime) => Promise<T>;
   qpqConfigs: QPQConfig[];
-  
+
   // File storage configuration (required with all defaults filled)
   fileStorageConfig: FileStorageConfig;
 

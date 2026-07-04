@@ -23,9 +23,7 @@ describe('askGraphDatabaseExecuteOpenCypherQuery', () => {
   });
 
   it('maps params to undefined when omitted', () => {
-    const { action } = captureRequester(
-      askGraphDatabaseExecuteOpenCypherQuery('graph', GraphDatabaseInstanceType.Read, 'MATCH (n) RETURN n'),
-    );
+    const { action } = captureRequester(askGraphDatabaseExecuteOpenCypherQuery('graph', GraphDatabaseInstanceType.Read, 'MATCH (n) RETURN n'));
 
     expect(action).toEqual({
       type: GraphDatabaseActionType.ExecuteOpenCypherQuery,

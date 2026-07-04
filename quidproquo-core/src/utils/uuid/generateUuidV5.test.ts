@@ -31,9 +31,7 @@ describe('generateUuidV5', () => {
   });
 
   it('handles multi-byte unicode names', () => {
-    expect(generateUuidV5('日本語の名前', UuidNamespace.dns)).toMatch(
-      /^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/,
-    );
+    expect(generateUuidV5('日本語の名前', UuidNamespace.dns)).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
   });
 
   it('sets the version nibble to 5 and a valid variant nibble', () => {
@@ -44,9 +42,7 @@ describe('generateUuidV5', () => {
   });
 
   it('matches the canonical v5 UUID regex', () => {
-    expect(generateUuidV5('regex-check', UuidNamespace.dns)).toMatch(
-      /^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/,
-    );
+    expect(generateUuidV5('regex-check', UuidNamespace.dns)).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
   });
 
   it('throws for a namespace that is not a valid UUID', () => {

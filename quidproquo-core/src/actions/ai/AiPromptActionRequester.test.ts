@@ -9,9 +9,7 @@ describe('askAiPrompt', () => {
   it('yields a Prompt action with the model, prompt and options', () => {
     const messages = [{ role: 'user', content: 'hi' }] as any;
 
-    const { action } = captureRequester(
-      askAiPrompt(AiModel.ClaudeSonnet45, 'do the thing', { system: 'be helpful', aiName: 'bob', messages }),
-    );
+    const { action } = captureRequester(askAiPrompt(AiModel.ClaudeSonnet45, 'do the thing', { system: 'be helpful', aiName: 'bob', messages }));
 
     expect(action).toEqual({
       type: AiActionType.Prompt,

@@ -37,7 +37,6 @@ export function MainLayout() {
       </Box>
 
       <BottomNavigation
-        value={tab}
         onChange={(event, newValue) => {
           // The trailing Logout / Loading actions are not tabs
           if (newValue < tabs.length) {
@@ -55,12 +54,13 @@ export function MainLayout() {
           borderColor: 'divider',
           bgcolor: 'background.paper',
         }}
+        value={tab}
       >
         {tabs.map((t) => (
-          <BottomNavigationAction key={t.name} label={t.name} icon={t.icon} />
+          <BottomNavigationAction key={t.name} icon={t.icon} label={t.name} />
         ))}
-        {loading && <BottomNavigationAction label="Loading" icon={<CircularProgress size={18} />} disabled />}
-        <BottomNavigationAction label="Logout" icon={<LogoutIcon />} onClick={() => authApi.authLogout()} />
+        {loading && <BottomNavigationAction disabled icon={<CircularProgress size={18} />} label="Loading" />}
+        <BottomNavigationAction icon={<LogoutIcon />} label="Logout" onClick={() => authApi.authLogout()} />
       </BottomNavigation>
     </Box>
   );

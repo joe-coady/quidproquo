@@ -15,7 +15,9 @@ vi.mock('../../../logic/s3/generatePresignedUploadUrl', () => ({ generatePresign
 const session = { correlation: 'corr-1' };
 
 const invoke = async (payload: { drive: string; filepath: string; expirationMs: number; contentType?: string }) => {
-  const processor = (await getFileGenerateTemporaryUploadSecureUrlActionProcessor({} as never, null as any))[FileActionType.GenerateTemporaryUploadSecureUrl];
+  const processor = (await getFileGenerateTemporaryUploadSecureUrlActionProcessor({} as never, null as any))[
+    FileActionType.GenerateTemporaryUploadSecureUrl
+  ];
   return invokeProcessor(processor, payload, { session });
 };
 

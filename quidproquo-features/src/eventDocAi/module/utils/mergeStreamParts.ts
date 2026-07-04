@@ -6,9 +6,7 @@ import type { EventDocAiMessageSegment } from '../../models';
 // deltas merged into one text segment; tool calls grouped and paired with
 // their results. Used live (rendering the in-flight stream) and at stream end
 // (converting the reply for saving).
-export const mergeStreamParts = (
-  parts: AiStreamPart[]
-): EventDocAiMessageSegment[] => {
+export const mergeStreamParts = (parts: AiStreamPart[]): EventDocAiMessageSegment[] => {
   const segments: EventDocAiMessageSegment[] = [];
 
   for (const part of parts) {
@@ -32,9 +30,7 @@ export const mergeStreamParts = (
     } else if (part.type === AiStreamPartType.ToolResult) {
       const last = segments[segments.length - 1];
       if (last && last.type === 'tool-use') {
-        const tool = last.tools.find(
-          (t) => t.toolName === part.toolName && t.output === undefined
-        );
+        const tool = last.tools.find((t) => t.toolName === part.toolName && t.output === undefined);
         if (tool) {
           tool.output = part.output;
         }

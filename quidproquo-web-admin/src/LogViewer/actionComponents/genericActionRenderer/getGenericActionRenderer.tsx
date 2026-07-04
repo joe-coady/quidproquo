@@ -13,9 +13,9 @@ export const getGenericActionRenderer =
     return (
       <>
         <pre style={genericFunctionRendererStyles.pre}>
-          <GenericFunctionRenderer functionName={functionName} args={args} tooltipMap={tooltipMap} expanded={expanded} />
+          <GenericFunctionRenderer args={args} expanded={expanded} functionName={functionName} tooltipMap={tooltipMap} />
         </pre>
-        <ActionResultDisplay action={action} result={result} expanded={expanded} />
+        <ActionResultDisplay action={action} expanded={expanded} result={result} />
       </>
     );
   };

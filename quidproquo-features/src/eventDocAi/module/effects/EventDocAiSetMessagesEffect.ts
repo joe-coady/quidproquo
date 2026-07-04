@@ -7,7 +7,4 @@ export type SetMessagesPayload = {
   messages: EventDocAiChatMessage[];
 };
 
-export type EventDocAiSetMessagesEffect = Effect<
-  EventDocAiEffect.SetMessages,
-  SetMessagesPayload
->;
+export type EventDocAiSetMessagesEffect = Effect<EventDocAiEffect.SetMessages, SetMessagesPayload>;

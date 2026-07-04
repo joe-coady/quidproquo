@@ -27,13 +27,7 @@ export type AnyEventBusMessageWithSession = QueueMessage<any> & {
 };
 
 const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): EventBusSendMessageActionProcessor<any> => {
-  return async (
-    {
-      eventBusName,
-      eventBusMessages,
-    },
-    session,
-  ) => {
+  return async ({ eventBusName, eventBusMessages }, session) => {
     const eventBusConfig = qpqCoreUtils.getEventBusConfigByName(eventBusName, qpqConfig);
     if (!eventBusConfig) {
       return actionResultError(

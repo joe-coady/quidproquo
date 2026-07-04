@@ -1,4 +1,11 @@
-import { buildTestQpqConfig, DeployEventStatusType, DeployEventType, ErrorTypeEnum, EventActionType, QPQCoreConfigSettingType } from 'quidproquo-core';
+import {
+  buildTestQpqConfig,
+  DeployEventStatusType,
+  DeployEventType,
+  ErrorTypeEnum,
+  EventActionType,
+  QPQCoreConfigSettingType,
+} from 'quidproquo-core';
 
 import { describe, expect, it } from 'vitest';
 
@@ -73,7 +80,10 @@ describe('eventBridgeEvent/deployStack getEventTransformResponseResultActionProc
   it('propagates a failed record as an error result', async () => {
     const processor = await resolveEventProcessor(getEventTransformResponseResultActionProcessor, EventActionType.TransformResponseResult, config);
 
-    const [, error] = await processor({ eventParams: [{}], qpqEventRecordResponses: [{ success: false, error: { errorType: ErrorTypeEnum.GenericError, errorText: 'boom' } }] });
+    const [, error] = await processor({
+      eventParams: [{}],
+      qpqEventRecordResponses: [{ success: false, error: { errorType: ErrorTypeEnum.GenericError, errorText: 'boom' } }],
+    });
 
     expect(error?.errorType).toBe(ErrorTypeEnum.GenericError);
   });

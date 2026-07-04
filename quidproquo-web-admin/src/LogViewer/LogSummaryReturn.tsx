@@ -16,19 +16,19 @@ export const LogSummaryReturn = ({ log }: LogSummaryReturnProps) => {
 
   return (
     <div>
-      <Box display="flex" alignItems="center">
-        <Typography variant="h6" gutterBottom>
+      <Box alignItems="center" display="flex">
+        <Typography gutterBottom variant="h6">
           {log.error ? 'Thrown Error' : 'Returned'}
         </Typography>
         <Tooltip title={expanded ? 'Collapse' : 'Expand'}>
-          <IconButton size="small" onClick={() => setExpanded(!expanded)}>
+          <IconButton onClick={() => setExpanded(!expanded)} size="small">
             {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
           </IconButton>
         </Tooltip>
       </Box>
       <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
         <pre style={genericFunctionRendererStyles.pre}>
-          {log.error ? <AnyVariableView value={log.error} expanded={expanded} /> : <AnyVariableView value={log.result} expanded={expanded} />}
+          {log.error ? <AnyVariableView expanded={expanded} value={log.error} /> : <AnyVariableView expanded={expanded} value={log.result} />}
         </pre>
       </pre>
     </div>

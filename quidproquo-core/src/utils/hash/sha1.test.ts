@@ -2,8 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { sha1 } from './sha1';
 
-const sha1Hex = (input: string): string =>
-  Array.from(sha1(new TextEncoder().encode(input)), (b) => b.toString(16).padStart(2, '0')).join('');
+const sha1Hex = (input: string): string => Array.from(sha1(new TextEncoder().encode(input)), (b) => b.toString(16).padStart(2, '0')).join('');
 
 describe('sha1', () => {
   // Known-answer vectors from RFC 3174 / FIPS 180.

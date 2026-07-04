@@ -201,18 +201,16 @@ describe('getStorageDriveCorsAllowedOrigins', () => {
   });
 
   it('honours an explicit defineStorageDriveCorsSettings for the matching drive', () => {
-    const config = buildTestQpqConfig(
-      [defineDns('example.com'), defineStorageDriveCorsSettings('uploads', ['https://app.other.com'])],
-      { environment: 'production' },
-    );
+    const config = buildTestQpqConfig([defineDns('example.com'), defineStorageDriveCorsSettings('uploads', ['https://app.other.com'])], {
+      environment: 'production',
+    });
     expect(getStorageDriveCorsAllowedOrigins(config, 'uploads')).toEqual(['https://app.other.com']);
   });
 
   it('ignores cors settings declared for a different drive', () => {
-    const config = buildTestQpqConfig(
-      [defineDns('example.com'), defineStorageDriveCorsSettings('other', ['https://app.other.com'])],
-      { environment: 'production' },
-    );
+    const config = buildTestQpqConfig([defineDns('example.com'), defineStorageDriveCorsSettings('other', ['https://app.other.com'])], {
+      environment: 'production',
+    });
     expect(getStorageDriveCorsAllowedOrigins(config, 'uploads')).toEqual(['https://example.com', 'https://*.example.com']);
   });
 

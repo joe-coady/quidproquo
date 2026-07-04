@@ -28,7 +28,8 @@ const getProcessGetUsers = (qpqConfig: QPQConfig): UserDirectoryGetUsersActionPr
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         InvalidParameterException: () => actionResultError(UserDirectoryGetUsersErrorTypeEnum.InvalidPageKey, 'The supplied page key is invalid'),
-        TooManyRequestsException: () => actionResultError(UserDirectoryGetUsersErrorTypeEnum.LimitExceeded, 'Too many requests, please try again later'),
+        TooManyRequestsException: () =>
+          actionResultError(UserDirectoryGetUsersErrorTypeEnum.LimitExceeded, 'Too many requests, please try again later'),
       });
     }
   };

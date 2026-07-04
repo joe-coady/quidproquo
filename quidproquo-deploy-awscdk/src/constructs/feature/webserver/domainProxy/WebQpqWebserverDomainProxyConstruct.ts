@@ -43,9 +43,7 @@ export class WebQpqWebserverDomainProxyConstruct extends QpqConstructBlock {
       domainName: apexDomain,
     });
 
-    const domainNames: string[] = (props.domainProxyConfig.domain.subDomainNames ?? []).map(
-      (subDomain) => `${subDomain}.${apexDomain}`,
-    );
+    const domainNames: string[] = (props.domainProxyConfig.domain.subDomainNames ?? []).map((subDomain) => `${subDomain}.${apexDomain}`);
     if (props.domainProxyConfig.domain.onRootDomain && domainNames.length === 0) {
       domainNames.unshift(apexDomain);
     }

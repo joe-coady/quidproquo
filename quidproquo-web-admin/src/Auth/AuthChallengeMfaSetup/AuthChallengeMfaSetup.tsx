@@ -1,4 +1,3 @@
- 
 import { createQpqRuntimeDefinition, useQpqRuntime } from 'quidproquo-web-react';
 
 import { useEffect, useRef } from 'react';
@@ -60,47 +59,47 @@ export function AuthChallengeMfaSetup({ authState }: AuthChallengeMfaSetupProps)
       <Box component="form" sx={{ width: '100%', maxWidth: 360 }}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+            <Typography gutterBottom sx={{ display: 'flex', alignItems: 'center' }} variant="h5">
               <LockIcon sx={{ marginRight: 1 }} />
               Set Up Authenticator
             </Typography>
           </Grid>
           <Grid item xs={12}>
-            <Typography variant="body2" color="text.secondary">
+            <Typography color="text.secondary" variant="body2">
               Add this account to your authenticator app, then enter the 6-digit code it generates.
             </Typography>
           </Grid>
           <Grid item xs={12}>
-            <Typography variant="caption" color="text.secondary">
+            <Typography color="text.secondary" variant="caption">
               Secret key
             </Typography>
-            <Typography variant="body1" sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>
+            <Typography sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }} variant="body1">
               {state.secretCode || 'Loading…'}
             </Typography>
           </Grid>
           {state.secretCode && (
             <Grid item xs={12}>
-              <Typography variant="caption" color="text.secondary" sx={{ wordBreak: 'break-all' }}>
+              <Typography color="text.secondary" sx={{ wordBreak: 'break-all' }} variant="caption">
                 {buildOtpAuthUri(authState.username, state.secretCode)}
               </Typography>
             </Grid>
           )}
           <Grid item xs={12}>
             <TextField
-              required
+              autoFocus
               fullWidth
               id="mfaCode"
-              label="Authentication Code"
-              autoFocus
               inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', maxLength: 6 }}
-              value={state.mfaCode}
+              label="Authentication Code"
               onChange={(event) => api.authChallengeSetMfaSetupCode(event.target.value.replace(/\D/g, ''))}
+              required
+              value={state.mfaCode}
             />
           </Grid>
           <Grid item xs={12}>
             <AsyncButton
-              onClick={() => api.authChallengeSendMfaSetupCode(challenge, authState.username)}
               disabled={!isCodeValid || !state.secretCode}
+              onClick={() => api.authChallengeSendMfaSetupCode(challenge, authState.username)}
             >
               Verify
             </AsyncButton>

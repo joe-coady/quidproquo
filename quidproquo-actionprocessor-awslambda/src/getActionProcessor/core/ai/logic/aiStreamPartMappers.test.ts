@@ -46,7 +46,11 @@ describe('aiStreamPartMappers', () => {
     ['reasoning-start', { type: 'reasoning-start', id: 'r1' }, { type: AiStreamPartType.ReasoningStart, id: 'r1' }],
     ['reasoning-end', { type: 'reasoning-end', id: 'r1' }, { type: AiStreamPartType.ReasoningEnd, id: 'r1' }],
     ['reasoning-delta', { type: 'reasoning-delta', id: 'r1', text: 'think' }, { type: AiStreamPartType.ReasoningDelta, id: 'r1', text: 'think' }],
-    ['tool-input-start', { type: 'tool-input-start', id: 'i1', toolName: 'calc' }, { type: AiStreamPartType.ToolInputStart, id: 'i1', toolName: 'calc' }],
+    [
+      'tool-input-start',
+      { type: 'tool-input-start', id: 'i1', toolName: 'calc' },
+      { type: AiStreamPartType.ToolInputStart, id: 'i1', toolName: 'calc' },
+    ],
     ['tool-input-end', { type: 'tool-input-end', id: 'i1' }, { type: AiStreamPartType.ToolInputEnd, id: 'i1' }],
     ['tool-input-delta', { type: 'tool-input-delta', id: 'i1', delta: '{' }, { type: AiStreamPartType.ToolInputDelta, id: 'i1', delta: '{' }],
     [
@@ -76,7 +80,13 @@ describe('aiStreamPartMappers', () => {
     ],
     [
       'tool-approval-response',
-      { type: 'tool-approval-response', approvalId: 'a1', approved: true, reason: 'ok', toolCall: { toolCallId: 'c1', toolName: 'calc', input: { a: 1 } } },
+      {
+        type: 'tool-approval-response',
+        approvalId: 'a1',
+        approved: true,
+        reason: 'ok',
+        toolCall: { toolCallId: 'c1', toolName: 'calc', input: { a: 1 } },
+      },
       { type: AiStreamPartType.ToolApprovalResponse, approvalId: 'a1', toolCallId: 'c1', toolName: 'calc', approved: true, reason: 'ok' },
     ],
   ])('maps a %s part', (type: string, part: unknown, expected: unknown) => {

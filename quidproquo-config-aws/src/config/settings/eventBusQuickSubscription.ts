@@ -18,8 +18,7 @@ export enum EventBusQuickSubscriptionType {
  * use the normal bus -> queue -> function pattern instead.
  */
 export type EventBusQuickSubscription =
-  | { type: EventBusQuickSubscriptionType.email; email: string }
-  | { type: EventBusQuickSubscriptionType.url; url: string };
+  { type: EventBusQuickSubscriptionType.email; email: string } | { type: EventBusQuickSubscriptionType.url; url: string };
 
 export interface QPQConfigAdvancedEventBusQuickSubscriptionSettings extends QPQConfigAdvancedSettings {
   /**

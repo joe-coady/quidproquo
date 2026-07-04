@@ -58,10 +58,7 @@ const devUserIdNamespace = generateUuidV5('quidproquo-dev-server/user-id', UuidN
 export const createDevUserId = (userDirectory: DevUserDirectory, username?: string | null): string => {
   const resolvedUsername = resolveDevUsername(username);
 
-  return generateUuidV5(
-    `${userDirectory.serviceName}/${userDirectory.directoryName}/${resolvedUsername.trim().toLowerCase()}`,
-    devUserIdNamespace,
-  );
+  return generateUuidV5(`${userDirectory.serviceName}/${userDirectory.directoryName}/${resolvedUsername.trim().toLowerCase()}`, devUserIdNamespace);
 };
 
 export const createDevJwt = (

@@ -1,11 +1,5 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
-  actionResult,
-  QPQConfig,
-  qpqCoreUtils,
-} from 'quidproquo-core';
+import { ActionProcessorList, ActionProcessorListResolver, actionResult, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 import { ApiKeyValidationActionType, ApiKeyValidationValidateActionProcessor } from 'quidproquo-webserver';
 
 import { timingSafeEqual } from 'crypto';
@@ -28,14 +22,12 @@ const safeEqual = (a?: string, b?: string): boolean => {
 
 const getProcessApiKeyValidationValidate = (qpqConfig: QPQConfig): ApiKeyValidationValidateActionProcessor => {
   const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
-    const application = qpqCoreUtils.getApplicationName(qpqConfig);
-    const service = qpqCoreUtils.getApplicationModuleName(qpqConfig);
-    const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
-    const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
-  
-  return async ({ apiKeyValue, apiKeyReferences }) => {
-    
+  const application = qpqCoreUtils.getApplicationName(qpqConfig);
+  const service = qpqCoreUtils.getApplicationModuleName(qpqConfig);
+  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
+  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
 
+  return async ({ apiKeyValue, apiKeyReferences }) => {
     const realApiKeys = await getApiKeys(
       region,
       ...apiKeyReferences.map((apiKey) => {

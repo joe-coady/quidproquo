@@ -6,7 +6,4 @@ export type SetLoadingHistoryPayload = {
   isLoading: boolean;
 };
 
-export type EventDocAiSetLoadingHistoryEffect = Effect<
-  EventDocAiEffect.SetLoadingHistory,
-  SetLoadingHistoryPayload
->;
+export type EventDocAiSetLoadingHistoryEffect = Effect<EventDocAiEffect.SetLoadingHistory, SetLoadingHistoryPayload>;

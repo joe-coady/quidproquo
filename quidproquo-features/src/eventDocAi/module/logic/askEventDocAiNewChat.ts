@@ -9,9 +9,7 @@ import { askUIEventDocAiSetMessages } from '../actionCreators/askUIEventDocAiSet
 import { askUIEventDocAiUpsertChat } from '../actionCreators/askUIEventDocAiUpsertChat';
 import { askEventDocAiChatCreateRequest } from '../requests/askEventDocAiChatCreateRequest';
 
-export function* askEventDocAiNewChat(): AskResponse<
-  Nullable<EventDocAiChatSummary>
-> {
+export function* askEventDocAiNewChat(): AskResponse<Nullable<EventDocAiChatSummary>> {
   const result = yield* askCatch(askEventDocAiChatCreateRequest());
 
   if (!result.success) {

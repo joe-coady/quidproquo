@@ -7,19 +7,12 @@ export type EventDocListOptions = {
   includeDeleted?: boolean;
 };
 
-export function* askEventDocList<T extends EventDocSummary = EventDocSummary>(
-  options?: EventDocListOptions
-): AskResponse<T[]> {
+export function* askEventDocList<T extends EventDocSummary = EventDocSummary>(options?: EventDocListOptions): AskResponse<T[]> {
   const { storeName, type } = yield* askEventDocResolveStore();
 
-  const items = yield* askKeyValueStoreQueryAll<T>(
-    storeName,
-    kvsEqual('type', type)
-  );
+  const items = yield* askKeyValueStoreQueryAll<T>(storeName, kvsEqual('type', type));
 
-  const visible = options?.includeDeleted
-    ? items
-    : items.filter((model) => !model.deletedAt);
+  const visible = options?.includeDeleted ? items : items.filter((model) => !model.deletedAt);
 
   return [...visible].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 }

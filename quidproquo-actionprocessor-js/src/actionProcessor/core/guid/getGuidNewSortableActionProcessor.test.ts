@@ -1,4 +1,4 @@
-import { buildTestQpqConfig, GuidActionType,resolveActionResult } from 'quidproquo-core';
+import { buildTestQpqConfig, GuidActionType, resolveActionResult } from 'quidproquo-core';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -10,7 +10,10 @@ vi.mock('uuidv7', () => ({
 
 describe('getGuidNewSortableActionProcessor', () => {
   it('returns a sortable v7 uuid', async () => {
-    const processor = (await getGuidNewSortableActionProcessor(buildTestQpqConfig(), async () => null))[GuidActionType.NewSortable] as (p: any, ...rest: any[]) => Promise<any>;
+    const processor = (await getGuidNewSortableActionProcessor(buildTestQpqConfig(), async () => null))[GuidActionType.NewSortable] as (
+      p: any,
+      ...rest: any[]
+    ) => Promise<any>;
 
     const result = await processor(undefined, undefined as any);
 

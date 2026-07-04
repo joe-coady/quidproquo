@@ -29,10 +29,8 @@ const getProcessConfirmForgotPassword = (
   };
 };
 
-export const getUserDirectoryConfirmForgotPasswordActionProcessor = (
-  devServerConfig: ResolvedDevServerConfig,
-): ActionProcessorListResolver => async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [UserDirectoryActionType.ConfirmForgotPassword]: getProcessConfirmForgotPassword(qpqConfig, devServerConfig),
-});
+export const getUserDirectoryConfirmForgotPasswordActionProcessor =
+  (devServerConfig: ResolvedDevServerConfig): ActionProcessorListResolver =>
+  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
+    [UserDirectoryActionType.ConfirmForgotPassword]: getProcessConfirmForgotPassword(qpqConfig, devServerConfig),
+  });

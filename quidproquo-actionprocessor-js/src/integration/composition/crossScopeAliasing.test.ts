@@ -37,7 +37,11 @@ describe('cross-scope context aliasing (same uniqueName)', () => {
 
   it('but across a boundary the local provider is stripped, so the global read falls to default', async () => {
     const story = function* () {
-      return yield* askContextProvideValue(localK, 'from-local', boundary(() => askContextRead(globalK)));
+      return yield* askContextProvideValue(
+        localK,
+        'from-local',
+        boundary(() => askContextRead(globalK)),
+      );
     };
 
     // The aliasing is a within-runtime artifact of the provider's interception; once the read

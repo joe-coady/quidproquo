@@ -6,5 +6,5 @@ export function DataGridPagination() {
   const page = useGridSelector(apiRef, gridPageSelector);
   const pageCount = useGridSelector(apiRef, gridPageCountSelector);
 
-  return <Pagination color="primary" count={pageCount} page={page + 1} onChange={(event, value) => apiRef.current.setPage(value - 1)} />;
+  return <Pagination color="primary" count={pageCount} onChange={(event, value) => apiRef.current.setPage(value - 1)} page={page + 1} />;
 }

@@ -33,14 +33,14 @@ export const CoreLogCreateCustomAction: ActionComponent<LogCreateActionPayload> 
   return (
     <Box sx={{ width: '100%', my: 1 }}>
       <Alert severity={getSeverity(logLevel)}>
-        <Typography variant="body1" fontWeight="bold">
+        <Typography fontWeight="bold" variant="body1">
           {resolveLookupText(logLevel, LogLevelEnum)}
         </Typography>
         <Typography variant="body1">{msg}</Typography>
         {data && (
-          <Typography variant="body2" sx={{ mt: 1, whiteSpace: 'pre-wrap' }}>
+          <Typography sx={{ mt: 1, whiteSpace: 'pre-wrap' }} variant="body2">
             <pre style={genericFunctionRendererStyles.pre}>
-              <AnyVariableView value={data} expanded={expanded} />
+              <AnyVariableView expanded={expanded} value={data} />
             </pre>
           </Typography>
         )}

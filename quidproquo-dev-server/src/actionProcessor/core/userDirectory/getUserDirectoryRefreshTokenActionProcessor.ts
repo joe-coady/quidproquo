@@ -35,10 +35,8 @@ const getProcessRefreshToken = (qpqConfig: QPQConfig, devServerConfig: ResolvedD
   };
 };
 
-export const getUserDirectoryRefreshTokenActionProcessor = (
-  devServerConfig: ResolvedDevServerConfig,
-): ActionProcessorListResolver => async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [UserDirectoryActionType.RefreshToken]: getProcessRefreshToken(qpqConfig, devServerConfig),
-});
+export const getUserDirectoryRefreshTokenActionProcessor =
+  (devServerConfig: ResolvedDevServerConfig): ActionProcessorListResolver =>
+  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
+    [UserDirectoryActionType.RefreshToken]: getProcessRefreshToken(qpqConfig, devServerConfig),
+  });

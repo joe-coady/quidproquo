@@ -8,8 +8,7 @@ vi.mock('../../logic', () => ({
   apiRequestPost: (...args: unknown[]) => apiRequestPost(...args),
 }));
 
-const callGetLogs = () =>
-  getLogs('/log/list', 'EXECUTE_STORY', 'start', 'end', 'svc', 'info', 'err', 'user', 'true', true, 'https://api', 'token');
+const callGetLogs = () => getLogs('/log/list', 'EXECUTE_STORY', 'start', 'end', 'svc', 'info', 'err', 'user', 'true', true, 'https://api', 'token');
 
 describe('getLogs', () => {
   it('follows the nextPageKey until exhausted and concatenates items', async () => {

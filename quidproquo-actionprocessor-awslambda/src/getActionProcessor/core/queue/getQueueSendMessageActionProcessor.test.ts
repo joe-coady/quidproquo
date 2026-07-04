@@ -25,7 +25,11 @@ describe('getQueueSendMessagesActionProcessor', () => {
   it('sends each message to the resolved queue with the session attached', async () => {
     const processor = await resolveProcessor();
 
-    const result = await invokeProcessor(processor, { queueName: 'jobs', queueMessages: [{ payload: { a: 1 } }] }, { session: buildTestStorySession() });
+    const result = await invokeProcessor(
+      processor,
+      { queueName: 'jobs', queueMessages: [{ payload: { a: 1 } }] },
+      { session: buildTestStorySession() },
+    );
 
     expect(result).toEqual([undefined]);
     const [queueName, region, bodies] = vi.mocked(sendMessages).mock.calls[0];

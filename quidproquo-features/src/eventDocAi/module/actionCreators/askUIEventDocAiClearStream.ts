@@ -4,8 +4,5 @@ import type { EventDocAiClearStreamEffect } from '../effects/EventDocAiClearStre
 import { EventDocAiEffect } from '../effects/EventDocAiEffect';
 
 export function* askUIEventDocAiClearStream(): AskResponse<void> {
-  yield* askStateDispatchEffect<EventDocAiClearStreamEffect>(
-    EventDocAiEffect.ClearStream,
-    {}
-  );
+  yield* askStateDispatchEffect<EventDocAiClearStreamEffect>(EventDocAiEffect.ClearStream, {});
 }

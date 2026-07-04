@@ -36,7 +36,8 @@ const getProcessConfirmForgotPassword = (qpqConfig: QPQConfig): UserDirectoryCon
         ExpiredCodeException: () => actionResultError(UserDirectoryConfirmForgotPasswordErrorTypeEnum.ExpiredCode, 'Confirmation code has expired'),
         InvalidPasswordException: () =>
           actionResultError(UserDirectoryConfirmForgotPasswordErrorTypeEnum.InvalidNewPassword, 'New password does not meet the password policy'),
-        LimitExceededException: () => actionResultError(UserDirectoryConfirmForgotPasswordErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
+        LimitExceededException: () =>
+          actionResultError(UserDirectoryConfirmForgotPasswordErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
       });
     }
   };

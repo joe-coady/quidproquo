@@ -14,11 +14,8 @@ export const defineEventDocSummary = (keyValueStoreName: string): QPQConfig => [
     indexes: [{ partitionKey: 'type', sortKey: 'updatedAt' }],
     disablePointInTimeRecovery: false,
   }),
-  defineKeyValueStore<EventDocStoredEvent>(
-    eventDocEventsStoreName(keyValueStoreName),
-    'pk',
-    [kvsKey('sk', 'number')],
-    { disablePointInTimeRecovery: false }
-  ),
+  defineKeyValueStore<EventDocStoredEvent>(eventDocEventsStoreName(keyValueStoreName), 'pk', [kvsKey('sk', 'number')], {
+    disablePointInTimeRecovery: false,
+  }),
   defineStorageDrive(eventDocStorageDriveName(keyValueStoreName)),
 ];

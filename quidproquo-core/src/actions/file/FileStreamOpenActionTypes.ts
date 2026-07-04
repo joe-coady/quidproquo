@@ -18,7 +18,4 @@ export interface FileStreamOpenAction extends Action<FileStreamOpenActionPayload
 
 // Function Types
 export type FileStreamOpenActionProcessor = ActionProcessor<FileStreamOpenAction, StreamHandle>;
-export type FileStreamOpenActionRequester<E extends StreamEncoding = StreamEncoding> = ActionRequester<
-  FileStreamOpenAction,
-  StreamHandle<E>
->;
+export type FileStreamOpenActionRequester<E extends StreamEncoding = StreamEncoding> = ActionRequester<FileStreamOpenAction, StreamHandle<E>>;

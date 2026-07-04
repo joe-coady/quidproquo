@@ -55,9 +55,7 @@ describe('getRouteAuthValidationDecodeActionProcessor', () => {
   });
 
   it('returns null when the decode action errors', async () => {
-    const [result] = await invoke(buildPayload({ Authorization: 'Bearer token' }), () =>
-      actionResultError(ErrorTypeEnum.GenericError, 'boom'),
-    );
+    const [result] = await invoke(buildPayload({ Authorization: 'Bearer token' }), () => actionResultError(ErrorTypeEnum.GenericError, 'boom'));
 
     expect(result).toBeNull();
   });

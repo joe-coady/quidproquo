@@ -15,9 +15,7 @@ describe('askConvertAnyNeo4jResultToAnyGraphResult', () => {
   });
 
   it('converts a node result into a graph node', () => {
-    const result = runStory(
-      askConvertAnyNeo4jResultToAnyGraphResult({ elementId: 'node-1', labels: ['Person'], properties: { name: 'Alice' } }),
-    );
+    const result = runStory(askConvertAnyNeo4jResultToAnyGraphResult({ elementId: 'node-1', labels: ['Person'], properties: { name: 'Alice' } }));
 
     expect(result).toEqual({
       $entityType: GraphEntityType.Node,

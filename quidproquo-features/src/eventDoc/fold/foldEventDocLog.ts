@@ -18,12 +18,9 @@ type FoldEventDocLogConfig<TState extends EventDocDocument> = {
 // missing migration step throws; a future-version event is clamped out of the target.
 export const foldEventDocLog = <TState extends EventDocDocument>(
   events: EventDocEvent[],
-  { seed, reducer, migrations, latestVersion }: FoldEventDocLogConfig<TState>
+  { seed, reducer, migrations, latestVersion }: FoldEventDocLogConfig<TState>,
 ): TState => {
-  const migrateTo = (
-    state: EventDocDocument,
-    target: number
-  ): EventDocDocument => {
+  const migrateTo = (state: EventDocDocument, target: number): EventDocDocument => {
     let migrated = state;
 
     while (migrated.schemaVersion < target) {
@@ -31,11 +28,7 @@ export const foldEventDocLog = <TState extends EventDocDocument>(
       const migrate = migrations[next];
 
       if (!migrate) {
-        throw new Error(
-          `No event-doc migration to version ${next} (registered: ${
-            Object.keys(migrations).join(', ') || 'none'
-          }).`
-        );
+        throw new Error(`No event-doc migration to version ${next} (registered: ${Object.keys(migrations).join(', ') || 'none'}).`);
       }
 
       migrated = { ...migrate(migrated), schemaVersion: next };

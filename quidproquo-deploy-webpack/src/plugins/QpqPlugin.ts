@@ -23,7 +23,7 @@ export class QpqPlugin implements WebpackPluginInstance {
     if (this.options.aliases && Object.keys(this.options.aliases).length > 0) {
       compiler.options.resolve = compiler.options.resolve || {};
       compiler.options.resolve.alias = {
-        ...(compiler.options.resolve.alias as Record<string, string> || {}),
+        ...((compiler.options.resolve.alias as Record<string, string>) || {}),
         ...this.options.aliases,
       };
     }

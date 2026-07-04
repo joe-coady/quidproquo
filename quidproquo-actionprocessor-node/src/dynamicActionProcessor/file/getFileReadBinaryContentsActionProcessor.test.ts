@@ -8,7 +8,8 @@ import { getFileReadBinaryContentsActionProcessor } from './getFileReadBinaryCon
 
 vi.mock('fs/promises');
 
-const invoke = () => runFileAction(getFileReadBinaryContentsActionProcessor(fileConfig), FileActionType.ReadBinaryContents, { filepath: 'nested/pic.bin' });
+const invoke = () =>
+  runFileAction(getFileReadBinaryContentsActionProcessor(fileConfig), FileActionType.ReadBinaryContents, { filepath: 'nested/pic.bin' });
 
 afterEach(() => {
   vi.clearAllMocks();

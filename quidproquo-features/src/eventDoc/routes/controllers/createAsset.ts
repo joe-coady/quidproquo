@@ -5,13 +5,8 @@ import { askEventDocGenerateAssetUploadUrl } from '../../data/askEventDocGenerat
 import { askEventDocProvideStoreFromGlobals } from '../../globals/askEventDocProvideStoreFromGlobals';
 import { askEventDocParseBody } from '../askEventDocParseBody';
 
-function* askEventDocStoreCreateAsset(
-  event: HTTPEvent,
-  docId: string
-): AskResponse<HTTPEventResponse> {
-  const { contentType } = yield* askEventDocParseBody<{ contentType: string }>(
-    event
-  );
+function* askEventDocStoreCreateAsset(event: HTTPEvent, docId: string): AskResponse<HTTPEventResponse> {
+  const { contentType } = yield* askEventDocParseBody<{ contentType: string }>(event);
 
   const result = yield* askEventDocGenerateAssetUploadUrl(docId, contentType);
 
@@ -19,11 +14,6 @@ function* askEventDocStoreCreateAsset(
 }
 
 /** POST {basePath}/{id}/assets — a presigned URL to upload an immutable asset blob. */
-export function* createAsset(
-  event: HTTPEvent,
-  params: { id: string }
-): AskResponse<HTTPEventResponse> {
-  return yield* askEventDocProvideStoreFromGlobals(
-    askEventDocStoreCreateAsset(event, params.id)
-  );
+export function* createAsset(event: HTTPEvent, params: { id: string }): AskResponse<HTTPEventResponse> {
+  return yield* askEventDocProvideStoreFromGlobals(askEventDocStoreCreateAsset(event, params.id));
 }

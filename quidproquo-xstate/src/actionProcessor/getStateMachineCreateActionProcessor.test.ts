@@ -76,9 +76,13 @@ describe('getStateMachineCreateActionProcessor', () => {
     const config = buildTestQpqConfig(defineStateMachine('order', { config: toggleConfig }));
     const processor = await getProcessor(config);
 
-    const [, error] = await invoke(processor, { stateMachineName: 'order', id: 'order-1', item: {} }, {
-      [KeyValueStoreActionType.Upsert]: async () => actionResultError(ErrorTypeEnum.GenericError, 'kvs down'),
-    });
+    const [, error] = await invoke(
+      processor,
+      { stateMachineName: 'order', id: 'order-1', item: {} },
+      {
+        [KeyValueStoreActionType.Upsert]: async () => actionResultError(ErrorTypeEnum.GenericError, 'kvs down'),
+      },
+    );
 
     expect(error?.errorText).toBe('kvs down');
   });
@@ -93,9 +97,10 @@ describe('getStateMachineCreateActionProcessor', () => {
     const processor = await getProcessor(config);
 
     let ran = 0;
-    const loader = async () => function* onCreated() {
-      ran++;
-    };
+    const loader = async () =>
+      function* onCreated() {
+        ran++;
+      };
 
     await invoke(processor, { stateMachineName: 'order', id: 'order-1', item: {} }, kvsStore(new Map()), loader);
 
@@ -111,9 +116,10 @@ describe('getStateMachineCreateActionProcessor', () => {
     const config = buildTestQpqConfig(defineStateMachine('order', { config: entryConfig, actions: { onCreated: 'rt' as any } }));
     const processor = await getProcessor(config);
 
-    const loader = async () => function* onCreated() {
-      throw new Error('side effect failed');
-    };
+    const loader = async () =>
+      function* onCreated() {
+        throw new Error('side effect failed');
+      };
 
     const [, error] = await invoke(processor, { stateMachineName: 'order', id: 'order-1', item: {} }, kvsStore(new Map()), loader);
 

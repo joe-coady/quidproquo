@@ -4,21 +4,13 @@ import { HTTPEvent, HTTPEventResponse, qpqWebServerUtils } from 'quidproquo-webs
 import { askEventDocGenerateAssetDownloadUrl } from '../../data/askEventDocGenerateAssetDownloadUrl';
 import { askEventDocProvideStoreFromGlobals } from '../../globals/askEventDocProvideStoreFromGlobals';
 
-function* askEventDocStoreGetAsset(
-  docId: string,
-  assetId: string
-): AskResponse<HTTPEventResponse> {
+function* askEventDocStoreGetAsset(docId: string, assetId: string): AskResponse<HTTPEventResponse> {
   const result = yield* askEventDocGenerateAssetDownloadUrl(docId, assetId);
 
   return qpqWebServerUtils.toJsonEventResponse(result);
 }
 
 /** GET {basePath}/{id}/assets/{assetId} — a presigned URL to read an asset blob. */
-export function* getAsset(
-  event: HTTPEvent,
-  params: { id: string; assetId: string }
-): AskResponse<HTTPEventResponse> {
-  return yield* askEventDocProvideStoreFromGlobals(
-    askEventDocStoreGetAsset(params.id, params.assetId)
-  );
+export function* getAsset(event: HTTPEvent, params: { id: string; assetId: string }): AskResponse<HTTPEventResponse> {
+  return yield* askEventDocProvideStoreFromGlobals(askEventDocStoreGetAsset(params.id, params.assetId));
 }

@@ -38,13 +38,11 @@ export const useWebsocketAuthSync = (accessToken: AuthenticationInfo['accessToke
     }
   });
 
-  useSubscribeToWebSocketEvent<WebSocketQueueServerEventMessageAuthenticated>(
-    WebSocketQueueServerMessageEventType.Authenticated,
-    () => setIsAuthenticated(true),
+  useSubscribeToWebSocketEvent<WebSocketQueueServerEventMessageAuthenticated>(WebSocketQueueServerMessageEventType.Authenticated, () =>
+    setIsAuthenticated(true),
   );
-  useSubscribeToWebSocketEvent<WebSocketQueueServerEventMessageUnauthenticated>(
-    WebSocketQueueServerMessageEventType.Unauthenticated,
-    () => setIsAuthenticated(false),
+  useSubscribeToWebSocketEvent<WebSocketQueueServerEventMessageUnauthenticated>(WebSocketQueueServerMessageEventType.Unauthenticated, () =>
+    setIsAuthenticated(false),
   );
 
   // Sync the tokens in on open

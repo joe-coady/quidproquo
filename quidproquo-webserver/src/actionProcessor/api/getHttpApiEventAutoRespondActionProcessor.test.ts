@@ -19,11 +19,7 @@ import { getHttpApiEventAutoRespondActionProcessor } from './getHttpApiEventAuto
 
 const qpqConfig = buildTestQpqConfig([defineDns('example.com')], { environment: 'production' });
 
-const invoke = async (
-  qpqEventRecord: Partial<HTTPEvent>,
-  config: RouteOptions,
-  processors: Record<string, any> = {},
-) => {
+const invoke = async (qpqEventRecord: Partial<HTTPEvent>, config: RouteOptions, processors: Record<string, any> = {}) => {
   const map = await getHttpApiEventAutoRespondActionProcessor(qpqConfig, noopDynamicModuleLoader);
   const processor = map[EventActionType.AutoRespond];
 

@@ -36,10 +36,9 @@ describe('askKeyValueStoreUpdatePartialProperties', () => {
   it('excludes the sort key from the update operations and passes it through', () => {
     const update = vi.fn((action: KeyValueStoreUpdateAction<Widget>) => action.payload);
 
-    runStory(
-      askKeyValueStoreUpdatePartialProperties<Widget, 'id', 'name'>('widgets', 'id', { id: 'w1', name: 'gear', count: 9 }, 'name'),
-      { [KeyValueStoreActionType.Update]: update },
-    );
+    runStory(askKeyValueStoreUpdatePartialProperties<Widget, 'id', 'name'>('widgets', 'id', { id: 'w1', name: 'gear', count: 9 }, 'name'), {
+      [KeyValueStoreActionType.Update]: update,
+    });
 
     const payload = update.mock.calls[0][0].payload;
     expect(payload.key).toBe('w1');

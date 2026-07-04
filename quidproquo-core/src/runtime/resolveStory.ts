@@ -35,8 +35,7 @@ export async function resolveStory<TArgs extends Array<any>>(
     decodedAccessToken: callerSession.decodedAccessToken,
     context: callerSession.context,
     localContext: callerSession.localContext,
-    functionGlobals:
-      qpqFunctionRuntimeInfo && isQpqFunctionRuntimeAdvanced(qpqFunctionRuntimeInfo) ? qpqFunctionRuntimeInfo.globals : undefined,
+    functionGlobals: qpqFunctionRuntimeInfo && isQpqFunctionRuntimeAdvanced(qpqFunctionRuntimeInfo) ? qpqFunctionRuntimeInfo.globals : undefined,
   };
 
   const updateSession: StorySessionUpdater = (newSession: Partial<StorySession>): void => {

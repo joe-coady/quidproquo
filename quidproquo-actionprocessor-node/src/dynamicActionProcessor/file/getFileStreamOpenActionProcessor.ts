@@ -30,10 +30,7 @@ async function* binaryStreamIterator(stream: Readable): AsyncIterableIterator<st
   }
 }
 
-const getProcessFileStreamOpen = (
-  qpqConfig: QPQConfig,
-  config: FileStorageConfig,
-): FileStreamOpenActionProcessor => {
+const getProcessFileStreamOpen = (qpqConfig: QPQConfig, config: FileStorageConfig): FileStreamOpenActionProcessor => {
   return async ({ drive, filepath, encoding, chunkSize }, session, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
     try {
       const fullPath = resolveFilePath(config, qpqConfig, drive, filepath);
@@ -54,10 +51,8 @@ const getProcessFileStreamOpen = (
   };
 };
 
-export const getFileStreamOpenActionProcessor = (
-  config: FileStorageConfig,
-): ActionProcessorListResolver => async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [FileActionType.StreamOpen]: getProcessFileStreamOpen(qpqConfig, config),
-});
+export const getFileStreamOpenActionProcessor =
+  (config: FileStorageConfig): ActionProcessorListResolver =>
+  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
+    [FileActionType.StreamOpen]: getProcessFileStreamOpen(qpqConfig, config),
+  });

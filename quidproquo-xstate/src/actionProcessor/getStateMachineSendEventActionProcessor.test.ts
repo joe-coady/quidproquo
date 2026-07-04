@@ -100,9 +100,13 @@ describe('getStateMachineSendEventActionProcessor', () => {
   it('returns the underlying store error', async () => {
     const processor = await getProcessor(buildTestQpqConfig(defineStateMachine('order', { config: toggleConfig })));
 
-    const [, error] = await invoke(processor, { stateMachineName: 'order', id: 'order-1', event: { type: 'TOGGLE' } }, {
-      [KeyValueStoreActionType.Get]: async () => actionResultError(ErrorTypeEnum.GenericError, 'kvs down'),
-    });
+    const [, error] = await invoke(
+      processor,
+      { stateMachineName: 'order', id: 'order-1', event: { type: 'TOGGLE' } },
+      {
+        [KeyValueStoreActionType.Get]: async () => actionResultError(ErrorTypeEnum.GenericError, 'kvs down'),
+      },
+    );
 
     expect(error?.errorText).toBe('kvs down');
   });
@@ -146,9 +150,10 @@ describe('getStateMachineSendEventActionProcessor', () => {
   it('allows a transition when its guard story returns true', async () => {
     const processor = await getProcessor(buildTestQpqConfig(defineStateMachine('order', { config: guardedConfig, guards: { canGo: 'rt' as any } })));
     const store = new Map<string, any>([['order-1', { id: 'order-1', __machineState: makeSnapshot(guardedConfig) }]]);
-    const loader = async () => function* canGo() {
-      return true;
-    };
+    const loader = async () =>
+      function* canGo() {
+        return true;
+      };
 
     const [entity] = await invoke(processor, { stateMachineName: 'order', id: 'order-1', event: { type: 'GO' } }, kvsStore(store), loader);
 
@@ -158,9 +163,10 @@ describe('getStateMachineSendEventActionProcessor', () => {
   it('blocks a transition when its guard story returns false', async () => {
     const processor = await getProcessor(buildTestQpqConfig(defineStateMachine('order', { config: guardedConfig, guards: { canGo: 'rt' as any } })));
     const store = new Map<string, any>([['order-1', { id: 'order-1', __machineState: makeSnapshot(guardedConfig) }]]);
-    const loader = async () => function* canGo() {
-      return false;
-    };
+    const loader = async () =>
+      function* canGo() {
+        return false;
+      };
 
     const [, error] = await invoke(processor, { stateMachineName: 'order', id: 'order-1', event: { type: 'GO' } }, kvsStore(store), loader);
 
@@ -170,9 +176,10 @@ describe('getStateMachineSendEventActionProcessor', () => {
   it('returns the error when a guard story fails', async () => {
     const processor = await getProcessor(buildTestQpqConfig(defineStateMachine('order', { config: guardedConfig, guards: { canGo: 'rt' as any } })));
     const store = new Map<string, any>([['order-1', { id: 'order-1', __machineState: makeSnapshot(guardedConfig) }]]);
-    const loader = async () => function* canGo() {
-      throw new Error('guard failed');
-    };
+    const loader = async () =>
+      function* canGo() {
+        throw new Error('guard failed');
+      };
 
     const [, error] = await invoke(processor, { stateMachineName: 'order', id: 'order-1', event: { type: 'GO' } }, kvsStore(store), loader);
 
@@ -183,9 +190,10 @@ describe('getStateMachineSendEventActionProcessor', () => {
     const processor = await getProcessor(buildTestQpqConfig(defineStateMachine('order', { config: actionConfig, actions: { notify: 'rt' as any } })));
     const store = new Map<string, any>([['order-1', { id: 'order-1', __machineState: makeSnapshot(actionConfig) }]]);
     let ran = 0;
-    const loader = async () => function* notify() {
-      ran++;
-    };
+    const loader = async () =>
+      function* notify() {
+        ran++;
+      };
 
     await invoke(processor, { stateMachineName: 'order', id: 'order-1', event: { type: 'GO' } }, kvsStore(store), loader);
 
@@ -195,9 +203,10 @@ describe('getStateMachineSendEventActionProcessor', () => {
   it('returns the error when a fired side-effect story fails', async () => {
     const processor = await getProcessor(buildTestQpqConfig(defineStateMachine('order', { config: actionConfig, actions: { notify: 'rt' as any } })));
     const store = new Map<string, any>([['order-1', { id: 'order-1', __machineState: makeSnapshot(actionConfig) }]]);
-    const loader = async () => function* notify() {
-      throw new Error('side effect failed');
-    };
+    const loader = async () =>
+      function* notify() {
+        throw new Error('side effect failed');
+      };
 
     const [, error] = await invoke(processor, { stateMachineName: 'order', id: 'order-1', event: { type: 'GO' } }, kvsStore(store), loader);
 
@@ -207,10 +216,14 @@ describe('getStateMachineSendEventActionProcessor', () => {
   it('returns the upsert error when persisting the new snapshot fails', async () => {
     const processor = await getProcessor(buildTestQpqConfig(defineStateMachine('order', { config: toggleConfig })));
 
-    const [, error] = await invoke(processor, { stateMachineName: 'order', id: 'order-1', event: { type: 'TOGGLE' } }, {
-      [KeyValueStoreActionType.Get]: async () => actionResult({ id: 'order-1', __machineState: makeSnapshot(toggleConfig) }),
-      [KeyValueStoreActionType.Upsert]: async () => actionResultError(ErrorTypeEnum.GenericError, 'upsert down'),
-    });
+    const [, error] = await invoke(
+      processor,
+      { stateMachineName: 'order', id: 'order-1', event: { type: 'TOGGLE' } },
+      {
+        [KeyValueStoreActionType.Get]: async () => actionResult({ id: 'order-1', __machineState: makeSnapshot(toggleConfig) }),
+        [KeyValueStoreActionType.Upsert]: async () => actionResultError(ErrorTypeEnum.GenericError, 'upsert down'),
+      },
+    );
 
     expect(error?.errorText).toBe('upsert down');
   });

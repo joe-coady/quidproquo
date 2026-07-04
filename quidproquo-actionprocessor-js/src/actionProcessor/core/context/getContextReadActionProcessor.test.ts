@@ -1,4 +1,4 @@
-import { buildTestQpqConfig, buildTestStorySession, ContextActionType, QpqContextIdentifier,resolveActionResult } from 'quidproquo-core';
+import { buildTestQpqConfig, buildTestStorySession, ContextActionType, QpqContextIdentifier, resolveActionResult } from 'quidproquo-core';
 
 import { describe, expect, it } from 'vitest';
 
@@ -12,7 +12,8 @@ const makeIdentifier = (overrides: Partial<QpqContextIdentifier<any>> = {}): Qpq
 });
 
 describe('getContextReadActionProcessor', () => {
-  const resolve = async () => (await getContextReadActionProcessor(buildTestQpqConfig(), async () => null))[ContextActionType.Read] as (p: any, ...rest: any[]) => Promise<any>;
+  const resolve = async () =>
+    (await getContextReadActionProcessor(buildTestQpqConfig(), async () => null))[ContextActionType.Read] as (p: any, ...rest: any[]) => Promise<any>;
 
   it('reads a value from the shared context', async () => {
     const processor = await resolve();

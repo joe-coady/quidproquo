@@ -33,7 +33,11 @@ describe('getEventBusSendMessagesActionProcessor', () => {
   it('publishes each message to the resolved sns topic arn', async () => {
     const processor = await resolveProcessor([defineEventBus('orders')]);
 
-    const result = await invokeProcessor(processor, { eventBusName: 'orders', eventBusMessages: [{ payload: { ok: true } }] }, { session: buildTestStorySession() });
+    const result = await invokeProcessor(
+      processor,
+      { eventBusName: 'orders', eventBusMessages: [{ payload: { ok: true } }] },
+      { session: buildTestStorySession() },
+    );
 
     expect(result).toEqual([undefined]);
     const [topicArn, region, bodies] = vi.mocked(publishMessage).mock.calls[0];

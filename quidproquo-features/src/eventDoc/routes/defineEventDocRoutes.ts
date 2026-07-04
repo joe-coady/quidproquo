@@ -46,8 +46,7 @@ export const defineEventDocRoutes = ({
   };
 
   if (routeAuthSettings?.userDirectoryName) {
-    globals[EVENT_DOC_USER_DIRECTORY_GLOBAL] =
-      routeAuthSettings.userDirectoryName;
+    globals[EVENT_DOC_USER_DIRECTORY_GLOBAL] = routeAuthSettings.userDirectoryName;
   }
 
   const options: RouteOptions = routeAuthSettings ? { routeAuthSettings } : {};
@@ -59,11 +58,7 @@ export const defineEventDocRoutes = ({
     globals,
   });
 
-  const route = (
-    method: HTTPMethod,
-    path: string,
-    functionName: string
-  ): QPQConfig =>
+  const route = (method: HTTPMethod, path: string, functionName: string): QPQConfig =>
     defineVersionedRoute(method, path, runtime(functionName), options, version);
 
   return [

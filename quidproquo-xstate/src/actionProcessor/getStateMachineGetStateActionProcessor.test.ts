@@ -56,9 +56,17 @@ const getProcessor = async (config: QPQConfig) => {
 };
 
 const invokeWith = (processor: ActionProcessor<any, any>, payload: any, entity: any) =>
-  processor(payload, session, buildActionProcessorList({
-    [KeyValueStoreActionType.Get]: async () => actionResult(entity),
-  }), logger, updateSession, noopDynamicModuleLoader, undefined as any);
+  processor(
+    payload,
+    session,
+    buildActionProcessorList({
+      [KeyValueStoreActionType.Get]: async () => actionResult(entity),
+    }),
+    logger,
+    updateSession,
+    noopDynamicModuleLoader,
+    undefined as any,
+  );
 
 const orderConfig = (machineConfig: any) => buildTestQpqConfig(defineStateMachine('order', { config: machineConfig }));
 
@@ -76,9 +84,17 @@ describe('getStateMachineGetStateActionProcessor', () => {
     const processors = await getStateMachineGetStateActionProcessor(config, noopDynamicModuleLoader);
     const processor = processors[StateMachineActionType.GetState];
 
-    const [, error] = await processor({ stateMachineName: 'order', id: 'order-1' }, session, buildActionProcessorList({
-      [KeyValueStoreActionType.Get]: async () => actionResultError(ErrorTypeEnum.GenericError, 'kvs down'),
-    }), logger, updateSession, noopDynamicModuleLoader, undefined as any);
+    const [, error] = await processor(
+      { stateMachineName: 'order', id: 'order-1' },
+      session,
+      buildActionProcessorList({
+        [KeyValueStoreActionType.Get]: async () => actionResultError(ErrorTypeEnum.GenericError, 'kvs down'),
+      }),
+      logger,
+      updateSession,
+      noopDynamicModuleLoader,
+      undefined as any,
+    );
 
     expect(error?.errorText).toBe('kvs down');
   });

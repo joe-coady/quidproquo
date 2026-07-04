@@ -17,49 +17,49 @@ const ensureParentDirectoryExists = async (filePath: string): Promise<void> => {
 export const fileStorageImplementation = async (devServerConfig: ResolvedDevServerConfig) => {
   const app: Express = express();
   const upload = multer({ storage: multer.memoryStorage() });
-  
+
   const port = devServerConfig.fileStorageConfig.secureUrlPort;
-  
+
   console.log(`Starting QPQ File Storage Server on port ${port}`);
-  
+
   // CORS headers for all endpoints
   app.use((req, res, next) => {
     res.header('Access-Control-Allow-Headers', '*');
     res.header('Access-Control-Allow-Methods', '*');
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Credentials', 'false');
-    
+
     // Handle OPTIONS preflight requests
     if (req.method === 'OPTIONS') {
       res.sendStatus(200);
       return;
     }
-    
+
     next();
   });
-  
+
   // Health check endpoint
   app.get('/health', (req: Request, res: Response) => {
     res.json({ status: 'ok', service: 'qpq-file-storage' });
   });
-  
+
   // Secure download endpoint
   app.get('/secure-download', async (req: Request, res: Response): Promise<void> => {
     try {
       const token = req.query.token as string;
-      
+
       if (!token) {
         res.status(400).json({ error: 'Missing token parameter' });
         return;
       }
-      
+
       const tokenData = verifySecureUrlToken(token, devServerConfig.fileStorageConfig.secureUrlSecret);
-      
+
       if (!tokenData) {
         res.status(401).json({ error: 'Invalid or expired token' });
         return;
       }
-      
+
       if (tokenData.operation !== 'download') {
         res.status(403).json({ error: 'Invalid token operation' });
         return;
@@ -70,7 +70,7 @@ export const fileStorageImplementation = async (devServerConfig: ResolvedDevServ
       try {
         // Check if file exists
         await fs.access(tokenData.fullFilepath);
-        
+
         // Mirror real S3: serve the object's stored mimetype + content-disposition (written as a
         // sidecar by the binary-write processor) so e.g. a PDF renders inline instead of force-
         // downloading. No sidecar → fall back to the generic attachment download.
@@ -78,9 +78,7 @@ export const fileStorageImplementation = async (devServerConfig: ResolvedDevServ
         let contentDisposition = `attachment; filename="${filename}"`;
         let contentType: string | undefined;
         try {
-          const meta = JSON.parse(
-            await fs.readFile(`${tokenData.fullFilepath}.qpqmeta.json`, 'utf8')
-          );
+          const meta = JSON.parse(await fs.readFile(`${tokenData.fullFilepath}.qpqmeta.json`, 'utf8'));
           if (meta.mimetype) {
             contentType = meta.mimetype;
           }
@@ -113,12 +111,8 @@ export const fileStorageImplementation = async (devServerConfig: ResolvedDevServ
       res.status(500).json({ error: 'Internal server error' });
     }
   });
-  
-  const writeUploadFromToken = async (
-    token: string | undefined,
-    buffer: Buffer | undefined,
-    res: Response
-  ): Promise<void> => {
+
+  const writeUploadFromToken = async (token: string | undefined, buffer: Buffer | undefined, res: Response): Promise<void> => {
     if (!token) {
       console.log('Upload attempt with missing token');
       res.status(400).json({ error: 'Missing token parameter' });
@@ -154,23 +148,19 @@ export const fileStorageImplementation = async (devServerConfig: ResolvedDevServ
       success: true,
       message: 'File uploaded successfully',
       filepath: tokenData.fullFilepath,
-      size: buffer.length
+      size: buffer.length,
     });
   };
 
   // Secure upload endpoint — PUT with raw body (matches S3 presigned PUT contract)
-  app.put(
-    '/secure-upload',
-    express.raw({ type: '*/*', limit: '500mb' }),
-    async (req: Request, res: Response): Promise<void> => {
-      try {
-        await writeUploadFromToken(req.query.token as string, req.body, res);
-      } catch (error) {
-        console.error('Error in secure-upload (PUT):', error);
-        res.status(500).json({ error: 'Internal server error' });
-      }
+  app.put('/secure-upload', express.raw({ type: '*/*', limit: '500mb' }), async (req: Request, res: Response): Promise<void> => {
+    try {
+      await writeUploadFromToken(req.query.token as string, req.body, res);
+    } catch (error) {
+      console.error('Error in secure-upload (PUT):', error);
+      res.status(500).json({ error: 'Internal server error' });
     }
-  );
+  });
 
   // Secure upload endpoint — legacy POST + multipart (kept for backwards compatibility)
   app.post('/secure-upload', upload.single('file'), async (req: Request, res: Response): Promise<void> => {
@@ -185,7 +175,7 @@ export const fileStorageImplementation = async (devServerConfig: ResolvedDevServ
       res.status(500).json({ error: 'Internal server error' });
     }
   });
-  
+
   // Start the server
   app.listen(port, () => {
     const fullStoragePath = path.join(devServerConfig.runtimePath, devServerConfig.fileStorageConfig.storagePath);

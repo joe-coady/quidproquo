@@ -119,8 +119,6 @@ describe('askProcessOnAuthenticate', () => {
     expect(upsert.payload.item).toEqual({ ...connection, userId: 'u1', accessToken: 'token-1' });
     expect(sends).toEqual([WebSocketQueueServerMessageEventType.Authenticated]);
     expect(broadcast.payload.eventBusName).toBe('event-bus');
-    expect(broadcast.payload.eventBusMessages).toEqual([
-      { type: WebSocketQueueClientMessageEventType.Authenticate, payload: {} },
-    ]);
+    expect(broadcast.payload.eventBusMessages).toEqual([{ type: WebSocketQueueClientMessageEventType.Authenticate, payload: {} }]);
   });
 });

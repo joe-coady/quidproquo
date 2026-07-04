@@ -36,10 +36,9 @@ const getProcessStateMachineSendEvent = (qpqConfig: QPQConfig): StateMachineSend
 
     // Load entity from KVS
     let entity: Record<string, any> | undefined;
-    const getResult = await resolveStory(
-      function* () { return yield* askKeyValueStoreGet<Record<string, any>>(smConfig.keyValueStoreName, payload.id); },
-      [],
-    );
+    const getResult = await resolveStory(function* () {
+      return yield* askKeyValueStoreGet<Record<string, any>>(smConfig.keyValueStoreName, payload.id);
+    }, []);
     if (getResult.error) {
       return actionResultError(getResult.error.errorType, getResult.error.errorText);
     }
@@ -105,10 +104,9 @@ const getProcessStateMachineSendEvent = (qpqConfig: QPQConfig): StateMachineSend
 
     // Persist new snapshot
     entity[smConfig.stateField] = newSnapshot;
-    const upsertResult = await resolveStory(
-      function* () { yield* askKeyValueStoreUpsert(smConfig.keyValueStoreName, entity); },
-      [],
-    );
+    const upsertResult = await resolveStory(function* () {
+      yield* askKeyValueStoreUpsert(smConfig.keyValueStoreName, entity);
+    }, []);
     if (upsertResult.error) {
       return actionResultError(upsertResult.error.errorType, upsertResult.error.errorText);
     }

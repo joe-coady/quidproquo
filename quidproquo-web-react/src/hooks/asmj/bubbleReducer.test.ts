@@ -7,8 +7,7 @@ import { createQpqRuntimeDefinition } from './createQpqRuntimeDefinition';
 
 type State = { count: number };
 
-const buildRuntime = (reducer: QpqBubbleReducer<State, any>) =>
-  createQpqRuntimeDefinition<State, any, {}>({}, { count: 0 }, reducer);
+const buildRuntime = (reducer: QpqBubbleReducer<State, any>) => createQpqRuntimeDefinition<State, any, {}>({}, { count: 0 }, reducer);
 
 describe('useQpqRuntimeBubblingReducer', () => {
   it('updates the runtime state when the reducer prevents bubbling', () => {

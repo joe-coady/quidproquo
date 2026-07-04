@@ -1,4 +1,13 @@
-import { AiModel, defineAi, defineKeyValueStore, defineQueue, defineStorageDrive, QPQConfig, QpqFunctionRuntimeAdvanced, QpqQueueProcessors } from 'quidproquo-core';
+import {
+  AiModel,
+  defineAi,
+  defineKeyValueStore,
+  defineQueue,
+  defineStorageDrive,
+  QPQConfig,
+  QpqFunctionRuntimeAdvanced,
+  QpqQueueProcessors,
+} from 'quidproquo-core';
 
 import {
   EVENT_DOC_EVENT_VALIDATOR_GLOBAL,
@@ -81,8 +90,7 @@ export const defineEventDocAi = ({
     globals,
   });
 
-  const processorKey = (method: string): string =>
-    `qpq/serviceRequest/${serviceName}/${buildEventDocAiMethodName(type, method)}`;
+  const processorKey = (method: string): string => `qpq/serviceRequest/${serviceName}/${buildEventDocAiMethodName(type, method)}`;
 
   const processors: QpqQueueProcessors = {
     [processorKey(EVENT_DOC_AI_METHOD_CHAT_CREATE)]: runtime('onChatCreate'),
@@ -92,9 +100,7 @@ export const defineEventDocAi = ({
   };
 
   return [
-    defineKeyValueStore<EventDocAiChatSummary>(chatListStore, 'docId', [
-      'chatId',
-    ]),
+    defineKeyValueStore<EventDocAiChatSummary>(chatListStore, 'docId', ['chatId']),
     defineStorageDrive(chatDrive),
     defineAi(aiName, { tools }),
     defineQueue(eventDocAiQueueName(storeName), processors, {

@@ -5,7 +5,10 @@ import { AuthChallengeMfaSetupEffect } from './authChallengeTypes';
 
 describe('authChallengeMfaSetupReducer', () => {
   it('sets the mfa code', () => {
-    const [state] = authChallengeMfaSetupReducer(authChallengeMfaSetupInitalState, { type: AuthChallengeMfaSetupEffect.SetMfaCode, payload: '123456' });
+    const [state] = authChallengeMfaSetupReducer(authChallengeMfaSetupInitalState, {
+      type: AuthChallengeMfaSetupEffect.SetMfaCode,
+      payload: '123456',
+    });
 
     expect(state.mfaCode).toBe('123456');
   });

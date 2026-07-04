@@ -15,10 +15,7 @@ describe('askSendLogToAdmins', () => {
 
     runStory(askSendLogToAdmins(log), {
       [KeyValueStoreActionType.Scan]: {
-        items: [
-          { id: 'c1', userId: 'u1' },
-          { id: 'c2' },
-        ],
+        items: [{ id: 'c1', userId: 'u1' }, { id: 'c2' }],
         nextPageKey: undefined,
       },
       [WebsocketActionType.SendMessage]: (action: Action<any>) => {

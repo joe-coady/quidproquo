@@ -42,7 +42,7 @@ export const LogDetailsTab: React.FC<LogDetailsTabProps> = ({
           label="Order by Duration"
         />
       </div>
-      <LogDetails log={log.log} hideFastActions={hideFastActions} orderByDuration={orderByDuration} />
+      <LogDetails hideFastActions={hideFastActions} log={log.log} orderByDuration={orderByDuration} />
     </div>
   );
 };

@@ -24,12 +24,7 @@ export function resolveDriveServiceName(drive: string, qpqConfig: QPQConfig): st
   return storageDrive?.owner?.module ?? qpqCoreUtils.getApplicationModuleName(qpqConfig);
 }
 
-export function resolveFilePath(
-  fileStorageConfig: FileStorageConfig,
-  qpqConfig: QPQConfig,
-  drive: string,
-  filepath: string
-): string {
+export function resolveFilePath(fileStorageConfig: FileStorageConfig, qpqConfig: QPQConfig, drive: string, filepath: string): string {
   const service = resolveDriveServiceName(drive, qpqConfig);
   const root = path.resolve(fileStorageConfig.storagePath, service, drive);
 
@@ -57,7 +52,6 @@ export function resolveFilePath(
 
   throw new Error('Invalid file path: escapes drive root.');
 }
-
 
 // Ensure a directory exists
 export const ensureDirectoryExists = async (dirPath: string): Promise<void> => {

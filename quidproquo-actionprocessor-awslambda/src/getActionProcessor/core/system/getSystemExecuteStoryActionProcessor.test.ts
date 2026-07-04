@@ -21,7 +21,11 @@ describe('getSystemExecuteStoryActionProcessor', () => {
     const processor = await resolveProcessor();
     const loader = vi.fn().mockResolvedValue(null);
 
-    const [, error] = await invokeProcessor(processor, { runtime: 'a/b::fn', params: [] }, { session: buildTestStorySession(), logger: createStubLogger(), updateSession: vi.fn(), dynamicModuleLoader: loader });
+    const [, error] = await invokeProcessor(
+      processor,
+      { runtime: 'a/b::fn', params: [] },
+      { session: buildTestStorySession(), logger: createStubLogger(), updateSession: vi.fn(), dynamicModuleLoader: loader },
+    );
 
     expect(error?.errorType).toBe(ErrorTypeEnum.NotFound);
   });
@@ -33,7 +37,11 @@ describe('getSystemExecuteStoryActionProcessor', () => {
     };
     const loader = vi.fn().mockResolvedValue(story);
 
-    const result = await invokeProcessor(processor, { runtime: 'a/b::fn', params: [] }, { session: buildTestStorySession(), logger: createStubLogger(), updateSession: vi.fn(), dynamicModuleLoader: loader });
+    const result = await invokeProcessor(
+      processor,
+      { runtime: 'a/b::fn', params: [] },
+      { session: buildTestStorySession(), logger: createStubLogger(), updateSession: vi.fn(), dynamicModuleLoader: loader },
+    );
 
     expect(result).toEqual(['done']);
   });

@@ -5,13 +5,8 @@ import type { EventDocAiChatMessage } from '../models';
 import { EventDocAiChatHistoryFile } from '../types/EventDocAiChatHistoryFile';
 import { eventDocAiChatHistoryPath } from './eventDocAiChatHistoryPath';
 
-export function* askEventDocAiChatHistoryLoad(
-  docId: string,
-  chatId: string
-): AskResponse<EventDocAiChatMessage[]> {
-  const drive = yield* askConfigGetGlobal<string>(
-    EVENT_DOC_AI_CHAT_DRIVE_GLOBAL
-  );
+export function* askEventDocAiChatHistoryLoad(docId: string, chatId: string): AskResponse<EventDocAiChatMessage[]> {
+  const drive = yield* askConfigGetGlobal<string>(EVENT_DOC_AI_CHAT_DRIVE_GLOBAL);
   const path = eventDocAiChatHistoryPath(docId, chatId);
 
   const exists = yield* askFileExists(drive, path);
@@ -19,10 +14,7 @@ export function* askEventDocAiChatHistoryLoad(
     return [];
   }
 
-  const file = yield* askFileReadObjectJson<EventDocAiChatHistoryFile>(
-    drive,
-    path
-  );
+  const file = yield* askFileReadObjectJson<EventDocAiChatHistoryFile>(drive, path);
 
   return file.messages;
 }

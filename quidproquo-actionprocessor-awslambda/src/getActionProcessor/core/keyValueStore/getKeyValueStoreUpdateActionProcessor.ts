@@ -1,6 +1,13 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import { ActionProcessorList, ActionProcessorListResolver, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
-import { actionResult, actionResultError, actionResultErrorFromCaughtError, KeyValueStoreActionType, KeyValueStoreUpdateActionProcessor, KeyValueStoreUpdateErrorTypeEnum } from 'quidproquo-core';
+import {
+  actionResult,
+  actionResultError,
+  actionResultErrorFromCaughtError,
+  KeyValueStoreActionType,
+  KeyValueStoreUpdateActionProcessor,
+  KeyValueStoreUpdateErrorTypeEnum,
+} from 'quidproquo-core';
 
 import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
 import { updateItem } from '../../../logic/dynamo';

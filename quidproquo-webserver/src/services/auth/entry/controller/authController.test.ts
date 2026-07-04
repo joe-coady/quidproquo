@@ -3,7 +3,15 @@ import { Action, AuthenticateUserChallenge, ConfigActionType, runStory, UserDire
 import { describe, expect, it } from 'vitest';
 
 import { HTTPEvent } from '../../../../types';
-import { associateSoftwareToken, changePassword, confirmForgotPassword, forgotPassword, login, refreshToken, respondToAuthChallenge } from './authController';
+import {
+  associateSoftwareToken,
+  changePassword,
+  confirmForgotPassword,
+  forgotPassword,
+  login,
+  refreshToken,
+  respondToAuthChallenge,
+} from './authController';
 
 const jsonEvent = (body: unknown, headers: HTTPEvent['headers'] = {}): HTTPEvent =>
   ({
@@ -116,19 +124,22 @@ describe('respondToAuthChallenge', () => {
       { email: 'a@b.com', session: 's', challenge: AuthenticateUserChallenge.MFA_SETUP, mfaCode: '123' },
       { challenge: AuthenticateUserChallenge.MFA_SETUP, username: 'a@b.com', session: 's', mfaCode: '123' },
     ],
-  ])('maps the %s wire payload onto the core auth challenge', (_challenge: AuthenticateUserChallenge, payload: unknown, expectedChallenge: unknown) => {
-    let captured: Action<any> | undefined;
+  ])(
+    'maps the %s wire payload onto the core auth challenge',
+    (_challenge: AuthenticateUserChallenge, payload: unknown, expectedChallenge: unknown) => {
+      let captured: Action<any> | undefined;
 
-    runStory(respondToAuthChallenge(jsonEvent(payload)), {
-      [ConfigActionType.GetGlobal]: 'my-directory',
-      [UserDirectoryActionType.RespondToAuthChallenge]: (action: Action<any>) => {
-        captured = action;
-        return { challenge: AuthenticateUserChallenge.NONE };
-      },
-    });
+      runStory(respondToAuthChallenge(jsonEvent(payload)), {
+        [ConfigActionType.GetGlobal]: 'my-directory',
+        [UserDirectoryActionType.RespondToAuthChallenge]: (action: Action<any>) => {
+          captured = action;
+          return { challenge: AuthenticateUserChallenge.NONE };
+        },
+      });
 
-    expect(captured?.payload.authChallenge).toEqual(expectedChallenge);
-  });
+      expect(captured?.payload.authChallenge).toEqual(expectedChallenge);
+    },
+  );
 
   it('throws for an unsupported challenge type', () => {
     expect(() => runStory(respondToAuthChallenge(jsonEvent({ email: 'a@b.com', session: 's', challenge: AuthenticateUserChallenge.NONE })))).toThrow(

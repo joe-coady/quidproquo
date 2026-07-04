@@ -89,7 +89,15 @@ const getProcessExecuteStory = <T extends Array<any>, R>(qpqConfig: QPQConfig): 
     }
 
     try {
-      const qpqPromisifyRuntime: QpqPromisifyRuntime = [payload, session, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry];
+      const qpqPromisifyRuntime: QpqPromisifyRuntime = [
+        payload,
+        session,
+        actionProcessors,
+        logger,
+        updateSession,
+        dynamicModuleLoader,
+        streamRegistry,
+      ];
       const result = await story(...payload.params, getRun(qpqPromisifyRuntime));
 
       return actionResult<R>(result);

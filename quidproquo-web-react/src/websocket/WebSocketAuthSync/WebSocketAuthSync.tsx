@@ -16,11 +16,7 @@ const component: React.FC<WebSocketAuthSyncProps> = ({ children, accessToken }) 
   // Keep the active websocket alive
   useWebsocketPingPong();
 
-  return (
-    <WebSocketAuthContext.Provider value={isAuthenticated}>
-      {children}
-    </WebSocketAuthContext.Provider>
-  );
+  return <WebSocketAuthContext.Provider value={isAuthenticated}>{children}</WebSocketAuthContext.Provider>;
 };
 
 export const WebSocketAuthSync = memo(component);

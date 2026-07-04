@@ -38,19 +38,22 @@ describe('cognito/customMessage getEventGetRecordsActionProcessor', () => {
     ['CustomMessage_ForgotPassword', undefined, EmailSendEventType.ResetPasswordAdmin],
     ['CustomMessage_VerifyUserAttribute', undefined, EmailSendEventType.VerifyEmail],
     ['CustomMessage_SignUp', undefined, EmailSendEventType.VerifyEmail],
-  ])('maps triggerSource %s to the right email event type', async (triggerSource: string, clientMetadata: Record<string, string> | undefined, expected: EmailSendEventType) => {
-    const processor = await resolveEventProcessor(getEventGetRecordsActionProcessor, EventActionType.GetRecords);
+  ])(
+    'maps triggerSource %s to the right email event type',
+    async (triggerSource: string, clientMetadata: Record<string, string> | undefined, expected: EmailSendEventType) => {
+      const processor = await resolveEventProcessor(getEventGetRecordsActionProcessor, EventActionType.GetRecords);
 
-    const [records] = await processor({ eventParams: [buildTriggerEvent(triggerSource, clientMetadata), {}] });
+      const [records] = await processor({ eventParams: [buildTriggerEvent(triggerSource, clientMetadata), {}] });
 
-    expect((records as any[])[0]).toEqual({
-      eventType: expected,
-      code: 'CODE',
-      link: 'LINK',
-      attributes: { email: 'a@b.com' },
-      username: 'USER',
-    });
-  });
+      expect((records as any[])[0]).toEqual({
+        eventType: expected,
+        code: 'CODE',
+        link: 'LINK',
+        attributes: { email: 'a@b.com' },
+        username: 'USER',
+      });
+    },
+  );
 });
 
 describe('cognito/customMessage getEventMatchStoryActionProcessor', () => {

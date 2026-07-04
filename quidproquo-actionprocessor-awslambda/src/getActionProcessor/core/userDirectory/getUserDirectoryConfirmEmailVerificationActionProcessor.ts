@@ -23,9 +23,12 @@ const getProcessConfirmEmailVerification = (qpqConfig: QPQConfig): UserDirectory
       return actionResult(void 0);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        CodeMismatchException: () => actionResultError(UserDirectoryConfirmEmailVerificationErrorTypeEnum.InvalidCode, 'Verification code is incorrect'),
-        ExpiredCodeException: () => actionResultError(UserDirectoryConfirmEmailVerificationErrorTypeEnum.ExpiredCode, 'Verification code has expired'),
-        LimitExceededException: () => actionResultError(UserDirectoryConfirmEmailVerificationErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
+        CodeMismatchException: () =>
+          actionResultError(UserDirectoryConfirmEmailVerificationErrorTypeEnum.InvalidCode, 'Verification code is incorrect'),
+        ExpiredCodeException: () =>
+          actionResultError(UserDirectoryConfirmEmailVerificationErrorTypeEnum.ExpiredCode, 'Verification code has expired'),
+        LimitExceededException: () =>
+          actionResultError(UserDirectoryConfirmEmailVerificationErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
       });
     }
   };

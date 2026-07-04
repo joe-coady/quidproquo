@@ -1,6 +1,13 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import { ActionProcessorList, ActionProcessorListResolver, QPQConfig } from 'quidproquo-core';
-import { actionResult, actionResultError, actionResultErrorFromCaughtError, FileActionType, FileDeleteActionProcessor, FileDeleteErrorTypeEnum } from 'quidproquo-core';
+import {
+  actionResult,
+  actionResultError,
+  actionResultErrorFromCaughtError,
+  FileActionType,
+  FileDeleteActionProcessor,
+  FileDeleteErrorTypeEnum,
+} from 'quidproquo-core';
 
 import { deleteFiles } from '../../../logic/s3/s3Utils';
 import { resolveStorageDriveBucketName } from './utils';

@@ -7,9 +7,6 @@ import { buildEventDocStore, EventDocStoreOptions } from './buildEventDocStore';
 // CUSTOM route — one outside `defineEventDocRoutes`, which has no per-route globals — can
 // call the generic `askEventDocEvent*` / `askEventDocGetByIdOrThrow` data functions. The
 // hand-written counterpart to `askEventDocProvideStoreFromGlobals`.
-export function* askEventDocProvideStore<T>(
-  options: EventDocStoreOptions,
-  story: AskResponse<T>
-): AskResponse<T> {
+export function* askEventDocProvideStore<T>(options: EventDocStoreOptions, story: AskResponse<T>): AskResponse<T> {
   return yield* askEventDocStoreProvide(buildEventDocStore(options), story);
 }

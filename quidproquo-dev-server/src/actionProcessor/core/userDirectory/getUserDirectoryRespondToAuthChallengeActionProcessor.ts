@@ -29,10 +29,8 @@ const getProcessRespondToAuthChallenge = (
   };
 };
 
-export const getUserDirectoryRespondToAuthChallengeActionProcessor = (
-  devServerConfig: ResolvedDevServerConfig,
-): ActionProcessorListResolver => async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [UserDirectoryActionType.RespondToAuthChallenge]: getProcessRespondToAuthChallenge(qpqConfig, devServerConfig),
-});
+export const getUserDirectoryRespondToAuthChallengeActionProcessor =
+  (devServerConfig: ResolvedDevServerConfig): ActionProcessorListResolver =>
+  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
+    [UserDirectoryActionType.RespondToAuthChallenge]: getProcessRespondToAuthChallenge(qpqConfig, devServerConfig),
+  });

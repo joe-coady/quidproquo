@@ -21,8 +21,6 @@ describe('askSetParam', () => {
     });
 
     expect(setPayloads).toEqual([{ key: 'tab', values: ['one', 'two'], createHistoryEntry: false }]);
-    expect(dispatched).toEqual([
-      { type: SharedQueryParamsEffect.SetParam, payload: { key: 'tab', values: ['one', 'two'] } },
-    ]);
+    expect(dispatched).toEqual([{ type: SharedQueryParamsEffect.SetParam, payload: { key: 'tab', values: ['one', 'two'] } }]);
   });
 });

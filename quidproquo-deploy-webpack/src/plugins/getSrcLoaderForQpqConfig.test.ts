@@ -34,9 +34,7 @@ describe('getSrcLoaderForQpqConfig', () => {
   });
 
   it('compares basePath, relativePath and functionName for an advanced src entry', () => {
-    const config = buildTestQpqConfig([
-      defineInlineFunction({ basePath: '/abs/base', relativePath: 'src/handler.ts', functionName: 'handler' }),
-    ]);
+    const config = buildTestQpqConfig([defineInlineFunction({ basePath: '/abs/base', relativePath: 'src/handler.ts', functionName: 'handler' })]);
 
     const src = getSrcLoaderForQpqConfig(config, 'runtime');
 

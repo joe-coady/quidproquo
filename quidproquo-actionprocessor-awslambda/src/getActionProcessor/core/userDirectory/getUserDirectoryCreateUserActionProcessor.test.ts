@@ -19,8 +19,7 @@ const resolveProcessor = async () => {
   return processors[UserDirectoryActionType.CreateUser];
 };
 
-const invoke = (processor: any) =>
-  invokeProcessor(processor, { userDirectoryName: 'users', createUserRequest: { email: 'a@b.com' } });
+const invoke = (processor: any) => invokeProcessor(processor, { userDirectoryName: 'users', createUserRequest: { email: 'a@b.com' } });
 
 describe('getUserDirectoryCreateUserActionProcessor', () => {
   beforeEach(() => {

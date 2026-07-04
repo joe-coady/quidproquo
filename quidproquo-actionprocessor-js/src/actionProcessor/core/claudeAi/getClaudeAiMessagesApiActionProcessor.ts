@@ -47,7 +47,10 @@ const getProcessMessagesApi = (qpqConfig: QPQConfig): ClaudeAiMessagesApiActionP
       }
 
       console.log(error);
-      return actionResultError(ErrorTypeEnum.GenericError, error instanceof Error ? error.message : 'An error occurred while processing your request.');
+      return actionResultError(
+        ErrorTypeEnum.GenericError,
+        error instanceof Error ? error.message : 'An error occurred while processing your request.',
+      );
     }
   };
 };

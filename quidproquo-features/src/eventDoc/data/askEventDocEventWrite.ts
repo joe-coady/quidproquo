@@ -9,15 +9,8 @@ import { eventDocEventToStoredEvent } from './storedEvent/eventDocEventToStoredE
 // computed the same index gets ErrorTypeEnum.Conflict instead of silently
 // overwriting the event. Ordering, index assignment, validation and the
 // conflict-retry live in the logic layer (askEventDocEventAppend).
-export function* askEventDocEventWrite(
-  modelId: string,
-  event: EventDocEvent
-): AskResponse<void> {
+export function* askEventDocEventWrite(modelId: string, event: EventDocEvent): AskResponse<void> {
   const { eventsStoreName } = yield* askEventDocResolveStore();
 
-  yield* askKeyValueStoreUpsertWithRetry(
-    eventsStoreName,
-    eventDocEventToStoredEvent(modelId, event),
-    { ifNotExists: true }
-  );
+  yield* askKeyValueStoreUpsertWithRetry(eventsStoreName, eventDocEventToStoredEvent(modelId, event), { ifNotExists: true });
 }

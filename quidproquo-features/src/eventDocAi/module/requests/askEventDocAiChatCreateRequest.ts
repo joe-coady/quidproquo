@@ -4,11 +4,6 @@ import type { EventDocAiChatCreatePayload, EventDocAiChatSummary } from '../../m
 import { EVENT_DOC_AI_METHOD_CHAT_CREATE } from '../constants/eventDocAiMethodNames';
 import { askEventDocAiServiceRequest } from '../logic/askEventDocAiServiceRequest';
 
-export function* askEventDocAiChatCreateRequest(
-  payload: EventDocAiChatCreatePayload = {}
-): AskResponse<EventDocAiChatSummary> {
-  return yield* askEventDocAiServiceRequest<
-    EventDocAiChatCreatePayload,
-    EventDocAiChatSummary
-  >(EVENT_DOC_AI_METHOD_CHAT_CREATE, payload);
+export function* askEventDocAiChatCreateRequest(payload: EventDocAiChatCreatePayload = {}): AskResponse<EventDocAiChatSummary> {
+  return yield* askEventDocAiServiceRequest<EventDocAiChatCreatePayload, EventDocAiChatSummary>(EVENT_DOC_AI_METHOD_CHAT_CREATE, payload);
 }

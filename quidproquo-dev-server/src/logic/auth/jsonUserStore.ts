@@ -43,11 +43,7 @@ export const upsertDevUser = async (
   return user;
 };
 
-export const getDevUserByUserId = async (
-  runtimePath: string,
-  userDirectory: DevUserDirectory,
-  userId: string,
-): Promise<UserAttributes | null> => {
+export const getDevUserByUserId = async (runtimePath: string, userDirectory: DevUserDirectory, userId: string): Promise<UserAttributes | null> => {
   const users = await readUsers(runtimePath, userDirectory);
 
   return users[userId] || null;

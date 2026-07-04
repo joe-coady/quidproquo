@@ -1,3 +1,4 @@
+export * from './EventDocAiAttachment';
 export * from './EventDocAiChatCreatePayload';
 export * from './EventDocAiChatHistoryPayload';
 export * from './EventDocAiChatListPayload';

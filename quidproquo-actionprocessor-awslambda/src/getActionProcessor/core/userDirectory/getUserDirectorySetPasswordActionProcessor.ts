@@ -31,9 +31,12 @@ const getProcessSetPassword = (qpqConfig: QPQConfig): UserDirectorySetPasswordAc
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         UserNotFoundException: () => actionResultError(UserDirectorySetPasswordErrorTypeEnum.UserNotFound, 'No account found for this user'),
-        InvalidPasswordException: () => actionResultError(UserDirectorySetPasswordErrorTypeEnum.InvalidNewPassword, 'Password does not meet the password policy'),
-        LimitExceededException: () => actionResultError(UserDirectorySetPasswordErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
-        TooManyRequestsException: () => actionResultError(UserDirectorySetPasswordErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
+        InvalidPasswordException: () =>
+          actionResultError(UserDirectorySetPasswordErrorTypeEnum.InvalidNewPassword, 'Password does not meet the password policy'),
+        LimitExceededException: () =>
+          actionResultError(UserDirectorySetPasswordErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
+        TooManyRequestsException: () =>
+          actionResultError(UserDirectorySetPasswordErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
       });
     }
   };

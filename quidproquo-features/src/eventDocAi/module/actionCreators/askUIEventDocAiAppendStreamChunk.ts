@@ -3,11 +3,6 @@ import { type AiStreamPart, AskResponse, askStateDispatchEffect } from 'quidproq
 import type { EventDocAiAppendStreamChunkEffect } from '../effects/EventDocAiAppendStreamChunkEffect';
 import { EventDocAiEffect } from '../effects/EventDocAiEffect';
 
-export function* askUIEventDocAiAppendStreamChunk(
-  part: AiStreamPart
-): AskResponse<void> {
-  yield* askStateDispatchEffect<EventDocAiAppendStreamChunkEffect>(
-    EventDocAiEffect.AppendStreamChunk,
-    { part }
-  );
+export function* askUIEventDocAiAppendStreamChunk(part: AiStreamPart): AskResponse<void> {
+  yield* askStateDispatchEffect<EventDocAiAppendStreamChunkEffect>(EventDocAiEffect.AppendStreamChunk, { part });
 }

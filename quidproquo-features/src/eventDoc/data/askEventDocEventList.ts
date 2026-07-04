@@ -14,29 +14,17 @@ export type EventDocEventListOptions = {
   afterIndex?: number;
 };
 
-export function* askEventDocEventList(
-  modelId: string,
-  options?: EventDocEventListOptions
-): AskResponse<QpqPagedData<EventDocEvent>> {
+export function* askEventDocEventList(modelId: string, options?: EventDocEventListOptions): AskResponse<QpqPagedData<EventDocEvent>> {
   const { eventsStoreName } = yield* askEventDocResolveStore();
 
   const keyCondition =
-    options?.afterIndex !== undefined
-      ? kvsAnd([
-          kvsEqual('pk', modelId),
-          kvsGreaterThan('sk', options.afterIndex),
-        ])
-      : kvsEqual('pk', modelId);
+    options?.afterIndex !== undefined ? kvsAnd([kvsEqual('pk', modelId), kvsGreaterThan('sk', options.afterIndex)]) : kvsEqual('pk', modelId);
 
-  const page = yield* askKeyValueStoreQuery<EventDocStoredEvent>(
-    eventsStoreName,
-    keyCondition,
-    {
-      sortAscending: true,
-      limit: options?.limit,
-      nextPageKey: options?.nextPageKey,
-    }
-  );
+  const page = yield* askKeyValueStoreQuery<EventDocStoredEvent>(eventsStoreName, keyCondition, {
+    sortAscending: true,
+    limit: options?.limit,
+    nextPageKey: options?.nextPageKey,
+  });
 
   return {
     nextPageKey: page.nextPageKey,

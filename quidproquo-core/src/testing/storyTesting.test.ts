@@ -66,10 +66,12 @@ describe('runStory', () => {
       return yield* askRunParallel([askRandomNumber(), askDateNow()]);
     }
 
-    expect(runStory(story(), {
-      [MathActionType.RandomNumber]: 0.1,
-      [DateActionType.Now]: 'today'
-    })).toEqual([0.1, 'today']);
+    expect(
+      runStory(story(), {
+        [MathActionType.RandomNumber]: 0.1,
+        [DateActionType.Now]: 'today',
+      }),
+    ).toEqual([0.1, 'today']);
   });
 
   it('wraps mocked values for askCatch automatically', () => {

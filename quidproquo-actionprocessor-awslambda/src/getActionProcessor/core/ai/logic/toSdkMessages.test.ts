@@ -10,9 +10,7 @@ const failingResolver: AiDriveFileResolver = () => {
 
 describe('toSdkMessages', () => {
   it('passes a string user message through', async () => {
-    expect(await toSdkMessages([{ role: 'user', content: 'hello' }] as AiMessage[], failingResolver)).toEqual([
-      { role: 'user', content: 'hello' },
-    ]);
+    expect(await toSdkMessages([{ role: 'user', content: 'hello' }] as AiMessage[], failingResolver)).toEqual([{ role: 'user', content: 'hello' }]);
   });
 
   it('maps user text and file parts', async () => {

@@ -14,10 +14,7 @@ import { foldEventDocLog } from './foldEventDocLog';
 // fold pins version 1 with no migrations (each event's version is clamped to 1).
 const baseSeed = (): EventDocDocument => createEventDocInitialDocumentState(1);
 
-const baseReducer = buildEventDocBaseReducer(baseSeed) as QpqReducer<
-  EventDocDocument,
-  EventDocEvent
->;
+const baseReducer = buildEventDocBaseReducer(baseSeed) as QpqReducer<EventDocDocument, EventDocEvent>;
 
 export const foldEventDocBase = (events: EventDocEvent[]): EventDocDocument =>
   foldEventDocLog(events, {

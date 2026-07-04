@@ -5,16 +5,10 @@ import type { EventDocAiChatListPayload, EventDocAiChatSummary } from '../models
 import { askEventDocAiContextRead } from '../module';
 import { eventDocAiServiceRequest } from './eventDocAiServiceRequest';
 
-const askChatListRequest = createServiceRequester<
-  EventDocAiChatListPayload,
-  EventDocAiChatSummary[]
->('eventDocAi', 'ChatList');
+const askChatListRequest = createServiceRequester<EventDocAiChatListPayload, EventDocAiChatSummary[]>('eventDocAi', 'ChatList');
 
-export const onChatList = eventDocAiServiceRequest(
-  askChatListRequest,
-  function* askOnChatList() {
-    const { docId } = yield* askEventDocAiContextRead();
+export const onChatList = eventDocAiServiceRequest(askChatListRequest, function* askOnChatList() {
+  const { docId } = yield* askEventDocAiContextRead();
 
-    return yield* askEventDocAiChatList(docId);
-  }
-);
+  return yield* askEventDocAiChatList(docId);
+});

@@ -16,8 +16,7 @@ import {
   toTextResponse,
 } from './httpEventUtils';
 
-const buildEvent = (overrides: Partial<HTTPEvent>): HTTPEvent =>
-  ({ headers: {}, isBase64Encoded: false, ...overrides }) as HTTPEvent;
+const buildEvent = (overrides: Partial<HTTPEvent>): HTTPEvent => ({ headers: {}, isBase64Encoded: false, ...overrides }) as HTTPEvent;
 
 describe('rawFromJsonEventRequest', () => {
   it('returns the plain body when not base64 encoded', () => {

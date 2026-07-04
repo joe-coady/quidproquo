@@ -65,9 +65,7 @@ export class Function extends QpqConstructBlock {
         ...(props.environment || {}),
       },
 
-      reservedConcurrentExecutions: qpqConfigAwsUtils.isReservedConcurrencyDisabled(props.qpqConfig)
-        ? undefined
-        : props.reservedConcurrentExecutions,
+      reservedConcurrentExecutions: qpqConfigAwsUtils.isReservedConcurrencyDisabled(props.qpqConfig) ? undefined : props.reservedConcurrentExecutions,
 
       tracing: qpqConfigAwsUtils.isTracingDisabled(props.qpqConfig) ? aws_lambda.Tracing.DISABLED : aws_lambda.Tracing.ACTIVE,
 

@@ -13,12 +13,9 @@ import {
 import * as fs from 'fs/promises';
 
 import { FileStorageConfig } from './types';
-import { ensureParentDirectoryExists,resolveFilePath } from './utils';
+import { ensureParentDirectoryExists, resolveFilePath } from './utils';
 
-const getProcessFileWriteTextContents = (
-  qpqConfig: QPQConfig,
-  config: FileStorageConfig
-): FileWriteTextContentsActionProcessor => {
+const getProcessFileWriteTextContents = (qpqConfig: QPQConfig, config: FileStorageConfig): FileWriteTextContentsActionProcessor => {
   return async ({ drive, filepath, data }) => {
     try {
       const fullPath = resolveFilePath(config, qpqConfig, drive, filepath);
@@ -33,10 +30,8 @@ const getProcessFileWriteTextContents = (
   };
 };
 
-export const getFileWriteTextContentsActionProcessor = (
-  config: FileStorageConfig
-): ActionProcessorListResolver => async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [FileActionType.WriteTextContents]: getProcessFileWriteTextContents(qpqConfig, config),
-});
+export const getFileWriteTextContentsActionProcessor =
+  (config: FileStorageConfig): ActionProcessorListResolver =>
+  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
+    [FileActionType.WriteTextContents]: getProcessFileWriteTextContents(qpqConfig, config),
+  });

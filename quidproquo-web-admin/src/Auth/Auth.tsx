@@ -48,11 +48,11 @@ export function Auth({ children }: AuthProps) {
     <QpqRuntimeEffectCatcher runtime={authRuntime}>
       {!isAuthenticated && (
         <Login
-          setUsername={api.authUISetUsername}
-          setPassword={api.authUISetPassword}
-          username={state.username}
-          password={state.password}
           onLogin={api.authLogin}
+          password={state.password}
+          setPassword={api.authUISetPassword}
+          setUsername={api.authUISetUsername}
+          username={state.username}
         />
       )}
       {isAuthenticated && (

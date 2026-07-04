@@ -1,11 +1,4 @@
-import {
-  ConfigActionType,
-  ContextActionType,
-  EventBusActionType,
-  KeyValueStoreActionType,
-  runStory,
-  UserDirectoryActionType,
-} from 'quidproquo-core';
+import { ConfigActionType, ContextActionType, EventBusActionType, KeyValueStoreActionType, runStory, UserDirectoryActionType } from 'quidproquo-core';
 
 import { describe, expect, it } from 'vitest';
 

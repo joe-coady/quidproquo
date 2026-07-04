@@ -8,12 +8,7 @@ import { EventDocEffect, EventDocEvent, EventDocEventActor, EventDocInitData } f
  * identity (id/code/name). Create-only — clients never send INIT_STATE, hence the empty
  * clientMessageId.
  */
-export function* askEventDocSeedInitState(
-  modelId: string,
-  code: string,
-  name: string,
-  actor: EventDocEventActor
-): AskResponse<EventDocEvent> {
+export function* askEventDocSeedInitState(modelId: string, code: string, name: string, actor: EventDocEventActor): AskResponse<EventDocEvent> {
   const now = yield* askDateNow();
 
   const event: EventDocEvent<EventDocInitData> = {

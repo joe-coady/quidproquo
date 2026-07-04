@@ -2,7 +2,14 @@ import { buildTestQpqConfig, defineKeyValueStore, defineStorageDrive } from 'qui
 
 import { describe, expect, it } from 'vitest';
 
-import { AwsAlarmLambdaMetricName, AwsAlarmNamespace, AwsAlarmOperator, AwsAlarmPeriod, AwsAlarmStatistic, defineAwsAlarm } from '../config/settings/awsAlarm';
+import {
+  AwsAlarmLambdaMetricName,
+  AwsAlarmNamespace,
+  AwsAlarmOperator,
+  AwsAlarmPeriod,
+  AwsAlarmStatistic,
+  defineAwsAlarm,
+} from '../config/settings/awsAlarm';
 import { defineAwsDyanmoOverrideForKvs } from '../config/settings/awsDyanmoOverrideForKvs';
 import { AwsKmsKeyTargetType, defineAwsKmsKey } from '../config/settings/awsKmsKey';
 import { defineBootstrapCloudTrail } from '../config/settings/cloudTrail';

@@ -8,7 +8,6 @@ export const useRefreshTokens = (
   authenticationInfo: AuthenticationInfo | undefined,
   refreshTokens: (authenticationInfo: AuthenticationInfo) => Promise<any>,
 ) => {
-
   const stableRefreshTokens = useFastCallback(refreshTokens);
 
   const refresh = () => {

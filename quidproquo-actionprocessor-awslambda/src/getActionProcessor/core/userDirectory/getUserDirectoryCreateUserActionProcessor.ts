@@ -32,19 +32,16 @@ const getProcessCreateUser = (qpqConfig: QPQConfig): UserDirectoryCreateUserActi
     }
 
     try {
-      const authResponse: AuthenticateUserResponse = await createUser(
-        userPoolId,
-        region,
-        userPoolClientId,
-        payload.createUserRequest,
-      );
+      const authResponse: AuthenticateUserResponse = await createUser(userPoolId, region, userPoolClientId, payload.createUserRequest);
 
       return actionResult(authResponse);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         UsernameExistsException: () => actionResultError(UserDirectoryCreateUserErrorTypeEnum.Conflict, 'An account with this email already exists'),
-        InvalidPasswordException: () => actionResultError(UserDirectoryCreateUserErrorTypeEnum.InvalidPassword, 'Password does not meet the password policy'),
-        LimitExceededException: () => actionResultError(UserDirectoryCreateUserErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
+        InvalidPasswordException: () =>
+          actionResultError(UserDirectoryCreateUserErrorTypeEnum.InvalidPassword, 'Password does not meet the password policy'),
+        LimitExceededException: () =>
+          actionResultError(UserDirectoryCreateUserErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
       });
     }
   };

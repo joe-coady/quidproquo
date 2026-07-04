@@ -12,43 +12,30 @@ import { EventDocRenderInput, EventDocRenderMode, EventDocRenderResult } from '.
 // service's registered inline function, exactly like the `eventValidator` pattern. `renderMode`
 // (draft|published) and `effectiveAt` (as-of time) are read from the query string and threaded
 // into the render input — modelled now, honoured once version/effectiveAt resolution lands.
-function* askEventDocStoreRender(
-  event: HTTPEvent,
-  modelId: string
-): AskResponse<HTTPEventResponse> {
+function* askEventDocStoreRender(event: HTTPEvent, modelId: string): AskResponse<HTTPEventResponse> {
   const { eventRenderer } = yield* askEventDocResolveStore();
 
   if (!eventRenderer) {
-    return yield* askThrowError(
-      ErrorTypeEnum.NotFound,
-      'This collection has no renderer configured.'
-    );
+    return yield* askThrowError(ErrorTypeEnum.NotFound, 'This collection has no renderer configured.');
   }
 
   const events = yield* askEventDocEventListAll(modelId);
 
   const renderModeParam = qpqWebServerUtils.readUriQueryParamFromEvent(event, 'renderMode');
-  const renderMode =
-    renderModeParam === EventDocRenderMode.Draft ||
-    renderModeParam === EventDocRenderMode.Published
-      ? renderModeParam
-      : undefined;
+  const renderMode = renderModeParam === EventDocRenderMode.Draft || renderModeParam === EventDocRenderMode.Published ? renderModeParam : undefined;
   const effectiveAt = getValidQpqIsoDateTime(qpqWebServerUtils.readUriQueryParamFromEvent(event, 'effectiveAt'));
 
-  const result = yield* askInlineFunctionExecute<
-    EventDocRenderResult,
-    EventDocRenderInput
-  >(eventRenderer, { events, docId: modelId, renderMode, effectiveAt });
+  const result = yield* askInlineFunctionExecute<EventDocRenderResult, EventDocRenderInput>(eventRenderer, {
+    events,
+    docId: modelId,
+    renderMode,
+    effectiveAt,
+  });
 
   return qpqWebServerUtils.toJsonEventResponse(result);
 }
 
 // GET {basePath}/{id}/render — mounted only when the collection configures an eventRenderer.
-export function* render(
-  event: HTTPEvent,
-  params: { id: string }
-): AskResponse<HTTPEventResponse> {
-  return yield* askEventDocProvideStoreFromGlobals(
-    askEventDocStoreRender(event, params.id)
-  );
+export function* render(event: HTTPEvent, params: { id: string }): AskResponse<HTTPEventResponse> {
+  return yield* askEventDocProvideStoreFromGlobals(askEventDocStoreRender(event, params.id));
 }

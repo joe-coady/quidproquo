@@ -7,7 +7,10 @@ import { getConfigGetApplicationInfoActionProcessor } from './getConfigGetApplic
 describe('getConfigGetApplicationInfoActionProcessor', () => {
   it('returns the application module info derived from the config', async () => {
     const qpqConfig = buildTestQpqConfig([], { applicationName: 'shop', moduleName: 'orders', environment: 'production', feature: 'beta' });
-    const processor = (await getConfigGetApplicationInfoActionProcessor(qpqConfig, async () => null))[ConfigActionType.GetApplicationInfo] as (p: any, ...rest: any[]) => Promise<any>;
+    const processor = (await getConfigGetApplicationInfoActionProcessor(qpqConfig, async () => null))[ConfigActionType.GetApplicationInfo] as (
+      p: any,
+      ...rest: any[]
+    ) => Promise<any>;
 
     const result = await processor(undefined, undefined as any);
 

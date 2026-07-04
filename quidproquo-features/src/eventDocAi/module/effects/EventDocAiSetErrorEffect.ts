@@ -7,7 +7,4 @@ export type SetErrorPayload = {
   error: Nullable<string>;
 };
 
-export type EventDocAiSetErrorEffect = Effect<
-  EventDocAiEffect.SetError,
-  SetErrorPayload
->;
+export type EventDocAiSetErrorEffect = Effect<EventDocAiEffect.SetError, SetErrorPayload>;

@@ -31,9 +31,15 @@ describe('askParallelDEPRECATED', () => {
       return `${prefix}-${guid}`;
     }
 
-    const result = runStory(askParallelDEPRECATED([[echo, 'first'], [echo, 'second']]), {
-      [GuidActionType.New]: 'g',
-    });
+    const result = runStory(
+      askParallelDEPRECATED([
+        [echo, 'first'],
+        [echo, 'second'],
+      ]),
+      {
+        [GuidActionType.New]: 'g',
+      },
+    );
 
     expect(result).toEqual(['first-g', 'second-g']);
   });

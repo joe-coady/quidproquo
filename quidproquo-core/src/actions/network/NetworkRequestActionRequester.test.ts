@@ -6,9 +6,7 @@ import { askNetworkRequest } from './NetworkRequestActionRequester';
 
 describe('askNetworkRequest', () => {
   it('yields a Request action with the supplied options', () => {
-    const { action } = captureRequester(
-      askNetworkRequest('POST', 'https://api.test/users', { body: { name: 'a' }, headers: { 'x-key': '1' } }),
-    );
+    const { action } = captureRequester(askNetworkRequest('POST', 'https://api.test/users', { body: { name: 'a' }, headers: { 'x-key': '1' } }));
 
     expect(action).toEqual({
       type: NetworkActionType.Request,

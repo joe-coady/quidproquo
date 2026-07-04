@@ -37,12 +37,7 @@ const state = (status: EventDocStatus): EventDocDocument => ({
   updatedAt: iso('2026-01-01T00:00:00.000Z'),
 });
 
-const reason = (type: string, status: EventDocStatus) =>
-  validateEventDocEvent(
-    reservedEventDocEventValidators,
-    event(type),
-    state(status)
-  );
+const reason = (type: string, status: EventDocStatus) => validateEventDocEvent(reservedEventDocEventValidators, event(type), state(status));
 
 describe('reserved validators via validateEventDocEvent', () => {
   describe('when draft', () => {
@@ -53,12 +48,8 @@ describe('reserved validators via validateEventDocEvent', () => {
     });
 
     it('rejects opening a second draft and re-initialising', () => {
-      expect(reason(CreateDraft, EventDocStatus.Draft)).toEqual(
-        expect.any(String)
-      );
-      expect(reason(InitState, EventDocStatus.Draft)).toEqual(
-        expect.any(String)
-      );
+      expect(reason(CreateDraft, EventDocStatus.Draft)).toEqual(expect.any(String));
+      expect(reason(InitState, EventDocStatus.Draft)).toEqual(expect.any(String));
     });
   });
 
@@ -69,9 +60,7 @@ describe('reserved validators via validateEventDocEvent', () => {
 
     it('rejects every other event (edits, publish, init)', () => {
       for (const type of [SetCode, Publish, InitState, 'SET_HTML']) {
-        expect(reason(type, EventDocStatus.Published)).toEqual(
-          expect.any(String)
-        );
+        expect(reason(type, EventDocStatus.Published)).toEqual(expect.any(String));
       }
     });
   });
@@ -79,13 +68,7 @@ describe('reserved validators via validateEventDocEvent', () => {
 
 describe('validateEventDocEvent', () => {
   it('returns null when no validator and no wildcard match', () => {
-    expect(
-      validateEventDocEvent(
-        {},
-        event('SET_HTML'),
-        state(EventDocStatus.Published)
-      )
-    ).toBeNull();
+    expect(validateEventDocEvent({}, event('SET_HTML'), state(EventDocStatus.Published))).toBeNull();
   });
 });
 
@@ -94,9 +77,7 @@ describe('all', () => {
   const pass: EventDocEventValidator = () => null;
 
   it('returns the first failure, short-circuiting', () => {
-    expect(all(pass, fail, pass)(event('X'), state(EventDocStatus.Draft))).toBe(
-      'nope'
-    );
+    expect(all(pass, fail, pass)(event('X'), state(EventDocStatus.Draft))).toBe('nope');
   });
 
   it('returns null when all pass', () => {

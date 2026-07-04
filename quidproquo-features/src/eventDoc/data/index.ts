@@ -9,3 +9,4 @@ export * from './askEventDocGetById';
 export * from './askEventDocList';
 export * from './askEventDocUpsert';
 export * from './askEventDocWriteAsset';
+export * from './eventDocAssetPath';

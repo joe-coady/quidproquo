@@ -27,9 +27,9 @@ export const TimelineTab: React.FC<TimelineTabProps> = ({
 
   return (
     <EventTimeline
+      isVisible={isVisible}
       logCorrelation={log.logCorrelation}
       setSelectedLogCorrelation={setSelectedLogCorrelation}
-      isVisible={isVisible}
       treeApi={treeApi}
     />
   );

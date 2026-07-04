@@ -13,10 +13,7 @@ export function* askEventDocAiSelectChat(chatId: string): AskResponse<void> {
   yield* askUIEventDocAiClearStream();
   yield* askUIEventDocAiSetLoadingHistory(true);
 
-  const result = yield* askCatch(
-    askEventDocAiChatHistoryRequest({ chatId }),
-    askUIEventDocAiSetLoadingHistory(false)
-  );
+  const result = yield* askCatch(askEventDocAiChatHistoryRequest({ chatId }), askUIEventDocAiSetLoadingHistory(false));
 
   if (result.success) {
     yield* askUIEventDocAiSetMessages(result.result);

@@ -6,9 +6,7 @@ import { EventDocVersion } from '../models';
 import { latestPublished } from './selectors/latestPublished';
 
 /** Resolve the latest published version pointer for `id`, or null. */
-export function* askEventDocGetLatestPublished(
-  id: string
-): AskResponse<Nullable<EventDocVersion>> {
+export function* askEventDocGetLatestPublished(id: string): AskResponse<Nullable<EventDocVersion>> {
   const model = yield* askEventDocGetById(id);
   if (!model) {
     return null;

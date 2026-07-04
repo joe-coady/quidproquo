@@ -7,7 +7,7 @@ import { RouteAuthValidationActionType } from '../actions/routeAuthValidation';
 import { HTTPEvent } from '../types/HTTPEvent';
 import { askValidateRouteAuth } from './askValidateRouteAuth';
 
-const buildEvent = (headers: Record<string, string> = {}) => ({ headers } as unknown as HTTPEvent);
+const buildEvent = (headers: Record<string, string> = {}) => ({ headers }) as unknown as HTTPEvent;
 
 describe('askValidateRouteAuth', () => {
   it('allows the request when there are no auth settings', () => {
@@ -15,27 +15,23 @@ describe('askValidateRouteAuth', () => {
   });
 
   it('rejects when the token decodes but is not valid', () => {
-    const result = runStory(
-      askValidateRouteAuth({ event: buildEvent(), routeAuthSettings: { userDirectoryName: 'users' } }),
-      { [RouteAuthValidationActionType.Decode]: { wasValid: false } },
-    );
+    const result = runStory(askValidateRouteAuth({ event: buildEvent(), routeAuthSettings: { userDirectoryName: 'users' } }), {
+      [RouteAuthValidationActionType.Decode]: { wasValid: false },
+    });
 
     expect(result).toBe(false);
   });
 
   it('rejects when the token cannot be decoded', () => {
-    const result = runStory(
-      askValidateRouteAuth({ event: buildEvent(), routeAuthSettings: { userDirectoryName: 'users' } }),
-      { [RouteAuthValidationActionType.Decode]: null },
-    );
+    const result = runStory(askValidateRouteAuth({ event: buildEvent(), routeAuthSettings: { userDirectoryName: 'users' } }), {
+      [RouteAuthValidationActionType.Decode]: null,
+    });
 
     expect(result).toBe(false);
   });
 
   it('rejects when an api key is required but absent', () => {
-    const result = runStory(
-      askValidateRouteAuth({ event: buildEvent(), routeAuthSettings: { apiKeys: [{ name: 'k1' }] } }),
-    );
+    const result = runStory(askValidateRouteAuth({ event: buildEvent(), routeAuthSettings: { apiKeys: [{ name: 'k1' }] } }));
 
     expect(result).toBe(false);
   });

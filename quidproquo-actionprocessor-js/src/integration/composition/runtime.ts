@@ -76,7 +76,15 @@ const getTestActionProcessors: ActionProcessorListResolver = async (qpqConfig, d
   ...(await getCoreActionProcessor(qpqConfig, dynamicModuleLoader)),
   [ECHO_ACTION]: async (payload: { value: unknown }) => actionResult(payload.value),
   [FAIL_ACTION]: async (payload: { error: string }) => actionResultError(payload.error, payload.error),
-  [BOUNDARY_ACTION]: async (payload: { storyFactory: () => AskResponse<any> }, session, actionProcessors, logger, updateSession, dml, streamRegistry) => {
+  [BOUNDARY_ACTION]: async (
+    payload: { storyFactory: () => AskResponse<any> },
+    session,
+    actionProcessors,
+    logger,
+    updateSession,
+    dml,
+    streamRegistry,
+  ) => {
     // This is exactly what the real cross-service send/execute processors do: drop service-local
     // context, then resolve the sub-story in a fresh runtime that inherits the rest of the session.
     const crossServiceRuntime = createRuntime(

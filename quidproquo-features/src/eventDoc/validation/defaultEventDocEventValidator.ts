@@ -7,5 +7,4 @@ import { createEventDocEventValidator } from './createEventDocEventValidator';
 // no-domain-rules case of `createEventDocEventValidator`, folding status generically with
 // `foldEventDocBase` (reserved lifecycle events only, no per-collection reducer), so it runs
 // identically on the frontend pending buffer and the backend append handler.
-export const defaultEventDocEventValidator =
-  createEventDocEventValidator(foldEventDocBase);
+export const defaultEventDocEventValidator = createEventDocEventValidator(foldEventDocBase);

@@ -28,18 +28,14 @@ const getProcessForgotPassword = (qpqConfig: QPQConfig): UserDirectoryForgotPass
     const resolvedUsername = await resolveUsernameByPreferredUsername(userPoolId, region, username);
 
     try {
-      const authResponse: AuthenticationDeliveryDetails = await forgotPassword(
-        userPoolId,
-        userPoolClientId,
-        region,
-        resolvedUsername,
-      );
+      const authResponse: AuthenticationDeliveryDetails = await forgotPassword(userPoolId, userPoolClientId, region, resolvedUsername);
 
       return actionResult(authResponse);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         UserNotFoundException: () => actionResultError(UserDirectoryForgotPasswordErrorTypeEnum.UserNotFound, 'No account found for this user'),
-        LimitExceededException: () => actionResultError(UserDirectoryForgotPasswordErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
+        LimitExceededException: () =>
+          actionResultError(UserDirectoryForgotPasswordErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
       });
     }
   };

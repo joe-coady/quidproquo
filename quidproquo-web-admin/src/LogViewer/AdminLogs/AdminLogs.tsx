@@ -10,8 +10,8 @@ export const AdminLogs = () => {
 
   return (
     <TabViewBox
+      body={() => <AdminLogGrid isLoading={isLoading} logs={logLogs} searchProgress={searchProgress} />}
       header={() => <AdminLogSearchBar onSearch={onSearch} />}
-      body={() => <AdminLogGrid logs={logLogs} isLoading={isLoading} searchProgress={searchProgress} />}
     />
   );
 };

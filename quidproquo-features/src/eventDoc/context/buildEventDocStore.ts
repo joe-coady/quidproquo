@@ -16,12 +16,7 @@ export type EventDocStoreOptions = {
 // events-table / blob-drive naming convention — used by both the per-route globals
 // (`defineEventDocRoutes`) and hand-written routes (`askEventDocProvideStore`), so a custom
 // route and a built-in route describe the exact same store.
-export const buildEventDocStore = ({
-  storeName,
-  type,
-  eventValidator,
-  eventRenderer,
-}: EventDocStoreOptions): EventDocStore => ({
+export const buildEventDocStore = ({ storeName, type, eventValidator, eventRenderer }: EventDocStoreOptions): EventDocStore => ({
   storeName,
   eventsStoreName: eventDocEventsStoreName(storeName),
   type,

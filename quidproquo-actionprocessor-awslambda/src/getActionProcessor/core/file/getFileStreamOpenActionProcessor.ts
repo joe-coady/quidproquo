@@ -19,11 +19,7 @@ import { randomGuid } from '../../../awsLambdaUtils';
 import { createAwsClient } from '../../../logic/createAwsClient';
 import { resolveStorageDriveBucketName } from './utils';
 
-async function* chunkedReadableIterator(
-  stream: Readable,
-  chunkSize: number,
-  transform: (buf: Buffer) => string,
-): AsyncIterableIterator<string> {
+async function* chunkedReadableIterator(stream: Readable, chunkSize: number, transform: (buf: Buffer) => string): AsyncIterableIterator<string> {
   let buffer = Buffer.alloc(0);
 
   for await (const chunk of stream) {
@@ -62,9 +58,7 @@ const getProcessFileStreamOpen = (qpqConfig: QPQConfig): FileStreamOpenActionPro
       const streamId = `s3-${randomGuid()}`;
       const isText = encoding === 'text';
       const size = chunkSize ?? 65536;
-      const transform = isText
-        ? (buf: Buffer) => buf.toString('utf8')
-        : (buf: Buffer) => buf.toString('base64');
+      const transform = isText ? (buf: Buffer) => buf.toString('utf8') : (buf: Buffer) => buf.toString('base64');
       const iterator = chunkedReadableIterator(response.Body as Readable, size, transform);
       streamRegistry.register(streamId, iterator);
 
@@ -79,8 +73,6 @@ const getProcessFileStreamOpen = (qpqConfig: QPQConfig): FileStreamOpenActionPro
   };
 };
 
-export const getFileStreamOpenActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
+export const getFileStreamOpenActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
   [FileActionType.StreamOpen]: getProcessFileStreamOpen(qpqConfig),
 });

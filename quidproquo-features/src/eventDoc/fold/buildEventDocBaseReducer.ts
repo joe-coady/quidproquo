@@ -11,7 +11,7 @@ import { ReservedEventDocEffects } from './ReservedEventDocEffects';
 // Reserved base effects every fold reducer carries, independent of any module's domain.
 // Each handler is a pure state updater in ./stateUpdaters (one per effect).
 export const buildEventDocBaseReducer = <TState extends EventDocDocument>(
-  getInitialState: () => TState
+  getInitialState: () => TState,
 ): QpqReducer<TState, ReservedEventDocEffects> =>
   buildEffectReducer<TState, ReservedEventDocEffects>({
     [EventDocEffect.InitState]: initState(getInitialState),

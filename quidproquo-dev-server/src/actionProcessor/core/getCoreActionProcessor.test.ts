@@ -35,11 +35,7 @@ const devServerConfig = {
 
 describe('getCoreActionProcessor', () => {
   it('aggregates processors across every core domain', async () => {
-    const config = buildTestQpqConfig([
-      defineKeyValueStore('store', 'id'),
-      defineEventBus('myBus'),
-      defineQueue('myQueue', {}),
-    ]);
+    const config = buildTestQpqConfig([defineKeyValueStore('store', 'id'), defineEventBus('myBus'), defineQueue('myQueue', {})]);
 
     const processors = await getCoreActionProcessor(config, noopDynamicModuleLoader, devServerConfig);
 

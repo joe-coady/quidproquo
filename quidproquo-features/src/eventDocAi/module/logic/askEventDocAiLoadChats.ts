@@ -8,10 +8,7 @@ import { askEventDocAiChatListRequest } from '../requests/askEventDocAiChatListR
 export function* askEventDocAiLoadChats(): AskResponse<void> {
   yield* askUIEventDocAiSetLoadingChats(true);
 
-  const result = yield* askCatch(
-    askEventDocAiChatListRequest(),
-    askUIEventDocAiSetLoadingChats(false)
-  );
+  const result = yield* askCatch(askEventDocAiChatListRequest(), askUIEventDocAiSetLoadingChats(false));
 
   if (result.success) {
     yield* askUIEventDocAiSetChats(result.result);

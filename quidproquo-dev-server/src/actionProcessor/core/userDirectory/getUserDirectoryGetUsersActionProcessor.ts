@@ -26,10 +26,8 @@ const getProcessGetUsers = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevSe
   };
 };
 
-export const getUserDirectoryGetUsersActionProcessor = (
-  devServerConfig: ResolvedDevServerConfig,
-): ActionProcessorListResolver => async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [UserDirectoryActionType.GetUsers]: getProcessGetUsers(qpqConfig, devServerConfig),
-});
+export const getUserDirectoryGetUsersActionProcessor =
+  (devServerConfig: ResolvedDevServerConfig): ActionProcessorListResolver =>
+  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
+    [UserDirectoryActionType.GetUsers]: getProcessGetUsers(qpqConfig, devServerConfig),
+  });

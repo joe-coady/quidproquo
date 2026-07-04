@@ -14,10 +14,13 @@ export const useTimeAgo = (date: Date, locale?: string | string[]): string => {
     let timeoutId: ReturnType<typeof setTimeout>;
 
     const schedule = () => {
-      timeoutId = setTimeout(() => {
-        setNow(new Date());
-        schedule();
-      }, getTimeAgoUpdateIntervalMs(date, new Date()));
+      timeoutId = setTimeout(
+        () => {
+          setNow(new Date());
+          schedule();
+        },
+        getTimeAgoUpdateIntervalMs(date, new Date()),
+      );
     };
 
     schedule();

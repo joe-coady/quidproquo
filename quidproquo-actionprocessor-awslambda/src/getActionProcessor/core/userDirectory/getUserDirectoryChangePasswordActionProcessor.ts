@@ -24,8 +24,10 @@ const getProcessChangePassword = (qpqConfig: QPQConfig): UserDirectoryChangePass
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         NotAuthorizedException: () => actionResultError(UserDirectoryChangePasswordErrorTypeEnum.IncorrectPassword, 'Current password is incorrect'),
-        InvalidPasswordException: () => actionResultError(UserDirectoryChangePasswordErrorTypeEnum.InvalidNewPassword, 'New password does not meet the password policy'),
-        LimitExceededException: () => actionResultError(UserDirectoryChangePasswordErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
+        InvalidPasswordException: () =>
+          actionResultError(UserDirectoryChangePasswordErrorTypeEnum.InvalidNewPassword, 'New password does not meet the password policy'),
+        LimitExceededException: () =>
+          actionResultError(UserDirectoryChangePasswordErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
       });
     }
   };

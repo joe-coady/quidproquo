@@ -60,8 +60,6 @@ const getProcessAutoRespond = (qpqConfig: QPQConfig): EventAutoRespondActionProc
   };
 };
 
-export const getHttpApiEventAutoRespondActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
+export const getHttpApiEventAutoRespondActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
   [EventActionType.AutoRespond]: getProcessAutoRespond(qpqConfig),
 });

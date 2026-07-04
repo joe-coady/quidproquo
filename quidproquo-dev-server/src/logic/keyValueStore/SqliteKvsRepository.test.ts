@@ -35,10 +35,8 @@ afterEach(async () => {
 });
 
 const usersStore = () => makeRepo([defineKeyValueStore('users', { key: 'id', type: 'string' })]);
-const ordersStore = () =>
-  makeRepo([defineKeyValueStore('orders', { key: 'pk', type: 'string' }, [{ key: 'sk', type: 'string' }])]);
-const eventsStore = () =>
-  makeRepo([defineKeyValueStore('events', { key: 'pk', type: 'string' }, [{ key: 'sk', type: 'number' }])]);
+const ordersStore = () => makeRepo([defineKeyValueStore('orders', { key: 'pk', type: 'string' }, [{ key: 'sk', type: 'string' }])]);
+const eventsStore = () => makeRepo([defineKeyValueStore('events', { key: 'pk', type: 'string' }, [{ key: 'sk', type: 'number' }])]);
 
 describe('SqliteKvsRepository upsert/get/delete', () => {
   it('upserts an item then reads it back by key', async () => {
@@ -93,9 +91,7 @@ describe('SqliteKvsRepository upsert/get/delete', () => {
 describe('SqliteKvsRepository update', () => {
   it('creates a base item from keys when updating a missing row', async () => {
     const repo = usersStore();
-    await repo.update('users', 'u1', undefined, [
-      { attributePath: 'name', action: KvsUpdateActionType.Set, value: 'Joe' },
-    ]);
+    await repo.update('users', 'u1', undefined, [{ attributePath: 'name', action: KvsUpdateActionType.Set, value: 'Joe' }]);
 
     expect(await repo.get('users', 'u1')).toEqual({ id: 'u1', name: 'Joe' });
   });
@@ -103,9 +99,7 @@ describe('SqliteKvsRepository update', () => {
   it('applies Set to an existing item', async () => {
     const repo = usersStore();
     await repo.upsert('users', { id: 'u1', name: 'Joe' });
-    await repo.update('users', 'u1', undefined, [
-      { attributePath: 'name', action: KvsUpdateActionType.Set, value: 'Joey' },
-    ]);
+    await repo.update('users', 'u1', undefined, [{ attributePath: 'name', action: KvsUpdateActionType.Set, value: 'Joey' }]);
 
     expect((await repo.get('users', 'u1')).name).toBe('Joey');
   });
@@ -113,9 +107,7 @@ describe('SqliteKvsRepository update', () => {
   it('Increment seeds from defaultValue then adds when attribute is missing', async () => {
     const repo = usersStore();
     await repo.upsert('users', { id: 'u1' });
-    await repo.update('users', 'u1', undefined, [
-      { attributePath: 'count', action: KvsUpdateActionType.Increment, value: 3, defaultValue: 10 },
-    ]);
+    await repo.update('users', 'u1', undefined, [{ attributePath: 'count', action: KvsUpdateActionType.Increment, value: 3, defaultValue: 10 }]);
 
     expect((await repo.get('users', 'u1')).count).toBe(13);
   });
@@ -123,9 +115,7 @@ describe('SqliteKvsRepository update', () => {
   it('Add increments an existing number', async () => {
     const repo = usersStore();
     await repo.upsert('users', { id: 'u1', count: 1 });
-    await repo.update('users', 'u1', undefined, [
-      { attributePath: 'count', action: KvsUpdateActionType.Add, value: 4 },
-    ]);
+    await repo.update('users', 'u1', undefined, [{ attributePath: 'count', action: KvsUpdateActionType.Add, value: 4 }]);
 
     expect((await repo.get('users', 'u1')).count).toBe(5);
   });
@@ -133,9 +123,7 @@ describe('SqliteKvsRepository update', () => {
   it('Add unions array values', async () => {
     const repo = usersStore();
     await repo.upsert('users', { id: 'u1', tags: ['a', 'b'] });
-    await repo.update('users', 'u1', undefined, [
-      { attributePath: 'tags', action: KvsUpdateActionType.Add, value: ['b', 'c'] },
-    ]);
+    await repo.update('users', 'u1', undefined, [{ attributePath: 'tags', action: KvsUpdateActionType.Add, value: ['b', 'c'] }]);
 
     expect((await repo.get('users', 'u1')).tags).toEqual(['a', 'b', 'c']);
   });
@@ -143,9 +131,7 @@ describe('SqliteKvsRepository update', () => {
   it('Remove deletes an attribute', async () => {
     const repo = usersStore();
     await repo.upsert('users', { id: 'u1', temp: 'x', keep: 'y' });
-    await repo.update('users', 'u1', undefined, [
-      { attributePath: 'temp', action: KvsUpdateActionType.Remove },
-    ]);
+    await repo.update('users', 'u1', undefined, [{ attributePath: 'temp', action: KvsUpdateActionType.Remove }]);
 
     expect(await repo.get('users', 'u1')).toEqual({ id: 'u1', keep: 'y' });
   });
@@ -153,9 +139,7 @@ describe('SqliteKvsRepository update', () => {
   it('Delete removes elements from an array', async () => {
     const repo = usersStore();
     await repo.upsert('users', { id: 'u1', tags: ['a', 'b', 'c'] });
-    await repo.update('users', 'u1', undefined, [
-      { attributePath: 'tags', action: KvsUpdateActionType.Delete, value: ['b'] },
-    ]);
+    await repo.update('users', 'u1', undefined, [{ attributePath: 'tags', action: KvsUpdateActionType.Delete, value: ['b'] }]);
 
     expect((await repo.get('users', 'u1')).tags).toEqual(['a', 'c']);
   });
@@ -176,9 +160,7 @@ describe('SqliteKvsRepository update', () => {
   it('sets a nested attribute via a dotted path', async () => {
     const repo = usersStore();
     await repo.upsert('users', { id: 'u1' });
-    await repo.update('users', 'u1', undefined, [
-      { attributePath: 'profile.city', action: KvsUpdateActionType.Set, value: 'NYC' },
-    ]);
+    await repo.update('users', 'u1', undefined, [{ attributePath: 'profile.city', action: KvsUpdateActionType.Set, value: 'NYC' }]);
 
     expect((await repo.get('users', 'u1')).profile).toEqual({ city: 'NYC' });
   });
@@ -186,9 +168,7 @@ describe('SqliteKvsRepository update', () => {
   it('updates an existing composite-key item', async () => {
     const repo = ordersStore();
     await repo.upsert('orders', { pk: 'p1', sk: 's1', total: 1 });
-    await repo.update('orders', 'p1', 's1', [
-      { attributePath: 'total', action: KvsUpdateActionType.Set, value: 9 },
-    ]);
+    await repo.update('orders', 'p1', 's1', [{ attributePath: 'total', action: KvsUpdateActionType.Set, value: 9 }]);
 
     expect((await repo.get('orders', 'p1#s1')).total).toBe(9);
   });
@@ -336,9 +316,9 @@ describe('SqliteKvsRepository query', () => {
     const repo = eventsStore();
     await seedEvents(repo);
 
-    await expect(
-      repo.query('events', { key: 'pk', operation: 'Nope' as KvsQueryOperationType, valueA: 'p' }),
-    ).rejects.toThrow('Unsupported query operation');
+    await expect(repo.query('events', { key: 'pk', operation: 'Nope' as KvsQueryOperationType, valueA: 'p' })).rejects.toThrow(
+      'Unsupported query operation',
+    );
   });
 });
 
@@ -396,9 +376,7 @@ describe('SqliteKvsRepository indexes', () => {
   it('maintains the index table across upsert, update and delete', async () => {
     const repo = indexedStore();
     await repo.upsert('people', { id: 'u1', email: 'a@x.com', age: 30 });
-    await repo.update('people', 'u1', undefined, [
-      { attributePath: 'email', action: KvsUpdateActionType.Set, value: 'b@x.com' },
-    ]);
+    await repo.update('people', 'u1', undefined, [{ attributePath: 'email', action: KvsUpdateActionType.Set, value: 'b@x.com' }]);
     expect((await repo.get('people', 'u1')).email).toBe('b@x.com');
 
     expect(await repo.delete('people', 'u1')).toBe(true);

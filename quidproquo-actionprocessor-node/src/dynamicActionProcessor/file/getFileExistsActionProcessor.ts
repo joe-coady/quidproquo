@@ -15,10 +15,7 @@ import * as fs from 'fs/promises';
 import { FileStorageConfig } from './types';
 import { resolveFilePath } from './utils';
 
-const getProcessFileExists = (
-  qpqConfig: QPQConfig,
-  config: FileStorageConfig
-): FileExistsActionProcessor => {
+const getProcessFileExists = (qpqConfig: QPQConfig, config: FileStorageConfig): FileExistsActionProcessor => {
   return async ({ drive, filepath }) => {
     try {
       const fullPath = resolveFilePath(config, qpqConfig, drive, filepath);
@@ -42,10 +39,8 @@ const getProcessFileExists = (
   };
 };
 
-export const getFileExistsActionProcessor = (
-  config: FileStorageConfig
-): ActionProcessorListResolver => async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [FileActionType.Exists]: getProcessFileExists(qpqConfig, config),
-});
+export const getFileExistsActionProcessor =
+  (config: FileStorageConfig): ActionProcessorListResolver =>
+  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
+    [FileActionType.Exists]: getProcessFileExists(qpqConfig, config),
+  });

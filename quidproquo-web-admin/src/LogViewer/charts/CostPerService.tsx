@@ -37,7 +37,7 @@ export const CostPerService = ({ logs }: CostPerServiceProps) => {
 
   return (
     <>
-      <Typography variant="h5" gutterBottom>
+      <Typography gutterBottom variant="h5">
         Cost per Service
       </Typography>
       <TableContainer component={Paper}>

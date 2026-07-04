@@ -15,10 +15,7 @@ import * as fs from 'fs/promises';
 import { FileStorageConfig } from './types';
 import { resolveFilePath } from './utils';
 
-const getProcessFileReadTextContents = (
-  qpqConfig: QPQConfig,
-  config: FileStorageConfig
-): FileReadTextContentsActionProcessor => {
+const getProcessFileReadTextContents = (qpqConfig: QPQConfig, config: FileStorageConfig): FileReadTextContentsActionProcessor => {
   return async ({ drive, filepath }) => {
     try {
       const fullPath = resolveFilePath(config, qpqConfig, drive, filepath);
@@ -32,10 +29,8 @@ const getProcessFileReadTextContents = (
   };
 };
 
-export const getFileReadTextContentsActionProcessor = (
-  config: FileStorageConfig
-): ActionProcessorListResolver => async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [FileActionType.ReadTextContents]: getProcessFileReadTextContents(qpqConfig, config),
-});
+export const getFileReadTextContentsActionProcessor =
+  (config: FileStorageConfig): ActionProcessorListResolver =>
+  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
+    [FileActionType.ReadTextContents]: getProcessFileReadTextContents(qpqConfig, config),
+  });

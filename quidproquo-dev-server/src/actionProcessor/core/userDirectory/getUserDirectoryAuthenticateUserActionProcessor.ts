@@ -12,10 +12,7 @@ import { createDevAuthResponse, resolveDevUserDirectory } from '../../../logic/a
 import { upsertDevUser } from '../../../logic/auth/jsonUserStore';
 import { ResolvedDevServerConfig } from '../../../types';
 
-const getProcessAuthenticateUser = (
-  qpqConfig: QPQConfig,
-  devServerConfig: ResolvedDevServerConfig,
-): UserDirectoryAuthenticateUserActionProcessor => {
+const getProcessAuthenticateUser = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): UserDirectoryAuthenticateUserActionProcessor => {
   return async ({ userDirectoryName, authenticateUserRequest }) => {
     try {
       // Any username / password is accepted in dev ~ mint an unsigned JWT for whatever was typed in
@@ -29,10 +26,8 @@ const getProcessAuthenticateUser = (
   };
 };
 
-export const getUserDirectoryAuthenticateUserActionProcessor = (
-  devServerConfig: ResolvedDevServerConfig,
-): ActionProcessorListResolver => async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [UserDirectoryActionType.AuthenticateUser]: getProcessAuthenticateUser(qpqConfig, devServerConfig),
-});
+export const getUserDirectoryAuthenticateUserActionProcessor =
+  (devServerConfig: ResolvedDevServerConfig): ActionProcessorListResolver =>
+  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
+    [UserDirectoryActionType.AuthenticateUser]: getProcessAuthenticateUser(qpqConfig, devServerConfig),
+  });

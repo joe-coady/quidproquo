@@ -6,9 +6,7 @@ import { askEventDocResolveActor } from '../../globals/askEventDocResolveActor';
 import { askEventDocCreate } from '../../logic/askEventDocCreate';
 import { askEventDocParseBody } from '../askEventDocParseBody';
 
-function* askEventDocStoreCreate(
-  event: HTTPEvent
-): AskResponse<HTTPEventResponse> {
+function* askEventDocStoreCreate(event: HTTPEvent): AskResponse<HTTPEventResponse> {
   const actor = yield* askEventDocResolveActor();
 
   const { name, code } = yield* askEventDocParseBody<{
@@ -22,7 +20,5 @@ function* askEventDocStoreCreate(
 
 /** POST {basePath} — create a new model (body `{ name, code }`). */
 export function* create(event: HTTPEvent): AskResponse<HTTPEventResponse> {
-  return yield* askEventDocProvideStoreFromGlobals(
-    askEventDocStoreCreate(event)
-  );
+  return yield* askEventDocProvideStoreFromGlobals(askEventDocStoreCreate(event));
 }

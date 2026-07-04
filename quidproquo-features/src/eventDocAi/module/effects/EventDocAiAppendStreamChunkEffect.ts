@@ -6,7 +6,4 @@ export type AppendStreamChunkPayload = {
   part: AiStreamPart;
 };
 
-export type EventDocAiAppendStreamChunkEffect = Effect<
-  EventDocAiEffect.AppendStreamChunk,
-  AppendStreamChunkPayload
->;
+export type EventDocAiAppendStreamChunkEffect = Effect<EventDocAiEffect.AppendStreamChunk, AppendStreamChunkPayload>;

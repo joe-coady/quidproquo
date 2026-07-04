@@ -29,7 +29,15 @@ describe('getLogDisableEventHistoryActionProcessor', () => {
     const process = processors[LogActionType.DisableEventHistory];
     const logger = { enableLogs: vi.fn() } as any;
 
-    await process({ enable: true, reason: 'verbose' }, buildTestStorySession({ correlation: '' }), {}, logger, () => {}, async () => null, undefined as any);
+    await process(
+      { enable: true, reason: 'verbose' },
+      buildTestStorySession({ correlation: '' }),
+      {},
+      logger,
+      () => {},
+      async () => null,
+      undefined as any,
+    );
 
     expect(logger.enableLogs).toHaveBeenCalledWith(true, 'verbose', '');
   });

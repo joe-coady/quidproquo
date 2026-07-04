@@ -7,7 +7,4 @@ export type AppendChatMessagePayload = {
   message: EventDocAiChatMessage;
 };
 
-export type EventDocAiAppendChatMessageEffect = Effect<
-  EventDocAiEffect.AppendChatMessage,
-  AppendChatMessagePayload
->;
+export type EventDocAiAppendChatMessageEffect = Effect<EventDocAiEffect.AppendChatMessage, AppendChatMessagePayload>;

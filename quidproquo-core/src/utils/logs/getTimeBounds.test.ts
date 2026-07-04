@@ -3,11 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { QpqRuntimeType, StoryResultMetadataWithChildren } from '../../types';
 import { getTimeBounds } from './getTimeBounds';
 
-const node = (
-  startedAt: string,
-  executionTimeMs: number,
-  children: StoryResultMetadataWithChildren[] = [],
-): StoryResultMetadataWithChildren => ({
+const node = (startedAt: string, executionTimeMs: number, children: StoryResultMetadataWithChildren[] = []): StoryResultMetadataWithChildren => ({
   correlation: 'c',
   moduleName: 'm',
   runtimeType: QpqRuntimeType.EXECUTE_STORY,
@@ -30,10 +26,7 @@ describe('getTimeBounds', () => {
   });
 
   it('finds the earliest start and latest finish across children', () => {
-    const tree = node('2026-01-01T00:00:05.000Z', 1000, [
-      node('2026-01-01T00:00:00.000Z', 2000),
-      node('2026-01-01T00:00:10.000Z', 5000),
-    ]);
+    const tree = node('2026-01-01T00:00:05.000Z', 1000, [node('2026-01-01T00:00:00.000Z', 2000), node('2026-01-01T00:00:10.000Z', 5000)]);
 
     expect(getTimeBounds([tree])).toEqual({
       earliestStartedAt: '2026-01-01T00:00:00.000Z',

@@ -6,9 +6,14 @@ import { AskResponse } from '../../types';
 import { askMapParallelBatch } from './askMapParallelBatch';
 
 function* doubleInBatches(items: number[], numBatch: number, delayMs = 0): AskResponse<number[]> {
-  return yield* askMapParallelBatch(items, numBatch, function* (item): AskResponse<number> {
-    return item * 10;
-  }, delayMs);
+  return yield* askMapParallelBatch(
+    items,
+    numBatch,
+    function* (item): AskResponse<number> {
+      return item * 10;
+    },
+    delayMs,
+  );
 }
 
 describe('askMapParallelBatch', () => {

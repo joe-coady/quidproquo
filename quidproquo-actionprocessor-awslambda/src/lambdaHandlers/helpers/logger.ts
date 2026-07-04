@@ -92,9 +92,7 @@ const createBufferedLogger = (bucketName: string, regionForBucket: string, ship:
 
   return {
     enableLogs: async (enable: boolean, reason: string, correlation: string) => {
-      disabledLogCorrelations = enable
-        ? disabledLogCorrelations.filter((dlc) => dlc !== correlation)
-        : [...disabledLogCorrelations, correlation];
+      disabledLogCorrelations = enable ? disabledLogCorrelations.filter((dlc) => dlc !== correlation) : [...disabledLogCorrelations, correlation];
     },
 
     log: (result: StoryResult<any>) => {

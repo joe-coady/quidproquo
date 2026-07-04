@@ -77,7 +77,7 @@ export const startDevServer = async (devServerConfig: DevServerConfig, devServer
 export const startTinker = async (
   devServerConfig: DevServerConfig,
   devServerConfigOverrides?: DevServerConfigOverrides,
-  tinkerOptions?: TinkerOptions
+  tinkerOptions?: TinkerOptions,
 ): Promise<TinkerInterface> => {
   console.log('Starting QPQ Tinker Environment...');
 
@@ -88,16 +88,16 @@ export const startTinker = async (
   if (tinkerOptions?.includeHttpServer) {
     apiImplementation(resolvedDevServerConfig);
   }
-  
+
   serviceFunctionImplementation(resolvedDevServerConfig);
   eventBusImplementation(resolvedDevServerConfig);
   queueImplementation(resolvedDevServerConfig);
   webSocketImplementation(resolvedDevServerConfig);
   fileStorageImplementation(resolvedDevServerConfig);
   fileWatcherImplementation(resolvedDevServerConfig);
-  
+
   // Give implementations a moment to initialize
-  await new Promise(resolve => setTimeout(resolve, 100));
+  await new Promise((resolve) => setTimeout(resolve, 100));
 
   // Create and return the tinker interface
   return createTinkerInterface(resolvedDevServerConfig, tinkerOptions);

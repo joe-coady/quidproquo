@@ -8,7 +8,8 @@ import { getFileWriteTextContentsActionProcessor } from './getFileWriteTextConte
 
 vi.mock('fs/promises');
 
-const invoke = (data: string) => runFileAction(getFileWriteTextContentsActionProcessor(fileConfig), FileActionType.WriteTextContents, { filepath: 'sub/a.txt', data });
+const invoke = (data: string) =>
+  runFileAction(getFileWriteTextContentsActionProcessor(fileConfig), FileActionType.WriteTextContents, { filepath: 'sub/a.txt', data });
 
 afterEach(() => {
   vi.clearAllMocks();

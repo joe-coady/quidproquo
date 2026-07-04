@@ -10,11 +10,6 @@ function* askEventDocStoreGet(id: string): AskResponse<HTTPEventResponse> {
 }
 
 /** GET {basePath}/{id} — fetch one head row (404 if missing). */
-export function* get(
-  event: HTTPEvent,
-  params: { id: string }
-): AskResponse<HTTPEventResponse> {
-  return yield* askEventDocProvideStoreFromGlobals(
-    askEventDocStoreGet(params.id)
-  );
+export function* get(event: HTTPEvent, params: { id: string }): AskResponse<HTTPEventResponse> {
+  return yield* askEventDocProvideStoreFromGlobals(askEventDocStoreGet(params.id));
 }

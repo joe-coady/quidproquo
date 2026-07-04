@@ -8,10 +8,7 @@ import { askEventDocGetByCode } from './askEventDocGetByCode';
  * `askEventDocGetByCode` for callers that only need the id and no per-record policy. Assumes the
  * store context is provided.
  */
-export function* askEventDocGetIdByCode(
-  code: string,
-  ownerUserId?: string
-): AskResponse<Nullable<string>> {
+export function* askEventDocGetIdByCode(code: string, ownerUserId?: string): AskResponse<Nullable<string>> {
   const summary = yield* askEventDocGetByCode(code, ownerUserId);
 
   return summary?.id ?? null;

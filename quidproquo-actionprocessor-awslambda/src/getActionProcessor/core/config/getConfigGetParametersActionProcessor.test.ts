@@ -11,8 +11,7 @@ vi.mock('../../../logic/parametersManager/getParameters', () => ({
   getParameters: vi.fn(),
 }));
 
-const buildConfig = () =>
-  buildTestQpqConfig([defineAwsServiceAccountInfo('111', 'eu-west-1'), defineParameter('a'), defineParameter('b')]);
+const buildConfig = () => buildTestQpqConfig([defineAwsServiceAccountInfo('111', 'eu-west-1'), defineParameter('a'), defineParameter('b')]);
 
 const resolveProcessor = async () => {
   const processors = await getConfigGetParametersActionProcessor(buildConfig(), {} as any);

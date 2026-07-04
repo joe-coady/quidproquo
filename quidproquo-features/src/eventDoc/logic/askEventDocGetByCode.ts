@@ -11,26 +11,17 @@ import { EventDocSummary } from '../models';
  * in `askEventDocProvideStore`). There is no GSI on `code` (and the dev KVS can't query one anyway),
  * so this lists the collection and filters in memory.
  */
-export function* askEventDocGetByCode<
-  T extends EventDocSummary = EventDocSummary,
->(code: string, ownerUserId?: string): AskResponse<Nullable<T>> {
+export function* askEventDocGetByCode<T extends EventDocSummary = EventDocSummary>(code: string, ownerUserId?: string): AskResponse<Nullable<T>> {
   const summaries = yield* askEventDocList<T>();
 
-  const matches = summaries.filter(
-    (summary) =>
-      summary.code === code &&
-      (ownerUserId === undefined || summary.createdBy === ownerUserId)
-  );
+  const matches = summaries.filter((summary) => summary.code === code && (ownerUserId === undefined || summary.createdBy === ownerUserId));
 
   if (matches.length === 0) {
     return null;
   }
 
   if (matches.length > 1) {
-    return yield* askThrowError(
-      ErrorTypeEnum.Conflict,
-      `Multiple instances detected for code "${code}"`
-    );
+    return yield* askThrowError(ErrorTypeEnum.Conflict, `Multiple instances detected for code "${code}"`);
   }
 
   return matches[0];

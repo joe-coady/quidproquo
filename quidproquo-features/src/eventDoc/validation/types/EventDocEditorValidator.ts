@@ -6,7 +6,4 @@ import { EventDocEvent } from '../../models';
 // prior log, fold the document with the app's reducer and run the validator registry,
 // returning the rejection reason or null. The frontend editor receives it via config; the
 // backend `eventValidator` inline function wraps it.
-export type EventDocEditorValidator = (
-  event: EventDocEvent,
-  events: EventDocEvent[]
-) => Nullable<string>;
+export type EventDocEditorValidator = (event: EventDocEvent, events: EventDocEvent[]) => Nullable<string>;

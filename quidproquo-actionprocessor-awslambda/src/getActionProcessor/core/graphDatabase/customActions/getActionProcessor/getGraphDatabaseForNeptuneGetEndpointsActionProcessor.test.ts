@@ -17,7 +17,9 @@ vi.mock('../../../../../awsNamingUtils', () => ({
 vi.mock('../../../../../logic/neptune', () => ({ getNeptuneEndpoints: vi.fn() }));
 
 const invoke = async (payload: { graphDatabaseName: string }) => {
-  const processor = (await getGraphDatabaseForNeptuneGetEndpointsActionProcessor({} as never, null as any))[GraphDatabaseForNeptuneActionType.GetEndpoints];
+  const processor = (await getGraphDatabaseForNeptuneGetEndpointsActionProcessor({} as never, null as any))[
+    GraphDatabaseForNeptuneActionType.GetEndpoints
+  ];
   return invokeProcessor(processor, payload);
 };
 

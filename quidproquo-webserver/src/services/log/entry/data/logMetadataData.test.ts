@@ -62,9 +62,7 @@ describe('askListLogs', () => {
       },
     });
 
-    expect(captured?.payload.keyCondition).toEqual(
-      kvsAnd([kvsEqual('runtimeType', QpqRuntimeType.API), kvsBetween('startedAt', 'start', 'end')]),
-    );
+    expect(captured?.payload.keyCondition).toEqual(kvsAnd([kvsEqual('runtimeType', QpqRuntimeType.API), kvsBetween('startedAt', 'start', 'end')]));
     expect(captured?.payload.options.filter).toBeUndefined();
   });
 

@@ -7,13 +7,8 @@ export interface ServiceRequester<TPayload, TResponse> {
   serviceRequest: { serviceName: string; method: string };
 }
 
-export const createServiceRequester = <TPayload, TResponse = void>(
-  serviceName: string,
-  method: string,
-) => {
-  const requester = function* askWrapServiceRequest(
-    payload: TPayload,
-  ): AskResponse<TResponse> {
+export const createServiceRequester = <TPayload, TResponse = void>(serviceName: string, method: string) => {
+  const requester = function* askWrapServiceRequest(payload: TPayload): AskResponse<TResponse> {
     return yield* askServiceRequest(serviceName, method, payload);
   };
 

@@ -26,7 +26,12 @@ describe('kvsExpression', () => {
     expect(kvsLessThan('age', 30)).toEqual({ key: 'age', operation: KvsQueryOperationType.LessThan, valueA: 30, valueB: undefined });
     expect(kvsLessThanOrEqual('age', 30)).toEqual({ key: 'age', operation: KvsQueryOperationType.LessThanOrEqual, valueA: 30, valueB: undefined });
     expect(kvsGreaterThan('age', 30)).toEqual({ key: 'age', operation: KvsQueryOperationType.GreaterThan, valueA: 30, valueB: undefined });
-    expect(kvsGreaterThanOrEqual('age', 30)).toEqual({ key: 'age', operation: KvsQueryOperationType.GreaterThanOrEqual, valueA: 30, valueB: undefined });
+    expect(kvsGreaterThanOrEqual('age', 30)).toEqual({
+      key: 'age',
+      operation: KvsQueryOperationType.GreaterThanOrEqual,
+      valueA: 30,
+      valueB: undefined,
+    });
     expect(kvsIn('role', ['a', 'b'])).toEqual({ key: 'role', operation: KvsQueryOperationType.In, valueA: ['a', 'b'], valueB: undefined });
     expect(kvsBeginsWith('name', 'Al')).toEqual({ key: 'name', operation: KvsQueryOperationType.BeginsWith, valueA: 'Al', valueB: undefined });
     expect(kvsContains('tags', 'x')).toEqual({ key: 'tags', operation: KvsQueryOperationType.Contains, valueA: 'x', valueB: undefined });

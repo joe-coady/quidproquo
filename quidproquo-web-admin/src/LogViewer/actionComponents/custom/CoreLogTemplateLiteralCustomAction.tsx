@@ -24,7 +24,7 @@ export const CoreLogTemplateLiteralCustomAction: ActionComponent<LogTemplateLite
             (preComp: React.ReactNode, value: DecomposedStringPrimitive, index: number) => (
               <>
                 {preComp}
-                {<AnyVariableView value={value} expanded={expanded} hideStringQuotes={true} />}
+                {<AnyVariableView expanded={expanded} hideStringQuotes={true} value={value} />}
                 {<span>{strings[index + 1]}</span>}
               </>
             ),

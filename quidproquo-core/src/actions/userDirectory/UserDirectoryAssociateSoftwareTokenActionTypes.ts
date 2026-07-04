@@ -24,5 +24,11 @@ export interface UserDirectoryAssociateSoftwareTokenAction extends Action<UserDi
 }
 
 // Function Types
-export type UserDirectoryAssociateSoftwareTokenActionProcessor = ActionProcessor<UserDirectoryAssociateSoftwareTokenAction, AssociateSoftwareTokenResult>;
-export type UserDirectoryAssociateSoftwareTokenActionRequester = ActionRequester<UserDirectoryAssociateSoftwareTokenAction, AssociateSoftwareTokenResult>;
+export type UserDirectoryAssociateSoftwareTokenActionProcessor = ActionProcessor<
+  UserDirectoryAssociateSoftwareTokenAction,
+  AssociateSoftwareTokenResult
+>;
+export type UserDirectoryAssociateSoftwareTokenActionRequester = ActionRequester<
+  UserDirectoryAssociateSoftwareTokenAction,
+  AssociateSoftwareTokenResult
+>;

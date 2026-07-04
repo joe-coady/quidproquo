@@ -13,8 +13,7 @@ describe('useWebsocketPingPong', () => {
 
   it('sends a ping on mount and again on each interval', () => {
     const sendEvent = vi.fn();
-    const wrapper = ({ children }: { children: ReactNode }) =>
-      createElement(WebSocketContext.Provider, { value: { sendEvent } as any }, children);
+    const wrapper = ({ children }: { children: ReactNode }) => createElement(WebSocketContext.Provider, { value: { sendEvent } as any }, children);
 
     renderHook(() => useWebsocketPingPong(), { wrapper });
 

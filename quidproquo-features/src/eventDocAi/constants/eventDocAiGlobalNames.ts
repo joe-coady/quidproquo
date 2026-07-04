@@ -7,5 +7,4 @@ export const EVENT_DOC_AI_SERVICE_NAME_GLOBAL = 'eventDocAiServiceName';
 export const EVENT_DOC_AI_NAME_GLOBAL = 'eventDocAiName';
 export const EVENT_DOC_AI_MODEL_GLOBAL = 'eventDocAiModel';
 export const EVENT_DOC_AI_SYSTEM_PROMPT_GLOBAL = 'eventDocAiSystemPrompt';
-export const EVENT_DOC_AI_SYSTEM_PROMPT_GENERATOR_GLOBAL =
-  'eventDocAiSystemPromptGenerator';
+export const EVENT_DOC_AI_SYSTEM_PROMPT_GENERATOR_GLOBAL = 'eventDocAiSystemPromptGenerator';

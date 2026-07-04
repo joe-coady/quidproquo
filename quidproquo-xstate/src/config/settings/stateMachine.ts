@@ -1,10 +1,4 @@
-import {
-  CrossModuleOwner,
-  defineKeyValueStore,
-  QPQConfigAdvancedSettings,
-  QPQConfigSetting,
-  QpqFunctionRuntime,
-} from 'quidproquo-core';
+import { CrossModuleOwner, defineKeyValueStore, QPQConfigAdvancedSettings, QPQConfigSetting, QpqFunctionRuntime } from 'quidproquo-core';
 
 import { EventObject, MachineConfig, MachineContext } from 'xstate';
 
@@ -33,29 +27,22 @@ export interface StateMachineQPQConfigSetting extends QPQConfigSetting {
 
 export const getStateMachineStoreName = (stateMachineName: string): string => `qpq-sm-${stateMachineName}`;
 
-export const defineStateMachine = (
-  stateMachineName: string,
-  options: QPQConfigAdvancedStateMachineSettings,
-): QPQConfigSetting[] => {
-
+export const defineStateMachine = (stateMachineName: string, options: QPQConfigAdvancedStateMachineSettings): QPQConfigSetting[] => {
   const keyValueStoreName = getStateMachineStoreName(stateMachineName);
   const stateMachineConfig: StateMachineQPQConfigSetting = {
-      configSettingType: QPQXStateConfigSettingType.StateMachine,
-      uniqueKey: stateMachineName,
+    configSettingType: QPQXStateConfigSettingType.StateMachine,
+    uniqueKey: stateMachineName,
 
-      stateMachineName,
-      keyValueStoreName,
+    stateMachineName,
+    keyValueStoreName,
 
-      config: options.config,
-      actions: options.actions ?? {},
-      guards: options.guards ?? {},
-      stateField: options.stateField ?? '__machineState',
+    config: options.config,
+    actions: options.actions ?? {},
+    guards: options.guards ?? {},
+    stateField: options.stateField ?? '__machineState',
 
-      owner: options.owner,
-    };
+    owner: options.owner,
+  };
 
-  return [
-    defineKeyValueStore(keyValueStoreName, 'id'),
-    stateMachineConfig
-  ]
+  return [defineKeyValueStore(keyValueStoreName, 'id'), stateMachineConfig];
 };

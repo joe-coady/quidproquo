@@ -3,8 +3,7 @@ import { WebSocketQueueServerMessageEventType } from './WebSocketQueueServerMess
 
 export type WebSocketQueueServerEventPayloadServiceRequestResponse = unknown;
 
-export type WebSocketQueueServerEventMessageServiceRequestResponse =
-  WebSocketQueueEventMessage<
-    WebSocketQueueServerEventPayloadServiceRequestResponse,
-    WebSocketQueueServerMessageEventType.ServiceRequestResponse
-  >;
+export type WebSocketQueueServerEventMessageServiceRequestResponse = WebSocketQueueEventMessage<
+  WebSocketQueueServerEventPayloadServiceRequestResponse,
+  WebSocketQueueServerMessageEventType.ServiceRequestResponse
+>;

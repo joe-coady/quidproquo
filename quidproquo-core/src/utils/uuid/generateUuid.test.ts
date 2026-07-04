@@ -12,7 +12,9 @@ describe('generateUuid', () => {
   });
 
   it('contains exactly 4 dashes', () => {
-    const dashes = generateUuid().split('').filter((c) => c === '-').length;
+    const dashes = generateUuid()
+      .split('')
+      .filter((c) => c === '-').length;
 
     expect(dashes).toBe(4);
   });

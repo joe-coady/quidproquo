@@ -1,5 +1,6 @@
 import { type AiModel, askAiPromptStream, askConfigGetGlobal, askInlineFunctionExecute, AskResponse, askStreamMap } from 'quidproquo-core';
 
+import { EVENT_DOC_STORAGE_DRIVE_GLOBAL } from '../../eventDoc';
 import {
   EVENT_DOC_AI_MODEL_GLOBAL,
   EVENT_DOC_AI_NAME_GLOBAL,
@@ -9,38 +10,29 @@ import {
 import { askEventDocAiChatHistoryLoad } from '../data/askEventDocAiChatHistoryLoad';
 import { askEventDocAiChatHistorySave } from '../data/askEventDocAiChatHistorySave';
 import { askEventDocAiChatTouch } from '../data/askEventDocAiChatTouch';
-import type { EventDocAiChatMessage, EventDocAiChatSendResult, EventDocAiSystemPromptInput } from '../models';
+import type { EventDocAiAttachment, EventDocAiChatMessage, EventDocAiChatSendResult, EventDocAiSystemPromptInput } from '../models';
 import {
   askUIEventDocAiAppendChatMessage,
   askUIEventDocAiAppendStreamChunk,
   askUIEventDocAiClearStream,
   chatMessagesToAiMessages,
-  makeEventDocAiMessageFromText,
+  makeEventDocAiUserMessage,
   mergeStreamParts,
 } from '../module';
+import { askEventDocAiAttachmentsValidate } from './askEventDocAiAttachmentsValidate';
 
-const DEFAULT_SYSTEM_PROMPT =
-  'You are a helpful assistant. Use tools when appropriate.';
+const DEFAULT_SYSTEM_PROMPT = 'You are a helpful assistant. Use tools when appropriate.';
 
 // The turn's system prompt, freshest source first: the configured generator
 // inline function (built per-turn so it can carry live document state), else
 // the static configured prompt, else the default. Never persisted — the chat
 // history stores messages only.
 function* askEventDocAiSystemPromptResolve(docId: string): AskResponse<string> {
-  const generatorFn = yield* askConfigGetGlobal<string>(
-    EVENT_DOC_AI_SYSTEM_PROMPT_GENERATOR_GLOBAL
-  );
+  const generatorFn = yield* askConfigGetGlobal<string>(EVENT_DOC_AI_SYSTEM_PROMPT_GENERATOR_GLOBAL);
 
-  const generatedPrompt = generatorFn
-    ? yield* askInlineFunctionExecute<string, EventDocAiSystemPromptInput>(
-        generatorFn,
-        { docId }
-      )
-    : '';
+  const generatedPrompt = generatorFn ? yield* askInlineFunctionExecute<string, EventDocAiSystemPromptInput>(generatorFn, { docId }) : '';
 
-  const configuredPrompt = yield* askConfigGetGlobal<string>(
-    EVENT_DOC_AI_SYSTEM_PROMPT_GLOBAL
-  );
+  const configuredPrompt = yield* askConfigGetGlobal<string>(EVENT_DOC_AI_SYSTEM_PROMPT_GLOBAL);
 
   return generatedPrompt || configuredPrompt || DEFAULT_SYSTEM_PROMPT;
 }
@@ -52,16 +44,20 @@ function* askEventDocAiSystemPromptResolve(docId: string): AskResponse<string> {
 export function* askEventDocAiProcessSend(
   docId: string,
   chatId: string,
-  message: string
+  message: string,
+  attachments: EventDocAiAttachment[] = [],
 ): AskResponse<EventDocAiChatSendResult> {
   const aiName = yield* askConfigGetGlobal<string>(EVENT_DOC_AI_NAME_GLOBAL);
   const model = yield* askConfigGetGlobal<AiModel>(EVENT_DOC_AI_MODEL_GLOBAL);
   const systemPrompt = yield* askEventDocAiSystemPromptResolve(docId);
 
-  const fullHistory = [
-    ...(yield* askEventDocAiChatHistoryLoad(docId, chatId)),
-    makeEventDocAiMessageFromText('user', message),
-  ];
+  // Attachments are doc assets — they live on the collection's storage drive
+  // (uploaded via the eventDoc asset routes), not the chat-history drive.
+  const docStorageDrive = yield* askConfigGetGlobal<string>(EVENT_DOC_STORAGE_DRIVE_GLOBAL);
+
+  yield* askEventDocAiAttachmentsValidate(docStorageDrive, docId, attachments);
+
+  const fullHistory = [...(yield* askEventDocAiChatHistoryLoad(docId, chatId)), makeEventDocAiUserMessage(message, attachments)];
 
   yield* askEventDocAiChatHistorySave(docId, chatId, fullHistory);
 
@@ -71,16 +67,13 @@ export function* askEventDocAiProcessSend(
   const streamHandle = yield* askAiPromptStream(model, message, {
     system: systemPrompt,
     aiName,
-    messages: chatMessagesToAiMessages(fullHistory),
+    messages: chatMessagesToAiMessages(fullHistory, docStorageDrive, docId),
   });
 
-  const assistantParts = yield* askStreamMap(
-    streamHandle,
-    function* askMap(part) {
-      yield* askUIEventDocAiAppendStreamChunk(part);
-      return part;
-    }
-  );
+  const assistantParts = yield* askStreamMap(streamHandle, function* askMap(part) {
+    yield* askUIEventDocAiAppendStreamChunk(part);
+    return part;
+  });
 
   // Fold the transport parts into durable segments; a stream that produced no
   // content (e.g. it errored before any text) saves no assistant message.
@@ -94,10 +87,7 @@ export function* askEventDocAiProcessSend(
 
     // Persist the folded reply, hand the finalized message to the UI, then
     // clear its (now superseded) live-stream buffer.
-    yield* askEventDocAiChatHistorySave(docId, chatId, [
-      ...fullHistory,
-      assistantMessage,
-    ]);
+    yield* askEventDocAiChatHistorySave(docId, chatId, [...fullHistory, assistantMessage]);
 
     yield* askUIEventDocAiAppendChatMessage(assistantMessage);
   }

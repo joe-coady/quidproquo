@@ -2,11 +2,7 @@ import { CognitoIdentityProviderClient, ListUsersCommand } from '@aws-sdk/client
 
 import { createAwsClient } from '../createAwsClient';
 
-export const resolveUsernameByPreferredUsername = async (
-  userPoolId: string,
-  region: string,
-  preferredUsername: string,
-): Promise<string> => {
+export const resolveUsernameByPreferredUsername = async (userPoolId: string, region: string, preferredUsername: string): Promise<string> => {
   const cognitoClient = createAwsClient(CognitoIdentityProviderClient, {
     region,
   });

@@ -29,8 +29,12 @@ describe('createDebugLogActionProcessor', () => {
     const resolver = createDebugLogActionProcessor(buildRecordedResult([{ res: actionResult('one') }, { res: actionResult('two') }]));
     const proxy = await resolver({} as any);
 
-    expect(await proxy.Anything(undefined as any, undefined as any, proxy, undefined as any, undefined as any, undefined as any, undefined as any)).toEqual(actionResult('one'));
-    expect(await proxy.Anything(undefined as any, undefined as any, proxy, undefined as any, undefined as any, undefined as any, undefined as any)).toEqual(actionResult('two'));
+    expect(
+      await proxy.Anything(undefined as any, undefined as any, proxy, undefined as any, undefined as any, undefined as any, undefined as any),
+    ).toEqual(actionResult('one'));
+    expect(
+      await proxy.Anything(undefined as any, undefined as any, proxy, undefined as any, undefined as any, undefined as any, undefined as any),
+    ).toEqual(actionResult('two'));
   });
 
   it('uses an override processor when one is present', async () => {

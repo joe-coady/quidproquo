@@ -40,30 +40,31 @@ export function AuthChallengeSoftwareTokenMfa({ authState }: AuthChallengeSoftwa
       <Box component="form" sx={{ width: '100%', maxWidth: 360 }}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+            <Typography gutterBottom sx={{ display: 'flex', alignItems: 'center' }} variant="h5">
               <LockIcon sx={{ marginRight: 1 }} />
               Verification Code
             </Typography>
           </Grid>
           <Grid item xs={12}>
-            <Typography variant="body2" color="text.secondary">
+            <Typography color="text.secondary" variant="body2">
               Enter the 6-digit code from your authenticator app.
             </Typography>
           </Grid>
           <Grid item xs={12}>
             <TextField
-              required
+              autoFocus
               fullWidth
               id="mfaCode"
-              label="Authentication Code"
-              autoFocus
               inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', maxLength: 6 }}
-              value={state.mfaCode}
+              label="Authentication Code"
               onChange={(event) => api.authChallengeSetMfaCode(event.target.value.replace(/\D/g, ''))}
+              required
+              value={state.mfaCode}
             />
           </Grid>
           <Grid item xs={12}>
             <AsyncButton
+              disabled={!isCodeValid}
               onClick={() =>
                 api.authChallengeSendMfaCode(
                   authState.authenticateUserResponse?.challenge!,
@@ -71,7 +72,6 @@ export function AuthChallengeSoftwareTokenMfa({ authState }: AuthChallengeSoftwa
                   authState.username,
                 )
               }
-              disabled={!isCodeValid}
             >
               Verify
             </AsyncButton>

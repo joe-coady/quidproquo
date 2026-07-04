@@ -9,7 +9,7 @@ import path from 'path';
 import { getExpressApiEventEventProcessor } from '../actionProcessor';
 import { getAllServiceConfigs } from '../allServiceConfig';
 import { processEvent } from '../logic';
-import { ExpressEvent, ExpressEventResponse,ResolvedDevServerConfig } from '../types';
+import { ExpressEvent, ExpressEventResponse, ResolvedDevServerConfig } from '../types';
 
 const getServiceBaseDomain = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig) =>
   qpqWebServerUtils.getDomainRoot(

@@ -395,7 +395,6 @@ export const getApiBuildPath = (qpqConfig: QPQConfig): string => {
   return apiBuildPathConfig.apiBuildPath;
 };
 
-
 export const getSrcFilenameFromQpqFunctionRuntime = (qpqFunctionRuntime: QpqFunctionRuntime): string => {
   if (isQpqFunctionRuntimeAdvanced(qpqFunctionRuntime)) {
     return qpqFunctionRuntime.relativePath.split('/').pop() || '';
@@ -510,7 +509,6 @@ export const getQueueQueueProcessors = (name: string, qpqConfig: QPQConfig): Qpq
 
   return queueConfig?.qpqQueueProcessors || {};
 };
-
 
 export const convertCustomFullyQualifiedResourceToGeneric = <T extends string>(resource: CustomFullyQualifiedResource<T>): FullyQualifiedResource => {
   type KeyType = KeyOf<CustomFullyQualifiedResource<T>>;

@@ -9,7 +9,15 @@ describe('getStateDispatchActionListResolver', () => {
     const dispatch = vi.fn();
     const processors = await getStateDispatchActionListResolver(dispatch)({} as any, {} as any);
 
-    const result = await processors[StateActionType.Dispatch]({ action: { type: 'inc' } }, {} as any, {} as any, {} as any, {} as any, {} as any, {} as any);
+    const result = await processors[StateActionType.Dispatch](
+      { action: { type: 'inc' } },
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
+    );
 
     expect(dispatch).toHaveBeenCalledWith({ type: 'inc' });
     expect(result).toEqual([undefined]);

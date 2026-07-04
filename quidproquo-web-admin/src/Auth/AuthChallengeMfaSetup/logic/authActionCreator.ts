@@ -1,10 +1,6 @@
 import { AskResponse, askStateDispatchEffect } from 'quidproquo-core';
 
-import {
-  AuthChallengeMfaSetupEffect,
-  AuthChallengeMfaSetupSetAssociationEffect,
-  AuthChallengeMfaSetupSetMfaCodeEffect,
-} from './authChallengeTypes';
+import { AuthChallengeMfaSetupEffect, AuthChallengeMfaSetupSetAssociationEffect, AuthChallengeMfaSetupSetMfaCodeEffect } from './authChallengeTypes';
 
 export function* askAuthChallengeSetMfaSetupCode(mfaCode: string): AskResponse<void> {
   yield* askStateDispatchEffect<AuthChallengeMfaSetupSetMfaCodeEffect>(AuthChallengeMfaSetupEffect.SetMfaCode, mfaCode);

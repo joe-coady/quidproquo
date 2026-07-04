@@ -27,10 +27,8 @@ const getProcessCreateUser = (qpqConfig: QPQConfig, devServerConfig: ResolvedDev
   };
 };
 
-export const getUserDirectoryCreateUserActionProcessor = (
-  devServerConfig: ResolvedDevServerConfig,
-): ActionProcessorListResolver => async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [UserDirectoryActionType.CreateUser]: getProcessCreateUser(qpqConfig, devServerConfig),
-});
+export const getUserDirectoryCreateUserActionProcessor =
+  (devServerConfig: ResolvedDevServerConfig): ActionProcessorListResolver =>
+  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
+    [UserDirectoryActionType.CreateUser]: getProcessCreateUser(qpqConfig, devServerConfig),
+  });

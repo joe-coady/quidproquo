@@ -10,12 +10,7 @@ describe('getStateMachineActionProcessor', () => {
     const processors = await getStateMachineActionProcessor(buildTestQpqConfig(), noopDynamicModuleLoader);
 
     expect(Object.keys(processors).sort()).toEqual(
-      [
-        StateMachineActionType.Create,
-        StateMachineActionType.Get,
-        StateMachineActionType.GetState,
-        StateMachineActionType.SendEvent,
-      ].sort(),
+      [StateMachineActionType.Create, StateMachineActionType.Get, StateMachineActionType.GetState, StateMachineActionType.SendEvent].sort(),
     );
   });
 });

@@ -29,7 +29,10 @@ describe('askStreamProcess', () => {
       },
     );
 
-    expect(seen).toEqual([['a', 0], ['b', 1]]);
+    expect(seen).toEqual([
+      ['a', 0],
+      ['b', 1],
+    ]);
     expect(close).toHaveBeenCalledTimes(1);
   });
 

@@ -15,10 +15,7 @@ import * as fs from 'fs/promises';
 import { FileStorageConfig } from './types';
 import { resolveFilePath } from './utils';
 
-const getProcessFileDelete = (
-  qpqConfig: QPQConfig,
-  config: FileStorageConfig
-): FileDeleteActionProcessor => {
+const getProcessFileDelete = (qpqConfig: QPQConfig, config: FileStorageConfig): FileDeleteActionProcessor => {
   return async ({ drive, filepaths }) => {
     const deletedFiles: string[] = [];
     const errors: { filepath: string; error: any }[] = [];
@@ -44,17 +41,18 @@ const getProcessFileDelete = (
       if (errors.some(({ error }) => error.code === 'EACCES')) {
         return actionResultError(FileDeleteErrorTypeEnum.AccessDenied, 'Access denied deleting files');
       }
-      return actionResultError(ErrorTypeEnum.GenericError, `Failed to delete files: ${errors.map(({ filepath, error }) => `Failed to delete ${filepath}: ${error.message}`).join(', ')}`);
+      return actionResultError(
+        ErrorTypeEnum.GenericError,
+        `Failed to delete files: ${errors.map(({ filepath, error }) => `Failed to delete ${filepath}: ${error.message}`).join(', ')}`,
+      );
     }
 
     return actionResult(deletedFiles);
   };
 };
 
-export const getFileDeleteActionProcessor = (
-  config: FileStorageConfig
-): ActionProcessorListResolver => async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [FileActionType.Delete]: getProcessFileDelete(qpqConfig, config),
-});
+export const getFileDeleteActionProcessor =
+  (config: FileStorageConfig): ActionProcessorListResolver =>
+  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
+    [FileActionType.Delete]: getProcessFileDelete(qpqConfig, config),
+  });

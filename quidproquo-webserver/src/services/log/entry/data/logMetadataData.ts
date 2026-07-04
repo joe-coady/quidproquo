@@ -1,5 +1,3 @@
-
-
 import {
   askFileExists,
   askFileGenerateTemporarySecureUrl,
@@ -25,7 +23,6 @@ import {
 } from 'quidproquo-core';
 
 import { LogMetadata } from '../domain/LogMetadata';
-
 
 const metadataStoreName = QPQ_LOGS_STORAGE_DRIVE_NAME;
 export function* askUpsert(logMetadata: LogMetadata): AskResponse<void> {

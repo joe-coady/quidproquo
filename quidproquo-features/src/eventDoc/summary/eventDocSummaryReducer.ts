@@ -1,11 +1,7 @@
 import { buildEffectReducer, QpqReducer } from 'quidproquo-core';
 
 import { ReservedEventDocEffects } from '../fold/ReservedEventDocEffects';
-import {
-  EventDocEffect,
-  EventDocEvent,
-  EventDocSummary,
-} from '../models';
+import { EventDocEffect, EventDocEvent, EventDocSummary } from '../models';
 import { createSummaryDraft } from './stateUpdaters/createSummaryDraft';
 import { initSummary } from './stateUpdaters/initSummary';
 import { publishSummary } from './stateUpdaters/publishSummary';
@@ -16,10 +12,7 @@ import { setSummaryName } from './stateUpdaters/setSummaryName';
 // (content) events bubble `[model, false]` — the record ignores them (the applier still
 // bumps updatedAt). Cast to accept any EventDocEvent: buildEffectReducer skips
 // unknown types, so it genuinely handles the whole log.
-export const eventDocSummaryReducer = buildEffectReducer<
-  EventDocSummary,
-  ReservedEventDocEffects
->({
+export const eventDocSummaryReducer = buildEffectReducer<EventDocSummary, ReservedEventDocEffects>({
   [EventDocEffect.InitState]: initSummary,
   [EventDocEffect.SetCode]: setSummaryCode,
   [EventDocEffect.SetName]: setSummaryName,

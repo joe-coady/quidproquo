@@ -31,10 +31,14 @@ const getProcessSetUserAttributes = (qpqConfig: QPQConfig): UserDirectorySetUser
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         UserNotFoundException: () => actionResultError(UserDirectorySetUserAttributesErrorTypeEnum.UserNotFound, 'No account found for this user'),
-        InvalidParameterException: () => actionResultError(UserDirectorySetUserAttributesErrorTypeEnum.InvalidAttributes, 'One or more attributes are invalid'),
-        AliasExistsException: () => actionResultError(UserDirectorySetUserAttributesErrorTypeEnum.AliasExists, 'That email or phone number is already in use'),
-        LimitExceededException: () => actionResultError(UserDirectorySetUserAttributesErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
-        TooManyRequestsException: () => actionResultError(UserDirectorySetUserAttributesErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
+        InvalidParameterException: () =>
+          actionResultError(UserDirectorySetUserAttributesErrorTypeEnum.InvalidAttributes, 'One or more attributes are invalid'),
+        AliasExistsException: () =>
+          actionResultError(UserDirectorySetUserAttributesErrorTypeEnum.AliasExists, 'That email or phone number is already in use'),
+        LimitExceededException: () =>
+          actionResultError(UserDirectorySetUserAttributesErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
+        TooManyRequestsException: () =>
+          actionResultError(UserDirectorySetUserAttributesErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
       });
     }
   };

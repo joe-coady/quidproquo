@@ -1,4 +1,13 @@
-import { ConfigActionType, ContextActionType, DateActionType, GuidActionType, NetworkActionType, runStory, StateActionType, StateDispatchAction } from 'quidproquo-core';
+import {
+  ConfigActionType,
+  ContextActionType,
+  DateActionType,
+  GuidActionType,
+  NetworkActionType,
+  runStory,
+  StateActionType,
+  StateDispatchAction,
+} from 'quidproquo-core';
 
 import { describe, expect, it, vi } from 'vitest';
 

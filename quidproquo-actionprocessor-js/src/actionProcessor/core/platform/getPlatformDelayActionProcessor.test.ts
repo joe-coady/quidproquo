@@ -1,4 +1,4 @@
-import { buildTestQpqConfig, PlatformActionType,resolveActionResult } from 'quidproquo-core';
+import { buildTestQpqConfig, PlatformActionType, resolveActionResult } from 'quidproquo-core';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -14,7 +14,10 @@ describe('getPlatformDelayActionProcessor', () => {
   });
 
   it('resolves after the requested delay elapses', async () => {
-    const processor = (await getPlatformDelayActionProcessor(buildTestQpqConfig(), async () => null))[PlatformActionType.Delay] as (p: any, ...rest: any[]) => Promise<any>;
+    const processor = (await getPlatformDelayActionProcessor(buildTestQpqConfig(), async () => null))[PlatformActionType.Delay] as (
+      p: any,
+      ...rest: any[]
+    ) => Promise<any>;
 
     const pending = processor({ timeMs: 1000 }, undefined as any);
     await vi.advanceTimersByTimeAsync(1000);

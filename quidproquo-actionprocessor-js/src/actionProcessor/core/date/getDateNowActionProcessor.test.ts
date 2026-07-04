@@ -15,7 +15,10 @@ describe('getDateNowActionProcessor', () => {
   });
 
   it('returns the current time as an ISO string', async () => {
-    const processor = (await getDateNowActionProcessor(buildTestQpqConfig(), async () => null))[DateActionType.Now] as (p: any, ...rest: any[]) => Promise<any>;
+    const processor = (await getDateNowActionProcessor(buildTestQpqConfig(), async () => null))[DateActionType.Now] as (
+      p: any,
+      ...rest: any[]
+    ) => Promise<any>;
 
     const result = await processor(undefined, undefined as any);
 

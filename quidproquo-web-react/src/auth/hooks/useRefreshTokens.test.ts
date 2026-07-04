@@ -6,7 +6,12 @@ import { renderHook } from '@testing-library/react';
 import { useRefreshTokens } from './useRefreshTokens';
 
 const buildInfo = (overrides: Partial<AuthenticationInfo>): AuthenticationInfo =>
-  ({ accessToken: 'a', refreshToken: 'r', expiresAt: getQpqIsoDateTimeFromDate(new Date(Date.now() + 60 * 60 * 1000)), ...overrides }) as AuthenticationInfo;
+  ({
+    accessToken: 'a',
+    refreshToken: 'r',
+    expiresAt: getQpqIsoDateTimeFromDate(new Date(Date.now() + 60 * 60 * 1000)),
+    ...overrides,
+  }) as AuthenticationInfo;
 
 describe('useRefreshTokens', () => {
   beforeEach(() => vi.useFakeTimers().setSystemTime(new Date('2026-06-26T12:00:00.000Z')));

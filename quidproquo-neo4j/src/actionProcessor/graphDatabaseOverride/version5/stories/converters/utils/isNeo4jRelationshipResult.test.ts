@@ -4,9 +4,7 @@ import { isNeo4jRelationshipResult } from './isNeo4jRelationshipResult';
 
 describe('isNeo4jRelationshipResult', () => {
   it('returns true for a relationship object', () => {
-    expect(
-      isNeo4jRelationshipResult({ elementId: '1', startNodeElementId: '2', endNodeElementId: '3', type: 'KNOWS', properties: {} }),
-    ).toBe(true);
+    expect(isNeo4jRelationshipResult({ elementId: '1', startNodeElementId: '2', endNodeElementId: '3', type: 'KNOWS', properties: {} })).toBe(true);
   });
 
   it('returns false for a node object', () => {

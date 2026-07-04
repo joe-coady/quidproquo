@@ -9,11 +9,7 @@ export interface AskAiPromptStreamOptions {
   messages?: AiMessage[];
 }
 
-export function* askAiPromptStream(
-  model: AiModel,
-  prompt: string,
-  options?: AskAiPromptStreamOptions,
-): AiPromptStreamActionRequester {
+export function* askAiPromptStream(model: AiModel, prompt: string, options?: AskAiPromptStreamOptions): AiPromptStreamActionRequester {
   return yield {
     type: AiActionType.PromptStream,
     payload: {

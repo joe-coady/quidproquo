@@ -1,4 +1,11 @@
-import { buildTestQpqConfig, ClaudeAiActionType, ClaudeAiMessagesApiErrorTypeEnum, ErrorTypeEnum, resolveActionResult,resolveActionResultError } from 'quidproquo-core';
+import {
+  buildTestQpqConfig,
+  ClaudeAiActionType,
+  ClaudeAiMessagesApiErrorTypeEnum,
+  ErrorTypeEnum,
+  resolveActionResult,
+  resolveActionResultError,
+} from 'quidproquo-core';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -46,7 +53,11 @@ describe('getClaudeAiMessagesApiActionProcessor', () => {
     messagesCreate.mockReset();
   });
 
-  const resolve = async () => (await getClaudeAiMessagesApiActionProcessor(buildTestQpqConfig(), async () => null))[ClaudeAiActionType.MessagesApi] as (p: any, ...rest: any[]) => Promise<any>;
+  const resolve = async () =>
+    (await getClaudeAiMessagesApiActionProcessor(buildTestQpqConfig(), async () => null))[ClaudeAiActionType.MessagesApi] as (
+      p: any,
+      ...rest: any[]
+    ) => Promise<any>;
 
   it('returns the created message on success', async () => {
     const message = { id: 'msg_1', content: [] };
@@ -66,7 +77,11 @@ describe('getClaudeAiMessagesApiActionProcessor', () => {
 
     const result = await processor({ body, apiKey: 'sk-test' }, undefined as any);
 
-    expect(resolveActionResultError(result)).toEqual({ errorType: ClaudeAiMessagesApiErrorTypeEnum.Unauthorized, errorText: 'Invalid API key.', errorStack: undefined });
+    expect(resolveActionResultError(result)).toEqual({
+      errorType: ClaudeAiMessagesApiErrorTypeEnum.Unauthorized,
+      errorText: 'Invalid API key.',
+      errorStack: undefined,
+    });
   });
 
   it('maps a generic error to its message', async () => {

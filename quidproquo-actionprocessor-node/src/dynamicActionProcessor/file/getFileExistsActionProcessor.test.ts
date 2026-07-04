@@ -1,4 +1,11 @@
-import { ErrorTypeEnum, FileActionType, FileExistsErrorTypeEnum, isErroredActionResult, resolveActionResult, resolveActionResultError } from 'quidproquo-core';
+import {
+  ErrorTypeEnum,
+  FileActionType,
+  FileExistsErrorTypeEnum,
+  isErroredActionResult,
+  resolveActionResult,
+  resolveActionResultError,
+} from 'quidproquo-core';
 
 import * as fs from 'fs/promises';
 import { afterEach, describe, expect, it, vi } from 'vitest';

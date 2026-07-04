@@ -1,4 +1,12 @@
-import { askDateNow, askInlineFunctionExecute, AskResponse, askRetry, askThrowError, ErrorTypeEnum, KeyValueStoreUpsertErrorTypeEnum } from 'quidproquo-core';
+import {
+  askDateNow,
+  askInlineFunctionExecute,
+  AskResponse,
+  askRetry,
+  askThrowError,
+  ErrorTypeEnum,
+  KeyValueStoreUpsertErrorTypeEnum,
+} from 'quidproquo-core';
 import { Nullable } from 'quidproquo-core';
 
 import { askValidateModelOrThrowError } from '../../validation/askValidateModelOrThrowError';
@@ -38,11 +46,7 @@ const APPEND_RETRY_MAX_JITTER_MS = 100;
  *   indexes instead of overwriting each other.
  * A deduped retry returns early and is neither validated nor re-derived.
  */
-export function* askEventDocEventAppend(
-  modelId: string,
-  input: EventDocEventInput,
-  actor: EventDocEventActor
-): AskResponse<EventDocEvent> {
+export function* askEventDocEventAppend(modelId: string, input: EventDocEventInput, actor: EventDocEventActor): AskResponse<EventDocEvent> {
   const { metadata } = input.payload;
 
   const result = yield* askRetry(
@@ -50,23 +54,17 @@ export function* askEventDocEventAppend(
       const last = yield* askEventDocEventLast(modelId);
 
       if (!last) {
-        return yield* askThrowError(
-          ErrorTypeEnum.NotFound,
-          `No event log for model ${modelId} — it has no INIT_STATE.`
-        );
+        return yield* askThrowError(ErrorTypeEnum.NotFound, `No event log for model ${modelId} — it has no INIT_STATE.`);
       }
 
-      if (
-        metadata.clientMessageId &&
-        last.payload.metadata.clientMessageId === metadata.clientMessageId
-      ) {
+      if (metadata.clientMessageId && last.payload.metadata.clientMessageId === metadata.clientMessageId) {
         return last;
       }
 
       if (metadata.version < last.payload.metadata.version) {
         return yield* askThrowError(
           ErrorTypeEnum.Conflict,
-          `Event version ${metadata.version} is older than the last event version ${last.payload.metadata.version}.`
+          `Event version ${metadata.version} is older than the last event version ${last.payload.metadata.version}.`,
         );
       }
 
@@ -98,10 +96,7 @@ export function* askEventDocEventAppend(
       const { eventValidator } = yield* askEventDocStoreRead();
       const events = yield* askEventDocEventListAll(modelId);
       const reason = eventValidator
-        ? yield* askInlineFunctionExecute<
-            Nullable<string>,
-            EventDocEventValidationInput
-          >(eventValidator, { event, events })
+        ? yield* askInlineFunctionExecute<Nullable<string>, EventDocEventValidationInput>(eventValidator, { event, events })
         : defaultEventDocEventValidator(event, events);
 
       if (reason) {
@@ -123,22 +118,18 @@ export function* askEventDocEventAppend(
     MAX_APPEND_ATTEMPTS,
     APPEND_RETRY_BASE_WAIT_MS,
     [KeyValueStoreUpsertErrorTypeEnum.Conflict],
-    { linearBackoff: true, maxJitterMs: APPEND_RETRY_MAX_JITTER_MS }
+    { linearBackoff: true, maxJitterMs: APPEND_RETRY_MAX_JITTER_MS },
   );
 
   if (!result.success) {
     if (result.error.errorType === KeyValueStoreUpsertErrorTypeEnum.Conflict) {
       return yield* askThrowError(
         ErrorTypeEnum.Conflict,
-        `Could not append to model ${modelId}: lost the index race ${MAX_APPEND_ATTEMPTS} times — too much concurrent write contention.`
+        `Could not append to model ${modelId}: lost the index race ${MAX_APPEND_ATTEMPTS} times — too much concurrent write contention.`,
       );
     }
 
-    return yield* askThrowError(
-      result.error.errorType as ErrorTypeEnum,
-      result.error.errorText,
-      result.error.errorStack
-    );
+    return yield* askThrowError(result.error.errorType as ErrorTypeEnum, result.error.errorText, result.error.errorStack);
   }
 
   return result.result;

@@ -7,9 +7,7 @@ type CognitoSession = DefineAuthChallengeTriggerEvent['request']['session'];
 
 describe('getChallengeSessionFromCognitoTriggerEventSession', () => {
   it('maps challengeMetadata to challengeName and passes the result through', () => {
-    const session = [
-      { challengeName: 'CUSTOM_CHALLENGE', challengeResult: true, challengeMetadata: 'emailCode' },
-    ] as unknown as CognitoSession;
+    const session = [{ challengeName: 'CUSTOM_CHALLENGE', challengeResult: true, challengeMetadata: 'emailCode' }] as unknown as CognitoSession;
 
     expect(getChallengeSessionFromCognitoTriggerEventSession(session)).toEqual([{ challengeName: 'emailCode', challengeResult: true }]);
   });

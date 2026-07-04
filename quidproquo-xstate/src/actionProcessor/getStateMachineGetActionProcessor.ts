@@ -31,10 +31,9 @@ const getProcessStateMachineGet = (qpqConfig: QPQConfig): StateMachineGetActionP
       streamRegistry,
     );
 
-    const getResult = await resolveStory(
-      function* () { return yield* askKeyValueStoreGet<Record<string, any>>(smConfig.keyValueStoreName, payload.id); },
-      [],
-    );
+    const getResult = await resolveStory(function* () {
+      return yield* askKeyValueStoreGet<Record<string, any>>(smConfig.keyValueStoreName, payload.id);
+    }, []);
     if (getResult.error) {
       return actionResultError(getResult.error.errorType, getResult.error.errorText);
     }

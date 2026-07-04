@@ -39,9 +39,7 @@ describe('mergeRouteOptions', () => {
 
 describe('mergeAllRouteOptions', () => {
   it('folds the default route options into the route options', () => {
-    const config = buildTestQpqConfig([
-      defineDefaultRouteOptions('default', { allowedOrigins: ['https://default.com'] }),
-    ]);
+    const config = buildTestQpqConfig([defineDefaultRouteOptions('default', { allowedOrigins: ['https://default.com'] })]);
     const route = { options: { allowedOrigins: ['https://route.com'] } } as RouteQPQWebServerConfigSetting;
 
     const merged = mergeAllRouteOptions('api', route, config);

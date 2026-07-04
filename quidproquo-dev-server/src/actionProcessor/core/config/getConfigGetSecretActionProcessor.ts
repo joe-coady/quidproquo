@@ -22,10 +22,8 @@ const getProcessConfigGetSecret = (qpqConfig: QPQConfig, devServerConfig: Resolv
   };
 };
 
-export const getConfigGetSecretActionProcessor = (
-  devServerConfig: ResolvedDevServerConfig,
-): ActionProcessorListResolver => async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [ConfigActionType.GetSecret]: getProcessConfigGetSecret(qpqConfig, devServerConfig),
-});
+export const getConfigGetSecretActionProcessor =
+  (devServerConfig: ResolvedDevServerConfig): ActionProcessorListResolver =>
+  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
+    [ConfigActionType.GetSecret]: getProcessConfigGetSecret(qpqConfig, devServerConfig),
+  });

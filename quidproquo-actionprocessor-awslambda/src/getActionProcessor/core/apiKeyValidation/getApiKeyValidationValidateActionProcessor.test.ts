@@ -18,8 +18,7 @@ const resolveProcessor = async () => {
   return processors[ApiKeyValidationActionType.Validate];
 };
 
-const invoke = (processor: any, apiKeyValue: string) =>
-  invokeProcessor(processor, { apiKeyValue, apiKeyReferences: [{ name: 'key' }] });
+const invoke = (processor: any, apiKeyValue: string) => invokeProcessor(processor, { apiKeyValue, apiKeyReferences: [{ name: 'key' }] });
 
 describe('getApiKeyValidationValidateActionProcessor', () => {
   beforeEach(() => {

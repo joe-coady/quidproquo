@@ -6,7 +6,4 @@ export type SetLoadingChatsPayload = {
   isLoading: boolean;
 };
 
-export type EventDocAiSetLoadingChatsEffect = Effect<
-  EventDocAiEffect.SetLoadingChats,
-  SetLoadingChatsPayload
->;
+export type EventDocAiSetLoadingChatsEffect = Effect<EventDocAiEffect.SetLoadingChats, SetLoadingChatsPayload>;

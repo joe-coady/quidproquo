@@ -13,13 +13,6 @@ import { validateEventDocEvent } from './validateEventDocEvent';
 // default: a separate default can't be relaxed. The same validator runs on the frontend pending
 // buffer and the backend append handler.
 export const createEventDocEventValidator =
-  <S extends EventDocDocument>(
-    fold: (events: EventDocEvent[]) => S,
-    domainValidators: EventDocEventValidators<S> = {}
-  ): EventDocEditorValidator =>
+  <S extends EventDocDocument>(fold: (events: EventDocEvent[]) => S, domainValidators: EventDocEventValidators<S> = {}): EventDocEditorValidator =>
   (event, events) =>
-    validateEventDocEvent(
-      { ...reservedEventDocEventValidators, ...domainValidators },
-      event,
-      fold(events)
-    );
+    validateEventDocEvent({ ...reservedEventDocEventValidators, ...domainValidators }, event, fold(events));

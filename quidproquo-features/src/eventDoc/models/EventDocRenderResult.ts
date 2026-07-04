@@ -5,6 +5,4 @@ import { EventDocRenderKind } from './EventDocRenderKind';
 // blob like a pdf (template). Only the Html variant is produced today; Css/Blob are modelled
 // ahead of use (the Blob payload — guid, download mechanism — will firm up when built).
 export type EventDocRenderResult =
-  | { kind: EventDocRenderKind.Html; html: string }
-  | { kind: EventDocRenderKind.Css; css: string }
-  | { kind: EventDocRenderKind.Blob; blobId: string };
+  { kind: EventDocRenderKind.Html; html: string } | { kind: EventDocRenderKind.Css; css: string } | { kind: EventDocRenderKind.Blob; blobId: string };

@@ -1,4 +1,4 @@
 export * from './chatMessagesToAiMessages';
-export * from './makeEventDocAiMessageFromText';
+export * from './makeEventDocAiUserMessage';
 export * from './mergeStreamParts';
 export * from './segmentsToText';

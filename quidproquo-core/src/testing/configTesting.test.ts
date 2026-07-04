@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
 import { QPQCoreConfigSettingType } from '../config';
-import { getApiBuildPath, getApplicationModuleEnvironment, getApplicationModuleFeature, getApplicationModuleName, getApplicationName, getConfigRoot } from '../qpqCoreUtils';
+import {
+  getApiBuildPath,
+  getApplicationModuleEnvironment,
+  getApplicationModuleFeature,
+  getApplicationModuleName,
+  getApplicationName,
+  getConfigRoot,
+} from '../qpqCoreUtils';
 import { buildTestQpqConfig } from './configTesting';
 
 describe('buildTestQpqConfig', () => {

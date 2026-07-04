@@ -7,7 +7,4 @@ export type SetActiveChatPayload = {
   chatId: Nullable<string>;
 };
 
-export type EventDocAiSetActiveChatEffect = Effect<
-  EventDocAiEffect.SetActiveChat,
-  SetActiveChatPayload
->;
+export type EventDocAiSetActiveChatEffect = Effect<EventDocAiEffect.SetActiveChat, SetActiveChatPayload>;

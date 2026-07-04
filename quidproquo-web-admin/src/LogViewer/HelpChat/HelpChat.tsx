@@ -89,7 +89,7 @@ export const HelpChat: React.FC<HelpChatProps> = ({ logCorrelation }) => {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <Box sx={{ flexGrow: 1, overflowY: 'auto', p: 2 }} ref={chatContainerRef}>
+      <Box ref={chatContainerRef} sx={{ flexGrow: 1, overflowY: 'auto', p: 2 }}>
         {chatMessages.map((message, index) => (
           <Box
             key={index}
@@ -160,14 +160,14 @@ export const HelpChat: React.FC<HelpChatProps> = ({ logCorrelation }) => {
         <Box sx={{ display: 'flex' }}>
           <TextField
             fullWidth
-            variant="outlined"
-            placeholder="Type your message..."
-            value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyDown={handleKeyPress}
+            placeholder="Type your message..."
             sx={{ mr: 2 }}
+            value={inputMessage}
+            variant="outlined"
           />
-          <Button variant="contained" onClick={handleSendMessage}>
+          <Button onClick={handleSendMessage} variant="contained">
             Send
           </Button>
         </Box>
