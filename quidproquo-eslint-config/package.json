@@ -21,11 +21,23 @@
   ],
   "author": "joecoady",
   "license": "ISC",
-  "devDependencies": {
+  "dependencies": {
     "@eslint/js": "^9.13.0",
-    "eslint": "^9.13.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-jsx-a11y": "^6.10.0",
+    "eslint-plugin-prettier": "^5.2.0",
+    "eslint-plugin-react": "^7.37.0",
+    "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "globals": "^15.11.0",
     "typescript-eslint": "^8.11.0"
+  },
+  "peerDependencies": {
+    "eslint": "^9.0.0",
+    "prettier": "^3.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^9.13.0",
+    "prettier": "^3.0.3"
   }
 }

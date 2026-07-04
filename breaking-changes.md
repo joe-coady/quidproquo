@@ -5,6 +5,7 @@ assembled quickly.
 
 ## vNext
 
+- `quidproquo-eslint-config`'s shared config now lints `.jsx`/`.tsx` files and enforces `eslint-plugin-react`, `eslint-plugin-jsx-a11y`, and `eslint-plugin-prettier` rules. Consumers now need `prettier` installed (peer dep) and may see new lint failures on JSX files and formatting-only diffs.
 - `DateNowActionProcessor`/`DateNowActionRequester` in `quidproquo-core` now resolve to `QpqIsoDateTime` instead of `string`. If you implement `DateNowActionProcessor` yourself, return `getQpqIsoDateTimeFromDate(date)` instead of `date.toISOString()`.
 - `AuthenticationInfo.expiresAt` in `quidproquo-core` is now typed `QpqIsoDateTime` instead of `string`. Still a plain ISO string at runtime; construct it with `getQpqIsoDateTimeFromDate` instead of a raw `.toISOString()`.
 - `preformNetworkRequest` is removed from `quidproquo-web`. Import it from `quidproquo-webserver` instead (same signature).

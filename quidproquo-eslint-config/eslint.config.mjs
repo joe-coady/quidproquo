@@ -4,10 +4,12 @@ import tseslint from 'typescript-eslint';
 import pluginJs from '@eslint/js';
 
 import { overrides } from './config/overrides.mjs';
+import { prettierConfigs } from './config/prettier.mjs';
+import { reactConfigs } from './config/react.mjs';
 
 export default [
   { ignores: ['**/dist/**', '**/lib/**', '**/node_modules/**', '**/*.d.ts'] },
-  { files: ['**/*.{js,mjs,cjs,ts}'] },
+  { files: ['**/*.{js,mjs,cjs,jsx,ts,tsx}'] },
   { languageOptions: { globals: { ...globals.browser, ...globals.node } } },
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
@@ -51,6 +53,9 @@ export default [
       'simple-import-sort/exports': 'error',
     },
   },
+
+  ...reactConfigs,
+  ...prettierConfigs,
 
   overrides,
 ];
