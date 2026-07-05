@@ -30,7 +30,12 @@ export const fileWatcherImplementation = async (devServerConfig: ResolvedDevServ
     console.error('Error creating storage directory:', error);
   }
 
-  // Create a watcher for the storage directory
+  // Create a watcher for the storage directory. Requires chokidar v3: on macOS
+  // v3 watches via FSEvents (one fd for the whole tree), while v4 dropped
+  // FSEvents and holds a kqueue fd PER FILE — high-churn drives (qpq-logs
+  // writes a file per story execution) then grow the fd table until
+  // child_process.spawn fails with EBADF (~80k fds), killing anything that
+  // launches a subprocess (e.g. puppeteer).
   const watcher = chokidar.watch(storagePath, {
     persistent: true,
     ignoreInitial: true, // Don't fire events for existing files
