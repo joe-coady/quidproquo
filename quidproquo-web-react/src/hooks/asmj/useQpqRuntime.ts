@@ -58,6 +58,7 @@ export function useQpqRuntime<
     if (mainStory) {
       resolver(mainStory)();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return [api as QpqMappedApi<TApi>, state, dispatch];
