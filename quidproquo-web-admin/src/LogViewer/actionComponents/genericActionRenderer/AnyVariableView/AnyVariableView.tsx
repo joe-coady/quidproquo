@@ -100,7 +100,7 @@ export const StringVariableView = ({ value, expanded, hideStringQuotes }: Variab
     return <span style={genericFunctionRendererStyles.stringValue}>{trimmedValue}</span>;
   }
 
-  return <span style={genericFunctionRendererStyles.stringValue}>"{trimmedValue}"</span>;
+  return <span style={genericFunctionRendererStyles.stringValue}>&quot;{trimmedValue}&quot;</span>;
 };
 
 export const ArrayVariableView = ({ value, expanded }: VariableViewProps) => {

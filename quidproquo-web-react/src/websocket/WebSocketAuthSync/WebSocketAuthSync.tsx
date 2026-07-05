@@ -10,7 +10,7 @@ export type WebSocketAuthSyncProps = {
   accessToken: AuthenticationInfo['accessToken'];
 };
 
-const component: React.FC<WebSocketAuthSyncProps> = ({ children, accessToken }) => {
+const WebSocketAuthSyncComponent: React.FC<WebSocketAuthSyncProps> = ({ children, accessToken }) => {
   const isAuthenticated = useWebsocketAuthSync(accessToken);
 
   // Keep the active websocket alive
@@ -19,4 +19,4 @@ const component: React.FC<WebSocketAuthSyncProps> = ({ children, accessToken }) 
   return <WebSocketAuthContext.Provider value={isAuthenticated}>{children}</WebSocketAuthContext.Provider>;
 };
 
-export const WebSocketAuthSync = memo(component);
+export const WebSocketAuthSync = memo(WebSocketAuthSyncComponent);

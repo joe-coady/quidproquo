@@ -36,13 +36,22 @@ export const LogSummaryDetails = ({ log }: LogSummaryDetailsProps) => {
       <div>
         <pre style={genericFunctionRendererStyles.pre}>
           <div style={genericFunctionRendererStyles.commentBlock}>
-            <div>// //////////////////////////////////////////////////////</div>
-            <div>// src: {functionKey}</div>
-            {log.fromCorrelation && <div>// Caller: {log.fromCorrelation}</div>}
+            <div>{'// //////////////////////////////////////////////////////'}</div>
             <div>
-              // Total Runtime: <span style={genericFunctionRendererStyles.highlightComment}>{totalRuntime} ms</span>
+              {'// src: '}
+              {functionKey}
             </div>
-            <div>// //////////////////////////////////////////////////////</div>
+            {log.fromCorrelation && (
+              <div>
+                {'// Caller: '}
+                {log.fromCorrelation}
+              </div>
+            )}
+            <div>
+              {'// Total Runtime: '}
+              <span style={genericFunctionRendererStyles.highlightComment}>{totalRuntime} ms</span>
+            </div>
+            <div>{'// //////////////////////////////////////////////////////'}</div>
           </div>
           <GenericFunctionRenderer args={log.input} expanded={expanded} functionName={functionKey.split('::').pop() || 'unknown'} />
         </pre>

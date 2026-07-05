@@ -56,17 +56,7 @@ const pickOptions = (
   return Object.keys(picked).length > 0 ? picked : undefined;
 };
 
-const toDate = (props: DateInput): Date => {
-  if ('isoDateTime' in props) {
-    return new Date(props.isoDateTime);
-  }
-  if ('unixTimestampMs' in props) {
-    return new Date(props.unixTimestampMs);
-  }
-  return props.date;
-};
-
-const component: React.FC<DateTimeProps> = (props) => {
+const DateTimeComponent: React.FC<DateTimeProps> = (props) => {
   const {
     locale,
     dateTimeFormatOptions,
@@ -80,9 +70,10 @@ const component: React.FC<DateTimeProps> = (props) => {
   } = props;
 
   // Stable primitive key so a fresh props object doesn't churn the memo.
+  // Both the ISO string and the epoch-ms number are valid Date constructor inputs.
   const dateKey = 'isoDateTime' in props ? props.isoDateTime : 'unixTimestampMs' in props ? props.unixTimestampMs : props.date.getTime();
 
-  const date = useMemo(() => toDate(props), [dateKey]);
+  const date = useMemo(() => new Date(dateKey), [dateKey]);
   const isValidDate = !Number.isNaN(date.getTime());
 
   const formattedDate = useMemo(
@@ -123,4 +114,4 @@ const component: React.FC<DateTimeProps> = (props) => {
   );
 };
 
-export const DateTime = memo(component);
+export const DateTime = memo(DateTimeComponent);

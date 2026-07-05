@@ -10,7 +10,7 @@ import { useActionProcessors } from './useActionProcessors';
 describe('ActionProcessorProvider', () => {
   it('exposes its processors to descendants', async () => {
     const getActionProcessors: ActionProcessorListResolver = async () => ({ own: (async () => [undefined]) as any });
-    const wrapper = ({ children }: { children: ReactNode }) => createElement(ActionProcessorProvider, { getActionProcessors, children });
+    const wrapper = ({ children }: { children: ReactNode }) => createElement(ActionProcessorProvider, { getActionProcessors }, children);
 
     const { result } = renderHook(() => useActionProcessors(), { wrapper });
 
@@ -22,10 +22,11 @@ describe('ActionProcessorProvider', () => {
     const child: ActionProcessorListResolver = async () => ({ b: (async () => ['child']) as any, shared: (async () => ['child']) as any });
 
     const wrapper = ({ children }: { children: ReactNode }) =>
-      createElement(ActionProcessorProvider, {
-        getActionProcessors: parent,
-        children: createElement(ActionProcessorProvider, { getActionProcessors: child, children }),
-      });
+      createElement(
+        ActionProcessorProvider,
+        { getActionProcessors: parent },
+        createElement(ActionProcessorProvider, { getActionProcessors: child }, children),
+      );
 
     const { result } = renderHook(() => useActionProcessors(), { wrapper });
     const processors = await result.current({} as any, {} as any);

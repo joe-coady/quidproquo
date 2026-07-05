@@ -4,6 +4,7 @@ import { EVENT_DOC_STORAGE_DRIVE_GLOBAL } from '../../eventDoc';
 import {
   EVENT_DOC_AI_MODEL_GLOBAL,
   EVENT_DOC_AI_NAME_GLOBAL,
+  EVENT_DOC_AI_REASONING_BUDGET_GLOBAL,
   EVENT_DOC_AI_SYSTEM_PROMPT_GENERATOR_GLOBAL,
   EVENT_DOC_AI_SYSTEM_PROMPT_GLOBAL,
 } from '../constants/eventDocAiGlobalNames';
@@ -49,6 +50,7 @@ export function* askEventDocAiProcessSend(
 ): AskResponse<EventDocAiChatSendResult> {
   const aiName = yield* askConfigGetGlobal<string>(EVENT_DOC_AI_NAME_GLOBAL);
   const model = yield* askConfigGetGlobal<AiModel>(EVENT_DOC_AI_MODEL_GLOBAL);
+  const reasoningBudgetTokens = yield* askConfigGetGlobal<number>(EVENT_DOC_AI_REASONING_BUDGET_GLOBAL);
   const systemPrompt = yield* askEventDocAiSystemPromptResolve(docId);
 
   // Attachments are doc assets — they live on the collection's storage drive
@@ -68,6 +70,7 @@ export function* askEventDocAiProcessSend(
     system: systemPrompt,
     aiName,
     messages: chatMessagesToAiMessages(fullHistory, docStorageDrive, docId),
+    reasoning: reasoningBudgetTokens ? { budgetTokens: reasoningBudgetTokens } : undefined,
   });
 
   const assistantParts = yield* askStreamMap(streamHandle, function* askMap(part) {

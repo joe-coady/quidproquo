@@ -57,7 +57,7 @@ export const LogSummary = ({ log }: LogSummaryProps) => {
     };
 
     sendMessage(refreshEvent);
-  }, [log.correlation]);
+  }, [log.correlation, sendMessage]);
 
   return (
     <Box sx={{ width: 1, p: 2 }}>

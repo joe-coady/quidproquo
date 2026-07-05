@@ -414,9 +414,12 @@ export class SqliteKvsRepository {
         const newGsiSk = index.sortKey ? this.extractKeyValue(newItem, index.sortKey) : null;
 
         if (newGsiPk !== null) {
+          // OR IGNORE: index rows are pure key tuples (the full row IS the primary key),
+          // so a concurrent writer landing the same row first already produced the
+          // desired end state — a plain INSERT would throw SQLITE_CONSTRAINT instead.
           const insertSql = index.sortKey
-            ? `INSERT INTO ${indexTableName} (gsi_pk, gsi_sk, pk, sk) VALUES (?, ?, ?, ?)`
-            : `INSERT INTO ${indexTableName} (gsi_pk, pk, sk) VALUES (?, ?, ?)`;
+            ? `INSERT OR IGNORE INTO ${indexTableName} (gsi_pk, gsi_sk, pk, sk) VALUES (?, ?, ?, ?)`
+            : `INSERT OR IGNORE INTO ${indexTableName} (gsi_pk, pk, sk) VALUES (?, ?, ?)`;
 
           const insertParams = index.sortKey ? [newGsiPk, newGsiSk, pk, sk] : [newGsiPk, pk, sk];
 
@@ -653,11 +656,13 @@ export class SqliteKvsRepository {
 
       await this.db!.run(updateSql, updateParams);
     } else {
-      // Insert new item
+      // Insert new item. OR REPLACE: concurrent updates of a not-yet-existing key both
+      // read no row, so the second plain INSERT would hit the primary key — last writer
+      // wins instead, matching the UPDATE branch's semantics.
       const insertSql =
         hasSortKey && sortKey !== undefined
-          ? `INSERT INTO ${tableName} (pk, sk, data) VALUES (?, ?, ?)`
-          : `INSERT INTO ${tableName} (pk, data) VALUES (?, ?)`;
+          ? `INSERT OR REPLACE INTO ${tableName} (pk, sk, data) VALUES (?, ?, ?)`
+          : `INSERT OR REPLACE INTO ${tableName} (pk, data) VALUES (?, ?)`;
 
       const insertParams = hasSortKey && sortKey !== undefined ? [key, sortKey, JSON.stringify(updatedItem)] : [key, JSON.stringify(updatedItem)];
 

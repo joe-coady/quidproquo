@@ -22,4 +22,8 @@ export type EventDocAiOptions = {
   systemPromptGenerator?: string;
   // Tool executors are defineInlineFunction names registered by the caller.
   tools?: AiToolDefinition[];
+  // Extended-thinking token budget. Defaults to 4096; pass 0 to disable
+  // reasoning entirely. Thinking streams to the chat as reasoning segments so
+  // the user sees progress instead of a silent wait.
+  reasoningBudgetTokens?: number;
 };

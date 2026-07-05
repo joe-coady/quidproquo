@@ -11,9 +11,7 @@ describe('RefreshAuthTokensProvider', () => {
   afterEach(() => vi.useRealTimers());
 
   it('renders its children', () => {
-    const { getByText } = render(
-      createElement(RefreshAuthTokensProvider, { refreshTokens: vi.fn(), children: createElement('span', null, 'child') }),
-    );
+    const { getByText } = render(createElement(RefreshAuthTokensProvider, { refreshTokens: vi.fn() }, createElement('span', null, 'child')));
 
     expect(getByText('child')).toBeDefined();
   });
@@ -26,7 +24,7 @@ describe('RefreshAuthTokensProvider', () => {
       expiresAt: new Date(Date.now() + 60 * 1000).toISOString(),
     } as AuthenticationInfo;
 
-    render(createElement(RefreshAuthTokensProvider, { authenticationInfo, refreshTokens, children: null }));
+    render(createElement(RefreshAuthTokensProvider, { authenticationInfo, refreshTokens }, null));
 
     expect(refreshTokens).toHaveBeenCalledWith(authenticationInfo);
   });

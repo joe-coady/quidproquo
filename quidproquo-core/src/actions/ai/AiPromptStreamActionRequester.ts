@@ -2,11 +2,13 @@ import { AiActionType } from './AiActionType';
 import { AiMessage } from './AiMessage';
 import { AiModel } from './AiModel';
 import { AiPromptStreamActionRequester } from './AiPromptStreamActionTypes';
+import { AiReasoningConfig } from './AiReasoningConfig';
 
 export interface AskAiPromptStreamOptions {
   system?: string;
   aiName?: string;
   messages?: AiMessage[];
+  reasoning?: AiReasoningConfig;
 }
 
 export function* askAiPromptStream(model: AiModel, prompt: string, options?: AskAiPromptStreamOptions): AiPromptStreamActionRequester {
@@ -18,6 +20,7 @@ export function* askAiPromptStream(model: AiModel, prompt: string, options?: Ask
       messages: options?.messages,
       system: options?.system,
       aiName: options?.aiName,
+      reasoning: options?.reasoning,
     },
   };
 }

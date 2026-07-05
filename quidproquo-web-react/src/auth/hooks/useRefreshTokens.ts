@@ -10,7 +10,9 @@ export const useRefreshTokens = (
 ) => {
   const stableRefreshTokens = useFastCallback(refreshTokens);
 
-  const refresh = () => {
+  // Stable identity so the effect below can list it as a dependency without
+  // re-running on every render.
+  const refresh = useFastCallback(() => {
     if (authenticationInfo && authenticationInfo.refreshToken && authenticationInfo.expiresAt) {
       const now = new Date().toISOString();
       const timeToExpire = new Date(authenticationInfo.expiresAt).getTime() - new Date(now).getTime();
@@ -30,7 +32,7 @@ export const useRefreshTokens = (
     }
 
     return null;
-  };
+  });
 
   useEffect(() => {
     const timerId = refresh();
@@ -47,5 +49,5 @@ export const useRefreshTokens = (
     // reference would re-run this effect every render — and when the token is
     // expired/near-expiry the "refresh immediately" branch would then fire a
     // network refresh on every render, an unbounded loop.
-  }, [authenticationInfo?.expiresAt, authenticationInfo?.refreshToken]);
+  }, [refresh, authenticationInfo?.expiresAt, authenticationInfo?.refreshToken]);
 };

@@ -1,4 +1,4 @@
-import { useAuthAccessToken, useBaseUrlResolvers } from 'quidproquo-web-react';
+import { useAuthAccessToken, useBaseUrlResolvers, useEffectCallback } from 'quidproquo-web-react';
 
 import { useEffect, useState } from 'react';
 
@@ -15,15 +15,16 @@ export function useFederatedAddon(): {
   const baseUrlResolvers = useBaseUrlResolvers();
   const loadAddons = useLoadFederatedAddons();
 
+  // Stable identity so the mount-only effect below can list it as a dependency.
+  const doAsyncWork = useEffectCallback(async () => {
+    setLoading(true);
+
+    const addons = await loadAddons({ baseUrlResolvers, accessToken });
+
+    setFederatedAddons(addons);
+  });
+
   useEffect(() => {
-    const doAsyncWork = async () => {
-      setLoading(true);
-
-      const addons = await loadAddons({ baseUrlResolvers, accessToken });
-
-      setFederatedAddons(addons);
-    };
-
     doAsyncWork()
       .catch((e) => {
         console.log(e);
@@ -32,7 +33,7 @@ export function useFederatedAddon(): {
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  }, [doAsyncWork]);
 
   return {
     addons: federatedAddons,

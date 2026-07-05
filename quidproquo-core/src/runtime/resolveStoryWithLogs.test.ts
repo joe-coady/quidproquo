@@ -59,4 +59,73 @@ describe('resolveStoryWithLogs', () => {
     expect(logSpy).toHaveBeenCalledOnce();
     expect(logSpy).toHaveBeenCalledWith(result);
   });
+
+  it('restores the original console.log after overlapping stories (no leaked wrappers)', async () => {
+    const logger = createStubLogger(vi.fn());
+
+    const silentConsoleLog = () => {};
+    const originalConsoleLog = console.log;
+    console.log = silentConsoleLog;
+
+    // A processor that parks until released, so two stories can overlap
+    // out of order: A starts, B starts, A finishes, B finishes — the
+    // interleaving that used to leak A's wrapper into console.log forever.
+    const makeParkedStory = () => {
+      let release!: () => void;
+      const parked = new Promise<void>((resolve) => {
+        release = resolve;
+      });
+
+      function* story(): AskResponse<string> {
+        yield { type: 'Park' };
+        console.log('parked story spoke');
+        return 'done';
+      }
+
+      const processors = buildActionProcessorResolver({
+        Park: async () => {
+          await parked;
+          return actionResult('released');
+        },
+      });
+
+      const run = () =>
+        resolveStoryWithLogs(
+          story,
+          [],
+          buildTestQpqConfig(),
+          buildTestStorySession(),
+          processors,
+          getTestTimeNow,
+          logger,
+          'corr-overlap',
+          QpqRuntimeType.UNIT_TEST,
+          noopDynamicModuleLoader as any,
+        );
+
+      return { run, release };
+    };
+
+    try {
+      const a = makeParkedStory();
+      const b = makeParkedStory();
+
+      const aPromise = a.run();
+      const bPromise = b.run();
+
+      a.release();
+      const aResult = await aPromise;
+
+      b.release();
+      const bResult = await bPromise;
+
+      expect(console.log).toBe(silentConsoleLog);
+
+      // Both stories captured their own logs even while overlapping.
+      expect(aResult.logs?.some((entry) => entry.a.includes('parked story spoke'))).toBe(true);
+      expect(bResult.logs?.some((entry) => entry.a.includes('parked story spoke'))).toBe(true);
+    } finally {
+      console.log = originalConsoleLog;
+    }
+  });
 });

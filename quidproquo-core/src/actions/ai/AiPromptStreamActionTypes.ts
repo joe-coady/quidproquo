@@ -3,6 +3,7 @@ import { StreamHandle } from '../../types/StreamRegistry';
 import { AiActionType } from './AiActionType';
 import { AiMessage } from './AiMessage';
 import { AiModel } from './AiModel';
+import { AiReasoningConfig } from './AiReasoningConfig';
 import { AiStreamPart } from './types';
 
 export interface AiPromptStreamActionPayload {
@@ -11,6 +12,7 @@ export interface AiPromptStreamActionPayload {
   messages?: AiMessage[];
   system?: string;
   aiName?: string;
+  reasoning?: AiReasoningConfig;
 }
 
 export interface AiPromptStreamAction extends Action<AiPromptStreamActionPayload> {

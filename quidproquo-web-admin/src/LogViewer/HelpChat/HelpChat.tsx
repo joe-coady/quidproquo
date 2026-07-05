@@ -1,5 +1,5 @@
 import { QpqPagedData } from 'quidproquo-core';
-import { useAuthAccessToken, useBaseUrlResolvers } from 'quidproquo-web-react';
+import { useAuthAccessToken, useBaseUrlResolvers, useEffectCallback } from 'quidproquo-web-react';
 
 import React, { useEffect, useRef, useState } from 'react';
 import Markdown from 'react-markdown';
@@ -22,11 +22,8 @@ export const HelpChat: React.FC<HelpChatProps> = ({ logCorrelation }) => {
   const accessToken = useAuthAccessToken();
   const baseUrlResolvers = useBaseUrlResolvers();
 
-  useEffect(() => {
-    fetchChatMessages();
-  }, []);
-
-  const fetchChatMessages = async () => {
+  // Stable identity so the mount-only effect below can list it as a dependency.
+  const fetchChatMessages = useEffectCallback(async () => {
     const listLogChatMessages: ListLogChatMessages = {
       correlationId: logCorrelation,
       nextPageKey: nextPageKey,
@@ -45,7 +42,11 @@ export const HelpChat: React.FC<HelpChatProps> = ({ logCorrelation }) => {
     } finally {
       // Do nothing
     }
-  };
+  });
+
+  useEffect(() => {
+    fetchChatMessages();
+  }, [fetchChatMessages]);
 
   const handleSendMessage = async () => {
     if (inputMessage.trim() !== '') {

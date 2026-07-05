@@ -30,11 +30,17 @@ const getProcessAiPrompt = (qpqConfig: QPQConfig): AiPromptActionProcessor => {
           }
         : { prompt: payload.prompt };
 
+      // Extended thinking — the model reasons before answering, within the token budget.
+      const providerOptions = payload.reasoning
+        ? { bedrock: { reasoningConfig: { type: 'enabled' as const, budgetTokens: payload.reasoning.budgetTokens ?? 4096 } } }
+        : undefined;
+
       const result = await generateText({
         model: prepared.model,
         system: payload.system,
         ...promptOrMessages,
         tools: prepared.tools,
+        providerOptions,
         stopWhen: stepCountIs(10),
       });
 

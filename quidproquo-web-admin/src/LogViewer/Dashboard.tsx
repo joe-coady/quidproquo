@@ -1,6 +1,6 @@
 import { StoryResultMetadata } from 'quidproquo-core';
 import { uniqueBy } from 'quidproquo-web';
-import { useRunEvery, useThrottledMemo } from 'quidproquo-web-react';
+import { useEffectCallback, useRunEvery, useThrottledMemo } from 'quidproquo-web-react';
 import { useSubscribeToWebSocketEvent } from 'quidproquo-web-react';
 import { LogMetadata, WebSocketQueueQpqAdminServerEventMessageLogMetadata, WebSocketQueueQpqAdminServerMessageEventType } from 'quidproquo-webserver';
 
@@ -35,7 +35,8 @@ export const Dashboard: React.FC<DashboardProps> = () => {
   const { onSearch, logs: weeklyLogs } = useLogSearch();
   const isLoading = useIsLoading();
 
-  useEffect(() => {
+  // Stable identity so the mount-only effect below can list it as a dependency.
+  const runInitialSearch = useEffectCallback(() => {
     const currentDate = new Date();
 
     const sevenDaysAgo = new Date(currentDate.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -58,7 +59,11 @@ export const Dashboard: React.FC<DashboardProps> = () => {
     };
 
     onSearch(searchParams);
-  }, []);
+  });
+
+  useEffect(() => {
+    runInitialSearch();
+  }, [runInitialSearch]);
 
   useSubscribeToWebSocketEvent(
     WebSocketQueueQpqAdminServerMessageEventType.LogMetadata,
@@ -77,7 +82,7 @@ export const Dashboard: React.FC<DashboardProps> = () => {
     return uniqueLogs.sort((a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime());
   }, [realtimeLogs, weeklyLogs]);
 
-  const dailyErrorCount = useMemo(() => getLogCountForSinceXDaysAgo(allLogs, hoursPassedToday / 24), [allLogs, getHoursSinceStartOfDay]);
+  const dailyErrorCount = useMemo(() => getLogCountForSinceXDaysAgo(allLogs, hoursPassedToday / 24), [allLogs, hoursPassedToday]);
   const weeklyErrorCount = useMemo(() => getLogCountForSinceXDaysAgo(allLogs, 7), [allLogs]);
 
   return (

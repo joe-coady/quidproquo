@@ -50,7 +50,7 @@ export const useWebsocketAuthSync = (accessToken: AuthenticationInfo['accessToke
   useSubscribeToWebsocket(WebsocketServiceEvent.CLOSE, () => setIsAuthenticated(false));
 
   // Sync the tokens when they change
-  useEffect(updateAuthTokens, [accessToken, websocketApi, isAuthenticated]);
+  useEffect(updateAuthTokens, [updateAuthTokens, accessToken, websocketApi, isAuthenticated]);
 
   return isAuthenticated;
 };

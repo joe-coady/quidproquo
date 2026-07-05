@@ -31,11 +31,17 @@ const getProcessAiPromptStream = (qpqConfig: QPQConfig): AiPromptStreamActionPro
           }
         : { prompt: payload.prompt };
 
+      // Extended thinking — thinking progress streams out as Reasoning* parts.
+      const providerOptions = payload.reasoning
+        ? { bedrock: { reasoningConfig: { type: 'enabled' as const, budgetTokens: payload.reasoning.budgetTokens ?? 4096 } } }
+        : undefined;
+
       const { fullStream } = streamText({
         model: prepared.model,
         system: payload.system,
         ...promptOrMessages,
         tools: prepared.tools,
+        providerOptions,
         stopWhen: stepCountIs(10),
         // streamText swallows errors by default to keep the server alive — surface them to CloudWatch.
         onError: ({ error }) => {

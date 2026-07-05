@@ -18,9 +18,8 @@ interface LogCorrelationTreeProps {
 
 // Here we're using `renderCustomNodeElement` to represent each node
 // as an SVG `rect` instead of the default `circle`.
-const renderRectSvgNode =
-  (setSelectedLogCorrelation: (logCorrelation: string) => void, highlightCorrelationId: string) =>
-  ({ nodeDatum }: { nodeDatum: any }) => {
+const renderRectSvgNode = (setSelectedLogCorrelation: (logCorrelation: string) => void, highlightCorrelationId: string) => {
+  const RectSvgNode = ({ nodeDatum }: { nodeDatum: any }) => {
     // TODO: Workout the nodeDateum type
     const color =
       nodeDatum.correlation === highlightCorrelationId
@@ -62,6 +61,9 @@ const renderRectSvgNode =
       </g>
     );
   };
+
+  return RectSvgNode;
+};
 
 const LogCorrelationTreeComponent = ({
   correlationId,
