@@ -50,6 +50,7 @@ import {
   getWebEntryConfigs,
   getWebsocketEntryByApiName,
   getWebsocketSettings,
+  isStorageDriveWebEntryOrigin,
   resolveApexDomainNameFromDomainConfig,
   resolveDomainRoot,
   resolveServiceScopedCorsAllowedOrigins,
@@ -220,6 +221,31 @@ describe('getStorageDriveCorsAllowedOrigins', () => {
   it('falls back to wildcard when the service declares no domain', () => {
     const config = buildTestQpqConfig();
     expect(getStorageDriveCorsAllowedOrigins(config, 'uploads')).toEqual(['*']);
+  });
+});
+
+describe('isStorageDriveWebEntryOrigin', () => {
+  it('is true when a web entry sources its assets from the drive', () => {
+    const config = buildTestQpqConfig([
+      defineWebEntry('site', { domain: webDomain, storageDrive: { sourceStorageDrive: 'uploads', autoUpload: false } }),
+    ]);
+    expect(isStorageDriveWebEntryOrigin(config, 'uploads')).toBe(true);
+  });
+
+  it('is false for drives no web entry consumes', () => {
+    const config = buildTestQpqConfig([
+      defineWebEntry('site', { domain: webDomain, storageDrive: { sourceStorageDrive: 'other', autoUpload: false } }),
+    ]);
+    expect(isStorageDriveWebEntryOrigin(config, 'uploads')).toBe(false);
+  });
+
+  it('is false when web entries own their bucket (no sourceStorageDrive)', () => {
+    const config = buildTestQpqConfig([defineWebEntry('site', { domain: webDomain })]);
+    expect(isStorageDriveWebEntryOrigin(config, 'uploads')).toBe(false);
+  });
+
+  it('is false when the service has no web entries at all', () => {
+    expect(isStorageDriveWebEntryOrigin(buildTestQpqConfig(), 'uploads')).toBe(false);
   });
 });
 

@@ -227,6 +227,16 @@ export const getStorageDriveCorsAllowedOrigins = (qpqConfig: QPQConfig, storageD
   return resolveServiceScopedCorsAllowedOrigins(qpqConfig, corsSetting?.allowedOrigins);
 };
 
+/**
+ * Whether any web entry in this service serves its assets from the named storage
+ * drive (`storageDrive.sourceStorageDrive`) — i.e. the drive's bucket is a
+ * CloudFront origin. Drives with no web entry consumer need no CloudFront access
+ * to their bucket at all.
+ */
+export const isStorageDriveWebEntryOrigin = (qpqConfig: QPQConfig, storageDriveName: string): boolean => {
+  return getWebEntryConfigs(qpqConfig).some((webEntry) => webEntry.storageDrive.sourceStorageDrive === storageDriveName);
+};
+
 // API Gateway caps request payloads at 10MB, so the default per-file ceiling matches it;
 // the other defaults exist to bound parser memory rather than to be hit in practice.
 export const defaultFileUploadSettings: FileUploadSettings = {

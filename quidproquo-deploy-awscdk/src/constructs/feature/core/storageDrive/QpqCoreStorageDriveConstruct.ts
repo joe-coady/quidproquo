@@ -19,6 +19,13 @@ export interface QpqCoreStorageDriveConstructProps extends QpqConstructBlockProp
    * to '*' when omitted (headless/core-only deployments have no browser origin).
    */
   corsAllowedOrigins?: string[];
+
+  /**
+   * Whether this drive's bucket is served through a CloudFront distribution
+   * (resolved by the web-aware caller from web entry configs). Only then does
+   * the bucket policy grant CloudFront read access.
+   */
+  allowCloudFrontRead?: boolean;
 }
 
 export abstract class QpqCoreStorageDriveConstructBase extends QpqConstructBlock implements QpqResource {
@@ -120,22 +127,27 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
 
     const awsAccountId = qpqConfigAwsUtils.getApplicationModuleDeployAccountId(props.qpqConfig);
 
-    // TODO: Only do this IF a cloud front dist wants to use it
-    // same with cors above.
-    this.bucket.addToResourcePolicy(
-      new aws_iam.PolicyStatement({
-        sid: 'AllowCloudFrontServicePrincipal',
-        effect: aws_iam.Effect.ALLOW,
-        principals: [new aws_iam.ServicePrincipal('cloudfront.amazonaws.com')],
-        actions: ['s3:GetObject'],
-        resources: [this.bucket.arnForObjects('*')],
-        conditions: {
-          StringLike: {
-            'AWS:SourceArn': `arn:aws:cloudfront::${awsAccountId}:distribution/*`,
+    // Account-scoped distribution/* (not the exact distribution ARN) is the ceiling
+    // here: the consuming distribution lives in the web phase (its AWS-generated id
+    // is unknowable at inf synth), and a bucket resource policy is a single document
+    // owned by this stack — the web stack can't append to it later the way it can an
+    // IAM role policy.
+    if (props.allowCloudFrontRead) {
+      this.bucket.addToResourcePolicy(
+        new aws_iam.PolicyStatement({
+          sid: 'AllowCloudFrontServicePrincipal',
+          effect: aws_iam.Effect.ALLOW,
+          principals: [new aws_iam.ServicePrincipal('cloudfront.amazonaws.com')],
+          actions: ['s3:GetObject'],
+          resources: [this.bucket.arnForObjects('*')],
+          conditions: {
+            StringLike: {
+              'AWS:SourceArn': `arn:aws:cloudfront::${awsAccountId}:distribution/*`,
+            },
           },
-        },
-      }),
-    );
+        }),
+      );
+    }
 
     // if (props.storageDriveConfig.global) {
     //   this.bucket.addToResourcePolicy(

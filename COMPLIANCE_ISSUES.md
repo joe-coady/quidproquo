@@ -3,23 +3,17 @@
 Source: "Security/compliance issue findings (From Claude)" — originally reviewed against `new-auth-oauth`.
 Re-verified against the current branch. Open items are listed first (ordered easiest → hardest by rough implementation effort); fixed items (checked) are moved to the bottom.
 
-Legend: `[ ]` = still open, `[x]` = fixed. Items tagged **PARTIAL** have had progress but are not fully resolved, so they remain open. Each open item has an `(effort: …)` estimate.
+Legend: `[ ]` = still open, `[x]` = fixed, `[~]` = deferred (deliberate decision to not do now; reconsider trigger documented). Items tagged **PARTIAL** have had progress but are not fully resolved, so they remain open. Each open item has an `(effort: …)` estimate.
 
 ---
 
 ## Open — easiest first
 
-[ ] 6.4 CloudFront S3 policy allows any distribution in the account — **PARTIAL**; web-entry bucket now scoped to its exact distribution, storage-drive bucket constrained by cross-stack boundary. `(effort: easy)`
-`WebQpqWebserverWebEntryConstruct.ts` no longer adds a manual `distribution/*` statement for the bucket it owns: `S3BucketOrigin.withOriginAccessControl` (CDK) auto-adds a policy scoped to that exact distribution's ARN (`StringEquals` on `AWS:SourceArn`), so the redundant broader statement was removed. `QpqCoreStorageDriveConstruct.ts` still uses account-scoped `distribution/*` because its bucket is consumed by a distribution in a *separate* service/deploy phase (imported by name → CDK can't auto-scope it, and the consuming distribution's AWS-generated ID isn't knowable here and can't be cross-referenced per the separate-deploys rule). Account-scoped `distribution/*` is the pragmatic ceiling for that path.
-
-[ ] 12.2 No AWS Shield Advanced — only default Shield Standard. `(effort: easy)`
-Mostly a cost/decision item: evaluate and optionally enable Shield Advanced for production workloads with SLA requirements. Minimal code.
-
 [ ] 11.2 No reserved capacity or savings plans — opt-in only. `(effort: easy)`
 Reserved concurrency is passthrough (undefined by default). Add sensible defaults for critical functions and document a Savings Plans / Reserved Capacity strategy.
 
-[ ] 6.1 No Lambda code signing — no `CodeSigningConfig` / `SigningProfile`. `(effort: medium)`
-Create an `aws_signer.SigningProfile` and `aws_lambda.CodeSigningConfig` and attach to all Lambda functions so uploaded code has integrity verification.
+[ ] 6.1 No Lambda code signing — parked; meaningful only with separated deploy duties. `(effort: medium, mostly pipeline work)`
+Code signing gates `UpdateFunctionCode` on packages signed by an `aws_signer.SigningProfile` (via `CodeSigningConfig`), defending against compromised *deploy* credentials pushing tampered code. Currently deploys run from a developer laptop with admin SSO — the same identity can modify/detach the signing config, so signing adds no real boundary while adding real friction (CDK doesn't sign assets; every bundle would need a Signer job before `cdk deploy`, restructuring the deploy flow). Deploy-time tampering is meanwhile visible via CloudTrail (every UpdateFunctionCode recorded) + GuardDuty credential-misuse detection. **Trigger to implement**: deploys move to CI/CD with a dedicated deploy role + SCPs denying signing-config changes (the boundary then exists and signing is just a pipeline stage), or a compliance framework explicitly requires code-integrity verification.
 
 [ ] 5.2 Minimal VPC configuration, no flow logs — VPC sets only `maxAzs` and `vpcName`. `(effort: medium)`
 Add VPC flow logs (CloudWatch/S3), VPC endpoints (S3/DynamoDB/Secrets Manager), and NAT configuration to the bootstrap VPC construct.
@@ -33,15 +27,25 @@ Lambdas in VPCs use the default security group. Create explicit security groups 
 [ ] 4.3 No KMS key constructs anywhere — **PARTIAL**; keys consumed by ARN, none provisioned. `(effort: hard)`
 S3/DynamoDB accept a KMS key via `fromKeyArn` but no `new aws_kms.Key(...)` is created. Add a shared KMS key construct with key policies + rotation and wire it into S3, DynamoDB, Secrets Manager, and logs.
 
-[ ] 14.1 No real-time log streaming — zero coverage. `(effort: hard)`
-Add CloudWatch Logs subscription filters → Kinesis Firehose (S3 archival + SIEM endpoint), or a Lambda log forwarder (Datadog/Splunk/Elastic). Current S3 JSON logs are forensic, not real-time.
+[ ] 14.1 No real-time log streaming — zero coverage; build only when an external log consumer exists (SIEM, security team, auditor). `(effort: hard)`
+The right feed is qpq's own structured story logs (see 14.3), not CloudWatch stdout: an S3 event / stream off the log bucket (or a hook in the log-extension path) → transform `StoryResult` → OCSF/ECS → Firehose/HTTP to the SIEM. CloudWatch subscription filters remain an option for the access-log groups specifically. Current S3 JSON logs are forensic (query-after-the-fact), not real-time — which is fine until someone needs to watch them live.
 
-[ ] 14.3 Log format not SIEM-optimized — unstructured CloudWatch logs. `(effort: hard)`
-Operational/error logging uses raw `console.log`/`console.error` with no consistent schema. Adopt structured JSON logging (CEF/OCSF/ECS-style) with enforced fields (timestamp, level, service, correlationId, userId, action, outcome) across all handlers.
+[ ] 14.3 Log format not SIEM-optimized — reassessed: qpq's real logging IS structured; this folds into 14.1. `(effort: folds into 14.1)`
+The original finding assumed CloudWatch stdout is the logging system. It isn't: every story execution is captured as a structured `StoryResult` JSON (actions, inputs/outputs, caught errors, correlationId, runtime type, session) shipped to S3 by the `QpqLogger` — consistent-schema, error-capturing logging already exists, and the qpqadmin log console reads it. What remains: (a) if 14.1 is ever built, the SIEM feed should be the S3 story logs with a `StoryResult` → OCSF/ECS mapping at export time (a transform in that pipeline, not a cross-cutting logging refactor); (b) minor hygiene — prune the stray framework `console.log`s (`tick:`, `CF Found:`, etc.) that bloat CloudWatch ingestion (the sensitive ones were already removed under 3.2).
+
+---
+
+## Deferred — reconsider later
+
+[~] 12.2 No AWS Shield Advanced — only default Shield Standard. **Deferred on cost: ~$3,000/month subscription (per-org, 1-year commitment), not justified at current scale.**
+Shield Standard (free, always on) already covers common L3/L4 DDoS; WAF rate limiting (12.1) covers L7 abuse. Reconsider if: production workloads carry SLA/contractual DDoS-response requirements, sustained traffic makes DDoS cost-amplification (Lambda/data-transfer spend during an attack) a real risk, or the org grows to where $36k/yr is proportionate. Minimal code when enabled — it's a subscription (manual/API opt-in) plus `AWS::Shield::Protection` resources on the CloudFront distributions / ALBs to protect, not new infrastructure.
 
 ---
 
 ## Fixed
+
+[x] 6.4 CloudFront S3 policy allows any distribution in the account — web-entry buckets exact-scoped; storage-drive CloudFront read now conditional, and `distribution/*` is the verified structural ceiling for that path.
+Two bucket populations. (1) **Web-entry buckets** (owned by the web stack): no manual policy — `S3BucketOrigin.withOriginAccessControl` (CDK) auto-adds a statement scoped to that exact distribution's ARN (`StringEquals` on `AWS:SourceArn`). (2) **Storage-drive buckets**: previously *every* drive got an account-scoped `distribution/*` read statement unconditionally (the code's own `TODO: Only do this IF a cloud front dist wants to use it`). Now conditional: `qpqWebServerUtils.isStorageDriveWebEntryOrigin` checks whether any web entry declares the drive as `sourceStorageDrive`, `InfQpqServiceStack` injects the result as `allowCloudFrontRead` (same layering as the CORS injection — core construct stays web-agnostic), and `QpqCoreStorageDriveConstruct` only adds the statement when true. Drives never served through CloudFront grant it nothing — which matters in a multi-app shared account, where `distribution/*` crosses app boundaries. For drives that *are* origins, account-scoped `distribution/*` is the structural ceiling, for a different reason than the IAM cases: the consuming distribution's AWS-generated id lives in the web phase (unknowable at inf synth), and the 1.1 inverted-grant pattern can't apply because a bucket *resource* policy is a single CFN-owned document — the web stack can't append a statement to it later the way it can an IAM role policy (`addToResourcePolicy` on a by-name-imported bucket silently no-ops; a second `AWS::S3::BucketPolicy` would clobber the first). Same-service check is sufficient: `sourceStorageDrive` has no cross-service reference form (the web construct resolves it with same-service naming). Rollout note: on next inf deploy, drives with no web-entry consumer lose the statement (intended); no behaviour change for consumed drives.
 
 [x] 13.6 Custom application metrics — new core action `askMetricPut`, CloudWatch EMF on AWS.
 New `metric` action domain in `quidproquo-core` (`askMetricPut(metricName, value = 1, { unit?, dimensions? })`, `MetricUnit` enum with CloudWatch unit values) so stories emit business metrics as naturally as they log. The awslambda processor writes one CloudWatch **Embedded Metric Format** JSON line to stdout — CloudWatch extracts the metric from the log stream, so there are zero API calls, no IAM changes, no latency, and no new infra; namespace `qpq/{application}/{environment}[/{feature}]` — the deployed app instance, mirroring how every qpq resource name embeds the deployment identity (apps sharing an account can't merge same-named metrics; per-developer feature sandboxes never pollute mainline) — with dimensions reserved for slices within the deployment: `service` merged with the payload's. Verified nothing intercepts Lambda stdout (the QpqLogger ships StoryResults to S3 separately), so EMF extraction works. The js package registers a console processor (`metric: name=value`) which node/web/dev-server inherit, keeping stories portable; the AWS processor overrides it in Lambda via merge order. Cost model doc-commented: one custom metric per metricName × dimension-combination (~$0.30/mo) — keep payload dimensions low-cardinality, never per-user/per-request ids. Percentile stats (p99 etc.) come free on extracted EMF metrics. Dashboard auto-widgets deliberately skipped (metric names are runtime-defined, unknowable at synth).
