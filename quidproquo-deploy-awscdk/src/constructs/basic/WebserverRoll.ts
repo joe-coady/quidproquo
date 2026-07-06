@@ -26,6 +26,9 @@ export class WebserverRoll extends QpqConstructBlock {
     });
 
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(props.qpqConfig);
+    const accountId = qpqConfigAwsUtils.getApplicationModuleDeployAccountId(props.qpqConfig);
+    const applicationName = qpqCoreUtils.getApplicationName(props.qpqConfig);
+    const environment = qpqCoreUtils.getApplicationModuleEnvironment(props.qpqConfig);
     const feature = qpqCoreUtils.getApplicationModuleFeature(props.qpqConfig);
 
     // This deployment's identity tags, as applied to every qpq resource by applyEnvironmentTags.
@@ -84,11 +87,16 @@ export class WebserverRoll extends QpqConstructBlock {
           ]
         : []),
 
-      // Invoke QPQ service functions (`*sfunc*`) from other Lambdas.
+      // Invoke QPQ service functions from other lambdas. The runtime derives target names
+      // with getConfigRuntimeResourceName from its own app/env/feature (only the target
+      // service varies), so the same helper builds this pattern with the function and
+      // service segments wildcarded - cross-app/env invocation is not possible.
       {
         sid: 'LambdaInvokeFunction',
         actions: ['lambda:InvokeFunction'],
-        resources: ['arn:aws:lambda:*:*:function:*sfunc*'],
+        resources: [
+          `arn:aws:lambda:${region}:${accountId}:function:${awsNamingUtils.getConfigRuntimeResourceName('*-sfunc', applicationName, '*', environment, feature)}`,
+        ],
       },
 
       // Look up ACM certs when wiring up custom domains at runtime.
@@ -98,7 +106,8 @@ export class WebserverRoll extends QpqConstructBlock {
         resources: ['*'],
       },
 
-      // Standard Lambda logging + log retrieval for the `askGetLogs` flow.
+      // Standard Lambda logging + log retrieval for the `askGetLogs` flow. Account-pinned;
+      // region is left open because edge lambdas write logs in their execution region.
       {
         sid: 'CloudWatchLogsManagement',
         actions: [
@@ -110,7 +119,7 @@ export class WebserverRoll extends QpqConstructBlock {
           'logs:GetLogEvents',
           'logs:FilterLogEvents',
         ],
-        resources: ['*'],
+        resources: [`arn:aws:logs:*:${accountId}:log-group:*`],
       },
 
       // Required for VPC-attached Lambdas to manage their ENIs.
