@@ -4,4 +4,5 @@ export * from './createDomainCertificateStacks';
 export * from './DomainCertificateStack';
 export * from './DomainQpqServiceStack';
 export * from './InfQpqServiceStack';
+export * from './WafCloudFrontWebAclStack';
 export * from './WebQpqServiceStack';

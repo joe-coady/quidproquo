@@ -11,6 +11,7 @@ import {
   aws_route53_targets,
   aws_s3,
   aws_s3_deployment,
+  aws_ssm,
 } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
@@ -152,6 +153,11 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
         responsePagePath: '/',
         ttl: cdk.Duration.seconds(0),
       })),
+
+      // Shared CLOUDFRONT web acl from the bootstrap phase (us-east-1, arn via SSM like the cert)
+      webAclId: qpqConfigAwsUtils.isWafProtectionEnabled(props.qpqConfig)
+        ? aws_ssm.StringParameter.valueForStringParameter(this, qpqConfigAwsUtils.getWafWebAclArnSsmParameterName('cloudfront', props.qpqConfig))
+        : undefined,
     });
 
     qpqDeployAwsCdkUtils.applyEnvironmentTags(distribution, props.qpqConfig);

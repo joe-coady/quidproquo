@@ -8,3 +8,4 @@ export * from './domainCertificate';
 export * from './eventBusQuickSubscription';
 export * from './organizations';
 export * from './serviceAccountInfo';
+export * from './waf';

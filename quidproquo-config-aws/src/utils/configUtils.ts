@@ -11,6 +11,7 @@ import {
   AwsServiceAccountInfoQPQConfigSetting,
   BootstrapBudgetQPQConfigSetting,
   BootstrapCloudTrailQPQConfigSetting,
+  BootstrapWafQPQConfigSetting,
   DomainCertificateQPQConfigSetting,
   EventBusQuickSubscription,
   EventBusQuickSubscriptionQPQConfigSetting,
@@ -56,6 +57,25 @@ export const getAwsBootstrapOrganizationConfigs = (qpqConfig: QPQConfig): AwsOrg
 
 export const getBootstrapBudgetConfigs = (qpqConfig: QPQConfig): BootstrapBudgetQPQConfigSetting[] =>
   qpqCoreUtils.getConfigSettings<BootstrapBudgetQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.bootstrapBudget);
+
+export const getBootstrapWafConfig = (qpqConfig: QPQConfig): BootstrapWafQPQConfigSetting | undefined =>
+  qpqCoreUtils.getConfigSetting<BootstrapWafQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.bootstrapWaf);
+
+export const isWafProtectionEnabled = (qpqConfig: QPQConfig): boolean =>
+  !!qpqCoreUtils.getConfigSetting(qpqConfig, QPQAwsConfigSettingType.wafProtection);
+
+// The web acl arns are shared by naming convention (not by setting) because the bootstrap
+// config that creates them and the service configs that attach them are separate arrays -
+// both sides can derive this name from their own app/env/feature.
+export const getWafWebAclArnSsmParameterName = (wafScope: 'regional' | 'cloudfront', qpqConfig: QPQConfig): string => {
+  const application = qpqCoreUtils.getApplicationName(qpqConfig);
+  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
+  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+
+  const deploymentName = feature ? `${application}-${environment}-${feature}` : `${application}-${environment}`;
+
+  return `/qpq/waf/web-acl-arn/${wafScope}/${deploymentName}`;
+};
 
 export const getBootstrapCloudTrailConfigs = (qpqConfig: QPQConfig): BootstrapCloudTrailQPQConfigSetting[] =>
   qpqCoreUtils.getConfigSettings<BootstrapCloudTrailQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.bootstrapCloudTrail);

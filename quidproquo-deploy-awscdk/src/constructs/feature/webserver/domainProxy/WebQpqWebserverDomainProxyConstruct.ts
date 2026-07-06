@@ -1,8 +1,9 @@
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import { DomainProxyQPQWebServerConfigSetting, qpqWebServerUtils } from 'quidproquo-webserver';
 import { DomainProxyViewerProtocolPolicy } from 'quidproquo-webserver';
 
-import { aws_cloudfront, aws_cloudfront_origins, aws_route53, aws_route53_targets } from 'aws-cdk-lib';
+import { aws_cloudfront, aws_cloudfront_origins, aws_route53, aws_route53_targets, aws_ssm } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
@@ -79,6 +80,11 @@ export class WebQpqWebserverDomainProxyConstruct extends QpqConstructBlock {
 
       domainNames,
       certificate,
+
+      // Shared CLOUDFRONT web acl from the bootstrap phase (us-east-1, arn via SSM like the cert)
+      webAclId: qpqConfigAwsUtils.isWafProtectionEnabled(props.qpqConfig)
+        ? aws_ssm.StringParameter.valueForStringParameter(this, qpqConfigAwsUtils.getWafWebAclArnSsmParameterName('cloudfront', props.qpqConfig))
+        : undefined,
     });
 
     qpqDeployAwsCdkUtils.applyEnvironmentTags(distribution, props.qpqConfig);

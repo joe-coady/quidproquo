@@ -18,6 +18,7 @@ import { defineBootstrapCloudTrail } from '../config/settings/cloudTrail';
 import { defineDomainCertificate } from '../config/settings/domainCertificate';
 import { defineBootstrapAwsOrganization } from '../config/settings/organizations';
 import { defineAwsServiceAccountInfo } from '../config/settings/serviceAccountInfo';
+import { defineBootstrapWaf, defineWafProtection } from '../config/settings/waf';
 import { ServiceAccountInfo } from '../types';
 import {
   getApplicationModuleDeployAccountId,
@@ -33,14 +34,17 @@ import {
   getAwsServiceAccountInfos,
   getBootstrapBudgetConfigs,
   getBootstrapCloudTrailConfigs,
+  getBootstrapWafConfig,
   getDomainCertificateArnSsmParameterName,
   getDomainCertificateConfigs,
   getDynamoTableNameOverrride,
   getLocalServiceAccountInfo,
   getOwnedAwsAlarmConfigs,
+  getWafWebAclArnSsmParameterName,
   isLambdaWarmingDisabled,
   isReservedConcurrencyDisabled,
   isTracingDisabled,
+  isWafProtectionEnabled,
   resolveAwsServiceAccountInfo,
 } from './configUtils';
 
@@ -95,6 +99,35 @@ describe('getBootstrapBudgetConfigs', () => {
 
   it('returns an empty list when none are defined', () => {
     expect(getBootstrapBudgetConfigs(buildTestQpqConfig())).toEqual([]);
+  });
+});
+
+describe('waf selectors', () => {
+  it('returns undefined / false when no waf settings are declared', () => {
+    const config = buildTestQpqConfig();
+
+    expect(getBootstrapWafConfig(config)).toBeUndefined();
+    expect(isWafProtectionEnabled(config)).toBe(false);
+  });
+
+  it('returns the declared bootstrap waf setting and protection flag', () => {
+    const config = buildTestQpqConfig([defineBootstrapWaf({ rateLimits: [{ name: 'auth', limit: 100 }] }), defineWafProtection()]);
+
+    expect(getBootstrapWafConfig(config)?.rateLimits).toEqual([{ name: 'auth', limit: 100 }]);
+    expect(isWafProtectionEnabled(config)).toBe(true);
+  });
+
+  it('derives the web acl arn ssm parameter name from app and environment', () => {
+    const config = buildTestQpqConfig();
+
+    expect(getWafWebAclArnSsmParameterName('regional', config)).toBe('/qpq/waf/web-acl-arn/regional/test-app-development');
+    expect(getWafWebAclArnSsmParameterName('cloudfront', config)).toBe('/qpq/waf/web-acl-arn/cloudfront/test-app-development');
+  });
+
+  it('includes the feature in the parameter name when set', () => {
+    const config = buildTestQpqConfig([], { feature: 'joe' });
+
+    expect(getWafWebAclArnSsmParameterName('regional', config)).toBe('/qpq/waf/web-acl-arn/regional/test-app-development-joe');
   });
 });
 

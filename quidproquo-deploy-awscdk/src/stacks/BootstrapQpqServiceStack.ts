@@ -8,9 +8,11 @@ import {
   QpqBootstrapConfigAwsOrganizationConstruct,
   QpqBootstrapConfigBudgetConstruct,
   QpqBootstrapConfigCloudTrailConstruct,
+  QpqBootstrapConfigWafConstruct,
 } from '../constructs';
 import { BSQpqLambdaWarmerEventConstructConstruct } from '../constructs/basic/BSQpqLambdaWarmerEventConstruct';
 import { QpqServiceStack, QpqServiceStackProps } from './base/QpqServiceStack';
+import { WafCloudFrontWebAclStack } from './WafCloudFrontWebAclStack';
 
 export interface BootstrapQpqServiceStackProps extends QpqServiceStackProps {}
 
@@ -57,5 +59,24 @@ export class BootstrapQpqServiceStack extends QpqServiceStack {
           budgetConfig: setting,
         }),
     );
+
+    const wafConfig = qpqConfigAwsUtils.getBootstrapWafConfig(props.qpqConfig);
+    if (wafConfig) {
+      // Regional web acl (api gateway) lives in this stack; the CLOUDFRONT-scope twin must
+      // live in us-east-1, so it is a sibling stack on the app scope (like the cert stacks)
+      // that deploys first via the dependency.
+      new QpqBootstrapConfigWafConstruct(this, 'waf', {
+        qpqConfig: props.qpqConfig,
+
+        wafConfig,
+      });
+
+      const cloudFrontWafStack = new WafCloudFrontWebAclStack(scope, `${id}-waf-cf`, {
+        qpqConfig: props.qpqConfig,
+        wafConfig,
+        stackName: `${this.stackName}-waf-cf`,
+      });
+      this.addDependency(cloudFrontWafStack);
+    }
   }
 }

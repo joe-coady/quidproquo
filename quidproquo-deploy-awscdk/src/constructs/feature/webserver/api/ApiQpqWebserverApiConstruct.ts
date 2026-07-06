@@ -1,8 +1,9 @@
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import { qpqCoreUtils } from 'quidproquo-core';
 import { ApiQPQWebServerConfigSetting, qpqWebServerUtils } from 'quidproquo-webserver';
 
-import { aws_apigateway, aws_ec2, aws_lambda, aws_logs } from 'aws-cdk-lib';
+import { aws_apigateway, aws_ec2, aws_lambda, aws_logs, aws_ssm, aws_wafv2 } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
@@ -82,6 +83,18 @@ export class ApiQpqWebserverApiConstruct extends QpqConstructBlock {
       threshold: 1,
       evaluationPeriods: 1,
     });
+
+    // Attach the shared REGIONAL web acl (created by the bootstrap phase's defineBootstrapWaf,
+    // arn published to SSM) - one association per service api stage, resolved at deploy time
+    if (qpqConfigAwsUtils.isWafProtectionEnabled(props.qpqConfig)) {
+      new aws_wafv2.CfnWebACLAssociation(this, 'waf-association', {
+        resourceArn: api.deploymentStage.stageArn,
+        webAclArn: aws_ssm.StringParameter.valueForStringParameter(
+          this,
+          qpqConfigAwsUtils.getWafWebAclArnSsmParameterName('regional', props.qpqConfig),
+        ),
+      });
+    }
 
     const baseDomain = qpqWebServerUtils.resolveDomainRoot(props.apiConfig.rootDomain, props.qpqConfig);
 
