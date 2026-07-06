@@ -10,15 +10,19 @@ describe('defineAccountSecurityServices', () => {
       uniqueKey: 'accountSecurityServices',
       enableGuardDuty: undefined,
       enableSecurityHub: undefined,
+      cognitoAuthFailureAlert: undefined,
     });
   });
 
   it('carries through the supplied options', () => {
-    expect(defineAccountSecurityServices({ enableGuardDuty: true, enableSecurityHub: true })).toEqual({
+    const cognitoAuthFailureAlert = { emails: ['ops@example.com'], thresholdPer5Minutes: 25 };
+
+    expect(defineAccountSecurityServices({ enableGuardDuty: true, enableSecurityHub: true, cognitoAuthFailureAlert })).toEqual({
       configSettingType: QPQAwsConfigSettingType.accountSecurityServices,
       uniqueKey: 'accountSecurityServices',
       enableGuardDuty: true,
       enableSecurityHub: true,
+      cognitoAuthFailureAlert,
     });
   });
 });

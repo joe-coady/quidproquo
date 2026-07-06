@@ -2,6 +2,13 @@ import { QPQConfigSetting } from 'quidproquo-core';
 
 import { QPQAwsConfigSettingType } from '../../QPQConfig';
 
+export interface AccountAuthFailureAlert {
+  emails: string[];
+
+  /** Failed Cognito sign-ins per 5 minutes before alerting. Defaults to 10. */
+  thresholdPer5Minutes?: number;
+}
+
 export interface AccountSecurityServicesQPQConfigSetting extends QPQConfigSetting {
   /**
    * Creates a GuardDuty detector. Opt-in: detectors are one-per-account+region and are
@@ -16,6 +23,14 @@ export interface AccountSecurityServicesQPQConfigSetting extends QPQConfigSettin
    * Enable knowingly.
    */
   enableSecurityHub?: boolean;
+
+  /**
+   * Email an alert when Cognito sign-in failures spike (credential stuffing hitting
+   * Cognito directly, bypassing the apis). Detected via a metric filter on the account
+   * CloudTrail's CloudWatch log group - requires `defineAccountCloudTrail` with
+   * `cloudWatchLogs` enabled.
+   */
+  cognitoAuthFailureAlert?: AccountAuthFailureAlert;
 }
 
 /**
@@ -33,4 +48,5 @@ export const defineAccountSecurityServices = (
 
   enableGuardDuty: options?.enableGuardDuty,
   enableSecurityHub: options?.enableSecurityHub,
+  cognitoAuthFailureAlert: options?.cognitoAuthFailureAlert,
 });

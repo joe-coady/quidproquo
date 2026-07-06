@@ -36,6 +36,10 @@ const resolveLogRetention = (days?: number): aws_logs.RetentionDays => {
 };
 
 export class QpqAccountCloudTrailConstruct extends QpqConstructBlock {
+  // Only set when the config enables cloudWatchLogs - consumed by the security services
+  // construct for the cognito auth-failure metric filter
+  public readonly logGroup?: aws_logs.LogGroup;
+
   constructor(scope: Construct, id: string, props: QpqAccountCloudTrailConstructProps) {
     super(scope, id, props);
 
@@ -60,7 +64,7 @@ export class QpqAccountCloudTrailConstruct extends QpqConstructBlock {
       lifecycleRules: [{ expiration: cdk.Duration.days(retentionDays) }],
     });
 
-    const logGroup = cloudWatchLogs
+    this.logGroup = cloudWatchLogs
       ? new aws_logs.LogGroup(this, 'log-group', {
           logGroupName: `/qpq/cloudtrail/${name}`,
           retention: resolveLogRetention(cloudWatchLogs.retentionDays),
@@ -74,8 +78,8 @@ export class QpqAccountCloudTrailConstruct extends QpqConstructBlock {
       enableFileValidation: enableLogFileValidation,
       isMultiRegionTrail: multiRegion,
       includeGlobalServiceEvents,
-      sendToCloudWatchLogs: !!logGroup,
-      cloudWatchLogGroup: logGroup,
+      sendToCloudWatchLogs: !!this.logGroup,
+      cloudWatchLogGroup: this.logGroup,
     });
   }
 }

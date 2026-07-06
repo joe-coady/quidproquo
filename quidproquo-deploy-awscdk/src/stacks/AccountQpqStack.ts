@@ -41,6 +41,9 @@ export class AccountQpqStack extends QpqServiceStack {
         qpqConfig: props.qpqConfig,
 
         securityServicesConfig,
+
+        // For the cognito auth-failure metric filter (when a trail publishes to CloudWatch)
+        cloudTrailLogGroup: cloudTrails.find((cloudTrail) => cloudTrail.logGroup)?.logGroup,
       });
     }
   }

@@ -3,7 +3,7 @@ import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import { qpqCoreUtils } from 'quidproquo-core';
 import { ApiQPQWebServerConfigSetting, qpqWebServerUtils } from 'quidproquo-webserver';
 
-import { aws_apigateway, aws_ec2, aws_lambda, aws_logs, aws_ssm, aws_wafv2 } from 'aws-cdk-lib';
+import { aws_apigateway, aws_cloudwatch, aws_ec2, aws_lambda, aws_logs, aws_ssm, aws_wafv2 } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
@@ -83,6 +83,39 @@ export class ApiQpqWebserverApiConstruct extends QpqConstructBlock {
       threshold: 1,
       evaluationPeriods: 1,
     });
+
+    // Security event monitoring (opt-in via defineNotifyError, like all default alarms):
+    // sustained 401s = credential stuffing / token probing, sustained 403s = forbidden
+    // probing. Access logs are JSON (jsonWithStandardFields) with status as a string.
+    // Thresholds are deliberate defaults - promote to config knobs if they prove noisy.
+    // Guarded as a whole because metric filters bill custom metrics even without alarms.
+    if (qpqCoreUtils.getNotifyErrorConfigs(props.qpqConfig).length > 0) {
+      for (const statusCode of ['401', '403']) {
+        const metricName = this.resourceName(`${props.apiConfig.apiName}-${statusCode}`);
+
+        new aws_logs.MetricFilter(this, `auth-failure-filter-${statusCode}`, {
+          logGroup: accessLogGroup,
+          filterPattern: aws_logs.FilterPattern.stringValue('$.status', '=', statusCode),
+          metricNamespace: 'qpq/security',
+          metricName,
+          metricValue: '1',
+        });
+
+        createDefaultResourceAlarm(this, props.qpqConfig, {
+          id: `default-alarm-${statusCode}-rate`,
+          alarmName: this.resourceName(`${props.apiConfig.apiName}-${statusCode}-rate`),
+          metric: new aws_cloudwatch.Metric({
+            namespace: 'qpq/security',
+            metricName,
+            statistic: 'Sum',
+            period: cdk.Duration.minutes(5),
+          }),
+          threshold: 20,
+          evaluationPeriods: 3,
+          datapointsToAlarm: 2,
+        });
+      }
+    }
 
     // Attach the shared REGIONAL web acl (created by the bootstrap phase's defineBootstrapWaf,
     // arn published to SSM) - one association per service api stage, resolved at deploy time
