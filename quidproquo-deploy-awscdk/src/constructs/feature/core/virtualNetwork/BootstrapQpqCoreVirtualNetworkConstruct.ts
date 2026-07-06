@@ -6,7 +6,7 @@ import { aws_ec2, aws_logs } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
-import { resolveLogRetention } from '../../../../utils';
+import { getVirtualNetworkWorkloadSecurityGroupName, resolveLogRetention } from '../../../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
 export interface BootstrapQpqCoreVirtualNetworkConstructProps extends QpqConstructBlockProps {
@@ -21,6 +21,7 @@ const flowLogTrafficTypeMap: Record<AwsVpcFlowLogTrafficType, aws_ec2.FlowLogTra
 
 export class BootstrapQpqCoreVirtualNetworkConstruct extends QpqConstructBlock {
   public readonly vpc: aws_ec2.Vpc;
+  public readonly workloadSecurityGroup: aws_ec2.SecurityGroup;
 
   constructor(scope: Construct, id: string, props: BootstrapQpqCoreVirtualNetworkConstructProps) {
     super(scope, id, props);
@@ -36,6 +37,18 @@ export class BootstrapQpqCoreVirtualNetworkConstruct extends QpqConstructBlock {
       // undefined = CDK default (one per AZ) — must pass through untouched so
       // already-deployed VPCs see no subnet/NAT churn
       natGateways: settings.natGateways,
+    });
+
+    // Every lambda qpq places in this network carries this group, and in-VPC
+    // data stores (e.g. Neptune) allow ingress from it only — membership is the
+    // trust boundary, not "anything in the VPC". No ingress rules: lambdas
+    // receive no inbound. Egress stays open: stories make arbitrary outbound
+    // network calls. Later phases look it up by its deterministic name.
+    this.workloadSecurityGroup = new aws_ec2.SecurityGroup(this, 'workload-sg', {
+      vpc: this.vpc,
+      securityGroupName: getVirtualNetworkWorkloadSecurityGroupName(props.virtualNetworkConfig.name, props.qpqConfig),
+      description: 'qpq workload lambdas in this virtual network',
+      allowAllOutbound: true,
     });
 
     if (!settings.flowLogs.disable) {

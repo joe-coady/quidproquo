@@ -7,6 +7,7 @@ import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as aws_neptune from '@aws-cdk/aws-neptune-alpha';
 
+import { getVirtualNetworkWorkloadSecurityGroupName } from '../../../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
 export interface QpqCoreApiGraphDatabaseConstructProps extends QpqConstructBlockProps {
@@ -70,7 +71,15 @@ export class QpqCoreApiGraphDatabaseConstruct extends QpqConstructBlock {
       // clusterParameterGroup,
     });
 
-    this.cluster.connections.allowDefaultPortFromAnyIpv4('Open to the world');
+    // Only lambdas carrying the bootstrap-created workload security group can
+    // reach the cluster — not everything that lands in the shared VPC
+    const workloadSecurityGroup = aws_ec2.SecurityGroup.fromLookupByName(
+      this,
+      'workload-sg-lookup',
+      getVirtualNetworkWorkloadSecurityGroupName(props.graphDatabaseConfig.virualNetworkName, props.qpqConfig),
+      vpc,
+    );
+    this.cluster.connections.allowDefaultPortFrom(workloadSecurityGroup, 'qpq workload lambdas');
   }
 
   public static authorizeActionsForRole(role: aws_iam.IRole, graphDatabaseConfigs: GraphDatabaseQPQConfigSetting[], qpqConfig: QPQConfig) {

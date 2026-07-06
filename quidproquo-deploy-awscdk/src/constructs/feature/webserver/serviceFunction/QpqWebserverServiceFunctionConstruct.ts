@@ -4,6 +4,7 @@ import { ServiceFunctionQPQWebServerConfigSetting } from 'quidproquo-webserver';
 import { aws_ec2, aws_lambda } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
+import { getVirtualNetworkWorkloadSecurityGroupName } from '../../../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 import { Function } from '../../../basic/Function';
 
@@ -22,6 +23,20 @@ export class QpqWebserverServiceFunctionConstruct extends QpqConstructBlock {
         })
       : undefined;
 
+    // The bootstrap-created workload group, not a CDK auto-created one — in-VPC
+    // data stores allow ingress from this group only
+    const securityGroups =
+      vpc && props.serviceFunctionConfig.virtualNetworkName
+        ? [
+            aws_ec2.SecurityGroup.fromLookupByName(
+              this,
+              'workload-sg-lookup',
+              getVirtualNetworkWorkloadSecurityGroupName(props.serviceFunctionConfig.virtualNetworkName, props.qpqConfig),
+              vpc,
+            ),
+          ]
+        : undefined;
+
     // Build Function
     const func = new Function(this, 'api-function', {
       functionName: this.resourceName(`${props.serviceFunctionConfig.functionName}-sfunc`),
@@ -38,6 +53,7 @@ export class QpqWebserverServiceFunctionConstruct extends QpqConstructBlock {
 
       role: this.getServiceRole(),
       vpc: vpc,
+      securityGroups,
     });
   }
 }

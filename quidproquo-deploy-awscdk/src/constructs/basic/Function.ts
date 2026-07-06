@@ -33,6 +33,7 @@ export interface FunctionProps extends QpqConstructBlockProps {
   reacreateOnFunctionNameChange?: boolean;
 
   vpc?: aws_ec2.IVpc;
+  securityGroups?: aws_ec2.ISecurityGroup[];
 }
 
 export class Function extends QpqConstructBlock {
@@ -82,6 +83,7 @@ export class Function extends QpqConstructBlock {
             subnetType: aws_ec2.SubnetType.PRIVATE_WITH_EGRESS,
           }
         : undefined,
+      securityGroups: props.securityGroups,
     });
 
     if (!qpqConfigAwsUtils.isLambdaWarmingDisabled(props.qpqConfig)) {
