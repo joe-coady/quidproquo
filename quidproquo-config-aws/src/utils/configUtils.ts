@@ -12,6 +12,7 @@ import {
   AwsKmsKeyTargetType,
   AwsOrganizationQPQConfigSetting,
   AwsServiceAccountInfoQPQConfigSetting,
+  AwsServiceDashboardQPQConfigSetting,
   BootstrapWafQPQConfigSetting,
   DomainCertificateQPQConfigSetting,
   EventBusQuickSubscription,
@@ -61,6 +62,9 @@ export const getAccountBudgetConfigs = (qpqConfig: QPQConfig): AccountBudgetQPQC
 
 export const getAccountSecurityServicesConfig = (qpqConfig: QPQConfig): AccountSecurityServicesQPQConfigSetting | undefined =>
   qpqCoreUtils.getConfigSetting<AccountSecurityServicesQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.accountSecurityServices);
+
+export const getAwsServiceDashboardConfig = (qpqConfig: QPQConfig): AwsServiceDashboardQPQConfigSetting | undefined =>
+  qpqCoreUtils.getConfigSetting<AwsServiceDashboardQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.awsServiceDashboard);
 
 export const getBootstrapWafConfig = (qpqConfig: QPQConfig): BootstrapWafQPQConfigSetting | undefined =>
   qpqCoreUtils.getConfigSetting<BootstrapWafQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.bootstrapWaf);

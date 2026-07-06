@@ -11,6 +11,7 @@ import {
   QpqApiCoreStorageDriveConstruct,
   QpqApiWebserverWebsocketConstruct,
   QpqConfigAwsAlarmConstruct,
+  QpqConfigAwsDashboardConstruct,
   QpqCoreDeployEventConstruct,
   QpqCoreNotifyErrorConstruct,
   QpqCoreRecurringScheduleConstruct,
@@ -143,5 +144,16 @@ export class ApiQpqServiceStack extends QpqServiceStack {
           notifyErrorConfig: setting,
         }),
     );
+
+    // Operational dashboard (+ latency/duration anomaly detection) - built here in the
+    // api phase where all the service's metric-emitting resources exist
+    const dashboardConfig = qpqConfigAwsUtils.getAwsServiceDashboardConfig(props.qpqConfig);
+    if (dashboardConfig) {
+      new QpqConfigAwsDashboardConstruct(this, 'dashboard', {
+        qpqConfig: props.qpqConfig,
+
+        dashboardConfig,
+      });
+    }
   }
 }

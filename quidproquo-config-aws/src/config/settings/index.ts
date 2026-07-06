@@ -3,6 +3,7 @@ export * from './awsAlarm';
 export * from './awsDataStoreRemovalPolicy';
 export * from './awsDyanmoOverrideForKvs';
 export * from './awsKmsKey';
+export * from './awsServiceDashboard';
 export * from './domainCertificate';
 export * from './eventBusQuickSubscription';
 export * from './organizations';

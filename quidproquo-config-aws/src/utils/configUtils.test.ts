@@ -14,6 +14,7 @@ import {
 import { AwsDataStoreRemovalPolicy, defineAwsDataStoreRemovalPolicy } from '../config/settings/awsDataStoreRemovalPolicy';
 import { defineAwsDyanmoOverrideForKvs } from '../config/settings/awsDyanmoOverrideForKvs';
 import { AwsKmsKeyTargetType, defineAwsKmsKey } from '../config/settings/awsKmsKey';
+import { defineAwsServiceDashboard } from '../config/settings/awsServiceDashboard';
 import { defineDomainCertificate } from '../config/settings/domainCertificate';
 import { defineBootstrapAwsOrganization } from '../config/settings/organizations';
 import { defineAwsServiceAccountInfo } from '../config/settings/serviceAccountInfo';
@@ -34,6 +35,7 @@ import {
   getAwsServiceAccountInfoByDeploymentInfo,
   getAwsServiceAccountInfoConfig,
   getAwsServiceAccountInfos,
+  getAwsServiceDashboardConfig,
   getBootstrapWafConfig,
   getDomainCertificateArnSsmParameterName,
   getDomainCertificateConfigs,
@@ -106,6 +108,15 @@ describe('account level selectors', () => {
 
     const config = buildTestQpqConfig([defineAccountSecurityServices({ enableSecurityHub: true })]);
     expect(getAccountSecurityServicesConfig(config)?.enableSecurityHub).toBe(true);
+  });
+});
+
+describe('getAwsServiceDashboardConfig', () => {
+  it('returns the dashboard setting or undefined', () => {
+    expect(getAwsServiceDashboardConfig(buildTestQpqConfig())).toBeUndefined();
+
+    const config = buildTestQpqConfig([defineAwsServiceDashboard({ disableAnomalyDetection: true })]);
+    expect(getAwsServiceDashboardConfig(config)?.disableAnomalyDetection).toBe(true);
   });
 });
 
