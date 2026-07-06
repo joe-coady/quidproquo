@@ -215,6 +215,23 @@ export const getCFExportNameWebsocketApiIdFromConfig = (websocketApiName: string
   return getQpqRuntimeResourceName(resourceName, application, service, environment, feature, 'websocket-api-id-export');
 };
 
+// SSM parameter holding a websocket api's AWS-generated id, written by the owning service's
+// inf stack. Referencing services resolve it at deploy time to build exact execute-api
+// grants (deploy the owning inf stack first - same owner-publishes/others-read pattern as
+// the domain certificate arn parameter).
+export const getWebsocketApiIdSsmParameterName = (websocketApiName: string, qpqConfig: QPQConfig) => {
+  const websocketApiConfig = qpqWebServerUtils.getWebsocketEntryByApiName(websocketApiName, qpqConfig);
+
+  const application = websocketApiConfig.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig);
+  const service = websocketApiConfig.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig);
+  const environment = websocketApiConfig.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
+  const feature = websocketApiConfig.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+
+  const resourceName = websocketApiConfig.owner?.resourceNameOverride || websocketApiName;
+
+  return `/qpq/websocket/api-id/${getConfigRuntimeResourceName(resourceName, application, service, environment, feature)}`;
+};
+
 export const getEventBusSnsTopicArn = (
   eventBusName: string,
   qpqConfig: QPQConfig,

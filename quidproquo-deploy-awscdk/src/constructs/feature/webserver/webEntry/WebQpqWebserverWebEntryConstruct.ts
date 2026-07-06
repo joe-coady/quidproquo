@@ -1,7 +1,17 @@
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import { qpqWebServerUtils, WebEntryQPQWebServerConfigSetting } from 'quidproquo-webserver';
 
-import { aws_cloudfront, aws_cloudfront_origins, aws_lambda, aws_route53, aws_route53_targets, aws_s3, aws_s3_deployment } from 'aws-cdk-lib';
+import {
+  aws_cloudfront,
+  aws_cloudfront_origins,
+  aws_iam,
+  aws_lambda,
+  aws_route53,
+  aws_route53_targets,
+  aws_s3,
+  aws_s3_deployment,
+} from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import path from 'path';
@@ -145,6 +155,19 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
     });
 
     qpqDeployAwsCdkUtils.applyEnvironmentTags(distribution, props.qpqConfig);
+
+    // The distribution id is AWS-generated here in the web stack, unknowable when the inf
+    // stack synthesizes the service role - so this stack attaches the exact-ARN invalidation
+    // grant to the role instead (web always deploys after inf, so the role exists).
+    this.getServiceRole().addToPrincipalPolicy(
+      new aws_iam.PolicyStatement({
+        effect: aws_iam.Effect.ALLOW,
+        actions: ['cloudfront:CreateInvalidation'],
+        resources: [
+          `arn:aws:cloudfront::${qpqConfigAwsUtils.getApplicationModuleDeployAccountId(props.qpqConfig)}:distribution/${distribution.distributionId}`,
+        ],
+      }),
+    );
 
     qpqDeployAwsCdkUtils.exportStackValue(
       this,

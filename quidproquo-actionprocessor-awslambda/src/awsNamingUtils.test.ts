@@ -27,6 +27,7 @@ import {
   getKvsDynamoTableNameFromConfig,
   getQpqRuntimeResourceName,
   getQpqRuntimeResourceNameFromConfig,
+  getWebsocketApiIdSsmParameterName,
   getWebStackName,
   resolveConfigRuntimeResourceNameFromConfig,
 } from './awsNamingUtils';
@@ -156,6 +157,12 @@ describe('cloudformation export names', () => {
     const config = buildTestQpqConfig([defineWebsocket('ws', 'example.com', websocketEventProcessors)]);
 
     expect(getCFExportNameWebsocketApiIdFromConfig('api', config)).toBe('api-test-app-test-module-development-qpqwebsocket-api-id-export');
+  });
+
+  it('builds the websocket api id ssm parameter name from the websocket config', () => {
+    const config = buildTestQpqConfig([defineWebsocket('ws', 'example.com', websocketEventProcessors)]);
+
+    expect(getWebsocketApiIdSsmParameterName('api', config)).toBe('/qpq/websocket/api-id/api-test-app-test-module-development');
   });
 });
 

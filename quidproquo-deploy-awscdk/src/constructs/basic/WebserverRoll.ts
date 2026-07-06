@@ -26,7 +26,6 @@ export class WebserverRoll extends QpqConstructBlock {
     });
 
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(props.qpqConfig);
-    const accountId = qpqConfigAwsUtils.getApplicationModuleDeployAccountId(props.qpqConfig);
     const feature = qpqCoreUtils.getApplicationModuleFeature(props.qpqConfig);
 
     // This deployment's identity tags, as applied to every qpq resource by applyEnvironmentTags.
@@ -36,10 +35,6 @@ export class WebserverRoll extends QpqConstructBlock {
       'aws:ResourceTag/application': qpqCoreUtils.getApplicationName(props.qpqConfig),
       'aws:ResourceTag/environment': qpqCoreUtils.getApplicationModuleEnvironment(props.qpqConfig),
       ...(feature ? { 'aws:ResourceTag/feature': feature } : {}),
-    };
-    const serviceResourceTagConditions = {
-      ...applicationResourceTagConditions,
-      'aws:ResourceTag/module': qpqCoreUtils.getApplicationModuleName(props.qpqConfig),
     };
 
     // Every event-bus topic this service can publish to (owned + referenced cross-module) -
@@ -74,19 +69,6 @@ export class WebserverRoll extends QpqConstructBlock {
         resources: [`arn:aws:apigateway:${region}::/apikeys/*`],
         conditions: {
           StringEquals: applicationResourceTagConditions,
-        },
-      },
-
-      // Invalidate CloudFront caches after web-entry static asset deploys. The exact
-      // distribution id lives in the separate web-phase stack (unknowable at synth), so the
-      // resource is account-wide but the tag condition pins it to this service's own
-      // distributions - evaluated at call time, immune to deploy ordering.
-      {
-        sid: 'CloudFrontCreateInvalidation',
-        actions: ['cloudfront:CreateInvalidation'],
-        resources: [`arn:aws:cloudfront::${accountId}:distribution/*`],
-        conditions: {
-          StringEquals: serviceResourceTagConditions,
         },
       },
 
