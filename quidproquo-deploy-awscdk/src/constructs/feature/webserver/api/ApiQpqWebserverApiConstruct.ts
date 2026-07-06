@@ -36,6 +36,8 @@ export class ApiQpqWebserverApiConstruct extends QpqConstructBlock {
 
       apiLayerVersions: props.apiLayerVersions,
 
+      reservedConcurrentExecutions: props.apiConfig.maxConcurrentExecutions,
+
       role: this.getServiceRole(),
 
       vpc,

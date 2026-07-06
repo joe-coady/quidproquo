@@ -52,6 +52,8 @@ export class QpqApiWebserverWebsocketConstruct extends QpqConstructBlock {
         websocketApiName: props.websocketConfig.apiName,
       },
 
+      reservedConcurrentExecutions: props.websocketConfig.maxConcurrentExecutions,
+
       role: this.getServiceRole(),
     });
 

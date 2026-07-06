@@ -30,6 +30,8 @@ export class QpqWebserverServiceFunctionConstruct extends QpqConstructBlock {
 
       timeoutInSeconds: 14.5 * 60,
 
+      reservedConcurrentExecutions: props.serviceFunctionConfig.maxConcurrentExecutions,
+
       qpqConfig: props.qpqConfig,
 
       apiLayerVersions: props.apiLayerVersions,
