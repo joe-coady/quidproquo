@@ -152,6 +152,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
           websocketConfig: setting,
         }),
     );
+    QpqWebserverWebsocketConstruct.authorizeManageConnectionsForRole(webserverRole, websockets, props.qpqConfig);
 
     // Cache settings
     const cache = qpqWebServerUtils.getAllOwnedCacheConfigs(props.qpqConfig).map(

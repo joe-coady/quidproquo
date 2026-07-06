@@ -1,11 +1,12 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import { ActionProcessorList, ActionProcessorListResolver, actionResult, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { ActionProcessorList, ActionProcessorListResolver, actionResult, QPQConfig } from 'quidproquo-core';
 import { ApiKeyValidationActionType, ApiKeyValidationValidateActionProcessor } from 'quidproquo-webserver';
 
 import { timingSafeEqual } from 'crypto';
 
-import { getConfigRuntimeResourceName } from '../../../awsNamingUtils';
-import { getApiKeys } from '../../../logic/apiGateway/getApiKeys';
+import { getCFExportNameApiKeyIdFromConfig } from '../../../awsNamingUtils';
+import { getApiKeyValue } from '../../../logic/apiGateway/getApiKeyValue';
+import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 
 // Constant-time string equality. `timingSafeEqual` throws on length mismatch,
 // so guard the length check — the length itself isn't secret for API keys.
@@ -22,23 +23,27 @@ const safeEqual = (a?: string, b?: string): boolean => {
 
 const getProcessApiKeyValidationValidate = (qpqConfig: QPQConfig): ApiKeyValidationValidateActionProcessor => {
   const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
-  const application = qpqCoreUtils.getApplicationName(qpqConfig);
-  const service = qpqCoreUtils.getApplicationModuleName(qpqConfig);
-  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
-  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
 
   return async ({ apiKeyValue, apiKeyReferences }) => {
-    const realApiKeys = await getApiKeys(
-      region,
-      ...apiKeyReferences.map((apiKey) => {
-        const apiKeyApplication = apiKey.applicationName || application;
-        const apiKeyService = apiKey.serviceName || service;
+    // Fetch each referenced key individually (id via CFN export, then GetApiKey) rather than
+    // listing every key in the account - keeps the IAM grant per-key instead of /apikeys-wide.
+    const realApiKeyValues = await Promise.all(
+      apiKeyReferences.map(async (apiKeyReference) => {
+        try {
+          const apiKeyId = await getExportedValue(
+            getCFExportNameApiKeyIdFromConfig(apiKeyReference.name, qpqConfig, apiKeyReference.serviceName, apiKeyReference.applicationName),
+            region,
+          );
 
-        return getConfigRuntimeResourceName(apiKey.name, apiKeyApplication, apiKeyService, environment, feature);
+          return await getApiKeyValue(region, apiKeyId);
+        } catch {
+          // An unresolvable reference behaves like the old list-and-filter miss - no match
+          return undefined;
+        }
       }),
     );
 
-    const matched = realApiKeys.some((apiKey) => safeEqual(apiKey.value, apiKeyValue));
+    const matched = realApiKeyValues.some((realApiKeyValue) => safeEqual(realApiKeyValue, apiKeyValue));
     return actionResult(matched);
   };
 };
