@@ -1,4 +1,5 @@
 export * from './awsAlarm';
+export * from './awsDataStoreRemovalPolicy';
 export * from './awsDyanmoOverrideForKvs';
 export * from './awsKmsKey';
 export * from './cloudTrail';

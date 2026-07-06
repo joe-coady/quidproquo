@@ -1,5 +1,5 @@
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-import { resolveAwsServiceAccountInfo } from 'quidproquo-config-aws';
+import { AwsDataStoreRemovalPolicy, qpqConfigAwsUtils, resolveAwsServiceAccountInfo } from 'quidproquo-config-aws';
 import { QPQConfig, UserDirectoryMfaMode, UserDirectoryMfaSecondFactor, UserDirectoryQPQConfigSetting } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
@@ -47,8 +47,14 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
 
     const userPoolName = this.resourceName(props.userDirectoryConfig.name);
 
+    const dataStoreRemovalPolicy = qpqConfigAwsUtils.getAwsDataStoreRemovalPolicy(props.qpqConfig);
+
     const userPool = new aws_cognito.UserPool(this, 'user-pool', {
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      // Retain user pools by default (user accounts are unrecoverable); dev configs opt into
+      // full teardown via defineAwsDataStoreRemovalPolicy(destroy). When retained, deletionProtection
+      // also blocks deletes/replacements outright (RETAIN alone only orphans the pool).
+      removalPolicy: dataStoreRemovalPolicy === AwsDataStoreRemovalPolicy.destroy ? cdk.RemovalPolicy.DESTROY : cdk.RemovalPolicy.RETAIN,
+      deletionProtection: dataStoreRemovalPolicy === AwsDataStoreRemovalPolicy.retain,
       userPoolName: userPoolName,
       selfSignUpEnabled: props.userDirectoryConfig.selfSignUpEnabled,
       mfa: mapMfaMode(props.userDirectoryConfig.mfa.mode),

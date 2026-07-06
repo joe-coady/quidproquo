@@ -7,4 +7,5 @@ export enum QPQAwsConfigSettingType {
   awsDomainCertificate = '@quidproquo-aws/config/awsDomainCertificate',
   awsKmsKey = '@quidproquo-aws/config/awsKmsKey',
   awsEventBusQuickSubscription = '@quidproquo-aws/config/awsEventBusQuickSubscription',
+  awsDataStoreRemovalPolicy = '@quidproquo-aws/config/awsDataStoreRemovalPolicy',
 }

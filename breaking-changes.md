@@ -5,6 +5,7 @@ assembled quickly.
 
 ## vNext
 
+- Data stores deployed via `quidproquo-deploy-awscdk` (storage-drive S3 buckets, key-value-store DynamoDB tables, Cognito user pools, Neptune graph DB clusters) now default to `RETAIN` (Neptune: `SNAPSHOT`) instead of `DESTROY` on `cdk destroy`/replacement, and S3 buckets no longer `autoDeleteObjects` by default. If you rely on full teardown (e.g. ephemeral dev/test environments), declare `defineAwsDataStoreRemovalPolicy(AwsDataStoreRemovalPolicy.destroy)` from `quidproquo-config-aws` in that environment's config.
 - `quidproquo-eslint-config`'s shared config now lints `.jsx`/`.tsx` files and enforces `eslint-plugin-react`, `eslint-plugin-jsx-a11y`, and `eslint-plugin-prettier` rules. Consumers now need `prettier` installed (peer dep) and may see new lint failures on JSX files and formatting-only diffs.
 - `DateNowActionProcessor`/`DateNowActionRequester` in `quidproquo-core` now resolve to `QpqIsoDateTime` instead of `string`. If you implement `DateNowActionProcessor` yourself, return `getQpqIsoDateTimeFromDate(date)` instead of `date.toISOString()`.
 - `AuthenticationInfo.expiresAt` in `quidproquo-core` is now typed `QpqIsoDateTime` instead of `string`. Still a plain ISO string at runtime; construct it with `getQpqIsoDateTimeFromDate` instead of a raw `.toISOString()`.

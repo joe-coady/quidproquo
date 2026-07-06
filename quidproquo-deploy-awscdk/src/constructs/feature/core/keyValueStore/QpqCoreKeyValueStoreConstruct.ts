@@ -1,5 +1,5 @@
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
+import { AwsDataStoreRemovalPolicy, qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import { KeyValueStoreQPQConfigSetting, KvsKey, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
 import { aws_dynamodb, aws_iam, aws_kms } from 'aws-cdk-lib';
@@ -64,6 +64,8 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
   constructor(scope: Construct, id: string, props: QpqCoreKeyValueStoreConstructProps) {
     super(scope, id, props);
 
+    const dataStoreRemovalPolicy = qpqConfigAwsUtils.getAwsDataStoreRemovalPolicy(props.qpqConfig);
+
     const [primarySortKey] = props.keyValueStoreConfig.sortKeys;
 
     let tableEncryption: aws_dynamodb.TableEncryption | undefined;
@@ -83,7 +85,10 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
       partitionKey: convertKvsKeyToDynamodbAttribute(props.keyValueStoreConfig.partitionKey),
       sortKey: primarySortKey && convertKvsKeyToDynamodbAttribute(primarySortKey),
       billingMode: aws_dynamodb.BillingMode.PAY_PER_REQUEST,
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      // Retain data stores by default; dev configs opt into full teardown via defineAwsDataStoreRemovalPolicy(destroy).
+      // When retained, deletionProtection also blocks deletes/replacements outright (RETAIN alone only orphans the table).
+      removalPolicy: dataStoreRemovalPolicy === AwsDataStoreRemovalPolicy.destroy ? cdk.RemovalPolicy.DESTROY : cdk.RemovalPolicy.RETAIN,
+      deletionProtection: dataStoreRemovalPolicy === AwsDataStoreRemovalPolicy.retain,
       timeToLiveAttribute: props.keyValueStoreConfig.ttlAttribute,
       // PITR on by default (35-day continuous backups / point-in-time restore); opt out per-table via config.
       pointInTimeRecoverySpecification: { pointInTimeRecoveryEnabled: !props.keyValueStoreConfig.disablePointInTimeRecovery },

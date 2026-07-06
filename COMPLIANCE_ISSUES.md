@@ -24,9 +24,6 @@ Add a default operational dashboard per service (request rate, error rate, laten
 [ ] 13.5 No anomaly detection — none configured. `(effort: medium)`
 Enable CloudWatch `AnomalyDetector` on critical metrics (Lambda duration, API latency, error rates) so slow leaks, degradation, and cost creep get surfaced.
 
-[ ] 8.1 DESTROY removal policy on all stateful resources — hardcoded, not environment-aware. `(effort: medium)`
-`RemovalPolicy.DESTROY` is hardcoded on S3 (+ `autoDeleteObjects`), DynamoDB, Cognito, and log groups. Introduce an environment-aware toggle defaulting to `RETAIN`/`SNAPSHOT` for production.
-
 [ ] 11.1 No AWS budget or cost alerting — zero coverage. `(effort: medium)`
 Add `aws_budgets.CfnBudget` threshold alerts (80/100/150%), enable Cost Anomaly Detection, and add cost-allocation tags (CostCenter/Team/Project). With PAY_PER_REQUEST + on-demand Lambda, runaway cost is currently unbounded and silent.
 
@@ -69,6 +66,9 @@ Operational/error logging uses raw `console.log`/`console.error` with no consist
 ---
 
 ## Fixed
+
+[x] 8.1 DESTROY removal policy on stateful resources — data stores now default to safe removal, config-driven opt-out for dev.
+Data stores (storage-drive S3 buckets, KVS DynamoDB tables, Cognito user pools, Neptune graph DB clusters) default to safe removal via `defineAwsDataStoreRemovalPolicy` (in `quidproquo-config-aws` — RemovalPolicy is a CloudFormation concept, so it stays off core config): undeclared = `RETAIN` (+ `deletionProtection` on tables and user pools, since RETAIN alone only orphans on stack delete, and `autoDeleteObjects` off on buckets) — except Neptune, which uses `SNAPSHOT` (final snapshot preserves the data without keeping an orphaned live cluster running/billing); dev configs declare `destroy` to keep full-teardown behaviour. Deliberately left as DESTROY (accepted): secrets, queues (+ DLQ messages), log groups (logs also shipped to S3), web-entry bucket (rebuildable static assets). The CloudTrail bucket was already RETAIN; only its optional CloudWatch mirror log group is DESTROY. Extend the same setting to these if that stance changes.
 
 [x] 7.4 File upload not validated — Busboy now runs with enforced limits, an optional MIME whitelist, and sanitized filenames.
 `parseMultipartFormData.ts` passes Busboy `limits` (`fileSize`/`files`/`fields`/`fieldSize`) resolved from a new webserver-layer setting `defineFileUploadSettings(partial)` via `qpqWebServerUtils.getFileUploadSettings` — defaults apply even when the setting isn't declared (10MB per file to match the API Gateway payload cap, 10 files, 100 fields, 1MB per field). An optional `allowedMimeTypes` whitelist (`type/*` wildcards supported) rejects disallowed content types, and filenames are reduced to a path-traversal-safe basename (`sanitizeFilename`: strips `/` and `\` segments, control chars, dot-only names). Truncated uploads fail instead of silently succeeding (Busboy's `limit`/`filesLimit`/`fieldsLimit` events reject with a named `FileUploadValidationError` carrying a `FileUploadErrorTypeEnum`). Violations don't 5xx the event: the getRecords processor stamps `fileUploadError` on the `HTTPEvent` record and the HTTP auto-respond step returns the mapped status (413 fileTooLarge/tooManyFiles, 415 disallowedMimeType, 400 tooManyFields/malformed) with CORS headers, after auth so a 401 still wins; malformed multipart bodies (previously an unhandled Lambda crash) now map to a clean 400. Also fixed the O(n²) per-chunk `Buffer.concat` by collecting chunks and concatenating once. Config lives in `quidproquo-webserver` (multipart-over-HTTP is a web concern), enforcement in the awslambda processor.

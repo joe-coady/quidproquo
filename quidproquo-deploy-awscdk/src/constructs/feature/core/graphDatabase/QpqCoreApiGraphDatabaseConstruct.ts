@@ -1,5 +1,5 @@
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-import { qpqConfigAwsUtils, resolveAwsServiceAccountInfo } from 'quidproquo-config-aws';
+import { AwsDataStoreRemovalPolicy, qpqConfigAwsUtils, resolveAwsServiceAccountInfo } from 'quidproquo-config-aws';
 import { GraphDatabaseQPQConfigSetting, QPQConfig } from 'quidproquo-core';
 
 import { aws_dynamodb, aws_ec2, aws_iam, aws_logs } from 'aws-cdk-lib';
@@ -60,7 +60,12 @@ export class QpqCoreApiGraphDatabaseConstruct extends QpqConstructBlock {
       // Optionally set a retention period on exported CloudWatch Logs
       cloudwatchLogsRetention: aws_logs.RetentionDays.ONE_WEEK,
 
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      // Retain data stores by default; a final snapshot preserves the graph data without keeping
+      // an orphaned live cluster running. Dev configs opt into full teardown via defineAwsDataStoreRemovalPolicy(destroy)
+      removalPolicy:
+        qpqConfigAwsUtils.getAwsDataStoreRemovalPolicy(props.qpqConfig) === AwsDataStoreRemovalPolicy.destroy
+          ? cdk.RemovalPolicy.DESTROY
+          : cdk.RemovalPolicy.SNAPSHOT,
 
       // clusterParameterGroup,
     });

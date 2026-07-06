@@ -2,6 +2,8 @@ import { CrossModuleOwner, KeyValueStoreQPQConfigSetting, QPQConfig, qpqCoreUtil
 
 import {
   AwsAlarmQPQConfigSetting,
+  AwsDataStoreRemovalPolicy,
+  AwsDataStoreRemovalPolicyQPQConfigSetting,
   AwsDyanmoOverrideForKvsQPQConfigSetting,
   AwsKmsKeyQPQConfigSetting,
   AwsKmsKeyTargetType,
@@ -31,6 +33,15 @@ export const getAwsServiceAccountInfoConfig = (qpqConfig: QPQConfig): AwsService
   }
 
   return serviceAccountInfos[0];
+};
+
+export const getAwsDataStoreRemovalPolicy = (qpqConfig: QPQConfig): AwsDataStoreRemovalPolicy => {
+  const setting = qpqCoreUtils.getConfigSetting<AwsDataStoreRemovalPolicyQPQConfigSetting>(
+    qpqConfig,
+    QPQAwsConfigSettingType.awsDataStoreRemovalPolicy,
+  );
+
+  return setting?.removalPolicy ?? AwsDataStoreRemovalPolicy.retain;
 };
 
 export const getAwsBootstrapOrganizationConfigs = (qpqConfig: QPQConfig): AwsOrganizationQPQConfigSetting[] => {

@@ -1,5 +1,5 @@
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
+import { AwsDataStoreRemovalPolicy, qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import { QPQConfig, qpqCoreUtils, StorageDriveLifecycleRule, StorageDriveQPQConfigSetting, StorageDriveTransition } from 'quidproquo-core';
 
 import { aws_iam, aws_kms, aws_s3, aws_s3_deployment } from 'aws-cdk-lib';
@@ -72,6 +72,8 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
   constructor(scope: Construct, id: string, props: QpqCoreStorageDriveConstructProps) {
     super(scope, id, props);
 
+    const dataStoreRemovalPolicy = qpqConfigAwsUtils.getAwsDataStoreRemovalPolicy(props.qpqConfig);
+
     let bucketEncryption: aws_s3.BucketEncryption = aws_s3.BucketEncryption.UNENCRYPTED;
     let encryptionKey: aws_kms.IKey | undefined;
     if (props.storageDriveConfig.encryption) {
@@ -91,9 +93,9 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
       publicReadAccess: false,
       blockPublicAccess: aws_s3.BlockPublicAccess.BLOCK_ALL,
 
-      // Allow bucket to auto delete upon cdk:Destroy
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
-      autoDeleteObjects: true,
+      // Retain data stores by default; dev configs opt into full teardown via defineAwsDataStoreRemovalPolicy(destroy)
+      removalPolicy: dataStoreRemovalPolicy === AwsDataStoreRemovalPolicy.destroy ? cdk.RemovalPolicy.DESTROY : cdk.RemovalPolicy.RETAIN,
+      autoDeleteObjects: dataStoreRemovalPolicy === AwsDataStoreRemovalPolicy.destroy,
 
       // Keep prior object versions so a bad deploy / accidental overwrite can be rolled back
       versioned: true,

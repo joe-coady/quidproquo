@@ -10,6 +10,7 @@ import {
   AwsAlarmStatistic,
   defineAwsAlarm,
 } from '../config/settings/awsAlarm';
+import { AwsDataStoreRemovalPolicy, defineAwsDataStoreRemovalPolicy } from '../config/settings/awsDataStoreRemovalPolicy';
 import { defineAwsDyanmoOverrideForKvs } from '../config/settings/awsDyanmoOverrideForKvs';
 import { AwsKmsKeyTargetType, defineAwsKmsKey } from '../config/settings/awsKmsKey';
 import { defineBootstrapCloudTrail } from '../config/settings/cloudTrail';
@@ -22,6 +23,7 @@ import {
   getApplicationModuleDeployRegion,
   getAwsAccountIds,
   getAwsBootstrapOrganizationConfigs,
+  getAwsDataStoreRemovalPolicy,
   getAwsKmsKeyForKeyValueStore,
   getAwsKmsKeyForStorageDrive,
   getAwsKmsKeys,
@@ -79,6 +81,18 @@ describe('getAwsBootstrapOrganizationConfigs', () => {
 
   it('returns an empty list when none are defined', () => {
     expect(getAwsBootstrapOrganizationConfigs(buildTestQpqConfig())).toEqual([]);
+  });
+});
+
+describe('getAwsDataStoreRemovalPolicy', () => {
+  it('defaults to retain when no setting is declared', () => {
+    expect(getAwsDataStoreRemovalPolicy(buildTestQpqConfig())).toBe(AwsDataStoreRemovalPolicy.retain);
+  });
+
+  it('returns the declared removal policy', () => {
+    const config = buildTestQpqConfig([defineAwsDataStoreRemovalPolicy(AwsDataStoreRemovalPolicy.destroy)]);
+
+    expect(getAwsDataStoreRemovalPolicy(config)).toBe(AwsDataStoreRemovalPolicy.destroy);
   });
 });
 
