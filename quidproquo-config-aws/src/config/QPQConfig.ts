@@ -13,4 +13,5 @@ export enum QPQAwsConfigSettingType {
   awsKmsKey = '@quidproquo-aws/config/awsKmsKey',
   awsEventBusQuickSubscription = '@quidproquo-aws/config/awsEventBusQuickSubscription',
   awsDataStoreRemovalPolicy = '@quidproquo-aws/config/awsDataStoreRemovalPolicy',
+  awsVirtualNetworkSettings = '@quidproquo-aws/config/awsVirtualNetworkSettings',
 }

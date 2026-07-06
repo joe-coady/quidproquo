@@ -4,36 +4,12 @@ import * as cdk from 'aws-cdk-lib';
 import { aws_cloudtrail, aws_logs, aws_s3 } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
+import { resolveLogRetention } from '../../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../base/QpqConstructBlock';
 
 export interface QpqAccountCloudTrailConstructProps extends QpqConstructBlockProps {
   cloudTrailConfig: AccountCloudTrailQPQConfigSetting;
 }
-
-const SUPPORTED_RETENTION_DAYS: aws_logs.RetentionDays[] = [
-  aws_logs.RetentionDays.ONE_DAY,
-  aws_logs.RetentionDays.THREE_DAYS,
-  aws_logs.RetentionDays.FIVE_DAYS,
-  aws_logs.RetentionDays.ONE_WEEK,
-  aws_logs.RetentionDays.TWO_WEEKS,
-  aws_logs.RetentionDays.ONE_MONTH,
-  aws_logs.RetentionDays.TWO_MONTHS,
-  aws_logs.RetentionDays.THREE_MONTHS,
-  aws_logs.RetentionDays.FOUR_MONTHS,
-  aws_logs.RetentionDays.FIVE_MONTHS,
-  aws_logs.RetentionDays.SIX_MONTHS,
-  aws_logs.RetentionDays.ONE_YEAR,
-  aws_logs.RetentionDays.THIRTEEN_MONTHS,
-  aws_logs.RetentionDays.EIGHTEEN_MONTHS,
-  aws_logs.RetentionDays.TWO_YEARS,
-  aws_logs.RetentionDays.FIVE_YEARS,
-  aws_logs.RetentionDays.TEN_YEARS,
-];
-
-const resolveLogRetention = (days?: number): aws_logs.RetentionDays => {
-  if (!days) return aws_logs.RetentionDays.ONE_MONTH;
-  return SUPPORTED_RETENTION_DAYS.find((v) => v >= days) ?? aws_logs.RetentionDays.TEN_YEARS;
-};
 
 export class QpqAccountCloudTrailConstruct extends QpqConstructBlock {
   // Only set when the config enables cloudWatchLogs - consumed by the security services

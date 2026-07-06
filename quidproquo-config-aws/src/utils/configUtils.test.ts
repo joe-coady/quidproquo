@@ -15,6 +15,7 @@ import { AwsDataStoreRemovalPolicy, defineAwsDataStoreRemovalPolicy } from '../c
 import { defineAwsDyanmoOverrideForKvs } from '../config/settings/awsDyanmoOverrideForKvs';
 import { AwsKmsKeyTargetType, defineAwsKmsKey } from '../config/settings/awsKmsKey';
 import { defineAwsServiceDashboard } from '../config/settings/awsServiceDashboard';
+import { defineAwsVirtualNetworkSettings } from '../config/settings/awsVirtualNetworkSettings';
 import { defineDomainCertificate } from '../config/settings/domainCertificate';
 import { defineBootstrapAwsOrganization } from '../config/settings/organizations';
 import { defineAwsServiceAccountInfo } from '../config/settings/serviceAccountInfo';
@@ -36,6 +37,7 @@ import {
   getAwsServiceAccountInfoConfig,
   getAwsServiceAccountInfos,
   getAwsServiceDashboardConfig,
+  getAwsVirtualNetworkSettings,
   getBootstrapWafConfig,
   getDomainCertificateArnSsmParameterName,
   getDomainCertificateConfigs,
@@ -158,6 +160,35 @@ describe('getAwsDataStoreRemovalPolicy', () => {
     const config = buildTestQpqConfig([defineAwsDataStoreRemovalPolicy(AwsDataStoreRemovalPolicy.destroy)]);
 
     expect(getAwsDataStoreRemovalPolicy(config)).toBe(AwsDataStoreRemovalPolicy.destroy);
+  });
+});
+
+describe('getAwsVirtualNetworkSettings', () => {
+  it('returns the declared setting matching the virtual network name', () => {
+    const config = buildTestQpqConfig([
+      defineAwsVirtualNetworkSettings('other', { maxAzs: 3 }),
+      defineAwsVirtualNetworkSettings('main', { natGateways: 1, interfaceEndpoints: ['secretsmanager'] }),
+    ]);
+
+    const settings = getAwsVirtualNetworkSettings(config, 'main');
+    expect(settings.natGateways).toBe(1);
+    expect(settings.interfaceEndpoints).toEqual(['secretsmanager']);
+    expect(settings.maxAzs).toBe(2);
+  });
+
+  it('falls back to secure defaults when no setting is declared', () => {
+    const settings = getAwsVirtualNetworkSettings(buildTestQpqConfig(), 'main');
+
+    expect(settings.flowLogs.disable).toBe(false);
+    expect(settings.disableS3GatewayEndpoint).toBe(false);
+    expect(settings.disableDynamoDbGatewayEndpoint).toBe(false);
+    expect(settings.natGateways).toBeUndefined();
+  });
+
+  it('ignores settings declared for a different virtual network', () => {
+    const config = buildTestQpqConfig([defineAwsVirtualNetworkSettings('other', { flowLogs: { disable: true } })]);
+
+    expect(getAwsVirtualNetworkSettings(config, 'main').flowLogs.disable).toBe(false);
   });
 });
 

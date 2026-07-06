@@ -4,6 +4,7 @@ export * from './awsDataStoreRemovalPolicy';
 export * from './awsDyanmoOverrideForKvs';
 export * from './awsKmsKey';
 export * from './awsServiceDashboard';
+export * from './awsVirtualNetworkSettings';
 export * from './domainCertificate';
 export * from './eventBusQuickSubscription';
 export * from './organizations';

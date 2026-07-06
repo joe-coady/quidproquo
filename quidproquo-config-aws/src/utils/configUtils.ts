@@ -13,7 +13,9 @@ import {
   AwsOrganizationQPQConfigSetting,
   AwsServiceAccountInfoQPQConfigSetting,
   AwsServiceDashboardQPQConfigSetting,
+  AwsVirtualNetworkQPQConfigSetting,
   BootstrapWafQPQConfigSetting,
+  defineAwsVirtualNetworkSettings,
   DomainCertificateQPQConfigSetting,
   EventBusQuickSubscription,
   EventBusQuickSubscriptionQPQConfigSetting,
@@ -37,6 +39,20 @@ export const getAwsServiceAccountInfoConfig = (qpqConfig: QPQConfig): AwsService
   }
 
   return serviceAccountInfos[0];
+};
+
+/**
+ * Resolve the AWS hardening settings for a named virtual network. Falls back
+ * to `defineAwsVirtualNetworkSettings(name)` when the config never declares
+ * one, so every VPC gets the secure defaults (flow logs + free S3/DynamoDB
+ * gateway endpoints) without opting in.
+ */
+export const getAwsVirtualNetworkSettings = (qpqConfig: QPQConfig, virtualNetworkName: string): AwsVirtualNetworkQPQConfigSetting => {
+  const setting = qpqCoreUtils
+    .getConfigSettings<AwsVirtualNetworkQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.awsVirtualNetworkSettings)
+    .find((s) => s.virtualNetworkName === virtualNetworkName);
+
+  return setting ?? defineAwsVirtualNetworkSettings(virtualNetworkName);
 };
 
 export const getAwsDataStoreRemovalPolicy = (qpqConfig: QPQConfig): AwsDataStoreRemovalPolicy => {
