@@ -251,6 +251,14 @@ export const getEventBusSnsTopicArn = (
   return `arn:aws:sns:${region}:${awsAccountId}:${topicName}`;
 };
 
+// The account stack owns account-level resources (cloud trail, budgets, security services)
+// so they never share an app's lifecycle. The name is deliberately static: stack names are
+// already namespaced per account+region, and the resources it holds meter/audit the whole
+// account - an app/environment segment would only fake a separation that doesn't exist.
+// Everything in one account converges on this one stack, so exactly ONE repo/config must
+// own it, and actor (feature) deploys must not deploy it.
+export const getAccountStackName = () => 'qpq-account';
+
 export const getBaseStackName = (qpqConfig: QPQConfig) => {
   const appName = qpqCoreUtils.getApplicationName(qpqConfig);
   const moduleName = qpqCoreUtils.getApplicationModuleName(qpqConfig);

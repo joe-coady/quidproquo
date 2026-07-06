@@ -3,13 +3,7 @@ import { qpqCoreUtils } from 'quidproquo-core';
 
 import { Construct } from 'constructs';
 
-import {
-  BootstrapQpqCoreVirtualNetworkConstruct,
-  QpqBootstrapConfigAwsOrganizationConstruct,
-  QpqBootstrapConfigBudgetConstruct,
-  QpqBootstrapConfigCloudTrailConstruct,
-  QpqBootstrapConfigWafConstruct,
-} from '../constructs';
+import { BootstrapQpqCoreVirtualNetworkConstruct, QpqBootstrapConfigAwsOrganizationConstruct, QpqBootstrapConfigWafConstruct } from '../constructs';
 import { BSQpqLambdaWarmerEventConstructConstruct } from '../constructs/basic/BSQpqLambdaWarmerEventConstruct';
 import { QpqServiceStack, QpqServiceStackProps } from './base/QpqServiceStack';
 import { WafCloudFrontWebAclStack } from './WafCloudFrontWebAclStack';
@@ -42,23 +36,7 @@ export class BootstrapQpqServiceStack extends QpqServiceStack {
         }),
     );
 
-    const cloudTrails = qpqConfigAwsUtils.getBootstrapCloudTrailConfigs(props.qpqConfig).map(
-      (setting) =>
-        new QpqBootstrapConfigCloudTrailConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
-          qpqConfig: props.qpqConfig,
-
-          cloudTrailConfig: setting,
-        }),
-    );
-
-    const budgets = qpqConfigAwsUtils.getBootstrapBudgetConfigs(props.qpqConfig).map(
-      (setting) =>
-        new QpqBootstrapConfigBudgetConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
-          qpqConfig: props.qpqConfig,
-
-          budgetConfig: setting,
-        }),
-    );
+    // Account-level resources (cloud trail, budgets, security services) live in AccountQpqStack
 
     const wafConfig = qpqConfigAwsUtils.getBootstrapWafConfig(props.qpqConfig);
     if (wafConfig) {

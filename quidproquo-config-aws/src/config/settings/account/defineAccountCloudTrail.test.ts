@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
 import { QPQAwsConfigSettingType } from '../../QPQConfig';
-import { defineBootstrapCloudTrail } from './defineBootstrapCloudTrail';
+import { defineAccountCloudTrail } from './defineAccountCloudTrail';
 
-describe('defineBootstrapCloudTrail', () => {
+describe('defineAccountCloudTrail', () => {
   it('builds a cloud trail setting keyed by name with undefined options when omitted', () => {
-    expect(defineBootstrapCloudTrail('trail')).toEqual({
-      configSettingType: QPQAwsConfigSettingType.bootstrapCloudTrail,
+    expect(defineAccountCloudTrail('trail')).toEqual({
+      configSettingType: QPQAwsConfigSettingType.accountCloudTrail,
       uniqueKey: 'trail',
       name: 'trail',
       retentionDays: undefined,
@@ -19,7 +19,7 @@ describe('defineBootstrapCloudTrail', () => {
 
   it('carries through the supplied options', () => {
     expect(
-      defineBootstrapCloudTrail('trail', {
+      defineAccountCloudTrail('trail', {
         retentionDays: 30,
         enableLogFileValidation: true,
         multiRegion: true,
@@ -27,7 +27,7 @@ describe('defineBootstrapCloudTrail', () => {
         cloudWatchLogs: { retentionDays: 7 },
       }),
     ).toEqual({
-      configSettingType: QPQAwsConfigSettingType.bootstrapCloudTrail,
+      configSettingType: QPQAwsConfigSettingType.accountCloudTrail,
       uniqueKey: 'trail',
       name: 'trail',
       retentionDays: 30,

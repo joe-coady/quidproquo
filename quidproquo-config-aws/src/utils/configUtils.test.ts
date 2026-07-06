@@ -2,6 +2,7 @@ import { buildTestQpqConfig, defineKeyValueStore, defineStorageDrive } from 'qui
 
 import { describe, expect, it } from 'vitest';
 
+import { defineAccountBudget, defineAccountCloudTrail, defineAccountSecurityServices } from '../config/settings/account';
 import {
   AwsAlarmLambdaMetricName,
   AwsAlarmNamespace,
@@ -13,14 +14,15 @@ import {
 import { AwsDataStoreRemovalPolicy, defineAwsDataStoreRemovalPolicy } from '../config/settings/awsDataStoreRemovalPolicy';
 import { defineAwsDyanmoOverrideForKvs } from '../config/settings/awsDyanmoOverrideForKvs';
 import { AwsKmsKeyTargetType, defineAwsKmsKey } from '../config/settings/awsKmsKey';
-import { defineBootstrapBudget } from '../config/settings/budget';
-import { defineBootstrapCloudTrail } from '../config/settings/cloudTrail';
 import { defineDomainCertificate } from '../config/settings/domainCertificate';
 import { defineBootstrapAwsOrganization } from '../config/settings/organizations';
 import { defineAwsServiceAccountInfo } from '../config/settings/serviceAccountInfo';
 import { defineBootstrapWaf, defineWafProtection } from '../config/settings/waf';
 import { ServiceAccountInfo } from '../types';
 import {
+  getAccountBudgetConfigs,
+  getAccountCloudTrailConfigs,
+  getAccountSecurityServicesConfig,
   getApplicationModuleDeployAccountId,
   getApplicationModuleDeployRegion,
   getAwsAccountIds,
@@ -32,8 +34,6 @@ import {
   getAwsServiceAccountInfoByDeploymentInfo,
   getAwsServiceAccountInfoConfig,
   getAwsServiceAccountInfos,
-  getBootstrapBudgetConfigs,
-  getBootstrapCloudTrailConfigs,
   getBootstrapWafConfig,
   getDomainCertificateArnSsmParameterName,
   getDomainCertificateConfigs,
@@ -90,15 +90,22 @@ describe('getAwsBootstrapOrganizationConfigs', () => {
   });
 });
 
-describe('getBootstrapBudgetConfigs', () => {
+describe('account level selectors', () => {
   it('returns the defined budget settings', () => {
-    const config = buildTestQpqConfig([defineBootstrapBudget('main', 100, ['ops@example.com'])]);
+    const config = buildTestQpqConfig([defineAccountBudget('main', 100, ['ops@example.com'])]);
 
-    expect(getBootstrapBudgetConfigs(config)).toHaveLength(1);
+    expect(getAccountBudgetConfigs(config)).toHaveLength(1);
   });
 
-  it('returns an empty list when none are defined', () => {
-    expect(getBootstrapBudgetConfigs(buildTestQpqConfig())).toEqual([]);
+  it('returns an empty list when no budgets are defined', () => {
+    expect(getAccountBudgetConfigs(buildTestQpqConfig())).toEqual([]);
+  });
+
+  it('returns the security services setting or undefined', () => {
+    expect(getAccountSecurityServicesConfig(buildTestQpqConfig())).toBeUndefined();
+
+    const config = buildTestQpqConfig([defineAccountSecurityServices({ enableSecurityHub: true })]);
+    expect(getAccountSecurityServicesConfig(config)?.enableSecurityHub).toBe(true);
   });
 });
 
@@ -143,11 +150,11 @@ describe('getAwsDataStoreRemovalPolicy', () => {
   });
 });
 
-describe('getBootstrapCloudTrailConfigs', () => {
+describe('getAccountCloudTrailConfigs', () => {
   it('returns the defined cloud trail settings', () => {
-    const config = buildTestQpqConfig([defineBootstrapCloudTrail('trail')]);
+    const config = buildTestQpqConfig([defineAccountCloudTrail('trail')]);
 
-    expect(getBootstrapCloudTrailConfigs(config)).toHaveLength(1);
+    expect(getAccountCloudTrailConfigs(config)).toHaveLength(1);
   });
 });
 

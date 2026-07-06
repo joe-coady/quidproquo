@@ -1,5 +1,6 @@
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 
+export const getAccountStackName = awsNamingUtils.getAccountStackName;
 export const getBaseStackName = awsNamingUtils.getBaseStackName;
 export const getInfStackName = awsNamingUtils.getInfStackName;
 export const getWebStackName = awsNamingUtils.getWebStackName;

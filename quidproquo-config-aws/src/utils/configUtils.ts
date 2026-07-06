@@ -1,6 +1,9 @@
 import { CrossModuleOwner, KeyValueStoreQPQConfigSetting, QPQConfig, qpqCoreUtils, StorageDriveQPQConfigSetting } from 'quidproquo-core';
 
 import {
+  AccountBudgetQPQConfigSetting,
+  AccountCloudTrailQPQConfigSetting,
+  AccountSecurityServicesQPQConfigSetting,
   AwsAlarmQPQConfigSetting,
   AwsDataStoreRemovalPolicy,
   AwsDataStoreRemovalPolicyQPQConfigSetting,
@@ -9,8 +12,6 @@ import {
   AwsKmsKeyTargetType,
   AwsOrganizationQPQConfigSetting,
   AwsServiceAccountInfoQPQConfigSetting,
-  BootstrapBudgetQPQConfigSetting,
-  BootstrapCloudTrailQPQConfigSetting,
   BootstrapWafQPQConfigSetting,
   DomainCertificateQPQConfigSetting,
   EventBusQuickSubscription,
@@ -55,8 +56,11 @@ export const getAwsBootstrapOrganizationConfigs = (qpqConfig: QPQConfig): AwsOrg
   return awsOrganizationQPQConfigSettings;
 };
 
-export const getBootstrapBudgetConfigs = (qpqConfig: QPQConfig): BootstrapBudgetQPQConfigSetting[] =>
-  qpqCoreUtils.getConfigSettings<BootstrapBudgetQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.bootstrapBudget);
+export const getAccountBudgetConfigs = (qpqConfig: QPQConfig): AccountBudgetQPQConfigSetting[] =>
+  qpqCoreUtils.getConfigSettings<AccountBudgetQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.accountBudget);
+
+export const getAccountSecurityServicesConfig = (qpqConfig: QPQConfig): AccountSecurityServicesQPQConfigSetting | undefined =>
+  qpqCoreUtils.getConfigSetting<AccountSecurityServicesQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.accountSecurityServices);
 
 export const getBootstrapWafConfig = (qpqConfig: QPQConfig): BootstrapWafQPQConfigSetting | undefined =>
   qpqCoreUtils.getConfigSetting<BootstrapWafQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.bootstrapWaf);
@@ -77,8 +81,8 @@ export const getWafWebAclArnSsmParameterName = (wafScope: 'regional' | 'cloudfro
   return `/qpq/waf/web-acl-arn/${wafScope}/${deploymentName}`;
 };
 
-export const getBootstrapCloudTrailConfigs = (qpqConfig: QPQConfig): BootstrapCloudTrailQPQConfigSetting[] =>
-  qpqCoreUtils.getConfigSettings<BootstrapCloudTrailQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.bootstrapCloudTrail);
+export const getAccountCloudTrailConfigs = (qpqConfig: QPQConfig): AccountCloudTrailQPQConfigSetting[] =>
+  qpqCoreUtils.getConfigSettings<AccountCloudTrailQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.accountCloudTrail);
 
 export const getAwsServiceAccountInfos = (qpqConfig: QPQConfig): ServiceAccountInfo[] => {
   const awsServiceAccountInfoConfig = getAwsServiceAccountInfoConfig(qpqConfig);

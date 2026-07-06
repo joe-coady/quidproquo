@@ -1,13 +1,13 @@
-import { BootstrapCloudTrailQPQConfigSetting, qpqConfigAwsUtils } from 'quidproquo-config-aws';
+import { AccountCloudTrailQPQConfigSetting, qpqConfigAwsUtils } from 'quidproquo-config-aws';
 
 import * as cdk from 'aws-cdk-lib';
 import { aws_cloudtrail, aws_logs, aws_s3 } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
-import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
+import { QpqConstructBlock, QpqConstructBlockProps } from '../../base/QpqConstructBlock';
 
-export interface QpqBootstrapConfigCloudTrailConstructProps extends QpqConstructBlockProps {
-  cloudTrailConfig: BootstrapCloudTrailQPQConfigSetting;
+export interface QpqAccountCloudTrailConstructProps extends QpqConstructBlockProps {
+  cloudTrailConfig: AccountCloudTrailQPQConfigSetting;
 }
 
 const SUPPORTED_RETENTION_DAYS: aws_logs.RetentionDays[] = [
@@ -35,8 +35,8 @@ const resolveLogRetention = (days?: number): aws_logs.RetentionDays => {
   return SUPPORTED_RETENTION_DAYS.find((v) => v >= days) ?? aws_logs.RetentionDays.TEN_YEARS;
 };
 
-export class QpqBootstrapConfigCloudTrailConstruct extends QpqConstructBlock {
-  constructor(scope: Construct, id: string, props: QpqBootstrapConfigCloudTrailConstructProps) {
+export class QpqAccountCloudTrailConstruct extends QpqConstructBlock {
+  constructor(scope: Construct, id: string, props: QpqAccountCloudTrailConstructProps) {
     super(scope, id, props);
 
     const {

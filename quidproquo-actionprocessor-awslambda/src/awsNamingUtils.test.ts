@@ -5,6 +5,7 @@ import { defineWebsocket } from 'quidproquo-webserver';
 import { describe, expect, it } from 'vitest';
 
 import {
+  getAccountStackName,
   getApiStackName,
   getBaseStackName,
   getBootstrapStackName,
@@ -195,6 +196,10 @@ describe('stack names', () => {
 
   it('builds the bootstrap stack name without the module', () => {
     expect(getBootstrapStackName(buildTestQpqConfig())).toBe('test-app-development-bs');
+  });
+
+  it('builds a static account stack name - the account+region namespace is the key', () => {
+    expect(getAccountStackName()).toBe('qpq-account');
   });
 
   it('builds the feature bootstrap stack name', () => {

@@ -1,12 +1,12 @@
-import { BootstrapBudgetQPQConfigSetting, BudgetThreshold, BudgetThresholdType, qpqConfigAwsUtils } from 'quidproquo-config-aws';
+import { AccountBudgetQPQConfigSetting, BudgetThreshold, BudgetThresholdType, qpqConfigAwsUtils } from 'quidproquo-config-aws';
 
 import { aws_budgets, aws_ce } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
-import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
+import { QpqConstructBlock, QpqConstructBlockProps } from '../../base/QpqConstructBlock';
 
-export interface QpqBootstrapConfigBudgetConstructProps extends QpqConstructBlockProps {
-  budgetConfig: BootstrapBudgetQPQConfigSetting;
+export interface QpqAccountBudgetConstructProps extends QpqConstructBlockProps {
+  budgetConfig: AccountBudgetQPQConfigSetting;
 }
 
 const defaultThresholds: BudgetThreshold[] = [
@@ -16,8 +16,8 @@ const defaultThresholds: BudgetThreshold[] = [
   { thresholdPercent: 150, type: BudgetThresholdType.actual },
 ];
 
-export class QpqBootstrapConfigBudgetConstruct extends QpqConstructBlock {
-  constructor(scope: Construct, id: string, props: QpqBootstrapConfigBudgetConstructProps) {
+export class QpqAccountBudgetConstruct extends QpqConstructBlock {
+  constructor(scope: Construct, id: string, props: QpqAccountBudgetConstructProps) {
     super(scope, id, props);
 
     const { name, monthlyLimitUsd, subscriberEmails, thresholds = defaultThresholds, anomalyDetection } = props.budgetConfig;
@@ -52,7 +52,7 @@ export class QpqBootstrapConfigBudgetConstruct extends QpqConstructBlock {
 
     if (!anomalyDetection?.disabled) {
       // AWS allows only one DIMENSIONAL(SERVICE) anomaly monitor per account - declare a
-      // single defineBootstrapBudget per account (or disable anomalyDetection on extras)
+      // single defineAccountBudget per account (or disable anomalyDetection on extras)
       const anomalyMonitor = new aws_ce.CfnAnomalyMonitor(this, 'anomaly-monitor', {
         monitorName: `qpq-anomaly-monitor-${accountId}-${name}`,
         monitorType: 'DIMENSIONAL',

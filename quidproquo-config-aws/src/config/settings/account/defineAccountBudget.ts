@@ -12,7 +12,7 @@ export interface BudgetThreshold {
   type: BudgetThresholdType;
 }
 
-export interface BootstrapBudgetAnomalyDetection {
+export interface AccountBudgetAnomalyDetection {
   /** Anomaly detection is created alongside the budget by default; set to opt out. */
   disabled?: boolean;
 
@@ -20,7 +20,7 @@ export interface BootstrapBudgetAnomalyDetection {
   minimumImpactUsd?: number;
 }
 
-export interface BootstrapBudgetQPQConfigSetting extends QPQConfigSetting {
+export interface AccountBudgetQPQConfigSetting extends QPQConfigSetting {
   name: string;
 
   /** Monthly account cost budget in USD that the threshold alerts are relative to. */
@@ -32,22 +32,23 @@ export interface BootstrapBudgetQPQConfigSetting extends QPQConfigSetting {
   /** Alert thresholds. Defaults to 80% actual, 100% forecasted, 100% actual, 150% actual. */
   thresholds?: BudgetThreshold[];
 
-  anomalyDetection?: BootstrapBudgetAnomalyDetection;
+  anomalyDetection?: AccountBudgetAnomalyDetection;
 }
 
 /**
  * Account-level monthly cost budget with email threshold alerts, plus Cost Anomaly
  * Detection for spend that deviates from baseline (slow creep fixed thresholds miss).
- * Deployed in the bootstrap phase. One per account is the expected usage — AWS allows
- * only one service-dimension anomaly monitor per account.
+ * Declared in the account config and deployed by the account stack. AWS allows only
+ * one service-dimension anomaly monitor per account, so if multiple environments share
+ * an account, enable anomaly detection in only one of them.
  */
-export const defineBootstrapBudget = (
-  name: BootstrapBudgetQPQConfigSetting['name'],
-  monthlyLimitUsd: BootstrapBudgetQPQConfigSetting['monthlyLimitUsd'],
-  subscriberEmails: BootstrapBudgetQPQConfigSetting['subscriberEmails'],
-  options?: Omit<BootstrapBudgetQPQConfigSetting, 'configSettingType' | 'uniqueKey' | 'name' | 'monthlyLimitUsd' | 'subscriberEmails'>,
-): BootstrapBudgetQPQConfigSetting => ({
-  configSettingType: QPQAwsConfigSettingType.bootstrapBudget,
+export const defineAccountBudget = (
+  name: AccountBudgetQPQConfigSetting['name'],
+  monthlyLimitUsd: AccountBudgetQPQConfigSetting['monthlyLimitUsd'],
+  subscriberEmails: AccountBudgetQPQConfigSetting['subscriberEmails'],
+  options?: Omit<AccountBudgetQPQConfigSetting, 'configSettingType' | 'uniqueKey' | 'name' | 'monthlyLimitUsd' | 'subscriberEmails'>,
+): AccountBudgetQPQConfigSetting => ({
+  configSettingType: QPQAwsConfigSettingType.accountBudget,
   uniqueKey: name,
 
   name,

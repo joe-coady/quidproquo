@@ -1,3 +1,4 @@
+export * from './AccountQpqStack';
 export * from './ApiQpqServiceStack';
 export * from './BootstrapQpqServiceStack';
 export * from './createDomainCertificateStacks';

@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
 import { QPQAwsConfigSettingType } from '../../QPQConfig';
-import { BudgetThresholdType, defineBootstrapBudget } from './defineBootstrapBudget';
+import { BudgetThresholdType, defineAccountBudget } from './defineAccountBudget';
 
-describe('defineBootstrapBudget', () => {
+describe('defineAccountBudget', () => {
   it('builds a budget setting keyed by name with undefined options when omitted', () => {
-    expect(defineBootstrapBudget('main', 100, ['ops@example.com'])).toEqual({
-      configSettingType: QPQAwsConfigSettingType.bootstrapBudget,
+    expect(defineAccountBudget('main', 100, ['ops@example.com'])).toEqual({
+      configSettingType: QPQAwsConfigSettingType.accountBudget,
       uniqueKey: 'main',
       name: 'main',
       monthlyLimitUsd: 100,
@@ -20,12 +20,12 @@ describe('defineBootstrapBudget', () => {
     const thresholds = [{ thresholdPercent: 90, type: BudgetThresholdType.forecasted }];
 
     expect(
-      defineBootstrapBudget('main', 250, ['ops@example.com', 'dev@example.com'], {
+      defineAccountBudget('main', 250, ['ops@example.com', 'dev@example.com'], {
         thresholds,
         anomalyDetection: { disabled: true, minimumImpactUsd: 25 },
       }),
     ).toEqual({
-      configSettingType: QPQAwsConfigSettingType.bootstrapBudget,
+      configSettingType: QPQAwsConfigSettingType.accountBudget,
       uniqueKey: 'main',
       name: 'main',
       monthlyLimitUsd: 250,
