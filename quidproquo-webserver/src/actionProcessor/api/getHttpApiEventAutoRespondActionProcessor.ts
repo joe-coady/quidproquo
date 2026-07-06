@@ -12,10 +12,18 @@ import {
 
 import { RouteOptions } from '../../config/settings/route';
 import { askValidateRouteAuth, ValidateRouteAuthPayload } from '../../stories/askValidateRouteAuth';
-import { HTTPEvent, HTTPEventResponse } from '../../types/HTTPEvent';
+import { FileUploadErrorTypeEnum, HTTPEvent, HTTPEventResponse } from '../../types/HTTPEvent';
 import { getCorsHeaders } from '../../utils/headerUtils';
 
 type InternalMatchResult = MatchStoryResult<any, RouteOptions>;
+
+const fileUploadErrorHttpStatusMap: Record<FileUploadErrorTypeEnum, number> = {
+  [FileUploadErrorTypeEnum.fileTooLarge]: 413,
+  [FileUploadErrorTypeEnum.tooManyFiles]: 413,
+  [FileUploadErrorTypeEnum.tooManyFields]: 400,
+  [FileUploadErrorTypeEnum.disallowedMimeType]: 415,
+  [FileUploadErrorTypeEnum.malformed]: 400,
+};
 
 const getProcessAutoRespond = (qpqConfig: QPQConfig): EventAutoRespondActionProcessor<HTTPEvent, InternalMatchResult, HTTPEventResponse> => {
   const validateAuth = getProcessCustomImplementation<any>(
@@ -51,6 +59,19 @@ const getProcessAutoRespond = (qpqConfig: QPQConfig): EventAutoRespondActionProc
         isBase64Encoded: false,
         body: JSON.stringify({
           message: 'You are unauthorized to access this resource',
+        }),
+        headers: getCorsHeaders(qpqConfig, matchResult.config || {}, qpqEventRecord.headers),
+      });
+    }
+
+    // Reject invalid multipart uploads before the route story runs (after auth, so a 401 wins)
+    if (qpqEventRecord.fileUploadError) {
+      return actionResult({
+        status: fileUploadErrorHttpStatusMap[qpqEventRecord.fileUploadError.errorType] || 400,
+        isBase64Encoded: false,
+        body: JSON.stringify({
+          errorType: qpqEventRecord.fileUploadError.errorType,
+          errorText: qpqEventRecord.fileUploadError.message,
         }),
         headers: getCorsHeaders(qpqConfig, matchResult.config || {}, qpqEventRecord.headers),
       });

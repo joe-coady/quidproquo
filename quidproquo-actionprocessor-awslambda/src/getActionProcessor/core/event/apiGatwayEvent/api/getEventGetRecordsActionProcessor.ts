@@ -8,13 +8,14 @@ import {
   QPQConfig,
   qpqCoreUtils,
 } from 'quidproquo-core';
-import { HTTPEvent, qpqWebServerUtils } from 'quidproquo-webserver';
+import { FileUploadErrorTypeEnum, HTTPEvent, qpqWebServerUtils } from 'quidproquo-webserver';
 
-import { parseMultipartFormData } from '../../utils/parseMultipartFormData';
+import { FileUploadValidationError, parseMultipartFormData } from '../../utils/parseMultipartFormData';
 import { EventInput, InternalEventRecord } from './types';
 
 const getProcessGetRecords = (qpqConfig: QPQConfig): EventGetRecordsActionProcessor<EventInput, InternalEventRecord> => {
   const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
+  const fileUploadSettings = qpqWebServerUtils.getFileUploadSettings(qpqConfig);
 
   return async ({ eventParams: [apiGatewayEvent, context] }) => {
     // Initialize `path` by removing the service name prefix from `apiGatewayEvent.path`.
@@ -41,7 +42,16 @@ const getProcessGetRecords = (qpqConfig: QPQConfig): EventGetRecordsActionProces
 
     // Transform the body if its a multipart/form-data
     if ((qpqWebServerUtils.getHeaderValue('Content-Type', apiGatewayEvent.headers) || '').startsWith('multipart/form-data') && apiGatewayEvent.body) {
-      internalEventRecord.files = await parseMultipartFormData(apiGatewayEvent);
+      try {
+        internalEventRecord.files = await parseMultipartFormData(apiGatewayEvent, fileUploadSettings);
+      } catch (error) {
+        // Stamp the failure on the record so the auto-respond step returns the matching
+        // 4xx before the route story runs - throwing here would fail the whole event as a 5xx
+        internalEventRecord.fileUploadError =
+          error instanceof FileUploadValidationError
+            ? { errorType: error.errorType, message: error.message }
+            : { errorType: FileUploadErrorTypeEnum.malformed, message: 'Unable to parse multipart/form-data body' };
+      }
     }
 
     return actionResult([internalEventRecord]);

@@ -8,6 +8,7 @@ export * from './defineAdminSettings';
 export * from './defineAuthSystem';
 export * from './dns';
 export * from './domainProxy';
+export * from './fileUploadSettings';
 export * from './migration';
 export * from './openApi';
 export * from './route';

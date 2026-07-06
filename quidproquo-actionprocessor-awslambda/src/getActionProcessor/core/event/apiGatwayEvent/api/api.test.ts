@@ -1,5 +1,5 @@
 import { buildTestQpqConfig, ErrorTypeEnum, EventActionType } from 'quidproquo-core';
-import { QPQWebServerConfigSettingType } from 'quidproquo-webserver';
+import { defineFileUploadSettings, FileUploadErrorTypeEnum, QPQWebServerConfigSettingType } from 'quidproquo-webserver';
 
 import { describe, expect, it } from 'vitest';
 
@@ -65,6 +65,28 @@ describe('apiGatwayEvent/api getEventGetRecordsActionProcessor', () => {
     const [records] = await processor({ eventParams: [event, context] });
 
     expect((records as any[])[0].files).toEqual([{ filename: 'a.txt', mimetype: 'text/plain', base64Data: Buffer.from('hi').toString('base64') }]);
+  });
+
+  it('stamps a fileUploadError on the record instead of throwing when upload validation fails', async () => {
+    const boundary = 'b';
+    const body = `--${boundary}\r\nContent-Disposition: form-data; name="f"; filename="a.txt"\r\nContent-Type: text/plain\r\n\r\nway too many bytes\r\n--${boundary}--\r\n`;
+    const config = buildTestQpqConfig([defineFileUploadSettings({ maxFileSizeBytes: 4 })]);
+    const processor = await resolveEventProcessor(getEventGetRecordsActionProcessor, EventActionType.GetRecords, config);
+    const event = buildApiGatewayEvent({ headers: { 'Content-Type': `multipart/form-data; boundary=${boundary}` }, body });
+
+    const [records] = await processor({ eventParams: [event, context] });
+
+    expect((records as any[])[0].files).toBeUndefined();
+    expect((records as any[])[0].fileUploadError.errorType).toBe(FileUploadErrorTypeEnum.fileTooLarge);
+  });
+
+  it('stamps a malformed fileUploadError when the multipart body cannot be parsed', async () => {
+    const processor = await resolveEventProcessor(getEventGetRecordsActionProcessor, EventActionType.GetRecords);
+    const event = buildApiGatewayEvent({ headers: { 'Content-Type': 'multipart/form-data' }, body: 'not multipart' });
+
+    const [records] = await processor({ eventParams: [event, context] });
+
+    expect((records as any[])[0].fileUploadError.errorType).toBe(FileUploadErrorTypeEnum.malformed);
   });
 });
 

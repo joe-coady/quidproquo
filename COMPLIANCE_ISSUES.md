@@ -18,9 +18,6 @@ Mostly a cost/decision item: evaluate and optionally enable Shield Advanced for 
 [ ] 11.2 No reserved capacity or savings plans — opt-in only. `(effort: easy)`
 Reserved concurrency is passthrough (undefined by default). Add sensible defaults for critical functions and document a Savings Plans / Reserved Capacity strategy.
 
-[ ] 7.4 File upload not validated — Busboy used with no limits. `(effort: medium)`
-`parseMultipartFormData.ts` has no size/count `limits`, no MIME-type whitelist, and no filename sanitization. Add configurable limits, a MIME whitelist, and path-traversal-safe filenames.
-
 [ ] 13.4 No CloudWatch dashboards — none defined. `(effort: medium)`
 Add a default operational dashboard per service (request rate, error rate, latency p50/p95/p99, Lambda duration, concurrent executions, DynamoDB capacity, queue depth).
 
@@ -72,6 +69,9 @@ Operational/error logging uses raw `console.log`/`console.error` with no consist
 ---
 
 ## Fixed
+
+[x] 7.4 File upload not validated — Busboy now runs with enforced limits, an optional MIME whitelist, and sanitized filenames.
+`parseMultipartFormData.ts` passes Busboy `limits` (`fileSize`/`files`/`fields`/`fieldSize`) resolved from a new webserver-layer setting `defineFileUploadSettings(partial)` via `qpqWebServerUtils.getFileUploadSettings` — defaults apply even when the setting isn't declared (10MB per file to match the API Gateway payload cap, 10 files, 100 fields, 1MB per field). An optional `allowedMimeTypes` whitelist (`type/*` wildcards supported) rejects disallowed content types, and filenames are reduced to a path-traversal-safe basename (`sanitizeFilename`: strips `/` and `\` segments, control chars, dot-only names). Truncated uploads fail instead of silently succeeding (Busboy's `limit`/`filesLimit`/`fieldsLimit` events reject with a named `FileUploadValidationError` carrying a `FileUploadErrorTypeEnum`). Violations don't 5xx the event: the getRecords processor stamps `fileUploadError` on the `HTTPEvent` record and the HTTP auto-respond step returns the mapped status (413 fileTooLarge/tooManyFiles, 415 disallowedMimeType, 400 tooManyFields/malformed) with CORS headers, after auth so a 401 still wins; malformed multipart bodies (previously an unhandled Lambda crash) now map to a clean 400. Also fixed the O(n²) per-chunk `Buffer.concat` by collecting chunks and concatenating once. Config lives in `quidproquo-webserver` (multipart-over-HTTP is a web concern), enforcement in the awslambda processor.
 
 [x] 13.1 Alarm framework — namespace support completed + per-resource default alarms auto-instantiated.
 The alarm config schema already modelled Lambda/ApiGateway/DynamoDb/Sqs, but the construct only handled Lambda (`else throw`). Since the alarm is built entirely from the shared `BaseAwsAlarmQPQConfigSetting` fields, the per-namespace branch was pointless — removed it, so `QpqConfigAwsAlarmConstruct` is now namespace-agnostic (all four + any future namespace work from config). Deleted a byte-identical dead duplicate at `feature/core/alarm`. For auto-instantiation, a shared `createDefaultResourceAlarm(scope, qpqConfig, props)` helper creates sensible per-resource default alarms and routes them to the service's error-notification bus (reusing `defineNotifyError`'s target — no new routing concept). Opt-in: no-op unless a `defineNotifyError` is declared. Wired in: SQS (`ApproximateAgeOfOldestMessage` backlog + any dead-letter message), DynamoDB (`ReadThrottleEvents`/`WriteThrottleEvents`), API Gateway (`5XXError`). Per-resource dimensions are required for these because API/DynamoDB/SQS publish no account-level metric rollup (unlike Lambda). Lambda stays covered by the existing account-aggregate Errors/Throttles alarms in `QpqCoreNotifyError`.

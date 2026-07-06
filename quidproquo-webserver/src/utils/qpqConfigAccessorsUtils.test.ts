@@ -9,6 +9,7 @@ import { defineCache } from '../config/settings/cache';
 import { defineCertificate } from '../config/settings/certificate';
 import { defineDefaultRouteOptions } from '../config/settings/defaultRouteOptions';
 import { defineDns } from '../config/settings/dns';
+import { defineFileUploadSettings } from '../config/settings/fileUploadSettings';
 import { defineOpenApi } from '../config/settings/openApi';
 import { defineRoute } from '../config/settings/route';
 import { defineSeo } from '../config/settings/seo';
@@ -20,6 +21,7 @@ import { defineWebsocket } from '../config/settings/websocket';
 import {
   constructEnvironmentDomainName,
   constructServiceDomainName,
+  defaultFileUploadSettings,
   getAllApiKeyConfigs,
   getAllOpenApiSpecs,
   getAllOwnedCacheConfigs,
@@ -38,6 +40,7 @@ import {
   getDomainProxyConfigs,
   getDomainRoot,
   getEnvironmentDomainName,
+  getFileUploadSettings,
   getOwnedServiceFunctions,
   getOwnedWebsocketSettings,
   getServiceDomainName,
@@ -217,6 +220,32 @@ describe('getStorageDriveCorsAllowedOrigins', () => {
   it('falls back to wildcard when the service declares no domain', () => {
     const config = buildTestQpqConfig();
     expect(getStorageDriveCorsAllowedOrigins(config, 'uploads')).toEqual(['*']);
+  });
+});
+
+describe('getFileUploadSettings', () => {
+  it('returns the defaults when no setting is declared', () => {
+    const config = buildTestQpqConfig();
+    expect(getFileUploadSettings(config)).toEqual(defaultFileUploadSettings);
+  });
+
+  it('merges declared overrides over the defaults', () => {
+    const config = buildTestQpqConfig([defineFileUploadSettings({ maxFileCount: 2, allowedMimeTypes: ['image/*'] })]);
+
+    expect(getFileUploadSettings(config)).toEqual({
+      ...defaultFileUploadSettings,
+      maxFileCount: 2,
+      allowedMimeTypes: ['image/*'],
+    });
+  });
+
+  it('ignores explicitly undefined overrides', () => {
+    const config = buildTestQpqConfig([defineFileUploadSettings({ maxFileSizeBytes: undefined, maxFieldCount: 7 })]);
+
+    expect(getFileUploadSettings(config)).toEqual({
+      ...defaultFileUploadSettings,
+      maxFieldCount: 7,
+    });
   });
 });
 

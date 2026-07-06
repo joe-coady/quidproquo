@@ -8,6 +8,19 @@ export interface HttpEventRouteParams {
   [key: string]: string;
 }
 
+export enum FileUploadErrorTypeEnum {
+  fileTooLarge = 'fileTooLarge',
+  tooManyFiles = 'tooManyFiles',
+  tooManyFields = 'tooManyFields',
+  disallowedMimeType = 'disallowedMimeType',
+  malformed = 'malformed',
+}
+
+export interface HTTPEventFileUploadError {
+  errorType: FileUploadErrorTypeEnum;
+  message: string;
+}
+
 export interface HTTPEvent {
   path: string;
   query: { [key: string]: undefined | string | string[] };
@@ -18,6 +31,11 @@ export interface HTTPEvent {
   sourceIp: string;
   isBase64Encoded: boolean;
   files?: QPQBinaryData[];
+
+  // Set instead of `files` when a multipart body fails upload validation (size/count/type
+  // limits) or cannot be parsed; the event auto-responds with the matching 4xx before the
+  // route story runs.
+  fileUploadError?: HTTPEventFileUploadError;
 }
 
 export interface HTTPEventResponse {

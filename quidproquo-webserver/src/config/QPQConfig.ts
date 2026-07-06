@@ -14,6 +14,7 @@ export enum QPQWebServerConfigSettingType {
   Certificate = '@quidproquo-webserver/config/Certificate',
   DomainProxy = '@quidproquo-webserver/config/DomainProxy',
   StorageDriveCorsSettings = '@quidproquo-webserver/config/StorageDriveCorsSettings',
+  FileUploadSettings = '@quidproquo-webserver/config/FileUploadSettings',
 }
 
 // TODO: move this somewhere better
