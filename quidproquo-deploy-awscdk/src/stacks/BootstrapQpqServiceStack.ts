@@ -6,6 +6,7 @@ import { Construct } from 'constructs';
 import {
   BootstrapQpqCoreVirtualNetworkConstruct,
   QpqBootstrapConfigAwsOrganizationConstruct,
+  QpqBootstrapConfigBudgetConstruct,
   QpqBootstrapConfigCloudTrailConstruct,
 } from '../constructs';
 import { BSQpqLambdaWarmerEventConstructConstruct } from '../constructs/basic/BSQpqLambdaWarmerEventConstruct';
@@ -45,6 +46,15 @@ export class BootstrapQpqServiceStack extends QpqServiceStack {
           qpqConfig: props.qpqConfig,
 
           cloudTrailConfig: setting,
+        }),
+    );
+
+    const budgets = qpqConfigAwsUtils.getBootstrapBudgetConfigs(props.qpqConfig).map(
+      (setting) =>
+        new QpqBootstrapConfigBudgetConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
+          qpqConfig: props.qpqConfig,
+
+          budgetConfig: setting,
         }),
     );
   }

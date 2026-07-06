@@ -13,6 +13,7 @@ import {
 import { AwsDataStoreRemovalPolicy, defineAwsDataStoreRemovalPolicy } from '../config/settings/awsDataStoreRemovalPolicy';
 import { defineAwsDyanmoOverrideForKvs } from '../config/settings/awsDyanmoOverrideForKvs';
 import { AwsKmsKeyTargetType, defineAwsKmsKey } from '../config/settings/awsKmsKey';
+import { defineBootstrapBudget } from '../config/settings/budget';
 import { defineBootstrapCloudTrail } from '../config/settings/cloudTrail';
 import { defineDomainCertificate } from '../config/settings/domainCertificate';
 import { defineBootstrapAwsOrganization } from '../config/settings/organizations';
@@ -30,6 +31,7 @@ import {
   getAwsServiceAccountInfoByDeploymentInfo,
   getAwsServiceAccountInfoConfig,
   getAwsServiceAccountInfos,
+  getBootstrapBudgetConfigs,
   getBootstrapCloudTrailConfigs,
   getDomainCertificateArnSsmParameterName,
   getDomainCertificateConfigs,
@@ -81,6 +83,18 @@ describe('getAwsBootstrapOrganizationConfigs', () => {
 
   it('returns an empty list when none are defined', () => {
     expect(getAwsBootstrapOrganizationConfigs(buildTestQpqConfig())).toEqual([]);
+  });
+});
+
+describe('getBootstrapBudgetConfigs', () => {
+  it('returns the defined budget settings', () => {
+    const config = buildTestQpqConfig([defineBootstrapBudget('main', 100, ['ops@example.com'])]);
+
+    expect(getBootstrapBudgetConfigs(config)).toHaveLength(1);
+  });
+
+  it('returns an empty list when none are defined', () => {
+    expect(getBootstrapBudgetConfigs(buildTestQpqConfig())).toEqual([]);
   });
 });
 

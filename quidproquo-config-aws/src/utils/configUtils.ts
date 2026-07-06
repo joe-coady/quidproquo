@@ -9,6 +9,7 @@ import {
   AwsKmsKeyTargetType,
   AwsOrganizationQPQConfigSetting,
   AwsServiceAccountInfoQPQConfigSetting,
+  BootstrapBudgetQPQConfigSetting,
   BootstrapCloudTrailQPQConfigSetting,
   DomainCertificateQPQConfigSetting,
   EventBusQuickSubscription,
@@ -52,6 +53,9 @@ export const getAwsBootstrapOrganizationConfigs = (qpqConfig: QPQConfig): AwsOrg
 
   return awsOrganizationQPQConfigSettings;
 };
+
+export const getBootstrapBudgetConfigs = (qpqConfig: QPQConfig): BootstrapBudgetQPQConfigSetting[] =>
+  qpqCoreUtils.getConfigSettings<BootstrapBudgetQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.bootstrapBudget);
 
 export const getBootstrapCloudTrailConfigs = (qpqConfig: QPQConfig): BootstrapCloudTrailQPQConfigSetting[] =>
   qpqCoreUtils.getConfigSettings<BootstrapCloudTrailQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.bootstrapCloudTrail);

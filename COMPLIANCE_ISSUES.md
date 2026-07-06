@@ -21,11 +21,8 @@ Reserved concurrency is passthrough (undefined by default). Add sensible default
 [ ] 13.4 No CloudWatch dashboards — none defined. `(effort: medium)`
 Add a default operational dashboard per service (request rate, error rate, latency p50/p95/p99, Lambda duration, concurrent executions, DynamoDB capacity, queue depth).
 
-[ ] 13.5 No anomaly detection — none configured. `(effort: medium)`
-Enable CloudWatch `AnomalyDetector` on critical metrics (Lambda duration, API latency, error rates) so slow leaks, degradation, and cost creep get surfaced.
-
-[ ] 11.1 No AWS budget or cost alerting — zero coverage. `(effort: medium)`
-Add `aws_budgets.CfnBudget` threshold alerts (80/100/150%), enable Cost Anomaly Detection, and add cost-allocation tags (CostCenter/Team/Project). With PAY_PER_REQUEST + on-demand Lambda, runaway cost is currently unbounded and silent.
+[ ] 13.5 No anomaly detection — **PARTIAL**; cost anomaly detection done (via 11.1), CloudWatch metric anomaly detection still open. `(effort: medium)`
+Cost creep is now surfaced by Cost Anomaly Detection (see 11.1). Still to do: CloudWatch `AnomalyDetector` on critical operational metrics (Lambda duration, API latency, error rates) so performance degradation and slow leaks get surfaced.
 
 [ ] 6.1 No Lambda code signing — no `CodeSigningConfig` / `SigningProfile`. `(effort: medium)`
 Create an `aws_signer.SigningProfile` and `aws_lambda.CodeSigningConfig` and attach to all Lambda functions so uploaded code has integrity verification.
@@ -66,6 +63,9 @@ Operational/error logging uses raw `console.log`/`console.error` with no consist
 ---
 
 ## Fixed
+
+[x] 11.1 No AWS budget or cost alerting — account-level budget + cost anomaly detection, config-driven, deployed in bootstrap.
+New `defineBootstrapBudget(name, monthlyLimitUsd, subscriberEmails, options?)` in `quidproquo-config-aws` (bootstrap-scoped, mirroring `defineBootstrapCloudTrail`) → `QpqBootstrapConfigBudgetConstruct` in `BootstrapQpqServiceStack`. Creates an `aws_budgets.CfnBudget` (`COST`/`MONTHLY`) with per-threshold email alerts — defaults: 80% actual, 100% forecasted, 100% actual, 150% actual (overridable via `thresholds`) — plus Cost Anomaly Detection on by default: a `DIMENSIONAL(SERVICE)` `CfnAnomalyMonitor` + `CfnAnomalySubscription` (frequency `DAILY`, required for EMAIL subscribers; `IMMEDIATE` is SNS-only) alerting the same emails when anomaly impact ≥ `minimumImpactUsd` (default $10); opt out per-setting via `anomalyDetection.disabled`. AWS allows one service-dimension anomaly monitor per account, so expected usage is one `defineBootstrapBudget` per account. Delivery is deliberately direct email (self-contained in bootstrap, no cross-phase coupling); routing via the notify-error event bus SNS topic is possible later but needs a `budgets.amazonaws.com` publish grant on the topic policy. Cost-allocation tags: `environment`/`application`/`module` tags are already applied by `applyEnvironmentTags`; *activating* them for Cost Explorer is not CloudFormation-able — one-time manual step in the billing console (Cost Allocation Tags → activate), documented here rather than a code gap.
 
 [x] 8.1 DESTROY removal policy on stateful resources — data stores now default to safe removal, config-driven opt-out for dev.
 Data stores (storage-drive S3 buckets, KVS DynamoDB tables, Cognito user pools, Neptune graph DB clusters) default to safe removal via `defineAwsDataStoreRemovalPolicy` (in `quidproquo-config-aws` — RemovalPolicy is a CloudFormation concept, so it stays off core config): undeclared = `RETAIN` (+ `deletionProtection` on tables and user pools, since RETAIN alone only orphans on stack delete, and `autoDeleteObjects` off on buckets) — except Neptune, which uses `SNAPSHOT` (final snapshot preserves the data without keeping an orphaned live cluster running/billing); dev configs declare `destroy` to keep full-teardown behaviour. Deliberately left as DESTROY (accepted): secrets, queues (+ DLQ messages), log groups (logs also shipped to S3), web-entry bucket (rebuildable static assets). The CloudTrail bucket was already RETAIN; only its optional CloudWatch mirror log group is DESTROY. Extend the same setting to these if that stance changes.

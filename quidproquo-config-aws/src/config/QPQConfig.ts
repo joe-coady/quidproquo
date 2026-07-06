@@ -3,6 +3,7 @@ export enum QPQAwsConfigSettingType {
   awsServiceAlarm = '@quidproquo-aws/config/AwsServiceAlarm',
   awsDyanmoOverrideForKvs = '@quidproquo-aws/config/awsDyanmoOverrideForKvs',
   bootstrapAwsOrganization = '@quidproquo-aws/config/bootstrapAwsOrganization',
+  bootstrapBudget = '@quidproquo-aws/config/bootstrapBudget',
   bootstrapCloudTrail = '@quidproquo-aws/config/bootstrapCloudTrail',
   awsDomainCertificate = '@quidproquo-aws/config/awsDomainCertificate',
   awsKmsKey = '@quidproquo-aws/config/awsKmsKey',
