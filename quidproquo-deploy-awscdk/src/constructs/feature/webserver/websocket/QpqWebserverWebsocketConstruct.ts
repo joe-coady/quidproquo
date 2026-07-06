@@ -36,40 +36,68 @@ export class QpqWebserverWebsocketConstruct extends QpqConstructBlock {
   }
 
   // Scope websocket pushes to this service's own websocket apis (exact api ids), mirroring
-  // the per-pool Cognito grant pattern. A service can also push to websocket apis it
-  // references but does not own - e.g. a shared websocket-queue owned by another module,
-  // where service-request responses are pushed straight from the responding service's
-  // lambda. Those api ids are AWS-generated in the owning service's stack and CANNOT be
-  // resolved here: modules reference each other's websockets (admin <-> websocket-queue),
-  // so hard SSM/export references deadlock every environment's inf deploys, and synth-time
-  // lookups go stale in cdk.context.json. The ceiling for referenced apis is send-only on
-  // the prod stage: POST /@connections (post messages only - no disconnect/enumerate; the
-  // runtime's push endpoint hardcodes /prod, so both sides change together if the stage
-  // ever moves). No-op when the config declares no websockets.
+  // the per-pool Cognito grant pattern. No-op when the service owns no websockets.
+  // Referenced-but-unowned websockets are granted separately in the api phase - see
+  // authorizeManageConnectionsForReferencedWebsockets.
   public static authorizeManageConnectionsForRole(
     role: aws_iam.IRole,
     websocketConstructs: QpqWebserverWebsocketConstruct[],
     qpqConfig: QPQConfig,
   ): void {
-    const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
-    const accountId = qpqConfigAwsUtils.getApplicationModuleDeployAccountId(qpqConfig);
+    if (websocketConstructs.length > 0) {
+      const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
+      const accountId = qpqConfigAwsUtils.getApplicationModuleDeployAccountId(qpqConfig);
 
-    const resources = websocketConstructs.map((websocket) => `arn:aws:execute-api:${region}:${accountId}:${websocket.api.ref}/*`);
-
-    const referencesUnownedWebsockets = qpqWebServerUtils.getWebsocketSettings(qpqConfig).length > websocketConstructs.length;
-    if (referencesUnownedWebsockets) {
-      resources.push(`arn:aws:execute-api:${region}:${accountId}:*/prod/POST/@connections/*`);
-    }
-
-    if (resources.length > 0) {
       role.addToPrincipalPolicy(
         new aws_iam.PolicyStatement({
           sid: 'APIGatewayManageConnections',
           effect: aws_iam.Effect.ALLOW,
           actions: ['execute-api:ManageConnections'],
-          resources,
+          resources: websocketConstructs.map((websocket) => `arn:aws:execute-api:${region}:${accountId}:${websocket.api.ref}/*`),
         }),
       );
     }
+  }
+
+  // Exact-ARN pushes to websocket apis this service references but does NOT own - e.g. a
+  // shared websocket-queue owned by another module, where service-request responses push
+  // straight from the responding service's lambda. The api ids are AWS-generated in the
+  // owning services' inf stacks, and modules reference each other's websockets (admin <->
+  // websocket-queue), so this grant cannot live in the inf phase (mutual SSM/role refs
+  // deadlock fresh environments). It runs in the API phase instead: all inf stacks deploy
+  // first (publishing their api-id SSM params), so the deploy-time SSM dynamic references
+  // here always resolve. No-op when the config references no unowned websockets.
+  public static authorizeManageConnectionsForReferencedWebsockets(scope: Construct, qpqConfig: QPQConfig): void {
+    const ownedApiNames = new Set(qpqWebServerUtils.getOwnedWebsocketSettings(qpqConfig).map((setting) => setting.apiName));
+    const unownedWebsocketSettings = qpqWebServerUtils.getWebsocketSettings(qpqConfig).filter((setting) => !ownedApiNames.has(setting.apiName));
+
+    if (unownedWebsocketSettings.length === 0) {
+      return;
+    }
+
+    const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
+    const accountId = qpqConfigAwsUtils.getApplicationModuleDeployAccountId(qpqConfig);
+
+    const serviceRole = aws_iam.Role.fromRoleName(
+      scope,
+      'referenced-websocket-service-role',
+      awsNamingUtils.getConfigRuntimeResourceNameFromConfig('service-role', qpqConfig),
+      { mutable: true },
+    );
+
+    serviceRole.addToPrincipalPolicy(
+      new aws_iam.PolicyStatement({
+        effect: aws_iam.Effect.ALLOW,
+        actions: ['execute-api:ManageConnections'],
+        resources: unownedWebsocketSettings.map((setting) => {
+          const apiId = aws_ssm.StringParameter.valueForStringParameter(
+            scope,
+            awsNamingUtils.getWebsocketApiIdSsmParameterName(setting.apiName, qpqConfig),
+          );
+
+          return `arn:aws:execute-api:${region}:${accountId}:${apiId}/*`;
+        }),
+      }),
+    );
   }
 }

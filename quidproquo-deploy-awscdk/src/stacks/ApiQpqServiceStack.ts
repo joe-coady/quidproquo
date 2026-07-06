@@ -16,6 +16,7 @@ import {
   QpqCoreRecurringScheduleConstruct,
   QpqWebserverServiceFunctionConstruct,
   QpqWebserverSubdomainRedirectConstruct,
+  QpqWebserverWebsocketConstruct,
 } from '../constructs';
 import { QpqServiceStack, QpqServiceStackProps } from './base/QpqServiceStack';
 import { InfQpqServiceStack } from './InfQpqServiceStack';
@@ -101,6 +102,7 @@ export class ApiQpqServiceStack extends QpqServiceStack {
           websocketConfig: setting,
         }),
     );
+    QpqWebserverWebsocketConstruct.authorizeManageConnectionsForReferencedWebsockets(this, props.qpqConfig);
 
     // migrations
     const deployEvents = qpqCoreUtils.getDeployEventConfigs(props.qpqConfig).map(
