@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { HTTPEvent } from '../types/HTTPEvent';
 import {
   askFromJsonEventRequest,
+  askFromValidJsonEventRequest,
   fromJsonEventRequest,
   rawFromJsonEventRequest,
   readUriQueryParamFromEvent,
@@ -60,6 +61,39 @@ describe('askFromJsonEventRequest', () => {
   it('throws a BadRequest when the body is not valid JSON', () => {
     try {
       runStory(askFromJsonEventRequest(buildEvent({ body: 'nope' })));
+      throw new Error('expected a StoryError');
+    } catch (e) {
+      expect((e as StoryError).errorType).toBe(ErrorTypeEnum.BadRequest);
+    }
+  });
+});
+
+describe('askFromValidJsonEventRequest', () => {
+  const validateUser = (data: unknown): { name: string } => {
+    const user = data as { name?: unknown };
+    if (typeof user?.name !== 'string') {
+      throw new Error('name must be a string');
+    }
+    return { name: user.name };
+  };
+
+  it('returns the validated body', () => {
+    expect(runStory(askFromValidJsonEventRequest(buildEvent({ body: '{"name":"joe"}' }), validateUser))).toEqual({ name: 'joe' });
+  });
+
+  it('throws an Invalid error carrying the validator message when validation fails', () => {
+    try {
+      runStory(askFromValidJsonEventRequest(buildEvent({ body: '{"name":7}' }), validateUser));
+      throw new Error('expected a StoryError');
+    } catch (e) {
+      expect((e as StoryError).errorType).toBe(ErrorTypeEnum.Invalid);
+      expect((e as StoryError).errorText).toBe('name must be a string');
+    }
+  });
+
+  it('still throws a BadRequest for an unparseable body (before validation runs)', () => {
+    try {
+      runStory(askFromValidJsonEventRequest(buildEvent({ body: 'nope' }), validateUser));
       throw new Error('expected a StoryError');
     } catch (e) {
       expect((e as StoryError).errorType).toBe(ErrorTypeEnum.BadRequest);

@@ -43,6 +43,22 @@ export function* askFromJsonEventRequest<T>(httpJsonEvent: HTTPEvent): AskRespon
   }
 }
 
+/**
+ * Like `askFromJsonEventRequest`, but the parsed body is run through an app-supplied
+ * validator before it is returned - so the `T` is actually checked, not just cast.
+ * The validator throws (or returns the typed value); a validation throw becomes an
+ * `Invalid` (422) response. Any schema library fits, e.g. zod: `(data) => schema.parse(data)`.
+ */
+export function* askFromValidJsonEventRequest<T>(httpJsonEvent: HTTPEvent, validate: (data: unknown) => T): AskResponse<T> {
+  const parsedBody = yield* askFromJsonEventRequest<unknown>(httpJsonEvent);
+
+  try {
+    return validate(parsedBody);
+  } catch (error) {
+    return yield* askThrowError(ErrorTypeEnum.Invalid, error instanceof Error ? error.message : 'Invalid request body.');
+  }
+}
+
 export const readUriQueryParamFromEvent = (event: HTTPEvent, paramName: string): string | undefined => {
   const rawValue = event.query[paramName];
 
