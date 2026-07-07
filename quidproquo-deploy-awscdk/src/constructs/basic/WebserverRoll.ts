@@ -5,6 +5,7 @@ import { qpqCoreUtils } from 'quidproquo-core';
 import { aws_iam } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
+import * as qpqDeployAwsCdkUtils from '../../utils/qpqDeployAwsCdkUtils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
 
 export interface WebserverRollProps extends QpqConstructBlockProps {}
@@ -24,6 +25,8 @@ export class WebserverRoll extends QpqConstructBlock {
         // new aws_iam.ServicePrincipal('neptune.amazonaws.com'),
       ),
     });
+
+    qpqDeployAwsCdkUtils.applyEnvironmentTags(role, props.qpqConfig);
 
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(props.qpqConfig);
     const accountId = qpqConfigAwsUtils.getApplicationModuleDeployAccountId(props.qpqConfig);
