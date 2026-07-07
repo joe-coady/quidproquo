@@ -10,6 +10,11 @@ interface QpqPluginOptions {
   qpqConfigs: QPQConfig[];
   nodeModulePath: string;
   aliases?: Record<string, string>;
+
+  // Bundle every service's story code even for thin shells (bundleFallback: false).
+  // Set by the dev-server build: thin shells only exist to keep lambda zips small,
+  // and the dev server always runs code from the local source instead.
+  alwaysBundleStoryCode?: boolean;
 }
 
 export class QpqPlugin implements WebpackPluginInstance {
@@ -33,7 +38,7 @@ export class QpqPlugin implements WebpackPluginInstance {
     };
 
     new VirtualModulesPlugin({
-      [dynamicLoaderPath]: getQpqDyanmicLoaderSrcFromQpqConfigs(this.options.qpqConfigs),
+      [dynamicLoaderPath]: getQpqDyanmicLoaderSrcFromQpqConfigs(this.options.qpqConfigs, this.options.alwaysBundleStoryCode),
     }).apply(compiler);
   }
 }

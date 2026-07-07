@@ -35,15 +35,19 @@ export const getFullSrcPathFromQpqFunctionRuntime = (qpqFunctionRuntime, qpqConf
  * @param {QPQConfig} qpqConfig - the service config whose src entries the loader covers.
  * @param {string} qpqFunctionRuntimeVariableName - the identifier of the runtime variable
  *   in the generated code that each guard compares against (e.g. `'qpqFunctionRuntime'`).
+ * @param {boolean} [alwaysBundleStoryCode] - emit the require() if-chain even for a
+ *   thin-shell service (bundleFallback:false). The dev-server build sets this: thin
+ *   shells only exist to keep lambda zips small, which is meaningless locally, and the
+ *   dev server has no federated store to load from.
  * @returns {string} JavaScript source to inline into the generated loader function body.
  */
-export function getSrcLoaderForQpqConfig(qpqConfig, qpqFunctionRuntimeVariableName) {
+export function getSrcLoaderForQpqConfig(qpqConfig, qpqFunctionRuntimeVariableName, alwaysBundleStoryCode) {
   // Thin shell: the service opted into federation with bundleFallback:false, so emit
   // NO require() calls (webpack then bundles no user story code) and fail fast. The
   // federated loader runs first in dynamicModuleLoader; reaching here means nothing was
   // published for this runtime, which for a thin shell is a hard error, not a fallback.
   const federatedStore = qpqCoreUtils.getFederatedModuleStore(qpqConfig);
-  if (federatedStore && federatedStore.bundleFallback === false) {
+  if (!alwaysBundleStoryCode && federatedStore && federatedStore.bundleFallback === false) {
     return `throw new Error('No federated module published for [' + JSON.stringify(${qpqFunctionRuntimeVariableName}) + '] and bundleFallback is disabled - publish the service\\'s federated remote');`;
   }
 

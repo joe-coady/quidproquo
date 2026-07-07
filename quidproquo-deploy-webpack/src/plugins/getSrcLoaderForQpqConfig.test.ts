@@ -32,6 +32,19 @@ describe('getSrcLoaderForQpqConfig bundleFallback', () => {
     expect(src).toContain('src/handlers/doThing');
     expect(src).toContain("module['handler']");
   });
+
+  it('bundles a thin shell anyway when alwaysBundleStoryCode is set (dev-server build)', () => {
+    const config = buildTestQpqConfig([
+      defineInlineFunction('/src/handlers/doThing::handler'),
+      defineFederatedModuleStore('artifacts', { bundleFallback: false }),
+    ]);
+
+    const src = getSrcLoaderForQpqConfig(config, 'runtime', true);
+
+    expect(src).toContain('src/handlers/doThing');
+    expect(src).toContain("module['handler']");
+    expect(src).not.toContain('bundleFallback is disabled');
+  });
 });
 
 describe('getFullSrcPathFromQpqFunctionRuntime', () => {
