@@ -1,6 +1,11 @@
+import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
+import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
+import { qpqCoreUtils } from 'quidproquo-core';
+
 import { aws_iam } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
+import * as qpqDeployAwsCdkUtils from '../../utils/qpqDeployAwsCdkUtils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
 
 export interface WebserverRollProps extends QpqConstructBlockProps {}
@@ -21,61 +26,91 @@ export class WebserverRoll extends QpqConstructBlock {
       ),
     });
 
+    qpqDeployAwsCdkUtils.applyEnvironmentTags(role, props.qpqConfig);
+
+    const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(props.qpqConfig);
+    const accountId = qpqConfigAwsUtils.getApplicationModuleDeployAccountId(props.qpqConfig);
+    const applicationName = qpqCoreUtils.getApplicationName(props.qpqConfig);
+    const environment = qpqCoreUtils.getApplicationModuleEnvironment(props.qpqConfig);
+    const feature = qpqCoreUtils.getApplicationModuleFeature(props.qpqConfig);
+
+    // This deployment's identity tags, as applied to every qpq resource by applyEnvironmentTags.
+    // Used for tag-based conditions where the target resource's id is unknowable at synth
+    // (later deploy phase / AWS-generated) but the resource is still owned by this deployment.
+    const applicationResourceTagConditions = {
+      'aws:ResourceTag/application': qpqCoreUtils.getApplicationName(props.qpqConfig),
+      'aws:ResourceTag/environment': qpqCoreUtils.getApplicationModuleEnvironment(props.qpqConfig),
+      ...(feature ? { 'aws:ResourceTag/feature': feature } : {}),
+    };
+
+    // Every event-bus topic this service can publish to (owned + referenced cross-module) -
+    // the same owner-fallback derivation the runtime send processor uses to build the ARN.
+    const eventBusTopicArns = qpqCoreUtils.getAllEventBusConfigs(props.qpqConfig).map((eventBusConfig) =>
+      awsNamingUtils.getEventBusSnsTopicArn(
+        eventBusConfig.owner?.resourceNameOverride || eventBusConfig.name,
+        props.qpqConfig,
+
+        eventBusConfig.owner?.module || qpqCoreUtils.getApplicationModuleName(props.qpqConfig),
+        eventBusConfig.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(props.qpqConfig),
+        eventBusConfig.owner?.application || qpqCoreUtils.getApplicationName(props.qpqConfig),
+        eventBusConfig.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(props.qpqConfig),
+      ),
+    );
+
     const policies: aws_iam.PolicyStatementProps[] = [
+      // Resolve cross-stack resource names at runtime via CloudFormation exports.
       {
         sid: 'CloudFormationListExports',
         actions: ['cloudformation:ListExports'],
         resources: ['*'],
       },
 
+      // Read api-key values at runtime for api-key validation - keys are fetched individually
+      // by id (never listed), so the grant is per-key, pinned to this application's tags.
+      // Module is deliberately NOT pinned: routes may reference another service's key
+      // (ApiKeyReference.serviceName) within the same application + environment.
       {
         sid: 'APIGatewayGetOperations',
         actions: ['apigateway:GET'],
-        resources: ['*'],
+        resources: [`arn:aws:apigateway:${region}::/apikeys/*`],
+        conditions: {
+          StringEquals: applicationResourceTagConditions,
+        },
       },
 
-      {
-        sid: 'CloudFrontCreateInvalidation',
-        actions: ['cloudfront:CreateInvalidation'],
-        resources: ['*'],
-      },
+      // Publish to event-bus SNS topics (the framework's pub/sub layer), scoped to the
+      // buses this service declares. Omitted entirely when no event buses are configured.
+      ...(eventBusTopicArns.length > 0
+        ? [
+            {
+              sid: 'SNSPublishMessages',
+              actions: ['sns:Publish'],
+              resources: eventBusTopicArns,
+            },
+          ]
+        : []),
 
-      {
-        sid: 'SNSPublishMessages',
-        actions: ['sns:Publish'],
-        resources: ['*'],
-      },
-
+      // Invoke QPQ service functions from other lambdas. The runtime derives target names
+      // with getConfigRuntimeResourceName from its own app/env/feature (only the target
+      // service varies), so the same helper builds this pattern with the function and
+      // service segments wildcarded - cross-app/env invocation is not possible.
       {
         sid: 'LambdaInvokeFunction',
         actions: ['lambda:InvokeFunction'],
-        resources: ['arn:aws:lambda:*:*:function:*sfunc*'],
+        resources: [
+          `arn:aws:lambda:${region}:${accountId}:function:${awsNamingUtils.getConfigRuntimeResourceName('*-sfunc', applicationName, '*', environment, feature)}`,
+        ],
       },
 
-      {
-        sid: 'S3BucketOperations',
-        actions: ['s3:GetObject', 's3:PutObject', 's3:ListBucket', 's3:DeleteObject'],
-        resources: ['arn:aws:s3:::*'],
-      },
-
-      {
-        sid: 'APIGatewayManageConnections',
-        actions: ['execute-api:ManageConnections'],
-        resources: ['*'],
-      },
-
+      // Look up ACM certs when wiring up custom domains at runtime.
       {
         sid: 'ACMCertificateOperations',
         actions: ['acm:DescribeCertificate', 'acm:ListCertificates'],
         resources: ['*'],
       },
 
-      {
-        sid: 'DynamoDBTableOperations',
-        actions: ['dynamodb:GetItem', 'dynamodb:Scan', 'dynamodb:Query', 'dynamodb:PutItem', 'dynamodb:UpdateItem', 'dynamodb:DeleteItem'],
-        resources: ['arn:aws:dynamodb:*:*:table/*'],
-      },
-
+      // Standard Lambda logging + log retrieval for the `askGetLogs` flow. Account-pinned;
+      // region is left open because edge lambdas write logs in their execution region.
       {
         sid: 'CloudWatchLogsManagement',
         actions: [
@@ -87,9 +122,10 @@ export class WebserverRoll extends QpqConstructBlock {
           'logs:GetLogEvents',
           'logs:FilterLogEvents',
         ],
-        resources: ['*'],
+        resources: [`arn:aws:logs:*:${accountId}:log-group:*`],
       },
 
+      // Required for VPC-attached Lambdas to manage their ENIs.
       {
         sid: 'EC2NetworkInterfacePermissions',
         actions: [
@@ -99,12 +135,6 @@ export class WebserverRoll extends QpqConstructBlock {
           'ec2:AssignPrivateIpAddresses',
           'ec2:UnassignPrivateIpAddresses',
         ],
-        resources: ['*'],
-      },
-
-      {
-        sid: 'TextractDocumentProcessing',
-        actions: ['textract:*'],
         resources: ['*'],
       },
     ];

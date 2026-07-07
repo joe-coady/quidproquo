@@ -1,4 +1,4 @@
-import { AuthenticateUserChallenge, AuthenticateUserResponse, AuthenticationInfo } from 'quidproquo-core';
+import { AuthenticateUserChallenge, AuthenticateUserResponse, AuthenticationInfo, getQpqIsoDateTimeFromDate } from 'quidproquo-core';
 
 import { AdminInitiateAuthResponse, AuthenticationResultType, ChallengeNameType } from '@aws-sdk/client-cognito-identity-provider';
 
@@ -10,7 +10,7 @@ export const cognitoAuthenticationResultTypeToQpqAuthenticationInfo = (
   let issueDate = new Date(issueDateTime);
   issueDate.setSeconds(issueDate.getSeconds() + (authResult.ExpiresIn || 0));
 
-  const expiresAt = issueDate.toISOString();
+  const expiresAt = getQpqIsoDateTimeFromDate(issueDate);
 
   return {
     accessToken: authResult.AccessToken,
@@ -33,6 +33,8 @@ export const cognitoChallengeNameTypeToQpqAuthenticateUserChallenge = (
   const map: Record<string, AuthenticateUserChallenge | string> = {
     [ChallengeNameType.NEW_PASSWORD_REQUIRED]: AuthenticateUserChallenge.NEW_PASSWORD_REQUIRED,
     [ChallengeNameType.CUSTOM_CHALLENGE]: AuthenticateUserChallenge.CUSTOM_CHALLENGE,
+    [ChallengeNameType.SOFTWARE_TOKEN_MFA]: AuthenticateUserChallenge.SOFTWARE_TOKEN_MFA,
+    [ChallengeNameType.MFA_SETUP]: AuthenticateUserChallenge.MFA_SETUP,
   };
 
   // TODO: handle the NOT-IMP cases

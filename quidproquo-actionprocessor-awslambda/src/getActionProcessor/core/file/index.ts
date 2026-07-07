@@ -3,7 +3,7 @@ import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, 
 import { getFileDeleteActionProcessor } from './getFileDeleteActionProcessor';
 import { getFileExistsActionProcessor } from './getFileExistsActionProcessor';
 import { getFileGenerateTemporarySecureUrlActionProcessor } from './getFileGenerateTemporarySecureUrlActionProcessor';
-import { getFileGenerateTemporaryUploadSecureUrlActionProcessor } from './getFileGenerateTemporaryUploadSecureUrlActionProcessor'
+import { getFileGenerateTemporaryUploadSecureUrlActionProcessor } from './getFileGenerateTemporaryUploadSecureUrlActionProcessor';
 import { getFileIsColdStorageActionProcessor } from './getFileIsColdStorageActionProcessor';
 import { getFileListDirectoryActionProcessor } from './getFileListDirectoryActionProcessor';
 import { getFileReadBinaryContentsActionProcessor } from './getFileReadBinaryContentsActionProcessor';

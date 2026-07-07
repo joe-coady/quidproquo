@@ -1,4 +1,4 @@
-import { createRuntime, QPQConfig, qpqCoreUtils, QpqRuntimeType,Story, StoryResult } from 'quidproquo-core';
+import { createRuntime, QPQConfig, qpqCoreUtils, QpqRuntimeType, Story, StoryResult } from 'quidproquo-core';
 import * as qpqCore from 'quidproquo-core';
 import * as qpqWebserver from 'quidproquo-webserver';
 
@@ -19,20 +19,13 @@ const getDynamicModuleLoader = (qpqConfig: QPQConfig, devServerConfig: ResolvedD
   return async (runtime: any): Promise<any> => devServerConfig.dynamicModuleLoader(serviceName, runtime);
 };
 
-export const createTinkerInterface = (
-  devServerConfig: ResolvedDevServerConfig,
-  tinkerOptions?: TinkerOptions
-): TinkerInterface => {
-  const availableServices = devServerConfig.qpqConfigs.map(config =>
-    qpqCoreUtils.getApplicationModuleName(config)
-  );
+export const createTinkerInterface = (devServerConfig: ResolvedDevServerConfig, tinkerOptions?: TinkerOptions): TinkerInterface => {
+  const availableServices = devServerConfig.qpqConfigs.map((config) => qpqCoreUtils.getApplicationModuleName(config));
 
   let currentServiceName = tinkerOptions?.initialService || availableServices[0];
 
   const getServiceConfig = (): QPQConfig => {
-    const config = devServerConfig.qpqConfigs.find(
-      c => qpqCoreUtils.getApplicationModuleName(c) === currentServiceName
-    );
+    const config = devServerConfig.qpqConfigs.find((c) => qpqCoreUtils.getApplicationModuleName(c) === currentServiceName);
     if (!config) {
       throw new Error(`Service '${currentServiceName}' not found`);
     }
@@ -40,10 +33,7 @@ export const createTinkerInterface = (
   };
 
   const tinkerInterface: TinkerInterface = {
-    run: async <TArgs extends Array<any>, TReturn>(
-      story: Story<TArgs, TReturn>,
-      args?: TArgs
-    ): Promise<StoryResult<TArgs, TReturn>> => {
+    run: async <TArgs extends Array<any>, TReturn>(story: Story<TArgs, TReturn>, args?: TArgs): Promise<StoryResult<TArgs, TReturn>> => {
       const qpqConfig = getServiceConfig();
       const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
       const dynamicModuleLoader = getDynamicModuleLoader(qpqConfig, devServerConfig);
@@ -67,7 +57,7 @@ export const createTinkerInterface = (
         QpqRuntimeType.SERVICE_FUNCTION_EXE,
         dynamicModuleLoader,
         undefined,
-        ['tinker']
+        ['tinker'],
       );
 
       try {
@@ -162,11 +152,11 @@ export const createTinkerInterface = (
           return util.inspect(output, { showHidden: false, depth: null, colors: true });
         },
         ignoreUndefined: true,
-        preview: false  // Disable preview to make multiline easier
+        preview: false, // Disable preview to make multiline easier
       });
 
       // Enable editor mode by default for better multiline support
-      replServer.setupHistory('.qpq-tinker-history', () => { });
+      replServer.setupHistory('.qpq-tinker-history', () => {});
 
       // Add a helper command to enter editor mode
       replServer.defineCommand('e', {
@@ -175,7 +165,7 @@ export const createTinkerInterface = (
           (this as any).editorMode = true;
           console.log('// Entering editor mode (Ctrl+D to finish, Ctrl+C to cancel)');
           this.displayPrompt();
-        }
+        },
       });
 
       // Start in editor mode if requested
@@ -243,7 +233,7 @@ export const createTinkerInterface = (
       //   // Extract function name (last part after ::, or last segment)
       //   const pathParts = cleanPath.split('/');
       //   const lastPart = pathParts[pathParts.length - 1];
-      //   const [modulePath, functionName] = lastPart.includes('::') 
+      //   const [modulePath, functionName] = lastPart.includes('::')
       //     ? lastPart.split('::')
       //     : [lastPart, 'default'];
 
@@ -319,7 +309,7 @@ export const createTinkerInterface = (
       // replServer.context.qpq = qpqConxtext;
 
       // Add commonly used ask functions directly to context
-      Object.keys(qpqConxtext).forEach(key => {
+      Object.keys(qpqConxtext).forEach((key) => {
         // if (key.startsWith('ask')) {
         replServer.context[key] = (qpqConxtext as any)[key];
         // }
@@ -332,7 +322,7 @@ export const createTinkerInterface = (
 
       // Force display the prompt immediately
       replServer.displayPrompt();
-    }
+    },
   };
 
   return tinkerInterface;

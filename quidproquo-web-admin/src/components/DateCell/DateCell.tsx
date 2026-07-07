@@ -25,7 +25,7 @@ export const DateCell: React.FC<DateCellProps> = (props: DateCellProps) => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <Typography variant="body2" component="span">
+      <Typography component="span" variant="body2">
         {formattedDate} {formattedTime}
       </Typography>
       <LastSeen isoTime={date.toISOString()} timeStyle="twitter" />

@@ -8,20 +8,18 @@ import {
   ErrorTypeEnum,
   FileActionType,
   FileStreamOpenActionProcessor,
+  FileStreamOpenErrorTypeEnum,
   QPQConfig,
 } from 'quidproquo-core';
 
 import { Readable } from 'stream';
 import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
 
+import { randomGuid } from '../../../awsLambdaUtils';
 import { createAwsClient } from '../../../logic/createAwsClient';
 import { resolveStorageDriveBucketName } from './utils';
 
-async function* chunkedReadableIterator(
-  stream: Readable,
-  chunkSize: number,
-  transform: (buf: Buffer) => string,
-): AsyncIterableIterator<string> {
+async function* chunkedReadableIterator(stream: Readable, chunkSize: number, transform: (buf: Buffer) => string): AsyncIterableIterator<string> {
   let buffer = Buffer.alloc(0);
 
   for await (const chunk of stream) {
@@ -57,24 +55,24 @@ const getProcessFileStreamOpen = (qpqConfig: QPQConfig): FileStreamOpenActionPro
         return actionResultError(ErrorTypeEnum.GenericError, `Empty response body for: ${filepath}`);
       }
 
-      const streamId = `s3-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      const streamId = `s3-${randomGuid()}`;
       const isText = encoding === 'text';
       const size = chunkSize ?? 65536;
-      const transform = isText
-        ? (buf: Buffer) => buf.toString('utf8')
-        : (buf: Buffer) => buf.toString('base64');
+      const transform = isText ? (buf: Buffer) => buf.toString('utf8') : (buf: Buffer) => buf.toString('base64');
       const iterator = chunkedReadableIterator(response.Body as Readable, size, transform);
       streamRegistry.register(streamId, iterator);
 
       return actionResult({ id: streamId, encoding });
     } catch (error: unknown) {
-      return actionResultErrorFromCaughtError(error, {});
+      return actionResultErrorFromCaughtError(error, {
+        InvalidObjectState: () => actionResultError(FileStreamOpenErrorTypeEnum.InvalidStorageClass, 'File is in the wrong storage class'),
+        NoSuchKey: () => actionResultError(FileStreamOpenErrorTypeEnum.FileNotFound, `File not found: ${filepath}`),
+        NotFound: () => actionResultError(FileStreamOpenErrorTypeEnum.FileNotFound, `File not found: ${filepath}`),
+      });
     }
   };
 };
 
-export const getFileStreamOpenActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
+export const getFileStreamOpenActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
   [FileActionType.StreamOpen]: getProcessFileStreamOpen(qpqConfig),
 });

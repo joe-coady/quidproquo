@@ -11,6 +11,7 @@ import {
   aws_route53_targets,
   aws_s3,
   aws_s3_deployment,
+  aws_ssm,
 } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
@@ -19,7 +20,7 @@ import path from 'path';
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
 import { qpqAwsCdkPathUtils } from '../../../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
-import { DnsValidatedCertificate } from '../../../basic/DnsValidatedCertificate';
+import { lookupDomainCertificate } from '../../../basic/DomainCertificateLookup';
 import { QpqWebServerCacheConstruct } from '../cache/QpqWebServerCacheConstruct';
 import { convertSecurityHeadersFromQpqSecurityHeaders } from './utils/securityHeaders';
 
@@ -47,24 +48,16 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
         // Allow bucket to auto delete upon cdk:Destroy
         removalPolicy: cdk.RemovalPolicy.DESTROY,
         autoDeleteObjects: true,
+
+        // Keep prior object versions so a bad deploy / accidental overwrite can be rolled back
+        versioned: true,
       });
 
-      const awsAccountId = qpqConfigAwsUtils.getApplicationModuleDeployAccountId(props.qpqConfig);
-
-      originBucket.addToResourcePolicy(
-        new aws_iam.PolicyStatement({
-          sid: 'AllowCloudFrontServicePrincipal',
-          effect: aws_iam.Effect.ALLOW,
-          principals: [new aws_iam.ServicePrincipal('cloudfront.amazonaws.com')],
-          actions: ['s3:GetObject'],
-          resources: [originBucket.arnForObjects('*')],
-          conditions: {
-            StringLike: {
-              'AWS:SourceArn': `arn:aws:cloudfront::${awsAccountId}:distribution/*`,
-            },
-          },
-        }),
-      );
+      // No manual CloudFront bucket policy here: because this bucket is owned by
+      // this stack, `S3BucketOrigin.withOriginAccessControl` (below) auto-adds a
+      // policy scoped to this exact distribution's ARN (StringEquals on
+      // AWS:SourceArn). Adding one manually would only re-broaden it to
+      // `distribution/*`.
     } else {
       originBucket = aws_s3.Bucket.fromBucketName(this, 'src-bucket-lookup', this.resourceName(props.webEntryConfig.storageDrive.sourceStorageDrive));
     }
@@ -77,15 +70,22 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
       });
     }
 
-    const dnsRecord = new DnsValidatedCertificate(this, 'validcert', {
-      domain: {
-        onRootDomain: props.webEntryConfig.domain.onRootDomain,
-        subDomainNames: props.webEntryConfig.domain.subDomainName ? [props.webEntryConfig.domain.subDomainName] : undefined,
-        rootDomain: props.webEntryConfig.domain.rootDomain,
-      },
+    const apexDomain = qpqWebServerUtils.resolveApexDomainNameFromDomainConfig(
+      props.qpqConfig,
+      props.webEntryConfig.domain.rootDomain,
+      props.webEntryConfig.domain.onRootDomain,
+    );
 
-      qpqConfig: props.qpqConfig,
+    const hostedZone = aws_route53.HostedZone.fromLookup(this, 'apex-zone', {
+      domainName: apexDomain,
     });
+
+    const domainNames: string[] = props.webEntryConfig.domain.subDomainName ? [`${props.webEntryConfig.domain.subDomainName}.${apexDomain}`] : [];
+    if (props.webEntryConfig.domain.onRootDomain && domainNames.length === 0) {
+      domainNames.unshift(apexDomain);
+    }
+
+    const certificate = lookupDomainCertificate(this, 'us-east-1', props.webEntryConfig.domain.rootDomain, props.webEntryConfig.name);
 
     const cachePolicy = props.webEntryConfig.cacheSettingsName
       ? QpqWebServerCacheConstruct.fromOtherStack(
@@ -114,12 +114,14 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
         // },
         securityHeadersBehavior: convertSecurityHeadersFromQpqSecurityHeaders(props.qpqConfig, props.webEntryConfig.securityHeaders),
 
-        // TODO: Expose this to config.
         corsBehavior: {
           accessControlAllowCredentials: false,
           accessControlAllowHeaders: ['Origin', 'Access-Control-Request-Headers', 'Access-Control-Request-Method'],
           accessControlAllowMethods: ['GET', 'HEAD', 'OPTIONS'],
-          accessControlAllowOrigins: ['*'],
+          accessControlAllowOrigins: qpqWebServerUtils.resolveServiceScopedCorsAllowedOrigins(
+            props.qpqConfig,
+            props.webEntryConfig.corsAllowedOrigins,
+          ),
           accessControlExposeHeaders: ['*'],
           accessControlMaxAge: cdk.Duration.seconds(600),
           originOverride: true,
@@ -140,8 +142,8 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
         responseHeadersPolicy: responseHeaderPolicy,
       },
 
-      domainNames: dnsRecord.domainNames,
-      certificate: dnsRecord.certificate,
+      domainNames,
+      certificate,
       defaultRootObject: props.webEntryConfig.indexRoot,
 
       // redirect errors to root page and let spa sort it
@@ -151,9 +153,27 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
         responsePagePath: '/',
         ttl: cdk.Duration.seconds(0),
       })),
+
+      // Shared CLOUDFRONT web acl from the bootstrap phase (us-east-1, arn via SSM like the cert)
+      webAclId: qpqConfigAwsUtils.isWafProtectionEnabled(props.qpqConfig)
+        ? aws_ssm.StringParameter.valueForStringParameter(this, qpqConfigAwsUtils.getWafWebAclArnSsmParameterName('cloudfront', props.qpqConfig))
+        : undefined,
     });
 
     qpqDeployAwsCdkUtils.applyEnvironmentTags(distribution, props.qpqConfig);
+
+    // The distribution id is AWS-generated here in the web stack, unknowable when the inf
+    // stack synthesizes the service role - so this stack attaches the exact-ARN invalidation
+    // grant to the role instead (web always deploys after inf, so the role exists).
+    this.getServiceRole().addToPrincipalPolicy(
+      new aws_iam.PolicyStatement({
+        effect: aws_iam.Effect.ALLOW,
+        actions: ['cloudfront:CreateInvalidation'],
+        resources: [
+          `arn:aws:cloudfront::${qpqConfigAwsUtils.getApplicationModuleDeployAccountId(props.qpqConfig)}:distribution/${distribution.distributionId}`,
+        ],
+      }),
+    );
 
     qpqDeployAwsCdkUtils.exportStackValue(
       this,
@@ -162,8 +182,8 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
     );
 
     new aws_route53.ARecord(this, `web-alias`, {
-      zone: dnsRecord.hostedZone,
-      recordName: dnsRecord.domainNames[0],
+      zone: hostedZone,
+      recordName: domainNames[0],
       target: aws_route53.RecordTarget.fromAlias(new aws_route53_targets.CloudFrontTarget(distribution)),
     });
 
@@ -186,7 +206,7 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
       const edgeFunctionVR = new aws_cloudfront.experimental.EdgeFunction(this, `SEO-VR`, {
         functionName: this.qpqResourceName(props.webEntryConfig.name, 'SEO-VR'),
         timeout: cdk.Duration.seconds(5),
-        runtime: aws_lambda.Runtime.NODEJS_20_X,
+        runtime: aws_lambda.Runtime.NODEJS_22_X,
 
         code: aws_lambda.Code.fromAsset(path.join(seoEntryBuildPath, 'cloudFrontRequestEvent_viewerRequest')),
         handler: 'index.cloudFrontRequestEvent_viewerRequest',
@@ -195,7 +215,7 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
       const edgeFunctionOR = new aws_cloudfront.experimental.EdgeFunction(this, `SEO-OR`, {
         functionName: this.qpqResourceName(props.webEntryConfig.name, 'SEO-OR'),
         timeout: cdk.Duration.seconds(30),
-        runtime: aws_lambda.Runtime.NODEJS_20_X,
+        runtime: aws_lambda.Runtime.NODEJS_22_X,
 
         memorySize: 1024,
 

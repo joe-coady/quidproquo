@@ -3,13 +3,14 @@ import {
   ActionProcessorListResolver,
   actionResult,
   actionResultError,
-  ErrorTypeEnum,
+  actionResultErrorFromCaughtError,
   FileActionType,
   FileStreamOpenActionProcessor,
+  FileStreamOpenErrorTypeEnum,
   QPQConfig,
-  qpqCoreUtils,
 } from 'quidproquo-core';
 
+import { randomUUID } from 'crypto';
 import * as fs from 'fs';
 import { Readable } from 'stream';
 
@@ -29,37 +30,29 @@ async function* binaryStreamIterator(stream: Readable): AsyncIterableIterator<st
   }
 }
 
-const getProcessFileStreamOpen = (
-  qpqConfig: QPQConfig,
-  config: FileStorageConfig,
-): FileStreamOpenActionProcessor => {
-  const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
-
+const getProcessFileStreamOpen = (qpqConfig: QPQConfig, config: FileStorageConfig): FileStreamOpenActionProcessor => {
   return async ({ drive, filepath, encoding, chunkSize }, session, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
     try {
-      const fullPath = resolveFilePath(config, serviceName, drive, filepath);
+      const fullPath = resolveFilePath(config, qpqConfig, drive, filepath);
       const isText = encoding === 'text';
       const highWaterMark = chunkSize ?? 65536;
       const readStream = fs.createReadStream(fullPath, isText ? { encoding: 'utf8', highWaterMark } : { highWaterMark });
-      const streamId = `file-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      const streamId = `file-${randomUUID()}`;
 
       const iterator = isText ? textStreamIterator(readStream) : binaryStreamIterator(readStream);
       streamRegistry.register(streamId, iterator);
 
       return actionResult({ id: streamId, encoding });
-    } catch (error: any) {
-      if (error.code === 'ENOENT') {
-        return actionResultError(ErrorTypeEnum.NotFound, `File not found: ${filepath}`);
-      }
-      return actionResultError(ErrorTypeEnum.GenericError, `Error opening file stream: ${error.message}`);
+    } catch (error: unknown) {
+      return actionResultErrorFromCaughtError(error, {
+        ENOENT: () => actionResultError(FileStreamOpenErrorTypeEnum.FileNotFound, `File not found: ${filepath}`), // node fs code
+      });
     }
   };
 };
 
-export const getFileStreamOpenActionProcessor = (
-  config: FileStorageConfig,
-): ActionProcessorListResolver => async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [FileActionType.StreamOpen]: getProcessFileStreamOpen(qpqConfig, config),
-});
+export const getFileStreamOpenActionProcessor =
+  (config: FileStorageConfig): ActionProcessorListResolver =>
+  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
+    [FileActionType.StreamOpen]: getProcessFileStreamOpen(qpqConfig, config),
+  });

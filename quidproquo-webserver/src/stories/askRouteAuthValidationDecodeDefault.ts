@@ -22,9 +22,7 @@ export function* askRouteAuthValidationDecodeDefault({
     return null;
   }
 
-  const result = yield* askCatch(
-    askUserDirectoryDecodeAccessToken(routeAuthSettings.userDirectoryName, ignoreExpiration, accessToken),
-  );
+  const result = yield* askCatch(askUserDirectoryDecodeAccessToken(routeAuthSettings.userDirectoryName, ignoreExpiration, accessToken));
 
   if (!result.success) {
     return null;

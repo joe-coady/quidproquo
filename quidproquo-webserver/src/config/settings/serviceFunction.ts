@@ -6,6 +6,11 @@ export interface QPQConfigAdvancedServiceFunctionSettings extends QPQConfigAdvan
   functionName?: string;
   virtualNetworkName?: string;
 
+  // Cap (and guarantee) on this service function's concurrent executions:
+  // never throttled below it, never scales above it. Free, but carved out of
+  // the deploy account's shared concurrency pool.
+  maxConcurrentExecutions?: number;
+
   owner?: CrossModuleOwner<'functionName'>;
 }
 
@@ -14,6 +19,8 @@ export interface ServiceFunctionQPQWebServerConfigSetting extends QPQConfigSetti
 
   functionName: string;
   virtualNetworkName?: string;
+
+  maxConcurrentExecutions?: number;
 }
 
 export const defineServiceFunction = (
@@ -31,6 +38,8 @@ export const defineServiceFunction = (
     functionName: functionName,
 
     virtualNetworkName: options?.virtualNetworkName,
+
+    maxConcurrentExecutions: options?.maxConcurrentExecutions,
 
     owner: qpqCoreUtils.convertCrossModuleOwnerToGenericResourceNameOverride(options?.owner),
   };

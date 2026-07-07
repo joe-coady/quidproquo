@@ -1,4 +1,4 @@
-import { getCustomActionActionProcessor } from 'quidproquo-actionprocessor-node';
+import { getCustomActionActionProcessor } from 'quidproquo-actionprocessor-js';
 import { askExecuteStory, createRuntime, DynamicModuleLoader, QPQConfig, qpqCoreUtils, QpqRuntimeType, StorySession } from 'quidproquo-core';
 import { StorageDriveEvent, StorageDriveEventType } from 'quidproquo-webserver';
 
@@ -30,21 +30,26 @@ export const fileWatcherImplementation = async (devServerConfig: ResolvedDevServ
     console.error('Error creating storage directory:', error);
   }
 
-  // Create a watcher for the storage directory
+  // Create a watcher for the storage directory. Requires chokidar v3: on macOS
+  // v3 watches via FSEvents (one fd for the whole tree), while v4 dropped
+  // FSEvents and holds a kqueue fd PER FILE — high-churn drives (qpq-logs
+  // writes a file per story execution) then grow the fd table until
+  // child_process.spawn fails with EBADF (~80k fds), killing anything that
+  // launches a subprocess (e.g. puppeteer).
   const watcher = chokidar.watch(storagePath, {
     persistent: true,
     ignoreInitial: true, // Don't fire events for existing files
     followSymlinks: false,
     awaitWriteFinish: {
       stabilityThreshold: 500, // Wait for file to be stable for 500ms
-      pollInterval: 100
+      pollInterval: 100,
     },
     ignored: [
       '**/node_modules/**',
       '**/.git/**',
       '**/.*', // Ignore hidden files
       '**/*.tmp', // Ignore temp files
-    ]
+    ],
   });
 
   // Parse file path to extract service, drive, and relative filepath
@@ -65,7 +70,7 @@ export const fileWatcherImplementation = async (devServerConfig: ResolvedDevServ
         service,
         drive,
         filepath,
-        event: 'create' // Will be overridden by the specific event
+        event: 'create', // Will be overridden by the specific event
       };
     } catch (error) {
       console.error('Error parsing file path:', fullPath, error);
@@ -75,17 +80,11 @@ export const fileWatcherImplementation = async (devServerConfig: ResolvedDevServ
 
   // Find the QPQ config for a specific service
   const findServiceConfig = (serviceName: string): QPQConfig | undefined => {
-    return devServerConfig.qpqConfigs.find(
-      config => qpqCoreUtils.getApplicationModuleName(config) === serviceName
-    );
+    return devServerConfig.qpqConfigs.find((config) => qpqCoreUtils.getApplicationModuleName(config) === serviceName);
   };
 
   // Execute the storage drive event function
-  const executeStorageDriveEvent = async (
-    eventPayload: FileEventPayload,
-    qpqConfig: QPQConfig,
-    functionRuntime: any
-  ) => {
+  const executeStorageDriveEvent = async (eventPayload: FileEventPayload, qpqConfig: QPQConfig, functionRuntime: any) => {
     const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
 
     // Create a story session for the event with storage event context
@@ -94,10 +93,10 @@ export const fileWatcherImplementation = async (devServerConfig: ResolvedDevServ
         storageEvent: {
           drive: eventPayload.drive,
           filepath: eventPayload.filepath,
-          event: eventPayload.event
-        }
+          event: eventPayload.event,
+        },
       },
-      depth: 0
+      depth: 0,
     };
 
     const logger = getDevServerLogger(qpqConfig, devServerConfig, storySession);
@@ -106,12 +105,11 @@ export const fileWatcherImplementation = async (devServerConfig: ResolvedDevServ
     const eventData: StorageDriveEvent = {
       eventType: eventPayload.event === 'create' ? StorageDriveEventType.Create : StorageDriveEventType.Delete,
       driveName: eventPayload.drive,
-      filePaths: [eventPayload.filepath]
+      filePaths: [eventPayload.filepath],
     };
 
     // Create a DynamicModuleLoader adapter for this service
-    const dynamicModuleLoaderForService: DynamicModuleLoader = (runtime) =>
-      devServerConfig.dynamicModuleLoader(serviceName, runtime);
+    const dynamicModuleLoaderForService: DynamicModuleLoader = (runtime) => devServerConfig.dynamicModuleLoader(serviceName, runtime);
 
     // Create runtime and execute the story directly
     const resolveStory = createRuntime(
@@ -127,7 +125,7 @@ export const fileWatcherImplementation = async (devServerConfig: ResolvedDevServ
       QpqRuntimeType.SERVICE_FUNCTION_EXE,
       dynamicModuleLoaderForService,
       undefined,
-      []
+      [],
     );
 
     try {

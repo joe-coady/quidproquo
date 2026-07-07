@@ -16,6 +16,13 @@ export interface QPQConfigAdvancedWebSocketSettings extends QPQConfigAdvancedSet
 
   cloudflareApiKeySecretName?: string;
 
+  // Cap (and guarantee) on this websocket api's concurrent event processing:
+  // never throttled below it, never scales above it. One compute unit serves all
+  // the api's event processors (connect/disconnect/message), so this bounds the
+  // api as a whole. Free, but carved out of the deploy account's shared
+  // concurrency pool.
+  maxConcurrentExecutions?: number;
+
   owner?: CrossModuleOwner<'websocketApiName'>;
 }
 
@@ -32,6 +39,8 @@ export interface WebSocketQPQWebServerConfigSetting extends QPQConfigSetting {
   deprecated: boolean;
 
   cloudflareApiKeySecretName?: string;
+
+  maxConcurrentExecutions?: number;
 }
 
 export const defineWebsocket = (
@@ -56,6 +65,8 @@ export const defineWebsocket = (
     deprecated: options?.deprecated || false,
 
     cloudflareApiKeySecretName: options?.cloudflareApiKeySecretName,
+
+    maxConcurrentExecutions: options?.maxConcurrentExecutions,
 
     owner: qpqCoreUtils.convertCrossModuleOwnerToGenericResourceNameOverride(options?.owner),
   };

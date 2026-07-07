@@ -1,5 +1,11 @@
+import { createErrorEnumForAction } from '../../types';
 import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 import { KeyValueStoreGetAllActionRequester, KeyValueStoreGetAllOptions } from './KeyValueStoreGetAllActionTypes';
+
+export const KeyValueStoreGetAllErrorTypeEnum = createErrorEnumForAction(KeyValueStoreActionType.GetAll, [
+  'ServiceUnavailable', // DynamoDB internal error / throttling
+  'ResourceNotFound', // the underlying table does not exist
+]);
 
 export function* askKeyValueStoreGetAll<Value>(
   keyValueStoreName: string,

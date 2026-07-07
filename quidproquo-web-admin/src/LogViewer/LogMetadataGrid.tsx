@@ -63,23 +63,23 @@ export const LogMetadataGrid = ({ logs, isLoading }: LogMetadataGridProps) => {
         `}
       </style>
       <DataGrid
+        autoPageSize
+        columns={columns}
         components={{
           Pagination: DataGridPagination,
-          LoadingOverlay: () => <LinearProgress variant="determinate" value={searchProgress} />,
+          LoadingOverlay: () => <LinearProgress value={searchProgress} variant="determinate" />,
         }}
-        columns={columns}
-        rows={logs.map((log) => ({ ...log, id: log.correlation }))}
-        autoPageSize
+        getRowClassName={getRowClassName}
         loading={isLoading}
         onRowClick={onRowClick}
-        getRowClassName={getRowClassName}
+        rows={logs.map((log) => ({ ...log, id: log.correlation }))}
       />
       <LogDialog
-        open={!!selectedLogCorrelation}
         handleClose={clearSelectedLogCorrelation}
         logCorrelation={selectedLogCorrelation}
-        storyResultMetadatas={logs}
+        open={!!selectedLogCorrelation}
         setSelectedLogCorrelation={setSelectedLogCorrelation}
+        storyResultMetadatas={logs}
       />
     </>
   );

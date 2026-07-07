@@ -120,10 +120,7 @@ export interface QPQConfigAdvancedAwsAlarmSettings extends QPQConfigAdvancedSett
 
 // Union type for namespace specific settings
 type AwsAlarmNamespaceSpecificSettings =
-  | AwsAlarmLambdaConfigSetting
-  | AwsAlarmApiGatewayConfigSetting
-  | AwsAlarmDynamoDbConfigSetting
-  | AwsAlarmSqsConfigSetting;
+  AwsAlarmLambdaConfigSetting | AwsAlarmApiGatewayConfigSetting | AwsAlarmDynamoDbConfigSetting | AwsAlarmSqsConfigSetting;
 
 export interface QPQConfigAdvancedAwsAlarmSettings extends QPQConfigAdvancedSettings {}
 

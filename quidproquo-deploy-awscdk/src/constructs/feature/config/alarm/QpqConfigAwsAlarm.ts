@@ -1,6 +1,6 @@
-import { AwsAlarmNamespace, AwsAlarmOperator, AwsAlarmQPQConfigSetting } from 'quidproquo-config-aws';
+import { AwsAlarmOperator, AwsAlarmQPQConfigSetting } from 'quidproquo-config-aws';
 
-import { aws_cloudwatch, aws_cloudwatch_actions, aws_sns } from 'aws-cdk-lib';
+import { aws_cloudwatch, aws_cloudwatch_actions } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
@@ -30,33 +30,30 @@ export class QpqConfigAwsAlarmConstruct extends QpqConstructBlock {
   constructor(scope: Construct, id: string, props: QpqConfigAwsAlarmConstructProps) {
     super(scope, id, props);
 
-    // Check if the namespace is Lambda
-    if (props.alarmConfig.alarmSettings.namespace === AwsAlarmNamespace.Lambda) {
-      const lambdaAlarmSettings = props.alarmConfig.alarmSettings;
+    // The alarm is built entirely from the shared BaseAwsAlarmQPQConfigSetting
+    // fields, so it is namespace-agnostic — Lambda, ApiGateway, DynamoDb and Sqs
+    // (and any future namespace) are all supported via the config's namespace +
+    // metricName pair, no per-namespace branching required.
+    const alarmSettings = props.alarmConfig.alarmSettings;
 
-      // Create CloudWatch alarm for Lambda
-      const alarm = new aws_cloudwatch.Alarm(this, props.alarmConfig.uniqueKey, {
-        alarmName: this.resourceName(props.alarmConfig.name),
-        metric: new aws_cloudwatch.Metric({
-          namespace: lambdaAlarmSettings.namespace,
-          metricName: lambdaAlarmSettings.metricName,
-          statistic: lambdaAlarmSettings.statistic,
-          period: cdk.Duration.seconds(lambdaAlarmSettings.period),
-        }),
-        threshold: lambdaAlarmSettings.threshold,
-        comparisonOperator: AwsAlarmOperatorToComparisonOperator(lambdaAlarmSettings.operator),
-        datapointsToAlarm: lambdaAlarmSettings.datapointsToAlarm,
-        evaluationPeriods: lambdaAlarmSettings.evaluationPeriodsToAlarm,
-      });
+    const alarm = new aws_cloudwatch.Alarm(this, props.alarmConfig.uniqueKey, {
+      alarmName: this.resourceName(props.alarmConfig.name),
+      metric: new aws_cloudwatch.Metric({
+        namespace: alarmSettings.namespace,
+        metricName: alarmSettings.metricName,
+        statistic: alarmSettings.statistic,
+        period: cdk.Duration.seconds(alarmSettings.period),
+      }),
+      threshold: alarmSettings.threshold,
+      comparisonOperator: AwsAlarmOperatorToComparisonOperator(alarmSettings.operator),
+      datapointsToAlarm: alarmSettings.datapointsToAlarm,
+      evaluationPeriods: alarmSettings.evaluationPeriodsToAlarm,
+    });
 
-      props.alarmConfig.alarmSettings.onAlarm.publishToEventBus?.forEach((eventBusName) => {
-        const eventBus = QpqCoreEventBusConstruct.fromOtherStack(scope, 'eventBus', props.qpqConfig, eventBusName);
+    alarmSettings.onAlarm.publishToEventBus?.forEach((eventBusName) => {
+      const eventBus = QpqCoreEventBusConstruct.fromOtherStack(scope, 'eventBus', props.qpqConfig, eventBusName);
 
-        alarm.addAlarmAction(new aws_cloudwatch_actions.SnsAction(eventBus.topic));
-      });
-    } else {
-      // Handle other namespaces or throw an error
-      throw new Error(`Invalid namespace ${props.alarmConfig.alarmSettings.namespace}`);
-    }
+      alarm.addAlarmAction(new aws_cloudwatch_actions.SnsAction(eventBus.topic));
+    });
   }
 }

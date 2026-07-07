@@ -1,0 +1,44 @@
+{
+  "name": "quidproquo-features",
+  "version": "0.1.3",
+  "description": "",
+  "main": "./lib/commonjs/index.js",
+  "module": "./lib/esm/index.js",
+  "types": "./lib/commonjs/index.d.ts",
+  "sideEffects": false,
+  "files": [
+    "lib/**/*"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "clean": "npx rimraf lib && npx rimraf node_modules",
+    "build": "npm run clean && npm run build:esm && npm run build:cjs",
+    "watch": "tsc -p tsconfig.commonjs.json -w",
+    "build:cjs": "tsc -p tsconfig.commonjs.json",
+    "build:esm": "tsc -p tsconfig.esm.json",
+    "lint": "npx eslint .",
+    "lint:fix": "npx eslint . --fix",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joe-coady/quidproquo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/joe-coady/quidproquo/issues"
+  },
+  "homepage": "https://github.com/joe-coady/quidproquo#readme",
+  "dependencies": {
+    "quidproquo-core": "0.1.3",
+    "quidproquo-webserver": "0.1.3",
+    "zod": "^3.25.76",
+    "zod-validation-error": "^1.1.0"
+  },
+  "devDependencies": {
+    "quidproquo-tsconfig": "0.1.3",
+    "typescript": "^5.8.2"
+  }
+}

@@ -10,6 +10,7 @@ import {
   qpqCoreUtils,
   QueueMessage,
   StorySession,
+  toCrossServiceSession,
 } from 'quidproquo-core';
 
 import { eventBus } from '../../../logic/eventBus';
@@ -26,13 +27,7 @@ export type AnyEventBusMessageWithSession = QueueMessage<any> & {
 };
 
 const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): EventBusSendMessageActionProcessor<any> => {
-  return async (
-    {
-      eventBusName,
-      eventBusMessages,
-    },
-    session,
-  ) => {
+  return async ({ eventBusName, eventBusMessages }, session) => {
     const eventBusConfig = qpqCoreUtils.getEventBusConfigByName(eventBusName, qpqConfig);
     if (!eventBusConfig) {
       return actionResultError(
@@ -46,7 +41,7 @@ const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): EventBusSendMessag
         payload: eventBusMessage.payload,
         type: eventBusMessage.type,
 
-        storySession: session,
+        storySession: toCrossServiceSession(session),
 
         eventBusName: eventBusConfig.name,
 

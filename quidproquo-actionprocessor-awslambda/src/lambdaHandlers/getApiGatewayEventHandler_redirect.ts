@@ -3,9 +3,6 @@ import { SubdomainRedirectQPQWebServerConfigSetting } from 'quidproquo-webserver
 import { APIGatewayEvent, Context } from 'aws-lambda';
 
 const apiGatewayEventHandler_redirect = async (event: APIGatewayEvent, context: Context) => {
-  console.log('event: ', JSON.stringify(event, null, 2));
-  console.log('process.env: ', JSON.stringify(process.env, null, 2));
-
   const redirectConfig: SubdomainRedirectQPQWebServerConfigSetting = JSON.parse(process.env.redirectConfig as string);
 
   // For direct urls ~ Go straight to the url

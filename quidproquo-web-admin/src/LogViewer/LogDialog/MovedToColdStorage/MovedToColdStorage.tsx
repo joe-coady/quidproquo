@@ -8,12 +8,12 @@ interface MovedToColdStorageProps {
 export const MovedToColdStorage: React.FC<MovedToColdStorageProps> = ({ guid }) => {
   return (
     <Paper elevation={3} sx={{ padding: 2, borderRadius: 2 }}>
-      <Typography variant="body1" color="textSecondary">
+      <Typography color="textSecondary" variant="body1">
         The log you are requesting has been moved to <b>cold storage</b>. Please provide the following Correlation to an administrator if you would
         like it to be moved back to standard storage.
       </Typography>
       <Box mt={1}>
-        <Typography variant="subtitle1" color="primary" fontWeight="bold">
+        <Typography color="primary" fontWeight="bold" variant="subtitle1">
           {guid}
         </Typography>
       </Box>

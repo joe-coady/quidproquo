@@ -23,7 +23,7 @@ export const useLogManagement = () => {
     window.viewLog = (log: any) => {
       setCorrelation(log.correlation);
     };
-  }, [logs]);
+  }, [logs, setCorrelation]);
 
   useEffect(() => {
     console.log('logs attached to window, try: viewLog(logs[0])');

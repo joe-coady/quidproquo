@@ -8,8 +8,9 @@ export interface EventTransformResponseResultActionPayload<EventParams extends A
 }
 
 // Action.
-export interface EventTransformResponseResultAction<EventParams extends Array<unknown>, QpqEventRecordResponse>
-  extends Action<EventTransformResponseResultActionPayload<EventParams, QpqEventRecordResponse>> {
+export interface EventTransformResponseResultAction<EventParams extends Array<unknown>, QpqEventRecordResponse> extends Action<
+  EventTransformResponseResultActionPayload<EventParams, QpqEventRecordResponse>
+> {
   type: EventActionType.TransformResponseResult;
   payload: EventTransformResponseResultActionPayload<EventParams, QpqEventRecordResponse>;
 }

@@ -1,5 +1,5 @@
-export { expectGenerator, GeneratorExpectChain } from './generatorExpect'
-export * from './types'
+export { expectGenerator, GeneratorExpectChain } from './generatorExpect';
+export * from './types';
 
 // Export vitestMatchers for explicit import by Vitest users
 // Users should import this explicitly: import 'quidproquo-testing/vitest'

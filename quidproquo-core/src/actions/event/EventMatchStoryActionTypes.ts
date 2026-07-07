@@ -8,8 +8,9 @@ export interface EventMatchStoryActionPayload<QpqEventRecord, EventParams extend
 }
 
 // Action
-export interface EventMatchStoryAction<QpqEventRecord, EventParams extends Array<unknown>>
-  extends Action<EventMatchStoryActionPayload<QpqEventRecord, EventParams>> {
+export interface EventMatchStoryAction<QpqEventRecord, EventParams extends Array<unknown>> extends Action<
+  EventMatchStoryActionPayload<QpqEventRecord, EventParams>
+> {
   type: EventActionType.MatchStory;
   payload: EventMatchStoryActionPayload<QpqEventRecord, EventParams>;
 }

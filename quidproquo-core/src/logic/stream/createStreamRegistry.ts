@@ -3,10 +3,28 @@ import { StreamChunk, StreamRegistry } from '../../types/StreamRegistry';
 interface StreamEntry {
   iterator: AsyncIterableIterator<string>;
   nextPromise: Promise<IteratorResult<string>>;
+  settled: boolean;
+  settledResult?: IteratorResult<string>;
 }
 
 export const createStreamRegistry = (): StreamRegistry => {
   const streams = new Map<string, StreamEntry>();
+
+  // Pull the next value and remember when it settles, so noWait can tell synchronously
+  // whether a chunk is ready without racing an already-resolved sentinel (which would
+  // always win and make noWait report "skipped" forever).
+  const advance = (entry: StreamEntry): void => {
+    const next = entry.iterator.next();
+    entry.nextPromise = next;
+    entry.settled = false;
+    entry.settledResult = undefined;
+    next.then((result) => {
+      if (entry.nextPromise === next) {
+        entry.settled = true;
+        entry.settledResult = result;
+      }
+    });
+  };
 
   return {
     register(id: string, iterator: AsyncIterableIterator<string>): void {
@@ -14,10 +32,9 @@ export const createStreamRegistry = (): StreamRegistry => {
         throw new Error(`Stream already registered: ${id}`);
       }
 
-      streams.set(id, {
-        iterator,
-        nextPromise: iterator.next(),
-      });
+      const entry: StreamEntry = { iterator, nextPromise: Promise.resolve() as any, settled: false };
+      streams.set(id, entry);
+      advance(entry);
     },
 
     async read(id: string, noWait?: boolean): Promise<StreamChunk<string>> {
@@ -27,22 +44,20 @@ export const createStreamRegistry = (): StreamRegistry => {
       }
 
       if (noWait) {
-        const result = await Promise.race([
-          entry.nextPromise.then((r) => ({ resolved: true as const, result: r })),
-          Promise.resolve({ resolved: false as const }),
-        ]);
+        // Give an already-resolvable promise a microtask to flip the settled flag.
+        await Promise.resolve();
 
-        if (!result.resolved) {
+        if (!entry.settled) {
           return { done: false, skipped: true };
         }
 
-        const iterResult = result.result;
+        const iterResult = entry.settledResult!;
         if (iterResult.done) {
           streams.delete(id);
           return { done: true };
         }
 
-        entry.nextPromise = entry.iterator.next();
+        advance(entry);
         return { done: false, data: iterResult.value };
       }
 
@@ -52,7 +67,7 @@ export const createStreamRegistry = (): StreamRegistry => {
         return { done: true };
       }
 
-      entry.nextPromise = entry.iterator.next();
+      advance(entry);
       return { done: false, data: iterResult.value };
     },
 

@@ -1,3 +1,5 @@
+import coreAiActionComponentMap from './coreAiActionComponentMap';
+import coreClaudeAiActionComponentMap from './coreClaudeAiActionComponentMap';
 import coreConfigActionComponentMap from './coreConfigActionComponentMap';
 import coreContextActionComponentMap from './coreContextActionComponentMap';
 import coreDateActionComponentMap from './coreDateActionComponentMap';
@@ -6,16 +8,22 @@ import coreErrorActionComponentMap from './coreErrorActionComponentMap';
 import coreEventActionComponentMap from './coreEventActionComponentMap';
 import coreEventBusActionComponentMap from './coreEventBusActionComponentMap';
 import coreFileActionComponentMap from './coreFileActionComponentMap';
+import coreGraphDatabaseActionComponentMap from './coreGraphDatabaseActionComponentMap';
 import coreGuidActionComponentMap from './coreGuidActionComponentMap';
+import coreInlineFunctionActionComponentMap from './coreInlineFunctionActionComponentMap';
 import coreKeyValueStoreActionComponentMap from './coreKeyValueStoreActionComponentMap';
 import coreMathActionComponentMap from './coreMathActionComponentMap';
 import corePlatformActionComponentMap from './corePlatformActionComponentMap';
 import coreQueueActionComponentMap from './coreQueueActionComponentMap';
+import coreStateActionComponentMap from './coreStateActionComponentMap';
+import coreStreamActionComponentMap from './coreStreamActionComponentMap';
 import coreSystemActionComponentMap from './coreSystemActionComponentMap';
 import coreUserDirectoryActionComponentMap from './coreUserDirectoryActionComponentMap';
 
 export default {
   ...coreDeployEventActionComponentMap,
+  ...coreAiActionComponentMap,
+  ...coreClaudeAiActionComponentMap,
   ...coreConfigActionComponentMap,
   ...coreContextActionComponentMap,
   ...coreDateActionComponentMap,
@@ -23,11 +31,15 @@ export default {
   ...coreEventActionComponentMap,
   ...coreEventBusActionComponentMap,
   ...coreFileActionComponentMap,
+  ...coreGraphDatabaseActionComponentMap,
   ...coreGuidActionComponentMap,
+  ...coreInlineFunctionActionComponentMap,
   ...coreKeyValueStoreActionComponentMap,
   ...coreMathActionComponentMap,
   ...corePlatformActionComponentMap,
   ...coreQueueActionComponentMap,
+  ...coreStateActionComponentMap,
+  ...coreStreamActionComponentMap,
   ...coreSystemActionComponentMap,
   ...coreUserDirectoryActionComponentMap,
 };

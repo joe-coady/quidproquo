@@ -7,11 +7,14 @@ import {
   DefaultRouteOptionsQPQWebServerConfigSetting,
   DnsQPQWebServerConfigSetting,
   DomainProxyQPQWebServerConfigSetting,
+  FileUploadSettings,
+  FileUploadSettingsQPQWebServerConfigSetting,
   OpenApiQPQWebServerConfigSetting,
   QPQWebServerConfigSettingType,
   RouteQPQWebServerConfigSetting,
   SeoQPQWebServerConfigSetting,
   ServiceFunctionQPQWebServerConfigSetting,
+  StorageDriveCorsSettingsQPQWebServerConfigSetting,
   SubdomainRedirectQPQWebServerConfigSetting,
   WebSocketQPQWebServerConfigSetting,
 } from '../config';
@@ -187,6 +190,72 @@ export const getServiceDomainName = (qpqConfig: QPQConfig): string => {
   const domainBase = getBaseDomainName(qpqConfig);
 
   return `${service}.${domainBase}`;
+};
+
+/**
+ * Resolve browser CORS origins for a service resource. An explicit list wins;
+ * otherwise scope to this service's own domain (apex + one-level subdomain
+ * wildcard, which S3/CloudFront both support). Falls back to '*' only when the
+ * service declares no domain at all (nothing browser-facing).
+ *
+ * Note: key off the raw dns base (`getDomainName`) to detect "no domain" —
+ * `getBaseDomainName` still returns an env prefix like `development.` here.
+ */
+export const resolveServiceScopedCorsAllowedOrigins = (qpqConfig: QPQConfig, explicitOrigins?: string[]): string[] => {
+  if (explicitOrigins) {
+    return explicitOrigins;
+  }
+
+  if (!getDomainName(qpqConfig)) {
+    return ['*'];
+  }
+
+  const baseDomain = getBaseDomainName(qpqConfig);
+  return [`https://${baseDomain}`, `https://*.${baseDomain}`];
+};
+
+/**
+ * Browser origins allowed to read/write a storage drive's objects cross-origin
+ * (e.g. presigned uploads/downloads), looked up by the drive's name. An explicit
+ * `defineStorageDriveCorsSettings` wins; otherwise the service-scoped default.
+ */
+export const getStorageDriveCorsAllowedOrigins = (qpqConfig: QPQConfig, storageDriveName: string): string[] => {
+  const corsSetting = qpqCoreUtils
+    .getConfigSettings<StorageDriveCorsSettingsQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.StorageDriveCorsSettings)
+    .find((setting) => setting.storageDriveName === storageDriveName);
+
+  return resolveServiceScopedCorsAllowedOrigins(qpqConfig, corsSetting?.allowedOrigins);
+};
+
+/**
+ * Whether any web entry in this service serves its assets from the named storage
+ * drive (`storageDrive.sourceStorageDrive`) — i.e. the drive's bucket is a
+ * CloudFront origin. Drives with no web entry consumer need no CloudFront access
+ * to their bucket at all.
+ */
+export const isStorageDriveWebEntryOrigin = (qpqConfig: QPQConfig, storageDriveName: string): boolean => {
+  return getWebEntryConfigs(qpqConfig).some((webEntry) => webEntry.storageDrive.sourceStorageDrive === storageDriveName);
+};
+
+// API Gateway caps request payloads at 10MB, so the default per-file ceiling matches it;
+// the other defaults exist to bound parser memory rather than to be hit in practice.
+export const defaultFileUploadSettings: FileUploadSettings = {
+  maxFileSizeBytes: 10 * 1024 * 1024,
+  maxFileCount: 10,
+  maxFieldCount: 100,
+  maxFieldSizeBytes: 1024 * 1024,
+};
+
+export const getFileUploadSettings = (qpqConfig: QPQConfig): FileUploadSettings => {
+  const setting = qpqCoreUtils.getConfigSetting<FileUploadSettingsQPQWebServerConfigSetting>(
+    qpqConfig,
+    QPQWebServerConfigSettingType.FileUploadSettings,
+  );
+
+  return {
+    ...defaultFileUploadSettings,
+    ...Object.fromEntries(Object.entries(setting?.fileUploadSettings || {}).filter(([, value]) => isDefined(value))),
+  };
 };
 
 export const resolveApexDomainNameFromDomainConfig = (qpqConfig: QPQConfig, rootDomain: string, onRootDomain: boolean): string => {

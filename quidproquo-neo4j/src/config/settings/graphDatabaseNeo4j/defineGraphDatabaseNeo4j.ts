@@ -7,7 +7,7 @@ import {
   QPQConfig,
   QPQConfigAdvancedSettings,
   QPQConfigSetting,
-  QpqFunctionRuntimeAbsolutePath,
+  QpqFunctionRuntimeAdvanced,
 } from 'quidproquo-core';
 
 export interface QPQConfigAdvancedGraphDatabaseNeo4jSettings extends QPQConfigAdvancedSettings {
@@ -23,7 +23,7 @@ export enum Neo4jVersion {
   Version5 = 'version5',
 }
 
-const fullQpqFunctionRuntime = (relativePath: string, functionName: string): QpqFunctionRuntimeAbsolutePath => {
+const fullQpqFunctionRuntime = (relativePath: string, functionName: string): QpqFunctionRuntimeAdvanced => {
   return {
     basePath: __dirname,
     relativePath: relativePath,

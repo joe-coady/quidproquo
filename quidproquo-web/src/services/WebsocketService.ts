@@ -150,10 +150,7 @@ export class WebsocketService {
   }
 
   private reconnectIfNotDestroyed() {
-    const baseDelay = Math.min(
-      WebsocketService.BASE_RECONNECT_MS * Math.pow(2, this.reconnectAttempts),
-      WebsocketService.MAX_RECONNECT_MS,
-    );
+    const baseDelay = Math.min(WebsocketService.BASE_RECONNECT_MS * Math.pow(2, this.reconnectAttempts), WebsocketService.MAX_RECONNECT_MS);
 
     // Add jitter: ±25% of base delay to prevent thundering herd
     const jitter = baseDelay * 0.25 * (Math.random() * 2 - 1);
@@ -161,7 +158,7 @@ export class WebsocketService {
 
     this.reconnectAttempts++;
 
-    console.log("Delay: ", delay);
+    console.log('Delay: ', delay);
 
     setTimeout(() => {
       if (!this.isDestroyed) {

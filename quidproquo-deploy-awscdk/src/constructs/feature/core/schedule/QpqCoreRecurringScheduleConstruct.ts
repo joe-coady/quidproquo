@@ -34,6 +34,8 @@ export class QpqCoreRecurringScheduleConstruct extends QpqConstructBlock {
       // 15 min timeout
       timeoutInSeconds: 15 * 60,
 
+      reservedConcurrentExecutions: props.scheduleConfig.maxConcurrentExecutions,
+
       role: this.getServiceRole(),
     });
 

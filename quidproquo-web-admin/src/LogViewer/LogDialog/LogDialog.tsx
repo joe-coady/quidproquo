@@ -57,13 +57,12 @@ export const LogDialog = ({ logCorrelation, open, handleClose, setSelectedLogCor
 
   return (
     <Dialog
-      open={open}
-      scroll={'paper'}
-      aria-labelledby="scroll-dialog-title"
       aria-describedby="scroll-dialog-description"
-      onClose={handleClose}
-      maxWidth={false}
+      aria-labelledby="scroll-dialog-title"
       fullWidth={true}
+      maxWidth={false}
+      onClose={handleClose}
+      open={open}
       PaperProps={{
         style: {
           width: '90%',
@@ -72,10 +71,11 @@ export const LogDialog = ({ logCorrelation, open, handleClose, setSelectedLogCor
           maxWidth: '90%',
         },
       }}
+      scroll={'paper'}
     >
       <DialogTitle id="scroll-dialog-title">Log Details - {logCorrelation}</DialogTitle>
-      <AppBar position="sticky" color="primary">
-        <Tabs value={logDialogState.selectedTab} onChange={handleTabChange} textColor="inherit" indicatorColor="secondary">
+      <AppBar color="primary" position="sticky">
+        <Tabs indicatorColor="secondary" onChange={handleTabChange} textColor="inherit" value={logDialogState.selectedTab}>
           <Tab label="Log Details" />
           <Tab label="Tree" />
           <Tab label="Timeline" />
@@ -97,17 +97,17 @@ export const LogDialog = ({ logCorrelation, open, handleClose, setSelectedLogCor
         </div>
         <div style={getTabStyle(logDialogState.selectedTab, 1)}>
           <TreeTab
-            log={asyncLog}
             isVisible={logDialogState.selectedTab === 1}
-            treeApi={treeApi}
+            log={asyncLog}
             setSelectedLogCorrelation={setSelectedLogCorrelation}
+            treeApi={treeApi}
           />
         </div>
         <div style={getTabStyle(logDialogState.selectedTab, 2)}>
           <TimelineTab
+            isVisible={logDialogState.selectedTab === 2}
             log={asyncLog}
             setSelectedLogCorrelation={setSelectedLogCorrelation}
-            isVisible={logDialogState.selectedTab === 2}
             treeApi={treeApi}
           />
         </div>
@@ -123,25 +123,25 @@ export const LogDialog = ({ logCorrelation, open, handleClose, setSelectedLogCor
       </DialogContent>
 
       <DialogActions>
-        <Button style={getTabStyle(logDialogState.selectedTab, 1)} onClick={(event) => treeApi.refreshTreeData()} disabled={asyncLog.isLoading}>
+        <Button disabled={asyncLog.isLoading} onClick={(event) => treeApi.refreshTreeData()} style={getTabStyle(logDialogState.selectedTab, 1)}>
           Refresh Tree
         </Button>
-        <Button style={getTabStyle(logDialogState.selectedTab, 2)} onClick={(event) => treeApi.refreshTreeData()} disabled={asyncLog.isLoading}>
+        <Button disabled={asyncLog.isLoading} onClick={(event) => treeApi.refreshTreeData()} style={getTabStyle(logDialogState.selectedTab, 2)}>
           Refresh Timeline
         </Button>
         <Button
+          disabled={asyncLog.isLoading}
           onClick={(event) => {
             if (asyncLog.log) {
               downloadJson(JSON.stringify(asyncLog.log, null, 2), `${asyncLog.log.correlation}.json`);
             }
             event.stopPropagation();
           }}
-          disabled={asyncLog.isLoading}
         >
           Download
         </Button>
         {asyncLog.log && (
-          <Button onClick={handleExecute} disabled={asyncLog.isLoading}>
+          <Button disabled={asyncLog.isLoading} onClick={handleExecute}>
             Execute
           </Button>
         )}

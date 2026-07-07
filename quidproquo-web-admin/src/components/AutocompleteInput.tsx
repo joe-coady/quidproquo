@@ -23,19 +23,19 @@ export const AutocompleteInput: React.FC<AutocompleteInputProps> = ({ label, val
   return (
     <FormControl fullWidth>
       <Autocomplete
-        options={options}
         getOptionLabel={(option) => option.label}
-        value={selectedValue}
         onChange={handleChange}
+        options={options}
         renderInput={(params) => (
           <TextField
             {...params}
-            label={label}
             InputLabelProps={{
               shrink: true,
             }}
+            label={label}
           />
         )}
+        value={selectedValue}
       />
     </FormControl>
   );

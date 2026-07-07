@@ -215,6 +215,23 @@ export const getCFExportNameWebsocketApiIdFromConfig = (websocketApiName: string
   return getQpqRuntimeResourceName(resourceName, application, service, environment, feature, 'websocket-api-id-export');
 };
 
+// SSM parameter holding a websocket api's AWS-generated id, written by the owning service's
+// inf stack. Referencing services resolve it at deploy time to build exact execute-api
+// grants (deploy the owning inf stack first - same owner-publishes/others-read pattern as
+// the domain certificate arn parameter).
+export const getWebsocketApiIdSsmParameterName = (websocketApiName: string, qpqConfig: QPQConfig) => {
+  const websocketApiConfig = qpqWebServerUtils.getWebsocketEntryByApiName(websocketApiName, qpqConfig);
+
+  const application = websocketApiConfig.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig);
+  const service = websocketApiConfig.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig);
+  const environment = websocketApiConfig.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
+  const feature = websocketApiConfig.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+
+  const resourceName = websocketApiConfig.owner?.resourceNameOverride || websocketApiName;
+
+  return `/qpq/websocket/api-id/${getConfigRuntimeResourceName(resourceName, application, service, environment, feature)}`;
+};
+
 export const getEventBusSnsTopicArn = (
   eventBusName: string,
   qpqConfig: QPQConfig,
@@ -233,6 +250,14 @@ export const getEventBusSnsTopicArn = (
 
   return `arn:aws:sns:${region}:${awsAccountId}:${topicName}`;
 };
+
+// The account stack owns account-level resources (cloud trail, budgets, security services)
+// so they never share an app's lifecycle. The name is deliberately static: stack names are
+// already namespaced per account+region, and the resources it holds meter/audit the whole
+// account - an app/environment segment would only fake a separation that doesn't exist.
+// Everything in one account converges on this one stack, so exactly ONE repo/config must
+// own it, and actor (feature) deploys must not deploy it.
+export const getAccountStackName = () => 'qpq-account';
 
 export const getBaseStackName = (qpqConfig: QPQConfig) => {
   const appName = qpqCoreUtils.getApplicationName(qpqConfig);
@@ -273,4 +298,18 @@ export const getBootstrapStackName = (qpqConfig: QPQConfig) => {
   }
 
   return `${baseName}-bs`;
+};
+
+export const getDomainStackName = (qpqConfig: QPQConfig) => {
+  const appName = qpqCoreUtils.getApplicationName(qpqConfig);
+  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
+  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+
+  const baseName = `${appName}-${environment}`;
+
+  if (feature) {
+    return `${baseName}-${feature}-domain`;
+  }
+
+  return `${baseName}-domain`;
 };

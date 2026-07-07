@@ -28,6 +28,9 @@ export function useThrottledMemo<T>(factory: () => T, deps: any[], delaySeconds:
         timeoutRef.current = null;
       }
     };
+    // The dependency list is supplied by the caller, so it can't be statically
+    // verified here — this hook is a throttled wrapper around useMemo semantics.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [...deps, delaySeconds]);
 
   return value;

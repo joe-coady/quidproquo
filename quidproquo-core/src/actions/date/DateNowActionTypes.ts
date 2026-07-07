@@ -1,4 +1,5 @@
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
+import { QpqIsoDateTime } from '../../types/QpqIsoDateTime';
 import { DateActionType } from './DateActionType';
 
 // Payload
@@ -10,5 +11,5 @@ export interface DateNowAction extends Action<DateNowActionPayload> {
 }
 
 // Function Types
-export type DateNowActionProcessor = ActionProcessor<DateNowAction, string>;
-export type DateNowActionRequester = ActionRequester<DateNowAction, string>;
+export type DateNowActionProcessor = ActionProcessor<DateNowAction, QpqIsoDateTime>;
+export type DateNowActionRequester = ActionRequester<DateNowAction, QpqIsoDateTime>;

@@ -5,7 +5,6 @@ import { QpqRuntimeDefinition } from './createQpqRuntimeDefinition';
 import { QpqApi } from './QpqMappedApi';
 import { useQpqRuntime } from './useQpqRuntime';
 
-
 type QpqRuntimeEffectCatcher = {
   runtime: QpqRuntimeDefinition<any, any, any>;
   name?: string;

@@ -8,6 +8,9 @@ export const overrides = {
     '@typescript-eslint/no-unused-vars': 'off',
     'prefer-const': 'off',
 
+    // Allow @ts-ignore, not just @ts-expect-error
+    '@typescript-eslint/ban-ts-comment': 'off',
+
     // Probably remove
     '@typescript-eslint/no-unnecessary-type-arguments': 'off',
     '@typescript-eslint/no-unnecessary-generics': 'off',

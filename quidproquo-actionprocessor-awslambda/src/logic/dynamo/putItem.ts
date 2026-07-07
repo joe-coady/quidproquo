@@ -7,6 +7,13 @@ import { buildAttributeValue } from './qpqDynamoOrm';
 
 export interface PutItemOptions {
   expires?: number;
+
+  // When set, the put becomes a conditional insert: it fails with
+  // ConditionalCheckFailedException if an item with the same primary key
+  // already exists. The value is the attribute name to condition on (any
+  // key attribute works — the condition evaluates against the item at the
+  // full primary key).
+  ifNotExistsAttribute?: string;
 }
 
 // We currently only support objects as root items in dynamo
@@ -47,6 +54,12 @@ export async function putItem<Item, T extends object = any>(
     new PutItemCommand({
       TableName: tableName,
       Item: convertObjectToDynamoItem(item as KvsObjectDataType),
+      ...(options.ifNotExistsAttribute
+        ? {
+            ConditionExpression: 'attribute_not_exists(#ineAttr)',
+            ExpressionAttributeNames: { '#ineAttr': options.ifNotExistsAttribute },
+          }
+        : {}),
     }),
   );
 }

@@ -1,5 +1,6 @@
 import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
 
+import { getUserDirectoryAssociateSoftwareTokenActionProcessor } from './getUserDirectoryAssociateSoftwareTokenActionProcessor';
 import { getUserDirectoryAuthenticateUserActionProcessor } from './getUserDirectoryAuthenticateUserActionProcessor';
 import { getUserDirectoryChangePasswordActionProcessor } from './getUserDirectoryChangePasswordActionProcessor';
 import { getUserDirectoryConfirmEmailVerificationActionProcessor } from './getUserDirectoryConfirmEmailVerificationActionProcessor';
@@ -23,6 +24,7 @@ export const getUserDirectoryActionProcessor: ActionProcessorListResolver = asyn
   qpqConfig: QPQConfig,
   dynamicModuleLoader: DynamicModuleLoader,
 ): Promise<ActionProcessorList> => ({
+  ...(await getUserDirectoryAssociateSoftwareTokenActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getUserDirectoryAuthenticateUserActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getUserDirectoryChangePasswordActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getUserDirectoryConfirmEmailVerificationActionProcessor(qpqConfig, dynamicModuleLoader)),

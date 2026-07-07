@@ -1,7 +1,7 @@
 import { WebEntryActionType } from 'quidproquo-webserver';
 
 const webserverWebEntryActionComponentMap: Record<string, string[]> = {
-  [WebEntryActionType.InvalidateCache]: ['askWebEntryInvalidateCache', 'entryName'],
+  [WebEntryActionType.InvalidateCache]: ['askWebEntryInvalidateCache', 'webEntryName', 'paths'],
 };
 
 export default webserverWebEntryActionComponentMap;

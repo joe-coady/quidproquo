@@ -1,16 +1,12 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import { qpqCoreUtils } from 'quidproquo-core';
-import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { Construct } from 'constructs';
 
-import {
-  BootstrapQpqCoreVirtualNetworkConstruct,
-  BootstrapQpqWebserverApiConstruct,
-  QpqBootstrapConfigAwsOrganizationConstruct,
-} from '../constructs';
+import { BootstrapQpqCoreVirtualNetworkConstruct, QpqBootstrapConfigAwsOrganizationConstruct, QpqBootstrapConfigWafConstruct } from '../constructs';
 import { BSQpqLambdaWarmerEventConstructConstruct } from '../constructs/basic/BSQpqLambdaWarmerEventConstruct';
 import { QpqServiceStack, QpqServiceStackProps } from './base/QpqServiceStack';
+import { WafCloudFrontWebAclStack } from './WafCloudFrontWebAclStack';
 
 export interface BootstrapQpqServiceStackProps extends QpqServiceStackProps {}
 
@@ -21,15 +17,6 @@ export class BootstrapQpqServiceStack extends QpqServiceStack {
     new BSQpqLambdaWarmerEventConstructConstruct(this, 'LambdaWarmer', {
       qpqConfig: props.qpqConfig,
     });
-
-    const apis = qpqWebServerUtils.getApiConfigs(props.qpqConfig).map(
-      (setting) =>
-        new BootstrapQpqWebserverApiConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
-          qpqConfig: props.qpqConfig,
-
-          apiConfig: setting,
-        }),
-    );
 
     const virtualNetworks = qpqCoreUtils.getVirualNetworkConfigs(props.qpqConfig).map(
       (setting) =>
@@ -48,5 +35,26 @@ export class BootstrapQpqServiceStack extends QpqServiceStack {
           awsOrganizationConfig: setting,
         }),
     );
+
+    // Account-level resources (cloud trail, budgets, security services) live in AccountQpqStack
+
+    const wafConfig = qpqConfigAwsUtils.getBootstrapWafConfig(props.qpqConfig);
+    if (wafConfig) {
+      // Regional web acl (api gateway) lives in this stack; the CLOUDFRONT-scope twin must
+      // live in us-east-1, so it is a sibling stack on the app scope (like the cert stacks)
+      // that deploys first via the dependency.
+      new QpqBootstrapConfigWafConstruct(this, 'waf', {
+        qpqConfig: props.qpqConfig,
+
+        wafConfig,
+      });
+
+      const cloudFrontWafStack = new WafCloudFrontWebAclStack(scope, `${id}-waf-cf`, {
+        qpqConfig: props.qpqConfig,
+        wafConfig,
+        stackName: `${this.stackName}-waf-cf`,
+      });
+      this.addDependency(cloudFrontWafStack);
+    }
   }
 }

@@ -3,8 +3,11 @@ import {
   ActionProcessorList,
   ActionProcessorListResolver,
   actionResult,
+  actionResultError,
+  actionResultErrorFromCaughtError,
   FileActionType,
   FileReadBinaryContentsActionProcessor,
+  FileReadBinaryContentsErrorTypeEnum,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -13,9 +16,17 @@ import { resolveStorageDriveBucketName } from './utils';
 
 const getProcessFileReadBinaryContents = (qpqConfig: QPQConfig): FileReadBinaryContentsActionProcessor => {
   return async ({ drive, filepath }) => {
-    const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
+    try {
+      const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
 
-    return actionResult(await readBinaryFile(s3BucketName, filepath, qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig)));
+      return actionResult(await readBinaryFile(s3BucketName, filepath, qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig)));
+    } catch (error: unknown) {
+      return actionResultErrorFromCaughtError(error, {
+        InvalidObjectState: () => actionResultError(FileReadBinaryContentsErrorTypeEnum.InvalidStorageClass, 'File is in the wrong storage class'),
+        NoSuchKey: () => actionResultError(FileReadBinaryContentsErrorTypeEnum.FileNotFound, `File not found: ${filepath}`),
+        NotFound: () => actionResultError(FileReadBinaryContentsErrorTypeEnum.FileNotFound, `File not found: ${filepath}`),
+      });
+    }
   };
 };
 

@@ -1,124 +1,123 @@
-import { expectGenerator } from 'quidproquo-testing'
+import { expectGenerator } from 'quidproquo-testing';
 
-import { describe, expect,it } from 'vitest'
+import { describe, expect, it } from 'vitest';
 
-import { ConfigActionType } from './ConfigActionType'
-import { askConfigGetGlobal } from './ConfigGetGlobalActionRequester'
+import { ConfigActionType } from './ConfigActionType';
+import { askConfigGetGlobal } from './ConfigGetGlobalActionRequester';
 
 describe('ConfigGetGlobalActionRequester', () => {
   describe('askConfigGetGlobal', () => {
     it('should yield an action with correct type and payload', () => {
-      const globalName = 'myGlobalVar'
-      
-      expectGenerator(askConfigGetGlobal(globalName))
-        .toYield({
-          type: ConfigActionType.GetGlobal,
-          payload: { globalName }
-        })
-    })
+      const globalName = 'myGlobalVar';
+
+      expectGenerator(askConfigGetGlobal(globalName)).toYield({
+        type: ConfigActionType.GetGlobal,
+        payload: { globalName },
+      });
+    });
 
     it('should return the value passed to next()', () => {
-      const globalName = 'testGlobal'
-      const mockGlobalValue = { key: 'value', data: 123 }
-      
+      const globalName = 'testGlobal';
+      const mockGlobalValue = { key: 'value', data: 123 };
+
       expectGenerator(askConfigGetGlobal(globalName))
         .toYield({
           type: ConfigActionType.GetGlobal,
-          payload: { globalName }
+          payload: { globalName },
         })
         .whenGiven(mockGlobalValue)
-        .thenReturn(mockGlobalValue)
-    })
+        .thenReturn(mockGlobalValue);
+    });
 
     it('should handle typed globals', () => {
       interface MyGlobalType {
-        id: number
-        name: string
-        active: boolean
+        id: number;
+        name: string;
+        active: boolean;
       }
-      
-      const globalName = 'typedGlobal'
-      const mockValue: MyGlobalType = { id: 1, name: 'Test', active: true }
-      
+
+      const globalName = 'typedGlobal';
+      const mockValue: MyGlobalType = { id: 1, name: 'Test', active: true };
+
       expectGenerator(askConfigGetGlobal<MyGlobalType>(globalName))
         .toYield({
           type: ConfigActionType.GetGlobal,
-          payload: { globalName }
+          payload: { globalName },
         })
         .whenGiven(mockValue)
-        .thenReturn(mockValue)
-    })
+        .thenReturn(mockValue);
+    });
 
     it('should handle string global values', () => {
-      const globalName = 'stringGlobal'
-      const mockValue = 'simple string value'
-      
+      const globalName = 'stringGlobal';
+      const mockValue = 'simple string value';
+
       expectGenerator(askConfigGetGlobal<string>(globalName))
         .toYield({
           type: ConfigActionType.GetGlobal,
-          payload: { globalName }
+          payload: { globalName },
         })
         .whenGiven(mockValue)
-        .thenReturn(mockValue)
-    })
+        .thenReturn(mockValue);
+    });
 
     it('should handle number global values', () => {
-      const globalName = 'numberGlobal'
-      const mockValue = 42
-      
+      const globalName = 'numberGlobal';
+      const mockValue = 42;
+
       expectGenerator(askConfigGetGlobal<number>(globalName))
         .toYield({
           type: ConfigActionType.GetGlobal,
-          payload: { globalName }
+          payload: { globalName },
         })
         .whenGiven(mockValue)
-        .thenReturn(mockValue)
-    })
+        .thenReturn(mockValue);
+    });
 
     it('should handle array global values', () => {
-      const globalName = 'arrayGlobal'
-      const mockValue = [1, 2, 3, 4, 5]
-      
+      const globalName = 'arrayGlobal';
+      const mockValue = [1, 2, 3, 4, 5];
+
       expectGenerator(askConfigGetGlobal<number[]>(globalName))
         .toYield({
           type: ConfigActionType.GetGlobal,
-          payload: { globalName }
+          payload: { globalName },
         })
         .whenGiven(mockValue)
-        .thenReturn(mockValue)
-    })
+        .thenReturn(mockValue);
+    });
 
     it('should handle null and undefined values', () => {
-      const globalName = 'nullableGlobal'
-      
+      const globalName = 'nullableGlobal';
+
       expectGenerator(askConfigGetGlobal(globalName))
         .toYield({
           type: ConfigActionType.GetGlobal,
-          payload: { globalName }
+          payload: { globalName },
         })
         .whenGiven(null)
-        .thenReturn(null)
-      
+        .thenReturn(null);
+
       expectGenerator(askConfigGetGlobal(globalName))
         .toYield({
           type: ConfigActionType.GetGlobal,
-          payload: { globalName }
+          payload: { globalName },
         })
         .whenGiven(undefined)
-        .thenReturn(undefined)
-    })
+        .thenReturn(undefined);
+    });
 
     it('should handle global names with special characters', () => {
-      const globalName = 'global.name-with_special/chars'
-      const mockValue = { special: 'value' }
-      
+      const globalName = 'global.name-with_special/chars';
+      const mockValue = { special: 'value' };
+
       expectGenerator(askConfigGetGlobal(globalName))
         .toYield({
           type: ConfigActionType.GetGlobal,
-          payload: { globalName }
+          payload: { globalName },
         })
         .whenGiven(mockValue)
-        .thenReturn(mockValue)
-    })
-  })
-})
+        .thenReturn(mockValue);
+    });
+  });
+});

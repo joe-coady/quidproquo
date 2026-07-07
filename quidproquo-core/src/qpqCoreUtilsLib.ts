@@ -3,6 +3,6 @@ import * as qpqCoreUtilsLib from './qpqCoreUtils';
 
 // TODO: Cleanup util exports
 export const qpqCoreUtils = {
-    ...qpqCoreUtilsLib,
-    ...moreUtils
+  ...qpqCoreUtilsLib,
+  ...moreUtils,
 };

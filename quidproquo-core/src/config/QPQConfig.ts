@@ -17,12 +17,15 @@ export enum QPQCoreConfigSettingType {
   keyValueStore = '@quidproquo-core/config/KeyValueStore',
   configValue = '@quidproquo-core/config/ConfigValue',
   environmentSettings = '@quidproquo-core/config/EnvironmentSettings',
+  serviceSettings = '@quidproquo-core/config/ServiceSettings',
   deployEvent = '@quidproquo-core/config/DeployEvent',
   claudeAi = '@quidproquo-core/config/ClaudeAi',
   graphDatabase = '@quidproquo-core/config/GraphDatabase',
   virtualNetwork = '@quidproquo-core/config/VirtualNetwork',
   notifyError = '@quidproquo-core/config/notifyError',
   inlineFunction = '@quidproquo-core/config/InlineFunction',
+  javascriptRuntime = '@quidproquo-core/config/JavascriptRuntime',
+  federatedModuleStore = '@quidproquo-core/config/FederatedModuleStore',
 }
 
 export interface QPQConfigSetting {

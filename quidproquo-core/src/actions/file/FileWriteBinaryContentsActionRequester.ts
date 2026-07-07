@@ -1,6 +1,12 @@
+import { createErrorEnumForAction } from '../../types';
 import { QPQBinaryData } from '../../types/QPQBinaryData';
 import { FileActionType, StorageDriveAdvancedWriteOptions } from './FileActionType';
 import { FileWriteBinaryContentsActionRequester } from './FileWriteBinaryContentsActionTypes';
+
+export const FileWriteBinaryContentsErrorTypeEnum = createErrorEnumForAction(FileActionType.WriteBinaryContents, [
+  'AccessDenied', // caller lacks permission to write the file
+  'DriveNotFound', // storage drive does not exist
+]);
 
 export function* askFileWriteBinaryContents(
   drive: string,

@@ -12,7 +12,7 @@ export const CoreContextListCustomAction: ActionComponent<ContextListActionPaylo
   return (
     <Box sx={{ width: '100%', my: 1 }}>
       <pre style={genericFunctionRendererStyles.pre}>
-        <AnyVariableView value={result} expanded={expanded} />
+        <AnyVariableView expanded={expanded} value={result} />
       </pre>
     </Box>
   );

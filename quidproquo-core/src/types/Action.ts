@@ -14,6 +14,7 @@ export interface Action<T> {
 
   returnErrors?: boolean;
   context?: QpqContext<any>;
+  localContext?: QpqContext<any>;
 }
 
 // Result tuple ~ Either result or error

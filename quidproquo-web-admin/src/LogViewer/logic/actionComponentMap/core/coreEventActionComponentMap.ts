@@ -6,6 +6,10 @@ const coreEventActionComponentMap: Record<string, string[]> = {
   [EventActionType.AutoRespond]: ['askEventAutoRespond', 'qpqEventRecord', 'matchResult'],
   [EventActionType.MatchStory]: ['askEventMatchStory', 'qpqEventRecord', 'eventParams'],
   [EventActionType.GetRecords]: ['askEventGetRecords', 'eventParams'],
+  [EventActionType.TransformEventRecord]: ['askEventTransformEventRecord', 'eventRecord'],
+  [EventActionType.TransformEventRecordResponse]: ['askEventTransformEventRecordResponse', 'eventRecord'],
+  [EventActionType.GetStorySession]: ['askEventGetStorySession', 'eventParams', 'qpqEventRecord', 'matchStoryResult'],
+  [EventActionType.ResolveCaughtError]: ['askEventResolveCaughtError', 'error'],
 };
 
 export default coreEventActionComponentMap;

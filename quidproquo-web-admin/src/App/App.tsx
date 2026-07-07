@@ -7,6 +7,8 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import { Auth } from '../Auth/Auth';
 import { MainLayout } from '../components';
+import { LoadFederatedAddons } from '../FederatedAddon';
+import { FederatedAddonProvider } from '../FederatedAddonProvider';
 import { BaseUrls, baseUrlsContext } from '../platformLogic/contexts';
 import { LoadingProvider } from '../view';
 import { WebSocketAuthProvider } from '../WebSocketAuthProvider';
@@ -19,9 +21,13 @@ const darkTheme = createTheme({
 
 export type AppProps = {
   urlResolvers: BaseUrlResolvers;
+
+  // Optional hook for the host application to federate / load admin addons.
+  // When omitted, no addons are loaded.
+  loadAddons?: LoadFederatedAddons;
 };
 
-export const App: React.FC<AppProps> = ({ urlResolvers }) => {
+export const App: React.FC<AppProps> = ({ urlResolvers, loadAddons }) => {
   const baseUrls: BaseUrls = useMemo(
     () => ({
       api: urlResolvers.getApiUrl(),
@@ -40,7 +46,9 @@ export const App: React.FC<AppProps> = ({ urlResolvers }) => {
               <Auth>
                 <WebsocketProvider wsUrl={urlResolvers.getWsUrl()}>
                   <WebSocketAuthProvider>
-                    <MainLayout />
+                    <FederatedAddonProvider loadAddons={loadAddons}>
+                      <MainLayout />
+                    </FederatedAddonProvider>
                   </WebSocketAuthProvider>
                 </WebsocketProvider>
               </Auth>

@@ -1,11 +1,13 @@
-import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
+import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
+import { AwsDataStoreRemovalPolicy, qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import { KeyValueStoreQPQConfigSetting, KvsKey, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
-import { aws_dynamodb, aws_iam } from 'aws-cdk-lib';
+import { aws_dynamodb, aws_iam, aws_kms } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import * as qpqDeployAwsCdkUtils from '../../../../utils/qpqDeployAwsCdkUtils';
+import { createDefaultResourceAlarm } from '../../../base/createDefaultResourceAlarm';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../../../base/QpqConstructBlock';
 
 export interface QpqCoreKeyValueStoreConstructProps extends QpqConstructBlockProps {
@@ -62,21 +64,56 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
   constructor(scope: Construct, id: string, props: QpqCoreKeyValueStoreConstructProps) {
     super(scope, id, props);
 
+    const dataStoreRemovalPolicy = qpqConfigAwsUtils.getAwsDataStoreRemovalPolicy(props.qpqConfig);
+
     const [primarySortKey] = props.keyValueStoreConfig.sortKeys;
+
+    let tableEncryption: aws_dynamodb.TableEncryption | undefined;
+    let encryptionKey: aws_kms.IKey | undefined;
+    if (props.keyValueStoreConfig.encryption) {
+      const kmsCfg = qpqConfigAwsUtils.getAwsKmsKeyForKeyValueStore(props.qpqConfig, props.keyValueStoreConfig);
+      if (kmsCfg) {
+        encryptionKey = aws_kms.Key.fromKeyArn(this, 'enc-key', kmsCfg.arn);
+        tableEncryption = aws_dynamodb.TableEncryption.CUSTOMER_MANAGED;
+      } else {
+        tableEncryption = aws_dynamodb.TableEncryption.AWS_MANAGED;
+      }
+    }
 
     const table = new aws_dynamodb.Table(this, 'table', {
       tableName: this.qpqResourceName(props.keyValueStoreConfig.keyValueStoreName, 'kvs'),
       partitionKey: convertKvsKeyToDynamodbAttribute(props.keyValueStoreConfig.partitionKey),
       sortKey: primarySortKey && convertKvsKeyToDynamodbAttribute(primarySortKey),
       billingMode: aws_dynamodb.BillingMode.PAY_PER_REQUEST,
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      // Retain data stores by default; dev configs opt into full teardown via defineAwsDataStoreRemovalPolicy(destroy).
+      // When retained, deletionProtection also blocks deletes/replacements outright (RETAIN alone only orphans the table).
+      removalPolicy: dataStoreRemovalPolicy === AwsDataStoreRemovalPolicy.destroy ? cdk.RemovalPolicy.DESTROY : cdk.RemovalPolicy.RETAIN,
+      deletionProtection: dataStoreRemovalPolicy === AwsDataStoreRemovalPolicy.retain,
       timeToLiveAttribute: props.keyValueStoreConfig.ttlAttribute,
-      pointInTimeRecoverySpecification: props.keyValueStoreConfig.enableMonthlyRollingBackups
-        ? { pointInTimeRecoveryEnabled: true }
-        : undefined,
+      // PITR on by default (35-day continuous backups / point-in-time restore); opt out per-table via config.
+      pointInTimeRecoverySpecification: { pointInTimeRecoveryEnabled: !props.keyValueStoreConfig.disablePointInTimeRecovery },
+      encryption: tableEncryption,
+      encryptionKey,
     });
 
     qpqDeployAwsCdkUtils.applyEnvironmentTags(table, props.qpqConfig);
+
+    // Default alarms (opt-in via defineNotifyError): read/write throttling means
+    // the table is rejecting requests (hot partition / capacity), user-visible.
+    createDefaultResourceAlarm(this, props.qpqConfig, {
+      id: 'default-alarm-read-throttle',
+      alarmName: this.resourceName(`${props.keyValueStoreConfig.keyValueStoreName}-read-throttle`),
+      metric: table.metric('ReadThrottleEvents', { period: cdk.Duration.minutes(1), statistic: 'Sum' }),
+      threshold: 1,
+      evaluationPeriods: 1,
+    });
+    createDefaultResourceAlarm(this, props.qpqConfig, {
+      id: 'default-alarm-write-throttle',
+      alarmName: this.resourceName(`${props.keyValueStoreConfig.keyValueStoreName}-write-throttle`),
+      metric: table.metric('WriteThrottleEvents', { period: cdk.Duration.minutes(1), statistic: 'Sum' }),
+      threshold: 1,
+      evaluationPeriods: 1,
+    });
 
     // Do local secondary indexes
     for (let i = 1; i < props.keyValueStoreConfig.sortKeys.length; i++) {
@@ -108,13 +145,47 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
     }
   }
 
-  public static authorizeActionsForRole(role: aws_iam.IRole, kvsList: QpqCoreKeyValueStoreConstruct[]) {
-    if (kvsList.length > 0) {
+  public static authorizeActionsForRole(role: aws_iam.IRole, qpqConfig: QPQConfig, ownedKvsList: QpqCoreKeyValueStoreConstruct[]) {
+    // CDK-known ARNs for tables created in this stack (+ GSI ARNs).
+    const ownedArns = ownedKvsList.flatMap((kvs) => [kvs.table.tableArn, `${kvs.table.tableArn}/index/*`]);
+
+    // Deterministically-computed ARNs for KVSs declared in this service's
+    // config but owned by another service. Uses the same naming path as
+    // `getKvsDynamoTableNameFromConfig` so no CDK cross-stack ref is created.
+    const allKvsConfigs = qpqCoreUtils.getAllKeyValueStores(qpqConfig);
+    const ownedKvsConfigs = qpqCoreUtils.getOwnedKeyValueStores(qpqConfig);
+    const foreignKvsConfigs = allKvsConfigs.filter((cfg) => !ownedKvsConfigs.includes(cfg));
+
+    const foreignArns = foreignKvsConfigs.flatMap((cfg) => {
+      const tableName = awsNamingUtils.getKvsDynamoTableNameFromConfig(cfg.keyValueStoreName, qpqConfig, 'kvs');
+      const tableArn = `arn:aws:dynamodb:*:*:table/${tableName}`;
+      return [tableArn, `${tableArn}/index/*`];
+    });
+
+    const resources = [...ownedArns, ...foreignArns];
+    if (resources.length === 0) return;
+
+    role.addToPrincipalPolicy(
+      new aws_iam.PolicyStatement({
+        effect: aws_iam.Effect.ALLOW,
+        actions: ['dynamodb:GetItem', 'dynamodb:PutItem', 'dynamodb:Query', 'dynamodb:Scan', 'dynamodb:UpdateItem', 'dynamodb:DeleteItem'],
+        resources,
+      }),
+    );
+
+    // Grant KMS permissions for any encrypted KVSs (owned or foreign) whose
+    // customer-managed key is declared in this service's config.
+    const kmsArns = [...ownedKvsConfigs, ...foreignKvsConfigs]
+      .filter((cfg) => cfg.encryption)
+      .map((cfg) => qpqConfigAwsUtils.getAwsKmsKeyForKeyValueStore(qpqConfig, cfg)?.arn)
+      .filter((arn): arn is string => Boolean(arn));
+
+    if (kmsArns.length > 0) {
       role.addToPrincipalPolicy(
         new aws_iam.PolicyStatement({
           effect: aws_iam.Effect.ALLOW,
-          actions: ['dynamodb:GetItem', 'dynamodb:PutItem', 'dynamodb:Query', 'dynamodb:Scan', 'dynamodb:UpdateItem', 'dynamodb:DeleteItem'],
-          resources: kvsList.map((kvs) => kvs.table.tableArn),
+          actions: ['kms:Decrypt', 'kms:GenerateDataKey*', 'kms:DescribeKey', 'kms:Encrypt', 'kms:ReEncrypt*'],
+          resources: [...new Set(kmsArns)],
         }),
       );
     }

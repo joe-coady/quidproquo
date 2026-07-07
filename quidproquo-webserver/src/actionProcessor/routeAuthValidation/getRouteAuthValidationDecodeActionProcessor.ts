@@ -2,13 +2,13 @@ import {
   ActionProcessorList,
   ActionProcessorListResolver,
   actionResult,
+  generateUuid,
   getProcessCustomImplementation,
   QPQConfig,
 } from 'quidproquo-core';
 
 import { RouteAuthValidationActionType, RouteAuthValidationDecodeActionProcessor } from '../../actions/routeAuthValidation';
 import { askRouteAuthValidationDecodeDefault } from '../../stories/askRouteAuthValidationDecodeDefault';
-import { generateUUID } from '../../utils/uuidUtils';
 
 const getProcessRouteAuthValidationDecode = (qpqConfig: QPQConfig): RouteAuthValidationDecodeActionProcessor => {
   const decodeAuth = getProcessCustomImplementation<RouteAuthValidationDecodeActionProcessor>(
@@ -17,7 +17,7 @@ const getProcessRouteAuthValidationDecode = (qpqConfig: QPQConfig): RouteAuthVal
     'Route Auth Validation Decode',
     null,
     () => new Date().toISOString(),
-    generateUUID,
+    generateUuid,
   );
 
   return async (payload, session, actionProcessorList, logger, updateSession, dynamicModuleLoader, streamRegistry) => {

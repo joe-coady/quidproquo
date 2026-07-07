@@ -45,11 +45,7 @@ export const kvsSetIfNotExists = (attributePath: KvsAttributePath, value: KvsAdv
  * @param incrementBy - The amount to increment by
  * @param defaultValue - The initial value if the attribute doesn't exist (default: 0)
  */
-export const kvsIncrement = (
-  attributePath: KvsAttributePath,
-  incrementBy: number,
-  defaultValue: number = 0,
-): KvsUpdateAction => ({
+export const kvsIncrement = (attributePath: KvsAttributePath, incrementBy: number, defaultValue: number = 0): KvsUpdateAction => ({
   attributePath,
   action: KvsUpdateActionType.Increment,
   value: incrementBy,
@@ -64,11 +60,7 @@ export const kvsIncrement = (
  * @param decrementBy - The amount to decrement by
  * @param defaultValue - The initial value if the attribute doesn't exist (default: 0)
  */
-export const kvsDecrement = (
-  attributePath: KvsAttributePath,
-  decrementBy: number,
-  defaultValue: number = 0,
-): KvsUpdateAction => ({
+export const kvsDecrement = (attributePath: KvsAttributePath, decrementBy: number, defaultValue: number = 0): KvsUpdateAction => ({
   attributePath,
   action: KvsUpdateActionType.Increment,
   value: -decrementBy,

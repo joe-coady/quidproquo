@@ -60,16 +60,16 @@ export function TopSection({ onSearch }: TopSectionProps) {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <Grid container columns={12} spacing={2}>
+      <Grid columns={12} container spacing={2}>
         <Grid item xs={2}>
           <FormControl fullWidth>
             <InputLabel id="runtime-select-label">Runtime Type</InputLabel>
             <Select
-              labelId="runtime-select-label"
               id="demo-simple-select"
-              value={runtimeType}
               label="Runtime Type"
+              labelId="runtime-select-label"
               onChange={handleRuntimeTypeOnChange}
+              value={runtimeType}
             >
               {RuntimeTypes.map((key) => (
                 <MenuItem key={key} value={key}>
@@ -83,30 +83,30 @@ export function TopSection({ onSearch }: TopSectionProps) {
           <FormControl fullWidth>
             <Autocomplete
               getOptionLabel={(option) => option.label}
-              options={serviceOptions}
-              value={serviceOptions.find((o) => o.value === service) || null}
               onChange={handleServiceOnChange}
+              options={serviceOptions}
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="Service Name"
                   InputLabelProps={{
                     shrink: true,
                   }}
+                  label="Service Name"
                 />
               )}
+              value={serviceOptions.find((o) => o.value === service) || null}
             />
           </FormControl>
         </Grid>
         <Grid item xs={2}>
           <Box position="relative">
             <FormControl fullWidth>
-              <DateTimePicker label="Start DateTime" value={startDate} onChange={handleStartDateChange} />
+              <DateTimePicker label="Start DateTime" onChange={handleStartDateChange} value={startDate} />
             </FormControl>
             <IconButton
-              aria-label="quick time select"
               aria-controls="quick-time-menu"
               aria-haspopup="true"
+              aria-label="quick time select"
               onClick={handleQuickTimeClick}
               sx={{
                 position: 'absolute',
@@ -121,55 +121,55 @@ export function TopSection({ onSearch }: TopSectionProps) {
         </Grid>
         <Grid item xs={2}>
           <FormControl fullWidth>
-            <DateTimePicker label="End DateTime" value={endDate} onChange={handleEndDateChange} />
+            <DateTimePicker label="End DateTime" onChange={handleEndDateChange} value={endDate} />
           </FormControl>
         </Grid>
         <Grid item xs={4}>
           <FormControl fullWidth>
             <TextField
+              InputLabelProps={{
+                shrink: true,
+              }}
               label="User"
-              value={user}
               onChange={handleUserOnChange}
-              InputLabelProps={{
-                shrink: true,
-              }}
+              value={user}
             />
           </FormControl>
         </Grid>
         <Grid item xs={6}>
           <FormControl fullWidth>
             <TextField
+              InputLabelProps={{
+                shrink: true,
+              }}
               label="Info"
-              value={info}
               onChange={handleInfoOnChange}
-              InputLabelProps={{
-                shrink: true,
-              }}
+              value={info}
             />
           </FormControl>
         </Grid>
         <Grid item xs={6}>
           <FormControl fullWidth>
             <TextField
-              label="Error Filter"
-              value={error}
-              onChange={handleErrorOnChange}
               InputLabelProps={{
                 shrink: true,
               }}
+              label="Error Filter"
+              onChange={handleErrorOnChange}
+              value={error}
             />
           </FormControl>
         </Grid>
         <Grid item xs={10}>
           <FormControl fullWidth>
             <TextField
-              label="Deep Search"
-              value={deep}
-              onChange={handleDeepOnChange}
-              placeholder="Use with caution, reduce results with above fields first, this is a contains search on the log JSON, so it will be slow."
               InputLabelProps={{
                 shrink: true,
               }}
+              label="Deep Search"
+              onChange={handleDeepOnChange}
+              placeholder="Use with caution, reduce results with above fields first, this is a contains search on the log JSON, so it will be slow."
+              value={deep}
             />
           </FormControl>
         </Grid>
@@ -177,7 +177,7 @@ export function TopSection({ onSearch }: TopSectionProps) {
           <AsyncButton onClick={() => onSearch()}>Search</AsyncButton>
         </Grid>
       </Grid>
-      <Menu id="quick-time-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleQuickTimeClose}>
+      <Menu anchorEl={anchorEl} id="quick-time-menu" keepMounted onClose={handleQuickTimeClose} open={Boolean(anchorEl)}>
         <MenuItem onClick={() => handleQuickTimeSelect(5)}>Last 5 minutes</MenuItem>
         <MenuItem onClick={() => handleQuickTimeSelect(30)}>Last 30 minutes</MenuItem>
         <MenuItem onClick={() => handleQuickTimeSelect(1 * 60)}>Last hour</MenuItem>

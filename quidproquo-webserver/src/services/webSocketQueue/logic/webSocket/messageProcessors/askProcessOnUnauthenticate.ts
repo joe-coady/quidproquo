@@ -1,11 +1,14 @@
-import { AnyEventMessage, AskResponse } from 'quidproquo-core';
+import { AskResponse } from 'quidproquo-core';
 
 import { webSocketConnectionData } from '../../../data';
 import {
   AnyWebSocketQueueEventMessageWithCorrelation,
   WebSocketQueueClientEventMessageUnauthenticate,
   WebSocketQueueClientMessageEventType,
+  WebSocketQueueServerEventMessageUnauthenticated,
+  WebSocketQueueServerMessageEventType,
 } from '../../../types';
+import { askSendMessage } from '../askSendMessage';
 
 export function isWebSocketUnauthenticateMessage(
   event: AnyWebSocketQueueEventMessageWithCorrelation,
@@ -25,4 +28,8 @@ export function* askProcessOnUnauthenticate(connectionId: string): AskResponse<v
   if (connection) {
     yield* webSocketConnectionData.askUpsert(connectionWithNoUserInfo);
   }
+
+  yield* askSendMessage(connectionId, {
+    type: WebSocketQueueServerMessageEventType.Unauthenticated,
+  } satisfies WebSocketQueueServerEventMessageUnauthenticated);
 }

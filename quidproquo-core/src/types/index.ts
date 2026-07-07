@@ -20,6 +20,7 @@ export * from './Nullable';
 export * from './QPQBinaryData';
 export * from './QpqContextIdentifier';
 export * from './QpqFunctionRuntime';
+export * from './QpqIsoDateTime';
 export * from './QpqLogger';
 export * from './QpqPagedData';
 export * from './QueueEvent';

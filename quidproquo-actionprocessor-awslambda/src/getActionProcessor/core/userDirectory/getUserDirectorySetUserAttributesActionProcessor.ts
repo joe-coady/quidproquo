@@ -3,9 +3,12 @@ import {
   ActionProcessorList,
   ActionProcessorListResolver,
   actionResult,
+  actionResultError,
+  actionResultErrorFromCaughtError,
   QPQConfig,
   UserDirectoryActionType,
   UserDirectorySetUserAttributesActionProcessor,
+  UserDirectorySetUserAttributesErrorTypeEnum,
 } from 'quidproquo-core';
 
 import { getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
@@ -21,9 +24,23 @@ const getProcessSetUserAttributes = (qpqConfig: QPQConfig): UserDirectorySetUser
 
     const resolvedUsername = await resolveUsernameByPreferredUsername(userPoolId, region, username);
 
-    await setUserAttributes(userPoolId, region, resolvedUsername, userAttributes);
+    try {
+      await setUserAttributes(userPoolId, region, resolvedUsername, userAttributes);
 
-    return actionResult(void 0);
+      return actionResult(void 0);
+    } catch (error: unknown) {
+      return actionResultErrorFromCaughtError(error, {
+        UserNotFoundException: () => actionResultError(UserDirectorySetUserAttributesErrorTypeEnum.UserNotFound, 'No account found for this user'),
+        InvalidParameterException: () =>
+          actionResultError(UserDirectorySetUserAttributesErrorTypeEnum.InvalidAttributes, 'One or more attributes are invalid'),
+        AliasExistsException: () =>
+          actionResultError(UserDirectorySetUserAttributesErrorTypeEnum.AliasExists, 'That email or phone number is already in use'),
+        LimitExceededException: () =>
+          actionResultError(UserDirectorySetUserAttributesErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
+        TooManyRequestsException: () =>
+          actionResultError(UserDirectorySetUserAttributesErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
+      });
+    }
   };
 };
 

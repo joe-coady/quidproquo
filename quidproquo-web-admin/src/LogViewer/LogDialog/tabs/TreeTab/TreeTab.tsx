@@ -27,9 +27,9 @@ export const TreeTab: React.FC<TreeTabProps> = ({
 
   return (
     <LogCorrelations
+      isVisible={isVisible}
       logCorrelation={log.logCorrelation}
       setSelectedLogCorrelation={setSelectedLogCorrelation}
-      isVisible={isVisible}
       treeApi={treeApi}
     />
   );

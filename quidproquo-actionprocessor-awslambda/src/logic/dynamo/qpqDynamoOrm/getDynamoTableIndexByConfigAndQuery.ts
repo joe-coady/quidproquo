@@ -18,13 +18,19 @@ export const getDynamoTableIndexByConfigAndQuery = <T extends object = any>(
 
   const queriedKeys = extractKeysFromQuery(query);
 
-  // Find a matching index
+  // If the query includes the primary sort key, the primary table is a direct match —
+  // prefer it over any GSI so we never land on a GSI with a non-SK condition.
+  const primarySortKey = setting.sortKeys[0]?.key;
+  if (primarySortKey && queriedKeys.includes(primarySortKey)) {
+    return undefined;
+  }
+
+  // Find a GSI whose partition key is in the query.
   for (const index of setting.indexes) {
     if (queriedKeys.includes(index.partitionKey.key)) {
       return index.partitionKey.key;
     }
   }
 
-  // No matching index found
   return undefined;
 };

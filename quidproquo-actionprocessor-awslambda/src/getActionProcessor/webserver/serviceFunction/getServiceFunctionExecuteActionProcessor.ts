@@ -8,6 +8,7 @@ import {
   QPQConfig,
   qpqCoreUtils,
   StorySession,
+  toCrossServiceSession,
 } from 'quidproquo-core';
 import { ExecuteServiceFunctionEvent, ServiceFunctionActionType, ServiceFunctionExecuteActionProcessor } from 'quidproquo-webserver';
 
@@ -31,7 +32,7 @@ const getProcessExecute = (qpqConfig: QPQConfig): ServiceFunctionExecuteActionPr
     const serviceFunctionEvent: AnyExecuteServiceFunctionEventWithSession = {
       functionName: functionName,
       payload: payload,
-      storySession: session,
+      storySession: toCrossServiceSession(session),
     };
 
     const result = await executeLambdaByName<EitherActionResult<any>>(awsFunctionName, region, serviceFunctionEvent, isAsync);

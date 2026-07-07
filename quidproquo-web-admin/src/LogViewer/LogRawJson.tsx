@@ -9,7 +9,7 @@ interface LogRawJsonProps {
 export const LogRawJson = ({ log }: LogRawJsonProps) => {
   return (
     <Box sx={{ width: 1, p: 2 }}>
-      <Typography variant="h6" gutterBottom>
+      <Typography gutterBottom variant="h6">
         Raw JSON
       </Typography>
       <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{JSON.stringify(log, null, 2)}</pre>

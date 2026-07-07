@@ -9,6 +9,11 @@ const coreFileActionComponentMap: Record<string, string[]> = {
   [FileActionType.ReadBinaryContents]: ['askFileReadBinaryContents', 'drive', 'filepath'],
   [FileActionType.WriteBinaryContents]: ['askFileWriteBinaryContents', 'drive', 'filepath', 'data', 'storageDriveAdvancedWriteOptions'],
   [FileActionType.GenerateTemporarySecureUrl]: ['askFileGenerateTemporarySecureUrl', 'drive', 'filepath', 'expirationMs'],
+  [FileActionType.GenerateTemporaryUploadSecureUrl]: ['askFileGenerateTemporaryUploadSecureUrl', 'drive', 'filepath', 'expirationMs', 'contentType'],
+  [FileActionType.ReadObjectJson]: ['askFileReadObjectJson', 'drive', 'filepath'],
+  [FileActionType.WriteObjectJson]: ['askFileWriteObjectJson', 'drive', 'filepath', 'data', 'storageDriveAdvancedWriteOptions'],
+  [FileActionType.IsColdStorage]: ['askFileIsColdStorage', 'drive', 'filepath'],
+  [FileActionType.StreamOpen]: ['askFileStreamOpen', 'drive', 'filepath', 'encoding', 'chunkSize'],
 };
 
 export default coreFileActionComponentMap;

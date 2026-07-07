@@ -1,5 +1,13 @@
 import { CrossModuleOwner } from '../../types';
 
+/**
+ * True when two cross-module owners refer to the same owning module identity
+ * (module/application/feature/environment). Ignores any resource-name-override
+ * key — that's a name, not part of the owner identity.
+ */
+export const isSameCrossModuleOwner = (a?: CrossModuleOwner, b?: CrossModuleOwner): boolean =>
+  a?.module === b?.module && a?.application === b?.application && a?.feature === b?.feature && a?.environment === b?.environment;
+
 export const convertCrossModuleOwnerToGenericResourceNameOverride = <T extends string>(
   owner?: CrossModuleOwner<T>,
 ): CrossModuleOwner<'resourceNameOverride'> | undefined => {

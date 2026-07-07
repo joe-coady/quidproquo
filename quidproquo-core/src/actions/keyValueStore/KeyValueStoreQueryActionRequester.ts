@@ -1,6 +1,12 @@
+import { createErrorEnumForAction } from '../../types';
 import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 import { KeyValueStoreQueryActionRequester, KeyValueStoreQueryOptions } from './KeyValueStoreQueryActionTypes';
 import { KvsQueryOperation } from './types';
+
+export const KeyValueStoreQueryErrorTypeEnum = createErrorEnumForAction(KeyValueStoreActionType.Query, [
+  'ServiceUnavailable', // DynamoDB internal error / throttling
+  'ResourceNotFound', // the underlying table does not exist
+]);
 
 export function* askKeyValueStoreQuery<KvsItem>(
   keyValueStoreName: string,

@@ -1,4 +1,4 @@
-import { getCustomActionActionProcessor } from 'quidproquo-actionprocessor-node';
+import { getCustomActionActionProcessor } from 'quidproquo-actionprocessor-js';
 import {
   ActionProcessorListResolver,
   askProcessEvent,
@@ -16,6 +16,7 @@ import { randomUUID } from 'crypto';
 import { getDevServerActionProcessors, getExpressApiEventEventProcessor } from '../actionProcessor';
 import { getDevServerLogger } from '../implementations/logger';
 import { ResolvedDevServerConfig } from '../types';
+import { withProcessorDelay } from './withProcessorDelay';
 
 // TODO: Make this a util or something based on server time or something..
 const getDateNow = () => new Date().toISOString();
@@ -37,13 +38,17 @@ export const processEvent = async <E, ER>(
   const resolveStory = createRuntime(
     qpqConfig,
     storySession,
-    async () => ({
-      ...(await getDevServerActionProcessors(qpqConfig, dynamicModuleLoader, devServerConfig)),
-      ...(await getActionProcessors(qpqConfig, dynamicModuleLoader)),
+    async () =>
+      withProcessorDelay(
+        {
+          ...(await getDevServerActionProcessors(qpqConfig, dynamicModuleLoader, devServerConfig)),
+          ...(await getActionProcessors(qpqConfig, dynamicModuleLoader)),
 
-      // Always done last, so they can ovveride the default ones if the user wants.
-      ...(await getCustomActionActionProcessor(qpqConfig, dynamicModuleLoader)),
-    }),
+          // Always done last, so they can ovveride the default ones if the user wants.
+          ...(await getCustomActionActionProcessor(qpqConfig, dynamicModuleLoader)),
+        },
+        devServerConfig.delay,
+      ),
     getDateNow,
     logger,
     `${serviceName}::${randomUUID()}`,

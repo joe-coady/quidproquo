@@ -6,6 +6,7 @@ import {
   askMapParallelBatch,
   AskResponse,
   askSecondsElapsedFrom,
+  QPQ_LOGS_STORAGE_DRIVE_NAME,
   QpqPagedData,
   QpqRuntimeType,
 } from 'quidproquo-core';
@@ -47,7 +48,7 @@ export function* askGetLogs(
 
     const data = deep
       ? yield* askMapParallelBatch(logPage.items, 10, function* askFilterDeep(log): AskResponse<string> {
-          const logData = yield* askCatch(askFileReadTextContents('qpq-logs', `${log.correlation}.json`));
+          const logData = yield* askCatch(askFileReadTextContents(QPQ_LOGS_STORAGE_DRIVE_NAME, `${log.correlation}.json`));
           return logData.success ? logData.result : '';
         })
       : [];

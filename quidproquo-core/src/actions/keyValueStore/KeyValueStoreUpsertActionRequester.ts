@@ -2,7 +2,14 @@ import { createErrorEnumForAction } from '../../types';
 import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 import { KeyValueStoreUpsertActionRequester, KeyValueStoreUpsertOptions } from './KeyValueStoreUpsertActionTypes';
 
-export const KeyValueStoreUpsertErrorTypeEnum = createErrorEnumForAction(KeyValueStoreActionType.Upsert, ['ServiceUnavailable', 'ResourceNotFound']);
+export const KeyValueStoreUpsertErrorTypeEnum = createErrorEnumForAction(KeyValueStoreActionType.Upsert, [
+  'ServiceUnavailable',
+  'ResourceNotFound',
+  // A conditional (ifNotExists) write lost to an existing item. Namespaced —
+  // not ErrorTypeEnum.Conflict — so retry logic can target the write race
+  // specifically without also catching domain-level conflicts.
+  'Conflict',
+]);
 
 export function* askKeyValueStoreUpsert<KvsItem>(
   keyValueStoreName: string,

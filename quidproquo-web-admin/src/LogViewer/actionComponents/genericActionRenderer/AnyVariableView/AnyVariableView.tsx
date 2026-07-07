@@ -28,30 +28,79 @@ type VariableViewProps = {
   hideStringQuotes?: boolean;
 };
 
-export const StringVariableView = ({ value, expanded, hideStringQuotes }: VariableViewProps) => {
+// Try to parse a string as JSON. We reject bare numbers so that plain numeric
+// strings (which JSON.parse happily accepts) keep rendering as strings.
+const tryParseJson = (text: string): { ok: true; value: any } | { ok: false } => {
   try {
-    const jsonValue = JSON.parse(value);
-    if (typeof jsonValue === 'number') {
-      throw new Error('Not a JSON string');
+    const value = JSON.parse(text);
+    if (typeof value === 'number') {
+      return { ok: false };
     }
+    return { ok: true, value };
+  } catch {
+    return { ok: false };
+  }
+};
 
+// base64 decoding succeeds on plenty of random strings, so the JSON parse below
+// is what actually makes this specific - it only matches if the string is BOTH
+// valid base64 AND decodes to valid JSON.
+const base64Pattern = /^[A-Za-z0-9+/]+={0,2}$/;
+
+const tryDecodeBase64 = (text: string): string | undefined => {
+  // Cheap structural gate: canonical base64 uses only this charset and its length
+  // is a multiple of 4. This also skips obvious non-base64 (anything with {, ", spaces).
+  if (text.length === 0 || text.length % 4 !== 0 || !base64Pattern.test(text)) {
+    return undefined;
+  }
+
+  try {
+    const decoded = atob(text);
+    // Round-trip to reject non-canonical base64 that atob would otherwise accept.
+    if (btoa(decoded) !== text) {
+      return undefined;
+    }
+    return decoded;
+  } catch {
+    return undefined;
+  }
+};
+
+export const StringVariableView = ({ value, expanded, hideStringQuotes }: VariableViewProps) => {
+  const asJson = tryParseJson(value);
+  if (asJson.ok) {
     return (
       <>
         <span style={genericFunctionRendererStyles.jsonComment}>
           {'<'}json{'>'}
         </span>
-        <AnyVariableView value={jsonValue} expanded={expanded} />
+        <AnyVariableView expanded={expanded} value={asJson.value} />
       </>
     );
-  } catch {
-    const trimmedValue = value.length > 25 && !expanded ? `${value.slice(0, 25)}...` : value;
-
-    if (hideStringQuotes) {
-      return <span style={genericFunctionRendererStyles.stringValue}>{trimmedValue}</span>;
-    }
-
-    return <span style={genericFunctionRendererStyles.stringValue}>"{trimmedValue}"</span>;
   }
+
+  const decoded = tryDecodeBase64(value);
+  if (decoded !== undefined) {
+    const asBase64Json = tryParseJson(decoded);
+    if (asBase64Json.ok) {
+      return (
+        <>
+          <span style={genericFunctionRendererStyles.jsonComment}>
+            {'<'}base64-json{'>'}
+          </span>
+          <AnyVariableView expanded={expanded} value={asBase64Json.value} />
+        </>
+      );
+    }
+  }
+
+  const trimmedValue = value.length > 25 && !expanded ? `${value.slice(0, 25)}...` : value;
+
+  if (hideStringQuotes) {
+    return <span style={genericFunctionRendererStyles.stringValue}>{trimmedValue}</span>;
+  }
+
+  return <span style={genericFunctionRendererStyles.stringValue}>&quot;{trimmedValue}&quot;</span>;
 };
 
 export const ArrayVariableView = ({ value, expanded }: VariableViewProps) => {
@@ -74,7 +123,7 @@ export const ArrayVariableView = ({ value, expanded }: VariableViewProps) => {
         <div style={{ paddingLeft: 10 }}>
           {value.map((item: any, index: number) => (
             <div key={index}>
-              <AnyVariableView value={item} expanded={expanded} />,
+              <AnyVariableView expanded={expanded} value={item} />,
             </div>
           ))}
         </div>
@@ -93,11 +142,11 @@ export const ArrayVariableView = ({ value, expanded }: VariableViewProps) => {
 };
 
 export const KvsQueryConditionVariableView = ({ value, expanded }: VariableViewProps) => {
-  return <GenericFunctionRenderer functionName={`kvs${value.operation}`} args={[value.key, value.valueA]} expanded={expanded} />;
+  return <GenericFunctionRenderer args={[value.key, value.valueA]} expanded={expanded} functionName={`kvs${value.operation}`} />;
 };
 
 export const KvsLogicalOperatorVariableView = ({ value, expanded }: VariableViewProps) => {
-  return <GenericFunctionRenderer functionName={`kvs${value.operation}`} args={[value.conditions]} expanded={expanded} />;
+  return <GenericFunctionRenderer args={[value.conditions]} expanded={expanded} functionName={`kvs${value.operation}`} />;
 };
 
 export const EmptyObjectVariableView = ({ value, expanded }: VariableViewProps) => {
@@ -114,25 +163,25 @@ export const EmptyObjectVariableView = ({ value, expanded }: VariableViewProps) 
 
 export const QpqBinaryDataVariableView = ({ value, expanded }: VariableViewProps) => {
   return (
-    <img src={`data:${value.mimeType || 'image/jpeg'};base64,${value.base64Data}`} alt="Binary Data" style={{ width: '100px', height: 'auto' }} />
+    <img alt="Binary Data" src={`data:${value.mimeType || 'image/jpeg'};base64,${value.base64Data}`} style={{ width: '100px', height: 'auto' }} />
   );
 };
 
 export const ObjectVariableView = ({ value, expanded }: VariableViewProps) => {
   if (Array.isArray(value)) {
-    return <ArrayVariableView value={value} expanded={expanded} />;
+    return <ArrayVariableView expanded={expanded} value={value} />;
   }
 
   const objectKeys = Object.keys(value);
 
   if (value.operation && value.key && objectKeys.length <= 4) {
-    return <KvsQueryConditionVariableView value={value} expanded={expanded} />;
+    return <KvsQueryConditionVariableView expanded={expanded} value={value} />;
   } else if (value.operation && value.conditions && objectKeys.length == 2) {
-    return <KvsLogicalOperatorVariableView value={value} expanded={expanded} />;
+    return <KvsLogicalOperatorVariableView expanded={expanded} value={value} />;
   } else if (objectKeys.length == 0) {
-    return <EmptyObjectVariableView value={value} expanded={expanded} />;
+    return <EmptyObjectVariableView expanded={expanded} value={value} />;
   } else if (value.base64Data && value.filename) {
-    return <QpqBinaryDataVariableView value={value} expanded={expanded} />;
+    return <QpqBinaryDataVariableView expanded={expanded} value={value} />;
   }
 
   const cleanObject = JSON.parse(JSON.stringify(value));
@@ -147,7 +196,7 @@ export const ObjectVariableView = ({ value, expanded }: VariableViewProps) => {
           {key}
           {Array.isArray(cleanObject[key]) && !expanded && (
             <>
-              <span>:</span> <ArrayVariableView value={cleanObject[key]} expanded={false} />
+              <span>:</span> <ArrayVariableView expanded={false} value={cleanObject[key]} />
             </>
           )}
           {index < cleanObjectKeys.length - 1 && ', '}
@@ -161,7 +210,7 @@ export const ObjectVariableView = ({ value, expanded }: VariableViewProps) => {
       <div style={{ paddingLeft: 10 }}>
         {cleanObjectKeys.map((key, index) => (
           <div key={key}>
-            {key}: <AnyVariableView value={cleanObject[key]} expanded={expanded} />,
+            {key}: <AnyVariableView expanded={expanded} value={cleanObject[key]} />,
           </div>
         ))}
       </div>
@@ -181,9 +230,9 @@ export const AnyVariableView = ({ value, expanded, hideStringQuotes }: VariableV
   } else if (typeof value === 'number') {
     return <span style={genericFunctionRendererStyles.numberValue}>{value}</span>;
   } else if (typeof value === 'string') {
-    return <StringVariableView value={value} expanded={expanded} hideStringQuotes={hideStringQuotes} />;
+    return <StringVariableView expanded={expanded} hideStringQuotes={hideStringQuotes} value={value} />;
   } else if (typeof value === 'object') {
-    return <ObjectVariableView value={value} expanded={expanded} />;
+    return <ObjectVariableView expanded={expanded} value={value} />;
   }
 
   // Fallback for other types, using normal text color
@@ -204,7 +253,7 @@ const renderBasicArg = (arg: string, value: any, index: number, expanded: boolea
   return (
     <React.Fragment key={arg}>
       <span title={tooltipText}>
-        <AnyVariableView value={value} expanded={expanded} />
+        <AnyVariableView expanded={expanded} value={value} />
       </span>
     </React.Fragment>
   );
