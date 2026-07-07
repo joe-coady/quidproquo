@@ -1,30 +1,423 @@
 /**
- * Any CSS included here will be global. The classic template
- * bundles Infima by default. Infima is a CSS framework designed to
- * work well for content-centric websites.
+ * quidproquo docs theme — dark, matching the landing page (qpq/spa/src/index.css).
+ * The site is locked to dark mode (colorMode.disableSwitch), so the palette is
+ * defined once on :root and mirrored on [data-theme='dark'].
  */
 
-/* You can override the default Infima variables here. */
-:root {
-  --ifm-color-primary: #2e8555;
-  --ifm-color-primary-dark: #29784c;
-  --ifm-color-primary-darker: #277148;
-  --ifm-color-primary-darkest: #205d3b;
-  --ifm-color-primary-light: #33925d;
-  --ifm-color-primary-lighter: #359962;
-  --ifm-color-primary-lightest: #3cad6e;
-  --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+:root,
+[data-theme='dark'] {
+  /* ------- landing page palette ------- */
+  --qpq-bg: #030609;
+  --qpq-bg-raised: #060c12;
+  --qpq-panel: rgba(9, 17, 25, 0.82);
+  --qpq-panel-solid: #091119;
+  --qpq-panel-border: rgba(125, 211, 252, 0.14);
+  --qpq-panel-border-hot: rgba(34, 211, 238, 0.45);
+  --qpq-text: #e8f4f9;
+  --qpq-muted: #8fa8b8;
+  --qpq-faint: #5c7181;
+  --qpq-cyan: #22d3ee;
+  --qpq-cyan-bright: #8df6ff;
+  --qpq-cyan-dim: rgba(34, 211, 238, 0.14);
+  --qpq-orange: #fb923c;
+
+  --qpq-font-display: 'Space Grotesk', system-ui, sans-serif;
+  --qpq-font-body: 'Inter', system-ui, sans-serif;
+  --qpq-font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+
+  /* ------- infima mapping ------- */
+  --ifm-color-primary: #22d3ee;
+  --ifm-color-primary-dark: #14c5e1;
+  --ifm-color-primary-darker: #10b9d4;
+  --ifm-color-primary-darkest: #0d98ae;
+  --ifm-color-primary-light: #43daf1;
+  --ifm-color-primary-lighter: #5ce0f3;
+  --ifm-color-primary-lightest: #8df6ff;
+
+  --ifm-background-color: var(--qpq-bg) !important;
+  --ifm-background-surface-color: var(--qpq-bg-raised);
+
+  --ifm-font-color-base: var(--qpq-text);
+  --ifm-font-color-secondary: var(--qpq-muted);
+  --ifm-heading-color: var(--qpq-text);
+
+  --ifm-font-family-base: var(--qpq-font-body);
+  --ifm-font-family-monospace: var(--qpq-font-mono);
+  --ifm-heading-font-family: var(--qpq-font-display);
+  --ifm-heading-font-weight: 700;
+
+  --ifm-link-color: var(--qpq-cyan);
+  --ifm-link-hover-color: var(--qpq-cyan-bright);
+
+  --ifm-code-font-size: 90%;
+  --ifm-code-background: rgba(11, 20, 29, 0.9);
+  --ifm-pre-background: var(--qpq-panel-solid);
+  --docusaurus-highlighted-code-line-bg: rgba(34, 211, 238, 0.09);
+
+  --ifm-toc-border-color: var(--qpq-panel-border);
+  --ifm-hr-background-color: var(--qpq-panel-border);
+  --ifm-table-border-color: var(--qpq-panel-border);
+  --ifm-table-stripe-background: rgba(9, 17, 25, 0.55);
+  --ifm-table-head-background: rgba(8, 16, 24, 0.9);
+
+  --ifm-card-background-color: var(--qpq-panel-solid);
+
+  --ifm-navbar-background-color: rgba(4, 9, 14, 0.78);
+  --ifm-navbar-shadow: none;
+  --ifm-navbar-height: 62px;
+
+  --ifm-footer-background-color: rgba(4, 9, 14, 0.9);
+  --ifm-footer-color: var(--qpq-faint);
+  --ifm-footer-link-color: var(--qpq-muted);
+  --ifm-footer-title-color: var(--qpq-text);
+
+  --ifm-menu-color: var(--qpq-muted);
+  --ifm-menu-color-active: var(--qpq-cyan-bright);
+  --ifm-menu-color-background-active: var(--qpq-cyan-dim);
+  --ifm-menu-color-background-hover: rgba(34, 211, 238, 0.07);
+
+  --ifm-breadcrumb-color-active: var(--qpq-cyan-bright);
+  --ifm-breadcrumb-item-background-active: var(--qpq-cyan-dim);
+
+  --ifm-blockquote-border-left-width: 2px;
+  --ifm-blockquote-color: var(--qpq-muted);
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
-[data-theme='dark'] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+html {
+  background: var(--qpq-bg);
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: rgba(34, 211, 238, 0.35);
+  color: #fff;
+}
+
+/* ---------------------------------- navbar --------------------------------- */
+
+.navbar {
+  border-bottom: 1px solid rgba(125, 211, 252, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.navbar__title {
+  font-family: var(--qpq-font-display);
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.navbar__logo {
+  filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.5));
+}
+
+.navbar__link {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--qpq-muted);
+}
+
+.navbar__link:hover {
+  color: var(--qpq-cyan-bright);
+  text-shadow: 0 0 14px rgba(34, 211, 238, 0.6);
+}
+
+.navbar__link--active {
+  color: var(--qpq-cyan-bright);
+}
+
+/* --------------------------------- sidebar --------------------------------- */
+
+.theme-doc-sidebar-container {
+  border-right: 1px solid var(--qpq-panel-border) !important;
+  background: rgba(5, 10, 16, 0.6);
+}
+
+.menu {
+  font-size: 14px;
+  font-weight: 500;
+  padding: 12px !important;
+}
+
+.menu__link {
+  border-radius: 8px;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.menu__link--active:not(.menu__link--sublist) {
+  box-shadow: inset 2px 0 0 var(--qpq-cyan);
+}
+
+.menu__list-item-collapsible:hover,
+.menu__link:hover {
+  color: var(--qpq-cyan-bright);
+}
+
+/* Top-level category labels (Actions / Config / Action Requesters) */
+.theme-doc-sidebar-item-category-level-1 > .menu__list-item-collapsible > .menu__link {
+  font-family: var(--qpq-font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--qpq-cyan);
+}
+
+/* ---------------------------------- content -------------------------------- */
+
+.markdown h1,
+.markdown h2,
+.markdown h3,
+.markdown h4,
+h1,
+h2,
+h3 {
+  font-family: var(--qpq-font-display);
+  letter-spacing: -0.015em;
+}
+
+.markdown h1:first-child {
+  font-size: 2.4rem;
+}
+
+.markdown a:not(.card) {
+  text-decoration: none;
+  border-bottom: 1px solid rgba(34, 211, 238, 0.35);
+  transition: color 0.15s ease, border-color 0.15s ease, text-shadow 0.15s ease;
+}
+
+.markdown a:not(.card):hover {
+  color: var(--qpq-cyan-bright);
+  border-bottom-color: var(--qpq-panel-border-hot);
+  text-shadow: 0 0 14px rgba(34, 211, 238, 0.45);
+}
+
+/* inline code — styled like the landing page package chips */
+code {
+  border: 1px solid var(--qpq-panel-border);
+  color: #b8d4e4;
+  vertical-align: baseline;
+  padding: 0.25rem 0.5rem;
+}
+
+a code {
+  color: inherit;
+}
+
+/* code blocks — styled like the landing page code window */
+.theme-code-block {
+  border: 1px solid var(--qpq-panel-border);
+  border-radius: 14px;
+  background: var(--qpq-panel);
+  box-shadow:
+    0 0 0 1px rgba(3, 6, 9, 0.6),
+    0 30px 70px -30px rgba(2, 12, 20, 0.9),
+    0 0 60px -20px rgba(34, 211, 238, 0.12);
+  overflow: hidden;
+}
+
+.theme-code-block pre code {
+  border: none;
+  font-size: 13px;
+  line-height: 1.75;
+}
+
+/* code block title bar (```ts title="...") */
+.theme-code-block > div:first-child:not(:only-child) {
+  border-bottom: 1px solid var(--qpq-panel-border);
+  background: rgba(8, 16, 24, 0.6);
+  font-family: var(--qpq-font-mono);
+  font-size: 12.5px;
+  color: var(--qpq-muted);
+}
+
+/* ---------------------------------- tables --------------------------------- */
+
+.markdown table {
+  display: table;
+  width: 100%;
+  border: 1px solid var(--qpq-panel-border);
+  border-radius: 12px;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  font-size: 14.5px;
+}
+
+.markdown table th {
+  font-family: var(--qpq-font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--qpq-cyan);
+  text-align: left;
+}
+
+.markdown table th,
+.markdown table td {
+  border: none;
+  border-bottom: 1px solid var(--qpq-panel-border);
+  padding: 10px 14px;
+}
+
+.markdown table tr:last-child td {
+  border-bottom: none;
+}
+
+.markdown table tr {
+  background: transparent;
+  border: none;
+}
+
+.markdown table tbody tr:hover {
+  background: rgba(34, 211, 238, 0.04);
+}
+
+/* ------------------------------- admonitions ------------------------------- */
+
+.alert {
+  border: 1px solid var(--qpq-panel-border);
+  border-left: 3px solid var(--ifm-alert-border-color, var(--qpq-cyan));
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(10, 19, 28, 0.85), rgba(6, 12, 18, 0.85));
+  color: var(--qpq-text);
+  box-shadow: none;
+}
+
+/* ----------------------- cards / pagination / breadcrumbs ------------------ */
+
+.card {
+  border: 1px solid var(--qpq-panel-border);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(10, 19, 28, 0.85), rgba(6, 12, 18, 0.85));
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.card:hover {
+  border-color: var(--qpq-panel-border-hot);
+  box-shadow: 0 0 34px -14px rgba(34, 211, 238, 0.5);
+}
+
+.card h2 {
+  color: var(--qpq-text);
+}
+
+.pagination-nav__link {
+  border: 1px solid var(--qpq-panel-border);
+  border-radius: 12px;
+  background: rgba(7, 13, 20, 0.7);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.pagination-nav__link:hover {
+  border-color: var(--qpq-panel-border-hot);
+  box-shadow: 0 0 22px -8px rgba(34, 211, 238, 0.6);
+}
+
+.pagination-nav__sublabel {
+  font-family: var(--qpq-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--qpq-faint);
+}
+
+.pagination-nav__label {
+  font-family: var(--qpq-font-display);
+  font-weight: 600;
+}
+
+.breadcrumbs__link {
+  font-size: 13px;
+}
+
+/* home crumb — always show the (hover) pill state: cyan icon on a dim cyan chip */
+.breadcrumbs__item:first-child .breadcrumbs__link {
+  background: var(--qpq-cyan-dim);
+  color: var(--qpq-cyan-bright);
+}
+
+.breadcrumbs__item:first-child .breadcrumbs__link:hover {
+  box-shadow: 0 0 14px -4px rgba(34, 211, 238, 0.6);
+}
+
+/* ------------------------------ table of contents -------------------------- */
+
+.table-of-contents {
+  font-size: 13px;
+}
+
+.table-of-contents__link {
+  color: var(--qpq-muted);
+}
+
+.table-of-contents__link:hover,
+.table-of-contents__link--active {
+  color: var(--qpq-cyan-bright);
+}
+
+/* ---------------------------------- footer --------------------------------- */
+
+.footer {
+  border-top: 1px solid var(--qpq-panel-border);
+}
+
+.footer__title {
+  font-family: var(--qpq-font-display);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.footer__link-item {
+  font-size: 14px;
+}
+
+.footer__link-item:hover {
+  color: var(--qpq-cyan-bright);
+}
+
+.footer__copyright {
+  margin-top: 24px;
+  font-family: var(--qpq-font-mono);
+  font-size: 12.5px;
+  color: var(--qpq-faint);
+}
+
+/* -------------------------------- misc polish ------------------------------ */
+
+/* generated category index page headers */
+header + .row .col {
+  margin-bottom: 16px;
+}
+
+/* "Edit this page" + last-updated row */
+.theme-doc-footer {
+  border-top: 1px solid var(--qpq-panel-border);
+  padding-top: 16px;
+}
+
+/* keyboard-focus outline in brand color */
+:focus-visible {
+  outline-color: var(--qpq-cyan);
+}
+
+/* subtle themed scrollbars (webkit) */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(125, 211, 252, 0.18);
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(34, 211, 238, 0.35);
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
 }

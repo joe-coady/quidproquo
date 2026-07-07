@@ -1,13 +1,34 @@
-import {themes as prismThemes} from 'prism-react-renderer';
 import type * as Preset from '@docusaurus/preset-classic';
 import type {Config} from '@docusaurus/types';
+import type {PrismTheme} from 'prism-react-renderer';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
+// Code highlighting palette matching the landing page's code window
+// (qpq/spa/src/index.css tok-* classes).
+const qpqPrismTheme: PrismTheme = {
+  plain: {
+    color: '#c9dde8',
+    backgroundColor: 'transparent',
+  },
+  styles: [
+    {types: ['keyword', 'operator', 'atrule'], style: {color: '#7dd3fc'}},
+    {types: ['function', 'function-variable'], style: {color: '#8df6ff'}},
+    {types: ['string', 'char', 'attr-value', 'url', 'regex'], style: {color: '#fbbf77'}},
+    {types: ['class-name', 'maybe-class-name', 'builtin', 'namespace'], style: {color: '#86efac'}},
+    {types: ['comment', 'prolog', 'doctype', 'cdata'], style: {color: '#5c7181', fontStyle: 'italic' as const}},
+    {types: ['number', 'boolean', 'constant', 'symbol', 'property', 'attr-name', 'variable'], style: {color: '#c4b5fd'}},
+    {types: ['punctuation'], style: {color: '#8fa8b8'}},
+    {types: ['tag', 'selector'], style: {color: '#7dd3fc'}},
+    {types: ['deleted'], style: {color: '#ff5f57'}},
+    {types: ['inserted'], style: {color: '#28c840'}},
+  ],
+};
+
 const config: Config = {
-  title: 'Quidproquo',
-  tagline: 'Functional, action-based web framework',
-  favicon: 'img/favicon.ico',
+  title: 'quidproquo',
+  tagline: 'Write the story, run it anywhere',
+  favicon: 'img/favicon.svg',
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
   future: {
@@ -36,6 +57,21 @@ const config: Config = {
     locales: ['en'],
   },
 
+  // Same font stack as the landing page (qpq/spa/index.html)
+  headTags: [
+    {
+      tagName: 'link',
+      attributes: {rel: 'preconnect', href: 'https://fonts.googleapis.com'},
+    },
+    {
+      tagName: 'link',
+      attributes: {rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: 'anonymous'},
+    },
+  ],
+  stylesheets: [
+    'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:ital,wght@0,400;0,500;1,400&display=swap',
+  ],
+
   presets: [
     [
       'classic',
@@ -59,11 +95,16 @@ const config: Config = {
   themeConfig: {
     // Replace with your project's social card
     image: 'img/docusaurus-social-card.jpg',
+    colorMode: {
+      defaultMode: 'dark',
+      disableSwitch: true,
+      respectPrefersColorScheme: false,
+    },
     navbar: {
-      title: 'Quidproquo',
+      title: 'quidproquo',
       logo: {
-        alt: 'Quidproquo Logo',
-        src: 'img/logo.svg',
+        alt: 'quidproquo logo',
+        src: 'img/qpq-logo.svg',
       },
       items: [
         {
@@ -115,11 +156,11 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} Quidproquo. Built with Docusaurus.`,
+      copyright: `© ${new Date().getFullYear()} quidproquo — write the story, run it anywhere.`,
     },
     prism: {
-      theme: prismThemes.github,
-      darkTheme: prismThemes.dracula,
+      theme: qpqPrismTheme,
+      darkTheme: qpqPrismTheme,
     },
   } satisfies Preset.ThemeConfig,
 };
