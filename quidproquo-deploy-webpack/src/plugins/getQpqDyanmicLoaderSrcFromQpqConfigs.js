@@ -1,7 +1,7 @@
 import { getModuleLoaderSrcForService } from './getModuleLoaderSrcForService';
 import { getSrcLoaderForQpqConfig } from './getSrcLoaderForQpqConfig';
 
-export const getQpqDyanmicLoaderSrcFromQpqConfigs = (qpqConfigs) => {
+export const getQpqDyanmicLoaderSrcFromQpqConfigs = (qpqConfigs, alwaysBundleStoryCode) => {
   if (!qpqConfigs || qpqConfigs.length === 0) {
     return `
       export const qpqConfig = undefined;
@@ -16,14 +16,14 @@ export const getQpqDyanmicLoaderSrcFromQpqConfigs = (qpqConfigs) => {
     export const qpqConfigs = ${JSON.stringify(qpqConfigs, null, 2)};
 
     export const qpqDynamicModuleLoader = async (qpqFunctionRuntime) => {
-      ${getSrcLoaderForQpqConfig(qpqConfigs[0], 'qpqFunctionRuntime')}
+      ${getSrcLoaderForQpqConfig(qpqConfigs[0], 'qpqFunctionRuntime', alwaysBundleStoryCode)}
 
       // This will never get hit
       return null;
     };
 
     export const qpqDynamicModuleLoaderForService = async (serviceName, qpqFunctionRuntime) => {
-      ${qpqConfigs.map((qpqConfig) => getModuleLoaderSrcForService(qpqConfig, 'serviceName', 'qpqFunctionRuntime')).join('')}
+      ${qpqConfigs.map((qpqConfig) => getModuleLoaderSrcForService(qpqConfig, 'serviceName', 'qpqFunctionRuntime', alwaysBundleStoryCode)).join('')}
 
       // This will never get hit
       return null;
