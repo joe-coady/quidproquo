@@ -1,3 +1,4 @@
+export * from './javascriptRuntimeUtils';
 export * from './logRetentionUtils';
 export * from './path';
 export * from './qpqAwsCdkNamingUtils';

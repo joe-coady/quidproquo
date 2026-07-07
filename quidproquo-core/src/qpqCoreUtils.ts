@@ -4,6 +4,7 @@ import {
   ApiBuildPathQPQConfigSetting,
   ApplicationQPQConfigSetting,
   ClaudeAIQPQConfigSetting,
+  defineJavascriptRuntime,
   DeployEventsQPQConfigSetting,
   EmailTemplates,
   EnvironmentSettingsQPQConfigSetting,
@@ -11,6 +12,7 @@ import {
   GlobalQPQConfigSetting,
   GraphDatabaseQPQConfigSetting,
   InlineFunctionQPQConfigSetting,
+  JavascriptRuntimeQPQConfigSetting,
   KeyValueStoreQPQConfigSetting,
   ModuleQPQConfigSetting,
   NotifyErrorQPQConfigSetting,
@@ -224,6 +226,11 @@ export const getAllEventBusConfigs = (qpqConfig: QPQConfig): EventBusQPQConfigSe
 
 export const getAllAiConfigs = (qpqConfig: QPQConfig): AiQPQConfigSetting[] => {
   return getConfigSettings<AiQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.ai);
+};
+
+// Always resolves - falls back to the defineJavascriptRuntime defaults when no setting is present
+export const getJavascriptRuntimeConfig = (qpqConfig: QPQConfig): JavascriptRuntimeQPQConfigSetting => {
+  return getConfigSetting<JavascriptRuntimeQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.javascriptRuntime) ?? defineJavascriptRuntime();
 };
 
 export const getAllClaudeAiConfigs = (qpqConfig: QPQConfig): ClaudeAIQPQConfigSetting[] => {

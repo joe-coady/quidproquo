@@ -7,7 +7,8 @@ import { Construct } from 'constructs';
 import { join } from 'upath';
 
 import { BootstrapResource } from '../../constants';
-import { qpqAwsCdkPathUtils } from '../../utils';
+import { getLambdaArchitecture, getLambdaRuntime, qpqAwsCdkPathUtils } from '../../utils';
+import * as qpqDeployAwsCdkUtils from '../../utils/qpqDeployAwsCdkUtils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
 
 export interface FunctionProps extends QpqConstructBlockProps {
@@ -54,7 +55,8 @@ export class Function extends QpqConstructBlock {
       functionName: props.functionName,
       timeout: cdk.Duration.seconds(props.timeoutInSeconds || 25),
 
-      runtime: aws_lambda.Runtime.NODEJS_22_X,
+      runtime: getLambdaRuntime(props.qpqConfig),
+      architecture: getLambdaArchitecture(props.qpqConfig),
       memorySize: props.memoryInBytes || serviceInfo.lambdaMaxMemoryInMiB || 1024,
       layers: props.apiLayerVersions,
 
@@ -85,6 +87,9 @@ export class Function extends QpqConstructBlock {
         : undefined,
       securityGroups: props.securityGroups,
     });
+
+    // Cost-allocation tags (environment/application/module/feature), same as every other qpq resource.
+    qpqDeployAwsCdkUtils.applyEnvironmentTags(this.lambdaFunction, props.qpqConfig);
 
     if (!qpqConfigAwsUtils.isLambdaWarmingDisabled(props.qpqConfig)) {
       const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(props.qpqConfig);

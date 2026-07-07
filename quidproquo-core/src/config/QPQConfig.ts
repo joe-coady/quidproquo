@@ -24,6 +24,7 @@ export enum QPQCoreConfigSettingType {
   virtualNetwork = '@quidproquo-core/config/VirtualNetwork',
   notifyError = '@quidproquo-core/config/notifyError',
   inlineFunction = '@quidproquo-core/config/InlineFunction',
+  javascriptRuntime = '@quidproquo-core/config/JavascriptRuntime',
 }
 
 export interface QPQConfigSetting {

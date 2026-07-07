@@ -6,6 +6,7 @@ import { aws_lambda } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import path from 'path';
 
+import { getLambdaRuntime } from '../../utils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
 
 export const getLambdaLayersWithFullPaths = (qpqConfig: QPQConfig): ApiLayer[] => {
@@ -27,13 +28,14 @@ export class LambdaLayers extends QpqConstructBlock {
     super(scope, id, props);
 
     const apiLayers = getLambdaLayersWithFullPaths(props.qpqConfig);
+    const lambdaRuntime = getLambdaRuntime(props.qpqConfig);
 
     const userLayers = apiLayers.map((layer) => {
       return layer.buildPath
         ? new aws_lambda.LayerVersion(this, `${layer.name}-layer`, {
             layerVersionName: awsNamingUtils.getQpqRuntimeResourceNameFromConfig(layer.name, props.qpqConfig),
             code: new aws_lambda.AssetCode(layer.buildPath),
-            compatibleRuntimes: [aws_lambda.Runtime.NODEJS_22_X],
+            compatibleRuntimes: [lambdaRuntime],
           })
         : aws_lambda.LayerVersion.fromLayerVersionArn(this, `${layer.name}-layer-ref`, layer.layerArn!);
     });
@@ -43,7 +45,7 @@ export class LambdaLayers extends QpqConstructBlock {
     const logExtensionLayer = new aws_lambda.LayerVersion(this, 'qpq-log-extension-layer', {
       layerVersionName: awsNamingUtils.getQpqRuntimeResourceNameFromConfig('qpq-log-extension', props.qpqConfig),
       code: new aws_lambda.AssetCode(getLogExtensionLayerPath()),
-      compatibleRuntimes: [aws_lambda.Runtime.NODEJS_22_X],
+      compatibleRuntimes: [lambdaRuntime],
     });
 
     this.layers = [...userLayers, logExtensionLayer];

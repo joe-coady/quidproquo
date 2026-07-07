@@ -14,6 +14,7 @@ export * from './eventBus';
 export * from './global';
 export * from './graphDatabase';
 export * from './inlineFunction';
+export * from './javascriptRuntime';
 export * from './keyValueStore';
 export * from './moduleName';
 export * from './notifyError';
