@@ -42,9 +42,12 @@
     // Do not emit output (JavaScript files)
     "noEmit": false,
 
-    // Generate corresponding '.map' file ~ We need to turn this off because
-    // the build output has no access to src files
-    "sourceMap": false,
+    // Emit '.map' files with the ORIGINAL TS embedded (inlineSources), so consumers of
+    // the built output never need access to src files — this is what lets the federated
+    // remote build chain framework code back to TS in execution traces
+    // (see trace-replay-plan.md).
+    "sourceMap": true,
+    "inlineSources": true,
 
     // Allows importing JSON files
     "resolveJsonModule": true,

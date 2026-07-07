@@ -7,3 +7,5 @@ export * from './SystemGetRuntimeCorrelationActionRequester';
 export * from './SystemGetRuntimeCorrelationActionTypes';
 export * from './SystemRunParallelActionRequester';
 export * from './SystemRunParallelActionTypes';
+export * from './SystemTraceStoryActionRequester';
+export * from './SystemTraceStoryActionTypes';

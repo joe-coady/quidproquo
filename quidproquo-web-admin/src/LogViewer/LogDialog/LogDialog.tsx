@@ -10,7 +10,7 @@ import { LogCorrelations } from '../LogCorrelations';
 import { LogRawJson } from '../LogRawJson';
 import { LogSummary } from '../LogSummary';
 import { useLoadedStoryResult, useLogDialogStateManagement } from './hooks';
-import { HelpTab, LogDetailsTab, NotesTab, RawTab, TimelineTab, TreeTab } from './tabs';
+import { HelpTab, LogDetailsTab, NotesTab, RawTab, TimelineTab, TraceTab, TreeTab } from './tabs';
 
 interface LogDialogProps {
   open: boolean;
@@ -81,6 +81,7 @@ export const LogDialog = ({ logCorrelation, open, handleClose, setSelectedLogCor
           <Tab label="Timeline" />
           <Tab label="Notes" />
           <Tab label="Raw JSON" />
+          <Tab label="Trace" />
           <Tab label="Help" />
         </Tabs>
       </AppBar>
@@ -118,6 +119,9 @@ export const LogDialog = ({ logCorrelation, open, handleClose, setSelectedLogCor
           <RawTab log={asyncLog} />
         </div>
         <div style={getTabStyle(logDialogState.selectedTab, 5)}>
+          <TraceTab isVisible={logDialogState.selectedTab === 5} log={asyncLog} />
+        </div>
+        <div style={getTabStyle(logDialogState.selectedTab, 6)}>
           <HelpTab log={asyncLog} />
         </div>
       </DialogContent>

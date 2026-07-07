@@ -7,8 +7,10 @@ import {
   QPQBinaryData,
 } from 'quidproquo-core';
 
-// Outgoing requests abort after this many milliseconds.
-const REQUEST_TIMEOUT_MS = 25000;
+// Outgoing requests abort after this many milliseconds. 30s outlasts API Gateway's 29s
+// integration timeout, so slow requests surface as real gateway errors instead of
+// client-side "(canceled)" aborts.
+const REQUEST_TIMEOUT_MS = 30000;
 
 // fetch cannot issue these methods - mirror the previous "not implemented" behaviour.
 const unsupportedMethods: HTTPMethod[] = ['CONNECT'];
