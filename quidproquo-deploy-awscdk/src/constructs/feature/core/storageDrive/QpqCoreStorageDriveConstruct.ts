@@ -81,15 +81,15 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
 
     const dataStoreRemovalPolicy = qpqConfigAwsUtils.getAwsDataStoreRemovalPolicy(props.qpqConfig);
 
-    let bucketEncryption: aws_s3.BucketEncryption = aws_s3.BucketEncryption.UNENCRYPTED;
+    // S3_MANAGED is the floor, not an opt-in: S3 applies SSE-S3 to every bucket anyway,
+    // and CDK's UNENCRYPTED member is deprecated for exactly that reason.
+    let bucketEncryption: aws_s3.BucketEncryption = aws_s3.BucketEncryption.S3_MANAGED;
     let encryptionKey: aws_kms.IKey | undefined;
     if (props.storageDriveConfig.encryption) {
       const kmsCfg = qpqConfigAwsUtils.getAwsKmsKeyForStorageDrive(props.qpqConfig, props.storageDriveConfig);
       if (kmsCfg) {
         encryptionKey = aws_kms.Key.fromKeyArn(this, 'enc-key', kmsCfg.arn);
         bucketEncryption = aws_s3.BucketEncryption.KMS;
-      } else {
-        bucketEncryption = aws_s3.BucketEncryption.S3_MANAGED;
       }
     }
 

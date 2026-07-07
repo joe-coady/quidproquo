@@ -27,6 +27,7 @@ import {
   QPQCoreConfigSettingType,
 } from './config';
 import {
+  assertFifoQueueEventBusSubscriptionsAreValid,
   convertCustomFullyQualifiedResourceToGeneric,
   flattenQpqConfig,
   getActionProcessorSources,
@@ -246,6 +247,35 @@ describe('qpqCoreUtils', () => {
     it('returns owned queues (queues carry no owner so all are owned)', () => {
       const config = buildTestQpqConfig([defineQueue('a', {}), defineQueue('b', {})]);
       expect(getOwnedQueues(config).map((q) => q.name)).toEqual(['a', 'b']);
+    });
+  });
+
+  describe('assertFifoQueueEventBusSubscriptionsAreValid', () => {
+    it('throws when a FIFO queue subscribes to a standard event bus', () => {
+      const config = buildTestQpqConfig([defineEventBus('bus'), defineQueue('jobs', {}, { isFifo: true, eventBusSubscriptions: ['bus'] })]);
+
+      expect(() => assertFifoQueueEventBusSubscriptionsAreValid(config)).toThrow('queue [jobs] -> event bus [bus]');
+    });
+
+    it('throws when a FIFO queue subscribes to a bus that does not exist', () => {
+      const config = buildTestQpqConfig([defineQueue('jobs', {}, { isFifo: true, eventBusSubscriptions: ['missing'] })]);
+
+      expect(() => assertFifoQueueEventBusSubscriptionsAreValid(config)).toThrow('queue [jobs] -> event bus [missing]');
+    });
+
+    it('accepts a FIFO queue subscribed to a FIFO event bus', () => {
+      const config = buildTestQpqConfig([
+        defineEventBus('bus', { isFifo: true }),
+        defineQueue('jobs', {}, { isFifo: true, eventBusSubscriptions: ['bus'] }),
+      ]);
+
+      expect(() => assertFifoQueueEventBusSubscriptionsAreValid(config)).not.toThrow();
+    });
+
+    it('ignores standard queues entirely', () => {
+      const config = buildTestQpqConfig([defineEventBus('bus'), defineQueue('jobs', {}, { eventBusSubscriptions: ['bus'] })]);
+
+      expect(() => assertFifoQueueEventBusSubscriptionsAreValid(config)).not.toThrow();
     });
   });
 

@@ -33,6 +33,7 @@ export const getQpqLambdaRuntimeForEvent = <E extends QpqFunctionExecutionEvent<
   getActionProcessorList: ActionProcessorListResolver,
   dynamicModuleLoader: DynamicModuleLoader,
   qpqConfig: QPQConfig,
+  getProcessEventStory: () => typeof askProcessEvent = () => askProcessEvent,
 ) => {
   return async (event: E, context: Context) => {
     console.log('tick: ', JSON.stringify(event, null, 2));
@@ -57,7 +58,7 @@ export const getQpqLambdaRuntimeForEvent = <E extends QpqFunctionExecutionEvent<
     );
 
     const processEvent = async () => {
-      const result = await resolveStory(askProcessEvent, [event, context]);
+      const result = await resolveStory(getProcessEventStory(), [event, context]);
       await logger.waitToFinishWriting();
 
       if (result.error) {

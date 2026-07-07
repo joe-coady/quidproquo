@@ -6,6 +6,7 @@ import {
   ErrorTypeEnum,
   EventBusActionType,
   EventBusSendMessageActionProcessor,
+  generateUuid,
   QPQConfig,
   qpqCoreUtils,
   QueueMessage,
@@ -14,6 +15,7 @@ import {
 } from 'quidproquo-core';
 
 import { eventBus } from '../../../logic/eventBus';
+import { isDuplicateFifoMessage } from '../../../logic/fifoDeduplication';
 
 export type AnyEventBusMessageWithSession = QueueMessage<any> & {
   storySession: StorySession;
@@ -37,6 +39,14 @@ const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): EventBusSendMessag
     }
 
     for (const eventBusMessage of eventBusMessages) {
+      if (eventBusConfig.isFifo) {
+        const deduplicationId = eventBusMessage.deduplicationId ?? generateUuid();
+
+        if (isDuplicateFifoMessage(`${eventBusName}:${deduplicationId}`)) {
+          continue;
+        }
+      }
+
       const eventBusEvent: AnyEventBusMessageWithSession = {
         payload: eventBusMessage.payload,
         type: eventBusMessage.type,
@@ -44,6 +54,10 @@ const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): EventBusSendMessag
         storySession: toCrossServiceSession(session),
 
         eventBusName: eventBusConfig.name,
+
+        // FIFO: default to one group per bus (global ordering) - callers opt in to
+        // per-entity groups via groupId on the message
+        groupId: eventBusConfig.isFifo ? (eventBusMessage.groupId ?? eventBusName) : undefined,
 
         targetApplication: eventBusConfig.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig),
         targetEnvironment: eventBusConfig.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),

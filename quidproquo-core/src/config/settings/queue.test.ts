@@ -20,6 +20,7 @@ describe('defineQueue', () => {
       qpqQueueProcessors: processors,
       eventBusSubscriptions: [],
       maxConcurrentExecutions: undefined,
+      isFifo: false,
     });
   });
 
@@ -33,5 +34,9 @@ describe('defineQueue', () => {
     expect(setting.batchSize).toBe(10);
     expect(setting.concurrency).toBe(4);
     expect(setting.eventBusSubscriptions).toEqual(['bus']);
+  });
+
+  it('applies isFifo when supplied', () => {
+    expect(defineQueue('Jobs', processors, { isFifo: true }).isFifo).toBe(true);
   });
 });

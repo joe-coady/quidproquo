@@ -9,7 +9,7 @@ import {
 } from '../actions';
 import { askExecuteStory } from '../actions/system';
 import { getSuccessfulEitherActionResult, getUnsuccessfulEitherActionResult } from '../logic/actionLogic';
-import { AskResponse, EitherActionResult, LogLevelEnum } from '../types';
+import { AskResponse, EitherActionResult, ErrorTypeEnum, LogLevelEnum } from '../types';
 import { askCatch } from './system/askCatch';
 import { askMapParallel } from './array';
 import { askGetApplicationVersion } from './askGetApplicationVersion';
@@ -55,6 +55,23 @@ function* askProcessEventRecord<QpqEventRecord, MSR extends AnyMatchStoryResult,
   return getUnsuccessfulEitherActionResult(executeStoryResponse.error);
 }
 
+function* askTransformProcessedRecords<EventParams extends Array<unknown>, QpqEventRecordResponse, EventResponse>(
+  processedRecords: EitherActionResult<QpqEventRecordResponse>[],
+  eventArguments: EventParams,
+): AskResponse<EventResponse> {
+  const transformedResponse = yield* askCatch(
+    askEventTransformResponseResult<EventParams, QpqEventRecordResponse, EventResponse>(processedRecords, ...eventArguments),
+  );
+
+  if (!transformedResponse.success) {
+    yield* askLogCreate(LogLevelEnum.Fatal, transformedResponse.error.errorText);
+
+    return yield* askThrowError(transformedResponse.error.errorType, transformedResponse.error.errorText, transformedResponse.error.errorStack);
+  }
+
+  return transformedResponse.result;
+}
+
 export function* askProcessEvent<
   EventParams extends Array<unknown> = any[],
   QpqEventRecord = any,
@@ -73,15 +90,47 @@ export function* askProcessEvent<
     return yield* askProcessEventRecord<QpqEventRecord, MSR, QpqEventRecordResponse, EventParams>(record, eventArguments);
   });
 
-  const transformedResponse = yield* askCatch(
-    askEventTransformResponseResult<EventParams, QpqEventRecordResponse, EventResponse>(processedRecords, ...eventArguments),
-  );
+  return yield* askTransformProcessedRecords<EventParams, QpqEventRecordResponse, EventResponse>(processedRecords, eventArguments);
+}
 
-  if (!transformedResponse.success) {
-    yield* askLogCreate(LogLevelEnum.Fatal, transformedResponse.error.errorText);
+// FIFO variant of askProcessEvent: records are processed one at a time, and once a record
+// fails, the remaining records in the same group are failed without executing so the
+// platform can redeliver them in order (block the group, not the batch).
+export function* askProcessEventWithGroupOrdering<
+  EventParams extends Array<unknown> = any[],
+  QpqEventRecord = any,
+  QpqEventRecordResponse = any,
+  MSR extends AnyMatchStoryResult = AnyMatchStoryResult,
+  EventResponse = any,
+>(getRecordGroupKey: (record: QpqEventRecord) => string | undefined, ...eventArguments: EventParams): AskResponse<EventResponse> {
+  yield* askGetApplicationVersion();
 
-    return yield* askThrowError(transformedResponse.error.errorType, transformedResponse.error.errorText, transformedResponse.error.errorStack);
+  const records = yield* askEventGetRecords<EventParams, QpqEventRecord>(...eventArguments);
+
+  const failedGroupKeys = new Set<string>();
+  const processedRecords: EitherActionResult<QpqEventRecordResponse>[] = [];
+
+  for (const record of records) {
+    const groupKey = getRecordGroupKey(record);
+
+    if (groupKey !== undefined && failedGroupKeys.has(groupKey)) {
+      processedRecords.push(
+        getUnsuccessfulEitherActionResult({
+          errorType: ErrorTypeEnum.GenericError,
+          errorText: `Skipped: an earlier message in group [${groupKey}] failed`,
+        }),
+      );
+      continue;
+    }
+
+    const processedRecord = yield* askProcessEventRecord<QpqEventRecord, MSR, QpqEventRecordResponse, EventParams>(record, eventArguments);
+
+    if (!processedRecord.success && groupKey !== undefined) {
+      failedGroupKeys.add(groupKey);
+    }
+
+    processedRecords.push(processedRecord);
   }
 
-  return transformedResponse.result;
+  return yield* askTransformProcessedRecords<EventParams, QpqEventRecordResponse, EventResponse>(processedRecords, eventArguments);
 }

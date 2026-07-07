@@ -1,4 +1,4 @@
-import { QueueQPQConfigSetting } from 'quidproquo-core';
+import { qpqCoreUtils, QueueQPQConfigSetting } from 'quidproquo-core';
 
 import { aws_lambda, aws_lambda_event_sources, aws_sns_subscriptions } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
@@ -46,6 +46,9 @@ export class QpqApiCoreQueueConstruct extends QpqConstructBlock {
 
     const queueResource = QpqCoreQueueConstruct.fromOtherStack(this, 'queue', props.qpqConfig, props.queueConfig);
 
+    // Fails synth when a FIFO queue subscribes to a standard bus (AWS can't deliver those)
+    qpqCoreUtils.assertFifoQueueEventBusSubscriptionsAreValid(props.qpqConfig);
+
     props.queueConfig.eventBusSubscriptions.forEach((eventBusSubscription) => {
       const eventBus = QpqCoreEventBusConstruct.fromOtherStack(this, `event-bus-${eventBusSubscription}`, props.qpqConfig, eventBusSubscription);
 
@@ -65,13 +68,20 @@ export class QpqApiCoreQueueConstruct extends QpqConstructBlock {
       );
     });
 
-    const eventSourceOptions: aws_lambda_event_sources.SqsEventSourceProps =
-      props.queueConfig.batchSize > 0
+    const eventSourceOptions: aws_lambda_event_sources.SqsEventSourceProps = {
+      // Honour the batchItemFailures the runtime returns - without this, SQS treats the
+      // whole batch as successful and failed messages are deleted instead of retried
+      reportBatchItemFailures: true,
+
+      ...(props.queueConfig.batchSize > 0
         ? {
             batchSize: props.queueConfig.batchSize,
-            maxBatchingWindow: cdk.Duration.seconds(props.queueConfig.batchWindowInSeconds),
+
+            // FIFO event sources don't support a batching window
+            ...(props.queueConfig.isFifo ? {} : { maxBatchingWindow: cdk.Duration.seconds(props.queueConfig.batchWindowInSeconds) }),
           }
-        : {};
+        : {}),
+    };
 
     queueFunction.lambdaFunction.addEventSource(new aws_lambda_event_sources.SqsEventSource(queueResource.queue, eventSourceOptions));
   }

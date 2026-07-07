@@ -1,5 +1,5 @@
 import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { buildTestQpqConfig, defineUserDirectory, QPQConfig } from 'quidproquo-core';
+import { buildTestQpqConfig, defineQueue, defineUserDirectory, QPQConfig } from 'quidproquo-core';
 import { defineWebsocket } from 'quidproquo-webserver';
 
 import { describe, expect, it } from 'vitest';
@@ -28,9 +28,11 @@ import {
   getKvsDynamoTableNameFromConfig,
   getQpqRuntimeResourceName,
   getQpqRuntimeResourceNameFromConfig,
+  getQueueRuntimeResourceNameFromConfig,
   getWebsocketApiIdSsmParameterName,
   getWebStackName,
   resolveConfigRuntimeResourceNameFromConfig,
+  withFifoSuffix,
 } from './awsNamingUtils';
 
 const websocketEventProcessors = { onConnect: undefined, onDisconnect: undefined } as any;
@@ -115,6 +117,32 @@ describe('getQpqRuntimeResourceNameFromConfig', () => {
   });
 });
 
+describe('withFifoSuffix', () => {
+  it('appends .fifo only when isFifo is true', () => {
+    expect(withFifoSuffix('res', true)).toBe('res.fifo');
+    expect(withFifoSuffix('res', false)).toBe('res');
+    expect(withFifoSuffix('res')).toBe('res');
+  });
+});
+
+describe('getQueueRuntimeResourceNameFromConfig', () => {
+  it('returns the standard decorated name for a non-FIFO queue', () => {
+    const config = buildTestQpqConfig([defineQueue('jobs', {})]);
+
+    expect(getQueueRuntimeResourceNameFromConfig('jobs', config)).toBe('jobs-test-app-test-module-development');
+  });
+
+  it('appends .fifo after the decoration for a FIFO queue', () => {
+    const config = buildTestQpqConfig([defineQueue('jobs', {}, { isFifo: true })]);
+
+    expect(getQueueRuntimeResourceNameFromConfig('jobs', config)).toBe('jobs-test-app-test-module-development.fifo');
+  });
+
+  it('falls back to the standard name when the queue config is not found', () => {
+    expect(getQueueRuntimeResourceNameFromConfig('jobs', buildTestQpqConfig())).toBe('jobs-test-app-test-module-development');
+  });
+});
+
 describe('getKvsDynamoTableNameFromConfig', () => {
   it('builds the dynamo table name from the config when there is no override', () => {
     expect(getKvsDynamoTableNameFromConfig('users', buildTestQpqConfig(), '-table')).toBe('users-test-app-test-module-development-qpq-table');
@@ -173,6 +201,14 @@ describe('getEventBusSnsTopicArn', () => {
 
     expect(getEventBusSnsTopicArn('bus', config, 'test-module', 'development', 'test-app')).toBe(
       'arn:aws:sns:eu-west-1:111:bus-test-app-test-module-development',
+    );
+  });
+
+  it('appends .fifo to the topic name for a FIFO bus', () => {
+    const config = buildTestQpqConfig([defineAwsServiceAccountInfo('111', 'eu-west-1')]);
+
+    expect(getEventBusSnsTopicArn('bus', config, 'test-module', 'development', 'test-app', undefined, true)).toBe(
+      'arn:aws:sns:eu-west-1:111:bus-test-app-test-module-development.fifo',
     );
   });
 });

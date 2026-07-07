@@ -4,6 +4,8 @@ import { convertCrossModuleOwnerToGenericResourceNameOverride } from '../utils/c
 
 export interface QPQConfigAdvancedEventBusSettings extends QPQConfigAdvancedSettings {
   owner?: CrossModuleOwner<'eventBusName'>;
+
+  isFifo?: boolean;
 }
 
 export interface EventBusQPQConfigSetting extends QPQConfigSetting {
@@ -12,6 +14,8 @@ export interface EventBusQPQConfigSetting extends QPQConfigSetting {
   deprecated?: boolean;
 
   owner?: CrossModuleOwner;
+
+  isFifo: boolean;
 }
 
 export const defineEventBus = (name: string, options?: QPQConfigAdvancedEventBusSettings): EventBusQPQConfigSetting => ({
@@ -23,4 +27,6 @@ export const defineEventBus = (name: string, options?: QPQConfigAdvancedEventBus
   deprecated: !!options?.deprecated,
 
   owner: convertCrossModuleOwnerToGenericResourceNameOverride(options?.owner),
+
+  isFifo: options?.isFifo || false,
 });

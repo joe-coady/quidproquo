@@ -3,15 +3,26 @@ import { SendMessageBatchCommand, SendMessageBatchRequestEntry, SQSClient } from
 import { createAwsClient } from '../createAwsClient';
 import { getQueueUrl } from './getQueueUrl';
 
-export const sendMessages = async (queueName: string, region: string, messages: string[]): Promise<void> => {
+export interface SqsQueueMessageEntry {
+  body: string;
+
+  // FIFO queues only
+  groupId?: string;
+  deduplicationId?: string;
+}
+
+export const sendMessages = async (queueName: string, region: string, messages: SqsQueueMessageEntry[]): Promise<void> => {
   const sqsClient = createAwsClient(SQSClient, { region });
 
   const url = await getQueueUrl(queueName, sqsClient);
 
   // Convert them to entries
   const entries: SendMessageBatchRequestEntry[] = messages.map((message, index) => ({
-    MessageBody: message,
+    MessageBody: message.body,
     Id: `${index}`,
+
+    ...(message.groupId !== undefined ? { MessageGroupId: message.groupId } : {}),
+    ...(message.deduplicationId !== undefined ? { MessageDeduplicationId: message.deduplicationId } : {}),
   }));
 
   // now send them off in batches of 10

@@ -10,6 +10,7 @@ import {
   EventBusMessage,
   EventBusSendMessageActionProcessor,
   EventBusSendMessagesErrorTypeEnum,
+  generateUuid,
   QPQConfig,
   qpqCoreUtils,
   StorySession,
@@ -17,7 +18,7 @@ import {
 } from 'quidproquo-core';
 
 import { getEventBusSnsTopicArn } from '../../../awsNamingUtils';
-import { publishMessage } from '../../../logic/sns/publishMessage';
+import { publishMessage, SnsPublishMessageEntry } from '../../../logic/sns/publishMessage';
 
 // TODO: Unify this once the lambda code moves from CDK to awslambda
 type AnyEventBusMessageWithSession = EventBusMessage<any> & {
@@ -42,19 +43,32 @@ const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): EventBusSendMessag
       eventBusConfig.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
       eventBusConfig.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig),
       eventBusConfig.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
+
+      eventBusConfig.isFifo,
     );
 
     try {
       await publishMessage(
         topicArn,
         region,
-        eventBusMessages.map((message) => {
+        eventBusMessages.map((message): SnsPublishMessageEntry => {
           const eventBusMessageWithSession: AnyEventBusMessageWithSession = {
             ...message,
             storySession: toCrossServiceSession(session),
           };
 
-          return JSON.stringify(eventBusMessageWithSession);
+          return {
+            message: JSON.stringify(eventBusMessageWithSession),
+
+            // FIFO: default to one group per bus (global ordering) and a unique
+            // dedup id (no dedup) - callers opt in to per-entity groups / real dedup
+            ...(eventBusConfig.isFifo
+              ? {
+                  groupId: message.groupId ?? eventBusName,
+                  deduplicationId: message.deduplicationId ?? generateUuid(),
+                }
+              : {}),
+          };
         }),
       );
 

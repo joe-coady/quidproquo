@@ -105,6 +105,9 @@ const getProcessGetRecords = (qpqConfig: QPQConfig): EventGetRecordsActionProces
           payload: parsedInternalEventRecord.payload,
         },
         id: record.messageId,
+
+        // FIFO queues only
+        groupId: record.attributes?.MessageGroupId,
       };
 
       return internalEventRecord;

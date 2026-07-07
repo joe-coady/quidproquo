@@ -64,4 +64,42 @@ describe('getEventBusSendMessagesActionProcessor', () => {
       }),
     );
   });
+
+  it('leaves groupId unset for non-FIFO buses', async () => {
+    const process = await getProcessor();
+
+    await invokeProcessor(process, { eventBusName: 'myBus', eventBusMessages: [{ payload: {}, type: 'x' }] });
+
+    expect(vi.mocked(eventBus.publish).mock.calls[0][1].groupId).toBeUndefined();
+  });
+
+  it('defaults groupId to the bus name for FIFO buses', async () => {
+    const process = await getProcessor(buildTestQpqConfig([defineEventBus('fifoBus', { isFifo: true })]));
+
+    await invokeProcessor(process, {
+      eventBusName: 'fifoBus',
+      eventBusMessages: [
+        { payload: {}, type: 'x' },
+        { payload: {}, type: 'y', groupId: 'user-42' },
+      ],
+    });
+
+    expect(vi.mocked(eventBus.publish).mock.calls[0][1].groupId).toBe('fifoBus');
+    expect(vi.mocked(eventBus.publish).mock.calls[1][1].groupId).toBe('user-42');
+  });
+
+  it('drops FIFO messages with a deduplicationId seen within the dedup window', async () => {
+    const process = await getProcessor(buildTestQpqConfig([defineEventBus('fifoBus', { isFifo: true })]));
+
+    await invokeProcessor(process, {
+      eventBusName: 'fifoBus',
+      eventBusMessages: [
+        { payload: { a: 1 }, type: 'x', deduplicationId: 'bus-dedup-1' },
+        { payload: { a: 2 }, type: 'x', deduplicationId: 'bus-dedup-1' },
+      ],
+    });
+
+    expect(eventBus.publish).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(eventBus.publish).mock.calls[0][1].payload).toEqual({ a: 1 });
+  });
 });

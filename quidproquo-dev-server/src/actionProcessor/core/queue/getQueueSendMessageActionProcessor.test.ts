@@ -62,4 +62,58 @@ describe('getQueueSendMessagesActionProcessor', () => {
       }),
     );
   });
+
+  it('leaves groupId unset for non-FIFO queues', async () => {
+    const process = await getProcessor();
+
+    await invokeProcessor(process, { queueName: 'myQueue', queueMessages: [{ payload: {}, type: 'x' }] });
+
+    expect(vi.mocked(eventBus.publish).mock.calls[0][1].groupId).toBeUndefined();
+  });
+
+  it('defaults groupId to the queue name for FIFO queues', async () => {
+    const process = await getProcessor(buildTestQpqConfig([defineQueue('fifoQueue', {}, { isFifo: true })]));
+
+    await invokeProcessor(process, {
+      queueName: 'fifoQueue',
+      queueMessages: [
+        { payload: {}, type: 'x' },
+        { payload: {}, type: 'y', groupId: 'user-42' },
+      ],
+    });
+
+    expect(vi.mocked(eventBus.publish).mock.calls[0][1].groupId).toBe('fifoQueue');
+    expect(vi.mocked(eventBus.publish).mock.calls[1][1].groupId).toBe('user-42');
+  });
+
+  it('drops FIFO messages with a deduplicationId seen within the dedup window', async () => {
+    const process = await getProcessor(buildTestQpqConfig([defineQueue('fifoQueue', {}, { isFifo: true })]));
+
+    await invokeProcessor(process, {
+      queueName: 'fifoQueue',
+      queueMessages: [
+        { payload: { a: 1 }, type: 'x', deduplicationId: 'dedup-1' },
+        { payload: { a: 2 }, type: 'x', deduplicationId: 'dedup-1' },
+        { payload: { a: 3 }, type: 'x', deduplicationId: 'dedup-2' },
+      ],
+    });
+
+    expect(eventBus.publish).toHaveBeenCalledTimes(2);
+    expect(vi.mocked(eventBus.publish).mock.calls[0][1].payload).toEqual({ a: 1 });
+    expect(vi.mocked(eventBus.publish).mock.calls[1][1].payload).toEqual({ a: 3 });
+  });
+
+  it('does not dedup FIFO messages without an explicit deduplicationId', async () => {
+    const process = await getProcessor(buildTestQpqConfig([defineQueue('fifoQueue', {}, { isFifo: true })]));
+
+    await invokeProcessor(process, {
+      queueName: 'fifoQueue',
+      queueMessages: [
+        { payload: { a: 1 }, type: 'x' },
+        { payload: { a: 1 }, type: 'x' },
+      ],
+    });
+
+    expect(eventBus.publish).toHaveBeenCalledTimes(2);
+  });
 });

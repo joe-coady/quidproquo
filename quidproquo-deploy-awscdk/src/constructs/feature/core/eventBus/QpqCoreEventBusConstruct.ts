@@ -40,6 +40,7 @@ export class QpqCoreEventBusConstruct extends QpqCoreEventBusConstructBase {
       eventBusConfig?.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
       eventBusConfig?.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig),
       eventBusConfig?.owner?.feature ?? qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
+      eventBusConfig?.isFifo,
     );
 
     class Import extends QpqCoreEventBusConstructBase {
@@ -52,9 +53,15 @@ export class QpqCoreEventBusConstruct extends QpqCoreEventBusConstructBase {
   constructor(scope: Construct, id: string, props: QpqCoreEventBusConstructProps) {
     super(scope, id, props);
 
+    // contentBasedDeduplication stays off for FIFO topics: message bodies embed a per-send
+    // storySession, so content hashes would never match - dedup ids are set explicitly at
+    // publish time instead.
+    const isFifo = props.eventBusConfig.isFifo;
+
     this.topic = new aws_sns.Topic(this, 'topic', {
-      topicName: this.resourceName(props.eventBusConfig.name),
+      topicName: awsNamingUtils.withFifoSuffix(this.resourceName(props.eventBusConfig.name), isFifo),
       displayName: props.eventBusConfig.name,
+      fifo: isFifo || undefined,
     });
 
     qpqDeployAwsCdkUtils.applyEnvironmentTags(this.topic, props.qpqConfig);
@@ -85,9 +92,18 @@ export class QpqCoreEventBusConstruct extends QpqCoreEventBusConstructBase {
     // Direct SNS fan-out (email / incident-tool webhooks), declared per-bus via
     // the AWS-specific `defineEventBusQuickSubscription`. Gives alarms routed here
     // via onAlarm.publishToEventBus somewhere to actually land.
-    qpqConfigAwsUtils
-      .getEventBusQuickSubscriptions(props.qpqConfig, props.eventBusConfig.name, props.eventBusConfig.owner)
-      .forEach((subscription) => {
+    const quickSubscriptions = qpqConfigAwsUtils.getEventBusQuickSubscriptions(
+      props.qpqConfig,
+      props.eventBusConfig.name,
+      props.eventBusConfig.owner,
+    );
+
+    // SNS FIFO topics only support SQS subscriptions - no email/http endpoints
+    if (isFifo && quickSubscriptions.length > 0) {
+      throw new Error(`Event bus [${props.eventBusConfig.name}]: quick subscriptions (email/url) are not supported on FIFO event buses`);
+    }
+
+    quickSubscriptions.forEach((subscription) => {
         if (subscription.type === EventBusQuickSubscriptionType.email) {
           this.topic.addSubscription(new aws_sns_subscriptions.EmailSubscription(subscription.email));
         } else {

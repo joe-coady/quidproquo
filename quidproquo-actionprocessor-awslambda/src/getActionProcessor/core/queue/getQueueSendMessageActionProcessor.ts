@@ -4,14 +4,15 @@ import {
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  generateUuid,
   QueueActionType,
   QueueSendMessageActionProcessor,
   QueueSendMessagesErrorTypeEnum,
   toCrossServiceSession,
 } from 'quidproquo-core';
 
-import { sendMessages } from '../../../logic/sqs/sendMessages';
-import { resolveResourceName } from '../../../runtimeConfig/qpqAwsLambdaRuntimeConfigUtils';
+import { getQueueRuntimeResourceNameFromConfig } from '../../../awsNamingUtils';
+import { sendMessages, SqsQueueMessageEntry } from '../../../logic/sqs/sendMessages';
 
 // TODO: Unify this once the lambda code moves from CDK to awslambda
 type AnyQueueMessageWithSession = QueueMessage<any> & {
@@ -21,20 +22,32 @@ type AnyQueueMessageWithSession = QueueMessage<any> & {
 const getProcessQueueSendMessage = (qpqConfig: QPQConfig): QueueSendMessageActionProcessor<any> => {
   return async ({ queueName, queueMessages }, session) => {
     // While we have some uuids
-    const sqsQueueName = resolveResourceName(queueName, qpqConfig);
+    const sqsQueueName = getQueueRuntimeResourceNameFromConfig(queueName, qpqConfig);
+    const isFifo = qpqCoreUtils.getQueueByName(qpqConfig, queueName)?.isFifo || false;
 
     try {
       await sendMessages(
         sqsQueueName,
         qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig),
-        queueMessages.map((message) => {
+        queueMessages.map((message): SqsQueueMessageEntry => {
           // Add the session info to the message
           const queueMessageWithSession: AnyQueueMessageWithSession = {
             ...message,
             storySession: toCrossServiceSession(session),
           };
 
-          return JSON.stringify(queueMessageWithSession);
+          return {
+            body: JSON.stringify(queueMessageWithSession),
+
+            // FIFO: default to one group per queue (global ordering) and a unique
+            // dedup id (no dedup) - callers opt in to per-entity groups / real dedup
+            ...(isFifo
+              ? {
+                  groupId: message.groupId ?? queueName,
+                  deduplicationId: message.deduplicationId ?? generateUuid(),
+                }
+              : {}),
+          };
         }),
       );
 
