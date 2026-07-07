@@ -1,5 +1,6 @@
 import {
-  ConfigActionType,
+  AuthenticateUserChallenge,
+  AuthenticateUserResponse,
   ContextActionType,
   DateActionType,
   GuidActionType,
@@ -9,22 +10,31 @@ import {
   StateDispatchAction,
 } from 'quidproquo-core';
 
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { clearInMemoryAuthToken, setInMemoryAuthToken } from '../config';
 import { askPlatformRequest } from './askPlatformRequest';
 
 const baseUrls = { api: 'https://api', ws: 'wss://api' };
 
 const baseMocks = () => ({
   [ContextActionType.Read]: baseUrls,
-  [ConfigActionType.GetParameter]: JSON.stringify({ authenticationInfo: { accessToken: 'tok' } }),
   [StateActionType.Dispatch]: undefined,
   [DateActionType.Now]: '2026-06-26T00:00:00.000Z',
   [GuidActionType.New]: 'guid-1',
 });
 
 describe('askPlatformRequest', () => {
+  beforeEach(() => {
+    clearInMemoryAuthToken();
+  });
+
   it('sends the request with the auth header and the api base path', () => {
+    setInMemoryAuthToken({
+      challenge: AuthenticateUserChallenge.NONE,
+      authenticationInfo: { accessToken: 'tok' },
+    } as unknown as AuthenticateUserResponse);
+
     const networkRequest = vi.fn(() => ({ status: 200, data: { ok: true } }));
 
     const result = runStory(askPlatformRequest('GET', '/thing'), {
@@ -37,6 +47,18 @@ describe('askPlatformRequest', () => {
     expect(action.payload.headers.Authorization).toBe('Bearer tok');
     expect(action.payload.basePath).toBe(baseUrls.api);
     expect(result).toEqual({ status: 200, data: { ok: true } });
+  });
+
+  it('sends no auth header when no token is stored', () => {
+    const networkRequest = vi.fn(() => ({ status: 200, data: { ok: true } }));
+
+    runStory(askPlatformRequest('GET', '/thing'), {
+      ...baseMocks(),
+      [NetworkActionType.Request]: networkRequest,
+    });
+
+    const action = networkRequest.mock.calls[0][0] as { payload: { headers: Record<string, string> } };
+    expect(action.payload.headers.Authorization).toBeUndefined();
   });
 
   it('shows an error dispatch when the response is not 2xx', () => {

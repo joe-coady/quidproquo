@@ -1,16 +1,18 @@
 import { LogLog } from 'quidproquo-webserver';
 
-import { useSearchParams } from 'react-router-dom';
+import { CorrelationOpenSource, useAdminApp, useSessionState } from '../../../../adminApp';
 
 export const useLogLogMananagement = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const selectedLogCorrelation = searchParams.get('correlation') || '';
+  const [api] = useAdminApp();
+  const session = useSessionState();
+
+  const selectedLogCorrelation = session.openCorrelation ?? '';
 
   const setSelectedLogCorrelation = (correlation?: string) => {
     if (correlation) {
-      setSearchParams({ correlation });
+      api.applyCorrelationOpened(correlation, CorrelationOpenSource.grid);
     } else {
-      setSearchParams({});
+      api.applyCorrelationClosed();
     }
   };
 
@@ -19,7 +21,7 @@ export const useLogLogMananagement = () => {
   };
 
   const clearSelectedLogCorrelation = () => {
-    setSelectedLogCorrelation();
+    api.applyCorrelationClosed();
   };
 
   return {

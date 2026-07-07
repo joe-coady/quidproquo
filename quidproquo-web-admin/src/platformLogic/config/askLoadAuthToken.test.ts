@@ -1,24 +1,29 @@
-import { AuthenticateUserChallenge, ConfigActionType, ErrorTypeEnum, runStory, throwsError } from 'quidproquo-core';
+import { AuthenticateUserChallenge, AuthenticateUserResponse, runStory } from 'quidproquo-core';
 
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import { askLoadAuthToken } from './askLoadAuthToken';
+import { clearInMemoryAuthToken, setInMemoryAuthToken } from './inMemoryAuthTokenStore';
 
 describe('askLoadAuthToken', () => {
-  it('parses the stored auth token parameter', () => {
-    const stored = { challenge: AuthenticateUserChallenge.NONE, authenticationInfo: { accessToken: 'tok' } };
+  beforeEach(() => {
+    clearInMemoryAuthToken();
+  });
 
-    const result = runStory(askLoadAuthToken(), {
-      [ConfigActionType.GetParameter]: JSON.stringify(stored),
-    });
+  it('returns the in-memory auth token', () => {
+    const stored = {
+      challenge: AuthenticateUserChallenge.NONE,
+      authenticationInfo: { accessToken: 'tok' },
+    } as unknown as AuthenticateUserResponse;
+    setInMemoryAuthToken(stored);
+
+    const result = runStory(askLoadAuthToken(), {});
 
     expect(result).toEqual(stored);
   });
 
-  it('returns a NONE challenge when the parameter is missing', () => {
-    const result = runStory(askLoadAuthToken(), {
-      [ConfigActionType.GetParameter]: throwsError(ErrorTypeEnum.NotFound, 'missing'),
-    });
+  it('returns a NONE challenge when no token is stored', () => {
+    const result = runStory(askLoadAuthToken(), {});
 
     expect(result).toEqual({ challenge: AuthenticateUserChallenge.NONE });
   });

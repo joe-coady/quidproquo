@@ -13,8 +13,8 @@ import { Box } from '@mui/system';
 import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
+import { useSearchFields } from '../../../adminApp';
 import { AsyncButton } from '../../../components/AsyncButton';
-import { useUrlFields } from '../../../queryParams';
 import { useServiceNames } from '../../hooks';
 
 export interface AdminLogSearchBarProps {
@@ -36,7 +36,7 @@ export function AdminLogSearchBar({ onSearch }: AdminLogSearchBarProps) {
     updateStartAndEndTimeSpan,
     logLevel,
     handleLogLevelOnChange,
-  } = useUrlFields();
+  } = useSearchFields();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 

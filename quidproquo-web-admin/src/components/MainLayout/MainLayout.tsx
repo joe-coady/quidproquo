@@ -4,13 +4,14 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import { BottomNavigation, BottomNavigationAction, CircularProgress } from '@mui/material';
 import Box from '@mui/material/Box';
 
+import { useAdminApp, useSessionState } from '../../adminApp';
 import { authRuntime } from '../../Auth/logic';
-import { useUrlFields } from '../../queryParams';
 import { useTabs } from './hooks/useTabs';
 
 export function MainLayout() {
   const { tabs, loading } = useTabs();
-  const { tab, handleTabOnChange } = useUrlFields();
+  const [adminApi] = useAdminApp();
+  const { tab } = useSessionState();
   const [authApi] = useQpqRuntime(authRuntime);
 
   return (
@@ -40,7 +41,7 @@ export function MainLayout() {
         onChange={(event, newValue) => {
           // The trailing Logout / Loading actions are not tabs
           if (newValue < tabs.length) {
-            handleTabOnChange(event, newValue);
+            adminApi.applyTabChanged(newValue, tabs[newValue].name);
           }
         }}
         showLabels
@@ -60,7 +61,15 @@ export function MainLayout() {
           <BottomNavigationAction key={t.name} icon={t.icon} label={t.name} />
         ))}
         {loading && <BottomNavigationAction disabled icon={<CircularProgress size={18} />} label="Loading" />}
-        <BottomNavigationAction icon={<LogoutIcon />} label="Logout" onClick={() => authApi.authLogout()} />
+        <BottomNavigationAction
+          icon={<LogoutIcon />}
+          label="Logout"
+          onClick={async () => {
+            // Record sessionEnded and drain the audit log before the tokens go.
+            await adminApi.endSession();
+            authApi.authLogout();
+          }}
+        />
       </BottomNavigation>
     </Box>
   );

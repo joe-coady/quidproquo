@@ -1,12 +1,9 @@
 import { AskResponse } from 'quidproquo-core';
 
-import { askLoadAuthToken } from '../../../platformLogic';
-import { askAuthUISetAuthInfo } from '../authActionCreator';
 import { askRunRefreshTokensLoop } from './askRunRefreshTokensLoop';
 
+// No token restore on boot: tokens are in-memory only, so a page refresh
+// always lands on the login screen and starts a fresh admin session.
 export function* askAuthMain(): AskResponse<void> {
-  const authInfo = yield* askLoadAuthToken();
-  yield* askAuthUISetAuthInfo(authInfo);
-
   yield* askRunRefreshTokensLoop();
 }

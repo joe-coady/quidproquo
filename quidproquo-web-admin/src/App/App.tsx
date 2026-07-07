@@ -5,6 +5,7 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import CssBaseline from '@mui/material/CssBaseline';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
+import { AdminAppProvider } from '../adminApp';
 import { Auth } from '../Auth/Auth';
 import { MainLayout } from '../components';
 import { LoadFederatedAddons } from '../FederatedAddon';
@@ -44,13 +45,15 @@ export const App: React.FC<AppProps> = ({ urlResolvers, loadAddons }) => {
             <CssBaseline />
             <LoadingProvider>
               <Auth>
-                <WebsocketProvider wsUrl={urlResolvers.getWsUrl()}>
-                  <WebSocketAuthProvider>
-                    <FederatedAddonProvider loadAddons={loadAddons}>
-                      <MainLayout />
-                    </FederatedAddonProvider>
-                  </WebSocketAuthProvider>
-                </WebsocketProvider>
+                <AdminAppProvider>
+                  <WebsocketProvider wsUrl={urlResolvers.getWsUrl()}>
+                    <WebSocketAuthProvider>
+                      <FederatedAddonProvider loadAddons={loadAddons}>
+                        <MainLayout />
+                      </FederatedAddonProvider>
+                    </WebSocketAuthProvider>
+                  </WebsocketProvider>
+                </AdminAppProvider>
               </Auth>
             </LoadingProvider>
           </ThemeProvider>

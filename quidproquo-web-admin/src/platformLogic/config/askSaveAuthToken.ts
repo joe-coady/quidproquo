@@ -1,18 +1,9 @@
-import { askConfigSetParameter, AuthenticateUserResponse } from 'quidproquo-core';
+import { AskResponse, AuthenticateUserResponse } from 'quidproquo-core';
 
-import { askLoadAuthToken } from './askLoadAuthToken';
+import { setInMemoryAuthToken } from './inMemoryAuthTokenStore';
 
-export function* askSaveAuthToken(newAuthenticateUserResponse: AuthenticateUserResponse) {
-  const oldAuthenticateUserResponse: AuthenticateUserResponse = yield* askLoadAuthToken();
-
-  const merged: AuthenticateUserResponse = {
-    ...oldAuthenticateUserResponse,
-    ...newAuthenticateUserResponse,
-
-    authenticationInfo: {
-      ...(oldAuthenticateUserResponse?.authenticationInfo || {}),
-      ...(newAuthenticateUserResponse?.authenticationInfo || {}),
-    },
-  };
-  yield* askConfigSetParameter('authToken', JSON.stringify(newAuthenticateUserResponse));
+// Kept as an ask* story so call sites read like every other effect, but the
+// write is an in-memory synchronous set — tokens must never be persisted.
+export function* askSaveAuthToken(newAuthenticateUserResponse: AuthenticateUserResponse): AskResponse<void> {
+  setInMemoryAuthToken(newAuthenticateUserResponse);
 }

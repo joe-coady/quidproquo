@@ -1,15 +1,14 @@
-import { ConfigActionType, ContextActionType, DateActionType, GuidActionType, NetworkActionType, runStory, StateActionType } from 'quidproquo-core';
+import { ContextActionType, DateActionType, GuidActionType, NetworkActionType, runStory, StateActionType } from 'quidproquo-core';
 
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { clearInMemoryAuthToken } from '../../../../platformLogic';
 import { AuthEffect } from '../../../logic/authTypes';
 import { askAuthChallengeSendMfaSetupCode } from './askAuthChallengeSendMfaSetupCode';
 
 const baseMocks = (dispatched: string[], networkRequest: unknown) => ({
   [StateActionType.Read]: { mfaCode: '123456', session: 'sess-from-state' },
   [ContextActionType.Read]: { api: 'https://api', ws: 'wss://api' },
-  [ConfigActionType.GetParameter]: JSON.stringify({ authenticationInfo: {} }),
-  [ConfigActionType.SetParameter]: undefined,
   [DateActionType.Now]: '2026-06-26T00:00:00.000Z',
   [GuidActionType.New]: 'guid-1',
   [NetworkActionType.Request]: networkRequest,
@@ -19,6 +18,10 @@ const baseMocks = (dispatched: string[], networkRequest: unknown) => ({
 });
 
 describe('askAuthChallengeSendMfaSetupCode', () => {
+  beforeEach(() => {
+    clearInMemoryAuthToken();
+  });
+
   it('posts the mfa code with the refreshed session from state', () => {
     const dispatched: string[] = [];
     const networkRequest = vi.fn(() => ({ status: 200, data: { challenge: 'NONE' } }));

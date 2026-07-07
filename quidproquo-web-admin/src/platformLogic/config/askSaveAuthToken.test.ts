@@ -1,26 +1,39 @@
-import { AuthenticateUserChallenge, AuthenticateUserResponse, ConfigActionType, ConfigSetParameterAction, runStory } from 'quidproquo-core';
+import { AuthenticateUserChallenge, AuthenticateUserResponse, runStory } from 'quidproquo-core';
 
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import { askSaveAuthToken } from './askSaveAuthToken';
+import { clearInMemoryAuthToken, getInMemoryAuthToken } from './inMemoryAuthTokenStore';
 
 describe('askSaveAuthToken', () => {
-  it('persists the new auth token as the authToken parameter', () => {
+  beforeEach(() => {
+    clearInMemoryAuthToken();
+  });
+
+  it('stores the new auth token in memory', () => {
     const newResponse = {
       challenge: AuthenticateUserChallenge.NONE,
       authenticationInfo: { accessToken: 'new' },
     } as unknown as AuthenticateUserResponse;
 
-    let saved: { parameterName: string; parameterValue: string } | undefined;
+    runStory(askSaveAuthToken(newResponse), {});
 
-    runStory(askSaveAuthToken(newResponse), {
-      [ConfigActionType.GetParameter]: JSON.stringify({ authenticationInfo: { refreshToken: 'old' } }),
-      [ConfigActionType.SetParameter]: (action: ConfigSetParameterAction) => {
-        saved = action.payload;
-      },
-    });
+    expect(getInMemoryAuthToken()).toEqual(newResponse);
+  });
 
-    expect(saved?.parameterName).toBe('authToken');
-    expect(JSON.parse(saved!.parameterValue)).toEqual(newResponse);
+  it('replaces any previously stored token', () => {
+    const oldResponse = {
+      challenge: AuthenticateUserChallenge.NONE,
+      authenticationInfo: { accessToken: 'old', refreshToken: 'old-refresh' },
+    } as unknown as AuthenticateUserResponse;
+    const newResponse = {
+      challenge: AuthenticateUserChallenge.NONE,
+      authenticationInfo: { accessToken: 'new' },
+    } as unknown as AuthenticateUserResponse;
+
+    runStory(askSaveAuthToken(oldResponse), {});
+    runStory(askSaveAuthToken(newResponse), {});
+
+    expect(getInMemoryAuthToken()).toEqual(newResponse);
   });
 });
