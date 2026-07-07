@@ -3,9 +3,9 @@ import { LogMetadata } from 'quidproquo-webserver';
 import LinearProgress from '@mui/material/LinearProgress';
 import { DataGrid, GridColDef, GridRenderCellParams, GridRowClassNameParams } from '@mui/x-data-grid';
 
+import { CorrelationOpenSource, getSearchProgress, logSearchKey, useAdminApp, useSessionState, useVolatileState } from '../adminApp';
 import { DataGridPagination } from '../components/DataGridPagination/DataGridPagination';
 import { DateCell } from '../components/DateCell/DateCell';
-import { useLogManagement } from './hooks';
 import { LogDialog } from './LogDialog';
 
 const formatTime = (ms: number) => {
@@ -47,7 +47,16 @@ type LogMetadataGridProps = {
 };
 
 export const LogMetadataGrid = ({ logs, isLoading }: LogMetadataGridProps) => {
-  const { selectedLogCorrelation, onRowClick, clearSelectedLogCorrelation, setSelectedLogCorrelation, searchProgress } = useLogManagement();
+  const [api] = useAdminApp();
+  const session = useSessionState();
+  const volatile = useVolatileState();
+
+  const searchProgress = getSearchProgress(volatile.logResults[logSearchKey(session.search)]);
+  const selectedLogCorrelation = session.openCorrelation ?? '';
+
+  const onRowClick = ({ row }: { row: { correlation: string } }) => api.applyCorrelationOpened(row.correlation, CorrelationOpenSource.grid);
+  const clearSelectedLogCorrelation = () => api.applyCorrelationClosed();
+  const setSelectedLogCorrelation = (correlation: string) => api.applyCorrelationOpened(correlation, CorrelationOpenSource.tree);
 
   const getRowClassName = (params: GridRowClassNameParams) => {
     return params.row.checked ? 'greenRow' : '';

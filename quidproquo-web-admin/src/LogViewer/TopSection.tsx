@@ -11,8 +11,8 @@ import { Box } from '@mui/system';
 import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
+import { useSearchFields } from '../adminApp';
 import { AsyncButton } from '../components/AsyncButton';
-import { useUrlFields } from '../queryParams';
 import { RuntimeTypes } from './constants';
 import { useServiceNames } from './hooks';
 
@@ -41,7 +41,7 @@ export function TopSection({ onSearch }: TopSectionProps) {
     error,
     handleErrorOnChange,
     updateStartAndEndTimeSpan,
-  } = useUrlFields();
+  } = useSearchFields();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 

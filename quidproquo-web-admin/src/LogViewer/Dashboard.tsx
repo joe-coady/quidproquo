@@ -1,15 +1,13 @@
-import { StoryResultMetadata } from 'quidproquo-core';
 import { uniqueBy } from 'quidproquo-web';
-import { useEffectCallback, useRunEvery, useThrottledMemo } from 'quidproquo-web-react';
-import { useSubscribeToWebSocketEvent } from 'quidproquo-web-react';
+import { useEffectCallback, useRunEvery, useSubscribeToWebSocketEvent, useThrottledMemo } from 'quidproquo-web-react';
 import { LogMetadata, WebSocketQueueQpqAdminServerEventMessageLogMetadata, WebSocketQueueQpqAdminServerMessageEventType } from 'quidproquo-webserver';
 
 import React, { useEffect, useMemo } from 'react';
 import { Box, Grid, Paper, Typography } from '@mui/material';
 
+import { dashboardErrorsSearchKey, useAdminApp, useVolatileState } from '../adminApp';
 import { TabViewBox } from '../components/TabViewBox';
 import { useIsLoading } from '../view/Loading/hooks/useIsLoading';
-import { useLogSearch } from './hooks';
 import { LogMetadataGrid } from './LogMetadataGrid';
 
 const getLogCountForSinceXDaysAgo = (logs: LogMetadata[], daysAgo: number) => {
@@ -30,35 +28,17 @@ const getHoursSinceStartOfDay = (): number => {
 interface DashboardProps {}
 
 export const Dashboard: React.FC<DashboardProps> = () => {
-  const [realtimeLogs, setRealtimeLogs] = React.useState<StoryResultMetadata[]>([]);
-
-  const { onSearch, logs: weeklyLogs } = useLogSearch();
+  const [api] = useAdminApp();
+  const volatile = useVolatileState();
   const isLoading = useIsLoading();
+
+  const results = volatile.logResults[dashboardErrorsSearchKey];
+  const weeklyLogs = useMemo(() => results?.logs ?? [], [results?.logs]);
+  const realtimeLogs = volatile.realtimeErrorLogs;
 
   // Stable identity so the mount-only effect below can list it as a dependency.
   const runInitialSearch = useEffectCallback(() => {
-    const currentDate = new Date();
-
-    const sevenDaysAgo = new Date(currentDate.getTime() - 7 * 24 * 60 * 60 * 1000);
-    const isoDateSevenDaysAgo = sevenDaysAgo.toISOString();
-
-    const now = new Date(currentDate.getTime() + 24 * 60 * 60 * 1000);
-    const isoDateNow = now.toISOString();
-
-    const searchParams = {
-      runtimeType: 'ALL',
-      startIsoDateTime: isoDateSevenDaysAgo,
-      endIsoDateTime: isoDateNow,
-      errorFilter: '',
-      infoFilter: '',
-      serviceFilter: '',
-      userFilter: '',
-      deep: '',
-
-      onlyErrors: true,
-    };
-
-    onSearch(searchParams);
+    api.runDashboardErrorSearch();
   });
 
   useEffect(() => {
@@ -68,10 +48,7 @@ export const Dashboard: React.FC<DashboardProps> = () => {
   useSubscribeToWebSocketEvent(
     WebSocketQueueQpqAdminServerMessageEventType.LogMetadata,
     (webSocketService, message: WebSocketQueueQpqAdminServerEventMessageLogMetadata) => {
-      // Add the log to the list if its an error
-      if (message.payload.log.error) {
-        setRealtimeLogs((prevLogs) => [message.payload.log, ...prevLogs.filter((pl) => pl.correlation !== message.payload.log.correlation)]);
-      }
+      api.receiveRealtimeErrorLog(message.payload.log);
     },
   );
 
@@ -102,7 +79,7 @@ export const Dashboard: React.FC<DashboardProps> = () => {
         </Grid>
       </Grid>
       <Box sx={{ flex: 1, overflow: 'auto' }}>
-        <LogMetadataGrid isLoading={isLoading} logs={allLogs} />
+        <LogMetadataGrid isLoading={isLoading || !!results?.isSearching} logs={allLogs} />
       </Box>
     </TabViewBox>
   );

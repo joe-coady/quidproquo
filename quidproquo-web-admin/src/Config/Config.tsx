@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import { Box, CssBaseline, Drawer, List, ListItem, ListItemButton, ListItemText, Tab, Tabs, TextField, Toolbar, Typography } from '@mui/material';
 import { useOnMount } from '@mui/x-data-grid/internals';
 
+import { useAdminApp, useSessionState } from '../adminApp';
 import { useServiceNames } from '../LogViewer/hooks';
 
 const drawerWidth = 240;
@@ -12,11 +13,12 @@ const drawerWidth = 240;
 const sections = ['General', 'Settings', 'Advanced'];
 
 export function Config() {
-  const [selectedServiceOverride, setSelectedServiceOverride] = useState('');
   const [tabIndex, setTabIndex] = useState(0);
   const [search, setSearch] = useState('');
   const services = useServiceNames();
 
+  const [api] = useAdminApp();
+  const session = useSessionState();
   const sendMessage = useWebsocketSendEvent();
 
   useOnMount(() => {
@@ -25,11 +27,12 @@ export function Config() {
       payload: {},
     };
 
+    api.applyConfigSyncRequested();
     sendMessage(configSyncRequestEvent);
   });
 
   const handleServiceClick = (service: string) => {
-    setSelectedServiceOverride(service);
+    api.applyConfigServiceSelected(service);
     setTabIndex(0);
   };
 
@@ -38,7 +41,7 @@ export function Config() {
   };
 
   const filteredServices = services.filter((s) => s.label.toLowerCase().includes(search.toLowerCase()));
-  const selectedService = selectedServiceOverride || services[0]?.label;
+  const selectedService = session.configSelectedService || services[0]?.label;
 
   return (
     <Box sx={{ display: 'flex' }}>

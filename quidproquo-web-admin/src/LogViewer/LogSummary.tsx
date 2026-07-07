@@ -12,6 +12,8 @@ import {
 import { useEffect, useState } from 'react';
 import { Box, Checkbox, CircularProgress, FormControlLabel, Typography } from '@mui/material';
 
+import { useAdminApp } from '../adminApp';
+
 interface LogSummaryProps {
   log: StoryResult<any>;
 }
@@ -20,6 +22,7 @@ export const LogSummary = ({ log }: LogSummaryProps) => {
   const [checkedLoading, setCheckedLoading] = useState(true);
   const [logMetadata, setLogMetadata] = useState<LogMetadata | null>(null);
 
+  const [adminApi] = useAdminApp();
   const sendMessage = useWebsocketSendEvent();
 
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -33,6 +36,7 @@ export const LogSummary = ({ log }: LogSummaryProps) => {
       },
     };
 
+    adminApi.applyLogCheckToggled(log.correlation, event.target.checked);
     sendMessage(checkEvent);
   };
 

@@ -1,8 +1,8 @@
-import { useAuthAccessToken, useBaseUrlResolvers, useEffectCallback } from 'quidproquo-web-react';
+import { useEffectCallback } from 'quidproquo-web-react';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 
-import { getServiceNames } from '../logic';
+import { useAdminApp, useVolatileState } from '../../adminApp';
 
 export type AutoCompleteOption = {
   label: string;
@@ -10,15 +10,16 @@ export type AutoCompleteOption = {
 };
 
 export const useServiceNames = (): AutoCompleteOption[] => {
-  const [serviceNames, setServiceNames] = useState<string[]>(['All']);
-  const accessToken = useAuthAccessToken();
-  const baseUrlResolvers = useBaseUrlResolvers();
+  const [api] = useAdminApp();
+  const volatile = useVolatileState();
+
+  const serviceNames = volatile.serviceNames;
 
   // Stable identity so the mount-only effect below can list it as a dependency.
-  const fetchData = useEffectCallback(async () => {
-    const updatedServiceNames = await getServiceNames(baseUrlResolvers.getApiUrl(), accessToken);
-
-    setServiceNames(updatedServiceNames);
+  const fetchData = useEffectCallback(() => {
+    if (serviceNames.length === 0) {
+      api.loadServiceNames();
+    }
   });
 
   useEffect(() => {
@@ -27,7 +28,7 @@ export const useServiceNames = (): AutoCompleteOption[] => {
 
   const serviceOptions = useMemo(
     () =>
-      serviceNames.map((s) => ({
+      (serviceNames.length ? serviceNames : ['All']).map((s) => ({
         label: s
           .split('-')
           .map((word) => word.charAt(0).toUpperCase() + word.slice(1))

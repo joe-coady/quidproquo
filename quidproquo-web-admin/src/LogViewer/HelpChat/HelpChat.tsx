@@ -1,77 +1,40 @@
-import { QpqPagedData } from 'quidproquo-core';
-import { useAuthAccessToken, useBaseUrlResolvers, useEffectCallback } from 'quidproquo-web-react';
+import { useEffectCallback } from 'quidproquo-web-react';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Markdown from 'react-markdown';
 import { Android as AndroidIcon, Person as PersonIcon } from '@mui/icons-material';
 import { Avatar, Box, Button, CircularProgress, Paper, TextField, Typography } from '@mui/material';
 
-import { apiRequestPost } from '../../logic';
-import { ListLogChatMessages, LogChatMessage, SendLogChatMessage } from '../../types';
+import { useAdminApp, useVolatileState } from '../../adminApp';
 
 interface HelpChatProps {
   logCorrelation: string;
 }
 
 export const HelpChat: React.FC<HelpChatProps> = ({ logCorrelation }) => {
-  const [chatMessages, setChatMessages] = useState<LogChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
-  const [pendingRequests, setPendingRequests] = useState(0);
-  const [nextPageKey, setNextPageKey] = useState<string | undefined>(undefined);
   const chatContainerRef = useRef<HTMLDivElement>(null);
-  const accessToken = useAuthAccessToken();
-  const baseUrlResolvers = useBaseUrlResolvers();
+
+  const [api] = useAdminApp();
+  const volatile = useVolatileState();
+
+  const chat = volatile.chatByCorrelation[logCorrelation];
+  const chatMessages = useMemo(() => chat?.messages ?? [], [chat?.messages]);
+  const pendingRequests = chat?.pendingReplies ?? 0;
 
   // Stable identity so the mount-only effect below can list it as a dependency.
-  const fetchChatMessages = useEffectCallback(async () => {
-    const listLogChatMessages: ListLogChatMessages = {
-      correlationId: logCorrelation,
-      nextPageKey: nextPageKey,
-    };
-
-    try {
-      const response = await apiRequestPost<QpqPagedData<LogChatMessage>>(
-        '/log/chat',
-        listLogChatMessages,
-        baseUrlResolvers.getApiUrl(),
-        accessToken,
-      );
-
-      setChatMessages((prevMessages) => [...prevMessages, ...response.items]);
-      setNextPageKey(response.nextPageKey);
-    } finally {
-      // Do nothing
-    }
+  const fetchChatMessages = useEffectCallback(() => {
+    api.loadChatMessages(logCorrelation);
   });
 
   useEffect(() => {
     fetchChatMessages();
   }, [fetchChatMessages]);
 
-  const handleSendMessage = async () => {
+  const handleSendMessage = () => {
     if (inputMessage.trim() !== '') {
-      const newMessage: LogChatMessage = {
-        message: inputMessage,
-        timestamp: new Date().toISOString(),
-        isAi: false,
-      };
-      setChatMessages((prevMessages) => [...prevMessages, newMessage]);
+      api.sendChatMessage(logCorrelation, inputMessage);
       setInputMessage('');
-
-      const sendLogChatMessage: SendLogChatMessage = {
-        correlationId: logCorrelation,
-        message: inputMessage,
-      };
-
-      setPendingRequests((prevCount) => prevCount + 1);
-
-      try {
-        const response = await apiRequestPost<LogChatMessage>('/log/chat/message', sendLogChatMessage, baseUrlResolvers.getApiUrl(), accessToken);
-
-        setChatMessages((prevMessages) => [...prevMessages, response]);
-      } finally {
-        setPendingRequests((prevCount) => prevCount - 1);
-      }
     }
   };
 

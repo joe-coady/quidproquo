@@ -1,4 +1,4 @@
-import { ConfigActionType, ContextActionType, DateActionType, GuidActionType, NetworkActionType, runStory, StateActionType } from 'quidproquo-core';
+import { ContextActionType, DateActionType, GuidActionType, NetworkActionType, runStory, StateActionType } from 'quidproquo-core';
 
 import { describe, expect, it } from 'vitest';
 
@@ -7,7 +7,6 @@ import { askAuthChallengeAssociateSoftwareToken } from './askAuthChallengeAssoci
 
 const baseMocks = (dispatched: unknown[], networkRequest: unknown) => ({
   [ContextActionType.Read]: { api: 'https://api', ws: 'wss://api' },
-  [ConfigActionType.GetParameter]: JSON.stringify({ authenticationInfo: {} }),
   [DateActionType.Now]: '2026-06-26T00:00:00.000Z',
   [GuidActionType.New]: 'guid-1',
   [NetworkActionType.Request]: networkRequest,
