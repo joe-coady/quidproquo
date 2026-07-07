@@ -13,8 +13,11 @@ export enum QPQWebServerConfigSettingType {
   Cache = '@quidproquo-webserver/config/Cache',
   Certificate = '@quidproquo-webserver/config/Certificate',
   DomainProxy = '@quidproquo-webserver/config/DomainProxy',
+  StorageDriveCorsSettings = '@quidproquo-webserver/config/StorageDriveCorsSettings',
+  FileUploadSettings = '@quidproquo-webserver/config/FileUploadSettings',
 }
 
+// TODO: move this somewhere better
 export interface CacheSettings {
   minTTLInSeconds: number;
   maxTTLInSeconds: number;

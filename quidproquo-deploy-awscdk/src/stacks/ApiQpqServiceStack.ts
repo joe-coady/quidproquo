@@ -11,11 +11,13 @@ import {
   QpqApiCoreStorageDriveConstruct,
   QpqApiWebserverWebsocketConstruct,
   QpqConfigAwsAlarmConstruct,
+  QpqConfigAwsDashboardConstruct,
   QpqCoreDeployEventConstruct,
   QpqCoreNotifyErrorConstruct,
   QpqCoreRecurringScheduleConstruct,
   QpqWebserverServiceFunctionConstruct,
   QpqWebserverSubdomainRedirectConstruct,
+  QpqWebserverWebsocketConstruct,
 } from '../constructs';
 import { QpqServiceStack, QpqServiceStackProps } from './base/QpqServiceStack';
 import { InfQpqServiceStack } from './InfQpqServiceStack';
@@ -101,6 +103,7 @@ export class ApiQpqServiceStack extends QpqServiceStack {
           websocketConfig: setting,
         }),
     );
+    QpqWebserverWebsocketConstruct.authorizeManageConnectionsForReferencedWebsockets(this, props.qpqConfig);
 
     // migrations
     const deployEvents = qpqCoreUtils.getDeployEventConfigs(props.qpqConfig).map(
@@ -141,5 +144,16 @@ export class ApiQpqServiceStack extends QpqServiceStack {
           notifyErrorConfig: setting,
         }),
     );
+
+    // Operational dashboard (+ latency/duration anomaly detection) - built here in the
+    // api phase where all the service's metric-emitting resources exist
+    const dashboardConfig = qpqConfigAwsUtils.getAwsServiceDashboardConfig(props.qpqConfig);
+    if (dashboardConfig) {
+      new QpqConfigAwsDashboardConstruct(this, 'dashboard', {
+        qpqConfig: props.qpqConfig,
+
+        dashboardConfig,
+      });
+    }
   }
 }

@@ -8,7 +8,10 @@ import { useQpqRuntimeBubblingReducer } from './bubbleReducer';
 import { QpqRuntimeDefinition } from './createQpqRuntimeDefinition';
 import { QpqApi, QpqMappedApi } from './QpqMappedApi';
 
-export type ActionProcessorListResolverFactory<TState = any> = (dispatch: Dispatch<any>, getCurrentState: () => TState) => ActionProcessorListResolver;
+export type ActionProcessorListResolverFactory<TState = any> = (
+  dispatch: Dispatch<any>,
+  getCurrentState: () => TState,
+) => ActionProcessorListResolver;
 
 export function useQpqRuntime<
   TState,
@@ -55,6 +58,7 @@ export function useQpqRuntime<
     if (mainStory) {
       resolver(mainStory)();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return [api as QpqMappedApi<TApi>, state, dispatch];

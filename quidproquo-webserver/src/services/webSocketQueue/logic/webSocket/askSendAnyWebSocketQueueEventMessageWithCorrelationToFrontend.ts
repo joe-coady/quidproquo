@@ -52,9 +52,7 @@ export function* askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend(
   }
 
   if (connectionId) {
-    const response = yield* askCatch(
-      askSendAnyWebSocketQueueEventMessageWithCorrelationOnWebsocket(connectionId, payloadWithCorrelationId)
-    );
+    const response = yield* askCatch(askSendAnyWebSocketQueueEventMessageWithCorrelationOnWebsocket(connectionId, payloadWithCorrelationId));
 
     // If we sent the message, or we don't have a direct user to send it to, bail
     if (response.success || !userId) {

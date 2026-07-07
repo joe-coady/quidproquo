@@ -1,6 +1,17 @@
 export enum QPQAwsConfigSettingType {
   awsServiceAccountInfo = '@quidproquo-aws/config/AwsServiceAccountInfo',
   awsServiceAlarm = '@quidproquo-aws/config/AwsServiceAlarm',
+  awsServiceDashboard = '@quidproquo-aws/config/awsServiceDashboard',
   awsDyanmoOverrideForKvs = '@quidproquo-aws/config/awsDyanmoOverrideForKvs',
   bootstrapAwsOrganization = '@quidproquo-aws/config/bootstrapAwsOrganization',
+  accountBudget = '@quidproquo-aws/config/accountBudget',
+  accountCloudTrail = '@quidproquo-aws/config/accountCloudTrail',
+  accountSecurityServices = '@quidproquo-aws/config/accountSecurityServices',
+  bootstrapWaf = '@quidproquo-aws/config/bootstrapWaf',
+  wafProtection = '@quidproquo-aws/config/wafProtection',
+  awsDomainCertificate = '@quidproquo-aws/config/awsDomainCertificate',
+  awsKmsKey = '@quidproquo-aws/config/awsKmsKey',
+  awsEventBusQuickSubscription = '@quidproquo-aws/config/awsEventBusQuickSubscription',
+  awsDataStoreRemovalPolicy = '@quidproquo-aws/config/awsDataStoreRemovalPolicy',
+  awsVirtualNetworkSettings = '@quidproquo-aws/config/awsVirtualNetworkSettings',
 }

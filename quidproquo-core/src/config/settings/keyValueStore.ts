@@ -70,7 +70,10 @@ export interface QPQConfigAdvancedKeyValueStoreSettings<T extends object = any> 
 
   ttlAttribute?: string;
 
-  enableMonthlyRollingBackups?: boolean;
+  // Point-in-time recovery (35-day continuous backups) is on by default; set this to opt out.
+  disablePointInTimeRecovery?: boolean;
+
+  encryption?: boolean;
 }
 
 export interface KeyValueStoreQPQConfigSetting<T extends object = any> extends QPQConfigSetting {
@@ -85,7 +88,9 @@ export interface KeyValueStoreQPQConfigSetting<T extends object = any> extends Q
 
   ttlAttribute?: string;
 
-  enableMonthlyRollingBackups: boolean;
+  disablePointInTimeRecovery: boolean;
+
+  encryption: boolean;
 }
 
 export const defineKeyValueStore = <T extends object = any>(
@@ -112,5 +117,7 @@ export const defineKeyValueStore = <T extends object = any>(
 
   ttlAttribute: options?.ttlAttribute,
 
-  enableMonthlyRollingBackups: options?.enableMonthlyRollingBackups ?? false,
+  disablePointInTimeRecovery: options?.disablePointInTimeRecovery ?? false,
+
+  encryption: options?.encryption ?? false,
 });

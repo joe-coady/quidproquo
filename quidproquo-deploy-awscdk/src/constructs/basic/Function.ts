@@ -1,5 +1,7 @@
+import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { getAwsServiceAccountInfoConfig } from 'quidproquo-config-aws';
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
+import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
 import { aws_ec2, aws_iam, aws_lambda, aws_logs, aws_sns, aws_sns_subscriptions } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
@@ -7,7 +9,8 @@ import { Construct } from 'constructs';
 import { join } from 'upath';
 
 import { BootstrapResource } from '../../constants';
-import { qpqAwsCdkPathUtils } from '../../utils';
+import { getLambdaArchitecture, getLambdaRuntime, qpqAwsCdkPathUtils } from '../../utils';
+import * as qpqDeployAwsCdkUtils from '../../utils/qpqDeployAwsCdkUtils';
 import { QpqConstructBlock, QpqConstructBlockProps } from '../base/QpqConstructBlock';
 
 export interface FunctionProps extends QpqConstructBlockProps {
@@ -33,7 +36,39 @@ export interface FunctionProps extends QpqConstructBlockProps {
   reacreateOnFunctionNameChange?: boolean;
 
   vpc?: aws_ec2.IVpc;
+  securityGroups?: aws_ec2.ISecurityGroup[];
 }
+
+// Resolves the federated code store location for this service, if it opted in via
+// defineFederatedModuleStore. Points the lambda at the referenced storage drive's
+// bucket, namespaced by service (s3://<bucket>/<service>), so many services can share
+// one bucket. Read access comes from the storage drive's own grants. Returns {} when
+// federation isn't configured, so the lambda runs only its bundled code.
+const getFederatedCodeStoreEnv = (qpqConfig: QPQConfig): Record<string, string> => {
+  const federatedStore = qpqCoreUtils.getFederatedModuleStore(qpqConfig);
+  if (!federatedStore) {
+    return {};
+  }
+
+  const storageDrive = qpqCoreUtils.getStorageDriveByName(federatedStore.storageDrive, qpqConfig);
+  if (!storageDrive) {
+    throw new Error(
+      `defineFederatedModuleStore references storage drive [${federatedStore.storageDrive}] which is not defined - add a matching defineStorageDrive`,
+    );
+  }
+
+  const bucketName = awsNamingUtils.resolveConfigRuntimeResourceNameFromConfig(
+    storageDrive.owner?.resourceNameOverride || storageDrive.storageDrive,
+    qpqConfig,
+    storageDrive.owner,
+  );
+  const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
+
+  return {
+    federatedCodeStoreUrl: `s3://${bucketName}/${serviceName}`,
+    ...(federatedStore.recheckMs !== undefined ? { federatedCodeStoreRecheckMs: `${federatedStore.recheckMs}` } : {}),
+  };
+};
 
 export class Function extends QpqConstructBlock {
   public readonly lambdaFunction: aws_lambda.Function;
@@ -53,7 +88,8 @@ export class Function extends QpqConstructBlock {
       functionName: props.functionName,
       timeout: cdk.Duration.seconds(props.timeoutInSeconds || 25),
 
-      runtime: aws_lambda.Runtime.NODEJS_20_X,
+      runtime: getLambdaRuntime(props.qpqConfig),
+      architecture: getLambdaArchitecture(props.qpqConfig),
       memorySize: props.memoryInBytes || serviceInfo.lambdaMaxMemoryInMiB || 1024,
       layers: props.apiLayerVersions,
 
@@ -62,18 +98,19 @@ export class Function extends QpqConstructBlock {
 
       environment: {
         AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
+        // Federated code store (only when the service opted in via
+        // defineFederatedModuleStore); the loader falls back to bundled modules
+        // while the store has nothing published for this service
+        ...getFederatedCodeStoreEnv(props.qpqConfig),
         ...(props.environment || {}),
       },
 
-      reservedConcurrentExecutions: qpqConfigAwsUtils.isReservedConcurrencyDisabled(props.qpqConfig)
-        ? undefined
-        : props.reservedConcurrentExecutions,
+      reservedConcurrentExecutions: qpqConfigAwsUtils.isReservedConcurrencyDisabled(props.qpqConfig) ? undefined : props.reservedConcurrentExecutions,
 
-      // TODO: Make this optional
-      tracing: aws_lambda.Tracing.DISABLED,
+      tracing: qpqConfigAwsUtils.isTracingDisabled(props.qpqConfig) ? aws_lambda.Tracing.DISABLED : aws_lambda.Tracing.ACTIVE,
 
       logGroup: new aws_logs.LogGroup(this, 'LogGroup', {
-        retention: aws_logs.RetentionDays.ONE_WEEK,
+        retention: aws_logs.RetentionDays.ONE_YEAR,
         removalPolicy: cdk.RemovalPolicy.DESTROY,
       }),
 
@@ -85,7 +122,10 @@ export class Function extends QpqConstructBlock {
             subnetType: aws_ec2.SubnetType.PRIVATE_WITH_EGRESS,
           }
         : undefined,
+      securityGroups: props.securityGroups,
     });
+
+    qpqDeployAwsCdkUtils.applyEnvironmentTags(this.lambdaFunction, props.qpqConfig);
 
     if (!qpqConfigAwsUtils.isLambdaWarmingDisabled(props.qpqConfig)) {
       const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(props.qpqConfig);

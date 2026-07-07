@@ -3,8 +3,11 @@ import {
   ActionProcessorList,
   ActionProcessorListResolver,
   actionResult,
+  actionResultError,
+  actionResultErrorFromCaughtError,
   FileActionType,
   FileWriteObjectJsonActionProcessor,
+  FileWriteObjectJsonErrorTypeEnum,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -18,15 +21,23 @@ const getProcessFileWriteObjectJson = (qpqConfig: QPQConfig): FileWriteObjectJso
 
     const dataJson = JSON.stringify(data);
 
-    await writeTextFile(
-      s3BucketName,
-      filepath,
-      dataJson,
-      qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig),
-      getS3BucketStorageClassFromStorageDriveTier(storageDriveAdvancedWriteOptions?.storageDriveTier),
-    );
+    try {
+      await writeTextFile(
+        s3BucketName,
+        filepath,
+        dataJson,
+        qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig),
+        getS3BucketStorageClassFromStorageDriveTier(storageDriveAdvancedWriteOptions?.storageDriveTier),
+      );
 
-    return actionResult(void 0);
+      return actionResult(void 0);
+    } catch (error: unknown) {
+      return actionResultErrorFromCaughtError(error, {
+        AccessDenied: () => actionResultError(FileWriteObjectJsonErrorTypeEnum.AccessDenied, 'Access denied writing file'),
+        Forbidden: () => actionResultError(FileWriteObjectJsonErrorTypeEnum.AccessDenied, 'Access denied writing file'),
+        NoSuchBucket: () => actionResultError(FileWriteObjectJsonErrorTypeEnum.DriveNotFound, `Storage drive not found: ${drive}`),
+      });
+    }
   };
 };
 

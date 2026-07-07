@@ -3,8 +3,11 @@ import {
   ActionProcessorList,
   ActionProcessorListResolver,
   actionResult,
+  actionResultError,
+  actionResultErrorFromCaughtError,
   FileActionType,
   FileIsColdStorageActionProcessor,
+  FileIsColdStorageErrorTypeEnum,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -15,10 +18,20 @@ const getProcessFileIsColdStorage = (qpqConfig: QPQConfig): FileIsColdStorageAct
   return async ({ drive, filepath }) => {
     const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
 
-    const isColdStorage =
-      (await getObjectStorageClass(s3BucketName, filepath, qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig))) === 'cold_storage';
+    try {
+      const isColdStorage =
+        (await getObjectStorageClass(s3BucketName, filepath, qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig))) === 'cold_storage';
 
-    return actionResult(isColdStorage);
+      return actionResult(isColdStorage);
+    } catch (error: unknown) {
+      return actionResultErrorFromCaughtError(error, {
+        AccessDenied: () => actionResultError(FileIsColdStorageErrorTypeEnum.AccessDenied, 'Access denied reading file storage class'),
+        Forbidden: () => actionResultError(FileIsColdStorageErrorTypeEnum.AccessDenied, 'Access denied reading file storage class'),
+        NotFound: () => actionResultError(FileIsColdStorageErrorTypeEnum.FileNotFound, `File not found: ${filepath}`),
+        NoSuchKey: () => actionResultError(FileIsColdStorageErrorTypeEnum.FileNotFound, `File not found: ${filepath}`),
+        NoSuchBucket: () => actionResultError(FileIsColdStorageErrorTypeEnum.DriveNotFound, `Storage drive not found: ${drive}`),
+      });
+    }
   };
 };
 

@@ -57,11 +57,11 @@ export const LogSummary = ({ log }: LogSummaryProps) => {
     };
 
     sendMessage(refreshEvent);
-  }, [log.correlation]);
+  }, [log.correlation, sendMessage]);
 
   return (
     <Box sx={{ width: 1, p: 2 }}>
-      <Typography variant="h6" gutterBottom>
+      <Typography gutterBottom variant="h6">
         Log Summary
       </Typography>
       <Typography>Correlation ID: {log.correlation}</Typography>

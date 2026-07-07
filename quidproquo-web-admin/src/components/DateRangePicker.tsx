@@ -51,19 +51,19 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({ startIsoDateTi
         <Grid item xs={6}>
           <Box position="relative">
             <FormControl fullWidth>
-              <DateTimePicker label="Start DateTime" value={new Date(startIsoDateTime)} onChange={handleStartDateChange} />
+              <DateTimePicker label="Start DateTime" onChange={handleStartDateChange} value={new Date(startIsoDateTime)} />
             </FormControl>
           </Box>
         </Grid>
         <Grid item xs={6}>
           <Box position="relative">
             <FormControl fullWidth>
-              <DateTimePicker label="End DateTime" value={new Date(endIsoDateTime)} onChange={handleEndDateChange} />
+              <DateTimePicker label="End DateTime" onChange={handleEndDateChange} value={new Date(endIsoDateTime)} />
             </FormControl>
             <IconButton
-              aria-label="quick time select"
               aria-controls="quick-time-menu"
               aria-haspopup="true"
+              aria-label="quick time select"
               onClick={handleQuickTimeClick}
               sx={{
                 position: 'absolute',
@@ -77,7 +77,7 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({ startIsoDateTi
           </Box>
         </Grid>
       </Grid>
-      <Menu id="quick-time-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleQuickTimeClose}>
+      <Menu anchorEl={anchorEl} id="quick-time-menu" keepMounted onClose={handleQuickTimeClose} open={Boolean(anchorEl)}>
         <MenuItem onClick={() => handleQuickTimeSelect(5)}>Last 5 minutes</MenuItem>
         <MenuItem onClick={() => handleQuickTimeSelect(30)}>Last 30 minutes</MenuItem>
         <MenuItem onClick={() => handleQuickTimeSelect(1 * 60)}>Last hour</MenuItem>

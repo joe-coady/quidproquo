@@ -57,7 +57,7 @@ export const ActionRender = ({ action, result, isLegacy, expanded }: ActionRende
   const actionComponentConfig = actionComponentMap[action.type];
 
   if (!isLegacy && action.type === SystemActionType.Batch) {
-    return <CoreBatchCustomAction action={action} result={result} expanded={expanded} />;
+    return <CoreBatchCustomAction action={action} expanded={expanded} result={result} />;
   }
 
   const ActionComponent = isLegacy
@@ -70,7 +70,7 @@ export const ActionRender = ({ action, result, isLegacy, expanded }: ActionRende
 
   return (
     <>
-      <ActionComponent action={action} result={result} expanded={expanded} />
+      <ActionComponent action={action} expanded={expanded} result={result} />
     </>
   );
 };
@@ -89,22 +89,22 @@ export const AnyActionHistoryItem = ({ action, result }: AnyActionHistoryItemPro
 
   return (
     <>
-      <Box display="flex" alignItems="center">
-        <Typography variant="h6" component="span">
+      <Box alignItems="center" display="flex">
+        <Typography component="span" variant="h6">
           {action.type.split('/').slice(-2).join('::')}
         </Typography>
         <Tooltip title={expanded ? 'Collapse' : 'Expand'}>
-          <IconButton size="small" onClick={toggleExpanded}>
+          <IconButton onClick={toggleExpanded} size="small">
             {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
           </IconButton>
         </Tooltip>
         <Tooltip title="Legacy View">
-          <IconButton size="small" onClick={toggleLegacy}>
+          <IconButton onClick={toggleLegacy} size="small">
             <HistoryIcon color={legacy ? 'primary' : 'inherit'} />
           </IconButton>
         </Tooltip>
       </Box>
-      <ActionRender action={action} result={result} isLegacy={legacy} expanded={expanded} />
+      <ActionRender action={action} expanded={expanded} isLegacy={legacy} result={result} />
     </>
   );
 };

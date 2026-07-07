@@ -80,6 +80,20 @@ const startServer = (
         devServerConfig,
       );
 
+    // Events for one connection must run in arrival order (connect -> messages
+    // -> disconnect). Concurrent processing lets an early message (e.g. the
+    // Authenticate sent on socket open) read the connection store before the
+    // connect handler has written the connection record, silently dropping it.
+    // API Gateway gives this ordering for free ($connect completes before the
+    // handshake finishes); this chain mirrors that behaviour locally.
+    let wsEventChain: Promise<unknown> = Promise.resolve();
+    const enqueueWsEvent = (wsEvent: WsEvent) => {
+      wsEventChain = wsEventChain.then(
+        () => processWsEvent(wsEvent),
+        () => processWsEvent(wsEvent),
+      );
+    };
+
     const onConnectEvent: WsEvent = {
       apiName: settingsMap.apiName,
       service: settingsMap.service,
@@ -92,7 +106,7 @@ const startServer = (
       userAgent: userAgent,
     };
 
-    processWsEvent(onConnectEvent);
+    enqueueWsEvent(onConnectEvent);
 
     ws.on('error', console.error);
 
@@ -109,7 +123,7 @@ const startServer = (
         userAgent: userAgent,
       };
 
-      processWsEvent(onMessageEvent);
+      enqueueWsEvent(onMessageEvent);
     });
 
     ws.on('close', () => {
@@ -127,7 +141,7 @@ const startServer = (
         userAgent: userAgent,
       };
 
-      processWsEvent(onCloseEvent);
+      enqueueWsEvent(onCloseEvent);
     });
   });
 

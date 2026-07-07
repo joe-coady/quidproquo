@@ -54,13 +54,11 @@ export const listFiles = async (
     ...files,
     ...(response.Contents || [])
       .filter((c) => !!c.Key && c.Key != folder)
-      .map(
-        (item): S3FileInfo => ({
-          filepath: item.Key!,
-          isDir: item.Key!.endsWith(filePathDelimiter),
-          hashMd5: item.ETag,
-        }),
-      ),
+      .map((item): S3FileInfo => ({
+        filepath: item.Key!,
+        isDir: item.Key!.endsWith(filePathDelimiter),
+        hashMd5: item.ETag,
+      })),
   ];
 
   return {

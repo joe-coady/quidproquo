@@ -1,0 +1,71 @@
+import {
+  buildTestQpqConfig,
+  ErrorTypeEnum,
+  isErroredActionResult,
+  KeyValueStoreActionType,
+  noopDynamicModuleLoader,
+  resolveActionResult,
+  resolveActionResultError,
+} from 'quidproquo-core';
+
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { invokeProcessor } from '../../../testing/testProcessorRuntime';
+import { getKeyValueStoreUpdateActionProcessor } from './getKeyValueStoreUpdateActionProcessor';
+
+const { repo } = vi.hoisted(() => ({
+  repo: { get: vi.fn(), delete: vi.fn(), query: vi.fn(), scan: vi.fn(), update: vi.fn(), upsert: vi.fn() },
+}));
+
+vi.mock('../../../logic/keyValueStore/SqliteKvsRepository', () => ({
+  SqliteKvsRepository: vi.fn(() => repo),
+}));
+
+const devServerConfig = { runtimePath: '/tmp/runtime' } as any;
+
+const getProcessor = async () => {
+  const processors = await getKeyValueStoreUpdateActionProcessor(devServerConfig)(buildTestQpqConfig(), noopDynamicModuleLoader);
+  return processors[KeyValueStoreActionType.Update];
+};
+
+describe('getKeyValueStoreUpdateActionProcessor', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it('stringifies the key and sortKey and passes the updates', async () => {
+    repo.update.mockResolvedValue({ id: 1 });
+    const process = await getProcessor();
+
+    const result = await invokeProcessor(process, { keyValueStoreName: 'store', key: 1, sortKey: 2, updates: { name: 'x' } });
+
+    expect(repo.update).toHaveBeenCalledWith('store', '1', '2', { name: 'x' });
+    expect(resolveActionResult(result)).toEqual({ id: 1 });
+  });
+
+  it('passes undefined for the sortKey when omitted', async () => {
+    repo.update.mockResolvedValue({});
+    const process = await getProcessor();
+
+    await invokeProcessor(process, { keyValueStoreName: 'store', key: 1, updates: { name: 'x' } });
+
+    expect(repo.update).toHaveBeenCalledWith('store', '1', undefined, { name: 'x' });
+  });
+
+  it('maps a not found error to ResourceNotFound', async () => {
+    repo.update.mockRejectedValue(new Error('store not found'));
+    const process = await getProcessor();
+
+    const result = await invokeProcessor(process, { keyValueStoreName: 'store', key: 1, updates: {} });
+
+    expect(resolveActionResultError(result).errorType).toBe('ResourceNotFound');
+  });
+
+  it('maps a generic error to a caught error', async () => {
+    repo.update.mockRejectedValue(new Error('boom'));
+    const process = await getProcessor();
+
+    const result = await invokeProcessor(process, { keyValueStoreName: 'store', key: 1, updates: {} });
+
+    expect(isErroredActionResult(result)).toBe(true);
+    expect(resolveActionResultError(result).errorType).toBe(ErrorTypeEnum.GenericError);
+  });
+});

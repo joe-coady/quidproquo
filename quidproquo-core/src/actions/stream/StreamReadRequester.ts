@@ -11,10 +11,7 @@ const decodeBase64ToUint8Array = (base64: string): Uint8Array => {
   return bytes;
 };
 
-export function* askStreamRead<E extends StreamEncoding, T = unknown>(
-  handle: StreamHandle<E, T>,
-  noWait?: boolean,
-): StreamReadActionRequester<E, T> {
+export function* askStreamRead<E extends StreamEncoding, T = unknown>(handle: StreamHandle<E, T>, noWait?: boolean): StreamReadActionRequester<E, T> {
   const rawChunk: StreamChunk<string> = yield {
     type: StreamActionType.Read,
     payload: {

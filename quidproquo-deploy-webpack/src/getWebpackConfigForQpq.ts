@@ -1,22 +1,11 @@
 // import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 
-import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { QPQConfig } from 'quidproquo-core';
 
 import { Configuration } from 'webpack';
 
+import { getWebpackBuildMode } from './getWebpackBuildMode';
 import { QpqPlugin } from './plugins';
-
-type WebpackBuildMode = 'none' | 'development' | 'production';
-
-const getWebpackBuildMode = (qpqConfig: QPQConfig): WebpackBuildMode => {
-  const feature = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig) as WebpackBuildMode;
-
-  if (['development', 'production'].indexOf(feature) >= 0) {
-    return feature;
-  }
-
-  return 'production';
-};
 
 export const getWebpackConfig = (qpqConfig: QPQConfig, buildPath: string, entries: Record<string, string>, nodeModulePath: string): Configuration => {
   return {

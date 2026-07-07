@@ -1,0 +1,88 @@
+import { describe, expect, it } from 'vitest';
+
+import { actionResult, isErroredActionResult, resolveActionResult, resolveActionResultError } from '../logic/actionLogic';
+import { buildActionProcessorList, buildTestStorySession, createStubLogger, noopDynamicModuleLoader } from '../testing/runtimeTesting';
+import { ErrorTypeEnum } from '../types/ErrorTypeEnum';
+import { StorySession } from '../types/StorySession';
+import { processAction } from './processAction';
+
+const logger = createStubLogger();
+const updateSession = () => {};
+const streamRegistry = {} as any;
+
+describe('processAction', () => {
+  it('returns the processor result for a known action type', async () => {
+    const processors = buildActionProcessorList({ Known: async () => actionResult('done') });
+
+    const result = await processAction(
+      { type: 'Known' },
+      processors,
+      buildTestStorySession(),
+      logger,
+      updateSession,
+      noopDynamicModuleLoader as any,
+      streamRegistry,
+    );
+
+    expect(resolveActionResult(result)).toBe('done');
+  });
+
+  it('returns a GenericError when no processor matches the type', async () => {
+    const result = await processAction(
+      { type: 'Missing' },
+      buildActionProcessorList({}),
+      buildTestStorySession(),
+      logger,
+      updateSession,
+      noopDynamicModuleLoader as any,
+      streamRegistry,
+    );
+
+    expect(isErroredActionResult(result)).toBe(true);
+    expect(resolveActionResultError(result).errorType).toBe(ErrorTypeEnum.GenericError);
+  });
+
+  it('wraps a thrown Error as a GenericError result with [name] - message text', async () => {
+    const processors = buildActionProcessorList({
+      Boom: async () => {
+        throw Object.assign(new Error('it broke'), { name: 'CustomError' });
+      },
+    });
+
+    const result = await processAction(
+      { type: 'Boom' },
+      processors,
+      buildTestStorySession(),
+      logger,
+      updateSession,
+      noopDynamicModuleLoader as any,
+      streamRegistry,
+    );
+
+    expect(isErroredActionResult(result)).toBe(true);
+    expect(resolveActionResultError(result).errorText).toBe('[CustomError] - it broke');
+  });
+
+  it('merges action.context and action.localContext into the session given to the processor', async () => {
+    let captured: StorySession | undefined;
+    const processors = buildActionProcessorList({
+      Capture: async (_payload, session) => {
+        captured = session;
+        return actionResult(null);
+      },
+    });
+
+    await processAction(
+      { type: 'Capture', context: { a: 1 } as any, localContext: { b: 2 } as any },
+      processors,
+      buildTestStorySession({ context: { base: 0 } as any }),
+      logger,
+      updateSession,
+      noopDynamicModuleLoader as any,
+      streamRegistry,
+    );
+
+    expect(captured?.context).toEqual({ base: 0, a: 1 });
+    expect(captured?.localContext).toEqual({ b: 2 });
+  });
+});

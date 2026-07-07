@@ -13,6 +13,7 @@ export * from './inlineFunction';
 export * from './keyValueStore';
 export * from './log';
 export * from './math';
+export * from './metric';
 export * from './network';
 export * from './platform';
 export * from './queue';

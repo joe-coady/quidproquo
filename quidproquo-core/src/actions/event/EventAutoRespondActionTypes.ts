@@ -8,8 +8,9 @@ export interface EventAutoRespondActionPayload<QpqEventRecord, MSR extends AnyMa
 }
 
 // action
-export interface EventAutoRespondAction<QpqEventRecord, MSR extends AnyMatchStoryResult>
-  extends Action<EventAutoRespondActionPayload<QpqEventRecord, MSR>> {
+export interface EventAutoRespondAction<QpqEventRecord, MSR extends AnyMatchStoryResult> extends Action<
+  EventAutoRespondActionPayload<QpqEventRecord, MSR>
+> {
   type: EventActionType.AutoRespond;
   payload: EventAutoRespondActionPayload<QpqEventRecord, MSR>;
 }

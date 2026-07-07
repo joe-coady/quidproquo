@@ -30,7 +30,7 @@ export const DataGrid = <T extends object>({ items, columns, onRowClick }: DataG
 
   return (
     <Box sx={{ height: '100%', width: '100%' }}>
-      <MuiDataGrid rows={items} columns={muiColumns} onRowClick={handleRowClick} />
+      <MuiDataGrid columns={muiColumns} onRowClick={handleRowClick} rows={items} />
     </Box>
   );
 };

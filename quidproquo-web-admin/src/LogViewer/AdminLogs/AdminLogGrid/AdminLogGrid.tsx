@@ -119,23 +119,23 @@ export const AdminLogGrid = ({ logs, isLoading, searchProgress }: AdminLogGridPr
 `}
       </style>
       <DataGrid
+        autoPageSize
+        columns={columns}
         components={{
           Pagination: DataGridPagination,
-          LoadingOverlay: () => <LinearProgress variant="determinate" value={searchProgress} />,
+          LoadingOverlay: () => <LinearProgress value={searchProgress} variant="determinate" />,
         }}
-        columns={columns}
-        rows={logs.map((log, i) => ({ ...log, id: `${i}` }))}
-        autoPageSize
+        getRowClassName={getRowClassName}
         loading={isLoading}
         onRowClick={onRowClick}
-        getRowClassName={getRowClassName}
+        rows={logs.map((log, i) => ({ ...log, id: `${i}` }))}
       />
       <LogDialog
-        open={!!selectedLogCorrelation}
         handleClose={clearSelectedLogCorrelation}
         logCorrelation={selectedLogCorrelation}
-        storyResultMetadatas={logs}
+        open={!!selectedLogCorrelation}
         setSelectedLogCorrelation={setSelectedLogCorrelation}
+        storyResultMetadatas={logs}
       />
     </>
   );

@@ -25,6 +25,9 @@ export class QpqWebserverApiKeyConstruct extends QpqConstructBlock {
       enabled: true,
     });
 
+    // The service-role's apigateway:GET grant is tag-conditioned - keys must carry the qpq tags
+    qpqDeployAwsCdkUtils.applyEnvironmentTags(apiKey, props.qpqConfig);
+
     qpqDeployAwsCdkUtils.exportStackValue(this, awsNamingUtils.getCFExportNameApiKeyIdFromConfig(apiKeyConfig.name, props.qpqConfig), apiKey.keyId);
   }
 }

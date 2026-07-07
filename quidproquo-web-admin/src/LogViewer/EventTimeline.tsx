@@ -41,6 +41,7 @@ const TimelineEvent = ({ event, level, setSelectedLogCorrelation, scale, parrent
         }}
       ></div>
       <div
+        onClick={() => setSelectedLogCorrelation(event.correlation)}
         style={{
           whiteSpace: 'nowrap',
           width: `${eventWidth}px`,
@@ -51,7 +52,6 @@ const TimelineEvent = ({ event, level, setSelectedLogCorrelation, scale, parrent
           borderRadius: 4,
           display: 'inline-block',
         }}
-        onClick={() => setSelectedLogCorrelation(event.correlation)}
       >
         {event.moduleName}::{event.generic.split('::').pop()} - @{parrentTimeOffsetMs}ms - {event.executionTimeMs}ms
       </div>
@@ -65,10 +65,10 @@ const TimelineEvent = ({ event, level, setSelectedLogCorrelation, scale, parrent
           <TimelineEvent
             key={child.correlation}
             event={child}
-            setSelectedLogCorrelation={setSelectedLogCorrelation}
             level={level + 1}
-            scale={scale}
             parrentTimeOffsetMs={offsetMs}
+            scale={scale}
+            setSelectedLogCorrelation={setSelectedLogCorrelation}
             totalParrentTimeOffsetMs={totalOffset}
           />
         );
@@ -145,9 +145,9 @@ export const EventTimeline: React.FC<EventTimelineProps> = ({ logCorrelation, se
           <TimelineEvent
             event={treeApi.treeDataWithNoQpqActions[0]}
             level={0}
-            setSelectedLogCorrelation={setSelectedLogCorrelation}
-            scale={scale}
             parrentTimeOffsetMs={0}
+            scale={scale}
+            setSelectedLogCorrelation={setSelectedLogCorrelation}
             totalParrentTimeOffsetMs={0}
           />
         )}

@@ -46,20 +46,16 @@ export function Config() {
 
       {/* Sidebar */}
       <Drawer
-        variant="permanent"
         sx={{
           width: drawerWidth,
           flexShrink: 0,
           [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box' },
         }}
+        variant="permanent"
       >
         <Toolbar>
           <TextField
             fullWidth
-            size="small"
-            variant="outlined"
-            placeholder="Search services"
-            value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
@@ -67,14 +63,18 @@ export function Config() {
                 handleServiceClick(filteredServices[0]?.label);
               }
             }}
+            placeholder="Search services"
+            size="small"
             sx={{ mt: 2 }}
+            value={search}
+            variant="outlined"
           />
         </Toolbar>
         <Box sx={{ overflow: 'auto', p: 2 }}>
           <List>
             {filteredServices.map((service) => (
               <ListItem key={service.value} disablePadding>
-                <ListItemButton selected={service.label === selectedService} onClick={() => handleServiceClick(service.label)}>
+                <ListItemButton onClick={() => handleServiceClick(service.label)} selected={service.label === selectedService}>
                   <ListItemText primary={service.label} />
                 </ListItemButton>
               </ListItem>
@@ -85,12 +85,12 @@ export function Config() {
 
       {/* Main Content */}
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-        <Typography variant="h5" gutterBottom>
+        <Typography gutterBottom variant="h5">
           {selectedService} Service
         </Typography>
 
         {/* Tabs */}
-        <Tabs value={tabIndex} onChange={handleTabChange} sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Tabs onChange={handleTabChange} sx={{ borderBottom: 1, borderColor: 'divider' }} value={tabIndex}>
           {sections.map((section, index) => (
             <Tab key={index} label={section} />
           ))}

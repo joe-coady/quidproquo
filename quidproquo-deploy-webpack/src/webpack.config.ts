@@ -5,18 +5,6 @@ import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import path from 'path';
 
-type WebpackBuildMode = 'none' | 'development' | 'production';
-
-export const getWebpackBuildMode = (qpqConfig: QPQConfig): WebpackBuildMode => {
-  const feature = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig) as WebpackBuildMode;
-
-  if (['development', 'production'].indexOf(feature) >= 0) {
-    return feature;
-  }
-
-  return 'production';
-};
-
 export const setupWebpackQPQRuntime = (qpqConfig: QPQConfig, buildPath: string): void => {
   const allSrcEntries = [...qpqCoreUtils.getAllSrcEntries(qpqConfig), ...qpqWebServerUtils.getAllSrcEntries(qpqConfig)];
 
@@ -35,5 +23,7 @@ export const setupWebpackQPQRuntime = (qpqConfig: QPQConfig, buildPath: string):
 
 export const getResolveLoaderModules = () => [path.resolve(__dirname, 'loaders'), 'node_modules'];
 
+export * from './federation';
+export * from './getWebpackBuildMode';
 export * from './getWebpackConfigForQpq';
 export * from './plugins';

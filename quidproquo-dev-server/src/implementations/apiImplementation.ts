@@ -9,7 +9,7 @@ import path from 'path';
 import { getExpressApiEventEventProcessor } from '../actionProcessor';
 import { getAllServiceConfigs } from '../allServiceConfig';
 import { processEvent } from '../logic';
-import { ExpressEvent, ExpressEventResponse,ResolvedDevServerConfig } from '../types';
+import { ExpressEvent, ExpressEventResponse, ResolvedDevServerConfig } from '../types';
 
 const getServiceBaseDomain = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig) =>
   qpqWebServerUtils.getDomainRoot(
@@ -51,6 +51,11 @@ export const apiImplementation = async (devServerConfig: ResolvedDevServerConfig
   app.use(multer().any());
 
   app.use(bodyParser.json({ limit: '50mb' }));
+
+  // Keep form-urlencoded bodies as the raw string so they reach handlers verbatim — exactly
+  // as API Gateway delivers them. Parsing to an object would be re-serialised as JSON below
+  // (see the `event.body` assignment), which urlencoded handlers (e.g. OAuth /token) can't read.
+  app.use(bodyParser.text({ type: 'application/x-www-form-urlencoded', limit: '50mb' }));
 
   const apiConfigs = allServiceConfig.map((qpqConfig) => getApiDomainsFromConfig(qpqConfig, devServerConfig)).flat();
 

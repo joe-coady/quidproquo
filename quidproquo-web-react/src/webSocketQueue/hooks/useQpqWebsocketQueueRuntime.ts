@@ -1,4 +1,3 @@
- 
 import { Story } from 'quidproquo-core';
 import { AnyWebSocketQueueEventMessageWithCorrelation, WebSocketQueueServerMessageEventType } from 'quidproquo-webserver';
 
@@ -10,20 +9,12 @@ import { ActionProcessorListResolverFactory, useQpqRuntime } from '../../hooks/a
 import { getServiceRequestActionProcessor } from './actionProcessor/getServiceRequestActionProcessor';
 import { useWebsocketQueueSendEvent } from './useWebsocketQueueSendEvent';
 
-export function useQpqWebsocketQueueRuntime<
-  TState,
-  TAction,
-  TApi extends QpqApi,
->(
+export function useQpqWebsocketQueueRuntime<TState, TAction, TApi extends QpqApi>(
   atom: QpqRuntimeDefinition<TState, TAction, TApi>,
   mainStory?: Story<any, any>,
   name?: string,
   getActionProcessors?: ActionProcessorListResolverFactory<TState>,
-): [
-  QpqMappedApi<TApi>,
-  TState, (action: any) => void,
-  (event: Omit<AnyWebSocketQueueEventMessageWithCorrelation, 'correlationId'>) => Promise<any>
-] {
+): [QpqMappedApi<TApi>, TState, (action: any) => void, (event: Omit<AnyWebSocketQueueEventMessageWithCorrelation, 'correlationId'>) => Promise<any>] {
   const sendEventRef = useRef<((event: Omit<AnyWebSocketQueueEventMessageWithCorrelation, 'correlationId'>) => Promise<any>) | null>(null);
 
   const mergedFactory: ActionProcessorListResolverFactory<TState> = (dispatch, getCurrentState) => {

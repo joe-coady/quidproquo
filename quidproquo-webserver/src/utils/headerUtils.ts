@@ -88,12 +88,20 @@ export const getCorsHeaders = (qpqConfig: QPQConfig, route: RouteOptions, reqHea
   const allowOrigin =
     (!allowCredentials ? allowedOrigins.find((ao) => origin === ao || ao === '*') : allowedOrigins.find((ao) => origin === ao)) || allowedOrigins[0];
 
+  // Reflect exactly what the preflight asks for instead of a blanket '*'. A
+  // literal '*' is invalid once credentials are allowed (browsers reject it),
+  // so echoing the requested headers/method keeps authenticated routes working
+  // while staying scoped to the real request. The security boundary is the
+  // origin check above; these two just describe what that trusted origin may send.
+  const requestedHeaders = getHeaderValue('access-control-request-headers', reqHeaders);
+  const requestedMethod = getHeaderValue('access-control-request-method', reqHeaders);
+
   return {
-    'Access-Control-Allow-Headers': '*',
-    'Access-Control-Allow-Methods': '*',
+    'Access-Control-Allow-Headers': requestedHeaders || 'Authorization, Content-Type',
+    'Access-Control-Allow-Methods': requestedMethod || 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
     'Access-Control-Allow-Origin': allowOrigin,
     'Access-Control-Allow-Credentials': `${allowCredentials}`,
-    Vary: 'Origin',
+    Vary: 'Origin, Access-Control-Request-Headers, Access-Control-Request-Method',
   };
 };
 

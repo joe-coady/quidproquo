@@ -1,5 +1,10 @@
+import { createErrorEnumForAction } from '../../types';
 import { HTTPMethod, HTTPRequestOptions, NetworkActionType } from './NetworkActionType';
 import { NetworkRequestActionRequester } from './NetworkRequestActionTypes';
+
+export const NetworkRequestErrorTypeEnum = createErrorEnumForAction(NetworkActionType.Request, [
+  'Timeout', // the request exceeded the request timeout and was aborted
+]);
 
 export function* askNetworkRequest<T, R>(
   method: HTTPMethod,

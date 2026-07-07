@@ -1,14 +1,22 @@
+import { createErrorEnumForAction } from '../../types';
 import { FileActionType } from './FileActionType';
-import { FileGenerateTemporaryUploadSecureUrlActionPayload, FileGenerateTemporaryUploadSecureUrlActionRequester } from './FileGenerateTemporaryUploadSecureUrlActionTypes';
+import {
+  FileGenerateTemporaryUploadSecureUrlActionPayload,
+  FileGenerateTemporaryUploadSecureUrlActionRequester,
+} from './FileGenerateTemporaryUploadSecureUrlActionTypes';
+
+export const FileGenerateTemporaryUploadSecureUrlErrorTypeEnum = createErrorEnumForAction(FileActionType.GenerateTemporaryUploadSecureUrl, [
+  'ExpirationTooLong', // requested expiry exceeds max length of time possible
+]);
 
 export function* askFileGenerateTemporaryUploadSecureUrl(
   drive: string,
   filepath: string,
   expirationMs: number,
   advancedOptions?: {
-    contentType?: FileGenerateTemporaryUploadSecureUrlActionPayload['contentType'],
+    contentType?: FileGenerateTemporaryUploadSecureUrlActionPayload['contentType'];
     // maxSizeBytes?: FileGenerateTemporaryUploadSecureUrlActionPayload['maxSizeBytes']
-  }
+  },
 ): FileGenerateTemporaryUploadSecureUrlActionRequester {
   return yield {
     type: FileActionType.GenerateTemporaryUploadSecureUrl,

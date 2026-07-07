@@ -30,6 +30,14 @@ export interface QPQConfigAdvancedWebEntrySettings extends QPQConfigAdvancedSett
   cloudflareApiKeySecretName?: string;
 
   securityHeaders?: ResponseSecurityHeaders;
+
+  /**
+   * Browser origins allowed to cross-origin `fetch` this web entry's (public,
+   * static) assets. Leave undefined to scope to this service's own domain
+   * (`https://<domain>` + `https://*.<domain>`); pass `['*']` to allow any
+   * origin (e.g. serving assets as a public CDN / cross-origin fonts).
+   */
+  corsAllowedOrigins?: string[];
 }
 
 export interface WebEntryQPQWebServerConfigSetting extends QPQConfigSetting {
@@ -48,6 +56,8 @@ export interface WebEntryQPQWebServerConfigSetting extends QPQConfigSetting {
   cloudflareApiKeySecretName?: string;
 
   securityHeaders?: ResponseSecurityHeaders;
+
+  corsAllowedOrigins?: string[];
 }
 
 export const defineWebEntry = (name: string, options: QPQConfigAdvancedWebEntrySettings): WebEntryQPQWebServerConfigSetting => ({
@@ -74,4 +84,6 @@ export const defineWebEntry = (name: string, options: QPQConfigAdvancedWebEntryS
   cloudflareApiKeySecretName: options?.cloudflareApiKeySecretName,
 
   cacheSettingsName: options?.cacheSettingsName,
+
+  corsAllowedOrigins: options?.corsAllowedOrigins,
 });

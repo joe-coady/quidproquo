@@ -44,13 +44,12 @@ export const AdminDialog = ({ open, handleClose, title, selectedTab, onSelectTab
 
   return (
     <Dialog
-      open={open}
-      scroll={'paper'}
-      aria-labelledby="scroll-dialog-title"
       aria-describedby="scroll-dialog-description"
-      onClose={handleClose}
-      maxWidth={false}
+      aria-labelledby="scroll-dialog-title"
       fullWidth={true}
+      maxWidth={false}
+      onClose={handleClose}
+      open={open}
       PaperProps={{
         style: {
           width: '90%',
@@ -59,13 +58,14 @@ export const AdminDialog = ({ open, handleClose, title, selectedTab, onSelectTab
           maxWidth: '90%',
         },
       }}
+      scroll={'paper'}
     >
       <DialogTitle id="scroll-dialog-title">{title}</DialogTitle>
       {tabs.length > 0 && (
-        <AppBar position="sticky" color="primary">
-          <Tabs value={selectedTabIndex} onChange={handleTabChange} textColor="inherit" indicatorColor="secondary">
+        <AppBar color="primary" position="sticky">
+          <Tabs indicatorColor="secondary" onChange={handleTabChange} textColor="inherit" value={selectedTabIndex}>
             {tabs.map((t) => (
-              <Tab label={t} key={t} />
+              <Tab key={t} label={t} />
             ))}
           </Tabs>
         </AppBar>

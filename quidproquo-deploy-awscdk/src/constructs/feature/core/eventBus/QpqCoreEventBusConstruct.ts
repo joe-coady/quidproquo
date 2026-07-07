@@ -1,8 +1,8 @@
 import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
-import { getAwsAccountIds } from 'quidproquo-config-aws';
+import { EventBusQuickSubscriptionType, getAwsAccountIds, qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import { EventBusQPQConfigSetting, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
-import { aws_iam, aws_sns } from 'aws-cdk-lib';
+import { aws_iam, aws_sns, aws_sns_subscriptions } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
 import * as qpqDeployAwsCdkUtils from '../../../../utils';
@@ -81,6 +81,20 @@ export class QpqCoreEventBusConstruct extends QpqCoreEventBusConstructBase {
         resources: [this.topic.topicArn],
       }),
     );
+
+    // Direct SNS fan-out (email / incident-tool webhooks), declared per-bus via
+    // the AWS-specific `defineEventBusQuickSubscription`. Gives alarms routed here
+    // via onAlarm.publishToEventBus somewhere to actually land.
+    qpqConfigAwsUtils
+      .getEventBusQuickSubscriptions(props.qpqConfig, props.eventBusConfig.name, props.eventBusConfig.owner)
+      .forEach((subscription) => {
+        if (subscription.type === EventBusQuickSubscriptionType.email) {
+          this.topic.addSubscription(new aws_sns_subscriptions.EmailSubscription(subscription.email));
+        } else {
+          // UrlSubscription infers http vs https from the url prefix.
+          this.topic.addSubscription(new aws_sns_subscriptions.UrlSubscription(subscription.url));
+        }
+      });
 
     // TODO: remove this, its deprecated
     const exportName = awsNamingUtils.getCFExportNameSnsTopicArnFromConfig(props.eventBusConfig.name, props.qpqConfig);

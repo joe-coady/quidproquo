@@ -1,6 +1,14 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import { ActionProcessorList, ActionProcessorListResolver, actionResultError, ErrorTypeEnum, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
-import { actionResult, KeyValueStoreActionType, KeyValueStoreQueryActionProcessor } from 'quidproquo-core';
+import {
+  ActionProcessorList,
+  ActionProcessorListResolver,
+  actionResultError,
+  actionResultErrorFromCaughtError,
+  ErrorTypeEnum,
+  QPQConfig,
+  qpqCoreUtils,
+} from 'quidproquo-core';
+import { actionResult, KeyValueStoreActionType, KeyValueStoreQueryActionProcessor, KeyValueStoreQueryErrorTypeEnum } from 'quidproquo-core';
 
 import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
 import { query } from '../../../logic/dynamo';
@@ -16,18 +24,25 @@ const getProcessKeyValueStoreQuery = (qpqConfig: QPQConfig): KeyValueStoreQueryA
       return actionResultError(ErrorTypeEnum.NotFound, `Could not find key value store with name "${keyValueStoreName}"`);
     }
 
-    const items = await query<any>(
-      dynamoTableName,
-      region,
-      keyCondition,
-      options?.filter,
-      options?.nextPageKey,
-      getDynamoTableIndexByConfigAndQuery(storeConfig, keyCondition),
-      options?.limit,
-      options?.sortAscending,
-    );
+    try {
+      const items = await query<any>(
+        dynamoTableName,
+        region,
+        keyCondition,
+        options?.filter,
+        options?.nextPageKey,
+        getDynamoTableIndexByConfigAndQuery(storeConfig, keyCondition),
+        options?.limit,
+        options?.sortAscending,
+      );
 
-    return actionResult(items);
+      return actionResult(items);
+    } catch (error: unknown) {
+      return actionResultErrorFromCaughtError(error, {
+        InternalServerError: () => actionResultError(KeyValueStoreQueryErrorTypeEnum.ServiceUnavailable, 'KVS Service Unavailable'),
+        ResourceNotFoundException: () => actionResultError(KeyValueStoreQueryErrorTypeEnum.ResourceNotFound, 'KVS Resource Not Found'),
+      });
+    }
   };
 };
 

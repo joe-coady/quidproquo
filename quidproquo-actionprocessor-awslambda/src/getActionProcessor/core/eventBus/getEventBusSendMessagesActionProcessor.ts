@@ -4,13 +4,16 @@ import {
   ActionProcessorListResolver,
   actionResult,
   actionResultError,
+  actionResultErrorFromCaughtError,
   ErrorTypeEnum,
   EventBusActionType,
   EventBusMessage,
   EventBusSendMessageActionProcessor,
+  EventBusSendMessagesErrorTypeEnum,
   QPQConfig,
   qpqCoreUtils,
   StorySession,
+  toCrossServiceSession,
 } from 'quidproquo-core';
 
 import { getEventBusSnsTopicArn } from '../../../awsNamingUtils';
@@ -22,13 +25,7 @@ type AnyEventBusMessageWithSession = EventBusMessage<any> & {
 };
 
 const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): EventBusSendMessageActionProcessor<any> => {
-  return async (
-    {
-      eventBusName,
-      eventBusMessages,
-    },
-    session,
-  ) => {
+  return async ({ eventBusName, eventBusMessages }, session) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const eventBusConfig = qpqCoreUtils.getEventBusConfigByName(eventBusName, qpqConfig);
@@ -47,20 +44,29 @@ const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): EventBusSendMessag
       eventBusConfig.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
     );
 
-    await publishMessage(
-      topicArn,
-      region,
-      eventBusMessages.map((message) => {
-        const eventBusMessageWithSession: AnyEventBusMessageWithSession = {
-          ...message,
-          storySession: session,
-        };
+    try {
+      await publishMessage(
+        topicArn,
+        region,
+        eventBusMessages.map((message) => {
+          const eventBusMessageWithSession: AnyEventBusMessageWithSession = {
+            ...message,
+            storySession: toCrossServiceSession(session),
+          };
 
-        return JSON.stringify(eventBusMessageWithSession);
-      }),
-    );
+          return JSON.stringify(eventBusMessageWithSession);
+        }),
+      );
 
-    return actionResult(void 0);
+      return actionResult(void 0);
+    } catch (error: unknown) {
+      return actionResultErrorFromCaughtError(error, {
+        AuthorizationErrorException: () => actionResultError(EventBusSendMessagesErrorTypeEnum.AccessDenied, 'Access denied publishing to event bus'),
+        NotFoundException: () => actionResultError(EventBusSendMessagesErrorTypeEnum.TopicNotFound, `Event bus topic not found: ${eventBusName}`),
+        InternalErrorException: () => actionResultError(EventBusSendMessagesErrorTypeEnum.ServiceUnavailable, 'Event bus service unavailable'),
+        ThrottledException: () => actionResultError(EventBusSendMessagesErrorTypeEnum.ServiceUnavailable, 'Event bus throttled'),
+      });
+    }
   };
 };
 

@@ -7,6 +7,7 @@ const coreConfigActionComponentMap: Record<string, string[]> = {
   [ConfigActionType.GetParameters]: ['askConfigGetParameters', 'parameterNames'],
   [ConfigActionType.GetSecret]: ['askConfigGetSecret', 'secretName'],
   [ConfigActionType.SetParameter]: ['askConfigSetParameter', 'parameterName', 'parameterValue'],
+  [ConfigActionType.ListParameters]: ['askConfigListParameters'],
 };
 
 export default coreConfigActionComponentMap;

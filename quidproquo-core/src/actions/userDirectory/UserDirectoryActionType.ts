@@ -1,3 +1,4 @@
+import { QpqIsoDateTime } from '../../types/QpqIsoDateTime';
 import { AuthenticateUserChallenge } from './types';
 
 export enum UserDirectoryActionType {
@@ -12,6 +13,7 @@ export enum UserDirectoryActionType {
   SetAccessToken = '@quidproquo-core/UserDirectory/SetAccessToken',
   DecodeAccessToken = '@quidproquo-core/UserDirectory/DecodeAccessToken',
   RespondToAuthChallenge = '@quidproquo-core/UserDirectory/RespondToAuthChallenge',
+  AssociateSoftwareToken = '@quidproquo-core/UserDirectory/AssociateSoftwareToken',
   GetUserAttributes = '@quidproquo-core/UserDirectory/GetUserAttributes',
   GetUserAttributesByUserId = '@quidproquo-core/UserDirectory/GetUserAttributesByUserId',
   SetUserAttributes = '@quidproquo-core/UserDirectory/SetUserAttributes',
@@ -24,7 +26,7 @@ export enum UserDirectoryActionType {
 export interface AuthenticationInfo {
   accessToken?: string;
   expirationDurationInSeconds?: number;
-  expiresAt?: string;
+  expiresAt?: QpqIsoDateTime;
   idToken?: string;
   refreshToken?: string;
   tokenType?: string;

@@ -6,6 +6,12 @@ export interface QPQConfigAdvancedApiSettings extends QPQConfigAdvancedSettings 
   subDomain?: string;
   cloudflareApiKeySecretName?: string;
   virtualNetworkName?: string;
+
+  // Cap (and guarantee) on this api's concurrent requests: never throttled below
+  // it, never scales above it. One compute unit serves every route on the api,
+  // so this bounds the api as a whole. Free, but carved out of the deploy
+  // account's shared concurrency pool.
+  maxConcurrentExecutions?: number;
 }
 
 export interface ApiQPQWebServerConfigSetting extends QPQConfigSetting {
@@ -19,6 +25,8 @@ export interface ApiQPQWebServerConfigSetting extends QPQConfigSetting {
   cloudflareApiKeySecretName?: string;
 
   virtualNetworkName?: string;
+
+  maxConcurrentExecutions?: number;
 }
 
 export const defineApi = (apiName: string, rootDomain: string, options?: QPQConfigAdvancedApiSettings): ApiQPQWebServerConfigSetting => {
@@ -36,5 +44,7 @@ export const defineApi = (apiName: string, rootDomain: string, options?: QPQConf
     cloudflareApiKeySecretName: options?.cloudflareApiKeySecretName,
 
     virtualNetworkName: options?.virtualNetworkName,
+
+    maxConcurrentExecutions: options?.maxConcurrentExecutions,
   };
 };

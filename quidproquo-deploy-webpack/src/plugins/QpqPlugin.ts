@@ -20,16 +20,20 @@ export class QpqPlugin implements WebpackPluginInstance {
   }
 
   apply(compiler: Compiler): void {
-    if (this.options.aliases && Object.keys(this.options.aliases).length > 0) {
-      compiler.options.resolve = compiler.options.resolve || {};
-      compiler.options.resolve.alias = {
-        ...(compiler.options.resolve.alias as Record<string, string> || {}),
-        ...this.options.aliases,
-      };
-    }
+    const dynamicLoaderPath = path.resolve(this.options.nodeModulePath, 'quidproquo-dynamic-loader.js');
+
+    // Alias the bare specifier the framework imports ('quidproquo-dynamic-loader') to the
+    // virtual module below, so resolution doesn't depend on nodeModulePath being on the
+    // importing file's node_modules chain. App-supplied aliases can still override it.
+    compiler.options.resolve = compiler.options.resolve || {};
+    compiler.options.resolve.alias = {
+      'quidproquo-dynamic-loader': dynamicLoaderPath,
+      ...((compiler.options.resolve.alias as Record<string, string>) || {}),
+      ...this.options.aliases,
+    };
 
     new VirtualModulesPlugin({
-      [path.resolve(this.options.nodeModulePath, 'quidproquo-dynamic-loader.js')]: getQpqDyanmicLoaderSrcFromQpqConfigs(this.options.qpqConfigs),
+      [dynamicLoaderPath]: getQpqDyanmicLoaderSrcFromQpqConfigs(this.options.qpqConfigs),
     }).apply(compiler);
   }
 }

@@ -138,11 +138,7 @@ const buildDynamoUpdateExpressionPart = (update: KvsUpdateAction, updateIndex: n
 };
 
 // Types that generate SET expressions
-const SET_ACTION_TYPES = [
-  KvsUpdateActionType.Set,
-  KvsUpdateActionType.SetIfNotExists,
-  KvsUpdateActionType.Increment
-];
+const SET_ACTION_TYPES = [KvsUpdateActionType.Set, KvsUpdateActionType.SetIfNotExists, KvsUpdateActionType.Increment];
 
 const buildDynamoUpdateExpressionForClause = (
   clause: 'SET' | 'REMOVE' | 'ADD' | 'DELETE',

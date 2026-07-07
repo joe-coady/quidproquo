@@ -1,5 +1,5 @@
 import { StoryResultMetadataWithChildren } from 'quidproquo-core';
-import { useAuthAccessToken, useBaseUrlResolvers } from 'quidproquo-web-react';
+import { useAuthAccessToken, useBaseUrlResolvers, useEffectCallback } from 'quidproquo-web-react';
 
 import { useEffect, useState } from 'react';
 import { TreeNodeDatum } from 'react-d3-tree';
@@ -54,23 +54,27 @@ export const useLogTreeData = (correlationId: string, hideQpqActions: boolean = 
     setIsLoading(false);
   };
 
+  // Stable identity so the effect below can list it as a dependency while
+  // still only re-running when a correlation id appears or disappears.
+  const fetchTreeData = useEffectCallback(async () => {
+    setIsLoading(true);
+    console.log('correlationId: ', correlationId);
+    const logHierarchy = await getLogHierarchy(baseUrlResolvers.getApiUrl(), correlationId, false, accessToken);
+
+    if (logHierarchy) {
+      setTreeData([logHierarchy]);
+    }
+
+    setIsLoading(false);
+  });
+
+  const hasCorrelationId = !!correlationId;
+
   useEffect(() => {
-    const fetchTreeData = async () => {
-      setIsLoading(true);
-      console.log('correlationId: ', correlationId);
-      const logHierarchy = await getLogHierarchy(baseUrlResolvers.getApiUrl(), correlationId, false, accessToken);
-
-      if (logHierarchy) {
-        setTreeData([logHierarchy]);
-      }
-
-      setIsLoading(false);
-    };
-
-    if (correlationId) {
+    if (hasCorrelationId) {
       fetchTreeData();
     }
-  }, [!!correlationId]);
+  }, [hasCorrelationId, fetchTreeData]);
 
   const result: TreeApi = {
     isLoading,

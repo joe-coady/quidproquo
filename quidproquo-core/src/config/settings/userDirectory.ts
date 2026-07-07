@@ -1,4 +1,4 @@
-import { ConfigUrl, CrossModuleOwner } from '../../types';
+import { CrossModuleOwner } from '../../types';
 import { QPQConfigAdvancedSettings, QPQConfigSetting, QPQCoreConfigSettingType } from '../QPQConfig';
 import { convertCrossModuleOwnerToGenericResourceNameOverride } from '../utils/crossModuleUtils';
 import { CustomAuthRuntime, EmailTemplates } from './emailTemplates';
@@ -8,31 +8,23 @@ export type AuthDirectoryDnsRecord = {
   rootDomain: string;
 };
 
-export enum AuthDirectoryFederatedProviderType {
-  Facebook = 'facebook',
-  Google = 'google',
+export enum UserDirectoryMfaMode {
+  off = 'off',
+  optional = 'optional',
+  required = 'required',
 }
 
-export type AuthDirectoryFacebookFederatedProvider = {
-  type: AuthDirectoryFederatedProviderType.Facebook;
+export enum UserDirectoryMfaSecondFactor {
+  totp = 'totp',
+  // sms = 'sms', // future — additionally needs phone + SNS role infra.
+}
 
-  clientId: string;
-  clientSecret: string;
-};
+export interface UserDirectoryMfaSettings {
+  mode: UserDirectoryMfaMode;
 
-export type AuthDirectoryGoogleFederatedProvider = {
-  type: AuthDirectoryFederatedProviderType.Google;
-
-  clientId: string;
-  clientSecret: string;
-};
-
-export type AnyAuthDirectoryFederatedProvider = AuthDirectoryFacebookFederatedProvider | AuthDirectoryGoogleFederatedProvider;
-
-export type AuthDirectoryOAuth = {
-  callbacks?: ConfigUrl[];
-  federatedProviders?: AnyAuthDirectoryFederatedProvider[];
-};
+  // Enabled second factors. Defaults to [totp] when omitted.
+  secondFactors?: UserDirectoryMfaSecondFactor[];
+}
 
 export interface QPQConfigAdvancedUserDirectorySettings extends QPQConfigAdvancedSettings {
   phoneRequired?: boolean;
@@ -45,9 +37,9 @@ export interface QPQConfigAdvancedUserDirectorySettings extends QPQConfigAdvance
 
   dnsRecord?: AuthDirectoryDnsRecord;
 
-  oAuth?: AuthDirectoryOAuth;
-
   customAuthRuntime?: CustomAuthRuntime;
+
+  mfa?: UserDirectoryMfaSettings;
 }
 
 export interface UserDirectoryQPQConfigSetting extends QPQConfigSetting {
@@ -62,9 +54,10 @@ export interface UserDirectoryQPQConfigSetting extends QPQConfigSetting {
   owner?: CrossModuleOwner;
 
   dnsRecord?: AuthDirectoryDnsRecord;
-  oAuth?: AuthDirectoryOAuth;
 
   customAuthRuntime?: CustomAuthRuntime;
+
+  mfa: UserDirectoryMfaSettings;
 }
 
 export const defineUserDirectory = (name: string, options?: QPQConfigAdvancedUserDirectorySettings): UserDirectoryQPQConfigSetting => ({
@@ -75,7 +68,7 @@ export const defineUserDirectory = (name: string, options?: QPQConfigAdvancedUse
 
   phoneRequired: options?.phoneRequired || false,
 
-  selfSignUpEnabled: options?.selfSignUpEnabled || true,
+  selfSignUpEnabled: options?.selfSignUpEnabled ?? false,
 
   emailTemplates: {
     verifyEmail: options?.emailTemplates?.verifyEmail,
@@ -84,8 +77,12 @@ export const defineUserDirectory = (name: string, options?: QPQConfigAdvancedUse
   },
 
   dnsRecord: options?.dnsRecord,
-  oAuth: options?.oAuth,
   customAuthRuntime: options?.customAuthRuntime,
+
+  mfa: {
+    mode: options?.mfa?.mode ?? UserDirectoryMfaMode.off,
+    secondFactors: options?.mfa?.secondFactors?.length ? options.mfa.secondFactors : [UserDirectoryMfaSecondFactor.totp],
+  },
 
   owner: convertCrossModuleOwnerToGenericResourceNameOverride(options?.owner),
 });

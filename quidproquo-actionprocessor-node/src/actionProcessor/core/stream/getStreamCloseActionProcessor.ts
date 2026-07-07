@@ -14,8 +14,6 @@ const getProcessStreamClose = (qpqConfig: QPQConfig): StreamCloseActionProcessor
   };
 };
 
-export const getStreamCloseActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
+export const getStreamCloseActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
   [StreamActionType.Close]: getProcessStreamClose(qpqConfig),
 });

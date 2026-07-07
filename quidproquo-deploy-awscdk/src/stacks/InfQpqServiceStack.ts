@@ -4,7 +4,7 @@ import { qpqWebServerUtils } from 'quidproquo-webserver';
 import { Construct } from 'constructs';
 
 import {
-  InfQpqWebserverServiceDomainsConstruct,
+  QpqCoreAiConstruct,
   QpqCoreApiGraphDatabaseConstruct,
   QpqCoreEventBusConstruct,
   QpqCoreKeyValueStoreConstruct,
@@ -32,11 +32,6 @@ export class InfQpqServiceStack extends QpqServiceStack {
       qpqConfig: props.qpqConfig,
     }).role;
 
-    // Web entry foundations
-    new InfQpqWebserverServiceDomainsConstruct(this, 'serviceDomains', {
-      qpqConfig: props.qpqConfig,
-    });
-
     // Build the storage drives
     const storageDrives = qpqCoreUtils.getOwnedStorageDrives(props.qpqConfig).map(
       (setting) =>
@@ -44,9 +39,12 @@ export class InfQpqServiceStack extends QpqServiceStack {
           qpqConfig: props.qpqConfig,
 
           storageDriveConfig: setting,
+
+          corsAllowedOrigins: qpqWebServerUtils.getStorageDriveCorsAllowedOrigins(props.qpqConfig, setting.storageDrive),
+          allowCloudFrontRead: qpqWebServerUtils.isStorageDriveWebEntryOrigin(props.qpqConfig, setting.storageDrive),
         }),
     );
-    QpqCoreStorageDriveConstruct.authorizeActionsForRole(webserverRole, storageDrives);
+    QpqCoreStorageDriveConstruct.authorizeActionsForRole(webserverRole, props.qpqConfig, storageDrives);
     // end storage drives
 
     // Build the parameters
@@ -95,7 +93,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
           userDirectoryConfig: setting,
         }),
     );
-    QpqInfCoreUserDirectoryConstruct.authorizeActionsForRole(webserverRole, ownedUserDirectoriesConfigs, userDirectories, props.qpqConfig);
+    QpqInfCoreUserDirectoryConstruct.authorizeAdminActionsForRole(webserverRole, ownedUserDirectoriesConfigs, userDirectories, props.qpqConfig);
 
     // Api Keys
     const apiKeys = qpqWebServerUtils.getAllApiKeyConfigs(props.qpqConfig).map(
@@ -126,7 +124,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
           keyValueStoreConfig: setting,
         }),
     );
-    QpqCoreKeyValueStoreConstruct.authorizeActionsForRole(webserverRole, keyValueStores);
+    QpqCoreKeyValueStoreConstruct.authorizeActionsForRole(webserverRole, props.qpqConfig, keyValueStores);
     // end key value store
 
     // Graph Databases
@@ -142,6 +140,10 @@ export class InfQpqServiceStack extends QpqServiceStack {
     QpqCoreApiGraphDatabaseConstruct.authorizeActionsForRole(webserverRole, allGraphDatabaseConfigs, props.qpqConfig);
     // end key value store
 
+    // AI (Bedrock)
+    QpqCoreAiConstruct.authorizeActionsForRole(webserverRole, qpqCoreUtils.getAllAiConfigs(props.qpqConfig));
+    // end AI
+
     // Build websocket apis
     const websockets = qpqWebServerUtils.getOwnedWebsocketSettings(props.qpqConfig).map(
       (setting) =>
@@ -151,6 +153,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
           websocketConfig: setting,
         }),
     );
+    QpqWebserverWebsocketConstruct.authorizeManageConnectionsForRole(webserverRole, websockets, props.qpqConfig);
 
     // Cache settings
     const cache = qpqWebServerUtils.getAllOwnedCacheConfigs(props.qpqConfig).map(

@@ -59,7 +59,7 @@ export const LogDetails = ({
         <TableBody>
           <TableRow>
             <TableCell sx={leftTableCell}>
-              <ActionHistoryItemTimeStamp startedAt={log.startedAt} finishedAt={log.startedAt} />
+              <ActionHistoryItemTimeStamp finishedAt={log.startedAt} startedAt={log.startedAt} />
             </TableCell>
             <TableCell sx={rightTableCell}>
               <LogSummaryDetails log={log} />
@@ -69,7 +69,7 @@ export const LogDetails = ({
           {history.map((historyItem, index) => (
             <TableRow key={`${index}`}>
               <TableCell sx={leftTableCell}>
-                <ActionHistoryItemTimeStamp startedAt={historyItem.startedAt} finishedAt={historyItem.finishedAt} />
+                <ActionHistoryItemTimeStamp finishedAt={historyItem.finishedAt} startedAt={historyItem.startedAt} />
               </TableCell>
               <TableCell sx={rightTableCell}>
                 {historyItem.act && <AnyActionHistoryItem action={historyItem.act} result={historyItem.res} />}
@@ -80,7 +80,7 @@ export const LogDetails = ({
 
           <TableRow>
             <TableCell sx={leftTableCell}>
-              <ActionHistoryItemTimeStamp startedAt={log.finishedAt} finishedAt={log.finishedAt} />
+              <ActionHistoryItemTimeStamp finishedAt={log.finishedAt} startedAt={log.finishedAt} />
             </TableCell>
             <TableCell sx={rightTableCell}>
               <LogSummaryReturn log={log} />
@@ -91,7 +91,7 @@ export const LogDetails = ({
             <TableRow>
               <TableCell colSpan={2} style={{ width: '100%' }}>
                 <div style={{ paddingBottom: '10px' }}>
-                  <Typography variant="h6" component="span">
+                  <Typography component="span" variant="h6">
                     Caught console.log events
                   </Typography>
                 </div>

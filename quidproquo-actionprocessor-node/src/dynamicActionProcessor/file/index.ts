@@ -18,13 +18,8 @@ import { FileStorageConfig } from './types';
 export * from './types';
 
 // Main export that accepts configuration
-export const getFileActionProcessor = (
-  fileStorageConfig: FileStorageConfig
-): ActionProcessorListResolver => {
-  return async (
-    qpqConfig: QPQConfig,
-    dynamicModuleLoader: DynamicModuleLoader,
-  ): Promise<ActionProcessorList> => ({
+export const getFileActionProcessor = (fileStorageConfig: FileStorageConfig): ActionProcessorListResolver => {
+  return async (qpqConfig: QPQConfig, dynamicModuleLoader: DynamicModuleLoader): Promise<ActionProcessorList> => ({
     ...(await getFileReadTextContentsActionProcessor(fileStorageConfig)(qpqConfig, dynamicModuleLoader)),
     ...(await getFileWriteTextContentsActionProcessor(fileStorageConfig)(qpqConfig, dynamicModuleLoader)),
     ...(await getFileReadObjectJsonActionProcessor(fileStorageConfig)(qpqConfig, dynamicModuleLoader)),
@@ -41,5 +36,5 @@ export const getFileActionProcessor = (
   });
 };
 
-export * from "./secureUrlUtils";
-export * from "./utils";
+export * from './secureUrlUtils';
+export * from './utils';

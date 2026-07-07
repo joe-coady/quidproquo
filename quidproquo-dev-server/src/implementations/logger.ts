@@ -1,4 +1,13 @@
-import { filterLogHistoryByActionTypes, LogActionType, QPQConfig, qpqCoreUtils, QpqLogger, StoryResult, StorySession } from 'quidproquo-core';
+import {
+  filterLogHistoryByActionTypes,
+  LogActionType,
+  QPQ_LOGS_STORAGE_DRIVE_NAME,
+  QPQConfig,
+  qpqCoreUtils,
+  QpqLogger,
+  StoryResult,
+  StorySession,
+} from 'quidproquo-core';
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
@@ -7,15 +16,15 @@ import { ResolvedDevServerConfig } from '../types';
 
 export const getDevServerLogger = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig, storySession?: StorySession): QpqLogger => {
   // Check if we're processing a storage event from the qpq-logs drive
-  const isProcessingLogDriveEvent = storySession?.context?.storageEvent?.drive === 'qpq-logs';
+  const isProcessingLogDriveEvent = storySession?.context?.storageEvent?.drive === QPQ_LOGS_STORAGE_DRIVE_NAME;
 
   // If we have no log service, or we're processing logs drive events, return a no-op logger
-  if (!devServerConfig.logServiceName || isProcessingLogDriveEvent || process.env.storageDriveName === 'qpq-logs') {
+  if (!devServerConfig.logServiceName || isProcessingLogDriveEvent || process.env.storageDriveName === QPQ_LOGS_STORAGE_DRIVE_NAME) {
     return {
-      enableLogs: async () => { },
-      log: async () => { },
-      waitToFinishWriting: async () => { },
-      moveToPermanentStorage: async () => { },
+      enableLogs: async () => {},
+      log: () => {},
+      waitToFinishWriting: async () => {},
+      moveToPermanentStorage: async () => {},
     };
   }
 
@@ -23,7 +32,7 @@ export const getDevServerLogger = (qpqConfig: QPQConfig, devServerConfig: Resolv
   const storagePath = devServerConfig.fileStorageConfig.storagePath;
 
   // Construct the log directory path: {storagePath}/{logServiceName}/qpq-logs/
-  const logDirectory = path.join(storagePath, logServiceName, 'qpq-logs');
+  const logDirectory = path.join(storagePath, logServiceName, QPQ_LOGS_STORAGE_DRIVE_NAME);
 
   const logs: Promise<void>[] = [];
   let disabledLogCorrelations: string[] = [];
@@ -51,22 +60,27 @@ export const getDevServerLogger = (qpqConfig: QPQConfig, devServerConfig: Resolv
       }
     },
 
-    log: async (result: StoryResult<any>) => {
-      let modifiableResult = !disabledLogCorrelations.includes(result.correlation)
-        ? result
-        : {
-          ...result,
-          history: filterLogHistoryByActionTypes(result.history, [
-            LogActionType.Create,
-            LogActionType.TemplateLiteral,
-            LogActionType.DisableEventHistory,
-          ]),
-        };
+    log: (result: StoryResult<any>) => {
+      // Defer all work to a microtask so the caller is not blocked.
+      // The promise is tracked in `logs` and awaited by waitToFinishWriting at the end.
+      const promise = Promise.resolve()
+        .then(async () => {
+          const modifiableResult = !disabledLogCorrelations.includes(result.correlation)
+            ? result
+            : {
+                ...result,
+                history: filterLogHistoryByActionTypes(result.history, [
+                  LogActionType.Create,
+                  LogActionType.TemplateLiteral,
+                  LogActionType.DisableEventHistory,
+                ]),
+              };
 
-      // Create a promise for this log write and add it to the array
-      const promise = writeLogFile(modifiableResult).catch((e) => {
-        console.log('Failed to log story result', JSON.stringify(e, null, 2));
-      });
+          await writeLogFile(modifiableResult);
+        })
+        .catch((e) => {
+          console.log('Failed to log story result', JSON.stringify(e, null, 2));
+        });
 
       logs.push(promise);
     },

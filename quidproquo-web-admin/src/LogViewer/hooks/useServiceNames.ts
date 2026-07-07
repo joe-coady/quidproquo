@@ -1,4 +1,4 @@
-import { useAuthAccessToken, useBaseUrlResolvers } from 'quidproquo-web-react';
+import { useAuthAccessToken, useBaseUrlResolvers, useEffectCallback } from 'quidproquo-web-react';
 
 import { useEffect, useMemo, useState } from 'react';
 
@@ -14,15 +14,16 @@ export const useServiceNames = (): AutoCompleteOption[] => {
   const accessToken = useAuthAccessToken();
   const baseUrlResolvers = useBaseUrlResolvers();
 
+  // Stable identity so the mount-only effect below can list it as a dependency.
+  const fetchData = useEffectCallback(async () => {
+    const updatedServiceNames = await getServiceNames(baseUrlResolvers.getApiUrl(), accessToken);
+
+    setServiceNames(updatedServiceNames);
+  });
+
   useEffect(() => {
-    const fetchData = async () => {
-      const updatedServiceNames = await getServiceNames(baseUrlResolvers.getApiUrl(), accessToken);
-
-      setServiceNames(updatedServiceNames);
-    };
-
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   const serviceOptions = useMemo(
     () =>

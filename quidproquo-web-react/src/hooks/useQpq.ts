@@ -15,6 +15,7 @@ import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import { useActionProcessors } from '../actionProcessor';
 import { useQpqContextValues } from './asmj/QpqContextProvider';
+import { useEffectCallback } from './useEffectCallback';
 
 function* withVersionCheck<R>(story: AskResponse<R>, versionRef: React.RefObject<number>, capturedVersion: number): AskResponse<R | undefined> {
   let nextValue: any = undefined;
@@ -50,10 +51,17 @@ export function useQpq(getActionProcessors: ActionProcessorListResolver = async 
   const versionRef = useRef(0);
 
   useEffect(() => {
+    const capturedVersionRef = versionRef;
     return () => {
-      versionRef.current++;
+      capturedVersionRef.current++;
     };
   }, []);
+
+  // Stable identities so the runtime memo can list them as dependencies
+  // without being recreated every render — the runtime always calls the
+  // latest processors through these wrappers.
+  const stableContextGetActionProcessors = useEffectCallback(contextGetActionProcessors);
+  const stableGetActionProcessors = useEffectCallback(getActionProcessors);
 
   const resolveStory = useMemo(
     () =>
@@ -65,8 +73,8 @@ export function useQpq(getActionProcessors: ActionProcessorListResolver = async 
         },
         async (qpqConfig, dynamicModuleLoader) => ({
           ...(await getWebActionProcessors(qpqConfig, dynamicModuleLoader)),
-          ...(await contextGetActionProcessors(qpqConfig, dynamicModuleLoader)),
-          ...(await getActionProcessors(qpqConfig, dynamicModuleLoader)),
+          ...(await stableContextGetActionProcessors(qpqConfig, dynamicModuleLoader)),
+          ...(await stableGetActionProcessors(qpqConfig, dynamicModuleLoader)),
         }),
         () => new Date().toISOString(),
         logger,
@@ -76,7 +84,7 @@ export function useQpq(getActionProcessors: ActionProcessorListResolver = async 
           // noop
         },
       ),
-    [qpqContextValues],
+    [qpqContextValues, stableContextGetActionProcessors, stableGetActionProcessors],
   );
 
   const qpq = useCallback(

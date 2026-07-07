@@ -2,7 +2,6 @@ export * from './createHierarchy';
 export * from './filterLogs';
 export * from './findLogDirectChildren';
 export * from './findRootLog';
-export * from './getFederationManifestUrl';
 export * from './getLogHierarchy';
 export * from './getLogs';
 export * from './getLogUrl';

@@ -4,13 +4,16 @@ import {
   ApiBuildPathQPQConfigSetting,
   ApplicationQPQConfigSetting,
   ClaudeAIQPQConfigSetting,
+  defineJavascriptRuntime,
   DeployEventsQPQConfigSetting,
   EmailTemplates,
   EnvironmentSettingsQPQConfigSetting,
   EventBusQPQConfigSetting,
+  FederatedModuleStoreQPQConfigSetting,
   GlobalQPQConfigSetting,
   GraphDatabaseQPQConfigSetting,
   InlineFunctionQPQConfigSetting,
+  JavascriptRuntimeQPQConfigSetting,
   KeyValueStoreQPQConfigSetting,
   ModuleQPQConfigSetting,
   NotifyErrorQPQConfigSetting,
@@ -23,6 +26,7 @@ import {
   QueueQPQConfigSetting,
   ScheduleQPQConfigSetting,
   SecretQPQConfigSetting,
+  ServiceSettingsQPQConfigSetting,
   StorageDriveQPQConfigSetting,
   UserDirectoryQPQConfigSetting,
   VirtualNetworkQPQConfigSetting,
@@ -37,7 +41,7 @@ import {
   QpqFunctionRuntime,
   ResourceName,
 } from './types';
-import { isQpqFunctionRuntimeAbsolutePath } from './utils';
+import { isQpqFunctionRuntimeAdvanced } from './utils';
 
 /**
  * Flattens a QPQConfig array into a single array of QPQConfigSetting objects.
@@ -49,6 +53,7 @@ import { isQpqFunctionRuntimeAbsolutePath } from './utils';
  */
 export const flattenQpqConfig = (qpqConfig: QPQConfig): QPQConfigSetting[] => {
   let environment = 'development';
+  let service: string | undefined;
 
   /**
    * A recursive helper function that flattens an array of QPQConfigItem objects.
@@ -67,10 +72,29 @@ export const flattenQpqConfig = (qpqConfig: QPQConfig): QPQConfigSetting[] => {
           environment = (item as ApplicationQPQConfigSetting).environment || 'development';
         }
 
+        // If its a moduleName config item, update the service variable
+        else if (item.configSettingType === QPQCoreConfigSettingType.moduleName) {
+          service = (item as ModuleQPQConfigSetting).moduleName;
+        }
+
         // Otherwise if its an environmentSettings config item, flatten out the child settings
+        // for the current environment, falling back to the '*' key if present.
         else if (item.configSettingType === QPQCoreConfigSettingType.environmentSettings) {
           const envSetting = item as EnvironmentSettingsQPQConfigSetting;
-          const settings = envSetting.environment === environment ? envSetting.settings : [];
+          const settings = envSetting.settingsByEnvironment[environment] ?? envSetting.settingsByEnvironment['*'] ?? [];
+
+          return flatten(settings, acc);
+        }
+
+        // Otherwise if its a serviceSettings config item, flatten out the child settings
+        // for the current service, falling back to the '*' key if present.
+        else if (item.configSettingType === QPQCoreConfigSettingType.serviceSettings) {
+          if (!service) {
+            throw new Error('defineServiceSettings requires a module to be set first via defineModule (usually through defineApplicationModule)');
+          }
+
+          const svcSetting = item as ServiceSettingsQPQConfigSetting;
+          const settings = svcSetting.settingsByService[service] ?? svcSetting.settingsByService['*'] ?? [];
 
           return flatten(settings, acc);
         }
@@ -171,6 +195,10 @@ export const getStorageDriveByName = (storageDriveName: string, configs: QPQConf
   return getStorageDrives(configs).find((sd) => sd.storageDrive === storageDriveName);
 };
 
+export const getFederatedModuleStore = (qpqConfig: QPQConfig): FederatedModuleStoreQPQConfigSetting | undefined => {
+  return getConfigSetting<FederatedModuleStoreQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.federatedModuleStore);
+};
+
 export const getQueues = (configs: QPQConfig): QueueQPQConfigSetting[] => {
   return getConfigSettings<QueueQPQConfigSetting>(configs, QPQCoreConfigSettingType.queue);
 };
@@ -203,6 +231,11 @@ export const getAllEventBusConfigs = (qpqConfig: QPQConfig): EventBusQPQConfigSe
 
 export const getAllAiConfigs = (qpqConfig: QPQConfig): AiQPQConfigSetting[] => {
   return getConfigSettings<AiQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.ai);
+};
+
+// Always resolves - falls back to the defineJavascriptRuntime defaults when no setting is present
+export const getJavascriptRuntimeConfig = (qpqConfig: QPQConfig): JavascriptRuntimeQPQConfigSetting => {
+  return getConfigSetting<JavascriptRuntimeQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.javascriptRuntime) ?? defineJavascriptRuntime();
 };
 
 export const getAllClaudeAiConfigs = (qpqConfig: QPQConfig): ClaudeAIQPQConfigSetting[] => {
@@ -374,9 +407,8 @@ export const getApiBuildPath = (qpqConfig: QPQConfig): string => {
   return apiBuildPathConfig.apiBuildPath;
 };
 
-
 export const getSrcFilenameFromQpqFunctionRuntime = (qpqFunctionRuntime: QpqFunctionRuntime): string => {
-  if (isQpqFunctionRuntimeAbsolutePath(qpqFunctionRuntime)) {
+  if (isQpqFunctionRuntimeAdvanced(qpqFunctionRuntime)) {
     return qpqFunctionRuntime.relativePath.split('/').pop() || '';
   }
 
@@ -416,6 +448,17 @@ export const getGlobalConfigValue = <T>(qpqConfig: QPQConfig, name: string): T =
   }
 
   return global.value;
+};
+
+// Resolves a global by name, giving precedence to globals declared on the
+// executing function (functionGlobals) before falling back to the service-wide
+// config global. Throws (via getGlobalConfigValue) if the name is found in neither.
+export const resolveGlobalValue = <T>(qpqConfig: QPQConfig, functionGlobals: Record<string, unknown> | undefined, name: string): T => {
+  if (functionGlobals && Object.prototype.hasOwnProperty.call(functionGlobals, name)) {
+    return functionGlobals[name] as T;
+  }
+
+  return getGlobalConfigValue<T>(qpqConfig, name);
 };
 
 export const getUserDirectories = (configs: QPQConfig): UserDirectoryQPQConfigSetting[] => {
@@ -478,7 +521,6 @@ export const getQueueQueueProcessors = (name: string, qpqConfig: QPQConfig): Qpq
 
   return queueConfig?.qpqQueueProcessors || {};
 };
-
 
 export const convertCustomFullyQualifiedResourceToGeneric = <T extends string>(resource: CustomFullyQualifiedResource<T>): FullyQualifiedResource => {
   type KeyType = KeyOf<CustomFullyQualifiedResource<T>>;

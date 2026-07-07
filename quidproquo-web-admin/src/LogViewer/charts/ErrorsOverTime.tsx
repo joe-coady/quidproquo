@@ -14,16 +14,16 @@ export const ErrorsOverTime = ({ logs, searchParams }: ErrorsOverTimeProps) => {
 
   return (
     <>
-      <Typography variant="h5" gutterBottom>
+      <Typography gutterBottom variant="h5">
         Errors Over Time
       </Typography>
-      <LineChart width={1200} height={300} data={data}>
+      <LineChart data={data} height={300} width={1200}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="time" />
         <YAxis />
         <Tooltip />
         <Legend />
-        <Line type="monotone" dataKey="errors" stroke="#8884d8" activeDot={{ r: 8 }} />
+        <Line activeDot={{ r: 8 }} dataKey="errors" stroke="#8884d8" type="monotone" />
       </LineChart>
     </>
   );

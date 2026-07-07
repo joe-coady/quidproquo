@@ -74,7 +74,7 @@ export function useQpqRuntimeState<TState, TAction, TApi extends QpqApi>(
 
       setState(newState);
     },
-    [setState],
+    [atom, name, setState],
   );
 
   const getState = useCallback((): TState => {

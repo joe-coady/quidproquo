@@ -1,10 +1,24 @@
-import { CrossModuleOwner, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { CrossModuleOwner, KeyValueStoreQPQConfigSetting, QPQConfig, qpqCoreUtils, StorageDriveQPQConfigSetting } from 'quidproquo-core';
 
 import {
+  AccountBudgetQPQConfigSetting,
+  AccountCloudTrailQPQConfigSetting,
+  AccountSecurityServicesQPQConfigSetting,
   AwsAlarmQPQConfigSetting,
+  AwsDataStoreRemovalPolicy,
+  AwsDataStoreRemovalPolicyQPQConfigSetting,
   AwsDyanmoOverrideForKvsQPQConfigSetting,
+  AwsKmsKeyQPQConfigSetting,
+  AwsKmsKeyTargetType,
   AwsOrganizationQPQConfigSetting,
   AwsServiceAccountInfoQPQConfigSetting,
+  AwsServiceDashboardQPQConfigSetting,
+  AwsVirtualNetworkQPQConfigSetting,
+  BootstrapWafQPQConfigSetting,
+  defineAwsVirtualNetworkSettings,
+  DomainCertificateQPQConfigSetting,
+  EventBusQuickSubscription,
+  EventBusQuickSubscriptionQPQConfigSetting,
   QPQAwsConfigSettingType,
 } from '../config';
 import { ApiLayer, LocalServiceAccountInfo, ServiceAccountInfo } from '../types';
@@ -27,6 +41,29 @@ export const getAwsServiceAccountInfoConfig = (qpqConfig: QPQConfig): AwsService
   return serviceAccountInfos[0];
 };
 
+/**
+ * Resolve the AWS hardening settings for a named virtual network. Falls back
+ * to `defineAwsVirtualNetworkSettings(name)` when the config never declares
+ * one, so every VPC gets the secure defaults (flow logs + free S3/DynamoDB
+ * gateway endpoints) without opting in.
+ */
+export const getAwsVirtualNetworkSettings = (qpqConfig: QPQConfig, virtualNetworkName: string): AwsVirtualNetworkQPQConfigSetting => {
+  const setting = qpqCoreUtils
+    .getConfigSettings<AwsVirtualNetworkQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.awsVirtualNetworkSettings)
+    .find((s) => s.virtualNetworkName === virtualNetworkName);
+
+  return setting ?? defineAwsVirtualNetworkSettings(virtualNetworkName);
+};
+
+export const getAwsDataStoreRemovalPolicy = (qpqConfig: QPQConfig): AwsDataStoreRemovalPolicy => {
+  const setting = qpqCoreUtils.getConfigSetting<AwsDataStoreRemovalPolicyQPQConfigSetting>(
+    qpqConfig,
+    QPQAwsConfigSettingType.awsDataStoreRemovalPolicy,
+  );
+
+  return setting?.removalPolicy ?? AwsDataStoreRemovalPolicy.retain;
+};
+
 export const getAwsBootstrapOrganizationConfigs = (qpqConfig: QPQConfig): AwsOrganizationQPQConfigSetting[] => {
   const awsOrganizationQPQConfigSettings = qpqCoreUtils.getConfigSettings<AwsOrganizationQPQConfigSetting>(
     qpqConfig,
@@ -35,6 +72,37 @@ export const getAwsBootstrapOrganizationConfigs = (qpqConfig: QPQConfig): AwsOrg
 
   return awsOrganizationQPQConfigSettings;
 };
+
+export const getAccountBudgetConfigs = (qpqConfig: QPQConfig): AccountBudgetQPQConfigSetting[] =>
+  qpqCoreUtils.getConfigSettings<AccountBudgetQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.accountBudget);
+
+export const getAccountSecurityServicesConfig = (qpqConfig: QPQConfig): AccountSecurityServicesQPQConfigSetting | undefined =>
+  qpqCoreUtils.getConfigSetting<AccountSecurityServicesQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.accountSecurityServices);
+
+export const getAwsServiceDashboardConfig = (qpqConfig: QPQConfig): AwsServiceDashboardQPQConfigSetting | undefined =>
+  qpqCoreUtils.getConfigSetting<AwsServiceDashboardQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.awsServiceDashboard);
+
+export const getBootstrapWafConfig = (qpqConfig: QPQConfig): BootstrapWafQPQConfigSetting | undefined =>
+  qpqCoreUtils.getConfigSetting<BootstrapWafQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.bootstrapWaf);
+
+export const isWafProtectionEnabled = (qpqConfig: QPQConfig): boolean =>
+  !!qpqCoreUtils.getConfigSetting(qpqConfig, QPQAwsConfigSettingType.wafProtection);
+
+// The web acl arns are shared by naming convention (not by setting) because the bootstrap
+// config that creates them and the service configs that attach them are separate arrays -
+// both sides can derive this name from their own app/env/feature.
+export const getWafWebAclArnSsmParameterName = (wafScope: 'regional' | 'cloudfront', qpqConfig: QPQConfig): string => {
+  const application = qpqCoreUtils.getApplicationName(qpqConfig);
+  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
+  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+
+  const deploymentName = feature ? `${application}-${environment}-${feature}` : `${application}-${environment}`;
+
+  return `/qpq/waf/web-acl-arn/${wafScope}/${deploymentName}`;
+};
+
+export const getAccountCloudTrailConfigs = (qpqConfig: QPQConfig): AccountCloudTrailQPQConfigSetting[] =>
+  qpqCoreUtils.getConfigSettings<AccountCloudTrailQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.accountCloudTrail);
 
 export const getAwsServiceAccountInfos = (qpqConfig: QPQConfig): ServiceAccountInfo[] => {
   const awsServiceAccountInfoConfig = getAwsServiceAccountInfoConfig(qpqConfig);
@@ -60,6 +128,24 @@ export const getOwnedAwsAlarmConfigs = (qpqConfig: QPQConfig): AwsAlarmQPQConfig
   const alarmConfigs = qpqCoreUtils.getConfigSettings<AwsAlarmQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.awsServiceAlarm);
 
   return qpqCoreUtils.getOwnedItems(alarmConfigs, qpqConfig);
+};
+
+/**
+ * Direct SNS subscribers (email / webhook) declared for a given event bus.
+ * Additive across calls. Pass the bus's `owner` (from its `defineEventBus`) to
+ * disambiguate: an owner-tagged quick-sub binds only to the matching owner's bus,
+ * while an owner-less one matches any bus with that name (simple single-service case).
+ */
+export const getEventBusQuickSubscriptions = (
+  qpqConfig: QPQConfig,
+  eventBusName: string,
+  busOwner?: CrossModuleOwner,
+): EventBusQuickSubscription[] => {
+  return qpqCoreUtils
+    .getConfigSettings<EventBusQuickSubscriptionQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.awsEventBusQuickSubscription)
+    .filter((setting) => setting.eventBusName === eventBusName)
+    .filter((setting) => !setting.owner || qpqCoreUtils.isSameCrossModuleOwner(setting.owner, busOwner))
+    .flatMap((setting) => setting.subscriptions);
 };
 
 export const getAwsAccountIds = (qpqConfig: QPQConfig): string[] => {
@@ -155,6 +241,46 @@ export const isLambdaWarmingDisabled = (qpqConfig: QPQConfig): boolean => {
 export const isReservedConcurrencyDisabled = (qpqConfig: QPQConfig): boolean => {
   const awsServiceAccountInfoConfig = getAwsServiceAccountInfoConfig(qpqConfig);
   return awsServiceAccountInfoConfig.disableReservedConcurrency;
+};
+
+export const isTracingDisabled = (qpqConfig: QPQConfig): boolean => {
+  const awsServiceAccountInfoConfig = getAwsServiceAccountInfoConfig(qpqConfig);
+  return awsServiceAccountInfoConfig.disableTracing;
+};
+
+export const getDomainCertificateConfigs = (qpqConfig: QPQConfig): DomainCertificateQPQConfigSetting[] => {
+  return qpqCoreUtils.getConfigSettings<DomainCertificateQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.awsDomainCertificate);
+};
+
+export const getDomainCertificateArnSsmParameterName = (region: string, rootDomain: string): string => {
+  const sanitizedRoot = rootDomain.replace(/\./g, '-');
+  return `/qpq/domain/certificate-arn/${region}/${sanitizedRoot}`;
+};
+
+export const getAwsKmsKeys = (qpqConfig: QPQConfig): AwsKmsKeyQPQConfigSetting[] => {
+  return qpqCoreUtils.getConfigSettings<AwsKmsKeyQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.awsKmsKey);
+};
+
+export const getAwsKmsKeyForStorageDrive = (
+  qpqConfig: QPQConfig,
+  storageDriveConfig: StorageDriveQPQConfigSetting,
+): AwsKmsKeyQPQConfigSetting | undefined => {
+  const ownerModule = storageDriveConfig.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig);
+
+  return getAwsKmsKeys(qpqConfig).find(
+    (k) => k.type === AwsKmsKeyTargetType.storageDrive && k.kmsOwner.name === storageDriveConfig.storageDrive && k.kmsOwner.module === ownerModule,
+  );
+};
+
+export const getAwsKmsKeyForKeyValueStore = (
+  qpqConfig: QPQConfig,
+  kvsConfig: KeyValueStoreQPQConfigSetting,
+): AwsKmsKeyQPQConfigSetting | undefined => {
+  const ownerModule = kvsConfig.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig);
+
+  return getAwsKmsKeys(qpqConfig).find(
+    (k) => k.type === AwsKmsKeyTargetType.keyValueStore && k.kmsOwner.name === kvsConfig.keyValueStoreName && k.kmsOwner.module === ownerModule,
+  );
 };
 
 export const getDynamoTableNameOverrride = (srcKvsName: string, qpqConfig: QPQConfig): string => {

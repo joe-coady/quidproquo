@@ -8,6 +8,7 @@ import { getErrorActionProcessor } from './error';
 import { getGuidProcessor } from './guid';
 import { getLogActionProcessor } from './log';
 import { getMathActionProcessor } from './math';
+import { getMetricActionProcessor } from './metric';
 import { getNetworkActionProcessor } from './network';
 import { getPlatformActionProcessor } from './platform';
 import { getSystemActionProcessor } from './system';
@@ -20,6 +21,7 @@ export * from './error';
 export * from './guid';
 export * from './log';
 export * from './math';
+export * from './metric';
 export * from './network';
 export * from './platform';
 export * from './system';
@@ -39,6 +41,7 @@ export const getCoreActionProcessor: ActionProcessorListResolver = async (
   ...(await getGuidProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getLogActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getMathActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getMetricActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getNetworkActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getPlatformActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getSystemActionProcessor(qpqConfig, dynamicModuleLoader)),

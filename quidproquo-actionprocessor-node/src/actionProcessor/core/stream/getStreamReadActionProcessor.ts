@@ -14,8 +14,6 @@ const getProcessStreamRead = (qpqConfig: QPQConfig): StreamReadActionProcessor =
   };
 };
 
-export const getStreamReadActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
+export const getStreamReadActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
   [StreamActionType.Read]: getProcessStreamRead(qpqConfig),
 });

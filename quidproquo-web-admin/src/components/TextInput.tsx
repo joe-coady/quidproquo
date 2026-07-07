@@ -15,12 +15,12 @@ export const TextInput: React.FC<TextInputProps> = ({ label, value, onChange }: 
   return (
     <FormControl fullWidth>
       <TextField
-        label={label}
-        value={value || ''}
-        onChange={handleChange}
         InputLabelProps={{
           shrink: true,
         }}
+        label={label}
+        onChange={handleChange}
+        value={value || ''}
       />
     </FormControl>
   );

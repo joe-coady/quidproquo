@@ -15,10 +15,10 @@ export const ActionHistoryItem = ({ action, result, expanded }: ActionHistoryIte
   return (
     <>
       <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-        <TruncatedText title="Input" text={inputText} expanded={expanded} />
+        <TruncatedText expanded={expanded} text={inputText} title="Input" />
       </pre>
       <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-        <TruncatedText title="Output" text={outputText} expanded={expanded} />
+        <TruncatedText expanded={expanded} text={outputText} title="Output" />
       </pre>
     </>
   );

@@ -3,12 +3,12 @@ import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 /**
  * Dev server optimized access token decoder.
- * 
+ *
  * In development:
  * - Skips AWS CloudFormation API calls
  * - Skips JWT signature verification (trusts the token)
  * - Just decodes the JWT payload for user info
- * 
+ *
  * This is ONLY safe for development where:
  * - Performance matters more than security
  * - We trust the tokens being sent
@@ -17,7 +17,7 @@ import { qpqWebServerUtils } from 'quidproquo-webserver';
 export const decodeAccessTokenForDev = (
   userDirectoryName: string,
   accessToken?: string,
-  ignoreExpiration: boolean = false
+  ignoreExpiration: boolean = false,
 ): DecodedAccessToken | null => {
   if (!accessToken) {
     return null;
@@ -25,7 +25,7 @@ export const decodeAccessTokenForDev = (
 
   try {
     // Just decode the JWT without verification (dev only!)
-    const decoded = qpqWebServerUtils.decodeJWT<{
+    const decoded = qpqWebServerUtils.unsafeDecodeJWTPayload<{
       sub?: string;
       userId?: string;
       username?: string;

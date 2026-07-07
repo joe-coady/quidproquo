@@ -3,9 +3,12 @@ import {
   ActionProcessorList,
   ActionProcessorListResolver,
   actionResult,
+  actionResultError,
+  actionResultErrorFromCaughtError,
   QPQConfig,
   UserDirectoryActionType,
   UserDirectoryGetUserAttributesByUserIdActionProcessor,
+  UserDirectoryGetUserAttributesByUserIdErrorTypeEnum,
 } from 'quidproquo-core';
 
 import { getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
@@ -18,9 +21,15 @@ const getProcessGetUserAttributesByUserId = (qpqConfig: QPQConfig): UserDirector
 
     const userPoolId = await getExportedValue(getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig), region);
 
-    const userAttributes = await getUserAttributesBySub(userPoolId, region, userId);
+    try {
+      const userAttributes = await getUserAttributesBySub(userPoolId, region, userId);
 
-    return actionResult(userAttributes);
+      return actionResult(userAttributes);
+    } catch (error: unknown) {
+      return actionResultErrorFromCaughtError(error, {
+        USER_NOT_FOUND: () => actionResultError(UserDirectoryGetUserAttributesByUserIdErrorTypeEnum.UserNotFound, 'No user found for this userId'),
+      });
+    }
   };
 };
 

@@ -15,7 +15,7 @@ export const CoreLogDisableEventHistoryCustomAction: ActionComponent<LogDisableE
   return (
     <Box sx={{ width: '100%', my: 1 }}>
       <Alert severity={'warning'}>
-        <Typography variant="body1" fontWeight="bold">
+        <Typography fontWeight="bold" variant="body1">
           {reason}
         </Typography>
       </Alert>

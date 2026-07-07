@@ -4,6 +4,7 @@ import {
   actionResult,
   EventActionType,
   EventGetStorySessionActionProcessor,
+  generateUuid,
   getProcessCustomImplementation,
   MatchStoryResult,
   QPQConfig,
@@ -13,7 +14,6 @@ import {
 import { RouteOptions } from '../../config/settings/route';
 import { askGetHttpApiEventStorySession, GetHttpApiEventStorySessionPayload } from '../../stories/askGetHttpApiEventStorySession';
 import { HTTPEvent } from '../../types/HTTPEvent';
-import { generateUUID } from '../../utils/uuidUtils';
 
 type InternalMatchResult = MatchStoryResult<any, RouteOptions>;
 
@@ -24,7 +24,7 @@ const getProcessGetStorySession = (qpqConfig: QPQConfig): EventGetStorySessionAc
     'API Get Story Session',
     null,
     () => new Date().toISOString(),
-    generateUUID,
+    generateUuid,
   );
 
   return async ({ matchStoryResult, qpqEventRecord }, session, actionProcessorList, logger, updateSession, dynamicModuleLoader) => {

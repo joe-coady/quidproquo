@@ -42,14 +42,15 @@ const AdminView: ComponentType = () => {
 
   return (
     <TabViewBox
+      body={() => <DataGrid columns={columns} items={[]} />}
       header={() => (
         <GridContainer spacing={2} xs={12}>
           <GridItem xs={6}>
             <DateRangePicker
-              startIsoDateTime={new Date().toISOString()}
               endIsoDateTime={new Date().toISOString()}
-              setStartIsoDateTime={() => {}}
               setEndIsoDateTime={() => {}}
+              setStartIsoDateTime={() => {}}
+              startIsoDateTime={new Date().toISOString()}
             />
           </GridItem>
           <GridItem xs={4}>
@@ -60,7 +61,6 @@ const AdminView: ComponentType = () => {
           </GridItem>
         </GridContainer>
       )}
-      body={() => <DataGrid items={[]} columns={columns} />}
     />
   );
 };

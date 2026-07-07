@@ -13,7 +13,6 @@ export const CoreNetworkRequestCustomAction: ActionComponent<NetworkRequestActio
     <>
       <pre style={genericFunctionRendererStyles.pre}>
         <GenericFunctionRenderer
-          functionName={'askNetworkRequest'}
           args={[
             action.payload.method,
             action.payload.url,
@@ -25,11 +24,12 @@ export const CoreNetworkRequestCustomAction: ActionComponent<NetworkRequestActio
               responseType: action.payload.responseType,
             },
           ]}
-          tooltipMap={['method', 'url', 'httpRequestOptions']}
           expanded={expanded}
+          functionName={'askNetworkRequest'}
+          tooltipMap={['method', 'url', 'httpRequestOptions']}
         />
       </pre>
-      <ActionResultDisplay action={action} result={result} expanded={expanded} />
+      <ActionResultDisplay action={action} expanded={expanded} result={result} />
     </>
   );
 };

@@ -45,16 +45,19 @@ type ErrorMap = { [key: string]: (error: Error) => ActionProcessorResult<any> };
 
 export const actionResultErrorFromCaughtError = (error: unknown, errorMap: ErrorMap): ReturnType<typeof actionResultError> => {
   if (error instanceof Error) {
-    const errorName = (error as any).name;
+    const errorCode = (error as any).code as string | undefined;
+    const errorName = error.name;
 
-    console.log('actionResultErrorFromCaughtError:', error, error.stack);
-
-    if (errorMap[errorName]) {
-      return errorMap[errorName](error);
+    // Prefer the OS/runtime code (node fs: EACCES, ENOENT...), then fall back
+    // to the error name (AWS SDK: AccessDenied, NoSuchBucket...).
+    const handler = (errorCode && errorMap[errorCode]) || errorMap[errorName];
+    if (handler) {
+      return handler(error);
     }
 
-    console.log(`Error: ${errorName}`);
-    return actionResultError(ErrorTypeEnum.GenericError, 'An unexpected error occurred.');
+    const unmappedKey = errorCode ?? errorName;
+    console.log(`Error: ${unmappedKey}`);
+    return actionResultError(ErrorTypeEnum.GenericError, `An unexpected error occurred [${unmappedKey}].`);
   }
 
   console.log('Caught non-error:', error);

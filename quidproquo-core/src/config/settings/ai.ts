@@ -19,10 +19,7 @@ export interface AiQPQConfigSetting extends QPQConfigSetting {
   tools: AiToolDefinition[];
 }
 
-export const defineAi = (
-  aiName: string,
-  options: QPQConfigAdvancedAiSettings,
-): AiQPQConfigSetting => ({
+export const defineAi = (aiName: string, options: QPQConfigAdvancedAiSettings): AiQPQConfigSetting => ({
   configSettingType: QPQCoreConfigSettingType.ai,
   uniqueKey: aiName,
 

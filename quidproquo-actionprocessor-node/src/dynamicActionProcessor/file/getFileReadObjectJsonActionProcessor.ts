@@ -3,11 +3,11 @@ import {
   ActionProcessorListResolver,
   actionResult,
   actionResultError,
+  actionResultErrorFromCaughtError,
   ErrorTypeEnum,
   FileActionType,
   FileReadObjectJsonActionProcessor,
   QPQConfig,
-  qpqCoreUtils,
 } from 'quidproquo-core';
 
 import * as fs from 'fs/promises';
@@ -15,29 +15,26 @@ import * as fs from 'fs/promises';
 import { FileStorageConfig } from './types';
 import { resolveFilePath } from './utils';
 
-const getProcessFileReadObjectJson = (config: FileStorageConfig) => (qpqConfig: QPQConfig): FileReadObjectJsonActionProcessor<any> => {
-  const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
-
-  return async ({ drive, filepath }) => {
-    try {
-      const fullPath = resolveFilePath(config, serviceName, drive, filepath);
-      const content = await fs.readFile(fullPath, 'utf8');
-      const jsonObject = JSON.parse(content);
-      return actionResult(jsonObject);
-    } catch (error: any) {
-      if (error.code === 'ENOENT') {
-        return actionResultError(ErrorTypeEnum.NotFound, `File not found: ${filepath}`);
+const getProcessFileReadObjectJson =
+  (config: FileStorageConfig) =>
+  (qpqConfig: QPQConfig): FileReadObjectJsonActionProcessor<any> => {
+    return async ({ drive, filepath }) => {
+      try {
+        const fullPath = resolveFilePath(config, qpqConfig, drive, filepath);
+        const content = await fs.readFile(fullPath, 'utf8');
+        const jsonObject = JSON.parse(content);
+        return actionResult(jsonObject);
+      } catch (error: unknown) {
+        return actionResultErrorFromCaughtError(error, {
+          ENOENT: () => actionResultError(ErrorTypeEnum.NotFound, `File not found: ${filepath}`), // node fs code
+          SyntaxError: () => actionResultError(ErrorTypeEnum.GenericError, `Invalid JSON in file: ${filepath}`), // JSON.parse failure
+        });
       }
-      if (error instanceof SyntaxError) {
-        return actionResultError(ErrorTypeEnum.GenericError, `Invalid JSON in file: ${filepath}`);
-      }
-      return actionResultError(ErrorTypeEnum.GenericError, `Error reading JSON file: ${error.message}`);
-    }
+    };
   };
-};
 
-export const getFileReadObjectJsonActionProcessor = (config: FileStorageConfig): ActionProcessorListResolver => async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [FileActionType.ReadObjectJson]: getProcessFileReadObjectJson(config)(qpqConfig),
-});
+export const getFileReadObjectJsonActionProcessor =
+  (config: FileStorageConfig): ActionProcessorListResolver =>
+  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
+    [FileActionType.ReadObjectJson]: getProcessFileReadObjectJson(config)(qpqConfig),
+  });

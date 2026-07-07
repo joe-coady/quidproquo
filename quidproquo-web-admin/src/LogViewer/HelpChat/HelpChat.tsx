@@ -1,5 +1,5 @@
 import { QpqPagedData } from 'quidproquo-core';
-import { useAuthAccessToken, useBaseUrlResolvers } from 'quidproquo-web-react';
+import { useAuthAccessToken, useBaseUrlResolvers, useEffectCallback } from 'quidproquo-web-react';
 
 import React, { useEffect, useRef, useState } from 'react';
 import Markdown from 'react-markdown';
@@ -22,11 +22,8 @@ export const HelpChat: React.FC<HelpChatProps> = ({ logCorrelation }) => {
   const accessToken = useAuthAccessToken();
   const baseUrlResolvers = useBaseUrlResolvers();
 
-  useEffect(() => {
-    fetchChatMessages();
-  }, []);
-
-  const fetchChatMessages = async () => {
+  // Stable identity so the mount-only effect below can list it as a dependency.
+  const fetchChatMessages = useEffectCallback(async () => {
     const listLogChatMessages: ListLogChatMessages = {
       correlationId: logCorrelation,
       nextPageKey: nextPageKey,
@@ -45,7 +42,11 @@ export const HelpChat: React.FC<HelpChatProps> = ({ logCorrelation }) => {
     } finally {
       // Do nothing
     }
-  };
+  });
+
+  useEffect(() => {
+    fetchChatMessages();
+  }, [fetchChatMessages]);
 
   const handleSendMessage = async () => {
     if (inputMessage.trim() !== '') {
@@ -89,7 +90,7 @@ export const HelpChat: React.FC<HelpChatProps> = ({ logCorrelation }) => {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <Box sx={{ flexGrow: 1, overflowY: 'auto', p: 2 }} ref={chatContainerRef}>
+      <Box ref={chatContainerRef} sx={{ flexGrow: 1, overflowY: 'auto', p: 2 }}>
         {chatMessages.map((message, index) => (
           <Box
             key={index}
@@ -160,14 +161,14 @@ export const HelpChat: React.FC<HelpChatProps> = ({ logCorrelation }) => {
         <Box sx={{ display: 'flex' }}>
           <TextField
             fullWidth
-            variant="outlined"
-            placeholder="Type your message..."
-            value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyDown={handleKeyPress}
+            placeholder="Type your message..."
             sx={{ mr: 2 }}
+            value={inputMessage}
+            variant="outlined"
           />
-          <Button variant="contained" onClick={handleSendMessage}>
+          <Button onClick={handleSendMessage} variant="contained">
             Send
           </Button>
         </Box>

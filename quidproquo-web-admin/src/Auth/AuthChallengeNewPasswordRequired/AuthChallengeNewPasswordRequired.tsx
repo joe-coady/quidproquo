@@ -40,36 +40,37 @@ export function AuthChallengeNewPasswordRequired({ authState }: AuthChallengeNew
       <Box component="form" sx={{ width: '100%', maxWidth: 360 }}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+            <Typography gutterBottom sx={{ display: 'flex', alignItems: 'center' }} variant="h5">
               <LockIcon sx={{ marginRight: 1 }} />
               Password Change Required
             </Typography>
           </Grid>
           <Grid item xs={12}>
             <TextField
-              required
+              autoFocus
               fullWidth
               id="newPassword"
               label="New Password"
-              type="password"
-              autoFocus
-              value={state.passwordA}
               onChange={(event) => api.authChallengeSetPasswordA(event.target.value)}
+              required
+              type="password"
+              value={state.passwordA}
             />
           </Grid>
           <Grid item xs={12}>
             <TextField
-              required
               fullWidth
               id="confirmPassword"
               label="Confirm Password"
+              onChange={(event) => api.authChallengeSetPasswordB(event.target.value)}
+              required
               type="password"
               value={state.passwordB}
-              onChange={(event) => api.authChallengeSetPasswordB(event.target.value)}
             />
           </Grid>
           <Grid item xs={12}>
             <AsyncButton
+              disabled={!arePasswordsMatching}
               onClick={() =>
                 api.authChallengeSendPasswords(
                   authState.authenticateUserResponse?.challenge!,
@@ -77,7 +78,6 @@ export function AuthChallengeNewPasswordRequired({ authState }: AuthChallengeNew
                   authState.username,
                 )
               }
-              disabled={!arePasswordsMatching}
             >
               Update Password
             </AsyncButton>

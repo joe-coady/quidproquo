@@ -1,8 +1,16 @@
-import { ActionProcessorList, ActionProcessorListResolver, actionResult, DateActionType, DateNowActionProcessor, QPQConfig } from 'quidproquo-core';
+import {
+  ActionProcessorList,
+  ActionProcessorListResolver,
+  actionResult,
+  DateActionType,
+  DateNowActionProcessor,
+  getQpqIsoDateTimeFromDate,
+  QPQConfig,
+} from 'quidproquo-core';
 
 const getProcessDateNow = (qpqConfig: QPQConfig): DateNowActionProcessor => {
   return async () => {
-    return actionResult(new Date().toISOString());
+    return actionResult(getQpqIsoDateTimeFromDate(new Date()));
   };
 };
 

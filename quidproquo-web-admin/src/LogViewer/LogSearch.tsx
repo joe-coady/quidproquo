@@ -8,5 +8,5 @@ export const LogSearch = () => {
   const { onSearch, logs } = useLogSearch();
   const isLoading = useIsLoading();
 
-  return <TabViewBox header={() => <TopSection onSearch={onSearch} />} body={() => <LogMetadataGrid logs={logs} isLoading={isLoading} />} />;
+  return <TabViewBox body={() => <LogMetadataGrid isLoading={isLoading} logs={logs} />} header={() => <TopSection onSearch={onSearch} />} />;
 };

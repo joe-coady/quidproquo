@@ -8,7 +8,7 @@ import { FileStorageConfig } from './types';
 // Resolve a drive name to a filesystem path
 export const isStorageDriveNameValid = (drive: string, qpqConfig: QPQConfig): boolean => {
   const storageDrive = qpqCoreUtils.getStorageDrives(qpqConfig).find((d) => d.storageDrive === drive);
-  
+
   if (!storageDrive) {
     return false;
   }
@@ -16,12 +16,16 @@ export const isStorageDriveNameValid = (drive: string, qpqConfig: QPQConfig): bo
   return true;
 };
 
-export function resolveFilePath(
-  fileStorageConfig: FileStorageConfig,
-  service: string,
-  drive: string,
-  filepath: string
-): string {
+// Resolve the service that owns a drive's on-disk location. Drives declared with
+// `owner.module` are shared across services, so every caller reads and writes
+// under the owner's folder — mirroring how AWS resolves the bucket by owner.
+export function resolveDriveServiceName(drive: string, qpqConfig: QPQConfig): string {
+  const storageDrive = qpqCoreUtils.getStorageDriveByName(drive, qpqConfig);
+  return storageDrive?.owner?.module ?? qpqCoreUtils.getApplicationModuleName(qpqConfig);
+}
+
+export function resolveFilePath(fileStorageConfig: FileStorageConfig, qpqConfig: QPQConfig, drive: string, filepath: string): string {
+  const service = resolveDriveServiceName(drive, qpqConfig);
   const root = path.resolve(fileStorageConfig.storagePath, service, drive);
 
   // Block absolute paths and null bytes outright
@@ -48,7 +52,6 @@ export function resolveFilePath(
 
   throw new Error('Invalid file path: escapes drive root.');
 }
-
 
 // Ensure a directory exists
 export const ensureDirectoryExists = async (dirPath: string): Promise<void> => {
