@@ -1,9 +1,38 @@
-import { buildTestQpqConfig, defineInlineFunction } from 'quidproquo-core';
+// Verifies the generated bundled-loader source string: src-path resolution, the guarded
+// require() emitted per runtime, and the bundleFallback:false "thin shell" branch that
+// emits a fail-fast throw with NO require() (so webpack bundles no user code).
+import { buildTestQpqConfig, defineFederatedModuleStore, defineInlineFunction } from 'quidproquo-core';
 
 import path from 'path';
 import { describe, expect, it } from 'vitest';
 
 import { getFullSrcPathFromQpqFunctionRuntime, getSrcLoaderForQpqConfig } from './getSrcLoaderForQpqConfig';
+
+describe('getSrcLoaderForQpqConfig bundleFallback', () => {
+  it('emits a fail-fast throw and NO require() when bundleFallback is disabled (thin shell)', () => {
+    const config = buildTestQpqConfig([
+      defineInlineFunction('/src/handlers/doThing::handler'),
+      defineFederatedModuleStore('artifacts', { bundleFallback: false }),
+    ]);
+
+    const src = getSrcLoaderForQpqConfig(config, 'runtime');
+
+    // No user code is bundled...
+    expect(src).not.toContain('require(');
+    expect(src).not.toContain('src/handlers/doThing');
+    // ...and an unpublished runtime fails fast rather than silently falling back.
+    expect(src).toContain('bundleFallback is disabled');
+  });
+
+  it('still bundles (emits require) when a federated store keeps the default bundleFallback', () => {
+    const config = buildTestQpqConfig([defineInlineFunction('/src/handlers/doThing::handler'), defineFederatedModuleStore('artifacts')]);
+
+    const src = getSrcLoaderForQpqConfig(config, 'runtime');
+
+    expect(src).toContain('src/handlers/doThing');
+    expect(src).toContain("module['handler']");
+  });
+});
 
 describe('getFullSrcPathFromQpqFunctionRuntime', () => {
   it('joins the basePath and relativePath for an advanced runtime', () => {

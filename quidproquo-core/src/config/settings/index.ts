@@ -11,6 +11,7 @@ export * from './deployEvent';
 export * from './emailTemplates';
 export * from './environmentSettings';
 export * from './eventBus';
+export * from './federatedModuleStore';
 export * from './global';
 export * from './graphDatabase';
 export * from './inlineFunction';

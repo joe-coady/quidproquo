@@ -25,6 +25,7 @@ export enum QPQCoreConfigSettingType {
   notifyError = '@quidproquo-core/config/notifyError',
   inlineFunction = '@quidproquo-core/config/InlineFunction',
   javascriptRuntime = '@quidproquo-core/config/JavascriptRuntime',
+  federatedModuleStore = '@quidproquo-core/config/FederatedModuleStore',
 }
 
 export interface QPQConfigSetting {

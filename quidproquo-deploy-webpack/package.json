@@ -32,6 +32,8 @@
   },
   "homepage": "https://github.com/joe-coady/quidproquo#readme",
   "dependencies": {
+    "@module-federation/enhanced": "0.18.2",
+    "@module-federation/node": "2.7.13",
     "path-browserify": "^1.0.1",
     "quidproquo-actionprocessor-awslambda": "0.1.2",
     "quidproquo-actionprocessor-node": "0.1.2",

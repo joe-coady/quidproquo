@@ -1,5 +1,7 @@
+import { awsNamingUtils } from 'quidproquo-actionprocessor-awslambda';
 import { getAwsServiceAccountInfoConfig } from 'quidproquo-config-aws';
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
+import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
 import { aws_ec2, aws_iam, aws_lambda, aws_logs, aws_sns, aws_sns_subscriptions } from 'aws-cdk-lib';
 import * as cdk from 'aws-cdk-lib';
@@ -37,6 +39,37 @@ export interface FunctionProps extends QpqConstructBlockProps {
   securityGroups?: aws_ec2.ISecurityGroup[];
 }
 
+// Resolves the federated code store location for this service, if it opted in via
+// defineFederatedModuleStore. Points the lambda at the referenced storage drive's
+// bucket, namespaced by service (s3://<bucket>/<service>), so many services can share
+// one bucket. Read access comes from the storage drive's own grants. Returns {} when
+// federation isn't configured, so the lambda runs only its bundled code.
+const getFederatedCodeStoreEnv = (qpqConfig: QPQConfig): Record<string, string> => {
+  const federatedStore = qpqCoreUtils.getFederatedModuleStore(qpqConfig);
+  if (!federatedStore) {
+    return {};
+  }
+
+  const storageDrive = qpqCoreUtils.getStorageDriveByName(federatedStore.storageDrive, qpqConfig);
+  if (!storageDrive) {
+    throw new Error(
+      `defineFederatedModuleStore references storage drive [${federatedStore.storageDrive}] which is not defined - add a matching defineStorageDrive`,
+    );
+  }
+
+  const bucketName = awsNamingUtils.resolveConfigRuntimeResourceNameFromConfig(
+    storageDrive.owner?.resourceNameOverride || storageDrive.storageDrive,
+    qpqConfig,
+    storageDrive.owner,
+  );
+  const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
+
+  return {
+    federatedCodeStoreUrl: `s3://${bucketName}/${serviceName}`,
+    ...(federatedStore.recheckMs !== undefined ? { federatedCodeStoreRecheckMs: `${federatedStore.recheckMs}` } : {}),
+  };
+};
+
 export class Function extends QpqConstructBlock {
   public readonly lambdaFunction: aws_lambda.Function;
 
@@ -65,6 +98,10 @@ export class Function extends QpqConstructBlock {
 
       environment: {
         AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
+        // Federated code store (only when the service opted in via
+        // defineFederatedModuleStore); the loader falls back to bundled modules
+        // while the store has nothing published for this service
+        ...getFederatedCodeStoreEnv(props.qpqConfig),
         ...(props.environment || {}),
       },
 
@@ -88,7 +125,6 @@ export class Function extends QpqConstructBlock {
       securityGroups: props.securityGroups,
     });
 
-    // Cost-allocation tags (environment/application/module/feature), same as every other qpq resource.
     qpqDeployAwsCdkUtils.applyEnvironmentTags(this.lambdaFunction, props.qpqConfig);
 
     if (!qpqConfigAwsUtils.isLambdaWarmingDisabled(props.qpqConfig)) {

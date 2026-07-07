@@ -9,6 +9,7 @@ import {
   EmailTemplates,
   EnvironmentSettingsQPQConfigSetting,
   EventBusQPQConfigSetting,
+  FederatedModuleStoreQPQConfigSetting,
   GlobalQPQConfigSetting,
   GraphDatabaseQPQConfigSetting,
   InlineFunctionQPQConfigSetting,
@@ -192,6 +193,10 @@ export const getStorageDrives = (configs: QPQConfig): StorageDriveQPQConfigSetti
 
 export const getStorageDriveByName = (storageDriveName: string, configs: QPQConfig): StorageDriveQPQConfigSetting | undefined => {
   return getStorageDrives(configs).find((sd) => sd.storageDrive === storageDriveName);
+};
+
+export const getFederatedModuleStore = (qpqConfig: QPQConfig): FederatedModuleStoreQPQConfigSetting | undefined => {
+  return getConfigSetting<FederatedModuleStoreQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.federatedModuleStore);
 };
 
 export const getQueues = (configs: QPQConfig): QueueQPQConfigSetting[] => {
