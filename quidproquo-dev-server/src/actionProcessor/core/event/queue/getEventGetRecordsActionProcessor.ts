@@ -17,6 +17,9 @@ const getProcessGetRecords = (qpqConfig: QPQConfig): EventGetRecordsActionProces
         payload: event.payload,
       },
       id: event.messageId,
+
+      // FIFO queues only
+      groupId: event.groupId,
     };
 
     return actionResult([internalEventRecord]);

@@ -14,6 +14,7 @@ export interface QPQConfigAdvancedQueueSettings extends QPQConfigAdvancedSetting
   hasDeadLetterQueue?: boolean;
   eventBusSubscriptions?: string[];
   maxConcurrentExecutions?: number;
+  isFifo?: boolean;
 }
 
 export interface QueueQPQConfigSetting extends QPQConfigSetting {
@@ -33,27 +34,33 @@ export interface QueueQPQConfigSetting extends QPQConfigSetting {
   eventBusSubscriptions: string[];
 
   maxConcurrentExecutions?: number;
+
+  isFifo: boolean;
 }
 
-export const defineQueue = (name: string, processors: QpqQueueProcessors, options?: QPQConfigAdvancedQueueSettings): QueueQPQConfigSetting => ({
-  configSettingType: QPQCoreConfigSettingType.queue,
-  uniqueKey: name,
+export const defineQueue = (name: string, processors: QpqQueueProcessors, options?: QPQConfigAdvancedQueueSettings): QueueQPQConfigSetting => {
+  return {
+    configSettingType: QPQCoreConfigSettingType.queue,
+    uniqueKey: name,
 
-  name,
+    name,
 
-  batchSize: options?.batchSize || 0,
-  batchWindowInSeconds: options?.batchWindowInSeconds || 5,
+    batchSize: options?.batchSize || 0,
+    batchWindowInSeconds: options?.batchWindowInSeconds || 5,
 
-  concurrency: options?.concurrency || 1,
+    concurrency: options?.concurrency || 1,
 
-  maxTries: options?.maxTries || 1,
-  ttRetryInSeconds: Math.min(options?.ttRetryInSeconds || 15 * 60, 15 * 60),
+    maxTries: options?.maxTries || 1,
+    ttRetryInSeconds: Math.min(options?.ttRetryInSeconds || 15 * 60, 15 * 60),
 
-  hasDeadLetterQueue: options?.hasDeadLetterQueue || true,
+    hasDeadLetterQueue: options?.hasDeadLetterQueue || true,
 
-  qpqQueueProcessors: processors,
+    qpqQueueProcessors: processors,
 
-  eventBusSubscriptions: options?.eventBusSubscriptions || [],
+    eventBusSubscriptions: options?.eventBusSubscriptions || [],
 
-  maxConcurrentExecutions: options?.maxConcurrentExecutions,
-});
+    maxConcurrentExecutions: options?.maxConcurrentExecutions,
+
+    isFifo: options?.isFifo || false,
+  };
+};

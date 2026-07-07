@@ -1,14 +1,25 @@
-import { PublishBatchCommand, PublishBatchCommandInput, PublishBatchRequestEntry, SNSClient } from '@aws-sdk/client-sns';
+import { PublishBatchCommand, PublishBatchRequestEntry, SNSClient } from '@aws-sdk/client-sns';
 
 import { createAwsClient } from '../createAwsClient';
 
-export const publishMessage = async (topicArn: string, region: string, messages: string[]): Promise<void> => {
+export interface SnsPublishMessageEntry {
+  message: string;
+
+  // FIFO topics only
+  groupId?: string;
+  deduplicationId?: string;
+}
+
+export const publishMessage = async (topicArn: string, region: string, messages: SnsPublishMessageEntry[]): Promise<void> => {
   const sqsClient = createAwsClient(SNSClient, { region });
 
   // Convert them to entries
   const entries: PublishBatchRequestEntry[] = messages.map((message, index) => ({
-    Message: message,
+    Message: message.message,
     Id: `${index}`,
+
+    ...(message.groupId !== undefined ? { MessageGroupId: message.groupId } : {}),
+    ...(message.deduplicationId !== undefined ? { MessageDeduplicationId: message.deduplicationId } : {}),
     // MessageAttributes: {
     //   type: {
     //     DataType: 'String',

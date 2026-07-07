@@ -47,7 +47,7 @@ export class QpqCoreQueueConstruct extends QpqCoreQueueConstructBase {
 
     const queueArn = `arn:aws:sqs:${qpqConfigAwsUtils.getApplicationModuleDeployRegion(
       qpqConfig,
-    )}:${accountId}:${awsNamingUtils.getConfigRuntimeResourceNameFromConfig(queueConfig.name, qpqConfig)}`;
+    )}:${accountId}:${awsNamingUtils.getQueueRuntimeResourceNameFromConfig(queueConfig.name, qpqConfig)}`;
 
     class Import extends QpqCoreQueueConstructBase {
       queue = aws_sqs.Queue.fromQueueAttributes(scope, `${id}-${queueConfig.uniqueKey}`, {
@@ -61,13 +61,21 @@ export class QpqCoreQueueConstruct extends QpqCoreQueueConstructBase {
   constructor(scope: Construct, id: string, props: QpqCoreQueueConstructProps) {
     super(scope, id, props);
 
+    // Queue names max out at 80 chars including the .fifo suffix, and a FIFO queue's dead
+    // letter queue must itself be FIFO. contentBasedDeduplication stays off: message bodies
+    // embed a per-send storySession, so content hashes would never match - dedup ids are
+    // set explicitly at send time instead.
+    const isFifo = props.queueConfig.isFifo;
+
     const deadLetterQueue = new aws_sqs.Queue(this, 'DeadLetterQueue', {
-      queueName: this.resourceName(`${props.queueConfig.name}-dead`),
+      queueName: awsNamingUtils.withFifoSuffix(this.resourceName(`${props.queueConfig.name}-dead`), isFifo),
+      fifo: isFifo || undefined,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
     this.queue = new aws_sqs.Queue(this, 'MainQueue', {
-      queueName: this.resourceName(props.queueConfig.name),
+      queueName: awsNamingUtils.withFifoSuffix(this.resourceName(props.queueConfig.name), isFifo),
+      fifo: isFifo || undefined,
       visibilityTimeout: cdk.Duration.seconds(props.queueConfig.ttRetryInSeconds),
       removalPolicy: cdk.RemovalPolicy.DESTROY,
 

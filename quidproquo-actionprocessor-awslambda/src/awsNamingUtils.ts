@@ -52,6 +52,18 @@ export const getConfigRuntimeResourceNameFromConfig = (resourceName: string, qpq
   return getConfigRuntimeResourceName(resourceName, application, service, environment, feature);
 };
 
+// AWS FIFO resources (SQS queues, SNS topics) must be named with a trailing .fifo - it has
+// to be the final characters, so it goes after the app-service-env decoration. Every FIFO
+// resource name (runtime send, CDK resource names, cross-stack ARNs) resolves through here
+// so they all stay in sync.
+export const withFifoSuffix = (resourceName: string, isFifo?: boolean) => (isFifo ? `${resourceName}.fifo` : resourceName);
+
+export const getQueueRuntimeResourceNameFromConfig = (queueName: string, qpqConfig: QPQConfig) => {
+  const baseName = getConfigRuntimeResourceNameFromConfig(queueName, qpqConfig);
+
+  return withFifoSuffix(baseName, qpqCoreUtils.getQueueByName(qpqConfig, queueName)?.isFifo);
+};
+
 export const resolveConfigRuntimeResourceNameFromConfig = (resourceName: string, qpqConfig: QPQConfig, owner?: CrossModuleOwner) => {
   const application = owner?.application || qpqCoreUtils.getApplicationName(qpqConfig);
   const service = owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig);
@@ -240,8 +252,10 @@ export const getEventBusSnsTopicArn = (
   environment: string,
   application: string,
   feature?: string,
+
+  isFifo?: boolean,
 ) => {
-  const topicName = getConfigRuntimeResourceName(eventBusName, application, module, environment, feature);
+  const topicName = withFifoSuffix(getConfigRuntimeResourceName(eventBusName, application, module, environment, feature), isFifo);
 
   const accountInfo = getAwsServiceAccountInfoByDeploymentInfo(qpqConfig, module, environment, feature, application);
 

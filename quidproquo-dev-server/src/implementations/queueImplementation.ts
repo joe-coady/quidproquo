@@ -103,6 +103,9 @@ const processQueueEventBusSubscriptions = async (qpqConfig: QPQConfig, ebMessage
 
       queueName: queue.name,
 
+      // FIFO: carry the bus message's group through to the queue, like SNS FIFO -> SQS FIFO
+      groupId: queue.isFifo ? ebMessage.groupId : undefined,
+
       targetApplication: queue.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig),
       targetEnvironment: queue.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
       targetFeature: queue.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
@@ -120,9 +123,41 @@ const processQueueEventBusSubscriptions = async (qpqConfig: QPQConfig, ebMessage
 };
 
 export const queueImplementation = async (devServerConfig: ResolvedDevServerConfig) => {
+  // Fail fast when a FIFO queue subscribes to a standard bus (AWS can't deliver those)
+  for (const qpqConfig of devServerConfig.qpqConfigs) {
+    qpqCoreUtils.assertFifoQueueEventBusSubscriptionsAreValid(qpqConfig);
+  }
+
+  // FIFO simulation: messages with a groupId are chained onto a per-group promise tail so
+  // they process strictly one at a time, in send order - like SQS FIFO message groups.
+  // There is no local redelivery/DLQ, so a failed message just logs and the group moves on.
+  const fifoGroupTails: Map<string, Promise<void>> = new Map();
+
   eventBus.on(QueueActionType.SendMessages, async (payload: AnyQueueMessageWithSession, correlation: string) => {
-    for (const qpqConfig of devServerConfig.qpqConfigs) {
-      await processQueueMessages(qpqConfig, payload, devServerConfig);
+    const processAll = async () => {
+      try {
+        for (const qpqConfig of devServerConfig.qpqConfigs) {
+          await processQueueMessages(qpqConfig, payload, devServerConfig);
+        }
+      } catch (error) {
+        console.error(`Queue [${payload.queueName}] message [${payload.messageId}] failed:`, error);
+      }
+    };
+
+    if (payload.groupId === undefined) {
+      await processAll();
+      return;
+    }
+
+    const groupKey = `${payload.queueName}:${payload.groupId}`;
+    const groupTail = (fifoGroupTails.get(groupKey) ?? Promise.resolve()).then(processAll);
+    fifoGroupTails.set(groupKey, groupTail);
+
+    await groupTail;
+
+    // Drop drained groups so the map doesn't grow forever
+    if (fifoGroupTails.get(groupKey) === groupTail) {
+      fifoGroupTails.delete(groupKey);
     }
   });
 

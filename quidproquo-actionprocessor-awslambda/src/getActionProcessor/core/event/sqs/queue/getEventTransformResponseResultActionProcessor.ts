@@ -18,15 +18,12 @@ const getProcessTransformResponseResult = (
   return async ({ eventParams, qpqEventRecordResponses }) => {
     const [sqsEvent] = eventParams;
 
-    const batchItemFailures = qpqEventRecordResponses
-      .filter((record) => !record.success)
-      .map((record, index) => {
-        const batchItemFailure: SQSBatchItemFailure = {
-          itemIdentifier: sqsEvent.Records[index].messageId,
-        };
-
-        return batchItemFailure;
-      });
+    const batchItemFailures: SQSBatchItemFailure[] = qpqEventRecordResponses
+      .map((record, index) => ({ record, index }))
+      .filter(({ record }) => !record.success)
+      .map(({ index }) => ({
+        itemIdentifier: sqsEvent.Records[index].messageId,
+      }));
 
     // Transform back to api gateway
     return actionResult<EventOutput>({

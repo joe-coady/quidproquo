@@ -24,7 +24,20 @@ describe('sqs/queue getEventGetRecordsActionProcessor', () => {
 
     const [records] = await processor({ eventParams: [{ Records: [record] }, {}] });
 
-    expect(records).toEqual([{ message: { type: 'orderCreated', payload: { id: 1 } }, id: 'm1' }]);
+    expect(records).toEqual([{ message: { type: 'orderCreated', payload: { id: 1 } }, id: 'm1', groupId: undefined }]);
+  });
+
+  it('maps the FIFO message group id from the record attributes', async () => {
+    const processor = await resolveEventProcessor(getEventGetRecordsActionProcessor, EventActionType.GetRecords);
+    const record = {
+      messageId: 'm1',
+      body: JSON.stringify({ type: 'orderCreated', payload: { id: 1 }, storySession: {} }),
+      attributes: { MessageGroupId: 'group-1' },
+    };
+
+    const [records] = await processor({ eventParams: [{ Records: [record] }, {}] });
+
+    expect(records).toEqual([{ message: { type: 'orderCreated', payload: { id: 1 } }, id: 'm1', groupId: 'group-1' }]);
   });
 
   it.each([
@@ -99,9 +112,19 @@ describe('sqs/queue getEventTransformResponseResultActionProcessor', () => {
 
     const [response] = await processor({ eventParams: [sqsEvent], qpqEventRecordResponses: [{ success: true }, { success: false }] });
 
-    // NOTE: the processor indexes sqsEvent.Records by the position within the FILTERED failures
-    // (not the original record index), so the single failure resolves to Records[0] ('a').
-    expect(response).toEqual({ batchItemFailures: [{ itemIdentifier: 'a' }] });
+    expect(response).toEqual({ batchItemFailures: [{ itemIdentifier: 'b' }] });
+  });
+
+  it('reports the original record ids when failures are interleaved with successes', async () => {
+    const processor = await resolveEventProcessor(getEventTransformResponseResultActionProcessor, EventActionType.TransformResponseResult);
+    const sqsEvent = { Records: [{ messageId: 'a' }, { messageId: 'b' }, { messageId: 'c' }] };
+
+    const [response] = await processor({
+      eventParams: [sqsEvent],
+      qpqEventRecordResponses: [{ success: false }, { success: true }, { success: false }],
+    });
+
+    expect(response).toEqual({ batchItemFailures: [{ itemIdentifier: 'a' }, { itemIdentifier: 'c' }] });
   });
 });
 

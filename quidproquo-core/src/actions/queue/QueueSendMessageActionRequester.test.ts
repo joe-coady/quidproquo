@@ -20,6 +20,14 @@ describe('askQueueSendMessages', () => {
     });
   });
 
+  it('passes FIFO groupId and deduplicationId through untouched', () => {
+    const message = { type: 'Demo/Job', payload: { a: 1 }, groupId: 'user-42', deduplicationId: 'dedup-1' };
+
+    const { action } = captureRequester(askQueueSendMessages('my-queue', message));
+
+    expect(action.payload.queueMessages).toEqual([message]);
+  });
+
   it('yields an empty queueMessages array when none are given', () => {
     const { action } = captureRequester(askQueueSendMessages('my-queue'));
 

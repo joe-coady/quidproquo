@@ -54,6 +54,7 @@ export class WebserverRoll extends QpqConstructBlock {
         eventBusConfig.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(props.qpqConfig),
         eventBusConfig.owner?.application || qpqCoreUtils.getApplicationName(props.qpqConfig),
         eventBusConfig.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(props.qpqConfig),
+        eventBusConfig.isFifo,
       ),
     );
 

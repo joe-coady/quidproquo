@@ -215,6 +215,25 @@ export const getQueueByName = (configs: QPQConfig, name: string): QueueQPQConfig
   return getQueues(configs).find((q) => q.name === name);
 };
 
+// A FIFO queue can only be fed by a FIFO event bus - standard SNS topics cannot deliver
+// to FIFO SQS queues at all. Called at deploy/startup time (the queue and bus are separate
+// settings, so defineQueue can't validate this on its own).
+export const assertFifoQueueEventBusSubscriptionsAreValid = (qpqConfig: QPQConfig): void => {
+  const invalidSubscriptions = getQueues(qpqConfig)
+    .filter((queue) => queue.isFifo)
+    .flatMap((queue) =>
+      queue.eventBusSubscriptions
+        .filter((eventBusName) => !getEventBusConfigByName(eventBusName, qpqConfig)?.isFifo)
+        .map((eventBusName) => `queue [${queue.name}] -> event bus [${eventBusName}]`),
+    );
+
+  if (invalidSubscriptions.length > 0) {
+    throw new Error(
+      `FIFO queues can only subscribe to FIFO event buses (standard SNS topics cannot deliver to FIFO SQS queues): ${invalidSubscriptions.join(', ')}`,
+    );
+  }
+};
+
 export const getStorageDriveNames = (configs: QPQConfig): string[] => {
   const storageDriveNames = getConfigSettings<StorageDriveQPQConfigSetting>(configs, QPQCoreConfigSettingType.storageDrive).map(
     (sd) => sd.storageDrive,
