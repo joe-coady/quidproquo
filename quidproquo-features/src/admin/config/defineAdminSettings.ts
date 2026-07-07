@@ -17,8 +17,11 @@ import {
   defineAdminServiceAuthRoute,
   defineAdminServiceLogLogRoute,
   defineAdminServiceLogRoute,
+  defineServiceFunction,
   defineWebSocketQueue,
   getServiceEntryQpqFunctionRuntime,
+  QPQ_STORE_TRACE_RESULT_SERVICE_FUNCTION_NAME,
+  QPQ_TRACE_LOG_SERVICE_FUNCTION_NAME,
   WebsocketAdminClientMessageEventType,
 } from 'quidproquo-webserver';
 
@@ -78,6 +81,20 @@ export const defineAdminSettings = (logServiceName: string, rootDomain: string, 
       owner: { module: logServiceName },
     }),
 
+    // Every service exposes the log-replay tracer as a service function, so the admin
+    // log service can trace any log INSIDE the service that owns it (right module
+    // loader / federated code store). See trace-replay-plan.md.
+    defineServiceFunction(
+      {
+        basePath: __dirname,
+        relativePath: 'entry/serviceFunction/qpqTraceLogExecution',
+        functionName: 'qpqTraceLogExecution',
+      },
+      {
+        functionName: QPQ_TRACE_LOG_SERVICE_FUNCTION_NAME,
+      },
+    ),
+
     defineStorageDrive(QPQ_LOGS_STORAGE_DRIVE_NAME, {
       owner: { module: logServiceName },
       onEvent: {
@@ -119,6 +136,12 @@ export const defineAdminSettings = (logServiceName: string, rootDomain: string, 
 
         defineKeyValueStore('qpq-log-messages', 'correlationId', ['timestamp']),
 
+        // The reply channel for async traces: owning services send finished traces
+        // here; this stores them and pushes a TraceDone websocket message to admins.
+        defineServiceFunction(getServiceEntryQpqFunctionRuntime('log', 'serviceFunction', 'traceStore::qpqStoreTraceResult'), {
+          functionName: QPQ_STORE_TRACE_RESULT_SERVICE_FUNCTION_NAME,
+        }),
+
         defineKeyValueStore(`${QPQ_LOGS_STORAGE_DRIVE_NAME}-list`, { key: 'type', type: 'number' }, ['timestamp'], {
           deprecated: advancedSettings?.deprecated,
         }),
@@ -136,6 +159,7 @@ export const defineAdminSettings = (logServiceName: string, rootDomain: string, 
         defineAdminServiceLogRoute('GET', '/log/children/{fromCorrelation}', 'getChildren', routeAuthSettings),
         defineAdminServiceLogRoute('GET', '/log/{correlationId}/hierarchies', 'getHierarchies', routeAuthSettings),
         defineAdminServiceLogRoute('GET', '/log/downloadurl/{correlationId}', 'downloadUrl', routeAuthSettings),
+        defineAdminServiceLogRoute('POST', '/log/{correlationId}/trace', 'traceLog', routeAuthSettings),
         defineAdminServiceLogRoute('POST', '/log/chat/message', 'sendChatMessage', routeAuthSettings),
         defineAdminServiceLogRoute('POST', '/log/chat', 'getChatMessages', routeAuthSettings),
 

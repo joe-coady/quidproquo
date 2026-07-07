@@ -41,7 +41,15 @@ export const getWebpackConfigForQpqRemote = (qpqConfig: QPQConfig, buildPath: st
     entry: {},
 
     mode: getWebpackBuildMode(qpqConfig),
-    devtool: false,
+
+    // Remotes ship S3 -> lambda /tmp, never over the wire to a browser, so size is not
+    // user-facing. Full source maps (with sourcesContent) and unmangled identifiers are
+    // what lets the trace-replay tooling map execution back to original TS lines and
+    // report locals under their real names (see trace-replay-plan.md).
+    devtool: 'source-map',
+    optimization: {
+      minimize: false,
+    },
 
     // async-node chunk loading resolves sibling chunks from the entry's own directory
     // at runtime, which is what lets the container run from the lambda's /tmp cache
@@ -85,12 +93,28 @@ export const getWebpackConfigForQpqRemote = (qpqConfig: QPQConfig, buildPath: st
           type: 'asset/source',
           exclude: /node_modules/,
         },
+        {
+          // Chain source maps from COMPILED dependencies (org libs shipping .js + .js.map)
+          // into the remote's output map, so execution traces show their original TS
+          // instead of tsc output. Libs get full source text in traces only when their
+          // maps embed it (tsc: sourceMap + inlineSources); otherwise traces still get
+          // the original file/line names.
+          test: /\.js$/,
+          enforce: 'pre',
+          // resolved from THIS package's deps so consumer hoisting layout doesn't matter
+          use: [require.resolve('source-map-loader')],
+        },
       ],
     },
 
     ignoreWarnings: [
       {
         module: /@module-federation/,
+        message: /Failed to parse source map/,
+      },
+      // source-map-loader runs over all node_modules js; third-party packages with
+      // broken/unresolvable maps are expected and harmless (their code just stays as-is)
+      {
         message: /Failed to parse source map/,
       },
     ],

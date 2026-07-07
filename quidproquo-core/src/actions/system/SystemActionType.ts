@@ -9,6 +9,9 @@ export enum SystemActionType {
   ExecuteStory = '@quidproquo-core/System/ExecuteStory',
   GetRuntimeCorrelation = '@quidproquo-core/System/GetRuntimeCorrelation',
 
+  // Only node runtimes implement a processor (V8-inspector based log replay tracing)
+  TraceStory = '@quidproquo-core/System/TraceStory',
+
   // This isn't needed as its just a hybrid runtime method for SystemBatch
   // RunParallel = '@quidproquo-core/System/RunParallel',
 }

@@ -7,6 +7,7 @@ describe('WebSocketQueueQpqAdminServerMessageEventType', () => {
     expect(WebSocketQueueQpqAdminServerMessageEventType).toEqual({
       LogMetadata: 'Qpq/admin/server/LogMetadata',
       ModifySetting: 'Qpq/admin/server/ModifySetting',
+      TraceDone: 'Qpq/admin/server/TraceDone',
     });
   });
 });

@@ -47,6 +47,10 @@ export class ApiQpqWebserverApiConstruct extends QpqConstructBlock {
       functionType: 'apiGatewayEventHandler',
       executorName: 'apiGatewayEventHandler',
 
+      // Match API Gateway's 29s integration cap — the (25s) Function default would kill
+      // slow requests as a 502 with 4s of the gateway window still unused
+      timeoutInSeconds: 29,
+
       qpqConfig: props.qpqConfig,
 
       apiLayerVersions: props.apiLayerVersions,

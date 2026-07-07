@@ -1,16 +1,23 @@
 import {
+  askConfigGetApplicationInfo,
   askConfigGetGlobal,
+  askFileExists,
   askFileGenerateTemporarySecureUrl,
   askFileIsColdStorage,
+  askFileReadObjectJson,
   AskResponse,
   askThrowError,
   ErrorTypeEnum,
+  QPQ_LOG_REPORTS_STORAGE_DRIVE_NAME,
   QPQ_LOGS_STORAGE_DRIVE_NAME,
   QpqRuntimeType,
+  StoryResult,
 } from 'quidproquo-core';
 
+import { askServiceFunctionExecute } from '../../../../actions/serviceFunction';
 import { HTTPEvent, HTTPEventResponse } from '../../../../types';
 import { askFromJsonEventRequest, toJsonEventResponse } from '../../../../utils/httpEventUtils';
+import { QPQ_TRACE_LOG_SERVICE_FUNCTION_NAME, QpqTraceLogExecutionPayload } from '../../config/traceLogServiceFunction';
 import { logsLogic } from '../../logic';
 import { askGetLogChatMessages } from '../../logic/askGetLogChatMessages';
 import { askLogSendChatMessage } from '../../logic/askLogSendChatMessage';
@@ -121,6 +128,64 @@ export function* downloadUrl(
   }
 
   return toJsonEventResponse({ url: '', isColdStorage: true });
+}
+
+// Replays the log against its service's real code under the execution tracer and
+// returns a signed url to the resulting QpqExecutionTrace json. The trace itself is
+// produced by the OWNING service (routed on the log's moduleName) so the story code
+// loads through that service's own module loader — see trace-replay-plan.md.
+//
+// ASYNC: tracing re-executes the story and can far outlive an HTTP request, so this
+// never waits for it. Responses are { url } when a stored trace exists, otherwise
+// { pending: true } with the trace kicked off fire-and-forget — the owning service
+// replies via qpqStoreTraceResult, which stores the trace and pushes a TraceDone
+// websocket message to admin clients. `check=true` only reports state (never triggers),
+// so clients can poll without stacking trace runs; `refresh=true` forces a re-run.
+export function* traceLog(
+  event: HTTPEvent,
+  params: {
+    correlationId: string;
+  },
+) {
+  const logFilePath = `${params.correlationId}.json`;
+  const traceFilePath = `${params.correlationId}.trace.json`;
+
+  const refresh = event.query.refresh === 'true';
+  const checkOnly = event.query.check === 'true';
+
+  if (!refresh) {
+    const traceExists = yield* askFileExists(QPQ_LOG_REPORTS_STORAGE_DRIVE_NAME, traceFilePath);
+    if (traceExists) {
+      const url = yield* askFileGenerateTemporarySecureUrl(QPQ_LOG_REPORTS_STORAGE_DRIVE_NAME, traceFilePath, 5 * 60 * 1000);
+      return toJsonEventResponse({ url });
+    }
+  }
+
+  if (checkOnly) {
+    return toJsonEventResponse({ pending: true });
+  }
+
+  const isColdStorage = yield* askFileIsColdStorage(QPQ_LOGS_STORAGE_DRIVE_NAME, logFilePath);
+  if (isColdStorage) {
+    yield* askThrowError(ErrorTypeEnum.Invalid, 'Log is in cold storage and cannot be traced');
+  }
+
+  const storyResult = yield* askFileReadObjectJson<StoryResult<any>>(QPQ_LOGS_STORAGE_DRIVE_NAME, logFilePath);
+  const applicationInfo = yield* askConfigGetApplicationInfo();
+
+  const traceLogPayload: QpqTraceLogExecutionPayload = {
+    storyResult,
+    replyToService: applicationInfo.module,
+  };
+
+  yield* askServiceFunctionExecute<void, QpqTraceLogExecutionPayload>(
+    storyResult.moduleName,
+    QPQ_TRACE_LOG_SERVICE_FUNCTION_NAME,
+    traceLogPayload,
+    true, // fire and forget
+  );
+
+  return toJsonEventResponse({ pending: true });
 }
 
 export function* sendChatMessage(event: HTTPEvent) {

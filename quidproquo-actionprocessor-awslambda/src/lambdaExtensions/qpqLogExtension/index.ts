@@ -21,7 +21,7 @@
  * Authored in TS, bundled to a single CJS file by scripts/buildLogExtensionLayer.mjs.
  */
 
-import { createServer, IncomingMessage, ServerResponse } from 'http';
+import { createServer, IncomingMessage, request, ServerResponse } from 'http';
 import { PutObjectCommand, PutObjectCommandInput, S3Client } from '@aws-sdk/client-s3';
 
 import { LOG_EXTENSION_PORT } from '../logExtensionPort';
@@ -170,19 +170,49 @@ const register = async (): Promise<string> => {
   return id;
 };
 
-const nextEvent = async (extensionId: string): Promise<any> => {
-  // Long-poll. Resolves when the platform has the next INVOKE/SHUTDOWN event.
-  const res = await fetch(`http://${RUNTIME_API}/${API_VERSION}/extension/event/next`, {
-    method: 'GET',
-    headers: { 'Lambda-Extension-Identifier': extensionId },
+const nextEvent = (extensionId: string): Promise<any> =>
+  // Long-poll. Resolves when the platform has the next INVOKE/SHUTDOWN event, which can
+  // be arbitrarily far away. Plain http.request, NOT fetch: undici's default 300s
+  // headersTimeout aborts any poll that blocks past 5 minutes — i.e. during every
+  // invocation that runs longer than that — crashing this extension and, with it, the
+  // whole sandbox (REPORT ... Error Type: Extension.Crash). http.request has no
+  // default timeout, which is exactly what an indefinite long-poll needs.
+  new Promise((resolve, reject) => {
+    const [host, port] = (RUNTIME_API || '').split(':');
+
+    const req = request(
+      {
+        host,
+        port,
+        path: `/${API_VERSION}/extension/event/next`,
+        method: 'GET',
+        headers: { 'Lambda-Extension-Identifier': extensionId },
+      },
+      (res) => {
+        const chunks: Buffer[] = [];
+        res.on('data', (chunk) => chunks.push(chunk));
+        res.on('error', reject);
+        res.on('end', () => {
+          const body = Buffer.concat(chunks).toString('utf8');
+          const statusCode = res.statusCode || 0;
+
+          if (statusCode < 200 || statusCode >= 300) {
+            reject(new Error(`event/next failed: ${statusCode} ${body}`));
+            return;
+          }
+
+          try {
+            resolve(JSON.parse(body));
+          } catch (error) {
+            reject(error);
+          }
+        });
+      },
+    );
+
+    req.on('error', reject);
+    req.end();
   });
-
-  if (!res.ok) {
-    throw new Error(`event/next failed: ${res.status} ${await res.text()}`);
-  }
-
-  return res.json();
-};
 
 // --- Local HTTP server (handler -> extension) -----------------------------
 

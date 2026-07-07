@@ -1,5 +1,5 @@
 import { getMetricActionProcessor } from 'quidproquo-actionprocessor-js';
-import { getFileActionProcessor } from 'quidproquo-actionprocessor-node';
+import { getFileActionProcessor, getSystemTraceStoryActionProcessor } from 'quidproquo-actionprocessor-node';
 import { ActionProcessorList, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
 import { getRouteAuthValidationActionProcessor } from 'quidproquo-webserver';
 
@@ -30,5 +30,6 @@ export const getCoreActionProcessor = async (
     ...(await getKeyValueStoreActionProcessor(devServerConfig)(qpqConfig, dynamicModuleLoader)),
     ...(await getRouteAuthValidationActionProcessor(qpqConfig, dynamicModuleLoader)),
     ...(await getUserDirectoryActionProcessor(devServerConfig)(qpqConfig, dynamicModuleLoader)),
+    ...(await getSystemTraceStoryActionProcessor()(qpqConfig, dynamicModuleLoader)),
   };
 };
