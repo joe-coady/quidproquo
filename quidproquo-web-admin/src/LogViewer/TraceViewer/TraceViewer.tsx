@@ -1,13 +1,18 @@
 import { QpqExecutionTrace } from 'quidproquo-core';
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Box, Chip, FormControl, IconButton, MenuItem, Select, Slider, Tooltip, Typography } from '@mui/material';
+import { Alert, Box, Checkbox, Chip, FormControl, FormControlLabel, IconButton, MenuItem, Select, Slider, Tooltip, Typography } from '@mui/material';
 
 import { LocalValueTree } from './LocalValueTree';
-import { buildLineAnnotations, formatLineAnnotation, getDefaultSourceIndex, getDisplaySourceNames } from './traceViewerLogic';
+import { buildLineAnnotations, formatLineAnnotation, getDefaultSourceIndex, getDisplaySourceNames, isExternalSourcePath } from './traceViewerLogic';
 
 interface TraceViewerProps {
   trace: QpqExecutionTrace;
+
+  // "My code only" lives with the tab (not here) so Re-run Trace can send it to the
+  // tracer — a re-trace with it on never sets breakpoints outside the user's own code
+  hideExternalSteps: boolean;
+  onHideExternalStepsChange: (hideExternalSteps: boolean) => void;
 }
 
 // Layout notes (deliberate, don't regress):
@@ -41,13 +46,35 @@ const codeAreaStyle: React.CSSProperties = {
   borderRadius: 4,
 };
 
-export const TraceViewer: React.FC<TraceViewerProps> = ({ trace }) => {
+export const TraceViewer: React.FC<TraceViewerProps> = ({ trace, hideExternalSteps, onHideExternalStepsChange }) => {
   const [selectedSourceIndex, setSelectedSourceIndex] = useState(() => getDefaultSourceIndex(trace));
   const [selectedStepIndex, setSelectedStepIndex] = useState(0);
   const highlightedLineRef = useRef<HTMLDivElement | null>(null);
 
   const annotations = useMemo(() => buildLineAnnotations(trace, selectedSourceIndex), [trace, selectedSourceIndex]);
   const displaySourceNames = useMemo(() => getDisplaySourceNames(trace.sources.map((traceSource) => traceSource.path)), [trace.sources]);
+
+  // The scrubber walks these indexes into trace.steps — all of them, or only the steps
+  // that resolved into the user's own code when the "my code" filter is on.
+  const visibleStepIndexes = useMemo(() => {
+    const externalSourceIndexes = new Set(
+      trace.sources.flatMap((traceSource, sourceIndex) => (isExternalSourcePath(traceSource.path) ? [sourceIndex] : [])),
+    );
+    return trace.steps.flatMap((step, stepIndex) => (hideExternalSteps && externalSourceIndexes.has(step.sourceIndex) ? [] : [stepIndex]));
+  }, [trace, hideExternalSteps]);
+
+  // Position of the selected step within the visible list (-1 while it's filtered out)
+  const selectedPosition = visibleStepIndexes.indexOf(selectedStepIndex);
+
+  // Turning the filter on while parked on an external step — snap forward to the next
+  // own-code step (or back to the last one)
+  useEffect(() => {
+    if (selectedPosition === -1 && visibleStepIndexes.length > 0) {
+      const nextVisible = visibleStepIndexes.find((stepIndex) => stepIndex > selectedStepIndex);
+      setSelectedStepIndex(nextVisible ?? visibleStepIndexes[visibleStepIndexes.length - 1]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedPosition, visibleStepIndexes]);
 
   const selectedStep = trace.steps[selectedStepIndex];
   const source = trace.sources[selectedSourceIndex];
@@ -105,26 +132,43 @@ export const TraceViewer: React.FC<TraceViewerProps> = ({ trace }) => {
         {trace.stats.instrumentMs !== undefined && <Chip label={`${trace.stats.instrumentMs}ms setup`} size="small" sx={{ flexShrink: 0 }} />}
         {trace.truncated && <Chip color="warning" label="truncated - step budget hit" size="small" sx={{ flexShrink: 0 }} />}
 
+        <Tooltip title="Hide steps in framework / node_modules code — scrub only through this service's own source">
+          <FormControlLabel
+            control={<Checkbox checked={hideExternalSteps} onChange={(event) => onHideExternalStepsChange(event.target.checked)} size="small" />}
+            label={<Typography variant="caption">My code only</Typography>}
+            sx={{ flexShrink: 0, ml: 0.5, mr: 0 }}
+          />
+        </Tooltip>
+
         <Box sx={{ flex: 1 }} />
 
-        <Chip label={`step ${selectedStepIndex + 1} / ${trace.steps.length}`} size="small" sx={{ flexShrink: 0 }} variant="outlined" />
+        <Chip
+          label={`step ${selectedPosition + 1} / ${visibleStepIndexes.length}${hideExternalSteps ? ` (${trace.steps.length} total)` : ''}`}
+          size="small"
+          sx={{ flexShrink: 0 }}
+          variant="outlined"
+        />
       </Box>
 
       {/* slider row — controls only, fixed geometry while scrubbing */}
       <Box sx={{ alignItems: 'center', display: 'flex', gap: 2, px: 1 }}>
-        <IconButton disabled={selectedStepIndex <= 0} onClick={() => setSelectedStepIndex(selectedStepIndex - 1)} size="small">
+        <IconButton disabled={selectedPosition <= 0} onClick={() => setSelectedStepIndex(visibleStepIndexes[selectedPosition - 1])} size="small">
           ◀
         </IconButton>
         <Slider
-          max={Math.max(trace.steps.length - 1, 0)}
+          max={Math.max(visibleStepIndexes.length - 1, 0)}
           min={0}
-          onChange={(event, value) => setSelectedStepIndex(value as number)}
+          onChange={(event, value) => setSelectedStepIndex(visibleStepIndexes[value as number])}
           size="small"
-          value={selectedStepIndex}
+          value={Math.max(selectedPosition, 0)}
           valueLabelDisplay="auto"
-          valueLabelFormat={(stepIndex) => `step ${stepIndex + 1}`}
+          valueLabelFormat={(position) => `step ${position + 1}`}
         />
-        <IconButton disabled={selectedStepIndex >= trace.steps.length - 1} onClick={() => setSelectedStepIndex(selectedStepIndex + 1)} size="small">
+        <IconButton
+          disabled={selectedPosition === -1 || selectedPosition >= visibleStepIndexes.length - 1}
+          onClick={() => setSelectedStepIndex(visibleStepIndexes[selectedPosition + 1])}
+          size="small"
+        >
           ▶
         </IconButton>
       </Box>
@@ -150,9 +194,12 @@ export const TraceViewer: React.FC<TraceViewerProps> = ({ trace }) => {
                     key={lineNumber}
                     ref={isHighlighted ? highlightedLineRef : undefined}
                     onClick={() => {
-                      // Jump the scrubber to this line's first visit
-                      const stepIndex = trace.steps.findIndex((step) => step.sourceIndex === selectedSourceIndex && step.line === lineNumber);
-                      if (stepIndex >= 0) {
+                      // Jump the scrubber to this line's first visit (among visible steps)
+                      const stepIndex = visibleStepIndexes.find(
+                        (visibleStepIndex) =>
+                          trace.steps[visibleStepIndex].sourceIndex === selectedSourceIndex && trace.steps[visibleStepIndex].line === lineNumber,
+                      );
+                      if (stepIndex !== undefined) {
                         setSelectedStepIndex(stepIndex);
                       }
                     }}

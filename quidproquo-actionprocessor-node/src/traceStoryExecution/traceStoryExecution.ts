@@ -15,13 +15,18 @@ import { ActionProcessorList, getQpqIsoDateTimeFromDate, qpqExecuteLog, QpqExecu
 import { Worker } from 'worker_threads';
 
 import { TraceControllerWorkerData, traceControllerWorkerMain } from './controllerWorker';
-import { resolveSourceMappedSteps } from './resolveSourceMaps';
+import { filterOwnCodeLocations, resolveSourceMappedSteps } from './resolveSourceMaps';
 
 export interface TraceStoryExecutionOptions {
   // Regex sources matched against script urls to trace IN ADDITION to the story
   // function's own script (auto-detected via [[FunctionLocation]]). Use for bundles
   // split across chunks, e.g. ['/tmp/qpq-federated-code/'].
   scriptPatterns?: string[];
+
+  // Only break on statements whose source-mapped origin is the service's own code —
+  // node_modules positions get no breakpoints, so the step/time budgets are spent
+  // entirely on user statements. Scripts without a source map stay fully traced.
+  onlyOwnCode?: boolean;
 
   // Step budget and wall-clock budget: past either, the replay finishes untraced and
   // the trace is marked truncated. The wall clock is what bounds total runtime — locals
@@ -109,8 +114,9 @@ export const traceStoryExecution = async (
 
   const workerData: TraceControllerWorkerData = {
     scriptPatterns: options.scriptPatterns ?? [],
-    maxSteps: options.maxSteps ?? 10_000,
-    maxTraceMs: options.maxTraceMs ?? 60_000,
+    onlyOwnCode: options.onlyOwnCode ?? false,
+    maxSteps: options.maxSteps ?? 20_000,
+    maxTraceMs: options.maxTraceMs ?? 120_000,
     maxValueLength: options.maxValueLength ?? 1_000,
     maxProperties: options.maxProperties ?? 32,
     maxValueDepth: options.maxValueDepth ?? 4,
@@ -122,6 +128,19 @@ export const traceStoryExecution = async (
   const controller = new Worker(`(${traceControllerWorkerMain.toString()})()`, {
     eval: true,
     workerData,
+  });
+
+  // onlyOwnCode: the worker can't load trace-mapping (eval worker, builtin requires
+  // only), so it round-trips candidate breakpoint locations here for source-map
+  // filtering. Attached before the ready-wait — instrumentation happens during init.
+  controller.on('message', (message: any) => {
+    if (message?.type === 'filterLocations') {
+      controller.postMessage({
+        type: 'filteredLocations',
+        requestId: message.requestId,
+        locations: filterOwnCodeLocations(message.scriptUrl, message.locations || []),
+      });
+    }
   });
 
   try {

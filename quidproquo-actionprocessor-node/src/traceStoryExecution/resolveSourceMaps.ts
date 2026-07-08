@@ -52,6 +52,26 @@ const loadTraceMap = (scriptPath: string): TraceMap | null => {
   }
 };
 
+// Which candidate breakpoint positions land in the service's OWN code — answers the
+// controller worker's filterLocations request when onlyOwnCode tracing is on (the eval
+// worker can't load trace-mapping itself). Positions mapping into node_modules
+// (framework/deps) or not mapping at all (webpack runtime glue) are dropped. No map
+// means the bundle can't be classified — everything stays traced.
+export const filterOwnCodeLocations = <TLocation extends { lineNumber: number; columnNumber?: number }>(
+  scriptUrl: string,
+  locations: TLocation[],
+): TLocation[] => {
+  const traceMap = scriptUrl ? loadTraceMap(scriptUrlToPath(scriptUrl)) : null;
+  if (!traceMap) {
+    return locations;
+  }
+
+  return locations.filter((location) => {
+    const original = originalPositionFor(traceMap, { line: location.lineNumber + 1, column: location.columnNumber ?? 0 });
+    return !!original.source && !original.source.includes('node_modules');
+  });
+};
+
 export interface ResolvedTraceSteps {
   sources: QpqExecutionTraceSource[];
   steps: QpqExecutionTraceStep[];

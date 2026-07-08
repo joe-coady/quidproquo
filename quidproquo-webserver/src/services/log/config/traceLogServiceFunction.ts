@@ -27,6 +27,9 @@ export interface QpqTraceLogExecutionPayload {
 
   // The log service's module name — where the result gets sent back to
   replyToService: string;
+
+  // Only trace statements in the service's own code (no node_modules breakpoints)
+  onlyOwnCode?: boolean;
 }
 
 export interface QpqStoreTraceResultPayload {

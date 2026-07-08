@@ -119,7 +119,9 @@ export const LogDialog = ({ logCorrelation, open, handleClose, setSelectedLogCor
           <RawTab log={asyncLog} />
         </div>
         <div style={getTabStyle(logDialogState.selectedTab, 5)}>
-          <TraceTab isVisible={logDialogState.selectedTab === 5} log={asyncLog} />
+          {/* keyed on the correlation so walking the tree remounts the tab with fresh
+              trace state instead of showing the previous log's trace */}
+          <TraceTab key={logCorrelation} isVisible={logDialogState.selectedTab === 5} log={asyncLog} />
         </div>
         <div style={getTabStyle(logDialogState.selectedTab, 6)}>
           <HelpTab log={asyncLog} />

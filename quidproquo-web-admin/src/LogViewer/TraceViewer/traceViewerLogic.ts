@@ -90,6 +90,12 @@ export const getDisplaySourceNames = (paths: string[]): string[] => {
   return paths.map((path) => path.slice(cutAt) || path);
 };
 
+// "Your code" vs framework/dependency code, the same way devtools ignore-listing draws
+// the line: anything that resolved into node_modules is external. Unmapped generated
+// chunks (no node_modules in a file:///tmp/... url) stay visible — they mix user and
+// framework code and hiding them would hide user statements.
+export const isExternalSourcePath = (path: string): boolean => path.includes('node_modules');
+
 // The source most of the trace ran in — the sensible tab to open first.
 export const getDefaultSourceIndex = (trace: QpqExecutionTrace): number => {
   const stepCounts = new Map<number, number>();

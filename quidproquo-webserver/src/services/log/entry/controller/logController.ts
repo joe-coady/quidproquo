@@ -152,6 +152,7 @@ export function* traceLog(
 
   const refresh = event.query.refresh === 'true';
   const checkOnly = event.query.check === 'true';
+  const onlyOwnCode = event.query.onlyOwnCode === 'true';
 
   if (!refresh) {
     const traceExists = yield* askFileExists(QPQ_LOG_REPORTS_STORAGE_DRIVE_NAME, traceFilePath);
@@ -176,6 +177,7 @@ export function* traceLog(
   const traceLogPayload: QpqTraceLogExecutionPayload = {
     storyResult,
     replyToService: applicationInfo.module,
+    onlyOwnCode,
   };
 
   yield* askServiceFunctionExecute<void, QpqTraceLogExecutionPayload>(

@@ -18,8 +18,10 @@
 // Protocol with the parent (traceStoryExecution):
 //   worker -> parent: { type: 'ready', tracedScriptUrls }   breakpoints armed, start the replay
 //                     { type: 'trace', steps, scripts, stats }   reply to 'done'
+//                     { type: 'filterLocations', requestId, scriptUrl, locations }   onlyOwnCode: map these through the source map
 //                     { type: 'fatal', error }
 //   parent -> worker: { type: 'done' }   replay finished, send the trace
+//                     { type: 'filteredLocations', requestId, locations }   reply to 'filterLocations'
 //
 // The story function is located via globalThis.__qpqTraceStoryFunction (set by the
 // parent before spawning): Runtime.evaluate -> [[FunctionLocation]] -> scriptId. Extra
@@ -29,6 +31,11 @@ export interface TraceControllerWorkerData {
   // Regex sources matched against script urls; matching scripts are traced in addition
   // to the story function's own script.
   scriptPatterns: string[];
+
+  // Ask the parent to source-map-filter breakpoint locations so only the service's own
+  // code gets breakpoints (the parent holds trace-mapping; this eval worker can't).
+  onlyOwnCode: boolean;
+
   maxSteps: number;
   maxTraceMs: number;
   maxValueLength: number;
@@ -259,24 +266,43 @@ export function traceControllerWorkerMain(): void {
   };
 
   // ── Script instrumentation ──────────────────────────────────────────────────
+  // onlyOwnCode: the parent (traceStoryExecution) filters candidate locations through
+  // the script's source map — only positions originating in the service's own code
+  // (not node_modules) get breakpoints. Round-tripped over parentPort because this
+  // worker can't load the source-map library (see the shipping constraint above).
+  let filterRequestSeq = 0;
+  const pendingFilterRequests = new Map<number, (locations: any[]) => void>();
+
+  const filterLocationsViaParent = (scriptId: string, locations: any[]): Promise<any[]> => {
+    if (!options.onlyOwnCode || locations.length === 0) return Promise.resolve(locations);
+
+    filterRequestSeq += 1;
+    const requestId = filterRequestSeq;
+    return new Promise((resolve) => {
+      pendingFilterRequests.set(requestId, resolve);
+      parentPort.postMessage({ type: 'filterLocations', requestId, scriptUrl: scriptUrlsById.get(scriptId) || '', locations });
+    });
+  };
+
   const instrumentScript = (scriptId: string): Promise<void> => {
     if (instrumentedScriptIds.has(scriptId)) return Promise.resolve();
     instrumentedScriptIds.add(scriptId);
 
-    return post('Debugger.getPossibleBreakpoints', { start: { scriptId, lineNumber: 0, columnNumber: 0 } }).then((response: any) => {
-      // PIPELINED, not chained: a service's chunks can hold tens of thousands of
-      // statement positions, and awaiting each setBreakpoint round-trip serially made
-      // instrumentation the dominant setup cost (it blew the ready timeout on real
-      // services). The session queues the posts; the backend processes them in order.
-      const locations = response.locations || [];
-      return Promise.all(
-        locations.map((location: any) =>
-          post('Debugger.setBreakpoint', { location }).then(() => {
-            breakpoints += 1;
-          }),
-        ),
-      ).then(() => undefined);
-    });
+    return post('Debugger.getPossibleBreakpoints', { start: { scriptId, lineNumber: 0, columnNumber: 0 } })
+      .then((response: any) => filterLocationsViaParent(scriptId, response.locations || []))
+      .then((locations: any[]) => {
+        // PIPELINED, not chained: a service's chunks can hold tens of thousands of
+        // statement positions, and awaiting each setBreakpoint round-trip serially made
+        // instrumentation the dominant setup cost (it blew the ready timeout on real
+        // services). The session queues the posts; the backend processes them in order.
+        return Promise.all(
+          locations.map((location: any) =>
+            post('Debugger.setBreakpoint', { location }).then(() => {
+              breakpoints += 1;
+            }),
+          ),
+        ).then(() => undefined);
+      });
   };
 
   session.on('Debugger.scriptParsed', (message: any) => {
@@ -335,6 +361,15 @@ export function traceControllerWorkerMain(): void {
   // ── Parent protocol (also keeps the worker's event loop alive — an inspector
   // session alone does not, the worker would silently exit) ────────────────────
   parentPort.on('message', (message: any) => {
+    if (message && message.type === 'filteredLocations') {
+      const resolveFilter = pendingFilterRequests.get(message.requestId);
+      if (resolveFilter) {
+        pendingFilterRequests.delete(message.requestId);
+        resolveFilter(message.locations || []);
+      }
+      return;
+    }
+
     if (message && message.type === 'done') {
       const scripts: Record<string, string> = {};
       scriptUrlsById.forEach((url, scriptId) => {

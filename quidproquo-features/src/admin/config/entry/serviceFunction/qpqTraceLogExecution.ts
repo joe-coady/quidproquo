@@ -15,9 +15,9 @@ import {
 // log service's qpqTraceStore function, which stores it and pushes a TraceDone
 // websocket message. See trace-replay-plan.md.
 export function* qpqTraceLogExecution(event: ExecuteServiceFunctionEvent<QpqTraceLogExecutionPayload>): AskResponse<void> {
-  const { storyResult, replyToService } = event.payload;
+  const { storyResult, replyToService, onlyOwnCode } = event.payload;
 
-  const traceResult = yield* askCatch(askTraceStory(storyResult));
+  const traceResult = yield* askCatch(askTraceStory(storyResult, undefined, onlyOwnCode));
 
   const storeTracePayload: QpqStoreTraceResultPayload = traceResult.success
     ? { correlation: storyResult.correlation, trace: traceResult.result }

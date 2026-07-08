@@ -29,7 +29,7 @@ const getProcessTraceStory = (qpqConfig: QPQConfig, defaultScriptPatterns: strin
     updateSession: StorySessionUpdater,
     dynamicModuleLoader: DynamicModuleLoader,
   ) => {
-    const { storyResult, scriptPatterns } = payload;
+    const { storyResult, scriptPatterns, onlyOwnCode } = payload;
 
     if (!storyResult.qpqFunctionRuntimeInfo) {
       return actionResultError(
@@ -46,6 +46,7 @@ const getProcessTraceStory = (qpqConfig: QPQConfig, defaultScriptPatterns: strin
     try {
       const { trace } = await traceStoryExecution(storyResult, story, {
         scriptPatterns: [...defaultScriptPatterns, ...(scriptPatterns || [])],
+        onlyOwnCode,
       });
 
       return actionResult(trace);

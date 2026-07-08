@@ -2,7 +2,7 @@ import { QpqExecutionTrace, QpqExecutionTraceValue } from 'quidproquo-core';
 
 import { describe, expect, it } from 'vitest';
 
-import { buildLineAnnotations, formatLineAnnotation, getDefaultSourceIndex, getDisplaySourceNames } from './traceViewerLogic';
+import { buildLineAnnotations, formatLineAnnotation, getDefaultSourceIndex, getDisplaySourceNames, isExternalSourcePath } from './traceViewerLogic';
 
 const v = (preview: string, json?: string): QpqExecutionTraceValue => (json === undefined ? { preview } : { preview, json });
 
@@ -147,5 +147,19 @@ describe('getDefaultSourceIndex', () => {
 
   it('falls back to zero for an empty trace', () => {
     expect(getDefaultSourceIndex(buildTrace([]))).toBe(0);
+  });
+});
+
+describe('isExternalSourcePath', () => {
+  it('marks node_modules paths as external', () => {
+    expect(isExternalSourcePath('webpack://svc/node_modules/quidproquo-core/lib/story.js')).toBe(true);
+  });
+
+  it('keeps own source paths', () => {
+    expect(isExternalSourcePath('webpack://svc/src/story.ts')).toBe(false);
+  });
+
+  it('keeps unmapped generated chunks (they mix user and framework code)', () => {
+    expect(isExternalSourcePath('file:///tmp/qpq-federated-code/container/abc123/chunk.js')).toBe(false);
   });
 });

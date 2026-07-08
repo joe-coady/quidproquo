@@ -8,6 +8,10 @@ export interface LogTraceRequestOptions {
 
   // Only report state — never kicks off a trace (safe for polling)
   checkOnly?: boolean;
+
+  // Trace only the service's own code — no breakpoints in node_modules, so the whole
+  // step budget goes to user statements
+  onlyOwnCode?: boolean;
 }
 
 export interface LogTraceResult {
@@ -27,7 +31,7 @@ export const getLogTrace = async (
   options: LogTraceRequestOptions,
   accessToken?: string,
 ): Promise<LogTraceResult> => {
-  const query = `refresh=${!!options.refresh}&check=${!!options.checkOnly}`;
+  const query = `refresh=${!!options.refresh}&check=${!!options.checkOnly}&onlyOwnCode=${!!options.onlyOwnCode}`;
   const traceUrl = await apiRequestPost<{ url?: string; pending?: boolean }>(`/log/${correlation}/trace?${query}`, {}, apiBaseUrl, accessToken);
 
   if (traceUrl.url) {
