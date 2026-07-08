@@ -1,7 +1,44 @@
-import { describe, expect, it } from 'vitest';
+import { buildTestQpqConfig } from 'quidproquo-core';
 
-describe('quidproquo-deploy-webpack', () => {
-  it('should pass smoke test', () => {
-    expect(1 + 1).toBe(2);
+import { afterEach, describe, expect, it } from 'vitest';
+
+import { getResolveLoaderModules, getRspackBuildMode, setupRspackQPQRuntime } from './index';
+
+describe('getRspackBuildMode', () => {
+  it.each([
+    ['development', 'development'],
+    ['production', 'production'],
+    ['staging', 'production'],
+    ['none', 'production'],
+  ])('maps the %s environment to the %s build mode', (environment: string, expected: string) => {
+    expect(getRspackBuildMode(buildTestQpqConfig([], { environment }))).toBe(expected);
+  });
+});
+
+describe('getResolveLoaderModules', () => {
+  it('returns the local loaders directory followed by node_modules', () => {
+    const modules = getResolveLoaderModules();
+
+    expect(modules).toHaveLength(2);
+    expect(modules[0].endsWith('loaders')).toBe(true);
+    expect(modules[1]).toBe('node_modules');
+  });
+});
+
+describe('setupRspackQPQRuntime', () => {
+  afterEach(() => {
+    delete process.env.QPQLoaderConfig;
+  });
+
+  it('serialises the loader config onto the QPQLoaderConfig env var', () => {
+    setupRspackQPQRuntime(buildTestQpqConfig(), './build');
+
+    const loaderConfig = JSON.parse(process.env.QPQLoaderConfig ?? '{}');
+
+    expect(loaderConfig).toMatchObject({
+      allSrcEntries: expect.any(Array),
+      customActionProcessorSources: expect.any(Array),
+      qpqConfig: expect.any(Array),
+    });
   });
 });

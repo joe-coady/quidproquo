@@ -1,12 +1,12 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// The webpack config that compiles a service's story code into a module-federation
+// The rspack config that compiles a service's story code into a module-federation
 // REMOTE container (remoteEntry.js + expose/shared chunks). This is step 2 of the
 // build/publish flow:
 //   1. getFederatedRemoteInfoForQpqConfig -> container name + exposes
-//   2. getWebpackConfigForQpqRemote (HERE) -> the container build in `buildPath`
+//   2. getRspackConfigForQpqRemote (HERE) -> the container build in `buildPath`
 //   3. publishFederatedRemote -> hash + manifest, ready to copy into the store bucket
 //
-// This is the counterpart to getWebpackConfigForQpq (the normal per-handler lambda
+// This is the counterpart to getRspackConfig (the normal per-handler lambda
 // build). The container is `target: async-node` + a commonjs-module library so the
 // lambda can require() it from /tmp, and `shared` keeps the framework packages OUT of
 // the bundle (the host provides them), so a remote carries only user code.
@@ -14,10 +14,10 @@
 import { FEDERATED_SHARED_PACKAGE_NAMES } from 'quidproquo-actionprocessor-awslambda';
 import { QPQConfig } from 'quidproquo-core';
 
-import { Configuration } from 'webpack';
-import { ModuleFederationPlugin } from '@module-federation/enhanced';
+import { ModuleFederationPlugin } from '@module-federation/enhanced/rspack';
+import { Configuration } from '@rspack/core';
 
-import { getWebpackBuildMode } from '../getWebpackBuildMode';
+import { getRspackBuildMode } from '../getRspackBuildMode';
 import { getFederatedRemoteInfoForQpqConfig } from './getFederatedRemoteInfoForQpqConfig';
 
 // The framework packages the lambda host provides as MF singletons. Built from the
@@ -31,16 +31,16 @@ const getSharedFrameworkModules = (): Record<string, { singleton: true; required
 // Everything the stories import is bundled in EXCEPT the framework packages listed in
 // `shared`, which the lambda host provides so both sides use the same module instances.
 //
-// Like getWebpackConfig, this config has no TS loader rule - consumer apps append the
+// Like getRspackConfig, this config has no TS loader rule - consumer apps append the
 // same module rules they use for their main qpq build.
-export const getWebpackConfigForQpqRemote = (qpqConfig: QPQConfig, buildPath: string): Configuration => {
+export const getRspackConfigForQpqRemote = (qpqConfig: QPQConfig, buildPath: string): Configuration => {
   const { containerName, exposes } = getFederatedRemoteInfoForQpqConfig(qpqConfig);
 
   return {
     // The federation container is the only entry - the exposes drive the module graph
     entry: {},
 
-    mode: getWebpackBuildMode(qpqConfig),
+    mode: getRspackBuildMode(qpqConfig),
 
     // Remotes ship S3 -> lambda /tmp, never over the wire to a browser, so size is not
     // user-facing. Full source maps (with sourcesContent) and unmangled identifiers are
@@ -101,8 +101,9 @@ export const getWebpackConfigForQpqRemote = (qpqConfig: QPQConfig, buildPath: st
           // the original file/line names.
           test: /\.js$/,
           enforce: 'pre',
-          // resolved from THIS package's deps so consumer hoisting layout doesn't matter
-          use: [require.resolve('source-map-loader')],
+          // our own loader (see src/loaders), resolved from THIS package so consumer
+          // hoisting layout doesn't matter
+          use: [require.resolve('../loaders/sourceMapLoader')],
         },
       ],
     },
@@ -112,7 +113,7 @@ export const getWebpackConfigForQpqRemote = (qpqConfig: QPQConfig, buildPath: st
         module: /@module-federation/,
         message: /Failed to parse source map/,
       },
-      // source-map-loader runs over all node_modules js; third-party packages with
+      // the source-map rule runs over all node_modules js; third-party packages with
       // broken/unresolvable maps are expected and harmless (their code just stays as-is)
       {
         message: /Failed to parse source map/,

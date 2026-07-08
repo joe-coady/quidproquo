@@ -1,18 +1,15 @@
-// import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
-
 import { QPQConfig } from 'quidproquo-core';
 
-import { Configuration } from 'webpack';
+import { Configuration } from '@rspack/core';
 
-import { getWebpackBuildMode } from './getWebpackBuildMode';
+import { getRspackBuildMode } from './getRspackBuildMode';
 import { QpqPlugin } from './plugins';
 
-export const getWebpackConfig = (qpqConfig: QPQConfig, buildPath: string, entries: Record<string, string>, nodeModulePath: string): Configuration => {
+export const getRspackConfig = (qpqConfig: QPQConfig, buildPath: string, entries: Record<string, string>, nodeModulePath: string): Configuration => {
   return {
     entry: entries,
 
-    mode: getWebpackBuildMode(qpqConfig),
-    // mode: 'production',
+    mode: getRspackBuildMode(qpqConfig),
 
     externals: [/aws-sdk/],
 
@@ -24,7 +21,7 @@ export const getWebpackConfig = (qpqConfig: QPQConfig, buildPath: string, entrie
 
       // Allow compiling as a lib ~ don't tree shake my exports plz
       globalObject: 'this',
-      libraryTarget: 'commonjs2',
+      library: { type: 'commonjs2' },
     },
 
     resolve: {
@@ -53,5 +50,5 @@ export const getWebpackConfig = (qpqConfig: QPQConfig, buildPath: string, entrie
   };
 };
 
-export const getAllWebpackConfig = (qpqConfig: QPQConfig, entries: Record<string, string>, outputPath?: string, nodeModulePath?: string) =>
-  getWebpackConfig(qpqConfig, outputPath || 'build', entries, nodeModulePath || 'node_modules');
+export const getAllRspackConfig = (qpqConfig: QPQConfig, entries: Record<string, string>, outputPath?: string, nodeModulePath?: string) =>
+  getRspackConfig(qpqConfig, outputPath || 'build', entries, nodeModulePath || 'node_modules');

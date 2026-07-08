@@ -2,16 +2,16 @@ import { buildTestQpqConfig } from 'quidproquo-core';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { getResolveLoaderModules, getWebpackBuildMode, setupWebpackQPQRuntime } from './webpack.config';
+import { getResolveLoaderModules, getRspackBuildMode, setupRspackQPQRuntime } from './index';
 
-describe('getWebpackBuildMode', () => {
+describe('getRspackBuildMode', () => {
   it.each([
     ['development', 'development'],
     ['production', 'production'],
     ['staging', 'production'],
     ['none', 'production'],
   ])('maps the %s environment to the %s build mode', (environment: string, expected: string) => {
-    expect(getWebpackBuildMode(buildTestQpqConfig([], { environment }))).toBe(expected);
+    expect(getRspackBuildMode(buildTestQpqConfig([], { environment }))).toBe(expected);
   });
 });
 
@@ -25,13 +25,13 @@ describe('getResolveLoaderModules', () => {
   });
 });
 
-describe('setupWebpackQPQRuntime', () => {
+describe('setupRspackQPQRuntime', () => {
   afterEach(() => {
     delete process.env.QPQLoaderConfig;
   });
 
   it('serialises the loader config onto the QPQLoaderConfig env var', () => {
-    setupWebpackQPQRuntime(buildTestQpqConfig(), './build');
+    setupRspackQPQRuntime(buildTestQpqConfig(), './build');
 
     const loaderConfig = JSON.parse(process.env.QPQLoaderConfig ?? '{}');
 

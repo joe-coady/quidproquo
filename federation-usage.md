@@ -29,9 +29,9 @@ no dedicated bucket or policy is created by federation.
 
 ## The pieces (all in the framework)
 
-- `getWebpackConfigForQpqRemote(qpqConfig, buildPath)` — `quidproquo-deploy-webpack`.
-  Builds the service as an MF remote container. Append your own `module.rules`
-  (ts-loader/babel) before running it.
+- `getRspackConfigForQpqRemote(qpqConfig, buildPath)` — `quidproquo-deploy-webpack`.
+  Builds the service as an MF remote container (rspack). Append your own `module.rules`
+  (e.g. `builtin:swc-loader`) before running it.
 - `publishFederatedRemote(qpqConfig, buildPath, publishPath)` — `quidproquo-deploy-webpack`.
   Lays out the content-hash version dir + `manifest.json` (written last). Returns the manifest.
 - `defineFederatedModuleStore(storageDrive)` / `defineStorageDrive(...)` — `quidproquo-core`.
@@ -41,9 +41,9 @@ no dedicated bucket or policy is created by federation.
 ## Build + publish flow
 
 ```ts
-const config = getWebpackConfigForQpqRemote(qpqConfig, remoteBuildPath);
-config.module.rules.push(/* your ts-loader rule */);
-await runWebpack(config);
+const config = getRspackConfigForQpqRemote(qpqConfig, remoteBuildPath);
+config.module.rules.push(/* your builtin:swc-loader rule */);
+await runRspack(config);
 
 const manifest = publishFederatedRemote(qpqConfig, remoteBuildPath, publishPath);
 // publishPath/<hash>/remoteEntry.js + chunks

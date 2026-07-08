@@ -1,11 +1,9 @@
-// import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
-
 import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import path from 'path';
 
-export const setupWebpackQPQRuntime = (qpqConfig: QPQConfig, buildPath: string): void => {
+export const setupRspackQPQRuntime = (qpqConfig: QPQConfig, buildPath: string): void => {
   const allSrcEntries = [...qpqCoreUtils.getAllSrcEntries(qpqConfig), ...qpqWebServerUtils.getAllSrcEntries(qpqConfig)];
 
   const customActionProcessorSources = qpqCoreUtils.getActionProcessorSources(qpqConfig);
@@ -24,6 +22,6 @@ export const setupWebpackQPQRuntime = (qpqConfig: QPQConfig, buildPath: string):
 export const getResolveLoaderModules = () => [path.resolve(__dirname, 'loaders'), 'node_modules'];
 
 export * from './federation';
-export * from './getWebpackBuildMode';
-export * from './getWebpackConfigForQpq';
+export * from './getRspackBuildMode';
+export * from './getRspackConfigForQpq';
 export * from './plugins';

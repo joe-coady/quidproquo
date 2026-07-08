@@ -184,8 +184,9 @@ const loadStoreVersion = async (getFile: (p: string) => Promise<Buffer>, manifes
 
       // Write to a temp name then rename: rename is atomic on the same filesystem, so a
       // crash/timeout mid-write never leaves a truncated file that a later invocation
-      // would trust via the existsSync check above.
-      const tempPath = `${localPath}.${process.pid}.tmp`;
+      // would trust via the existsSync check above. The random suffix keeps concurrent
+      // writers in the SAME process (overlapping probes) off each other's temp file.
+      const tempPath = `${localPath}.${process.pid}.${Math.random().toString(36).slice(2)}.tmp`;
       await fs.promises.writeFile(tempPath, data);
       await fs.promises.rename(tempPath, localPath);
     }),

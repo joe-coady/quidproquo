@@ -205,7 +205,9 @@ describe('loadFederatedStory', () => {
         const story = await loadFederatedStory<() => Promise<string>>(qpqConfig, '/entry::run');
         latest = await story!();
         if (latest !== 'VERSION_2') {
-          await new Promise((resolve) => setImmediate(resolve));
+          // A real (macrotask) delay: the background probe needs several event-loop
+          // turns of fs promises to land; setImmediate spins can outrun it.
+          await new Promise((resolve) => setTimeout(resolve, 10));
         }
       }
 
