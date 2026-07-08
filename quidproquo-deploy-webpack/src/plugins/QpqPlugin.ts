@@ -1,7 +1,8 @@
 import { QPQConfig } from 'quidproquo-core';
 
 import path from 'path';
-import type { Compiler, RspackPluginInstance } from '@rspack/core';
+import { Compiler, WebpackPluginInstance } from 'webpack';
+import VirtualModulesPlugin from 'webpack-virtual-modules';
 
 import { getQpqDyanmicLoaderSrcFromQpqConfigs } from './getQpqDyanmicLoaderSrcFromQpqConfigs';
 
@@ -16,7 +17,7 @@ interface QpqPluginOptions {
   alwaysBundleStoryCode?: boolean;
 }
 
-export class QpqPlugin implements RspackPluginInstance {
+export class QpqPlugin implements WebpackPluginInstance {
   private options: QpqPluginOptions;
 
   constructor(options: QpqPluginOptions) {
@@ -36,11 +37,7 @@ export class QpqPlugin implements RspackPluginInstance {
       ...this.options.aliases,
     };
 
-    // Take the plugin class from the COMPILER's own rspack instance, not this
-    // package's import: under npm link the two can be different physical copies of
-    // @rspack/core, and a virtual module registered on the wrong instance's binding
-    // is invisible to the build ("Cannot find module" on the aliased key).
-    new compiler.rspack.experiments.VirtualModulesPlugin({
+    new VirtualModulesPlugin({
       [dynamicLoaderPath]: getQpqDyanmicLoaderSrcFromQpqConfigs(this.options.qpqConfigs, this.options.alwaysBundleStoryCode),
     }).apply(compiler);
   }

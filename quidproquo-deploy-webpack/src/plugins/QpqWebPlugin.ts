@@ -1,12 +1,12 @@
 import { ApplicationConfigInfo, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
-import type { Compiler, RspackPluginInstance } from '@rspack/core';
+import type { Compiler, WebpackPluginInstance } from 'webpack';
 
 interface QpqWebPluginOptions {
   qpqConfig: QPQConfig;
 }
 
-export class QpqWebPlugin implements RspackPluginInstance {
+export class QpqWebPlugin implements WebpackPluginInstance {
   private options: QpqWebPluginOptions;
 
   constructor(options: QpqWebPluginOptions) {
@@ -28,9 +28,10 @@ export class QpqWebPlugin implements RspackPluginInstance {
 
     console.log('Applying QpqWebPlugin with config:', applicationConfigInfo);
 
-    // From the compiler's own rspack instance - see QpqPlugin for why (npm link
-    // can make this package's @rspack/core a different copy than the build's).
-    new compiler.rspack.DefinePlugin({
+    // From the compiler's own webpack instance: under npm link this package's
+    // 'webpack' import can be a different physical copy than the build's, and a
+    // plugin from the wrong copy misbehaves silently.
+    new compiler.webpack.DefinePlugin({
       [`process.env.QPQ_APPLICATION_CONFIG_INFO_${serviceName.toUpperCase()}`]: JSON.stringify(applicationConfigInfo),
       'process.env.QPQ_APPLICATION_CONFIG_INFO': JSON.stringify(applicationConfigInfo),
     }).apply(compiler);

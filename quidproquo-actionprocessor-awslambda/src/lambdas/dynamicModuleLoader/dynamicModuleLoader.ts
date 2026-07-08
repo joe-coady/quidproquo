@@ -9,8 +9,8 @@
 //                   the published version of the story (see ../../logic/
 //                   federatedModuleStore/loadFederatedStory.ts for the whole flow).
 //   2. BUNDLED    — qpqDynamicModuleLoader is a build-time-generated function
-//                   (rspack virtual module 'quidproquo-dynamic-loader', produced by
-//                   quidproquo-deploy-webpack's QpqPlugin) — an if-chain that
+//                   (the 'quidproquo-dynamic-loader' virtual module, produced by the
+//                   deploy-webpack/deploy-rspack QpqPlugin) — an if-chain that
 //                   require()s the story code statically bundled into the lambda zip.
 //
 // loadFederatedStory returns undefined on any miss (no store configured, nothing
@@ -20,7 +20,7 @@
 // fails loudly rather than silently serving stale code.
 // ─────────────────────────────────────────────────────────────────────────────
 import { QpqFunctionRuntime } from 'quidproquo-core';
-// @ts-expect-error - injected at build time by QpqPlugin (rspack virtual module)
+// @ts-expect-error - injected at build time by QpqPlugin (virtual module)
 import { qpqConfig, qpqDynamicModuleLoader } from 'quidproquo-dynamic-loader';
 
 import { loadFederatedStory } from '../../logic/federatedModuleStore';

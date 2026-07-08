@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // The BUILD half of federation, shared by both build steps:
-//   getRspackConfigForQpqRemote -> uses `exposes` to build the MF container
-//   publishFederatedRemote      -> uses `runtimeExposeMap` for the manifest
+//   getWebpackConfigForQpqRemote -> uses `exposes` to build the MF container
+//   publishFederatedRemote       -> uses `runtimeExposeMap` for the manifest
 //
 // It walks every QpqFunctionRuntime the config references (a story reachable from a
 // route/queue/schedule/etc.) and produces TWO maps keyed off one derived `exposePath`
@@ -21,8 +21,8 @@ export interface FederatedRemoteInfo {
 
   serviceName: string;
 
-  // For the ModuleFederationPlugin.exposes: exposeKey ('./src/routes/getOrders')
-  // -> ABSOLUTE source path rspack should compile ('/abs/root/src/routes/getOrders').
+  // For webpack's ModuleFederationPlugin.exposes: exposeKey ('./src/routes/getOrders')
+  // -> ABSOLUTE source path webpack should compile ('/abs/root/src/routes/getOrders').
   exposes: Record<string, string>;
 
   // For the runtime manifest: machine-independent runtime key
@@ -70,7 +70,7 @@ export const getFederatedRemoteInfoForQpqConfig = (qpqConfig: QPQConfig): Federa
     const fullSrcPath: string = getFullSrcPathFromQpqFunctionRuntime(qpqFunctionRuntime, qpqConfig);
     const exposePath = getExposePathForFullSrcPath(fullSrcPath, configRoot);
 
-    // build: compile this absolute source under the './<exposePath>' key.
+    // webpack: compile this absolute source under the './<exposePath>' key.
     exposes[`./${exposePath}`] = fullSrcPath;
     // manifest: let the loader map a runtime back to that same expose path.
     runtimeExposeMap[getFederatedKeyFromQpqFunctionRuntime(qpqFunctionRuntime)] = exposePath;

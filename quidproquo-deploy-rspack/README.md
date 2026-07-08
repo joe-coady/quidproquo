@@ -1,6 +1,9 @@
-# quidproquo-actionprocessor-node
+# quidproquo-deploy-rspack
 
-generic action processors for node
+Rspack build configs and plugins for bundling QPQ services (lambda handler bundles,
+the `quidproquo-dynamic-loader` virtual module, and module-federation remote builds).
+
+webpack counterpart: `quidproquo-deploy-webpack` (same API surface, webpack naming).
 
 ### Note
 

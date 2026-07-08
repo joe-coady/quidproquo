@@ -24,8 +24,8 @@ export const getFullSrcPathFromQpqFunctionRuntime = (qpqFunctionRuntime, qpqConf
  * emits an `if` guard that matches the incoming runtime — string equality for relative
  * runtimes, or `basePath`/`relativePath`/`functionName` equality for advanced ones — and,
  * on a match, `require()`s that runtime's source file and returns its named story export.
- * Because those `require()` paths are string literals, the bundler statically resolves
- * them and bundles every referenced module into the lambda zip.
+ * Because those `require()` paths are string literals, webpack statically resolves them
+ * and bundles every referenced module into the lambda zip.
  *
  * If the service opted into federation with `bundleFallback: false` (a "thin shell"), it
  * instead emits a single fail-fast `throw` and NO `require()` calls, so no user story code
@@ -43,7 +43,7 @@ export const getFullSrcPathFromQpqFunctionRuntime = (qpqFunctionRuntime, qpqConf
  */
 export function getSrcLoaderForQpqConfig(qpqConfig, qpqFunctionRuntimeVariableName, alwaysBundleStoryCode) {
   // Thin shell: the service opted into federation with bundleFallback:false, so emit
-  // NO require() calls (the bundler then bundles no user story code) and fail fast. The
+  // NO require() calls (webpack then bundles no user story code) and fail fast. The
   // federated loader runs first in dynamicModuleLoader; reaching here means nothing was
   // published for this runtime, which for a thin shell is a hard error, not a fallback.
   const federatedStore = qpqCoreUtils.getFederatedModuleStore(qpqConfig);

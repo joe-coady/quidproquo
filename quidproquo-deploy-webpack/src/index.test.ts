@@ -2,16 +2,18 @@ import { buildTestQpqConfig } from 'quidproquo-core';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { getResolveLoaderModules, getRspackBuildMode, setupRspackQPQRuntime } from './index';
+// NOTE: these tests live here (not next to webpack.config.ts) because vitest's
+// default exclude drops any file matching `webpack.config.*`.
+import { getResolveLoaderModules, getWebpackBuildMode, setupWebpackQPQRuntime } from './webpack.config';
 
-describe('getRspackBuildMode', () => {
+describe('getWebpackBuildMode', () => {
   it.each([
     ['development', 'development'],
     ['production', 'production'],
     ['staging', 'production'],
     ['none', 'production'],
   ])('maps the %s environment to the %s build mode', (environment: string, expected: string) => {
-    expect(getRspackBuildMode(buildTestQpqConfig([], { environment }))).toBe(expected);
+    expect(getWebpackBuildMode(buildTestQpqConfig([], { environment }))).toBe(expected);
   });
 });
 
@@ -25,13 +27,13 @@ describe('getResolveLoaderModules', () => {
   });
 });
 
-describe('setupRspackQPQRuntime', () => {
+describe('setupWebpackQPQRuntime', () => {
   afterEach(() => {
     delete process.env.QPQLoaderConfig;
   });
 
   it('serialises the loader config onto the QPQLoaderConfig env var', () => {
-    setupRspackQPQRuntime(buildTestQpqConfig(), './build');
+    setupWebpackQPQRuntime(buildTestQpqConfig(), './build');
 
     const loaderConfig = JSON.parse(process.env.QPQLoaderConfig ?? '{}');
 

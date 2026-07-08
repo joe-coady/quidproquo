@@ -1,3 +1,3 @@
 export * from './getFederatedRemoteInfoForQpqConfig';
-export * from './getRspackConfigForQpqRemote';
+export * from './getWebpackConfigForQpqRemote';
 export * from './publishFederatedRemote';

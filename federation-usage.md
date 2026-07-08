@@ -29,10 +29,11 @@ no dedicated bucket or policy is created by federation.
 
 ## The pieces (all in the framework)
 
-- `getRspackConfigForQpqRemote(qpqConfig, buildPath)` — `quidproquo-deploy-webpack`.
-  Builds the service as an MF remote container (rspack). Append your own `module.rules`
-  (e.g. `builtin:swc-loader`) before running it.
-- `publishFederatedRemote(qpqConfig, buildPath, publishPath)` — `quidproquo-deploy-webpack`.
+- `getRspackConfigForQpqRemote(qpqConfig, buildPath)` — `quidproquo-deploy-rspack`, or
+  `getWebpackConfigForQpqRemote(qpqConfig, buildPath)` — `quidproquo-deploy-webpack`.
+  Builds the service as an MF remote container. Append your own `module.rules`
+  (e.g. `builtin:swc-loader` for rspack, ts-loader for webpack) before running it.
+- `publishFederatedRemote(qpqConfig, buildPath, publishPath)` — both deploy packages.
   Lays out the content-hash version dir + `manifest.json` (written last). Returns the manifest.
 - `defineFederatedModuleStore(storageDrive)` / `defineStorageDrive(...)` — `quidproquo-core`.
 - The lambda loader (`loadFederatedStory`) reads `<prefix>/manifest.json`, syncs the
@@ -41,9 +42,9 @@ no dedicated bucket or policy is created by federation.
 ## Build + publish flow
 
 ```ts
-const config = getRspackConfigForQpqRemote(qpqConfig, remoteBuildPath);
-config.module.rules.push(/* your builtin:swc-loader rule */);
-await runRspack(config);
+const config = getRspackConfigForQpqRemote(qpqConfig, remoteBuildPath); // or getWebpackConfigForQpqRemote
+config.module.rules.push(/* your builtin:swc-loader / ts-loader rule */);
+await runRspack(config); // or webpack(config, cb)
 
 const manifest = publishFederatedRemote(qpqConfig, remoteBuildPath, publishPath);
 // publishPath/<hash>/remoteEntry.js + chunks

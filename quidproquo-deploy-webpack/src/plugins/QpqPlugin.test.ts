@@ -1,29 +1,23 @@
 import { buildTestQpqConfig } from 'quidproquo-core';
 
 import path from 'path';
-import { describe, expect, it } from 'vitest';
-import type { Compiler } from '@rspack/core';
+import { describe, expect, it, vi } from 'vitest';
+import { Compiler } from 'webpack';
 
 import { QpqPlugin } from './QpqPlugin';
 
-// The plugin reads VirtualModulesPlugin off the compiler's own rspack instance
-// (npm-link safety), so the stub carries one.
-const buildCompilerStub = (): Compiler =>
-  ({
-    options: { resolve: {} },
-    rspack: {
-      experiments: {
-        VirtualModulesPlugin: class {
-          apply() {}
-        },
-      },
-    },
-  }) as unknown as Compiler;
+vi.mock('webpack-virtual-modules', () => ({
+  default: class {
+    apply() {}
+  },
+}));
+
+const buildCompilerStub = (): Compiler => ({ options: { resolve: {} } }) as unknown as Compiler;
 
 const dynamicLoaderPath = path.resolve('node_modules', 'quidproquo-dynamic-loader.js');
 
 describe('QpqPlugin', () => {
-  it('constructs a plugin instance exposing apply', () => {
+  it('constructs a webpack plugin instance exposing apply', () => {
     const plugin = new QpqPlugin({ qpqConfigs: [buildTestQpqConfig()], nodeModulePath: 'node_modules' });
 
     expect(plugin).toBeInstanceOf(QpqPlugin);

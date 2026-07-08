@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// The PUBLISH step. Takes a getRspackConfigForQpqRemote build output and turns it
+// The PUBLISH step. Takes a getWebpackConfigForQpqRemote build output and turns it
 // into the store layout the lambda loader expects. It does NOT upload - the caller
 // copies the result into s3://<bucket>/<service>/ (version dir first, manifest last).
 //
@@ -30,7 +30,7 @@ const listFilesRecursive = (dir: string, base: string = dir): string[] =>
 
 export const publishFederatedRemote = (qpqConfig: QPQConfig, remoteBuildPath: string, publishPath: string): FederatedModuleStoreManifest => {
   // The container name + the runtime->expose map that goes into the manifest. Re-derived
-  // from the same config the build used, so keys line up with what the build exposed.
+  // from the same config the build used, so keys line up with what webpack exposed.
   const { containerName, runtimeExposeMap } = getFederatedRemoteInfoForQpqConfig(qpqConfig);
 
   // 1. Enumerate the runtime files (drop build metadata) and sanity-check the container.
