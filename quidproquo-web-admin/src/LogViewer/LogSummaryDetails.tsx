@@ -1,4 +1,4 @@
-import { getUniqueKeyFromQpqFunctionRuntime, StoryResult } from 'quidproquo-core';
+import { getFederatedKeyFromQpqFunctionRuntime, StoryResult } from 'quidproquo-core';
 
 import { useState } from 'react';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
@@ -18,7 +18,7 @@ export const LogSummaryDetails = ({ log }: LogSummaryDetailsProps) => {
 
   const totalRuntime = new Date(log.finishedAt).getTime() - new Date(log.startedAt).getTime();
   const functionKey = log.qpqFunctionRuntimeInfo
-    ? getUniqueKeyFromQpqFunctionRuntime(log.qpqFunctionRuntimeInfo)
+    ? getFederatedKeyFromQpqFunctionRuntime(log.qpqFunctionRuntimeInfo)
     : runtimeTypeToCamelCase(log.runtimeType);
 
   return (

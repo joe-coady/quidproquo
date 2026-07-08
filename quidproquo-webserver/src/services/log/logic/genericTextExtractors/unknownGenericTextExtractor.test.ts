@@ -12,10 +12,10 @@ describe('unknownGenericTextExtractor', () => {
     expect(unknownGenericTextExtractor(buildStoryResult({ qpqFunctionRuntimeInfo: 'myFunction' as QpqFunctionRuntime }))).toEqual(['myFunction']);
   });
 
-  it('builds a unique key for an advanced runtime info', () => {
+  it('builds a relative key without the base path for an advanced runtime info', () => {
     const qpqFunctionRuntimeInfo = { basePath: 'src', relativePath: 'handlers', functionName: 'doThing' } as unknown as QpqFunctionRuntime;
 
-    expect(unknownGenericTextExtractor(buildStoryResult({ qpqFunctionRuntimeInfo }))).toEqual(['src/handlers::doThing']);
+    expect(unknownGenericTextExtractor(buildStoryResult({ qpqFunctionRuntimeInfo }))).toEqual(['handlers::doThing']);
   });
 
   it('returns a single empty string when there is no runtime info', () => {
