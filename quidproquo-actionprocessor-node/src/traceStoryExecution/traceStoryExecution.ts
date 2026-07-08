@@ -169,6 +169,7 @@ export const traceStoryExecution = async (
         replayMs,
         localsCaptureMs: rawTrace.stats.localsCaptureMs,
         instrumentMs: rawTrace.stats.instrumentMs,
+        instrumentedScriptUrls: rawTrace.stats.instrumentedScriptUrls,
       },
     };
 

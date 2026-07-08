@@ -1,10 +1,32 @@
 import { QpqExecutionTrace } from 'quidproquo-core';
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Box, Checkbox, Chip, FormControl, FormControlLabel, IconButton, MenuItem, Select, Slider, Tooltip, Typography } from '@mui/material';
+import {
+  Alert,
+  Box,
+  Checkbox,
+  Chip,
+  FormControl,
+  FormControlLabel,
+  IconButton,
+  MenuItem,
+  Select,
+  Slider,
+  TextField,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 
 import { LocalValueTree } from './LocalValueTree';
-import { buildLineAnnotations, formatLineAnnotation, getDefaultSourceIndex, getDisplaySourceNames, isExternalSourcePath } from './traceViewerLogic';
+import {
+  buildLineAnnotations,
+  formatLineAnnotation,
+  getDefaultSourceIndex,
+  getDisplaySourceNames,
+  isExternalSourcePath,
+  RETURNS_MATCH_NAME,
+  searchStepValues,
+} from './traceViewerLogic';
 
 interface TraceViewerProps {
   trace: QpqExecutionTrace;
@@ -13,11 +35,15 @@ interface TraceViewerProps {
   // tracer — a re-trace with it on never sets breakpoints outside the user's own code
   hideExternalSteps: boolean;
   onHideExternalStepsChange: (hideExternalSteps: boolean) => void;
+
+  // Tab-owned controls (the Re-run Trace button) rendered at the end of the header row
+  // so they don't need a row of their own
+  actions?: React.ReactNode;
 }
 
 // Layout notes (deliberate, don't regress):
 // - the slider row contains ONLY the prev/slider/next controls — any text that changes
-//   width as you scrub (step counter, function names) lives in the header row instead,
+//   width as you scrub (step counter, function names) lives in the rows above instead,
 //   so the slider never jumps under the pointer
 // - source paths are enormous (federated chunk files) — everything that shows one is
 //   width-bounded with tail-ellipsis (rtl trick keeps the distinguishing END visible)
@@ -46,9 +72,10 @@ const codeAreaStyle: React.CSSProperties = {
   borderRadius: 4,
 };
 
-export const TraceViewer: React.FC<TraceViewerProps> = ({ trace, hideExternalSteps, onHideExternalStepsChange }) => {
+export const TraceViewer: React.FC<TraceViewerProps> = ({ trace, hideExternalSteps, onHideExternalStepsChange, actions }) => {
   const [selectedSourceIndex, setSelectedSourceIndex] = useState(() => getDefaultSourceIndex(trace));
   const [selectedStepIndex, setSelectedStepIndex] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
   const highlightedLineRef = useRef<HTMLDivElement | null>(null);
 
   const annotations = useMemo(() => buildLineAnnotations(trace, selectedSourceIndex), [trace, selectedSourceIndex]);
@@ -76,6 +103,39 @@ export const TraceViewer: React.FC<TraceViewerProps> = ({ trace, hideExternalSte
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedPosition, visibleStepIndexes]);
 
+  // Value search — which (visible) steps carry the query in a variable name, preview,
+  // or deep json capture. Ordered, so the first match is where the value first appears.
+  const matches = useMemo(() => searchStepValues(trace, searchQuery, visibleStepIndexes), [trace, searchQuery, visibleStepIndexes]);
+  const matchStepIndexes = useMemo(() => matches.map((match) => match.stepIndex), [matches]);
+  const currentMatchNumber = matchStepIndexes.indexOf(selectedStepIndex) + 1;
+
+  const goToMatch = (direction: 1 | -1) => {
+    if (matchStepIndexes.length === 0) {
+      return;
+    }
+    if (direction === 1) {
+      const next = matchStepIndexes.find((stepIndex) => stepIndex > selectedStepIndex);
+      setSelectedStepIndex(next ?? matchStepIndexes[0]);
+    } else {
+      const previous = [...matchStepIndexes].reverse().find((stepIndex) => stepIndex < selectedStepIndex);
+      setSelectedStepIndex(previous ?? matchStepIndexes[matchStepIndexes.length - 1]);
+    }
+  };
+
+  // Match marks on the scrubber — where the searched value lives across the run
+  const matchMarks = useMemo(() => {
+    const positionByStepIndex = new Map(visibleStepIndexes.map((stepIndex, position) => [stepIndex, position]));
+    return matches.flatMap((match) => {
+      const position = positionByStepIndex.get(match.stepIndex);
+      return position === undefined ? [] : [{ value: position }];
+    });
+  }, [matches, visibleStepIndexes]);
+
+  const selectedStepMatchedNames = useMemo(
+    () => new Set(matches.find((match) => match.stepIndex === selectedStepIndex)?.matchedNames ?? []),
+    [matches, selectedStepIndex],
+  );
+
   const selectedStep = trace.steps[selectedStepIndex];
   const source = trace.sources[selectedSourceIndex];
   const sourceLines = useMemo(() => (source?.content ? source.content.split('\n') : null), [source]);
@@ -97,7 +157,7 @@ export const TraceViewer: React.FC<TraceViewerProps> = ({ trace, hideExternalSte
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, height: '100%' }}>
-      {/* header row — source picker, stats, and the step indicator's stable home */}
+      {/* header row — source picker, stats, and the tab's actions (Re-run Trace) */}
       <Box sx={{ alignItems: 'center', display: 'flex', gap: 1, minWidth: 0 }}>
         {trace.sources.length > 1 ? (
           <FormControl size="small" sx={{ flexShrink: 0, width: 280 }}>
@@ -130,6 +190,17 @@ export const TraceViewer: React.FC<TraceViewerProps> = ({ trace, hideExternalSte
         <Chip label={`${trace.steps.length} steps`} size="small" sx={{ flexShrink: 0 }} />
         <Chip label={`${trace.stats.replayMs}ms replay`} size="small" sx={{ flexShrink: 0 }} />
         {trace.stats.instrumentMs !== undefined && <Chip label={`${trace.stats.instrumentMs}ms setup`} size="small" sx={{ flexShrink: 0 }} />}
+        {trace.stats.instrumentedScriptUrls && (
+          <Tooltip
+            title={
+              <span style={{ whiteSpace: 'pre-line' }}>
+                {`Scripts that received breakpoints — steps are only recorded in these:\n${trace.stats.instrumentedScriptUrls.join('\n')}`}
+              </span>
+            }
+          >
+            <Chip label={`${trace.stats.instrumentedScriptUrls.length} scripts traced`} size="small" sx={{ flexShrink: 0 }} />
+          </Tooltip>
+        )}
         {trace.truncated && <Chip color="warning" label="truncated - step budget hit" size="small" sx={{ flexShrink: 0 }} />}
 
         <Tooltip title="Hide steps in framework / node_modules code — scrub only through this service's own source">
@@ -139,6 +210,43 @@ export const TraceViewer: React.FC<TraceViewerProps> = ({ trace, hideExternalSte
             sx={{ flexShrink: 0, ml: 0.5, mr: 0 }}
           />
         </Tooltip>
+
+        <Box sx={{ flex: 1 }} />
+
+        {actions}
+      </Box>
+
+      {/* search row — find where a value appears across the trace's variables; also the
+          step indicator's stable home (it changes width while scrubbing, so it must not
+          share a row with the slider) */}
+      <Box sx={{ alignItems: 'center', display: 'flex', gap: 1, px: 1 }}>
+        <TextField
+          onChange={(event) => setSearchQuery(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter') {
+              goToMatch(1);
+            }
+          }}
+          placeholder="Find in variables — names, values, nested json"
+          size="small"
+          sx={{ width: 380 }}
+          value={searchQuery}
+        />
+        <IconButton disabled={matchStepIndexes.length === 0} onClick={() => goToMatch(-1)} size="small">
+          ◀
+        </IconButton>
+        <IconButton disabled={matchStepIndexes.length === 0} onClick={() => goToMatch(1)} size="small">
+          ▶
+        </IconButton>
+        {searchQuery && (
+          <Typography color="text.secondary" variant="caption">
+            {matchStepIndexes.length === 0
+              ? 'no matches'
+              : currentMatchNumber > 0
+                ? `match ${currentMatchNumber} of ${matchStepIndexes.length} steps`
+                : `${matchStepIndexes.length} matching steps`}
+          </Typography>
+        )}
 
         <Box sx={{ flex: 1 }} />
 
@@ -156,10 +264,12 @@ export const TraceViewer: React.FC<TraceViewerProps> = ({ trace, hideExternalSte
           ◀
         </IconButton>
         <Slider
+          marks={matchMarks.length > 0 ? matchMarks : undefined}
           max={Math.max(visibleStepIndexes.length - 1, 0)}
           min={0}
           onChange={(event, value) => setSelectedStepIndex(visibleStepIndexes[value as number])}
           size="small"
+          sx={{ '& .MuiSlider-mark': { backgroundColor: 'warning.main', height: 8, width: 2 } }}
           value={Math.max(selectedPosition, 0)}
           valueLabelDisplay="auto"
           valueLabelFormat={(position) => `step ${position + 1}`}
@@ -259,12 +369,26 @@ export const TraceViewer: React.FC<TraceViewerProps> = ({ trace, hideExternalSte
           </Box>
           <Box sx={{ flex: 1, fontFamily: monoFont, fontSize: '12px', lineHeight: '18px', overflow: 'auto', p: 1 }}>
             {selectedStep?.returnValue && (
-              <div style={{ borderBottom: '1px solid rgba(128, 128, 128, 0.3)', marginBottom: 4, paddingBottom: 4 }}>
-                <LocalValueTree name="→ returns" value={selectedStep.returnValue} />
+              <div
+                style={{
+                  borderBottom: '1px solid rgba(128, 128, 128, 0.3)',
+                  marginBottom: 4,
+                  paddingBottom: 4,
+                  ...(selectedStepMatchedNames.has(RETURNS_MATCH_NAME) ? { backgroundColor: 'rgba(255, 200, 0, 0.18)' } : {}),
+                }}
+              >
+                <LocalValueTree name={RETURNS_MATCH_NAME} value={selectedStep.returnValue} />
               </div>
             )}
             {selectedStep ? (
-              Object.entries(selectedStep.locals).map(([name, value]) => <LocalValueTree key={name} name={name} value={value} />)
+              Object.entries(selectedStep.locals).map(([name, value]) => (
+                <div
+                  key={name}
+                  style={selectedStepMatchedNames.has(name) ? { backgroundColor: 'rgba(255, 200, 0, 0.18)', borderRadius: 2 } : undefined}
+                >
+                  <LocalValueTree name={name} value={value} />
+                </div>
+              ))
             ) : (
               <Typography color="text.secondary" variant="caption">
                 No step selected

@@ -4,7 +4,7 @@ import { WebSocketQueueQpqAdminServerEventMessageTraceDone, WebSocketQueueQpqAdm
 
 import React, { useEffect, useRef, useState } from 'react';
 import TroubleshootIcon from '@mui/icons-material/Troubleshoot';
-import { Alert, Box, Button, LinearProgress, Tooltip, Typography } from '@mui/material';
+import { Alert, Box, Button, Checkbox, FormControlLabel, LinearProgress, Tooltip, Typography } from '@mui/material';
 
 import { getLogTrace } from '../../../logic';
 import { TraceViewer } from '../../../TraceViewer';
@@ -35,10 +35,11 @@ export const TraceTab: React.FC<TraceTabProps> = ({ log, isVisible }) => {
   const [hasRequested, setHasRequested] = useState(false);
   const [hasCheckedForStoredTrace, setHasCheckedForStoredTrace] = useState(false);
 
-  // The viewer's "My code only" checkbox — held here so Re-run Trace can send it: a
-  // re-trace with it on sets no breakpoints outside the user's own code, spending the
-  // whole step budget on user statements
-  const [hideExternalSteps, setHideExternalSteps] = useState(false);
+  // "My code only" — held here so Begin Trace / Re-run Trace can send it: a trace with
+  // it on sets no breakpoints outside the user's own code. Every step pause freezes the
+  // replay for several inspector round trips, so full traces of real bundles burn the
+  // whole wall-clock budget on framework glue — own-code-only is the sane default.
+  const [hideExternalSteps, setHideExternalSteps] = useState(true);
 
   // The request a stale async response must not clobber (rapid re-runs, dialog reuse)
   const requestVersionRef = useRef(0);
@@ -177,7 +178,19 @@ export const TraceTab: React.FC<TraceTabProps> = ({ log, isVisible }) => {
               down to the {QpqRuntimeType.EXECUTE_STORY} runs it triggered and trace those instead.
             </Alert>
           )}
-          <Button disabled={!isTraceable} onClick={() => requestTrace({})} variant="contained">
+          {isTraceable && (
+            <Box sx={{ mb: 1 }}>
+              <FormControlLabel
+                control={<Checkbox checked={hideExternalSteps} onChange={(event) => setHideExternalSteps(event.target.checked)} size="small" />}
+                label={
+                  <Typography variant="body2">
+                    My code only — trace just this service&apos;s own source (much faster; framework internals get no steps)
+                  </Typography>
+                }
+              />
+            </Box>
+          )}
+          <Button disabled={!isTraceable} onClick={() => requestTrace({ onlyOwnCode: hideExternalSteps })} variant="contained">
             Begin Trace
           </Button>
           {isTraceable && (
@@ -191,17 +204,21 @@ export const TraceTab: React.FC<TraceTabProps> = ({ log, isVisible }) => {
   }
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', pb: 1 }}>
-        <Tooltip title={hideExternalSteps ? 'Re-traces with breakpoints only in your own code — the whole step budget goes to your statements' : ''}>
-          <Button onClick={() => requestTrace({ refresh: true, onlyOwnCode: hideExternalSteps })} size="small">
-            Re-run Trace{hideExternalSteps ? ' (my code only)' : ''}
-          </Button>
-        </Tooltip>
-      </Box>
-      <Box sx={{ flex: 1, minHeight: 0 }}>
-        <TraceViewer hideExternalSteps={hideExternalSteps} onHideExternalStepsChange={setHideExternalSteps} trace={trace} />
-      </Box>
+    <Box sx={{ height: '100%' }}>
+      <TraceViewer
+        actions={
+          <Tooltip
+            title={hideExternalSteps ? 'Re-traces with breakpoints only in your own code — the whole step budget goes to your statements' : ''}
+          >
+            <Button onClick={() => requestTrace({ refresh: true, onlyOwnCode: hideExternalSteps })} size="small" sx={{ flexShrink: 0 }}>
+              Re-run Trace{hideExternalSteps ? ' (my code only)' : ''}
+            </Button>
+          </Tooltip>
+        }
+        hideExternalSteps={hideExternalSteps}
+        onHideExternalStepsChange={setHideExternalSteps}
+        trace={trace}
+      />
     </Box>
   );
 };

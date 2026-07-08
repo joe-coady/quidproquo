@@ -149,6 +149,94 @@ describe('traceStoryExecution', () => {
     expect(trace.steps.length).toBeLessThan(10);
   });
 
+  it('traces a story exported through a factory wrapper defined in a different module (sibling chunks)', async () => {
+    // Mirrors the dynamicRoute pattern: the exported story is a wrapper CREATED inside
+    // a shared/vendor module, so [[FunctionLocation]] points at the wrapper's file — the
+    // real story body lives in a sibling file that must still be traced.
+    const wrapperFactorySource = `
+function wrapRoute(runtime) {
+  const wrapper = function* wrapper(input) {
+    const result = yield* runtime(input);
+    return { wrapped: result };
+  };
+  return wrapper;
+}
+module.exports = { wrapRoute };
+`;
+
+    const innerStorySource = `
+function* askGenerateSecret(seed) {
+  const guid = yield { type: 'TestGuid::New' };
+  const secret = 'ca_' + guid + '_' + seed;
+  return secret;
+}
+module.exports = { askGenerateSecret };
+`;
+
+    const routeSource = `
+const { wrapRoute } = require('./wrapperFactory.js');
+const { askGenerateSecret } = require('./innerStory.js');
+module.exports = { generate: wrapRoute(askGenerateSecret) };
+`;
+
+    fs.writeFileSync(path.join(fixtureDirectory, 'wrapperFactory.js'), wrapperFactorySource);
+    fs.writeFileSync(path.join(fixtureDirectory, 'innerStory.js'), innerStorySource);
+    fs.writeFileSync(path.join(fixtureDirectory, 'route.js'), routeSource);
+
+    const story = fixtureRequire(path.join(fixtureDirectory, 'route.js')).generate;
+    const recording = buildRecordedResult(['seed-1'], [{ res: actionResult('guid-9') }]);
+
+    // Deliberately NO scriptPatterns — sibling-directory detection must cover it
+    const { trace, replay } = await traceStoryExecution(recording, story);
+
+    expect(replay.result).toEqual({ wrapped: 'ca_guid-9_seed-1' });
+
+    // Both the wrapper's module and the inner story's sibling module were instrumented
+    expect(trace.stats.instrumentedScriptUrls?.some((url) => url.includes('wrapperFactory.js'))).toBe(true);
+    expect(trace.stats.instrumentedScriptUrls?.some((url) => url.includes('innerStory.js'))).toBe(true);
+
+    // The inner story's statements were recorded — the secret's birth step is findable
+    const secretStep = trace.steps.find((step) => step.locals.secret?.preview === '"ca_guid-9_seed-1"');
+    expect(secretStep).toBeDefined();
+    expect(secretStep?.functionName).toBe('askGenerateSecret');
+
+    // And the wrapper's own statements too
+    expect(trace.steps.some((step) => step.functionName === 'wrapper')).toBe(true);
+  });
+
+  it('traces code beyond the getPossibleBreakpoints response cap (huge bundle chunks)', async () => {
+    // Debugger.getPossibleBreakpoints caps its response (~1000 locations), so on a real
+    // bundle chunk a single call covers only the top of the file — code below the cap
+    // silently got no breakpoints. Bury the story under enough LIVE statements (exported,
+    // so V8 keeps them and reports their positions) to blow the cap and assert the
+    // story's steps still get recorded (the worker must paginate).
+    const fillerCount = 1500;
+    const filler = Array.from({ length: fillerCount }, (_, i) => `function filler${i}() { return ${i}; }`).join('\n');
+    const fillerRefs = Array.from({ length: fillerCount }, (_, i) => `filler${i}`).join(',');
+    const buriedStorySource = `${filler}
+function* askBuried(seed) {
+  const guid = yield { type: 'TestGuid::New' };
+  const secret = 'ca_' + guid + '_' + seed;
+  return secret;
+}
+module.exports = { askBuried, fillers: [${fillerRefs}] };
+`;
+    const storyPath = path.join(fixtureDirectory, 'buriedStory.js');
+    fs.writeFileSync(storyPath, buriedStorySource);
+    const story = fixtureRequire(storyPath).askBuried;
+
+    const recording = buildRecordedResult(['seed-1'], [{ res: actionResult('guid-9') }]);
+    const { trace, replay } = await traceStoryExecution(recording, story);
+
+    expect(replay.result).toBe('ca_guid-9_seed-1');
+    // Well past a single un-paginated page
+    expect(trace.stats.breakpoints).toBeGreaterThan(1500);
+
+    const secretStep = trace.steps.find((step) => step.locals.secret?.preview === '"ca_guid-9_seed-1"');
+    expect(secretStep).toBeDefined();
+    expect(secretStep?.functionName).toBe('askBuried');
+  });
+
   it('maps steps back to original TypeScript lines and content via source maps', async () => {
     const mappedStoryTs = [
       'export function* askDouble(seed: number): Generator<any, number, any> {',

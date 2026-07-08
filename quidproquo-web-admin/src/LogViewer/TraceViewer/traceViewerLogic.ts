@@ -90,6 +90,48 @@ export const getDisplaySourceNames = (paths: string[]): string[] => {
   return paths.map((path) => path.slice(cutAt) || path);
 };
 
+// One step whose captured values matched a search, with the locals that matched —
+// RETURNS_MATCH_NAME stands in for a matching return value.
+export interface TraceValueMatch {
+  stepIndex: number;
+  matchedNames: string[];
+}
+
+export const RETURNS_MATCH_NAME = '→ returns';
+
+// Case-insensitive substring search across every captured value of the given steps —
+// variable names, preview strings, and the deep json captures (values a preview clamps
+// or nests can still be found). stepIndexes ordered → matches come back ordered, so the
+// FIRST match is where a generated value first appears in the execution.
+export const searchStepValues = (trace: QpqExecutionTrace, query: string, stepIndexes: number[]): TraceValueMatch[] => {
+  const loweredQuery = query.toLowerCase();
+  if (!loweredQuery) {
+    return [];
+  }
+
+  const valueMatches = (value: QpqExecutionTraceValue): boolean =>
+    value.preview.toLowerCase().includes(loweredQuery) || (value.json !== undefined && value.json.toLowerCase().includes(loweredQuery));
+
+  const matches: TraceValueMatch[] = [];
+  for (const stepIndex of stepIndexes) {
+    const step = trace.steps[stepIndex];
+
+    const matchedNames = Object.entries(step.locals)
+      .filter(([name, value]) => name.toLowerCase().includes(loweredQuery) || valueMatches(value))
+      .map(([name]) => name);
+
+    if (step.returnValue && valueMatches(step.returnValue)) {
+      matchedNames.push(RETURNS_MATCH_NAME);
+    }
+
+    if (matchedNames.length > 0) {
+      matches.push({ stepIndex, matchedNames });
+    }
+  }
+
+  return matches;
+};
+
 // "Your code" vs framework/dependency code, the same way devtools ignore-listing draws
 // the line: anything that resolved into node_modules is external. Unmapped generated
 // chunks (no node_modules in a file:///tmp/... url) stay visible — they mix user and

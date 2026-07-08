@@ -2,7 +2,15 @@ import { QpqExecutionTrace, QpqExecutionTraceValue } from 'quidproquo-core';
 
 import { describe, expect, it } from 'vitest';
 
-import { buildLineAnnotations, formatLineAnnotation, getDefaultSourceIndex, getDisplaySourceNames, isExternalSourcePath } from './traceViewerLogic';
+import {
+  buildLineAnnotations,
+  formatLineAnnotation,
+  getDefaultSourceIndex,
+  getDisplaySourceNames,
+  isExternalSourcePath,
+  RETURNS_MATCH_NAME,
+  searchStepValues,
+} from './traceViewerLogic';
 
 const v = (preview: string, json?: string): QpqExecutionTraceValue => (json === undefined ? { preview } : { preview, json });
 
@@ -147,6 +155,38 @@ describe('getDefaultSourceIndex', () => {
 
   it('falls back to zero for an empty trace', () => {
     expect(getDefaultSourceIndex(buildTrace([]))).toBe(0);
+  });
+});
+
+describe('searchStepValues', () => {
+  const allIndexes = (trace: QpqExecutionTrace) => trace.steps.map((step, stepIndex) => stepIndex);
+
+  it('finds a value in a preview, case-insensitively, reporting the matched local', () => {
+    const trace = buildTrace([{ locals: { code: v("'CA_3c83'") } }, { locals: { other: v("'nope'") } }, { locals: { copy: v("'ca_3c83'") } }]);
+
+    expect(searchStepValues(trace, 'ca_3C83', allIndexes(trace))).toEqual([
+      { stepIndex: 0, matchedNames: ['code'] },
+      { stepIndex: 2, matchedNames: ['copy'] },
+    ]);
+  });
+
+  it('finds values nested in the deep json capture that the preview clamps away', () => {
+    const trace = buildTrace([{ locals: { payload: v('{…}', '{"inner":{"token":"ca_deadbeef"}}') } }]);
+
+    expect(searchStepValues(trace, 'ca_deadbeef', allIndexes(trace))).toEqual([{ stepIndex: 0, matchedNames: ['payload'] }]);
+  });
+
+  it('matches variable names and return values', () => {
+    const trace = buildTrace([{ locals: { authCode: v("'x'") }, returnValue: v("'the authCode'") }]);
+
+    expect(searchStepValues(trace, 'authcode', allIndexes(trace))).toEqual([{ stepIndex: 0, matchedNames: ['authCode', RETURNS_MATCH_NAME] }]);
+  });
+
+  it('only searches the given step indexes and returns nothing for an empty query', () => {
+    const trace = buildTrace([{ locals: { code: v("'needle'") } }, { locals: { code: v("'needle'") } }]);
+
+    expect(searchStepValues(trace, 'needle', [1])).toEqual([{ stepIndex: 1, matchedNames: ['code'] }]);
+    expect(searchStepValues(trace, '', allIndexes(trace))).toEqual([]);
   });
 });
 

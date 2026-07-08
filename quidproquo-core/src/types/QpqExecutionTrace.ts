@@ -58,6 +58,10 @@ export interface QpqExecutionTraceStats {
 
   // Setup time before the replay could start (domain enable + breakpoint installation)
   instrumentMs?: number;
+
+  // Urls of every script that received breakpoints (steps can only be recorded in
+  // these) — the first thing to check when expected code is missing from a trace
+  instrumentedScriptUrls?: string[];
 }
 
 export interface QpqExecutionTrace {

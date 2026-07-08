@@ -89,6 +89,21 @@ export function traceControllerWorkerMain(): void {
   const scriptUrlsById = new Map<string, string>();
   const instrumentedScriptIds = new Set<string>();
 
+  // The directory of the story function's own script (set during init). Bundles are
+  // chunk-SPLIT: a story exported through a factory wrapper (export const x = wrap(story))
+  // has its function object created in the FACTORY's chunk, while the code it runs lives
+  // in sibling chunks — so every script in the same directory is traced too. This covers
+  // any bundle layout (federated /tmp cache, lambda shell, dev-server dist) without
+  // needing an environment-specific pattern.
+  let storyScriptDirUrl = '';
+
+  // CJS require() scripts get plain-path urls, ESM imports get file:// urls — the same
+  // directory can appear both ways in one process, so compare scheme-stripped.
+  const normalizeScriptUrl = (url: string): string => url.replace(/^file:\/\//, '').replace(/\\/g, '/');
+
+  const isTraceTargetUrl = (url: string): boolean =>
+    !!url && (scriptPatterns.some((pattern) => pattern.test(url)) || (!!storyScriptDirUrl && normalizeScriptUrl(url).startsWith(storyScriptDirUrl)));
+
   const steps: TraceRawStep[] = [];
   let pauses = 0;
   let breakpoints = 0;
@@ -284,22 +299,54 @@ export function traceControllerWorkerMain(): void {
     });
   };
 
+  // getPossibleBreakpoints CAPS its response (~1000 locations) when the range is large —
+  // on a real bundle chunk (tens of thousands of lines) a single call covers only the
+  // top of the file and everything below it silently gets no breakpoints. Page through
+  // the script, restarting just past the last returned location, until a page comes back
+  // empty or stops advancing.
+  const getAllPossibleBreakpoints = (scriptId: string): Promise<any[]> => {
+    const allLocations: any[] = [];
+
+    const readPage = (startLine: number, startColumn: number): Promise<any[]> =>
+      post('Debugger.getPossibleBreakpoints', { start: { scriptId, lineNumber: startLine, columnNumber: startColumn } }).then((response: any) => {
+        const locations = response.locations || [];
+        if (locations.length === 0) return allLocations;
+
+        locations.forEach((location: any) => allLocations.push(location));
+
+        const last = locations[locations.length - 1];
+        const nextLine = last.lineNumber;
+        const nextColumn = (last.columnNumber || 0) + 1;
+        if (nextLine < startLine || (nextLine === startLine && nextColumn <= startColumn)) return allLocations;
+
+        return readPage(nextLine, nextColumn);
+      });
+
+    return readPage(0, 0);
+  };
+
   const instrumentScript = (scriptId: string): Promise<void> => {
     if (instrumentedScriptIds.has(scriptId)) return Promise.resolve();
     instrumentedScriptIds.add(scriptId);
 
-    return post('Debugger.getPossibleBreakpoints', { start: { scriptId, lineNumber: 0, columnNumber: 0 } })
-      .then((response: any) => filterLocationsViaParent(scriptId, response.locations || []))
+    return getAllPossibleBreakpoints(scriptId)
+      .then((locations: any[]) => filterLocationsViaParent(scriptId, locations))
       .then((locations: any[]) => {
         // PIPELINED, not chained: a service's chunks can hold tens of thousands of
         // statement positions, and awaiting each setBreakpoint round-trip serially made
         // instrumentation the dominant setup cost (it blew the ready timeout on real
         // services). The session queues the posts; the backend processes them in order.
+        // Per-location failures are tolerated: nearby candidate positions can RESOLVE to
+        // the same actual breakpoint ("already exists") — one lost position must not
+        // abort the whole trace.
         return Promise.all(
           locations.map((location: any) =>
-            post('Debugger.setBreakpoint', { location }).then(() => {
-              breakpoints += 1;
-            }),
+            post('Debugger.setBreakpoint', { location }).then(
+              () => {
+                breakpoints += 1;
+              },
+              () => undefined,
+            ),
           ),
         ).then(() => undefined);
       });
@@ -311,7 +358,7 @@ export function traceControllerWorkerMain(): void {
 
     // A traced bundle chunk loaded mid-story (async-node chunk loading) — instrument it
     // as it appears so its statements are traced too.
-    if (ready && url && scriptPatterns.some((pattern) => pattern.test(url))) {
+    if (ready && isTraceTargetUrl(url)) {
       instrumentScript(message.params.scriptId).catch(fatal);
     }
   });
@@ -375,11 +422,15 @@ export function traceControllerWorkerMain(): void {
       scriptUrlsById.forEach((url, scriptId) => {
         scripts[scriptId] = url;
       });
+      const instrumentedScriptUrls: string[] = [];
+      instrumentedScriptIds.forEach((scriptId) => {
+        instrumentedScriptUrls.push(scriptUrlsById.get(scriptId) || scriptId);
+      });
       parentPort.postMessage({
         type: 'trace',
         steps,
         scripts,
-        stats: { pauses, breakpoints, localsCaptureMs, truncated, instrumentMs },
+        stats: { pauses, breakpoints, localsCaptureMs, truncated, instrumentMs, instrumentedScriptUrls },
       });
     }
   });
@@ -400,9 +451,15 @@ export function traceControllerWorkerMain(): void {
     })
     .then((storyFunctionScriptId: string | null) => {
       const targetScriptIds = new Set<string>();
-      if (storyFunctionScriptId) targetScriptIds.add(storyFunctionScriptId);
+      if (storyFunctionScriptId) {
+        targetScriptIds.add(storyFunctionScriptId);
+
+        const storyScriptUrl = normalizeScriptUrl(scriptUrlsById.get(storyFunctionScriptId) || '');
+        storyScriptDirUrl = storyScriptUrl.slice(0, storyScriptUrl.lastIndexOf('/') + 1);
+      }
+
       scriptUrlsById.forEach((url, scriptId) => {
-        if (url && scriptPatterns.some((pattern) => pattern.test(url))) targetScriptIds.add(scriptId);
+        if (isTraceTargetUrl(url)) targetScriptIds.add(scriptId);
       });
 
       if (targetScriptIds.size === 0) {
