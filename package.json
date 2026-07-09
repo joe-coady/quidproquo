@@ -56,6 +56,7 @@
     "quidproquo-deploy-webpack",
     "quidproquo-deploy-rspack",
     "quidproquo-deploy-awscdk",
+    "quidproquo-cli",
     "quidproquo-web",
     "quidproquo-actionprocessor-web",
     "quidproquo-web-react",
