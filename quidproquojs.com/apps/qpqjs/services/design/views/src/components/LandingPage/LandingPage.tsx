@@ -1,0 +1,21 @@
+// federated.export: This file will be exported using module federation
+
+import './landing.css';
+
+import { Features } from './components/Features';
+import { Footer } from './components/Footer';
+import { Hero } from './components/Hero';
+import { Packages } from './components/Packages';
+import { Pipeline } from './components/Pipeline';
+import { YieldLoop } from './components/YieldLoop';
+
+export const LandingPage = () => (
+  <main>
+    <Hero />
+    <Features />
+    <YieldLoop />
+    <Pipeline />
+    <Packages />
+    <Footer />
+  </main>
+);

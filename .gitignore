@@ -28,3 +28,5 @@ tests/**/*
 coverage/
 
 dist/
+
+cdk.context.json

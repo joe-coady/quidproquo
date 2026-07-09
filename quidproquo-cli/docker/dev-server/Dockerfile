@@ -14,11 +14,23 @@ WORKDIR /app
 
 # Runtime deps (package.json is the consumer root's, with workspaces/scripts
 # stripped by the assemble step). Slow but correct: natives compile for linux.
+# vendor/ must be present before the install: consumers on file: refs have
+# their quidproquo deps rewritten to file:./vendor/<pkg> so npm can resolve
+# them (and their transitive deps) inside the context.
+COPY vendor/ ./vendor/
 COPY package.json ./
 RUN npm install --omit=dev
 
-# Overlay the locally-built quidproquo packages over the registry installs.
-COPY vendor/ ./node_modules/
+# Overlay the locally-built quidproquo packages over the installed ones.
+# npm leaves file:./vendor deps as symlinks and registry deps as real
+# directories — rm+cp replaces either shape with the vendored code (a plain
+# COPY cannot write a directory over a symlink).
+RUN set -e; for d in ./vendor/*/; do \
+      [ -d "$d" ] || continue; \
+      pkg="$(basename "$d")"; \
+      rm -rf "./node_modules/$pkg"; \
+      cp -a "$d" "./node_modules/$pkg"; \
+    done
 
 COPY server/ ./server/
 COPY web/ ./web/

@@ -1,0 +1,23 @@
+{
+  "extends": "quidproquo-tsconfig/tsconfig.base.json",
+  "compileOnSave": false,
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "module": "commonjs",
+    "rootDir": ".",
+    "declaration": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "baseUrl": ".",
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "noPropertyAccessFromIndexSignature": false
+  },
+  "exclude": [
+    "node_modules",
+    "tmp"
+  ]
+}

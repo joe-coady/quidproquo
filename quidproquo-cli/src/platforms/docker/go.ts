@@ -33,14 +33,25 @@ const getImageContextDir = (root: string, appName: string): string => path.join(
 // needs: runtime dependencies (+ overrides). Workspaces/scripts/devDeps are
 // host-only concerns — the workspace packages themselves are bundled into the
 // server bundle from source.
+//
+// quidproquo deps declared as file: refs (a consumer living beside the qpq
+// monorepo) point outside the image context, where npm install would leave
+// dangling symlinks — rewrite them to the vendored copies inside the context.
 const writeImagePackageJson = (root: string, contextDir: string): void => {
   const rootPackageJson = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
+
+  const dependencies: Record<string, string> = { ...(rootPackageJson.dependencies ?? {}) };
+  for (const [name, version] of Object.entries(dependencies)) {
+    if (name.startsWith('quidproquo') && version.startsWith('file:')) {
+      dependencies[name] = `file:./vendor/${name}`;
+    }
+  }
 
   const imagePackageJson = {
     name: `${rootPackageJson.name}-qpq-docker`,
     version: rootPackageJson.version ?? '0.0.0',
     private: true,
-    dependencies: rootPackageJson.dependencies ?? {},
+    dependencies,
     overrides: rootPackageJson.overrides,
   };
 
