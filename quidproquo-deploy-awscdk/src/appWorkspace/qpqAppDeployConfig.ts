@@ -10,8 +10,10 @@ export interface QpqAppDeployEnvironment {
   // config change instead of a different command.
   platform?: string;
 
-  accountId: string;
-  region: string;
+  // Platform-specific identity — aws needs both; other platforms (e.g. docker)
+  // may need neither.
+  accountId?: string;
+  region?: string;
 }
 
 export interface QpqAppDeployConfig {

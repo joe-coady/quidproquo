@@ -26,6 +26,12 @@ export type DevServerConfig = {
   // File storage configuration (optional)
   fileStorageConfig?: OptionalFileStorageConfig;
 
+  // Serve pre-built views from this directory (optional — used by the docker
+  // platform image). Layout mirrors the AWS buckets: <webRoot>/website is the
+  // module-federation host (shell) served at /, <webRoot>/views/<svc> are the
+  // remotes. Unknown GET paths fall back to the shell's index.html (SPA).
+  webRoot?: string;
+
   // Service name to use for logging (optional)
   logServiceName?: string;
 
@@ -46,6 +52,9 @@ export type ResolvedDevServerConfig = {
 
   // File storage configuration (required with all defaults filled)
   fileStorageConfig: FileStorageConfig;
+
+  // Serve pre-built views from this directory (see DevServerConfig.webRoot).
+  webRoot?: string;
 
   // Service name to use for logging (optional)
   logServiceName?: string;

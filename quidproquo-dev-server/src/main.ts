@@ -47,6 +47,8 @@ const resolveDevServerConfig = (devServerConfig: DevServerConfig, devServerConfi
       secureUrlSecret: devServerConfig.fileStorageConfig?.secureUrlSecret || crypto.randomBytes(32).toString('hex'),
     },
 
+    webRoot: devServerConfig.webRoot,
+
     logServiceName: devServerConfig.logServiceName,
 
     delay: devServerConfig.delay,

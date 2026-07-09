@@ -4,6 +4,7 @@ import { DeployPlan } from '../lib/deployPrompts';
 
 export enum QpqDeployPlatform {
   aws = 'aws',
+  docker = 'docker',
 }
 
 // A deploy platform driver — everything that happens after "what to deploy"

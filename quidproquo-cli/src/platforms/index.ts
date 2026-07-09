@@ -1,8 +1,10 @@
 import { awsPlatformDriver } from './aws';
+import { dockerPlatformDriver } from './docker';
 import { QpqDeployPlatform, QpqPlatformDriver } from './types';
 
 const platformDrivers: Record<string, QpqPlatformDriver> = {
   [QpqDeployPlatform.aws]: awsPlatformDriver,
+  [QpqDeployPlatform.docker]: dockerPlatformDriver,
 };
 
 // Lenient lookup for best-effort paths (local dev priming) — undefined when

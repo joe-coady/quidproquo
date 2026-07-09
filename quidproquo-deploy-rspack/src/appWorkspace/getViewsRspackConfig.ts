@@ -121,6 +121,18 @@ export const getViewsRspackConfig = (viewsDir: string): Configuration => {
     }
   };
 
+  // Same-origin remote base for single-host deploys (the docker platform
+  // image): QPQ_VIEWS_REMOTE_BASE='/views' makes every remote resolve
+  // root-relative against whatever origin serves the bundle — shell at /,
+  // remotes at <base>/<svc> — instead of localhost ports or the AWS domains.
+  const remoteBase = process.env.QPQ_VIEWS_REMOTE_BASE;
+
+  const getRemoteBaseUrl = (service: string): string | null => {
+    if (isDev) return `http://localhost:${siblings.find((sib) => sib.service === service)?.port}`;
+    if (remoteBase) return service === 'shell' ? '' : `${remoteBase}/${service}`;
+    return getProdBaseUrl(service);
+  };
+
   // Remotes: alias -> mfName@<base>/mf-manifest.json (dev = localhost ports).
   // ONLY siblings that actually expose something — an app with no exposes emits a
   // consumer-style manifest with no remoteEntry, and registering it as a remote
@@ -128,8 +140,8 @@ export const getViewsRspackConfig = (viewsDir: string): Configuration => {
   const remotes: Record<string, string> = {};
   for (const sib of siblings) {
     if (Object.keys(scanFederatedExposes(sib.viewsDir)).length === 0) continue;
-    const baseUrl = isDev ? `http://localhost:${sib.port}` : getProdBaseUrl(sib.service);
-    if (!baseUrl) continue;
+    const baseUrl = getRemoteBaseUrl(sib.service);
+    if (baseUrl === null) continue;
     remotes[sib.alias] = `${sib.mfName}@${baseUrl}/mf-manifest.json`;
   }
 

@@ -61,7 +61,9 @@ export const apiImplementation = async (devServerConfig: ResolvedDevServerConfig
 
   console.log(apiConfigs.map((ac) => ac.devPath));
 
-  const adminFrontend = path.join(__dirname, '../../..', 'node_modules', 'quidproquo-web-admin', 'lib');
+  // Resolved through node resolution (not a __dirname walk) so it works both
+  // from a workspace checkout and inside the docker platform image.
+  const adminFrontend = path.join(path.dirname(require.resolve('quidproquo-web-admin/package.json')), 'lib');
 
   // Admin page
   app.use('/admin', express.static(adminFrontend));
@@ -116,6 +118,14 @@ export const apiImplementation = async (devServerConfig: ResolvedDevServerConfig
     const result = await qpqExecuteLog(serviceLog, runtimeModule);
     res.json(result);
   });
+
+  // Pre-built views (docker platform image): shell at /, remotes at
+  // /views/<svc> — the same layout as the AWS website/views buckets, so the
+  // module-federation manifests resolve with a root-relative remote base.
+  if (devServerConfig.webRoot) {
+    app.use('/views', express.static(path.join(devServerConfig.webRoot, 'views')));
+    app.use(express.static(path.join(devServerConfig.webRoot, 'website')));
+  }
 
   // Proxy for all services
   app.all('*', async (req: Request | any, res: Response) => {
@@ -172,6 +182,9 @@ export const apiImplementation = async (devServerConfig: ResolvedDevServerConfig
           res.status(response.result.statusCode).send(response.result.body);
         }
       }
+    } else if (devServerConfig.webRoot && req.method === 'GET' && req.accepts('html')) {
+      // SPA fallback — client-side routes resolve to the shell's index.html.
+      res.sendFile(path.resolve(devServerConfig.webRoot, 'website', 'index.html'));
     } else {
       console.log(`NotFound::[${req.method}::${req.socket.remoteAddress}]: ${req.protocol}://${req.get('host')}${req.url}`);
       res.status(500).send({ message: 'resource does not exist' });

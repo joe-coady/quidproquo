@@ -245,6 +245,19 @@ implementation:
   deploy.config.json reader/types live in quidproquo-deploy-awscdk — move to a
   neutral package when a second platform lands.
 
+- **Docker platform (proof of concept)**: `"platform": "docker"` on an
+  environment makes `qpq go` bake the whole app into one self-hosting image —
+  the QPQ dev server (full local platform emulation) + every service bundle +
+  production views builds served statically (shell at /, remotes at
+  /views/<svc>, SPA fallback) with a same-origin module-federation remote base
+  (QPQ_VIEWS_REMOTE_BASE). Image context assembled at
+  dist/qpq/docker-image/<app>/ (server bundle, web root, workspaces-stripped
+  package.json npm-installed in-image for linux natives, locally-built
+  quidproquo packages overlaid as vendor/). Dockerfile ships in
+  quidproquo-cli/docker/dev-server/ (the go:docker deployer one moved to
+  docker/cdk-deployer/). Dev server gained `webRoot` for the static serving.
+  Single process + sqlite — demos/self-hosting, not production.
+
 ## Deferred / open
 
 - validate-ts story once per-package tsconfigs are stubs.
