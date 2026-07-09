@@ -1,0 +1,1 @@
+{ "label": "Service Function", "link": { "type": "generated-index", "description": "Invoke callable service functions (RPC-style stories) from within a story." } }

@@ -1,0 +1,7 @@
+{
+  "label": "Graph Database",
+  "link": {
+    "type": "generated-index",
+    "description": "Run openCypher queries against a graph database defined with defineGraphDatabase."
+  }
+}

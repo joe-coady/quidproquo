@@ -1,0 +1,1 @@
+{ "label": "Queue", "link": { "type": "generated-index", "description": "Send messages to a queue defined with defineQueue." } }

@@ -1,0 +1,7 @@
+{
+  "label": "Error",
+  "link": {
+    "type": "generated-index",
+    "description": "Throw structured, catchable errors from a story."
+  }
+}

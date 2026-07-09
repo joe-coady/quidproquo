@@ -1,0 +1,7 @@
+{
+  "label": "Context",
+  "link": {
+    "type": "generated-index",
+    "description": "Context is ambient, story-scoped state — like React context for stories. Provide a value around a sub-story and read it anywhere inside, without threading it through every call."
+  }
+}

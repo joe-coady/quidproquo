@@ -1,0 +1,7 @@
+{
+  "label": "System",
+  "link": {
+    "type": "generated-index",
+    "description": "System control-flow primitives: catch errors, retry, run stories in parallel, conditionally execute, override action processing."
+  }
+}

@@ -1,0 +1,1 @@
+{ "label": "API Key Validation", "link": { "type": "generated-index", "description": "Validate a presented API key value against the keys declared with defineApiKey." } }

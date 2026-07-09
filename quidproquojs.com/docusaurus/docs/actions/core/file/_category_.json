@@ -1,0 +1,7 @@
+{
+  "label": "File",
+  "link": {
+    "type": "generated-index",
+    "description": "File actions read and write files on a storage drive defined with defineStorageDrive."
+  }
+}

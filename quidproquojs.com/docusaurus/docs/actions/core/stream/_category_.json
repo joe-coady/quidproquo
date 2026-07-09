@@ -1,0 +1,7 @@
+{
+  "label": "Stream",
+  "link": {
+    "type": "generated-index",
+    "description": "Streams read data incrementally in chunks — opened by actions like askFileStreamOpen and askAiPromptStream, consumed with askStreamRead / askStreamProcess / askStreamMap."
+  }
+}

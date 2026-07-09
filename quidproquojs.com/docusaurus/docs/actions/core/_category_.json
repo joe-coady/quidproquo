@@ -1,0 +1,8 @@
+{
+  "label": "quidproquo-core",
+  "position": 1,
+  "link": {
+    "type": "generated-index",
+    "description": "Action requesters (ask* generator functions) exported from quidproquo-core."
+  }
+}

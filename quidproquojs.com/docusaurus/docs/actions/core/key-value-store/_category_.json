@@ -1,0 +1,1 @@
+{ "label": "Key-Value Store", "link": { "type": "generated-index", "description": "DynamoDB-style key-value storage: get, query, scan, update, upsert, and delete records on a store defined with defineKeyValueStore." } }

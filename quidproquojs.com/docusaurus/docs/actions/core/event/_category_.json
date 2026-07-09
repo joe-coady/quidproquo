@@ -1,0 +1,7 @@
+{
+  "label": "Event",
+  "link": {
+    "type": "generated-index",
+    "description": "The event-processing pipeline that turns a raw platform trigger (queue message, event-bus message, HTTP request, schedule) into matched story executions and a response."
+  }
+}

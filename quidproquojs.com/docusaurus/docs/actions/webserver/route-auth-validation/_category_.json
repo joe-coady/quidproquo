@@ -1,0 +1,1 @@
+{ "label": "Route Auth Validation", "link": { "type": "generated-index", "description": "Decode and validate a route's incoming auth token." } }

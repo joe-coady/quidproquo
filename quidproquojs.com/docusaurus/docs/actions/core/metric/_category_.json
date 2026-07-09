@@ -1,0 +1,7 @@
+{
+  "label": "Metric",
+  "link": {
+    "type": "generated-index",
+    "description": "Emit custom metrics from a story (CloudWatch metrics on AWS)."
+  }
+}

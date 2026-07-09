@@ -1,0 +1,7 @@
+{
+  "label": "Config",
+  "link": {
+    "type": "generated-index",
+    "description": "Config actions read secrets, parameters, globals, and application metadata at runtime. They pair with the defineSecret / defineParameter / defineGlobal config settings."
+  }
+}

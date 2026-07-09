@@ -1,0 +1,7 @@
+{
+  "label": "GUID",
+  "link": {
+    "type": "generated-index",
+    "description": "Generate globally-unique identifiers."
+  }
+}

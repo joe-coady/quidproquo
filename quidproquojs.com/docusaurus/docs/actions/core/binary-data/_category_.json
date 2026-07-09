@@ -1,0 +1,7 @@
+{
+  "label": "Binary Data",
+  "link": {
+    "type": "generated-index",
+    "description": "Create and work with QPQBinaryData, the portable binary wrapper used by file and network actions."
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "label": "AI",
+  "link": {
+    "type": "generated-index",
+    "description": "AI actions send prompts to a large language model and stream back the response. On AWS they run through the Vercel AI SDK against Amazon Bedrock."
+  }
+}

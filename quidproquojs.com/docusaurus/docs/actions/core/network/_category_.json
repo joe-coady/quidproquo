@@ -1,0 +1,7 @@
+{
+  "label": "Network",
+  "link": {
+    "type": "generated-index",
+    "description": "Make outbound HTTP requests from a story."
+  }
+}

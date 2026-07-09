@@ -1,0 +1,7 @@
+{
+  "label": "Array",
+  "link": {
+    "type": "generated-index",
+    "description": "Story-composition helpers for iterating arrays — map, filter, reduce, flatMap, and their parallel/batched variants — where each item's callback is itself a story."
+  }
+}

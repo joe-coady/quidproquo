@@ -1,0 +1,7 @@
+{
+  "label": "JSON",
+  "link": {
+    "type": "generated-index",
+    "description": "Parse JSON safely from within a story."
+  }
+}

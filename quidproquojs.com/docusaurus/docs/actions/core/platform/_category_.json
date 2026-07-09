@@ -1,0 +1,7 @@
+{
+  "label": "Platform",
+  "link": {
+    "type": "generated-index",
+    "description": "Platform utilities like delaying/sleeping within a story."
+  }
+}

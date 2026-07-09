@@ -1,0 +1,7 @@
+{
+  "label": "State",
+  "link": {
+    "type": "generated-index",
+    "description": "Redux-style in-story state: dispatch actions through reducers/effects and read the resulting state."
+  }
+}

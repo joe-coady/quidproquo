@@ -1,0 +1,7 @@
+{
+  "label": "Claude AI",
+  "link": {
+    "type": "generated-index",
+    "description": "Low-level actions that call the Anthropic Claude Messages API directly. For the higher-level, provider-agnostic prompt actions see the AI domain."
+  }
+}

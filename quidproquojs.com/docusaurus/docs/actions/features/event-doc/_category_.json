@@ -1,0 +1,1 @@
+{ "label": "Event documents", "link": { "type": "generated-index", "description": "Action requesters for event-sourced documents — create, read, delete, and resolve draft/published versions of a document derived by folding its event log." } }

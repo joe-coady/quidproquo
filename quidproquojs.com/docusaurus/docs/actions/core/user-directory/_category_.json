@@ -1,0 +1,1 @@
+{ "label": "User Directory", "link": { "type": "generated-index", "description": "Authentication and user management: create users, authenticate, handle auth challenges & MFA, manage passwords, tokens, attributes, and email verification against a directory defined with defineUserDirectory." } }

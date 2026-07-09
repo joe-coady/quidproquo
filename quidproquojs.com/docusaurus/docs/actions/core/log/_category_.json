@@ -1,0 +1,7 @@
+{
+  "label": "Log",
+  "link": {
+    "type": "generated-index",
+    "description": "Structured logging from within a story."
+  }
+}

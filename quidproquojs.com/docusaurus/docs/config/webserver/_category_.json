@@ -1,0 +1,8 @@
+{
+  "label": "quidproquo-webserver",
+  "position": 2,
+  "link": {
+    "type": "generated-index",
+    "description": "Config settings (define* functions) exported from quidproquo-webserver — APIs, routes, websockets, auth, DNS, and web hosting."
+  }
+}

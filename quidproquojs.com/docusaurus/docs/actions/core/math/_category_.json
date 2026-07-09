@@ -1,0 +1,7 @@
+{
+  "label": "Math",
+  "link": {
+    "type": "generated-index",
+    "description": "Non-deterministic math done as actions so stories stay pure and replayable."
+  }
+}

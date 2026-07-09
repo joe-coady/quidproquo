@@ -1,0 +1,7 @@
+{
+  "label": "Date",
+  "link": {
+    "type": "generated-index",
+    "description": "Read the current date/time from the runtime."
+  }
+}
