@@ -1,6 +1,6 @@
 import { QpqAppDeployEnvironment } from 'quidproquo-deploy-awscdk';
 
-import { DeployPlan } from '../lib/deployPrompts';
+import { DeployPlan, TeardownPlan } from '../lib/deployPrompts';
 
 export enum QpqDeployPlatform {
   aws = 'aws',
@@ -26,6 +26,10 @@ export interface QpqPlatformDriver {
   // Parallel containerized deploy (`qpq go:docker`) — optional; drivers that
   // have no docker strategy simply omit it.
   goDocker?: (appName: string, plan: DeployPlan) => Promise<void>;
+
+  // Destroy the web/api/inf stacks for selected services (`qpq teardown`) —
+  // optional; drivers with no teardown strategy simply omit it.
+  teardown?: (appName: string, plan: TeardownPlan) => Promise<void>;
 
   // Federated remote publishing (`qpq publish[:build|:upload|:deploy]`).
   publish: (appName: string, serviceNames: string[]) => Promise<void>;

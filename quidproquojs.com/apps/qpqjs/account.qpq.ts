@@ -5,12 +5,18 @@
 // any app's lifecycle. Identity plumbing comes from the workspace CDK app.
 import { QPQConfig } from 'quidproquo';
 import {
+  AwsDataStoreRemovalPolicy,
   defineAccountBudget,
   defineAccountCloudTrail,
   defineAccountSecurityServices,
+  defineAwsDataStoreRemovalPolicy,
 } from 'quidproquo-config-aws';
 
 export default (): QPQConfig => [
+  // Dev account: deleting the account stack takes the CloudTrail bucket
+  // (and its audit history) with it.
+  defineAwsDataStoreRemovalPolicy(AwsDataStoreRemovalPolicy.destroy),
+
   defineAccountCloudTrail('main', {
     cloudWatchLogs: {
       retentionDays: 30,

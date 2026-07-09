@@ -1,4 +1,4 @@
-import { AccountCloudTrailQPQConfigSetting, qpqConfigAwsUtils } from 'quidproquo-config-aws';
+import { AccountCloudTrailQPQConfigSetting, AwsDataStoreRemovalPolicy, qpqConfigAwsUtils } from 'quidproquo-config-aws';
 
 import * as cdk from 'aws-cdk-lib';
 import { aws_cloudtrail, aws_logs, aws_s3 } from 'aws-cdk-lib';
@@ -30,13 +30,16 @@ export class QpqAccountCloudTrailConstruct extends QpqConstructBlock {
 
     const accountId = qpqConfigAwsUtils.getApplicationModuleDeployAccountId(props.qpqConfig);
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(props.qpqConfig);
+    const dataStoreRemovalPolicy = qpqConfigAwsUtils.getAwsDataStoreRemovalPolicy(props.qpqConfig);
 
     const bucket = new aws_s3.Bucket(this, 'logs', {
       bucketName: `qpq-cloudtrail-${accountId}-${region}-${name}`,
       blockPublicAccess: aws_s3.BlockPublicAccess.BLOCK_ALL,
       encryption: aws_s3.BucketEncryption.S3_MANAGED,
       enforceSSL: true,
-      removalPolicy: cdk.RemovalPolicy.RETAIN,
+      // Retain audit logs by default; dev configs opt into full teardown via defineAwsDataStoreRemovalPolicy(destroy).
+      removalPolicy: dataStoreRemovalPolicy === AwsDataStoreRemovalPolicy.destroy ? cdk.RemovalPolicy.DESTROY : cdk.RemovalPolicy.RETAIN,
+      autoDeleteObjects: dataStoreRemovalPolicy === AwsDataStoreRemovalPolicy.destroy,
       lifecycleRules: [{ expiration: cdk.Duration.days(retentionDays) }],
     });
 

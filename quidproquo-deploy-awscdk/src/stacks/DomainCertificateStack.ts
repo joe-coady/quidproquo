@@ -87,6 +87,9 @@ export class DomainCertificateStack extends Stack {
       };
 
       new AwsCustomResource(this, 'arn-ssm-xregion', {
+        // Plain SSM put/deleteParameter — Lambda's built-in SDK is plenty; don't
+        // npm-install the latest SDK at runtime (slow cold starts, needs internet).
+        installLatestAwsSdk: false,
         onCreate: sdkCall,
         onUpdate: sdkCall,
         onDelete: {

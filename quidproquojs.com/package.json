@@ -33,7 +33,8 @@
     "publish:build": "qpq publish:build",
     "publish:upload": "qpq publish:upload",
     "publish:deploy": "qpq publish:deploy",
-    "go:docker": "qpq go:docker"
+    "go:docker": "qpq go:docker",
+    "teardown": "qpq teardown"
   },
   "devDependencies": {
     "@chakra-ui/cli": "^3.0.0",

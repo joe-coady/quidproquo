@@ -7,6 +7,7 @@ Commands:
   go:docker        Same as go, but deploys in parallel via docker
   go:dev           Run the local dev server (hot reload)
   go:dev:web       Run every views microfrontend dev server
+  teardown         Destroy web/api/inf stacks for selected services (interactive)
   synth [service]  Synth QPQ configs to dist/apps/<app>/infrastructure
   prep             Regenerate apps/<app>/tsconfig.federated.json
   publish          Build + upload + deploy federated remotes
@@ -43,6 +44,7 @@ export const runCli = async (argv: string[]): Promise<void> => {
     'go:docker': (a) => require('../commands/goDocker').goDockerCommand(a),
     'go:dev': (a) => require('../commands/goDev').goDevCommand(a),
     'go:dev:web': (a) => require('../commands/goDevWeb').goDevWebCommand(a),
+    teardown: (a) => require('../commands/teardown').teardownCommand(a),
     synth: (a) => require('../commands/synth').synthCommand(a),
     prep: (a) => require('../commands/prep').prepCommand(a),
     publish: (a) => require('../commands/publish').publishCommand(a),
