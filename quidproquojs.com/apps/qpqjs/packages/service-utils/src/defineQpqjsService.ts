@@ -13,6 +13,8 @@ import {
   ApiLayer,
   defineAwsServiceAccountInfo,
   defineWafProtection,
+  AwsDataStoreRemovalPolicy,
+  defineAwsDataStoreRemovalPolicy 
 } from 'quidproquo-config-aws';
 import {
   defineAdminSettings,
@@ -29,7 +31,7 @@ import {
 
 const productionAccountId = '761018864142';
 const stagingAccountId = '761018864142';
-const developmentAccountId = '761018864142';
+const developmentAccountId = '061039804449';
 const modulePrefix = 'qpqjs';
 const developerNames: string[] = [];
 
@@ -140,4 +142,7 @@ export const defineQpqjsService = (
     services: qpqjsServiceNames,
     coldStorageAfterDays: 90,
   }),
+
+  // turning this off is super painful for maintaince, dont be a nubbet.
+  defineAwsDataStoreRemovalPolicy(AwsDataStoreRemovalPolicy.destroy)
 ];

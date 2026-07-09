@@ -5,7 +5,7 @@
 #
 # CDK_VERSION is passed at build time to match the workspace's aws-cdk, so the
 # CLI can always read the assembly schema the host synthesized.
-FROM node:20-slim
+FROM node:24-slim
 
 ARG CDK_VERSION=2
 RUN npm install -g aws-cdk@${CDK_VERSION}

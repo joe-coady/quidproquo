@@ -22,7 +22,7 @@ const config: Config = {
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'quidproquo', // Usually your GitHub org/user name.
+  organizationName: 'joe-coady', // Usually your GitHub org/user name.
   projectName: 'quidproquo', // Usually your repo name.
 
   onBrokenLinks: 'throw',
@@ -47,10 +47,8 @@ const config: Config = {
         docs: {
           routeBasePath: '/',
           sidebarPath: './sidebars.ts',
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/quidproquo/quidproquo/tree/main/quidproquo-docusaurus/',
+            'https://github.com/joe-coady/quidproquo/tree/main/quidproquojs.com/docusaurus/',
         },
         blog: false,
         theme: {
@@ -83,7 +81,12 @@ const config: Config = {
           label: 'API Reference',
         },
         {
-          href: 'https://github.com/quidproquo/quidproquo',
+          href: 'https://quidproquojs.com',
+          label: 'quidproquojs.com',
+          position: 'right',
+        },
+        {
+          href: 'https://github.com/joe-coady/quidproquo',
           label: 'GitHub',
           position: 'right',
         },
@@ -114,7 +117,11 @@ const config: Config = {
           items: [
             {
               label: 'GitHub',
-              href: 'https://github.com/quidproquo/quidproquo',
+              href: 'https://github.com/joe-coady/quidproquo',
+            },
+            {
+              label: 'quidproquojs.com',
+              href: 'https://quidproquojs.com',
             },
           ],
         },
