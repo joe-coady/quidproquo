@@ -45,6 +45,9 @@ apps/<app>/                       # qpqjs
     service-utils
     service/                      # Lambda backend (rspack bundle, built at deploy time)
     views/                        # React microfrontend (Rspack + Module Federation)
+docusaurus/                       # docs site (docs.quidproquojs.com) — built first
+                                  # (listed first in workspaces); the shell's 'docs'
+                                  # web entry auto-uploads docusaurus/build at deploy
 ```
 
 There is no tools/ directory: all build/dev/deploy orchestration ships in the

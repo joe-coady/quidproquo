@@ -11,7 +11,7 @@ import { defineQpqjsService } from '@qpqjs/service-utils';
 
 import * as dynamicRoutes from './entry/controller';
 
-const webBuildPath = '../../../../../dist/packages/website';
+const webBuildPath = '../../../../../../dist/apps/qpqjs/services/shell/views';
 
 // shell is the module-federation host: its views bundle is the root website,
 // every other service's views hang off views.<domain>/<service>. The deploy
@@ -55,6 +55,20 @@ const mfeHostWebEntryOptions: QPQConfigAdvancedWebEntrySettings = {
   ],
 };
 
+// The Docusaurus docs site. No storage drive: the web entry owns its bucket,
+// and autoUpload (the default) packages docusaurus/build as a CDK asset at
+// synth time, uploads it at deploy time, and invalidates the distribution —
+// so `docusaurus` must be built before the web stack deploys.
+const docsWebEntryOptions: QPQConfigAdvancedWebEntrySettings = {
+  buildPath: '../../../../../../docusaurus/build',
+  cacheSettingsName: 'default',
+  domain: {
+    subDomainName: 'docs',
+    onRootDomain: true,
+    rootDomain: QPQJS_DOMAIN,
+  },
+};
+
 export default [
   defineDevServerOptions({ port: 3080 }),
 
@@ -70,6 +84,8 @@ export default [
 
   defineStorageDrive(mfeHostWebEntryStorageDriveName),
   defineWebEntry('views', mfeHostWebEntryOptions),
+
+  defineWebEntry('docs', docsWebEntryOptions),
 
   defineDynamicRoutes(dynamicRoutes),
 ];

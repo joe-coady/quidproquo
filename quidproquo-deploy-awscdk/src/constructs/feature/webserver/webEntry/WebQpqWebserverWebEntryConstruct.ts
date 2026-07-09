@@ -62,14 +62,6 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
       originBucket = aws_s3.Bucket.fromBucketName(this, 'src-bucket-lookup', this.resourceName(props.webEntryConfig.storageDrive.sourceStorageDrive));
     }
 
-    if (props.webEntryConfig.storageDrive.autoUpload) {
-      const webEntryBuildPath = qpqAwsCdkPathUtils.getWebEntryFullPath(props.qpqConfig, props.webEntryConfig);
-      new aws_s3_deployment.BucketDeployment(this, 'bucket-deploy', {
-        sources: [aws_s3_deployment.Source.asset(webEntryBuildPath)],
-        destinationBucket: originBucket,
-      });
-    }
-
     const apexDomain = qpqWebServerUtils.resolveApexDomainNameFromDomainConfig(
       props.qpqConfig,
       props.webEntryConfig.domain.rootDomain,
@@ -161,6 +153,21 @@ export class WebQpqWebserverWebEntryConstruct extends QpqConstructBlock {
     });
 
     qpqDeployAwsCdkUtils.applyEnvironmentTags(distribution, props.qpqConfig);
+
+    // Deploy-time artifact publishing: the build dir is packaged as a CDK
+    // asset at synth time, unpacked into the origin bucket during deploy, then
+    // the distribution is invalidated so the new content serves immediately.
+    // Note: prunes objects missing from the source — only safe on buckets this
+    // web entry owns outright, not shared multi-service drives.
+    if (props.webEntryConfig.storageDrive.autoUpload) {
+      const webEntryBuildPath = qpqAwsCdkPathUtils.getWebEntryFullPath(props.qpqConfig, props.webEntryConfig);
+      new aws_s3_deployment.BucketDeployment(this, 'bucket-deploy', {
+        sources: [aws_s3_deployment.Source.asset(webEntryBuildPath)],
+        destinationBucket: originBucket,
+        distribution,
+        distributionPaths: ['/*'],
+      });
+    }
 
     // The distribution id is AWS-generated here in the web stack, unknowable when the inf
     // stack synthesizes the service role - so this stack attaches the exact-ARN invalidation
