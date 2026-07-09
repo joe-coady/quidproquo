@@ -32,12 +32,13 @@ export function Pipeline() {
       <p className="section__kicker">how it runs</p>
       <h2 className="section__title">From yield to production</h2>
       <p className="section__sub">
-        A story never touches a platform API. Actions travel the grid; processors do the work.
+        A story never touches a platform API. Actions travel the grid;
+        processors do the work.
       </p>
 
       <div className="pipeline">
         {STAGES.map((stage, index) => (
-          <div className="pipeline__stage-wrap" key={stage.step}>
+          <div key={stage.step} className="pipeline__stage-wrap">
             <article className="pipeline__stage">
               <span className="pipeline__step">{stage.step}</span>
               <h3>{stage.title}</h3>
@@ -45,7 +46,7 @@ export function Pipeline() {
               <code className="pipeline__code">{stage.code}</code>
             </article>
             {index < STAGES.length - 1 && (
-              <div className="pipeline__link" aria-hidden="true">
+              <div aria-hidden="true" className="pipeline__link">
                 <span className="pipeline__packet" />
               </div>
             )}

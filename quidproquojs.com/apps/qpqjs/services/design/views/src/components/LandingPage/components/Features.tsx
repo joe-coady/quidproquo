@@ -65,12 +65,13 @@ export function Features() {
       <p className="section__kicker">why qpq</p>
       <h2 className="section__title">One story. Every runtime.</h2>
       <p className="section__sub">
-        Separate the <em>what</em> from the <em>how</em>, and the how becomes replaceable.
+        Separate the <em>what</em> from the <em>how</em>, and the how becomes
+        replaceable.
       </p>
 
       <div className="feature-grid">
         {FEATURES.map((feature) => (
-          <article className="feature-card" key={feature.title}>
+          <article key={feature.title} className="feature-card">
             <span className="feature-card__icon">{feature.icon}</span>
             <h3>{feature.title}</h3>
             <p>{feature.body}</p>

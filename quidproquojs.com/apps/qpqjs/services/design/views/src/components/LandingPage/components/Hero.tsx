@@ -1,12 +1,16 @@
+import { useRef } from 'react';
+
 import { CodeWindow } from './CodeWindow';
 import { InstallChip } from './InstallChip';
 import { NavBar } from './NavBar';
-import { TronGrid } from './TronGrid';
+import { RuntimeBelow } from './RuntimeBelow';
 
 export function Hero() {
+  const panelRef = useRef<HTMLDivElement>(null);
+
   return (
     <section className="hero" id="top">
-      <TronGrid />
+      <RuntimeBelow anchorRootRef={panelRef} />
       <NavBar />
 
       <div className="hero__inner">
@@ -23,9 +27,10 @@ export function Hero() {
           </h1>
 
           <p className="hero__sub">
-            quidproquo is an action-based framework where business logic is a generator function — a{' '}
-            <em>story</em> that yields typed actions. The runtime decides how each action executes: AWS
-            Lambda in production, Node on your machine, the browser in your app.
+            quidproquo is an action-based framework where business logic is a
+            generator function — a <em>story</em> that yields typed actions. The
+            runtime decides how each action executes: AWS Lambda in production,
+            Node on your machine, the browser in your app.
           </p>
 
           <div className="hero__cta">
@@ -43,12 +48,12 @@ export function Hero() {
           </div>
         </div>
 
-        <div className="hero__panel">
+        <div ref={panelRef} className="hero__panel">
           <CodeWindow />
         </div>
       </div>
 
-      <div className="hero__fade" aria-hidden="true" />
+      <div aria-hidden="true" className="hero__fade" />
     </section>
   );
 }

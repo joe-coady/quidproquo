@@ -29,9 +29,27 @@ interface LoopStep {
 }
 
 const STEPS: LoopStep[] = [
-  { lineIndex: 1, action: 'KeyValueStoreGet', result: 'order', platform: 'DynamoDB', processor: 'keyValueStore' },
-  { lineIndex: 2, action: 'PdfRender', result: 'receipt', platform: 'Headless Chrome', processor: 'custom action' },
-  { lineIndex: 3, action: 'FileWriteContents', result: 'saved', platform: 'S3', processor: 'file' },
+  {
+    lineIndex: 1,
+    action: 'KeyValueStoreGet',
+    result: 'order',
+    platform: 'DynamoDB',
+    processor: 'keyValueStore',
+  },
+  {
+    lineIndex: 2,
+    action: 'PdfRender',
+    result: 'receipt',
+    platform: 'Headless Chrome',
+    processor: 'custom action',
+  },
+  {
+    lineIndex: 3,
+    action: 'FileWriteContents',
+    result: 'saved',
+    platform: 'S3',
+    processor: 'file',
+  },
 ];
 
 const DURATIONS: Record<Phase, number> = {
@@ -164,7 +182,10 @@ export function YieldLoop() {
       setView({
         step,
         phase,
-        completed: STEPS.map((_, index) => index < step || (index === step && phase === Phase.settle)),
+        completed: STEPS.map(
+          (_, index) =>
+            index < step || (index === step && phase === Phase.settle)
+        ),
       });
     };
 
@@ -219,38 +240,52 @@ export function YieldLoop() {
   const active = STEPS[step];
   const returning = phase === Phase.back;
   const hubMessage =
-    phase === Phase.done ? 'story complete' : returning ? `⟵ ${active.result}` : `${active.action} ⟶`;
+    phase === Phase.done
+      ? 'story complete'
+      : returning
+        ? `⟵ ${active.result}`
+        : `${active.action} ⟶`;
 
   return (
     <section className="section" id="loop">
       <p className="section__kicker">the loop</p>
       <h2 className="section__title">Yield out. Flow back.</h2>
       <p className="section__sub">
-        A story is a paused conversation with the runtime: it yields an action, the infrastructure does
-        the work, and the result resumes the generator — right where it left off.
+        A story is a paused conversation with the runtime: it yields an action,
+        the infrastructure does the work, and the result resumes the generator —
+        right where it left off.
       </p>
 
-      <div className="loop" ref={containerRef}>
-        <svg className="loop__wires" width={size.w} height={size.h} aria-hidden="true">
+      <div ref={containerRef} className="loop">
+        <svg
+          aria-hidden="true"
+          className="loop__wires"
+          height={size.h}
+          width={size.w}
+        >
           {paths.map((d, index) => (
             <path
               key={index}
-              d={d}
               ref={(el) => {
                 pathRefs.current[index] = el;
               }}
               className={`loop__wire${index === step && phase !== Phase.done ? ' is-active' : ''}${
                 index === step && returning ? ' is-returning' : ''
               }`}
+              d={d}
             />
           ))}
-          <g ref={packetRef} opacity="0" className={`loop__packet${returning ? ' is-returning' : ''}`}>
-            <circle r="7" className="loop__packet-halo" />
-            <circle r="2.8" className="loop__packet-core" />
+          <g
+            ref={packetRef}
+            className={`loop__packet${returning ? ' is-returning' : ''}`}
+            opacity="0"
+          >
+            <circle className="loop__packet-halo" r="7" />
+            <circle className="loop__packet-core" r="2.8" />
           </g>
         </svg>
 
-        <div className="loop__card" ref={cardRef}>
+        <div ref={cardRef} className="loop__card">
           <div className="loop__card-bar">
             <span className="code-window__dot code-window__dot--red" />
             <span className="code-window__dot code-window__dot--amber" />
@@ -262,20 +297,27 @@ export function YieldLoop() {
               {CODE_LINES.map((line, index) => {
                 const stepIndex = STEPS.findIndex((s) => s.lineIndex === index);
                 const isActive =
-                  phase === Phase.done ? index === RETURN_LINE : stepIndex === step && stepIndex !== -1;
+                  phase === Phase.done
+                    ? index === RETURN_LINE
+                    : stepIndex === step && stepIndex !== -1;
                 const isDone = stepIndex !== -1 && completed[stepIndex];
                 return (
-                  <span key={index} className={`loop-line${isActive ? ' is-active' : ''}`}>
+                  <span
+                    key={index}
+                    className={`loop-line${isActive ? ' is-active' : ''}`}
+                  >
                     <span
-                      className="loop-line__text"
                       ref={(el) => {
                         lineRefs.current[index] = el;
                       }}
+                      className="loop-line__text"
                     >
                       {line}
                     </span>
                     {isDone && stepIndex !== -1 && (
-                      <span className="loop-line__result">⟵ {STEPS[stepIndex].result}</span>
+                      <span className="loop-line__result">
+                        ⟵ {STEPS[stepIndex].result}
+                      </span>
                     )}
                   </span>
                 );
@@ -286,8 +328,13 @@ export function YieldLoop() {
         </div>
 
         <div className="loop__hub-zone">
-          <div className={`loop__hub-msg${returning ? ' is-returning' : ''}`}>{hubMessage}</div>
-          <div className={`loop__hub${phase !== Phase.done ? ' is-active' : ''}`} ref={hubRef}>
+          <div className={`loop__hub-msg${returning ? ' is-returning' : ''}`}>
+            {hubMessage}
+          </div>
+          <div
+            ref={hubRef}
+            className={`loop__hub${phase !== Phase.done ? ' is-active' : ''}`}
+          >
             <span className="loop__hub-ring" />
             <span className="loop__hub-core" />
           </div>

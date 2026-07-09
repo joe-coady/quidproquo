@@ -78,6 +78,65 @@ em {
   pointer-events: none;
 }
 
+/* ------------------------- hero backdrop: runtime below ------------------- */
+
+.runtime-below {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.runtime-below canvas {
+  position: absolute;
+  inset: 0;
+}
+
+/* a soft atmospheric band marking where the machine hall meets the sky;
+   the % stops track the engine's horizonFrac (0.53 desktop, 0.62 narrow) */
+.runtime-below__horizon {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      to bottom,
+      transparent 51.4%,
+      rgba(141, 246, 255, 0.04) 52.6%,
+      rgba(141, 246, 255, 0.12) 53%,
+      rgba(125, 211, 252, 0.03) 53.8%,
+      transparent 57%
+    ),
+    radial-gradient(ellipse 85% 16% at 56% 53%, rgba(34, 211, 238, 0.05), transparent 65%);
+}
+
+.runtime-below__vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 100% 80% at 50% 20%, transparent 45%, rgba(3, 6, 9, 0.45) 100%),
+    linear-gradient(to bottom, transparent 76%, var(--bg) 100%);
+  pointer-events: none;
+}
+
+/* WebGL unavailable: a quiet static horizon so the hero is never blank */
+.runtime-below--fallback::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 120% 55% at 50% 100%, rgba(34, 211, 238, 0.07), transparent 62%),
+    radial-gradient(ellipse 40% 12% at 63% 66%, rgba(134, 239, 172, 0.06), transparent 70%),
+    radial-gradient(ellipse 34% 10% at 44% 80%, rgba(251, 146, 60, 0.05), transparent 70%),
+    linear-gradient(
+      to bottom,
+      transparent 52.6%,
+      rgba(125, 211, 252, 0.09) 53%,
+      rgba(125, 211, 252, 0.03) 54%,
+      transparent 60%
+    );
+}
+
 .hero__fade {
   position: absolute;
   left: 0;
@@ -449,10 +508,24 @@ em {
 .code-line {
   display: flex;
   padding: 0 18px;
+  transition: background 0.5s ease, box-shadow 0.5s ease;
 }
 
 .code-line:hover {
   background: rgba(34, 211, 238, 0.04);
+}
+
+/* the backdrop's action pulses light their yield line as they depart/return */
+.code-line.is-glint-out {
+  background: rgba(34, 211, 238, 0.1);
+  box-shadow: inset 2px 0 0 rgba(141, 246, 255, 0.85);
+  transition: background 0.12s ease-out, box-shadow 0.12s ease-out;
+}
+
+.code-line.is-glint-back {
+  background: rgba(134, 239, 172, 0.09);
+  box-shadow: inset 2px 0 0 rgba(134, 239, 172, 0.75);
+  transition: background 0.12s ease-out, box-shadow 0.12s ease-out;
 }
 
 .code-line__num {
@@ -523,6 +596,33 @@ em {
   font-family: var(--font-mono);
   font-size: 12px;
   color: var(--cyan-bright);
+  transition: color 0.55s ease, border-color 0.55s ease, background 0.55s ease, box-shadow 0.55s ease;
+}
+
+/* a pulse landing in a runtime well lights its chip in the well's color */
+.runtime-chip.is-pulse {
+  transition: color 0.14s ease-out, border-color 0.14s ease-out, background 0.14s ease-out, box-shadow 0.14s ease-out;
+}
+
+.runtime-chip[data-runtime='lambda'].is-pulse {
+  color: #ffd9b0;
+  border-color: rgba(251, 146, 60, 0.75);
+  background: rgba(251, 146, 60, 0.16);
+  box-shadow: 0 0 16px -3px rgba(251, 146, 60, 0.8);
+}
+
+.runtime-chip[data-runtime='node'].is-pulse {
+  color: #d7ffe6;
+  border-color: rgba(134, 239, 172, 0.75);
+  background: rgba(134, 239, 172, 0.14);
+  box-shadow: 0 0 16px -3px rgba(134, 239, 172, 0.8);
+}
+
+.runtime-chip[data-runtime='browser'].is-pulse {
+  color: #dbeaff;
+  border-color: rgba(96, 165, 250, 0.8);
+  background: rgba(96, 165, 250, 0.16);
+  box-shadow: 0 0 16px -3px rgba(96, 165, 250, 0.8);
 }
 
 /* -------------------------------- sections -------------------------------- */
@@ -1081,6 +1181,19 @@ em {
     grid-template-columns: 1fr;
     gap: 44px;
     padding-top: 56px;
+  }
+
+  .runtime-below__horizon {
+    background:
+      linear-gradient(
+        to bottom,
+        transparent 60.4%,
+        rgba(141, 246, 255, 0.04) 61.6%,
+        rgba(141, 246, 255, 0.12) 62%,
+        rgba(125, 211, 252, 0.03) 62.8%,
+        transparent 66%
+      ),
+      radial-gradient(ellipse 110% 14% at 50% 62%, rgba(34, 211, 238, 0.05), transparent 65%);
   }
 
   .nav__links {

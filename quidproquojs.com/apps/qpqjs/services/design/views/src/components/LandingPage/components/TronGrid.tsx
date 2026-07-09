@@ -101,7 +101,7 @@ function steerInside(
   head: Point,
   width: number,
   height: number,
-  blocked: (x: number, y: number) => boolean,
+  blocked: (x: number, y: number) => boolean
 ): boolean {
   for (let attempts = 0; attempts < 4; attempts += 1) {
     const nextX = head.x + DX[snake.heading] * CELL;
@@ -140,12 +140,18 @@ function trimTrail(snake: Snake): void {
   }
 }
 
-function drawGrid(ctx: CanvasRenderingContext2D, width: number, height: number): void {
+function drawGrid(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number
+): void {
   ctx.clearRect(0, 0, width, height);
 
   for (let x = 0; x <= width + CELL; x += CELL) {
     const major = Math.round(x / CELL) % 5 === 0;
-    ctx.strokeStyle = major ? 'rgba(125, 211, 252, 0.12)' : 'rgba(125, 211, 252, 0.065)';
+    ctx.strokeStyle = major
+      ? 'rgba(125, 211, 252, 0.12)'
+      : 'rgba(125, 211, 252, 0.065)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(x + 0.5, 0);
@@ -155,7 +161,9 @@ function drawGrid(ctx: CanvasRenderingContext2D, width: number, height: number):
 
   for (let y = 0; y <= height + CELL; y += CELL) {
     const major = Math.round(y / CELL) % 5 === 0;
-    ctx.strokeStyle = major ? 'rgba(125, 211, 252, 0.12)' : 'rgba(125, 211, 252, 0.065)';
+    ctx.strokeStyle = major
+      ? 'rgba(125, 211, 252, 0.12)'
+      : 'rgba(125, 211, 252, 0.065)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(0, y + 0.5);
@@ -191,7 +199,9 @@ export function TronGrid({ avoidRef }: TronGridProps = {}) {
     const trailCtx = trailCanvas.getContext('2d');
     if (!gridCtx || !trailCtx) return;
 
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const reducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches;
 
     let width = 0;
     let height = 0;
@@ -244,8 +254,13 @@ export function TronGrid({ avoidRef }: TronGridProps = {}) {
 
       drawGrid(gridCtx, width, height);
 
-      const target = Math.min(13, Math.max(6, Math.round((width * height) / 130000)));
-      snakes = Array.from({ length: target }, (_, index) => spawnClear(index < 2));
+      const target = Math.min(
+        13,
+        Math.max(6, Math.round((width * height) / 130000))
+      );
+      snakes = Array.from({ length: target }, (_, index) =>
+        spawnClear(index < 2)
+      );
       sparks = [];
     };
 
@@ -297,9 +312,17 @@ export function TronGrid({ avoidRef }: TronGridProps = {}) {
         const segment = Math.abs(near.x - far.x) + Math.abs(near.y - far.y);
         if (segment < 0.01) continue;
 
-        const alphaNear = maxAlpha * Math.max(0, 1 - cumulative / snake.trailLength);
-        const alphaFar = maxAlpha * Math.max(0, 1 - (cumulative + segment) / snake.trailLength);
-        const gradient = trailCtx.createLinearGradient(near.x, near.y, far.x, far.y);
+        const alphaNear =
+          maxAlpha * Math.max(0, 1 - cumulative / snake.trailLength);
+        const alphaFar =
+          maxAlpha *
+          Math.max(0, 1 - (cumulative + segment) / snake.trailLength);
+        const gradient = trailCtx.createLinearGradient(
+          near.x,
+          near.y,
+          far.x,
+          far.y
+        );
         gradient.addColorStop(0, `rgba(${tone.rgb}, ${alphaNear})`);
         gradient.addColorStop(1, `rgba(${tone.rgb}, ${alphaFar})`);
 
@@ -385,7 +408,7 @@ export function TronGrid({ avoidRef }: TronGridProps = {}) {
         if (inView) start();
         else stop();
       },
-      { threshold: 0 },
+      { threshold: 0 }
     );
     intersectionObserver.observe(wrap);
 
@@ -403,7 +426,7 @@ export function TronGrid({ avoidRef }: TronGridProps = {}) {
   }, []);
 
   return (
-    <div ref={wrapRef} className="tron-grid" aria-hidden="true">
+    <div ref={wrapRef} aria-hidden="true" className="tron-grid">
       <canvas ref={gridRef} />
       <canvas ref={trailRef} />
       <div className="tron-grid__vignette" />
