@@ -1,6 +1,8 @@
-import { buildTestQpqConfig } from 'quidproquo-core';
+import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
+import { buildTestQpqConfig, defineBackendBundleOptions } from 'quidproquo-core';
 
 import { describe, expect, it } from 'vitest';
+import { IgnorePlugin } from 'webpack';
 
 import { getAllWebpackConfig, getWebpackConfig } from './getWebpackConfigForQpq';
 import { QpqPlugin } from './plugins';
@@ -34,6 +36,82 @@ describe('getWebpackConfig', () => {
     const config = getWebpackConfig(buildTestQpqConfig(), 'out', entries, 'node_modules');
 
     expect(config.plugins?.[0]).toBeInstanceOf(QpqPlugin);
+  });
+
+  it('adds no layer external when no layer provides modules', () => {
+    const config = getWebpackConfig(buildTestQpqConfig(), 'out', entries, 'node_modules');
+
+    expect(config.externals).toHaveLength(1);
+  });
+
+  describe('layer provided modules', () => {
+    const qpqConfig = buildTestQpqConfig([
+      defineAwsServiceAccountInfo('111', 'us-east-1', [], {
+        apiLayers: [{ name: 'chromium', buildPath: '../layers/chromium.zip', modules: ['@sparticuz/chromium'] }],
+      }),
+    ]);
+
+    const resolveExternal = (request: string): string | undefined => {
+      const config = getWebpackConfig(qpqConfig, 'out', entries, 'node_modules');
+      const externals = config.externals as any[];
+
+      expect(externals).toHaveLength(2);
+
+      let result: string | undefined = undefined;
+      externals[1]({ request }, (_err?: unknown, external?: string) => {
+        result = external;
+      });
+
+      return result;
+    };
+
+    it('externalizes a layer provided module', () => {
+      expect(resolveExternal('@sparticuz/chromium')).toBe('commonjs2 @sparticuz/chromium');
+    });
+
+    it('externalizes subpath imports of a layer provided module', () => {
+      expect(resolveExternal('@sparticuz/chromium/bin')).toBe('commonjs2 @sparticuz/chromium/bin');
+    });
+
+    it('leaves unrelated modules bundled', () => {
+      expect(resolveExternal('@sparticuz/chromium-extra')).toBeUndefined();
+      expect(resolveExternal('lodash')).toBeUndefined();
+    });
+  });
+
+  describe('backend bundle options', () => {
+    const qpqConfig = buildTestQpqConfig([
+      defineBackendBundleOptions({
+        externals: ['sharp'],
+        ignoreModules: [{ resource: '^original-fs$', context: 'adm-zip' }],
+        ignoreWarnings: [{ module: 'liquidjs', message: 'module\\.createRequire failed parsing argument' }],
+      }),
+    ]);
+
+    it('externalizes configured externals', () => {
+      const config = getWebpackConfig(qpqConfig, 'out', entries, 'node_modules');
+      const externals = config.externals as any[];
+
+      let result: string | undefined = undefined;
+      externals[1]({ request: 'sharp' }, (_err?: unknown, external?: string) => {
+        result = external;
+      });
+
+      expect(result).toBe('commonjs2 sharp');
+    });
+
+    it('adds an IgnorePlugin per ignored module', () => {
+      const config = getWebpackConfig(qpqConfig, 'out', entries, 'node_modules');
+
+      expect(config.plugins?.[1]).toBeInstanceOf(IgnorePlugin);
+    });
+
+    it('appends the configured ignore warnings', () => {
+      const config = getWebpackConfig(qpqConfig, 'out', entries, 'node_modules');
+
+      expect(config.ignoreWarnings).toHaveLength(2);
+      expect((config.ignoreWarnings?.[1] as { module?: RegExp }).module?.source).toBe('liquidjs');
+    });
   });
 });
 

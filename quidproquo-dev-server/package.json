@@ -7,7 +7,8 @@
   "types": "./lib/commonjs/index.d.ts",
   "sideEffects": false,
   "files": [
-    "lib/**/*"
+    "lib/**/*",
+    "config/**/*"
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

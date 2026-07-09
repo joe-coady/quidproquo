@@ -42,6 +42,7 @@ import {
   getDomainCertificateArnSsmParameterName,
   getDomainCertificateConfigs,
   getDynamoTableNameOverrride,
+  getLayerProvidedModules,
   getLocalServiceAccountInfo,
   getOwnedAwsAlarmConfigs,
   getWafWebAclArnSsmParameterName,
@@ -79,6 +80,26 @@ describe('getAwsServiceAccountInfoConfig', () => {
     const config = buildTestQpqConfig([defineAwsServiceAccountInfo('111', 'us-east-1'), defineAwsServiceAccountInfo('222', 'us-west-2')]);
 
     expect(() => getAwsServiceAccountInfoConfig(config)).toThrow();
+  });
+});
+
+describe('getLayerProvidedModules', () => {
+  it('collects modules across all layers', () => {
+    const config = buildTestQpqConfig([
+      defineAwsServiceAccountInfo('111', 'us-east-1', [], {
+        apiLayers: [
+          { name: 'chromium', buildPath: '../layers/chromium.zip', modules: ['@sparticuz/chromium'] },
+          { name: 'tools', layerArn: 'arn:aws:lambda:us-east-1:111:layer:tools:1', modules: ['sharp', 'canvas'] },
+          { name: 'no-modules', layerArn: 'arn:aws:lambda:us-east-1:111:layer:bare:1' },
+        ],
+      }),
+    ]);
+
+    expect(getLayerProvidedModules(config)).toEqual(['@sparticuz/chromium', 'sharp', 'canvas']);
+  });
+
+  it('returns an empty list when no service account info is defined', () => {
+    expect(getLayerProvidedModules(buildTestQpqConfig())).toEqual([]);
   });
 });
 

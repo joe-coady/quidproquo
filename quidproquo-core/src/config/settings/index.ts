@@ -4,6 +4,7 @@ export * from './apiBuildPath';
 export * from './applicationModule';
 export * from './applicationName';
 export * from './applicationVersion';
+export * from './bundleOptions';
 export * from './claudeAi';
 export * from './configValue';
 export * from './definePromiseMode';

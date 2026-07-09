@@ -21,7 +21,9 @@ export const setupRspackQPQRuntime = (qpqConfig: QPQConfig, buildPath: string): 
 
 export const getResolveLoaderModules = () => [path.resolve(__dirname, 'loaders'), 'node_modules'];
 
+export * from './appWorkspace';
 export * from './federation';
+export * from './getQpqBundleExternals';
 export * from './getRspackBuildMode';
 export * from './getRspackConfigForQpq';
 export * from './plugins';

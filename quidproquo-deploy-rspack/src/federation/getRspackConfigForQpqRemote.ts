@@ -12,11 +12,12 @@
 // the bundle (the host provides them), so a remote carries only user code.
 // ─────────────────────────────────────────────────────────────────────────────
 import { FEDERATED_SHARED_PACKAGE_NAMES } from 'quidproquo-actionprocessor-awslambda';
-import { QPQConfig } from 'quidproquo-core';
+import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
 import { ModuleFederationPlugin } from '@module-federation/enhanced/rspack';
-import { Configuration } from '@rspack/core';
+import { Configuration, IgnorePlugin } from '@rspack/core';
 
+import { getQpqBundleExternals } from '../getQpqBundleExternals';
 import { getRspackBuildMode } from '../getRspackBuildMode';
 import { getFederatedRemoteInfoForQpqConfig } from './getFederatedRemoteInfoForQpqConfig';
 
@@ -35,12 +36,27 @@ const getSharedFrameworkModules = (): Record<string, { singleton: true; required
 // same module rules they use for their main qpq build.
 export const getRspackConfigForQpqRemote = (qpqConfig: QPQConfig, buildPath: string): Configuration => {
   const { containerName, exposes } = getFederatedRemoteInfoForQpqConfig(qpqConfig);
+  const bundleOptions = qpqCoreUtils.getBackendBundleOptions(qpqConfig);
+
+  // `defineBackendBundleOptions` — optional requires inside dependencies that
+  // should resolve to nothing instead of bundling (or warning).
+  const ignoreModulePlugins = bundleOptions.ignoreModules.map(
+    (ignoreModule) =>
+      new IgnorePlugin({
+        resourceRegExp: new RegExp(ignoreModule.resource),
+        contextRegExp: ignoreModule.context ? new RegExp(ignoreModule.context) : undefined,
+      }),
+  );
 
   return {
     // The federation container is the only entry - the exposes drive the module graph
     entry: {},
 
     mode: getRspackBuildMode(qpqConfig),
+
+    // The remote runs inside the lambda, so environment-provided packages
+    // (layer modules + configured externals) stay out of the container too.
+    externals: getQpqBundleExternals(qpqConfig),
 
     // Remotes ship S3 -> lambda /tmp, never over the wire to a browser, so size is not
     // user-facing. Full source maps (with sourcesContent) and unmangled identifiers are
@@ -84,6 +100,7 @@ export const getRspackConfigForQpqRemote = (qpqConfig: QPQConfig, buildPath: str
         // generation entirely (publishFederatedRemote drops @mf-types anyway).
         dts: false,
       }),
+      ...ignoreModulePlugins,
     ],
 
     module: {
@@ -118,6 +135,11 @@ export const getRspackConfigForQpqRemote = (qpqConfig: QPQConfig, buildPath: str
       {
         message: /Failed to parse source map/,
       },
+      // `defineBackendBundleOptions` — known-noisy warnings from dependencies.
+      ...bundleOptions.ignoreWarnings.map((ignoreWarning) => ({
+        module: ignoreWarning.module ? new RegExp(ignoreWarning.module) : undefined,
+        message: ignoreWarning.message ? new RegExp(ignoreWarning.message) : undefined,
+      })),
     ],
   };
 };

@@ -24,6 +24,7 @@ export const setupWebpackQPQRuntime = (qpqConfig: QPQConfig, buildPath: string):
 export const getResolveLoaderModules = () => [path.resolve(__dirname, 'loaders'), 'node_modules'];
 
 export * from './federation';
+export * from './getQpqBundleExternals';
 export * from './getWebpackBuildMode';
 export * from './getWebpackConfigForQpq';
 export * from './plugins';

@@ -1,4 +1,4 @@
-# quidproquo-scripts — the invisible harness
+# quidproquo-cli — the invisible harness
 
 Design agreed 2026-07-09, from a review of `~/repo/antero-software/doccypoccy` (the
 reference QPQ consumer app). Goal: a consumer repo owns only its apps and a handful
@@ -49,9 +49,9 @@ as `apps/` exists.
 purpose: one place to update versions across all apps, and module federation requires
 shared singletons (react etc.) to agree across every independently built bundle.
 Root package.json is entirely user-owned; qpq's only claims on it are a
-`quidproquo-scripts` devDep, the workspaces globs, and thin alias scripts.
+`quidproquo-cli` devDep, the workspaces globs, and thin alias scripts.
 
-## quidproquo-scripts (the `qpq` CLI)
+## quidproquo-cli (the `qpq` CLI)
 
 - Published from the quidproquo monorepo. Declares `"bin": { "qpq": ... }` — bin
   names are not registry-namespaced, so the taken `qpq` npm package name doesn't
@@ -156,7 +156,7 @@ are day-two. Day one is making doccypoccy lean:
 4. Move `tools/dev-server` into `quidproquo-dev-server`; port config comes from
    `defineDevServerOptions`, delete `"port"` from views package.jsons.
 5. Move the CDK entry + cdk.json into `quidproquo-deploy-awscdk`.
-6. Create `quidproquo-scripts`: port `tools/services-deployment-awscdk/scripts/*`
+6. Create `quidproquo-cli`: port `tools/services-deployment-awscdk/scripts/*`
    as `qpq` commands, calling down into the packages above.
 7. Move account/bootstrap configs per-app; extend deploy.config.json with the
    env → account/region map; switch scripts off raw env vars.
@@ -165,12 +165,91 @@ are day-two. Day one is making doccypoccy lean:
 10. Root package.json: thin `"go": "qpq go"`-style aliases; drop tools/ and the
     devDeps that only existed for it; delete `tools/`.
 
+## Implementation notes (landed 2026-07-09)
+
+Everything above is implemented except the scaffolder. Details decided during
+implementation:
+
+- **quidproquo-cli** ships `bin/qpq.js` (dispatch: go, go:docker, go:dev,
+  go:dev:web, synth, prep, publish[:build|:upload|:deploy], hooks) and
+  `bin/qpq-cdk-app.js` (the CDK app command). The CLI registers ts-node's
+  transpile-only require hook at startup, so consumers need no root ts-node
+  wiring; ts-node, typescript, aws-cdk, inquirer, @aws-sdk/client-sts and
+  @rspack/dev-server are CLI dependencies (hoisted to the consumer root).
+- **No cdk.json at all**: `qpq go` passes
+  `--app 'node -r ts-node/register/transpile-only .../bin/qpq-cdk-app.js'` and
+  `--output dist/qpq/cdk.out` on the cdk invocation, cwd = consumer root.
+  CDK's Route53 context cache regenerates at the consumer root
+  (`cdk.context.json`) — check it in.
+- **deploy-rspack `appWorkspace/`** holds all the ported builders:
+  getServiceRspackConfig, getServiceRemoteRspackConfig, getViewsRspackConfig,
+  getDevServerRspackConfig, viewsWorkspace, federatedExports,
+  getWorkspaceSourceAliases, getAppServiceQpqConfigs,
+  writeFederatedTsconfigForApp. deploy-rspack now depends on
+  quidproquo-config-aws AND quidproquo-dev-server (for reading
+  defineDevServerOptions) — quidproquo-dev-server moved earlier in the root
+  workspaces build order to satisfy this.
+- **`quidproquo-dev-server/config` subpath** (folder-stub package.json):
+  service `infrastructure.ts` files import `defineDevServerOptions` from there
+  so the dev server's express/sqlite3 never enter lambda bundles.
+  `viewsWorkspace` resolves a views port as: defineDevServerOptions → legacy
+  `"port"` in views package.json → 4200.
+- **FrontendBundleOptions got its first field**: `sharedSingletons`
+  (substring-matched against hoisted root deps → MF singletons). doccypoccy
+  declares `['chakra', 'zod']`; react/react-dom/react-ish/quidproquo-web*
+  remain built-in defaults.
+- **Bundle options apply everywhere**: static lambda build, federated remote
+  build (which also now externalizes layer modules), and the dev-server bundle
+  (ignoreWarnings/ignoreModules merged across all hosted services).
+- **deploy.config.json** gains an optional `environments` map
+  (env → accountId/region). `qpq go --env <name>` primes
+  ENVIRONMENT/AWS_DEFAULT_* for legacy config reads; raw env vars still
+  override, so existing setups keep working. `account.qpq.ts` /
+  `bootstrap.qpq.ts` are default-exported `(ctx) => QPQConfig` fragments of
+  app-specific EXTRAS — the workspace CDK app provides defineApplication +
+  defineAwsServiceAccountInfo.
+- **Dev server entry is generated** at `dist/qpq/dev-server/entry.ts` per
+  `qpq go:dev` run; an optional `apps/<app>/devServer.config.ts`
+  (default-exporting DevServerConfigOverrides) is imported when present.
+  `qpq go:dev:web` runs all views dev servers in-process via RspackDevServer.
+- **Hooks**: `qpq hooks <name>` runs `qpq:<name>` from every
+  `apps/<app>/package.json`; doccypoccy root postinstall =
+  `qpq hooks postinstall || true` (non-fatal while quidproquo-cli is linked,
+  not registry-installed); chakra:typegen lives in docgen's `qpq:postinstall`.
+  `qpq go` also fires a `qpq:predeploy` hook before building.
+- **`qpq go:docker`** is the parallel dockerized deploy, ported intact: local
+  builds first (synth in-process, api/views bundles programmatic + concurrent,
+  one CDK cloud assembly per service via `cdk synth --app <workspace app>`),
+  then docker waves (inf → api+web → views sync). The deployer Dockerfile
+  ships inside quidproquo-cli (`docker/`), pinned to the CLI's own aws-cdk
+  version. Same knobs: GO_DOCKER_BUILD_CONCURRENCY / GO_DOCKER_DEPLOY_CONCURRENCY.
+- **doccypoccy is slimmed**: tools/ deleted, 33 per-service rspack.config.ts
+  deleted, ports migrated to defineDevServerOptions, chromium layer declares
+  `modules: ['@sparticuz/chromium']` (fixing the found bug), the ignore-cruft
+  moved to define*BundleOptions in each app's service-utils, root scripts are
+  qpq aliases.
+
+- **Platform drivers (added after landing)**: the CLI is internally split into
+  `src/platforms/<platform>/` drivers (aws = go, goDocker, publish, stacks,
+  cdkApp, viewsSync, remote, credentials) behind a `QpqPlatformDriver`
+  interface. `qpq go` resolves the platform from the environment's `platform`
+  field in deploy.config.json (default `aws`; `--platform` overrides) and
+  dispatches — a future `quidproquo-deploy-gcp` means adding
+  `src/platforms/gcp/` + a registry entry, with no command-surface or consumer
+  changes. Platform-neutral commands (go:dev, go:dev:web, synth, prep, hooks)
+  and the neutral build helpers stay in `src/lib/`. Identity priming is a
+  driver method too (`primeDeployIdentity(target)` — AWS fills
+  AWS_DEFAULT_ACCOUNT/AWS_DEFAULT_REGION from the environment entry, env vars
+  win, and returns what's missing so deploys can fail while local dev shrugs);
+  the neutral code never names an AWS env var. Remaining known AWS-ism: the
+  deploy.config.json reader/types live in quidproquo-deploy-awscdk — move to a
+  neutral package when a second platform lands.
+
 ## Deferred / open
 
-- dynamicModuleLoader ownership details when tools/dev-server merges into
-  quidproquo-dev-server (some overlap already exists).
-- publish / docker deploy flow specifics.
 - validate-ts story once per-package tsconfigs are stubs.
-- Port auto-assignment fallback when a service declares no defineDevServerOptions.
-- The npm-link development workflow against quidproquo-scripts itself.
+- Port auto-assignment fallback when a service declares no defineDevServerOptions
+  (currently defaults to 4200 after the legacy package.json fallback).
+- The npm-link development workflow against quidproquo-cli itself (root
+  devDep `quidproquo-cli@^0.1.4` needs the package published, or qpq:link).
 - Scaffolder (`npm create quidproquo`) and `qpq upgrade` codemods — day two.

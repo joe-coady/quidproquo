@@ -11,6 +11,8 @@ export enum QPQCoreConfigSettingType {
   parameter = '@quidproquo-core/config/parameter',
   actionProcessors = '@quidproquo-core/config/actionProcessors',
   apiBuildPath = '@quidproquo-core/config/apiBuildPath',
+  backendBundleOptions = '@quidproquo-core/config/BackendBundleOptions',
+  frontendBundleOptions = '@quidproquo-core/config/FrontendBundleOptions',
   queue = '@quidproquo-core/config/Queue',
   eventBus = '@quidproquo-core/config/EventBus',
   userDirectory = '@quidproquo-core/config/UserDirectory',

@@ -1,3 +1,4 @@
+export * from './appWorkspace';
 export * from './constructs';
 export * from './QPQApp';
 export * from './stacks';

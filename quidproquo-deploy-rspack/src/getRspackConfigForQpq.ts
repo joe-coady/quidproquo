@@ -1,17 +1,30 @@
-import { QPQConfig } from 'quidproquo-core';
+import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
-import { Configuration } from '@rspack/core';
+import { Configuration, IgnorePlugin, RspackPluginInstance } from '@rspack/core';
 
+import { getQpqBundleExternals } from './getQpqBundleExternals';
 import { getRspackBuildMode } from './getRspackBuildMode';
 import { QpqPlugin } from './plugins';
 
 export const getRspackConfig = (qpqConfig: QPQConfig, buildPath: string, entries: Record<string, string>, nodeModulePath: string): Configuration => {
+  const bundleOptions = qpqCoreUtils.getBackendBundleOptions(qpqConfig);
+
+  // `defineBackendBundleOptions` — optional requires inside dependencies that
+  // should resolve to nothing instead of bundling (or warning).
+  const ignoreModulePlugins: RspackPluginInstance[] = bundleOptions.ignoreModules.map(
+    (ignoreModule) =>
+      new IgnorePlugin({
+        resourceRegExp: new RegExp(ignoreModule.resource),
+        contextRegExp: ignoreModule.context ? new RegExp(ignoreModule.context) : undefined,
+      }),
+  );
+
   return {
     entry: entries,
 
     mode: getRspackBuildMode(qpqConfig),
 
-    externals: [/aws-sdk/],
+    externals: [/aws-sdk/, ...getQpqBundleExternals(qpqConfig)],
 
     target: 'node',
     output: {
@@ -29,7 +42,7 @@ export const getRspackConfig = (qpqConfig: QPQConfig, buildPath: string, entries
       fallback: {},
     },
 
-    plugins: [new QpqPlugin({ qpqConfigs: [qpqConfig], nodeModulePath })],
+    plugins: [new QpqPlugin({ qpqConfigs: [qpqConfig], nodeModulePath }), ...ignoreModulePlugins],
 
     module: {
       rules: [
@@ -46,6 +59,11 @@ export const getRspackConfig = (qpqConfig: QPQConfig, buildPath: string, entries
         module: /@module-federation/,
         message: /Failed to parse source map/,
       },
+      // `defineBackendBundleOptions` — known-noisy warnings from dependencies.
+      ...bundleOptions.ignoreWarnings.map((ignoreWarning) => ({
+        module: ignoreWarning.module ? new RegExp(ignoreWarning.module) : undefined,
+        message: ignoreWarning.message ? new RegExp(ignoreWarning.message) : undefined,
+      })),
     ],
   };
 };

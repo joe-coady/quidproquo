@@ -53,18 +53,18 @@
     "quidproquo-actionprocessor-node",
     "quidproquo-actionprocessor-awslambda",
     "quidproquo-neo4j",
+    "quidproquo-dev-server",
     "quidproquo-deploy-webpack",
     "quidproquo-deploy-rspack",
     "quidproquo-deploy-awscdk",
-    "quidproquo-cli",
     "quidproquo-web",
     "quidproquo-actionprocessor-web",
     "quidproquo-web-react",
     "quidproquo-web-admin",
     "quidproquo-testing",
-    "quidproquo-dev-server",
     "quidproquo",
-    "quidproquo-features"
+    "quidproquo-features",
+    "quidproquo-cli"
   ],
   "devDependencies": {
     "@types/node": "^26.1.0",

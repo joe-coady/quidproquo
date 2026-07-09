@@ -36,6 +36,7 @@
     "@module-federation/node": "2.7.45",
     "quidproquo-actionprocessor-awslambda": "0.1.4",
     "quidproquo-actionprocessor-node": "0.1.4",
+    "quidproquo-config-aws": "0.1.4",
     "quidproquo-core": "0.1.4",
     "quidproquo-deploy-awscdk": "0.1.4",
     "quidproquo-webserver": "0.1.4",

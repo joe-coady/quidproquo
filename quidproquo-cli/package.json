@@ -1,24 +1,26 @@
 {
   "name": "quidproquo-cli",
   "version": "0.1.4",
-  "description": "",
+  "description": "The qpq CLI — build, dev and deploy orchestration for QPQ apps",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
   "types": "./lib/commonjs/index.d.ts",
   "sideEffects": false,
   "files": [
-    "lib/**/*"
+    "lib/**/*",
+    "docker/**/*"
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "npx rimraf lib && npx rimraf node_modules",
-    "build": "npm run clean && npm run build:esm && npm run build:cjs",
+    "build": "npm run clean && npm run build:esm && npm run build:cjs && npm run build:bin-perms",
     "watch": "tsc -p tsconfig.commonjs.json -w",
     "build:cjs": "tsc -p tsconfig.commonjs.json",
     "build:esm": "tsc -p tsconfig.esm.json",
     "lint": "npx eslint .",
     "lint:fix": "npx eslint . --fix",
-    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\""
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
+    "build:bin-perms": "node -e \"require('fs').chmodSync('lib/commonjs/bin/qpq.js', 0o755)\""
   },
   "repository": {
     "type": "git",
@@ -32,11 +34,30 @@
   },
   "homepage": "https://github.com/joe-coady/quidproquo#readme",
   "dependencies": {
+    "@aws-sdk/client-sts": "^3.621.0",
+    "@inquirer/prompts": "^8.5.2",
+    "@rspack/dev-server": "^2.1.0",
+    "aws-cdk": "^2.1128.1",
+    "quidproquo": "0.1.4",
+    "quidproquo-actionprocessor-awslambda": "0.1.4",
+    "quidproquo-config-aws": "0.1.4",
     "quidproquo-core": "0.1.4",
-    "quidproquo-webserver": "0.1.4"
+    "quidproquo-deploy-awscdk": "0.1.4",
+    "quidproquo-deploy-rspack": "0.1.4",
+    "quidproquo-dev-server": "0.1.4",
+    "quidproquo-webserver": "0.1.4",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.8.2"
   },
   "devDependencies": {
-    "quidproquo-tsconfig": "0.1.4",
-    "typescript": "^5.8.2"
+    "@rspack/core": "^2.1.2",
+    "@types/node": "^22.13.13",
+    "quidproquo-tsconfig": "0.1.4"
+  },
+  "bin": {
+    "qpq": "./lib/commonjs/bin/qpq.js"
+  },
+  "peerDependencies": {
+    "@rspack/core": "^2.0.0"
   }
 }

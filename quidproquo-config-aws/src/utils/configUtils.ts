@@ -42,6 +42,21 @@ export const getAwsServiceAccountInfoConfig = (qpqConfig: QPQConfig): AwsService
 };
 
 /**
+ * All npm packages provided at runtime by the service's lambda layers
+ * (`ApiLayer.modules`). Bundlers externalize these on AWS builds. Returns []
+ * when no `defineAwsServiceAccountInfo` is present so non-AWS configs can
+ * still be bundled.
+ */
+export const getLayerProvidedModules = (qpqConfig: QPQConfig): string[] => {
+  const serviceAccountInfos = qpqCoreUtils.getConfigSettings<AwsServiceAccountInfoQPQConfigSetting>(
+    qpqConfig,
+    QPQAwsConfigSettingType.awsServiceAccountInfo,
+  );
+
+  return serviceAccountInfos.flatMap((serviceAccountInfo) => serviceAccountInfo.apiLayers.flatMap((layer) => layer.modules ?? []));
+};
+
+/**
  * Resolve the AWS hardening settings for a named virtual network. Falls back
  * to `defineAwsVirtualNetworkSettings(name)` when the config never declares
  * one, so every VPC gets the secure defaults (flow logs + free S3/DynamoDB

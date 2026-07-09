@@ -1,20 +1,34 @@
 // import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 
-import { QPQConfig } from 'quidproquo-core';
+import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
-import { Configuration } from 'webpack';
+import { Configuration, IgnorePlugin, WebpackPluginInstance } from 'webpack';
 
+import { getQpqBundleExternals } from './getQpqBundleExternals';
 import { getWebpackBuildMode } from './getWebpackBuildMode';
 import { QpqPlugin } from './plugins';
 
 export const getWebpackConfig = (qpqConfig: QPQConfig, buildPath: string, entries: Record<string, string>, nodeModulePath: string): Configuration => {
+  const bundleOptions = qpqCoreUtils.getBackendBundleOptions(qpqConfig);
+
+  // `defineBackendBundleOptions` — optional requires inside dependencies that
+  // should resolve to nothing instead of bundling (or warning).
+  const ignoreModulePlugins: WebpackPluginInstance[] = bundleOptions.ignoreModules.map(
+    (ignoreModule) =>
+      new IgnorePlugin(
+        ignoreModule.context
+          ? { resourceRegExp: new RegExp(ignoreModule.resource), contextRegExp: new RegExp(ignoreModule.context) }
+          : { resourceRegExp: new RegExp(ignoreModule.resource) },
+      ),
+  );
+
   return {
     entry: entries,
 
     mode: getWebpackBuildMode(qpqConfig),
     // mode: 'production',
 
-    externals: [/aws-sdk/],
+    externals: [/aws-sdk/, ...getQpqBundleExternals(qpqConfig)],
 
     target: 'node',
     output: {
@@ -32,7 +46,7 @@ export const getWebpackConfig = (qpqConfig: QPQConfig, buildPath: string, entrie
       fallback: {},
     },
 
-    plugins: [new QpqPlugin({ qpqConfigs: [qpqConfig], nodeModulePath })],
+    plugins: [new QpqPlugin({ qpqConfigs: [qpqConfig], nodeModulePath }), ...ignoreModulePlugins],
 
     module: {
       rules: [
@@ -49,6 +63,11 @@ export const getWebpackConfig = (qpqConfig: QPQConfig, buildPath: string, entrie
         module: /@module-federation/,
         message: /Failed to parse source map/,
       },
+      // `defineBackendBundleOptions` — known-noisy warnings from dependencies.
+      ...bundleOptions.ignoreWarnings.map((ignoreWarning) => ({
+        module: ignoreWarning.module ? new RegExp(ignoreWarning.module) : undefined,
+        message: ignoreWarning.message ? new RegExp(ignoreWarning.message) : undefined,
+      })),
     ],
   };
 };

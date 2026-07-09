@@ -19,7 +19,7 @@ const buildDevServerConfig = (settings: any[] = []): any => ({
 const startImplementation = (actionType: string = QueueActionType.SendMessages, settings: any[] = []) => {
   queueImplementation(buildDevServerConfig(settings));
 
-  const call = vi.mocked(eventBus.on).mock.calls.find(([type]) => type === actionType)!;
+  const call = vi.mocked(eventBus.on).mock.calls.find(([type]: any[]) => type === actionType)!;
   return call[1] as (payload: any, correlation: string) => Promise<void>;
 };
 
@@ -133,7 +133,10 @@ describe('queueImplementation FIFO group serialization', () => {
 describe('queueImplementation event bus fan-out', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  const fifoSettings = [defineEventBus('fifoBus', { isFifo: true }), defineQueue('fifoQueue', {}, { isFifo: true, eventBusSubscriptions: ['fifoBus'] })];
+  const fifoSettings = [
+    defineEventBus('fifoBus', { isFifo: true }),
+    defineQueue('fifoQueue', {}, { isFifo: true, eventBusSubscriptions: ['fifoBus'] }),
+  ];
 
   const buildBusMessage = (overrides: Record<string, unknown> = {}): any => ({
     type: 'x',

@@ -3,6 +3,8 @@ import {
   AiQPQConfigSetting,
   ApiBuildPathQPQConfigSetting,
   ApplicationQPQConfigSetting,
+  BackendBundleOptions,
+  BackendBundleOptionsQPQConfigSetting,
   ClaudeAIQPQConfigSetting,
   defineJavascriptRuntime,
   DeployEventsQPQConfigSetting,
@@ -10,6 +12,8 @@ import {
   EnvironmentSettingsQPQConfigSetting,
   EventBusQPQConfigSetting,
   FederatedModuleStoreQPQConfigSetting,
+  FrontendBundleOptions,
+  FrontendBundleOptionsQPQConfigSetting,
   GlobalQPQConfigSetting,
   GraphDatabaseQPQConfigSetting,
   InlineFunctionQPQConfigSetting,
@@ -524,6 +528,33 @@ export const getOwnedParameterConfigs = (qpqConfig: QPQConfig): ParameterQPQConf
   const parameters = getAllParameterConfigs(qpqConfig);
 
   return getOwnedItems(parameters, qpqConfig);
+};
+
+/**
+ * Merges every `defineBackendBundleOptions` in the config into a single set of
+ * bundler directives. Services compose config from many fragments, so each
+ * fragment can declare the build quirks of its own dependencies.
+ */
+export const getBackendBundleOptions = (qpqConfig: QPQConfig): Required<BackendBundleOptions> => {
+  const settings = getConfigSettings<BackendBundleOptionsQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.backendBundleOptions);
+
+  return {
+    externals: settings.flatMap((setting) => setting.externals),
+    ignoreModules: settings.flatMap((setting) => setting.ignoreModules),
+    ignoreWarnings: settings.flatMap((setting) => setting.ignoreWarnings),
+  };
+};
+
+/**
+ * Merges every `defineFrontendBundleOptions` in the config into a single set
+ * of views-bundler directives.
+ */
+export const getFrontendBundleOptions = (qpqConfig: QPQConfig): Required<FrontendBundleOptions> => {
+  const settings = getConfigSettings<FrontendBundleOptionsQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.frontendBundleOptions);
+
+  return {
+    sharedSingletons: settings.flatMap((setting) => setting.sharedSingletons),
+  };
 };
 
 export const getUniqueKeyForSetting = (setting: QPQConfigSetting) => {

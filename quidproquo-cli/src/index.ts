@@ -1,3 +1,1 @@
-export const noop = () => {
-  // noop
-};
+export * from './cli';
