@@ -107,6 +107,8 @@ const config: Config = {
       logo: {
         alt: 'quidproquo logo',
         src: 'img/qpq-logo.svg',
+        href: 'https://quidproquojs.com',
+        target: '_self',
       },
       items: [
         {
