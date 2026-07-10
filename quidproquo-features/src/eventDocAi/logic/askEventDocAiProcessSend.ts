@@ -71,6 +71,7 @@ export function* askEventDocAiProcessSend(
     aiName,
     messages: chatMessagesToAiMessages(fullHistory, docStorageDrive, docId),
     reasoning: reasoningBudgetTokens ? { budgetTokens: reasoningBudgetTokens } : undefined,
+    caching: true,
   });
 
   const assistantParts = yield* askStreamMap(streamHandle, function* askMap(part) {
