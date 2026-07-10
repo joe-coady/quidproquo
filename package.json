@@ -24,7 +24,8 @@
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage --coverage.reporter=text-summary",
     "test:coverage:core": "vitest run --coverage --root quidproquo-core --coverage.reporter=text --coverage.reporter=text-summary --coverage.include='src/**/*.ts' --coverage.exclude='src/**/*.test.ts'",
-    "test:types": "tsc --build tsconfig.test.json"
+    "test:types": "tsc --build tsconfig.test.json",
+    "docs": "npm run build --prefix quidproquojs.com/docusaurus && npm run serve --prefix quidproquojs.com/docusaurus"
   },
   "repository": {
     "type": "git",

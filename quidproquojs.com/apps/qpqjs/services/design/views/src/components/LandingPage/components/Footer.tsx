@@ -18,8 +18,9 @@ export function Footer() {
             <span className="hero__title-glow">your first story?</span>
           </h2>
           <p className="footer__cta-sub">
-            Install the core, yield an action, and let the runtime handle the
-            rest.
+            One command scaffolds a full app — five services, a local dev
+            server, a one-image docker deploy. Yield an action; the runtime
+            handles the rest.
           </p>
           <div className="footer__cta-actions">
             <InstallChip />

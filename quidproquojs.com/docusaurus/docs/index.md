@@ -179,7 +179,12 @@ Dive deep into the architecture that powers Quidproquo's platform independence a
 
 ## Next Steps
 
-Ready to get started with Quidproquo?
+Ready to get started with Quidproquo? One command scaffolds a complete,
+running app:
+
+```bash
+npx create-qpq-app myapp
+```
 
 <div className="row">
   <div className="col col--6">
@@ -188,7 +193,7 @@ Ready to get started with Quidproquo?
         <h3>🚀 Quick Start</h3>
       </div>
       <div className="card__body">
-        <p>Get up and running in 5 minutes with our quick start guide.</p>
+        <p>Scaffold a five-service app that runs locally and deploys as a single docker image.</p>
       </div>
       <div className="card__footer">
         <a href="/getting-started" className="button button--primary button--block">Get Started</a>

@@ -109,6 +109,13 @@ All packages extend the base config at `quidproquo-tsconfig/tsconfig.base.json`.
 
 Shared ESLint config at `quidproquo-eslint-config/eslint.config.mjs` enforces consistent code style. Import sorting groups quidproquo packages separately from external dependencies.
 
+## Writing style
+
+When writing documentation, comments, or user-facing frontend copy (e.g. the landing page):
+
+- **Never** use em dashes (—). Use a period, comma, colon, or parentheses instead.
+- Write like a person, not an AI assistant. Avoid the tells: no "leverage/utilize/robust/seamless/delve", no rule-of-three lists piled into one sentence, no overly symmetric "it's not just X, it's Y" constructions, no forced enthusiasm. Prefer plain, direct, slightly informal phrasing over polished marketing tone.
+
 ## Important Notes
 
 - This is a monorepo using npm workspaces - always use `-w <package-name>` to target specific packages

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const INSTALL_COMMAND = 'npm install quidproquo-core';
+const INSTALL_COMMAND = 'npx create-qpq-app myapp';
 
 export function InstallChip() {
   const [copied, setCopied] = useState(false);
