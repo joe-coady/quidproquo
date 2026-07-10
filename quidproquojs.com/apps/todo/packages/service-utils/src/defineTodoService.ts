@@ -30,6 +30,20 @@ import {
 
 const modulePrefix = 'todo';
 
+// The deployed version tag — git sha when available, so a fresh checkout
+// (or a scaffold that skipped git init) still loads.
+const getVersionTag = (): string => {
+  try {
+    return execSync('git rev-parse --short HEAD', {
+      stdio: ['ignore', 'pipe', 'ignore'],
+    })
+      .toString()
+      .trim();
+  } catch {
+    return 'no-git';
+  }
+};
+
 // The shared config every todo service starts from — app identity, dns,
 // auth, admin, api and caching. Each service's infrastructure.ts layers its
 // own resources on top of this.
@@ -50,11 +64,7 @@ export const defineTodoService = (
     process.env.ACTOR_NAME
   ),
 
-  defineApplicationVersion(
-    `${execSync('git rev-parse --short HEAD')
-      .toString()
-      .trim()}-${new Date().toISOString()}`
-  ),
+  defineApplicationVersion(`${getVersionTag()}-${new Date().toISOString()}`),
 
   defineDns(domainName),
 

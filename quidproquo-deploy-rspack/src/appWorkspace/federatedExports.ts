@@ -3,7 +3,7 @@ import path from 'path';
 
 // The `// federated.export` marker system — single source of truth for module
 // federation exposes:
-//  - any .ts/.tsx file whose content CONTAINS the substring `// federated.export`
+//  - any .ts/.tsx/.js/.jsx file whose content CONTAINS the substring `// federated.export`
 //    is exposed as `./<basename-without-ext>` -> `./src/<relative-path>`
 //  - a file NAMED `federated.export` marks its directory as an expose: the key is
 //    the trimmed file contents (or the directory name when empty), the value is
@@ -38,10 +38,10 @@ export const scanFederatedExposes = (viewsDir: string): FederatedExposes => {
         continue;
       }
 
-      if (/\.tsx?$/.test(entry.name)) {
+      if (/\.[jt]sx?$/.test(entry.name)) {
         const contents = fs.readFileSync(full, 'utf8');
         if (contents.includes(FEDERATED_EXPORT_COMMENT)) {
-          const key = entry.name.replace(/\.tsx?$/, '');
+          const key = entry.name.replace(/\.[jt]sx?$/, '');
           exposes[`./${key}`] = `./src/${relFromSrc}`;
         }
       }

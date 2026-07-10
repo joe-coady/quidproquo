@@ -23,7 +23,9 @@ const loadServiceConfig = (root: string, appName: string, service: string): QPQC
 export const getAppServiceNames = (root: string, appName: string): string[] => {
   const dir = path.join(root, 'apps', appName, 'services');
   if (!fs.existsSync(dir)) return [];
-  return fs.readdirSync(dir).filter((s) => fs.existsSync(path.join(dir, s, 'service', 'src', 'infrastructure.ts')));
+  return fs
+    .readdirSync(dir)
+    .filter((s) => ['infrastructure.ts', 'infrastructure.js'].some((infra) => fs.existsSync(path.join(dir, s, 'service', 'src', infra))));
 };
 
 // First app under apps/ that has a services/ dir — the app-agnostic default.

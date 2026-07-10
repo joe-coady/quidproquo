@@ -22,6 +22,7 @@
     "build:esm": "tsc -p tsconfig.esm.json",
     "build:bin-perms": "node -e \"require('fs').chmodSync('lib/commonjs/bin/createQpqApp.js', 0o755)\"",
     "snapshot-template": "node ./scripts/snapshotTemplate.mjs",
+    "smoke-test": "node ./scripts/smokeTest.mjs",
     "prepack": "npm run snapshot-template",
     "lint": "npx eslint .",
     "lint:fix": "npx eslint . --fix",
@@ -44,12 +45,13 @@
   },
   "homepage": "https://github.com/joe-coady/quidproquo#readme",
   "dependencies": {
-    "@inquirer/prompts": "^8.5.2"
+    "@inquirer/prompts": "^8.5.2",
+    "prettier": "^3.2.5",
+    "typescript": "^5.8.2"
   },
   "devDependencies": {
     "@types/node": "^22.13.13",
-    "quidproquo-tsconfig": "0.1.5",
-    "typescript": "^5.8.2"
+    "quidproquo-tsconfig": "0.1.5"
   },
   "bin": {
     "create-qpq-app": "./lib/commonjs/bin/createQpqApp.js"

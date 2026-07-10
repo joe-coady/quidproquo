@@ -4,6 +4,10 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "module": "commonjs",
+    // This repo is the create-qpq-app template; its JavaScript flavour is
+    // produced by per-file transpilation, which only supports
+    // isolatedModules-compatible TypeScript. Keep this on.
+    "isolatedModules": true,
     "rootDir": ".",
     "declaration": false,
     "emitDecoratorMetadata": true,

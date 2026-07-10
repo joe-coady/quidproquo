@@ -148,10 +148,14 @@ export const getViewsRspackConfig = (viewsDir: string): Configuration => {
   const htmlTemplate = path.join(viewsDir, 'src', 'index.html');
   const favicon = path.join(viewsDir, 'src', 'favicon.ico');
 
+  // main.ts for TypeScript apps, main.js for JavaScript apps
+  const tsEntry = path.join(viewsDir, 'src', 'main.ts');
+  const entry = fs.existsSync(tsEntry) ? tsEntry : path.join(viewsDir, 'src', 'main.js');
+
   return {
     mode: isDev ? 'development' : 'production',
     context: viewsDir,
-    entry: path.join(viewsDir, 'src', 'main.ts'),
+    entry,
     devtool: isDev ? 'eval-cheap-module-source-map' : 'source-map',
 
     output: {
@@ -200,6 +204,13 @@ export const getViewsRspackConfig = (viewsDir: string): Configuration => {
           exclude: /node_modules/,
           loader: 'builtin:swc-loader',
           options: swcReactOptions(isDev, true),
+        },
+        {
+          // JavaScript apps ship ESM-syntax .js inside type:commonjs packages;
+          // 'auto' accepts both module syntaxes.
+          test: /\.js$/,
+          exclude: /node_modules/,
+          type: 'javascript/auto',
         },
         { test: /\.css$/, type: 'css/auto' },
         { test: /\.(png|jpe?g|gif|webp|avif|ico)$/, type: 'asset' },

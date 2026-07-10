@@ -91,6 +91,14 @@ export const getDevServerRspackConfig = ({ root, entry, qpqConfigs }: DevServerR
           },
         },
         {
+          // JavaScript apps ship ESM-syntax .js inside type:commonjs packages;
+          // 'auto' accepts both module syntaxes (the rspack default for files
+          // outside a package "type" scope).
+          test: /\.js$/,
+          exclude: /node_modules/,
+          type: 'javascript/auto',
+        },
+        {
           // Small fonts inline as data urls, larger ones emit as files.
           test: /\.(woff|woff2)$/,
           type: 'asset',
