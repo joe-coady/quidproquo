@@ -64,7 +64,8 @@
     "quidproquo-testing",
     "quidproquo",
     "quidproquo-features",
-    "quidproquo-cli"
+    "quidproquo-cli",
+    "create-qpq-app"
   ],
   "devDependencies": {
     "@types/node": "^26.1.0",
