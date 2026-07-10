@@ -1,0 +1,8 @@
+{
+  "name": "@todo/design-service-views",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "validate-ts": "tsc -p tsconfig.app.json"
+  }
+}
