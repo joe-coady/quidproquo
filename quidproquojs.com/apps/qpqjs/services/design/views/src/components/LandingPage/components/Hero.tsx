@@ -3,18 +3,19 @@ import { useRef } from 'react';
 import { CodeWindow } from './CodeWindow';
 import { InstallChip } from './InstallChip';
 import { NavBar } from './NavBar';
-import { RuntimeBelow } from './RuntimeBelow';
+import { TronGrid } from './TronGrid';
 
 export function Hero() {
+  const copyRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
   return (
     <section className="hero" id="top">
-      <RuntimeBelow anchorRootRef={panelRef} />
+      <TronGrid avoidRefs={[copyRef, panelRef]} />
       <NavBar />
 
       <div className="hero__inner">
-        <div className="hero__copy">
+        <div ref={copyRef} className="hero__copy">
           <span className="hero__badge">
             <span className="hero__badge-pulse" />
             functional · action-based · typescript

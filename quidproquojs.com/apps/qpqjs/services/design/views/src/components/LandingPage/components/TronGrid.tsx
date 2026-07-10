@@ -5,10 +5,16 @@ import type { RefObject } from 'react';
  * Animated hero backdrop: a faint grid lattice with glowing "light cycle"
  * trails that travel along the grid lines, turning at intersections.
  *
- * Two stacked canvases: a static grid layer (redrawn on resize only) and a
- * trail layer that is fully cleared and redrawn every frame from each snake's
- * recorded polyline — alpha falls off with distance from the head, so tails
- * end cleanly and nothing accumulates on screen.
+ * Two stacked canvases: a grid layer and a trail layer that is fully cleared
+ * and redrawn every frame from each snake's recorded polyline — alpha falls
+ * off with distance from the head, so tails end cleanly and nothing
+ * accumulates on screen.
+ *
+ * The grid is a gently rippling surface: two slow ambient swells plus small
+ * rings sown by the cursor displace everything drawn on it (lines, dots,
+ * cycles, sparks) through one shared field, giving the flat lattice a quiet
+ * 3D undulation. Under prefers-reduced-motion the grid renders flat and
+ * static exactly as it used to.
  */
 
 const CELL = 44;
@@ -140,12 +146,26 @@ function trimTrail(snake: Snake): void {
   }
 }
 
+interface Displacement {
+  dx: number;
+  dy: number;
+}
+
+/**
+ * When a `displace` sampler is given, grid lines are drawn as polylines bent
+ * by it — the subtle 3D ripple. Without one (reduced motion, initial paint)
+ * the grid renders crisp and flat exactly as before.
+ */
 function drawGrid(
   ctx: CanvasRenderingContext2D,
   width: number,
-  height: number
+  height: number,
+  displace?: (x: number, y: number, out: Displacement) => void
 ): void {
   ctx.clearRect(0, 0, width, height);
+
+  const out: Displacement = { dx: 0, dy: 0 };
+  const step = CELL / 2;
 
   for (let x = 0; x <= width + CELL; x += CELL) {
     const major = Math.round(x / CELL) % 5 === 0;
@@ -154,8 +174,16 @@ function drawGrid(
       : 'rgba(125, 211, 252, 0.065)';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(x + 0.5, 0);
-    ctx.lineTo(x + 0.5, height);
+    if (displace) {
+      for (let y = 0; y <= height + step; y += step) {
+        displace(x, y, out);
+        if (y === 0) ctx.moveTo(x + out.dx, y + out.dy);
+        else ctx.lineTo(x + out.dx, y + out.dy);
+      }
+    } else {
+      ctx.moveTo(x + 0.5, 0);
+      ctx.lineTo(x + 0.5, height);
+    }
     ctx.stroke();
   }
 
@@ -166,25 +194,38 @@ function drawGrid(
       : 'rgba(125, 211, 252, 0.065)';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(0, y + 0.5);
-    ctx.lineTo(width, y + 0.5);
+    if (displace) {
+      for (let x = 0; x <= width + step; x += step) {
+        displace(x, y, out);
+        if (x === 0) ctx.moveTo(x + out.dx, y + out.dy);
+        else ctx.lineTo(x + out.dx, y + out.dy);
+      }
+    } else {
+      ctx.moveTo(0, y + 0.5);
+      ctx.lineTo(width, y + 0.5);
+    }
     ctx.stroke();
   }
 
   ctx.fillStyle = 'rgba(148, 210, 255, 0.16)';
   for (let x = 0; x <= width + CELL; x += CELL) {
     for (let y = 0; y <= height + CELL; y += CELL) {
-      ctx.fillRect(x - 0.5, y - 0.5, 1.5, 1.5);
+      if (displace) {
+        displace(x, y, out);
+        ctx.fillRect(x + out.dx - 0.5, y + out.dy - 0.5, 1.5, 1.5);
+      } else {
+        ctx.fillRect(x - 0.5, y - 0.5, 1.5, 1.5);
+      }
     }
   }
 }
 
 interface TronGridProps {
-  /** Element the light cycles must route around instead of passing behind. */
-  avoidRef?: RefObject<HTMLElement | null>;
+  /** Elements the light cycles must route around instead of passing behind. */
+  avoidRefs?: RefObject<HTMLElement | null>[];
 }
 
-export function TronGrid({ avoidRef }: TronGridProps = {}) {
+export function TronGrid({ avoidRefs }: TronGridProps = {}) {
   const gridRef = useRef<HTMLCanvasElement>(null);
   const trailRef = useRef<HTMLCanvasElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -210,10 +251,74 @@ export function TronGrid({ avoidRef }: TronGridProps = {}) {
     let rafId = 0;
     let lastTime = 0;
     let inView = true;
-    let avoid: { x0: number; y0: number; x1: number; y1: number } | null = null;
+    let avoids: { x0: number; y0: number; x1: number; y1: number }[] = [];
 
-    const blockedAt = (x: number, y: number) =>
-      !!avoid && x > avoid.x0 && x < avoid.x1 && y > avoid.y0 && y < avoid.y1;
+    // ------------------------------------------------------------- ripple
+    // The grid behaves like a taut surface: two broad, slow ambient swells
+    // plus small expanding rings that the cursor sows. Everything drawn on
+    // the grid (lines, dots, light cycles, sparks) samples the same field,
+    // so the whole scene undulates together.
+    interface Ripple {
+      x: number;
+      y: number;
+      born: number; // seconds, same clock as tSec
+    }
+    let ripples: Ripple[] = [];
+    let tSec = 0;
+    let docLeft = 0;
+    let docTop = 0;
+    let lastSowAt = 0;
+    let lastSowX = 0;
+    let lastSowY = 0;
+
+    const heightAt = (x: number, y: number, t: number): number => {
+      let h =
+        2.6 * Math.sin(x * 0.008 + y * 0.011 + t * 0.7) +
+        1.8 * Math.sin(x * 0.013 - y * 0.007 - t * 0.52);
+      for (const ripple of ripples) {
+        const age = t - ripple.born;
+        const dist = Math.hypot(x - ripple.x, y - ripple.y);
+        const ring = dist - age * 230;
+        h +=
+          5 *
+          Math.exp(-(ring * ring) / 9800) *
+          Math.exp(-age * 1.4) *
+          Math.min(age * 4, 1);
+      }
+      return h;
+    };
+
+    const displaceAt = (x: number, y: number, out: Displacement): void => {
+      out.dy = heightAt(x, y, tSec);
+      // a decorrelated sample of the same field for the lateral component,
+      // so vertical lines bend too instead of sliding along themselves
+      out.dx = 0.6 * heightAt(x + 157, y + 211, tSec * 1.13 + 5);
+    };
+
+    const onPointerMove = (event: PointerEvent) => {
+      if (!rafId) return;
+      if (event.pointerType && event.pointerType !== 'mouse') return;
+      const x = event.clientX - docLeft;
+      const y = event.clientY - (docTop - window.scrollY);
+      if (x < -CELL || x > width + CELL || y < -CELL || y > height + CELL)
+        return;
+      const now = performance.now();
+      if (now - lastSowAt < 150 || Math.hypot(x - lastSowX, y - lastSowY) < 32)
+        return;
+      ripples.push({ x, y, born: now / 1000 });
+      if (ripples.length > 6) ripples.shift();
+      lastSowAt = now;
+      lastSowX = x;
+      lastSowY = y;
+    };
+
+    const blockedAt = (x: number, y: number) => {
+      for (const avoid of avoids) {
+        if (x > avoid.x0 && x < avoid.x1 && y > avoid.y0 && y < avoid.y1)
+          return true;
+      }
+      return false;
+    };
 
     const spawnClear = (comet: boolean): Snake => {
       for (let tries = 0; tries < 24; tries += 1) {
@@ -227,19 +332,21 @@ export function TronGrid({ avoidRef }: TronGridProps = {}) {
       const rect = wrap.getBoundingClientRect();
       width = rect.width;
       height = rect.height;
+      docLeft = rect.left;
+      docTop = rect.top + window.scrollY;
 
-      const avoidEl = avoidRef?.current;
-      if (avoidEl) {
+      avoids = [];
+      const pad = CELL * 0.5;
+      for (const ref of avoidRefs ?? []) {
+        const avoidEl = ref.current;
+        if (!avoidEl) continue;
         const r = avoidEl.getBoundingClientRect();
-        const pad = CELL * 0.5;
-        avoid = {
+        avoids.push({
           x0: r.left - rect.left - pad,
           y0: r.top - rect.top - pad,
           x1: r.right - rect.left + pad,
           y1: r.bottom - rect.top + pad,
-        };
-      } else {
-        avoid = null;
+        });
       }
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
@@ -301,6 +408,11 @@ export function TronGrid({ avoidRef }: TronGridProps = {}) {
       trimTrail(snake);
     };
 
+    // the cycles live in flat grid coordinates; only their RENDERED positions
+    // ride the rippling surface, so their routing logic is untouched
+    const dispA: Displacement = { dx: 0, dy: 0 };
+    const dispB: Displacement = { dx: 0, dy: 0 };
+
     const drawSnake = (snake: Snake) => {
       const { trail, tone } = snake;
       const maxAlpha = snake.comet ? 0.95 : 0.8;
@@ -312,16 +424,23 @@ export function TronGrid({ avoidRef }: TronGridProps = {}) {
         const segment = Math.abs(near.x - far.x) + Math.abs(near.y - far.y);
         if (segment < 0.01) continue;
 
+        displaceAt(near.x, near.y, dispA);
+        displaceAt(far.x, far.y, dispB);
+        const nearX = near.x + dispA.dx;
+        const nearY = near.y + dispA.dy;
+        const farX = far.x + dispB.dx;
+        const farY = far.y + dispB.dy;
+
         const alphaNear =
           maxAlpha * Math.max(0, 1 - cumulative / snake.trailLength);
         const alphaFar =
           maxAlpha *
           Math.max(0, 1 - (cumulative + segment) / snake.trailLength);
         const gradient = trailCtx.createLinearGradient(
-          near.x,
-          near.y,
-          far.x,
-          far.y
+          nearX,
+          nearY,
+          farX,
+          farY
         );
         gradient.addColorStop(0, `rgba(${tone.rgb}, ${alphaNear})`);
         gradient.addColorStop(1, `rgba(${tone.rgb}, ${alphaFar})`);
@@ -332,15 +451,15 @@ export function TronGrid({ avoidRef }: TronGridProps = {}) {
         trailCtx.globalAlpha = 0.28;
         trailCtx.lineWidth = snake.lineWidth + 4.5;
         trailCtx.beginPath();
-        trailCtx.moveTo(near.x, near.y);
-        trailCtx.lineTo(far.x, far.y);
+        trailCtx.moveTo(nearX, nearY);
+        trailCtx.lineTo(farX, farY);
         trailCtx.stroke();
 
         trailCtx.globalAlpha = 1;
         trailCtx.lineWidth = snake.lineWidth;
         trailCtx.beginPath();
-        trailCtx.moveTo(near.x, near.y);
-        trailCtx.lineTo(far.x, far.y);
+        trailCtx.moveTo(nearX, nearY);
+        trailCtx.lineTo(farX, farY);
         trailCtx.stroke();
 
         cumulative += segment;
@@ -348,11 +467,18 @@ export function TronGrid({ avoidRef }: TronGridProps = {}) {
       }
 
       const head = trail[trail.length - 1];
+      displaceAt(head.x, head.y, dispA);
       trailCtx.fillStyle = '#eaffff';
       trailCtx.shadowColor = `rgba(${tone.rgb}, 0.9)`;
       trailCtx.shadowBlur = 12;
       trailCtx.beginPath();
-      trailCtx.arc(head.x, head.y, snake.comet ? 1.4 : 1.8, 0, Math.PI * 2);
+      trailCtx.arc(
+        head.x + dispA.dx,
+        head.y + dispA.dy,
+        snake.comet ? 1.4 : 1.8,
+        0,
+        Math.PI * 2
+      );
       trailCtx.fill();
       trailCtx.shadowBlur = 0;
     };
@@ -361,9 +487,16 @@ export function TronGrid({ avoidRef }: TronGridProps = {}) {
       sparks = sparks.filter((spark) => (spark.age += dt) < SPARK_LIFE);
       for (const spark of sparks) {
         const fade = 1 - spark.age / SPARK_LIFE;
+        displaceAt(spark.x, spark.y, dispA);
         trailCtx.fillStyle = `rgba(${spark.tone.rgb}, ${0.85 * fade})`;
         trailCtx.beginPath();
-        trailCtx.arc(spark.x, spark.y, 1.6 + spark.age * 6, 0, Math.PI * 2);
+        trailCtx.arc(
+          spark.x + dispA.dx,
+          spark.y + dispA.dy,
+          1.6 + spark.age * 6,
+          0,
+          Math.PI * 2
+        );
         trailCtx.fill();
       }
     };
@@ -374,6 +507,12 @@ export function TronGrid({ avoidRef }: TronGridProps = {}) {
       lastTime = time;
       if (dt <= 0) return;
 
+      tSec = time / 1000;
+      for (let i = ripples.length - 1; i >= 0; i -= 1) {
+        if (tSec - ripples[i].born > 2.4) ripples.splice(i, 1);
+      }
+
+      drawGrid(gridCtx, width, height, displaceAt);
       trailCtx.clearRect(0, 0, width, height);
 
       for (const snake of snakes) {
@@ -400,7 +539,16 @@ export function TronGrid({ avoidRef }: TronGridProps = {}) {
       resize();
     });
     resizeObserver.observe(wrap);
-    if (avoidRef?.current) resizeObserver.observe(avoidRef.current);
+    const avoidEls: HTMLElement[] = [];
+    for (const ref of avoidRefs ?? []) {
+      if (ref.current) avoidEls.push(ref.current);
+    }
+    for (const el of avoidEls) {
+      resizeObserver.observe(el);
+      // entrance animations translate these blocks; re-measure the avoid
+      // rects once they settle or they'd stay offset by the initial shift
+      el.addEventListener('animationend', resize);
+    }
 
     const intersectionObserver = new IntersectionObserver(
       ([entry]) => {
@@ -413,6 +561,8 @@ export function TronGrid({ avoidRef }: TronGridProps = {}) {
     intersectionObserver.observe(wrap);
 
     document.addEventListener('visibilitychange', onVisibility);
+    if (!reducedMotion)
+      window.addEventListener('pointermove', onPointerMove, { passive: true });
 
     resize();
     start();
@@ -422,6 +572,8 @@ export function TronGrid({ avoidRef }: TronGridProps = {}) {
       resizeObserver.disconnect();
       intersectionObserver.disconnect();
       document.removeEventListener('visibilitychange', onVisibility);
+      window.removeEventListener('pointermove', onPointerMove);
+      for (const el of avoidEls) el.removeEventListener('animationend', resize);
     };
   }, []);
 

@@ -9,7 +9,7 @@ export function Footer() {
   return (
     <footer className="footer">
       <div className="footer__cta">
-        <TronGrid avoidRef={panelRef} />
+        <TronGrid avoidRefs={[panelRef]} />
         <div ref={panelRef} className="footer__cta-content">
           <p className="section__kicker">get started</p>
           <h2 className="footer__cta-title">
