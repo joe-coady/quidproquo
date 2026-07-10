@@ -1,6 +1,6 @@
 {
   "name": "create-qpq-app",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Scaffold a new quidproquo app — npx create-qpq-app my-app",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
@@ -48,7 +48,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.13.13",
-    "quidproquo-tsconfig": "0.1.4",
+    "quidproquo-tsconfig": "0.1.5",
     "typescript": "^5.8.2"
   },
   "bin": {
