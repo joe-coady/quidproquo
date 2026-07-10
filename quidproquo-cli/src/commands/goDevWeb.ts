@@ -19,7 +19,14 @@ import { primeDeployEnvFromConfig } from '../lib/deployEnv';
 import { getRoot } from '../lib/discovery';
 import { resolveAppSelection } from '../lib/resolveAppSelection';
 
-export const goDevWebCommand = async (argv: string[]): Promise<void> => {
+export type GoDevWebOptions = {
+  // The in-place "(started)" chip rewrite assumes this command owns the
+  // terminal; when stdout is shared with the API dev server (combined
+  // `qpq go:dev`) the cursor math breaks, so fall back to plain lines.
+  plainStatusLines?: boolean;
+};
+
+export const goDevWebCommand = async (argv: string[], options: GoDevWebOptions = {}): Promise<void> => {
   const root = getRoot();
   const appName = await resolveAppSelection({ argv, envVar: 'QPQ_DEV_APP' });
 
@@ -71,7 +78,7 @@ export const goDevWebCommand = async (argv: string[]): Promise<void> => {
 
   const markStarted = (index: number): void => {
     const v = views[index];
-    if (!process.stdout.isTTY) {
+    if (!process.stdout.isTTY || options.plainStatusLines) {
       logBelowList(`  ${v.service} started`);
       return;
     }

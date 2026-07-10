@@ -5,7 +5,8 @@ Usage: qpq <command> [--app <name>] [--env <name>] [--platform <name>]
 Commands:
   go               Deploy services (interactive; platform from deploy.config.json, default aws)
   go:docker        Same as go, but deploys in parallel via docker
-  go:dev           Run the local dev server (hot reload)
+  go:dev           Run the full local dev stack (api + web) in one process
+  go:dev:api       Run the local API dev server (hot reload)
   go:dev:web       Run every views microfrontend dev server
   teardown         Destroy web/api/inf stacks for selected services (interactive)
   synth [service]  Synth QPQ configs to dist/apps/<app>/infrastructure
@@ -49,6 +50,7 @@ export const runCli = async (argv: string[]): Promise<void> => {
     go: (a) => require('../commands/go').goCommand(a),
     'go:docker': (a) => require('../commands/goDocker').goDockerCommand(a),
     'go:dev': (a) => require('../commands/goDev').goDevCommand(a),
+    'go:dev:api': (a) => require('../commands/goDevApi').goDevApiCommand(a),
     'go:dev:web': (a) => require('../commands/goDevWeb').goDevWebCommand(a),
     teardown: (a) => require('../commands/teardown').teardownCommand(a),
     synth: (a) => require('../commands/synth').synthCommand(a),

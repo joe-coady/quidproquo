@@ -16,8 +16,12 @@ builds it, and makes the first git commit for you.
 
 ```bash
 cd myapp
-npm run go:dev     # local dev server on http://localhost:8080
+npm run go:dev     # api on http://localhost:8080, web on http://localhost:3080
 ```
+
+One command, one ctrl+c: `go:dev` runs the backend dev server and every views
+dev server in a single process. Want just one side? `npm run go:dev:api` and
+`npm run go:dev:web` run them separately.
 
 Check it's alive:
 

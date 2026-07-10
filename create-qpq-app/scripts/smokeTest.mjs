@@ -111,7 +111,10 @@ const smokeTestLanguage = async (workDir, language) => {
 
   log(`--- ${language}: booting dev server`);
   clearDevServerPorts();
-  const devServer = spawn('npm', ['run', 'go:dev'], { cwd: appDir, shell: true, detached: true, stdio: 'ignore' });
+  // go:dev:api, not the combined go:dev — the smoke test only asserts the API
+  // health endpoint, and the views dev servers would add minutes of Rspack
+  // compile plus a fleet of ports this script doesn't sweep.
+  const devServer = spawn('npm', ['run', 'go:dev:api'], { cwd: appDir, shell: true, detached: true, stdio: 'ignore' });
 
   try {
     const health = await waitForHealthy(BOOT_TIMEOUT_MS);

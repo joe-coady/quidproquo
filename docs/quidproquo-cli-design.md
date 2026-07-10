@@ -68,7 +68,7 @@ Root package.json is entirely user-owned; qpq's only claims on it are a
 - **Zero package-specific knowledge**: no liquidjs/adm-zip/ws special cases baked in.
   That cruft moves to the consumer's own config (see bundle options below). Hard
   line — otherwise the ignore list grows forever with every consumer's pet dependency.
-- Command names keep the muscle memory: `qpq go`, `qpq go:dev`, `qpq go:dev:web`,
+- Command names keep the muscle memory: `qpq go`, `qpq go:dev`, `qpq go:dev:api`, `qpq go:dev:web`,
   `qpq synth`, `qpq prep`, `qpq publish[:build|:upload|:deploy]`, `qpq go:docker`.
   Root package.json keeps aliases like `"go": "qpq go"`.
 
@@ -171,7 +171,7 @@ Everything above is implemented except the scaffolder. Details decided during
 implementation:
 
 - **quidproquo-cli** ships `bin/qpq.js` (dispatch: go, go:docker, go:dev,
-  go:dev:web, synth, prep, publish[:build|:upload|:deploy], hooks) and
+  go:dev:api, go:dev:web, synth, prep, publish[:build|:upload|:deploy], hooks) and
   `bin/qpq-cdk-app.js` (the CDK app command). The CLI registers ts-node's
   transpile-only require hook at startup, so consumers need no root ts-node
   wiring; ts-node, typescript, aws-cdk, inquirer, @aws-sdk/client-sts and
@@ -209,9 +209,11 @@ implementation:
   app-specific EXTRAS — the workspace CDK app provides defineApplication +
   defineAwsServiceAccountInfo.
 - **Dev server entry is generated** at `dist/qpq/dev-server/entry.ts` per
-  `qpq go:dev` run; an optional `apps/<app>/devServer.config.ts`
+  `qpq go:dev:api` run; an optional `apps/<app>/devServer.config.ts`
   (default-exporting DevServerConfigOverrides) is imported when present.
   `qpq go:dev:web` runs all views dev servers in-process via RspackDevServer.
+  `qpq go:dev` composes both: the API watch plus every views dev server in one
+  process, so a single ctrl+c stops the whole stack.
 - **Hooks**: `qpq hooks <name>` runs `qpq:<name>` from every
   `apps/<app>/package.json`; doccypoccy root postinstall =
   `qpq hooks postinstall || true` (non-fatal while quidproquo-cli is linked,
@@ -236,7 +238,7 @@ implementation:
   field in deploy.config.json (default `aws`; `--platform` overrides) and
   dispatches — a future `quidproquo-deploy-gcp` means adding
   `src/platforms/gcp/` + a registry entry, with no command-surface or consumer
-  changes. Platform-neutral commands (go:dev, go:dev:web, synth, prep, hooks)
+  changes. Platform-neutral commands (go:dev, go:dev:api, go:dev:web, synth, prep, hooks)
   and the neutral build helpers stay in `src/lib/`. Identity priming is a
   driver method too (`primeDeployIdentity(target)` — AWS fills
   AWS_DEFAULT_ACCOUNT/AWS_DEFAULT_REGION from the environment entry, env vars

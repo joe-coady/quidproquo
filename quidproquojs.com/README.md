@@ -21,8 +21,7 @@ always runs against the in-repo HEAD. Build the framework first
 nvm use              # ALWAYS FIRST — switches to the Node version in .nvmrc
 npm install          # installs deps + symlinks the sibling quidproquo-* packages (file: refs)
 npm run build        # build every workspace (libs -> tsc -b to dist; services -> type-check)
-npm run go:dev       # backend dev server on :8080 (all services of the selected app)
-npm run go:dev:web   # views dev servers (host + one Rspack server per remote)
+npm run go:dev       # full local dev stack: api dev server (:8080) + all views dev servers
 ```
 
 Smoke test once `go:dev` is up:
@@ -74,7 +73,7 @@ generic CDK app in `quidproquo-deploy-awscdk`.
   `defineDevServerOptions({ port })` in its `infrastructure.ts`). The
   only generated artifact is `apps/<app>/tsconfig.federated.json` — regenerate
   with `npm run prep` after adding or removing a marker.
-- **The dev server** (`qpq go:dev`, powered by `quidproquo-dev-server`) loads each service's
+- **The dev server** (`qpq go:dev:api`, powered by `quidproquo-dev-server`) loads each service's
   `infrastructure.ts` directly — no synth needed, just built libs. Its bundle
   externalizes `node_modules` (an externals function in its rspack config) so native modules like
   `sqlite3` load at runtime from their install location.
@@ -90,7 +89,8 @@ generic CDK app in `quidproquo-deploy-awscdk`.
 npm run build        # build only the libs (services/views are bundled, not built); scope with --workspace=@qpqjs/constants
 npm run validate-ts  # TS check: build libs, then tsc-typecheck every service + views
 npm run prep         # regenerate tsconfig.federated.json from // federated.export markers
-npm run go:dev       # backend dev server on :8080, every service at /api/<svc>
+npm run go:dev       # api + web dev servers in one process (one ctrl+c stops the lot)
+npm run go:dev:api   # backend dev server only, on :8080, every service at /api/<svc>
 npm run go:dev:web   # boot ALL views Rspack dev servers (host shell :3080 + remotes on their
                      # ports); remotes resolve dynamically at runtime via mf-manifest.json.
                      # Subset: npm run go:dev:web -- --only host,shell,design
@@ -99,7 +99,7 @@ npm run go:dev:web   # boot ALL views Rspack dev servers (host shell :3080 + rem
 ### App selection (multi-app)
 
 Every app-facing script (`prep`, `synth`, `go`, `go:docker`, `go:dev`,
-`go:dev:web`) resolves its target app the same way:
+`go:dev:api`, `go:dev:web`) resolves its target app the same way:
 
 1. `--app <name>` — **must come after `--`**: `npm run go:dev -- --app qpqjs`
    (this npm silently swallows flags before `--`)

@@ -1,136 +1,26 @@
-// `qpq go:dev` — boots the QPQ local dev server. Resolves the app, generates
-// the dev-server entry, builds the rspack config, then runs rspack in watch
-// mode, restarting the server process on every successful rebuild.
-//
-// The one thing NOT hot-reloaded is the qpq configs themselves: each service's
-// infrastructure.ts is evaluated once at launch and baked into the
-// `quidproquo-dynamic-loader` virtual module — config changes need a full
-// `go:dev` restart.
-import { getAppServiceQpqConfigs, getDevServerRspackConfig } from 'quidproquo-deploy-rspack';
+// `qpq go:dev` — the whole local dev stack in one process: the API dev server
+// (go:dev:api) plus every views dev server (go:dev:web), so a single ctrl+c
+// tears it all down. The app is resolved once here and handed to both
+// sub-commands via QPQ_DEV_APP; their output shares the terminal.
+import { getAllViews } from 'quidproquo-deploy-rspack';
 
-import { ChildProcess, execSync, spawn } from 'child_process';
-import fs from 'fs';
-import path from 'path';
-import { rspack } from '@rspack/core';
-
-import { primeDeployEnvFromConfig } from '../lib/deployEnv';
-import { writeDevServerEntry } from '../lib/devServerEntry';
 import { getRoot } from '../lib/discovery';
 import { resolveAppSelection } from '../lib/resolveAppSelection';
-
-// 8080/8888 are set in the generated entry; 3001 is the quidproquo-dev-server
-// file-storage (secure URL) default port.
-const DEV_SERVER_PORTS = [8080, 8888, 3001];
-const DEV_SERVER_BUNDLE_PATH = path.join('dist', 'qpq', 'dev-server', 'main.js');
-
-// Pre-start sweep: a previous `go:dev` whose wrapper died without killing its
-// child (closed terminal, SIGKILL) leaves an orphaned server process holding
-// the dev ports, and the next launch dies with EADDRINUSE. Before starting,
-// kill any listener on those ports that is running the dev-server bundle.
-// Anything else on the ports is left alone and reported — it's not ours.
-const killStaleDevServers = (): void => {
-  for (const port of DEV_SERVER_PORTS) {
-    let pids: number[] = [];
-    try {
-      pids = execSync(`lsof -t -iTCP:${port} -sTCP:LISTEN`, {
-        stdio: ['ignore', 'pipe', 'ignore'],
-      })
-        .toString()
-        .split('\n')
-        .map((line) => Number(line.trim()))
-        .filter(Boolean);
-    } catch {
-      continue; // lsof exits non-zero when nothing is listening
-    }
-
-    for (const pid of pids) {
-      let command = '';
-      try {
-        command = execSync(`ps -p ${pid} -o command=`).toString().trim();
-      } catch {
-        continue; // already gone
-      }
-      if (command.includes(DEV_SERVER_BUNDLE_PATH)) {
-        console.log(`Killing stale dev server on port ${port} (pid ${pid})`);
-        process.kill(pid);
-      } else {
-        console.warn(`Port ${port} is in use by an unrelated process (pid ${pid}: ${command}) — not killing it.`);
-      }
-    }
-  }
-};
+import { goDevApiCommand } from './goDevApi';
+import { goDevWebCommand } from './goDevWeb';
 
 export const goDevCommand = async (argv: string[]): Promise<void> => {
-  const root = getRoot();
   const appName = await resolveAppSelection({ argv, envVar: 'QPQ_DEV_APP' });
   process.env.QPQ_DEV_APP = appName;
-  primeDeployEnvFromConfig(appName);
-  console.log(`Dev server for app [${appName}]`);
 
-  killStaleDevServers();
+  // Kicks off the rspack watch and returns; the API server keeps running in
+  // the background of this process.
+  await goDevApiCommand(argv);
 
-  const qpqConfigs = getAppServiceQpqConfigs(root, appName);
-  const entry = writeDevServerEntry(root, appName);
-  const rspackConfig = getDevServerRspackConfig({ root, entry, qpqConfigs });
-  const bundlePath = path.join(root, DEV_SERVER_BUNDLE_PATH);
-  const env = { ...process.env, QPQ_DEV_APP: appName };
+  if (getAllViews(getRoot(), appName).length === 0) {
+    console.log('No views projects found. Running the API dev server only.');
+    return;
+  }
 
-  // The long-lived server process (HTTP 8080 / WS 8888), restarted per rebuild.
-  let child: ChildProcess | null = null;
-  let restartQueued = false;
-
-  const startServer = (): void => {
-    child = spawn('node', [bundlePath], { stdio: 'inherit', env });
-    child.on('exit', (code) => {
-      child = null;
-      if (!restartQueued) {
-        // Crashed (or exited) on its own — leave it down; the next successful
-        // rebuild (i.e. the next file save) brings it back up.
-        console.log(`Dev server exited with code ${code}. Save a file to restart it.`);
-      }
-    });
-  };
-
-  const restartServer = (): void => {
-    if (restartQueued) return;
-    if (!child) {
-      startServer();
-      return;
-    }
-    restartQueued = true;
-    child.once('exit', () => {
-      restartQueued = false;
-      startServer();
-    });
-    child.kill();
-  };
-
-  console.log('Bundling dev server (watch mode)...');
-  let lastHash: string | null | undefined;
-  const compiler = rspack(rspackConfig);
-  compiler.watch({ aggregateTimeout: 200 }, (err, stats) => {
-    if (err) {
-      console.error(err);
-      return;
-    }
-    if (stats?.hasErrors()) {
-      console.error(stats.toString({ colors: true, chunks: false, modules: false }));
-      console.log('Build failed — dev server not restarted. Fix the error and save again.');
-      return;
-    }
-    // Skip no-op rebuilds (e.g. the virtual-module-triggered second compile at
-    // startup): only restart when the output actually changed.
-    if (stats?.hash === lastHash && child) {
-      return;
-    }
-    lastHash = stats?.hash;
-    console.log(child ? 'Rebuilt. Restarting dev server...' : 'Dev server bundled. Starting...');
-    restartServer();
-  });
-
-  process.on('SIGINT', () => {
-    restartQueued = true; // suppress the crash log / rebuild-restart on our own kill
-    child?.kill();
-    compiler.close(() => process.exit(0));
-  });
+  await goDevWebCommand(argv, { plainStatusLines: true });
 };

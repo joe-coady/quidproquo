@@ -2,7 +2,7 @@
 // apps/<app>/services/<svc>/service/src/infrastructure.ts directly (its @scope
 // imports resolve to built lib dist via workspace symlinks). This makes the
 // caller the single source of truth for configs: no synth-to-JSON round-trip.
-// Relies on TS require hooks (ts-node / rspack config eval), as go:dev has.
+// Relies on TS require hooks (ts-node / rspack config eval), as go:dev:api has.
 import { QPQConfig } from 'quidproquo-core';
 
 import fs from 'fs';
