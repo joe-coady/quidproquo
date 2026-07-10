@@ -11,6 +11,7 @@ export interface AiPromptActionPayload {
   system?: string;
   aiName?: string;
   reasoning?: AiReasoningConfig;
+  caching?: boolean;
 }
 
 export interface AiPromptActionResult {

@@ -29,5 +29,7 @@ export * from './mapAiStreamToolOutputDenied';
 export * from './mapAiStreamToolResult';
 export * from './prepareAiPromptCall';
 export * from './toAiStreamUsage';
+export * from './toCacheableMessages';
+export * from './toCacheableSystem';
 export * from './toErrorMessage';
 export * from './toSdkMessages';

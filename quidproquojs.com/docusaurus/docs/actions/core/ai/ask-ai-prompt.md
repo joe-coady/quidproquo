@@ -49,6 +49,7 @@ function* askAiPrompt(
 | `aiName` | `string` | – | Name of a [defineAi](../../../config/core/ai.md) config to bind. This is what wires up tool definitions (and their executors) for the model to call. Omit for a plain, tool-less prompt. |
 | `messages` | [`AiMessage[]`](#aimessage) | – | A full conversation history. When present, this is sent instead of `prompt`, letting you carry a multi-turn dialogue (including prior assistant turns and tool results). |
 | `reasoning` | [`AiReasoningConfig`](#aireasoningconfig) | – | Enables extended thinking. Its presence turns reasoning on; `budgetTokens` caps how many tokens the model may spend thinking before it answers (defaults to `4096` on AWS). |
+| `caching` | `boolean` | – | Marks the system prompt and the last message (or the last `messages` entry) with a Bedrock cache point, so a following call in the same conversation can read everything up to there from cache instead of reprocessing it. |
 
 ### `AiModel`
 

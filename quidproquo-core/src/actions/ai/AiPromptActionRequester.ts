@@ -9,6 +9,7 @@ export interface AskAiPromptOptions {
   aiName?: string;
   messages?: AiMessage[];
   reasoning?: AiReasoningConfig;
+  caching?: boolean;
 }
 
 export function* askAiPrompt(model: AiModel, prompt: string, options?: AskAiPromptOptions): AiPromptActionRequester {
@@ -21,6 +22,7 @@ export function* askAiPrompt(model: AiModel, prompt: string, options?: AskAiProm
       system: options?.system,
       aiName: options?.aiName,
       reasoning: options?.reasoning,
+      caching: options?.caching,
     },
   };
 }

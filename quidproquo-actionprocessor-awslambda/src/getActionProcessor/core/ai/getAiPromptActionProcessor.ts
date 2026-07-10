@@ -11,7 +11,7 @@ import {
 
 import { generateText, stepCountIs } from 'ai';
 
-import { createDriveFileResolver, prepareAiPromptCall, toSdkMessages } from './logic';
+import { createDriveFileResolver, prepareAiPromptCall, toCacheableMessages, toCacheableSystem, toSdkMessages } from './logic';
 
 const getProcessAiPrompt = (qpqConfig: QPQConfig): AiPromptActionProcessor => {
   return async (payload, session, actionProcessorList, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
@@ -23,9 +23,12 @@ const getProcessAiPrompt = (qpqConfig: QPQConfig): AiPromptActionProcessor => {
     try {
       const promptOrMessages = payload.messages
         ? {
-            messages: await toSdkMessages(
-              payload.messages,
-              createDriveFileResolver(qpqConfig, session, actionProcessorList, logger, dynamicModuleLoader, streamRegistry),
+            messages: toCacheableMessages(
+              await toSdkMessages(
+                payload.messages,
+                createDriveFileResolver(qpqConfig, session, actionProcessorList, logger, dynamicModuleLoader, streamRegistry),
+              ),
+              payload.caching,
             ),
           }
         : { prompt: payload.prompt };
@@ -37,12 +40,18 @@ const getProcessAiPrompt = (qpqConfig: QPQConfig): AiPromptActionProcessor => {
 
       const result = await generateText({
         model: prepared.model,
-        system: payload.system,
+        system: toCacheableSystem(payload.system, payload.caching),
         ...promptOrMessages,
         tools: prepared.tools,
         providerOptions,
         stopWhen: stepCountIs(10),
       });
+
+      if (payload.caching) {
+        // The SDK's cross-provider usage breakdown, not providerMetadata.bedrock.usage — that
+        // field never carries cacheReadInputTokens through on @ai-sdk/amazon-bedrock (5.0.11).
+        console.log('AI prompt cache usage:', result.finalStep?.usage?.inputTokenDetails);
+      }
 
       return actionResult({ text: result.text });
     } catch (error) {

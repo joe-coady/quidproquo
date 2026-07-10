@@ -13,6 +13,7 @@ export interface AiPromptStreamActionPayload {
   system?: string;
   aiName?: string;
   reasoning?: AiReasoningConfig;
+  caching?: boolean;
 }
 
 export interface AiPromptStreamAction extends Action<AiPromptStreamActionPayload> {
