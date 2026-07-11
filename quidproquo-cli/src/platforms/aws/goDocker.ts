@@ -275,7 +275,7 @@ export const awsGoDocker = async (appName: string, plan: DeployPlan): Promise<vo
             await runCommandPrefixed(
               `cdk-synth:${service}`,
               'npx',
-              ['cdk', 'synth', '--all', '--quiet', '--app', `'${getCdkAppCommand()}'`, '--output', `"${outputDir}"`],
+              ['cdk', 'synth', '--quiet', '--app', `'${getCdkAppCommand()}'`, '--output', `"${outputDir}"`],
               {
                 cwd: getRoot(),
                 env: { DEPLOY_SERVICE_NAME: service, DEPLOY_APP_NAME: appName },
