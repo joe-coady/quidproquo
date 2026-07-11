@@ -65,6 +65,36 @@ export const getRspackConfigForQpqRemote = (qpqConfig: QPQConfig, buildPath: str
     devtool: 'source-map',
     optimization: {
       minimize: false,
+
+      // Dedupe modules shared across exposes into their own chunks. The defaults
+      // (20KB minSize, capped request counts) leave a copy of common user/vendor code
+      // inside every expose chunk, so the store carries N copies and every loadRemote
+      // re-parses the same code. Chunks here are require()d from /tmp, not fetched over
+      // HTTP, so split aggressively: a shared chunk downloads and parses once per lambda
+      // container, and an expose chunk carries only its own code.
+      splitChunks: {
+        // Expose chunks are async chunks; remoteEntry itself must stay whole.
+        chunks: 'async',
+        // Any shared module is worth extracting - there's no browser round-trip to amortise.
+        minSize: 1,
+        // No HTTP request-count pressure on disk requires.
+        maxAsyncRequests: Infinity,
+        cacheGroups: {
+          // Bundled dependencies (not MF-shared, not externals) - split even when only
+          // one expose uses them, so expose chunks stay user-code-only.
+          vendors: {
+            test: /[\\/]node_modules[\\/]/,
+            priority: -10,
+            reuseExistingChunk: true,
+          },
+          // User code imported by two or more exposes.
+          default: {
+            minChunks: 2,
+            priority: -20,
+            reuseExistingChunk: true,
+          },
+        },
+      },
     },
 
     // async-node chunk loading resolves sibling chunks from the entry's own directory
