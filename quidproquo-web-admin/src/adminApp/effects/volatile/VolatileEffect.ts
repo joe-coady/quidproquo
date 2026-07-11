@@ -5,9 +5,6 @@ export enum VolatileEffect {
   logLogSearchStarted = 'qpqAdmin/volatile/logLogSearchStarted',
   logLogSearchPartLoaded = 'qpqAdmin/volatile/logLogSearchPartLoaded',
   logLogSearchCompleted = 'qpqAdmin/volatile/logLogSearchCompleted',
-  chatMessagesLoaded = 'qpqAdmin/volatile/chatMessagesLoaded',
-  chatMessageAppended = 'qpqAdmin/volatile/chatMessageAppended',
-  chatPendingReplyChanged = 'qpqAdmin/volatile/chatPendingReplyChanged',
   serviceNamesLoaded = 'qpqAdmin/volatile/serviceNamesLoaded',
   realtimeErrorLogReceived = 'qpqAdmin/volatile/realtimeErrorLogReceived',
 }

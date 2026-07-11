@@ -1,5 +1,4 @@
 import { askApplySessionEvent } from './actions/askApplySessionEvent';
-import { askLoadChatMessages } from './logic/chat/askLoadChatMessages';
 import { askSendChatMessage } from './logic/chat/askSendChatMessage';
 import { askApplyConfigServiceSelected } from './logic/config/askApplyConfigServiceSelected';
 import { askApplyConfigSyncRequested } from './logic/config/askApplyConfigSyncRequested';
@@ -27,7 +26,6 @@ export const sharedAdminAppApi = {
   askApplySessionEvent,
   askApplyTabChanged,
   askEndSession,
-  askLoadChatMessages,
   askLoadServiceNames,
   askReceiveRealtimeErrorLog,
   askRunDashboardErrorSearch,

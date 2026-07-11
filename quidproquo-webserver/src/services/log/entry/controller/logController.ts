@@ -19,11 +19,8 @@ import { HTTPEvent, HTTPEventResponse } from '../../../../types';
 import { askFromJsonEventRequest, toJsonEventResponse } from '../../../../utils/httpEventUtils';
 import { QPQ_TRACE_LOG_SERVICE_FUNCTION_NAME, QpqTraceLogExecutionPayload } from '../../config/traceLogServiceFunction';
 import { logsLogic } from '../../logic';
-import { askGetLogChatMessages } from '../../logic/askGetLogChatMessages';
-import { askLogSendChatMessage } from '../../logic/askLogSendChatMessage';
 import { askToggleLogChecked } from '../../logic/logs';
 import { askGetByCorrelation, askGetByFromCorrelation, askGetHierarchiesByCorrelation } from '../data/logMetadataData';
-import { ListLogChatMessages, SendLogChatMessage } from '../domain';
 
 export interface GetLogsParams {
   nextPageKey?: string;
@@ -86,9 +83,10 @@ export function* toggleLogCheck(
 }
 
 export function* getServiceNames(event: HTTPEvent) {
-  const serviceNames = yield* askConfigGetGlobal('qpq-serviceNames');
+  const services = yield* askConfigGetGlobal<string[]>('qpq-serviceNames');
+  const logServiceName = yield* askConfigGetGlobal<string>('qpq-log-service-name');
 
-  return toJsonEventResponse(serviceNames);
+  return toJsonEventResponse({ services, logServiceName });
 }
 
 export function* getHierarchies(
@@ -188,20 +186,4 @@ export function* traceLog(
   );
 
   return toJsonEventResponse({ pending: true });
-}
-
-export function* sendChatMessage(event: HTTPEvent) {
-  const sendLogChatMessage = yield* askFromJsonEventRequest<SendLogChatMessage>(event);
-
-  const message = yield* askLogSendChatMessage(sendLogChatMessage.correlationId, sendLogChatMessage.message);
-
-  return toJsonEventResponse(message);
-}
-
-export function* getChatMessages(event: HTTPEvent) {
-  const listLogChatMessages = yield* askFromJsonEventRequest<ListLogChatMessages>(event);
-
-  const messages = yield* askGetLogChatMessages(listLogChatMessages.correlationId, listLogChatMessages.nextPageKey);
-
-  return toJsonEventResponse(messages);
 }

@@ -35,14 +35,15 @@ describe('getLog', () => {
 });
 
 describe('getServiceNames', () => {
-  it('returns the configured service names global', () => {
-    const serviceNames = ['auth', 'log'];
+  it('returns the configured service names and the log service name', () => {
+    const services = ['auth', 'log'];
 
     const response = runStory(getServiceNames(event), {
-      [ConfigActionType.GetGlobal]: serviceNames,
+      [ConfigActionType.GetGlobal]: (action: { payload: { globalName: string } }) =>
+        action.payload.globalName === 'qpq-serviceNames' ? services : 'log',
     });
 
-    expect(JSON.parse(response.body!)).toEqual(serviceNames);
+    expect(JSON.parse(response.body!)).toEqual({ services, logServiceName: 'log' });
   });
 });
 

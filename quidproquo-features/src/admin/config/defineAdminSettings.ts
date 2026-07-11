@@ -1,4 +1,5 @@
 import {
+  AiModel,
   defineEventBus,
   defineGlobal,
   defineKeyValueStore,
@@ -25,14 +26,15 @@ import {
   WebsocketAdminClientMessageEventType,
 } from 'quidproquo-webserver';
 
+import { defineEventDocAi } from '../../eventDocAi';
+import { adminLogAiSystemPrompt } from '../constants/adminLogAiSystemPrompt';
 import { adminUserDirectoryResourceName } from './adminUserDirectory';
+import { adminLogAiTools, defineAdminLogAiTools } from './defineAdminLogAiTools';
 import { defineAdminSessionEventDoc } from './defineAdminSessionEventDoc';
 
 export interface QPQConfigAdvancedLogSettings extends QPQConfigAdvancedSettings {
   logRetentionDays?: number;
   coldStorageAfterDays?: number;
-
-  claudeAiApiKeySecretName?: string;
 
   services?: string[];
 }
@@ -160,8 +162,20 @@ export const defineAdminSettings = (logServiceName: string, rootDomain: string, 
         defineAdminServiceLogRoute('GET', '/log/{correlationId}/hierarchies', 'getHierarchies', routeAuthSettings),
         defineAdminServiceLogRoute('GET', '/log/downloadurl/{correlationId}', 'downloadUrl', routeAuthSettings),
         defineAdminServiceLogRoute('POST', '/log/{correlationId}/trace', 'traceLog', routeAuthSettings),
-        defineAdminServiceLogRoute('POST', '/log/chat/message', 'sendChatMessage', routeAuthSettings),
-        defineAdminServiceLogRoute('POST', '/log/chat', 'getChatMessages', routeAuthSettings),
+
+        // The log chat: a generic EventDocAi instance scoped to `docId` = log correlation id,
+        // with tools instead of the log pasted into the prompt (see adminLogAiSystemPrompt).
+        defineEventDocAi({
+          storeName: 'log',
+          type: 'log',
+          serviceName: logServiceName,
+          eventBusName: 'qpq-admin-wsq',
+          userDirectoryName: adminUserDirectoryResourceName,
+          model: AiModel.ClaudeSonnet46,
+          systemPrompt: adminLogAiSystemPrompt,
+          tools: adminLogAiTools,
+        }),
+        defineAdminLogAiTools(),
 
         defineQueue(
           'qpq-admin-websockets',
@@ -202,7 +216,7 @@ export const defineAdminSettings = (logServiceName: string, rootDomain: string, 
 
         defineGlobal('qpq-serviceNames', advancedSettings?.services ?? []),
         defineGlobal('qpq-log-retention-days', logRetentionDays),
-        defineGlobal('claudeAi-api-key', advancedSettings?.claudeAiApiKeySecretName ?? ''),
+        defineGlobal('qpq-log-service-name', logServiceName),
       ],
     }),
 

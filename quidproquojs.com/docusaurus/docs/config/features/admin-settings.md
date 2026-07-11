@@ -53,7 +53,6 @@ The root domain the admin service is hosted on. Used to stand up the admin WebSo
 export interface QPQConfigAdvancedLogSettings extends QPQConfigAdvancedSettings {
   logRetentionDays?: number;
   coldStorageAfterDays?: number;
-  claudeAiApiKeySecretName?: string;
   services?: string[];
 }
 ```
@@ -62,7 +61,6 @@ export interface QPQConfigAdvancedLogSettings extends QPQConfigAdvancedSettings 
 | --- | --- | --- | --- |
 | `logRetentionDays` | `number` | – (no expiry) | How many days to keep the raw log objects on the logs storage drive before they are deleted. When unset, logs never expire. If `coldStorageAfterDays` is set, the effective retention is padded so that it is at least `coldStorageAfterDays + 180` days — logs always outlive the cold-storage transition window. |
 | `coldStorageAfterDays` | `number` | – (no transition) | When greater than 0, adds a lifecycle rule transitioning log objects to the `DEEP_COLD_STORAGE` tier after this many days, to cut storage cost for old logs. |
-| `claudeAiApiKeySecretName` | `string` | `''` | Name of the secret holding a Claude AI API key, exposed to the admin service as the `claudeAi-api-key` global. Enables the admin dashboard's log-chat feature (asking questions about a log with Claude). |
 | `services` | `string[]` | `[]` | The list of service names the admin dashboard should surface, exposed as the `qpq-serviceNames` global. Returned by the `/admin/services` route. |
 | `deprecated` | `boolean` | `false` | Inherited from `QPQConfigAdvancedSettings`; marks the log storage drives and key-value stores as deprecated. |
 
@@ -73,10 +71,11 @@ export interface QPQConfigAdvancedLogSettings extends QPQConfigAdvancedSettings 
 - **Log storage** — a `QPQ_LOGS_STORAGE_DRIVE_NAME` storage drive (with an `onCreate` handler and the retention / cold-storage lifecycle rules), plus a `QPQ_LOG_REPORTS_STORAGE_DRIVE_NAME` drive (30-day retention) for generated reports.
 - **Log indexes** — key-value stores for correlations (indexed by `runtimeType` and `fromCorrelation`, both sorted by `startedAt`, with a `ttl` attribute), log messages, and a log list.
 - **Auth routes** — `POST /login`, `POST /refreshToken`, `POST /challenge`, authenticated against the [admin user directory](./admin-user-directory.md).
-- **Log routes** — `GET /admin/services`, `POST /log/list`, `GET /log/{correlationId}`, its `/toggle`, `/children`, `/hierarchies`, `/downloadurl`, the log-log list, and the `/log/chat` message endpoints — all (except the service list) requiring an admin token.
+- **Log routes** — `GET /admin/services`, `POST /log/list`, `GET /log/{correlationId}`, its `/toggle`, `/children`, `/hierarchies`, `/downloadurl`, and the log-log list — all (except the service list) requiring an admin token.
+- **Log chat** — a `defineEventDocAi` instance scoped to `docId` = log correlation id, with two tools (`getLogActions`, `getLogAction`) instead of the log's JSON pasted into the prompt. Runs on `AiModel.ClaudeSonnet46` over the same admin WebSocket connection, not a separate HTTP route.
 - **WebSocket sync** — an admin event bus (`qpq-admin-wsq`), a `defineWebSocketQueue`, and queues that fan out client messages (config sync, mark-log-checked, refresh-metadata) using `WebsocketAdminClientMessageEventType`.
 - **Alarms** — a `defineNotifyError` publishing to an `admin-notifier` event bus, with a queue handling its Error / Timeout / Throttle events.
-- **Globals** — `qpq-serviceNames`, `qpq-log-retention-days`, and `claudeAi-api-key`.
+- **Globals** — `qpq-serviceNames` and `qpq-log-retention-days`.
 - **Audit sessions** — spreads in [defineAdminSessionEventDoc](./admin-session-event-doc.md) for the admin UI's per-login session document.
 
 ## Examples
@@ -87,12 +86,10 @@ import { defineAdminSettings, defineAdminUserDirectory } from 'quidproquo-featur
 export default [
   ...defineAdminUserDirectory({ owner: { module: 'log' } }),
 
-  // Retain logs 30 days, move to deep cold storage after 7,
-  // enable the Claude log-chat feature.
+  // Retain logs 30 days, move to deep cold storage after 7.
   ...defineAdminSettings('log', 'example.com', {
     logRetentionDays: 30,
     coldStorageAfterDays: 7,
-    claudeAiApiKeySecretName: 'claude-api-key',
     services: ['api', 'workers'],
   }),
 ];

@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { HelpChat } from '../../../HelpChat';
+import { useVolatileState } from '../../../../adminApp';
+import { LogChat } from '../../../LogChat';
 import { AsyncStoryState } from '../../hooks';
 
 interface HelpTabProps {
@@ -8,5 +9,7 @@ interface HelpTabProps {
 }
 
 export const HelpTab: React.FC<HelpTabProps> = ({ log }) => {
-  return <HelpChat logCorrelation={log.logCorrelation} />;
+  const volatile = useVolatileState();
+
+  return <LogChat logCorrelation={log.logCorrelation} logServiceName={volatile.logServiceName} />;
 };

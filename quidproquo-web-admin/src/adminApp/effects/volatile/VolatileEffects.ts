@@ -1,6 +1,3 @@
-import { VolatileChatMessageAppendedEffect } from './VolatileChatMessageAppendedEffect';
-import { VolatileChatMessagesLoadedEffect } from './VolatileChatMessagesLoadedEffect';
-import { VolatileChatPendingReplyChangedEffect } from './VolatileChatPendingReplyChangedEffect';
 import { VolatileLogLogSearchCompletedEffect } from './VolatileLogLogSearchCompletedEffect';
 import { VolatileLogLogSearchPartLoadedEffect } from './VolatileLogLogSearchPartLoadedEffect';
 import { VolatileLogLogSearchStartedEffect } from './VolatileLogLogSearchStartedEffect';
@@ -17,8 +14,5 @@ export type VolatileEffects =
   | VolatileLogLogSearchStartedEffect
   | VolatileLogLogSearchPartLoadedEffect
   | VolatileLogLogSearchCompletedEffect
-  | VolatileChatMessagesLoadedEffect
-  | VolatileChatMessageAppendedEffect
-  | VolatileChatPendingReplyChangedEffect
   | VolatileServiceNamesLoadedEffect
   | VolatileRealtimeErrorLogReceivedEffect;

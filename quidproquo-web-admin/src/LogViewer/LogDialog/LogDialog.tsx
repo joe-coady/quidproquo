@@ -4,7 +4,6 @@ import { AppBar, Button, Dialog, DialogActions, DialogContent, DialogTitle, Line
 
 import { apiRequestPost } from '../../logic';
 import { EventTimeline } from '../EventTimeline'; // Add this import
-import { HelpChat } from '../HelpChat';
 import { useLogTreeData } from '../hooks';
 import { LogCorrelations } from '../LogCorrelations';
 import { LogRawJson } from '../LogRawJson';
