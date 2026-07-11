@@ -8,7 +8,7 @@
 // `go:dev:api` restart.
 import { getAppServiceQpqConfigs, getDevServerRspackConfig } from 'quidproquo-deploy-rspack';
 
-import { ChildProcess, execSync, spawn } from 'child_process';
+import { ChildProcess, spawn } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import { rspack } from '@rspack/core';
@@ -16,49 +16,13 @@ import { rspack } from '@rspack/core';
 import { primeDeployEnvFromConfig } from '../lib/deployEnv';
 import { writeDevServerEntry } from '../lib/devServerEntry';
 import { getRoot } from '../lib/discovery';
+import { killStaleListeners } from '../lib/killStaleListeners';
 import { resolveAppSelection } from '../lib/resolveAppSelection';
 
 // 8080/8888 are set in the generated entry; 3001 is the quidproquo-dev-server
 // file-storage (secure URL) default port.
 const DEV_SERVER_PORTS = [8080, 8888, 3001];
 const DEV_SERVER_BUNDLE_PATH = path.join('dist', 'qpq', 'dev-server', 'main.js');
-
-// Pre-start sweep: a previous `go:dev:api` whose wrapper died without killing its
-// child (closed terminal, SIGKILL) leaves an orphaned server process holding
-// the dev ports, and the next launch dies with EADDRINUSE. Before starting,
-// kill any listener on those ports that is running the dev-server bundle.
-// Anything else on the ports is left alone and reported — it's not ours.
-const killStaleDevServers = (): void => {
-  for (const port of DEV_SERVER_PORTS) {
-    let pids: number[] = [];
-    try {
-      pids = execSync(`lsof -t -iTCP:${port} -sTCP:LISTEN`, {
-        stdio: ['ignore', 'pipe', 'ignore'],
-      })
-        .toString()
-        .split('\n')
-        .map((line) => Number(line.trim()))
-        .filter(Boolean);
-    } catch {
-      continue; // lsof exits non-zero when nothing is listening
-    }
-
-    for (const pid of pids) {
-      let command = '';
-      try {
-        command = execSync(`ps -p ${pid} -o command=`).toString().trim();
-      } catch {
-        continue; // already gone
-      }
-      if (command.includes(DEV_SERVER_BUNDLE_PATH)) {
-        console.log(`Killing stale dev server on port ${port} (pid ${pid})`);
-        process.kill(pid);
-      } else {
-        console.warn(`Port ${port} is in use by an unrelated process (pid ${pid}: ${command}) — not killing it.`);
-      }
-    }
-  }
-};
 
 export const goDevApiCommand = async (argv: string[]): Promise<void> => {
   const root = getRoot();
@@ -67,7 +31,7 @@ export const goDevApiCommand = async (argv: string[]): Promise<void> => {
   primeDeployEnvFromConfig(appName);
   console.log(`Dev server for app [${appName}]`);
 
-  killStaleDevServers();
+  killStaleListeners(DEV_SERVER_PORTS, (command) => command.includes(DEV_SERVER_BUNDLE_PATH));
 
   const qpqConfigs = getAppServiceQpqConfigs(root, appName);
   const entry = writeDevServerEntry(root, appName);
