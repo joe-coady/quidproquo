@@ -14,18 +14,22 @@ import {
 import { matchUrl } from '../../../../../awsLambdaUtils';
 import { EventInput, InternalEventRecord, MatchResult } from './types';
 
-export const getQueueConfigSetting = (): QueueQPQConfigSetting => {
-  const queueQPQConfigSetting: QueueQPQConfigSetting = JSON.parse(process.env.queueQPQConfigSetting as string);
+export const getQueueConfigSetting = (qpqConfig: QPQConfig): QueueQPQConfigSetting => {
+  // Only the queue name travels via the environment - the full setting lives in
+  // the bundled qpqConfig (serializing it into env blows the lambda 4KB limit).
+  const queueName = process.env.queueName as string;
+  const queueQPQConfigSetting = qpqCoreUtils.getQueueConfigSettingByName(queueName, qpqConfig);
 
-  // TODO: Validate here
+  if (!queueQPQConfigSetting) {
+    throw new Error(`No queue config setting found for queue [${queueName}]`);
+  }
 
   return queueQPQConfigSetting;
 };
 
 const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProcessor<InternalEventRecord, MatchResult, EventInput> => {
-  // TODO: Get this out of the qpqconfig like the other event processors
-  const queueQPQConfigSetting = getQueueConfigSetting();
-  const queueQueueProcessors = qpqCoreUtils.getQueueQueueProcessors(queueQPQConfigSetting.name, qpqConfig);
+  const queueQPQConfigSetting = getQueueConfigSetting(qpqConfig);
+  const queueQueueProcessors = queueQPQConfigSetting.qpqQueueProcessors;
   const queueTypes = Object.keys(queueQueueProcessors).sort();
 
   return async ({ qpqEventRecord }) => {

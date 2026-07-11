@@ -58,27 +58,46 @@ describe('sqs/queue getEventGetRecordsActionProcessor', () => {
 });
 
 describe('sqs/queue getQueueConfigSetting', () => {
-  it('parses the queue config setting from the environment', () => {
-    process.env.queueQPQConfigSetting = JSON.stringify({ name: 'q', eventBusSubscriptions: [] });
+  afterEach(() => {
+    delete process.env.queueName;
+  });
 
-    expect(getQueueConfigSetting()).toEqual({ name: 'q', eventBusSubscriptions: [] });
+  it('looks up the queue config setting named by the environment', () => {
+    process.env.queueName = 'q';
+    const setting = { configSettingType: QPQCoreConfigSettingType.queue, name: 'q', eventBusSubscriptions: [] };
 
-    delete process.env.queueQPQConfigSetting;
+    expect(getQueueConfigSetting(buildTestQpqConfig([setting as any]))).toEqual(setting);
+  });
+
+  it('throws when the named queue is not in the config', () => {
+    process.env.queueName = 'missing';
+
+    expect(() => getQueueConfigSetting(buildTestQpqConfig([]))).toThrow('No queue config setting found for queue [missing]');
   });
 });
 
 describe('sqs/queue getEventMatchStoryActionProcessor', () => {
   const runtime = { src: 'onOrder' };
 
-  afterEach(() => {
-    delete process.env.queueQPQConfigSetting;
+  beforeEach(() => {
+    process.env.queueName = 'q';
   });
 
-  const buildConfig = () =>
-    buildTestQpqConfig([{ configSettingType: QPQCoreConfigSettingType.queue, name: 'q', qpqQueueProcessors: { orderCreated: runtime } } as any]);
+  afterEach(() => {
+    delete process.env.queueName;
+  });
+
+  const buildConfig = (eventBusSubscriptions: string[] = []) =>
+    buildTestQpqConfig([
+      {
+        configSettingType: QPQCoreConfigSettingType.queue,
+        name: 'q',
+        qpqQueueProcessors: { orderCreated: runtime },
+        eventBusSubscriptions,
+      } as any,
+    ]);
 
   it('matches a queue message type to its processor', async () => {
-    process.env.queueQPQConfigSetting = JSON.stringify({ name: 'q', eventBusSubscriptions: [] });
     const processor = await resolveEventProcessor(getEventMatchStoryActionProcessor, EventActionType.MatchStory, buildConfig());
 
     const [match] = await processor({ qpqEventRecord: { message: { type: 'orderCreated' } } });
@@ -87,7 +106,6 @@ describe('sqs/queue getEventMatchStoryActionProcessor', () => {
   });
 
   it('returns a NotFound error when no queue type matches and there are no subscriptions', async () => {
-    process.env.queueQPQConfigSetting = JSON.stringify({ name: 'q', eventBusSubscriptions: [] });
     const processor = await resolveEventProcessor(getEventMatchStoryActionProcessor, EventActionType.MatchStory, buildConfig());
 
     const [, error] = await processor({ qpqEventRecord: { message: { type: 'unknown' } } });
@@ -96,8 +114,7 @@ describe('sqs/queue getEventMatchStoryActionProcessor', () => {
   });
 
   it('exits gracefully with an empty match when there are event bus subscriptions', async () => {
-    process.env.queueQPQConfigSetting = JSON.stringify({ name: 'q', eventBusSubscriptions: ['sub'] });
-    const processor = await resolveEventProcessor(getEventMatchStoryActionProcessor, EventActionType.MatchStory, buildConfig());
+    const processor = await resolveEventProcessor(getEventMatchStoryActionProcessor, EventActionType.MatchStory, buildConfig(['sub']));
 
     const [match] = await processor({ qpqEventRecord: { message: { type: 'unknown' } } });
 

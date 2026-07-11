@@ -28,7 +28,10 @@ export class QpqApiCoreQueueConstruct extends QpqConstructBlock {
       apiLayerVersions: props.apiLayerVersions,
 
       environment: {
-        queueQPQConfigSetting: JSON.stringify(props.queueConfig),
+        // Just the name - the runtime resolves the full setting from the bundled
+        // qpqConfig. Serializing the whole setting here blows the lambda 4KB
+        // env limit once processors carry large globals (e.g. AI system prompts).
+        queueName: props.queueConfig.name,
       },
 
       reservedConcurrentExecutions: props.queueConfig.maxConcurrentExecutions,

@@ -6,9 +6,9 @@ import { getSqsQueueEventProcessor } from '../getActionProcessor';
 import { getQueueConfigSetting } from '../getActionProcessor/core/event/sqs/queue/getEventMatchStoryActionProcessor';
 import { getQpqLambdaRuntimeForEvent } from './helpers/getQpqLambdaRuntimeForEvent';
 
-const getProcessEventStory = (): typeof askProcessEvent => {
+const getProcessEventStory = (qpqConfig: QPQConfig): typeof askProcessEvent => {
   // FIFO queues must process records one group at a time, blocking a group once a record fails
-  if (getQueueConfigSetting().isFifo) {
+  if (getQueueConfigSetting(qpqConfig).isFifo) {
     return function* askProcessQueueEventWithGroupOrdering(...eventArguments) {
       return yield* askProcessEventWithGroupOrdering((record: QueueEvent<any>) => record.groupId, ...eventArguments);
     };
@@ -29,5 +29,5 @@ export const getSqsEvent_queueEvent = (dynamicModuleLoader: DynamicModuleLoader,
     getSqsQueueEventProcessor,
     dynamicModuleLoader,
     qpqConfig,
-    getProcessEventStory,
+    () => getProcessEventStory(qpqConfig),
   );

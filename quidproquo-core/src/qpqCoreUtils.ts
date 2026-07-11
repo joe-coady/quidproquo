@@ -564,12 +564,14 @@ export const getUniqueKeyForSetting = (setting: QPQConfigSetting) => {
   return `${type}${key}`;
 };
 
+export const getQueueConfigSettingByName = (name: string, qpqConfig: QPQConfig): QueueQPQConfigSetting | undefined => {
+  const queueConfigs = getConfigSettings<QueueQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.queue);
+
+  return queueConfigs.find((c) => c.name === name);
+};
+
 export const getQueueQueueProcessors = (name: string, qpqConfig: QPQConfig): QpqQueueProcessors => {
-  const seoConfigs = getConfigSettings<QueueQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.queue);
-
-  const queueConfig = seoConfigs.find((c) => c.name === name);
-
-  return queueConfig?.qpqQueueProcessors || {};
+  return getQueueConfigSettingByName(name, qpqConfig)?.qpqQueueProcessors || {};
 };
 
 export const convertCustomFullyQualifiedResourceToGeneric = <T extends string>(resource: CustomFullyQualifiedResource<T>): FullyQualifiedResource => {
