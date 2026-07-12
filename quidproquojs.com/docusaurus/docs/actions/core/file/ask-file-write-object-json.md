@@ -31,6 +31,7 @@ function* askFileWriteObjectJson<T extends object>(
   filepath: string,
   data: T,
   storageDriveAdvancedWriteOptions?: StorageDriveAdvancedWriteOptions,
+  scope?: string,
 ): AskResponse<void>;
 ```
 
@@ -42,6 +43,7 @@ function* askFileWriteObjectJson<T extends object>(
 | `filepath` | `string` | Destination path within the drive, forward-slash delimited. Parent "directories" are implicit — no need to create them. |
 | `data` | `T` | The object to serialize and write. It is stored as `JSON.stringify(data)`. |
 | `storageDriveAdvancedWriteOptions` | `StorageDriveAdvancedWriteOptions` | Optional write options — see below. |
+| `scope` | `string` | Optional storage-scope segment. When set, the processor writes `{scope}/{filepath}` instead, partitioning the drive (used by tenant/scoped features such as the event-doc `scopeResolver`). Must be a single path segment: no separators, `..`, or null bytes. |
 
 ### `StorageDriveAdvancedWriteOptions`
 
@@ -59,6 +61,7 @@ function* askFileWriteObjectJson<T extends object>(
 | --- | --- |
 | `FileWriteObjectJsonErrorTypeEnum.AccessDenied` | The caller lacks permission to write to this drive (e.g. a foreign drive shared without write access). |
 | `FileWriteObjectJsonErrorTypeEnum.DriveNotFound` | No storage drive with that name exists in the deployed config. |
+| `FileWriteObjectJsonErrorTypeEnum.InvalidScope` | The `scope` is not a valid single path segment (empty, too long, or contains separators, `..`, or null bytes), or the scoped `filepath` is absolute or contains `..` segments or null bytes. |
 
 Errors thrown by actions can be caught with `askCatch` from quidproquo-core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 

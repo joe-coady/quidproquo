@@ -22,8 +22,9 @@ export function* askProcessOnUnauthenticate(connectionId: string): AskResponse<v
     return;
   }
 
-  // Remove the userid and access token
-  const { userId, accessToken, ...connectionWithNoUserInfo } = connection;
+  // Remove the user id, access token and any claimed storage scope — an
+  // unauthenticated connection must never keep stamping a tenant onto messages
+  const { userId, accessToken, tenantId, ...connectionWithNoUserInfo } = connection;
 
   if (connection) {
     yield* webSocketConnectionData.askUpsert(connectionWithNoUserInfo);

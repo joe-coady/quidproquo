@@ -3,6 +3,7 @@ import { askKeyValueStoreUpsertWithRetry, AskResponse } from 'quidproquo-core';
 import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
 import { EventDocEvent } from '../models';
 import { eventDocEventToStoredEvent } from './storedEvent/eventDocEventToStoredEvent';
+import { askEventDocResolveScope } from './askEventDocResolveScope';
 
 // Events are immutable and uniquely keyed, so the write is CONDITIONAL: the
 // (modelId, index) slot is claimed atomically, and a concurrent writer that
@@ -11,6 +12,7 @@ import { eventDocEventToStoredEvent } from './storedEvent/eventDocEventToStoredE
 // conflict-retry live in the logic layer (askEventDocEventAppend).
 export function* askEventDocEventWrite(modelId: string, event: EventDocEvent): AskResponse<void> {
   const { eventsStoreName } = yield* askEventDocResolveStore();
+  const scope = yield* askEventDocResolveScope();
 
-  yield* askKeyValueStoreUpsertWithRetry(eventsStoreName, eventDocEventToStoredEvent(modelId, event), { ifNotExists: true });
+  yield* askKeyValueStoreUpsertWithRetry(eventsStoreName, eventDocEventToStoredEvent(modelId, event), { ifNotExists: true, scope });
 }

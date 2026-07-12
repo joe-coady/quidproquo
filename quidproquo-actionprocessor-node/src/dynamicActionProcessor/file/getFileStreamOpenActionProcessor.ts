@@ -31,9 +31,17 @@ async function* binaryStreamIterator(stream: Readable): AsyncIterableIterator<st
 }
 
 const getProcessFileStreamOpen = (qpqConfig: QPQConfig, config: FileStorageConfig): FileStreamOpenActionProcessor => {
-  return async ({ drive, filepath, encoding, chunkSize }, session, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
+  return async (
+    { drive, filepath, encoding, chunkSize, scope },
+    session,
+    actionProcessors,
+    logger,
+    updateSession,
+    dynamicModuleLoader,
+    streamRegistry,
+  ) => {
     try {
-      const fullPath = resolveFilePath(config, qpqConfig, drive, filepath);
+      const fullPath = resolveFilePath(config, qpqConfig, drive, filepath, scope);
       const isText = encoding === 'text';
       const highWaterMark = chunkSize ?? 65536;
       const readStream = fs.createReadStream(fullPath, isText ? { encoding: 'utf8', highWaterMark } : { highWaterMark });
@@ -45,6 +53,7 @@ const getProcessFileStreamOpen = (qpqConfig: QPQConfig, config: FileStorageConfi
       return actionResult({ id: streamId, encoding });
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
+        InvalidScopeError: (error) => actionResultError(FileStreamOpenErrorTypeEnum.InvalidScope, error.message),
         ENOENT: () => actionResultError(FileStreamOpenErrorTypeEnum.FileNotFound, `File not found: ${filepath}`), // node fs code
       });
     }

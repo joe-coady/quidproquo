@@ -3,7 +3,10 @@ import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 import { KvsCoreDataType, KvsUpdate } from './types';
 
 // Options Type
-export interface KeyValueStoreUpdateOptions {}
+export interface KeyValueStoreUpdateOptions {
+  // Composed into the partition key value by the processor; requires a string-typed partition key.
+  scope?: string;
+}
 
 // Payload
 export interface KeyValueStoreUpdateActionPayload<Value> {

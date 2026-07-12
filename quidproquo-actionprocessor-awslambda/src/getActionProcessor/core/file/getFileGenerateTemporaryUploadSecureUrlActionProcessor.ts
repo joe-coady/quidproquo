@@ -1,7 +1,8 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import { ActionProcessorList, ActionProcessorListResolver, actionResultError, ErrorTypeEnum, QPQConfig } from 'quidproquo-core';
+import { ActionProcessorList, ActionProcessorListResolver, actionResultError, ErrorTypeEnum, InvalidScopeError, QPQConfig } from 'quidproquo-core';
 import {
   actionResult,
+  composeScopedFilePath,
   FileActionType,
   FileGenerateTemporaryUploadSecureUrlActionProcessor,
   FileGenerateTemporaryUploadSecureUrlErrorTypeEnum,
@@ -14,7 +15,7 @@ import { resolveStorageDriveBucketName } from './utils';
 const maxExpirationMs = 7 * 24 * 60 * 60 * 1000;
 
 const getProcessFileGenerateTemporaryUploadSecureUrl = (qpqConfig: QPQConfig): FileGenerateTemporaryUploadSecureUrlActionProcessor => {
-  return async ({ drive, filepath, expirationMs, contentType }, session) => {
+  return async ({ drive, filepath, expirationMs, contentType, scope }, session) => {
     if (expirationMs > maxExpirationMs) {
       return actionResultError(
         FileGenerateTemporaryUploadSecureUrlErrorTypeEnum.ExpirationTooLong,
@@ -26,7 +27,7 @@ const getProcessFileGenerateTemporaryUploadSecureUrl = (qpqConfig: QPQConfig): F
       const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
       const url = await generatePresignedUploadUrl(
         s3BucketName,
-        filepath,
+        composeScopedFilePath(scope, filepath),
         qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig),
         expirationMs,
         session.correlation,
@@ -35,6 +36,9 @@ const getProcessFileGenerateTemporaryUploadSecureUrl = (qpqConfig: QPQConfig): F
 
       return actionResult(url);
     } catch (error: any) {
+      if (error instanceof InvalidScopeError) {
+        return actionResultError(FileGenerateTemporaryUploadSecureUrlErrorTypeEnum.InvalidScope, error.message);
+      }
       return actionResultError(ErrorTypeEnum.GenericError, 'Unable to generate temporary upload secure URL', error);
     }
   };

@@ -6,6 +6,7 @@ import { KvsCoreDataType, KvsUpdate } from './types';
 export const KeyValueStoreUpdateErrorTypeEnum = createErrorEnumForAction(KeyValueStoreActionType.Update, [
   'ServiceUnavailable', // DynamoDB internal error / throttling
   'ResourceNotFound', // the underlying table does not exist
+  'InvalidScope', // scope is malformed or the store's partition key is not string-typed
 ]);
 
 export function* askKeyValueStoreUpdate<Value>(

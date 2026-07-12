@@ -1,4 +1,4 @@
-import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { QPQConfig, qpqCoreUtils, validateScopeSegment } from 'quidproquo-core';
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
@@ -24,9 +24,18 @@ export function resolveDriveServiceName(drive: string, qpqConfig: QPQConfig): st
   return storageDrive?.owner?.module ?? qpqCoreUtils.getApplicationModuleName(qpqConfig);
 }
 
-export function resolveFilePath(fileStorageConfig: FileStorageConfig, qpqConfig: QPQConfig, drive: string, filepath: string): string {
+export function resolveFilePath(fileStorageConfig: FileStorageConfig, qpqConfig: QPQConfig, drive: string, filepath: string, scope?: string): string {
   const service = resolveDriveServiceName(drive, qpqConfig);
-  const root = path.resolve(fileStorageConfig.storagePath, service, drive);
+
+  // A scope becomes part of the root, so the escape check below also guarantees
+  // the filepath cannot traverse out of its scope, not just out of the drive.
+  if (scope !== undefined) {
+    validateScopeSegment(scope);
+  }
+
+  const root = scope
+    ? path.resolve(fileStorageConfig.storagePath, service, drive, scope)
+    : path.resolve(fileStorageConfig.storagePath, service, drive);
 
   // Block absolute paths and null bytes outright
   if (path.isAbsolute(filepath)) {

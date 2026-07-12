@@ -2,6 +2,7 @@ import {
   ConfigActionType,
   ContextActionType,
   EventBusActionType,
+  InlineFunctionActionType,
   KeyValueStoreActionType,
   runStory,
   throwsError,
@@ -66,17 +67,17 @@ describe('askProcessOnAuthenticate', () => {
     expect(setAccessTokenCalled).toBe(false);
   });
 
-  it('notifies the connection it is unauthenticated when the token is invalid', () => {
+  it('clears the connection auth and notifies it is unauthenticated when the token is invalid', () => {
     const sends: any[] = [];
-    let upsertCalled = false;
+    let upsert: any;
 
     runStory(askProcessOnAuthenticate('c1', 'bad-token'), {
       [ContextActionType.Read]: { apiName: 'demo' },
-      [KeyValueStoreActionType.Query]: { items: [connection] },
+      [KeyValueStoreActionType.Query]: { items: [{ ...connection, userId: 'old-user', accessToken: 'old-token', tenantId: 'old-tenant' }] },
       [ConfigActionType.GetGlobal]: globalByKey({ 'qpq-wsq-kvs-name-demo': 'user-directory' }),
       [UserDirectoryActionType.SetAccessToken]: throwsError('Unauthorized', 'bad'),
-      [KeyValueStoreActionType.Upsert]: () => {
-        upsertCalled = true;
+      [KeyValueStoreActionType.Upsert]: (action: any) => {
+        upsert = action;
         return undefined;
       },
       [WebsocketActionType.SendMessage]: (action: any) => {
@@ -86,7 +87,7 @@ describe('askProcessOnAuthenticate', () => {
     });
 
     expect(sends).toEqual([WebSocketQueueServerMessageEventType.Unauthenticated]);
-    expect(upsertCalled).toBe(false);
+    expect(upsert.payload.item).toEqual(connection);
   });
 
   it('stores the user, confirms authentication and broadcasts the authenticate event', () => {
@@ -120,5 +121,111 @@ describe('askProcessOnAuthenticate', () => {
     expect(sends).toEqual([WebSocketQueueServerMessageEventType.Authenticated]);
     expect(broadcast.payload.eventBusName).toBe('event-bus');
     expect(broadcast.payload.eventBusMessages).toEqual([{ type: WebSocketQueueClientMessageEventType.Authenticate, payload: {} }]);
+  });
+
+  it('stores a validated tenant claim on the connection', () => {
+    let upsert: any;
+    let validatorCall: any;
+    const sends: any[] = [];
+
+    runStory(askProcessOnAuthenticate('c1', 'token-1', 'tenant-a'), {
+      [ContextActionType.Read]: { apiName: 'demo' },
+      [KeyValueStoreActionType.Query]: { items: [connection] },
+      [ConfigActionType.GetGlobal]: globalByKey({
+        'qpq-wsq-kvs-name-demo': 'user-directory',
+        'qpq-wsq-eb-name-demo': 'event-bus',
+        'qpq-wsq-scope-validator-demo': 'validateTenantScope',
+      }),
+      [UserDirectoryActionType.SetAccessToken]: { userId: 'u1' },
+      [InlineFunctionActionType.Execute]: (action: any) => {
+        validatorCall = action.payload;
+        return true;
+      },
+      [KeyValueStoreActionType.Upsert]: (action: any) => {
+        upsert = action;
+        return undefined;
+      },
+      [WebsocketActionType.SendMessage]: (action: any) => {
+        sends.push(action.payload.payload.type);
+        return undefined;
+      },
+      [EventBusActionType.SendMessages]: undefined,
+    });
+
+    expect(validatorCall).toEqual({ functionName: 'validateTenantScope', payload: { userId: 'u1', requestedScope: 'tenant-a' } });
+    expect(upsert.payload.item.tenantId).toBe('tenant-a');
+    expect(sends).toEqual([WebSocketQueueServerMessageEventType.Authenticated]);
+  });
+
+  it('clears the connection auth when the tenant claim fails validation', () => {
+    let upsert: any;
+    const sends: any[] = [];
+
+    runStory(askProcessOnAuthenticate('c1', 'token-1', 'tenant-b'), {
+      [ContextActionType.Read]: { apiName: 'demo' },
+      [KeyValueStoreActionType.Query]: { items: [{ ...connection, userId: 'old-user', accessToken: 'old-token', tenantId: 'old-tenant' }] },
+      [ConfigActionType.GetGlobal]: globalByKey({
+        'qpq-wsq-kvs-name-demo': 'user-directory',
+        'qpq-wsq-scope-validator-demo': 'validateTenantScope',
+      }),
+      [UserDirectoryActionType.SetAccessToken]: { userId: 'u1' },
+      [InlineFunctionActionType.Execute]: false,
+      [KeyValueStoreActionType.Upsert]: (action: any) => {
+        upsert = action;
+        return undefined;
+      },
+      [WebsocketActionType.SendMessage]: (action: any) => {
+        sends.push(action.payload.payload.type);
+        return undefined;
+      },
+    });
+
+    expect(sends).toEqual([WebSocketQueueServerMessageEventType.Unauthenticated]);
+    expect(upsert.payload.item).toEqual(connection);
+  });
+
+  it('clears the connection auth when a tenant is claimed but no scope validator is configured', () => {
+    let upsert: any;
+    const sends: any[] = [];
+
+    runStory(askProcessOnAuthenticate('c1', 'token-1', 'tenant-a'), {
+      [ContextActionType.Read]: { apiName: 'demo' },
+      [KeyValueStoreActionType.Query]: { items: [{ ...connection, userId: 'old-user', accessToken: 'old-token', tenantId: 'old-tenant' }] },
+      [ConfigActionType.GetGlobal]: globalByKey({ 'qpq-wsq-kvs-name-demo': 'user-directory' }),
+      [UserDirectoryActionType.SetAccessToken]: { userId: 'u1' },
+      [KeyValueStoreActionType.Upsert]: (action: any) => {
+        upsert = action;
+        return undefined;
+      },
+      [WebsocketActionType.SendMessage]: (action: any) => {
+        sends.push(action.payload.payload.type);
+        return undefined;
+      },
+    });
+
+    expect(sends).toEqual([WebSocketQueueServerMessageEventType.Unauthenticated]);
+    expect(upsert.payload.item).toEqual(connection);
+  });
+
+  it('clears a previous tenant claim when re-authenticating without one', () => {
+    let upsert: any;
+
+    runStory(askProcessOnAuthenticate('c1', 'token-1'), {
+      [ContextActionType.Read]: { apiName: 'demo' },
+      [KeyValueStoreActionType.Query]: { items: [{ ...connection, tenantId: 'tenant-a' }] },
+      [ConfigActionType.GetGlobal]: globalByKey({
+        'qpq-wsq-kvs-name-demo': 'user-directory',
+        'qpq-wsq-eb-name-demo': 'event-bus',
+      }),
+      [UserDirectoryActionType.SetAccessToken]: { userId: 'u1' },
+      [KeyValueStoreActionType.Upsert]: (action: any) => {
+        upsert = action;
+        return undefined;
+      },
+      [WebsocketActionType.SendMessage]: undefined,
+      [EventBusActionType.SendMessages]: undefined,
+    });
+
+    expect(upsert.payload.item.tenantId).toBeUndefined();
   });
 });

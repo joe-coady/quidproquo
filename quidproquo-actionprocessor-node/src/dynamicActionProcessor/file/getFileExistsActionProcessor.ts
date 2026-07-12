@@ -7,6 +7,7 @@ import {
   FileActionType,
   FileExistsActionProcessor,
   FileExistsErrorTypeEnum,
+  InvalidScopeError,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -16,9 +17,9 @@ import { FileStorageConfig } from './types';
 import { resolveFilePath } from './utils';
 
 const getProcessFileExists = (qpqConfig: QPQConfig, config: FileStorageConfig): FileExistsActionProcessor => {
-  return async ({ drive, filepath }) => {
+  return async ({ drive, filepath, scope }) => {
     try {
-      const fullPath = resolveFilePath(config, qpqConfig, drive, filepath);
+      const fullPath = resolveFilePath(config, qpqConfig, drive, filepath, scope);
 
       try {
         await fs.access(fullPath);
@@ -34,6 +35,9 @@ const getProcessFileExists = (qpqConfig: QPQConfig, config: FileStorageConfig): 
         throw error;
       }
     } catch (error: any) {
+      if (error instanceof InvalidScopeError) {
+        return actionResultError(FileExistsErrorTypeEnum.InvalidScope, error.message);
+      }
       return actionResultError(ErrorTypeEnum.GenericError, `Error checking file existence: ${error.message}`);
     }
   };

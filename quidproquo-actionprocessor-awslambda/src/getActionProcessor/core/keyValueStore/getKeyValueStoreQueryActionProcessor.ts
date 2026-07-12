@@ -13,6 +13,7 @@ import { actionResult, KeyValueStoreActionType, KeyValueStoreQueryActionProcesso
 import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
 import { query } from '../../../logic/dynamo';
 import { getDynamoTableIndexByConfigAndQuery } from '../../../logic/dynamo/qpqDynamoOrm';
+import { getScopedKvsTranslatorOrThrow } from './kvsScopeUtils';
 
 const getProcessKeyValueStoreQuery = (qpqConfig: QPQConfig): KeyValueStoreQueryActionProcessor<any> => {
   return async ({ keyValueStoreName, keyCondition, options }) => {
@@ -25,22 +26,30 @@ const getProcessKeyValueStoreQuery = (qpqConfig: QPQConfig): KeyValueStoreQueryA
     }
 
     try {
+      // Scope lives inside the pk values, so pk conditions are rewritten to the
+      // composed form (throws when the key condition never constrains the pk).
+      const scoped = getScopedKvsTranslatorOrThrow(qpqConfig, keyValueStoreName, options?.scope);
+      const effectiveKeyCondition = scoped.keyCondition(keyCondition);
+
       const items = await query<any>(
         dynamoTableName,
         region,
-        keyCondition,
-        options?.filter,
+        effectiveKeyCondition,
+        scoped.filter(options?.filter),
         options?.nextPageKey,
-        getDynamoTableIndexByConfigAndQuery(storeConfig, keyCondition),
+        getDynamoTableIndexByConfigAndQuery(storeConfig, effectiveKeyCondition),
         options?.limit,
         options?.sortAscending,
       );
+
+      items.items = items.items.map((item: any) => scoped.strip(item));
 
       return actionResult(items);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         InternalServerError: () => actionResultError(KeyValueStoreQueryErrorTypeEnum.ServiceUnavailable, 'KVS Service Unavailable'),
         ResourceNotFoundException: () => actionResultError(KeyValueStoreQueryErrorTypeEnum.ResourceNotFound, 'KVS Resource Not Found'),
+        InvalidScopeError: (error) => actionResultError(KeyValueStoreQueryErrorTypeEnum.InvalidScope, error.message),
       });
     }
   };

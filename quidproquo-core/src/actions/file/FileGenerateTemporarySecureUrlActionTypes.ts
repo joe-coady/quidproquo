@@ -6,6 +6,7 @@ export interface FileGenerateTemporarySecureUrlActionPayload {
   drive: string;
   filepath: string;
   expirationMs: number;
+  scope?: string;
 }
 
 // Action

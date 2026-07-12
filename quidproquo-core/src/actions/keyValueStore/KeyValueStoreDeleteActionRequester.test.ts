@@ -6,7 +6,7 @@ import { askKeyValueStoreDelete } from './KeyValueStoreDeleteActionRequester';
 
 describe('askKeyValueStoreDelete', () => {
   it('yields a Delete action with key, sort key and options', () => {
-    const options = { consistentRead: true };
+    const options = { scope: 'tenant-a' };
 
     const { action } = captureRequester(askKeyValueStoreDelete('users', 'user-1', 'sort-1', options));
 

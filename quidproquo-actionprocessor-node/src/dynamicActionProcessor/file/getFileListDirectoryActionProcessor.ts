@@ -21,9 +21,9 @@ import { resolveFilePath } from './utils';
 const getProcessFileListDirectory =
   (config: FileStorageConfig) =>
   (qpqConfig: QPQConfig): FileListDirectoryActionProcessor => {
-    return async ({ drive, folderPath, maxFiles, pageToken }) => {
+    return async ({ drive, folderPath, maxFiles, pageToken, scope }) => {
       try {
-        const fullPath = resolveFilePath(config, qpqConfig, drive, folderPath || '');
+        const fullPath = resolveFilePath(config, qpqConfig, drive, folderPath || '', scope);
 
         // Read all entries in the directory
         const entries = await fs.readdir(fullPath, { withFileTypes: true });
@@ -59,6 +59,7 @@ const getProcessFileListDirectory =
         return actionResult(result);
       } catch (error: unknown) {
         return actionResultErrorFromCaughtError(error, {
+          InvalidScopeError: (error) => actionResultError(FileListDirectoryErrorTypeEnum.InvalidScope, error.message),
           ENOENT: () => actionResultError(FileListDirectoryErrorTypeEnum.DirectoryNotFound, `Directory not found: ${folderPath}`), // node fs code
           ENOTDIR: () => actionResultError(FileListDirectoryErrorTypeEnum.NotADirectory, `Path is not a directory: ${folderPath}`), // node fs code
           EACCES: () => actionResultError(FileListDirectoryErrorTypeEnum.AccessDenied, `Access denied listing directory: ${folderPath}`), // node fs code

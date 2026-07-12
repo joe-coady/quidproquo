@@ -5,6 +5,7 @@ import { FileActionType } from './FileActionType';
 export interface FileDeleteActionPayload {
   drive: string;
   filepaths: string[];
+  scope?: string;
 }
 
 // Action

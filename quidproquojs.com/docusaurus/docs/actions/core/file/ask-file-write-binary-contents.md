@@ -30,6 +30,7 @@ function* askFileWriteBinaryContents(
   filepath: string,
   data: QPQBinaryData,
   storageDriveAdvancedWriteOptions?: StorageDriveAdvancedWriteOptions,
+  scope?: string,
 ): AskResponse<void>;
 ```
 
@@ -41,6 +42,7 @@ function* askFileWriteBinaryContents(
 | `filepath` | `string` | Destination path within the drive, forward-slash delimited. Parent "directories" are implicit — no need to create them. |
 | `data` | `QPQBinaryData` | The binary payload to write — see below. |
 | `storageDriveAdvancedWriteOptions` | `StorageDriveAdvancedWriteOptions` | Optional write options — see below. |
+| `scope` | `string` | Optional storage-scope segment. When set, the processor writes `{scope}/{filepath}` instead, partitioning the drive (used by tenant/scoped features such as the event-doc `scopeResolver`). Must be a single path segment: no separators, `..`, or null bytes. |
 
 ### `QPQBinaryData`
 
@@ -69,6 +71,7 @@ interface QPQBinaryData {
 | --- | --- |
 | `FileWriteBinaryContentsErrorTypeEnum.AccessDenied` | The caller lacks permission to write to this drive (e.g. a foreign drive shared without write access). |
 | `FileWriteBinaryContentsErrorTypeEnum.DriveNotFound` | No storage drive with that name exists in the deployed config. |
+| `FileWriteBinaryContentsErrorTypeEnum.InvalidScope` | The `scope` is not a valid single path segment (empty, too long, or contains separators, `..`, or null bytes), or the scoped `filepath` is absolute or contains `..` segments or null bytes. |
 
 Errors thrown by actions can be caught with `askCatch` from quidproquo-core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 

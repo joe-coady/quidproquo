@@ -5,6 +5,7 @@ import { FileWriteObjectJsonActionRequester } from './FileWriteObjectJsonActionT
 export const FileWriteObjectJsonErrorTypeEnum = createErrorEnumForAction(FileActionType.WriteObjectJson, [
   'AccessDenied', // caller lacks permission to write the file
   'DriveNotFound', // storage drive does not exist
+  'InvalidScope', // scope is not a valid single path segment
 ]);
 
 export function* askFileWriteObjectJson<T extends object>(
@@ -12,6 +13,7 @@ export function* askFileWriteObjectJson<T extends object>(
   filepath: string,
   data: T,
   storageDriveAdvancedWriteOptions?: StorageDriveAdvancedWriteOptions,
+  scope?: string,
 ): FileWriteObjectJsonActionRequester<T> {
   return yield {
     type: FileActionType.WriteObjectJson,
@@ -21,6 +23,7 @@ export function* askFileWriteObjectJson<T extends object>(
       data,
 
       storageDriveAdvancedWriteOptions,
+      scope,
     },
   };
 }

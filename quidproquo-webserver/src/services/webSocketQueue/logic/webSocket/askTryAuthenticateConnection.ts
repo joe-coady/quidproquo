@@ -1,14 +1,17 @@
-import { askConfigGetGlobal, AskResponse, askUserDirectorySetAccessToken } from 'quidproquo-core';
+import { askConfigGetGlobal, AskResponse, askUserDirectorySetAccessToken, Nullable } from 'quidproquo-core';
 
 import { getWebSocketQueueGlobalConfigKeyForUserDirectoryName } from '../../../../config';
 import { askWebsocketReadApiNameOrThrow } from '../../../../context';
 import { webSocketConnectionData } from '../../data';
+import { Connection } from '../../types';
 
-export function* askTryAuthenticateConnection(connectionId: string): AskResponse<void> {
+// Re-stamp the connection's auth onto this message's session, and hand the
+// connection record back so the caller can also apply its stored storage scope.
+export function* askTryAuthenticateConnection(connectionId: string): AskResponse<Nullable<Connection>> {
   const apiName = yield* askWebsocketReadApiNameOrThrow();
   const userDirectoryName = yield* askConfigGetGlobal<string>(getWebSocketQueueGlobalConfigKeyForUserDirectoryName(apiName));
   if (!userDirectoryName) {
-    return;
+    return null;
   }
 
   const connection = yield* webSocketConnectionData.askGetById(connectionId);
@@ -18,4 +21,6 @@ export function* askTryAuthenticateConnection(connectionId: string): AskResponse
     // and service functions
     yield* askUserDirectorySetAccessToken(userDirectoryName, connection?.accessToken);
   }
+
+  return connection ?? null;
 }

@@ -30,6 +30,7 @@ function* askKeyValueStoreScan<KvsItem>(
   keyValueStoreName: string,
   filterCondition?: KvsQueryOperation,
   nextPageKey?: string,
+  options?: KeyValueStoreScanOptions,
 ): AskResponse<QpqPagedData<KvsItem>>;
 ```
 
@@ -40,6 +41,13 @@ function* askKeyValueStoreScan<KvsItem>(
 | `keyValueStoreName` | `string` | Name of the store to scan — must match a store declared with [defineKeyValueStore](../../../config/core/key-value-store.md) (or one shared via its `owner` option). |
 | `filterCondition` | `KvsQueryOperation` | Optional filter applied to every scanned record. Built with the `kvs*` condition helpers — see [Query conditions](./ask-key-value-store-query.md#query-conditions-kvsqueryoperation). Omit it to return everything. |
 | `nextPageKey` | `string` | Opaque cursor from a previous page's `nextPageKey`; pass it to fetch the following page. |
+| `options` | `KeyValueStoreScanOptions` | Optional scan options (see below). |
+
+### `KeyValueStoreScanOptions`
+
+| Property | Type | Default | Description |
+| --- | --- | --- | --- |
+| `scope` | `string` | – | Optional storage scope. The processor enforces it as a begins-with prefix filter on the partition key, so only records written under the same scope are returned (used by tenant/scoped features). It is still a full-table scan on the storage side; only the results are isolated. Requires the store's partition key to be string-typed. |
 
 ## Returns
 
@@ -60,6 +68,7 @@ When `nextPageKey` is set, pass it back as the third argument to fetch the next 
 | --- | --- |
 | `KeyValueStoreScanErrorTypeEnum.ServiceUnavailable` | DynamoDB internal error or throttling. |
 | `KeyValueStoreScanErrorTypeEnum.ResourceNotFound` | The underlying table does not exist. |
+| `KeyValueStoreScanErrorTypeEnum.InvalidScope` | The `scope` option is malformed (empty, over 128 characters, or containing path separators, `..`, or null bytes), or the store's partition key is not string-typed. |
 
 Catch errors with `askCatch` — it returns `{ success: true, result }` or `{ success: false, error }`.
 

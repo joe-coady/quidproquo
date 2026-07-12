@@ -6,6 +6,8 @@ import {
   ErrorTypeEnum,
   FileActionType,
   FileGenerateTemporarySecureUrlActionProcessor,
+  FileGenerateTemporarySecureUrlErrorTypeEnum,
+  InvalidScopeError,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -14,12 +16,12 @@ import { FileStorageConfig } from './types';
 import { resolveFilePath } from './utils';
 
 const getProcessFileGenerateTemporarySecureUrl = (qpqConfig: QPQConfig, config: FileStorageConfig): FileGenerateTemporarySecureUrlActionProcessor => {
-  return async ({ drive, filepath, expirationMs }) => {
+  return async ({ drive, filepath, expirationMs, scope }) => {
     try {
       // Create a token for download
       const token = createSecureUrlToken(
         {
-          fullFilepath: resolveFilePath(config, qpqConfig, drive, filepath),
+          fullFilepath: resolveFilePath(config, qpqConfig, drive, filepath, scope),
           operation: 'download',
           expiresAt: Date.now() + expirationMs,
         },
@@ -32,6 +34,9 @@ const getProcessFileGenerateTemporarySecureUrl = (qpqConfig: QPQConfig, config: 
 
       return actionResult(url);
     } catch (error: any) {
+      if (error instanceof InvalidScopeError) {
+        return actionResultError(FileGenerateTemporarySecureUrlErrorTypeEnum.InvalidScope, error.message);
+      }
       return actionResultError(ErrorTypeEnum.GenericError, `Unable to generate temporary secure URL: ${error.message}`);
     }
   };

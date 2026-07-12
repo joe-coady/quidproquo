@@ -3,7 +3,8 @@ import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 
 // Options Type
 export interface KeyValueStoreGetOptions {
-  // Add options here as needed, for example, read consistency
+  // Composed into the partition key value by the processor; requires a string-typed partition key.
+  scope?: string;
 }
 
 // Payload

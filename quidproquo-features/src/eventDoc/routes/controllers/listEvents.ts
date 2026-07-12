@@ -2,6 +2,7 @@ import { AskResponse } from 'quidproquo-core';
 import { HTTPEvent, HTTPEventResponse, qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { askEventDocEventList } from '../../data/askEventDocEventList';
+import { askEventDocProvideRequestScope } from '../../globals/askEventDocProvideRequestScope';
 import { askEventDocProvideStoreFromGlobals } from '../../globals/askEventDocProvideStoreFromGlobals';
 
 function* askEventDocStoreListEvents(event: HTTPEvent, modelId: string): AskResponse<HTTPEventResponse> {
@@ -19,5 +20,5 @@ function* askEventDocStoreListEvents(event: HTTPEvent, modelId: string): AskResp
 }
 
 export function* listEvents(event: HTTPEvent, params: { id: string }): AskResponse<HTTPEventResponse> {
-  return yield* askEventDocProvideStoreFromGlobals(askEventDocStoreListEvents(event, params.id));
+  return yield* askEventDocProvideStoreFromGlobals(askEventDocProvideRequestScope(event, askEventDocStoreListEvents(event, params.id)));
 }

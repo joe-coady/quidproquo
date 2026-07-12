@@ -39,7 +39,13 @@ function* askKeyValueStoreGet<Value>(
 | --- | --- | --- |
 | `keyValueStoreName` | `string` | Name of the store to read from — must match a store declared with [defineKeyValueStore](../../../config/core/key-value-store.md) (or one shared via its `owner` option). |
 | `key` | `string` | The partition key value of the record to fetch. |
-| `options` | `KeyValueStoreGetOptions` | Reserved for future read options; currently empty. |
+| `options` | `KeyValueStoreGetOptions` | Optional read options (see below). |
+
+### `KeyValueStoreGetOptions`
+
+| Property | Type | Default | Description |
+| --- | --- | --- | --- |
+| `scope` | `string` | – | Optional storage scope. The processor composes it into the partition key value, so scoped and unscoped records live under separate keys in the same store (used by tenant/scoped features). Requires the store's partition key to be string-typed. |
 
 ## Returns
 
@@ -51,6 +57,7 @@ function* askKeyValueStoreGet<Value>(
 | --- | --- |
 | `KeyValueStoreGetErrorTypeEnum.ServiceUnavailable` | DynamoDB internal error or throttling. |
 | `KeyValueStoreGetErrorTypeEnum.ResourceNotFound` | The underlying table does not exist. |
+| `KeyValueStoreGetErrorTypeEnum.InvalidScope` | The `scope` option is malformed (empty, over 128 characters, or containing path separators, `..`, or null bytes), or the store's partition key is not string-typed. |
 
 Errors thrown by actions can be caught with `askCatch` from quidproquo-core. It returns an object — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 

@@ -3,6 +3,7 @@ import { HTTPEvent, HTTPEventResponse, qpqWebServerUtils } from 'quidproquo-webs
 
 import { askEventDocResolveStore } from '../../context/askEventDocResolveStore';
 import { askEventDocEventListAll } from '../../data/askEventDocEventListAll';
+import { askEventDocProvideRequestScope } from '../../globals/askEventDocProvideRequestScope';
 import { askEventDocProvideStoreFromGlobals } from '../../globals/askEventDocProvideStoreFromGlobals';
 import { EventDocRenderInput, EventDocRenderMode, EventDocRenderResult } from '../../models';
 
@@ -37,5 +38,5 @@ function* askEventDocStoreRender(event: HTTPEvent, modelId: string): AskResponse
 
 // GET {basePath}/{id}/render — mounted only when the collection configures an eventRenderer.
 export function* render(event: HTTPEvent, params: { id: string }): AskResponse<HTTPEventResponse> {
-  return yield* askEventDocProvideStoreFromGlobals(askEventDocStoreRender(event, params.id));
+  return yield* askEventDocProvideStoreFromGlobals(askEventDocProvideRequestScope(event, askEventDocStoreRender(event, params.id)));
 }

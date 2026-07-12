@@ -47,6 +47,7 @@ function* askKeyValueStoreUpsert<KvsItem>(
 | --- | --- | --- | --- |
 | `ttlInSeconds` | `number` | – | Time-to-live in seconds; sets the record's expiry (used with the store's `ttlAttribute`). |
 | `ifNotExists` | `boolean` | `false` | Conditional insert: only write when no item with the same key exists. A losing concurrent writer receives `KeyValueStoreUpsertErrorTypeEnum.Conflict` instead of silently overwriting — the primitive for optimistic-concurrency schemes (e.g. append-only event logs where the sort key is a claimed index). |
+| `scope` | `string` | – | Optional storage scope. The processor composes it into the item's partition key value, so the record is written under that scope and only scoped reads see it (used by tenant/scoped features). Requires the store's partition key to be string-typed. |
 
 ## Returns
 
@@ -59,6 +60,7 @@ function* askKeyValueStoreUpsert<KvsItem>(
 | `KeyValueStoreUpsertErrorTypeEnum.ServiceUnavailable` | DynamoDB internal error or throttling. |
 | `KeyValueStoreUpsertErrorTypeEnum.ResourceNotFound` | The underlying table does not exist. |
 | `KeyValueStoreUpsertErrorTypeEnum.Conflict` | A conditional (`ifNotExists`) write lost to an existing item. Namespaced — not the generic `ErrorTypeEnum.Conflict` — so retry logic can target the write race specifically without also catching domain-level conflicts. |
+| `KeyValueStoreUpsertErrorTypeEnum.InvalidScope` | The `scope` option is malformed (empty, over 128 characters, or containing path separators, `..`, or null bytes), or the store's partition key is not string-typed. |
 
 Catch errors with `askCatch` — it returns `{ success: true, result }` or `{ success: false, error }`.
 

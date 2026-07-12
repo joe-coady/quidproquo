@@ -37,7 +37,7 @@ describe('getKeyValueStoreScanActionProcessor', () => {
 
     const result = await invokeProcessor(process, { keyValueStoreName: 'store', filterCondition: 'active = true', nextPageKey: 'np' });
 
-    expect(repo.scan).toHaveBeenCalledWith('store', 'active = true', 'np', undefined);
+    expect(repo.scan).toHaveBeenCalledWith('store', 'active = true', 'np', undefined, undefined);
     expect(resolveActionResult(result)).toEqual({ items: [{ id: 'a' }] });
   });
 

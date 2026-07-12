@@ -6,6 +6,7 @@ import { FileActionType } from './FileActionType';
 export interface FileReadBinaryContentsActionPayload {
   drive: string;
   filepath: string;
+  scope?: string;
 }
 
 // Action

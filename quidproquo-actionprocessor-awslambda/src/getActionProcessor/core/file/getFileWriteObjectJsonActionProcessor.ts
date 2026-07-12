@@ -5,6 +5,7 @@ import {
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  composeScopedFilePath,
   FileActionType,
   FileWriteObjectJsonActionProcessor,
   FileWriteObjectJsonErrorTypeEnum,
@@ -16,7 +17,7 @@ import { writeTextFile } from '../../../logic/s3/s3Utils';
 import { resolveStorageDriveBucketName } from './utils';
 
 const getProcessFileWriteObjectJson = (qpqConfig: QPQConfig): FileWriteObjectJsonActionProcessor<object> => {
-  return async ({ drive, filepath, data, storageDriveAdvancedWriteOptions }) => {
+  return async ({ drive, filepath, data, storageDriveAdvancedWriteOptions, scope }) => {
     const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
 
     const dataJson = JSON.stringify(data);
@@ -24,7 +25,7 @@ const getProcessFileWriteObjectJson = (qpqConfig: QPQConfig): FileWriteObjectJso
     try {
       await writeTextFile(
         s3BucketName,
-        filepath,
+        composeScopedFilePath(scope, filepath),
         dataJson,
         qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig),
         getS3BucketStorageClassFromStorageDriveTier(storageDriveAdvancedWriteOptions?.storageDriveTier),
@@ -36,6 +37,7 @@ const getProcessFileWriteObjectJson = (qpqConfig: QPQConfig): FileWriteObjectJso
         AccessDenied: () => actionResultError(FileWriteObjectJsonErrorTypeEnum.AccessDenied, 'Access denied writing file'),
         Forbidden: () => actionResultError(FileWriteObjectJsonErrorTypeEnum.AccessDenied, 'Access denied writing file'),
         NoSuchBucket: () => actionResultError(FileWriteObjectJsonErrorTypeEnum.DriveNotFound, `Storage drive not found: ${drive}`),
+        InvalidScopeError: (error) => actionResultError(FileWriteObjectJsonErrorTypeEnum.InvalidScope, error.message),
       });
     }
   };

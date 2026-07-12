@@ -15,7 +15,15 @@ import { askEventDocEventLast } from '../data/askEventDocEventLast';
 import { askEventDocEventListAll } from '../data/askEventDocEventListAll';
 import { askEventDocEventWrite } from '../data/askEventDocEventWrite';
 import { askEventDocUpsert } from '../data/askEventDocUpsert';
-import { EventDocEvent, EventDocEventActor, EventDocEventInput, EventDocEventValidationInput, eventDocSummarySchema } from '../models';
+import {
+  EventDocEffect,
+  EventDocEvent,
+  EventDocEventActor,
+  EventDocEventInput,
+  EventDocEventValidationInput,
+  EventDocOnPublishInput,
+  eventDocSummarySchema,
+} from '../models';
 import { applyEventDocSummaryEvent } from '../summary';
 import { defaultEventDocEventValidator } from '../validation';
 import { askEventDocGetByIdOrThrow } from './askEventDocGetByIdOrThrow';
@@ -130,6 +138,24 @@ export function* askEventDocEventAppend(modelId: string, input: EventDocEventInp
     }
 
     return yield* askThrowError(result.error.errorType as ErrorTypeEnum, result.error.errorText, result.error.errorStack);
+  }
+
+  // The on-publish hook runs AFTER the retry block, never inside a lap: the
+  // hook may itself throw the namespaced Upsert Conflict (e.g. a materialized
+  // read-model write), which inside a lap would re-run the whole append. At
+  // this point the event is durably written and the summary persisted; a hook
+  // failure propagates so the caller knows the side effect (not the append)
+  // failed. A deduped publish retry also reaches here and re-fires the hook -
+  // deliberate: hooks must be idempotent, and a retry after a failed hook is
+  // exactly how a stale read model gets repaired.
+  const { onPublish } = yield* askEventDocStoreRead();
+  if (onPublish && result.result.type === EventDocEffect.Publish) {
+    const summary = yield* askEventDocGetByIdOrThrow(modelId);
+    yield* askInlineFunctionExecute<void, EventDocOnPublishInput>(onPublish, {
+      docId: modelId,
+      event: result.result,
+      summary,
+    });
   }
 
   return result.result;

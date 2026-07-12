@@ -5,6 +5,7 @@ import {
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  composeScopedFilePath,
   ErrorTypeEnum,
   FileActionType,
   FileStreamOpenActionProcessor,
@@ -38,7 +39,15 @@ async function* chunkedReadableIterator(stream: Readable, chunkSize: number, tra
 }
 
 const getProcessFileStreamOpen = (qpqConfig: QPQConfig): FileStreamOpenActionProcessor => {
-  return async ({ drive, filepath, encoding, chunkSize }, session, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
+  return async (
+    { drive, filepath, encoding, chunkSize, scope },
+    session,
+    actionProcessors,
+    logger,
+    updateSession,
+    dynamicModuleLoader,
+    streamRegistry,
+  ) => {
     try {
       const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
       const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
@@ -46,7 +55,7 @@ const getProcessFileStreamOpen = (qpqConfig: QPQConfig): FileStreamOpenActionPro
 
       const response = await s3Client.send(
         new GetObjectCommand({
-          Key: filepath,
+          Key: composeScopedFilePath(scope, filepath),
           Bucket: s3BucketName,
         }),
       );
@@ -68,6 +77,7 @@ const getProcessFileStreamOpen = (qpqConfig: QPQConfig): FileStreamOpenActionPro
         InvalidObjectState: () => actionResultError(FileStreamOpenErrorTypeEnum.InvalidStorageClass, 'File is in the wrong storage class'),
         NoSuchKey: () => actionResultError(FileStreamOpenErrorTypeEnum.FileNotFound, `File not found: ${filepath}`),
         NotFound: () => actionResultError(FileStreamOpenErrorTypeEnum.FileNotFound, `File not found: ${filepath}`),
+        InvalidScopeError: (error) => actionResultError(FileStreamOpenErrorTypeEnum.InvalidScope, error.message),
       });
     }
   };

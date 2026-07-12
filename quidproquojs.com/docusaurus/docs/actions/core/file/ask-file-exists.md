@@ -28,6 +28,7 @@ export function* askEnsureSeedFile() {
 function* askFileExists(
   drive: string,
   filepath: string,
+  scope?: string,
 ): AskResponse<boolean>;
 ```
 
@@ -37,6 +38,7 @@ function* askFileExists(
 | --- | --- | --- |
 | `drive` | `string` | Name of the storage drive to check — must match a drive declared with [defineStorageDrive](../../../config/core/storage-drive.md) (or one shared via its `owner` option). |
 | `filepath` | `string` | Path of the file within the drive, forward-slash delimited, e.g. `'uploads/avatar.png'`. |
+| `scope` | `string` | Optional storage-scope segment. When set, the processor checks `{scope}/{filepath}` instead, partitioning the drive (used by tenant/scoped features such as the event-doc `scopeResolver`). Must be a single path segment: no separators, `..`, or null bytes. |
 
 ## Returns
 
@@ -47,6 +49,7 @@ function* askFileExists(
 | Error | Meaning |
 | --- | --- |
 | `FileExistsErrorTypeEnum.AccessDenied` | The caller lacks permission to check existence on this drive. |
+| `FileExistsErrorTypeEnum.InvalidScope` | The `scope` is not a valid single path segment (empty, too long, or contains separators, `..`, or null bytes), or the scoped `filepath` is absolute or contains `..` segments or null bytes. |
 
 Errors thrown by actions can be caught with `askCatch` from quidproquo-core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 

@@ -30,6 +30,7 @@ export function* askGetSettings() {
 function* askFileReadObjectJson<T extends object>(
   drive: string,
   filepath: string,
+  scope?: string,
 ): AskResponse<T>;
 ```
 
@@ -39,6 +40,7 @@ function* askFileReadObjectJson<T extends object>(
 | --- | --- | --- |
 | `drive` | `string` | Name of the storage drive to read from — must match a drive declared with [defineStorageDrive](../../../config/core/storage-drive.md) (or one shared via its `owner` option). |
 | `filepath` | `string` | Path of the JSON file within the drive, forward-slash delimited. |
+| `scope` | `string` | Optional storage-scope segment. When set, the processor reads `{scope}/{filepath}` instead, partitioning the drive (used by tenant/scoped features such as the event-doc `scopeResolver`). Must be a single path segment: no separators, `..`, or null bytes. |
 
 The type parameter `T` is the shape you expect the parsed JSON to have. It is a compile-time annotation only — the contents are not validated against it at runtime.
 
@@ -51,6 +53,7 @@ The type parameter `T` is the shape you expect the parsed JSON to have. It is a 
 | Error | Meaning |
 | --- | --- |
 | `FileReadObjectJsonErrorTypeEnum.InvalidStorageClass` | The file is in a cold storage tier and cannot be read directly. Check first with [askFileIsColdStorage](./ask-file-is-cold-storage.md). |
+| `FileReadObjectJsonErrorTypeEnum.InvalidScope` | The `scope` is not a valid single path segment (empty, too long, or contains separators, `..`, or null bytes), or the scoped `filepath` is absolute or contains `..` segments or null bytes. |
 
 Errors thrown by actions can be caught with `askCatch` from quidproquo-core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 

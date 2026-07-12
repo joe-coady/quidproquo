@@ -38,7 +38,7 @@ describe('getKeyValueStoreUpsertActionProcessor', () => {
 
     const result = await invokeProcessor(process, { keyValueStoreName: 'store', item: { id: 'a' } });
 
-    expect(repo.upsert).toHaveBeenCalledWith('store', { id: 'a' }, { ifNotExists: undefined });
+    expect(repo.upsert).toHaveBeenCalledWith('store', { id: 'a' }, { ifNotExists: undefined }, undefined);
     expect(resolveActionResult(result)).toEqual({ id: 'a' });
   });
 

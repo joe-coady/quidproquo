@@ -51,6 +51,7 @@ export const actionResultErrorFromCaughtError = (error: unknown, errorMap: Error
     // Prefer the OS/runtime code (node fs: EACCES, ENOENT...), then fall back
     // to the error name (AWS SDK: AccessDenied, NoSuchBucket...).
     const handler = (errorCode && errorMap[errorCode]) || errorMap[errorName];
+    if (!handler) console.log(error);
     if (handler) {
       return handler(error);
     }

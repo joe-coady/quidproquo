@@ -1,4 +1,5 @@
 import {
+  actionResult,
   actionResultError,
   buildTestQpqConfig,
   createStreamRegistry,
@@ -58,6 +59,48 @@ describe('getInlineFunctionExecuteActionProcessor', () => {
     const error = resolveActionResultError(result);
     expect(error.errorType).toBe(ErrorTypeEnum.NotFound);
     expect(error.errorText).toContain('Unable to dynamically load');
+  });
+
+  it('carries the caller function globals into the inline story session', async () => {
+    // The inline function runs WITHIN the caller's function, so route-level
+    // globals (e.g. eventDocUserDirectory) must be visible to its actions -
+    // this is what lets the tenant scope resolver resolve the current user.
+    let seenGlobals: Record<string, unknown> | undefined;
+
+    function* capturesSession(): any {
+      yield { type: 'Capture' };
+      return 'ok';
+    }
+
+    const actionProcessors = {
+      Capture: async (_payload: unknown, storySession: { functionGlobals?: Record<string, unknown> }) => {
+        seenGlobals = storySession.functionGlobals;
+        return actionResult(null);
+      },
+    };
+
+    const processors = await getInlineFunctionExecuteActionProcessor(qpqConfig, async () => null);
+    const process = processors[InlineFunctionActionType.Execute] as (p: any, ...rest: any[]) => Promise<any>;
+
+    const callerSession = {
+      correlation: 'corr-0',
+      depth: 0,
+      context: {},
+      localContext: {},
+      functionGlobals: { eventDocUserDirectory: 'users' },
+    } as any;
+
+    await process(
+      { functionName: 'handler', payload: {} },
+      callerSession,
+      actionProcessors,
+      logger,
+      undefined,
+      async () => capturesSession,
+      createStreamRegistry(),
+    );
+
+    expect(seenGlobals).toEqual({ eventDocUserDirectory: 'users' });
   });
 
   it('propagates a story error as an action error', async () => {

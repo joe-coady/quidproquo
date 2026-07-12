@@ -13,6 +13,12 @@ import { defineWebsocket } from './websocket';
 export interface QPQConfigAdvancedWebsocketQueueSettings extends QPQConfigAdvancedSettings {
   owner?: CrossModuleOwnerWithNoResourceOverride;
   userDirectoryName?: string;
+
+  // Registered inline-function name (see `defineInlineFunction`) invoked with
+  // `{ userId, requestedScope }` when an Authenticate message claims a storage
+  // scope (e.g. a tenant id); must return true for the claim to be stored on
+  // the connection. A claim with NO validator configured is rejected outright.
+  connectionScopeValidator?: string;
 }
 
 export function getWebSocketQueueGlobalConfigKeyForEventBusName(apiName: string): string {
@@ -21,6 +27,10 @@ export function getWebSocketQueueGlobalConfigKeyForEventBusName(apiName: string)
 
 export function getWebSocketQueueGlobalConfigKeyForUserDirectoryName(apiName: string): string {
   return `qpq-wsq-kvs-name-${apiName}`;
+}
+
+export function getWebSocketQueueGlobalConfigKeyForConnectionScopeValidator(apiName: string): string {
+  return `qpq-wsq-scope-validator-${apiName}`;
 }
 
 export function getWebSocketQueueKeyValueStoreName(apiName: string): string {
@@ -37,6 +47,7 @@ export const defineWebSocketQueue = (
     // User defined vars (stored in config)
     defineGlobal(getWebSocketQueueGlobalConfigKeyForEventBusName(apiName), eventBusName),
     defineGlobal(getWebSocketQueueGlobalConfigKeyForUserDirectoryName(apiName), advancedSettings?.userDirectoryName || ''),
+    defineGlobal(getWebSocketQueueGlobalConfigKeyForConnectionScopeValidator(apiName), advancedSettings?.connectionScopeValidator || ''),
 
     // Store To Save Connection Info
     defineKeyValueStore(getWebSocketQueueKeyValueStoreName(apiName), 'id', undefined, {

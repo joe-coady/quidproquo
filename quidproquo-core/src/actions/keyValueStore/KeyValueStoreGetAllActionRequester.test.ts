@@ -6,7 +6,7 @@ import { askKeyValueStoreGetAll } from './KeyValueStoreGetAllActionRequester';
 
 describe('askKeyValueStoreGetAll', () => {
   it('yields a GetAll action with options', () => {
-    const options = { consistentRead: true };
+    const options = { scope: 'tenant-a' };
 
     const { action } = captureRequester(askKeyValueStoreGetAll('users', options));
 

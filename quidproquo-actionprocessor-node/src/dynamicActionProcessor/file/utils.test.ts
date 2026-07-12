@@ -75,6 +75,22 @@ describe('resolveFilePath', () => {
   it('throws when the path escapes the drive root', () => {
     expect(() => resolveFilePath(fileConfig, qpqConfig, 'media', '../../etc/passwd')).toThrow('escapes drive root');
   });
+
+  it('resolves under the scope segment when a scope is given', () => {
+    const expected = path.resolve(fileConfig.storagePath, moduleName, 'media', 'tenant-a', 'a/b.txt');
+
+    expect(resolveFilePath(fileConfig, qpqConfig, 'media', 'a/b.txt', 'tenant-a')).toBe(expected);
+  });
+
+  it('throws when the path escapes the scope root', () => {
+    expect(() => resolveFilePath(fileConfig, qpqConfig, 'media', '../tenant-b/secret.txt', 'tenant-a')).toThrow('escapes drive root');
+  });
+
+  it('rejects a scope containing separators or traversal outright', () => {
+    expect(() => resolveFilePath(fileConfig, qpqConfig, 'media', 'a.txt', 'tenant-a/../tenant-b')).toThrow('Scope must not contain path separators');
+    expect(() => resolveFilePath(fileConfig, qpqConfig, 'media', 'a.txt', '..')).toThrow('Scope must not contain path separators');
+    expect(() => resolveFilePath(fileConfig, qpqConfig, 'media', 'a.txt', '')).toThrow('Scope must not be empty.');
+  });
 });
 
 describe('ensureDirectoryExists', () => {

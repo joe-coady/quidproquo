@@ -11,4 +11,10 @@ export type EventDocStore = {
   eventValidator?: string;
   // The collection's render inline-function name, if configured (powers GET .../render).
   eventRenderer?: string;
+  // The collection's on-publish inline-function name, if configured. Invoked after a
+  // Publish event has been durably appended and the summary re-derived.
+  onPublish?: string;
+  // The collection's request-scope inline-function name, if configured. Invoked with the
+  // HTTP event; a non-null result becomes the ambient storage scope for the request.
+  scopeResolver?: string;
 };

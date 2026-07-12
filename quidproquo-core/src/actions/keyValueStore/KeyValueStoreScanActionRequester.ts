@@ -1,17 +1,19 @@
 import { createErrorEnumForAction } from '../../types';
 import { KeyValueStoreActionType } from './KeyValueStoreActionType';
-import { KeyValueStoreScanActionRequester } from './KeyValueStoreScanActionTypes';
+import { KeyValueStoreScanActionRequester, KeyValueStoreScanOptions } from './KeyValueStoreScanActionTypes';
 import { KvsQueryOperation } from './types';
 
 export const KeyValueStoreScanErrorTypeEnum = createErrorEnumForAction(KeyValueStoreActionType.Scan, [
   'ServiceUnavailable', // DynamoDB internal error / throttling
   'ResourceNotFound', // the underlying table does not exist
+  'InvalidScope', // scope is malformed or the store's partition key is not string-typed
 ]);
 
 export function* askKeyValueStoreScan<KvsItem>(
   keyValueStoreName: string,
   filterCondition?: KvsQueryOperation,
   nextPageKey?: string,
+  options?: KeyValueStoreScanOptions,
 ): KeyValueStoreScanActionRequester<KvsItem> {
   return yield {
     type: KeyValueStoreActionType.Scan,
@@ -21,6 +23,8 @@ export function* askKeyValueStoreScan<KvsItem>(
       filterCondition,
 
       nextPageKey,
+
+      options,
     },
   };
 }

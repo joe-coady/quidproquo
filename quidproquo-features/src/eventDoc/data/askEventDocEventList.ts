@@ -4,6 +4,7 @@ import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
 import { EventDocEvent } from '../models';
 import { EventDocStoredEvent } from '../types/EventDocStoredEvent';
 import { eventDocStoredEventToEvent } from './storedEvent/eventDocStoredEventToEvent';
+import { askEventDocResolveScope } from './askEventDocResolveScope';
 
 export type EventDocEventListOptions = {
   limit?: number;
@@ -16,6 +17,7 @@ export type EventDocEventListOptions = {
 
 export function* askEventDocEventList(modelId: string, options?: EventDocEventListOptions): AskResponse<QpqPagedData<EventDocEvent>> {
   const { eventsStoreName } = yield* askEventDocResolveStore();
+  const scope = yield* askEventDocResolveScope();
 
   const keyCondition =
     options?.afterIndex !== undefined ? kvsAnd([kvsEqual('pk', modelId), kvsGreaterThan('sk', options.afterIndex)]) : kvsEqual('pk', modelId);
@@ -24,6 +26,7 @@ export function* askEventDocEventList(modelId: string, options?: EventDocEventLi
     sortAscending: true,
     limit: options?.limit,
     nextPageKey: options?.nextPageKey,
+    scope,
   });
 
   return {

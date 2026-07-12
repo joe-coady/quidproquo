@@ -7,6 +7,7 @@ export interface FileListDirectoryActionPayload {
   folderPath: string;
   maxFiles: number;
   pageToken?: string;
+  scope?: string;
 }
 
 // Action

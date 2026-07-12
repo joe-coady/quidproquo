@@ -7,6 +7,8 @@ import { KvsQueryOperation } from './types';
 export interface KeyValueStoreScanOptions {
   ttlInSeconds?: number; // Time-to-live in seconds
   limit?: number; // Maximum number of items to return
+  // Enforced by the processor as a partition-key prefix filter; requires a string-typed partition key.
+  scope?: string;
 }
 
 // Payload
@@ -16,6 +18,8 @@ export interface KeyValueStoreScanActionPayload {
   filterCondition?: KvsQueryOperation;
 
   nextPageKey?: string;
+
+  options?: KeyValueStoreScanOptions;
 }
 
 // Action

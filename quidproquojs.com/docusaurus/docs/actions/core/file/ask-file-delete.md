@@ -24,6 +24,7 @@ export function* askRemoveOldExports() {
 function* askFileDelete(
   drive: string,
   filepaths: string[],
+  scope?: string,
 ): AskResponse<string[]>;
 ```
 
@@ -33,6 +34,7 @@ function* askFileDelete(
 | --- | --- | --- |
 | `drive` | `string` | Name of the storage drive to delete from — must match a drive declared with [defineStorageDrive](../../../config/core/storage-drive.md) (or one shared via its `owner` option). |
 | `filepaths` | `string[]` | The paths of the files to delete within the drive, forward-slash delimited. Pass one path or many in a single call. |
+| `scope` | `string` | Optional storage-scope segment. When set, the processor deletes `{scope}/{filepath}` for every path in `filepaths`, partitioning the drive (used by tenant/scoped features such as the event-doc `scopeResolver`). Must be a single path segment: no separators, `..`, or null bytes. |
 
 ## Returns
 
@@ -44,6 +46,7 @@ function* askFileDelete(
 | --- | --- |
 | `FileDeleteErrorTypeEnum.AccessDenied` | The caller lacks permission to delete from this drive (e.g. a foreign drive shared without write access). |
 | `FileDeleteErrorTypeEnum.DriveNotFound` | No storage drive with that name exists in the deployed config. |
+| `FileDeleteErrorTypeEnum.InvalidScope` | The `scope` is not a valid single path segment (empty, too long, or contains separators, `..`, or null bytes), or one of the scoped `filepaths` is absolute or contains `..` segments or null bytes. |
 
 Errors thrown by actions can be caught with `askCatch` from quidproquo-core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 

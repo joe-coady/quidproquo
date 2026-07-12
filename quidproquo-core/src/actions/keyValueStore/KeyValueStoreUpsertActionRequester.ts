@@ -9,6 +9,7 @@ export const KeyValueStoreUpsertErrorTypeEnum = createErrorEnumForAction(KeyValu
   // not ErrorTypeEnum.Conflict — so retry logic can target the write race
   // specifically without also catching domain-level conflicts.
   'Conflict',
+  'InvalidScope', // scope is malformed or the store's partition key is not string-typed
 ]);
 
 export function* askKeyValueStoreUpsert<KvsItem>(

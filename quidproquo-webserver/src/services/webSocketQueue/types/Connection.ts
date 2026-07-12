@@ -6,4 +6,8 @@ export interface Connection {
 
   userId?: string;
   accessToken?: string;
+
+  // Validated storage scope (e.g. active tenant) claimed at authenticate time.
+  // Every message on this connection runs with it as the ambient storage scope.
+  tenantId?: string;
 }

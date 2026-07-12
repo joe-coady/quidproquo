@@ -5,6 +5,7 @@ import { FileActionType } from './FileActionType';
 export interface FileReadObjectJsonActionPayload {
   drive: string;
   filepath: string;
+  scope?: string;
 }
 
 // Action

@@ -5,6 +5,7 @@ import { KeyValueStoreGetActionRequester, KeyValueStoreGetOptions } from './KeyV
 export const KeyValueStoreGetErrorTypeEnum = createErrorEnumForAction(KeyValueStoreActionType.Get, [
   'ServiceUnavailable', // DynamoDB internal error / throttling
   'ResourceNotFound', // the underlying table does not exist
+  'InvalidScope', // scope is malformed or the store's partition key is not string-typed
 ]);
 
 export function* askKeyValueStoreGet<Value>(

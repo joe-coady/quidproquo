@@ -8,6 +8,7 @@ export const FileListDirectoryErrorTypeEnum = createErrorEnumForAction(FileActio
   'DirectoryNotFound', // no directory exists at the given folderPath
   'NotADirectory', // the folderPath points at a file, not a directory
   'DriveNotFound', // storage drive does not exist
+  'InvalidScope', // scope is not a valid single path segment
 ]);
 
 export function* askFileListDirectory(
@@ -15,6 +16,7 @@ export function* askFileListDirectory(
   folderPath: string,
   maxFiles: number = 1000,
   pageToken?: string,
+  scope?: string,
 ): FileListDirectoryActionRequester {
   return yield {
     type: FileActionType.ListDirectory,
@@ -23,16 +25,17 @@ export function* askFileListDirectory(
       folderPath,
       pageToken,
       maxFiles,
+      scope,
     },
   };
 }
 
-export function* askFileListAllDirectory(drive: string, folderPath: string): AskResponse<FileInfo[]> {
+export function* askFileListAllDirectory(drive: string, folderPath: string, scope?: string): AskResponse<FileInfo[]> {
   let pageToken: string | undefined;
   let fileInfos: FileInfo[] = [];
 
   while (true) {
-    const directoryInfo = yield* askFileListDirectory(drive, folderPath, 1000, pageToken);
+    const directoryInfo = yield* askFileListDirectory(drive, folderPath, 1000, pageToken, scope);
 
     fileInfos = [...fileInfos, ...directoryInfo.fileInfos];
 

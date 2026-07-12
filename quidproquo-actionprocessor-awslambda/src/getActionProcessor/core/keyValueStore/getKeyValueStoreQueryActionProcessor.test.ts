@@ -29,12 +29,12 @@ describe('getKeyValueStoreQueryActionProcessor', () => {
 
   it('queries the resolved table and returns the items', async () => {
     vi.mocked(getDynamoTableIndexByConfigAndQuery).mockReturnValue('gsi-1' as any);
-    vi.mocked(query).mockResolvedValue([{ id: '1' }] as any);
+    vi.mocked(query).mockResolvedValue({ items: [{ id: '1' }], nextPageKey: undefined } as any);
     const processor = await resolveProcessor();
 
     const result = await invokeProcessor(processor, { keyValueStoreName: 'users', keyCondition: { pk: '1' }, options: { limit: 10 } });
 
-    expect(result).toEqual([[{ id: '1' }]]);
+    expect(result).toEqual([{ items: [{ id: '1' }], nextPageKey: undefined }]);
     expect(vi.mocked(query).mock.calls[0][0]).toBe('users-test-app-test-module-development-qpqkvs');
   });
 

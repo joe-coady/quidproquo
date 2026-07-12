@@ -37,7 +37,13 @@ function* askKeyValueStoreGetAll<Value>(
 | Parameter | Type | Description |
 | --- | --- | --- |
 | `keyValueStoreName` | `string` | Name of the store to read from — must match a store declared with [defineKeyValueStore](../../../config/core/key-value-store.md) (or one shared via its `owner` option). |
-| `options` | `KeyValueStoreGetAllOptions` | Reserved for future read options; currently empty. |
+| `options` | `KeyValueStoreGetAllOptions` | Optional read options (see below). |
+
+### `KeyValueStoreGetAllOptions`
+
+| Property | Type | Default | Description |
+| --- | --- | --- | --- |
+| `scope` | `string` | – | Optional storage scope. The processor enforces it as a begins-with prefix filter on the partition key, so only records written under the same scope are returned (used by tenant/scoped features). Requires the store's partition key to be string-typed. |
 
 ## Returns
 
@@ -49,6 +55,7 @@ function* askKeyValueStoreGetAll<Value>(
 | --- | --- |
 | `KeyValueStoreGetAllErrorTypeEnum.ServiceUnavailable` | DynamoDB internal error or throttling. |
 | `KeyValueStoreGetAllErrorTypeEnum.ResourceNotFound` | The underlying table does not exist. |
+| `KeyValueStoreGetAllErrorTypeEnum.InvalidScope` | The `scope` option is malformed (empty, over 128 characters, or containing path separators, `..`, or null bytes), or the store's partition key is not string-typed. |
 
 Catch errors with `askCatch` — it returns `{ success: true, result }` or `{ success: false, error }`.
 

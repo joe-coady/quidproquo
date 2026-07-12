@@ -13,6 +13,7 @@ const authenticatedConnection = {
   ip: '1.1.1.1',
   userId: 'u1',
   accessToken: 'token-1',
+  tenantId: 'tenant-a',
 };
 
 describe('isWebSocketUnauthenticateMessage', () => {
@@ -41,7 +42,7 @@ describe('askProcessOnUnauthenticate', () => {
     expect(sendCalled).toBe(false);
   });
 
-  it('strips the user info and notifies the connection it is unauthenticated', () => {
+  it('strips the user info and tenant claim and notifies the connection it is unauthenticated', () => {
     let upsert: any;
     let send: any;
 

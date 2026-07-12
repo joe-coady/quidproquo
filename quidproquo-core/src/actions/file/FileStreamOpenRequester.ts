@@ -6,6 +6,7 @@ import { FileStreamOpenActionRequester } from './FileStreamOpenActionTypes';
 export const FileStreamOpenErrorTypeEnum = createErrorEnumForAction(FileActionType.StreamOpen, [
   'InvalidStorageClass', // object is in cold storage and cannot be streamed directly
   'FileNotFound', // no object exists at the given filepath
+  'InvalidScope', // scope is not a valid single path segment
 ]);
 
 export function* askFileStreamOpen<E extends StreamEncoding = 'text'>(
@@ -13,6 +14,7 @@ export function* askFileStreamOpen<E extends StreamEncoding = 'text'>(
   filepath: string,
   encoding: E = 'text' as E,
   chunkSize?: number,
+  scope?: string,
 ): FileStreamOpenActionRequester<E> {
   return yield {
     type: FileActionType.StreamOpen,
@@ -21,6 +23,7 @@ export function* askFileStreamOpen<E extends StreamEncoding = 'text'>(
       filepath,
       encoding,
       chunkSize,
+      scope,
     },
   };
 }

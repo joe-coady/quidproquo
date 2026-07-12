@@ -5,6 +5,7 @@ import { FileWriteTextContentsActionRequester } from './FileWriteTextContentsAct
 export const FileWriteTextContentsErrorTypeEnum = createErrorEnumForAction(FileActionType.WriteTextContents, [
   'AccessDenied', // caller lacks permission to write the file
   'DriveNotFound', // storage drive does not exist
+  'InvalidScope', // scope is not a valid single path segment
 ]);
 
 export function* askFileWriteTextContents(
@@ -12,6 +13,7 @@ export function* askFileWriteTextContents(
   filepath: string,
   data: string,
   storageDriveAdvancedWriteOptions?: StorageDriveAdvancedWriteOptions,
+  scope?: string,
 ): FileWriteTextContentsActionRequester {
   return yield {
     type: FileActionType.WriteTextContents,
@@ -21,6 +23,7 @@ export function* askFileWriteTextContents(
       data,
 
       storageDriveAdvancedWriteOptions,
+      scope,
     },
   };
 }

@@ -10,6 +10,8 @@ export interface KeyValueStoreQueryOptions {
   limit?: number;
   nextPageKey?: string;
   filter?: KvsQueryOperation;
+  // Composed into partition-key conditions by the processor; requires a string-typed partition key.
+  scope?: string;
 }
 
 // Payload

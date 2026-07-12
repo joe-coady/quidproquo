@@ -6,6 +6,7 @@ import { KvsCoreDataType } from './types';
 export const KeyValueStoreDeleteErrorTypeEnum = createErrorEnumForAction(KeyValueStoreActionType.Delete, [
   'ServiceUnavailable', // DynamoDB internal error / throttling
   'ResourceNotFound', // the underlying table does not exist
+  'InvalidScope', // scope is malformed or the store's partition key is not string-typed
 ]);
 
 export function* askKeyValueStoreDelete(

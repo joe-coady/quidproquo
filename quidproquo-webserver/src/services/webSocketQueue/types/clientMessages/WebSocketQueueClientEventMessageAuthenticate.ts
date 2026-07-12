@@ -6,6 +6,11 @@ import { WebSocketQueueClientMessageEventType } from './WebSocketQueueClientMess
 
 export type WebSocketQueueClientEventPayloadAuthenticate = {
   accessToken?: AuthenticationInfo['accessToken'];
+
+  // The connection's claimed storage scope (e.g. an active tenant id). Only
+  // stored when the configured connectionScopeValidator confirms the claim;
+  // re-authenticating without it clears any previous claim.
+  tenantId?: string;
 };
 
 export type WebSocketQueueClientEventMessageAuthenticate = WebSocketQueueEventMessage<

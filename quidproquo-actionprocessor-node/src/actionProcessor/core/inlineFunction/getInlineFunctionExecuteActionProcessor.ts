@@ -55,6 +55,10 @@ const getProcessExecute = <R, T>(qpqConfig: QPQConfig): InlineFunctionExecuteAct
         depth: (session.depth || 0) + 1,
         decodedAccessToken: session.decodedAccessToken,
         correlation: session.correlation,
+        // Inline functions run WITHIN the caller's function - carry its globals
+        // so stories like the tenant scope resolver can read route config (the
+        // runtime merges these under the inline function's own registration).
+        functionGlobals: session.functionGlobals,
       },
       async () => actionProcessors,
       getDateNow,

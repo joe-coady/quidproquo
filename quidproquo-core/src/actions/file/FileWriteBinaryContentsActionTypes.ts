@@ -9,6 +9,7 @@ export interface FileWriteBinaryContentsActionPayload {
   data: QPQBinaryData;
 
   storageDriveAdvancedWriteOptions?: StorageDriveAdvancedWriteOptions;
+  scope?: string;
 }
 
 // Action

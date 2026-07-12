@@ -7,6 +7,7 @@ import {
   FileActionType,
   FileDeleteActionProcessor,
   FileDeleteErrorTypeEnum,
+  InvalidScopeError,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -16,13 +17,13 @@ import { FileStorageConfig } from './types';
 import { resolveFilePath } from './utils';
 
 const getProcessFileDelete = (qpqConfig: QPQConfig, config: FileStorageConfig): FileDeleteActionProcessor => {
-  return async ({ drive, filepaths }) => {
+  return async ({ drive, filepaths, scope }) => {
     const deletedFiles: string[] = [];
     const errors: { filepath: string; error: any }[] = [];
 
     for (const filepath of filepaths) {
       try {
-        const fullPath = resolveFilePath(config, qpqConfig, drive, filepath);
+        const fullPath = resolveFilePath(config, qpqConfig, drive, filepath, scope);
 
         await fs.unlink(fullPath);
         deletedFiles.push(filepath);
@@ -34,6 +35,13 @@ const getProcessFileDelete = (qpqConfig: QPQConfig, config: FileStorageConfig): 
           errors.push({ filepath, error });
         }
       }
+    }
+
+    // Scope is shared by every filepath in the request, so a bad scope fails the
+    // whole call regardless of any deletes that a different code path allowed.
+    const invalidScope = errors.find(({ error }) => error instanceof InvalidScopeError);
+    if (invalidScope) {
+      return actionResultError(FileDeleteErrorTypeEnum.InvalidScope, invalidScope.error.message);
     }
 
     if (errors.length > 0 && deletedFiles.length === 0) {

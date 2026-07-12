@@ -5,31 +5,35 @@ import {
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  composeScopedFilePath,
   FileActionType,
   FileListDirectoryActionProcessor,
   FileListDirectoryErrorTypeEnum,
   QPQConfig,
+  stripScopedFilePath,
 } from 'quidproquo-core';
 
 import { listFiles } from '../../../logic/s3/s3Utils';
 import { resolveStorageDriveBucketName } from './utils';
 
 const getProcessFileListDirectory = (qpqConfig: QPQConfig): FileListDirectoryActionProcessor => {
-  return async ({ drive, folderPath, maxFiles, pageToken }) => {
+  return async ({ drive, folderPath, maxFiles, pageToken, scope }) => {
     const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
 
     try {
       const s3FileList = await listFiles(
         s3BucketName,
         qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig),
-        folderPath,
+        composeScopedFilePath(scope, folderPath),
         maxFiles,
         pageToken,
       );
 
-      // Add the drive onto the list
+      // S3 keys carry the scope prefix; strip it so callers see the same
+      // scope-relative paths they passed in. Add the drive onto the list.
       const fileInfos = s3FileList.fileInfos.map((s3fi) => ({
         ...s3fi,
+        filepath: stripScopedFilePath(scope, s3fi.filepath),
         drive,
       }));
 
@@ -42,6 +46,7 @@ const getProcessFileListDirectory = (qpqConfig: QPQConfig): FileListDirectoryAct
         AccessDenied: () => actionResultError(FileListDirectoryErrorTypeEnum.AccessDenied, 'Access denied listing directory'),
         Forbidden: () => actionResultError(FileListDirectoryErrorTypeEnum.AccessDenied, 'Access denied listing directory'),
         NoSuchBucket: () => actionResultError(FileListDirectoryErrorTypeEnum.DriveNotFound, `Storage drive not found: ${drive}`),
+        InvalidScopeError: (error) => actionResultError(FileListDirectoryErrorTypeEnum.InvalidScope, error.message),
       });
     }
   };

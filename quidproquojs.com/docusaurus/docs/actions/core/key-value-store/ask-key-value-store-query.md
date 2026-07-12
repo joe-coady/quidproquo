@@ -56,6 +56,7 @@ function* askKeyValueStoreQuery<KvsItem>(
 | `limit` | `number` | – | Maximum number of records to return in this page. |
 | `nextPageKey` | `string` | – | Opaque cursor from a previous page's `nextPageKey`; pass it to fetch the following page. |
 | `ttlInSeconds` | `number` | – | Time-to-live in seconds for a cached result of this query. |
+| `scope` | `string` | – | Optional storage scope. The processor composes it into the partition-key conditions, so the query only matches records written under the same scope (used by tenant/scoped features). Requires a string-typed partition key, and the key condition must constrain the partition key. |
 
 ## Query conditions (`KvsQueryOperation`)
 
@@ -116,6 +117,7 @@ When `nextPageKey` is set, pass it back as `options.nextPageKey` to fetch the ne
 | --- | --- |
 | `KeyValueStoreQueryErrorTypeEnum.ServiceUnavailable` | DynamoDB internal error or throttling. |
 | `KeyValueStoreQueryErrorTypeEnum.ResourceNotFound` | The underlying table does not exist. |
+| `KeyValueStoreQueryErrorTypeEnum.InvalidScope` | The `scope` option is malformed (empty, over 128 characters, or containing path separators, `..`, or null bytes), the store's partition key is not string-typed, or a scoped query's key condition does not constrain the partition key (or constrains it with an operator that cannot be scoped). |
 
 Catch errors with `askCatch` — it returns `{ success: true, result }` or `{ success: false, error }`.
 

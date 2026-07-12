@@ -2,6 +2,7 @@ import { askKeyValueStoreQueryAll, AskResponse, kvsEqual } from 'quidproquo-core
 
 import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
 import { EventDocSummary } from '../models';
+import { askEventDocResolveScope } from './askEventDocResolveScope';
 
 export type EventDocListOptions = {
   includeDeleted?: boolean;
@@ -9,8 +10,9 @@ export type EventDocListOptions = {
 
 export function* askEventDocList<T extends EventDocSummary = EventDocSummary>(options?: EventDocListOptions): AskResponse<T[]> {
   const { storeName, type } = yield* askEventDocResolveStore();
+  const scope = yield* askEventDocResolveScope();
 
-  const items = yield* askKeyValueStoreQueryAll<T>(storeName, kvsEqual('type', type));
+  const items = yield* askKeyValueStoreQueryAll<T>(storeName, kvsEqual('type', type), { scope });
 
   const visible = options?.includeDeleted ? items : items.filter((model) => !model.deletedAt);
 

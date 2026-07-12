@@ -7,6 +7,7 @@ export function* askKeyValueStoreQuerySingle<T>(
   filter?: KvsQueryOperation,
   sortAscending?: boolean,
   limit = 1,
+  scope?: string,
 ): AskResponse<T | null> {
   const allData: T[] = [];
   let data: QpqPagedData<T> = {
@@ -20,6 +21,7 @@ export function* askKeyValueStoreQuerySingle<T>(
       limit,
       sortAscending,
       nextPageKey: data.nextPageKey,
+      scope,
     });
 
     allData.push(...data.items);

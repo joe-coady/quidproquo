@@ -2,6 +2,7 @@ import { askFileGenerateTemporaryUploadSecureUrl, askNewGuid, AskResponse } from
 
 import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
 import { EventDocAssetUploadUrl } from '../models';
+import { askEventDocResolveScope } from './askEventDocResolveScope';
 import { eventDocAssetPath } from './eventDocAssetPath';
 
 const ASSET_UPLOAD_TTL_MS = 5 * 60 * 1000;
@@ -10,12 +11,17 @@ const ASSET_UPLOAD_TTL_MS = 5 * 60 * 1000;
 // the bytes to. Returns the guid (assetId) so the caller can record it in a domain event.
 export function* askEventDocGenerateAssetUploadUrl(docId: string, contentType: string): AskResponse<EventDocAssetUploadUrl> {
   const { storageDriveName } = yield* askEventDocResolveStore();
+  const scope = yield* askEventDocResolveScope();
 
   const assetId = yield* askNewGuid();
 
-  const uploadUrl = yield* askFileGenerateTemporaryUploadSecureUrl(storageDriveName, eventDocAssetPath(docId, assetId), ASSET_UPLOAD_TTL_MS, {
-    contentType,
-  });
+  const uploadUrl = yield* askFileGenerateTemporaryUploadSecureUrl(
+    storageDriveName,
+    eventDocAssetPath(docId, assetId),
+    ASSET_UPLOAD_TTL_MS,
+    { contentType },
+    scope,
+  );
 
   return { uploadUrl, assetId };
 }

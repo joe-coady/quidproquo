@@ -41,7 +41,7 @@ describe('getKeyValueStoreQueryActionProcessor', () => {
       options: { filter: 'f', nextPageKey: 'np', limit: 10, sortAscending: false },
     });
 
-    expect(repo.query).toHaveBeenCalledWith('store', 'id = :id', 'f', 'np', undefined, 10, false);
+    expect(repo.query).toHaveBeenCalledWith('store', 'id = :id', 'f', 'np', undefined, 10, false, undefined);
     expect(resolveActionResult(result)).toEqual({ items: [] });
   });
 
@@ -51,7 +51,7 @@ describe('getKeyValueStoreQueryActionProcessor', () => {
 
     await invokeProcessor(process, { keyValueStoreName: 'store', keyCondition: 'id = :id' });
 
-    expect(repo.query).toHaveBeenCalledWith('store', 'id = :id', undefined, undefined, undefined, undefined, true);
+    expect(repo.query).toHaveBeenCalledWith('store', 'id = :id', undefined, undefined, undefined, undefined, true, undefined);
   });
 
   it('maps a not found error to ResourceNotFound', async () => {

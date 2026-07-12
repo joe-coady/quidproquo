@@ -8,6 +8,7 @@ export interface FileStreamOpenActionPayload {
   filepath: string;
   encoding: StreamEncoding;
   chunkSize?: number;
+  scope?: string;
 }
 
 // Action

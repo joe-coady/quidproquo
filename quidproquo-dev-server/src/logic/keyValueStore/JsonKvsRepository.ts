@@ -9,6 +9,8 @@ import { KvsRepository } from './KvsRepository';
 import { compareKvsItemKeys, getPk, getSk, paginateKvsItems } from './paginateKvsItems';
 
 interface KvsStoreState {
+  keyValueStoreName: string;
+  scope?: string;
   items: Map<string, any>;
   dirty: boolean;
   flushTimer: NodeJS.Timeout | null;
@@ -31,6 +33,11 @@ interface KvsStoreFile {
 // sole in-process copy of every store's data (see getKvsRepository.ts, which
 // guarantees one instance per service), and relies on that - there is no
 // cross-process locking the way sqlite's WAL mode provided.
+//
+// A scope (tenant) partitions a store into its own file under a scope folder
+// (`kvs/<service>/<scope>/<store>.json`), keeping the on-disk runtime state
+// human-readable per tenant. The scope is validated by the action processors
+// before it reaches here (it becomes a folder name).
 export class JsonKvsRepository implements KvsRepository {
   private stores = new Map<string, KvsStoreState>();
 
@@ -47,9 +54,11 @@ export class JsonKvsRepository implements KvsRepository {
     return storeConfig;
   }
 
-  private getStoreFilePath(keyValueStoreName: string, storeConfig: KeyValueStoreQPQConfigSetting): string {
+  private getStoreFilePath(keyValueStoreName: string, storeConfig: KeyValueStoreQPQConfigSetting, scope?: string): string {
     const serviceName = storeConfig.owner?.module ?? qpqCoreUtils.getApplicationModuleName(this.qpqConfig);
-    return path.join(this.runtimePath, 'kvs', serviceName, `${keyValueStoreName}.json`);
+    return scope
+      ? path.join(this.runtimePath, 'kvs', serviceName, scope, `${keyValueStoreName}.json`)
+      : path.join(this.runtimePath, 'kvs', serviceName, `${keyValueStoreName}.json`);
   }
 
   private buildStorageKey(item: any, storeConfig: KeyValueStoreQPQConfigSetting): string {
@@ -66,13 +75,16 @@ export class JsonKvsRepository implements KvsRepository {
     }
   }
 
-  private getStore(keyValueStoreName: string, storeConfig: KeyValueStoreQPQConfigSetting): KvsStoreState {
-    const existing = this.stores.get(keyValueStoreName);
+  private getStore(keyValueStoreName: string, storeConfig: KeyValueStoreQPQConfigSetting, scope?: string): KvsStoreState {
+    // Scope can never contain '/' (validated upstream), so this key is unambiguous.
+    const stateKey = scope ? `${scope}/${keyValueStoreName}` : keyValueStoreName;
+
+    const existing = this.stores.get(stateKey);
     if (existing) {
       return existing;
     }
 
-    const filePath = this.getStoreFilePath(keyValueStoreName, storeConfig);
+    const filePath = this.getStoreFilePath(keyValueStoreName, storeConfig, scope);
     const items = new Map<string, any>();
 
     if (fs.existsSync(filePath)) {
@@ -82,13 +94,21 @@ export class JsonKvsRepository implements KvsRepository {
       }
     }
 
-    const state: KvsStoreState = { items, dirty: false, flushTimer: null, flushPromise: null, flushAgain: false };
-    this.stores.set(keyValueStoreName, state);
+    const state: KvsStoreState = {
+      keyValueStoreName,
+      scope,
+      items,
+      dirty: false,
+      flushTimer: null,
+      flushPromise: null,
+      flushAgain: false,
+    };
+    this.stores.set(stateKey, state);
     return state;
   }
 
-  private async writeStoreFile(keyValueStoreName: string, storeConfig: KeyValueStoreQPQConfigSetting, state: KvsStoreState): Promise<void> {
-    const filePath = this.getStoreFilePath(keyValueStoreName, storeConfig);
+  private async writeStoreFile(state: KvsStoreState, storeConfig: KeyValueStoreQPQConfigSetting): Promise<void> {
+    const filePath = this.getStoreFilePath(state.keyValueStoreName, storeConfig, state.scope);
     const dir = path.dirname(filePath);
     await fs.promises.mkdir(dir, { recursive: true });
 
@@ -105,7 +125,7 @@ export class JsonKvsRepository implements KvsRepository {
   // within FLUSH_DEBOUNCE_MS collapses into one write; a mutation that lands
   // while a write is already in flight is folded into the next write instead
   // of starting a second concurrent one.
-  private runFlush(keyValueStoreName: string, storeConfig: KeyValueStoreQPQConfigSetting, state: KvsStoreState): Promise<void> {
+  private runFlush(state: KvsStoreState, storeConfig: KeyValueStoreQPQConfigSetting): Promise<void> {
     if (state.flushPromise) {
       state.flushAgain = true;
       return state.flushPromise;
@@ -116,18 +136,18 @@ export class JsonKvsRepository implements KvsRepository {
     }
 
     state.dirty = false;
-    state.flushPromise = this.writeStoreFile(keyValueStoreName, storeConfig, state).then(async () => {
+    state.flushPromise = this.writeStoreFile(state, storeConfig).then(async () => {
       state.flushPromise = null;
       if (state.flushAgain) {
         state.flushAgain = false;
-        await this.runFlush(keyValueStoreName, storeConfig, state);
+        await this.runFlush(state, storeConfig);
       }
     });
 
     return state.flushPromise;
   }
 
-  private scheduleFlush(keyValueStoreName: string, storeConfig: KeyValueStoreQPQConfigSetting, state: KvsStoreState): void {
+  private scheduleFlush(state: KvsStoreState, storeConfig: KeyValueStoreQPQConfigSetting): void {
     state.dirty = true;
 
     if (state.flushTimer) {
@@ -136,14 +156,14 @@ export class JsonKvsRepository implements KvsRepository {
 
     state.flushTimer = setTimeout(() => {
       state.flushTimer = null;
-      void this.runFlush(keyValueStoreName, storeConfig, state);
+      void this.runFlush(state, storeConfig);
     }, FLUSH_DEBOUNCE_MS);
     state.flushTimer.unref();
   }
 
-  async get(keyValueStoreName: string, key: string): Promise<any | null> {
+  async get(keyValueStoreName: string, key: string, scope?: string): Promise<any | null> {
     const storeConfig = this.getStoreConfig(keyValueStoreName);
-    const state = this.getStore(keyValueStoreName, storeConfig);
+    const state = this.getStore(keyValueStoreName, storeConfig, scope);
     return state.items.get(key) ?? null;
   }
 
@@ -155,9 +175,10 @@ export class JsonKvsRepository implements KvsRepository {
     _indexName?: string,
     limit?: number,
     sortAscending: boolean = true,
+    scope?: string,
   ): Promise<QpqPagedData<any>> {
     const storeConfig = this.getStoreConfig(keyValueStoreName);
-    const state = this.getStore(keyValueStoreName, storeConfig);
+    const state = this.getStore(keyValueStoreName, storeConfig, scope);
 
     validateKvsQueryOperation(keyCondition);
     if (filter) {
@@ -171,9 +192,15 @@ export class JsonKvsRepository implements KvsRepository {
     return paginateKvsItems(matched, storeConfig, sortAscending, nextPageKey, limit);
   }
 
-  async scan(keyValueStoreName: string, filter?: KvsQueryOperation, nextPageKey?: string, limit?: number): Promise<QpqPagedData<any>> {
+  async scan(
+    keyValueStoreName: string,
+    filter?: KvsQueryOperation,
+    nextPageKey?: string,
+    limit?: number,
+    scope?: string,
+  ): Promise<QpqPagedData<any>> {
     const storeConfig = this.getStoreConfig(keyValueStoreName);
-    const state = this.getStore(keyValueStoreName, storeConfig);
+    const state = this.getStore(keyValueStoreName, storeConfig, scope);
 
     if (filter) {
       validateKvsQueryOperation(filter);
@@ -186,9 +213,9 @@ export class JsonKvsRepository implements KvsRepository {
     return paginateKvsItems(matched, storeConfig, true, nextPageKey, limit);
   }
 
-  async upsert(keyValueStoreName: string, item: any, options?: { ifNotExists?: boolean }): Promise<any> {
+  async upsert(keyValueStoreName: string, item: any, options?: { ifNotExists?: boolean }, scope?: string): Promise<any> {
     const storeConfig = this.getStoreConfig(keyValueStoreName);
-    const state = this.getStore(keyValueStoreName, storeConfig);
+    const state = this.getStore(keyValueStoreName, storeConfig, scope);
     const storageKey = this.buildStorageKey(item, storeConfig);
 
     if (options?.ifNotExists && state.items.has(storageKey)) {
@@ -198,14 +225,14 @@ export class JsonKvsRepository implements KvsRepository {
     }
 
     state.items.set(storageKey, item);
-    this.scheduleFlush(keyValueStoreName, storeConfig, state);
+    this.scheduleFlush(state, storeConfig);
 
     return item;
   }
 
-  async update(keyValueStoreName: string, key: string, sortKey: string | undefined, updates: KvsUpdate): Promise<any> {
+  async update(keyValueStoreName: string, key: string, sortKey: string | undefined, updates: KvsUpdate, scope?: string): Promise<any> {
     const storeConfig = this.getStoreConfig(keyValueStoreName);
-    const state = this.getStore(keyValueStoreName, storeConfig);
+    const state = this.getStore(keyValueStoreName, storeConfig, scope);
     const hasSortKey = storeConfig.sortKeys.length > 0;
 
     const storageKey = hasSortKey && sortKey !== undefined ? `${key}#${sortKey}` : key;
@@ -220,21 +247,21 @@ export class JsonKvsRepository implements KvsRepository {
     const updatedItem = applyUpdateToItem(currentItem, updates);
 
     state.items.set(storageKey, updatedItem);
-    this.scheduleFlush(keyValueStoreName, storeConfig, state);
+    this.scheduleFlush(state, storeConfig);
 
     return updatedItem;
   }
 
-  async delete(keyValueStoreName: string, key: string): Promise<boolean> {
+  async delete(keyValueStoreName: string, key: string, scope?: string): Promise<boolean> {
     const storeConfig = this.getStoreConfig(keyValueStoreName);
-    const state = this.getStore(keyValueStoreName, storeConfig);
+    const state = this.getStore(keyValueStoreName, storeConfig, scope);
 
     if (!state.items.has(key)) {
       return false;
     }
 
     state.items.delete(key);
-    this.scheduleFlush(keyValueStoreName, storeConfig, state);
+    this.scheduleFlush(state, storeConfig);
 
     return true;
   }
@@ -242,13 +269,13 @@ export class JsonKvsRepository implements KvsRepository {
   // Forces every store with a pending or in-flight write to flush immediately.
   async flush(): Promise<void> {
     await Promise.all(
-      [...this.stores.entries()].map(([keyValueStoreName, state]) => {
+      [...this.stores.values()].map((state) => {
         if (state.flushTimer) {
           clearTimeout(state.flushTimer);
           state.flushTimer = null;
         }
-        const storeConfig = this.getStoreConfig(keyValueStoreName);
-        return this.runFlush(keyValueStoreName, storeConfig, state);
+        const storeConfig = this.getStoreConfig(state.keyValueStoreName);
+        return this.runFlush(state, storeConfig);
       }),
     );
   }

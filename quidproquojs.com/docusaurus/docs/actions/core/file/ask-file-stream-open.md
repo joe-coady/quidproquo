@@ -42,6 +42,7 @@ function* askFileStreamOpen<E extends StreamEncoding = 'text'>(
   filepath: string,
   encoding?: E,
   chunkSize?: number,
+  scope?: string,
 ): AskResponse<StreamHandle<E>>;
 ```
 
@@ -53,6 +54,7 @@ function* askFileStreamOpen<E extends StreamEncoding = 'text'>(
 | `filepath` | `string` | Path of the file within the drive, forward-slash delimited. |
 | `encoding` | `StreamEncoding` | How each chunk is decoded when you read it. `'text'` (default) yields `string`, `'binary'` yields `Uint8Array`, `'json'` parses each chunk. |
 | `chunkSize` | `number` | Bytes per chunk. Defaults to `65536` (64 KiB) in the AWS runtime. |
+| `scope` | `string` | Optional storage-scope segment. When set, the processor opens `{scope}/{filepath}` instead, partitioning the drive (used by tenant/scoped features such as the event-doc `scopeResolver`). Must be a single path segment: no separators, `..`, or null bytes. |
 
 `StreamEncoding` is `'text' | 'binary' | 'json'`.
 
@@ -75,6 +77,7 @@ The handle's `encoding` type parameter flows through to `askStreamRead`, so a `'
 | --- | --- |
 | `FileStreamOpenErrorTypeEnum.InvalidStorageClass` | The file is in a cold storage tier and cannot be streamed directly. Check first with [askFileIsColdStorage](./ask-file-is-cold-storage.md). |
 | `FileStreamOpenErrorTypeEnum.FileNotFound` | No file exists at the given path. |
+| `FileStreamOpenErrorTypeEnum.InvalidScope` | The `scope` is not a valid single path segment (empty, too long, or contains separators, `..`, or null bytes), or the scoped `filepath` is absolute or contains `..` segments or null bytes. |
 
 Errors thrown by actions can be caught with `askCatch` from quidproquo-core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 

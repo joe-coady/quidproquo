@@ -18,15 +18,16 @@ import { ensureParentDirectoryExists, resolveFilePath } from './utils';
 const getProcessFileWriteObjectJson =
   (config: FileStorageConfig) =>
   (qpqConfig: QPQConfig): FileWriteObjectJsonActionProcessor<any> => {
-    return async ({ drive, filepath, data }) => {
+    return async ({ drive, filepath, data, scope }) => {
       try {
-        const fullPath = resolveFilePath(config, qpqConfig, drive, filepath);
+        const fullPath = resolveFilePath(config, qpqConfig, drive, filepath, scope);
         await ensureParentDirectoryExists(fullPath);
         const jsonString = JSON.stringify(data, null, 2);
         await fs.writeFile(fullPath, jsonString, 'utf8');
         return actionResult(void 0);
       } catch (error: unknown) {
         return actionResultErrorFromCaughtError(error, {
+          InvalidScopeError: (error) => actionResultError(FileWriteObjectJsonErrorTypeEnum.InvalidScope, error.message),
           EACCES: () => actionResultError(FileWriteObjectJsonErrorTypeEnum.AccessDenied, `Access denied writing file: ${filepath}`), // node fs code
         });
       }

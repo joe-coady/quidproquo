@@ -108,7 +108,9 @@ describe('getProcessAiPrompt', () => {
   it('passes mapped messages and caching through to toCacheableMessages', async () => {
     vi.mocked(prepareAiPromptCall).mockReturnValue({ model: { id: 'm' } as never, tools: undefined });
     generateText.mockResolvedValue({ text: 'ok', finalStep: {} });
-    vi.mocked(toCacheableMessages).mockReturnValue([{ role: 'user', content: 'mapped', providerOptions: { bedrock: { cachePoint: { type: 'default' } } } }]);
+    vi.mocked(toCacheableMessages).mockReturnValue([
+      { role: 'user', content: 'mapped', providerOptions: { bedrock: { cachePoint: { type: 'default' } } } },
+    ]);
 
     const [result] = await invoke({ messages: [{ role: 'user', content: 'hi' }], caching: true });
 

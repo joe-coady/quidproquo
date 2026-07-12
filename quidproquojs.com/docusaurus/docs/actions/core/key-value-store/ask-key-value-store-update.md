@@ -52,7 +52,13 @@ function* askKeyValueStoreUpdate<Value>(
 | `updates` | `KvsUpdate` | The list of update operations to apply. See [Update operations](#update-operations-kvsupdate). |
 | `key` | `KvsCoreDataType` | Partition key value of the record to update (`string \| number`). |
 | `sortKey` | `KvsCoreDataType` | Sort key value, required only if the store declares a sort key (`string \| number`). |
-| `options` | `KeyValueStoreUpdateOptions` | Reserved for future update options; currently empty. |
+| `options` | `KeyValueStoreUpdateOptions` | Optional update options (see below). |
+
+### `KeyValueStoreUpdateOptions`
+
+| Property | Type | Default | Description |
+| --- | --- | --- | --- |
+| `scope` | `string` | – | Optional storage scope. The processor composes it into the partition key value, so the update only addresses the record written under that scope (used by tenant/scoped features). Requires the store's partition key to be string-typed. |
 
 ## Update operations (`KvsUpdate`)
 
@@ -95,6 +101,7 @@ Each `path` is a `KvsAttributePath` — either a top-level attribute name (`'bal
 | --- | --- |
 | `KeyValueStoreUpdateErrorTypeEnum.ServiceUnavailable` | DynamoDB internal error or throttling. |
 | `KeyValueStoreUpdateErrorTypeEnum.ResourceNotFound` | The underlying table does not exist. |
+| `KeyValueStoreUpdateErrorTypeEnum.InvalidScope` | The `scope` option is malformed (empty, over 128 characters, or containing path separators, `..`, or null bytes), or the store's partition key is not string-typed. |
 
 Catch errors with `askCatch` — it returns `{ success: true, result }` or `{ success: false, error }`.
 

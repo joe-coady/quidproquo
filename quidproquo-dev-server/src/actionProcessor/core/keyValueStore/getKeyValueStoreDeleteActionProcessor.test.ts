@@ -37,7 +37,7 @@ describe('getKeyValueStoreDeleteActionProcessor', () => {
 
     await invokeProcessor(process, { keyValueStoreName: 'store', key: 'a', sortKey: 'b' });
 
-    expect(repo.delete).toHaveBeenCalledWith('store', 'a#b');
+    expect(repo.delete).toHaveBeenCalledWith('store', 'a#b', undefined);
   });
 
   it('uses the key as-is when no sortKey is given', async () => {
@@ -46,7 +46,7 @@ describe('getKeyValueStoreDeleteActionProcessor', () => {
 
     const result = await invokeProcessor(process, { keyValueStoreName: 'store', key: 'a' });
 
-    expect(repo.delete).toHaveBeenCalledWith('store', 'a');
+    expect(repo.delete).toHaveBeenCalledWith('store', 'a', undefined);
     expect(resolveActionResult(result)).toBeUndefined();
   });
 

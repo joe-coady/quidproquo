@@ -6,6 +6,8 @@ import {
   ErrorTypeEnum,
   FileActionType,
   FileGenerateTemporaryUploadSecureUrlActionProcessor,
+  FileGenerateTemporaryUploadSecureUrlErrorTypeEnum,
+  InvalidScopeError,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -17,14 +19,14 @@ const getProcessFileGenerateTemporaryUploadSecureUrl = (
   qpqConfig: QPQConfig,
   config: FileStorageConfig,
 ): FileGenerateTemporaryUploadSecureUrlActionProcessor => {
-  return async ({ drive, filepath, expirationMs, contentType }) => {
+  return async ({ drive, filepath, expirationMs, contentType, scope }) => {
     try {
       const expiresAt = Date.now() + expirationMs;
 
       // Create a token for upload
       const token = createSecureUrlToken(
         {
-          fullFilepath: resolveFilePath(config, qpqConfig, drive, filepath),
+          fullFilepath: resolveFilePath(config, qpqConfig, drive, filepath, scope),
           operation: 'upload',
           expiresAt,
           contentType,
@@ -40,6 +42,9 @@ const getProcessFileGenerateTemporaryUploadSecureUrl = (
 
       return actionResult(url);
     } catch (error: any) {
+      if (error instanceof InvalidScopeError) {
+        return actionResultError(FileGenerateTemporaryUploadSecureUrlErrorTypeEnum.InvalidScope, error.message);
+      }
       return actionResultError(ErrorTypeEnum.GenericError, `Unable to generate temporary upload secure URL: ${error.message}`);
     }
   };

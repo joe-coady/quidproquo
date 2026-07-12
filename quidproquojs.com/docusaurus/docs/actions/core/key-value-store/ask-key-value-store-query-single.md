@@ -32,6 +32,7 @@ function* askKeyValueStoreQuerySingle<T>(
   filter?: KvsQueryOperation,
   sortAscending?: boolean,
   limit?: number,
+  scope?: string,
 ): AskResponse<T | null>;
 ```
 
@@ -44,6 +45,7 @@ function* askKeyValueStoreQuerySingle<T>(
 | `filter` | `KvsQueryOperation` | – | Optional filter on non-key attributes, applied after the key match. |
 | `sortAscending` | `boolean` | – | Order by the sort key; `false` returns the highest/newest first. |
 | `limit` | `number` | `1` | How many records to fetch per underlying page while searching. The story still returns only the first matching record. |
+| `scope` | `string` | – | Optional storage scope, passed through as the underlying query's `scope` option. See [`KeyValueStoreQueryOptions`](./ask-key-value-store-query.md#keyvaluestorequeryoptions). An invalid scope surfaces as `KeyValueStoreQueryErrorTypeEnum.InvalidScope`. |
 
 ## Returns
 

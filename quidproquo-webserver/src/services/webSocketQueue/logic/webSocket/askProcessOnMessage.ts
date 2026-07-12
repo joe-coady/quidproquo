@@ -1,4 +1,4 @@
-import { AskResponse } from 'quidproquo-core';
+import { AskResponse, askStorageScopeProvide } from 'quidproquo-core';
 
 import { AnyWebSocketQueueEventMessageWithCorrelation } from '../../types';
 import { askBroadcastUnknownMessage } from './askBroadcastUnknownMessage';
@@ -15,7 +15,7 @@ import {
 export function* askProcessOnMessage(connectionId: string, message: AnyWebSocketQueueEventMessageWithCorrelation): AskResponse<void> {
   if (isWebSocketAuthenticateMessage(message)) {
     if (message.payload.accessToken) {
-      return yield* askProcessOnAuthenticate(connectionId, message.payload.accessToken);
+      return yield* askProcessOnAuthenticate(connectionId, message.payload.accessToken, message.payload.tenantId);
     } else {
       return yield* askProcessOnUnauthenticate(connectionId);
     }
@@ -30,7 +30,14 @@ export function* askProcessOnMessage(connectionId: string, message: AnyWebSocket
   }
 
   // Make sure any messages below have access to the authenticated user
-  yield* askTryAuthenticateConnection(connectionId);
+  const connection = yield* askTryAuthenticateConnection(connectionId);
+
+  // The connection's validated scope becomes the ambient storage scope for the
+  // whole message - the event-bus send serializes it with the session, so queue
+  // handlers (and the AI tools running on their sessions) inherit it.
+  if (connection?.tenantId) {
+    return yield* askStorageScopeProvide(connection.tenantId, askBroadcastUnknownMessage(message));
+  }
 
   // Send the message to the event bus
   yield* askBroadcastUnknownMessage(message);

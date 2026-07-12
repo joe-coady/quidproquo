@@ -2,16 +2,9 @@ import { HTTPMethod, QPQConfig, QpqFunctionRuntimeAdvanced } from 'quidproquo-co
 import { RouteOptions } from 'quidproquo-webserver';
 
 import { defineVersionedRoute } from '../../routes/defineVersionedRoute';
-import {
-  EVENT_DOC_EVENT_VALIDATOR_GLOBAL,
-  EVENT_DOC_EVENTS_STORE_NAME_GLOBAL,
-  EVENT_DOC_RENDERER_GLOBAL,
-  EVENT_DOC_STORAGE_DRIVE_GLOBAL,
-  EVENT_DOC_STORE_NAME_GLOBAL,
-  EVENT_DOC_TYPE_GLOBAL,
-  EVENT_DOC_USER_DIRECTORY_GLOBAL,
-} from '../constants/eventDocGlobalNames';
+import { EVENT_DOC_USER_DIRECTORY_GLOBAL } from '../constants/eventDocGlobalNames';
 import { buildEventDocStore } from '../context/buildEventDocStore';
+import { buildEventDocStoreGlobals } from '../globals/buildEventDocStoreGlobals';
 import { EventDocRoutesOptions } from '../types/EventDocRoutesOptions';
 
 // Controllers ship inside this package (resolved relative to this file) and read
@@ -25,6 +18,8 @@ export const defineEventDocRoutes = ({
   version,
   eventValidator,
   eventRenderer,
+  onPublish,
+  scopeResolver,
 }: EventDocRoutesOptions): QPQConfig => {
   // Same assembly a hand-written route uses via askEventDocProvideStore, so built-in and
   // custom routes describe the identical store.
@@ -33,17 +28,11 @@ export const defineEventDocRoutes = ({
     type,
     eventValidator,
     eventRenderer,
+    onPublish,
+    scopeResolver,
   });
 
-  const globals: Record<string, unknown> = {
-    [EVENT_DOC_STORE_NAME_GLOBAL]: store.storeName,
-    [EVENT_DOC_EVENTS_STORE_NAME_GLOBAL]: store.eventsStoreName,
-    [EVENT_DOC_TYPE_GLOBAL]: store.type,
-    [EVENT_DOC_STORAGE_DRIVE_GLOBAL]: store.storageDriveName,
-    // Always set (empty when unconfigured) so the bridge can read them unconditionally.
-    [EVENT_DOC_EVENT_VALIDATOR_GLOBAL]: store.eventValidator ?? '',
-    [EVENT_DOC_RENDERER_GLOBAL]: store.eventRenderer ?? '',
-  };
+  const globals: Record<string, unknown> = buildEventDocStoreGlobals(store);
 
   if (routeAuthSettings?.userDirectoryName) {
     globals[EVENT_DOC_USER_DIRECTORY_GLOBAL] = routeAuthSettings.userDirectoryName;

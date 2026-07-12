@@ -99,5 +99,27 @@ describe('askProcessOnMessage', () => {
 
     expect(broadcast.payload.eventBusName).toBe('event-bus');
     expect(broadcast.payload.eventBusMessages).toEqual([{ type: 'custom/event', payload: { a: 1 } }]);
+    expect(broadcast.context?.['qpq-storage-scope']).toBeUndefined();
+  });
+
+  it('broadcasts a message on a tenant connection under the connection storage scope', () => {
+    let broadcast: any;
+
+    runStory(askProcessOnMessage('c1', { type: 'custom/event', payload: { a: 1 }, correlationId: 'corr' } as any), {
+      [ContextActionType.Read]: { apiName: 'demo' },
+      [KeyValueStoreActionType.Query]: { items: [{ ...connection, accessToken: 'token-1', tenantId: 'tenant-a' }] },
+      [ConfigActionType.GetGlobal]: globalByKey({
+        'qpq-wsq-kvs-name-demo': 'user-directory',
+        'qpq-wsq-eb-name-demo': 'event-bus',
+      }),
+      [UserDirectoryActionType.SetAccessToken]: { userId: 'u1' },
+      [EventBusActionType.SendMessages]: (action: any) => {
+        broadcast = action;
+        return undefined;
+      },
+    });
+
+    expect(broadcast.context?.['qpq-storage-scope']).toBe('tenant-a');
+    expect(broadcast.payload.eventBusMessages).toEqual([{ type: 'custom/event', payload: { a: 1 } }]);
   });
 });

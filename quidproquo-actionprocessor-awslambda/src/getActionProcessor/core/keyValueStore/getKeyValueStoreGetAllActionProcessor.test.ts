@@ -29,6 +29,6 @@ describe('getKeyValueStoreGetAllActionProcessor', () => {
     const result = await invokeProcessor(processor, { keyValueStoreName: 'users' });
 
     expect(result).toEqual([[{ id: '1' }]]);
-    expect(getAllItems).toHaveBeenCalledWith('users-test-app-test-module-development-qpqkvs', 'eu-west-1');
+    expect(getAllItems).toHaveBeenCalledWith('users-test-app-test-module-development-qpqkvs', 'eu-west-1', undefined);
   });
 });

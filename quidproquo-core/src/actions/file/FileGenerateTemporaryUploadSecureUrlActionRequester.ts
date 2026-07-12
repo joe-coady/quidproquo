@@ -7,6 +7,7 @@ import {
 
 export const FileGenerateTemporaryUploadSecureUrlErrorTypeEnum = createErrorEnumForAction(FileActionType.GenerateTemporaryUploadSecureUrl, [
   'ExpirationTooLong', // requested expiry exceeds max length of time possible
+  'InvalidScope', // scope is not a valid single path segment
 ]);
 
 export function* askFileGenerateTemporaryUploadSecureUrl(
@@ -17,6 +18,7 @@ export function* askFileGenerateTemporaryUploadSecureUrl(
     contentType?: FileGenerateTemporaryUploadSecureUrlActionPayload['contentType'];
     // maxSizeBytes?: FileGenerateTemporaryUploadSecureUrlActionPayload['maxSizeBytes']
   },
+  scope?: string,
 ): FileGenerateTemporaryUploadSecureUrlActionRequester {
   return yield {
     type: FileActionType.GenerateTemporaryUploadSecureUrl,
@@ -26,6 +28,7 @@ export function* askFileGenerateTemporaryUploadSecureUrl(
       expirationMs,
       contentType: advancedOptions?.contentType,
       // maxSizeBytes: advancedOptions?.maxSizeBytes,
+      scope,
     },
   };
 }

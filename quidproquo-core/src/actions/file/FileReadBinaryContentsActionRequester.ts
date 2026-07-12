@@ -5,14 +5,16 @@ import { FileReadBinaryContentsActionRequester } from './FileReadBinaryContentsA
 export const FileReadBinaryContentsErrorTypeEnum = createErrorEnumForAction(FileActionType.ReadBinaryContents, [
   'InvalidStorageClass', // object is in cold storage and cannot be read directly
   'FileNotFound', // no object exists at the given filepath
+  'InvalidScope', // scope is not a valid single path segment
 ]);
 
-export function* askFileReadBinaryContents(drive: string, filepath: string): FileReadBinaryContentsActionRequester {
+export function* askFileReadBinaryContents(drive: string, filepath: string, scope?: string): FileReadBinaryContentsActionRequester {
   return yield {
     type: FileActionType.ReadBinaryContents,
     payload: {
       drive,
       filepath,
+      scope,
     },
   };
 }

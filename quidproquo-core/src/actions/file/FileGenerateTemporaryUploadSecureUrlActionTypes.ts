@@ -8,6 +8,7 @@ export interface FileGenerateTemporaryUploadSecureUrlActionPayload {
   expirationMs: number;
   // maxSizeBytes?: number;
   contentType?: string;
+  scope?: string;
 }
 
 // Action

@@ -9,16 +9,8 @@ import {
   QpqQueueProcessors,
 } from 'quidproquo-core';
 
-import {
-  EVENT_DOC_EVENT_VALIDATOR_GLOBAL,
-  EVENT_DOC_EVENTS_STORE_NAME_GLOBAL,
-  EVENT_DOC_RENDERER_GLOBAL,
-  EVENT_DOC_STORAGE_DRIVE_GLOBAL,
-  EVENT_DOC_STORE_NAME_GLOBAL,
-  EVENT_DOC_TYPE_GLOBAL,
-  EVENT_DOC_USER_DIRECTORY_GLOBAL,
-} from '../../eventDoc';
-import { buildEventDocStore } from '../../eventDoc';
+import { EVENT_DOC_USER_DIRECTORY_GLOBAL } from '../../eventDoc';
+import { buildEventDocStore, buildEventDocStoreGlobals } from '../../eventDoc';
 import { eventDocAiChatDriveName } from '../constants/eventDocAiChatDriveName';
 import { eventDocAiChatListStoreName } from '../constants/eventDocAiChatListStoreName';
 import {
@@ -68,12 +60,7 @@ export const defineEventDocAi = ({
   const globals: Record<string, unknown> = {
     // Full doc-store context so controllers (and future doc-aware helpers)
     // can use the generic eventDoc logic against the collection.
-    [EVENT_DOC_STORE_NAME_GLOBAL]: store.storeName,
-    [EVENT_DOC_EVENTS_STORE_NAME_GLOBAL]: store.eventsStoreName,
-    [EVENT_DOC_TYPE_GLOBAL]: store.type,
-    [EVENT_DOC_STORAGE_DRIVE_GLOBAL]: store.storageDriveName,
-    [EVENT_DOC_EVENT_VALIDATOR_GLOBAL]: store.eventValidator ?? '',
-    [EVENT_DOC_RENDERER_GLOBAL]: store.eventRenderer ?? '',
+    ...buildEventDocStoreGlobals(store),
     [EVENT_DOC_USER_DIRECTORY_GLOBAL]: userDirectoryName,
 
     [EVENT_DOC_AI_CHAT_DRIVE_GLOBAL]: chatDrive,

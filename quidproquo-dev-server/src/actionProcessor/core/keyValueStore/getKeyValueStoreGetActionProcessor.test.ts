@@ -37,7 +37,7 @@ describe('getKeyValueStoreGetActionProcessor', () => {
 
     const result = await invokeProcessor(process, { keyValueStoreName: 'store', key: 'a' });
 
-    expect(repo.get).toHaveBeenCalledWith('store', 'a');
+    expect(repo.get).toHaveBeenCalledWith('store', 'a', undefined);
     expect(resolveActionResult(result)).toEqual({ id: 'a' });
   });
 

@@ -37,7 +37,7 @@ describe('getKeyValueStoreUpdateActionProcessor', () => {
 
     const result = await invokeProcessor(process, { keyValueStoreName: 'store', key: 1, sortKey: 2, updates: { name: 'x' } });
 
-    expect(repo.update).toHaveBeenCalledWith('store', '1', '2', { name: 'x' });
+    expect(repo.update).toHaveBeenCalledWith('store', '1', '2', { name: 'x' }, undefined);
     expect(resolveActionResult(result)).toEqual({ id: 1 });
   });
 
@@ -47,7 +47,7 @@ describe('getKeyValueStoreUpdateActionProcessor', () => {
 
     await invokeProcessor(process, { keyValueStoreName: 'store', key: 1, updates: { name: 'x' } });
 
-    expect(repo.update).toHaveBeenCalledWith('store', '1', undefined, { name: 'x' });
+    expect(repo.update).toHaveBeenCalledWith('store', '1', undefined, { name: 'x' }, undefined);
   });
 
   it('maps a not found error to ResourceNotFound', async () => {

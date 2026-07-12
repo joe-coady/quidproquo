@@ -71,7 +71,11 @@ describe('getProcessAiPromptStream', () => {
 
   it('passes system and caching through to toCacheableSystem', async () => {
     vi.mocked(prepareAiPromptCall).mockReturnValue({ model: {} as never, tools: undefined });
-    vi.mocked(toCacheableSystem).mockReturnValue({ role: 'system', content: 'sys', providerOptions: { bedrock: { cachePoint: { type: 'default' } } } });
+    vi.mocked(toCacheableSystem).mockReturnValue({
+      role: 'system',
+      content: 'sys',
+      providerOptions: { bedrock: { cachePoint: { type: 'default' } } },
+    });
     streamText.mockReturnValue({ fullStream: (async function* () {})() });
 
     await invoke({ prompt: 'hi', system: 'sys', caching: true }, buildRegistry());

@@ -42,7 +42,7 @@ function* askKeyValueStoreUpsertWithRetry<KvsItem>(
 
 ### `KeyValueStoreUpsertWithRetryOptions`
 
-Extends `KeyValueStoreUpsertOptions` (`ttlInSeconds`, `ifNotExists`) with:
+Extends `KeyValueStoreUpsertOptions` (`ttlInSeconds`, `ifNotExists`, `scope`) with:
 
 | Property | Type | Default | Description |
 | --- | --- | --- | --- |

@@ -5,6 +5,7 @@ import {
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  composeScopedFilePath,
   FileActionType,
   FileWriteBinaryContentsActionProcessor,
   FileWriteBinaryContentsErrorTypeEnum,
@@ -16,13 +17,13 @@ import { writeBinaryFile } from '../../../logic/s3/s3Utils';
 import { resolveStorageDriveBucketName } from './utils';
 
 const getProcessFileWriteBinaryContents = (qpqConfig: QPQConfig): FileWriteBinaryContentsActionProcessor => {
-  return async ({ drive, filepath, data, storageDriveAdvancedWriteOptions }) => {
+  return async ({ drive, filepath, data, storageDriveAdvancedWriteOptions, scope }) => {
     const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
 
     try {
       await writeBinaryFile(
         s3BucketName,
-        filepath,
+        composeScopedFilePath(scope, filepath),
         data,
         qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig),
         getS3BucketStorageClassFromStorageDriveTier(storageDriveAdvancedWriteOptions?.storageDriveTier),
@@ -34,6 +35,7 @@ const getProcessFileWriteBinaryContents = (qpqConfig: QPQConfig): FileWriteBinar
         AccessDenied: () => actionResultError(FileWriteBinaryContentsErrorTypeEnum.AccessDenied, 'Access denied writing file'),
         Forbidden: () => actionResultError(FileWriteBinaryContentsErrorTypeEnum.AccessDenied, 'Access denied writing file'),
         NoSuchBucket: () => actionResultError(FileWriteBinaryContentsErrorTypeEnum.DriveNotFound, `Storage drive not found: ${drive}`),
+        InvalidScopeError: (error) => actionResultError(FileWriteBinaryContentsErrorTypeEnum.InvalidScope, error.message),
       });
     }
   };

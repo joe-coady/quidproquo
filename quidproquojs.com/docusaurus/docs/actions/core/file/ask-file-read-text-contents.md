@@ -24,6 +24,7 @@ export function* askGetWelcomeMessage() {
 function* askFileReadTextContents(
   drive: string,
   filepath: string,
+  scope?: string,
 ): AskResponse<string>;
 ```
 
@@ -33,6 +34,7 @@ function* askFileReadTextContents(
 | --- | --- | --- |
 | `drive` | `string` | Name of the storage drive to read from — must match a drive declared with [defineStorageDrive](../../../config/core/storage-drive.md) (or one shared via its `owner` option). |
 | `filepath` | `string` | Path of the file within the drive. Always use forward slashes, e.g. `'reports/2026/summary.txt'`. |
+| `scope` | `string` | Optional storage-scope segment. When set, the processor reads `{scope}/{filepath}` instead, partitioning the drive (used by tenant/scoped features such as the event-doc `scopeResolver`). Must be a single path segment: no separators, `..`, or null bytes. |
 
 ## Returns
 
@@ -43,6 +45,7 @@ function* askFileReadTextContents(
 | Error | Meaning |
 | --- | --- |
 | `FileReadTextContentsErrorTypeEnum.InvalidStorageClass` | The file is in a cold storage tier and cannot be read directly. Check first with `askFileIsColdStorage`. |
+| `FileReadTextContentsErrorTypeEnum.InvalidScope` | The `scope` is not a valid single path segment (empty, too long, or contains separators, `..`, or null bytes), or the scoped `filepath` is absolute or contains `..` segments or null bytes. |
 
 Errors thrown by actions can be caught with `askCatch` from quidproquo-core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 

@@ -1,6 +1,7 @@
 import { AskResponse } from 'quidproquo-core';
 import { HTTPEvent, HTTPEventResponse, qpqWebServerUtils } from 'quidproquo-webserver';
 
+import { askEventDocProvideRequestScope } from '../../globals/askEventDocProvideRequestScope';
 import { askEventDocProvideStoreFromGlobals } from '../../globals/askEventDocProvideStoreFromGlobals';
 import { askEventDocResolveActor } from '../../globals/askEventDocResolveActor';
 import { askEventDocCreate } from '../../logic/askEventDocCreate';
@@ -20,5 +21,5 @@ function* askEventDocStoreCreate(event: HTTPEvent): AskResponse<HTTPEventRespons
 
 /** POST {basePath} — create a new model (body `{ name, code }`). */
 export function* create(event: HTTPEvent): AskResponse<HTTPEventResponse> {
-  return yield* askEventDocProvideStoreFromGlobals(askEventDocStoreCreate(event));
+  return yield* askEventDocProvideStoreFromGlobals(askEventDocProvideRequestScope(event, askEventDocStoreCreate(event)));
 }

@@ -2,6 +2,7 @@ import { askFileWriteBinaryContents, askNewGuid, AskResponse, QPQBinaryData } fr
 
 import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
 import { EventDocAssetRef } from '../models';
+import { askEventDocResolveScope } from './askEventDocResolveScope';
 
 const FALLBACK_MIMETYPE = 'application/octet-stream';
 
@@ -12,9 +13,10 @@ const FALLBACK_MIMETYPE = 'application/octet-stream';
 // provided (wrap in askEventDocProvideStore); the download route serves it back via the same key.
 export function* askEventDocWriteAsset(docId: string, binary: QPQBinaryData): AskResponse<EventDocAssetRef> {
   const { storageDriveName } = yield* askEventDocResolveStore();
+  const scope = yield* askEventDocResolveScope();
   const guid = yield* askNewGuid();
 
-  yield* askFileWriteBinaryContents(storageDriveName, `${docId}/assets/${guid}`, binary);
+  yield* askFileWriteBinaryContents(storageDriveName, `${docId}/assets/${guid}`, binary, undefined, scope);
 
   return {
     guid,

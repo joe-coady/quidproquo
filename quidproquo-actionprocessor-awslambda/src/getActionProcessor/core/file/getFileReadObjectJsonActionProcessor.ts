@@ -5,6 +5,7 @@ import {
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  composeScopedFilePath,
   FileActionType,
   FileReadObjectJsonActionProcessor,
   FileReadObjectJsonErrorTypeEnum,
@@ -15,11 +16,12 @@ import { readTextFile } from '../../../logic/s3/s3Utils';
 import { resolveStorageDriveBucketName } from './utils';
 
 const getProcessFileReadObjectJson = (qpqConfig: QPQConfig): FileReadObjectJsonActionProcessor<object> => {
-  return async ({ drive, filepath }) => {
+  return async ({ drive, filepath, scope }) => {
     try {
       const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
+      const key = composeScopedFilePath(scope, filepath);
 
-      const json = await readTextFile(s3BucketName, filepath, qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig));
+      const json = await readTextFile(s3BucketName, key, qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig));
 
       const obj = JSON.parse(json);
 
@@ -27,6 +29,7 @@ const getProcessFileReadObjectJson = (qpqConfig: QPQConfig): FileReadObjectJsonA
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         InvalidObjectState: () => actionResultError(FileReadObjectJsonErrorTypeEnum.InvalidStorageClass, 'File is in the wrong storage class'),
+        InvalidScopeError: (error) => actionResultError(FileReadObjectJsonErrorTypeEnum.InvalidScope, error.message),
       });
     }
   };

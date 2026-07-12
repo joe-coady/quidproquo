@@ -27,6 +27,7 @@ function* askFileGenerateTemporarySecureUrl(
   drive: string,
   filepath: string,
   expirationMs: number,
+  scope?: string,
 ): AskResponse<string>;
 ```
 
@@ -37,6 +38,7 @@ function* askFileGenerateTemporarySecureUrl(
 | `drive` | `string` | Name of the storage drive the file lives on — must match a drive declared with [defineStorageDrive](../../../config/core/storage-drive.md) (or one shared via its `owner` option). |
 | `filepath` | `string` | Path of the file within the drive, forward-slash delimited. |
 | `expirationMs` | `number` | How long the URL stays valid, in milliseconds. Must not exceed 7 days (`604800000` ms). |
+| `scope` | `string` | Optional storage-scope segment. When set, the signed URL targets `{scope}/{filepath}` instead, partitioning the drive (used by tenant/scoped features such as the event-doc `scopeResolver`). Must be a single path segment: no separators, `..`, or null bytes. |
 
 ## Returns
 
@@ -47,6 +49,7 @@ function* askFileGenerateTemporarySecureUrl(
 | Error | Meaning |
 | --- | --- |
 | `FileGenerateTemporarySecureUrlErrorTypeEnum.ExpirationTooLong` | The requested `expirationMs` exceeds the 7 day maximum for signed URLs. |
+| `FileGenerateTemporarySecureUrlErrorTypeEnum.InvalidScope` | The `scope` is not a valid single path segment (empty, too long, or contains separators, `..`, or null bytes), or the scoped `filepath` is absolute or contains `..` segments or null bytes. |
 
 Errors thrown by actions can be caught with `askCatch` from quidproquo-core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 

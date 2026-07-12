@@ -18,9 +18,9 @@ import { ensureParentDirectoryExists, resolveFilePath } from './utils';
 const getProcessFileWriteBinaryContents =
   (config: FileStorageConfig) =>
   (qpqConfig: QPQConfig): FileWriteBinaryContentsActionProcessor => {
-    return async ({ drive, filepath, data }) => {
+    return async ({ drive, filepath, data, scope }) => {
       try {
-        const fullPath = resolveFilePath(config, qpqConfig, drive, filepath);
+        const fullPath = resolveFilePath(config, qpqConfig, drive, filepath, scope);
         await ensureParentDirectoryExists(fullPath);
 
         // Convert QPQBinaryData to Buffer
@@ -40,6 +40,7 @@ const getProcessFileWriteBinaryContents =
         return actionResult(void 0);
       } catch (error: unknown) {
         return actionResultErrorFromCaughtError(error, {
+          InvalidScopeError: (error) => actionResultError(FileWriteBinaryContentsErrorTypeEnum.InvalidScope, error.message),
           EACCES: () => actionResultError(FileWriteBinaryContentsErrorTypeEnum.AccessDenied, `Access denied writing file: ${filepath}`), // node fs code
         });
       }

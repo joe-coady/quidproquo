@@ -14,7 +14,7 @@ import { useEffect, useState } from 'react';
 import { useFastCallback } from '../../../hooks';
 import { useSubscribeToWebsocket, useSubscribeToWebSocketEvent, useWebsocketApi, useWebsocketSendEvent } from '../../hooks';
 
-export const useWebsocketAuthSync = (accessToken: AuthenticationInfo['accessToken']) => {
+export const useWebsocketAuthSync = (accessToken: AuthenticationInfo['accessToken'], activeTenantId?: string | null) => {
   const sendMessage = useWebsocketSendEvent();
   const websocketApi = useWebsocketApi();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -29,6 +29,7 @@ export const useWebsocketAuthSync = (accessToken: AuthenticationInfo['accessToke
         type: WebSocketQueueClientMessageEventType.Authenticate,
         payload: {
           accessToken: accessToken,
+          tenantId: activeTenantId || undefined,
         },
       } satisfies WebSocketQueueClientEventMessageAuthenticate);
     } else if (isAuthenticated) {
@@ -49,8 +50,9 @@ export const useWebsocketAuthSync = (accessToken: AuthenticationInfo['accessToke
   useSubscribeToWebsocket(WebsocketServiceEvent.OPEN, updateAuthTokens);
   useSubscribeToWebsocket(WebsocketServiceEvent.CLOSE, () => setIsAuthenticated(false));
 
-  // Sync the tokens when they change
-  useEffect(updateAuthTokens, [updateAuthTokens, accessToken, websocketApi, isAuthenticated]);
+  // Sync the tokens when they change (a tenant change re-authenticates, which
+  // the server treats as a fresh scope claim)
+  useEffect(updateAuthTokens, [updateAuthTokens, accessToken, activeTenantId, websocketApi, isAuthenticated]);
 
   return isAuthenticated;
 };

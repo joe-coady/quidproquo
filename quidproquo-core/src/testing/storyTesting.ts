@@ -1,3 +1,4 @@
+import { ContextActionType } from '../actions/context/ContextActionType';
 import { ErrorActionType } from '../actions/error/ErrorActionType';
 import { askThrowError } from '../actions/error/ErrorThrowErrorActionRequester';
 import { SystemActionType } from '../actions/system/SystemActionType';
@@ -107,6 +108,15 @@ const drive = <R>(story: AskResponse<R>): R => {
         continue;
       }
       throw new StoryError(errorType, errorText, errorStack);
+    }
+
+    // An unprovided, unmocked context read resolves to the identifier's default —
+    // exactly what the production context processor does when nothing provided a
+    // value. A mock or an askContextProvideValue wrapper still takes precedence
+    // (both intercept before the action reaches the runtime).
+    if (action.type === ContextActionType.Read) {
+      next = story.next(getSuccessfulEitherActionResultIfRequired(action.payload?.contextIdentifier?.defaultValue, action.returnErrors));
+      continue;
     }
 
     throw new StoryError('TestSetupError', `Unmocked action reached the runtime: "${action.type}". Add it to your mocks.`);

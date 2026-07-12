@@ -3,7 +3,9 @@ import { askConfigGetGlobal, AskResponse } from 'quidproquo-core';
 import {
   EVENT_DOC_EVENT_VALIDATOR_GLOBAL,
   EVENT_DOC_EVENTS_STORE_NAME_GLOBAL,
+  EVENT_DOC_ON_PUBLISH_GLOBAL,
   EVENT_DOC_RENDERER_GLOBAL,
+  EVENT_DOC_SCOPE_RESOLVER_GLOBAL,
   EVENT_DOC_STORAGE_DRIVE_GLOBAL,
   EVENT_DOC_STORE_NAME_GLOBAL,
   EVENT_DOC_TYPE_GLOBAL,
@@ -17,9 +19,11 @@ export function* askEventDocProvideStoreFromGlobals<T>(story: AskResponse<T>): A
   const eventsStoreName = yield* askConfigGetGlobal<string>(EVENT_DOC_EVENTS_STORE_NAME_GLOBAL);
   const type = yield* askConfigGetGlobal<string>(EVENT_DOC_TYPE_GLOBAL);
   const storageDriveName = yield* askConfigGetGlobal<string>(EVENT_DOC_STORAGE_DRIVE_GLOBAL);
-  // Empty string when the collection configured no validator/renderer (see defineEventDocRoutes).
+  // Empty string when the collection configured no validator/renderer/on-publish/scope-resolver (see defineEventDocRoutes).
   const eventValidator = yield* askConfigGetGlobal<string>(EVENT_DOC_EVENT_VALIDATOR_GLOBAL);
   const eventRenderer = yield* askConfigGetGlobal<string>(EVENT_DOC_RENDERER_GLOBAL);
+  const onPublish = yield* askConfigGetGlobal<string>(EVENT_DOC_ON_PUBLISH_GLOBAL);
+  const scopeResolver = yield* askConfigGetGlobal<string>(EVENT_DOC_SCOPE_RESOLVER_GLOBAL);
 
   return yield* askEventDocStoreProvide(
     {
@@ -29,6 +33,8 @@ export function* askEventDocProvideStoreFromGlobals<T>(story: AskResponse<T>): A
       storageDriveName,
       eventValidator,
       eventRenderer,
+      onPublish,
+      scopeResolver,
     },
     story,
   );

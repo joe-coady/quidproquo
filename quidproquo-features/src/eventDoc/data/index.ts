@@ -7,6 +7,7 @@ export * from './askEventDocGenerateAssetDownloadUrl';
 export * from './askEventDocGenerateAssetUploadUrl';
 export * from './askEventDocGetById';
 export * from './askEventDocList';
+export * from './askEventDocResolveScope';
 export * from './askEventDocUpsert';
 export * from './askEventDocWriteAsset';
 export * from './eventDocAssetPath';

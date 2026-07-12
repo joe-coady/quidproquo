@@ -32,6 +32,7 @@ function* askFileListDirectory(
   folderPath: string,
   maxFiles?: number,
   pageToken?: string,
+  scope?: string,
 ): AskResponse<DirectoryList>;
 ```
 
@@ -43,6 +44,7 @@ function* askFileListDirectory(
 | `folderPath` | `string` | The folder prefix to list under, forward-slash delimited, e.g. `'exports/'`. |
 | `maxFiles` | `number` | Maximum entries to return in this page. Defaults to `1000`. |
 | `pageToken` | `string` | Token returned by a previous call to fetch the next page. Omit for the first page. |
+| `scope` | `string` | Optional storage-scope segment. When set, the processor lists under `{scope}/{folderPath}` instead, partitioning the drive (used by tenant/scoped features such as the event-doc `scopeResolver`). Returned `filepath`s are relative to the scope, matching what you would pass back in. Must be a single path segment: no separators, `..`, or null bytes. |
 
 ## Returns
 
@@ -72,6 +74,7 @@ When `pageToken` is `undefined`, the last page has been returned.
 | `FileListDirectoryErrorTypeEnum.DirectoryNotFound` | No directory exists at the given `folderPath`. |
 | `FileListDirectoryErrorTypeEnum.NotADirectory` | The `folderPath` points at a file rather than a directory. |
 | `FileListDirectoryErrorTypeEnum.DriveNotFound` | No storage drive with that name exists in the deployed config. |
+| `FileListDirectoryErrorTypeEnum.InvalidScope` | The `scope` is not a valid single path segment (empty, too long, or contains separators, `..`, or null bytes), or the scoped `folderPath` is absolute or contains `..` segments or null bytes. |
 
 Errors thrown by actions can be caught with `askCatch` from quidproquo-core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 
@@ -87,7 +90,7 @@ if (outcome.success) {
 
 ## Notes
 
-- To pull **every** page in one call, use `askFileListAllDirectory(drive, folderPath)` — a companion requester exported from quidproquo-core that loops internally and returns a flat `FileInfo[]`. Prefer paging with `askFileListDirectory` for large directories.
+- To pull **every** page in one call, use `askFileListAllDirectory(drive, folderPath, scope?)` — a companion requester exported from quidproquo-core that loops internally and returns a flat `FileInfo[]`. Prefer paging with `askFileListDirectory` for large directories.
 
 ## Related
 

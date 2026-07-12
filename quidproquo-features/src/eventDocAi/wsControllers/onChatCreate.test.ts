@@ -9,7 +9,7 @@ import {
   runStory,
   UserDirectoryActionType,
 } from 'quidproquo-core';
-import { WebsocketActionType } from 'quidproquo-webserver';
+import { WebsocketActionType, websocketConnectionInfoContext } from 'quidproquo-webserver';
 
 import { describe, expect, it } from 'vitest';
 
@@ -23,6 +23,13 @@ const globals: Record<string, string> = {
   [EVENT_DOC_TYPE_GLOBAL]: 'log',
   [EVENT_DOC_USER_DIRECTORY_GLOBAL]: 'admin-users',
 };
+
+// Answer only the ws connection-info read; every other context read (e.g. the
+// storage scope) falls back to its identifier's default, like the runtime does.
+const readContextByIdentifier = (action: { payload: { contextIdentifier: { uniqueName: string; defaultValue: unknown } } }) =>
+  action.payload.contextIdentifier.uniqueName === websocketConnectionInfoContext.uniqueName
+    ? { apiName: 'ws-api', connectionId: 'conn-1', correlationId: 'ws-corr-1' }
+    : action.payload.contextIdentifier.defaultValue;
 
 describe('onChatCreate', () => {
   it('creates and stores a chat scoped to the trusted docId, then responds over the websocket', () => {
@@ -40,9 +47,9 @@ describe('onChatCreate', () => {
       [GuidActionType.New]: 'chat-1',
       [DateActionType.Now]: '2026-07-11T00:00:00.000Z',
       [KeyValueStoreActionType.Upsert]: (action: { payload: { keyValueStoreName: string; item: unknown } }) => {
-        upserts.push(action.payload);
+        upserts.push({ keyValueStoreName: action.payload.keyValueStoreName, item: action.payload.item });
       },
-      [ContextActionType.Read]: { apiName: 'ws-api', connectionId: 'conn-1', correlationId: 'ws-corr-1' },
+      [ContextActionType.Read]: readContextByIdentifier,
       [WebsocketActionType.SendMessage]: (action: { payload: { payload: unknown } }) => {
         sentMessages.push(action.payload.payload);
       },

@@ -7,6 +7,7 @@ export interface FileWriteObjectJsonActionPayload<T extends object> {
   filepath: string;
   data: T;
   storageDriveAdvancedWriteOptions?: StorageDriveAdvancedWriteOptions;
+  scope?: string;
 }
 
 // Action

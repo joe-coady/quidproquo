@@ -20,9 +20,9 @@ import { resolveFilePath } from './utils';
 const getProcessFileReadBinaryContents =
   (config: FileStorageConfig) =>
   (qpqConfig: QPQConfig): FileReadBinaryContentsActionProcessor => {
-    return async ({ drive, filepath }) => {
+    return async ({ drive, filepath, scope }) => {
       try {
-        const fullPath = resolveFilePath(config, qpqConfig, drive, filepath);
+        const fullPath = resolveFilePath(config, qpqConfig, drive, filepath, scope);
         const buffer = await fs.readFile(fullPath);
 
         // Convert Buffer to QPQBinaryData
@@ -35,6 +35,7 @@ const getProcessFileReadBinaryContents =
         return actionResult(binaryData);
       } catch (error: unknown) {
         return actionResultErrorFromCaughtError(error, {
+          InvalidScopeError: (error) => actionResultError(FileReadBinaryContentsErrorTypeEnum.InvalidScope, error.message),
           ENOENT: () => actionResultError(FileReadBinaryContentsErrorTypeEnum.FileNotFound, `File not found: ${filepath}`), // node fs code
         });
       }

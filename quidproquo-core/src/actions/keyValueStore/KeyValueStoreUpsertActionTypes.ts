@@ -10,6 +10,9 @@ export interface KeyValueStoreUpsertOptions {
   // overwriting — the primitive for optimistic-concurrency schemes (e.g.
   // append-only event logs where the sort key is a claimed index).
   ifNotExists?: boolean;
+
+  // Composed into the item's partition key value by the processor; requires a string-typed partition key.
+  scope?: string;
 }
 
 // Payload

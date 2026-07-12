@@ -7,6 +7,7 @@ export interface FileWriteTextContentsActionPayload {
   filepath: string;
   data: string;
   storageDriveAdvancedWriteOptions?: StorageDriveAdvancedWriteOptions;
+  scope?: string;
 }
 
 // Action

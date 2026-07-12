@@ -60,6 +60,8 @@ The single `options` argument is an `EventDocRoutesOptions`:
 | `version` | `number` | `1` | Version number for the `/v{version}` path prefix on every route. |
 | `eventValidator` | `string` | – | Name of a registered inline function (see `defineInlineFunction`). When set, every append invokes it with `{ event, events }` to reject lifecycle- or payload-invalid events before they reach the log. The frontend editor runs the same rule for instant feedback. |
 | `eventRenderer` | `string` | – | Name of a registered inline function. When set, a `GET {basePath}/{id}/render` route is mounted; it invokes the renderer with the document's full `{ events }` log, which folds + renders to HTML. |
+| `onPublish` | `string` | – | Name of a registered inline function. When set, every successful append of a Publish event invokes it with `{ docId, event, summary }`, after the event is durably written and the summary re-derived. This is the seam for syncing a folded document into a materialized read model. Errors propagate to the caller: the event has landed but the side effect did not, so the caller learns the read model may be stale. |
+| `scopeResolver` | `string` | – | Name of a registered inline function. When set, every route invokes it with `{ event }` before running; a non-null result becomes the ambient storage scope for the whole request, transparently partitioning the collection's stores and assets (e.g. per-tenant). Null means unscoped. Omit for collections that never partition. |
 
 ### `RouteAuthSettings`
 

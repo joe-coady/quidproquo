@@ -4,6 +4,7 @@ import {
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  composeScopedFilePath,
   FileActionType,
   FileDeleteActionProcessor,
   FileDeleteErrorTypeEnum,
@@ -13,11 +14,12 @@ import { deleteFiles } from '../../../logic/s3/s3Utils';
 import { resolveStorageDriveBucketName } from './utils';
 
 const getProcessFileDelete = (qpqConfig: QPQConfig): FileDeleteActionProcessor => {
-  return async ({ drive, filepaths }) => {
+  return async ({ drive, filepaths, scope }) => {
     const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
 
     try {
-      const errored = await deleteFiles(s3BucketName, filepaths, qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig));
+      const keys = filepaths.map((filepath) => composeScopedFilePath(scope, filepath));
+      const errored = await deleteFiles(s3BucketName, keys, qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig));
 
       // errored deletes are a graceful success ~ Retry
       // if (errored.length > 0) {
@@ -32,6 +34,7 @@ const getProcessFileDelete = (qpqConfig: QPQConfig): FileDeleteActionProcessor =
       return actionResultErrorFromCaughtError(error, {
         AccessDenied: () => actionResultError(FileDeleteErrorTypeEnum.AccessDenied, 'Access denied deleting files'),
         NoSuchBucket: () => actionResultError(FileDeleteErrorTypeEnum.DriveNotFound, `Storage drive not found: ${drive}`),
+        InvalidScopeError: (error) => actionResultError(FileDeleteErrorTypeEnum.InvalidScope, error.message),
       });
     }
   };
