@@ -1,0 +1,17 @@
+// Present a single-choice list prompt and return the selected value.
+// @inquirer/prompts is imported lazily so commands only pay for it when
+// actually prompting.
+export const promptSelect = async (message: string, choices: string[], defaultChoice?: string): Promise<string> => {
+  const { select } = await import('@inquirer/prompts');
+  return select({ message, choices, default: defaultChoice });
+};
+
+// A yes/no list prompt, returning true for "Yes".
+export const promptYesNo = async (message: string): Promise<boolean> => (await promptSelect(message, ['No', 'Yes'])) === 'Yes';
+
+// A free-text prompt — used where a y/n is too easy to fat-finger (destructive
+// confirmations that require typing the target name back).
+export const promptText = async (message: string): Promise<string> => {
+  const { input } = await import('@inquirer/prompts');
+  return input({ message });
+};
