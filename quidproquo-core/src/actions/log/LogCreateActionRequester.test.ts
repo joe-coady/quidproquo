@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { captureRequester } from '../../testing';
+import { captureRequester, runStory, StoryError, throwsError } from '../../testing';
 import { LogLevelEnum } from '../../types/LogLevelEnum';
 import { LogActionType } from './LogActionType';
 import { askLogCreate } from './LogCreateActionRequester';
@@ -30,5 +30,15 @@ describe('askLogCreate', () => {
         data: undefined,
       },
     });
+  });
+
+  it('propagates a logging failure as a thrown error', () => {
+    const run = () =>
+      runStory(askLogCreate(LogLevelEnum.Info, 'hello'), {
+        [LogActionType.Create]: throwsError('GenericError', 'log sink unavailable'),
+      });
+
+    expect(run).toThrow(StoryError);
+    expect(run).toThrow('log sink unavailable');
   });
 });

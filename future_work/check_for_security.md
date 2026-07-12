@@ -968,11 +968,11 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [x] quidproquo-core/src/actions/context/ContextReadActionRequester.ts
 - [x] quidproquo-core/src/actions/context/ContextReadActionTypes.ts
 - [x] quidproquo-core/src/actions/context/index.ts
-- [ ] quidproquo-core/src/actions/date/DateActionType.ts
-- [ ] quidproquo-core/src/actions/date/DateNowActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/date/DateNowActionRequester.ts
-- [ ] quidproquo-core/src/actions/date/DateNowActionTypes.ts
-- [ ] quidproquo-core/src/actions/date/index.ts
+- [x] quidproquo-core/src/actions/date/DateActionType.ts
+- [x] quidproquo-core/src/actions/date/DateNowActionRequester.test.ts
+- [x] quidproquo-core/src/actions/date/DateNowActionRequester.ts
+- [x] quidproquo-core/src/actions/date/DateNowActionTypes.ts
+- [x] quidproquo-core/src/actions/date/index.ts
 - [x] quidproquo-core/src/actions/error/ErrorActionType.ts
 - [x] quidproquo-core/src/actions/error/ErrorThrowErrorActionRequester.test.ts
 - [x] quidproquo-core/src/actions/error/ErrorThrowErrorActionRequester.ts
@@ -1063,14 +1063,14 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [x] quidproquo-core/src/actions/graphDatabase/GraphDatabaseInternalFieldNamesActionRequester.ts
 - [x] quidproquo-core/src/actions/graphDatabase/GraphDatabaseInternalFieldNamesActionTypes.ts
 - [x] quidproquo-core/src/actions/graphDatabase/index.ts
-- [ ] quidproquo-core/src/actions/guid/GuidActionType.ts
-- [ ] quidproquo-core/src/actions/guid/GuidNewActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/guid/GuidNewActionRequester.ts
-- [ ] quidproquo-core/src/actions/guid/GuidNewActionRequesterTypes.ts
-- [ ] quidproquo-core/src/actions/guid/GuidNewSortableActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/guid/GuidNewSortableActionRequester.ts
-- [ ] quidproquo-core/src/actions/guid/GuidNewSortableActionRequesterTypes.ts
-- [ ] quidproquo-core/src/actions/guid/index.ts
+- [x] quidproquo-core/src/actions/guid/GuidActionType.ts
+- [x] quidproquo-core/src/actions/guid/GuidNewActionRequester.test.ts
+- [x] quidproquo-core/src/actions/guid/GuidNewActionRequester.ts
+- [x] quidproquo-core/src/actions/guid/GuidNewActionRequesterTypes.ts
+- [x] quidproquo-core/src/actions/guid/GuidNewSortableActionRequester.test.ts
+- [x] quidproquo-core/src/actions/guid/GuidNewSortableActionRequester.ts
+- [x] quidproquo-core/src/actions/guid/GuidNewSortableActionRequesterTypes.ts
+- [x] quidproquo-core/src/actions/guid/index.ts
 - [x] quidproquo-core/src/actions/index.ts
 - [x] quidproquo-core/src/actions/inlineFunction/index.ts
 - [x] quidproquo-core/src/actions/inlineFunction/InlineFunctionActionType.ts
@@ -1111,22 +1111,22 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [x] quidproquo-core/src/actions/keyValueStore/utils/kvsExpression.ts
 - [x] quidproquo-core/src/actions/keyValueStore/utils/kvsUpdateExpression.test.ts
 - [x] quidproquo-core/src/actions/keyValueStore/utils/kvsUpdateExpression.ts
-- [ ] quidproquo-core/src/actions/log/index.ts
-- [ ] quidproquo-core/src/actions/log/LogActionType.ts
-- [ ] quidproquo-core/src/actions/log/LogCreateActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/log/LogCreateActionRequester.ts
-- [ ] quidproquo-core/src/actions/log/LogCreateActionTypes.ts
-- [ ] quidproquo-core/src/actions/log/LogDisableEventHistoryActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/log/LogDisableEventHistoryActionRequester.ts
-- [ ] quidproquo-core/src/actions/log/LogDisableEventHistoryActionTypes.ts
-- [ ] quidproquo-core/src/actions/log/LogTemplateLiteralActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/log/LogTemplateLiteralActionRequester.ts
-- [ ] quidproquo-core/src/actions/log/LogTemplateLiteralActionTypes.ts
-- [ ] quidproquo-core/src/actions/math/index.ts
-- [ ] quidproquo-core/src/actions/math/MathActionType.ts
-- [ ] quidproquo-core/src/actions/math/MathRandomNumberActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/math/MathRandomNumberActionRequester.ts
-- [ ] quidproquo-core/src/actions/math/MathRandomNumberActionRequesterTypes.ts
+- [x] quidproquo-core/src/actions/log/index.ts
+- [x] quidproquo-core/src/actions/log/LogActionType.ts
+- [x] quidproquo-core/src/actions/log/LogCreateActionRequester.test.ts
+- [x] quidproquo-core/src/actions/log/LogCreateActionRequester.ts
+- [x] quidproquo-core/src/actions/log/LogCreateActionTypes.ts
+- [x] quidproquo-core/src/actions/log/LogDisableEventHistoryActionRequester.test.ts
+- [x] quidproquo-core/src/actions/log/LogDisableEventHistoryActionRequester.ts
+- [x] quidproquo-core/src/actions/log/LogDisableEventHistoryActionTypes.ts
+- [x] quidproquo-core/src/actions/log/LogTemplateLiteralActionRequester.test.ts
+- [x] quidproquo-core/src/actions/log/LogTemplateLiteralActionRequester.ts
+- [x] quidproquo-core/src/actions/log/LogTemplateLiteralActionTypes.ts
+- [x] quidproquo-core/src/actions/math/index.ts
+- [x] quidproquo-core/src/actions/math/MathActionType.ts
+- [x] quidproquo-core/src/actions/math/MathRandomNumberActionRequester.test.ts
+- [x] quidproquo-core/src/actions/math/MathRandomNumberActionRequester.ts
+- [x] quidproquo-core/src/actions/math/MathRandomNumberActionRequesterTypes.ts
 - [x] quidproquo-core/src/actions/metric/index.ts
 - [x] quidproquo-core/src/actions/metric/MetricActionType.ts
 - [x] quidproquo-core/src/actions/metric/MetricPutActionRequester.test.ts
@@ -1164,23 +1164,24 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [x] quidproquo-core/src/actions/stream/StreamReadActionTypes.ts
 - [x] quidproquo-core/src/actions/stream/StreamReadRequester.test.ts
 - [x] quidproquo-core/src/actions/stream/StreamReadRequester.ts
-- [ ] quidproquo-core/src/actions/system/index.ts
-- [ ] quidproquo-core/src/actions/system/SystemActionType.ts
-- [ ] quidproquo-core/src/actions/system/SystemBatchActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/system/SystemBatchActionRequester.ts
-- [ ] quidproquo-core/src/actions/system/SystemBatchActionTypes.ts
-- [ ] quidproquo-core/src/actions/system/SystemExecuteStoryActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/system/SystemExecuteStoryActionRequester.ts
-- [ ] quidproquo-core/src/actions/system/SystemExecuteStoryActionTypes.ts
-- [ ] quidproquo-core/src/actions/system/SystemGetRuntimeCorrelationActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/system/SystemGetRuntimeCorrelationActionRequester.ts
-- [ ] quidproquo-core/src/actions/system/SystemGetRuntimeCorrelationActionTypes.ts
-- [ ] quidproquo-core/src/actions/system/SystemRunParallelActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/system/SystemRunParallelActionRequester.ts
-- [ ] quidproquo-core/src/actions/system/SystemRunParallelActionTypes.ts
-- [ ] quidproquo-core/src/actions/system/SystemTraceStoryActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/system/SystemTraceStoryActionRequester.ts
-- [ ] quidproquo-core/src/actions/system/SystemTraceStoryActionTypes.ts
+- [x] quidproquo-core/src/actions/system/index.ts
+- [x] quidproquo-core/src/actions/system/SystemActionType.ts
+- [x] quidproquo-core/src/actions/system/SystemBatchActionRequester.test.ts
+- [x] quidproquo-core/src/actions/system/SystemBatchActionRequester.ts
+- [x] quidproquo-core/src/actions/system/SystemBatchActionTypes.ts
+- [x] quidproquo-core/src/actions/system/SystemExecuteStoryActionRequester.test.ts
+- [x] quidproquo-core/src/actions/system/SystemExecuteStoryActionRequester.ts
+- [x] quidproquo-core/src/actions/system/SystemExecuteStoryActionTypes.ts
+- [x] quidproquo-core/src/actions/system/SystemGetRuntimeCorrelationActionRequester.test.ts
+- [x] quidproquo-core/src/actions/system/SystemGetRuntimeCorrelationActionRequester.ts
+- [x] quidproquo-core/src/actions/system/SystemGetRuntimeCorrelationActionTypes.ts
+- [x] quidproquo-core/src/actions/system/SystemRunParallelActionRequester.test.ts
+- [x] quidproquo-core/src/actions/system/SystemRunParallelActionRequester.ts
+  - Fixed: mixed-length parallel stories sent null holes into the batch action, crashing the batch processor; only pending actions are batched now, results scattered back positionally.
+- [x] quidproquo-core/src/actions/system/SystemRunParallelActionTypes.ts
+- [x] quidproquo-core/src/actions/system/SystemTraceStoryActionRequester.test.ts
+- [x] quidproquo-core/src/actions/system/SystemTraceStoryActionRequester.ts
+- [x] quidproquo-core/src/actions/system/SystemTraceStoryActionTypes.ts
 - [x] quidproquo-core/src/actions/userDirectory/index.ts
 - [x] quidproquo-core/src/actions/userDirectory/types/AnyAuthChallenge.ts
 - [x] quidproquo-core/src/actions/userDirectory/types/AuthChallenges/AuthChallengeBase.ts

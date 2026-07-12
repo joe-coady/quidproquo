@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { captureRequester } from '../../testing';
+import { captureRequester, runStory, StoryError, throwsError } from '../../testing';
 import { SystemActionType } from './SystemActionType';
 import { askTraceStory } from './SystemTraceStoryActionRequester';
 
@@ -28,5 +28,21 @@ describe('askTraceStory', () => {
     const { returned } = captureRequester(askTraceStory(storyResult), trace);
 
     expect(returned).toBe(trace);
+  });
+
+  it('passes the onlyOwnCode flag through to the payload', () => {
+    const { action } = captureRequester(askTraceStory(storyResult, undefined, true));
+
+    expect(action.payload).toEqual({ storyResult, scriptPatterns: undefined, onlyOwnCode: true });
+  });
+
+  it('propagates a trace failure as a thrown error', () => {
+    const run = () =>
+      runStory(askTraceStory(storyResult), {
+        [SystemActionType.TraceStory]: throwsError('GenericError', 'tracer unavailable'),
+      });
+
+    expect(run).toThrow(StoryError);
+    expect(run).toThrow('tracer unavailable');
   });
 });

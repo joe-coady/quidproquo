@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { captureRequester } from '../../testing';
+import { captureRequester, runStory, StoryError, throwsError } from '../../testing';
 import { SystemActionType } from './SystemActionType';
 import { askGetRuntimeCorrelation } from './SystemGetRuntimeCorrelationActionRequester';
 
@@ -15,5 +15,15 @@ describe('askGetRuntimeCorrelation', () => {
     const { returned } = captureRequester(askGetRuntimeCorrelation(), 'module::abc-123');
 
     expect(returned).toBe('module::abc-123');
+  });
+
+  it('propagates a correlation lookup failure as a thrown error', () => {
+    const run = () =>
+      runStory(askGetRuntimeCorrelation(), {
+        [SystemActionType.GetRuntimeCorrelation]: throwsError('GenericError', 'no active session'),
+      });
+
+    expect(run).toThrow(StoryError);
+    expect(run).toThrow('no active session');
   });
 });

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { captureRequester } from '../../testing';
+import { captureRequester, runStory, StoryError, throwsError } from '../../testing';
 import { LogActionType } from './LogActionType';
 import { askLogTemplateLiteral } from './LogTemplateLiteralActionRequester';
 
@@ -28,5 +28,15 @@ describe('askLogTemplateLiteral', () => {
         messageParts: [['static message'], []],
       },
     });
+  });
+
+  it('propagates a logging failure as a thrown error', () => {
+    const run = () =>
+      runStory(askLogTemplateLiteral`boom`, {
+        [LogActionType.TemplateLiteral]: throwsError('GenericError', 'log sink unavailable'),
+      });
+
+    expect(run).toThrow(StoryError);
+    expect(run).toThrow('log sink unavailable');
   });
 });

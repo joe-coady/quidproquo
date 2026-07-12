@@ -22,10 +22,18 @@ export function* askParallelDEPRECATED(stories: Array<any>): SystemRunParallelAc
     // Batch any actions that we have not processed yet
     const actionsToBatch = actions.map((a) => (!a.done ? a.value : null));
 
+    // Only send the still-pending actions to the runtime: a story that has already
+    // finished leaves a null hole, and a null action crashes the batch processor.
+    // Results are scattered back into their original positions afterwards.
+    const pendingActions = actionsToBatch.filter((atb) => !!atb);
+
     // Only batch actions when there are some to batch
     // People may batch stories together that actually dont have actions in them!?
-    if (actionsToBatch.filter((atb) => !!atb).length) {
-      values = yield* askBatch(actionsToBatch);
+    if (pendingActions.length) {
+      const pendingResults = yield* askBatch(pendingActions);
+
+      let pendingIndex = 0;
+      values = actionsToBatch.map((atb) => (atb ? pendingResults[pendingIndex++] : undefined));
     }
 
     // Calculate real values

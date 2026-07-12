@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { captureRequester } from '../../testing';
+import { captureRequester, runStory, StoryError, throwsError } from '../../testing';
 import { DateActionType } from './DateActionType';
 import { askDateNow } from './DateNowActionRequester';
 
@@ -15,5 +15,15 @@ describe('askDateNow', () => {
     const { returned } = captureRequester(askDateNow(), '2026-06-26T00:00:00.000Z');
 
     expect(returned).toBe('2026-06-26T00:00:00.000Z');
+  });
+
+  it('propagates a clock failure as a thrown error', () => {
+    const run = () =>
+      runStory(askDateNow(), {
+        [DateActionType.Now]: throwsError('GenericError', 'clock unavailable'),
+      });
+
+    expect(run).toThrow(StoryError);
+    expect(run).toThrow('clock unavailable');
   });
 });

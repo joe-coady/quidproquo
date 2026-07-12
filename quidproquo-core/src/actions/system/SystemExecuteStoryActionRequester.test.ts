@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { captureRequester } from '../../testing';
+import { captureRequester, runStory, StoryError, throwsError } from '../../testing';
 import { SystemActionType } from './SystemActionType';
 import { askExecuteStory } from './SystemExecuteStoryActionRequester';
 
@@ -32,5 +32,15 @@ describe('askExecuteStory', () => {
     const { returned } = captureRequester(askExecuteStory(runtime, ['Ada']), 'Hello Ada');
 
     expect(returned).toBe('Hello Ada');
+  });
+
+  it('propagates an execution failure as a thrown error', () => {
+    const run = () =>
+      runStory(askExecuteStory('/handlers/greet::default', ['Ada']), {
+        [SystemActionType.ExecuteStory]: throwsError('NotFound', 'story module not found'),
+      });
+
+    expect(run).toThrow(StoryError);
+    expect(run).toThrow('story module not found');
   });
 });

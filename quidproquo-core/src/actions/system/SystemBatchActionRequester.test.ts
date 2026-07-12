@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { captureRequester } from '../../testing';
+import { captureRequester, runStory, StoryError, throwsError } from '../../testing';
 import { SystemActionType } from './SystemActionType';
 import { askBatch } from './SystemBatchActionRequester';
 
@@ -29,5 +29,28 @@ describe('askBatch', () => {
     const { returned } = captureRequester(askBatch([{ type: 'a', payload: 1 }]), 'ra');
 
     expect(returned).toEqual(['ra']);
+  });
+
+  it('resolves an empty batch to an empty result array', () => {
+    const result = runStory(askBatch([]));
+
+    expect(result).toEqual([]);
+  });
+
+  it('propagates a failing batched action as a thrown error', () => {
+    const run = () =>
+      runStory(
+        askBatch([
+          { type: 'a', payload: 1 },
+          { type: 'b', payload: 2 },
+        ]),
+        {
+          a: 'ra',
+          b: throwsError('GenericError', 'b failed'),
+        },
+      );
+
+    expect(run).toThrow(StoryError);
+    expect(run).toThrow('b failed');
   });
 });

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { runStory } from '../../testing';
+import { runStory, StoryError, throwsError } from '../../testing';
 import { AskResponse } from '../../types';
 import { GuidActionType } from '../guid/GuidActionType';
 import { askNewGuid } from '../guid/GuidNewActionRequester';
@@ -42,5 +42,44 @@ describe('askParallelDEPRECATED', () => {
     );
 
     expect(result).toEqual(['first-g', 'second-g']);
+  });
+
+  it('keeps stepping longer stories after shorter ones finish', () => {
+    // Regression: a finished story used to leave a null hole in the batch sent to the
+    // runtime, which crashed the batch processor. The pending action must be batched
+    // alone and its result routed back to the right story.
+    function* shortStory(): AskResponse<string> {
+      return yield* askNewGuid();
+    }
+    function* longStory(): AskResponse<string> {
+      const first = yield* askNewGuid();
+      const second = yield* askNewGuid();
+      return `${first}+${second}`;
+    }
+
+    let guidCount = 0;
+    const result = runStory(askParallelDEPRECATED([[longStory], [shortStory]]), {
+      [GuidActionType.New]: () => `g${++guidCount}`,
+    });
+
+    expect(result).toEqual(['g1+g3', 'g2']);
+  });
+
+  it('propagates a failing action in one of the stories as a thrown error', () => {
+    function* storyA(): AskResponse<number> {
+      return yield* askRandomNumber();
+    }
+    function* storyB(): AskResponse<string> {
+      return yield* askNewGuid();
+    }
+
+    const run = () =>
+      runStory(askParallelDEPRECATED([[storyA], [storyB]]), {
+        [MathActionType.RandomNumber]: 0.5,
+        [GuidActionType.New]: throwsError('GenericError', 'guid service down'),
+      });
+
+    expect(run).toThrow(StoryError);
+    expect(run).toThrow('guid service down');
   });
 });

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { captureRequester } from '../../testing';
+import { captureRequester, runStory, StoryError, throwsError } from '../../testing';
 import { MathActionType } from './MathActionType';
 import { askRandomNumber } from './MathRandomNumberActionRequester';
 
@@ -15,5 +15,15 @@ describe('askRandomNumber', () => {
     const { returned } = captureRequester(askRandomNumber(), 0.42);
 
     expect(returned).toBe(0.42);
+  });
+
+  it('propagates a random number failure as a thrown error', () => {
+    const run = () =>
+      runStory(askRandomNumber(), {
+        [MathActionType.RandomNumber]: throwsError('GenericError', 'entropy source failed'),
+      });
+
+    expect(run).toThrow(StoryError);
+    expect(run).toThrow('entropy source failed');
   });
 });
