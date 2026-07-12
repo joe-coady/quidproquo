@@ -332,6 +332,8 @@ interface StorySession {
   accessToken?: string;        // Auth token (not transferred)
   decodedAccessToken?: DecodedAccessToken; // User info
   context: QpqContext<any>;    // Contextual data
+  localContext?: QpqContext<any>; // Service-local context (never crosses a service boundary)
+  functionGlobals?: Record<string, unknown>; // Globals from the executing function's runtime definition
 }
 ```
 

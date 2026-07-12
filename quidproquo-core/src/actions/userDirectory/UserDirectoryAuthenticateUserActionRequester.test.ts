@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
+import { ErrorActionType } from '../error/ErrorActionType';
 import { UserDirectoryActionType } from './UserDirectoryActionType';
-import { askUserDirectoryAuthenticateUser } from './UserDirectoryAuthenticateUserActionRequester';
+import { askUserDirectoryAuthenticateUser, UserDirectoryAuthenticateUserErrorTypeEnum } from './UserDirectoryAuthenticateUserActionRequester';
 
 describe('askUserDirectoryAuthenticateUser', () => {
   it('yields a standard authentication request carrying email and password', () => {
@@ -33,5 +34,24 @@ describe('askUserDirectoryAuthenticateUser', () => {
     const { returned } = captureRequester(askUserDirectoryAuthenticateUser('pool', false, 'a@b.com', 'pw'), { challenge: 'NONE' });
 
     expect(returned).toEqual({ challenge: 'NONE' });
+  });
+
+  it('throws InvalidPassword when a standard sign-in has no password', () => {
+    const { action } = captureRequester(askUserDirectoryAuthenticateUser('pool', false, 'a@b.com'));
+
+    expect(action).toEqual({
+      type: ErrorActionType.ThrowError,
+      payload: {
+        errorType: UserDirectoryAuthenticateUserErrorTypeEnum.InvalidPassword,
+        errorText: 'Password required',
+        errorStack: undefined,
+      },
+    });
+  });
+
+  it('throws InvalidPassword when a standard sign-in has an empty password', () => {
+    const { action } = captureRequester(askUserDirectoryAuthenticateUser('pool', false, 'a@b.com', ''));
+
+    expect(action.type).toBe(ErrorActionType.ThrowError);
   });
 });

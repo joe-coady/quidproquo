@@ -1,5 +1,6 @@
 import { createErrorEnumForAction } from '../../types';
-import { UserDirectoryActionType } from './UserDirectoryActionType';
+import { askThrowError } from '../error/ErrorThrowErrorActionRequester';
+import { AuthenticateUserResponse, UserDirectoryActionType } from './UserDirectoryActionType';
 import { AuthenticateUserRequest, UserDirectoryAuthenticateUserActionRequester } from './UserDirectoryAuthenticateUserActionTypes';
 
 export const UserDirectoryAuthenticateUserErrorTypeEnum = createErrorEnumForAction(UserDirectoryActionType.AuthenticateUser, [
@@ -13,9 +14,12 @@ export function* askUserDirectoryAuthenticateUser(
   email: string,
   password?: string,
 ): UserDirectoryAuthenticateUserActionRequester {
-  // if (!isCustom && !password) {
-  //   return yield* askThrowError(UserDirectoryAuthenticateUserErrorTypeEnum.InvalidPassword, 'Password required');
-  // }
+  // A standard sign-in without a password can never succeed. Fail fast here so a
+  // missing password is a typed error rather than an undefined value handed to the
+  // identity provider (the dev-server processor would otherwise accept it).
+  if (!isCustom && !password) {
+    return yield* askThrowError<AuthenticateUserResponse>(UserDirectoryAuthenticateUserErrorTypeEnum.InvalidPassword, 'Password required');
+  }
 
   const authenticateUserRequest: AuthenticateUserRequest = isCustom
     ? {

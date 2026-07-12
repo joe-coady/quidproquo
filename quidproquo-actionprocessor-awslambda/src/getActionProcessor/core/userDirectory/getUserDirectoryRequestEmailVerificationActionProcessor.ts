@@ -18,9 +18,9 @@ const getProcessRequestEmailVerification = (qpqConfig: QPQConfig): UserDirectory
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     try {
-      await requestEmailVerificationCode(region, accessToken);
+      const deliveryDetails = await requestEmailVerificationCode(region, accessToken);
 
-      return actionResult(void 0);
+      return actionResult(deliveryDetails);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         NotAuthorizedException: () =>

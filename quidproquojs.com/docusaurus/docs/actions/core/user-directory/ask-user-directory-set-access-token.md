@@ -43,6 +43,7 @@ function* askUserDirectorySetAccessToken(
 ## Notes
 
 - The token is stored on the session only; sessions are not transferred across service boundaries (queues, event buses, service functions), so the identity does not leak beyond the current in-process runtime.
+- A token that cannot be verified (missing, malformed, wrong pool, bad signature, or expired) fails the action with a generic `Unauthorized` error and leaves the session untouched. Catch it with `askCatch` from quidproquo-core when a failed load should not abort the story.
 
 ## Related
 

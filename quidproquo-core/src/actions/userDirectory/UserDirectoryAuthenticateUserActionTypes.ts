@@ -1,4 +1,5 @@
 import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
+import { ErrorThrowErrorAction } from '../error/ErrorThrowErrorActionRequesterTypes';
 import { AuthenticateUserResponse, UserDirectoryActionType } from './UserDirectoryActionType';
 
 export type AuthenticateUserRequest = {
@@ -28,4 +29,9 @@ export interface UserDirectoryAuthenticateUserAction extends Action<UserDirector
 
 // Function Types
 export type UserDirectoryAuthenticateUserActionProcessor = ActionProcessor<UserDirectoryAuthenticateUserAction, AuthenticateUserResponse>;
-export type UserDirectoryAuthenticateUserActionRequester = ActionRequester<UserDirectoryAuthenticateUserAction, AuthenticateUserResponse>;
+// The requester can also yield a ThrowError action: a standard (non custom) sign-in
+// with no password is rejected in the requester before it ever reaches a processor.
+export type UserDirectoryAuthenticateUserActionRequester = ActionRequester<
+  UserDirectoryAuthenticateUserAction | ErrorThrowErrorAction,
+  AuthenticateUserResponse
+>;

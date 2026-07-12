@@ -65,7 +65,7 @@ function* askUserDirectoryAuthenticateUser(
 | `userDirectoryName` | `string` | Name of the directory to authenticate against — must match a directory declared with [defineUserDirectory](../../../config/core/user-directory.md) (or one shared via its `owner` option). |
 | `isCustom` | `boolean` | `false` for a standard email + password sign-in; `true` to start Cognito's custom auth flow (requires a [customAuthRuntime](../../../config/core/user-directory.md#custom-auth-runtime)). When `true`, `password` is not used. |
 | `email` | `string` | The user's email / username. |
-| `password` | `string` | The user's password. Required for a standard (`isCustom: false`) sign-in; omitted for custom auth. |
+| `password` | `string` | The user's password. Required for a standard (`isCustom: false`) sign-in: a missing or empty password throws `InvalidPassword`. Omitted for custom auth. |
 
 ## Returns
 
@@ -98,8 +98,8 @@ interface AuthenticationInfo {
 
 | Error | Meaning |
 | --- | --- |
-| `UserDirectoryAuthenticateUserErrorTypeEnum.UserNotFound` | No user matches the supplied email. |
-| `UserDirectoryAuthenticateUserErrorTypeEnum.InvalidPassword` | The supplied password is incorrect. |
+| `UserDirectoryAuthenticateUserErrorTypeEnum.UserNotFound` | The email or password is incorrect. Unknown users and wrong passwords are deliberately reported the same way so callers cannot probe which accounts exist. |
+| `UserDirectoryAuthenticateUserErrorTypeEnum.InvalidPassword` | A standard (`isCustom: false`) sign-in was attempted without a password. Thrown before the request reaches the identity provider. |
 
 Errors thrown by actions can be caught with `askCatch` from quidproquo-core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 

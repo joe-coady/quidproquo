@@ -1,4 +1,4 @@
-import { getAllEnumValues, getLookupValues } from '../logic/lookup';
+import { getLookupValues } from '../logic/lookup';
 import { Lookup } from './Lookup';
 
 // How important is the log
@@ -49,6 +49,8 @@ export enum LogLevelEnum {
 
 export type LogLevelEnumLookup = Lookup<typeof LogLevelEnum>;
 
-export const allLogLevelEnumValues: LogLevelEnum[] = Object.values(LogLevelEnum) as LogLevelEnum[];
+// Object.values on a numeric enum returns the reverse-mapping names as well as the
+// numbers, so keep only the numeric members.
+export const allLogLevelEnumValues: LogLevelEnum[] = Object.values(LogLevelEnum).filter((value): value is LogLevelEnum => typeof value === 'number');
 
 export const logLevelEnumLookups: LogLevelEnumLookup[] = getLookupValues(LogLevelEnum);

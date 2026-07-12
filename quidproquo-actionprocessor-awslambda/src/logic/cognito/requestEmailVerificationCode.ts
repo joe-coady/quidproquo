@@ -1,3 +1,5 @@
+import { AuthenticationDeliveryDetails } from 'quidproquo-core';
+
 import {
   CognitoIdentityProviderClient,
   GetUserAttributeVerificationCodeCommand,
@@ -6,7 +8,7 @@ import {
 
 import { createAwsClient } from '../createAwsClient';
 
-export const requestEmailVerificationCode = async (region: string, accessToken: string) => {
+export const requestEmailVerificationCode = async (region: string, accessToken: string): Promise<AuthenticationDeliveryDetails> => {
   const cognitoClient = createAwsClient(CognitoIdentityProviderClient, {
     region,
   });
@@ -16,5 +18,13 @@ export const requestEmailVerificationCode = async (region: string, accessToken: 
     AttributeName: 'email', // Request verification for the email attribute
   };
 
-  const requestEmailVerificationCodeResponse = await cognitoClient.send(new GetUserAttributeVerificationCodeCommand(params));
+  const response = await cognitoClient.send(new GetUserAttributeVerificationCodeCommand(params));
+
+  const deliveryInfo = {
+    attributeName: response.CodeDeliveryDetails?.AttributeName || 'email',
+    destination: response.CodeDeliveryDetails?.Destination || 'unknown@email.com',
+    deliveryMedium: response.CodeDeliveryDetails?.DeliveryMedium || 'EMAIL',
+  } as AuthenticationDeliveryDetails;
+
+  return deliveryInfo;
 };

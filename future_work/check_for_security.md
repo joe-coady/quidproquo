@@ -1224,33 +1224,33 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [x] quidproquo-core/src/actions/userDirectory/UserDirectoryGetUserAttributesByUserIdActionRequester.test.ts
 - [x] quidproquo-core/src/actions/userDirectory/UserDirectoryGetUserAttributesByUserIdActionRequester.ts
 - [x] quidproquo-core/src/actions/userDirectory/UserDirectoryGetUserAttributesByUserIdActionTypes.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryGetUsersActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryGetUsersActionRequester.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryGetUsersActionTypes.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryGetUsersByAttributeActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryGetUsersByAttributeActionRequester.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryGetUsersByAttributeActionTypes.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryReadAccessTokenActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryReadAccessTokenActionRequester.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryReadAccessTokenActionTypes.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryRefreshTokenActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryRefreshTokenActionRequester.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryRefreshTokenActionTypes.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryRequestEmailVerificationActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryRequestEmailVerificationActionRequester.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryRequestEmailVerificationActionTypes.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryRespondToAuthChallengeActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryRespondToAuthChallengeActionRequester.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryRespondToAuthChallengeActionTypes.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectorySetAccessTokenActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectorySetAccessTokenActionRequester.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectorySetAccessTokenActionTypes.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectorySetPasswordActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectorySetPasswordActionRequester.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectorySetPasswordActionTypes.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectorySetUserAttributesActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectorySetUserAttributesActionRequester.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectorySetUserAttributesActionTypes.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryGetUsersActionRequester.test.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryGetUsersActionRequester.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryGetUsersActionTypes.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryGetUsersByAttributeActionRequester.test.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryGetUsersByAttributeActionRequester.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryGetUsersByAttributeActionTypes.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryReadAccessTokenActionRequester.test.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryReadAccessTokenActionRequester.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryReadAccessTokenActionTypes.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryRefreshTokenActionRequester.test.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryRefreshTokenActionRequester.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryRefreshTokenActionTypes.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryRequestEmailVerificationActionRequester.test.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryRequestEmailVerificationActionRequester.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryRequestEmailVerificationActionTypes.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryRespondToAuthChallengeActionRequester.test.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryRespondToAuthChallengeActionRequester.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryRespondToAuthChallengeActionTypes.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectorySetAccessTokenActionRequester.test.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectorySetAccessTokenActionRequester.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectorySetAccessTokenActionTypes.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectorySetPasswordActionRequester.test.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectorySetPasswordActionRequester.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectorySetPasswordActionTypes.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectorySetUserAttributesActionRequester.test.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectorySetUserAttributesActionRequester.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectorySetUserAttributesActionTypes.ts
 - [ ] quidproquo-core/src/config/index.ts
 - [ ] quidproquo-core/src/config/QPQConfig.ts
 - [ ] quidproquo-core/src/config/settings/actionProcessors.test.ts
@@ -1506,47 +1506,47 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [ ] quidproquo-core/src/testing/runtimeTesting.ts
 - [ ] quidproquo-core/src/testing/storyTesting.test.ts
 - [ ] quidproquo-core/src/testing/storyTesting.ts
-- [ ] quidproquo-core/src/types/Action.ts
-- [ ] quidproquo-core/src/types/authChallenge/CreateAuthChallengeEvent.ts
-- [ ] quidproquo-core/src/types/authChallenge/DefineAuthChallengeEvent.ts
-- [ ] quidproquo-core/src/types/authChallenge/index.ts
-- [ ] quidproquo-core/src/types/authChallenge/types/ChallengeResult.ts
-- [ ] quidproquo-core/src/types/authChallenge/types/ChallengeSession.ts
-- [ ] quidproquo-core/src/types/authChallenge/types/index.ts
-- [ ] quidproquo-core/src/types/authChallenge/VerifyAuthChallengeEvent.ts
-- [ ] quidproquo-core/src/types/BoundLogicStory.ts
-- [ ] quidproquo-core/src/types/ConfigUrlDefinition.ts
-- [ ] quidproquo-core/src/types/CrossModuleMessage.ts
-- [ ] quidproquo-core/src/types/CrossModuleOwner.ts
-- [ ] quidproquo-core/src/types/CrossServiceResourceName.ts
-- [ ] quidproquo-core/src/types/DecomposedString.ts
-- [ ] quidproquo-core/src/types/DeployEvent.ts
-- [ ] quidproquo-core/src/types/DynamicModuleLoader.ts
-- [ ] quidproquo-core/src/types/ErrorTypeEnum.ts
-- [ ] quidproquo-core/src/types/EventMessage.ts
-- [ ] quidproquo-core/src/types/ExcludeKeys.ts
-- [ ] quidproquo-core/src/types/FullyQualifiedResource.ts
-- [ ] quidproquo-core/src/types/index.ts
-- [ ] quidproquo-core/src/types/KeyOf.ts
-- [ ] quidproquo-core/src/types/LogLevelEnum.ts
-- [ ] quidproquo-core/src/types/Lookup.ts
-- [ ] quidproquo-core/src/types/NotifyErrorQueueEvent.ts
-- [ ] quidproquo-core/src/types/Nullable.ts
-- [ ] quidproquo-core/src/types/QPQBinaryData.ts
-- [ ] quidproquo-core/src/types/QpqContextIdentifier.ts
-- [ ] quidproquo-core/src/types/QpqExecutionTrace.ts
-- [ ] quidproquo-core/src/types/QpqFunctionRuntime.ts
-- [ ] quidproquo-core/src/types/QpqIsoDateTime.ts
-- [ ] quidproquo-core/src/types/QpqLogger.ts
-- [ ] quidproquo-core/src/types/QpqPagedData.ts
-- [ ] quidproquo-core/src/types/QueueEvent.ts
-- [ ] quidproquo-core/src/types/Readonlyify.ts
-- [ ] quidproquo-core/src/types/ScheduledEvent.ts
-- [ ] quidproquo-core/src/types/StorySession.ts
-- [ ] quidproquo-core/src/types/StreamRegistry.ts
-- [ ] quidproquo-core/src/types/UnboundLogicStory.ts
-- [ ] quidproquo-core/src/types/utils/createErrorEnumForAction.ts
-- [ ] quidproquo-core/src/types/utils/index.ts
+- [x] quidproquo-core/src/types/Action.ts
+- [x] quidproquo-core/src/types/authChallenge/CreateAuthChallengeEvent.ts
+- [x] quidproquo-core/src/types/authChallenge/DefineAuthChallengeEvent.ts
+- [x] quidproquo-core/src/types/authChallenge/index.ts
+- [x] quidproquo-core/src/types/authChallenge/types/ChallengeResult.ts
+- [x] quidproquo-core/src/types/authChallenge/types/ChallengeSession.ts
+- [x] quidproquo-core/src/types/authChallenge/types/index.ts
+- [x] quidproquo-core/src/types/authChallenge/VerifyAuthChallengeEvent.ts
+- [x] quidproquo-core/src/types/BoundLogicStory.ts
+- [x] quidproquo-core/src/types/ConfigUrlDefinition.ts
+- [x] quidproquo-core/src/types/CrossModuleMessage.ts
+- [x] quidproquo-core/src/types/CrossModuleOwner.ts
+- [x] quidproquo-core/src/types/CrossServiceResourceName.ts
+- [x] quidproquo-core/src/types/DecomposedString.ts
+- [x] quidproquo-core/src/types/DeployEvent.ts
+- [x] quidproquo-core/src/types/DynamicModuleLoader.ts
+- [x] quidproquo-core/src/types/ErrorTypeEnum.ts
+- [x] quidproquo-core/src/types/EventMessage.ts
+- [x] quidproquo-core/src/types/ExcludeKeys.ts
+- [x] quidproquo-core/src/types/FullyQualifiedResource.ts
+- [x] quidproquo-core/src/types/index.ts
+- [x] quidproquo-core/src/types/KeyOf.ts
+- [x] quidproquo-core/src/types/LogLevelEnum.ts
+- [x] quidproquo-core/src/types/Lookup.ts
+- [x] quidproquo-core/src/types/NotifyErrorQueueEvent.ts
+- [x] quidproquo-core/src/types/Nullable.ts
+- [x] quidproquo-core/src/types/QPQBinaryData.ts
+- [x] quidproquo-core/src/types/QpqContextIdentifier.ts
+- [x] quidproquo-core/src/types/QpqExecutionTrace.ts
+- [x] quidproquo-core/src/types/QpqFunctionRuntime.ts
+- [x] quidproquo-core/src/types/QpqIsoDateTime.ts
+- [x] quidproquo-core/src/types/QpqLogger.ts
+- [x] quidproquo-core/src/types/QpqPagedData.ts
+- [x] quidproquo-core/src/types/QueueEvent.ts
+- [x] quidproquo-core/src/types/Readonlyify.ts
+- [x] quidproquo-core/src/types/ScheduledEvent.ts
+- [x] quidproquo-core/src/types/StorySession.ts
+- [x] quidproquo-core/src/types/StreamRegistry.ts
+- [x] quidproquo-core/src/types/UnboundLogicStory.ts
+- [x] quidproquo-core/src/types/utils/createErrorEnumForAction.ts
+- [x] quidproquo-core/src/types/utils/index.ts
 - [ ] quidproquo-core/src/utils/array/index.ts
 - [ ] quidproquo-core/src/utils/array/zipArrays.test.ts
 - [ ] quidproquo-core/src/utils/array/zipArrays.ts

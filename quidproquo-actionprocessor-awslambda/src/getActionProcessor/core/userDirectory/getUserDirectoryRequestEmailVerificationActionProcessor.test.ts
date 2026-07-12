@@ -1,5 +1,5 @@
 import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { buildTestQpqConfig, UserDirectoryActionType } from 'quidproquo-core';
+import { buildTestQpqConfig, UserDirectoryActionType, UserDirectoryRequestEmailVerificationErrorTypeEnum } from 'quidproquo-core';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -17,17 +17,49 @@ const resolveProcessor = async () => {
   return processors[UserDirectoryActionType.RequestEmailVerification];
 };
 
+// Builds an error shaped like an AWS SDK failure, whose `name` drives the
+// processor's actionResultErrorFromCaughtError mapping.
+const buildAwsError = (name: string): Error => {
+  const error = new Error(name);
+  error.name = name;
+  return error;
+};
+
 describe('getUserDirectoryRequestEmailVerificationActionProcessor', () => {
   beforeEach(() => {
     vi.mocked(requestEmailVerificationCode).mockReset();
   });
 
-  it('requests an email verification code for the access token', async () => {
+  it('requests a code for the access token and returns the delivery details', async () => {
+    vi.mocked(requestEmailVerificationCode).mockResolvedValue({
+      attributeName: 'email',
+      deliveryMedium: 'EMAIL',
+      destination: 'a***@b.com',
+    });
     const processor = await resolveProcessor();
 
-    const result = await invokeProcessor(processor, { userDirectoryName: 'users', accessToken: 'tok' });
+    const [details, error] = await invokeProcessor(processor, { userDirectoryName: 'users', accessToken: 'tok' });
 
-    expect(result).toEqual([undefined]);
+    expect(error).toBeUndefined();
+    expect(details).toEqual({ attributeName: 'email', deliveryMedium: 'EMAIL', destination: 'a***@b.com' });
     expect(requestEmailVerificationCode).toHaveBeenCalledWith('eu-west-1', 'tok');
+  });
+
+  it('maps NotAuthorizedException to the Unauthorized error', async () => {
+    vi.mocked(requestEmailVerificationCode).mockRejectedValue(buildAwsError('NotAuthorizedException'));
+    const processor = await resolveProcessor();
+
+    const [, error] = await invokeProcessor(processor, { userDirectoryName: 'users', accessToken: 'bad' });
+
+    expect(error?.errorType).toBe(UserDirectoryRequestEmailVerificationErrorTypeEnum.Unauthorized);
+  });
+
+  it('maps CodeDeliveryFailureException to the CodeDeliveryFailed error', async () => {
+    vi.mocked(requestEmailVerificationCode).mockRejectedValue(buildAwsError('CodeDeliveryFailureException'));
+    const processor = await resolveProcessor();
+
+    const [, error] = await invokeProcessor(processor, { userDirectoryName: 'users', accessToken: 'tok' });
+
+    expect(error?.errorType).toBe(UserDirectoryRequestEmailVerificationErrorTypeEnum.CodeDeliveryFailed);
   });
 });
