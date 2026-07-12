@@ -33,4 +33,23 @@ describe('askDecodeJson', () => {
     expect(result.success).toBe(false);
     expect((result as { error: { errorType: string } }).error.errorType).toBe(ErrorTypeEnum.Invalid);
   });
+
+  it('reports a throwing validator as a validation problem, not a parse failure', () => {
+    const explodingValidator = () => {
+      throw new Error('validator exploded');
+    };
+
+    function* story(): AskResponse<EitherActionResult<{ a: number }>> {
+      return yield* askCatch(askDecodeJson<{ a: number }>('{"a":1}', explodingValidator));
+    }
+
+    const result = runStory(story());
+    expect(result.success).toBe(false);
+
+    const error = (result as { error: { errorType: string; errorText: string } }).error;
+    expect(error.errorType).toBe(ErrorTypeEnum.Invalid);
+    expect(error.errorText).toContain('validation function threw');
+    expect(error.errorText).toContain('validator exploded');
+    expect(error.errorText).not.toContain('Failed to parse JSON');
+  });
 });

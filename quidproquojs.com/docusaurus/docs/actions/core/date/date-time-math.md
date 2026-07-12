@@ -20,7 +20,7 @@ export function* askSevenDaysFromNow() {
 ```
 
 :::note
-Pass a negative amount to move backward in time, e.g. `addDaysToTDateIso(now, -7)` returns the timestamp seven days ago. All helpers accept and return a plain `string`; the returned value is always normalised to UTC (`...Z`) by `toISOString()`.
+Pass a negative amount to move backward in time, e.g. `addDaysToTDateIso(now, -7)` returns the timestamp seven days ago. All helpers accept and return a plain `string`; the returned value is always normalised to UTC (`...Z`) by `toISOString()`. The arithmetic itself uses the UTC `Date` accessors, so the result never depends on the server's local timezone or its DST transitions.
 :::
 
 ## addMillisecondsToTDateIso
@@ -66,7 +66,7 @@ function addMonthsToTDateIso(startDate: string, numMonths: number): string;
 | `startDate` | `string` | The ISO-8601 timestamp to shift from. |
 | `numMonths` | `number` | Months to add (negative to subtract). |
 
-Returns a `string` — the shifted timestamp in UTC ISO-8601 form. Uses JavaScript's `Date.setMonth`, so day-of-month overflow rolls over: adding one month to `2026-01-31` yields early March, since February has no 31st.
+Returns a `string` — the shifted timestamp in UTC ISO-8601 form. Uses JavaScript's `Date.setUTCMonth`, so day-of-month overflow rolls over: adding one month to `2026-01-31` yields early March, since February has no 31st.
 
 ## addYearsToTDateIso
 

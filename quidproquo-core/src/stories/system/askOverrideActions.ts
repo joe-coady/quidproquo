@@ -15,6 +15,13 @@ export type ActionOverrideMap = {
   [actionType: string]: ActionOverrideHandler<any, any>;
 };
 
+// Looks up a handler as an OWN property of the override map. A plain-object map inherits from
+// Object.prototype, so an action type like "toString" or "constructor" would otherwise resolve
+// to an inherited function and get invoked as a handler.
+function getOwnOverrideHandler(overrides: ActionOverrideMap, actionType: string): ActionOverrideHandler | undefined {
+  return Object.prototype.hasOwnProperty.call(overrides, actionType) ? overrides[actionType] : undefined;
+}
+
 // A tiny helper story that just yields a single action and returns whatever the processor gives back.
 // We use this to wrap individual actions so we can pass them into askOverrideActions recursively.
 // For example, when we pull an action out of a batch, we wrap it in this so askOverrideActions
@@ -71,7 +78,8 @@ export function* askOverrideActions<T extends AskResponse<any>>(
 
     // Check if we have an override for this specific action type, or a "*" wildcard catch-all.
     // The specific type takes priority over the wildcard because we check it first.
-    const handler = overrides[action.type] || (action.type !== SystemActionType.Batch ? overrides['*'] : undefined);
+    const handler =
+      getOwnOverrideHandler(overrides, action.type) || (action.type !== SystemActionType.Batch ? getOwnOverrideHandler(overrides, '*') : undefined);
     if (handler) {
       // We have an override! Run the user's handler instead of letting the runtime process it.
       // The handler is itself a story (generator), so we yield* into it to run it.
@@ -99,7 +107,7 @@ export function* askOverrideActions<T extends AskResponse<any>>(
       // or if we can leave it for the runtime to process in the remaining batch.
       const batchActionsToRun = yield* askMapParallel(batchActionPayload.actions, function* (batchAction) {
         // Does this individual action have an override handler (specific type or wildcard)?
-        const isOverridden = !!(overrides[batchAction.type] || overrides['*']);
+        const isOverridden = !!(getOwnOverrideHandler(overrides, batchAction.type) || getOwnOverrideHandler(overrides, '*'));
 
         // Is this individual action itself another batch? If so, it could contain overridden
         // actions deeper inside, so we need to recurse into it even though we don't override
@@ -119,9 +127,15 @@ export function* askOverrideActions<T extends AskResponse<any>>(
           // If we need to process it, wrap the action in askProcessAction (which makes it look
           // like a story that yields one action) and run it through askOverrideActions recursively.
           // This handles both direct overrides and nested batches-within-batches.
+          //
+          // The recursion is wrapped in askCatch so a failing sub-action becomes a captured
+          // failure for THIS slot instead of escaping bare and bypassing the enclosing batch's
+          // returnErrors protection. All slot results are held as EitherActionResults; the
+          // successful ones are unwrapped when the batch is reassembled below.
+          //
           // If we don't need to process it, leave the result undefined for now - the runtime
           // will fill it in when we send the remaining batch.
-          result: needsRecursion ? yield* askOverrideActions(askProcessAction(batchAction), overrides) : undefined,
+          result: needsRecursion ? yield* askCatch(askOverrideActions(askProcessAction(batchAction), overrides)) : undefined,
         };
       });
 
@@ -136,32 +150,36 @@ export function* askOverrideActions<T extends AskResponse<any>>(
       const results = yield* askCatch(askBatch(remainingBatchActionsToRun.map((ba) => ba.action)));
 
       // If the batch succeeded, take each result from the runtime and attach it to the
-      // corresponding action object, so we can reassemble the full results array later.
+      // corresponding action object (wrapped so every slot holds an EitherActionResult),
+      // so we can reassemble the full results array later.
       if (results.success) {
         remainingBatchActionsToRun.forEach((ba, index) => {
-          ba.result = results.result[index];
+          ba.result = getSuccessfulEitherActionResult(results.result[index]);
         });
       }
 
-      // Reassemble the full results array in the original order.
-      // This combines the results from overridden actions (which we computed above)
-      // with the results from the runtime batch (which we just attached).
-      // The story that yielded the batch expects results in the same order as the original actions.
-      const allResults = batchActionsToRun.map((ba) => ba.result);
+      // One failure fails the whole batch, matching the runtime's batch semantics: a runtime
+      // batch failure wins, otherwise the first captured failure from an overridden slot.
+      const isFailedSlotResult = (slotResult: EitherActionResult<any> | undefined): slotResult is EitherActionResult<any> & { success: false } =>
+        slotResult !== undefined && !slotResult.success;
+      const failedResult = !results.success ? results : batchActionsToRun.map((ba) => ba.result).find(isFailedSlotResult);
 
-      // If the runtime batch failed (one of the non-overridden actions errored)
-      if (!results.success) {
+      // If any sub-action failed (in the runtime batch or in an overridden slot)
+      if (failedResult) {
         // Check if the caller wants errors returned as values (askCatch set returnErrors: true)
         if (!action.returnErrors) {
           // No askCatch protecting this, so throw the error up to crash the story
-          return yield* askThrowError(results.error.errorType, results.error.errorText, results.error.errorStack);
+          return yield* askThrowError(failedResult.error.errorType, failedResult.error.errorText, failedResult.error.errorStack);
         } else {
           // askCatch is protecting this, so pass the error back as a value
-          nextResult = storyIterator.next(results);
+          nextResult = storyIterator.next(failedResult);
         }
       } else {
-        // Everything succeeded! Pass all the results back to the story.
-        // Wrap in either result if needed (same returnErrors logic as the single action case above).
+        // Everything succeeded! Reassemble the results in the original order, unwrapping each
+        // slot's EitherActionResult back to its raw value, then wrap the whole array for the
+        // caller if needed (same returnErrors logic as the single action case above).
+        const allResults = batchActionsToRun.map((ba) => ba.result?.result);
+
         nextResult = storyIterator.next(getSuccessfulEitherActionResultIfRequired(allResults, action.returnErrors));
       }
 

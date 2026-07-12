@@ -26,9 +26,23 @@ const TextFileTypeMimeTypeMap: { [key in TextFileType]: string } = {
   [TextFileType.Rtf]: 'application/rtf',
 };
 
+// Base64-encode a string's UTF-8 bytes using web globals (TextEncoder/btoa) rather than
+// Node's Buffer, so this also works in browser bundles of quidproquo-core. Mirrors the
+// decode direction in StreamReadRequester, which already uses atob.
+const encodeUtf8ToBase64 = (textData: string): string => {
+  const utf8Bytes = new TextEncoder().encode(textData);
+
+  let binary = '';
+  for (let i = 0; i < utf8Bytes.length; i++) {
+    binary += String.fromCharCode(utf8Bytes[i]);
+  }
+
+  return btoa(binary);
+};
+
 export function* askCreateTextQpqBinaryData(textData: string, filename: string, fileType: TextFileType): AskResponse<QPQBinaryData> {
   const binaryData: QPQBinaryData = {
-    base64Data: Buffer.from(textData, 'utf-8').toString('base64'),
+    base64Data: encodeUtf8ToBase64(textData),
     filename: filename,
     mimetype: TextFileTypeMimeTypeMap[fileType],
   };

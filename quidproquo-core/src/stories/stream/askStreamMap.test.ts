@@ -1,9 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { StreamActionType } from '../../actions/stream/StreamActionType';
-import { runStory } from '../../testing/storyTesting';
+import { expectError, runStory, StoryError, throwsError } from '../../testing/storyTesting';
 import { AskResponse } from '../../types';
 import { StreamChunk, StreamHandle } from '../../types/StreamRegistry';
+import { askCatch } from '../system/askCatch';
 import { askStreamMap } from './askStreamMap';
 
 const handle: StreamHandle<'text', string> = { id: 'stream-1', encoding: 'text' };
@@ -48,5 +49,51 @@ describe('askStreamMap', () => {
     });
 
     expect(result).toEqual([]);
+  });
+
+  it('closes the stream and rethrows when a read fails', () => {
+    const close = vi.fn();
+
+    expect(() =>
+      runStory(askStreamMap(handle), {
+        [StreamActionType.Read]: throwsError('GenericError', 'source went away'),
+        [StreamActionType.Close]: close,
+      }),
+    ).toThrow(StoryError);
+
+    expect(close).toHaveBeenCalledTimes(1);
+  });
+
+  it('closes the stream and rethrows when the callback fails', () => {
+    const close = vi.fn();
+
+    function* failingCallback(): AskResponse<string> {
+      throw new Error('callback exploded');
+    }
+
+    expect(() =>
+      runStory(askStreamMap(handle, failingCallback), {
+        [StreamActionType.Read]: readsFrom([{ done: false, data: 'a' }, { done: true }]),
+        [StreamActionType.Close]: close,
+      }),
+    ).toThrow('callback exploded');
+
+    expect(close).toHaveBeenCalledTimes(1);
+  });
+
+  it('surfaces a read failure to a surrounding askCatch with the original error, after closing', () => {
+    const close = vi.fn();
+
+    function* story(): AskResponse<any> {
+      return yield* askCatch(askStreamMap(handle));
+    }
+
+    const result = runStory(story(), {
+      [StreamActionType.Read]: throwsError('GenericError', 'source went away'),
+      [StreamActionType.Close]: close,
+    });
+
+    expect(expectError(result).errorText).toBe('source went away');
+    expect(close).toHaveBeenCalledTimes(1);
   });
 });

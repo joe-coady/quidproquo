@@ -11,6 +11,14 @@ export function isValidKvsAdvancedDataType(value: any): value is KvsAdvancedData
   }
 
   if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+    // Only plain objects count. A class instance (Date, Map, ...) often has no
+    // enumerable own values, so it would otherwise slip through as an "empty"
+    // object and get stored as {}.
+    const proto = Object.getPrototypeOf(value);
+    if (proto !== Object.prototype && proto !== null) {
+      return false;
+    }
+
     // Check if every value in the object is a KvsBasicDataType (recursive structures not allowed here)
     return Object.values(value).every((v) => typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean');
   }

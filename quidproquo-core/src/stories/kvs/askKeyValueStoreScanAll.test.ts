@@ -25,4 +25,25 @@ describe('askKeyValueStoreScanAll', () => {
 
     expect(result).toEqual([]);
   });
+
+  it('forwards the options (including scope) on every paginated scan', () => {
+    const scopes: string[] = [];
+    const pages: Record<string, QpqPagedData<number>> = {
+      start: { items: [1], nextPageKey: 'next' },
+      next: { items: [2] },
+    };
+
+    // Record the scope of each page request so we can prove none of them dropped it
+    const scanRecordingScope = (action: KeyValueStoreScanAction) => {
+      scopes.push(action.payload.options?.scope ?? '(none)');
+      return pages[action.payload.nextPageKey ?? 'start'];
+    };
+
+    const result = runStory(askKeyValueStoreScanAll('items', undefined, { scope: 'tenant-a' }), {
+      [KeyValueStoreActionType.Scan]: scanRecordingScope,
+    });
+
+    expect(result).toEqual([1, 2]);
+    expect(scopes).toEqual(['tenant-a', 'tenant-a']);
+  });
 });

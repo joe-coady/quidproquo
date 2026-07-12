@@ -29,6 +29,7 @@ export function* askAllSuspendedUsers() {
 function* askKeyValueStoreScanAll<T>(
   storeName: string,
   filterCondition?: KvsQueryOperation,
+  options?: KeyValueStoreScanOptions,
 ): AskResponse<T[]>;
 ```
 
@@ -38,6 +39,7 @@ function* askKeyValueStoreScanAll<T>(
 | --- | --- | --- |
 | `storeName` | `string` | Name of the store to scan — must match a store declared with [defineKeyValueStore](../../../config/core/key-value-store.md). |
 | `filterCondition` | `KvsQueryOperation` | Optional filter applied to every scanned record — see [Query conditions](./ask-key-value-store-query.md#query-conditions-kvsqueryoperation). Omit it to return every record. |
+| `options` | `KeyValueStoreScanOptions` | Optional scan options, forwarded to the underlying scan on **every** page (see [`KeyValueStoreScanOptions`](./ask-key-value-store-scan.md#keyvaluestorescanoptions)). In particular `scope` restricts every page to records written under that storage scope. |
 
 ## Returns
 

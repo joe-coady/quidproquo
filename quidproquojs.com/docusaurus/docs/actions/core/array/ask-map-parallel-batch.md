@@ -45,8 +45,8 @@ function* askMapParallelBatch<T, R>(
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |
 | `items` | `T[]` | — | The array to iterate. |
-| `numBatch` | `number` | — | Batch size — the maximum number of items that run **concurrently** at once. The array is consumed `numBatch` items at a time; each slice runs in parallel and must finish before the next slice begins. |
-| `askCallback` | `(item: T, index: number, srcArray: T[]) => AskResponse<R>` | — | A generator called once per item. Receives the item, its zero-based index, and the source array. |
+| `numBatch` | `number` | — | Batch size — the maximum number of items that run **concurrently** at once. The array is consumed `numBatch` items at a time; each slice runs in parallel and must finish before the next slice begins. Must be at least `1`; anything lower (including `NaN`) throws an `InvalidBatchSizeError` (code `notPositive`) rather than looping forever. |
+| `askCallback` | `(item: T, index: number, srcArray: T[]) => AskResponse<R>` | — | A generator called once per item. Receives the item, its zero-based index in the **original** `items` array, and the original array itself (not the batch slice). |
 | `delayAfterEachBatchMs` | `number` | `0` | Optional pause (in milliseconds) inserted **after every batch**, including the last. When greater than `0`, the helper `yield*`s [askDelay](../platform/ask-delay.md) between batches — useful for spacing out calls to a throttled service. |
 
 ## Returns

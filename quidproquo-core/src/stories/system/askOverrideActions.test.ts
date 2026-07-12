@@ -418,6 +418,22 @@ describe('askOverrideActions', () => {
       expect(threwError).toEqual({ errorType: 'GenericError', errorText: 'Date service down' });
     });
 
+    it('captures the failure of an overridden (relayed) batch action under askCatch', () => {
+      function* story(): AskResponse<EitherActionResult<[number, string]>> {
+        return yield* askCatch(askRunParallel([askRandomNumber(), askDateNow()]));
+      }
+
+      // The relayed RandomNumber fails at the runtime. Before the slot-level askCatch fix the
+      // failure escaped the batch's returnErrors protection and killed the whole story.
+      const { result, threwError } = runWithRuntime(askOverrideActions(story(), { [MathActionType.RandomNumber]: relay }), {
+        ...defaultResponses,
+        [MathActionType.RandomNumber]: respondError('GenericError', 'random service down'),
+      });
+
+      expect(threwError).toBeUndefined();
+      expect(result).toEqual({ success: false, error: { errorType: 'GenericError', errorText: 'random service down' } });
+    });
+
     it('passes a batch failure back to the story when wrapped in askCatch', () => {
       function* story(): AskResponse<EitherActionResult<[number, string]>> {
         return yield* askCatch(askRunParallel([askRandomNumber(), askDateNow()]));
@@ -843,6 +859,32 @@ describe('askOverrideActions', () => {
       const { result } = runWithRuntime(askOverrideActions(story(), {}), defaultResponses);
 
       expect(result).toEqual([MOCK_RANDOM]);
+    });
+
+    it('does not treat Object.prototype members as override handlers', () => {
+      // An action type that collides with an inherited object member must pass through to the
+      // runtime, not invoke Object.prototype.toString as a "handler".
+      function* story(): AskResponse<string> {
+        return (yield { type: 'toString' }) as string;
+      }
+
+      const { result, runtimeActions } = runWithRuntime(askOverrideActions(story(), {}), { toString: 'runtime-answer' });
+
+      expect(result).toBe('runtime-answer');
+      expect(runtimeActions).toEqual([{ type: 'toString' }]);
+    });
+
+    it('does not treat Object.prototype members as override handlers inside a batch', () => {
+      function* subStory(): AskResponse<string> {
+        return (yield { type: 'constructor' }) as string;
+      }
+      function* story(): AskResponse<[string, number]> {
+        return yield* askRunParallel([subStory(), askRandomNumber()]);
+      }
+
+      const { result } = runWithRuntime(askOverrideActions(story(), {}), { constructor: 'runtime-answer', ...defaultResponses });
+
+      expect(result).toEqual(['runtime-answer', MOCK_RANDOM]);
     });
 
     it('handles a large batch with partial overrides', () => {

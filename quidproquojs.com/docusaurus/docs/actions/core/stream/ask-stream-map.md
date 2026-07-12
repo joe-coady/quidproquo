@@ -61,7 +61,7 @@ function* askStreamMap<E extends StreamEncoding, T, R = StreamDataType<E, T>>(
 ## Notes
 
 - The `index` counts only chunks handed to your callback — chunks that are `skipped` or carry no `data` are dropped and do not advance it.
-- The handle is closed for you when the loop ends.
+- The handle is closed for you when the loop ends. This includes failures: when a read or your callback fails, the stream is closed first and the original error is then rethrown, so a surrounding [askCatch](../system/ask-catch.md) can handle it without leaking the stream.
 - Because it buffers the entire stream in memory, prefer [askStreamProcess](./ask-stream-process.md) when you only need to react to each chunk and don't need the full list.
 
 ## Related

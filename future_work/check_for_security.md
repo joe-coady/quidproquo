@@ -1419,87 +1419,88 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [x] quidproquo-core/src/runtime/resolveStory.ts
 - [x] quidproquo-core/src/runtime/resolveStoryWithLogs.test.ts
 - [x] quidproquo-core/src/runtime/resolveStoryWithLogs.ts
-- [ ] quidproquo-core/src/stories/array/askArraySome.test.ts
-- [ ] quidproquo-core/src/stories/array/askArraySome.ts
-- [ ] quidproquo-core/src/stories/array/askFilter.test.ts
-- [ ] quidproquo-core/src/stories/array/askFilter.ts
-- [ ] quidproquo-core/src/stories/array/askFlatMap.test.ts
-- [ ] quidproquo-core/src/stories/array/askFlatMap.ts
-- [ ] quidproquo-core/src/stories/array/askFlatMapParallelBatch.test.ts
-- [ ] quidproquo-core/src/stories/array/askFlatMapParallelBatch.ts
-- [ ] quidproquo-core/src/stories/array/askMap.test.ts
-- [ ] quidproquo-core/src/stories/array/askMap.ts
-- [ ] quidproquo-core/src/stories/array/askMapParallel.ts
-- [ ] quidproquo-core/src/stories/array/askMapParallelBatch.test.ts
-- [ ] quidproquo-core/src/stories/array/askMapParallelBatch.ts
-- [ ] quidproquo-core/src/stories/array/askReduce.test.ts
-- [ ] quidproquo-core/src/stories/array/askReduce.ts
-- [ ] quidproquo-core/src/stories/array/index.ts
-- [ ] quidproquo-core/src/stories/askGetApplicationVersion.test.ts
-- [ ] quidproquo-core/src/stories/askGetApplicationVersion.ts
-- [ ] quidproquo-core/src/stories/askProcessEvent.test.ts
-- [ ] quidproquo-core/src/stories/askProcessEvent.ts
-- [ ] quidproquo-core/src/stories/askRetry.test.ts
-- [ ] quidproquo-core/src/stories/askRetry.ts
-- [ ] quidproquo-core/src/stories/binaryData/askCreateBinaryData.test.ts
-- [ ] quidproquo-core/src/stories/binaryData/askCreateBinaryData.ts
-- [ ] quidproquo-core/src/stories/binaryData/index.ts
-- [ ] quidproquo-core/src/stories/context/askContextProvideValue.test.ts
-- [ ] quidproquo-core/src/stories/context/askContextProvideValue.ts
-- [ ] quidproquo-core/src/stories/context/index.ts
-- [ ] quidproquo-core/src/stories/dateTime/addTime/addDayMonthYearToTDateIso.test.ts
-- [ ] quidproquo-core/src/stories/dateTime/addTime/addDayMonthYearToTDateIso.ts
-- [ ] quidproquo-core/src/stories/dateTime/addTime/addDaysToTDateIso.test.ts
-- [ ] quidproquo-core/src/stories/dateTime/addTime/addDaysToTDateIso.ts
-- [ ] quidproquo-core/src/stories/dateTime/addTime/addMillisecondsToTDateIso.test.ts
-- [ ] quidproquo-core/src/stories/dateTime/addTime/addMillisecondsToTDateIso.ts
-- [ ] quidproquo-core/src/stories/dateTime/addTime/addMonthsToTDateIso.ts
-- [ ] quidproquo-core/src/stories/dateTime/addTime/addYearsToTDateIso.test.ts
-- [ ] quidproquo-core/src/stories/dateTime/addTime/addYearsToTDateIso.ts
-- [ ] quidproquo-core/src/stories/dateTime/addTime/index.ts
-- [ ] quidproquo-core/src/stories/dateTime/askGetCurrentEpoch.test.ts
-- [ ] quidproquo-core/src/stories/dateTime/askGetCurrentEpoch.ts
-- [ ] quidproquo-core/src/stories/dateTime/askGetCurrentEpochMs.test.ts
-- [ ] quidproquo-core/src/stories/dateTime/askGetCurrentEpochMs.ts
-- [ ] quidproquo-core/src/stories/dateTime/askGetEpochStartTime.test.ts
-- [ ] quidproquo-core/src/stories/dateTime/askGetEpochStartTime.ts
-- [ ] quidproquo-core/src/stories/dateTime/askSecondsElapsedFrom.test.ts
-- [ ] quidproquo-core/src/stories/dateTime/askSecondsElapsedFrom.ts
-- [ ] quidproquo-core/src/stories/dateTime/index.ts
-- [ ] quidproquo-core/src/stories/index.ts
-- [ ] quidproquo-core/src/stories/json/askDecodeJson.test.ts
-- [ ] quidproquo-core/src/stories/json/askDecodeJson.ts
-- [ ] quidproquo-core/src/stories/json/index.ts
-- [ ] quidproquo-core/src/stories/kvs/askKeyValueStoreQueryAll.test.ts
-- [ ] quidproquo-core/src/stories/kvs/askKeyValueStoreQueryAll.ts
-- [ ] quidproquo-core/src/stories/kvs/askKeyValueStoreQuerySingle.test.ts
-- [ ] quidproquo-core/src/stories/kvs/askKeyValueStoreQuerySingle.ts
-- [ ] quidproquo-core/src/stories/kvs/askKeyValueStoreScanAll.test.ts
-- [ ] quidproquo-core/src/stories/kvs/askKeyValueStoreScanAll.ts
-- [ ] quidproquo-core/src/stories/kvs/askKeyValueStoreUpdatePartialProperties.test.ts
-- [ ] quidproquo-core/src/stories/kvs/askKeyValueStoreUpdatePartialProperties.ts
-- [ ] quidproquo-core/src/stories/kvs/askKeyValueStoreUpsertWithRetry.test.ts
-- [ ] quidproquo-core/src/stories/kvs/askKeyValueStoreUpsertWithRetry.ts
-- [ ] quidproquo-core/src/stories/kvs/index.ts
-- [ ] quidproquo-core/src/stories/kvs/utils/index.ts
-- [ ] quidproquo-core/src/stories/kvs/utils/isValidKvsAdvancedDataType.test.ts
-- [ ] quidproquo-core/src/stories/kvs/utils/isValidKvsAdvancedDataType.ts
-- [ ] quidproquo-core/src/stories/state/askReduceState.test.ts
-- [ ] quidproquo-core/src/stories/state/askReduceState.ts
-- [ ] quidproquo-core/src/stories/state/index.ts
-- [ ] quidproquo-core/src/stories/stream/askStreamMap.test.ts
-- [ ] quidproquo-core/src/stories/stream/askStreamMap.ts
-- [ ] quidproquo-core/src/stories/stream/askStreamProcess.test.ts
-- [ ] quidproquo-core/src/stories/stream/askStreamProcess.ts
-- [ ] quidproquo-core/src/stories/stream/index.ts
-- [ ] quidproquo-core/src/stories/system/askCatch.test.ts
-- [ ] quidproquo-core/src/stories/system/askCatch.ts
-- [ ] quidproquo-core/src/stories/system/askExecuteIf.test.ts
-- [ ] quidproquo-core/src/stories/system/askExecuteIf.ts
-- [ ] quidproquo-core/src/stories/system/askOverrideActions.test.ts
-- [ ] quidproquo-core/src/stories/system/askOverrideActions.ts
-- [ ] quidproquo-core/src/stories/system/askRunParallel.ts
-- [ ] quidproquo-core/src/stories/system/index.ts
+- [x] quidproquo-core/src/stories/array/askArraySome.test.ts
+- [x] quidproquo-core/src/stories/array/askArraySome.ts
+- [x] quidproquo-core/src/stories/array/askFilter.test.ts
+- [x] quidproquo-core/src/stories/array/askFilter.ts
+- [x] quidproquo-core/src/stories/array/askFlatMap.test.ts
+- [x] quidproquo-core/src/stories/array/askFlatMap.ts
+- [x] quidproquo-core/src/stories/array/askFlatMapParallelBatch.test.ts
+- [x] quidproquo-core/src/stories/array/askFlatMapParallelBatch.ts
+- [x] quidproquo-core/src/stories/array/askMap.test.ts
+- [x] quidproquo-core/src/stories/array/askMap.ts
+- [x] quidproquo-core/src/stories/array/askMapParallel.ts
+- [x] quidproquo-core/src/stories/array/askMapParallelBatch.test.ts
+- [x] quidproquo-core/src/stories/array/askMapParallelBatch.ts
+- [x] quidproquo-core/src/stories/array/askReduce.test.ts
+- [x] quidproquo-core/src/stories/array/askReduce.ts
+- [x] quidproquo-core/src/stories/array/index.ts
+- [x] quidproquo-core/src/stories/askGetApplicationVersion.test.ts
+- [x] quidproquo-core/src/stories/askGetApplicationVersion.ts
+- [x] quidproquo-core/src/stories/askProcessEvent.test.ts
+- [x] quidproquo-core/src/stories/askProcessEvent.ts
+- [x] quidproquo-core/src/stories/askRetry.test.ts
+- [x] quidproquo-core/src/stories/askRetry.ts
+- [x] quidproquo-core/src/stories/binaryData/askCreateBinaryData.test.ts
+- [x] quidproquo-core/src/stories/binaryData/askCreateBinaryData.ts
+- [x] quidproquo-core/src/stories/binaryData/index.ts
+- [x] quidproquo-core/src/stories/context/askContextProvideValue.test.ts
+- [x] quidproquo-core/src/stories/context/askContextProvideValue.ts
+- [x] quidproquo-core/src/stories/context/index.ts
+- [x] quidproquo-core/src/stories/dateTime/addTime/addDayMonthYearToTDateIso.test.ts
+- [x] quidproquo-core/src/stories/dateTime/addTime/addDayMonthYearToTDateIso.ts
+- [x] quidproquo-core/src/stories/dateTime/addTime/addDaysToTDateIso.test.ts
+- [x] quidproquo-core/src/stories/dateTime/addTime/addDaysToTDateIso.ts
+- [x] quidproquo-core/src/stories/dateTime/addTime/addMillisecondsToTDateIso.test.ts
+- [x] quidproquo-core/src/stories/dateTime/addTime/addMillisecondsToTDateIso.ts
+- [x] quidproquo-core/src/stories/dateTime/addTime/addMonthsToTDateIso.ts
+- [x] quidproquo-core/src/stories/dateTime/addTime/addYearsToTDateIso.test.ts
+- [x] quidproquo-core/src/stories/dateTime/addTime/addYearsToTDateIso.ts
+- [x] quidproquo-core/src/stories/dateTime/addTime/index.ts
+- [x] quidproquo-core/src/stories/dateTime/askGetCurrentEpoch.test.ts
+- [x] quidproquo-core/src/stories/dateTime/askGetCurrentEpoch.ts
+- [x] quidproquo-core/src/stories/dateTime/askGetCurrentEpochMs.test.ts
+- [x] quidproquo-core/src/stories/dateTime/askGetCurrentEpochMs.ts
+- [x] quidproquo-core/src/stories/dateTime/askGetEpochStartTime.test.ts
+- [x] quidproquo-core/src/stories/dateTime/askGetEpochStartTime.ts
+- [x] quidproquo-core/src/stories/dateTime/askSecondsElapsedFrom.test.ts
+- [x] quidproquo-core/src/stories/dateTime/askSecondsElapsedFrom.ts
+- [x] quidproquo-core/src/stories/dateTime/index.ts
+- [x] quidproquo-core/src/stories/index.ts
+- [x] quidproquo-core/src/stories/json/askDecodeJson.test.ts
+- [x] quidproquo-core/src/stories/json/askDecodeJson.ts
+- [x] quidproquo-core/src/stories/json/index.ts
+- [x] quidproquo-core/src/stories/kvs/askKeyValueStoreQueryAll.test.ts
+- [x] quidproquo-core/src/stories/kvs/askKeyValueStoreQueryAll.ts
+- [x] quidproquo-core/src/stories/kvs/askKeyValueStoreQuerySingle.test.ts
+- [x] quidproquo-core/src/stories/kvs/askKeyValueStoreQuerySingle.ts
+- [x] quidproquo-core/src/stories/kvs/askKeyValueStoreScanAll.test.ts
+- [x] quidproquo-core/src/stories/kvs/askKeyValueStoreScanAll.ts
+- [x] quidproquo-core/src/stories/kvs/askKeyValueStoreUpdatePartialProperties.test.ts
+- [x] quidproquo-core/src/stories/kvs/askKeyValueStoreUpdatePartialProperties.ts
+- [x] quidproquo-core/src/stories/kvs/askKeyValueStoreUpsertWithRetry.test.ts
+- [x] quidproquo-core/src/stories/kvs/askKeyValueStoreUpsertWithRetry.ts
+- [x] quidproquo-core/src/stories/kvs/index.ts
+- [x] quidproquo-core/src/stories/kvs/utils/index.ts
+- [x] quidproquo-core/src/stories/kvs/utils/isValidKvsAdvancedDataType.test.ts
+- [x] quidproquo-core/src/stories/kvs/utils/isValidKvsAdvancedDataType.ts
+- [x] quidproquo-core/src/stories/state/askReduceState.test.ts
+- [x] quidproquo-core/src/stories/state/askReduceState.ts
+- [x] quidproquo-core/src/stories/state/index.ts
+- [x] quidproquo-core/src/stories/stream/askStreamMap.test.ts
+- [x] quidproquo-core/src/stories/stream/askStreamMap.ts
+- [x] quidproquo-core/src/stories/stream/askStreamProcess.test.ts
+- [x] quidproquo-core/src/stories/stream/askStreamProcess.ts
+- [x] quidproquo-core/src/stories/stream/index.ts
+- [x] quidproquo-core/src/stories/system/askCatch.test.ts
+- [x] quidproquo-core/src/stories/system/askCatch.ts
+- [x] quidproquo-core/src/stories/system/askExecuteIf.test.ts
+- [x] quidproquo-core/src/stories/system/askExecuteIf.ts
+- [x] quidproquo-core/src/stories/system/askOverrideActions.test.ts
+- [x] quidproquo-core/src/stories/system/askOverrideActions.ts
+  - Fixed: handler lookup no longer walks the prototype chain (action type 'toString' invoked inherited members); overridden batch-slot failures now honor the batch's returnErrors instead of escaping askCatch.
+- [x] quidproquo-core/src/stories/system/askRunParallel.ts
+- [x] quidproquo-core/src/stories/system/index.ts
 - [x] quidproquo-core/src/testing/configTesting.test.ts
 - [x] quidproquo-core/src/testing/configTesting.ts
 - [x] quidproquo-core/src/testing/index.ts

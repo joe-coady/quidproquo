@@ -38,6 +38,8 @@ function* askKeyValueStoreUpdatePartialProperties<TModel, PartitionKey extends k
   keyValueStoreName: string,
   partitionKeyName: PartitionKey,
   partialProperties: Partial<TModel> & { [k in PartitionKey]: TModel[PartitionKey] },
+  sortKeyName?: undefined,
+  options?: KeyValueStoreUpdateOptions,
 ): AskResponse<TModel>;
 
 // Partition + sort key
@@ -46,6 +48,7 @@ function* askKeyValueStoreUpdatePartialProperties<TModel, PartitionKey extends k
   partitionKeyName: PartitionKey,
   partialProperties: Partial<TModel> & { [k in PartitionKey]: TModel[PartitionKey] } & { [k in SortKey]: TModel[SortKey] },
   sortKeyName: SortKey,
+  options?: KeyValueStoreUpdateOptions,
 ): AskResponse<TModel>;
 ```
 
@@ -57,6 +60,7 @@ function* askKeyValueStoreUpdatePartialProperties<TModel, PartitionKey extends k
 | `partitionKeyName` | `keyof TModel` | The property name that holds the partition key. That property must be present in `partialProperties`; it is used to address the record, not written. |
 | `partialProperties` | `Partial<TModel>` (with the key properties required) | The record patch. Each non-key property becomes a `Set`; a property explicitly set to `undefined` becomes a `Remove`. |
 | `sortKeyName` | `keyof TModel` | (Overload) The property name holding the sort key, when the store has one. Must be present in `partialProperties`. |
+| `options` | `KeyValueStoreUpdateOptions` | Optional update options, passed straight through to the underlying update (see [`KeyValueStoreUpdateOptions`](./ask-key-value-store-update.md#keyvaluestoreupdateoptions)). In particular `scope` addresses the record written under that storage scope. |
 
 ## Returns
 
@@ -65,7 +69,7 @@ function* askKeyValueStoreUpdatePartialProperties<TModel, PartitionKey extends k
 ## Notes
 
 - The partition-key (and sort-key) properties are skipped when building the operations — they identify the record rather than mutate it.
-- A property whose value is `undefined` is turned into a `Remove`; a property with a valid value is turned into a `Set`. Values that aren't a supported store data type are silently skipped (validated internally via `isValidKvsAdvancedDataType`).
+- A property whose value is `undefined` is turned into a `Remove`; a property with a valid value is turned into a `Set`. A value that isn't a supported store data type (validated via `isValidKvsAdvancedDataType`, e.g. a nested object) throws an `InvalidKvsPartialPropertyError` (code `unsupportedValueType`) before anything is written, rather than being silently skipped.
 - Errors surface the same as the underlying update (`KeyValueStoreUpdateErrorTypeEnum`); catch them with `askCatch`.
 
 ## Related

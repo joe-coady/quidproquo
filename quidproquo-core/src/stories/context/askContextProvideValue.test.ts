@@ -196,6 +196,35 @@ describe('askContextProvideValue', () => {
     expect(result).toEqual({ success: true, result: { existing: 'base', [ctxId.uniqueName]: 'CTX_VALUE' } });
   });
 
+  it('propagates a failed parent list as a thrown error instead of masking it', () => {
+    function* story(): AskResponse<QpqContext<any>> {
+      return (yield { type: ContextActionType.List }) as QpqContext<any>;
+    }
+
+    const { threwError } = simulateRuntime(askContextProvideValue(ctxId, 'CTX_VALUE', story()), {
+      [ContextActionType.List]: simulatorError('GenericError', 'context service down'),
+    });
+
+    expect(threwError).toEqual({ errorType: 'GenericError', errorText: 'context service down', errorStack: undefined });
+  });
+
+  it('propagates a failed parent list to a surrounding askCatch', () => {
+    function* story(): AskResponse<EitherActionResult<QpqContext<any>>> {
+      return yield* askCatch(
+        (function* (): AskResponse<QpqContext<any>> {
+          return (yield { type: ContextActionType.List }) as QpqContext<any>;
+        })(),
+      );
+    }
+
+    const { result } = simulateRuntime(askContextProvideValue(ctxId, 'CTX_VALUE', story()), {
+      [ContextActionType.List]: simulatorError('GenericError', 'context service down'),
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.error.errorText).toBe('context service down');
+  });
+
   it('resolves reads across nested providers', () => {
     const ctxA = { uniqueName: 'ctx-a' } as QpqContextIdentifier<string>;
     const ctxB = { uniqueName: 'ctx-b' } as QpqContextIdentifier<string>;

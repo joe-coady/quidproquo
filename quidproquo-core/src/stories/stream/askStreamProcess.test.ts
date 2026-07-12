@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { StreamActionType } from '../../actions/stream/StreamActionType';
-import { runStory } from '../../testing/storyTesting';
+import { runStory, StoryError, throwsError } from '../../testing/storyTesting';
 import { AskResponse } from '../../types';
 import { StreamChunk, StreamHandle } from '../../types/StreamRegistry';
 import { askStreamProcess } from './askStreamProcess';
@@ -50,5 +50,37 @@ describe('askStreamProcess', () => {
     );
 
     expect(seen).toEqual(['a', 'c']);
+  });
+
+  it('closes the stream and rethrows when a read fails', () => {
+    const close = vi.fn();
+
+    function* noopCallback(): AskResponse<void> {}
+
+    expect(() =>
+      runStory(askStreamProcess(handle, noopCallback), {
+        [StreamActionType.Read]: throwsError('GenericError', 'source went away'),
+        [StreamActionType.Close]: close,
+      }),
+    ).toThrow(StoryError);
+
+    expect(close).toHaveBeenCalledTimes(1);
+  });
+
+  it('closes the stream and rethrows when the callback fails', () => {
+    const close = vi.fn();
+
+    function* failingCallback(): AskResponse<void> {
+      throw new Error('callback exploded');
+    }
+
+    expect(() =>
+      runStory(askStreamProcess(handle, failingCallback), {
+        [StreamActionType.Read]: readsFrom([{ done: false, data: 'a' }, { done: true }]),
+        [StreamActionType.Close]: close,
+      }),
+    ).toThrow('callback exploded');
+
+    expect(close).toHaveBeenCalledTimes(1);
   });
 });

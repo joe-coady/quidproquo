@@ -46,7 +46,8 @@ function* askStreamProcess<E extends StreamEncoding, T>(
 ## Notes
 
 - The `index` counts only chunks handed to your callback — chunks that are `skipped` or carry no `data` are dropped and do not advance it.
-- The handle is closed for you when the loop ends. If you need finer control — reading only part of a stream, or polling with `noWait` — drive [askStreamRead](./ask-stream-read.md) / [askStreamClose](./ask-stream-close.md) directly instead.
+- The handle is closed for you when the loop ends. This includes failures: when a read or your callback fails, the stream is closed first and the original error is then rethrown, so a surrounding [askCatch](../system/ask-catch.md) can handle it without leaking the stream.
+- If you need finer control — reading only part of a stream, or polling with `noWait` — drive [askStreamRead](./ask-stream-read.md) / [askStreamClose](./ask-stream-close.md) directly instead.
 - To build up a result rather than react to each chunk, use [askStreamMap](./ask-stream-map.md).
 
 ## Related

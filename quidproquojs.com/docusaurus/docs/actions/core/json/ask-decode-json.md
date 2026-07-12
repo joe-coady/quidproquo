@@ -56,6 +56,7 @@ The generic `T` is the expected shape of the decoded value; it is applied as a c
 | --- | --- |
 | The input is not valid JSON (`JSON.parse` throws). | `ErrorTypeEnum.Invalid` — the error text includes the underlying parser message. |
 | `validateObject` is supplied and returns `false`. | `ErrorTypeEnum.Invalid` — the error text notes the JSON parsed but failed structural validation. |
+| `validateObject` is supplied and throws. | `ErrorTypeEnum.Invalid`: the error text notes the JSON parsed but the validation function threw, and includes the thrown message. |
 
 Because these are thrown through the qpq error mechanism, catch them with `askCatch` from quidproquo-core, which returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 

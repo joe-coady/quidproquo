@@ -41,7 +41,13 @@ export function* askRetry<R>(
 
     if (options?.maxJitterMs) {
       const guid = yield* askNewGuid();
-      waitMs += Math.floor((parseInt(guid.slice(0, 2), 16) / 255) * options.maxJitterMs);
+      const jitterByte = parseInt(guid.slice(0, 2), 16);
+
+      // Guid processors are platform-pluggable, so guard against a non-hex id
+      // poisoning the wait with NaN.
+      if (!Number.isNaN(jitterByte)) {
+        waitMs += Math.floor((jitterByte / 255) * options.maxJitterMs);
+      }
     }
 
     yield* askDelay(waitMs);

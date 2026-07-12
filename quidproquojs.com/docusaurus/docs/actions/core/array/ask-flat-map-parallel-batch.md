@@ -47,7 +47,7 @@ function* askFlatMapParallelBatch<T, R>(
 | Parameter | Type | Default | Description |
 | --- | --- | --- | --- |
 | `items` | `T[]` | — | The array to iterate. |
-| `numBatch` | `number` | — | Batch size — the maximum number of items that run **concurrently** at once. |
+| `numBatch` | `number` | — | Batch size — the maximum number of items that run **concurrently** at once. Must be at least `1`; anything lower (including `NaN`) throws an `InvalidBatchSizeError` (code `notPositive`). |
 | `askCallback` | `(item: T, index: number, srcArray: T[]) => AskResponse<R[]>` | — | A generator called once per item. Receives the item, its zero-based index, and the source array, and returns an **array** of results. |
 | `delayAfterEachBatchMs` | `number` | `0` | Optional pause (in milliseconds) inserted after every batch, including the last — passed straight through to [askMapParallelBatch](./ask-map-parallel-batch.md). |
 

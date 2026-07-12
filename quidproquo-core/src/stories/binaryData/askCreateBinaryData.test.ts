@@ -22,4 +22,12 @@ describe('askCreateTextQpqBinaryData', () => {
   it('encodes an empty string', () => {
     expect(runStory(askCreateTextQpqBinaryData('', 'empty.txt', TextFileType.PlainText)).base64Data).toBe('');
   });
+
+  it('encodes multibyte UTF-8 text identically to Buffer', () => {
+    const text = 'héllo wörld 🎉 日本語';
+
+    const result = runStory(askCreateTextQpqBinaryData(text, 'utf8.txt', TextFileType.PlainText));
+
+    expect(result.base64Data).toBe(Buffer.from(text, 'utf-8').toString('base64'));
+  });
 });

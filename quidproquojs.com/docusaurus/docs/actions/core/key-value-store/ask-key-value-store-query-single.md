@@ -54,6 +54,7 @@ function* askKeyValueStoreQuerySingle<T>(
 ## Notes
 
 - Because `filter` is applied after the key match, when a filter is supplied the helper pages through results until it has gathered up to `limit` records before returning the first — so a matching record isn't missed just because it fell outside the first page.
+- The record returned is the first one **collected across all fetched pages**, so a match found on an early page still wins even when a later page comes back empty.
 - Errors surface the same as the underlying query (`KeyValueStoreQueryErrorTypeEnum`); catch them with `askCatch`.
 
 ## Related

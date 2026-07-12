@@ -38,6 +38,35 @@ describe('askProcessEvent', () => {
     expect(execute).not.toHaveBeenCalled();
   });
 
+  it('hands per-record failures to the transform without failing the other records', () => {
+    const result = runStory(askProcessEvent('event-arg'), {
+      [ConfigActionType.GetGlobal]: 'v1',
+      [EventActionType.GetRecords]: [{ id: 'good' }, { id: 'bad' }],
+      [EventActionType.MatchStory]: { runtime: '/handlers/run::default', runtimeOptions: {} },
+      [EventActionType.AutoRespond]: null,
+      [EventActionType.GetStorySession]: { correlation: 'corr-1' },
+      [SystemActionType.ExecuteStory]: (action: any) =>
+        action.payload.params[0].id === 'bad' ? throwsError('GenericError', 'record exploded') : 'story-output',
+      [EventActionType.TransformResponseResult]: (action: any) => action.payload.qpqEventRecordResponses,
+    });
+
+    expect(result).toEqual([
+      { success: true, result: 'story-output' },
+      { success: false, error: { errorType: 'GenericError', errorText: 'record exploded', errorStack: undefined } },
+    ]);
+  });
+
+  it('returns a match failure for the record instead of crashing the batch', () => {
+    const result = runStory(askProcessEvent('event-arg'), {
+      [ConfigActionType.GetGlobal]: 'v1',
+      [EventActionType.GetRecords]: ['record-1'],
+      [EventActionType.MatchStory]: throwsError('NotFound', 'no story matched'),
+      [EventActionType.TransformResponseResult]: (action: any) => action.payload.qpqEventRecordResponses,
+    });
+
+    expect(result).toEqual([{ success: false, error: { errorType: 'NotFound', errorText: 'no story matched', errorStack: undefined } }]);
+  });
+
   it('logs and throws when the response transform fails', () => {
     const log = vi.fn();
 

@@ -4,7 +4,7 @@ import { KeyValueStoreActionType } from '../../actions/keyValueStore/KeyValueSto
 import { KeyValueStoreUpdateAction } from '../../actions/keyValueStore/KeyValueStoreUpdateActionTypes';
 import { KvsUpdateActionType } from '../../actions/keyValueStore/types';
 import { runStory } from '../../testing/storyTesting';
-import { askKeyValueStoreUpdatePartialProperties } from './askKeyValueStoreUpdatePartialProperties';
+import { askKeyValueStoreUpdatePartialProperties, InvalidKvsPartialPropertyError } from './askKeyValueStoreUpdatePartialProperties';
 
 interface Widget {
   id: string;
@@ -44,5 +44,27 @@ describe('askKeyValueStoreUpdatePartialProperties', () => {
     expect(payload.key).toBe('w1');
     expect(payload.sortKey).toBe('gear');
     expect(payload.updates).toEqual([{ attributePath: 'count', action: KvsUpdateActionType.Set, value: 9 }]);
+  });
+
+  it('forwards the options (including scope) to the update action', () => {
+    const update = vi.fn((action: KeyValueStoreUpdateAction<Widget>) => action.payload);
+
+    runStory(askKeyValueStoreUpdatePartialProperties<Widget, 'id'>('widgets', 'id', { id: 'w1', count: 2 }, undefined, { scope: 'tenant-a' }), {
+      [KeyValueStoreActionType.Update]: update,
+    });
+
+    expect(update.mock.calls[0][0].payload.options).toEqual({ scope: 'tenant-a' });
+  });
+
+  it('throws InvalidKvsPartialPropertyError instead of silently dropping an unstorable value', () => {
+    const update = vi.fn((action: KeyValueStoreUpdateAction<Widget>) => action.payload);
+
+    const act = () =>
+      runStory(askKeyValueStoreUpdatePartialProperties<Widget, 'id'>('widgets', 'id', { id: 'w1', count: { nested: { deep: 1 } } as any }), {
+        [KeyValueStoreActionType.Update]: update,
+      });
+
+    expect(act).toThrowError(InvalidKvsPartialPropertyError);
+    expect(update).not.toHaveBeenCalled();
   });
 });

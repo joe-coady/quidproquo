@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { ConfigActionType } from '../actions/config/ConfigActionType';
 import { askConfigGetParameter } from '../actions/config/ConfigGetParameterActionRequester';
+import { GuidActionType } from '../actions/guid/GuidActionType';
 import { PlatformActionType } from '../actions/platform/PlatformActionType';
 import { expectError, runStory, throwsError } from '../testing/storyTesting';
 import { AskResponse } from '../types';
@@ -56,5 +57,51 @@ describe('askRetry', () => {
 
     expect(result.success).toBe(false);
     expect(config).toHaveBeenCalledTimes(1);
+  });
+
+  it('multiplies the wait by the 1-based attempt number with linearBackoff', () => {
+    const waits: number[] = [];
+    const recordDelay = (action: any) => {
+      waits.push(action.payload.timeMs);
+    };
+
+    runStory(askRetry(loadConfig, 3, 100, undefined, { linearBackoff: true }), {
+      [ConfigActionType.GetParameter]: throwsError('Throttling', 'slow down'),
+      [PlatformActionType.Delay]: recordDelay,
+    });
+
+    expect(waits).toEqual([100, 200, 300]);
+  });
+
+  it('adds guid-derived jitter of at most maxJitterMs to each wait', () => {
+    const waits: number[] = [];
+    const recordDelay = (action: any) => {
+      waits.push(action.payload.timeMs);
+    };
+
+    runStory(askRetry(loadConfig, 1, 100, undefined, { maxJitterMs: 1000 }), {
+      [ConfigActionType.GetParameter]: throwsError('Throttling', 'slow down'),
+      [PlatformActionType.Delay]: recordDelay,
+      // 0x80 = 128 -> floor((128 / 255) * 1000) = 501
+      [GuidActionType.New]: '80ffffff-guid',
+    });
+
+    expect(waits).toEqual([100 + Math.floor((128 / 255) * 1000)]);
+  });
+
+  it('ignores jitter when the guid processor returns a non-hex id', () => {
+    const waits: number[] = [];
+    const recordDelay = (action: any) => {
+      waits.push(action.payload.timeMs);
+    };
+
+    runStory(askRetry(loadConfig, 1, 100, undefined, { maxJitterMs: 1000 }), {
+      [ConfigActionType.GetParameter]: throwsError('Throttling', 'slow down'),
+      [PlatformActionType.Delay]: recordDelay,
+      [GuidActionType.New]: 'zz-not-hex',
+    });
+
+    // A NaN jitter byte must not poison the wait
+    expect(waits).toEqual([100]);
   });
 });

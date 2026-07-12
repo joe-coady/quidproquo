@@ -27,6 +27,7 @@ export function* askKeyValueStoreQuerySingle<T>(
     allData.push(...data.items);
   } while (data.nextPageKey && allData.length < limit);
 
-  // Return the first item if available, otherwise return null
-  return data.items.length > 0 ? data.items[0] : null;
+  // Return the first collected item: the last fetched page can be empty (or hold a
+  // later match) even when an earlier page already produced the item we want.
+  return allData.length > 0 ? allData[0] : null;
 }

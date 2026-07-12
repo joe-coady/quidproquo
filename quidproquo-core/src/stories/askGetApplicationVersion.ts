@@ -1,4 +1,4 @@
-import { askConfigGetGlobal, askLogCreate } from '../actions';
+import { askConfigGetGlobal } from '../actions';
 import { qpqApplicationVersionGlobal } from '../constants';
 import { AskResponse } from '../types';
 import { askCatch } from './system/askCatch';

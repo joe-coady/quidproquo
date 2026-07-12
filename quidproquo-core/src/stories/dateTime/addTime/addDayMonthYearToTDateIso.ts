@@ -2,13 +2,11 @@ export function addDayMonthYearToTDateIso(startDate: string, numDays: number, nu
   // Convert ISO string to Date object
   const nowDate = new Date(startDate);
 
-  nowDate.setDate(nowDate.getDate() + numDays);
-  nowDate.setMonth(nowDate.getMonth() + numMonths);
-  nowDate.setFullYear(nowDate.getFullYear() + numYears);
+  // Apply the offsets in UTC so the result does not depend on the server's local timezone (DST shifts)
+  nowDate.setUTCDate(nowDate.getUTCDate() + numDays);
+  nowDate.setUTCMonth(nowDate.getUTCMonth() + numMonths);
+  nowDate.setUTCFullYear(nowDate.getUTCFullYear() + numYears);
 
   // Convert back to ISO string format
-  const pastDateAsIsoString = nowDate.toISOString();
-
-  // Return the ISO string for 7 days ago
-  return pastDateAsIsoString;
+  return nowDate.toISOString();
 }

@@ -37,4 +37,25 @@ describe('askKeyValueStoreQueryAll', () => {
 
     expect(result).toEqual([]);
   });
+
+  it('forwards the options (including scope) on every paginated query', () => {
+    const scopes: string[] = [];
+    const pages: Record<string, QpqPagedData<string>> = {
+      first: { items: ['a'], nextPageKey: 'page-2' },
+      'page-2': { items: ['b'] },
+    };
+
+    // Record the scope of each page request so we can prove none of them dropped it
+    const queryRecordingScope = (action: KeyValueStoreQueryAction) => {
+      scopes.push(action.payload.options?.scope ?? '(none)');
+      return pages[action.payload.options?.nextPageKey ?? 'first'];
+    };
+
+    const result = runStory(askKeyValueStoreQueryAll('items', keyCondition, { scope: 'tenant-a' }), {
+      [KeyValueStoreActionType.Query]: queryRecordingScope,
+    });
+
+    expect(result).toEqual(['a', 'b']);
+    expect(scopes).toEqual(['tenant-a', 'tenant-a']);
+  });
 });

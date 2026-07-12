@@ -1,3 +1,4 @@
+import { askThrowError } from '../../actions';
 import { ContextActionType, ContextReadActionPayload } from '../../actions/context';
 import { ContextListAction } from '../../actions/context/ContextListActionTypes';
 import { ContextReadAction } from '../../actions/context/ContextReadActionTypes';
@@ -34,6 +35,17 @@ export function* askContextProvideValue<R, T extends AskResponse<any>>(
           type: ContextActionType.List,
           returnErrors: true,
         }) as EitherActionResult<QpqContext<any>>;
+
+        // A failed parent list must propagate, not be masked as an empty parent context.
+        // The failure Either is already the shape the inner action expects when it carries
+        // returnErrors; otherwise rethrow so the error surfaces as normal.
+        if (!parentContextValues.success) {
+          if (action.returnErrors) {
+            return parentContextValues;
+          }
+
+          return yield* askThrowError(parentContextValues.error.errorType, parentContextValues.error.errorText, parentContextValues.error.errorStack);
+        }
 
         cache = {
           ...(parentContextValues.result || {}),
