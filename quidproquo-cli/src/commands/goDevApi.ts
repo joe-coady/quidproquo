@@ -16,7 +16,7 @@ import { rspack } from '@rspack/core';
 import { primeDeployEnvFromConfig } from '../lib/deployEnv';
 import { writeDevServerEntry } from '../lib/devServerEntry';
 import { getRoot } from '../lib/discovery';
-import { killStaleListeners } from '../lib/killStaleListeners';
+import { killOtherQpqDevProcesses, killStaleListeners } from '../lib/killStaleListeners';
 import { resolveAppSelection } from '../lib/resolveAppSelection';
 
 // 8080/8888 are set in the generated entry; 3001 is the quidproquo-dev-server
@@ -31,6 +31,10 @@ export const goDevApiCommand = async (argv: string[]): Promise<void> => {
   primeDeployEnvFromConfig(appName);
   console.log(`Dev server for app [${appName}]`);
 
+  // Catches a lingering watcher from a previous run even if its spawned
+  // child already exited (see killOtherQpqDevProcesses) — then the usual
+  // port-based sweep for anything else still bound to our ports.
+  killOtherQpqDevProcesses(root);
   killStaleListeners(DEV_SERVER_PORTS, (command) => command.includes(DEV_SERVER_BUNDLE_PATH));
 
   const qpqConfigs = getAppServiceQpqConfigs(root, appName);

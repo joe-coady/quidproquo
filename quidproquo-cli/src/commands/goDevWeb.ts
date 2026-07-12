@@ -11,20 +11,14 @@
 import { getAllViews, getViewsRspackConfig } from 'quidproquo-deploy-rspack';
 
 import http from 'http';
-import path from 'path';
 import { rspack } from '@rspack/core';
 import { RspackDevServer } from '@rspack/dev-server';
 
 import { getArgValue } from '../lib/args';
 import { primeDeployEnvFromConfig } from '../lib/deployEnv';
 import { getRoot } from '../lib/discovery';
-import { killStaleListeners } from '../lib/killStaleListeners';
+import { isQpqCliCommand, killStaleListeners } from '../lib/killStaleListeners';
 import { resolveAppSelection } from '../lib/resolveAppSelection';
-
-// The qpq CLI binary path each views dev server listener runs under — unlike
-// go:dev:api's dev-server, these run in-process (no spawned child), so the
-// listening process IS the `qpq go:dev:web` / `qpq go:dev` invocation itself.
-const QPQ_BIN_PATH = path.join('bin', 'qpq.js');
 
 export type GoDevWebOptions = {
   // The in-place "(started)" chip rewrite assumes this command owns the
@@ -54,7 +48,7 @@ export const goDevWebCommand = async (argv: string[], options: GoDevWebOptions =
 
   killStaleListeners(
     views.map((v) => v.port),
-    (command) => command.includes(QPQ_BIN_PATH),
+    isQpqCliCommand,
   );
 
   // Every RspackDevServer.start() registers its own SIGINT/SIGTERM handler on
