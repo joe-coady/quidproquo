@@ -652,7 +652,5 @@ export const getFullUrlFromConfigUrl = (configUrl: ConfigUrl, qpqConfig: QPQConf
 
   fullUrl = `${configUrl.protocol}://${fullUrl}`;
 
-  console.log(fullUrl);
-
   return fullUrl;
 };

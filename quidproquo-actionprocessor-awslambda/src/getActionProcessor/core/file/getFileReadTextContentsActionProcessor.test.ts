@@ -34,4 +34,12 @@ describe('getProcessFileReadTextContents', () => {
 
     expect(error?.errorType).toBe(FileReadTextContentsErrorTypeEnum.InvalidStorageClass);
   });
+
+  it('maps NoSuchKey to the action-typed FileNotFound error', async () => {
+    vi.mocked(readTextFile).mockRejectedValue(Object.assign(new Error('x'), { name: 'NoSuchKey' }));
+
+    const [, error] = await invoke({ drive: 'assets', filepath: 'a.txt' });
+
+    expect(error?.errorType).toBe(FileReadTextContentsErrorTypeEnum.FileNotFound);
+  });
 });

@@ -29,6 +29,9 @@ const getProcessFileReadObjectJson = (qpqConfig: QPQConfig): FileReadObjectJsonA
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         InvalidObjectState: () => actionResultError(FileReadObjectJsonErrorTypeEnum.InvalidStorageClass, 'File is in the wrong storage class'),
+        NoSuchKey: () => actionResultError(FileReadObjectJsonErrorTypeEnum.FileNotFound, `File not found: ${filepath}`),
+        NotFound: () => actionResultError(FileReadObjectJsonErrorTypeEnum.FileNotFound, `File not found: ${filepath}`),
+        SyntaxError: () => actionResultError(FileReadObjectJsonErrorTypeEnum.InvalidJson, `Invalid JSON in file: ${filepath}`), // JSON.parse failure
         InvalidScopeError: (error) => actionResultError(FileReadObjectJsonErrorTypeEnum.InvalidScope, error.message),
       });
     }

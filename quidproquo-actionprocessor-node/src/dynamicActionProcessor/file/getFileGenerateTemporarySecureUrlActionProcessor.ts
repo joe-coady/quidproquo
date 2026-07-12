@@ -14,8 +14,19 @@ import { createSecureUrlToken, getSecureUrlBaseUrl } from './secureUrlUtils';
 import { FileStorageConfig } from './types';
 import { resolveFilePath } from './utils';
 
+// Mirror the AWS processor's SigV4 limit (7 days) so a story that would fail
+// in production fails the same way on the dev server.
+const maxExpirationMs = 7 * 24 * 60 * 60 * 1000;
+
 const getProcessFileGenerateTemporarySecureUrl = (qpqConfig: QPQConfig, config: FileStorageConfig): FileGenerateTemporarySecureUrlActionProcessor => {
   return async ({ drive, filepath, expirationMs, scope }) => {
+    if (expirationMs > maxExpirationMs) {
+      return actionResultError(
+        FileGenerateTemporarySecureUrlErrorTypeEnum.ExpirationTooLong,
+        'Expiration exceeds the 7 day maximum for presigned URLs',
+      );
+    }
+
     try {
       // Create a token for download
       const token = createSecureUrlToken(

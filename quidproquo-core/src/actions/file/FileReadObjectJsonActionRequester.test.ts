@@ -20,4 +20,10 @@ describe('askFileReadObjectJson', () => {
 
     expect(returned).toBe(parsed);
   });
+
+  it('forwards the tenant scope onto the payload', () => {
+    const { action } = captureRequester(askFileReadObjectJson('drive', 'path/file.json', 'tenant-a'));
+
+    expect(action.payload.scope).toBe('tenant-a');
+  });
 });

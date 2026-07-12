@@ -973,11 +973,11 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [ ] quidproquo-core/src/actions/date/DateNowActionRequester.ts
 - [ ] quidproquo-core/src/actions/date/DateNowActionTypes.ts
 - [ ] quidproquo-core/src/actions/date/index.ts
-- [ ] quidproquo-core/src/actions/error/ErrorActionType.ts
-- [ ] quidproquo-core/src/actions/error/ErrorThrowErrorActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/error/ErrorThrowErrorActionRequester.ts
-- [ ] quidproquo-core/src/actions/error/ErrorThrowErrorActionRequesterTypes.ts
-- [ ] quidproquo-core/src/actions/error/index.ts
+- [x] quidproquo-core/src/actions/error/ErrorActionType.ts
+- [x] quidproquo-core/src/actions/error/ErrorThrowErrorActionRequester.test.ts
+- [x] quidproquo-core/src/actions/error/ErrorThrowErrorActionRequester.ts
+- [x] quidproquo-core/src/actions/error/ErrorThrowErrorActionRequesterTypes.ts
+- [x] quidproquo-core/src/actions/error/index.ts
 - [x] quidproquo-core/src/actions/event/EventActionType.ts
 - [x] quidproquo-core/src/actions/event/EventAutoRespondActionRequester.test.ts
 - [x] quidproquo-core/src/actions/event/EventAutoRespondActionRequester.ts
@@ -1008,52 +1008,53 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [x] quidproquo-core/src/actions/event/EventTransformResponseResultActionRequester.ts
 - [x] quidproquo-core/src/actions/event/EventTransformResponseResultActionTypes.ts
 - [x] quidproquo-core/src/actions/event/index.ts
-- [ ] quidproquo-core/src/actions/eventBus/EventBusActionType.ts
-- [ ] quidproquo-core/src/actions/eventBus/EventBusSendMessageActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/eventBus/EventBusSendMessageActionRequester.ts
-- [ ] quidproquo-core/src/actions/eventBus/EventBusSendMessageActionTypes.ts
-- [ ] quidproquo-core/src/actions/eventBus/index.ts
-- [ ] quidproquo-core/src/actions/file/FileActionType.ts
-- [ ] quidproquo-core/src/actions/file/FileDeleteActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/file/FileDeleteActionRequester.ts
-- [ ] quidproquo-core/src/actions/file/FileDeleteActionTypes.ts
-- [ ] quidproquo-core/src/actions/file/FileExistsActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/file/FileExistsActionRequester.ts
-- [ ] quidproquo-core/src/actions/file/FileExistsActionTypes.ts
-- [ ] quidproquo-core/src/actions/file/FileGenerateTemporarySecureUrlActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/file/FileGenerateTemporarySecureUrlActionRequester.ts
-- [ ] quidproquo-core/src/actions/file/FileGenerateTemporarySecureUrlActionTypes.ts
-- [ ] quidproquo-core/src/actions/file/FileGenerateTemporaryUploadSecureUrlActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/file/FileGenerateTemporaryUploadSecureUrlActionRequester.ts
-- [ ] quidproquo-core/src/actions/file/FileGenerateTemporaryUploadSecureUrlActionTypes.ts
-- [ ] quidproquo-core/src/actions/file/FileIsColdStorageActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/file/FileIsColdStorageActionRequester.ts
-- [ ] quidproquo-core/src/actions/file/FileIsColdStorageActionTypes.ts
-- [ ] quidproquo-core/src/actions/file/FileListDirectoryActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/file/FileListDirectoryActionRequester.ts
-- [ ] quidproquo-core/src/actions/file/FileListDirectoryActionTypes.ts
-- [ ] quidproquo-core/src/actions/file/FileReadBinaryContentsActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/file/FileReadBinaryContentsActionRequester.ts
-- [ ] quidproquo-core/src/actions/file/FileReadBinaryContentsActionTypes.ts
-- [ ] quidproquo-core/src/actions/file/FileReadObjectJsonActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/file/FileReadObjectJsonActionRequester.ts
-- [ ] quidproquo-core/src/actions/file/FileReadObjectJsonActionTypes.ts
-- [ ] quidproquo-core/src/actions/file/FileReadTextContentsActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/file/FileReadTextContentsActionRequester.ts
-- [ ] quidproquo-core/src/actions/file/FileReadTextContentsActionTypes.ts
-- [ ] quidproquo-core/src/actions/file/FileStreamOpenActionTypes.ts
-- [ ] quidproquo-core/src/actions/file/FileStreamOpenRequester.test.ts
-- [ ] quidproquo-core/src/actions/file/FileStreamOpenRequester.ts
-- [ ] quidproquo-core/src/actions/file/FileWriteBinaryContentsActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/file/FileWriteBinaryContentsActionRequester.ts
-- [ ] quidproquo-core/src/actions/file/FileWriteBinaryContentsActionTypes.ts
-- [ ] quidproquo-core/src/actions/file/FileWriteObjectJsonActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/file/FileWriteObjectJsonActionRequester.ts
-- [ ] quidproquo-core/src/actions/file/FileWriteObjectJsonActionTypes.ts
-- [ ] quidproquo-core/src/actions/file/FileWriteTextContentsActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/file/FileWriteTextContentsActionRequester.ts
-- [ ] quidproquo-core/src/actions/file/FileWriteTextContentsActionTypes.ts
-- [ ] quidproquo-core/src/actions/file/index.ts
+- [x] quidproquo-core/src/actions/eventBus/EventBusActionType.ts
+- [x] quidproquo-core/src/actions/eventBus/EventBusSendMessageActionRequester.test.ts
+- [x] quidproquo-core/src/actions/eventBus/EventBusSendMessageActionRequester.ts
+- [x] quidproquo-core/src/actions/eventBus/EventBusSendMessageActionTypes.ts
+- [x] quidproquo-core/src/actions/eventBus/index.ts
+- [x] quidproquo-core/src/actions/file/FileActionType.ts
+- [x] quidproquo-core/src/actions/file/FileDeleteActionRequester.test.ts
+- [x] quidproquo-core/src/actions/file/FileDeleteActionRequester.ts
+- [x] quidproquo-core/src/actions/file/FileDeleteActionTypes.ts
+- [x] quidproquo-core/src/actions/file/FileExistsActionRequester.test.ts
+- [x] quidproquo-core/src/actions/file/FileExistsActionRequester.ts
+- [x] quidproquo-core/src/actions/file/FileExistsActionTypes.ts
+- [x] quidproquo-core/src/actions/file/FileGenerateTemporarySecureUrlActionRequester.test.ts
+- [x] quidproquo-core/src/actions/file/FileGenerateTemporarySecureUrlActionRequester.ts
+- [x] quidproquo-core/src/actions/file/FileGenerateTemporarySecureUrlActionTypes.ts
+- [x] quidproquo-core/src/actions/file/FileGenerateTemporaryUploadSecureUrlActionRequester.test.ts
+- [x] quidproquo-core/src/actions/file/FileGenerateTemporaryUploadSecureUrlActionRequester.ts
+- [x] quidproquo-core/src/actions/file/FileGenerateTemporaryUploadSecureUrlActionTypes.ts
+- [x] quidproquo-core/src/actions/file/FileIsColdStorageActionRequester.test.ts
+- [x] quidproquo-core/src/actions/file/FileIsColdStorageActionRequester.ts
+- [x] quidproquo-core/src/actions/file/FileIsColdStorageActionTypes.ts
+- [x] quidproquo-core/src/actions/file/FileListDirectoryActionRequester.test.ts
+- [x] quidproquo-core/src/actions/file/FileListDirectoryActionRequester.ts
+- [x] quidproquo-core/src/actions/file/FileListDirectoryActionTypes.ts
+- [x] quidproquo-core/src/actions/file/FileReadBinaryContentsActionRequester.test.ts
+- [x] quidproquo-core/src/actions/file/FileReadBinaryContentsActionRequester.ts
+- [x] quidproquo-core/src/actions/file/FileReadBinaryContentsActionTypes.ts
+- [x] quidproquo-core/src/actions/file/FileReadObjectJsonActionRequester.test.ts
+- [x] quidproquo-core/src/actions/file/FileReadObjectJsonActionRequester.ts
+  - Fixed: added FileNotFound and InvalidJson to the error enum; AWS + node processors updated with regression tests (was GenericError/[NoSuchKey]). Node dev server also gained the 7-day secure-URL expiry cap for prod parity. In breaking-changes.md.
+- [x] quidproquo-core/src/actions/file/FileReadObjectJsonActionTypes.ts
+- [x] quidproquo-core/src/actions/file/FileReadTextContentsActionRequester.test.ts
+- [x] quidproquo-core/src/actions/file/FileReadTextContentsActionRequester.ts
+- [x] quidproquo-core/src/actions/file/FileReadTextContentsActionTypes.ts
+- [x] quidproquo-core/src/actions/file/FileStreamOpenActionTypes.ts
+- [x] quidproquo-core/src/actions/file/FileStreamOpenRequester.test.ts
+- [x] quidproquo-core/src/actions/file/FileStreamOpenRequester.ts
+- [x] quidproquo-core/src/actions/file/FileWriteBinaryContentsActionRequester.test.ts
+- [x] quidproquo-core/src/actions/file/FileWriteBinaryContentsActionRequester.ts
+- [x] quidproquo-core/src/actions/file/FileWriteBinaryContentsActionTypes.ts
+- [x] quidproquo-core/src/actions/file/FileWriteObjectJsonActionRequester.test.ts
+- [x] quidproquo-core/src/actions/file/FileWriteObjectJsonActionRequester.ts
+- [x] quidproquo-core/src/actions/file/FileWriteObjectJsonActionTypes.ts
+- [x] quidproquo-core/src/actions/file/FileWriteTextContentsActionRequester.test.ts
+- [x] quidproquo-core/src/actions/file/FileWriteTextContentsActionRequester.ts
+- [x] quidproquo-core/src/actions/file/FileWriteTextContentsActionTypes.ts
+- [x] quidproquo-core/src/actions/file/index.ts
 - [x] quidproquo-core/src/actions/graphDatabase/GraphDatabaseActionType.ts
 - [x] quidproquo-core/src/actions/graphDatabase/GraphDatabaseExecuteOpenCypherQueryActionRequester.test.ts
 - [x] quidproquo-core/src/actions/graphDatabase/GraphDatabaseExecuteOpenCypherQueryActionRequester.ts
@@ -1070,12 +1071,12 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [ ] quidproquo-core/src/actions/guid/GuidNewSortableActionRequester.ts
 - [ ] quidproquo-core/src/actions/guid/GuidNewSortableActionRequesterTypes.ts
 - [ ] quidproquo-core/src/actions/guid/index.ts
-- [ ] quidproquo-core/src/actions/index.ts
-- [ ] quidproquo-core/src/actions/inlineFunction/index.ts
-- [ ] quidproquo-core/src/actions/inlineFunction/InlineFunctionActionType.ts
-- [ ] quidproquo-core/src/actions/inlineFunction/InlineFunctionExecuteActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/inlineFunction/InlineFunctionExecuteActionRequester.ts
-- [ ] quidproquo-core/src/actions/inlineFunction/InlineFunctionExecuteActionTypes.ts
+- [x] quidproquo-core/src/actions/index.ts
+- [x] quidproquo-core/src/actions/inlineFunction/index.ts
+- [x] quidproquo-core/src/actions/inlineFunction/InlineFunctionActionType.ts
+- [x] quidproquo-core/src/actions/inlineFunction/InlineFunctionExecuteActionRequester.test.ts
+- [x] quidproquo-core/src/actions/inlineFunction/InlineFunctionExecuteActionRequester.ts
+- [x] quidproquo-core/src/actions/inlineFunction/InlineFunctionExecuteActionTypes.ts
 - [x] quidproquo-core/src/actions/keyValueStore/index.ts
 - [x] quidproquo-core/src/actions/keyValueStore/KeyValueStoreActionType.ts
 - [x] quidproquo-core/src/actions/keyValueStore/KeyValueStoreDeleteActionRequester.test.ts
@@ -1132,16 +1133,16 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [x] quidproquo-core/src/actions/metric/MetricPutActionRequester.ts
 - [x] quidproquo-core/src/actions/metric/MetricPutActionTypes.ts
 - [x] quidproquo-core/src/actions/metric/MetricUnit.ts
-- [ ] quidproquo-core/src/actions/network/index.ts
-- [ ] quidproquo-core/src/actions/network/NetworkActionType.ts
-- [ ] quidproquo-core/src/actions/network/NetworkRequestActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/network/NetworkRequestActionRequester.ts
-- [ ] quidproquo-core/src/actions/network/NetworkRequestActionTypes.ts
-- [ ] quidproquo-core/src/actions/platform/index.ts
-- [ ] quidproquo-core/src/actions/platform/PlatformActionType.ts
-- [ ] quidproquo-core/src/actions/platform/PlatformDelayActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/platform/PlatformDelayActionRequester.ts
-- [ ] quidproquo-core/src/actions/platform/PlatformDelayActionRequesterTypes.ts
+- [x] quidproquo-core/src/actions/network/index.ts
+- [x] quidproquo-core/src/actions/network/NetworkActionType.ts
+- [x] quidproquo-core/src/actions/network/NetworkRequestActionRequester.test.ts
+- [x] quidproquo-core/src/actions/network/NetworkRequestActionRequester.ts
+- [x] quidproquo-core/src/actions/network/NetworkRequestActionTypes.ts
+- [x] quidproquo-core/src/actions/platform/index.ts
+- [x] quidproquo-core/src/actions/platform/PlatformActionType.ts
+- [x] quidproquo-core/src/actions/platform/PlatformDelayActionRequester.test.ts
+- [x] quidproquo-core/src/actions/platform/PlatformDelayActionRequester.ts
+- [x] quidproquo-core/src/actions/platform/PlatformDelayActionRequesterTypes.ts
 - [x] quidproquo-core/src/actions/queue/index.ts
 - [x] quidproquo-core/src/actions/queue/QueueActionType.ts
 - [x] quidproquo-core/src/actions/queue/QueueSendMessageActionRequester.test.ts
@@ -1180,47 +1181,48 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [ ] quidproquo-core/src/actions/system/SystemTraceStoryActionRequester.test.ts
 - [ ] quidproquo-core/src/actions/system/SystemTraceStoryActionRequester.ts
 - [ ] quidproquo-core/src/actions/system/SystemTraceStoryActionTypes.ts
-- [ ] quidproquo-core/src/actions/userDirectory/index.ts
-- [ ] quidproquo-core/src/actions/userDirectory/types/AnyAuthChallenge.ts
-- [ ] quidproquo-core/src/actions/userDirectory/types/AuthChallenges/AuthChallengeBase.ts
-- [ ] quidproquo-core/src/actions/userDirectory/types/AuthChallenges/AuthenticateUserCustomChallengeChallenge.ts
-- [ ] quidproquo-core/src/actions/userDirectory/types/AuthChallenges/AuthenticateUserMfaSetupChallenge.ts
-- [ ] quidproquo-core/src/actions/userDirectory/types/AuthChallenges/AuthenticateUserNewPasswordRequiredChallenge.ts
-- [ ] quidproquo-core/src/actions/userDirectory/types/AuthChallenges/AuthenticateUserSoftwareTokenMfaChallenge.ts
-- [ ] quidproquo-core/src/actions/userDirectory/types/AuthChallenges/index.ts
-- [ ] quidproquo-core/src/actions/userDirectory/types/AuthenticateUserChallenge.ts
-- [ ] quidproquo-core/src/actions/userDirectory/types/index.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryActionType.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryAssociateSoftwareTokenActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryAssociateSoftwareTokenActionRequester.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryAssociateSoftwareTokenActionTypes.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryAuthenticateUserActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryAuthenticateUserActionRequester.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryAuthenticateUserActionTypes.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryChangePasswordActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryChangePasswordActionRequester.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryChangePasswordActionTypes.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryConfirmEmailVerificationActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryConfirmEmailVerificationActionRequester.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryConfirmEmailVerificationActionTypes.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryConfirmForgotPasswordActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryConfirmForgotPasswordActionRequester.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryConfirmForgotPasswordActionTypes.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryCreateUserActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryCreateUserActionRequester.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryCreateUserActionTypes.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryDecodeAccessTokenActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryDecodeAccessTokenActionRequester.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryDecodeAccessTokenActionTypes.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryForgotPasswordActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryForgotPasswordActionRequester.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryForgotPasswordActionTypes.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryGetUserAttributesActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryGetUserAttributesActionRequester.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryGetUserAttributesActionTypes.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryGetUserAttributesByUserIdActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryGetUserAttributesByUserIdActionRequester.ts
-- [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryGetUserAttributesByUserIdActionTypes.ts
+- [x] quidproquo-core/src/actions/userDirectory/index.ts
+- [x] quidproquo-core/src/actions/userDirectory/types/AnyAuthChallenge.ts
+- [x] quidproquo-core/src/actions/userDirectory/types/AuthChallenges/AuthChallengeBase.ts
+- [x] quidproquo-core/src/actions/userDirectory/types/AuthChallenges/AuthenticateUserCustomChallengeChallenge.ts
+- [x] quidproquo-core/src/actions/userDirectory/types/AuthChallenges/AuthenticateUserMfaSetupChallenge.ts
+- [x] quidproquo-core/src/actions/userDirectory/types/AuthChallenges/AuthenticateUserNewPasswordRequiredChallenge.ts
+- [x] quidproquo-core/src/actions/userDirectory/types/AuthChallenges/AuthenticateUserSoftwareTokenMfaChallenge.ts
+- [x] quidproquo-core/src/actions/userDirectory/types/AuthChallenges/index.ts
+- [x] quidproquo-core/src/actions/userDirectory/types/AuthenticateUserChallenge.ts
+- [x] quidproquo-core/src/actions/userDirectory/types/index.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryActionType.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryAssociateSoftwareTokenActionRequester.test.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryAssociateSoftwareTokenActionRequester.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryAssociateSoftwareTokenActionTypes.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryAuthenticateUserActionRequester.test.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryAuthenticateUserActionRequester.ts
+  - Security fix: standard sign-in with missing/empty password now throws InvalidPassword before dispatch (dev server previously minted a token for password-less logins). Recorded in breaking-changes.md.
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryAuthenticateUserActionTypes.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryChangePasswordActionRequester.test.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryChangePasswordActionRequester.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryChangePasswordActionTypes.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryConfirmEmailVerificationActionRequester.test.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryConfirmEmailVerificationActionRequester.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryConfirmEmailVerificationActionTypes.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryConfirmForgotPasswordActionRequester.test.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryConfirmForgotPasswordActionRequester.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryConfirmForgotPasswordActionTypes.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryCreateUserActionRequester.test.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryCreateUserActionRequester.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryCreateUserActionTypes.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryDecodeAccessTokenActionRequester.test.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryDecodeAccessTokenActionRequester.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryDecodeAccessTokenActionTypes.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryForgotPasswordActionRequester.test.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryForgotPasswordActionRequester.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryForgotPasswordActionTypes.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryGetUserAttributesActionRequester.test.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryGetUserAttributesActionRequester.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryGetUserAttributesActionTypes.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryGetUserAttributesByUserIdActionRequester.test.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryGetUserAttributesByUserIdActionRequester.ts
+- [x] quidproquo-core/src/actions/userDirectory/UserDirectoryGetUserAttributesByUserIdActionTypes.ts
 - [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryGetUsersActionRequester.test.ts
 - [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryGetUsersActionRequester.ts
 - [ ] quidproquo-core/src/actions/userDirectory/UserDirectoryGetUsersActionTypes.ts
@@ -1394,8 +1396,9 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [ ] quidproquo-core/src/proiseify/getSystemExecuteStoryActionProcessor.test.ts
 - [ ] quidproquo-core/src/proiseify/getSystemExecuteStoryActionProcessor.ts
 - [ ] quidproquo-core/src/proiseify/index.ts
-- [ ] quidproquo-core/src/qpqCoreUtils.test.ts
-- [ ] quidproquo-core/src/qpqCoreUtils.ts
+- [x] quidproquo-core/src/qpqCoreUtils.test.ts
+- [x] quidproquo-core/src/qpqCoreUtils.ts
+  - Fixed: removed stray `console.log(fullUrl)` in getFullUrlFromConfigUrl. Deferred: flattenQpqConfig defaults environment to 'development' while getApplicationModuleEnvironment falls back to 'production'; unifying changes deployed resource names, needs owner decision.
 - [x] quidproquo-core/src/qpqCoreUtilsLib.test.ts
 - [x] quidproquo-core/src/qpqCoreUtilsLib.ts
 - [x] quidproquo-core/src/qpqExecuteLog.test.ts

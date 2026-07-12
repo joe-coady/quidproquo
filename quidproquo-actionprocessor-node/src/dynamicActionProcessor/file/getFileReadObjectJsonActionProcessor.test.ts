@@ -1,4 +1,4 @@
-import { ErrorTypeEnum, FileActionType, resolveActionResult, resolveActionResultError } from 'quidproquo-core';
+import { ErrorTypeEnum, FileActionType, FileReadObjectJsonErrorTypeEnum, resolveActionResult, resolveActionResultError } from 'quidproquo-core';
 
 import * as fs from 'fs/promises';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -23,21 +23,21 @@ describe('getFileReadObjectJsonActionProcessor', () => {
     expect(resolveActionResult(result)).toEqual({ a: 1 });
   });
 
-  it('returns NotFound when the file is missing', async () => {
+  it('returns the action-typed FileNotFound when the file is missing', async () => {
     vi.mocked(fs.readFile).mockRejectedValue(errorWithCode('ENOENT'));
 
     const result = await invoke();
 
-    expect(resolveActionResultError(result).errorType).toBe(ErrorTypeEnum.NotFound);
+    expect(resolveActionResultError(result).errorType).toBe(FileReadObjectJsonErrorTypeEnum.FileNotFound);
   });
 
-  it('returns GenericError when the json is invalid', async () => {
+  it('returns the action-typed InvalidJson when the json is invalid', async () => {
     vi.mocked(fs.readFile).mockResolvedValue('not json');
 
     const result = await invoke();
 
     const error = resolveActionResultError(result);
-    expect(error.errorType).toBe(ErrorTypeEnum.GenericError);
+    expect(error.errorType).toBe(FileReadObjectJsonErrorTypeEnum.InvalidJson);
     expect(error.errorText).toContain('Invalid JSON');
   });
 

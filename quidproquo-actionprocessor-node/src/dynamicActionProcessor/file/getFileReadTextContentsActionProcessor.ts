@@ -4,7 +4,6 @@ import {
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
-  ErrorTypeEnum,
   FileActionType,
   FileReadTextContentsActionProcessor,
   FileReadTextContentsErrorTypeEnum,
@@ -25,7 +24,7 @@ const getProcessFileReadTextContents = (qpqConfig: QPQConfig, config: FileStorag
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         InvalidScopeError: (error) => actionResultError(FileReadTextContentsErrorTypeEnum.InvalidScope, error.message),
-        ENOENT: () => actionResultError(ErrorTypeEnum.NotFound, `File not found: ${filepath}`), // node fs code
+        ENOENT: () => actionResultError(FileReadTextContentsErrorTypeEnum.FileNotFound, `File not found: ${filepath}`), // node fs code
       });
     }
   };

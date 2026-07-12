@@ -1,4 +1,4 @@
-import { ErrorTypeEnum, FileActionType, resolveActionResult, resolveActionResultError } from 'quidproquo-core';
+import { ErrorTypeEnum, FileActionType, FileReadTextContentsErrorTypeEnum, resolveActionResult, resolveActionResultError } from 'quidproquo-core';
 
 import * as fs from 'fs/promises';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -23,12 +23,12 @@ describe('getFileReadTextContentsActionProcessor', () => {
     expect(resolveActionResult(result)).toBe('hello world');
   });
 
-  it('returns NotFound when the file is missing', async () => {
+  it('returns the action-typed FileNotFound when the file is missing', async () => {
     vi.mocked(fs.readFile).mockRejectedValue(errorWithCode('ENOENT'));
 
     const result = await invoke();
 
-    expect(resolveActionResultError(result).errorType).toBe(ErrorTypeEnum.NotFound);
+    expect(resolveActionResultError(result).errorType).toBe(FileReadTextContentsErrorTypeEnum.FileNotFound);
   });
 
   it('returns GenericError for any other failure', async () => {

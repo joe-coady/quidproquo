@@ -88,7 +88,7 @@ if (outcome.success) {
 
 ## Notes
 
-- Requests abort after 25 seconds, surfacing as `NetworkRequestErrorTypeEnum.Timeout`.
+- Requests abort after 30 seconds, surfacing as `NetworkRequestErrorTypeEnum.Timeout`. (30s deliberately outlasts API Gateway's 29s integration timeout, so a slow upstream shows up as a real gateway error rather than a client-side abort.)
 
 ## Related
 

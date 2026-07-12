@@ -27,4 +27,10 @@ describe('askFileStreamOpen', () => {
 
     expect(returned).toBe(handle);
   });
+
+  it('forwards the tenant scope onto the payload', () => {
+    const { action } = captureRequester(askFileStreamOpen('drive', 'path/to/file', 'text', undefined, 'tenant-a'));
+
+    expect(action.payload.scope).toBe('tenant-a');
+  });
 });

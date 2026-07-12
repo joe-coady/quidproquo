@@ -27,4 +27,10 @@ describe('askFileWriteTextContents', () => {
 
     expect(returned).toBeUndefined();
   });
+
+  it('forwards the tenant scope onto the payload', () => {
+    const { action } = captureRequester(askFileWriteTextContents('drive', 'path/file.txt', 'file body', undefined, 'tenant-a'));
+
+    expect(action.payload.scope).toBe('tenant-a');
+  });
 });

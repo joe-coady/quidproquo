@@ -1,4 +1,10 @@
-import { ErrorTypeEnum, FileActionType, resolveActionResult, resolveActionResultError } from 'quidproquo-core';
+import {
+  ErrorTypeEnum,
+  FileActionType,
+  FileGenerateTemporarySecureUrlErrorTypeEnum,
+  resolveActionResult,
+  resolveActionResultError,
+} from 'quidproquo-core';
 
 import { describe, expect, it } from 'vitest';
 
@@ -6,10 +12,10 @@ import { fileConfig, runFileAction } from '../../testing/fileProcessorTestHelper
 import { getFileGenerateTemporarySecureUrlActionProcessor } from './getFileGenerateTemporarySecureUrlActionProcessor';
 import { verifySecureUrlToken } from './secureUrlUtils';
 
-const invoke = (filepath: string) =>
+const invoke = (filepath: string, expirationMs: number = 60_000) =>
   runFileAction(getFileGenerateTemporarySecureUrlActionProcessor(fileConfig), FileActionType.GenerateTemporarySecureUrl, {
     filepath,
-    expirationMs: 60_000,
+    expirationMs,
   });
 
 describe('getFileGenerateTemporarySecureUrlActionProcessor', () => {
@@ -28,5 +34,12 @@ describe('getFileGenerateTemporarySecureUrlActionProcessor', () => {
     const result = await invoke('/etc/passwd');
 
     expect(resolveActionResultError(result).errorType).toBe(ErrorTypeEnum.GenericError);
+  });
+
+  it('rejects an expiry beyond the 7 day presigned limit, matching the AWS processor', async () => {
+    const eightDaysMs = 8 * 24 * 60 * 60 * 1000;
+    const result = await invoke('a.txt', eightDaysMs);
+
+    expect(resolveActionResultError(result).errorType).toBe(FileGenerateTemporarySecureUrlErrorTypeEnum.ExpirationTooLong);
   });
 });

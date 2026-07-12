@@ -19,4 +19,10 @@ describe('askFileGenerateTemporarySecureUrl', () => {
 
     expect(returned).toBe('https://signed');
   });
+
+  it('forwards the tenant scope onto the payload', () => {
+    const { action } = captureRequester(askFileGenerateTemporarySecureUrl('drive', 'path/file.txt', 60000, 'tenant-a'));
+
+    expect(action.payload.scope).toBe('tenant-a');
+  });
 });

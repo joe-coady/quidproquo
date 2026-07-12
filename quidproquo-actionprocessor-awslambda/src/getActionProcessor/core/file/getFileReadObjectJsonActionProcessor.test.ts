@@ -34,4 +34,20 @@ describe('getProcessFileReadObjectJson', () => {
 
     expect(error?.errorType).toBe(FileReadObjectJsonErrorTypeEnum.InvalidStorageClass);
   });
+
+  it('maps NoSuchKey to the action-typed FileNotFound error', async () => {
+    vi.mocked(readTextFile).mockRejectedValue(Object.assign(new Error('x'), { name: 'NoSuchKey' }));
+
+    const [, error] = await invoke({ drive: 'assets', filepath: 'a.json' });
+
+    expect(error?.errorType).toBe(FileReadObjectJsonErrorTypeEnum.FileNotFound);
+  });
+
+  it('maps a JSON.parse failure to the action-typed InvalidJson error', async () => {
+    vi.mocked(readTextFile).mockResolvedValue('not json');
+
+    const [, error] = await invoke({ drive: 'assets', filepath: 'a.json' });
+
+    expect(error?.errorType).toBe(FileReadObjectJsonErrorTypeEnum.InvalidJson);
+  });
 });

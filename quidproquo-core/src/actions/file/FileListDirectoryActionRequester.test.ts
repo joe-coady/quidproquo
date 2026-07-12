@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { captureRequester, runStory } from '../../testing';
+import { captureRequester, runStory, StoryError, throwsError } from '../../testing';
 import { FileActionType, FileInfo } from './FileActionType';
 import { askFileListAllDirectory, askFileListDirectory } from './FileListDirectoryActionRequester';
 import { FileListDirectoryAction } from './FileListDirectoryActionTypes';
@@ -26,6 +26,12 @@ describe('askFileListDirectory', () => {
     const { returned } = captureRequester(askFileListDirectory('drive', 'folder'), directoryInfo);
 
     expect(returned).toBe(directoryInfo);
+  });
+
+  it('forwards the tenant scope onto the payload', () => {
+    const { action } = captureRequester(askFileListDirectory('drive', 'folder', 1000, undefined, 'tenant-a'));
+
+    expect(action.payload.scope).toBe('tenant-a');
   });
 });
 
@@ -75,5 +81,33 @@ describe('askFileListAllDirectory', () => {
     });
 
     expect(result).toEqual([file('only')]);
+  });
+
+  it('forwards the tenant scope on every page request', () => {
+    const scopes: (string | undefined)[] = [];
+    const pages: { fileInfos: FileInfo[]; pageToken?: string }[] = [
+      { fileInfos: [file('a')], pageToken: 'next' },
+      { fileInfos: [file('b')], pageToken: undefined },
+    ];
+
+    let index = 0;
+    runStory(askFileListAllDirectory('drive', 'folder', 'tenant-a'), {
+      [FileActionType.ListDirectory]: (action: FileListDirectoryAction) => {
+        scopes.push(action.payload.scope);
+        return pages[index++];
+      },
+    });
+
+    expect(scopes).toEqual(['tenant-a', 'tenant-a']);
+  });
+
+  it('propagates a listing failure instead of returning a partial result', () => {
+    const list = () =>
+      runStory(askFileListAllDirectory('drive', 'folder'), {
+        [FileActionType.ListDirectory]: throwsError('SomeErrorType', 'boom'),
+      });
+
+    expect(list).toThrow(StoryError);
+    expect(list).toThrow('SomeErrorType: boom');
   });
 });

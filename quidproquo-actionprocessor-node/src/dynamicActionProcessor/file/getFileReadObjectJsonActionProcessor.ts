@@ -4,7 +4,6 @@ import {
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
-  ErrorTypeEnum,
   FileActionType,
   FileReadObjectJsonActionProcessor,
   FileReadObjectJsonErrorTypeEnum,
@@ -28,8 +27,8 @@ const getProcessFileReadObjectJson =
       } catch (error: unknown) {
         return actionResultErrorFromCaughtError(error, {
           InvalidScopeError: (error) => actionResultError(FileReadObjectJsonErrorTypeEnum.InvalidScope, error.message),
-          ENOENT: () => actionResultError(ErrorTypeEnum.NotFound, `File not found: ${filepath}`), // node fs code
-          SyntaxError: () => actionResultError(ErrorTypeEnum.GenericError, `Invalid JSON in file: ${filepath}`), // JSON.parse failure
+          ENOENT: () => actionResultError(FileReadObjectJsonErrorTypeEnum.FileNotFound, `File not found: ${filepath}`), // node fs code
+          SyntaxError: () => actionResultError(FileReadObjectJsonErrorTypeEnum.InvalidJson, `Invalid JSON in file: ${filepath}`), // JSON.parse failure
         });
       }
     };

@@ -25,6 +25,8 @@ const getProcessFileReadTextContents = (qpqConfig: QPQConfig): FileReadTextConte
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         InvalidObjectState: () => actionResultError(FileReadTextContentsErrorTypeEnum.InvalidStorageClass, 'File is in the wrong storage class'),
+        NoSuchKey: () => actionResultError(FileReadTextContentsErrorTypeEnum.FileNotFound, `File not found: ${filepath}`),
+        NotFound: () => actionResultError(FileReadTextContentsErrorTypeEnum.FileNotFound, `File not found: ${filepath}`),
         InvalidScopeError: (error) => actionResultError(FileReadTextContentsErrorTypeEnum.InvalidScope, error.message),
       });
     }
