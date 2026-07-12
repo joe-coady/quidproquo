@@ -2,6 +2,7 @@ import { expectGenerator } from 'quidproquo-testing';
 
 import { describe, expect, it } from 'vitest';
 
+import { runStory, StoryError, throwsError } from '../../testing';
 import { ConfigActionType } from './ConfigActionType';
 import { askConfigGetParameter, ConfigGetParameterErrorTypeEnum } from './ConfigGetParameterActionRequester';
 
@@ -53,6 +54,16 @@ describe('ConfigGetParameterActionRequester', () => {
         })
         .whenGiven(mockValue)
         .thenReturn(mockValue);
+    });
+
+    it('propagates a processor failure as a thrown StoryError', () => {
+      const runFailingStory = () =>
+        runStory(askConfigGetParameter('some-param'), {
+          [ConfigActionType.GetParameter]: throwsError(ConfigGetParameterErrorTypeEnum.Throttling, 'Rate exceeded'),
+        });
+
+      expect(runFailingStory).toThrow(StoryError);
+      expect(runFailingStory).toThrow(`${ConfigGetParameterErrorTypeEnum.Throttling}: Rate exceeded`);
     });
   });
 

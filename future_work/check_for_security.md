@@ -932,41 +932,42 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [x] quidproquo-core/src/actions/ai/types/AiStreamToolResult.ts
 - [x] quidproquo-core/src/actions/ai/types/AiStreamUsage.ts
 - [x] quidproquo-core/src/actions/ai/types/index.ts
-- [ ] quidproquo-core/src/actions/claudeAi/ClaudeAiActionType.ts
-- [ ] quidproquo-core/src/actions/claudeAi/ClaudeAiMessagesApiActionTypes.ts
-- [ ] quidproquo-core/src/actions/claudeAi/ClaudeAiMessagesApiRequester.test.ts
-- [ ] quidproquo-core/src/actions/claudeAi/ClaudeAiMessagesApiRequester.ts
-- [ ] quidproquo-core/src/actions/claudeAi/index.ts
-- [ ] quidproquo-core/src/actions/config/ConfigActionType.test.ts
-- [ ] quidproquo-core/src/actions/config/ConfigActionType.ts
-- [ ] quidproquo-core/src/actions/config/ConfigGetApplicationInfoActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/config/ConfigGetApplicationInfoActionRequester.ts
-- [ ] quidproquo-core/src/actions/config/ConfigGetApplicationInfoActionTypes.ts
-- [ ] quidproquo-core/src/actions/config/ConfigGetGlobalActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/config/ConfigGetGlobalActionRequester.ts
-- [ ] quidproquo-core/src/actions/config/ConfigGetGlobalActionTypes.ts
-- [ ] quidproquo-core/src/actions/config/ConfigGetParameterActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/config/ConfigGetParameterActionRequester.ts
-- [ ] quidproquo-core/src/actions/config/ConfigGetParameterActionTypes.ts
-- [ ] quidproquo-core/src/actions/config/ConfigGetParametersActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/config/ConfigGetParametersActionRequester.ts
-- [ ] quidproquo-core/src/actions/config/ConfigGetParametersActionTypes.ts
-- [ ] quidproquo-core/src/actions/config/ConfigGetSecretActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/config/ConfigGetSecretActionRequester.ts
-- [ ] quidproquo-core/src/actions/config/ConfigGetSecretActionTypes.ts
-- [ ] quidproquo-core/src/actions/config/ConfigListParametersActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/config/ConfigListParametersActionRequester.ts
-- [ ] quidproquo-core/src/actions/config/ConfigListParametersActionTypes.ts
-- [ ] quidproquo-core/src/actions/config/ConfigSetParameterActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/config/ConfigSetParameterActionRequester.ts
-- [ ] quidproquo-core/src/actions/config/ConfigSetParameterActionTypes.ts
-- [ ] quidproquo-core/src/actions/config/index.ts
-- [ ] quidproquo-core/src/actions/context/ContextActionType.ts
-- [ ] quidproquo-core/src/actions/context/ContextListActionTypes.ts
-- [ ] quidproquo-core/src/actions/context/ContextReadActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/context/ContextReadActionRequester.ts
-- [ ] quidproquo-core/src/actions/context/ContextReadActionTypes.ts
-- [ ] quidproquo-core/src/actions/context/index.ts
+- [x] quidproquo-core/src/actions/claudeAi/ClaudeAiActionType.ts
+- [x] quidproquo-core/src/actions/claudeAi/ClaudeAiMessagesApiActionTypes.ts
+- [x] quidproquo-core/src/actions/claudeAi/ClaudeAiMessagesApiRequester.test.ts
+- [x] quidproquo-core/src/actions/claudeAi/ClaudeAiMessagesApiRequester.ts
+- [x] quidproquo-core/src/actions/claudeAi/index.ts
+- [x] quidproquo-core/src/actions/config/ConfigActionType.test.ts
+- [x] quidproquo-core/src/actions/config/ConfigActionType.ts
+- [x] quidproquo-core/src/actions/config/ConfigGetApplicationInfoActionRequester.test.ts
+- [x] quidproquo-core/src/actions/config/ConfigGetApplicationInfoActionRequester.ts
+- [x] quidproquo-core/src/actions/config/ConfigGetApplicationInfoActionTypes.ts
+- [x] quidproquo-core/src/actions/config/ConfigGetGlobalActionRequester.test.ts
+- [x] quidproquo-core/src/actions/config/ConfigGetGlobalActionRequester.ts
+- [x] quidproquo-core/src/actions/config/ConfigGetGlobalActionTypes.ts
+- [x] quidproquo-core/src/actions/config/ConfigGetParameterActionRequester.test.ts
+- [x] quidproquo-core/src/actions/config/ConfigGetParameterActionRequester.ts
+- [x] quidproquo-core/src/actions/config/ConfigGetParameterActionTypes.ts
+- [x] quidproquo-core/src/actions/config/ConfigGetParametersActionRequester.test.ts
+- [x] quidproquo-core/src/actions/config/ConfigGetParametersActionRequester.ts
+- [x] quidproquo-core/src/actions/config/ConfigGetParametersActionTypes.ts
+- [x] quidproquo-core/src/actions/config/ConfigGetSecretActionRequester.test.ts
+- [x] quidproquo-core/src/actions/config/ConfigGetSecretActionRequester.ts
+  - Deferred (design): secret values and credential payloads (e.g. claudeAi apiKey) persist unredacted in StoryResult history and are serialized to S3 by the log writer. Needs a core redaction mechanism (per-action sensitive marker in resolveStory history) plus admin log-viewer awareness. See resolveStory.ts:93-101, resolveStoryWithLogs.ts:81, awslambda lambdaHandlers/helpers/logger.ts:20.
+- [x] quidproquo-core/src/actions/config/ConfigGetSecretActionTypes.ts
+- [x] quidproquo-core/src/actions/config/ConfigListParametersActionRequester.test.ts
+- [x] quidproquo-core/src/actions/config/ConfigListParametersActionRequester.ts
+- [x] quidproquo-core/src/actions/config/ConfigListParametersActionTypes.ts
+- [x] quidproquo-core/src/actions/config/ConfigSetParameterActionRequester.test.ts
+- [x] quidproquo-core/src/actions/config/ConfigSetParameterActionRequester.ts
+- [x] quidproquo-core/src/actions/config/ConfigSetParameterActionTypes.ts
+- [x] quidproquo-core/src/actions/config/index.ts
+- [x] quidproquo-core/src/actions/context/ContextActionType.ts
+- [x] quidproquo-core/src/actions/context/ContextListActionTypes.ts
+- [x] quidproquo-core/src/actions/context/ContextReadActionRequester.test.ts
+- [x] quidproquo-core/src/actions/context/ContextReadActionRequester.ts
+- [x] quidproquo-core/src/actions/context/ContextReadActionTypes.ts
+- [x] quidproquo-core/src/actions/context/index.ts
 - [ ] quidproquo-core/src/actions/date/DateActionType.ts
 - [ ] quidproquo-core/src/actions/date/DateNowActionRequester.test.ts
 - [ ] quidproquo-core/src/actions/date/DateNowActionRequester.ts
@@ -1053,14 +1054,14 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [ ] quidproquo-core/src/actions/file/FileWriteTextContentsActionRequester.ts
 - [ ] quidproquo-core/src/actions/file/FileWriteTextContentsActionTypes.ts
 - [ ] quidproquo-core/src/actions/file/index.ts
-- [ ] quidproquo-core/src/actions/graphDatabase/GraphDatabaseActionType.ts
-- [ ] quidproquo-core/src/actions/graphDatabase/GraphDatabaseExecuteOpenCypherQueryActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/graphDatabase/GraphDatabaseExecuteOpenCypherQueryActionRequester.ts
-- [ ] quidproquo-core/src/actions/graphDatabase/GraphDatabaseExecuteOpenCypherQueryActionTypes.ts
-- [ ] quidproquo-core/src/actions/graphDatabase/GraphDatabaseInternalFieldNamesActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/graphDatabase/GraphDatabaseInternalFieldNamesActionRequester.ts
-- [ ] quidproquo-core/src/actions/graphDatabase/GraphDatabaseInternalFieldNamesActionTypes.ts
-- [ ] quidproquo-core/src/actions/graphDatabase/index.ts
+- [x] quidproquo-core/src/actions/graphDatabase/GraphDatabaseActionType.ts
+- [x] quidproquo-core/src/actions/graphDatabase/GraphDatabaseExecuteOpenCypherQueryActionRequester.test.ts
+- [x] quidproquo-core/src/actions/graphDatabase/GraphDatabaseExecuteOpenCypherQueryActionRequester.ts
+- [x] quidproquo-core/src/actions/graphDatabase/GraphDatabaseExecuteOpenCypherQueryActionTypes.ts
+- [x] quidproquo-core/src/actions/graphDatabase/GraphDatabaseInternalFieldNamesActionRequester.test.ts
+- [x] quidproquo-core/src/actions/graphDatabase/GraphDatabaseInternalFieldNamesActionRequester.ts
+- [x] quidproquo-core/src/actions/graphDatabase/GraphDatabaseInternalFieldNamesActionTypes.ts
+- [x] quidproquo-core/src/actions/graphDatabase/index.ts
 - [ ] quidproquo-core/src/actions/guid/GuidActionType.ts
 - [ ] quidproquo-core/src/actions/guid/GuidNewActionRequester.test.ts
 - [ ] quidproquo-core/src/actions/guid/GuidNewActionRequester.ts
@@ -1075,39 +1076,40 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [ ] quidproquo-core/src/actions/inlineFunction/InlineFunctionExecuteActionRequester.test.ts
 - [ ] quidproquo-core/src/actions/inlineFunction/InlineFunctionExecuteActionRequester.ts
 - [ ] quidproquo-core/src/actions/inlineFunction/InlineFunctionExecuteActionTypes.ts
-- [ ] quidproquo-core/src/actions/keyValueStore/index.ts
-- [ ] quidproquo-core/src/actions/keyValueStore/KeyValueStoreActionType.ts
-- [ ] quidproquo-core/src/actions/keyValueStore/KeyValueStoreDeleteActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/keyValueStore/KeyValueStoreDeleteActionRequester.ts
-- [ ] quidproquo-core/src/actions/keyValueStore/KeyValueStoreDeleteActionTypes.ts
-- [ ] quidproquo-core/src/actions/keyValueStore/KeyValueStoreGetActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/keyValueStore/KeyValueStoreGetActionRequester.ts
-- [ ] quidproquo-core/src/actions/keyValueStore/KeyValueStoreGetActionTypes.ts
-- [ ] quidproquo-core/src/actions/keyValueStore/KeyValueStoreGetAllActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/keyValueStore/KeyValueStoreGetAllActionRequester.ts
-- [ ] quidproquo-core/src/actions/keyValueStore/KeyValueStoreGetAllActionTypes.ts
-- [ ] quidproquo-core/src/actions/keyValueStore/KeyValueStoreQueryActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/keyValueStore/KeyValueStoreQueryActionRequester.ts
-- [ ] quidproquo-core/src/actions/keyValueStore/KeyValueStoreQueryActionTypes.ts
-- [ ] quidproquo-core/src/actions/keyValueStore/KeyValueStoreScanActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/keyValueStore/KeyValueStoreScanActionRequester.ts
-- [ ] quidproquo-core/src/actions/keyValueStore/KeyValueStoreScanActionTypes.ts
-- [ ] quidproquo-core/src/actions/keyValueStore/KeyValueStoreUpdateActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/keyValueStore/KeyValueStoreUpdateActionRequester.ts
-- [ ] quidproquo-core/src/actions/keyValueStore/KeyValueStoreUpdateActionTypes.ts
-- [ ] quidproquo-core/src/actions/keyValueStore/KeyValueStoreUpsertActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/keyValueStore/KeyValueStoreUpsertActionRequester.ts
-- [ ] quidproquo-core/src/actions/keyValueStore/KeyValueStoreUpsertActionTypes.ts
-- [ ] quidproquo-core/src/actions/keyValueStore/types/index.ts
-- [ ] quidproquo-core/src/actions/keyValueStore/types/KvsAttributePath.ts
-- [ ] quidproquo-core/src/actions/keyValueStore/types/KvsQueryOperation.ts
-- [ ] quidproquo-core/src/actions/keyValueStore/types/KvsQueryOperationType.ts
-- [ ] quidproquo-core/src/actions/keyValueStore/types/KvsUpdate.ts
-- [ ] quidproquo-core/src/actions/keyValueStore/utils/index.ts
-- [ ] quidproquo-core/src/actions/keyValueStore/utils/kvsExpression.test.ts
-- [ ] quidproquo-core/src/actions/keyValueStore/utils/kvsExpression.ts
-- [ ] quidproquo-core/src/actions/keyValueStore/utils/kvsUpdateExpression.test.ts
-- [ ] quidproquo-core/src/actions/keyValueStore/utils/kvsUpdateExpression.ts
+- [x] quidproquo-core/src/actions/keyValueStore/index.ts
+- [x] quidproquo-core/src/actions/keyValueStore/KeyValueStoreActionType.ts
+- [x] quidproquo-core/src/actions/keyValueStore/KeyValueStoreDeleteActionRequester.test.ts
+- [x] quidproquo-core/src/actions/keyValueStore/KeyValueStoreDeleteActionRequester.ts
+- [x] quidproquo-core/src/actions/keyValueStore/KeyValueStoreDeleteActionTypes.ts
+- [x] quidproquo-core/src/actions/keyValueStore/KeyValueStoreGetActionRequester.test.ts
+- [x] quidproquo-core/src/actions/keyValueStore/KeyValueStoreGetActionRequester.ts
+- [x] quidproquo-core/src/actions/keyValueStore/KeyValueStoreGetActionTypes.ts
+- [x] quidproquo-core/src/actions/keyValueStore/KeyValueStoreGetAllActionRequester.test.ts
+- [x] quidproquo-core/src/actions/keyValueStore/KeyValueStoreGetAllActionRequester.ts
+- [x] quidproquo-core/src/actions/keyValueStore/KeyValueStoreGetAllActionTypes.ts
+- [x] quidproquo-core/src/actions/keyValueStore/KeyValueStoreQueryActionRequester.test.ts
+- [x] quidproquo-core/src/actions/keyValueStore/KeyValueStoreQueryActionRequester.ts
+- [x] quidproquo-core/src/actions/keyValueStore/KeyValueStoreQueryActionTypes.ts
+- [x] quidproquo-core/src/actions/keyValueStore/KeyValueStoreScanActionRequester.test.ts
+- [x] quidproquo-core/src/actions/keyValueStore/KeyValueStoreScanActionRequester.ts
+- [x] quidproquo-core/src/actions/keyValueStore/KeyValueStoreScanActionTypes.ts
+  - Follow-up: Scan `limit`/`ttlInSeconds` (and Query `ttlInSeconds`) are accepted but implemented by no processor; docs now say so. Decide implement-or-remove (published-API break). Also consider widening Get key to KvsCoreDataType and tightening kvsIn to KvsListDataType.
+- [x] quidproquo-core/src/actions/keyValueStore/KeyValueStoreUpdateActionRequester.test.ts
+- [x] quidproquo-core/src/actions/keyValueStore/KeyValueStoreUpdateActionRequester.ts
+- [x] quidproquo-core/src/actions/keyValueStore/KeyValueStoreUpdateActionTypes.ts
+- [x] quidproquo-core/src/actions/keyValueStore/KeyValueStoreUpsertActionRequester.test.ts
+- [x] quidproquo-core/src/actions/keyValueStore/KeyValueStoreUpsertActionRequester.ts
+- [x] quidproquo-core/src/actions/keyValueStore/KeyValueStoreUpsertActionTypes.ts
+- [x] quidproquo-core/src/actions/keyValueStore/types/index.ts
+- [x] quidproquo-core/src/actions/keyValueStore/types/KvsAttributePath.ts
+- [x] quidproquo-core/src/actions/keyValueStore/types/KvsQueryOperation.ts
+- [x] quidproquo-core/src/actions/keyValueStore/types/KvsQueryOperationType.ts
+- [x] quidproquo-core/src/actions/keyValueStore/types/KvsUpdate.ts
+- [x] quidproquo-core/src/actions/keyValueStore/utils/index.ts
+- [x] quidproquo-core/src/actions/keyValueStore/utils/kvsExpression.test.ts
+- [x] quidproquo-core/src/actions/keyValueStore/utils/kvsExpression.ts
+- [x] quidproquo-core/src/actions/keyValueStore/utils/kvsUpdateExpression.test.ts
+- [x] quidproquo-core/src/actions/keyValueStore/utils/kvsUpdateExpression.ts
 - [ ] quidproquo-core/src/actions/log/index.ts
 - [ ] quidproquo-core/src/actions/log/LogActionType.ts
 - [ ] quidproquo-core/src/actions/log/LogCreateActionRequester.test.ts
@@ -1124,12 +1126,12 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [ ] quidproquo-core/src/actions/math/MathRandomNumberActionRequester.test.ts
 - [ ] quidproquo-core/src/actions/math/MathRandomNumberActionRequester.ts
 - [ ] quidproquo-core/src/actions/math/MathRandomNumberActionRequesterTypes.ts
-- [ ] quidproquo-core/src/actions/metric/index.ts
-- [ ] quidproquo-core/src/actions/metric/MetricActionType.ts
-- [ ] quidproquo-core/src/actions/metric/MetricPutActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/metric/MetricPutActionRequester.ts
-- [ ] quidproquo-core/src/actions/metric/MetricPutActionTypes.ts
-- [ ] quidproquo-core/src/actions/metric/MetricUnit.ts
+- [x] quidproquo-core/src/actions/metric/index.ts
+- [x] quidproquo-core/src/actions/metric/MetricActionType.ts
+- [x] quidproquo-core/src/actions/metric/MetricPutActionRequester.test.ts
+- [x] quidproquo-core/src/actions/metric/MetricPutActionRequester.ts
+- [x] quidproquo-core/src/actions/metric/MetricPutActionTypes.ts
+- [x] quidproquo-core/src/actions/metric/MetricUnit.ts
 - [ ] quidproquo-core/src/actions/network/index.ts
 - [ ] quidproquo-core/src/actions/network/NetworkActionType.ts
 - [ ] quidproquo-core/src/actions/network/NetworkRequestActionRequester.test.ts
@@ -1140,27 +1142,27 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [ ] quidproquo-core/src/actions/platform/PlatformDelayActionRequester.test.ts
 - [ ] quidproquo-core/src/actions/platform/PlatformDelayActionRequester.ts
 - [ ] quidproquo-core/src/actions/platform/PlatformDelayActionRequesterTypes.ts
-- [ ] quidproquo-core/src/actions/queue/index.ts
-- [ ] quidproquo-core/src/actions/queue/QueueActionType.ts
-- [ ] quidproquo-core/src/actions/queue/QueueSendMessageActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/queue/QueueSendMessageActionRequester.ts
-- [ ] quidproquo-core/src/actions/queue/QueueSendMessageActionTypes.ts
-- [ ] quidproquo-core/src/actions/state/index.ts
-- [ ] quidproquo-core/src/actions/state/StateActionType.ts
-- [ ] quidproquo-core/src/actions/state/StateDispatchActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/state/StateDispatchActionRequester.ts
-- [ ] quidproquo-core/src/actions/state/StateDispatchActionTypes.ts
-- [ ] quidproquo-core/src/actions/state/StateReadActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/state/StateReadActionRequester.ts
-- [ ] quidproquo-core/src/actions/state/StateReadActionTypes.ts
-- [ ] quidproquo-core/src/actions/stream/index.ts
-- [ ] quidproquo-core/src/actions/stream/StreamActionType.ts
-- [ ] quidproquo-core/src/actions/stream/StreamCloseActionTypes.ts
-- [ ] quidproquo-core/src/actions/stream/StreamCloseRequester.test.ts
-- [ ] quidproquo-core/src/actions/stream/StreamCloseRequester.ts
-- [ ] quidproquo-core/src/actions/stream/StreamReadActionTypes.ts
-- [ ] quidproquo-core/src/actions/stream/StreamReadRequester.test.ts
-- [ ] quidproquo-core/src/actions/stream/StreamReadRequester.ts
+- [x] quidproquo-core/src/actions/queue/index.ts
+- [x] quidproquo-core/src/actions/queue/QueueActionType.ts
+- [x] quidproquo-core/src/actions/queue/QueueSendMessageActionRequester.test.ts
+- [x] quidproquo-core/src/actions/queue/QueueSendMessageActionRequester.ts
+- [x] quidproquo-core/src/actions/queue/QueueSendMessageActionTypes.ts
+- [x] quidproquo-core/src/actions/state/index.ts
+- [x] quidproquo-core/src/actions/state/StateActionType.ts
+- [x] quidproquo-core/src/actions/state/StateDispatchActionRequester.test.ts
+- [x] quidproquo-core/src/actions/state/StateDispatchActionRequester.ts
+- [x] quidproquo-core/src/actions/state/StateDispatchActionTypes.ts
+- [x] quidproquo-core/src/actions/state/StateReadActionRequester.test.ts
+- [x] quidproquo-core/src/actions/state/StateReadActionRequester.ts
+- [x] quidproquo-core/src/actions/state/StateReadActionTypes.ts
+- [x] quidproquo-core/src/actions/stream/index.ts
+- [x] quidproquo-core/src/actions/stream/StreamActionType.ts
+- [x] quidproquo-core/src/actions/stream/StreamCloseActionTypes.ts
+- [x] quidproquo-core/src/actions/stream/StreamCloseRequester.test.ts
+- [x] quidproquo-core/src/actions/stream/StreamCloseRequester.ts
+- [x] quidproquo-core/src/actions/stream/StreamReadActionTypes.ts
+- [x] quidproquo-core/src/actions/stream/StreamReadRequester.test.ts
+- [x] quidproquo-core/src/actions/stream/StreamReadRequester.ts
 - [ ] quidproquo-core/src/actions/system/index.ts
 - [ ] quidproquo-core/src/actions/system/SystemActionType.ts
 - [ ] quidproquo-core/src/actions/system/SystemBatchActionRequester.test.ts

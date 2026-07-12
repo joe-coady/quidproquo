@@ -1,9 +1,10 @@
 import { expectGenerator } from 'quidproquo-testing';
 
-import { describe, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
+import { runStory, StoryError, throwsError } from '../../testing';
 import { ConfigActionType } from './ConfigActionType';
-import { askConfigSetParameter } from './ConfigSetParameterActionRequester';
+import { askConfigSetParameter, ConfigSetParameterErrorTypeEnum } from './ConfigSetParameterActionRequester';
 
 describe('ConfigSetParameterActionRequester', () => {
   describe('askConfigSetParameter', () => {
@@ -77,6 +78,25 @@ line3`;
           payload: { parameterName, parameterValue },
         })
         .thenComplete();
+    });
+
+    it('propagates a processor failure as a thrown StoryError', () => {
+      const runFailingStory = () =>
+        runStory(askConfigSetParameter('some-param', 'some-value'), {
+          [ConfigActionType.SetParameter]: throwsError(ConfigSetParameterErrorTypeEnum.QuotaExceeded, 'Parameter store limit hit'),
+        });
+
+      expect(runFailingStory).toThrow(StoryError);
+      expect(runFailingStory).toThrow(`${ConfigSetParameterErrorTypeEnum.QuotaExceeded}: Parameter store limit hit`);
+    });
+  });
+
+  describe('ConfigSetParameterErrorTypeEnum', () => {
+    it('lists every error the processor can produce, namespaced by the action type', () => {
+      expect(ConfigSetParameterErrorTypeEnum).toEqual({
+        Throttling: `${ConfigActionType.SetParameter}-Throttling`,
+        QuotaExceeded: `${ConfigActionType.SetParameter}-QuotaExceeded`,
+      });
     });
   });
 });

@@ -39,4 +39,10 @@ describe('askQueueSendMessages', () => {
       },
     });
   });
+
+  it('resumes with no value once the runtime accepts the messages', () => {
+    const { returned } = captureRequester(askQueueSendMessages('my-queue', { type: 'Demo/Job', payload: {} }), undefined);
+
+    expect(returned).toBeUndefined();
+  });
 });

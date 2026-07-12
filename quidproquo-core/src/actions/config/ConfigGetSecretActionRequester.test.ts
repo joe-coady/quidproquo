@@ -1,9 +1,10 @@
 import { expectGenerator } from 'quidproquo-testing';
 
-import { describe, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
+import { runStory, StoryError, throwsError } from '../../testing';
 import { ConfigActionType } from './ConfigActionType';
-import { askConfigGetSecret } from './ConfigGetSecretActionRequester';
+import { askConfigGetSecret, ConfigGetSecretErrorTypeEnum } from './ConfigGetSecretActionRequester';
 
 describe('ConfigGetSecretActionRequester', () => {
   describe('askConfigGetSecret', () => {
@@ -52,6 +53,25 @@ describe('ConfigGetSecretActionRequester', () => {
         })
         .whenGiven(mockSecretValue)
         .thenReturn(mockSecretValue);
+    });
+
+    it('propagates a processor failure as a thrown StoryError', () => {
+      const runFailingStory = () =>
+        runStory(askConfigGetSecret('missing-secret'), {
+          [ConfigActionType.GetSecret]: throwsError(ConfigGetSecretErrorTypeEnum.ResourceNotFound, 'Secret not found'),
+        });
+
+      expect(runFailingStory).toThrow(StoryError);
+      expect(runFailingStory).toThrow(`${ConfigGetSecretErrorTypeEnum.ResourceNotFound}: Secret not found`);
+    });
+  });
+
+  describe('ConfigGetSecretErrorTypeEnum', () => {
+    it('lists every error the processor can produce, namespaced by the action type', () => {
+      expect(ConfigGetSecretErrorTypeEnum).toEqual({
+        ResourceNotFound: `${ConfigActionType.GetSecret}-ResourceNotFound`,
+        Throttling: `${ConfigActionType.GetSecret}-Throttling`,
+      });
     });
   });
 });

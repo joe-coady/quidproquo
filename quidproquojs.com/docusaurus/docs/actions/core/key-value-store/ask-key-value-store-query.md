@@ -55,7 +55,7 @@ function* askKeyValueStoreQuery<KvsItem>(
 | `sortAscending` | `boolean` | `true` | Order results by the sort key. `false` returns the newest/highest first. |
 | `limit` | `number` | – | Maximum number of records to return in this page. |
 | `nextPageKey` | `string` | – | Opaque cursor from a previous page's `nextPageKey`; pass it to fetch the following page. |
-| `ttlInSeconds` | `number` | – | Time-to-live in seconds for a cached result of this query. |
+| `ttlInSeconds` | `number` | – | Accepted but not implemented: no processor currently applies a TTL to query results, so setting it has no effect. |
 | `scope` | `string` | – | Optional storage scope. The processor composes it into the partition-key conditions, so the query only matches records written under the same scope (used by tenant/scoped features). Requires a string-typed partition key, and the key condition must constrain the partition key. |
 
 ## Query conditions (`KvsQueryOperation`)

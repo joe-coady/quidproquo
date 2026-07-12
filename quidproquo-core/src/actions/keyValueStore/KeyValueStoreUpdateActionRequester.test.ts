@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
 import { KeyValueStoreActionType } from './KeyValueStoreActionType';
-import { askKeyValueStoreUpdate } from './KeyValueStoreUpdateActionRequester';
+import { askKeyValueStoreUpdate, KeyValueStoreUpdateErrorTypeEnum } from './KeyValueStoreUpdateActionRequester';
 
 describe('askKeyValueStoreUpdate', () => {
   it('yields an Update action with updates, key, sort key and options', () => {
@@ -31,5 +31,19 @@ describe('askKeyValueStoreUpdate', () => {
     const { returned } = captureRequester(askKeyValueStoreUpdate('users', updates, 'user-1'), { id: 'user-1', name: 'new' });
 
     expect(returned).toEqual({ id: 'user-1', name: 'new' });
+  });
+
+  it('propagates a runtime failure thrown into the requester', () => {
+    const updates = { set: { name: 'new' } } as any;
+
+    const requester = askKeyValueStoreUpdate('users', updates, 'user-1');
+    requester.next();
+
+    expect(() => requester.throw(new Error('kvs unavailable'))).toThrow('kvs unavailable');
+  });
+
+  it('namespaces its error enum values under the action type', () => {
+    expect(KeyValueStoreUpdateErrorTypeEnum.StoreNotFound).toBe(`${KeyValueStoreActionType.Update}-StoreNotFound`);
+    expect(KeyValueStoreUpdateErrorTypeEnum.InvalidScope).toBe(`${KeyValueStoreActionType.Update}-InvalidScope`);
   });
 });

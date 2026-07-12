@@ -44,7 +44,7 @@ None.
 
 ## Returns
 
-`GraphDatabaseInternalFieldNames` — a map of the engine's internal field-name tokens:
+`GraphDatabaseInternalFieldNames` (importable from quidproquo-core) — a map of the engine's internal field-name tokens:
 
 ```typescript
 type GraphDatabaseInternalFieldNames = {

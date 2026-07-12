@@ -5,7 +5,8 @@ import { KvsQueryOperation } from './types';
 
 // Options Type
 export interface KeyValueStoreQueryOptions {
-  ttlInSeconds?: number; // Time-to-live in seconds
+  // Accepted but not implemented: no processor applies a TTL to query results.
+  ttlInSeconds?: number;
   sortAscending?: boolean;
   limit?: number;
   nextPageKey?: string;

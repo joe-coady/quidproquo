@@ -5,8 +5,10 @@ import { KvsQueryOperation } from './types';
 
 // Options Type
 export interface KeyValueStoreScanOptions {
-  ttlInSeconds?: number; // Time-to-live in seconds
-  limit?: number; // Maximum number of items to return
+  // Accepted but not implemented: no processor applies a TTL to scans.
+  ttlInSeconds?: number;
+  // Accepted but not implemented: no processor caps the page size of a scan.
+  limit?: number;
   // Enforced by the processor as a partition-key prefix filter; requires a string-typed partition key.
   scope?: string;
 }

@@ -47,6 +47,8 @@ function* askKeyValueStoreScan<KvsItem>(
 
 | Property | Type | Default | Description |
 | --- | --- | --- | --- |
+| `limit` | `number` | – | Accepted but not implemented: no processor currently caps the page size of a scan, so setting it has no effect. |
+| `ttlInSeconds` | `number` | – | Accepted but not implemented: no processor currently applies a TTL to scans, so setting it has no effect. |
 | `scope` | `string` | – | Optional storage scope. The processor enforces it as a begins-with prefix filter on the partition key, so only records written under the same scope are returned (used by tenant/scoped features). It is still a full-table scan on the storage side; only the results are isolated. Requires the store's partition key to be string-typed. When no scope is given, scope-composed records are excluded, so one tenant's data never appears in an unscoped listing. |
 
 ## Returns

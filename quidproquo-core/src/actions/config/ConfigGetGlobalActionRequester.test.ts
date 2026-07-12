@@ -2,6 +2,8 @@ import { expectGenerator } from 'quidproquo-testing';
 
 import { describe, expect, it } from 'vitest';
 
+import { runStory, StoryError, throwsError } from '../../testing';
+import { ErrorTypeEnum } from '../../types/ErrorTypeEnum';
 import { ConfigActionType } from './ConfigActionType';
 import { askConfigGetGlobal } from './ConfigGetGlobalActionRequester';
 
@@ -118,6 +120,16 @@ describe('ConfigGetGlobalActionRequester', () => {
         })
         .whenGiven(mockValue)
         .thenReturn(mockValue);
+    });
+
+    it('propagates a processor failure as a thrown StoryError', () => {
+      const runFailingStory = () =>
+        runStory(askConfigGetGlobal('missing-global'), {
+          [ConfigActionType.GetGlobal]: throwsError(ErrorTypeEnum.NotFound, 'Global not found'),
+        });
+
+      expect(runFailingStory).toThrow(StoryError);
+      expect(runFailingStory).toThrow(`${ErrorTypeEnum.NotFound}: Global not found`);
     });
   });
 });

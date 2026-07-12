@@ -12,4 +12,10 @@ describe('askStateDispatch', () => {
 
     expect(action).toEqual({ type: StateActionType.Dispatch, payload: { action: dispatched } });
   });
+
+  it('resumes with no value once the runtime processes the dispatch', () => {
+    const { returned } = captureRequester(askStateDispatch({ type: 'increment' }), undefined);
+
+    expect(returned).toBeUndefined();
+  });
 });

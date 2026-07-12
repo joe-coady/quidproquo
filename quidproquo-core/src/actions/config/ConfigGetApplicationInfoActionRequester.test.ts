@@ -2,6 +2,8 @@ import { expectGenerator } from 'quidproquo-testing';
 
 import { describe, expect, it } from 'vitest';
 
+import { runStory, StoryError, throwsError } from '../../testing';
+import { ErrorTypeEnum } from '../../types/ErrorTypeEnum';
 import { ConfigActionType } from './ConfigActionType';
 import { askConfigGetApplicationInfo } from './ConfigGetApplicationInfoActionRequester';
 
@@ -59,6 +61,16 @@ describe('ConfigGetApplicationInfoActionRequester', () => {
       };
 
       expectGenerator(askConfigGetApplicationInfo()).toYield(standardGetApplicationInfoAction).whenGiven(prodInfo).thenReturn(prodInfo);
+    });
+
+    it('propagates a processor failure as a thrown StoryError', () => {
+      const runFailingStory = () =>
+        runStory(askConfigGetApplicationInfo(), {
+          [ConfigActionType.GetApplicationInfo]: throwsError(ErrorTypeEnum.GenericError, 'Could not resolve application info'),
+        });
+
+      expect(runFailingStory).toThrow(StoryError);
+      expect(runFailingStory).toThrow(`${ErrorTypeEnum.GenericError}: Could not resolve application info`);
     });
   });
 });

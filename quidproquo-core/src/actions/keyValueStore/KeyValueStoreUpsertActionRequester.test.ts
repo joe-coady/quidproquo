@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
 import { KeyValueStoreActionType } from './KeyValueStoreActionType';
-import { askKeyValueStoreUpsert } from './KeyValueStoreUpsertActionRequester';
+import { askKeyValueStoreUpsert, KeyValueStoreUpsertErrorTypeEnum } from './KeyValueStoreUpsertActionRequester';
 
 describe('askKeyValueStoreUpsert', () => {
   it('yields an Upsert action with the item and options', () => {
@@ -31,5 +31,18 @@ describe('askKeyValueStoreUpsert', () => {
     const { returned } = captureRequester(askKeyValueStoreUpsert('users', item), item);
 
     expect(returned).toEqual(item);
+  });
+
+  it('propagates a runtime failure thrown into the requester', () => {
+    const requester = askKeyValueStoreUpsert('users', { id: 'user-1' });
+    requester.next();
+
+    expect(() => requester.throw(new Error('kvs unavailable'))).toThrow('kvs unavailable');
+  });
+
+  it('namespaces its error enum values under the action type', () => {
+    expect(KeyValueStoreUpsertErrorTypeEnum.StoreNotFound).toBe(`${KeyValueStoreActionType.Upsert}-StoreNotFound`);
+    expect(KeyValueStoreUpsertErrorTypeEnum.InvalidScope).toBe(`${KeyValueStoreActionType.Upsert}-InvalidScope`);
+    expect(KeyValueStoreUpsertErrorTypeEnum.Conflict).toBe(`${KeyValueStoreActionType.Upsert}-Conflict`);
   });
 });

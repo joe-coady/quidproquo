@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { captureRequester } from '../../testing';
+import { createContextIdentifier } from '../../logic/context/createContextIdentifier';
+import { captureRequester, runStory, StoryError, throwsError } from '../../testing';
+import { ErrorTypeEnum } from '../../types/ErrorTypeEnum';
 import { ContextActionType } from './ContextActionType';
 import { askContextRead } from './ContextReadActionRequester';
 
@@ -21,5 +23,25 @@ describe('askContextRead', () => {
     const { returned } = captureRequester(askContextRead({ key: 'my-context' } as any), value);
 
     expect(returned).toBe(value);
+  });
+
+  it('resolves to the identifier default when no provider has set a value', () => {
+    const identifier = createContextIdentifier<string>('unit-test-context', 'the-default');
+
+    const result = runStory(askContextRead(identifier));
+
+    expect(result).toBe('the-default');
+  });
+
+  it('propagates a processor failure as a thrown StoryError', () => {
+    const identifier = createContextIdentifier<string>('unit-test-context', 'the-default');
+
+    const runFailingStory = () =>
+      runStory(askContextRead(identifier), {
+        [ContextActionType.Read]: throwsError(ErrorTypeEnum.GenericError, 'Context read failed'),
+      });
+
+    expect(runFailingStory).toThrow(StoryError);
+    expect(runFailingStory).toThrow(`${ErrorTypeEnum.GenericError}: Context read failed`);
   });
 });

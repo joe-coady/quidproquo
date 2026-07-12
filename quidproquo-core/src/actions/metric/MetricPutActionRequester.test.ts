@@ -33,4 +33,10 @@ describe('askMetricPut', () => {
       },
     });
   });
+
+  it('resumes with no value once the runtime records the metric', () => {
+    const { returned } = captureRequester(askMetricPut('signIn'), undefined);
+
+    expect(returned).toBeUndefined();
+  });
 });

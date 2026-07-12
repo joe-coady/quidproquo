@@ -60,4 +60,22 @@ describe('askStreamRead', () => {
 
     expect(returned).toEqual({ done: false });
   });
+
+  it('passes an empty-string data chunk through without decoding', () => {
+    const { returned } = captureRequester(askStreamRead(handle('json')), { done: false, data: '' } as StreamChunk<string>);
+
+    expect(returned).toEqual({ done: false, data: '' });
+  });
+
+  it('throws when a json chunk contains malformed json', () => {
+    const runMalformedJsonRead = () => captureRequester(askStreamRead(handle('json')), { done: false, data: 'not json' } as StreamChunk<string>);
+
+    expect(runMalformedJsonRead).toThrow(SyntaxError);
+  });
+
+  it('throws when a binary chunk is not valid base64', () => {
+    const runInvalidBase64Read = () => captureRequester(askStreamRead(handle('binary')), { done: false, data: '!!!' } as StreamChunk<string>);
+
+    expect(runInvalidBase64Read).toThrow();
+  });
 });

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
 import { KeyValueStoreActionType } from './KeyValueStoreActionType';
-import { askKeyValueStoreQuery } from './KeyValueStoreQueryActionRequester';
+import { askKeyValueStoreQuery, KeyValueStoreQueryErrorTypeEnum } from './KeyValueStoreQueryActionRequester';
 
 describe('askKeyValueStoreQuery', () => {
   it('yields a Query action with the key condition and options', () => {
@@ -32,5 +32,19 @@ describe('askKeyValueStoreQuery', () => {
     const { returned } = captureRequester(askKeyValueStoreQuery('users', keyCondition), items);
 
     expect(returned).toEqual(items);
+  });
+
+  it('propagates a runtime failure thrown into the requester', () => {
+    const keyCondition = { field: 'pk', operation: 'equals', value: 'group-1' } as any;
+
+    const requester = askKeyValueStoreQuery('users', keyCondition);
+    requester.next();
+
+    expect(() => requester.throw(new Error('kvs unavailable'))).toThrow('kvs unavailable');
+  });
+
+  it('namespaces its error enum values under the action type', () => {
+    expect(KeyValueStoreQueryErrorTypeEnum.StoreNotFound).toBe(`${KeyValueStoreActionType.Query}-StoreNotFound`);
+    expect(KeyValueStoreQueryErrorTypeEnum.InvalidScope).toBe(`${KeyValueStoreActionType.Query}-InvalidScope`);
   });
 });
