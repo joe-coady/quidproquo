@@ -33,7 +33,7 @@ export const resolveActionResult = <T>(actionResult: ActionProcessorResult<T>) =
 export const resolveActionResultError = <T>(actionResult: ActionProcessorResult<T>): QPQError => {
   if (!actionResult) {
     return {
-      errorText: 'no idea' + JSON.stringify(actionResult),
+      errorText: `Action processor returned no result [${JSON.stringify(actionResult)}]`,
       errorType: ErrorTypeEnum.GenericError,
     };
   }

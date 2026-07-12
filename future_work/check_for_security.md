@@ -1337,11 +1337,11 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [x] quidproquo-core/src/createImplementationRuntime.ts
 - [x] quidproquo-core/src/index.test.ts
 - [x] quidproquo-core/src/index.ts
-- [ ] quidproquo-core/src/logic/actionLogic.test.ts
-- [ ] quidproquo-core/src/logic/actionLogic.ts
-- [ ] quidproquo-core/src/logic/actionValidators/index.ts
-- [ ] quidproquo-core/src/logic/actionValidators/isBatchAction.test.ts
-- [ ] quidproquo-core/src/logic/actionValidators/isBatchAction.ts
+- [x] quidproquo-core/src/logic/actionLogic.test.ts
+- [x] quidproquo-core/src/logic/actionLogic.ts
+- [x] quidproquo-core/src/logic/actionValidators/index.ts
+- [x] quidproquo-core/src/logic/actionValidators/isBatchAction.test.ts
+- [x] quidproquo-core/src/logic/actionValidators/isBatchAction.ts
 - [ ] quidproquo-core/src/logic/context/createContextIdentifier.test.ts
 - [ ] quidproquo-core/src/logic/context/createContextIdentifier.ts
 - [ ] quidproquo-core/src/logic/context/createContextProvider.test.ts
@@ -1353,25 +1353,26 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [ ] quidproquo-core/src/logic/context/index.ts
 - [ ] quidproquo-core/src/logic/context/toCrossServiceSession.test.ts
 - [ ] quidproquo-core/src/logic/context/toCrossServiceSession.ts
-- [ ] quidproquo-core/src/logic/decomposedString/decomposedStringToString.test.ts
-- [ ] quidproquo-core/src/logic/decomposedString/decomposedStringToString.ts
-- [ ] quidproquo-core/src/logic/decomposedString/index.ts
-- [ ] quidproquo-core/src/logic/error/buildQPQError.test.ts
-- [ ] quidproquo-core/src/logic/error/buildQPQError.ts
-- [ ] quidproquo-core/src/logic/error/index.ts
-- [ ] quidproquo-core/src/logic/index.ts
-- [ ] quidproquo-core/src/logic/logHistory/filterLogHistoryByActionTypes.test.ts
-- [ ] quidproquo-core/src/logic/logHistory/filterLogHistoryByActionTypes.ts
-- [ ] quidproquo-core/src/logic/logHistory/index.ts
-- [ ] quidproquo-core/src/logic/lookup/getAllEnumValues.test.ts
-- [ ] quidproquo-core/src/logic/lookup/getAllEnumValues.ts
-- [ ] quidproquo-core/src/logic/lookup/getLookupValues.test.ts
-- [ ] quidproquo-core/src/logic/lookup/getLookupValues.ts
-- [ ] quidproquo-core/src/logic/lookup/index.ts
-- [ ] quidproquo-core/src/logic/lookup/resolveLookupText.test.ts
-- [ ] quidproquo-core/src/logic/lookup/resolveLookupText.ts
-- [ ] quidproquo-core/src/logic/lookup/resolveLookupValues.test.ts
-- [ ] quidproquo-core/src/logic/lookup/resolveLookupValues.ts
+- [x] quidproquo-core/src/logic/decomposedString/decomposedStringToString.test.ts
+- [x] quidproquo-core/src/logic/decomposedString/decomposedStringToString.ts
+- [x] quidproquo-core/src/logic/decomposedString/index.ts
+- [x] quidproquo-core/src/logic/error/buildQPQError.test.ts
+- [x] quidproquo-core/src/logic/error/buildQPQError.ts
+- [x] quidproquo-core/src/logic/error/index.ts
+- [x] quidproquo-core/src/logic/index.ts
+- [x] quidproquo-core/src/logic/logHistory/filterLogHistoryByActionTypes.test.ts
+- [x] quidproquo-core/src/logic/logHistory/filterLogHistoryByActionTypes.ts
+  - Security fix: flattened batch entries carried the whole batch result, dragging sibling action payloads into persisted logs past the history filter; entries now get only their own indexed result slice.
+- [x] quidproquo-core/src/logic/logHistory/index.ts
+- [x] quidproquo-core/src/logic/lookup/getAllEnumValues.test.ts
+- [x] quidproquo-core/src/logic/lookup/getAllEnumValues.ts
+- [x] quidproquo-core/src/logic/lookup/getLookupValues.test.ts
+- [x] quidproquo-core/src/logic/lookup/getLookupValues.ts
+- [x] quidproquo-core/src/logic/lookup/index.ts
+- [x] quidproquo-core/src/logic/lookup/resolveLookupText.test.ts
+- [x] quidproquo-core/src/logic/lookup/resolveLookupText.ts
+- [x] quidproquo-core/src/logic/lookup/resolveLookupValues.test.ts
+- [x] quidproquo-core/src/logic/lookup/resolveLookupValues.ts
 - [ ] quidproquo-core/src/logic/scope/composeScopedFilePath.ts
 - [ ] quidproquo-core/src/logic/scope/index.ts
 - [ ] quidproquo-core/src/logic/scope/InvalidScopeError.ts
@@ -1392,9 +1393,9 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [ ] quidproquo-core/src/logic/stateEffects/index.ts
 - [ ] quidproquo-core/src/logic/stateEffects/replayEffects.test.ts
 - [ ] quidproquo-core/src/logic/stateEffects/replayEffects.ts
-- [ ] quidproquo-core/src/logic/stream/createStreamRegistry.test.ts
-- [ ] quidproquo-core/src/logic/stream/createStreamRegistry.ts
-- [ ] quidproquo-core/src/logic/stream/index.ts
+- [x] quidproquo-core/src/logic/stream/createStreamRegistry.test.ts
+- [x] quidproquo-core/src/logic/stream/createStreamRegistry.ts
+- [x] quidproquo-core/src/logic/stream/index.ts
 - [ ] quidproquo-core/src/proiseify/getSystemExecuteStoryActionProcessor.test.ts
 - [ ] quidproquo-core/src/proiseify/getSystemExecuteStoryActionProcessor.ts
 - [ ] quidproquo-core/src/proiseify/index.ts

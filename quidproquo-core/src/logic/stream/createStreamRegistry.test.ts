@@ -51,6 +51,63 @@ describe('createStreamRegistry', () => {
     expect(registry.has('s')).toBe(false);
   });
 
+  it('rejects a blocking read and drops the stream when the iterator throws', async () => {
+    async function* failing(): AsyncIterableIterator<string> {
+      throw new Error('stream blew up');
+    }
+
+    const registry = createStreamRegistry();
+    registry.register('bad', failing());
+
+    await expect(registry.read('bad')).rejects.toThrow('stream blew up');
+    expect(registry.has('bad')).toBe(false);
+  });
+
+  it('surfaces an iterator failure through noWait once it settles, instead of skipping forever', async () => {
+    let reject!: (error: Error) => void;
+    const gate = new Promise<string>((_, rej) => {
+      reject = rej;
+    });
+
+    async function* gatedFailing(): AsyncIterableIterator<string> {
+      yield await gate;
+    }
+
+    const registry = createStreamRegistry();
+    registry.register('bad', gatedFailing());
+
+    expect(await registry.read('bad', true)).toEqual({ done: false, skipped: true });
+
+    reject(new Error('stream blew up'));
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    await expect(registry.read('bad', true)).rejects.toThrow('stream blew up');
+    expect(registry.has('bad')).toBe(false);
+  });
+
+  it('does not throw when closing a stream whose cleanup fails', async () => {
+    async function* source(): AsyncIterableIterator<string> {
+      try {
+        yield await new Promise<string>(() => {});
+      } finally {
+        // eslint-disable-next-line no-unsafe-finally
+        throw new Error('cleanup failed');
+      }
+    }
+
+    const registry = createStreamRegistry();
+    registry.register('s', source());
+
+    // Let the first next() start so return() actually runs the finally block.
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(() => registry.close('s')).not.toThrow();
+    expect(registry.has('s')).toBe(false);
+
+    // Give the swallowed cleanup rejection a tick so it would surface if unhandled.
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  });
+
   it('skips with noWait when the next chunk is not ready, then returns it once it is', async () => {
     let release!: (value: string) => void;
     const gate = new Promise<string>((resolve) => {

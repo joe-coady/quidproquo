@@ -22,4 +22,14 @@ describe('decomposedStringToString', () => {
 
     expect(decomposedStringToString(decomposed, (v) => `[${String(v)}]`)).toBe('<[x]>');
   });
+
+  it('returns an empty string for a missing decomposed string instead of throwing', () => {
+    expect(decomposedStringToString(undefined as any)).toBe('');
+  });
+
+  it('does not print undefined fillers when literal segments are missing', () => {
+    const malformed = [['only one segment'], ['a', 'b']] as DecomposedString;
+
+    expect(decomposedStringToString(malformed)).toBe('only one segmentab');
+  });
 });

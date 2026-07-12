@@ -5,6 +5,7 @@ interface StreamEntry {
   nextPromise: Promise<IteratorResult<string>>;
   settled: boolean;
   settledResult?: IteratorResult<string>;
+  settledError?: unknown;
 }
 
 export const createStreamRegistry = (): StreamRegistry => {
@@ -18,12 +19,26 @@ export const createStreamRegistry = (): StreamRegistry => {
     entry.nextPromise = next;
     entry.settled = false;
     entry.settledResult = undefined;
-    next.then((result) => {
+    entry.settledError = undefined;
+
+    // Track fulfilment for noWait reads.
+    const rememberResult = (result: IteratorResult<string>): void => {
       if (entry.nextPromise === next) {
         entry.settled = true;
         entry.settledResult = result;
       }
-    });
+    };
+
+    // Track rejection too: without this a failing iterator leaves an unhandled
+    // rejection and noWait reads would report "skipped" forever.
+    const rememberError = (error: unknown): void => {
+      if (entry.nextPromise === next) {
+        entry.settled = true;
+        entry.settledError = error;
+      }
+    };
+
+    next.then(rememberResult, rememberError);
   };
 
   return {
@@ -51,7 +66,13 @@ export const createStreamRegistry = (): StreamRegistry => {
           return { done: false, skipped: true };
         }
 
-        const iterResult = entry.settledResult!;
+        // A settled entry with no result means the iterator rejected.
+        if (!entry.settledResult) {
+          streams.delete(id);
+          throw entry.settledError;
+        }
+
+        const iterResult = entry.settledResult;
         if (iterResult.done) {
           streams.delete(id);
           return { done: true };
@@ -61,7 +82,16 @@ export const createStreamRegistry = (): StreamRegistry => {
         return { done: false, data: iterResult.value };
       }
 
-      const iterResult = await entry.nextPromise;
+      let iterResult: IteratorResult<string>;
+      try {
+        iterResult = await entry.nextPromise;
+      } catch (error) {
+        // A failed stream cannot yield anything more, drop it so callers do not
+        // keep re-reading a dead entry.
+        streams.delete(id);
+        throw error;
+      }
+
       if (iterResult.done) {
         streams.delete(id);
         return { done: true };
@@ -74,7 +104,8 @@ export const createStreamRegistry = (): StreamRegistry => {
     close(id: string): void {
       const entry = streams.get(id);
       if (entry) {
-        entry.iterator.return?.();
+        // Swallow cleanup failures so close never surfaces as an unhandled rejection.
+        entry.iterator.return?.()?.catch(() => {});
         streams.delete(id);
       }
     },
