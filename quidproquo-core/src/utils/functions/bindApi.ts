@@ -1,4 +1,4 @@
-import { AskResponse, BoundLogicStory, UnboundLogicStory } from '../../types';
+import { AskResponse, BoundLogicStory } from '../../types';
 import { bindApiFunction } from './bindApiFunction';
 
 export function bindApi<ApiDeps, ApiFunctions extends Record<string, (deps: ApiDeps, ...args: any) => AskResponse<any>>>(

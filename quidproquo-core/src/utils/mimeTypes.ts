@@ -34,7 +34,13 @@ const MIME_TO_EXTENSION: Record<string, string> = {
   'text/xml': 'xml',
 };
 
-export const getExtensionForMimeType = (mimeType: string): string => MIME_TO_EXTENSION[mimeType.toLowerCase()] ?? 'bin';
+export const getExtensionForMimeType = (mimeType: string): string => {
+  const key = mimeType.toLowerCase();
+
+  // Own-property check so header-controlled values like "constructor" or
+  // "__proto__" can't hit the prototype chain and leak an object instead of a string.
+  return Object.prototype.hasOwnProperty.call(MIME_TO_EXTENSION, key) ? MIME_TO_EXTENSION[key] : 'bin';
+};
 
 // Strips parameters off a Content-Type header value, leaving just the MIME type
 // (e.g. "text/plain; charset=utf-8" -> "text/plain").

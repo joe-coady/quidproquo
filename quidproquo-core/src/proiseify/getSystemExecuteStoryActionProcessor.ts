@@ -11,6 +11,7 @@ import {
   AskResponseReturnType,
   DynamicModuleLoader,
   ErrorTypeEnum,
+  QPQError,
   QpqLogger,
   Story,
   StorySession,
@@ -19,6 +20,18 @@ import {
 } from '../types';
 
 export const getDateNow = () => new Date().toISOString();
+
+// Thrown when an action inside a promisified story fails without returnErrors.
+// Carries the structured action error so the ExecuteStory processor can
+// surface the original errorType instead of collapsing everything to a
+// GenericError string.
+export class QpqPromisifyActionError extends Error {
+  readonly code = 'qpqPromisifyActionError';
+
+  constructor(readonly actionError: QPQError) {
+    super(actionError.errorText);
+  }
+}
 
 type QpqPromisifyRuntime = Parameters<ActionProcessor<any, any>>;
 
@@ -50,7 +63,7 @@ export function qpqPromisify<S extends Story<any, any>>(
           storyProgress = reader.next(result);
         } else {
           if (!isSuccess) {
-            throw new Error(resolveActionResultError(actionResult).errorText);
+            throw new QpqPromisifyActionError(resolveActionResultError(actionResult));
           }
 
           const result = resolveActionResult(actionResult);
@@ -60,6 +73,13 @@ export function qpqPromisify<S extends Story<any, any>>(
 
       return storyProgress.value;
     } catch (error) {
+      // Real errors (including QpqPromisifyActionError above) propagate as-is
+      // so callers keep the original message, type and stack. Only non-Error
+      // throws get wrapped.
+      if (error instanceof Error) {
+        throw error;
+      }
+
       throw new Error(`Error in qpqPromisify: ${error}`);
     }
   };
@@ -83,7 +103,7 @@ const getProcessExecuteStory = <T extends Array<any>, R>(qpqConfig: QPQConfig): 
     dynamicModuleLoader: DynamicModuleLoader,
     streamRegistry: StreamRegistry,
   ): Promise<any> => {
-    let story = await dynamicModuleLoader(payload.runtime);
+    const story = await dynamicModuleLoader(payload.runtime);
     if (!story) {
       return actionResultError(ErrorTypeEnum.NotFound, `Unable to dynamically load: [${payload.runtime}]`);
     }
@@ -102,6 +122,12 @@ const getProcessExecuteStory = <T extends Array<any>, R>(qpqConfig: QPQConfig): 
 
       return actionResult<R>(result);
     } catch (error) {
+      // Keep the original error type when a nested action failed, instead of
+      // collapsing everything into a GenericError.
+      if (error instanceof QpqPromisifyActionError) {
+        return actionResultError(error.actionError.errorType, error.actionError.errorText, error.actionError.errorStack);
+      }
+
       return actionResultError(ErrorTypeEnum.GenericError, `${error}`);
     }
   };

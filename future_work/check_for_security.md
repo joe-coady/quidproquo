@@ -1330,9 +1330,9 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [x] quidproquo-core/src/config/utils/index.ts
 - [x] quidproquo-core/src/config/utils/qpqFunctionRuntimeUtils.test.ts
 - [x] quidproquo-core/src/config/utils/qpqFunctionRuntimeUtils.ts
-- [ ] quidproquo-core/src/constants/index.ts
-- [ ] quidproquo-core/src/constants/qpqApplicationVersionGlobal.ts
-- [ ] quidproquo-core/src/constants/storageDrives.ts
+- [x] quidproquo-core/src/constants/index.ts
+- [x] quidproquo-core/src/constants/qpqApplicationVersionGlobal.ts
+- [x] quidproquo-core/src/constants/storageDrives.ts
 - [x] quidproquo-core/src/createImplementationRuntime.test.ts
 - [x] quidproquo-core/src/createImplementationRuntime.ts
 - [x] quidproquo-core/src/index.test.ts
@@ -1396,9 +1396,9 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [x] quidproquo-core/src/logic/stream/createStreamRegistry.test.ts
 - [x] quidproquo-core/src/logic/stream/createStreamRegistry.ts
 - [x] quidproquo-core/src/logic/stream/index.ts
-- [ ] quidproquo-core/src/proiseify/getSystemExecuteStoryActionProcessor.test.ts
-- [ ] quidproquo-core/src/proiseify/getSystemExecuteStoryActionProcessor.ts
-- [ ] quidproquo-core/src/proiseify/index.ts
+- [x] quidproquo-core/src/proiseify/getSystemExecuteStoryActionProcessor.test.ts
+- [x] quidproquo-core/src/proiseify/getSystemExecuteStoryActionProcessor.ts
+- [x] quidproquo-core/src/proiseify/index.ts
 - [x] quidproquo-core/src/qpqCoreUtils.test.ts
 - [x] quidproquo-core/src/qpqCoreUtils.ts
   - Fixed: removed stray `console.log(fullUrl)` in getFullUrlFromConfigUrl. Deferred: flattenQpqConfig defaults environment to 'development' while getApplicationModuleEnvironment falls back to 'production'; unifying changes deployed resource names, needs owner decision.
@@ -1550,23 +1550,23 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [x] quidproquo-core/src/types/UnboundLogicStory.ts
 - [x] quidproquo-core/src/types/utils/createErrorEnumForAction.ts
 - [x] quidproquo-core/src/types/utils/index.ts
-- [ ] quidproquo-core/src/utils/array/index.ts
-- [ ] quidproquo-core/src/utils/array/zipArrays.test.ts
-- [ ] quidproquo-core/src/utils/array/zipArrays.ts
-- [ ] quidproquo-core/src/utils/dateTime/getQpqIsoDateTimeFromDate.ts
-- [ ] quidproquo-core/src/utils/dateTime/getValidQpqIsoDateTime.ts
-- [ ] quidproquo-core/src/utils/dateTime/index.ts
-- [ ] quidproquo-core/src/utils/functions/bindApi.test.ts
-- [ ] quidproquo-core/src/utils/functions/bindApi.ts
-- [ ] quidproquo-core/src/utils/functions/bindApiFunction.test.ts
-- [ ] quidproquo-core/src/utils/functions/bindApiFunction.ts
-- [ ] quidproquo-core/src/utils/functions/index.ts
+- [x] quidproquo-core/src/utils/array/index.ts
+- [x] quidproquo-core/src/utils/array/zipArrays.test.ts
+- [x] quidproquo-core/src/utils/array/zipArrays.ts
+- [x] quidproquo-core/src/utils/dateTime/getQpqIsoDateTimeFromDate.ts
+- [x] quidproquo-core/src/utils/dateTime/getValidQpqIsoDateTime.ts
+- [x] quidproquo-core/src/utils/dateTime/index.ts
+- [x] quidproquo-core/src/utils/functions/bindApi.test.ts
+- [x] quidproquo-core/src/utils/functions/bindApi.ts
+- [x] quidproquo-core/src/utils/functions/bindApiFunction.test.ts
+- [x] quidproquo-core/src/utils/functions/bindApiFunction.ts
+- [x] quidproquo-core/src/utils/functions/index.ts
 - [x] quidproquo-core/src/utils/hash/generateSimpleHash.test.ts
 - [x] quidproquo-core/src/utils/hash/generateSimpleHash.ts
 - [x] quidproquo-core/src/utils/hash/index.ts
 - [x] quidproquo-core/src/utils/hash/sha1.test.ts
 - [x] quidproquo-core/src/utils/hash/sha1.ts
-- [ ] quidproquo-core/src/utils/index.ts
+- [x] quidproquo-core/src/utils/index.ts
 - [x] quidproquo-core/src/utils/logs/formatDuration.test.ts
 - [x] quidproquo-core/src/utils/logs/formatDuration.ts
 - [x] quidproquo-core/src/utils/logs/getTimeBounds.test.ts
@@ -1574,8 +1574,8 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [x] quidproquo-core/src/utils/logs/getTotalExecutionTime.test.ts
 - [x] quidproquo-core/src/utils/logs/getTotalExecutionTime.ts
 - [x] quidproquo-core/src/utils/logs/index.ts
-- [ ] quidproquo-core/src/utils/mimeTypes.test.ts
-- [ ] quidproquo-core/src/utils/mimeTypes.ts
+- [x] quidproquo-core/src/utils/mimeTypes.test.ts
+- [x] quidproquo-core/src/utils/mimeTypes.ts
 - [x] quidproquo-core/src/utils/path/getFederatedKeyFromQpqFunctionRuntime.ts
 - [x] quidproquo-core/src/utils/path/getUniqueKeyFromQpqFunctionRuntime.test.ts
 - [x] quidproquo-core/src/utils/path/getUniqueKeyFromQpqFunctionRuntime.ts
@@ -1594,9 +1594,9 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [x] quidproquo-core/src/utils/uuid/generateUuidV5.test.ts
 - [x] quidproquo-core/src/utils/uuid/generateUuidV5.ts
 - [x] quidproquo-core/src/utils/uuid/index.ts
-- [ ] quidproquo-core/src/validators/index.ts
-- [ ] quidproquo-core/src/validators/isString.test.ts
-- [ ] quidproquo-core/src/validators/isString.ts
+- [x] quidproquo-core/src/validators/index.ts
+- [x] quidproquo-core/src/validators/isString.test.ts
+- [x] quidproquo-core/src/validators/isString.ts
 - [x] quidproquo-core/vitest.config.ts
 
 ### quidproquo-deploy-rspack

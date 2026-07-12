@@ -16,6 +16,13 @@ describe('getExtensionForMimeType', () => {
   it('falls back to bin for an unknown mime type', () => {
     expect(getExtensionForMimeType('application/unknown')).toBe('bin');
   });
+
+  it('falls back to bin for prototype-chain property names', () => {
+    expect(getExtensionForMimeType('constructor')).toBe('bin');
+    expect(getExtensionForMimeType('__proto__')).toBe('bin');
+    expect(getExtensionForMimeType('hasOwnProperty')).toBe('bin');
+    expect(getExtensionForMimeType('toString')).toBe('bin');
+  });
 });
 
 describe('getMimeTypeFromContentType', () => {
