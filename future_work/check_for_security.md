@@ -3122,9 +3122,9 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [ ] quidproquo-webserver/src/context/index.ts
 - [ ] quidproquo-webserver/src/context/websocketConnectionInfoContext.test.ts
 - [ ] quidproquo-webserver/src/context/websocketConnectionInfoContext.ts
-- [ ] quidproquo-webserver/src/index.test.ts
-- [ ] quidproquo-webserver/src/index.ts
-- [ ] quidproquo-webserver/src/qpqWebServerUtils.ts
+- [x] quidproquo-webserver/src/index.test.ts
+- [x] quidproquo-webserver/src/index.ts
+- [x] quidproquo-webserver/src/qpqWebServerUtils.ts
 - [ ] quidproquo-webserver/src/services/auth/config/constants.test.ts
 - [ ] quidproquo-webserver/src/services/auth/config/constants.ts
 - [ ] quidproquo-webserver/src/services/auth/config/defineAuthServiceRoute.test.ts
@@ -3355,36 +3355,36 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [ ] quidproquo-webserver/src/stories/askValidateRouteAuth.ts
 - [ ] quidproquo-webserver/src/stories/index.ts
 - [ ] quidproquo-webserver/src/testing/genericTextExtractorTestHelpers.ts
-- [ ] quidproquo-webserver/src/types/CloudflareDnsDeployEvent.ts
-- [ ] quidproquo-webserver/src/types/constants.ts
-- [ ] quidproquo-webserver/src/types/EmailSendEvent.ts
-- [ ] quidproquo-webserver/src/types/ExecuteServiceFunctionEvent.ts
-- [ ] quidproquo-webserver/src/types/HTTPEvent.ts
-- [ ] quidproquo-webserver/src/types/index.ts
-- [ ] quidproquo-webserver/src/types/SEOEvent.ts
-- [ ] quidproquo-webserver/src/types/StorageDriveEvent.ts
-- [ ] quidproquo-webserver/src/types/WebsocketEvent.ts
-- [ ] quidproquo-webserver/src/utils/headerUtils.test.ts
-- [ ] quidproquo-webserver/src/utils/headerUtils.ts
-- [ ] quidproquo-webserver/src/utils/httpEventUtils.test.ts
-- [ ] quidproquo-webserver/src/utils/httpEventUtils.ts
-- [ ] quidproquo-webserver/src/utils/index.ts
-- [ ] quidproquo-webserver/src/utils/jwtUtils.test.ts
-- [ ] quidproquo-webserver/src/utils/jwtUtils.ts
-- [ ] quidproquo-webserver/src/utils/mergeRouteUtils.test.ts
-- [ ] quidproquo-webserver/src/utils/mergeRouteUtils.ts
-- [ ] quidproquo-webserver/src/utils/networkRequestUtils.test.ts
-- [ ] quidproquo-webserver/src/utils/networkRequestUtils.ts
-- [ ] quidproquo-webserver/src/utils/pathUtils.test.ts
-- [ ] quidproquo-webserver/src/utils/pathUtils.ts
-- [ ] quidproquo-webserver/src/utils/preformNetworkRequest.test.ts
-- [ ] quidproquo-webserver/src/utils/preformNetworkRequest.ts
-- [ ] quidproquo-webserver/src/utils/qpqConfigAccessorsUtils.test.ts
-- [ ] quidproquo-webserver/src/utils/qpqConfigAccessorsUtils.ts
-- [ ] quidproquo-webserver/src/utils/urlUtils.test.ts
-- [ ] quidproquo-webserver/src/utils/urlUtils.ts
-- [ ] quidproquo-webserver/src/utils/websocketEventUtils.test.ts
-- [ ] quidproquo-webserver/src/utils/websocketEventUtils.ts
+- [x] quidproquo-webserver/src/types/CloudflareDnsDeployEvent.ts
+- [x] quidproquo-webserver/src/types/constants.ts
+- [x] quidproquo-webserver/src/types/EmailSendEvent.ts
+- [x] quidproquo-webserver/src/types/ExecuteServiceFunctionEvent.ts
+- [x] quidproquo-webserver/src/types/HTTPEvent.ts
+- [x] quidproquo-webserver/src/types/index.ts
+- [x] quidproquo-webserver/src/types/SEOEvent.ts
+- [x] quidproquo-webserver/src/types/StorageDriveEvent.ts
+- [x] quidproquo-webserver/src/types/WebsocketEvent.ts
+- [x] quidproquo-webserver/src/utils/headerUtils.test.ts
+- [x] quidproquo-webserver/src/utils/headerUtils.ts
+- [x] quidproquo-webserver/src/utils/httpEventUtils.test.ts
+- [x] quidproquo-webserver/src/utils/httpEventUtils.ts
+- [x] quidproquo-webserver/src/utils/index.ts
+- [x] quidproquo-webserver/src/utils/jwtUtils.test.ts
+- [x] quidproquo-webserver/src/utils/jwtUtils.ts
+- [x] quidproquo-webserver/src/utils/mergeRouteUtils.test.ts
+- [x] quidproquo-webserver/src/utils/mergeRouteUtils.ts
+- [x] quidproquo-webserver/src/utils/networkRequestUtils.test.ts
+- [x] quidproquo-webserver/src/utils/networkRequestUtils.ts
+- [x] quidproquo-webserver/src/utils/pathUtils.test.ts
+- [x] quidproquo-webserver/src/utils/pathUtils.ts
+- [x] quidproquo-webserver/src/utils/preformNetworkRequest.test.ts
+- [x] quidproquo-webserver/src/utils/preformNetworkRequest.ts
+- [x] quidproquo-webserver/src/utils/qpqConfigAccessorsUtils.test.ts
+- [x] quidproquo-webserver/src/utils/qpqConfigAccessorsUtils.ts
+- [x] quidproquo-webserver/src/utils/urlUtils.test.ts
+- [x] quidproquo-webserver/src/utils/urlUtils.ts
+- [x] quidproquo-webserver/src/utils/websocketEventUtils.test.ts
+- [x] quidproquo-webserver/src/utils/websocketEventUtils.ts
 - [ ] quidproquo-webserver/vitest.config.ts
 
 ### quidproquo-xstate

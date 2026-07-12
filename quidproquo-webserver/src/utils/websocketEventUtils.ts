@@ -7,15 +7,23 @@ export const fromJsonWebsocketEventRequest = <T>(websocketJsonEvent: WebsocketEv
     throw new Error('websocketJsonEvent.body is undefined');
   }
 
-  const item: T = JSON.parse(websocketJsonEvent.body);
-  return item;
+  try {
+    const item: T = JSON.parse(websocketJsonEvent.body);
+    return item;
+  } catch {
+    throw new Error('Unable to parse incoming json body from websocket event.');
+  }
 };
 
 export function* askFromJsonWebsocketEventRequest<T>(websocketJsonEvent: WebsocketEvent<string>): AskResponse<T> {
   if (!websocketJsonEvent.body) {
-    yield* askThrowError(ErrorTypeEnum.Invalid, 'websocketJsonEvent.body is undefined');
+    return yield* askThrowError(ErrorTypeEnum.Invalid, 'websocketJsonEvent.body is undefined');
   }
 
-  const item: T = JSON.parse(websocketJsonEvent.body!);
-  return item;
+  try {
+    const item: T = JSON.parse(websocketJsonEvent.body);
+    return item;
+  } catch {
+    return yield* askThrowError(ErrorTypeEnum.Invalid, 'Unable to parse incoming json from WebsocketEvent.');
+  }
 }

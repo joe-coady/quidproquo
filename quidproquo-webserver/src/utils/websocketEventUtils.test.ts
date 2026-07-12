@@ -15,6 +15,10 @@ describe('fromJsonWebsocketEventRequest', () => {
   it('throws when the body is missing', () => {
     expect(() => fromJsonWebsocketEventRequest(buildEvent())).toThrow('websocketJsonEvent.body is undefined');
   });
+
+  it('throws a friendly error when the body is not valid JSON', () => {
+    expect(() => fromJsonWebsocketEventRequest(buildEvent('nope'))).toThrow('Unable to parse incoming json body from websocket event.');
+  });
 });
 
 describe('askFromJsonWebsocketEventRequest', () => {
@@ -27,6 +31,16 @@ describe('askFromJsonWebsocketEventRequest', () => {
       runStory(askFromJsonWebsocketEventRequest(buildEvent()));
       throw new Error('expected a StoryError');
     } catch (e) {
+      expect((e as StoryError).errorType).toBe(ErrorTypeEnum.Invalid);
+    }
+  });
+
+  it('throws an Invalid story error (not a raw SyntaxError) when the body is not valid JSON', () => {
+    try {
+      runStory(askFromJsonWebsocketEventRequest(buildEvent('nope')));
+      throw new Error('expected a StoryError');
+    } catch (e) {
+      expect(e).toBeInstanceOf(StoryError);
       expect((e as StoryError).errorType).toBe(ErrorTypeEnum.Invalid);
     }
   });
