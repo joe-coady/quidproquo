@@ -1,11 +1,11 @@
 import { EventActionType } from './EventActionType';
-import { EventTransformEventRecordActionRequester } from './EventTransformEventRecordActionTypes';
+import { EventTransformEventRecordResponseActionRequester } from './EventTransformEventRecordResponseActionTypes';
 
-export function* askEventTransformEventRecord<EventRecord, QpqEventRecord>(
+export function* askEventTransformEventRecordResponse<EventRecord, QpqEventRecord>(
   eventRecord: EventRecord,
-): EventTransformEventRecordActionRequester<EventRecord, QpqEventRecord> {
+): EventTransformEventRecordResponseActionRequester<EventRecord, QpqEventRecord> {
   return yield {
-    type: EventActionType.TransformEventRecord,
+    type: EventActionType.TransformEventRecordResponse,
     payload: { eventRecord },
   };
 }

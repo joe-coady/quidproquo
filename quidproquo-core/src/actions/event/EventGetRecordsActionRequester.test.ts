@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { captureRequester } from '../../testing';
+import { captureRequester, runStory, throwsError } from '../../testing';
 import { EventActionType } from './EventActionType';
 import { askEventGetRecords } from './EventGetRecordsActionRequester';
 
@@ -28,5 +28,14 @@ describe('askEventGetRecords', () => {
     const { returned } = captureRequester(askEventGetRecords('x'), records);
 
     expect(returned).toBe(records);
+  });
+
+  it('propagates a processor failure as a thrown story error', () => {
+    const failingRun = () =>
+      runStory(askEventGetRecords('x'), {
+        [EventActionType.GetRecords]: throwsError('GenericError', 'could not read records'),
+      });
+
+    expect(failingRun).toThrow('GenericError: could not read records');
   });
 });

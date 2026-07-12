@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { captureRequester } from '../../testing';
+import { captureRequester, runStory, throwsError } from '../../testing';
 import { EventActionType } from './EventActionType';
 import { askEventAutoRespond } from './EventAutoRespondActionRequester';
 
@@ -21,5 +21,14 @@ describe('askEventAutoRespond', () => {
     const { returned } = captureRequester(askEventAutoRespond({ id: 'r1' }, { matched: true } as any), { status: 200 });
 
     expect(returned).toEqual({ status: 200 });
+  });
+
+  it('propagates a processor failure as a thrown story error', () => {
+    const failingRun = () =>
+      runStory(askEventAutoRespond({ id: 'r1' }, { matched: true } as any), {
+        [EventActionType.AutoRespond]: throwsError('GenericError', 'auto respond failed'),
+      });
+
+    expect(failingRun).toThrow('GenericError: auto respond failed');
   });
 });

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { captureRequester } from '../../testing';
+import { captureRequester, runStory, throwsError } from '../../testing';
 import { EventActionType } from './EventActionType';
 import { askEventMatchStory } from './EventMatchStoryActionRequester';
 
@@ -22,5 +22,14 @@ describe('askEventMatchStory', () => {
     const { returned } = captureRequester(askEventMatchStory({ id: 'r1' }, []), matchResult);
 
     expect(returned).toBe(matchResult);
+  });
+
+  it('propagates a processor failure as a thrown story error', () => {
+    const failingRun = () =>
+      runStory(askEventMatchStory({ id: 'r1' }, []), {
+        [EventActionType.MatchStory]: throwsError('NotFound', 'no story matched'),
+      });
+
+    expect(failingRun).toThrow('NotFound: no story matched');
   });
 });

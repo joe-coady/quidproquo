@@ -887,50 +887,51 @@ part of a documented config/action surface) must be covered by the docs site at 
 
 ### quidproquo-core
 
-- [ ] quidproquo-core/eslint.config.mjs
-- [ ] quidproquo-core/src/actions/ai/AiActionType.ts
-- [ ] quidproquo-core/src/actions/ai/AiMessage.ts
-- [ ] quidproquo-core/src/actions/ai/AiModel.ts
-- [ ] quidproquo-core/src/actions/ai/AiPromptActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/ai/AiPromptActionRequester.ts
-- [ ] quidproquo-core/src/actions/ai/AiPromptActionTypes.ts
-- [ ] quidproquo-core/src/actions/ai/AiPromptStreamActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/ai/AiPromptStreamActionRequester.ts
-- [ ] quidproquo-core/src/actions/ai/AiPromptStreamActionTypes.ts
-- [ ] quidproquo-core/src/actions/ai/AiReasoningConfig.ts
-- [ ] quidproquo-core/src/actions/ai/index.ts
-- [ ] quidproquo-core/src/actions/ai/types/AiStreamAbort.ts
-- [ ] quidproquo-core/src/actions/ai/types/AiStreamCustom.ts
-- [ ] quidproquo-core/src/actions/ai/types/AiStreamError.ts
-- [ ] quidproquo-core/src/actions/ai/types/AiStreamFile.ts
-- [ ] quidproquo-core/src/actions/ai/types/AiStreamFilePart.ts
-- [ ] quidproquo-core/src/actions/ai/types/AiStreamFinish.ts
-- [ ] quidproquo-core/src/actions/ai/types/AiStreamFinishStep.ts
-- [ ] quidproquo-core/src/actions/ai/types/AiStreamPart.ts
-- [ ] quidproquo-core/src/actions/ai/types/AiStreamPartType.ts
-- [ ] quidproquo-core/src/actions/ai/types/AiStreamRaw.ts
-- [ ] quidproquo-core/src/actions/ai/types/AiStreamReasoningDelta.ts
-- [ ] quidproquo-core/src/actions/ai/types/AiStreamReasoningEnd.ts
-- [ ] quidproquo-core/src/actions/ai/types/AiStreamReasoningFilePart.ts
-- [ ] quidproquo-core/src/actions/ai/types/AiStreamReasoningStart.ts
-- [ ] quidproquo-core/src/actions/ai/types/AiStreamSource.ts
-- [ ] quidproquo-core/src/actions/ai/types/AiStreamSourcePart.ts
-- [ ] quidproquo-core/src/actions/ai/types/AiStreamStart.ts
-- [ ] quidproquo-core/src/actions/ai/types/AiStreamStartStep.ts
-- [ ] quidproquo-core/src/actions/ai/types/AiStreamTextDelta.ts
-- [ ] quidproquo-core/src/actions/ai/types/AiStreamTextEnd.ts
-- [ ] quidproquo-core/src/actions/ai/types/AiStreamTextStart.ts
-- [ ] quidproquo-core/src/actions/ai/types/AiStreamToolApprovalRequest.ts
-- [ ] quidproquo-core/src/actions/ai/types/AiStreamToolApprovalResponse.ts
-- [ ] quidproquo-core/src/actions/ai/types/AiStreamToolCall.ts
-- [ ] quidproquo-core/src/actions/ai/types/AiStreamToolError.ts
-- [ ] quidproquo-core/src/actions/ai/types/AiStreamToolInputDelta.ts
-- [ ] quidproquo-core/src/actions/ai/types/AiStreamToolInputEnd.ts
-- [ ] quidproquo-core/src/actions/ai/types/AiStreamToolInputStart.ts
-- [ ] quidproquo-core/src/actions/ai/types/AiStreamToolOutputDenied.ts
-- [ ] quidproquo-core/src/actions/ai/types/AiStreamToolResult.ts
-- [ ] quidproquo-core/src/actions/ai/types/AiStreamUsage.ts
-- [ ] quidproquo-core/src/actions/ai/types/index.ts
+- [x] quidproquo-core/eslint.config.mjs
+- [x] quidproquo-core/src/actions/ai/AiActionType.ts
+- [x] quidproquo-core/src/actions/ai/AiMessage.ts
+  - Fixed: `AiFileDrivePart` gained optional `scope` so tenant-scoped drive attachments resolve; threaded through the awslambda drive-file resolver with a regression test.
+- [x] quidproquo-core/src/actions/ai/AiModel.ts
+- [x] quidproquo-core/src/actions/ai/AiPromptActionRequester.test.ts
+- [x] quidproquo-core/src/actions/ai/AiPromptActionRequester.ts
+- [x] quidproquo-core/src/actions/ai/AiPromptActionTypes.ts
+- [x] quidproquo-core/src/actions/ai/AiPromptStreamActionRequester.test.ts
+- [x] quidproquo-core/src/actions/ai/AiPromptStreamActionRequester.ts
+- [x] quidproquo-core/src/actions/ai/AiPromptStreamActionTypes.ts
+- [x] quidproquo-core/src/actions/ai/AiReasoningConfig.ts
+- [x] quidproquo-core/src/actions/ai/index.ts
+- [x] quidproquo-core/src/actions/ai/types/AiStreamAbort.ts
+- [x] quidproquo-core/src/actions/ai/types/AiStreamCustom.ts
+- [x] quidproquo-core/src/actions/ai/types/AiStreamError.ts
+- [x] quidproquo-core/src/actions/ai/types/AiStreamFile.ts
+- [x] quidproquo-core/src/actions/ai/types/AiStreamFilePart.ts
+- [x] quidproquo-core/src/actions/ai/types/AiStreamFinish.ts
+- [x] quidproquo-core/src/actions/ai/types/AiStreamFinishStep.ts
+- [x] quidproquo-core/src/actions/ai/types/AiStreamPart.ts
+- [x] quidproquo-core/src/actions/ai/types/AiStreamPartType.ts
+- [x] quidproquo-core/src/actions/ai/types/AiStreamRaw.ts
+- [x] quidproquo-core/src/actions/ai/types/AiStreamReasoningDelta.ts
+- [x] quidproquo-core/src/actions/ai/types/AiStreamReasoningEnd.ts
+- [x] quidproquo-core/src/actions/ai/types/AiStreamReasoningFilePart.ts
+- [x] quidproquo-core/src/actions/ai/types/AiStreamReasoningStart.ts
+- [x] quidproquo-core/src/actions/ai/types/AiStreamSource.ts
+- [x] quidproquo-core/src/actions/ai/types/AiStreamSourcePart.ts
+- [x] quidproquo-core/src/actions/ai/types/AiStreamStart.ts
+- [x] quidproquo-core/src/actions/ai/types/AiStreamStartStep.ts
+- [x] quidproquo-core/src/actions/ai/types/AiStreamTextDelta.ts
+- [x] quidproquo-core/src/actions/ai/types/AiStreamTextEnd.ts
+- [x] quidproquo-core/src/actions/ai/types/AiStreamTextStart.ts
+- [x] quidproquo-core/src/actions/ai/types/AiStreamToolApprovalRequest.ts
+- [x] quidproquo-core/src/actions/ai/types/AiStreamToolApprovalResponse.ts
+- [x] quidproquo-core/src/actions/ai/types/AiStreamToolCall.ts
+- [x] quidproquo-core/src/actions/ai/types/AiStreamToolError.ts
+- [x] quidproquo-core/src/actions/ai/types/AiStreamToolInputDelta.ts
+- [x] quidproquo-core/src/actions/ai/types/AiStreamToolInputEnd.ts
+- [x] quidproquo-core/src/actions/ai/types/AiStreamToolInputStart.ts
+- [x] quidproquo-core/src/actions/ai/types/AiStreamToolOutputDenied.ts
+- [x] quidproquo-core/src/actions/ai/types/AiStreamToolResult.ts
+- [x] quidproquo-core/src/actions/ai/types/AiStreamUsage.ts
+- [x] quidproquo-core/src/actions/ai/types/index.ts
 - [ ] quidproquo-core/src/actions/claudeAi/ClaudeAiActionType.ts
 - [ ] quidproquo-core/src/actions/claudeAi/ClaudeAiMessagesApiActionTypes.ts
 - [ ] quidproquo-core/src/actions/claudeAi/ClaudeAiMessagesApiRequester.test.ts
@@ -976,35 +977,36 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [ ] quidproquo-core/src/actions/error/ErrorThrowErrorActionRequester.ts
 - [ ] quidproquo-core/src/actions/error/ErrorThrowErrorActionRequesterTypes.ts
 - [ ] quidproquo-core/src/actions/error/index.ts
-- [ ] quidproquo-core/src/actions/event/EventActionType.ts
-- [ ] quidproquo-core/src/actions/event/EventAutoRespondActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/event/EventAutoRespondActionRequester.ts
-- [ ] quidproquo-core/src/actions/event/EventAutoRespondActionTypes.ts
-- [ ] quidproquo-core/src/actions/event/EventGetRecordsActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/event/EventGetRecordsActionRequester.ts
-- [ ] quidproquo-core/src/actions/event/EventGetRecordsActionTypes.ts
-- [ ] quidproquo-core/src/actions/event/EventGetStorySessionActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/event/EventGetStorySessionActionRequester.ts
-- [ ] quidproquo-core/src/actions/event/EventGetStorySessionActionTypes.ts
-- [ ] quidproquo-core/src/actions/event/EventMatchStoryActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/event/EventMatchStoryActionRequester.ts
-- [ ] quidproquo-core/src/actions/event/EventMatchStoryActionTypes.ts
-- [ ] quidproquo-core/src/actions/event/EventResolveCaughtErrorActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/event/EventResolveCaughtErrorActionRequester.ts
-- [ ] quidproquo-core/src/actions/event/EventResolveCaughtErrorActionTypes.ts
-- [ ] quidproquo-core/src/actions/event/EventTransformEventParamsActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/event/EventTransformEventParamsActionRequester.ts
-- [ ] quidproquo-core/src/actions/event/EventTransformEventParamsActionTypes.ts
-- [ ] quidproquo-core/src/actions/event/EventTransformEventRecordActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/event/EventTransformEventRecordActionRequester.ts
-- [ ] quidproquo-core/src/actions/event/EventTransformEventRecordActionTypes.ts
-- [ ] quidproquo-core/src/actions/event/EventTransformEventRecordResponseActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/event/EventTransformEventRecordResponseActionRequester.ts
-- [ ] quidproquo-core/src/actions/event/EventTransformEventRecordResponseActionTypes.ts
-- [ ] quidproquo-core/src/actions/event/EventTransformResponseResultActionRequester.test.ts
-- [ ] quidproquo-core/src/actions/event/EventTransformResponseResultActionRequester.ts
-- [ ] quidproquo-core/src/actions/event/EventTransformResponseResultActionTypes.ts
-- [ ] quidproquo-core/src/actions/event/index.ts
+- [x] quidproquo-core/src/actions/event/EventActionType.ts
+- [x] quidproquo-core/src/actions/event/EventAutoRespondActionRequester.test.ts
+- [x] quidproquo-core/src/actions/event/EventAutoRespondActionRequester.ts
+- [x] quidproquo-core/src/actions/event/EventAutoRespondActionTypes.ts
+- [x] quidproquo-core/src/actions/event/EventGetRecordsActionRequester.test.ts
+- [x] quidproquo-core/src/actions/event/EventGetRecordsActionRequester.ts
+- [x] quidproquo-core/src/actions/event/EventGetRecordsActionTypes.ts
+- [x] quidproquo-core/src/actions/event/EventGetStorySessionActionRequester.test.ts
+- [x] quidproquo-core/src/actions/event/EventGetStorySessionActionRequester.ts
+- [x] quidproquo-core/src/actions/event/EventGetStorySessionActionTypes.ts
+- [x] quidproquo-core/src/actions/event/EventMatchStoryActionRequester.test.ts
+- [x] quidproquo-core/src/actions/event/EventMatchStoryActionRequester.ts
+- [x] quidproquo-core/src/actions/event/EventMatchStoryActionTypes.ts
+- [x] quidproquo-core/src/actions/event/EventResolveCaughtErrorActionRequester.test.ts
+- [x] quidproquo-core/src/actions/event/EventResolveCaughtErrorActionRequester.ts
+- [x] quidproquo-core/src/actions/event/EventResolveCaughtErrorActionTypes.ts
+- [x] quidproquo-core/src/actions/event/EventTransformEventParamsActionRequester.test.ts
+- [x] quidproquo-core/src/actions/event/EventTransformEventParamsActionRequester.ts
+- [x] quidproquo-core/src/actions/event/EventTransformEventParamsActionTypes.ts
+- [x] quidproquo-core/src/actions/event/EventTransformEventRecordActionRequester.test.ts
+- [x] quidproquo-core/src/actions/event/EventTransformEventRecordActionRequester.ts
+- [x] quidproquo-core/src/actions/event/EventTransformEventRecordActionTypes.ts
+- [x] quidproquo-core/src/actions/event/EventTransformEventRecordResponseActionRequester.test.ts
+- [x] quidproquo-core/src/actions/event/EventTransformEventRecordResponseActionRequester.ts
+  - Fixed: file was a copy of the record requester, so `askEventTransformEventRecordResponse` never existed and the barrel omitted it; rewrote the requester and added the missing index exports.
+- [x] quidproquo-core/src/actions/event/EventTransformEventRecordResponseActionTypes.ts
+- [x] quidproquo-core/src/actions/event/EventTransformResponseResultActionRequester.test.ts
+- [x] quidproquo-core/src/actions/event/EventTransformResponseResultActionRequester.ts
+- [x] quidproquo-core/src/actions/event/EventTransformResponseResultActionTypes.ts
+- [x] quidproquo-core/src/actions/event/index.ts
 - [ ] quidproquo-core/src/actions/eventBus/EventBusActionType.ts
 - [ ] quidproquo-core/src/actions/eventBus/EventBusSendMessageActionRequester.test.ts
 - [ ] quidproquo-core/src/actions/eventBus/EventBusSendMessageActionRequester.ts
@@ -1325,10 +1327,10 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [ ] quidproquo-core/src/constants/index.ts
 - [ ] quidproquo-core/src/constants/qpqApplicationVersionGlobal.ts
 - [ ] quidproquo-core/src/constants/storageDrives.ts
-- [ ] quidproquo-core/src/createImplementationRuntime.test.ts
-- [ ] quidproquo-core/src/createImplementationRuntime.ts
-- [ ] quidproquo-core/src/index.test.ts
-- [ ] quidproquo-core/src/index.ts
+- [x] quidproquo-core/src/createImplementationRuntime.test.ts
+- [x] quidproquo-core/src/createImplementationRuntime.ts
+- [x] quidproquo-core/src/index.test.ts
+- [x] quidproquo-core/src/index.ts
 - [ ] quidproquo-core/src/logic/actionLogic.test.ts
 - [ ] quidproquo-core/src/logic/actionLogic.ts
 - [ ] quidproquo-core/src/logic/actionValidators/index.ts
@@ -1392,10 +1394,10 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [ ] quidproquo-core/src/proiseify/index.ts
 - [ ] quidproquo-core/src/qpqCoreUtils.test.ts
 - [ ] quidproquo-core/src/qpqCoreUtils.ts
-- [ ] quidproquo-core/src/qpqCoreUtilsLib.test.ts
-- [ ] quidproquo-core/src/qpqCoreUtilsLib.ts
-- [ ] quidproquo-core/src/qpqExecuteLog.test.ts
-- [ ] quidproquo-core/src/qpqExecuteLog.ts
+- [x] quidproquo-core/src/qpqCoreUtilsLib.test.ts
+- [x] quidproquo-core/src/qpqCoreUtilsLib.ts
+- [x] quidproquo-core/src/qpqExecuteLog.test.ts
+- [x] quidproquo-core/src/qpqExecuteLog.ts
 - [ ] quidproquo-core/src/runtime/consoleLogHook.test.ts
 - [ ] quidproquo-core/src/runtime/consoleLogHook.ts
 - [ ] quidproquo-core/src/runtime/createRuntime.test.ts
@@ -1585,7 +1587,7 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [ ] quidproquo-core/src/validators/index.ts
 - [ ] quidproquo-core/src/validators/isString.test.ts
 - [ ] quidproquo-core/src/validators/isString.ts
-- [ ] quidproquo-core/vitest.config.ts
+- [x] quidproquo-core/vitest.config.ts
 
 ### quidproquo-deploy-rspack
 

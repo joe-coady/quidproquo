@@ -12,7 +12,7 @@ import {
 
 import type { AssistantModelMessage, ModelMessage, ToolModelMessage, UserModelMessage } from 'ai';
 
-export type AiDriveFileResolver = (drive: string, filepath: string) => Promise<QPQBinaryData>;
+export type AiDriveFileResolver = (drive: string, filepath: string, scope?: string) => Promise<QPQBinaryData>;
 
 const mapFilePart = async (part: AiFilePart, resolveDriveFile: AiDriveFileResolver) => {
   if ('url' in part) {
@@ -24,7 +24,7 @@ const mapFilePart = async (part: AiFilePart, resolveDriveFile: AiDriveFileResolv
     };
   }
 
-  const binary = await resolveDriveFile(part.drive, part.filepath);
+  const binary = await resolveDriveFile(part.drive, part.filepath, part.scope);
 
   return {
     type: 'file' as const,

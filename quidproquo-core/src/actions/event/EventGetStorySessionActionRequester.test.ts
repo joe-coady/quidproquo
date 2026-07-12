@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { captureRequester } from '../../testing';
+import { captureRequester, runStory, throwsError } from '../../testing';
 import { EventActionType } from './EventActionType';
 import { askEventGetStorySession } from './EventGetStorySessionActionRequester';
 
@@ -23,5 +23,14 @@ describe('askEventGetStorySession', () => {
     const { returned } = captureRequester(askEventGetStorySession(['a'], { id: 'r1' }, { matched: true } as any), session);
 
     expect(returned).toBe(session);
+  });
+
+  it('propagates a processor failure as a thrown story error', () => {
+    const failingRun = () =>
+      runStory(askEventGetStorySession(['a'], { id: 'r1' }, { matched: true } as any), {
+        [EventActionType.GetStorySession]: throwsError('GenericError', 'session lookup failed'),
+      });
+
+    expect(failingRun).toThrow('GenericError: session lookup failed');
   });
 });

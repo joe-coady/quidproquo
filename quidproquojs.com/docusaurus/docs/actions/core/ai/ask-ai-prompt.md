@@ -85,7 +85,7 @@ type AiToolMessage      = { role: 'tool';      content: AiToolResultPart[] };
 | --- | --- | --- |
 | `text` | `text` | Plain text. |
 | `file` (URL) | `url`, `mediaType`, `filename?` | Attach a file by URL. |
-| `file` (drive) | `drive`, `filepath`, `mediaType`, `filename?` | Attach a file from a [storage drive](../../../config/core/storage-drive.md). The processor resolves the contents at prompt time, so no presigned URL ever lands in logs or session state. |
+| `file` (drive) | `drive`, `filepath`, `scope?`, `mediaType`, `filename?` | Attach a file from a [storage drive](../../../config/core/storage-drive.md). The processor resolves the contents at prompt time, so no presigned URL ever lands in logs or session state. Set `scope` when the file lives under a tenant scope; it is forwarded to the file read. |
 | `tool-call` | `toolCallId`, `toolName`, `input` | An assistant turn's request to call a tool. |
 | `reasoning` | `text`, `providerOptions?` | An assistant turn's thinking block. |
 | `tool-result` | `toolCallId`, `toolName`, `output`, `isError?` | The result you feed back for a tool call (in a `tool` message). |
@@ -104,7 +104,13 @@ interface AiReasoningConfig {
 
 ## Errors
 
-On any failure the processor throws `ErrorTypeEnum.GenericError` with the underlying provider message. Catch it with `askCatch`, which returns an `EitherActionResult` — `{ success: true, result }` or `{ success: false, error }`:
+| Error | When |
+| --- | --- |
+| `ErrorTypeEnum.NotImplemented` | The `model` has no mapping to an underlying provider model id. |
+| `ErrorTypeEnum.NotFound` | `options.aiName` names an AI config that does not exist. |
+| `ErrorTypeEnum.GenericError` | Any failure while generating, with the underlying provider message. |
+
+Catch failures with `askCatch`, which returns an `EitherActionResult` — `{ success: true, result }` or `{ success: false, error }`:
 
 ```typescript
 import { askCatch, askAiPrompt, AiModel } from 'quidproquo-core';

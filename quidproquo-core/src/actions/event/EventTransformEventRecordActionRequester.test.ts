@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { captureRequester } from '../../testing';
+import { captureRequester, runStory, throwsError } from '../../testing';
 import { EventActionType } from './EventActionType';
 import { askEventTransformEventRecord } from './EventTransformEventRecordActionRequester';
 
@@ -21,5 +21,14 @@ describe('askEventTransformEventRecord', () => {
     const { returned } = captureRequester(askEventTransformEventRecord({ raw: 'payload' }), transformed);
 
     expect(returned).toBe(transformed);
+  });
+
+  it('propagates a processor failure as a thrown story error', () => {
+    const failingRun = () =>
+      runStory(askEventTransformEventRecord({ raw: 'payload' }), {
+        [EventActionType.TransformEventRecord]: throwsError('GenericError', 'record transform failed'),
+      });
+
+    expect(failingRun).toThrow('GenericError: record transform failed');
   });
 });

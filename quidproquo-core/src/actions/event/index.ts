@@ -13,5 +13,7 @@ export * from './EventTransformEventParamsActionRequester';
 export * from './EventTransformEventParamsActionTypes';
 export * from './EventTransformEventRecordActionRequester';
 export * from './EventTransformEventRecordActionTypes';
+export * from './EventTransformEventRecordResponseActionRequester';
+export * from './EventTransformEventRecordResponseActionTypes';
 export * from './EventTransformResponseResultActionRequester';
 export * from './EventTransformResponseResultActionTypes';

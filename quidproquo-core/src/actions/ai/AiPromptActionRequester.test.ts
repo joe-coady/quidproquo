@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { captureRequester } from '../../testing';
+import { captureRequester, runStory, throwsError } from '../../testing';
 import { AiActionType } from './AiActionType';
 import { AiModel } from './AiModel';
 import { askAiPrompt } from './AiPromptActionRequester';
@@ -9,7 +9,15 @@ describe('askAiPrompt', () => {
   it('yields a Prompt action with the model, prompt and options', () => {
     const messages = [{ role: 'user', content: 'hi' }] as any;
 
-    const { action } = captureRequester(askAiPrompt(AiModel.ClaudeSonnet45, 'do the thing', { system: 'be helpful', aiName: 'bob', messages }));
+    const { action } = captureRequester(
+      askAiPrompt(AiModel.ClaudeSonnet45, 'do the thing', {
+        system: 'be helpful',
+        aiName: 'bob',
+        messages,
+        reasoning: { budgetTokens: 2048 },
+        caching: true,
+      }),
+    );
 
     expect(action).toEqual({
       type: AiActionType.Prompt,
@@ -19,6 +27,8 @@ describe('askAiPrompt', () => {
         messages,
         system: 'be helpful',
         aiName: 'bob',
+        reasoning: { budgetTokens: 2048 },
+        caching: true,
       },
     });
   });
@@ -34,6 +44,8 @@ describe('askAiPrompt', () => {
         messages: undefined,
         system: undefined,
         aiName: undefined,
+        reasoning: undefined,
+        caching: undefined,
       },
     });
   });
@@ -43,5 +55,14 @@ describe('askAiPrompt', () => {
     const { returned } = captureRequester(askAiPrompt(AiModel.ClaudeHaiku45, 'hello'), completion);
 
     expect(returned).toBe(completion);
+  });
+
+  it('propagates a processor failure as a thrown story error', () => {
+    const failingRun = () =>
+      runStory(askAiPrompt(AiModel.ClaudeHaiku45, 'hello'), {
+        [AiActionType.Prompt]: throwsError('GenericError', 'model unavailable'),
+      });
+
+    expect(failingRun).toThrow('GenericError: model unavailable');
   });
 });

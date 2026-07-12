@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { captureRequester } from '../../testing';
+import { captureRequester, runStory, throwsError } from '../../testing';
 import { EventActionType } from './EventActionType';
 import { askEventTransformResponseResult } from './EventTransformResponseResultActionRequester';
 
@@ -32,5 +32,14 @@ describe('askEventTransformResponseResult', () => {
     const { returned } = captureRequester(askEventTransformResponseResult([] as any), transformed);
 
     expect(returned).toBe(transformed);
+  });
+
+  it('propagates a processor failure as a thrown story error', () => {
+    const failingRun = () =>
+      runStory(askEventTransformResponseResult([] as any), {
+        [EventActionType.TransformResponseResult]: throwsError('GenericError', 'response transform failed'),
+      });
+
+    expect(failingRun).toThrow('GenericError: response transform failed');
   });
 });

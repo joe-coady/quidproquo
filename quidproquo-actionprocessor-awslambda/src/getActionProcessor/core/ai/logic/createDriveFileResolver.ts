@@ -22,7 +22,7 @@ export const createDriveFileResolver = (
   dynamicModuleLoader: DynamicModuleLoader,
   streamRegistry?: StreamRegistry,
 ): AiDriveFileResolver => {
-  return async (drive: string, filepath: string) => {
+  return async (drive: string, filepath: string, scope?: string) => {
     const resolveStory = createImplementationRuntime(
       qpqConfig,
       [`AI File: ${drive}/${filepath}`],
@@ -35,7 +35,7 @@ export const createDriveFileResolver = (
       streamRegistry,
     );
 
-    const storyResult = await resolveStory(askFileReadBinaryContents, [drive, filepath]);
+    const storyResult = await resolveStory(askFileReadBinaryContents, [drive, filepath, scope]);
 
     if (storyResult.error) {
       throw new Error(storyResult.error.errorText);

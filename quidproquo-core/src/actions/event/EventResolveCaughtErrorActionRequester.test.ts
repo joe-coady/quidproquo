@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { captureRequester } from '../../testing';
+import { captureRequester, runStory, throwsError } from '../../testing';
 import { EventActionType } from './EventActionType';
 import { askEventResolveCaughtError } from './EventResolveCaughtErrorActionRequester';
 
@@ -21,5 +21,14 @@ describe('askEventResolveCaughtError', () => {
     const { returned } = captureRequester(askEventResolveCaughtError({ errorType: 'GenericError' } as any), resolved);
 
     expect(returned).toBe(resolved);
+  });
+
+  it('propagates a processor failure as a thrown story error', () => {
+    const failingRun = () =>
+      runStory(askEventResolveCaughtError({ errorType: 'GenericError', errorText: 'boom' } as any), {
+        [EventActionType.ResolveCaughtError]: throwsError('GenericError', 'resolver failed'),
+      });
+
+    expect(failingRun).toThrow('GenericError: resolver failed');
   });
 });

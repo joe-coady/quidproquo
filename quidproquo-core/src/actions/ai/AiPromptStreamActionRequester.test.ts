@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { captureRequester } from '../../testing';
+import { captureRequester, runStory, throwsError } from '../../testing';
 import { AiActionType } from './AiActionType';
 import { AiModel } from './AiModel';
 import { askAiPromptStream } from './AiPromptStreamActionRequester';
@@ -9,7 +9,15 @@ describe('askAiPromptStream', () => {
   it('yields a PromptStream action with the model, prompt and options', () => {
     const messages = [{ role: 'user', content: 'hi' }] as any;
 
-    const { action } = captureRequester(askAiPromptStream(AiModel.ClaudeSonnet45, 'stream it', { system: 'be helpful', aiName: 'bob', messages }));
+    const { action } = captureRequester(
+      askAiPromptStream(AiModel.ClaudeSonnet45, 'stream it', {
+        system: 'be helpful',
+        aiName: 'bob',
+        messages,
+        reasoning: { budgetTokens: 2048 },
+        caching: true,
+      }),
+    );
 
     expect(action).toEqual({
       type: AiActionType.PromptStream,
@@ -19,6 +27,8 @@ describe('askAiPromptStream', () => {
         messages,
         system: 'be helpful',
         aiName: 'bob',
+        reasoning: { budgetTokens: 2048 },
+        caching: true,
       },
     });
   });
@@ -34,6 +44,8 @@ describe('askAiPromptStream', () => {
         messages: undefined,
         system: undefined,
         aiName: undefined,
+        reasoning: undefined,
+        caching: undefined,
       },
     });
   });
@@ -43,5 +55,14 @@ describe('askAiPromptStream', () => {
     const { returned } = captureRequester(askAiPromptStream(AiModel.ClaudeHaiku45, 'hello'), result);
 
     expect(returned).toBe(result);
+  });
+
+  it('propagates a processor failure as a thrown story error', () => {
+    const failingRun = () =>
+      runStory(askAiPromptStream(AiModel.ClaudeHaiku45, 'hello'), {
+        [AiActionType.PromptStream]: throwsError('GenericError', 'model unavailable'),
+      });
+
+    expect(failingRun).toThrow('GenericError: model unavailable');
   });
 });

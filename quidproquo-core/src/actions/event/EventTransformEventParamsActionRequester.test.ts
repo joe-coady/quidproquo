@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { captureRequester } from '../../testing';
+import { captureRequester, runStory, throwsError } from '../../testing';
 import { EventActionType } from './EventActionType';
 import { askEventTransformEventParams } from './EventTransformEventParamsActionRequester';
 
@@ -28,5 +28,14 @@ describe('askEventTransformEventParams', () => {
     const { returned } = captureRequester(askEventTransformEventParams('a'), transformed);
 
     expect(returned).toBe(transformed);
+  });
+
+  it('propagates a processor failure as a thrown story error', () => {
+    const failingRun = () =>
+      runStory(askEventTransformEventParams('a'), {
+        [EventActionType.TransformEventParams]: throwsError('GenericError', 'params transform failed'),
+      });
+
+    expect(failingRun).toThrow('GenericError: params transform failed');
   });
 });

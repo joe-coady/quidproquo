@@ -48,9 +48,25 @@ describe('toSdkMessages', () => {
       resolver,
     );
 
-    expect(resolver).toHaveBeenCalledWith('chat-drive', 'doc-1/assets/a1');
+    expect(resolver).toHaveBeenCalledWith('chat-drive', 'doc-1/assets/a1', undefined);
     const content = message.content as Array<Record<string, unknown>>;
     expect(content[0]).toEqual({ type: 'file', data: 'AAECAw==', mediaType: 'application/pdf', filename: 'stored.pdf' });
+  });
+
+  it('forwards the tenant scope of a drive file part to the resolver', async () => {
+    const resolver = vi.fn(async () => ({ base64Data: 'AAECAw==', filename: 'stored.pdf' }));
+
+    await toSdkMessages(
+      [
+        {
+          role: 'user',
+          content: [{ type: 'file', drive: 'chat-drive', filepath: 'doc-1/assets/a1', scope: 'tenant-a', mediaType: 'application/pdf' }],
+        },
+      ] as AiMessage[],
+      resolver,
+    );
+
+    expect(resolver).toHaveBeenCalledWith('chat-drive', 'doc-1/assets/a1', 'tenant-a');
   });
 
   it('prefers the part filename over the stored filename for drive parts', async () => {

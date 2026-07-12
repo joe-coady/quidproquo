@@ -85,7 +85,13 @@ Within a step, text / reasoning / tool-input events arrive as matched `*Start â†
 
 ## Errors
 
-Fatal failures throw `ErrorTypeEnum.GenericError`; non-fatal issues that arise mid-stream surface as `Error` (`error`) parts rather than throwing. Wrap the initial call with `askCatch` if the model may be unavailable.
+| Error | When |
+| --- | --- |
+| `ErrorTypeEnum.NotImplemented` | The `model` has no mapping to an underlying provider model id. |
+| `ErrorTypeEnum.NotFound` | `options.aiName` names an AI config that does not exist. |
+| `ErrorTypeEnum.GenericError` | Any failure while setting up the stream. |
+
+Non-fatal issues that arise mid-stream surface as `Error` (`error`) parts rather than throwing. Wrap the initial call with `askCatch` if the model may be unavailable.
 
 ## Related
 
