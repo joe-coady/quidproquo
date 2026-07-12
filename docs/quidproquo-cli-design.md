@@ -191,7 +191,7 @@ implementation:
   workspaces build order to satisfy this.
 - **`quidproquo-dev-server/config` subpath** (folder-stub package.json):
   service `infrastructure.ts` files import `defineDevServerOptions` from there
-  so the dev server's express/sqlite3 never enter lambda bundles.
+  so the dev server's express/native deps never enter lambda bundles.
   `viewsWorkspace` resolves a views port as: defineDevServerOptions → legacy
   `"port"` in views package.json → 4200.
 - **FrontendBundleOptions got its first field**: `sharedSingletons`

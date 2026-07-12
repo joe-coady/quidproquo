@@ -8,28 +8,15 @@ import {
   KeyValueStoreUpsertActionProcessor,
   KeyValueStoreUpsertErrorTypeEnum,
   QPQConfig,
-  qpqCoreUtils,
 } from 'quidproquo-core';
 
-import { SqliteKvsRepository } from '../../../logic/keyValueStore/SqliteKvsRepository';
+import { getKvsRepository } from '../../../logic/keyValueStore/getKvsRepository';
 import { ResolvedDevServerConfig } from '../../../types';
-
-const repositoryInstances = new Map<string, SqliteKvsRepository>();
-
-const getRepository = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): SqliteKvsRepository => {
-  const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
-
-  if (!repositoryInstances.has(serviceName)) {
-    repositoryInstances.set(serviceName, new SqliteKvsRepository(devServerConfig.runtimePath, qpqConfig));
-  }
-
-  return repositoryInstances.get(serviceName)!;
-};
 
 const getProcessKeyValueStoreUpsert = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): KeyValueStoreUpsertActionProcessor<any> => {
   return async ({ keyValueStoreName, item, options }) => {
     try {
-      const repository = getRepository(qpqConfig, devServerConfig);
+      const repository = getKvsRepository(qpqConfig, devServerConfig);
       const result = await repository.upsert(keyValueStoreName, item, {
         ifNotExists: options?.ifNotExists,
       });

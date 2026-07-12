@@ -7,28 +7,15 @@ import {
   KeyValueStoreActionType,
   KeyValueStoreScanActionProcessor,
   QPQConfig,
-  qpqCoreUtils,
 } from 'quidproquo-core';
 
-import { SqliteKvsRepository } from '../../../logic/keyValueStore/SqliteKvsRepository';
+import { getKvsRepository } from '../../../logic/keyValueStore/getKvsRepository';
 import { ResolvedDevServerConfig } from '../../../types';
-
-const repositoryInstances = new Map<string, SqliteKvsRepository>();
-
-const getRepository = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): SqliteKvsRepository => {
-  const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
-
-  if (!repositoryInstances.has(serviceName)) {
-    repositoryInstances.set(serviceName, new SqliteKvsRepository(devServerConfig.runtimePath, qpqConfig));
-  }
-
-  return repositoryInstances.get(serviceName)!;
-};
 
 const getProcessKeyValueStoreScan = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): KeyValueStoreScanActionProcessor<any> => {
   return async ({ keyValueStoreName, filterCondition, nextPageKey }) => {
     try {
-      const repository = getRepository(qpqConfig, devServerConfig);
+      const repository = getKvsRepository(qpqConfig, devServerConfig);
       const result = await repository.scan(
         keyValueStoreName,
         filterCondition,

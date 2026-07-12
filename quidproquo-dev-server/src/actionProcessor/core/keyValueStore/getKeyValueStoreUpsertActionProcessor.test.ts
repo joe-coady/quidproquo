@@ -3,6 +3,7 @@ import {
   ErrorTypeEnum,
   isErroredActionResult,
   KeyValueStoreActionType,
+  KeyValueStoreUpsertErrorTypeEnum,
   noopDynamicModuleLoader,
   resolveActionResult,
   resolveActionResultError,
@@ -17,8 +18,8 @@ const { repo } = vi.hoisted(() => ({
   repo: { get: vi.fn(), delete: vi.fn(), query: vi.fn(), scan: vi.fn(), update: vi.fn(), upsert: vi.fn() },
 }));
 
-vi.mock('../../../logic/keyValueStore/SqliteKvsRepository', () => ({
-  SqliteKvsRepository: vi.fn(() => repo),
+vi.mock('../../../logic/keyValueStore/getKvsRepository', () => ({
+  getKvsRepository: vi.fn(() => repo),
 }));
 
 const devServerConfig = { runtimePath: '/tmp/runtime' } as any;
@@ -48,6 +49,18 @@ describe('getKeyValueStoreUpsertActionProcessor', () => {
     const result = await invokeProcessor(process, { keyValueStoreName: 'store', item: {} });
 
     expect(resolveActionResultError(result).errorType).toBe('ResourceNotFound');
+  });
+
+  it('maps a ConditionalCheckFailedException from the repository to Conflict', async () => {
+    const conflictError = new Error('KVS item already exists');
+    conflictError.name = 'ConditionalCheckFailedException';
+    repo.upsert.mockRejectedValue(conflictError);
+    const process = await getProcessor();
+
+    const result = await invokeProcessor(process, { keyValueStoreName: 'store', item: { id: 'a' }, options: { ifNotExists: true } });
+
+    expect(isErroredActionResult(result)).toBe(true);
+    expect(resolveActionResultError(result).errorType).toBe(KeyValueStoreUpsertErrorTypeEnum.Conflict);
   });
 
   it('maps a generic error to a caught error', async () => {

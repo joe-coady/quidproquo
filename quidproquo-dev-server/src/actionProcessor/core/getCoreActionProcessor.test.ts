@@ -19,8 +19,8 @@ const { repo } = vi.hoisted(() => ({
   repo: { get: vi.fn(), delete: vi.fn(), query: vi.fn(), scan: vi.fn(), update: vi.fn(), upsert: vi.fn() },
 }));
 
-vi.mock('../../logic/keyValueStore/SqliteKvsRepository', () => ({
-  SqliteKvsRepository: vi.fn(() => repo),
+vi.mock('../../logic/keyValueStore/getKvsRepository', () => ({
+  getKvsRepository: vi.fn(() => repo),
 }));
 
 const devServerConfig = {

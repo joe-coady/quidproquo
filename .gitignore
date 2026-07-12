@@ -30,3 +30,6 @@ coverage/
 dist/
 
 cdk.context.json
+
+# Throwaway local benchmark scripts
+benchmarks/

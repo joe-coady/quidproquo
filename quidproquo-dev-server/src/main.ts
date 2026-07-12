@@ -3,6 +3,7 @@ import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 import * as crypto from 'crypto';
 import path from 'path';
 
+import { warnIfLegacyKvsDatabase } from './logic/keyValueStore/warnIfLegacyKvsDatabase';
 import {
   apiImplementation,
   createTinkerInterface,
@@ -59,6 +60,7 @@ export const startDevServer = async (devServerConfig: DevServerConfig, devServer
   console.log('Starting QPQ Dev Server!!! - this is a note');
 
   const resolvedDevServerConfig = resolveDevServerConfig(devServerConfig, devServerConfigOverrides);
+  warnIfLegacyKvsDatabase(resolvedDevServerConfig.runtimePath);
 
   await Promise.all([
     apiImplementation(resolvedDevServerConfig),
@@ -84,6 +86,7 @@ export const startTinker = async (
   console.log('Starting QPQ Tinker Environment...');
 
   const resolvedDevServerConfig = resolveDevServerConfig(devServerConfig, devServerConfigOverrides);
+  warnIfLegacyKvsDatabase(resolvedDevServerConfig.runtimePath);
 
   // Start all implementations without awaiting (they run forever)
   // Just fire them off in the background

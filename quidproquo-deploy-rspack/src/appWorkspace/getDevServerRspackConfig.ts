@@ -31,7 +31,7 @@ export const getDevServerRspackConfig = ({ root, entry, qpqConfigs }: DevServerR
   const ignoreModules = bundleOptions.flatMap((options) => options.ignoreModules);
 
   // Don't bundle node_modules — require them at runtime instead. This keeps
-  // native modules (sqlite3, sharp) and linked quidproquo packages loading from
+  // native modules (e.g. sharp) and linked quidproquo packages loading from
   // their own install locations. Workspace packages and the
   // `quidproquo-dynamic-loader` virtual module are allowlisted so they get
   // bundled (from source, via the aliases above).
