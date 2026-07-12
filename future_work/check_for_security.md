@@ -1406,17 +1406,19 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [x] quidproquo-core/src/qpqCoreUtilsLib.ts
 - [x] quidproquo-core/src/qpqExecuteLog.test.ts
 - [x] quidproquo-core/src/qpqExecuteLog.ts
-- [ ] quidproquo-core/src/runtime/consoleLogHook.test.ts
-- [ ] quidproquo-core/src/runtime/consoleLogHook.ts
-- [ ] quidproquo-core/src/runtime/createRuntime.test.ts
-- [ ] quidproquo-core/src/runtime/createRuntime.ts
-- [ ] quidproquo-core/src/runtime/index.ts
-- [ ] quidproquo-core/src/runtime/processAction.test.ts
-- [ ] quidproquo-core/src/runtime/processAction.ts
-- [ ] quidproquo-core/src/runtime/resolveStory.test.ts
-- [ ] quidproquo-core/src/runtime/resolveStory.ts
-- [ ] quidproquo-core/src/runtime/resolveStoryWithLogs.test.ts
-- [ ] quidproquo-core/src/runtime/resolveStoryWithLogs.ts
+- [x] quidproquo-core/src/runtime/consoleLogHook.test.ts
+- [x] quidproquo-core/src/runtime/consoleLogHook.ts
+- [x] quidproquo-core/src/runtime/createRuntime.test.ts
+- [x] quidproquo-core/src/runtime/createRuntime.ts
+- [x] quidproquo-core/src/runtime/index.ts
+- [x] quidproquo-core/src/runtime/processAction.test.ts
+- [x] quidproquo-core/src/runtime/processAction.ts
+  - Fixed: action types shadowing Object.prototype members ('constructor', 'toString') no longer invoke inherited members as processors (identity guard, Proxy-compatible).
+  - Deferred (design): GenericError errorText carries raw caught-exception messages to HTTP clients via five transforms (awslambda api/cloudfront/cognito x2, dev-server express). Proper fix: `internal?: boolean` on QPQError set only in caught-exception paths, redact at transforms, keep full text in logs. Cross-package.
+- [x] quidproquo-core/src/runtime/resolveStory.test.ts
+- [x] quidproquo-core/src/runtime/resolveStory.ts
+- [x] quidproquo-core/src/runtime/resolveStoryWithLogs.test.ts
+- [x] quidproquo-core/src/runtime/resolveStoryWithLogs.ts
 - [ ] quidproquo-core/src/stories/array/askArraySome.test.ts
 - [ ] quidproquo-core/src/stories/array/askArraySome.ts
 - [ ] quidproquo-core/src/stories/array/askFilter.test.ts
@@ -1498,15 +1500,15 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [ ] quidproquo-core/src/stories/system/askOverrideActions.ts
 - [ ] quidproquo-core/src/stories/system/askRunParallel.ts
 - [ ] quidproquo-core/src/stories/system/index.ts
-- [ ] quidproquo-core/src/testing/configTesting.test.ts
-- [ ] quidproquo-core/src/testing/configTesting.ts
-- [ ] quidproquo-core/src/testing/index.ts
-- [ ] quidproquo-core/src/testing/requesterTesting.test.ts
-- [ ] quidproquo-core/src/testing/requesterTesting.ts
-- [ ] quidproquo-core/src/testing/runtimeTesting.test.ts
-- [ ] quidproquo-core/src/testing/runtimeTesting.ts
-- [ ] quidproquo-core/src/testing/storyTesting.test.ts
-- [ ] quidproquo-core/src/testing/storyTesting.ts
+- [x] quidproquo-core/src/testing/configTesting.test.ts
+- [x] quidproquo-core/src/testing/configTesting.ts
+- [x] quidproquo-core/src/testing/index.ts
+- [x] quidproquo-core/src/testing/requesterTesting.test.ts
+- [x] quidproquo-core/src/testing/requesterTesting.ts
+- [x] quidproquo-core/src/testing/runtimeTesting.test.ts
+- [x] quidproquo-core/src/testing/runtimeTesting.ts
+- [x] quidproquo-core/src/testing/storyTesting.test.ts
+- [x] quidproquo-core/src/testing/storyTesting.ts
 - [x] quidproquo-core/src/types/Action.ts
 - [x] quidproquo-core/src/types/authChallenge/CreateAuthChallengeEvent.ts
 - [x] quidproquo-core/src/types/authChallenge/DefineAuthChallengeEvent.ts

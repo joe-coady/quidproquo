@@ -42,6 +42,26 @@ describe('processAction', () => {
     expect(resolveActionResultError(result).errorType).toBe(ErrorTypeEnum.GenericError);
   });
 
+  it('does not resolve inherited Object.prototype members as processors', async () => {
+    // 'constructor' and 'toString' exist on the prototype chain of a plain
+    // processor map; a plain string index would invoke them as processors.
+    for (const type of ['constructor', 'toString', 'hasOwnProperty']) {
+      const result = await processAction(
+        { type },
+        buildActionProcessorList({ Known: async () => actionResult('done') }),
+        buildTestStorySession(),
+        logger,
+        updateSession,
+        noopDynamicModuleLoader as any,
+        streamRegistry,
+      );
+
+      expect(isErroredActionResult(result)).toBe(true);
+      expect(resolveActionResultError(result).errorType).toBe(ErrorTypeEnum.GenericError);
+      expect(resolveActionResultError(result).errorText).toContain('Unable to process action');
+    }
+  });
+
   it('wraps a thrown Error as a GenericError result with [name] - message text', async () => {
     const processors = buildActionProcessorList({
       Boom: async () => {

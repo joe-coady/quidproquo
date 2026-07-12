@@ -92,6 +92,26 @@ describe('resolveStory', () => {
     expect(result.result).toBe('caught:oops');
   });
 
+  it('persists updateSession changes from one processor to the next action', async () => {
+    function* story(): AskResponse<string> {
+      yield { type: 'Login' };
+      const token: string = yield { type: 'WhoAmI' };
+      return token;
+    }
+
+    const login = async (_payload: any, _session: any, _processors: any, _logger: any, updateSession: any) => {
+      updateSession({ decodedAccessToken: { userId: 'user-1' } });
+      return actionResult(null);
+    };
+
+    const result = await run(story, [], {
+      Login: login,
+      WhoAmI: async (_payload: any, session: any) => actionResult(session.decodedAccessToken?.userId),
+    });
+
+    expect(result.result).toBe('user-1');
+  });
+
   it('returns a depth-exceeded error when the caller session is too deep', async () => {
     function* story(): AskResponse<string> {
       return 'never';

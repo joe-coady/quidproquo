@@ -13,7 +13,14 @@ export async function processAction(
   streamRegistry: StreamRegistry,
 ): Promise<ActionProcessorResult<any>> {
   try {
-    const processor = actionProcessors?.[action?.type];
+    // A plain string index resolves inherited Object.prototype members for action
+    // types like 'constructor' or 'toString' and would invoke them as processors.
+    // Reject anything that is just an inherited prototype member so unknown types
+    // hit the error path below. This stays an identity check (not an own-property
+    // check) because some processor lists are Proxies that synthesize processors
+    // in their get trap (see createDebugLogActionProcessor in qpqExecuteLog).
+    const candidate = actionProcessors?.[action?.type];
+    const processor = candidate === (Object.prototype as any)[action?.type] ? undefined : candidate;
     if (!processor) {
       throw new Error(`Unable to process action: ${action?.type} from [${Object.keys(actionProcessors).join(', ')}]`);
     }
