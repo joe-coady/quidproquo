@@ -116,6 +116,10 @@ When writing documentation, comments, or user-facing frontend copy (e.g. the lan
 - **Never** use em dashes (—). Use a period, comma, colon, or parentheses instead.
 - Write like a person, not an AI assistant. Avoid the tells: no "leverage/utilize/robust/seamless/delve", no rule-of-three lists piled into one sentence, no overly symmetric "it's not just X, it's Y" constructions, no forced enthusiasm. Prefer plain, direct, slightly informal phrasing over polished marketing tone.
 
+## Code style
+
+- **No non-trivial logic inline as a call argument.** If an arrow function passed as an argument needs a `try`/`catch`, an `if` beyond a single guard clause, or more than ~2 lines of body, pull it out into a named `const` (or top-level function) above the call site, with a comment explaining *why*, and pass the name instead. This applies especially inside object/array literals and spread expressions (e.g. `{ ...(await getX(y, inlineCallbackHere)) }`), where an inline multi-line callback breaks the scan-ability of the surrounding list and buries the actual logic. A named function you can read top-to-bottom, separate from the plumbing that wires it in, is worth the extra top-level declaration.
+
 ## Important Notes
 
 - This is a monorepo using npm workspaces - always use `-w <package-name>` to target specific packages

@@ -57,9 +57,17 @@ const loadTraceMap = (scriptPath: string): TraceMap | null => {
 // worker can't load trace-mapping itself). Positions mapping into node_modules
 // (framework/deps) or not mapping at all (webpack runtime glue) are dropped. No map
 // means the bundle can't be classified — everything stays traced.
+//
+// ownCodeMarkers is a second, opt-in signal: substrings identifying the traced story's
+// own source root. The node_modules check alone assumes framework/deps are bundled from
+// real node_modules — true for lambda's federated remotes, but not for hosts (the dev
+// server) that bundle workspace framework packages from source alongside every hosted
+// service in one script, where framework code never lands in node_modules either. When
+// markers are given, a location must ALSO map into one of them to count as own code.
 export const filterOwnCodeLocations = <TLocation extends { lineNumber: number; columnNumber?: number }>(
   scriptUrl: string,
   locations: TLocation[],
+  ownCodeMarkers?: string[],
 ): TLocation[] => {
   const traceMap = scriptUrl ? loadTraceMap(scriptUrlToPath(scriptUrl)) : null;
   if (!traceMap) {
@@ -68,8 +76,23 @@ export const filterOwnCodeLocations = <TLocation extends { lineNumber: number; c
 
   return locations.filter((location) => {
     const original = originalPositionFor(traceMap, { line: location.lineNumber + 1, column: location.columnNumber ?? 0 });
-    return !!original.source && !original.source.includes('node_modules');
+    if (!original.source || original.source.includes('node_modules')) return false;
+
+    return !ownCodeMarkers?.length || ownCodeMarkers.some((marker) => original.source!.includes(marker));
   });
+};
+
+// Derives own-code markers from a service's absolute source root (QpqFunctionRuntimeAdvanced.basePath,
+// or getApplicationConfigRoot(qpqConfig) for the relative-string runtime form). Bundlers emit
+// source-map `source` entries as either real filesystem paths or webpack://<namespace>/./<path
+// relative to the build context> pseudo urls — both preserve the original directory names
+// verbatim, so matching on the root's own trailing segments works for either form without
+// needing to know the bundler's exact context/namespace.
+export const getOwnCodeMarkersFromRoot = (root: string): string[] => {
+  const normalized = root.replace(/\\/g, '/').replace(/\/+$/, '');
+  const tailSegments = normalized.split('/').filter(Boolean).slice(-3).join('/');
+
+  return tailSegments && tailSegments !== normalized ? [normalized, tailSegments] : [normalized];
 };
 
 export interface ResolvedTraceSteps {

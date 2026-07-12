@@ -28,6 +28,10 @@ export interface TraceStoryExecutionOptions {
   // entirely on user statements. Scripts without a source map stay fully traced.
   onlyOwnCode?: boolean;
 
+  // Extra own-code markers beyond the built-in "not node_modules" check — see
+  // resolveSourceMaps.filterOwnCodeLocations. Only takes effect when onlyOwnCode is set.
+  ownCodeMarkers?: string[];
+
   // Step budget and wall-clock budget: past either, the replay finishes untraced and
   // the trace is marked truncated. The wall clock is what bounds total runtime — locals
   // capture makes per-step cost variable, so step count alone doesn't bound time.
@@ -138,7 +142,7 @@ export const traceStoryExecution = async (
       controller.postMessage({
         type: 'filteredLocations',
         requestId: message.requestId,
-        locations: filterOwnCodeLocations(message.scriptUrl, message.locations || []),
+        locations: filterOwnCodeLocations(message.scriptUrl, message.locations || [], options.ownCodeMarkers),
       });
     }
   });

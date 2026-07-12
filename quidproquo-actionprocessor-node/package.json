@@ -40,6 +40,7 @@
     "uuidv7": "^1.0.1"
   },
   "devDependencies": {
+    "@jridgewell/gen-mapping": "^0.3.13",
     "@types/node": "^22.13.13",
     "quidproquo-tsconfig": "0.1.7",
     "typescript": "^5.8.2"
