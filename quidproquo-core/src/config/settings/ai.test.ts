@@ -4,6 +4,10 @@ import { QPQCoreConfigSettingType } from '../QPQConfig';
 import { defineAi } from './ai';
 
 describe('defineAi', () => {
+  it('accepts a missing options argument', () => {
+    expect(defineAi('Assistant').tools).toEqual([]);
+  });
+
   it('builds an Ai setting with the given name and defaults tools to an empty array', () => {
     expect(defineAi('Assistant', {})).toEqual({
       configSettingType: QPQCoreConfigSettingType.ai,

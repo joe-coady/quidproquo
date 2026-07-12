@@ -19,13 +19,13 @@ export interface AiQPQConfigSetting extends QPQConfigSetting {
   tools: AiToolDefinition[];
 }
 
-export const defineAi = (aiName: string, options: QPQConfigAdvancedAiSettings): AiQPQConfigSetting => ({
+export const defineAi = (aiName: string, options?: QPQConfigAdvancedAiSettings): AiQPQConfigSetting => ({
   configSettingType: QPQCoreConfigSettingType.ai,
   uniqueKey: aiName,
 
   aiName,
 
-  tools: options.tools || [],
+  tools: options?.tools || [],
 
   owner: convertCrossModuleOwnerToGenericResourceNameOverride(options?.owner),
 });

@@ -33,7 +33,7 @@ export default [
 ```typescript
 function defineAi(
   aiName: string,
-  options: QPQConfigAdvancedAiSettings,
+  options?: QPQConfigAdvancedAiSettings,
 ): AiQPQConfigSetting;
 ```
 
@@ -43,7 +43,7 @@ function defineAi(
 
 The name of the AI config, and its `uniqueKey` within the config. This is the value you pass as the `aiName` option to the AI prompt actions to bind these tools to a request.
 
-### `options` — `QPQConfigAdvancedAiSettings` (required)
+### `options` — `QPQConfigAdvancedAiSettings` (optional)
 
 | Property | Type | Default | Description |
 | --- | --- | --- | --- |

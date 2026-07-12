@@ -1251,38 +1251,38 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [x] quidproquo-core/src/actions/userDirectory/UserDirectorySetUserAttributesActionRequester.test.ts
 - [x] quidproquo-core/src/actions/userDirectory/UserDirectorySetUserAttributesActionRequester.ts
 - [x] quidproquo-core/src/actions/userDirectory/UserDirectorySetUserAttributesActionTypes.ts
-- [ ] quidproquo-core/src/config/index.ts
-- [ ] quidproquo-core/src/config/QPQConfig.ts
-- [ ] quidproquo-core/src/config/settings/actionProcessors.test.ts
-- [ ] quidproquo-core/src/config/settings/actionProcessors.ts
-- [ ] quidproquo-core/src/config/settings/ai.test.ts
-- [ ] quidproquo-core/src/config/settings/ai.ts
-- [ ] quidproquo-core/src/config/settings/apiBuildPath/defineApiBuildPath.test.ts
-- [ ] quidproquo-core/src/config/settings/apiBuildPath/defineApiBuildPath.ts
-- [ ] quidproquo-core/src/config/settings/apiBuildPath/index.ts
-- [ ] quidproquo-core/src/config/settings/applicationModule.test.ts
-- [ ] quidproquo-core/src/config/settings/applicationModule.ts
-- [ ] quidproquo-core/src/config/settings/applicationName.test.ts
-- [ ] quidproquo-core/src/config/settings/applicationName.ts
-- [ ] quidproquo-core/src/config/settings/applicationVersion.test.ts
-- [ ] quidproquo-core/src/config/settings/applicationVersion.ts
-- [ ] quidproquo-core/src/config/settings/bundleOptions.test.ts
-- [ ] quidproquo-core/src/config/settings/bundleOptions.ts
-- [ ] quidproquo-core/src/config/settings/claudeAi.test.ts
-- [ ] quidproquo-core/src/config/settings/claudeAi.ts
-- [ ] quidproquo-core/src/config/settings/configValue.test.ts
-- [ ] quidproquo-core/src/config/settings/configValue.ts
-- [ ] quidproquo-core/src/config/settings/definePromiseMode.test.ts
-- [ ] quidproquo-core/src/config/settings/definePromiseMode.ts
-- [ ] quidproquo-core/src/config/settings/deployEvent.test.ts
-- [ ] quidproquo-core/src/config/settings/deployEvent.ts
-- [ ] quidproquo-core/src/config/settings/emailTemplates/index.ts
-- [ ] quidproquo-core/src/config/settings/emailTemplates/types/index.ts
-- [ ] quidproquo-core/src/config/settings/environmentSettings.test.ts
-- [ ] quidproquo-core/src/config/settings/environmentSettings.ts
-- [ ] quidproquo-core/src/config/settings/eventBus.test.ts
-- [ ] quidproquo-core/src/config/settings/eventBus.ts
-- [ ] quidproquo-core/src/config/settings/federatedModuleStore.ts
+- [x] quidproquo-core/src/config/index.ts
+- [x] quidproquo-core/src/config/QPQConfig.ts
+- [x] quidproquo-core/src/config/settings/actionProcessors.test.ts
+- [x] quidproquo-core/src/config/settings/actionProcessors.ts
+- [x] quidproquo-core/src/config/settings/ai.test.ts
+- [x] quidproquo-core/src/config/settings/ai.ts
+- [x] quidproquo-core/src/config/settings/apiBuildPath/defineApiBuildPath.test.ts
+- [x] quidproquo-core/src/config/settings/apiBuildPath/defineApiBuildPath.ts
+- [x] quidproquo-core/src/config/settings/apiBuildPath/index.ts
+- [x] quidproquo-core/src/config/settings/applicationModule.test.ts
+- [x] quidproquo-core/src/config/settings/applicationModule.ts
+- [x] quidproquo-core/src/config/settings/applicationName.test.ts
+- [x] quidproquo-core/src/config/settings/applicationName.ts
+- [x] quidproquo-core/src/config/settings/applicationVersion.test.ts
+- [x] quidproquo-core/src/config/settings/applicationVersion.ts
+- [x] quidproquo-core/src/config/settings/bundleOptions.test.ts
+- [x] quidproquo-core/src/config/settings/bundleOptions.ts
+- [x] quidproquo-core/src/config/settings/claudeAi.test.ts
+- [x] quidproquo-core/src/config/settings/claudeAi.ts
+- [x] quidproquo-core/src/config/settings/configValue.test.ts
+- [x] quidproquo-core/src/config/settings/configValue.ts
+- [x] quidproquo-core/src/config/settings/definePromiseMode.test.ts
+- [x] quidproquo-core/src/config/settings/definePromiseMode.ts
+- [x] quidproquo-core/src/config/settings/deployEvent.test.ts
+- [x] quidproquo-core/src/config/settings/deployEvent.ts
+- [x] quidproquo-core/src/config/settings/emailTemplates/index.ts
+- [x] quidproquo-core/src/config/settings/emailTemplates/types/index.ts
+- [x] quidproquo-core/src/config/settings/environmentSettings.test.ts
+- [x] quidproquo-core/src/config/settings/environmentSettings.ts
+- [x] quidproquo-core/src/config/settings/eventBus.test.ts
+- [x] quidproquo-core/src/config/settings/eventBus.ts
+- [x] quidproquo-core/src/config/settings/federatedModuleStore.ts
 - [x] quidproquo-core/src/config/settings/global.test.ts
 - [x] quidproquo-core/src/config/settings/global.ts
 - [x] quidproquo-core/src/config/settings/graphDatabase/graphDatabase.test.ts
@@ -1325,11 +1325,11 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [x] quidproquo-core/src/config/settings/userDirectory.ts
 - [x] quidproquo-core/src/config/settings/virtualNetwork.test.ts
 - [x] quidproquo-core/src/config/settings/virtualNetwork.ts
-- [ ] quidproquo-core/src/config/utils/crossModuleUtils.test.ts
-- [ ] quidproquo-core/src/config/utils/crossModuleUtils.ts
-- [ ] quidproquo-core/src/config/utils/index.ts
-- [ ] quidproquo-core/src/config/utils/qpqFunctionRuntimeUtils.test.ts
-- [ ] quidproquo-core/src/config/utils/qpqFunctionRuntimeUtils.ts
+- [x] quidproquo-core/src/config/utils/crossModuleUtils.test.ts
+- [x] quidproquo-core/src/config/utils/crossModuleUtils.ts
+- [x] quidproquo-core/src/config/utils/index.ts
+- [x] quidproquo-core/src/config/utils/qpqFunctionRuntimeUtils.test.ts
+- [x] quidproquo-core/src/config/utils/qpqFunctionRuntimeUtils.ts
 - [ ] quidproquo-core/src/constants/index.ts
 - [ ] quidproquo-core/src/constants/qpqApplicationVersionGlobal.ts
 - [ ] quidproquo-core/src/constants/storageDrives.ts
