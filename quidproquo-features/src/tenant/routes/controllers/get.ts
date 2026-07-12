@@ -5,7 +5,7 @@ import { askEventDocResolveUserId } from '../../../eventDoc/globals/askEventDocR
 import { askTenantRecordGet } from '../../data/askTenantRecordGet';
 import { askTenantValidateMembership } from '../../logic/askTenantValidateMembership';
 
-/** GET {basePath}/{id} — one tenant record (fast path), members only. */
+/** GET {basePath}/{id}: one tenant record (fast path), members only. */
 export function* get(event: HTTPEvent, params: { id: string }): AskResponse<HTTPEventResponse> {
   const userId = yield* askEventDocResolveUserId();
 

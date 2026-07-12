@@ -1,5 +1,5 @@
 import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { buildTestQpqConfig, defineKeyValueStore, ErrorTypeEnum, KeyValueStoreActionType, KeyValueStoreUpsertErrorTypeEnum } from 'quidproquo-core';
+import { buildTestQpqConfig, defineKeyValueStore, KeyValueStoreActionType, KeyValueStoreUpsertErrorTypeEnum } from 'quidproquo-core';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -37,12 +37,12 @@ describe('getKeyValueStoreUpsertActionProcessor', () => {
     expect(region).toBe('eu-west-1');
   });
 
-  it('returns a NotFound error when the store is not configured', async () => {
+  it('returns the typed StoreNotFound error when the store is not configured', async () => {
     const processor = await resolveProcessor(false);
 
     const [, error] = await invoke(processor);
 
-    expect(error?.errorType).toBe(ErrorTypeEnum.NotFound);
+    expect(error?.errorType).toBe(KeyValueStoreUpsertErrorTypeEnum.StoreNotFound);
   });
 
   it.each([

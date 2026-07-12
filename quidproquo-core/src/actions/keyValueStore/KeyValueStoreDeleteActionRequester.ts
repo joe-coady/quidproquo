@@ -7,6 +7,7 @@ export const KeyValueStoreDeleteErrorTypeEnum = createErrorEnumForAction(KeyValu
   'ServiceUnavailable', // DynamoDB internal error / throttling
   'ResourceNotFound', // the underlying table does not exist
   'InvalidScope', // scope is malformed or the store's partition key is not string-typed
+  'StoreNotFound', // the store is not declared in the qpq config (misconfiguration)
 ]);
 
 export function* askKeyValueStoreDelete(

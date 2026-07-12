@@ -110,7 +110,7 @@ const drive = <R>(story: AskResponse<R>): R => {
       throw new StoryError(errorType, errorText, errorStack);
     }
 
-    // An unprovided, unmocked context read resolves to the identifier's default —
+    // An unprovided, unmocked context read resolves to the identifier's default,
     // exactly what the production context processor does when nothing provided a
     // value. A mock or an askContextProvideValue wrapper still takes precedence
     // (both intercept before the action reaches the runtime).

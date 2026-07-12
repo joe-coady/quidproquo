@@ -1,4 +1,4 @@
-import { AskResponse } from 'quidproquo-core';
+import { AskResponse, askRunParallel } from 'quidproquo-core';
 
 import { askEventDocGetById } from '../../eventDoc/data/askEventDocGetById';
 import { EventDocSummary } from '../../eventDoc/models';
@@ -12,14 +12,10 @@ import { askUserTenantLinksGet } from '../data/askUserTenantLinksGet';
 export function* askTenantListForUser(userId: string): AskResponse<EventDocSummary[]> {
   const links = yield* askUserTenantLinksGet(userId);
 
-  const summaries: EventDocSummary[] = [];
-  for (const tenantId of links?.tenantIds ?? []) {
-    const summary = yield* askEventDocGetById(tenantId);
-    // askEventDocGetById returns soft-deleted rows as-is; hide them here.
-    if (summary && !summary.deletedAt) {
-      summaries.push(summary);
-    }
-  }
+  // The summary reads are independent, so run them as one batched round trip
+  // instead of one sequential read per tenant.
+  const summaries = yield* askRunParallel((links?.tenantIds ?? []).map((tenantId) => askEventDocGetById(tenantId)));
 
-  return summaries;
+  // askEventDocGetById returns soft-deleted rows as-is; hide them here.
+  return summaries.filter((summary): summary is EventDocSummary => !!summary && !summary.deletedAt);
 }

@@ -53,7 +53,8 @@ function* askKeyValueStoreDelete(
 | --- | --- |
 | `KeyValueStoreDeleteErrorTypeEnum.ServiceUnavailable` | DynamoDB internal error or throttling. |
 | `KeyValueStoreDeleteErrorTypeEnum.ResourceNotFound` | The underlying table does not exist. |
-| `KeyValueStoreDeleteErrorTypeEnum.InvalidScope` | The `scope` option is malformed (empty, over 128 characters, or containing path separators, `..`, or null bytes), or the store's partition key is not string-typed. |
+| `KeyValueStoreDeleteErrorTypeEnum.InvalidScope` | The `scope` option is malformed (empty, over 128 characters, or containing path separators, `..`, `:`, or null bytes), the store's partition key is not string-typed, or a scoped call's partition-key value contains the reserved `::` delimiter. |
+| `KeyValueStoreDeleteErrorTypeEnum.StoreNotFound` | The key value store is not declared in the qpq config (misconfiguration, e.g. a wrong name or a missing `defineKeyValueStore`). |
 
 Catch errors with `askCatch` — it returns `{ success: true, result }` or `{ success: false, error }`.
 

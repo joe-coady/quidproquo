@@ -2,6 +2,7 @@ import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, 
 
 import { getKeyValueStoreDeleteActionProcessor } from './getKeyValueStoreDeleteActionProcessor';
 import { getKeyValueStoreGetActionProcessor } from './getKeyValueStoreGetActionProcessor';
+import { getKeyValueStoreGetAllActionProcessor } from './getKeyValueStoreGetAllActionProcessor';
 import { getKeyValueStoreQueryActionProcessor } from './getKeyValueStoreQueryActionProcessor';
 import { getKeyValueStoreScanActionProcessor } from './getKeyValueStoreScanActionProcessor';
 import { getKeyValueStoreUpdateActionProcessor } from './getKeyValueStoreUpdateActionProcessor';
@@ -13,6 +14,7 @@ export const getKeyValueStoreActionProcessor: ActionProcessorListResolver = asyn
 ): Promise<ActionProcessorList> => ({
   ...(await getKeyValueStoreDeleteActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getKeyValueStoreGetActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getKeyValueStoreGetAllActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getKeyValueStoreUpsertActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getKeyValueStoreUpdateActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getKeyValueStoreQueryActionProcessor(qpqConfig, dynamicModuleLoader)),

@@ -19,4 +19,10 @@ export function validateScopeSegment(scope: string): void {
   if (scope.includes('/') || scope.includes('\\') || scope.includes('..') || scope.includes('\0')) {
     throw new InvalidScopeError(InvalidScopeErrorCode.unsafeCharacters, 'Scope must not contain path separators, "..", or null bytes.');
   }
+
+  // ':' is reserved for the kvs scope delimiter ('::'): a scope containing it
+  // could forge or shadow another scope's composed prefix.
+  if (scope.includes(':')) {
+    throw new InvalidScopeError(InvalidScopeErrorCode.unsafeCharacters, 'Scope must not contain ":".');
+  }
 }

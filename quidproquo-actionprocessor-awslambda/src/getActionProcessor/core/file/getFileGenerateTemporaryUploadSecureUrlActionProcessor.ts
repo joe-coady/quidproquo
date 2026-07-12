@@ -1,5 +1,5 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import { ActionProcessorList, ActionProcessorListResolver, actionResultError, ErrorTypeEnum, InvalidScopeError, QPQConfig } from 'quidproquo-core';
+import { ActionProcessorList, ActionProcessorListResolver, actionResultError, actionResultErrorFromCaughtError, QPQConfig } from 'quidproquo-core';
 import {
   actionResult,
   composeScopedFilePath,
@@ -35,11 +35,12 @@ const getProcessFileGenerateTemporaryUploadSecureUrl = (qpqConfig: QPQConfig): F
       );
 
       return actionResult(url);
-    } catch (error: any) {
-      if (error instanceof InvalidScopeError) {
-        return actionResultError(FileGenerateTemporaryUploadSecureUrlErrorTypeEnum.InvalidScope, error.message);
-      }
-      return actionResultError(ErrorTypeEnum.GenericError, 'Unable to generate temporary upload secure URL', error);
+    } catch (error: unknown) {
+      // Name-keyed, not instanceof: under npm link / module federation the
+      // error can come from another copy of quidproquo-core.
+      return actionResultErrorFromCaughtError(error, {
+        InvalidScopeError: (error) => actionResultError(FileGenerateTemporaryUploadSecureUrlErrorTypeEnum.InvalidScope, error.message),
+      });
     }
   };
 };

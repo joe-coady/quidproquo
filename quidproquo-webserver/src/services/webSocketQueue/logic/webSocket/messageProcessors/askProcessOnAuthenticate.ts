@@ -71,7 +71,7 @@ export function* askProcessOnAuthenticate(connectionId: string, accessToken: str
 
     // A rejected authenticate downgrades the CONNECTION, not just the reply:
     // on a re-authenticate the row still holds the previous userId/accessToken/
-    // tenantId, and later messages re-stamp auth from the row — so leaving it
+    // tenantId, and later messages re-stamp auth from the row, so leaving it
     // untouched would keep the session alive under the old identity and scope
     // while the client believes it is unauthenticated.
     if (!result.success) {
@@ -80,7 +80,7 @@ export function* askProcessOnAuthenticate(connectionId: string, accessToken: str
 
     const decodedAccessToken: DecodedAccessToken = result.result;
 
-    // A failed scope claim rejects the whole authenticate — the client must
+    // A failed scope claim rejects the whole authenticate: the client must
     // never end up authenticated on a different scope than it asked for.
     if (tenantId) {
       const isScopeValid = yield* askValidateScopeClaim(apiName, decodedAccessToken.userId, tenantId);

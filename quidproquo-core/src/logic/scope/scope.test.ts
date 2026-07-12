@@ -37,6 +37,13 @@ describe('validateScopeSegment', () => {
     expectInvalidScope(() => validateScopeSegment('a\0b'), InvalidScopeErrorCode.unsafeCharacters);
   });
 
+  it('rejects the kvs scope delimiter character', () => {
+    // A scope containing ':' could forge or shadow another scope's composed
+    // prefix ('a:' + ':b' vs 'a' + '::b').
+    expectInvalidScope(() => validateScopeSegment('a:b'), InvalidScopeErrorCode.unsafeCharacters);
+    expectInvalidScope(() => validateScopeSegment('acme::'), InvalidScopeErrorCode.unsafeCharacters);
+  });
+
   it('rejects overly long scopes', () => {
     expectInvalidScope(() => validateScopeSegment('x'.repeat(129)), InvalidScopeErrorCode.tooLong);
     expect(() => validateScopeSegment('x'.repeat(128))).not.toThrow();
@@ -84,6 +91,13 @@ describe('composeScopedKvsValue / stripScopedKvsValue', () => {
 
   it('rejects scoping a non-string value', () => {
     expectInvalidScope(() => composeScopedKvsValue('tenant-a', 42), InvalidScopeErrorCode.unsafeCharacters);
+  });
+
+  it('rejects a raw value containing the scope delimiter', () => {
+    // 'tenant-a' + 'x::y' would store 'tenant-a::x::y'; on strip it reads back
+    // as 'x::y', but an unscoped row 'acme::secret' must never be forgeable or
+    // matchable as scoped data, so the delimiter is reserved outright.
+    expectInvalidScope(() => composeScopedKvsValue('tenant-a', 'x::y'), InvalidScopeErrorCode.reservedDelimiter);
   });
 
   it('leaves an unscoped stored value unchanged when stripping', () => {

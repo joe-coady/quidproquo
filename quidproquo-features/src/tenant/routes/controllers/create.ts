@@ -15,7 +15,7 @@ function* askTenantRouteCreate(event: HTTPEvent): AskResponse<HTTPEventResponse>
   return qpqWebServerUtils.toJsonEventResponse(summary);
 }
 
-/** POST {basePath} — create a tenant (body `{ name }`); the caller becomes its first member. */
+/** POST {basePath}: create a tenant (body `{ name }`); the caller becomes its first member. */
 export function* create(event: HTTPEvent): AskResponse<HTTPEventResponse> {
   return yield* askEventDocProvideStoreFromGlobals(askTenantRouteCreate(event));
 }

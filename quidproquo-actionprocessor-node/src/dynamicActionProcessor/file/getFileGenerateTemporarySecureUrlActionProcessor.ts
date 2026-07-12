@@ -3,11 +3,10 @@ import {
   ActionProcessorListResolver,
   actionResult,
   actionResultError,
-  ErrorTypeEnum,
+  actionResultErrorFromCaughtError,
   FileActionType,
   FileGenerateTemporarySecureUrlActionProcessor,
   FileGenerateTemporarySecureUrlErrorTypeEnum,
-  InvalidScopeError,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -33,11 +32,12 @@ const getProcessFileGenerateTemporarySecureUrl = (qpqConfig: QPQConfig, config: 
       const url = `${baseUrl}/secure-download?token=${token}`;
 
       return actionResult(url);
-    } catch (error: any) {
-      if (error instanceof InvalidScopeError) {
-        return actionResultError(FileGenerateTemporarySecureUrlErrorTypeEnum.InvalidScope, error.message);
-      }
-      return actionResultError(ErrorTypeEnum.GenericError, `Unable to generate temporary secure URL: ${error.message}`);
+    } catch (error: unknown) {
+      // Name-keyed, not instanceof: under npm link / module federation the
+      // error can come from another copy of quidproquo-core.
+      return actionResultErrorFromCaughtError(error, {
+        InvalidScopeError: (error) => actionResultError(FileGenerateTemporarySecureUrlErrorTypeEnum.InvalidScope, error.message),
+      });
     }
   };
 };

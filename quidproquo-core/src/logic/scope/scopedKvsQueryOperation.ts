@@ -7,7 +7,7 @@ import {
   KvsQueryOperationType,
 } from '../../actions/keyValueStore/types';
 import { InvalidScopeError, InvalidScopeErrorCode } from './InvalidScopeError';
-import { composeScopedKvsValue } from './scopedKvsValue';
+import { composeScopedKvsValue, stripScopedKvsValue } from './scopedKvsValue';
 
 // Operations whose comparison values can be safely prefixed with the scope:
 // prefixing preserves equality and lexicographic ordering within one scope.
@@ -84,6 +84,24 @@ export function composeScopedKvsQueryOperation(
 }
 
 /**
+ * Compose a scoped KEY condition in one walk, throwing when the tree never
+ * constrains the partition key - a scoped query that constrains no pk would
+ * silently span every scope.
+ */
+export function composeScopedKvsQueryOperationOrThrow(scope: string, operation: KvsQueryOperation, pkKeyNames: string[]): KvsQueryOperation {
+  const { operation: composed, scopedConditionCount } = composeScopedKvsQueryOperation(scope, operation, pkKeyNames);
+
+  if (scopedConditionCount === 0) {
+    throw new InvalidScopeError(
+      InvalidScopeErrorCode.queryMissingPartitionKey,
+      'A scoped query must constrain the partition key in its key condition.',
+    );
+  }
+
+  return composed;
+}
+
+/**
  * Assert a scoped query is expressible on EVERY backend. Validation only - the
  * conditions are not modified.
  *
@@ -95,28 +113,14 @@ export function composeScopedKvsQueryOperation(
  * would fail deployed fails locally first.
  */
 export function validateScopedQueryConstrainsPkOrThrow(scope: string, operation: KvsQueryOperation, pkKeyNames: string[]): void {
-  const { scopedConditionCount } = composeScopedKvsQueryOperation(scope, operation, pkKeyNames);
-
-  if (scopedConditionCount === 0) {
-    throw new InvalidScopeError(
-      InvalidScopeErrorCode.queryMissingPartitionKey,
-      'A scoped query must constrain the partition key in its key condition.',
-    );
-  }
+  composeScopedKvsQueryOperationOrThrow(scope, operation, pkKeyNames);
 }
 
 // Shallow-clone an item read from storage, stripping the scope prefix off its
 // partition key attribute so callers never see the composed form.
 export function stripScopedKvsItem<T extends Record<string, any>>(scope: string, item: T, pkAttributeName: string): T {
   const storedValue = item[pkAttributeName];
-  if (typeof storedValue !== 'string') {
-    return item;
-  }
+  const strippedValue = stripScopedKvsValue(scope, storedValue);
 
-  const prefix = `${scope}::`;
-  if (!storedValue.startsWith(prefix)) {
-    return item;
-  }
-
-  return { ...item, [pkAttributeName]: storedValue.slice(prefix.length) };
+  return strippedValue === storedValue ? item : { ...item, [pkAttributeName]: strippedValue };
 }

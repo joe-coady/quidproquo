@@ -1,5 +1,5 @@
 import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { buildTestQpqConfig, defineKeyValueStore, ErrorTypeEnum, KeyValueStoreActionType } from 'quidproquo-core';
+import { buildTestQpqConfig, defineKeyValueStore, KeyValueStoreActionType, KeyValueStoreQueryErrorTypeEnum } from 'quidproquo-core';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -38,11 +38,11 @@ describe('getKeyValueStoreQueryActionProcessor', () => {
     expect(vi.mocked(query).mock.calls[0][0]).toBe('users-test-app-test-module-development-qpqkvs');
   });
 
-  it('returns a NotFound error when the store is not configured', async () => {
+  it('returns the typed StoreNotFound error when the store is not configured', async () => {
     const processor = await resolveProcessor(false);
 
     const [, error] = await invokeProcessor(processor, { keyValueStoreName: 'users', keyCondition: {} });
 
-    expect(error?.errorType).toBe(ErrorTypeEnum.NotFound);
+    expect(error?.errorType).toBe(KeyValueStoreQueryErrorTypeEnum.StoreNotFound);
   });
 });

@@ -7,7 +7,6 @@ import {
   FileActionType,
   FileDeleteActionProcessor,
   FileDeleteErrorTypeEnum,
-  InvalidScopeError,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -39,7 +38,9 @@ const getProcessFileDelete = (qpqConfig: QPQConfig, config: FileStorageConfig): 
 
     // Scope is shared by every filepath in the request, so a bad scope fails the
     // whole call regardless of any deletes that a different code path allowed.
-    const invalidScope = errors.find(({ error }) => error instanceof InvalidScopeError);
+    // Name-keyed, not instanceof: under npm link / module federation the error
+    // can come from another copy of quidproquo-core.
+    const invalidScope = errors.find(({ error }) => error?.name === 'InvalidScopeError');
     if (invalidScope) {
       return actionResultError(FileDeleteErrorTypeEnum.InvalidScope, invalidScope.error.message);
     }

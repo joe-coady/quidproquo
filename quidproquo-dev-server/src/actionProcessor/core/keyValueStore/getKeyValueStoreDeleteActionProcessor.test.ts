@@ -3,6 +3,8 @@ import {
   ErrorTypeEnum,
   isErroredActionResult,
   KeyValueStoreActionType,
+  KeyValueStoreDeleteErrorTypeEnum,
+  KvsStoreNotFoundError,
   noopDynamicModuleLoader,
   resolveActionResult,
   resolveActionResultError,
@@ -61,13 +63,13 @@ describe('getKeyValueStoreDeleteActionProcessor', () => {
     expect(resolveActionResultError(result).errorText).toBe("Item with key 'a' not found");
   });
 
-  it('maps a not found error to ResourceNotFound', async () => {
-    repo.delete.mockRejectedValue(new Error('store not found'));
+  it('maps a missing store to the typed StoreNotFound', async () => {
+    repo.delete.mockRejectedValue(new KvsStoreNotFoundError('store'));
     const process = await getProcessor();
 
     const result = await invokeProcessor(process, { keyValueStoreName: 'store', key: 'a' });
 
-    expect(resolveActionResultError(result).errorType).toBe('ResourceNotFound');
+    expect(resolveActionResultError(result).errorType).toBe(KeyValueStoreDeleteErrorTypeEnum.StoreNotFound);
   });
 
   it('maps a generic error to a caught error', async () => {

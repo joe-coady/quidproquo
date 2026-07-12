@@ -3,11 +3,10 @@ import {
   ActionProcessorListResolver,
   actionResult,
   actionResultError,
-  ErrorTypeEnum,
+  actionResultErrorFromCaughtError,
   FileActionType,
   FileExistsActionProcessor,
   FileExistsErrorTypeEnum,
-  InvalidScopeError,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -34,11 +33,12 @@ const getProcessFileExists = (qpqConfig: QPQConfig, config: FileStorageConfig): 
         }
         throw error;
       }
-    } catch (error: any) {
-      if (error instanceof InvalidScopeError) {
-        return actionResultError(FileExistsErrorTypeEnum.InvalidScope, error.message);
-      }
-      return actionResultError(ErrorTypeEnum.GenericError, `Error checking file existence: ${error.message}`);
+    } catch (error: unknown) {
+      // Name-keyed, not instanceof: under npm link / module federation the
+      // error can come from another copy of quidproquo-core.
+      return actionResultErrorFromCaughtError(error, {
+        InvalidScopeError: (error) => actionResultError(FileExistsErrorTypeEnum.InvalidScope, error.message),
+      });
     }
   };
 };

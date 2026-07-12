@@ -3,11 +3,10 @@ import {
   ActionProcessorListResolver,
   actionResult,
   actionResultError,
-  ErrorTypeEnum,
+  actionResultErrorFromCaughtError,
   FileActionType,
   FileGenerateTemporaryUploadSecureUrlActionProcessor,
   FileGenerateTemporaryUploadSecureUrlErrorTypeEnum,
-  InvalidScopeError,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -41,11 +40,12 @@ const getProcessFileGenerateTemporaryUploadSecureUrl = (
       console.log(`Generated upload URL for ${filepath} in drive ${drive}, expires at ${new Date(expiresAt).toISOString()}`);
 
       return actionResult(url);
-    } catch (error: any) {
-      if (error instanceof InvalidScopeError) {
-        return actionResultError(FileGenerateTemporaryUploadSecureUrlErrorTypeEnum.InvalidScope, error.message);
-      }
-      return actionResultError(ErrorTypeEnum.GenericError, `Unable to generate temporary upload secure URL: ${error.message}`);
+    } catch (error: unknown) {
+      // Name-keyed, not instanceof: under npm link / module federation the
+      // error can come from another copy of quidproquo-core.
+      return actionResultErrorFromCaughtError(error, {
+        InvalidScopeError: (error) => actionResultError(FileGenerateTemporaryUploadSecureUrlErrorTypeEnum.InvalidScope, error.message),
+      });
     }
   };
 };

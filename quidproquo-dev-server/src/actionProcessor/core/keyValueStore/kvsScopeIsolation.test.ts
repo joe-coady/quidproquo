@@ -18,6 +18,7 @@ import { getKvsRepository } from '../../../logic/keyValueStore/getKvsRepository'
 import { invokeProcessor } from '../../../testing/testProcessorRuntime';
 import { getKeyValueStoreDeleteActionProcessor } from './getKeyValueStoreDeleteActionProcessor';
 import { getKeyValueStoreGetActionProcessor } from './getKeyValueStoreGetActionProcessor';
+import { getKeyValueStoreGetAllActionProcessor } from './getKeyValueStoreGetAllActionProcessor';
 import { getKeyValueStoreQueryActionProcessor } from './getKeyValueStoreQueryActionProcessor';
 import { getKeyValueStoreScanActionProcessor } from './getKeyValueStoreScanActionProcessor';
 import { getKeyValueStoreUpsertActionProcessor } from './getKeyValueStoreUpsertActionProcessor';
@@ -45,6 +46,7 @@ describe('KVS scope isolation', () => {
     return {
       upsert: (await getKeyValueStoreUpsertActionProcessor(devConfig)(config, noopDynamicModuleLoader))[KeyValueStoreActionType.Upsert],
       get: (await getKeyValueStoreGetActionProcessor(devConfig)(config, noopDynamicModuleLoader))[KeyValueStoreActionType.Get],
+      getAll: (await getKeyValueStoreGetAllActionProcessor(devConfig)(config, noopDynamicModuleLoader))[KeyValueStoreActionType.GetAll],
       query: (await getKeyValueStoreQueryActionProcessor(devConfig)(config, noopDynamicModuleLoader))[KeyValueStoreActionType.Query],
       scan: (await getKeyValueStoreScanActionProcessor(devConfig)(config, noopDynamicModuleLoader))[KeyValueStoreActionType.Scan],
       remove: (await getKeyValueStoreDeleteActionProcessor(devConfig)(config, noopDynamicModuleLoader))[KeyValueStoreActionType.Delete],
@@ -117,11 +119,27 @@ describe('KVS scope isolation', () => {
 
     const result = await invokeProcessor(query, {
       keyValueStoreName: 'widgets',
-      keyCondition: { key: 'pk', operation: KvsQueryOperationType.Equal, valueA: 'w1' },
+      keyCondition: { key: 'id', operation: KvsQueryOperationType.Equal, valueA: 'w1' },
       options: { scope: 'tenant-a' },
     });
 
     expect(resolveActionResult(result).items).toEqual([{ id: 'w1', name: 'A' }]);
+  });
+
+  it('rejects a scoped query keyed by the pk alias (aws parity)', async () => {
+    const { query } = await getProcessors();
+
+    // The dynamo translator only recognizes the store's real pk attribute, so
+    // an alias-keyed scoped query that passed locally would 500 deployed. It
+    // must fail locally first.
+    const result = await invokeProcessor(query, {
+      keyValueStoreName: 'widgets',
+      keyCondition: { key: 'pk', operation: KvsQueryOperationType.Equal, valueA: 'w1' },
+      options: { scope: 'tenant-a' },
+    });
+
+    expect(isErroredActionResult(result)).toBe(true);
+    expect(resolveActionResultError(result).errorType).toContain('InvalidScope');
   });
 
   it('rejects a scoped query whose key condition does not constrain the partition key', async () => {
@@ -149,6 +167,20 @@ describe('KVS scope isolation', () => {
     expect(resolveActionResult(result).items).toEqual([{ id: 'w1', name: 'A' }]);
   });
 
+  it('restricts get-all to the scope', async () => {
+    const { upsert, getAll } = await getProcessors();
+
+    await invokeProcessor(upsert, { keyValueStoreName: 'widgets', item: { id: 'w1', name: 'A' }, options: { scope: 'tenant-a' } });
+    await invokeProcessor(upsert, { keyValueStoreName: 'widgets', item: { id: 'w2', name: 'B' }, options: { scope: 'tenant-b' } });
+    await invokeProcessor(upsert, { keyValueStoreName: 'widgets', item: { id: 'w3', name: 'C' } });
+
+    const scoped = await invokeProcessor(getAll, { keyValueStoreName: 'widgets', options: { scope: 'tenant-a' } });
+    expect(resolveActionResult(scoped)).toEqual([{ id: 'w1', name: 'A' }]);
+
+    const unscoped = await invokeProcessor(getAll, { keyValueStoreName: 'widgets' });
+    expect(resolveActionResult(unscoped)).toEqual([{ id: 'w3', name: 'C' }]);
+  });
+
   it('deletes only within the scope', async () => {
     const { upsert, get, remove } = await getProcessors();
 
@@ -162,6 +194,21 @@ describe('KVS scope isolation', () => {
 
     const untouched = await invokeProcessor(get, { keyValueStoreName: 'widgets', key: 'w1', options: { scope: 'tenant-b' } });
     expect(resolveActionResult(untouched)).toEqual({ id: 'w1', name: 'B' });
+  });
+
+  it('rejects a scoped write whose partition key value contains the scope delimiter', async () => {
+    const { upsert } = await getProcessors();
+
+    // AWS composes 'tenant-a::acme::secret' and throws; the json backend
+    // stores raw, so it must throw the same typed error for parity.
+    const result = await invokeProcessor(upsert, {
+      keyValueStoreName: 'widgets',
+      item: { id: 'acme::secret', name: 'X' },
+      options: { scope: 'tenant-a' },
+    });
+
+    expect(isErroredActionResult(result)).toBe(true);
+    expect(resolveActionResultError(result).errorType).toContain('InvalidScope');
   });
 
   it('rejects a malformed scope with the typed error', async () => {

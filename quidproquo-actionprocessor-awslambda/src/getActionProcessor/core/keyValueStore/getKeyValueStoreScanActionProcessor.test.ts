@@ -1,5 +1,5 @@
 import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { buildTestQpqConfig, defineKeyValueStore, KeyValueStoreActionType } from 'quidproquo-core';
+import { buildTestQpqConfig, defineKeyValueStore, KeyValueStoreActionType, KvsLogicalOperatorType, KvsQueryOperationType } from 'quidproquo-core';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -22,13 +22,31 @@ describe('getKeyValueStoreScanActionProcessor', () => {
     vi.mocked(scan).mockReset();
   });
 
-  it('scans the resolved dynamo table with the filter and page key', async () => {
+  // An unscoped scan over a mixed (scoped + unscoped) table must exclude the
+  // scope-composed rows, or every tenant's data leaks with composed pk values.
+  const composedRowExclusion = { key: 'pk', operation: KvsQueryOperationType.NotContains, valueA: '::' };
+
+  it('scans the resolved dynamo table with the filter and page key, excluding composed rows', async () => {
     vi.mocked(scan).mockResolvedValue({ items: [] } as any);
     const processor = await resolveProcessor();
 
     const result = await invokeProcessor(processor, { keyValueStoreName: 'users', filterCondition: { f: 1 }, nextPageKey: 'pk1' });
 
     expect(result).toEqual([{ items: [] }]);
-    expect(scan).toHaveBeenCalledWith('users-test-app-test-module-development-qpqkvs', 'eu-west-1', { f: 1 }, 'pk1');
+    expect(scan).toHaveBeenCalledWith(
+      'users-test-app-test-module-development-qpqkvs',
+      'eu-west-1',
+      { operation: KvsLogicalOperatorType.And, conditions: [composedRowExclusion, { f: 1 }] },
+      'pk1',
+    );
+  });
+
+  it('excludes composed rows from an unscoped filterless scan', async () => {
+    vi.mocked(scan).mockResolvedValue({ items: [] } as any);
+    const processor = await resolveProcessor();
+
+    await invokeProcessor(processor, { keyValueStoreName: 'users' });
+
+    expect(scan).toHaveBeenCalledWith('users-test-app-test-module-development-qpqkvs', 'eu-west-1', composedRowExclusion, undefined);
   });
 });

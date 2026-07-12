@@ -57,7 +57,8 @@ function* askKeyValueStoreGet<Value>(
 | --- | --- |
 | `KeyValueStoreGetErrorTypeEnum.ServiceUnavailable` | DynamoDB internal error or throttling. |
 | `KeyValueStoreGetErrorTypeEnum.ResourceNotFound` | The underlying table does not exist. |
-| `KeyValueStoreGetErrorTypeEnum.InvalidScope` | The `scope` option is malformed (empty, over 128 characters, or containing path separators, `..`, or null bytes), or the store's partition key is not string-typed. |
+| `KeyValueStoreGetErrorTypeEnum.InvalidScope` | The `scope` option is malformed (empty, over 128 characters, or containing path separators, `..`, `:`, or null bytes), the store's partition key is not string-typed, or a scoped call's partition-key value contains the reserved `::` delimiter. |
+| `KeyValueStoreGetErrorTypeEnum.StoreNotFound` | The key value store is not declared in the qpq config (misconfiguration, e.g. a wrong name or a missing `defineKeyValueStore`). |
 
 Errors thrown by actions can be caught with `askCatch` from quidproquo-core. It returns an object — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 

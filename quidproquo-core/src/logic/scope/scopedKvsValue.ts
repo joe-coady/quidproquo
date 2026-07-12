@@ -18,7 +18,23 @@ export function composeScopedKvsValue(scope: string | undefined, rawValue: KvsCo
     throw new InvalidScopeError(InvalidScopeErrorCode.unsafeCharacters, 'Scope is only supported on string partition key values.');
   }
 
+  validateRawPkValueForScopeOrThrow(rawValue);
+
   return `${scope}${KVS_SCOPE_DELIMITER}${rawValue}`;
+}
+
+// The delimiter is reserved in scoped partition-key values: a raw value
+// carrying it would strip ambiguously and could collide with (or forge)
+// another scope's composed rows. File-partitioned backends call this directly
+// for parity - they store values raw, but a value prod rejects must fail
+// locally too.
+export function validateRawPkValueForScopeOrThrow(rawValue: KvsCoreDataType): void {
+  if (typeof rawValue === 'string' && rawValue.includes(KVS_SCOPE_DELIMITER)) {
+    throw new InvalidScopeError(
+      InvalidScopeErrorCode.reservedDelimiter,
+      `Partition key values must not contain the scope delimiter '${KVS_SCOPE_DELIMITER}'.`,
+    );
+  }
 }
 
 // Undo composeScopedKvsValue on a value read back from storage, so callers
@@ -43,6 +59,18 @@ export function validateScopeSupportedForPartitionKeyType(partitionKeyType: stri
       `Scope is only supported on stores with a string partition key (got '${partitionKeyType}').`,
     );
   }
+}
+
+// The inverse guard for UNSCOPED Scan / GetAll on a value-composed backend:
+// exclude rows whose pk carries the scope delimiter, so unscoped listings never
+// leak other tenants' (composed) rows. File-partitioned backends get this for
+// free from the file boundary.
+export function buildKvsScopeExclusionCondition(pkAttributeName: string): KvsQueryCondition {
+  return {
+    key: pkAttributeName,
+    operation: KvsQueryOperationType.NotContains,
+    valueA: KVS_SCOPE_DELIMITER,
+  };
 }
 
 // A begins-with predicate on the partition key attribute, for enforcing scope

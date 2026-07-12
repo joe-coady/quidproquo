@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { getKeyValueStoreActionProcessor } from './getKeyValueStoreActionProcessor';
 
 const { repo } = vi.hoisted(() => ({
-  repo: { get: vi.fn(), delete: vi.fn(), query: vi.fn(), scan: vi.fn(), update: vi.fn(), upsert: vi.fn() },
+  repo: { get: vi.fn(), getAll: vi.fn(), delete: vi.fn(), query: vi.fn(), scan: vi.fn(), update: vi.fn(), upsert: vi.fn() },
 }));
 
 vi.mock('../../../logic/keyValueStore/getKvsRepository', () => ({
@@ -21,6 +21,7 @@ describe('getKeyValueStoreActionProcessor', () => {
     expect(Object.keys(processors).sort()).toEqual(
       [
         KeyValueStoreActionType.Get,
+        KeyValueStoreActionType.GetAll,
         KeyValueStoreActionType.Delete,
         KeyValueStoreActionType.Query,
         KeyValueStoreActionType.Scan,

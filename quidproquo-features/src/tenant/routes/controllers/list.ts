@@ -11,7 +11,7 @@ function* askTenantRouteList(): AskResponse<HTTPEventResponse> {
   return qpqWebServerUtils.toJsonEventResponse(summaries);
 }
 
-/** GET {basePath} — the authenticated user's tenants as EventDocSummary rows (drafts included). */
+/** GET {basePath}: the authenticated user's tenants as EventDocSummary rows (drafts included). */
 export function* list(): AskResponse<HTTPEventResponse> {
   return yield* askEventDocProvideStoreFromGlobals(askTenantRouteList());
 }

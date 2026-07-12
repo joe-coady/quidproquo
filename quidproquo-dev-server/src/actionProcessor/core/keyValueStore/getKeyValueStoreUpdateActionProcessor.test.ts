@@ -3,6 +3,8 @@ import {
   ErrorTypeEnum,
   isErroredActionResult,
   KeyValueStoreActionType,
+  KeyValueStoreUpdateErrorTypeEnum,
+  KvsStoreNotFoundError,
   noopDynamicModuleLoader,
   resolveActionResult,
   resolveActionResultError,
@@ -50,13 +52,13 @@ describe('getKeyValueStoreUpdateActionProcessor', () => {
     expect(repo.update).toHaveBeenCalledWith('store', '1', undefined, { name: 'x' }, undefined);
   });
 
-  it('maps a not found error to ResourceNotFound', async () => {
-    repo.update.mockRejectedValue(new Error('store not found'));
+  it('maps a missing store to the typed StoreNotFound', async () => {
+    repo.update.mockRejectedValue(new KvsStoreNotFoundError('store'));
     const process = await getProcessor();
 
     const result = await invokeProcessor(process, { keyValueStoreName: 'store', key: 1, updates: {} });
 
-    expect(resolveActionResultError(result).errorType).toBe('ResourceNotFound');
+    expect(resolveActionResultError(result).errorType).toBe(KeyValueStoreUpdateErrorTypeEnum.StoreNotFound);
   });
 
   it('maps a generic error to a caught error', async () => {

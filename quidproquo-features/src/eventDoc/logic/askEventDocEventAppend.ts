@@ -22,6 +22,7 @@ import {
   EventDocEventInput,
   EventDocEventValidationInput,
   EventDocOnPublishInput,
+  EventDocSummary,
   eventDocSummarySchema,
 } from '../models';
 import { applyEventDocSummaryEvent } from '../summary';
@@ -36,6 +37,17 @@ import { askEventDocGetByIdOrThrow } from './askEventDocGetByIdOrThrow';
 const MAX_APPEND_ATTEMPTS = 8;
 const APPEND_RETRY_BASE_WAIT_MS = 50;
 const APPEND_RETRY_MAX_JITTER_MS = 100;
+
+// What one append lap hands back. `priorEvents` (the log the validator already
+// paged through, excluding the new event) and `summary` (the record this lap
+// upserted) are only set when the lap actually wrote the event - the dedup
+// early-return skips those reads, and the publish hook below falls back to
+// fetching them.
+type AppendLapResult = {
+  event: EventDocEvent;
+  priorEvents?: EventDocEvent[];
+  summary?: EventDocSummary;
+};
 
 /**
  * Append a client event to a model's log; the safety invariants live here:
@@ -58,7 +70,7 @@ export function* askEventDocEventAppend(modelId: string, input: EventDocEventInp
   const { metadata } = input.payload;
 
   const result = yield* askRetry(
-    function* askAppendLap(): AskResponse<EventDocEvent> {
+    function* askAppendLap(): AskResponse<AppendLapResult> {
       const last = yield* askEventDocEventLast(modelId);
 
       if (!last) {
@@ -66,7 +78,7 @@ export function* askEventDocEventAppend(modelId: string, input: EventDocEventInp
       }
 
       if (metadata.clientMessageId && last.payload.metadata.clientMessageId === metadata.clientMessageId) {
-        return last;
+        return { event: last };
       }
 
       if (metadata.version < last.payload.metadata.version) {
@@ -121,7 +133,7 @@ export function* askEventDocEventAppend(modelId: string, input: EventDocEventInp
       yield* askValidateModelOrThrowError(record, eventDocSummarySchema);
       yield* askEventDocUpsert(record);
 
-      return event;
+      return { event, priorEvents: events, summary: record };
     },
     MAX_APPEND_ATTEMPTS,
     APPEND_RETRY_BASE_WAIT_MS,
@@ -140,6 +152,8 @@ export function* askEventDocEventAppend(modelId: string, input: EventDocEventInp
     return yield* askThrowError(result.error.errorType as ErrorTypeEnum, result.error.errorText, result.error.errorStack);
   }
 
+  const appendedEvent = result.result.event;
+
   // The on-publish hook runs AFTER the retry block, never inside a lap: the
   // hook may itself throw the namespaced Upsert Conflict (e.g. a materialized
   // read-model write), which inside a lap would re-run the whole append. At
@@ -149,14 +163,19 @@ export function* askEventDocEventAppend(modelId: string, input: EventDocEventInp
   // deliberate: hooks must be idempotent, and a retry after a failed hook is
   // exactly how a stale read model gets repaired.
   const { onPublish } = yield* askEventDocStoreRead();
-  if (onPublish && result.result.type === EventDocEffect.Publish) {
-    const summary = yield* askEventDocGetByIdOrThrow(modelId);
+  if (onPublish && appendedEvent.type === EventDocEffect.Publish) {
+    // The writing lap already read the log and upserted the summary; reuse
+    // both. Only the dedup path (which skipped those reads) fetches fresh.
+    const summary = result.result.summary ?? (yield* askEventDocGetByIdOrThrow(modelId));
+    const events = result.result.priorEvents ? [...result.result.priorEvents, appendedEvent] : yield* askEventDocEventListAll(modelId);
+
     yield* askInlineFunctionExecute<void, EventDocOnPublishInput>(onPublish, {
       docId: modelId,
-      event: result.result,
+      event: appendedEvent,
       summary,
+      events,
     });
   }
 
-  return result.result;
+  return appendedEvent;
 }

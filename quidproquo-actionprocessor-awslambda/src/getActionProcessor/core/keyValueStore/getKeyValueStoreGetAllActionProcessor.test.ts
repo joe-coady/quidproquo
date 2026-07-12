@@ -1,5 +1,5 @@
 import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { buildTestQpqConfig, defineKeyValueStore, KeyValueStoreActionType } from 'quidproquo-core';
+import { buildTestQpqConfig, defineKeyValueStore, KeyValueStoreActionType, KvsQueryOperationType } from 'quidproquo-core';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -22,13 +22,17 @@ describe('getKeyValueStoreGetAllActionProcessor', () => {
     vi.mocked(getAllItems).mockReset();
   });
 
-  it('reads every item from the resolved dynamo table', async () => {
+  it('reads every item from the resolved dynamo table, excluding composed rows', async () => {
     vi.mocked(getAllItems).mockResolvedValue([{ id: '1' }] as any);
     const processor = await resolveProcessor();
 
     const result = await invokeProcessor(processor, { keyValueStoreName: 'users' });
 
     expect(result).toEqual([[{ id: '1' }]]);
-    expect(getAllItems).toHaveBeenCalledWith('users-test-app-test-module-development-qpqkvs', 'eu-west-1', undefined);
+    expect(getAllItems).toHaveBeenCalledWith('users-test-app-test-module-development-qpqkvs', 'eu-west-1', {
+      key: 'pk',
+      operation: KvsQueryOperationType.NotContains,
+      valueA: '::',
+    });
   });
 });

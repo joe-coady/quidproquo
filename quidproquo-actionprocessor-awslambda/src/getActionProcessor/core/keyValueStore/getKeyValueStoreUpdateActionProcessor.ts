@@ -1,26 +1,26 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import { ActionProcessorList, ActionProcessorListResolver, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { ActionProcessorList, ActionProcessorListResolver, QPQConfig } from 'quidproquo-core';
 import {
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  getScopedKvsTranslatorOrThrow,
   KeyValueStoreActionType,
   KeyValueStoreUpdateActionProcessor,
   KeyValueStoreUpdateErrorTypeEnum,
+  resolveKvsStoreConfigOrThrow,
 } from 'quidproquo-core';
 
 import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
 import { updateItem } from '../../../logic/dynamo';
-import { getScopedKvsTranslatorOrThrow } from './kvsScopeUtils';
 
 const getProcessKeyValueStoreUpdate = (qpqConfig: QPQConfig): KeyValueStoreUpdateActionProcessor<any> => {
   return async ({ keyValueStoreName, key, sortKey, updates, options }) => {
     const dynamoTableName = getKvsDynamoTableNameFromConfig(keyValueStoreName, qpqConfig, 'kvs');
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
-    const storeConfig = qpqCoreUtils.getKeyValueStoreByName(qpqConfig, keyValueStoreName)!;
-
     try {
+      const storeConfig = resolveKvsStoreConfigOrThrow(qpqConfig, keyValueStoreName);
       const scoped = getScopedKvsTranslatorOrThrow(qpqConfig, keyValueStoreName, options?.scope);
 
       const item = await updateItem(
@@ -39,6 +39,7 @@ const getProcessKeyValueStoreUpdate = (qpqConfig: QPQConfig): KeyValueStoreUpdat
         InternalServerError: () => actionResultError(KeyValueStoreUpdateErrorTypeEnum.ServiceUnavailable, 'KVS Service Unavailable'),
         ResourceNotFoundException: () => actionResultError(KeyValueStoreUpdateErrorTypeEnum.ResourceNotFound, 'KVS Resource Not Found'),
         InvalidScopeError: (error) => actionResultError(KeyValueStoreUpdateErrorTypeEnum.InvalidScope, error.message),
+        KvsStoreNotFoundError: (error) => actionResultError(KeyValueStoreUpdateErrorTypeEnum.StoreNotFound, error.message),
       });
     }
   };

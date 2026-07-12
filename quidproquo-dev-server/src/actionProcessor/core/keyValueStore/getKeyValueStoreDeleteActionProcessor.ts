@@ -8,11 +8,11 @@ import {
   KeyValueStoreDeleteActionProcessor,
   KeyValueStoreDeleteErrorTypeEnum,
   QPQConfig,
+  resolveScopedPkAttributeOrThrow,
 } from 'quidproquo-core';
 
 import { getKvsRepository } from '../../../logic/keyValueStore/getKvsRepository';
 import { ResolvedDevServerConfig } from '../../../types';
-import { resolveScopedPkAttributeOrThrow } from './kvsScopeUtils';
 
 const getProcessKeyValueStoreDelete = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): KeyValueStoreDeleteActionProcessor => {
   return async ({ keyValueStoreName, key, sortKey, options }) => {
@@ -35,11 +35,9 @@ const getProcessKeyValueStoreDelete = (qpqConfig: QPQConfig, devServerConfig: Re
 
       return actionResult(undefined);
     } catch (error: any) {
-      if (error.message?.includes('not found')) {
-        return actionResultError('ResourceNotFound', error.message);
-      }
       return actionResultErrorFromCaughtError(error, {
         InvalidScopeError: (error) => actionResultError(KeyValueStoreDeleteErrorTypeEnum.InvalidScope, error.message),
+        KvsStoreNotFoundError: (error) => actionResultError(KeyValueStoreDeleteErrorTypeEnum.StoreNotFound, error.message),
       });
     }
   };

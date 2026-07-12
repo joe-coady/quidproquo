@@ -1,7 +1,8 @@
-import { ConfigActionType, runStory } from 'quidproquo-core';
+import { ConfigActionType, runStory, throwsError } from 'quidproquo-core';
 
 import { describe, expect, it } from 'vitest';
 
+import { EVENT_DOC_ON_PUBLISH_GLOBAL, EVENT_DOC_SCOPE_RESOLVER_GLOBAL } from '../constants/eventDocGlobalNames';
 import { askEventDocStoreRead } from '../context/askEventDocStoreRead';
 import { buildEventDocStore } from '../context/buildEventDocStore';
 import { askEventDocProvideStoreFromGlobals } from './askEventDocProvideStoreFromGlobals';
@@ -36,5 +37,32 @@ describe('buildEventDocStoreGlobals', () => {
     });
 
     expect(resolved).toEqual(store);
+  });
+
+  it('supports legacy consumers whose routes registered only the original six globals', () => {
+    const store = buildEventDocStore({
+      storeName: 'widgets',
+      type: 'widget',
+      eventValidator: 'validateWidget',
+      eventRenderer: 'renderWidget',
+    });
+
+    // Routes registered before onPublish/scopeResolver existed have NO key at
+    // all for them - the bridge must treat that as "hook not configured", not
+    // throw at request time.
+    const globals = { ...buildEventDocStoreGlobals(store) };
+    delete globals[EVENT_DOC_ON_PUBLISH_GLOBAL];
+    delete globals[EVENT_DOC_SCOPE_RESOLVER_GLOBAL];
+
+    const resolved = runStory(askEventDocProvideStoreFromGlobals(askEventDocStoreRead()), {
+      [ConfigActionType.GetGlobal]: (action: { payload: { globalName: string } }) => {
+        if (!(action.payload.globalName in globals)) {
+          return throwsError('GenericError', `Global config ${action.payload.globalName} not found`);
+        }
+        return globals[action.payload.globalName];
+      },
+    });
+
+    expect(resolved).toEqual({ ...store, onPublish: '', scopeResolver: '' });
   });
 });

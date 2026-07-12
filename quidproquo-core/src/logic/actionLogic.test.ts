@@ -107,6 +107,27 @@ describe('actionResultErrorFromCaughtError', () => {
     vi.restoreAllMocks();
   });
 
+  it('logs only the unmapped key, never the raw error object', () => {
+    const log = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const error = Object.assign(new Error('boom'), { name: 'SomeUnknownAwsError' });
+
+    actionResultErrorFromCaughtError(error, {});
+
+    expect(log).toHaveBeenCalledTimes(1);
+    expect(log).toHaveBeenCalledWith('Error: SomeUnknownAwsError');
+    vi.restoreAllMocks();
+  });
+
+  it('logs nothing when a handler matches', () => {
+    const log = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const error = Object.assign(new Error('boom'), { name: 'Mapped' });
+
+    actionResultErrorFromCaughtError(error, { Mapped: () => actionResultError(ErrorTypeEnum.Conflict, 'mapped') });
+
+    expect(log).not.toHaveBeenCalled();
+    vi.restoreAllMocks();
+  });
+
   it('handles a thrown non-error value', () => {
     vi.spyOn(console, 'log').mockImplementation(() => {});
 

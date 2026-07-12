@@ -4,6 +4,7 @@ import {
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  getScopedKvsTranslatorOrThrow,
   KeyValueStoreActionType,
   KeyValueStoreGetAllActionProcessor,
   KeyValueStoreGetAllErrorTypeEnum,
@@ -11,7 +12,6 @@ import {
 
 import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
 import { getAllItems } from '../../../logic/dynamo';
-import { getScopedKvsTranslatorOrThrow } from './kvsScopeUtils';
 
 const getProcessKeyValueStoreGetAll = (qpqConfig: QPQConfig): KeyValueStoreGetAllActionProcessor<any> => {
   return async ({ keyValueStoreName, options }) => {
@@ -31,6 +31,7 @@ const getProcessKeyValueStoreGetAll = (qpqConfig: QPQConfig): KeyValueStoreGetAl
         InternalServerError: () => actionResultError(KeyValueStoreGetAllErrorTypeEnum.ServiceUnavailable, 'KVS Service Unavailable'),
         ResourceNotFoundException: () => actionResultError(KeyValueStoreGetAllErrorTypeEnum.ResourceNotFound, 'KVS Resource Not Found'),
         InvalidScopeError: (error) => actionResultError(KeyValueStoreGetAllErrorTypeEnum.InvalidScope, error.message),
+        KvsStoreNotFoundError: (error) => actionResultError(KeyValueStoreGetAllErrorTypeEnum.StoreNotFound, error.message),
       });
     }
   };

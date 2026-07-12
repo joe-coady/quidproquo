@@ -15,6 +15,9 @@ export enum InvalidScopeErrorCode {
   // A scoped query whose key condition never constrains the partition key -
   // on value-composed backends (dynamo) it would silently span every scope.
   queryMissingPartitionKey = 'queryMissingPartitionKey',
+  // A raw partition-key value containing the scope delimiter: storing it would
+  // make the row indistinguishable from another scope's composed data.
+  reservedDelimiter = 'reservedDelimiter',
 }
 
 export class InvalidScopeError extends Error {

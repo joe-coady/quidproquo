@@ -10,6 +10,7 @@ export const KeyValueStoreUpsertErrorTypeEnum = createErrorEnumForAction(KeyValu
   // specifically without also catching domain-level conflicts.
   'Conflict',
   'InvalidScope', // scope is malformed or the store's partition key is not string-typed
+  'StoreNotFound', // the store is not declared in the qpq config (misconfiguration)
 ]);
 
 export function* askKeyValueStoreUpsert<KvsItem>(

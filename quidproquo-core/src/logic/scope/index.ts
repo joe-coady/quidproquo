@@ -1,5 +1,7 @@
 export * from './composeScopedFilePath';
 export * from './InvalidScopeError';
+export * from './kvsScopeGate';
+export * from './KvsStoreNotFoundError';
 export * from './scopedKvsQueryOperation';
 export * from './scopedKvsTranslator';
 export * from './scopedKvsValue';

@@ -1,4 +1,12 @@
-import { KeyValueStoreQPQConfigSetting, KvsQueryOperation, KvsUpdate, QPQConfig, qpqCoreUtils, QpqPagedData } from 'quidproquo-core';
+import {
+  KeyValueStoreQPQConfigSetting,
+  KvsQueryOperation,
+  KvsStoreNotFoundError,
+  KvsUpdate,
+  QPQConfig,
+  qpqCoreUtils,
+  QpqPagedData,
+} from 'quidproquo-core';
 
 import * as fs from 'fs';
 import * as path from 'path';
@@ -49,7 +57,7 @@ export class JsonKvsRepository implements KvsRepository {
   private getStoreConfig(keyValueStoreName: string): KeyValueStoreQPQConfigSetting {
     const storeConfig = qpqCoreUtils.getKeyValueStoreByName(this.qpqConfig, keyValueStoreName);
     if (!storeConfig) {
-      throw new Error(`Key value store '${keyValueStoreName}' not found in configuration`);
+      throw new KvsStoreNotFoundError(keyValueStoreName);
     }
     return storeConfig;
   }
@@ -211,6 +219,13 @@ export class JsonKvsRepository implements KvsRepository {
       : [...state.items.values()];
 
     return paginateKvsItems(matched, storeConfig, true, nextPageKey, limit);
+  }
+
+  async getAll(keyValueStoreName: string, scope?: string): Promise<any[]> {
+    const storeConfig = this.getStoreConfig(keyValueStoreName);
+    const state = this.getStore(keyValueStoreName, storeConfig, scope);
+
+    return [...state.items.values()];
   }
 
   async upsert(keyValueStoreName: string, item: any, options?: { ifNotExists?: boolean }, scope?: string): Promise<any> {

@@ -8,11 +8,11 @@ import {
   KeyValueStoreScanActionProcessor,
   KeyValueStoreScanErrorTypeEnum,
   QPQConfig,
+  resolveScopedPkAttributeOrThrow,
 } from 'quidproquo-core';
 
 import { getKvsRepository } from '../../../logic/keyValueStore/getKvsRepository';
 import { ResolvedDevServerConfig } from '../../../types';
-import { resolveScopedPkAttributeOrThrow } from './kvsScopeUtils';
 
 const getProcessKeyValueStoreScan = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): KeyValueStoreScanActionProcessor<any> => {
   return async ({ keyValueStoreName, filterCondition, nextPageKey, options }) => {
@@ -36,11 +36,9 @@ const getProcessKeyValueStoreScan = (qpqConfig: QPQConfig, devServerConfig: Reso
 
       return actionResult(result);
     } catch (error: any) {
-      if (error.message?.includes('not found')) {
-        return actionResultError('ResourceNotFound', error.message);
-      }
       return actionResultErrorFromCaughtError(error, {
         InvalidScopeError: (error) => actionResultError(KeyValueStoreScanErrorTypeEnum.InvalidScope, error.message),
+        KvsStoreNotFoundError: (error) => actionResultError(KeyValueStoreScanErrorTypeEnum.StoreNotFound, error.message),
       });
     }
   };

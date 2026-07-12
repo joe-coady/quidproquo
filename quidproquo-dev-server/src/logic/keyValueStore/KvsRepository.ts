@@ -24,6 +24,8 @@ export interface KvsRepository {
 
   scan(keyValueStoreName: string, filter?: KvsQueryOperation, nextPageKey?: string, limit?: number, scope?: string): Promise<QpqPagedData<any>>;
 
+  getAll(keyValueStoreName: string, scope?: string): Promise<any[]>;
+
   upsert(keyValueStoreName: string, item: any, options?: { ifNotExists?: boolean }, scope?: string): Promise<any>;
 
   update(keyValueStoreName: string, key: string, sortKey: string | undefined, updates: KvsUpdate, scope?: string): Promise<any>;

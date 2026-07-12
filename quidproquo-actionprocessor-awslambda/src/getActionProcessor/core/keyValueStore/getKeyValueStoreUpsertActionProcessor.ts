@@ -5,36 +5,32 @@ import {
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
-  ErrorTypeEnum,
+  getScopedKvsTranslatorOrThrow,
   KeyValueStoreActionType,
   KeyValueStoreUpsertActionProcessor,
   QPQConfig,
-  qpqCoreUtils,
+  resolveKvsStoreConfigOrThrow,
 } from 'quidproquo-core';
 import { KeyValueStoreUpsertErrorTypeEnum } from 'quidproquo-core';
 
 import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
 import { putItem } from '../../../logic/dynamo';
-import { getScopedKvsTranslatorOrThrow } from './kvsScopeUtils';
 
 const getProcessKeyValueStoreUpsert = (qpqConfig: QPQConfig): KeyValueStoreUpsertActionProcessor<any> => {
   return async ({ keyValueStoreName, item, options }) => {
     const dynamoTableName = getKvsDynamoTableNameFromConfig(keyValueStoreName, qpqConfig, 'kvs');
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
-    const storeConfig = qpqCoreUtils.getKeyValueStoreByName(qpqConfig, keyValueStoreName);
-    if (!storeConfig) {
-      return actionResultError(ErrorTypeEnum.NotFound, `Could not find key value store with name "${keyValueStoreName}"`);
-    }
-
-    const keys = [
-      storeConfig.partitionKey,
-      ...storeConfig.sortKeys,
-      ...storeConfig.indexes.map((i) => i.partitionKey),
-      ...storeConfig.indexes.filter((i) => !!i.sortKey).map((i) => i.sortKey!),
-    ];
-
     try {
+      const storeConfig = resolveKvsStoreConfigOrThrow(qpqConfig, keyValueStoreName);
+
+      const keys = [
+        storeConfig.partitionKey,
+        ...storeConfig.sortKeys,
+        ...storeConfig.indexes.map((i) => i.partitionKey),
+        ...storeConfig.indexes.filter((i) => !!i.sortKey).map((i) => i.sortKey!),
+      ];
+
       // The scope lives inside the stored partition key value, so the item is
       // persisted with a composed pk; reads strip it back off.
       const scoped = getScopedKvsTranslatorOrThrow(qpqConfig, keyValueStoreName, options?.scope);
@@ -57,6 +53,7 @@ const getProcessKeyValueStoreUpsert = (qpqConfig: QPQConfig): KeyValueStoreUpser
         ResourceNotFoundException: () => actionResultError(KeyValueStoreUpsertErrorTypeEnum.ResourceNotFound, 'KVS Resource Not Found'),
         ConditionalCheckFailedException: () => actionResultError(KeyValueStoreUpsertErrorTypeEnum.Conflict, 'KVS item already exists'),
         InvalidScopeError: (error) => actionResultError(KeyValueStoreUpsertErrorTypeEnum.InvalidScope, error.message),
+        KvsStoreNotFoundError: (error) => actionResultError(KeyValueStoreUpsertErrorTypeEnum.StoreNotFound, error.message),
       });
     }
   };

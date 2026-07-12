@@ -171,6 +171,9 @@ describe('eventDoc onPublish hook', () => {
     expect(inlineInvocations[0].payload.docId).toBe(summary.id);
     expect(inlineInvocations[0].payload.event.type).toBe(EventDocEffect.Publish);
     expect(inlineInvocations[0].payload.summary.id).toBe(summary.id);
+
+    // The full log (INIT_STATE + PUBLISH) rides along so the hook never re-reads it.
+    expect(inlineInvocations[0].payload.events.map((e: { type: string }) => e.type)).toEqual([EventDocEffect.InitState, EventDocEffect.Publish]);
   });
 
   it('does not invoke the hook for non-Publish events', () => {
@@ -222,6 +225,11 @@ describe('eventDoc onPublish hook', () => {
     runStory(appendEvent(baseHttpEvent(publishBody('msg-1')), { id: summary.id }), mocks);
 
     expect(inlineInvocations).toHaveLength(2);
+
+    // The deduped retry skipped the writing lap, so its hook input is rebuilt
+    // from a fresh read and must still carry the full log.
+    expect(inlineInvocations[1].payload.events).toHaveLength(2);
+    expect(inlineInvocations[1].payload.summary.id).toBe(summary.id);
 
     const events = tables[store.eventsStoreName] ?? [];
     expect(events).toHaveLength(2);

@@ -1,6 +1,6 @@
 import { KvsCoreDataType, KvsLogicalOperatorType, KvsQueryOperation } from '../../actions/keyValueStore/types';
-import { composeScopedKvsQueryOperation, stripScopedKvsItem, validateScopedQueryConstrainsPkOrThrow } from './scopedKvsQueryOperation';
-import { buildKvsScopeBeginsWithCondition, composeScopedKvsValue } from './scopedKvsValue';
+import { composeScopedKvsQueryOperation, composeScopedKvsQueryOperationOrThrow, stripScopedKvsItem } from './scopedKvsQueryOperation';
+import { buildKvsScopeBeginsWithCondition, buildKvsScopeExclusionCondition, composeScopedKvsValue } from './scopedKvsValue';
 
 /**
  * Everything a value-composed backend (dynamo) needs to scope one store, in one
@@ -8,8 +8,13 @@ import { buildKvsScopeBeginsWithCondition, composeScopedKvsValue } from './scope
  * inside the item, buried in a condition tree, or absent entirely - so each
  * shape gets one method instead of each processor wiring the low-level helpers.
  *
- * Unscoped requests get the identity translator: every method is a passthrough,
- * so processors never branch on `scope === undefined`.
+ * Unscoped requests get the identity translator, so processors never branch on
+ * `scope === undefined` - with ONE exception: when the store's (string) pk
+ * attribute is known, an unscoped scanFilter excludes scope-composed rows.
+ * Without it an unscoped Scan/GetAll over a mixed table would return every
+ * tenant's rows with the composed `tenant::key` values un-stripped - a leak,
+ * and a mismatch with file-partitioned backends where scoped rows are
+ * physically invisible to unscoped reads.
  */
 export type ScopedKvsTranslator = {
   /** Get/Update/Delete: prefix a bare key value. */
@@ -37,7 +42,19 @@ const identityTranslator: ScopedKvsTranslator = {
 
 export const createScopedKvsTranslator = (scope: string | undefined, pkAttributeName: string): ScopedKvsTranslator => {
   if (scope === undefined) {
-    return identityTranslator;
+    // Empty pk name = unknown store or non-string pk: composed rows cannot be
+    // filtered (or cannot exist), so stay a pure passthrough.
+    if (!pkAttributeName) {
+      return identityTranslator;
+    }
+
+    return {
+      ...identityTranslator,
+      scanFilter: (operation) => {
+        const exclusion = buildKvsScopeExclusionCondition(pkAttributeName);
+        return operation ? { operation: KvsLogicalOperatorType.And, conditions: [exclusion, operation] } : exclusion;
+      },
+    };
   }
 
   const strip = <T>(item: T): T =>
@@ -48,10 +65,7 @@ export const createScopedKvsTranslator = (scope: string | undefined, pkAttribute
 
     item: (item) => ({ ...item, [pkAttributeName]: composeScopedKvsValue(scope, item[pkAttributeName]) }),
 
-    keyCondition: (operation) => {
-      validateScopedQueryConstrainsPkOrThrow(scope, operation, [pkAttributeName]);
-      return composeScopedKvsQueryOperation(scope, operation, [pkAttributeName]).operation;
-    },
+    keyCondition: (operation) => composeScopedKvsQueryOperationOrThrow(scope, operation, [pkAttributeName]),
 
     filter: (operation) => (operation ? composeScopedKvsQueryOperation(scope, operation, [pkAttributeName]).operation : operation),
 

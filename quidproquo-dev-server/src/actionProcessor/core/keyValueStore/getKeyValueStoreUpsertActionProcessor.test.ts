@@ -4,6 +4,7 @@ import {
   isErroredActionResult,
   KeyValueStoreActionType,
   KeyValueStoreUpsertErrorTypeEnum,
+  KvsStoreNotFoundError,
   noopDynamicModuleLoader,
   resolveActionResult,
   resolveActionResultError,
@@ -42,13 +43,13 @@ describe('getKeyValueStoreUpsertActionProcessor', () => {
     expect(resolveActionResult(result)).toEqual({ id: 'a' });
   });
 
-  it('maps a not found error to ResourceNotFound', async () => {
-    repo.upsert.mockRejectedValue(new Error('store not found'));
+  it('maps a missing store to the typed StoreNotFound', async () => {
+    repo.upsert.mockRejectedValue(new KvsStoreNotFoundError('store'));
     const process = await getProcessor();
 
     const result = await invokeProcessor(process, { keyValueStoreName: 'store', item: {} });
 
-    expect(resolveActionResultError(result).errorType).toBe('ResourceNotFound');
+    expect(resolveActionResultError(result).errorType).toBe(KeyValueStoreUpsertErrorTypeEnum.StoreNotFound);
   });
 
   it('maps a ConditionalCheckFailedException from the repository to Conflict', async () => {

@@ -1,10 +1,15 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import { ActionProcessorList, ActionProcessorListResolver, actionResultError, actionResultErrorFromCaughtError, QPQConfig } from 'quidproquo-core';
-import { actionResult, KeyValueStoreActionType, KeyValueStoreScanActionProcessor, KeyValueStoreScanErrorTypeEnum } from 'quidproquo-core';
+import {
+  actionResult,
+  getScopedKvsTranslatorOrThrow,
+  KeyValueStoreActionType,
+  KeyValueStoreScanActionProcessor,
+  KeyValueStoreScanErrorTypeEnum,
+} from 'quidproquo-core';
 
 import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
 import { scan } from '../../../logic/dynamo/scan';
-import { getScopedKvsTranslatorOrThrow } from './kvsScopeUtils';
 
 const getProcessKeyValueStoreScan = (qpqConfig: QPQConfig): KeyValueStoreScanActionProcessor<any> => {
   return async ({ keyValueStoreName, filterCondition, nextPageKey, options }) => {
@@ -27,6 +32,7 @@ const getProcessKeyValueStoreScan = (qpqConfig: QPQConfig): KeyValueStoreScanAct
         InternalServerError: () => actionResultError(KeyValueStoreScanErrorTypeEnum.ServiceUnavailable, 'KVS Service Unavailable'),
         ResourceNotFoundException: () => actionResultError(KeyValueStoreScanErrorTypeEnum.ResourceNotFound, 'KVS Resource Not Found'),
         InvalidScopeError: (error) => actionResultError(KeyValueStoreScanErrorTypeEnum.InvalidScope, error.message),
+        KvsStoreNotFoundError: (error) => actionResultError(KeyValueStoreScanErrorTypeEnum.StoreNotFound, error.message),
       });
     }
   };
