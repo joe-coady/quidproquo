@@ -10,6 +10,21 @@ export enum UuidNamespace {
 
 const uuidFormatRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+// Raised when the namespace argument is not a canonical UUID string.
+export enum InvalidUuidNamespaceErrorCode {
+  notAUuid = 'notAUuid',
+}
+
+export class InvalidUuidNamespaceError extends Error {
+  constructor(
+    public readonly code: InvalidUuidNamespaceErrorCode,
+    message: string,
+  ) {
+    super(message);
+    this.name = 'InvalidUuidNamespaceError';
+  }
+}
+
 const uuidToBytes = (uuid: string): Uint8Array => {
   const hex = uuid.replace(/-/g, '');
   const bytes = new Uint8Array(16);
@@ -42,7 +57,7 @@ const bytesToUuid = (bytes: Uint8Array): string => {
  */
 export function generateUuidV5(name: string, namespace: string): string {
   if (!uuidFormatRegex.test(namespace)) {
-    throw new Error(`Invalid namespace UUID [${namespace}]`);
+    throw new InvalidUuidNamespaceError(InvalidUuidNamespaceErrorCode.notAUuid, `Invalid namespace UUID [${namespace}]`);
   }
 
   const namespaceBytes = uuidToBytes(namespace);

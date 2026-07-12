@@ -33,4 +33,24 @@ describe('getTimeBounds', () => {
       latestFinishedAt: '2026-01-01T00:00:15.000Z',
     });
   });
+
+  it('skips nodes with an unparseable startedAt instead of throwing', () => {
+    const logs = [node('not-a-date', 1000), node('2026-01-01T00:00:00.000Z', 1000)];
+
+    expect(getTimeBounds(logs)).toEqual({
+      earliestStartedAt: '2026-01-01T00:00:00.000Z',
+      latestFinishedAt: '2026-01-01T00:00:01.000Z',
+    });
+  });
+
+  it('skips nodes with an empty startedAt instead of throwing', () => {
+    expect(getTimeBounds([node('', 1000)])).toEqual({ earliestStartedAt: '', latestFinishedAt: '' });
+  });
+
+  it('skips a non-finite executionTimeMs instead of throwing', () => {
+    expect(getTimeBounds([node('2026-01-01T00:00:00.000Z', NaN)])).toEqual({
+      earliestStartedAt: '2026-01-01T00:00:00.000Z',
+      latestFinishedAt: '',
+    });
+  });
 });

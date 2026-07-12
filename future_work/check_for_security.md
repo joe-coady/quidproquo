@@ -1561,39 +1561,39 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [ ] quidproquo-core/src/utils/functions/bindApiFunction.test.ts
 - [ ] quidproquo-core/src/utils/functions/bindApiFunction.ts
 - [ ] quidproquo-core/src/utils/functions/index.ts
-- [ ] quidproquo-core/src/utils/hash/generateSimpleHash.test.ts
-- [ ] quidproquo-core/src/utils/hash/generateSimpleHash.ts
-- [ ] quidproquo-core/src/utils/hash/index.ts
-- [ ] quidproquo-core/src/utils/hash/sha1.test.ts
-- [ ] quidproquo-core/src/utils/hash/sha1.ts
+- [x] quidproquo-core/src/utils/hash/generateSimpleHash.test.ts
+- [x] quidproquo-core/src/utils/hash/generateSimpleHash.ts
+- [x] quidproquo-core/src/utils/hash/index.ts
+- [x] quidproquo-core/src/utils/hash/sha1.test.ts
+- [x] quidproquo-core/src/utils/hash/sha1.ts
 - [ ] quidproquo-core/src/utils/index.ts
-- [ ] quidproquo-core/src/utils/logs/formatDuration.test.ts
-- [ ] quidproquo-core/src/utils/logs/formatDuration.ts
-- [ ] quidproquo-core/src/utils/logs/getTimeBounds.test.ts
-- [ ] quidproquo-core/src/utils/logs/getTimeBounds.ts
-- [ ] quidproquo-core/src/utils/logs/getTotalExecutionTime.test.ts
-- [ ] quidproquo-core/src/utils/logs/getTotalExecutionTime.ts
-- [ ] quidproquo-core/src/utils/logs/index.ts
+- [x] quidproquo-core/src/utils/logs/formatDuration.test.ts
+- [x] quidproquo-core/src/utils/logs/formatDuration.ts
+- [x] quidproquo-core/src/utils/logs/getTimeBounds.test.ts
+- [x] quidproquo-core/src/utils/logs/getTimeBounds.ts
+- [x] quidproquo-core/src/utils/logs/getTotalExecutionTime.test.ts
+- [x] quidproquo-core/src/utils/logs/getTotalExecutionTime.ts
+- [x] quidproquo-core/src/utils/logs/index.ts
 - [ ] quidproquo-core/src/utils/mimeTypes.test.ts
 - [ ] quidproquo-core/src/utils/mimeTypes.ts
-- [ ] quidproquo-core/src/utils/path/getFederatedKeyFromQpqFunctionRuntime.ts
-- [ ] quidproquo-core/src/utils/path/getUniqueKeyFromQpqFunctionRuntime.test.ts
-- [ ] quidproquo-core/src/utils/path/getUniqueKeyFromQpqFunctionRuntime.ts
-- [ ] quidproquo-core/src/utils/path/index.ts
-- [ ] quidproquo-core/src/utils/path/isQpqFunctionRuntimeAdvanced.test.ts
-- [ ] quidproquo-core/src/utils/path/isQpqFunctionRuntimeAdvanced.ts
-- [ ] quidproquo-core/src/utils/path/isQpqFunctionRuntimeRelativePath.test.ts
-- [ ] quidproquo-core/src/utils/path/isQpqFunctionRuntimeRelativePath.ts
-- [ ] quidproquo-core/src/utils/types/index.ts
-- [ ] quidproquo-core/src/utils/types/isDefined.test.ts
-- [ ] quidproquo-core/src/utils/types/isDefined.ts
-- [ ] quidproquo-core/src/utils/types/when.test.ts
-- [ ] quidproquo-core/src/utils/types/when.ts
-- [ ] quidproquo-core/src/utils/uuid/generateUuid.test.ts
-- [ ] quidproquo-core/src/utils/uuid/generateUuid.ts
-- [ ] quidproquo-core/src/utils/uuid/generateUuidV5.test.ts
-- [ ] quidproquo-core/src/utils/uuid/generateUuidV5.ts
-- [ ] quidproquo-core/src/utils/uuid/index.ts
+- [x] quidproquo-core/src/utils/path/getFederatedKeyFromQpqFunctionRuntime.ts
+- [x] quidproquo-core/src/utils/path/getUniqueKeyFromQpqFunctionRuntime.test.ts
+- [x] quidproquo-core/src/utils/path/getUniqueKeyFromQpqFunctionRuntime.ts
+- [x] quidproquo-core/src/utils/path/index.ts
+- [x] quidproquo-core/src/utils/path/isQpqFunctionRuntimeAdvanced.test.ts
+- [x] quidproquo-core/src/utils/path/isQpqFunctionRuntimeAdvanced.ts
+- [x] quidproquo-core/src/utils/path/isQpqFunctionRuntimeRelativePath.test.ts
+- [x] quidproquo-core/src/utils/path/isQpqFunctionRuntimeRelativePath.ts
+- [x] quidproquo-core/src/utils/types/index.ts
+- [x] quidproquo-core/src/utils/types/isDefined.test.ts
+- [x] quidproquo-core/src/utils/types/isDefined.ts
+- [x] quidproquo-core/src/utils/types/when.test.ts
+- [x] quidproquo-core/src/utils/types/when.ts
+- [x] quidproquo-core/src/utils/uuid/generateUuid.test.ts
+- [x] quidproquo-core/src/utils/uuid/generateUuid.ts
+- [x] quidproquo-core/src/utils/uuid/generateUuidV5.test.ts
+- [x] quidproquo-core/src/utils/uuid/generateUuidV5.ts
+- [x] quidproquo-core/src/utils/uuid/index.ts
 - [ ] quidproquo-core/src/validators/index.ts
 - [ ] quidproquo-core/src/validators/isString.test.ts
 - [ ] quidproquo-core/src/validators/isString.ts

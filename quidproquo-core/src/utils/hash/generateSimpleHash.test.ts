@@ -21,4 +21,13 @@ describe('generateSimpleHash', () => {
   it('joins the rest arguments into the hashed string', () => {
     expect(generateSimpleHash('a', 'b', 'c')).toBe(generateSimpleHash('abc'));
   });
+
+  it('pads small hash values with leading zeros to 8 characters', () => {
+    // 'a' hashes to charCode 97 = 0x61, so padding must fill the rest.
+    expect(generateSimpleHash('a')).toBe('00000061');
+  });
+
+  it('hashes the empty string to eight zeros', () => {
+    expect(generateSimpleHash('')).toBe('00000000');
+  });
 });

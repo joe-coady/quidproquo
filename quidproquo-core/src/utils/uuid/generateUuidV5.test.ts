@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { generateUuidV5, UuidNamespace } from './generateUuidV5';
+import { generateUuidV5, InvalidUuidNamespaceError, InvalidUuidNamespaceErrorCode, UuidNamespace } from './generateUuidV5';
 
 describe('generateUuidV5', () => {
   // Known-answer vectors from the uuid npm package docs and the Python uuid stdlib docs.
@@ -47,5 +47,17 @@ describe('generateUuidV5', () => {
 
   it('throws for a namespace that is not a valid UUID', () => {
     expect(() => generateUuidV5('some-name', 'not-a-uuid')).toThrow('Invalid namespace UUID [not-a-uuid]');
+  });
+
+  it('throws a discriminable InvalidUuidNamespaceError with the notAUuid code', () => {
+    let caught: unknown;
+    try {
+      generateUuidV5('some-name', 'not-a-uuid');
+    } catch (error) {
+      caught = error;
+    }
+
+    expect(caught).toBeInstanceOf(InvalidUuidNamespaceError);
+    expect((caught as InvalidUuidNamespaceError).code).toBe(InvalidUuidNamespaceErrorCode.notAUuid);
   });
 });

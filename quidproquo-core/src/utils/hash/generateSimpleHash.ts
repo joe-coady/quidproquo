@@ -1,9 +1,15 @@
 /**
  * Generates a short 8-character hash string from the given input strings.
- * This function uses a simple hashing algorithm based on the FNV-1a hash.
  *
- * @param {...string[]} inputStrings - The input strings to generate the hash for.
- * @returns {string} A hexadecimal string representing the generated hash.
+ * The algorithm is the classic multiply-by-31 string hash (the same one Java's
+ * `String.hashCode` uses), folded to 32 bits with the sign dropped. It is fast and
+ * deterministic but NOT cryptographic and not collision-resistant: use it only for
+ * short non-adversarial identifiers like derived resource names, never for anything
+ * security-sensitive.
+ *
+ * @param {string} input - The first input string to hash.
+ * @param {...string[]} rest - Further strings, concatenated onto the input before hashing.
+ * @returns {string} An 8-character lowercase hexadecimal string.
  */
 export function generateSimpleHash(input: string, ...rest: string[]): string {
   const megaString = [input, ...rest].join('');
