@@ -1,6 +1,6 @@
 import { QpqReducer } from './combineQpqReducers';
 
-// Pure, synchronous reduction of a list of effects into state — the event-sourcing counterpart to
+// Pure, synchronous reduction of a list of effects into state: the event-sourcing counterpart to
 // askReduceState. Each effect is run through `reducer` in order, starting from `initialState`.
 // Effects the reducer doesn't handle (it returns [state, false]) leave the state unchanged and are
 // skipped. Returns the final recomputed state.

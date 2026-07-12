@@ -46,7 +46,7 @@ function* askFileDelete(
 | --- | --- |
 | `FileDeleteErrorTypeEnum.AccessDenied` | The caller lacks permission to delete from this drive (e.g. a foreign drive shared without write access). |
 | `FileDeleteErrorTypeEnum.DriveNotFound` | No storage drive with that name exists in the deployed config. |
-| `FileDeleteErrorTypeEnum.InvalidScope` | The `scope` is not a valid single path segment (empty, too long, or contains separators, `..`, or null bytes), or one of the scoped `filepaths` is absolute or contains `..` segments or null bytes. |
+| `FileDeleteErrorTypeEnum.InvalidScope` | The `scope` is not a valid single path segment (empty, `.`, too long, or contains separators, `..`, `:`, or null bytes), or one of the scoped `filepaths` is absolute or contains `..` segments or null bytes. |
 
 Errors thrown by actions can be caught with `askCatch` from quidproquo-core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 

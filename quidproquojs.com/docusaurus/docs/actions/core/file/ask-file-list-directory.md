@@ -74,7 +74,7 @@ When `pageToken` is `undefined`, the last page has been returned.
 | `FileListDirectoryErrorTypeEnum.DirectoryNotFound` | No directory exists at the given `folderPath`. |
 | `FileListDirectoryErrorTypeEnum.NotADirectory` | The `folderPath` points at a file rather than a directory. |
 | `FileListDirectoryErrorTypeEnum.DriveNotFound` | No storage drive with that name exists in the deployed config. |
-| `FileListDirectoryErrorTypeEnum.InvalidScope` | The `scope` is not a valid single path segment (empty, too long, or contains separators, `..`, or null bytes), or the scoped `folderPath` is absolute or contains `..` segments or null bytes. |
+| `FileListDirectoryErrorTypeEnum.InvalidScope` | The `scope` is not a valid single path segment (empty, `.`, too long, or contains separators, `..`, `:`, or null bytes), or the scoped `folderPath` is absolute or contains `..` segments or null bytes. |
 
 Errors thrown by actions can be caught with `askCatch` from quidproquo-core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 

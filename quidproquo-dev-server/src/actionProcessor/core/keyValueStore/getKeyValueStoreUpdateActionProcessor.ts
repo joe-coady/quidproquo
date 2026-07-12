@@ -8,7 +8,7 @@ import {
   KeyValueStoreUpdateActionProcessor,
   KeyValueStoreUpdateErrorTypeEnum,
   QPQConfig,
-  resolveScopedPkAttributeOrThrow,
+  validateScopedKvsKeyOrThrow,
 } from 'quidproquo-core';
 
 import { getKvsRepository } from '../../../logic/keyValueStore/getKvsRepository';
@@ -22,9 +22,10 @@ const getProcessKeyValueStoreUpdate = (qpqConfig: QPQConfig, devServerConfig: Re
 
       // The json backend partitions per-scope at the FILE level, so keys and
       // items stay raw - the scope just selects which file the store updates.
-      if (scope !== undefined) {
-        resolveScopedPkAttributeOrThrow(qpqConfig, keyValueStoreName, scope);
-      }
+      // The key is still validated for AWS parity: a key prod rejects (bad
+      // scope, or the reserved '::' delimiter in the raw value) must fail
+      // locally too.
+      validateScopedKvsKeyOrThrow(qpqConfig, keyValueStoreName, scope, key);
 
       const result = await repository.update(keyValueStoreName, String(key), sortKey ? String(sortKey) : undefined, updates, scope);
 

@@ -61,7 +61,7 @@ function* askFileWriteObjectJson<T extends object>(
 | --- | --- |
 | `FileWriteObjectJsonErrorTypeEnum.AccessDenied` | The caller lacks permission to write to this drive (e.g. a foreign drive shared without write access). |
 | `FileWriteObjectJsonErrorTypeEnum.DriveNotFound` | No storage drive with that name exists in the deployed config. |
-| `FileWriteObjectJsonErrorTypeEnum.InvalidScope` | The `scope` is not a valid single path segment (empty, too long, or contains separators, `..`, or null bytes), or the scoped `filepath` is absolute or contains `..` segments or null bytes. |
+| `FileWriteObjectJsonErrorTypeEnum.InvalidScope` | The `scope` is not a valid single path segment (empty, `.`, too long, or contains separators, `..`, `:`, or null bytes), or the scoped `filepath` is absolute or contains `..` segments or null bytes. |
 
 Errors thrown by actions can be caught with `askCatch` from quidproquo-core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 

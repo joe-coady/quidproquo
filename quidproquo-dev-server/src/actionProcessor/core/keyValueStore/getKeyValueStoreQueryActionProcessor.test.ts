@@ -1,9 +1,12 @@
 import {
   buildTestQpqConfig,
+  defineKeyValueStore,
   ErrorTypeEnum,
   isErroredActionResult,
   KeyValueStoreActionType,
   KeyValueStoreQueryErrorTypeEnum,
+  kvsKey,
+  KvsQueryOperationType,
   KvsStoreNotFoundError,
   noopDynamicModuleLoader,
   resolveActionResult,
@@ -25,8 +28,16 @@ vi.mock('../../../logic/keyValueStore/getKvsRepository', () => ({
 
 const devServerConfig = { runtimePath: '/tmp/runtime' } as any;
 
+// A real KvsQueryOperation: the processor walks the condition tree (scope
+// gate validation), so a stand-in string would throw before reaching the repo.
+const keyCondition = { key: 'id', operation: KvsQueryOperationType.Equal, valueA: 'a' };
+
+// The processors resolve the store's config up front (scope gate), so the
+// store under test must be declared.
+const testQpqConfig = buildTestQpqConfig([defineKeyValueStore('store', kvsKey('id', 'string'))]);
+
 const getProcessor = async () => {
-  const processors = await getKeyValueStoreQueryActionProcessor(devServerConfig)(buildTestQpqConfig(), noopDynamicModuleLoader);
+  const processors = await getKeyValueStoreQueryActionProcessor(devServerConfig)(testQpqConfig, noopDynamicModuleLoader);
   return processors[KeyValueStoreActionType.Query];
 };
 
@@ -39,11 +50,11 @@ describe('getKeyValueStoreQueryActionProcessor', () => {
 
     const result = await invokeProcessor(process, {
       keyValueStoreName: 'store',
-      keyCondition: 'id = :id',
+      keyCondition,
       options: { filter: 'f', nextPageKey: 'np', limit: 10, sortAscending: false },
     });
 
-    expect(repo.query).toHaveBeenCalledWith('store', 'id = :id', 'f', 'np', undefined, 10, false, undefined);
+    expect(repo.query).toHaveBeenCalledWith('store', keyCondition, 'f', 'np', undefined, 10, false, undefined);
     expect(resolveActionResult(result)).toEqual({ items: [] });
   });
 
@@ -51,16 +62,16 @@ describe('getKeyValueStoreQueryActionProcessor', () => {
     repo.query.mockResolvedValue({ items: [] });
     const process = await getProcessor();
 
-    await invokeProcessor(process, { keyValueStoreName: 'store', keyCondition: 'id = :id' });
+    await invokeProcessor(process, { keyValueStoreName: 'store', keyCondition });
 
-    expect(repo.query).toHaveBeenCalledWith('store', 'id = :id', undefined, undefined, undefined, undefined, true, undefined);
+    expect(repo.query).toHaveBeenCalledWith('store', keyCondition, undefined, undefined, undefined, undefined, true, undefined);
   });
 
   it('maps a missing store to the typed StoreNotFound', async () => {
     repo.query.mockRejectedValue(new KvsStoreNotFoundError('store'));
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'store', keyCondition: 'id = :id' });
+    const result = await invokeProcessor(process, { keyValueStoreName: 'store', keyCondition });
 
     expect(resolveActionResultError(result).errorType).toBe(KeyValueStoreQueryErrorTypeEnum.StoreNotFound);
   });
@@ -69,7 +80,7 @@ describe('getKeyValueStoreQueryActionProcessor', () => {
     repo.query.mockRejectedValue(new Error('boom'));
     const process = await getProcessor();
 
-    const result = await invokeProcessor(process, { keyValueStoreName: 'store', keyCondition: 'id = :id' });
+    const result = await invokeProcessor(process, { keyValueStoreName: 'store', keyCondition });
 
     expect(isErroredActionResult(result)).toBe(true);
     expect(resolveActionResultError(result).errorType).toBe(ErrorTypeEnum.GenericError);

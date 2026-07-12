@@ -20,6 +20,13 @@ export function validateScopeSegment(scope: string): void {
     throw new InvalidScopeError(InvalidScopeErrorCode.unsafeCharacters, 'Scope must not contain path separators, "..", or null bytes.');
   }
 
+  // '.' is the self-referencing path segment: a file composed under it
+  // ('./file') resolves to the UNSCOPED root on any backend with path
+  // resolution, escaping the scope entirely.
+  if (scope === '.') {
+    throw new InvalidScopeError(InvalidScopeErrorCode.unsafeCharacters, 'Scope must not be ".".');
+  }
+
   // ':' is reserved for the kvs scope delimiter ('::'): a scope containing it
   // could forge or shadow another scope's composed prefix.
   if (scope.includes(':')) {

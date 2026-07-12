@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildEffectReducer } from './buildEffectReducer';
+import { buildMutableEffectReducer } from './buildMutableEffectReducer';
 
 interface CounterState {
   count: number;
@@ -8,14 +8,24 @@ interface CounterState {
 
 type CounterEffect = { type: 'add'; payload: number } | { type: 'reset'; payload: undefined };
 
-const reducer = buildEffectReducer<CounterState, CounterEffect>({
-  add: (state, amount) => ({ count: state.count + amount }),
-  reset: () => ({ count: 0 }),
+const reducer = buildMutableEffectReducer<CounterState, CounterEffect>({
+  add: (state, amount) => {
+    state.count += amount;
+  },
+  reset: (state) => {
+    state.count = 0;
+  },
 });
 
-describe('buildEffectReducer', () => {
-  it('applies a handled effect and flags it as handled', () => {
-    expect(reducer({ count: 1 }, { type: 'add', payload: 4 })).toEqual([{ count: 5 }, true]);
+describe('buildMutableEffectReducer', () => {
+  it('applies a handled effect immutably and flags it as handled', () => {
+    const state = { count: 1 };
+    const [next, handled] = reducer(state, { type: 'add', payload: 4 });
+
+    expect(handled).toBe(true);
+    expect(next).toEqual({ count: 5 });
+    expect(state).toEqual({ count: 1 });
+    expect(next).not.toBe(state);
   });
 
   it('returns the untouched state and false for an unhandled effect', () => {

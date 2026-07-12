@@ -1342,17 +1342,17 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [x] quidproquo-core/src/logic/actionValidators/index.ts
 - [x] quidproquo-core/src/logic/actionValidators/isBatchAction.test.ts
 - [x] quidproquo-core/src/logic/actionValidators/isBatchAction.ts
-- [ ] quidproquo-core/src/logic/context/createContextIdentifier.test.ts
-- [ ] quidproquo-core/src/logic/context/createContextIdentifier.ts
-- [ ] quidproquo-core/src/logic/context/createContextProvider.test.ts
-- [ ] quidproquo-core/src/logic/context/createContextProvider.ts
-- [ ] quidproquo-core/src/logic/context/createContextReader.test.ts
-- [ ] quidproquo-core/src/logic/context/createContextReader.ts
-- [ ] quidproquo-core/src/logic/context/createLocalContextIdentifier.test.ts
-- [ ] quidproquo-core/src/logic/context/createLocalContextIdentifier.ts
-- [ ] quidproquo-core/src/logic/context/index.ts
-- [ ] quidproquo-core/src/logic/context/toCrossServiceSession.test.ts
-- [ ] quidproquo-core/src/logic/context/toCrossServiceSession.ts
+- [x] quidproquo-core/src/logic/context/createContextIdentifier.test.ts
+- [x] quidproquo-core/src/logic/context/createContextIdentifier.ts
+- [x] quidproquo-core/src/logic/context/createContextProvider.test.ts
+- [x] quidproquo-core/src/logic/context/createContextProvider.ts
+- [x] quidproquo-core/src/logic/context/createContextReader.test.ts
+- [x] quidproquo-core/src/logic/context/createContextReader.ts
+- [x] quidproquo-core/src/logic/context/createLocalContextIdentifier.test.ts
+- [x] quidproquo-core/src/logic/context/createLocalContextIdentifier.ts
+- [x] quidproquo-core/src/logic/context/index.ts
+- [x] quidproquo-core/src/logic/context/toCrossServiceSession.test.ts
+- [x] quidproquo-core/src/logic/context/toCrossServiceSession.ts
 - [x] quidproquo-core/src/logic/decomposedString/decomposedStringToString.test.ts
 - [x] quidproquo-core/src/logic/decomposedString/decomposedStringToString.ts
 - [x] quidproquo-core/src/logic/decomposedString/index.ts
@@ -1373,26 +1373,27 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [x] quidproquo-core/src/logic/lookup/resolveLookupText.ts
 - [x] quidproquo-core/src/logic/lookup/resolveLookupValues.test.ts
 - [x] quidproquo-core/src/logic/lookup/resolveLookupValues.ts
-- [ ] quidproquo-core/src/logic/scope/composeScopedFilePath.ts
-- [ ] quidproquo-core/src/logic/scope/index.ts
-- [ ] quidproquo-core/src/logic/scope/InvalidScopeError.ts
-- [ ] quidproquo-core/src/logic/scope/scope.test.ts
-- [ ] quidproquo-core/src/logic/scope/scopedKvsQueryOperation.ts
-- [ ] quidproquo-core/src/logic/scope/scopedKvsTranslator.ts
-- [ ] quidproquo-core/src/logic/scope/scopedKvsValue.ts
-- [ ] quidproquo-core/src/logic/scope/storageScopeContext.ts
-- [ ] quidproquo-core/src/logic/scope/stripScopedFilePath.ts
-- [ ] quidproquo-core/src/logic/scope/validateScopeSegment.ts
-- [ ] quidproquo-core/src/logic/stateEffects/askStateDispatchEffect.ts
-- [ ] quidproquo-core/src/logic/stateEffects/buildEffectReducer.test.ts
-- [ ] quidproquo-core/src/logic/stateEffects/buildEffectReducer.ts
-- [ ] quidproquo-core/src/logic/stateEffects/buildMutableEffectReducer.ts
-- [ ] quidproquo-core/src/logic/stateEffects/combineQpqReducers.test.ts
-- [ ] quidproquo-core/src/logic/stateEffects/combineQpqReducers.ts
-- [ ] quidproquo-core/src/logic/stateEffects/Effect.ts
-- [ ] quidproquo-core/src/logic/stateEffects/index.ts
-- [ ] quidproquo-core/src/logic/stateEffects/replayEffects.test.ts
-- [ ] quidproquo-core/src/logic/stateEffects/replayEffects.ts
+- [x] quidproquo-core/src/logic/scope/composeScopedFilePath.ts
+- [x] quidproquo-core/src/logic/scope/index.ts
+- [x] quidproquo-core/src/logic/scope/InvalidScopeError.ts
+- [x] quidproquo-core/src/logic/scope/scope.test.ts
+- [x] quidproquo-core/src/logic/scope/scopedKvsQueryOperation.ts
+- [x] quidproquo-core/src/logic/scope/scopedKvsTranslator.ts
+  - Security fix (cross-tenant): the unscoped KVS translator was pure identity, so an unscoped op on a pk like `acme::secret` forged into / read from tenant scope `acme`. Unscoped key/item/keyCondition now reject the `::` delimiter. Paired with `validateScopeSegment` rejecting `'.'` (file-root escape) and prototype-key fixes in the stateEffects reducers.
+- [x] quidproquo-core/src/logic/scope/scopedKvsValue.ts
+- [x] quidproquo-core/src/logic/scope/storageScopeContext.ts
+- [x] quidproquo-core/src/logic/scope/stripScopedFilePath.ts
+- [x] quidproquo-core/src/logic/scope/validateScopeSegment.ts
+- [x] quidproquo-core/src/logic/stateEffects/askStateDispatchEffect.ts
+- [x] quidproquo-core/src/logic/stateEffects/buildEffectReducer.test.ts
+- [x] quidproquo-core/src/logic/stateEffects/buildEffectReducer.ts
+- [x] quidproquo-core/src/logic/stateEffects/buildMutableEffectReducer.ts
+- [x] quidproquo-core/src/logic/stateEffects/combineQpqReducers.test.ts
+- [x] quidproquo-core/src/logic/stateEffects/combineQpqReducers.ts
+- [x] quidproquo-core/src/logic/stateEffects/Effect.ts
+- [x] quidproquo-core/src/logic/stateEffects/index.ts
+- [x] quidproquo-core/src/logic/stateEffects/replayEffects.test.ts
+- [x] quidproquo-core/src/logic/stateEffects/replayEffects.ts
 - [x] quidproquo-core/src/logic/stream/createStreamRegistry.test.ts
 - [x] quidproquo-core/src/logic/stream/createStreamRegistry.ts
 - [x] quidproquo-core/src/logic/stream/index.ts

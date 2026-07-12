@@ -8,8 +8,7 @@ import {
   KeyValueStoreUpsertActionProcessor,
   KeyValueStoreUpsertErrorTypeEnum,
   QPQConfig,
-  resolveScopedPkAttributeOrThrow,
-  validateRawPkValueForScopeOrThrow,
+  validateScopedKvsItemOrThrow,
 } from 'quidproquo-core';
 
 import { getKvsRepository } from '../../../logic/keyValueStore/getKvsRepository';
@@ -23,12 +22,10 @@ const getProcessKeyValueStoreUpsert = (qpqConfig: QPQConfig, devServerConfig: Re
 
       // The json backend partitions per-scope at the FILE level, so the item is
       // stored raw - the scope just selects which file the store writes to.
-      // The raw pk value is still checked for the reserved delimiter, purely
-      // for AWS parity (prod composes it into the pk and rejects it there).
-      if (scope !== undefined) {
-        const pkAttribute = resolveScopedPkAttributeOrThrow(qpqConfig, keyValueStoreName, scope);
-        validateRawPkValueForScopeOrThrow(item?.[pkAttribute]);
-      }
+      // The item's pk value is still validated for AWS parity: a write prod
+      // rejects (bad scope, or the reserved '::' delimiter in the raw value,
+      // scoped or not) must fail locally too.
+      validateScopedKvsItemOrThrow(qpqConfig, keyValueStoreName, scope, item);
 
       const result = await repository.upsert(keyValueStoreName, item, { ifNotExists: options?.ifNotExists }, scope);
       return actionResult(result);

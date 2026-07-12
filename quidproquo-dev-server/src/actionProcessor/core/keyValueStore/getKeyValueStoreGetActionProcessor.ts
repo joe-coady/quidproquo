@@ -8,7 +8,7 @@ import {
   KeyValueStoreGetActionProcessor,
   KeyValueStoreGetErrorTypeEnum,
   QPQConfig,
-  resolveScopedPkAttributeOrThrow,
+  validateScopedKvsKeyOrThrow,
 } from 'quidproquo-core';
 
 import { getKvsRepository } from '../../../logic/keyValueStore/getKvsRepository';
@@ -20,11 +20,11 @@ const getProcessKeyValueStoreGet = (qpqConfig: QPQConfig, devServerConfig: Resol
       const scope = options?.scope;
       const repository = getKvsRepository(qpqConfig, devServerConfig);
 
-      // The json backend partitions per-scope at the FILE level, so keys and
-      // items stay raw - the scope just selects which file the store reads.
-      if (scope !== undefined) {
-        resolveScopedPkAttributeOrThrow(qpqConfig, keyValueStoreName, scope);
-      }
+      // The json backend partitions per-scope at the FILE level, so keys stay
+      // raw - the scope just selects which file the store reads. The key is
+      // still validated for AWS parity: a key prod rejects (bad scope, or the
+      // reserved '::' delimiter in the raw value) must fail locally too.
+      validateScopedKvsKeyOrThrow(qpqConfig, keyValueStoreName, scope, key);
 
       return actionResult(await repository.get(keyValueStoreName, key, scope));
     } catch (error: any) {

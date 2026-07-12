@@ -60,7 +60,7 @@ function* askKeyValueStoreUpsert<KvsItem>(
 | `KeyValueStoreUpsertErrorTypeEnum.ServiceUnavailable` | DynamoDB internal error or throttling. |
 | `KeyValueStoreUpsertErrorTypeEnum.ResourceNotFound` | The underlying table does not exist. |
 | `KeyValueStoreUpsertErrorTypeEnum.Conflict` | A conditional (`ifNotExists`) write lost to an existing item. Namespaced — not the generic `ErrorTypeEnum.Conflict` — so retry logic can target the write race specifically without also catching domain-level conflicts. |
-| `KeyValueStoreUpsertErrorTypeEnum.InvalidScope` | The `scope` option is malformed (empty, over 128 characters, or containing path separators, `..`, `:`, or null bytes), the store's partition key is not string-typed, or a scoped call's partition-key value contains the reserved `::` delimiter. |
+| `KeyValueStoreUpsertErrorTypeEnum.InvalidScope` | The `scope` option is malformed (empty, `.`, over 128 characters, or containing path separators, `..`, `:`, or null bytes), the store's partition key is not string-typed, or the partition-key value contains the reserved `::` delimiter (reserved on string-pk stores, so unscoped calls reject it too). |
 | `KeyValueStoreUpsertErrorTypeEnum.StoreNotFound` | The key value store is not declared in the qpq config (misconfiguration, e.g. a wrong name or a missing `defineKeyValueStore`). |
 
 Catch errors with `askCatch` — it returns `{ success: true, result }` or `{ success: false, error }`.

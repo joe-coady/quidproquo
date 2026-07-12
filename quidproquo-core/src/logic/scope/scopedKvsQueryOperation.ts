@@ -7,7 +7,7 @@ import {
   KvsQueryOperationType,
 } from '../../actions/keyValueStore/types';
 import { InvalidScopeError, InvalidScopeErrorCode } from './InvalidScopeError';
-import { composeScopedKvsValue, stripScopedKvsValue } from './scopedKvsValue';
+import { composeScopedKvsValue, stripScopedKvsValue, validateRawPkValueForScopeOrThrow } from './scopedKvsValue';
 
 // Operations whose comparison values can be safely prefixed with the scope:
 // prefixing preserves equality and lexicographic ordering within one scope.
@@ -114,6 +114,41 @@ export function composeScopedKvsQueryOperationOrThrow(scope: string, operation: 
  */
 export function validateScopedQueryConstrainsPkOrThrow(scope: string, operation: KvsQueryOperation, pkKeyNames: string[]): void {
   composeScopedKvsQueryOperationOrThrow(scope, operation, pkKeyNames);
+}
+
+// One comparison value (or each entry of an In list) checked for the reserved
+// delimiter; non-string values pass through untouched.
+const validateUnscopedConditionValueOrThrow = (value: KvsAdvancedDataType | undefined): void => {
+  if (Array.isArray(value)) {
+    value.forEach((entry) => validateRawPkValueForScopeOrThrow(entry as KvsCoreDataType));
+    return;
+  }
+
+  if (value !== undefined) {
+    validateRawPkValueForScopeOrThrow(value as KvsCoreDataType);
+  }
+};
+
+/**
+ * The reserved delimiter is rejected in UNSCOPED partition-key comparisons too:
+ * on a value-composed backend a raw value like 'acme::secret' in a pk condition
+ * would match (or probe for) scope acme's composed rows. Validation only - the
+ * tree is not modified.
+ */
+export function validateUnscopedPkConditionValuesOrThrow(operation: KvsQueryOperation, pkKeyNames: string[]): void {
+  if ('conditions' in operation) {
+    (operation as KvsLogicalOperator).conditions.forEach((child) => validateUnscopedPkConditionValuesOrThrow(child, pkKeyNames));
+    return;
+  }
+
+  const condition = operation as KvsQueryCondition;
+
+  if (!pkKeyNames.includes(condition.key)) {
+    return;
+  }
+
+  validateUnscopedConditionValueOrThrow(condition.valueA);
+  validateUnscopedConditionValueOrThrow(condition.valueB);
 }
 
 // Shallow-clone an item read from storage, stripping the scope prefix off its

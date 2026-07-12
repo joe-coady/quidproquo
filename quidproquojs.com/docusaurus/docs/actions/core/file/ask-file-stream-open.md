@@ -77,7 +77,7 @@ The handle's `encoding` type parameter flows through to `askStreamRead`, so a `'
 | --- | --- |
 | `FileStreamOpenErrorTypeEnum.InvalidStorageClass` | The file is in a cold storage tier and cannot be streamed directly. Check first with [askFileIsColdStorage](./ask-file-is-cold-storage.md). |
 | `FileStreamOpenErrorTypeEnum.FileNotFound` | No file exists at the given path. |
-| `FileStreamOpenErrorTypeEnum.InvalidScope` | The `scope` is not a valid single path segment (empty, too long, or contains separators, `..`, or null bytes), or the scoped `filepath` is absolute or contains `..` segments or null bytes. |
+| `FileStreamOpenErrorTypeEnum.InvalidScope` | The `scope` is not a valid single path segment (empty, `.`, too long, or contains separators, `..`, `:`, or null bytes), or the scoped `filepath` is absolute or contains `..` segments or null bytes. |
 
 Errors thrown by actions can be caught with `askCatch` from quidproquo-core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 

@@ -1,9 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
-import { KvsQueryOperationType } from '../../actions/keyValueStore/types';
+import { KvsLogicalOperatorType, KvsQueryOperationType } from '../../actions/keyValueStore/types';
 import { composeScopedFilePath } from './composeScopedFilePath';
 import { InvalidScopeError, InvalidScopeErrorCode } from './InvalidScopeError';
-import { composeScopedKvsQueryOperation, validateScopedQueryConstrainsPkOrThrow } from './scopedKvsQueryOperation';
+import {
+  composeScopedKvsQueryOperation,
+  stripScopedKvsItem,
+  validateScopedQueryConstrainsPkOrThrow,
+  validateUnscopedPkConditionValuesOrThrow,
+} from './scopedKvsQueryOperation';
 import { buildKvsScopeBeginsWithCondition, composeScopedKvsValue, stripScopedKvsValue } from './scopedKvsValue';
 import { stripScopedFilePath } from './stripScopedFilePath';
 import { validateScopeSegment } from './validateScopeSegment';
@@ -42,6 +47,11 @@ describe('validateScopeSegment', () => {
     // prefix ('a:' + ':b' vs 'a' + '::b').
     expectInvalidScope(() => validateScopeSegment('a:b'), InvalidScopeErrorCode.unsafeCharacters);
     expectInvalidScope(() => validateScopeSegment('acme::'), InvalidScopeErrorCode.unsafeCharacters);
+  });
+
+  it('rejects the self-referencing path segment', () => {
+    // './file' composed under scope '.' resolves to the unscoped root.
+    expectInvalidScope(() => validateScopeSegment('.'), InvalidScopeErrorCode.unsafeCharacters);
   });
 
   it('rejects overly long scopes', () => {
@@ -152,6 +162,63 @@ describe('validateScopedQueryConstrainsPkOrThrow', () => {
       () => validateScopedQueryConstrainsPkOrThrow('tenant-a', { key: 'name', operation: KvsQueryOperationType.Equal, valueA: 'x' }, ['id']),
       InvalidScopeErrorCode.queryMissingPartitionKey,
     );
+  });
+});
+
+describe('validateUnscopedPkConditionValuesOrThrow', () => {
+  it('passes clean pk comparisons and ignores non-pk conditions', () => {
+    const operation = {
+      operation: KvsLogicalOperatorType.And,
+      conditions: [
+        { key: 'id', operation: KvsQueryOperationType.Equal, valueA: 'item-1' },
+        // Non-pk conditions may legitimately contain '::' (it is only reserved in the pk).
+        { key: 'note', operation: KvsQueryOperationType.Equal, valueA: 'a::b' },
+      ],
+    };
+
+    expect(() => validateUnscopedPkConditionValuesOrThrow(operation, ['id'])).not.toThrow();
+  });
+
+  it('rejects the reserved delimiter in a pk comparison, including nested trees and In lists', () => {
+    // An unscoped pk value 'acme::secret' would match scope acme's composed rows.
+    expectInvalidScope(
+      () => validateUnscopedPkConditionValuesOrThrow({ key: 'id', operation: KvsQueryOperationType.Equal, valueA: 'acme::secret' }, ['id']),
+      InvalidScopeErrorCode.reservedDelimiter,
+    );
+
+    const nested = {
+      operation: KvsLogicalOperatorType.Or,
+      conditions: [
+        { key: 'name', operation: KvsQueryOperationType.Equal, valueA: 'x' },
+        {
+          operation: KvsLogicalOperatorType.And,
+          conditions: [{ key: 'id', operation: KvsQueryOperationType.In, valueA: ['ok', 'acme::secret'] }],
+        },
+      ],
+    };
+    expectInvalidScope(() => validateUnscopedPkConditionValuesOrThrow(nested, ['id']), InvalidScopeErrorCode.reservedDelimiter);
+
+    expectInvalidScope(
+      () => validateUnscopedPkConditionValuesOrThrow({ key: 'id', operation: KvsQueryOperationType.Between, valueA: 'a', valueB: 'acme::z' }, ['id']),
+      InvalidScopeErrorCode.reservedDelimiter,
+    );
+  });
+});
+
+describe('stripScopedKvsItem', () => {
+  it('clones the item with the scope prefix stripped off its pk attribute', () => {
+    const stored = { id: 'tenant-a::item-1', name: 'n' };
+
+    const stripped = stripScopedKvsItem('tenant-a', stored, 'id');
+
+    expect(stripped).toEqual({ id: 'item-1', name: 'n' });
+    expect(stored).toEqual({ id: 'tenant-a::item-1', name: 'n' });
+  });
+
+  it('returns the same item when the pk carries no prefix', () => {
+    const stored = { id: 'item-1', name: 'n' };
+
+    expect(stripScopedKvsItem('tenant-a', stored, 'id')).toBe(stored);
   });
 });
 

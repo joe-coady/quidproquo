@@ -8,8 +8,7 @@ import {
   KeyValueStoreQueryActionProcessor,
   KeyValueStoreQueryErrorTypeEnum,
   QPQConfig,
-  resolveScopedPkAttributeOrThrow,
-  validateScopedQueryConstrainsPkOrThrow,
+  validateScopedKvsKeyConditionOrThrow,
 } from 'quidproquo-core';
 
 import { getKvsRepository } from '../../../logic/keyValueStore/getKvsRepository';
@@ -23,14 +22,13 @@ const getProcessKeyValueStoreQuery = (qpqConfig: QPQConfig, devServerConfig: Res
 
       // The json backend partitions per-scope at the FILE level, so the query
       // conditions run unmodified against the scope's own file. The validation
-      // is pure dynamo parity: a scoped query that only works locally must
-      // fail here too, not in production. Only the store's REAL pk attribute
-      // counts - the local DSL's 'pk' alias is unknown to the dynamo
-      // translator, so an alias-keyed scoped query must fail locally first.
-      if (scope !== undefined) {
-        const pkAttribute = resolveScopedPkAttributeOrThrow(qpqConfig, keyValueStoreName, scope);
-        validateScopedQueryConstrainsPkOrThrow(scope, keyCondition, [pkAttribute]);
-      }
+      // is pure dynamo parity: a query that only works locally must fail here
+      // too, not in production - a scoped query must constrain the real pk
+      // attribute (the local DSL's 'pk' alias is unknown to the dynamo
+      // translator, so an alias-keyed scoped query must fail locally first),
+      // and an unscoped one must not carry the reserved '::' delimiter in a pk
+      // comparison.
+      validateScopedKvsKeyConditionOrThrow(qpqConfig, keyValueStoreName, scope, keyCondition);
 
       const result = await repository.query(
         keyValueStoreName,

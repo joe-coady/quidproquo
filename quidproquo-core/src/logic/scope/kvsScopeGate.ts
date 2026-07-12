@@ -1,3 +1,4 @@
+import { KvsCoreDataType, KvsQueryOperation } from '../../actions/keyValueStore/types';
 import { KeyValueStoreQPQConfigSetting, QPQConfig } from '../../config';
 import { getKeyValueStoreByName } from '../../qpqCoreUtils';
 import { KvsStoreNotFoundError } from './KvsStoreNotFoundError';
@@ -52,4 +53,37 @@ export const resolveScopedPkAttributeOrThrow = (qpqConfig: QPQConfig, keyValueSt
   validateScopeSupportedForPartitionKeyType(storeConfig.partitionKey.type);
 
   return storeConfig.partitionKey.key;
+};
+
+// Validation-only counterparts for file-partitioned backends. They store keys
+// and items raw (the scope just picks the file), but anything the
+// value-composed translator would reject must fail locally too - same scope
+// validation, same reserved-delimiter rule - so local behavior matches
+// deployed behavior. The composed results are discarded.
+
+export const validateScopedKvsKeyOrThrow = (
+  qpqConfig: QPQConfig,
+  keyValueStoreName: string,
+  scope: string | undefined,
+  key: KvsCoreDataType,
+): void => {
+  getScopedKvsTranslatorOrThrow(qpqConfig, keyValueStoreName, scope).key(key);
+};
+
+export const validateScopedKvsItemOrThrow = (
+  qpqConfig: QPQConfig,
+  keyValueStoreName: string,
+  scope: string | undefined,
+  item: Record<string, any>,
+): void => {
+  getScopedKvsTranslatorOrThrow(qpqConfig, keyValueStoreName, scope).item(item ?? {});
+};
+
+export const validateScopedKvsKeyConditionOrThrow = (
+  qpqConfig: QPQConfig,
+  keyValueStoreName: string,
+  scope: string | undefined,
+  keyCondition: KvsQueryOperation,
+): void => {
+  getScopedKvsTranslatorOrThrow(qpqConfig, keyValueStoreName, scope).keyCondition(keyCondition);
 };

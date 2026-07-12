@@ -1,9 +1,11 @@
 import {
   buildTestQpqConfig,
+  defineKeyValueStore,
   ErrorTypeEnum,
   isErroredActionResult,
   KeyValueStoreActionType,
   KeyValueStoreGetErrorTypeEnum,
+  kvsKey,
   KvsStoreNotFoundError,
   noopDynamicModuleLoader,
   resolveActionResult,
@@ -25,8 +27,12 @@ vi.mock('../../../logic/keyValueStore/getKvsRepository', () => ({
 
 const devServerConfig = { runtimePath: '/tmp/runtime' } as any;
 
+// The processors resolve the store's config up front (scope gate), so the
+// store under test must be declared.
+const testQpqConfig = buildTestQpqConfig([defineKeyValueStore('store', kvsKey('id', 'string'))]);
+
 const getProcessor = async () => {
-  const processors = await getKeyValueStoreGetActionProcessor(devServerConfig)(buildTestQpqConfig(), noopDynamicModuleLoader);
+  const processors = await getKeyValueStoreGetActionProcessor(devServerConfig)(testQpqConfig, noopDynamicModuleLoader);
   return processors[KeyValueStoreActionType.Get];
 };
 

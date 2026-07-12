@@ -54,7 +54,7 @@ function* askFileIsColdStorage(
 | `FileIsColdStorageErrorTypeEnum.AccessDenied` | The caller lacks permission to read the file's metadata. |
 | `FileIsColdStorageErrorTypeEnum.FileNotFound` | No file exists at the given path. |
 | `FileIsColdStorageErrorTypeEnum.DriveNotFound` | No storage drive with that name exists in the deployed config. |
-| `FileIsColdStorageErrorTypeEnum.InvalidScope` | The `scope` is not a valid single path segment (empty, too long, or contains separators, `..`, or null bytes), or the scoped `filepath` is absolute or contains `..` segments or null bytes. |
+| `FileIsColdStorageErrorTypeEnum.InvalidScope` | The `scope` is not a valid single path segment (empty, `.`, too long, or contains separators, `..`, `:`, or null bytes), or the scoped `filepath` is absolute or contains `..` segments or null bytes. |
 
 Errors thrown by actions can be caught with `askCatch` from quidproquo-core. It returns an `EitherActionResult` — `{ success: true, result }` on success, or `{ success: false, error }` on failure:
 
