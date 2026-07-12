@@ -17,4 +17,12 @@ describe('defineParameter', () => {
   it('uses the supplied value', () => {
     expect(defineParameter('region', { value: 'us-east-1' }).value).toBe('us-east-1');
   });
+
+  it('converts the owner to a resourceNameOverride', () => {
+    expect(defineParameter('region', { owner: { module: 'other', parameterName: 'region' } }).owner).toEqual({
+      module: 'other',
+      parameterName: 'region',
+      resourceNameOverride: 'region',
+    });
+  });
 });

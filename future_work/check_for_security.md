@@ -1283,47 +1283,48 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [ ] quidproquo-core/src/config/settings/eventBus.test.ts
 - [ ] quidproquo-core/src/config/settings/eventBus.ts
 - [ ] quidproquo-core/src/config/settings/federatedModuleStore.ts
-- [ ] quidproquo-core/src/config/settings/global.test.ts
-- [ ] quidproquo-core/src/config/settings/global.ts
-- [ ] quidproquo-core/src/config/settings/graphDatabase/graphDatabase.test.ts
-- [ ] quidproquo-core/src/config/settings/graphDatabase/graphDatabase.ts
-- [ ] quidproquo-core/src/config/settings/graphDatabase/index.ts
-- [ ] quidproquo-core/src/config/settings/graphDatabase/types/AnyGraphResult.ts
-- [ ] quidproquo-core/src/config/settings/graphDatabase/types/GraphCypherResponse.ts
-- [ ] quidproquo-core/src/config/settings/graphDatabase/types/GraphEntity.ts
-- [ ] quidproquo-core/src/config/settings/graphDatabase/types/GraphEntityType.ts
-- [ ] quidproquo-core/src/config/settings/graphDatabase/types/GraphNodeResult.ts
-- [ ] quidproquo-core/src/config/settings/graphDatabase/types/GraphQueryResult.ts
-- [ ] quidproquo-core/src/config/settings/graphDatabase/types/GraphRelationshipResult.ts
-- [ ] quidproquo-core/src/config/settings/graphDatabase/types/GraphScalarResult.ts
-- [ ] quidproquo-core/src/config/settings/graphDatabase/types/index.ts
-- [ ] quidproquo-core/src/config/settings/index.ts
-- [ ] quidproquo-core/src/config/settings/inlineFunction.test.ts
-- [ ] quidproquo-core/src/config/settings/inlineFunction.ts
-- [ ] quidproquo-core/src/config/settings/javascriptRuntime.test.ts
-- [ ] quidproquo-core/src/config/settings/javascriptRuntime.ts
-- [ ] quidproquo-core/src/config/settings/keyValueStore.test.ts
-- [ ] quidproquo-core/src/config/settings/keyValueStore.ts
-- [ ] quidproquo-core/src/config/settings/moduleName.test.ts
-- [ ] quidproquo-core/src/config/settings/moduleName.ts
-- [ ] quidproquo-core/src/config/settings/notifyError.test.ts
-- [ ] quidproquo-core/src/config/settings/notifyError.ts
-- [ ] quidproquo-core/src/config/settings/parameter.test.ts
-- [ ] quidproquo-core/src/config/settings/parameter.ts
-- [ ] quidproquo-core/src/config/settings/queue.test.ts
-- [ ] quidproquo-core/src/config/settings/queue.ts
-- [ ] quidproquo-core/src/config/settings/schedule.test.ts
-- [ ] quidproquo-core/src/config/settings/schedule.ts
-- [ ] quidproquo-core/src/config/settings/secret.test.ts
-- [ ] quidproquo-core/src/config/settings/secret.ts
-- [ ] quidproquo-core/src/config/settings/serviceSettings.test.ts
-- [ ] quidproquo-core/src/config/settings/serviceSettings.ts
-- [ ] quidproquo-core/src/config/settings/storageDrive.test.ts
-- [ ] quidproquo-core/src/config/settings/storageDrive.ts
-- [ ] quidproquo-core/src/config/settings/userDirectory.test.ts
-- [ ] quidproquo-core/src/config/settings/userDirectory.ts
-- [ ] quidproquo-core/src/config/settings/virtualNetwork.test.ts
-- [ ] quidproquo-core/src/config/settings/virtualNetwork.ts
+- [x] quidproquo-core/src/config/settings/global.test.ts
+- [x] quidproquo-core/src/config/settings/global.ts
+- [x] quidproquo-core/src/config/settings/graphDatabase/graphDatabase.test.ts
+- [x] quidproquo-core/src/config/settings/graphDatabase/graphDatabase.ts
+- [x] quidproquo-core/src/config/settings/graphDatabase/index.ts
+- [x] quidproquo-core/src/config/settings/graphDatabase/types/AnyGraphResult.ts
+- [x] quidproquo-core/src/config/settings/graphDatabase/types/GraphCypherResponse.ts
+- [x] quidproquo-core/src/config/settings/graphDatabase/types/GraphEntity.ts
+- [x] quidproquo-core/src/config/settings/graphDatabase/types/GraphEntityType.ts
+- [x] quidproquo-core/src/config/settings/graphDatabase/types/GraphNodeResult.ts
+- [x] quidproquo-core/src/config/settings/graphDatabase/types/GraphQueryResult.ts
+- [x] quidproquo-core/src/config/settings/graphDatabase/types/GraphRelationshipResult.ts
+- [x] quidproquo-core/src/config/settings/graphDatabase/types/GraphScalarResult.ts
+- [x] quidproquo-core/src/config/settings/graphDatabase/types/index.ts
+- [x] quidproquo-core/src/config/settings/index.ts
+- [x] quidproquo-core/src/config/settings/inlineFunction.test.ts
+- [x] quidproquo-core/src/config/settings/inlineFunction.ts
+- [x] quidproquo-core/src/config/settings/javascriptRuntime.test.ts
+- [x] quidproquo-core/src/config/settings/javascriptRuntime.ts
+- [x] quidproquo-core/src/config/settings/keyValueStore.test.ts
+- [x] quidproquo-core/src/config/settings/keyValueStore.ts
+- [x] quidproquo-core/src/config/settings/moduleName.test.ts
+- [x] quidproquo-core/src/config/settings/moduleName.ts
+- [x] quidproquo-core/src/config/settings/notifyError.test.ts
+- [x] quidproquo-core/src/config/settings/notifyError.ts
+- [x] quidproquo-core/src/config/settings/parameter.test.ts
+- [x] quidproquo-core/src/config/settings/parameter.ts
+- [x] quidproquo-core/src/config/settings/queue.test.ts
+- [x] quidproquo-core/src/config/settings/queue.ts
+  - Fixed: `hasDeadLetterQueue || true` meant explicit false was ignored; now `??`. Gap documented: QpqCoreQueueConstruct provisions the DLQ unconditionally, so the flag is still not honored at deploy time.
+- [x] quidproquo-core/src/config/settings/schedule.test.ts
+- [x] quidproquo-core/src/config/settings/schedule.ts
+- [x] quidproquo-core/src/config/settings/secret.test.ts
+- [x] quidproquo-core/src/config/settings/secret.ts
+- [x] quidproquo-core/src/config/settings/serviceSettings.test.ts
+- [x] quidproquo-core/src/config/settings/serviceSettings.ts
+- [x] quidproquo-core/src/config/settings/storageDrive.test.ts
+- [x] quidproquo-core/src/config/settings/storageDrive.ts
+- [x] quidproquo-core/src/config/settings/userDirectory.test.ts
+- [x] quidproquo-core/src/config/settings/userDirectory.ts
+- [x] quidproquo-core/src/config/settings/virtualNetwork.test.ts
+- [x] quidproquo-core/src/config/settings/virtualNetwork.ts
 - [ ] quidproquo-core/src/config/utils/crossModuleUtils.test.ts
 - [ ] quidproquo-core/src/config/utils/crossModuleUtils.ts
 - [ ] quidproquo-core/src/config/utils/index.ts

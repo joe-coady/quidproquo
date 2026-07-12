@@ -32,4 +32,22 @@ describe('defineStorageDrive', () => {
     expect(setting.encryption).toBe(true);
     expect(setting.copyPath).toBe('./assets');
   });
+
+  it('passes lifecycle rules and event handlers through', () => {
+    const lifecycleRules = [{ deleteAfterDays: 30 }];
+    const onEvent = { create: '/entry/files::onCreate' as const };
+
+    const setting = defineStorageDrive('Uploads', { lifecycleRules, onEvent });
+
+    expect(setting.lifecycleRules).toEqual(lifecycleRules);
+    expect(setting.onEvent).toEqual(onEvent);
+  });
+
+  it('converts the owner to a resourceNameOverride', () => {
+    expect(defineStorageDrive('Uploads', { owner: { module: 'other', storageDriveName: 'Uploads' } }).owner).toEqual({
+      module: 'other',
+      storageDriveName: 'Uploads',
+      resourceNameOverride: 'Uploads',
+    });
+  });
 });

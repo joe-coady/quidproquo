@@ -45,4 +45,21 @@ describe('defineKeyValueStore', () => {
     expect(setting.global).toBe(true);
     expect(setting.encryption).toBe(true);
   });
+
+  it('converts an object index with partition and sort keys, keeping explicit key types', () => {
+    const setting = defineKeyValueStore('Users', 'id', [], {
+      indexes: [{ partitionKey: { key: 'email', type: 'string' }, sortKey: 'createdAt' }],
+    });
+
+    expect(setting.indexes).toEqual([
+      {
+        partitionKey: { key: 'email', type: 'string' },
+        sortKey: { key: 'createdAt', type: 'string' },
+      },
+    ]);
+  });
+
+  it('passes ttlAttribute through', () => {
+    expect(defineKeyValueStore('Users', 'id', [], { ttlAttribute: 'expiresAt' }).ttlAttribute).toBe('expiresAt');
+  });
 });

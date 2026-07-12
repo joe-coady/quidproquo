@@ -23,4 +23,16 @@ describe('defineRecurringSchedule', () => {
   it('passes supplied metadata through', () => {
     expect(defineRecurringSchedule('* * * * ? *', '/entry/cron::tick', { metadata: { team: 'ops' } }).metadata).toEqual({ team: 'ops' });
   });
+
+  it('passes maxConcurrentExecutions through', () => {
+    expect(defineRecurringSchedule('* * * * ? *', '/entry/cron::tick', { maxConcurrentExecutions: 2 }).maxConcurrentExecutions).toBe(2);
+  });
+
+  it('converts the owner to a resourceNameOverride', () => {
+    expect(defineRecurringSchedule('* * * * ? *', '/entry/cron::tick', { owner: { module: 'other', recurringSchedule: 'tick' } }).owner).toEqual({
+      module: 'other',
+      recurringSchedule: 'tick',
+      resourceNameOverride: 'tick',
+    });
+  });
 });

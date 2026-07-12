@@ -39,4 +39,17 @@ describe('defineUserDirectory', () => {
       secondFactors: [UserDirectoryMfaSecondFactor.totp],
     });
   });
+
+  it('falls back to totp when an empty secondFactors list is given', () => {
+    expect(defineUserDirectory('Members', { mfa: { mode: UserDirectoryMfaMode.optional, secondFactors: [] } }).mfa.secondFactors).toEqual([
+      UserDirectoryMfaSecondFactor.totp,
+    ]);
+  });
+
+  it('applies supplied account options', () => {
+    const setting = defineUserDirectory('Members', { phoneRequired: true, selfSignUpEnabled: true });
+
+    expect(setting.phoneRequired).toBe(true);
+    expect(setting.selfSignUpEnabled).toBe(true);
+  });
 });

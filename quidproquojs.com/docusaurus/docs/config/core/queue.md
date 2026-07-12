@@ -56,7 +56,7 @@ Each key is matched against a delivered message's `type` field. The key may be a
 | `concurrency` | `number` | `1` | Consumer concurrency hint. |
 | `maxTries` | `number` | `1` | How many times a message is delivered before it is sent to the dead-letter queue (SQS `maxReceiveCount`). |
 | `ttRetryInSeconds` | `number` | `900` | Retry/visibility timeout in seconds — how long a message stays invisible while being processed before it can be redelivered. Also used as the consumer Lambda timeout. Capped at 900 (15 minutes). |
-| `hasDeadLetterQueue` | `boolean` | `true` | Whether a dead-letter queue backs the main queue. |
+| `hasDeadLetterQueue` | `boolean` | `true` | Whether a dead-letter queue backs the main queue. Note: the AWS deploy currently always provisions a DLQ; this flag is recorded in the config but not yet honoured by `QpqCoreQueueConstruct`. |
 | `eventBusSubscriptions` | `string[]` | `[]` | Names of [event buses](./event-bus.md) this queue subscribes to. Each subscribed bus's messages are delivered into this queue. |
 | `maxConcurrentExecutions` | `number` | – | Reserved concurrent executions for the consumer Lambda (caps parallelism). |
 | `isFifo` | `boolean` | `false` | Creates a **FIFO** queue that preserves per-group ordering and supports deduplication. See [FIFO queues](#fifo-queues). |

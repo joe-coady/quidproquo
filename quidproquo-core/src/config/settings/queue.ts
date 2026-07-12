@@ -53,7 +53,7 @@ export const defineQueue = (name: string, processors: QpqQueueProcessors, option
     maxTries: options?.maxTries || 1,
     ttRetryInSeconds: Math.min(options?.ttRetryInSeconds || 15 * 60, 15 * 60),
 
-    hasDeadLetterQueue: options?.hasDeadLetterQueue || true,
+    hasDeadLetterQueue: options?.hasDeadLetterQueue ?? true,
 
     qpqQueueProcessors: processors,
 

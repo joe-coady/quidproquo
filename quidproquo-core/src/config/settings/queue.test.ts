@@ -39,4 +39,13 @@ describe('defineQueue', () => {
   it('applies isFifo when supplied', () => {
     expect(defineQueue('Jobs', processors, { isFifo: true }).isFifo).toBe(true);
   });
+
+  it('lets hasDeadLetterQueue be turned off', () => {
+    // Regression: `|| true` used to swallow an explicit false
+    expect(defineQueue('Jobs', processors, { hasDeadLetterQueue: false }).hasDeadLetterQueue).toBe(false);
+  });
+
+  it('passes maxConcurrentExecutions through', () => {
+    expect(defineQueue('Jobs', processors, { maxConcurrentExecutions: 3 }).maxConcurrentExecutions).toBe(3);
+  });
 });
