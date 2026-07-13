@@ -26,7 +26,7 @@ const getProcessKeyValueStoreQuery = (qpqConfig: QPQConfig, devServerConfig: Res
       // too, not in production - a scoped query must constrain the real pk
       // attribute (the local DSL's 'pk' alias is unknown to the dynamo
       // translator, so an alias-keyed scoped query must fail locally first),
-      // and an unscoped one must not carry the reserved '::' delimiter in a pk
+      // and an unscoped one must not carry the reserved scope delimiter in a pk
       // comparison.
       validateScopedKvsKeyConditionOrThrow(qpqConfig, keyValueStoreName, scope, keyCondition);
 

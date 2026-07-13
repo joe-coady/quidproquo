@@ -43,10 +43,14 @@ describe('validateScopeSegment', () => {
   });
 
   it('rejects the kvs scope delimiter character', () => {
-    // A scope containing ':' could forge or shadow another scope's composed
-    // prefix ('a:' + ':b' vs 'a' + '::b').
-    expectInvalidScope(() => validateScopeSegment('a:b'), InvalidScopeErrorCode.unsafeCharacters);
-    expectInvalidScope(() => validateScopeSegment('acme::'), InvalidScopeErrorCode.unsafeCharacters);
+    // A scope containing '@' could forge or shadow another scope's composed
+    // prefix ('a@' + '@QPQSCOPE@@b' vs 'a' + '@@QPQSCOPE@@b').
+    expectInvalidScope(() => validateScopeSegment('a@b'), InvalidScopeErrorCode.unsafeCharacters);
+    expectInvalidScope(() => validateScopeSegment('acme@@QPQSCOPE@@'), InvalidScopeErrorCode.unsafeCharacters);
+  });
+
+  it('accepts scopes containing ":" (no longer the delimiter character)', () => {
+    expect(() => validateScopeSegment('a:b')).not.toThrow();
   });
 
   it('rejects the self-referencing path segment', () => {
@@ -89,14 +93,14 @@ describe('composeScopedFilePath', () => {
 describe('composeScopedKvsValue / stripScopedKvsValue', () => {
   it('round-trips a scoped string value', () => {
     const stored = composeScopedKvsValue('tenant-a', 'item-1');
-    expect(stored).toBe('tenant-a::item-1');
+    expect(stored).toBe('tenant-a@@QPQSCOPE@@item-1');
     expect(stripScopedKvsValue('tenant-a', stored)).toBe('item-1');
   });
 
   it('passes values through untouched without a scope', () => {
     expect(composeScopedKvsValue(undefined, 'item-1')).toBe('item-1');
     expect(composeScopedKvsValue(undefined, 42)).toBe(42);
-    expect(stripScopedKvsValue(undefined, 'tenant-a::item-1')).toBe('tenant-a::item-1');
+    expect(stripScopedKvsValue(undefined, 'tenant-a@@QPQSCOPE@@item-1')).toBe('tenant-a@@QPQSCOPE@@item-1');
   });
 
   it('rejects scoping a non-string value', () => {
@@ -104,10 +108,19 @@ describe('composeScopedKvsValue / stripScopedKvsValue', () => {
   });
 
   it('rejects a raw value containing the scope delimiter', () => {
-    // 'tenant-a' + 'x::y' would store 'tenant-a::x::y'; on strip it reads back
-    // as 'x::y', but an unscoped row 'acme::secret' must never be forgeable or
-    // matchable as scoped data, so the delimiter is reserved outright.
-    expectInvalidScope(() => composeScopedKvsValue('tenant-a', 'x::y'), InvalidScopeErrorCode.reservedDelimiter);
+    // Storing 'tenant-a' + delimiter + 'x' + delimiter + 'y' would read back
+    // ambiguously, and an unscoped row carrying the delimiter must never be
+    // forgeable or matchable as scoped data, so the delimiter is reserved
+    // outright.
+    expectInvalidScope(() => composeScopedKvsValue('tenant-a', 'x@@QPQSCOPE@@y'), InvalidScopeErrorCode.reservedDelimiter);
+  });
+
+  // '::' is qpq's function-runtime separator and lives inside correlation ids,
+  // which the log service stores as partition keys - it must round-trip fine.
+  it('round-trips a value containing "::"', () => {
+    const stored = composeScopedKvsValue('tenant-a', 'onCreate::onCreate');
+    expect(stored).toBe('tenant-a@@QPQSCOPE@@onCreate::onCreate');
+    expect(stripScopedKvsValue('tenant-a', stored)).toBe('onCreate::onCreate');
   });
 
   it('leaves an unscoped stored value unchanged when stripping', () => {
@@ -139,7 +152,12 @@ describe('composeScopedKvsQueryOperation', () => {
     );
 
     expect(scopedConditionCount).toBe(1);
-    expect(operation).toEqual({ key: 'id', operation: KvsQueryOperationType.Between, valueA: 'tenant-a::a', valueB: 'tenant-a::z' });
+    expect(operation).toEqual({
+      key: 'id',
+      operation: KvsQueryOperationType.Between,
+      valueA: 'tenant-a@@QPQSCOPE@@a',
+      valueB: 'tenant-a@@QPQSCOPE@@z',
+    });
   });
 
   it('rejects a non-string bound on the partition key', () => {
@@ -171,8 +189,8 @@ describe('validateUnscopedPkConditionValuesOrThrow', () => {
       operation: KvsLogicalOperatorType.And,
       conditions: [
         { key: 'id', operation: KvsQueryOperationType.Equal, valueA: 'item-1' },
-        // Non-pk conditions may legitimately contain '::' (it is only reserved in the pk).
-        { key: 'note', operation: KvsQueryOperationType.Equal, valueA: 'a::b' },
+        // Non-pk conditions may legitimately contain '@@QPQSCOPE@@' (it is only reserved in the pk).
+        { key: 'note', operation: KvsQueryOperationType.Equal, valueA: 'a@@QPQSCOPE@@b' },
       ],
     };
 
@@ -180,9 +198,9 @@ describe('validateUnscopedPkConditionValuesOrThrow', () => {
   });
 
   it('rejects the reserved delimiter in a pk comparison, including nested trees and In lists', () => {
-    // An unscoped pk value 'acme::secret' would match scope acme's composed rows.
+    // An unscoped pk value 'acme@@QPQSCOPE@@secret' would match scope acme's composed rows.
     expectInvalidScope(
-      () => validateUnscopedPkConditionValuesOrThrow({ key: 'id', operation: KvsQueryOperationType.Equal, valueA: 'acme::secret' }, ['id']),
+      () => validateUnscopedPkConditionValuesOrThrow({ key: 'id', operation: KvsQueryOperationType.Equal, valueA: 'acme@@QPQSCOPE@@secret' }, ['id']),
       InvalidScopeErrorCode.reservedDelimiter,
     );
 
@@ -192,14 +210,17 @@ describe('validateUnscopedPkConditionValuesOrThrow', () => {
         { key: 'name', operation: KvsQueryOperationType.Equal, valueA: 'x' },
         {
           operation: KvsLogicalOperatorType.And,
-          conditions: [{ key: 'id', operation: KvsQueryOperationType.In, valueA: ['ok', 'acme::secret'] }],
+          conditions: [{ key: 'id', operation: KvsQueryOperationType.In, valueA: ['ok', 'acme@@QPQSCOPE@@secret'] }],
         },
       ],
     };
     expectInvalidScope(() => validateUnscopedPkConditionValuesOrThrow(nested, ['id']), InvalidScopeErrorCode.reservedDelimiter);
 
     expectInvalidScope(
-      () => validateUnscopedPkConditionValuesOrThrow({ key: 'id', operation: KvsQueryOperationType.Between, valueA: 'a', valueB: 'acme::z' }, ['id']),
+      () =>
+        validateUnscopedPkConditionValuesOrThrow({ key: 'id', operation: KvsQueryOperationType.Between, valueA: 'a', valueB: 'acme@@QPQSCOPE@@z' }, [
+          'id',
+        ]),
       InvalidScopeErrorCode.reservedDelimiter,
     );
   });
@@ -207,12 +228,12 @@ describe('validateUnscopedPkConditionValuesOrThrow', () => {
 
 describe('stripScopedKvsItem', () => {
   it('clones the item with the scope prefix stripped off its pk attribute', () => {
-    const stored = { id: 'tenant-a::item-1', name: 'n' };
+    const stored = { id: 'tenant-a@@QPQSCOPE@@item-1', name: 'n' };
 
     const stripped = stripScopedKvsItem('tenant-a', stored, 'id');
 
     expect(stripped).toEqual({ id: 'item-1', name: 'n' });
-    expect(stored).toEqual({ id: 'tenant-a::item-1', name: 'n' });
+    expect(stored).toEqual({ id: 'tenant-a@@QPQSCOPE@@item-1', name: 'n' });
   });
 
   it('returns the same item when the pk carries no prefix', () => {
@@ -227,7 +248,7 @@ describe('buildKvsScopeBeginsWithCondition', () => {
     expect(buildKvsScopeBeginsWithCondition('id', 'tenant-a')).toEqual({
       key: 'id',
       operation: 'BeginsWith',
-      valueA: 'tenant-a::',
+      valueA: 'tenant-a@@QPQSCOPE@@',
     });
   });
 });

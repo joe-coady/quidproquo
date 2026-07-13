@@ -117,7 +117,7 @@ When `nextPageKey` is set, pass it back as `options.nextPageKey` to fetch the ne
 | --- | --- |
 | `KeyValueStoreQueryErrorTypeEnum.ServiceUnavailable` | DynamoDB internal error or throttling. |
 | `KeyValueStoreQueryErrorTypeEnum.ResourceNotFound` | The underlying table does not exist. |
-| `KeyValueStoreQueryErrorTypeEnum.InvalidScope` | The `scope` option is malformed (empty, `.`, over 128 characters, or containing path separators, `..`, `:`, or null bytes), the store's partition key is not string-typed, a scoped query's key condition does not constrain the partition key (or constrains it with an operator that cannot be scoped), or a partition-key condition value contains the reserved `::` delimiter (reserved on string-pk stores, so unscoped queries reject it too). |
+| `KeyValueStoreQueryErrorTypeEnum.InvalidScope` | The `scope` option is malformed (empty, `.`, over 128 characters, or containing path separators, `..`, `@`, or null bytes), the store's partition key is not string-typed, a scoped query's key condition does not constrain the partition key (or constrains it with an operator that cannot be scoped), or a partition-key condition value contains the reserved `@@QPQSCOPE@@` delimiter (reserved on string-pk stores, so unscoped queries reject it too). |
 | `KeyValueStoreQueryErrorTypeEnum.StoreNotFound` | The key value store is not declared in the qpq config (misconfiguration, e.g. a wrong name or a missing `defineKeyValueStore`). |
 
 Catch errors with `askCatch` — it returns `{ success: true, result }` or `{ success: false, error }`.

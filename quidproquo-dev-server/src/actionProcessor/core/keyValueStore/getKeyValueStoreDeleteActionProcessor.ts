@@ -23,7 +23,7 @@ const getProcessKeyValueStoreDelete = (qpqConfig: QPQConfig, devServerConfig: Re
       // The json backend partitions per-scope at the FILE level, so keys stay
       // raw - the scope just selects which file the store deletes from. The
       // key is still validated for AWS parity: a key prod rejects (bad scope,
-      // or the reserved '::' delimiter in the raw value) must fail locally
+      // or the reserved scope delimiter in the raw value) must fail locally
       // too.
       validateScopedKvsKeyOrThrow(qpqConfig, keyValueStoreName, scope, key);
 

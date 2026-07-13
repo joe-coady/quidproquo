@@ -43,14 +43,14 @@ describe('getScopedKvsTranslatorOrThrow', () => {
   it('returns a composing translator for a valid scope on a string-pk store', () => {
     const translator = getScopedKvsTranslatorOrThrow(qpqConfig, 'stringStore', 'tenant-a');
 
-    expect(translator.key('item-1')).toBe('tenant-a::item-1');
+    expect(translator.key('item-1')).toBe('tenant-a@@QPQSCOPE@@item-1');
   });
 
   it('returns the unscoped translator with the composed-row scan exclusion for a string-pk store', () => {
     const translator = getScopedKvsTranslatorOrThrow(qpqConfig, 'stringStore', undefined);
 
     expect(translator.key('item-1')).toBe('item-1');
-    expect(translator.scanFilter(undefined)).toEqual({ key: 'id', operation: KvsQueryOperationType.NotContains, valueA: '::' });
+    expect(translator.scanFilter(undefined)).toEqual({ key: 'id', operation: KvsQueryOperationType.NotContains, valueA: '@@QPQSCOPE@@' });
   });
 
   it('returns a pure passthrough for an unscoped number-pk store', () => {
@@ -61,6 +61,7 @@ describe('getScopedKvsTranslatorOrThrow', () => {
 
   it('rejects an invalid scope, a number-pk store, and an unknown store', () => {
     expectInvalidScope(() => getScopedKvsTranslatorOrThrow(qpqConfig, 'stringStore', '../evil'), InvalidScopeErrorCode.unsafeCharacters);
+    expectInvalidScope(() => getScopedKvsTranslatorOrThrow(qpqConfig, 'stringStore', 'ten@nt'), InvalidScopeErrorCode.unsafeCharacters);
     expectInvalidScope(() => getScopedKvsTranslatorOrThrow(qpqConfig, 'numberStore', 'tenant-a'), InvalidScopeErrorCode.unsafeCharacters);
     expect(() => getScopedKvsTranslatorOrThrow(qpqConfig, 'missingStore', 'tenant-a')).toThrow(KvsStoreNotFoundError);
   });
@@ -83,10 +84,22 @@ describe('validateScopedKvsKeyOrThrow', () => {
     expect(() => validateScopedKvsKeyOrThrow(qpqConfig, 'stringStore', undefined, 'item-1')).not.toThrow();
   });
 
+  // '::' is qpq's function-runtime separator and lives inside correlation ids,
+  // which the log service stores as partition keys - it must never be reserved.
+  it('passes keys containing "::" (correlation ids), scoped or unscoped', () => {
+    const correlationKey = 'services/log/entry/storageDrive/onCreate::onCreate';
+
+    expect(() => validateScopedKvsKeyOrThrow(qpqConfig, 'stringStore', 'tenant-a', correlationKey)).not.toThrow();
+    expect(() => validateScopedKvsKeyOrThrow(qpqConfig, 'stringStore', undefined, correlationKey)).not.toThrow();
+  });
+
   it('rejects the reserved delimiter in the raw key, scoped or unscoped', () => {
-    expectInvalidScope(() => validateScopedKvsKeyOrThrow(qpqConfig, 'stringStore', 'tenant-a', 'x::y'), InvalidScopeErrorCode.reservedDelimiter);
     expectInvalidScope(
-      () => validateScopedKvsKeyOrThrow(qpqConfig, 'stringStore', undefined, 'acme::secret'),
+      () => validateScopedKvsKeyOrThrow(qpqConfig, 'stringStore', 'tenant-a', 'x@@QPQSCOPE@@y'),
+      InvalidScopeErrorCode.reservedDelimiter,
+    );
+    expectInvalidScope(
+      () => validateScopedKvsKeyOrThrow(qpqConfig, 'stringStore', undefined, 'acme@@QPQSCOPE@@secret'),
       InvalidScopeErrorCode.reservedDelimiter,
     );
   });
@@ -98,13 +111,17 @@ describe('validateScopedKvsItemOrThrow', () => {
     expect(() => validateScopedKvsItemOrThrow(qpqConfig, 'stringStore', undefined, { id: 'item-1' })).not.toThrow();
   });
 
+  it('passes an item whose pk contains "::" (correlation ids)', () => {
+    expect(() => validateScopedKvsItemOrThrow(qpqConfig, 'stringStore', undefined, { id: 'onCreate::onCreate' })).not.toThrow();
+  });
+
   it('rejects the reserved delimiter in the item pk, scoped or unscoped', () => {
     expectInvalidScope(
-      () => validateScopedKvsItemOrThrow(qpqConfig, 'stringStore', 'tenant-a', { id: 'x::y' }),
+      () => validateScopedKvsItemOrThrow(qpqConfig, 'stringStore', 'tenant-a', { id: 'x@@QPQSCOPE@@y' }),
       InvalidScopeErrorCode.reservedDelimiter,
     );
     expectInvalidScope(
-      () => validateScopedKvsItemOrThrow(qpqConfig, 'stringStore', undefined, { id: 'acme::secret' }),
+      () => validateScopedKvsItemOrThrow(qpqConfig, 'stringStore', undefined, { id: 'acme@@QPQSCOPE@@secret' }),
       InvalidScopeErrorCode.reservedDelimiter,
     );
   });
@@ -127,9 +144,13 @@ describe('validateScopedKvsKeyConditionOrThrow', () => {
     );
   });
 
+  it('passes an unscoped pk comparison containing "::" (correlation ids)', () => {
+    expect(() => validateScopedKvsKeyConditionOrThrow(qpqConfig, 'stringStore', undefined, pkEquals('onCreate::onCreate'))).not.toThrow();
+  });
+
   it('rejects the reserved delimiter in an unscoped pk comparison', () => {
     expectInvalidScope(
-      () => validateScopedKvsKeyConditionOrThrow(qpqConfig, 'stringStore', undefined, pkEquals('acme::secret')),
+      () => validateScopedKvsKeyConditionOrThrow(qpqConfig, 'stringStore', undefined, pkEquals('acme@@QPQSCOPE@@secret')),
       InvalidScopeErrorCode.reservedDelimiter,
     );
   });

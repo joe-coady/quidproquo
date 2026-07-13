@@ -27,9 +27,11 @@ export function validateScopeSegment(scope: string): void {
     throw new InvalidScopeError(InvalidScopeErrorCode.unsafeCharacters, 'Scope must not be ".".');
   }
 
-  // ':' is reserved for the kvs scope delimiter ('::'): a scope containing it
-  // could forge or shadow another scope's composed prefix.
-  if (scope.includes(':')) {
-    throw new InvalidScopeError(InvalidScopeErrorCode.unsafeCharacters, 'Scope must not contain ":".');
+  // '@' is reserved for the kvs scope delimiter ('@@QPQSCOPE@@'): a scope
+  // containing it could forge or shadow another scope's composed prefix.
+  // Rejecting the single character (not just the full delimiter) keeps the
+  // scope/delimiter boundary unambiguous by construction.
+  if (scope.includes('@')) {
+    throw new InvalidScopeError(InvalidScopeErrorCode.unsafeCharacters, 'Scope must not contain "@".');
   }
 }

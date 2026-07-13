@@ -21,7 +21,7 @@ describe('createScopedKvsTranslator (unscoped)', () => {
     expect(translator.scanFilter(undefined)).toEqual({
       key: 'id',
       operation: KvsQueryOperationType.NotContains,
-      valueA: '::',
+      valueA: '@@QPQSCOPE@@',
     });
   });
 
@@ -31,7 +31,7 @@ describe('createScopedKvsTranslator (unscoped)', () => {
 
     expect(translator.scanFilter(filter)).toEqual({
       operation: KvsLogicalOperatorType.And,
-      conditions: [{ key: 'id', operation: KvsQueryOperationType.NotContains, valueA: '::' }, filter],
+      conditions: [{ key: 'id', operation: KvsQueryOperationType.NotContains, valueA: '@@QPQSCOPE@@' }, filter],
     });
   });
 
@@ -56,14 +56,14 @@ describe('createScopedKvsTranslator (unscoped)', () => {
   });
 
   it('rejects the reserved delimiter in unscoped keys, items, and key conditions', () => {
-    // An unscoped raw pk value 'acme::secret' would read or forge scope
+    // An unscoped raw pk value 'acme@@QPQSCOPE@@secret' would read or forge scope
     // acme's composed rows, so it is rejected instead of matched.
     const translator = createScopedKvsTranslator(undefined, 'id');
 
-    expectInvalidScope(() => translator.key('acme::secret'), InvalidScopeErrorCode.reservedDelimiter);
-    expectInvalidScope(() => translator.item({ id: 'acme::secret', name: 'n' }), InvalidScopeErrorCode.reservedDelimiter);
+    expectInvalidScope(() => translator.key('acme@@QPQSCOPE@@secret'), InvalidScopeErrorCode.reservedDelimiter);
+    expectInvalidScope(() => translator.item({ id: 'acme@@QPQSCOPE@@secret', name: 'n' }), InvalidScopeErrorCode.reservedDelimiter);
     expectInvalidScope(
-      () => translator.keyCondition({ key: 'id', operation: KvsQueryOperationType.Equal, valueA: 'acme::secret' }),
+      () => translator.keyCondition({ key: 'id', operation: KvsQueryOperationType.Equal, valueA: 'acme@@QPQSCOPE@@secret' }),
       InvalidScopeErrorCode.reservedDelimiter,
     );
   });
@@ -76,7 +76,7 @@ describe('createScopedKvsTranslator (scoped)', () => {
     expect(translator.scanFilter(undefined)).toEqual({
       key: 'id',
       operation: KvsQueryOperationType.BeginsWith,
-      valueA: 'tenant-a::',
+      valueA: 'tenant-a@@QPQSCOPE@@',
     });
   });
 
@@ -85,18 +85,18 @@ describe('createScopedKvsTranslator (scoped)', () => {
 
     expect(translator.scanFilter(filter)).toEqual({
       operation: KvsLogicalOperatorType.And,
-      conditions: [{ key: 'id', operation: KvsQueryOperationType.BeginsWith, valueA: 'tenant-a::' }, filter],
+      conditions: [{ key: 'id', operation: KvsQueryOperationType.BeginsWith, valueA: 'tenant-a@@QPQSCOPE@@' }, filter],
     });
   });
 
   it('composes a bare key', () => {
-    expect(translator.key('item-1')).toBe('tenant-a::item-1');
+    expect(translator.key('item-1')).toBe('tenant-a@@QPQSCOPE@@item-1');
   });
 
   it('clones an item with its pk field composed, leaving the original untouched', () => {
     const item = { id: 'item-1', name: 'n' };
 
-    expect(translator.item(item)).toEqual({ id: 'tenant-a::item-1', name: 'n' });
+    expect(translator.item(item)).toEqual({ id: 'tenant-a@@QPQSCOPE@@item-1', name: 'n' });
     expect(item).toEqual({ id: 'item-1', name: 'n' });
   });
 
@@ -104,7 +104,7 @@ describe('createScopedKvsTranslator (scoped)', () => {
     expect(translator.keyCondition({ key: 'id', operation: KvsQueryOperationType.Equal, valueA: 'item-1' })).toEqual({
       key: 'id',
       operation: KvsQueryOperationType.Equal,
-      valueA: 'tenant-a::item-1',
+      valueA: 'tenant-a@@QPQSCOPE@@item-1',
     });
 
     expectInvalidScope(
@@ -125,7 +125,7 @@ describe('createScopedKvsTranslator (scoped)', () => {
     expect(translator.filter(filter)).toEqual({
       operation: KvsLogicalOperatorType.And,
       conditions: [
-        { key: 'id', operation: KvsQueryOperationType.BeginsWith, valueA: 'tenant-a::item' },
+        { key: 'id', operation: KvsQueryOperationType.BeginsWith, valueA: 'tenant-a@@QPQSCOPE@@item' },
         { key: 'status', operation: KvsQueryOperationType.Equal, valueA: 'active' },
       ],
     });
@@ -133,7 +133,7 @@ describe('createScopedKvsTranslator (scoped)', () => {
   });
 
   it('strips the composed pk off returned items and passes null-ish results through', () => {
-    expect(translator.strip({ id: 'tenant-a::item-1', name: 'n' })).toEqual({ id: 'item-1', name: 'n' });
+    expect(translator.strip({ id: 'tenant-a@@QPQSCOPE@@item-1', name: 'n' })).toEqual({ id: 'item-1', name: 'n' });
     expect(translator.strip(null)).toBeNull();
     expect(translator.strip(undefined)).toBeUndefined();
   });

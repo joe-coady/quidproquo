@@ -22,10 +22,10 @@ import {
  * on `scope === undefined`. When the store's (string) pk attribute is known it
  * still guards the scope boundary in both directions: scanFilter excludes
  * scope-composed rows (an unscoped Scan/GetAll over a mixed table would
- * otherwise return every tenant's rows with the composed `tenant::key` values
+ * otherwise return every tenant's rows with the scope-composed pk values
  * un-stripped), and key/item/keyCondition reject raw pk values carrying the
- * reserved delimiter (an unscoped 'acme::secret' would read or forge scope
- * acme's composed rows). This matches file-partitioned backends, where scoped
+ * reserved delimiter (an unscoped value of `acme${DELIMITER}secret` would read
+ * or forge scope acme's composed rows). This matches file-partitioned backends, where scoped
  * rows are physically unreachable from unscoped access.
  */
 export type ScopedKvsTranslator = {

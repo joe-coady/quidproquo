@@ -23,7 +23,7 @@ const getProcessKeyValueStoreUpsert = (qpqConfig: QPQConfig, devServerConfig: Re
       // The json backend partitions per-scope at the FILE level, so the item is
       // stored raw - the scope just selects which file the store writes to.
       // The item's pk value is still validated for AWS parity: a write prod
-      // rejects (bad scope, or the reserved '::' delimiter in the raw value,
+      // rejects (bad scope, or the reserved scope delimiter in the raw value,
       // scoped or not) must fail locally too.
       validateScopedKvsItemOrThrow(qpqConfig, keyValueStoreName, scope, item);
 

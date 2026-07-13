@@ -23,7 +23,7 @@ const getProcessKeyValueStoreGet = (qpqConfig: QPQConfig, devServerConfig: Resol
       // The json backend partitions per-scope at the FILE level, so keys stay
       // raw - the scope just selects which file the store reads. The key is
       // still validated for AWS parity: a key prod rejects (bad scope, or the
-      // reserved '::' delimiter in the raw value) must fail locally too.
+      // reserved scope delimiter in the raw value) must fail locally too.
       validateScopedKvsKeyOrThrow(qpqConfig, keyValueStoreName, scope, key);
 
       return actionResult(await repository.get(keyValueStoreName, key, scope));

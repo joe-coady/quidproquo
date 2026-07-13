@@ -199,11 +199,12 @@ describe('KVS scope isolation', () => {
   it('rejects a scoped write whose partition key value contains the scope delimiter', async () => {
     const { upsert } = await getProcessors();
 
-    // AWS composes 'tenant-a::acme::secret' and throws; the json backend
-    // stores raw, so it must throw the same typed error for parity.
+    // AWS composes 'tenant-a@@QPQSCOPE@@acme@@QPQSCOPE@@secret' and throws;
+    // the json backend stores raw, so it must throw the same typed error for
+    // parity.
     const result = await invokeProcessor(upsert, {
       keyValueStoreName: 'widgets',
-      item: { id: 'acme::secret', name: 'X' },
+      item: { id: 'acme@@QPQSCOPE@@secret', name: 'X' },
       options: { scope: 'tenant-a' },
     });
 

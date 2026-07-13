@@ -32,7 +32,7 @@ describe('getKeyValueStoreGetAllActionProcessor', () => {
     expect(getAllItems).toHaveBeenCalledWith('users-test-app-test-module-development-qpqkvs', 'eu-west-1', {
       key: 'pk',
       operation: KvsQueryOperationType.NotContains,
-      valueA: '::',
+      valueA: '@@QPQSCOPE@@',
     });
   });
 });

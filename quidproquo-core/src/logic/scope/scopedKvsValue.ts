@@ -2,9 +2,15 @@ import { KvsCoreDataType, KvsQueryCondition, KvsQueryOperationType } from '../..
 import { InvalidScopeError, InvalidScopeErrorCode } from './InvalidScopeError';
 import { validateScopeSegment } from './validateScopeSegment';
 
-export const KVS_SCOPE_DELIMITER = '::';
+// The delimiter must never occur in legitimate partition key data, because raw
+// values carrying it are rejected outright (see below). '::' is unusable: it is
+// qpq's own function-runtime separator ('src/path::method') and appears inside
+// correlation ids, which the log service stores as partition keys. So the
+// delimiter is a loud qpq-namespaced sentinel instead of a short punctuation
+// token.
+export const KVS_SCOPE_DELIMITER = '@@QPQSCOPE@@';
 
-// Compose a scope into a partition key value: `${scope}::${rawValue}`. Only
+// Compose a scope into a partition key value: `${scope}${KVS_SCOPE_DELIMITER}${rawValue}`. Only
 // string keys can carry a scope - a number/binary pk has nowhere to embed the
 // prefix, so scoping such a store is rejected rather than silently coerced.
 export function composeScopedKvsValue(scope: string | undefined, rawValue: KvsCoreDataType): KvsCoreDataType {

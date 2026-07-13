@@ -131,9 +131,9 @@ const validateUnscopedConditionValueOrThrow = (value: KvsAdvancedDataType | unde
 
 /**
  * The reserved delimiter is rejected in UNSCOPED partition-key comparisons too:
- * on a value-composed backend a raw value like 'acme::secret' in a pk condition
- * would match (or probe for) scope acme's composed rows. Validation only - the
- * tree is not modified.
+ * on a value-composed backend a raw value like `acme${DELIMITER}secret` in a pk
+ * condition would match (or probe for) scope acme's composed rows. Validation
+ * only - the tree is not modified.
  */
 export function validateUnscopedPkConditionValuesOrThrow(operation: KvsQueryOperation, pkKeyNames: string[]): void {
   if ('conditions' in operation) {

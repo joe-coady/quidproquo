@@ -24,7 +24,7 @@ describe('getKeyValueStoreScanActionProcessor', () => {
 
   // An unscoped scan over a mixed (scoped + unscoped) table must exclude the
   // scope-composed rows, or every tenant's data leaks with composed pk values.
-  const composedRowExclusion = { key: 'pk', operation: KvsQueryOperationType.NotContains, valueA: '::' };
+  const composedRowExclusion = { key: 'pk', operation: KvsQueryOperationType.NotContains, valueA: '@@QPQSCOPE@@' };
 
   it('scans the resolved dynamo table with the filter and page key, excluding composed rows', async () => {
     vi.mocked(scan).mockResolvedValue({ items: [] } as any);
