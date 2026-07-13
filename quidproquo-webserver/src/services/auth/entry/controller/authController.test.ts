@@ -194,7 +194,8 @@ describe('respondToAuthChallenge', () => {
 
   it('rejects a known challenge type missing its credential field as BadRequest', () => {
     expectStoryErrorType(
-      () => runStory(respondToAuthChallenge(jsonEvent({ email: 'a@b.com', session: 's', challenge: AuthenticateUserChallenge.NEW_PASSWORD_REQUIRED }))),
+      () =>
+        runStory(respondToAuthChallenge(jsonEvent({ email: 'a@b.com', session: 's', challenge: AuthenticateUserChallenge.NEW_PASSWORD_REQUIRED }))),
       ErrorTypeEnum.BadRequest,
     );
   });

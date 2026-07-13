@@ -21,7 +21,9 @@ describe('getFederatedKeyFromQpqFunctionRuntime', () => {
   });
 
   it('normalizes windows backslashes in the relative path', () => {
-    expect(getFederatedKeyFromQpqFunctionRuntime({ basePath: '/base', relativePath: 'service\\entry', functionName: 'fn' })).toBe('service/entry::fn');
+    expect(getFederatedKeyFromQpqFunctionRuntime({ basePath: '/base', relativePath: 'service\\entry', functionName: 'fn' })).toBe(
+      'service/entry::fn',
+    );
   });
 
   it('strips a leading slash from the relative path', () => {
