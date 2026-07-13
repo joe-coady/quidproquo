@@ -3,8 +3,11 @@ const usage = `qpq — build, dev and deploy orchestration for QPQ apps
 Usage: qpq <command> [--app <name>] [--env <name>] [--platform <name>]
 
 Commands:
-  go               Deploy services (interactive; platform from deploy.config.json, default aws)
-  go:docker        Same as go, but deploys in parallel via docker
+  go [svc] [stack] Deploy services (interactive; platform from deploy.config.json, default aws).
+                   Pass positional args to skip prompts, e.g. qpq go all all — svc is
+                   'all' | comma-list | account | domain | bootstrap; stack is all|inf|api|web|views.
+                   A full 'all all' (or 'all api') deploy also publishes federated backends.
+  go:docker        Same as go (incl. positional args), but deploys in parallel via docker
   go:dev           Run the full local dev stack (api + web) in one process
   go:dev:api       Run the local API dev server (hot reload)
   go:dev:web       Run every views microfrontend dev server

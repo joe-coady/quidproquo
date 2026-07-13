@@ -2,7 +2,7 @@
 // platform driver's parallel containerized deploy (drivers without a docker
 // strategy don't offer one).
 import { resolveDeployEnvironment } from '../lib/deployEnv';
-import { promptDeployPlan } from '../lib/deployPrompts';
+import { buildDeployPlanFromArgs, promptDeployPlan } from '../lib/deployPrompts';
 import { resolveAppSelection } from '../lib/resolveAppSelection';
 import { getPlatformDriver } from '../platforms';
 
@@ -16,7 +16,8 @@ export const goDockerCommand = async (argv: string[]): Promise<void> => {
     process.exit(1);
   }
 
-  const plan = await promptDeployPlan(appName);
+  // Positional args (`qpq go:docker all all`) run prompt-free; otherwise ask.
+  const plan = buildDeployPlanFromArgs(appName, argv) ?? (await promptDeployPlan(appName));
 
   await driver.goDocker(appName, plan);
 };

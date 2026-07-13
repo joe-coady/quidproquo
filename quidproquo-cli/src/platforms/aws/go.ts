@@ -1,7 +1,10 @@
 // AWS sequential deploy (`qpq go`). Per service it: synths the QPQ config,
 // rspack-bundles the backend (programmatic — no per-service rspack.config.ts),
 // deploys the inf/api/web CDK stacks (cdk runs the generic workspace app via
-// --app), bundles views (rspack, production) and syncs them to S3.
+// --app), bundles views (rspack, production) and syncs them to S3. Finally, any
+// service that opts into module federation has its federated remote published
+// (built + uploaded + manifest flipped), so a deploy that ships new backend
+// code also republishes the code the lambdas federate.
 import { qpqDeployAwsCdkUtils } from 'quidproquo-deploy-awscdk';
 import { getServiceRspackConfig } from 'quidproquo-deploy-rspack';
 
@@ -11,12 +14,13 @@ import { synthCommand } from '../../commands/synth';
 import { DeployPlan } from '../../lib/deployPrompts';
 import { getServiceDirectory, getServiceNamesWithViews } from '../../lib/discovery';
 import { runAppHook } from '../../lib/hooks';
-import { loadServiceQpqConfig } from '../../lib/qpqConfigs';
+import { getServiceNamesWithFederation, loadServiceQpqConfig } from '../../lib/qpqConfigs';
 import { runRspack } from '../../lib/rspackRun';
 import { runCommand } from '../../lib/runCommand';
 import { logTimeEnd, logTimeStart } from '../../lib/timing';
 import { bundleViews } from '../../lib/views';
 import { isAwsCredentialsValid } from './awsCredentials';
+import { awsPublish } from './publish';
 import { deployAccountStack, deployBootstrapStack, deployDomainStack, deployServiceStack } from './stacks';
 import { syncViewsToS3 } from './viewsSync';
 
@@ -133,6 +137,17 @@ export const awsGo = async (appName: string, plan: DeployPlan): Promise<void> =>
         appName,
       );
     }, Promise.resolve());
+  }
+
+  // Publishing federated remotes only matters once the new backend code is
+  // live, so it's gated on the api stack having been (re)deployed. Services
+  // without defineFederatedModuleStore(...) are skipped.
+  if (allStacks || stacks === 'api') {
+    const federatedServices = getServiceNamesWithFederation(appName, services);
+    if (federatedServices.length > 0) {
+      console.log('\n\nPublishing federated backends\n');
+      await awsPublish(appName, federatedServices);
+    }
   }
 
   logTimeEnd('totalTime');

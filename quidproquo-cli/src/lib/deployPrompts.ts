@@ -1,10 +1,14 @@
 // The interactive question flow shared by `qpq go` (sequential AWS deploy) and
 // a future dockerized variant: pick an app, confirm the target, pick services
-// (or domain/bootstrap), pick stacks.
+// (or domain/bootstrap), pick stacks. buildDeployPlanFromArgs is the
+// non-interactive shortcut (`qpq go all all`) that skips every prompt.
+import { getPositionalArgs } from './args';
 import { getServiceNames } from './discovery';
 import { promptSelect, promptText, promptYesNo } from './prompts';
 
 export type StackType = 'all' | 'inf' | 'api' | 'web' | 'views';
+
+const STACK_TYPES: StackType[] = ['all', 'inf', 'api', 'web', 'views'];
 
 export type DeployPlan =
   | { kind: 'cancelled' }
@@ -19,6 +23,47 @@ export type DeployPlan =
       services: string[];
       stacks: StackType;
     };
+
+// Non-interactive deploy plan from positional args: `qpq go <services> [stacks]`.
+//   services: 'all' | comma-separated service names | 'account' | 'domain' | 'bootstrap'
+//   stacks:   all | inf | api | web | views          (defaults to 'all')
+// Returns null when no positional services token is given, so callers fall back
+// to the interactive promptDeployPlan. Passing args is an explicit opt-in to a
+// prompt-free deploy, so the "Deploying to: [env]" confirmation is skipped too.
+export const buildDeployPlanFromArgs = (appName: string, argv: string[]): DeployPlan | null => {
+  const [servicesArg, stacksArg] = getPositionalArgs(argv, ['--app', '--env', '--platform']);
+
+  if (!servicesArg) {
+    return null;
+  }
+
+  if (servicesArg === 'account') {
+    return { kind: 'account', appName };
+  }
+  if (servicesArg === 'domain') {
+    return { kind: 'bootstrap', appName, includeDomain: true };
+  }
+  if (servicesArg === 'bootstrap') {
+    return { kind: 'bootstrap', appName, includeDomain: false };
+  }
+
+  const allServices = getServiceNames(appName);
+  const services = servicesArg === 'all' ? allServices : servicesArg.split(',').map((s) => s.trim()).filter(Boolean);
+
+  const unknownServices = services.filter((service) => !allServices.includes(service));
+  if (unknownServices.length > 0) {
+    console.error(`Unknown service(s): ${unknownServices.join(', ')}. Valid services: ${allServices.join(', ')}`);
+    process.exit(1);
+  }
+
+  const stacks = (stacksArg ?? 'all') as StackType;
+  if (!STACK_TYPES.includes(stacks)) {
+    console.error(`Unknown stacks '${stacksArg}'. Valid stacks: ${STACK_TYPES.join(', ')}`);
+    process.exit(1);
+  }
+
+  return { kind: 'services', appName, services: [...new Set(services)], stacks };
+};
 
 export const promptDeployPlan = async (appName: string): Promise<DeployPlan> => {
   const deployInfo = process.env.ACTOR_NAME

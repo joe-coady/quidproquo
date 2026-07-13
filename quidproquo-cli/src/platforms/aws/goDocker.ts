@@ -2,8 +2,9 @@
 // parallel via docker instead of sequentially:
 //
 //   1. Build everything locally first: QPQ config synth, rspack API bundles,
-//      rspack view bundles, and one self-contained CDK cloud assembly per
-//      service (`cdk synth --output dist/qpq/cdk-docker/<app>/<service>`).
+//      rspack view bundles, rspack federated-remote bundles, and one
+//      self-contained CDK cloud assembly per service
+//      (`cdk synth --output dist/qpq/cdk-docker/<app>/<service>`).
 //   2. Wave 1 (inf): one docker container per service deploys its inf stack,
 //      all concurrently. Containers run only the CDK CLI against the mounted
 //      pre-synthesized assembly — the workspace (and its npm-linked
@@ -13,6 +14,9 @@
 //      each other).
 //   4. Views: the already-built bundles are synced to S3, one aws-cli
 //      container per service, all concurrently.
+//   5. Publish: the already-built federated remotes (backends that opt in with
+//      defineFederatedModuleStore(...)) are synced to S3 and their manifests
+//      flipped, one aws-cli container per service, all concurrently.
 //
 // domain/bootstrap menu options deploy host-side exactly like `qpq go` —
 // a single stack gains nothing from docker.
@@ -31,7 +35,7 @@ import { synthCommand } from '../../commands/synth';
 import { DeployPlan } from '../../lib/deployPrompts';
 import { getRoot, getServiceDirectory, getServiceNamesWithViews } from '../../lib/discovery';
 import { runAppHook } from '../../lib/hooks';
-import { loadServiceQpqConfig } from '../../lib/qpqConfigs';
+import { getServiceNamesWithFederation, loadServiceQpqConfig } from '../../lib/qpqConfigs';
 import { runRspack } from '../../lib/rspackRun';
 import { nextPrefixColor, runCommand, runCommandPrefixed } from '../../lib/runCommand';
 import { assertNoFailures, runTasks } from '../../lib/runTasks';
@@ -39,6 +43,7 @@ import { logTimeEnd, logTimeStart } from '../../lib/timing';
 import { bundleViews, getViewsDistDir } from '../../lib/views';
 import { isAwsCredentialsValid } from './awsCredentials';
 import { getCdkAppCommand, getDockerDir } from './cdkApp';
+import { buildRemote, resolvePublishTarget } from './remote';
 import { deployAccountStack, deployBootstrapStack, deployDomainStack } from './stacks';
 import { getViewsS3Destinations } from './viewsSync';
 
@@ -156,6 +161,50 @@ const dockerSyncViews = async (color: number, appName: string, serviceName: stri
   }
 };
 
+// Publish one service's already-built federated remote to S3 in a throwaway
+// aws-cli container named <service>-publish. The version dir (everything the
+// manifest references) syncs first, then the manifest.json is copied last —
+// same ordering guarantee as the host-side publish, so a reading lambda never
+// sees a manifest whose files aren't all present yet. resolvePublishTarget reads
+// the manifest hash + resolved bucket/prefix from the buildRemote output.
+const dockerPublishRemote = async (color: number, appName: string, serviceName: string): Promise<void> => {
+  const { publishPath, manifestHash, bucketName, servicePrefix } = resolvePublishTarget(appName, serviceName);
+  const containerName = `${serviceName}-publish`;
+
+  // /publish is the service-remote-published dir; the hashed version subdir and
+  // manifest.json both live directly under it.
+  const s3Operations: string[][] = [
+    ['s3', 'sync', `/publish/${manifestHash}`, `s3://${bucketName}/${servicePrefix}/${manifestHash}`],
+    ['s3', 'cp', '/publish/manifest.json', `s3://${bucketName}/${servicePrefix}/manifest.json`],
+  ];
+
+  for (const s3Operation of s3Operations) {
+    await runCommandPrefixed(
+      `publish:${serviceName}`,
+      'docker',
+      [
+        'rm',
+        '-f',
+        containerName,
+        '>/dev/null',
+        '2>&1',
+        ';',
+        'docker',
+        'run',
+        '--rm',
+        '--name',
+        containerName,
+        '-v',
+        `"${publishPath}:/publish:ro"`,
+        ...AWS_ENV_PASSTHROUGH.flatMap((name) => ['-e', name]),
+        AWS_CLI_IMAGE,
+        ...s3Operation,
+      ],
+      { color },
+    );
+  }
+};
+
 export const awsGoDocker = async (appName: string, plan: DeployPlan): Promise<void> => {
   if (plan.kind === 'cancelled') {
     return;
@@ -198,16 +247,13 @@ export const awsGoDocker = async (appName: string, plan: DeployPlan): Promise<vo
   console.log('Executing for services');
   console.log(services.join(', '));
 
+  // Federated publish needs the api stack (needApi ⇒ needCdkDeploys), so any
+  // docker preflight it requires is already covered by these two checks.
   if (needCdkDeploys || viewServices.length > 0) {
     await assertDockerRunning();
   }
   if (needCdkDeploys) {
     await buildDeployerImage();
-  }
-  if (viewServices.length > 0) {
-    // Pull up front so the views wave doesn't race N containers into pulling
-    // the same image.
-    await runCommand('docker', ['pull', AWS_CLI_IMAGE]);
   }
 
   // ---- Phase 1: build everything locally ----
@@ -227,6 +273,18 @@ export const awsGoDocker = async (appName: string, plan: DeployPlan): Promise<vo
   const qpqSynthServices = [...new Set([...services, ...(needViews ? ['shell'] : [])])];
   for (const service of qpqSynthServices) {
     await synthCommand([service, '--app', appName]);
+  }
+
+  // Federated remotes are the backend story code, so republish them whenever the
+  // api stack was (re)deployed. Skips services without defineFederatedModuleStore(...).
+  // Detected here (after the workspace build) because it loads each service's config.
+  const federatedServices = needApi ? getServiceNamesWithFederation(appName, services) : [];
+
+  // The aws-cli image backs both the views sync (phase 4) and the federated
+  // publish (phase 5) waves. Pull once now so those waves don't race N containers
+  // into pulling the same image. Docker is already confirmed running above.
+  if (viewServices.length > 0 || federatedServices.length > 0) {
+    await runCommand('docker', ['pull', AWS_CLI_IMAGE]);
   }
 
   if (stacks !== 'views') {
@@ -254,6 +312,23 @@ export const awsGoDocker = async (appName: string, plan: DeployPlan): Promise<vo
         run: async () => {
           console.log(`Bundling views: [${service}]`);
           await bundleViews(appName, service);
+        },
+      })),
+      BUILD_CONCURRENCY,
+    ),
+  );
+
+  // Build the federated remotes locally now (rspack needs the workspace), so the
+  // publish wave only has to sync the already-built output — mirroring how views
+  // are bundled here and synced later.
+  assertNoFailures(
+    'Remote bundling',
+    await runTasks(
+      federatedServices.map((service) => ({
+        label: `bundle-remote:${service}`,
+        run: async () => {
+          console.log(`Bundling federated remote: [${service}]`);
+          await buildRemote(appName, service);
         },
       })),
       BUILD_CONCURRENCY,
@@ -357,6 +432,23 @@ export const awsGoDocker = async (appName: string, plan: DeployPlan): Promise<vo
       ),
     );
     logTimeEnd('viewsWave');
+  }
+
+  // ---- Phase 5: publish the pre-built federated remotes to S3, all concurrent ----
+  if (federatedServices.length > 0) {
+    console.log('\n=== Phase 5: publish federated remotes to S3 (docker) ===\n');
+    logTimeStart('publishWave');
+    assertNoFailures(
+      'Federated publish',
+      await runTasks(
+        federatedServices.map((service) => ({
+          label: `publish:${service}`,
+          run: () => dockerPublishRemote(nextPrefixColor(), appName, service),
+        })),
+        DEPLOY_CONCURRENCY,
+      ),
+    );
+    logTimeEnd('publishWave');
   }
 
   logTimeEnd('totalTime');
