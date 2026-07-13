@@ -1,6 +1,6 @@
 import { AskResponse, askStateRead } from 'quidproquo-core';
+import { WebSocketQueueServerMessageEventType } from 'quidproquo-features';
 import { WebsocketService } from 'quidproquo-web';
-import { WebSocketQueueServerMessageEventType } from 'quidproquo-webserver';
 
 import { createElement, ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';

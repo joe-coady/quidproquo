@@ -12,7 +12,7 @@ import {
   QpqPagedData,
   resolveLookupValues,
 } from 'quidproquo-core';
-import { LogLog } from 'quidproquo-webserver';
+import { LogLog } from 'quidproquo-features';
 
 import { askPlatformRequest } from '../../../platformLogic/network/askPlatformRequest';
 import { askUIVolatileLogLogSearchCompleted } from '../../actionCreators/volatile/askUIVolatileLogLogSearchCompleted';

@@ -1,4 +1,4 @@
-import { LogLog } from 'quidproquo-webserver';
+import { LogLog } from 'quidproquo-features';
 
 import { VolatileLogLogSearchPartLoadedPayload } from '../../effects/volatile/VolatileLogLogSearchPartLoadedEffect';
 import { VolatileState } from '../../VolatileState';

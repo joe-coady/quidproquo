@@ -101,10 +101,10 @@ A `WebSocketQPQWebServerConfigSetting` config setting (`configSettingType: WebSo
 
 ## Notes
 
-- `defineWebsocket` gives you the raw connect/disconnect/message hooks. If you want a batteries-included messaging layer — connection tracking, authentication, ping/pong, and typed client/server messages — use [defineWebSocketQueue](./web-socket-queue.md), which wires those three handlers to a built-in service for you.
+- `defineWebsocket` gives you the raw connect/disconnect/message hooks. If you want a batteries-included messaging layer — connection tracking, authentication, ping/pong, and typed client/server messages — use [defineWebSocketQueue](../features/web-socket-queue.md), which wires those three handlers to a built-in service for you.
 
 ## Related
 
-- [defineWebSocketQueue](./web-socket-queue.md) — a higher-level WebSocket setup that provides `eventProcessors` for you and manages connections and messaging.
-- [defineStateDispatchOverWebsockets](./state-dispatch-over-websockets.md) — pushes core State-domain dispatches to clients over the WebSocket queue.
+- [defineWebSocketQueue](../features/web-socket-queue.md) — a higher-level WebSocket setup that provides `eventProcessors` for you and manages connections and messaging.
+- [defineStateDispatchOverWebsockets](../features/state-dispatch-over-websockets.md) — pushes core State-domain dispatches to clients over the WebSocket queue.
 - [askWebsocketSendMessage](../../actions/webserver/websocket/ask-websocket-send-message.md) — send a message to a connected client by `connectionId`.

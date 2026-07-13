@@ -1,7 +1,7 @@
 import { AskResponse } from 'quidproquo-core';
-import { logsLogic } from 'quidproquo-webserver';
 
 import { askEventDocAiContextRead } from '../../../eventDocAi';
+import { logsLogic } from '../../log/logic';
 
 // Tool executor for the log chat. The model never supplies which log to read —
 // docId is the open log's correlation id, trusted from the EventDocAi session

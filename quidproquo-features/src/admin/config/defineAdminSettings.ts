@@ -14,20 +14,20 @@ import {
   QPQConfigAdvancedSettings,
   StorageDriveTier,
 } from 'quidproquo-core';
+import { defineServiceFunction } from 'quidproquo-webserver';
+
+import { defineEventDocAi } from '../../eventDocAi';
+import { getFeatureEntryQpqFunctionRuntime } from '../../getFeatureEntryQpqFunctionRuntime';
+import { defineWebSocketQueue } from '../../webSocketQueue';
+import { adminLogAiSystemPrompt } from '../constants/adminLogAiSystemPrompt';
 import {
   defineAdminServiceAuthRoute,
   defineAdminServiceLogLogRoute,
   defineAdminServiceLogRoute,
-  defineServiceFunction,
-  defineWebSocketQueue,
-  getServiceEntryQpqFunctionRuntime,
   QPQ_STORE_TRACE_RESULT_SERVICE_FUNCTION_NAME,
   QPQ_TRACE_LOG_SERVICE_FUNCTION_NAME,
   WebsocketAdminClientMessageEventType,
-} from 'quidproquo-webserver';
-
-import { defineEventDocAi } from '../../eventDocAi';
-import { adminLogAiSystemPrompt } from '../constants/adminLogAiSystemPrompt';
+} from '../log';
 import { adminUserDirectoryResourceName } from './adminUserDirectory';
 import { adminLogAiTools, defineAdminLogAiTools } from './defineAdminLogAiTools';
 import { defineAdminSessionEventDoc } from './defineAdminSessionEventDoc';
@@ -100,7 +100,7 @@ export const defineAdminSettings = (logServiceName: string, rootDomain: string, 
     defineStorageDrive(QPQ_LOGS_STORAGE_DRIVE_NAME, {
       owner: { module: logServiceName },
       onEvent: {
-        create: getServiceEntryQpqFunctionRuntime('log', 'storageDrive', 'onCreate::onCreate'),
+        create: getFeatureEntryQpqFunctionRuntime('admin/log', 'storageDrive', 'onCreate::onCreate'),
       },
       deprecated: advancedSettings?.deprecated,
       lifecycleRules: [
@@ -140,7 +140,7 @@ export const defineAdminSettings = (logServiceName: string, rootDomain: string, 
 
         // The reply channel for async traces: owning services send finished traces
         // here; this stores them and pushes a TraceDone websocket message to admins.
-        defineServiceFunction(getServiceEntryQpqFunctionRuntime('log', 'serviceFunction', 'traceStore::qpqStoreTraceResult'), {
+        defineServiceFunction(getFeatureEntryQpqFunctionRuntime('admin/log', 'serviceFunction', 'traceStore::qpqStoreTraceResult'), {
           functionName: QPQ_STORE_TRACE_RESULT_SERVICE_FUNCTION_NAME,
         }),
 
@@ -180,13 +180,13 @@ export const defineAdminSettings = (logServiceName: string, rootDomain: string, 
         defineQueue(
           'qpq-admin-websockets',
           {
-            [WebsocketAdminClientMessageEventType.MarkLogChecked]: getServiceEntryQpqFunctionRuntime(
-              'log',
+            [WebsocketAdminClientMessageEventType.MarkLogChecked]: getFeatureEntryQpqFunctionRuntime(
+              'admin/log',
               'queueEvent',
               'webSocket::onMarkLogChecked',
             ),
-            [WebsocketAdminClientMessageEventType.RefreshLogMetadata]: getServiceEntryQpqFunctionRuntime(
-              'log',
+            [WebsocketAdminClientMessageEventType.RefreshLogMetadata]: getFeatureEntryQpqFunctionRuntime(
+              'admin/log',
               'queueEvent',
               'webSocket::onRefreshLogMetadata',
             ),
@@ -205,9 +205,9 @@ export const defineAdminSettings = (logServiceName: string, rootDomain: string, 
         defineQueue(
           'admin-alarms',
           {
-            [NotifyErrorQueueEvents.Error]: getServiceEntryQpqFunctionRuntime('log', 'queueEvent', 'alarm::onError'),
-            [NotifyErrorQueueEvents.Timeout]: getServiceEntryQpqFunctionRuntime('log', 'queueEvent', 'alarm::onTimeout'),
-            [NotifyErrorQueueEvents.Throttle]: getServiceEntryQpqFunctionRuntime('log', 'queueEvent', 'alarm::onThrottle'),
+            [NotifyErrorQueueEvents.Error]: getFeatureEntryQpqFunctionRuntime('admin/log', 'queueEvent', 'alarm::onError'),
+            [NotifyErrorQueueEvents.Timeout]: getFeatureEntryQpqFunctionRuntime('admin/log', 'queueEvent', 'alarm::onTimeout'),
+            [NotifyErrorQueueEvents.Throttle]: getFeatureEntryQpqFunctionRuntime('admin/log', 'queueEvent', 'alarm::onThrottle'),
           },
           {
             eventBusSubscriptions: ['admin-notifier'],

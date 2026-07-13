@@ -16,6 +16,6 @@ describe('storageScopeContext', () => {
       return yield* askStorageScopeRead();
     }
 
-    expect(runStory(askStorageScopeProvide('tenant-a', readsScope()))).toBe('tenant-a');
+    expect(runStory(askStorageScopeProvide('scope-a', readsScope()))).toBe('scope-a');
   });
 });

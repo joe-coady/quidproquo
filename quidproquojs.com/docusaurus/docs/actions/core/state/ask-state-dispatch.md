@@ -84,4 +84,4 @@ function* askStateDispatchEffect<E extends Effect<any, any>>(
 
 - [askStateRead](./ask-state-read.md) — read the state that dispatches accumulate into.
 - [askReduceState](./ask-reduce-state.md) — run a story purely for its dispatched effects and return the reduced state.
-- [defineStateDispatchOverWebsockets](../../../config/webserver/state-dispatch-over-websockets.md) — redirect these dispatches to a connected WebSocket client.
+- [defineStateDispatchOverWebsockets](../../../config/features/state-dispatch-over-websockets.md) — redirect these dispatches to a connected WebSocket client.

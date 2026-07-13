@@ -6,7 +6,7 @@ import { askKeyValueStoreGet, KeyValueStoreGetErrorTypeEnum } from './KeyValueSt
 
 describe('askKeyValueStoreGet', () => {
   it('yields a Get action for the key', () => {
-    const options = { scope: 'tenant-a' };
+    const options = { scope: 'scope-a' };
 
     const { action } = captureRequester(askKeyValueStoreGet('users', 'user-1', options));
 

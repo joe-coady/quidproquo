@@ -49,6 +49,7 @@
     "quidproquo-eslint-config",
     "quidproquo-core",
     "quidproquo-webserver",
+    "quidproquo-features",
     "quidproquo-xstate",
     "quidproquo-config-aws",
     "quidproquo-actionprocessor-js",
@@ -65,7 +66,6 @@
     "quidproquo-web-admin",
     "quidproquo-testing",
     "quidproquo",
-    "quidproquo-features",
     "quidproquo-cli",
     "create-qpq-app"
   ],

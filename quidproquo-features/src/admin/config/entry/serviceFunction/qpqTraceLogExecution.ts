@@ -1,11 +1,11 @@
 import { askCatch, AskResponse, askTraceStory } from 'quidproquo-core';
+import { askServiceFunctionExecute, ExecuteServiceFunctionEvent } from 'quidproquo-webserver';
+
 import {
-  askServiceFunctionExecute,
-  ExecuteServiceFunctionEvent,
   QPQ_STORE_TRACE_RESULT_SERVICE_FUNCTION_NAME,
   QpqStoreTraceResultPayload,
   QpqTraceLogExecutionPayload,
-} from 'quidproquo-webserver';
+} from '../../../log/config/traceLogServiceFunction';
 
 // The per-service trace entry (defineAdminSettings exposes it from EVERY service as the
 // qpqTraceLog service function). Runs ASYNC in the service that owns the log, so

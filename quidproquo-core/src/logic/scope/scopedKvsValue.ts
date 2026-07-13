@@ -69,7 +69,7 @@ export function validateScopeSupportedForPartitionKeyType(partitionKeyType: stri
 
 // The inverse guard for UNSCOPED Scan / GetAll on a value-composed backend:
 // exclude rows whose pk carries the scope delimiter, so unscoped listings never
-// leak other tenants' (composed) rows. File-partitioned backends get this for
+// leak other scopes' (composed) rows. File-partitioned backends get this for
 // free from the file boundary.
 export function buildKvsScopeExclusionCondition(pkAttributeName: string): KvsQueryCondition {
   return {

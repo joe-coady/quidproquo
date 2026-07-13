@@ -35,7 +35,7 @@ function* askWebsocketSendMessage<T>(
 
 | Parameter | Type | Description |
 | --- | --- | --- |
-| `websocketApiName` | `string` | The `apiName` of the target [WebSocket API](../../../config/webserver/websocket.md) (the `apiName` option of [defineWebsocket](../../../config/webserver/websocket.md), or the `apiName` argument to [defineWebSocketQueue](../../../config/webserver/web-socket-queue.md)). Identifies which deployed API the connection belongs to. |
+| `websocketApiName` | `string` | The `apiName` of the target [WebSocket API](../../../config/webserver/websocket.md) (the `apiName` option of [defineWebsocket](../../../config/webserver/websocket.md), or the `apiName` argument to [defineWebSocketQueue](../../../config/features/web-socket-queue.md)). Identifies which deployed API the connection belongs to. |
 | `connectionId` | `string` | Identifier of the client connection to send to. You receive this on the `WebsocketEvent` in your connect/message handlers; persist it (e.g. keyed by user) if you need to send outside the request that created it. |
 | `payload` | `T` | The message to send. Serialized to JSON before transmission, so any JSON-serializable value works. |
 
@@ -67,5 +67,5 @@ export function* askTrySend(connectionId: string, payload: unknown) {
 ## Related
 
 - [defineWebsocket](../../../config/webserver/websocket.md) — declares the WebSocket API and its connect/disconnect/message handlers.
-- [defineWebSocketQueue](../../../config/webserver/web-socket-queue.md) — managed messaging layer that tracks connections for you.
+- [defineWebSocketQueue](../../../config/features/web-socket-queue.md) — managed messaging layer that tracks connections for you.
 - [askCatch](../../../actions/core/system/ask-catch.md) — catch the throttled/disconnected errors above.

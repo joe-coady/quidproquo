@@ -1,0 +1,29 @@
+import { QPQCoreConfigSettingType } from 'quidproquo-core';
+
+import { describe, expect, it } from 'vitest';
+
+import { getWebSocketQueueGlobalConfigKeyForConnectionScopeValidator } from '../../webSocketQueue';
+import { TENANT_CONNECTION_SCOPE_VALIDATOR_FN } from '../constants/tenantStoreNames';
+import { defineTenantedWebSocketQueue } from './defineTenantedWebSocketQueue';
+
+describe('defineTenantedWebSocketQueue', () => {
+  it('pre-wires the tenant membership check as the connection scope validator', () => {
+    const config = defineTenantedWebSocketQueue('chat-bus', 'chat', 'example.com');
+
+    const validatorGlobal = config.find(
+      (setting) =>
+        (setting as { configSettingType: string; key?: string }).configSettingType === QPQCoreConfigSettingType.global &&
+        (setting as { key?: string }).key === getWebSocketQueueGlobalConfigKeyForConnectionScopeValidator('chat'),
+    );
+
+    expect(validatorGlobal).toMatchObject({ value: TENANT_CONNECTION_SCOPE_VALIDATOR_FN });
+  });
+
+  it('forwards the remaining advanced settings to defineWebSocketQueue', () => {
+    const config = defineTenantedWebSocketQueue('chat-bus', 'chat', 'example.com', { userDirectoryName: 'users' });
+
+    // Same shape as defineWebSocketQueue: three globals, a connection kvs and a websocket.
+    expect(config).toHaveLength(5);
+    expect(config.some((setting) => (setting as { value?: unknown }).value === 'users')).toBe(true);
+  });
+});

@@ -1,6 +1,6 @@
+import { LogMetadata, WebSocketQueueQpqAdminServerEventMessageLogMetadata, WebSocketQueueQpqAdminServerMessageEventType } from 'quidproquo-features';
 import { uniqueBy } from 'quidproquo-web';
 import { useEffectCallback, useRunEvery, useSubscribeToWebSocketEvent, useThrottledMemo } from 'quidproquo-web-react';
-import { LogMetadata, WebSocketQueueQpqAdminServerEventMessageLogMetadata, WebSocketQueueQpqAdminServerMessageEventType } from 'quidproquo-webserver';
 
 import React, { useEffect, useMemo } from 'react';
 import { Box, Grid, Paper, Typography } from '@mui/material';

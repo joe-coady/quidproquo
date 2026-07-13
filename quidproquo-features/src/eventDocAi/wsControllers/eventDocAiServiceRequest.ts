@@ -1,8 +1,8 @@
 import { askConfigGetGlobal, AskResponse } from 'quidproquo-core';
-import { serviceRequest, ServiceRequester } from 'quidproquo-webserver';
 
 import { EVENT_DOC_TYPE_GLOBAL } from '../../eventDoc';
 import { askEventDocResolveActor } from '../../eventDoc';
+import { serviceRequest, ServiceRequester } from '../../webSocketQueue/logic/service';
 import { EVENT_DOC_AI_SERVICE_NAME_GLOBAL } from '../constants/eventDocAiGlobalNames';
 import type { EventDocAiDocRef } from '../models';
 import { askEventDocAiContextProvide } from '../module';

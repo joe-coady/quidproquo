@@ -31,10 +31,10 @@ describe('askFileWriteObjectJson', () => {
     expect(returned).toBeUndefined();
   });
 
-  it('forwards the tenant scope onto the payload', () => {
+  it('forwards the scope onto the payload', () => {
     const data = { hello: 'world' };
-    const { action } = captureRequester(askFileWriteObjectJson('drive', 'path/file.json', data, undefined, 'tenant-a'));
+    const { action } = captureRequester(askFileWriteObjectJson('drive', 'path/file.json', data, undefined, 'scope-a'));
 
-    expect(action.payload.scope).toBe('tenant-a');
+    expect(action.payload.scope).toBe('scope-a');
   });
 });

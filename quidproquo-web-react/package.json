@@ -45,6 +45,7 @@
     "jotai": "^2.12.1",
     "quidproquo-actionprocessor-node": "0.1.7",
     "quidproquo-actionprocessor-web": "0.1.7",
+    "quidproquo-features": "0.1.7",
     "quidproquo-web": "0.1.7",
     "quidproquo-webserver": "0.1.7",
     "symbol-observable": "^4.0.0"

@@ -6,7 +6,7 @@ import { askKeyValueStoreGetAll, KeyValueStoreGetAllErrorTypeEnum } from './KeyV
 
 describe('askKeyValueStoreGetAll', () => {
   it('yields a GetAll action with options', () => {
-    const options = { scope: 'tenant-a' };
+    const options = { scope: 'scope-a' };
 
     const { action } = captureRequester(askKeyValueStoreGetAll('users', options));
 

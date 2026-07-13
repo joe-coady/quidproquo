@@ -20,9 +20,9 @@ describe('askFileDelete', () => {
     expect(returned).toBeUndefined();
   });
 
-  it('forwards the tenant scope onto the payload', () => {
-    const { action } = captureRequester(askFileDelete('drive', ['a.txt'], 'tenant-a'));
+  it('forwards the scope onto the payload', () => {
+    const { action } = captureRequester(askFileDelete('drive', ['a.txt'], 'scope-a'));
 
-    expect(action.payload.scope).toBe('tenant-a');
+    expect(action.payload.scope).toBe('scope-a');
   });
 });

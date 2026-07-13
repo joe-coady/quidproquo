@@ -1,7 +1,7 @@
 import { AskResponse } from 'quidproquo-core';
-import { logsLogic } from 'quidproquo-webserver';
 
 import { askEventDocAiContextRead } from '../../../eventDocAi';
+import { logsLogic } from '../../log/logic';
 
 export type AdminLogAiToolGetActionDetailInput = {
   index: number;

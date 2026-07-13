@@ -12,7 +12,7 @@ export function* askKeyValueStoreScanAll<T>(
   };
 
   do {
-    // Forward the options (including any tenant scope) on every page, not just the first
+    // Forward the options (including any scope) on every page, not just the first
     data = yield* askKeyValueStoreScan<T>(storeName, filterCondition, data.nextPageKey, options);
 
     allData.push(...data.items);

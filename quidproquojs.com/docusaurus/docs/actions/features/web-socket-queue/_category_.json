@@ -1,0 +1,1 @@
+{ "label": "WebSocket queue", "link": { "type": "generated-index", "description": "Send RPC-style requests to another qpq service over the WebSocket queue." } }

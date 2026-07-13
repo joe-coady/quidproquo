@@ -7,15 +7,16 @@ import {
   askRunParallel,
   QueueEventResponse,
 } from 'quidproquo-core';
+
+import { askWebsocketReadConnectionInfo } from '../../../../webSocketQueue/context';
+import { askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend } from '../../../../webSocketQueue/logic/webSocket/askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend';
 import {
   AdminSettingDataType,
   AdminSettingFieldType,
-  askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend,
-  askWebsocketReadConnectionInfo,
   WebSocketQueueQpqAdminConfigSyncRequestQueueEvent,
   WebSocketQueueQpqAdminServerEventMessageModifySetting,
   WebSocketQueueQpqAdminServerMessageEventType,
-} from 'quidproquo-webserver';
+} from '../../../log/logic/webSocket';
 
 export function* onConfigSyncRequest(event: WebSocketQueueQpqAdminConfigSyncRequestQueueEvent): AskResponse<QueueEventResponse> {
   const [params, { connectionId, correlationId }, { module }] = yield* askRunParallel([

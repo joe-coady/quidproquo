@@ -1,6 +1,5 @@
 import { ContextActionType, runStory, StateActionType } from 'quidproquo-core';
-import { eventDocAiContext } from 'quidproquo-features';
-import { ServiceActionType } from 'quidproquo-webserver';
+import { eventDocAiContext, ServiceActionType } from 'quidproquo-features';
 
 import { describe, expect, it } from 'vitest';
 

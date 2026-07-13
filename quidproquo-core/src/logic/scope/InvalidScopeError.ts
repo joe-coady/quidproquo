@@ -1,7 +1,8 @@
 // Raised when a scope segment fails validation. Scope is an opaque identifier
-// (e.g. a tenant id) that gets embedded into file paths and kvs partition keys,
-// so a malformed one is always rejected outright - never normalized - to make
-// escaping a scope impossible by construction.
+// (supplied by a higher-level data-partitioning feature) that gets embedded
+// into file paths and kvs partition keys, so a malformed one is always
+// rejected outright - never normalized - to make escaping a scope impossible
+// by construction.
 export enum InvalidScopeErrorCode {
   // Empty or whitespace-only scope.
   empty = 'empty',

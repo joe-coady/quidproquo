@@ -1,5 +1,4 @@
 import { StoryResult } from 'quidproquo-core';
-import { useSubscribeToWebSocketEvent, useWebsocketSendEvent } from 'quidproquo-web-react';
 import {
   LogMetadata,
   WebsocketAdminClientMessageEventType,
@@ -7,7 +6,8 @@ import {
   WebSocketQueueClientEventMessageQpqAdminRefreshLogMetadata,
   WebSocketQueueQpqAdminServerEventMessageLogMetadata,
   WebSocketQueueQpqAdminServerMessageEventType,
-} from 'quidproquo-webserver';
+} from 'quidproquo-features';
+import { useSubscribeToWebSocketEvent, useWebsocketSendEvent } from 'quidproquo-web-react';
 
 import { useEffect, useState } from 'react';
 import { Box, Checkbox, CircularProgress, FormControlLabel, Typography } from '@mui/material';

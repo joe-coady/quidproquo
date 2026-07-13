@@ -16,7 +16,7 @@ export interface AiFileDrivePart {
   type: 'file';
   drive: string;
   filepath: string;
-  // Tenant scope the file lives under, for tenant-scoped drives. Forwarded to the
+  // Storage scope the file lives under, for scoped drives. Forwarded to the
   // file read at resolve time; omit for unscoped drives.
   scope?: string;
   mediaType: string;

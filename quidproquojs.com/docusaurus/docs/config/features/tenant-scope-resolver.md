@@ -47,7 +47,7 @@ The service that owns the tenant stores, e.g. `{ module: 'ca' }`. When set, the 
 
 ## Notes
 
-- Wiring is by name: pass `TENANT_SCOPE_RESOLVER_FN` as the `scopeResolver` option on [defineEventDocRoutes](./event-doc-routes.md) (or defineEventDoc), and `TENANT_CONNECTION_SCOPE_VALIDATOR_FN` as the `connectionScopeValidator` on [defineWebSocketQueue](../webserver/web-socket-queue.md).
+- Wiring is by name: pass `TENANT_SCOPE_RESOLVER_FN` as the `scopeResolver` option on [defineEventDocRoutes](./event-doc-routes.md) (or defineEventDoc), and `TENANT_CONNECTION_SCOPE_VALIDATOR_FN` as the `connectionScopeValidator` on [defineWebSocketQueue](./web-socket-queue.md).
 - The scope resolver is the generic event-doc `scopeResolver` hook, so any collection can be tenant-scoped without the event-doc feature knowing about tenants.
 - The header is never trusted alone. Even though the client picks the tenant, every request re-validates membership before the tenant id becomes the ambient storage scope.
 - The tenant collection itself (the `tenants` store) stays unscoped; it is the registry. The resolver exists so a service can scope its **other** collections.
@@ -57,5 +57,6 @@ The service that owns the tenant stores, e.g. `{ module: 'ca' }`. When set, the 
 - [defineTenant](./tenant.md): composes this (with no owner) alongside the stores and routes in the owning service.
 - [defineTenantStores](./tenant-stores.md): declares the membership table this resolver validates against.
 - [defineEventDocRoutes](./event-doc-routes.md): the `scopeResolver` option these functions plug into.
-- [defineWebSocketQueue](../webserver/web-socket-queue.md): the `connectionScopeValidator` option for the WebSocket side.
+- [defineWebSocketQueue](./web-socket-queue.md): the `connectionScopeValidator` option for the WebSocket side.
+- [defineTenantedWebSocketQueue](./tenanted-web-socket-queue.md): wires `TENANT_CONNECTION_SCOPE_VALIDATOR_FN` in for you.
 - [defineInlineFunction](../core/inline-function.md): the underlying registration mechanism.

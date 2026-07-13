@@ -6,7 +6,7 @@ import { askKeyValueStoreDelete, KeyValueStoreDeleteErrorTypeEnum } from './KeyV
 
 describe('askKeyValueStoreDelete', () => {
   it('yields a Delete action with key, sort key and options', () => {
-    const options = { scope: 'tenant-a' };
+    const options = { scope: 'scope-a' };
 
     const { action } = captureRequester(askKeyValueStoreDelete('users', 'user-1', 'sort-1', options));
 

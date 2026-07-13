@@ -31,9 +31,9 @@ describe('askFileWriteBinaryContents', () => {
     expect(returned).toBeUndefined();
   });
 
-  it('forwards the tenant scope onto the payload', () => {
-    const { action } = captureRequester(askFileWriteBinaryContents('drive', 'path/file.bin', data, undefined, 'tenant-a'));
+  it('forwards the scope onto the payload', () => {
+    const { action } = captureRequester(askFileWriteBinaryContents('drive', 'path/file.bin', data, undefined, 'scope-a'));
 
-    expect(action.payload.scope).toBe('tenant-a');
+    expect(action.payload.scope).toBe('scope-a');
   });
 });

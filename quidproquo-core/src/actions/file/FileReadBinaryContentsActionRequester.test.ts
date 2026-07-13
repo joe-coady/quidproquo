@@ -21,9 +21,9 @@ describe('askFileReadBinaryContents', () => {
     expect(returned).toBe(data);
   });
 
-  it('forwards the tenant scope onto the payload', () => {
-    const { action } = captureRequester(askFileReadBinaryContents('drive', 'path/file.bin', 'tenant-a'));
+  it('forwards the scope onto the payload', () => {
+    const { action } = captureRequester(askFileReadBinaryContents('drive', 'path/file.bin', 'scope-a'));
 
-    expect(action.payload.scope).toBe('tenant-a');
+    expect(action.payload.scope).toBe('scope-a');
   });
 });

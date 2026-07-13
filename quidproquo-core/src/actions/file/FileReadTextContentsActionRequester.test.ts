@@ -20,9 +20,9 @@ describe('askFileReadTextContents', () => {
     expect(returned).toBe('file body');
   });
 
-  it('forwards the tenant scope onto the payload', () => {
-    const { action } = captureRequester(askFileReadTextContents('drive', 'path/file.txt', 'tenant-a'));
+  it('forwards the scope onto the payload', () => {
+    const { action } = captureRequester(askFileReadTextContents('drive', 'path/file.txt', 'scope-a'));
 
-    expect(action.payload.scope).toBe('tenant-a');
+    expect(action.payload.scope).toBe('scope-a');
   });
 });

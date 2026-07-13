@@ -67,4 +67,5 @@ The single `options` argument is a `TenantRoutesOptions`:
 - [defineTenantStores](./tenant-stores.md): the store half of this helper.
 - [defineTenantScopeResolver](./tenant-scope-resolver.md): the scope-resolver half; call it directly (with `linksOwner`) in non-owning services.
 - [defineEventDocRoutes](./event-doc-routes.md): the generic CRUD mounted under `{basePath}/docs`, and home of the `scopeResolver` / `onPublish` options.
-- [defineWebSocketQueue](../webserver/web-socket-queue.md): where the tenant connection-scope validator plugs in.
+- [defineWebSocketQueue](./web-socket-queue.md): where the tenant connection-scope validator plugs in.
+- [defineTenantedWebSocketQueue](./tenanted-web-socket-queue.md): a `defineWebSocketQueue` with that validator pre-wired.

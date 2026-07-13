@@ -1,7 +1,7 @@
 import { askDateNow, askNewGuid } from 'quidproquo-core';
-import { createServiceRequester } from 'quidproquo-webserver';
 
 import { askEventDocResolveActor } from '../../eventDoc';
+import { createServiceRequester } from '../../webSocketQueue/logic/service';
 import { askEventDocAiChatUpsert } from '../data/askEventDocAiChatUpsert';
 import type { EventDocAiChatCreatePayload, EventDocAiChatSummary } from '../models';
 import { askEventDocAiContextRead } from '../module';

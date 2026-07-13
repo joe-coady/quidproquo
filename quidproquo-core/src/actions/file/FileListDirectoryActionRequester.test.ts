@@ -28,10 +28,10 @@ describe('askFileListDirectory', () => {
     expect(returned).toBe(directoryInfo);
   });
 
-  it('forwards the tenant scope onto the payload', () => {
-    const { action } = captureRequester(askFileListDirectory('drive', 'folder', 1000, undefined, 'tenant-a'));
+  it('forwards the scope onto the payload', () => {
+    const { action } = captureRequester(askFileListDirectory('drive', 'folder', 1000, undefined, 'scope-a'));
 
-    expect(action.payload.scope).toBe('tenant-a');
+    expect(action.payload.scope).toBe('scope-a');
   });
 });
 
@@ -83,7 +83,7 @@ describe('askFileListAllDirectory', () => {
     expect(result).toEqual([file('only')]);
   });
 
-  it('forwards the tenant scope on every page request', () => {
+  it('forwards the scope on every page request', () => {
     const scopes: (string | undefined)[] = [];
     const pages: { fileInfos: FileInfo[]; pageToken?: string }[] = [
       { fileInfos: [file('a')], pageToken: 'next' },
@@ -91,14 +91,14 @@ describe('askFileListAllDirectory', () => {
     ];
 
     let index = 0;
-    runStory(askFileListAllDirectory('drive', 'folder', 'tenant-a'), {
+    runStory(askFileListAllDirectory('drive', 'folder', 'scope-a'), {
       [FileActionType.ListDirectory]: (action: FileListDirectoryAction) => {
         scopes.push(action.payload.scope);
         return pages[index++];
       },
     });
 
-    expect(scopes).toEqual(['tenant-a', 'tenant-a']);
+    expect(scopes).toEqual(['scope-a', 'scope-a']);
   });
 
   it('propagates a listing failure instead of returning a partial result', () => {

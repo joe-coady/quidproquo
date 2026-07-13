@@ -1,5 +1,5 @@
 import { ErrorTypeEnum } from 'quidproquo-core';
-import { ServiceActionType } from 'quidproquo-webserver';
+import { ServiceActionType } from 'quidproquo-features';
 
 import { describe, expect, it, vi } from 'vitest';
 

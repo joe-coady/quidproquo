@@ -1,4 +1,4 @@
-import { LogLog } from 'quidproquo-webserver';
+import { LogLog } from 'quidproquo-features';
 
 import { CorrelationOpenSource, useAdminApp, useSessionState } from '../../../../adminApp';
 

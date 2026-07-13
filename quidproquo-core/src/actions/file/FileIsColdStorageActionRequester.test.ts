@@ -20,9 +20,9 @@ describe('askFileIsColdStorage', () => {
     expect(returned).toBe(false);
   });
 
-  it('forwards the tenant scope onto the payload', () => {
-    const { action } = captureRequester(askFileIsColdStorage('drive', 'path/file.txt', 'tenant-a'));
+  it('forwards the scope onto the payload', () => {
+    const { action } = captureRequester(askFileIsColdStorage('drive', 'path/file.txt', 'scope-a'));
 
-    expect(action.payload.scope).toBe('tenant-a');
+    expect(action.payload.scope).toBe('scope-a');
   });
 });

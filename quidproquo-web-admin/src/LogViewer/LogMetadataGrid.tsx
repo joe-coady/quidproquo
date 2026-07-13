@@ -1,4 +1,4 @@
-import { LogMetadata } from 'quidproquo-webserver';
+import { LogMetadata } from 'quidproquo-features';
 
 import LinearProgress from '@mui/material/LinearProgress';
 import { DataGrid, GridColDef, GridRenderCellParams, GridRowClassNameParams } from '@mui/x-data-grid';

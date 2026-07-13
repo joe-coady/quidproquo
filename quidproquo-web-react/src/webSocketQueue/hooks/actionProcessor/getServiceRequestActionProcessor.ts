@@ -1,5 +1,5 @@
 import { ActionProcessorList, actionResult, actionResultError } from 'quidproquo-core';
-import { AnyWebSocketQueueEventMessageWithCorrelation, ServiceActionType } from 'quidproquo-webserver';
+import { AnyWebSocketQueueEventMessageWithCorrelation, ServiceActionType } from 'quidproquo-features';
 
 import { RefObject } from 'react';
 

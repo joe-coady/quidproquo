@@ -26,7 +26,7 @@ const expectInvalidScope = (fn: () => unknown, code: InvalidScopeErrorCode) => {
 describe('validateScopeSegment', () => {
   it('accepts opaque ids', () => {
     expect(() => validateScopeSegment('0198f2ab-6cf2-7bbc-9c33-7a2d1f0a1c11')).not.toThrow();
-    expect(() => validateScopeSegment('tenant-abc_123')).not.toThrow();
+    expect(() => validateScopeSegment('org-abc_123')).not.toThrow();
   });
 
   it('rejects empty and whitespace-only scopes', () => {
@@ -70,7 +70,7 @@ describe('composeScopedFilePath', () => {
   });
 
   it('prefixes the scope as a single path segment', () => {
-    expect(composeScopedFilePath('tenant-a', 'a/b.txt')).toBe('tenant-a/a/b.txt');
+    expect(composeScopedFilePath('scope-a', 'a/b.txt')).toBe('scope-a/a/b.txt');
   });
 
   it('rejects an invalid scope', () => {
@@ -78,75 +78,75 @@ describe('composeScopedFilePath', () => {
   });
 
   it('rejects a filepath that could traverse out of the scope', () => {
-    expectInvalidScope(() => composeScopedFilePath('tenant-a', '../tenant-b/secret.txt'), InvalidScopeErrorCode.unsafePath);
-    expectInvalidScope(() => composeScopedFilePath('tenant-a', 'a/../../tenant-b/secret.txt'), InvalidScopeErrorCode.unsafePath);
-    expectInvalidScope(() => composeScopedFilePath('tenant-a', 'a\\..\\b.txt'), InvalidScopeErrorCode.unsafePath);
-    expectInvalidScope(() => composeScopedFilePath('tenant-a', '/etc/passwd'), InvalidScopeErrorCode.unsafePath);
-    expectInvalidScope(() => composeScopedFilePath('tenant-a', 'a\0b.txt'), InvalidScopeErrorCode.unsafePath);
+    expectInvalidScope(() => composeScopedFilePath('scope-a', '../scope-b/secret.txt'), InvalidScopeErrorCode.unsafePath);
+    expectInvalidScope(() => composeScopedFilePath('scope-a', 'a/../../scope-b/secret.txt'), InvalidScopeErrorCode.unsafePath);
+    expectInvalidScope(() => composeScopedFilePath('scope-a', 'a\\..\\b.txt'), InvalidScopeErrorCode.unsafePath);
+    expectInvalidScope(() => composeScopedFilePath('scope-a', '/etc/passwd'), InvalidScopeErrorCode.unsafePath);
+    expectInvalidScope(() => composeScopedFilePath('scope-a', 'a\0b.txt'), InvalidScopeErrorCode.unsafePath);
   });
 
   it('allows dot-prefixed names that are not traversal segments', () => {
-    expect(composeScopedFilePath('tenant-a', '.hidden/..file.txt')).toBe('tenant-a/.hidden/..file.txt');
+    expect(composeScopedFilePath('scope-a', '.hidden/..file.txt')).toBe('scope-a/.hidden/..file.txt');
   });
 });
 
 describe('composeScopedKvsValue / stripScopedKvsValue', () => {
   it('round-trips a scoped string value', () => {
-    const stored = composeScopedKvsValue('tenant-a', 'item-1');
-    expect(stored).toBe('tenant-a@@QPQSCOPE@@item-1');
-    expect(stripScopedKvsValue('tenant-a', stored)).toBe('item-1');
+    const stored = composeScopedKvsValue('scope-a', 'item-1');
+    expect(stored).toBe('scope-a@@QPQSCOPE@@item-1');
+    expect(stripScopedKvsValue('scope-a', stored)).toBe('item-1');
   });
 
   it('passes values through untouched without a scope', () => {
     expect(composeScopedKvsValue(undefined, 'item-1')).toBe('item-1');
     expect(composeScopedKvsValue(undefined, 42)).toBe(42);
-    expect(stripScopedKvsValue(undefined, 'tenant-a@@QPQSCOPE@@item-1')).toBe('tenant-a@@QPQSCOPE@@item-1');
+    expect(stripScopedKvsValue(undefined, 'scope-a@@QPQSCOPE@@item-1')).toBe('scope-a@@QPQSCOPE@@item-1');
   });
 
   it('rejects scoping a non-string value', () => {
-    expectInvalidScope(() => composeScopedKvsValue('tenant-a', 42), InvalidScopeErrorCode.unsafeCharacters);
+    expectInvalidScope(() => composeScopedKvsValue('scope-a', 42), InvalidScopeErrorCode.unsafeCharacters);
   });
 
   it('rejects a raw value containing the scope delimiter', () => {
-    // Storing 'tenant-a' + delimiter + 'x' + delimiter + 'y' would read back
+    // Storing 'scope-a' + delimiter + 'x' + delimiter + 'y' would read back
     // ambiguously, and an unscoped row carrying the delimiter must never be
     // forgeable or matchable as scoped data, so the delimiter is reserved
     // outright.
-    expectInvalidScope(() => composeScopedKvsValue('tenant-a', 'x@@QPQSCOPE@@y'), InvalidScopeErrorCode.reservedDelimiter);
+    expectInvalidScope(() => composeScopedKvsValue('scope-a', 'x@@QPQSCOPE@@y'), InvalidScopeErrorCode.reservedDelimiter);
   });
 
   // '::' is qpq's function-runtime separator and lives inside correlation ids,
   // which the log service stores as partition keys - it must round-trip fine.
   it('round-trips a value containing "::"', () => {
-    const stored = composeScopedKvsValue('tenant-a', 'onCreate::onCreate');
-    expect(stored).toBe('tenant-a@@QPQSCOPE@@onCreate::onCreate');
-    expect(stripScopedKvsValue('tenant-a', stored)).toBe('onCreate::onCreate');
+    const stored = composeScopedKvsValue('scope-a', 'onCreate::onCreate');
+    expect(stored).toBe('scope-a@@QPQSCOPE@@onCreate::onCreate');
+    expect(stripScopedKvsValue('scope-a', stored)).toBe('onCreate::onCreate');
   });
 
   it('leaves an unscoped stored value unchanged when stripping', () => {
-    expect(stripScopedKvsValue('tenant-a', 'item-1')).toBe('item-1');
-    expect(stripScopedKvsValue('tenant-a', 7)).toBe(7);
+    expect(stripScopedKvsValue('scope-a', 'item-1')).toBe('item-1');
+    expect(stripScopedKvsValue('scope-a', 7)).toBe(7);
   });
 });
 
 describe('stripScopedFilePath', () => {
   it('round-trips with composeScopedFilePath', () => {
-    expect(stripScopedFilePath('tenant-a', composeScopedFilePath('tenant-a', 'a/b.txt'))).toBe('a/b.txt');
+    expect(stripScopedFilePath('scope-a', composeScopedFilePath('scope-a', 'a/b.txt'))).toBe('a/b.txt');
   });
 
   it('passes paths through untouched without a scope', () => {
-    expect(stripScopedFilePath(undefined, 'tenant-a/a/b.txt')).toBe('tenant-a/a/b.txt');
+    expect(stripScopedFilePath(undefined, 'scope-a/a/b.txt')).toBe('scope-a/a/b.txt');
   });
 
   it('leaves an unscoped stored path unchanged', () => {
-    expect(stripScopedFilePath('tenant-a', 'a/b.txt')).toBe('a/b.txt');
+    expect(stripScopedFilePath('scope-a', 'a/b.txt')).toBe('a/b.txt');
   });
 });
 
 describe('composeScopedKvsQueryOperation', () => {
   it('rewrites both bounds of a Between condition on the partition key', () => {
     const { operation, scopedConditionCount } = composeScopedKvsQueryOperation(
-      'tenant-a',
+      'scope-a',
       { key: 'id', operation: KvsQueryOperationType.Between, valueA: 'a', valueB: 'z' },
       ['id'],
     );
@@ -155,14 +155,14 @@ describe('composeScopedKvsQueryOperation', () => {
     expect(operation).toEqual({
       key: 'id',
       operation: KvsQueryOperationType.Between,
-      valueA: 'tenant-a@@QPQSCOPE@@a',
-      valueB: 'tenant-a@@QPQSCOPE@@z',
+      valueA: 'scope-a@@QPQSCOPE@@a',
+      valueB: 'scope-a@@QPQSCOPE@@z',
     });
   });
 
   it('rejects a non-string bound on the partition key', () => {
     expectInvalidScope(
-      () => composeScopedKvsQueryOperation('tenant-a', { key: 'id', operation: KvsQueryOperationType.Between, valueA: 'a', valueB: true }, ['id']),
+      () => composeScopedKvsQueryOperation('scope-a', { key: 'id', operation: KvsQueryOperationType.Between, valueA: 'a', valueB: true }, ['id']),
       InvalidScopeErrorCode.unsafeCharacters,
     );
   });
@@ -171,13 +171,13 @@ describe('composeScopedKvsQueryOperation', () => {
 describe('validateScopedQueryConstrainsPkOrThrow', () => {
   it('passes a query that constrains the partition key', () => {
     expect(() =>
-      validateScopedQueryConstrainsPkOrThrow('tenant-a', { key: 'id', operation: KvsQueryOperationType.Equal, valueA: 'x' }, ['id']),
+      validateScopedQueryConstrainsPkOrThrow('scope-a', { key: 'id', operation: KvsQueryOperationType.Equal, valueA: 'x' }, ['id']),
     ).not.toThrow();
   });
 
   it('rejects a query that never constrains the partition key', () => {
     expectInvalidScope(
-      () => validateScopedQueryConstrainsPkOrThrow('tenant-a', { key: 'name', operation: KvsQueryOperationType.Equal, valueA: 'x' }, ['id']),
+      () => validateScopedQueryConstrainsPkOrThrow('scope-a', { key: 'name', operation: KvsQueryOperationType.Equal, valueA: 'x' }, ['id']),
       InvalidScopeErrorCode.queryMissingPartitionKey,
     );
   });
@@ -228,27 +228,27 @@ describe('validateUnscopedPkConditionValuesOrThrow', () => {
 
 describe('stripScopedKvsItem', () => {
   it('clones the item with the scope prefix stripped off its pk attribute', () => {
-    const stored = { id: 'tenant-a@@QPQSCOPE@@item-1', name: 'n' };
+    const stored = { id: 'scope-a@@QPQSCOPE@@item-1', name: 'n' };
 
-    const stripped = stripScopedKvsItem('tenant-a', stored, 'id');
+    const stripped = stripScopedKvsItem('scope-a', stored, 'id');
 
     expect(stripped).toEqual({ id: 'item-1', name: 'n' });
-    expect(stored).toEqual({ id: 'tenant-a@@QPQSCOPE@@item-1', name: 'n' });
+    expect(stored).toEqual({ id: 'scope-a@@QPQSCOPE@@item-1', name: 'n' });
   });
 
   it('returns the same item when the pk carries no prefix', () => {
     const stored = { id: 'item-1', name: 'n' };
 
-    expect(stripScopedKvsItem('tenant-a', stored, 'id')).toBe(stored);
+    expect(stripScopedKvsItem('scope-a', stored, 'id')).toBe(stored);
   });
 });
 
 describe('buildKvsScopeBeginsWithCondition', () => {
   it('builds a begins-with predicate on the pk attribute', () => {
-    expect(buildKvsScopeBeginsWithCondition('id', 'tenant-a')).toEqual({
+    expect(buildKvsScopeBeginsWithCondition('id', 'scope-a')).toEqual({
       key: 'id',
       operation: 'BeginsWith',
-      valueA: 'tenant-a@@QPQSCOPE@@',
+      valueA: 'scope-a@@QPQSCOPE@@',
     });
   });
 });

@@ -9,11 +9,12 @@ import {
   runStory,
   UserDirectoryActionType,
 } from 'quidproquo-core';
-import { WebsocketActionType, websocketConnectionInfoContext } from 'quidproquo-webserver';
+import { WebsocketActionType } from 'quidproquo-webserver';
 
 import { describe, expect, it } from 'vitest';
 
 import { EVENT_DOC_TYPE_GLOBAL, EVENT_DOC_USER_DIRECTORY_GLOBAL } from '../../eventDoc';
+import { websocketConnectionInfoContext } from '../../webSocketQueue/context';
 import { EVENT_DOC_AI_CHAT_LIST_STORE_GLOBAL, EVENT_DOC_AI_SERVICE_NAME_GLOBAL } from '../constants/eventDocAiGlobalNames';
 import { onChatCreate } from './onChatCreate';
 

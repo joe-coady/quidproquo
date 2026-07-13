@@ -157,4 +157,4 @@ Effects the reducer doesn't handle leave the state unchanged and are skipped. Us
 
 - [askStateDispatch](./ask-state-dispatch.md) — dispatch the effects this story reduces.
 - [askStateRead](./ask-state-read.md) — read the accumulated state mid-story.
-- [defineStateDispatchOverWebsockets](../../../config/webserver/state-dispatch-over-websockets.md) — stream reduced dispatches to a WebSocket client.
+- [defineStateDispatchOverWebsockets](../../../config/features/state-dispatch-over-websockets.md) — stream reduced dispatches to a WebSocket client.

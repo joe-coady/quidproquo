@@ -1,5 +1,5 @@
 import { Effect } from 'quidproquo-core';
-import { LogLog } from 'quidproquo-webserver';
+import { LogLog } from 'quidproquo-features';
 
 import { VolatileEffect } from './VolatileEffect';
 

@@ -40,4 +40,4 @@ function defineGlobal<T>(
 - [defineParameter](./parameter.md) — for values that change at runtime.
 - [defineSecret](./secret.md) — for sensitive values.
 - [defineApplicationVersion](./application-version.md) — a specialised global that records the service's version string.
-- [defineWebSocketQueue](../webserver/web-socket-queue.md) — stores its event-bus and user-directory names in globals like these.
+- [defineWebSocketQueue](../features/web-socket-queue.md) — stores its event-bus and user-directory names in globals like these.

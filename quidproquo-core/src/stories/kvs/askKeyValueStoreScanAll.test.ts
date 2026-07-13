@@ -39,11 +39,11 @@ describe('askKeyValueStoreScanAll', () => {
       return pages[action.payload.nextPageKey ?? 'start'];
     };
 
-    const result = runStory(askKeyValueStoreScanAll('items', undefined, { scope: 'tenant-a' }), {
+    const result = runStory(askKeyValueStoreScanAll('items', undefined, { scope: 'scope-a' }), {
       [KeyValueStoreActionType.Scan]: scanRecordingScope,
     });
 
     expect(result).toEqual([1, 2]);
-    expect(scopes).toEqual(['tenant-a', 'tenant-a']);
+    expect(scopes).toEqual(['scope-a', 'scope-a']);
   });
 });

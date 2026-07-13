@@ -1,6 +1,15 @@
+import path from 'node:path';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      'quidproquo-core': path.resolve(__dirname, '../quidproquo-core/src'),
+      'quidproquo-features': path.resolve(__dirname, '../quidproquo-features/src'),
+      'quidproquo-web': path.resolve(__dirname, '../quidproquo-web/src'),
+      'quidproquo-webserver': path.resolve(__dirname, '../quidproquo-webserver/src'),
+    },
+  },
   test: {
     globals: true,
     environment: 'jsdom',

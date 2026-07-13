@@ -49,11 +49,11 @@ describe('askKeyValueStoreUpdatePartialProperties', () => {
   it('forwards the options (including scope) to the update action', () => {
     const update = vi.fn((action: KeyValueStoreUpdateAction<Widget>) => action.payload);
 
-    runStory(askKeyValueStoreUpdatePartialProperties<Widget, 'id'>('widgets', 'id', { id: 'w1', count: 2 }, undefined, { scope: 'tenant-a' }), {
+    runStory(askKeyValueStoreUpdatePartialProperties<Widget, 'id'>('widgets', 'id', { id: 'w1', count: 2 }, undefined, { scope: 'scope-a' }), {
       [KeyValueStoreActionType.Update]: update,
     });
 
-    expect(update.mock.calls[0][0].payload.options).toEqual({ scope: 'tenant-a' });
+    expect(update.mock.calls[0][0].payload.options).toEqual({ scope: 'scope-a' });
   });
 
   it('throws InvalidKvsPartialPropertyError instead of silently dropping an unstorable value', () => {

@@ -26,9 +26,9 @@ describe('askFileGenerateTemporaryUploadSecureUrl', () => {
     expect(returned).toBe('https://upload');
   });
 
-  it('forwards the tenant scope onto the payload', () => {
-    const { action } = captureRequester(askFileGenerateTemporaryUploadSecureUrl('drive', 'path/file.txt', 60000, undefined, 'tenant-a'));
+  it('forwards the scope onto the payload', () => {
+    const { action } = captureRequester(askFileGenerateTemporaryUploadSecureUrl('drive', 'path/file.txt', 60000, undefined, 'scope-a'));
 
-    expect(action.payload.scope).toBe('tenant-a');
+    expect(action.payload.scope).toBe('scope-a');
   });
 });

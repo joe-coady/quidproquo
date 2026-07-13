@@ -1,5 +1,5 @@
 import { Story } from 'quidproquo-core';
-import { AnyWebSocketQueueEventMessageWithCorrelation, WebSocketQueueServerMessageEventType } from 'quidproquo-webserver';
+import { AnyWebSocketQueueEventMessageWithCorrelation, WebSocketQueueServerMessageEventType } from 'quidproquo-features';
 
 import { useRef } from 'react';
 

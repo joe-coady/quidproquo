@@ -7,7 +7,7 @@ import { askKeyValueStoreUpdate, KeyValueStoreUpdateErrorTypeEnum } from './KeyV
 describe('askKeyValueStoreUpdate', () => {
   it('yields an Update action with updates, key, sort key and options', () => {
     const updates = { set: { name: 'new' } } as any;
-    const options = { scope: 'tenant-a' };
+    const options = { scope: 'scope-a' };
 
     const { action } = captureRequester(askKeyValueStoreUpdate('users', updates, 'user-1', 'sort-1', options));
 

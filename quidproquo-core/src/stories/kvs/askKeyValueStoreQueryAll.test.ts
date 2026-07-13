@@ -7,7 +7,7 @@ import { runStory } from '../../testing/storyTesting';
 import { QpqPagedData } from '../../types';
 import { askKeyValueStoreQueryAll } from './askKeyValueStoreQueryAll';
 
-const keyCondition = { key: 'pk', operation: KvsQueryOperationType.Equal, valueA: 'tenant-1' };
+const keyCondition = { key: 'pk', operation: KvsQueryOperationType.Equal, valueA: 'scope-1' };
 
 describe('askKeyValueStoreQueryAll', () => {
   it('follows nextPageKey and concatenates every page', () => {
@@ -51,11 +51,11 @@ describe('askKeyValueStoreQueryAll', () => {
       return pages[action.payload.options?.nextPageKey ?? 'first'];
     };
 
-    const result = runStory(askKeyValueStoreQueryAll('items', keyCondition, { scope: 'tenant-a' }), {
+    const result = runStory(askKeyValueStoreQueryAll('items', keyCondition, { scope: 'scope-a' }), {
       [KeyValueStoreActionType.Query]: queryRecordingScope,
     });
 
     expect(result).toEqual(['a', 'b']);
-    expect(scopes).toEqual(['tenant-a', 'tenant-a']);
+    expect(scopes).toEqual(['scope-a', 'scope-a']);
   });
 });

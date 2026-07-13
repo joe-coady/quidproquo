@@ -1,5 +1,4 @@
-import { createServiceRequester } from 'quidproquo-webserver';
-
+import { createServiceRequester } from '../../webSocketQueue/logic/service';
 import { askEventDocAiProcessSend } from '../logic/askEventDocAiProcessSend';
 import type { EventDocAiChatSendPayload, EventDocAiChatSendResult } from '../models';
 import { askEventDocAiContextRead } from '../module';

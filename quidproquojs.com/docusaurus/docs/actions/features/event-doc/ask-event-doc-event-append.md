@@ -91,6 +91,7 @@ What the client POSTs to append an event. `modelId` and the server-stamped prove
 ## Related
 
 - [askEventDocAppendServerEvent](./ask-event-doc-append-server-event.md) — the server-authored wrapper that builds the input envelope for you.
+- [askApplyEventDocEvent](./ask-apply-event-doc-event.md) — a declarative, processor-dispatched alternative when the same verb must also run in a browser editor.
 - [askEventDocEventWrite](./ask-event-doc-event-write.md) — the low-level conditional write this composes.
 - [askEventDocEventList / EventListAll / EventLast](./ask-event-doc-event-list.md) — reading the log this appends to.
 - [askEventDocProvideStore](./ask-event-doc-provide-store.md) — provides the store context this requires.

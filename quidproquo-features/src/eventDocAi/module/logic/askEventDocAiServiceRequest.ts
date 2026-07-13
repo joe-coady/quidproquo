@@ -1,6 +1,6 @@
 import { AskResponse } from 'quidproquo-core';
-import { askServiceRequest } from 'quidproquo-webserver';
 
+import { askServiceRequest } from '../../../webSocketQueue/logic/service';
 import type { EventDocAiDocRef } from '../../models';
 import { askEventDocAiContextRead } from '../qpqContexts/eventDocAiContext';
 import { buildEventDocAiMethodName } from './buildEventDocAiMethodName';
