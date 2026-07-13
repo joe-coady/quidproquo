@@ -56,21 +56,24 @@ export class QpqCoreSecretConstruct extends QpqCoreSecretConstructBase {
     qpqDeployAwsCdkUtils.applyEnvironmentTags(this.secret, props.qpqConfig);
   }
 
-  public static authorizeActionsForRole(role: aws_iam.IRole, secretConfigs: SecretQPQConfigSetting[], qpqConfig: QPQConfig) {
-    if (secretConfigs.length > 0) {
-      role.addToPrincipalPolicy(
-        new aws_iam.PolicyStatement({
-          effect: aws_iam.Effect.ALLOW,
-          actions: ['secretsmanager:GetSecretValue'],
-          resources: secretConfigs.map((secretConfig) => {
-            const { awsRegion, awsAccountId } = resolveAwsServiceAccountInfo(qpqConfig, secretConfig.owner);
+  public static authorizeActionsForRole(scope: Construct, role: aws_iam.IRole, secretConfigs: SecretQPQConfigSetting[], qpqConfig: QPQConfig) {
+    const resources = secretConfigs.map((secretConfig) => {
+      const { awsRegion, awsAccountId } = resolveAwsServiceAccountInfo(qpqConfig, secretConfig.owner);
 
-            const secretName = awsNamingUtils.resolveConfigRuntimeResourceNameFromConfig(secretConfig.key, qpqConfig, secretConfig.owner);
+      const secretName = awsNamingUtils.resolveConfigRuntimeResourceNameFromConfig(secretConfig.key, qpqConfig, secretConfig.owner);
 
-            return `arn:aws:secretsmanager:${awsRegion}:${awsAccountId}:secret:${secretName}-*`;
-          }),
-        }),
-      );
-    }
+      return `arn:aws:secretsmanager:${awsRegion}:${awsAccountId}:secret:${secretName}-*`;
+    });
+
+    if (resources.length === 0) return;
+
+    // Off the inline DefaultPolicy (10,240-byte cap) onto managed policies.
+    qpqDeployAwsCdkUtils.attachManagedResourcePolicies(
+      scope,
+      role,
+      'webserverSecretAccess',
+      ['secretsmanager:GetSecretValue'],
+      resources,
+    );
   }
 }

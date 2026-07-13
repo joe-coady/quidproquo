@@ -58,21 +58,24 @@ export class QpqCoreParameterConstruct extends QpqCoreParameterConstructBase {
     qpqDeployAwsCdkUtils.applyEnvironmentTags(this.stringParameter, props.qpqConfig);
   }
 
-  public static authorizeActionsForRole(role: aws_iam.IRole, parameterConfigs: ParameterQPQConfigSetting[], qpqConfig: QPQConfig) {
-    if (parameterConfigs.length > 0) {
-      role.addToPrincipalPolicy(
-        new aws_iam.PolicyStatement({
-          effect: aws_iam.Effect.ALLOW,
-          actions: ['ssm:GetParameter', 'ssm:GetParameters', 'ssm:DescribeParameters'],
-          resources: parameterConfigs.map((parameterConfig) => {
-            const { awsRegion, awsAccountId } = resolveAwsServiceAccountInfo(qpqConfig, parameterConfig.owner);
+  public static authorizeActionsForRole(scope: Construct, role: aws_iam.IRole, parameterConfigs: ParameterQPQConfigSetting[], qpqConfig: QPQConfig) {
+    const resources = parameterConfigs.map((parameterConfig) => {
+      const { awsRegion, awsAccountId } = resolveAwsServiceAccountInfo(qpqConfig, parameterConfig.owner);
 
-            const paramName = awsNamingUtils.resolveConfigRuntimeResourceNameFromConfig(parameterConfig.key, qpqConfig, parameterConfig.owner);
+      const paramName = awsNamingUtils.resolveConfigRuntimeResourceNameFromConfig(parameterConfig.key, qpqConfig, parameterConfig.owner);
 
-            return `arn:aws:ssm:${awsRegion}:${awsAccountId}:parameter/${paramName}`;
-          }),
-        }),
-      );
-    }
+      return `arn:aws:ssm:${awsRegion}:${awsAccountId}:parameter/${paramName}`;
+    });
+
+    if (resources.length === 0) return;
+
+    // Off the inline DefaultPolicy (10,240-byte cap) onto managed policies.
+    qpqDeployAwsCdkUtils.attachManagedResourcePolicies(
+      scope,
+      role,
+      'webserverParameterAccess',
+      ['ssm:GetParameter', 'ssm:GetParameters', 'ssm:DescribeParameters'],
+      resources,
+    );
   }
 }

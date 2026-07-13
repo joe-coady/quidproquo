@@ -171,7 +171,7 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
     }
   }
 
-  public static authorizeActionsForRole(role: aws_iam.IRole, qpqConfig: QPQConfig, ownedStorageDrives: QpqCoreStorageDriveConstruct[]) {
+  public static authorizeActionsForRole(scope: Construct, role: aws_iam.IRole, qpqConfig: QPQConfig, ownedStorageDrives: QpqCoreStorageDriveConstruct[]) {
     // CDK-known ARNs for drives created in this stack.
     const ownedArns = ownedStorageDrives.flatMap((sd) => [sd.bucket.bucketArn, sd.bucket.arnForObjects('*')]);
 
@@ -195,12 +195,14 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
     const resources = [...ownedArns, ...foreignArns];
     if (resources.length === 0) return;
 
-    role.addToPrincipalPolicy(
-      new aws_iam.PolicyStatement({
-        effect: aws_iam.Effect.ALLOW,
-        actions: ['s3:GetObject', 's3:PutObject', 's3:DeleteObject', 's3:ListBucket'],
-        resources,
-      }),
+    // Off the inline DefaultPolicy (10,240-byte cap) onto managed policies — the
+    // drive ARN list grows with every eventDoc collection's asset bucket.
+    qpqDeployAwsCdkUtils.attachManagedResourcePolicies(
+      scope,
+      role,
+      'webserverStorageDriveAccess',
+      ['s3:GetObject', 's3:PutObject', 's3:DeleteObject', 's3:ListBucket'],
+      resources,
     );
 
     // Grant KMS permissions for any encrypted drives (owned or foreign) whose

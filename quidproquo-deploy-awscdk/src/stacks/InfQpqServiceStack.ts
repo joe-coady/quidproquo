@@ -44,7 +44,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
           allowCloudFrontRead: qpqWebServerUtils.isStorageDriveWebEntryOrigin(props.qpqConfig, setting.storageDrive),
         }),
     );
-    QpqCoreStorageDriveConstruct.authorizeActionsForRole(webserverRole, props.qpqConfig, storageDrives);
+    QpqCoreStorageDriveConstruct.authorizeActionsForRole(this, webserverRole, props.qpqConfig, storageDrives);
     // end storage drives
 
     // Build the parameters
@@ -56,7 +56,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
           parameterConfig: setting,
         }),
     );
-    QpqCoreParameterConstruct.authorizeActionsForRole(webserverRole, qpqCoreUtils.getAllParameterConfigs(props.qpqConfig), props.qpqConfig);
+    QpqCoreParameterConstruct.authorizeActionsForRole(this, webserverRole, qpqCoreUtils.getAllParameterConfigs(props.qpqConfig), props.qpqConfig);
     // end parameters
 
     // Secrets
@@ -68,7 +68,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
           secretConfig: setting,
         }),
     );
-    QpqCoreSecretConstruct.authorizeActionsForRole(webserverRole, qpqCoreUtils.getAllSecretConfigs(props.qpqConfig), props.qpqConfig);
+    QpqCoreSecretConstruct.authorizeActionsForRole(this, webserverRole, qpqCoreUtils.getAllSecretConfigs(props.qpqConfig), props.qpqConfig);
     // end secrets
 
     // Queues
@@ -124,7 +124,7 @@ export class InfQpqServiceStack extends QpqServiceStack {
           keyValueStoreConfig: setting,
         }),
     );
-    QpqCoreKeyValueStoreConstruct.authorizeActionsForRole(webserverRole, props.qpqConfig, keyValueStores);
+    QpqCoreKeyValueStoreConstruct.authorizeActionsForRole(this, webserverRole, props.qpqConfig, keyValueStores);
     // end key value store
 
     // Graph Databases

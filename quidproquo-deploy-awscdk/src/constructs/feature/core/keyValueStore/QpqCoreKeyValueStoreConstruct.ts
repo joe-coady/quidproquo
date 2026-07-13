@@ -145,7 +145,7 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
     }
   }
 
-  public static authorizeActionsForRole(role: aws_iam.IRole, qpqConfig: QPQConfig, ownedKvsList: QpqCoreKeyValueStoreConstruct[]) {
+  public static authorizeActionsForRole(scope: Construct, role: aws_iam.IRole, qpqConfig: QPQConfig, ownedKvsList: QpqCoreKeyValueStoreConstruct[]) {
     // CDK-known ARNs for tables created in this stack (+ GSI ARNs).
     const ownedArns = ownedKvsList.flatMap((kvs) => [kvs.table.tableArn, `${kvs.table.tableArn}/index/*`]);
 
@@ -165,12 +165,12 @@ export class QpqCoreKeyValueStoreConstruct extends QpqCoreKeyValueStoreConstruct
     const resources = [...ownedArns, ...foreignArns];
     if (resources.length === 0) return;
 
-    role.addToPrincipalPolicy(
-      new aws_iam.PolicyStatement({
-        effect: aws_iam.Effect.ALLOW,
-        actions: ['dynamodb:GetItem', 'dynamodb:PutItem', 'dynamodb:Query', 'dynamodb:Scan', 'dynamodb:UpdateItem', 'dynamodb:DeleteItem'],
-        resources,
-      }),
+    qpqDeployAwsCdkUtils.attachManagedResourcePolicies(
+      scope,
+      role,
+      'webserverKeyValueStoreAccess',
+      ['dynamodb:GetItem', 'dynamodb:PutItem', 'dynamodb:Query', 'dynamodb:Scan', 'dynamodb:UpdateItem', 'dynamodb:DeleteItem'],
+      resources,
     );
 
     // Grant KMS permissions for any encrypted KVSs (owned or foreign) whose

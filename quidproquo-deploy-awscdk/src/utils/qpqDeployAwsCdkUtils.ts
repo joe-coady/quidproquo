@@ -24,3 +24,40 @@ export const applyEnvironmentTags = (scope: IConstruct, qpqConfig: QPQConfig) =>
     cdk.Tags.of(scope).add('feature', feature);
   }
 };
+
+// A role's INLINE policies are capped at 10,240 bytes in aggregate, and the
+// resource-scoped grants (S3 drives, DynamoDB tables, SSM params, secrets — owned
+// + foreign, two exact ARNs apiece) blow that cap as a service accumulates stores
+// (every eventDoc collection adds several). Attach those grants as customer-managed
+// policies instead: managed policies are a separate budget (6,144 bytes each, many
+// attachable per role). Same actions + exact ARNs as before — just packaged off the
+// inline DefaultPolicy. The ARN list is chunked so no single managed policy overflows
+// its own limit.
+//
+// ~40 ARNs/policy keeps each document well under 6,144 bytes even for long names; a
+// service would need hundreds of referenced resources to approach the (default 10)
+// managed-policies-per-role quota.
+const MANAGED_POLICY_RESOURCE_CHUNK = 40;
+
+export const attachManagedResourcePolicies = (
+  scope: Construct,
+  role: cdk.aws_iam.IRole,
+  idPrefix: string,
+  actions: string[],
+  resources: string[],
+): void => {
+  for (let start = 0; start < resources.length; start += MANAGED_POLICY_RESOURCE_CHUNK) {
+    const chunkIndex = start / MANAGED_POLICY_RESOURCE_CHUNK;
+
+    new cdk.aws_iam.ManagedPolicy(scope, `${idPrefix}${chunkIndex}`, {
+      roles: [role],
+      statements: [
+        new cdk.aws_iam.PolicyStatement({
+          effect: cdk.aws_iam.Effect.ALLOW,
+          actions,
+          resources: resources.slice(start, start + MANAGED_POLICY_RESOURCE_CHUNK),
+        }),
+      ],
+    });
+  }
+};
