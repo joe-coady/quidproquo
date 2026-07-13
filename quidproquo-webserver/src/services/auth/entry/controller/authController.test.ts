@@ -1,4 +1,4 @@
-import { Action, AuthenticateUserChallenge, ConfigActionType, runStory, UserDirectoryActionType } from 'quidproquo-core';
+import { Action, AuthenticateUserChallenge, ConfigActionType, ErrorTypeEnum, runStory, StoryError, UserDirectoryActionType } from 'quidproquo-core';
 
 import { describe, expect, it } from 'vitest';
 
@@ -25,6 +25,18 @@ const jsonEvent = (body: unknown, headers: HTTPEvent['headers'] = {}): HTTPEvent
     isBase64Encoded: false,
   }) as HTTPEvent;
 
+// Runs a story that is expected to die with a typed StoryError and asserts its
+// errorType, so each failure-path test reads as one line.
+const expectStoryErrorType = (run: () => unknown, errorType: ErrorTypeEnum) => {
+  try {
+    run();
+    throw new Error('expected a StoryError');
+  } catch (e) {
+    expect(e).toBeInstanceOf(StoryError);
+    expect((e as StoryError).errorType).toBe(errorType);
+  }
+};
+
 describe('login', () => {
   it('logs in and returns the auth response as json', () => {
     const authResponse = { challenge: AuthenticateUserChallenge.NONE };
@@ -36,6 +48,11 @@ describe('login', () => {
 
     expect(response.status).toBe(200);
     expect(JSON.parse(response.body!)).toEqual(authResponse);
+  });
+
+  it('rejects a payload with a missing or empty field as Invalid', () => {
+    expectStoryErrorType(() => runStory(login(jsonEvent({ username: 'a@b.com' }))), ErrorTypeEnum.Invalid);
+    expectStoryErrorType(() => runStory(login(jsonEvent({ username: 'a@b.com', password: '' }))), ErrorTypeEnum.Invalid);
   });
 });
 
@@ -50,6 +67,10 @@ describe('refreshToken', () => {
 
     expect(JSON.parse(response.body!)).toEqual(authResponse);
   });
+
+  it('rejects a payload without a refresh token as Invalid', () => {
+    expectStoryErrorType(() => runStory(refreshToken(jsonEvent({}))), ErrorTypeEnum.Invalid);
+  });
 });
 
 describe('associateSoftwareToken', () => {
@@ -62,6 +83,10 @@ describe('associateSoftwareToken', () => {
     });
 
     expect(JSON.parse(response.body!)).toEqual(tokenResult);
+  });
+
+  it('rejects a payload without a session as Invalid', () => {
+    expectStoryErrorType(() => runStory(associateSoftwareToken(jsonEvent({}))), ErrorTypeEnum.Invalid);
   });
 });
 
@@ -76,6 +101,10 @@ describe('forgotPassword', () => {
 
     expect(JSON.parse(response.body!)).toEqual(deliveryDetails);
   });
+
+  it('rejects a payload without a username as Invalid', () => {
+    expectStoryErrorType(() => runStory(forgotPassword(jsonEvent({}))), ErrorTypeEnum.Invalid);
+  });
 });
 
 describe('confirmForgotPassword', () => {
@@ -88,6 +117,10 @@ describe('confirmForgotPassword', () => {
     });
 
     expect(JSON.parse(response.body!)).toEqual(authResponse);
+  });
+
+  it('rejects a payload without a code as Invalid', () => {
+    expectStoryErrorType(() => runStory(confirmForgotPassword(jsonEvent({ username: 'a@b.com', password: 'pw' }))), ErrorTypeEnum.Invalid);
   });
 });
 
@@ -104,6 +137,17 @@ describe('changePassword', () => {
 
     expect(captured?.payload).toEqual({ oldPassword: 'old', newPassword: 'new', accessToken: 'access-tok' });
     expect(JSON.parse(response.body!)).toEqual({ success: true });
+  });
+
+  it('rejects a payload without a new password as Invalid', () => {
+    expectStoryErrorType(
+      () => runStory(changePassword(jsonEvent({ oldPassword: 'old' }, { authorization: 'Bearer access-tok' }))),
+      ErrorTypeEnum.Invalid,
+    );
+  });
+
+  it('rejects a request without an access token as Unauthorized', () => {
+    expectStoryErrorType(() => runStory(changePassword(jsonEvent({ oldPassword: 'old', newPassword: 'new' }))), ErrorTypeEnum.Unauthorized);
   });
 });
 
@@ -141,9 +185,24 @@ describe('respondToAuthChallenge', () => {
     },
   );
 
-  it('throws for an unsupported challenge type', () => {
-    expect(() => runStory(respondToAuthChallenge(jsonEvent({ email: 'a@b.com', session: 's', challenge: AuthenticateUserChallenge.NONE })))).toThrow(
-      'Unsupported auth challenge',
+  it('rejects an unsupported challenge type as BadRequest', () => {
+    expectStoryErrorType(
+      () => runStory(respondToAuthChallenge(jsonEvent({ email: 'a@b.com', session: 's', challenge: AuthenticateUserChallenge.NONE }))),
+      ErrorTypeEnum.BadRequest,
+    );
+  });
+
+  it('rejects a known challenge type missing its credential field as BadRequest', () => {
+    expectStoryErrorType(
+      () => runStory(respondToAuthChallenge(jsonEvent({ email: 'a@b.com', session: 's', challenge: AuthenticateUserChallenge.NEW_PASSWORD_REQUIRED }))),
+      ErrorTypeEnum.BadRequest,
+    );
+  });
+
+  it('rejects a payload without a session as Invalid', () => {
+    expectStoryErrorType(
+      () => runStory(respondToAuthChallenge(jsonEvent({ email: 'a@b.com', challenge: AuthenticateUserChallenge.SOFTWARE_TOKEN_MFA, mfaCode: '1' }))),
+      ErrorTypeEnum.Invalid,
     );
   });
 });

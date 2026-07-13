@@ -1,4 +1,4 @@
-import { Action, ActionProcessor, ActionRequester, ContextListAction, QpqContext } from 'quidproquo-core';
+import { Action, ActionProcessor, ActionRequester } from 'quidproquo-core';
 
 import { DnsActionType } from './DnsActionType';
 

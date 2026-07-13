@@ -1,16 +1,19 @@
 import {
   actionResult,
+  actionResultError,
   buildActionProcessorList,
   buildTestQpqConfig,
   buildTestStorySession,
   createStreamRegistry,
   createStubLogger,
+  ErrorTypeEnum,
   EventActionType,
   noopDynamicModuleLoader,
 } from 'quidproquo-core';
 
 import { describe, expect, it } from 'vitest';
 
+import { ApiKeyValidationActionType } from '../../actions/apiKeyValidation';
 import { RouteAuthValidationActionType } from '../../actions/routeAuthValidation';
 import { defineDns } from '../../config/settings/dns';
 import { RouteOptions } from '../../config/settings/route';
@@ -56,6 +59,57 @@ describe('getHttpApiEventAutoRespondActionProcessor', () => {
     );
 
     expect(response.status).toBe(401);
+  });
+
+  it('passes through (null) when auth validation succeeds', async () => {
+    const [response] = await invoke(
+      { method: 'GET', headers: {} },
+      { routeAuthSettings: { userDirectoryName: 'users' } },
+      { [RouteAuthValidationActionType.Decode]: async () => actionResult({ wasValid: true, userId: 'u1' }) },
+    );
+
+    expect(response).toBeNull();
+  });
+
+  it('responds 401 when the decode action itself errors (fails closed)', async () => {
+    const [response] = await invoke(
+      { method: 'GET', headers: {} },
+      { routeAuthSettings: { userDirectoryName: 'users' } },
+      { [RouteAuthValidationActionType.Decode]: async () => actionResultError(ErrorTypeEnum.GenericError, 'decode blew up') },
+    );
+
+    expect(response.status).toBe(401);
+  });
+
+  it('responds 401 when the route requires an api key and none is presented (default deny)', async () => {
+    // Validate is mocked permissive to prove the missing header alone denies the request
+    const [response] = await invoke(
+      { method: 'GET', headers: {} },
+      { routeAuthSettings: { apiKeys: [{ name: 'primary' }] } },
+      { [ApiKeyValidationActionType.Validate]: async () => actionResult(true) },
+    );
+
+    expect(response.status).toBe(401);
+  });
+
+  it('responds 401 when the presented api key does not validate', async () => {
+    const [response] = await invoke(
+      { method: 'GET', headers: { 'x-api-key': 'wrong' } },
+      { routeAuthSettings: { apiKeys: [{ name: 'primary' }] } },
+      { [ApiKeyValidationActionType.Validate]: async () => actionResult(false) },
+    );
+
+    expect(response.status).toBe(401);
+  });
+
+  it('passes through (null) when the presented api key validates', async () => {
+    const [response] = await invoke(
+      { method: 'GET', headers: { 'x-api-key': 'right' } },
+      { routeAuthSettings: { apiKeys: [{ name: 'primary' }] } },
+      { [ApiKeyValidationActionType.Validate]: async () => actionResult(true) },
+    );
+
+    expect(response).toBeNull();
   });
 
   it('responds with the mapped status and error body when the record carries a file upload error', async () => {

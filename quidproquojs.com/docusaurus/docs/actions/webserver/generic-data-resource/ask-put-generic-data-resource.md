@@ -9,6 +9,10 @@ Writes a single item into a **generic data resource** — a named table addresse
 
 - **Action type:** `GenericDataResourceActionTypeEnum.Put`
 
+:::warning Not implemented by any runtime
+No action processor currently implements this action on any platform (AWS, dev server, or browser). Yielding it from a story will fail at runtime with an unknown-action error. The action type exists so tooling (like the admin log viewer) can label historical log entries. Use a [key-value store](../../../config/core/key-value-store.md) for application data.
+:::
+
 ```typescript
 import { askPutGenericDataResource } from 'quidproquo-webserver';
 
