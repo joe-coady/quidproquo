@@ -17,14 +17,29 @@ export type DynamicRouteKnownErrors = {
 export const isDynamicRouteErrorCode = (value: DynamicRouteErrorCode | DynamicRouteErrorCodeWithMessage): value is DynamicRouteErrorCode =>
   typeof value === 'number';
 
+// The route config carried alongside the handler, harvested by defineDynamicRoutes
+export interface DynamicRouteMeta {
+  method: HTTPMethod;
+  path: string;
+  options?: RouteOptions;
+  version: number;
+}
+
+// A story handler branded with its own route config. The `S` param keeps the
+// path-param typing available to anyone calling the handler directly; the brand
+// lets defineDynamicRoutes accept a controller module without falling back to `any`.
+export type DynamicRouteHandler<S extends string = string> = ((event: HTTPEvent, params: ExtractRouteParams<S>) => AskResponse<HTTPEventResponse>) & {
+  dynamicRoute: DynamicRouteMeta;
+};
+
 export const dynamicRoute = <S extends string>(
   settings: [HTTPMethod, S] | [HTTPMethod, S, number] | [HTTPMethod, S, number, RouteOptions],
   runtime: (event: HTTPEvent, params: ExtractRouteParams<S>) => AskResponse<HTTPEventResponse>,
   knownErrors?: DynamicRouteKnownErrors,
-) => {
+): DynamicRouteHandler<S> => {
   const [method, path, version, options] = settings;
 
-  const wrapper = function* wrapper(event: HTTPEvent, params: ExtractRouteParams<S>) {
+  const wrapper = function* wrapper(event: HTTPEvent, params: ExtractRouteParams<S>): AskResponse<HTTPEventResponse> {
     const res = yield* askCatch(runtime(event, params));
 
     if (!res.success) {
@@ -56,13 +71,16 @@ export const dynamicRoute = <S extends string>(
         );
       }
 
-      yield* askThrowError(res.error.errorType, res.error.errorText);
+      // askThrowError yields a ThrowError action that terminates the handler at
+      // runtime; the `return` just tells the type system this branch never falls
+      // through, so `res` narrows to the success case below.
+      return yield* askThrowError<HTTPEventResponse>(res.error.errorType, res.error.errorText);
     }
 
     return res.result;
   };
 
-  wrapper.dynamicRoute = { method, path, options, version: version || 1 };
-
-  return wrapper;
+  return Object.assign(wrapper, {
+    dynamicRoute: { method, path, options, version: version || 1 },
+  });
 };

@@ -1,25 +1,30 @@
 ---
 title: defineTenant
-description: Wire up org/tenant support for a service (the tenant stores, publish sync, scope resolver, and tenant routes) in one call.
+description: Wire up org/tenant support across every service in one call — the registry (stores, publish sync, routes) on the owner, the scope resolver everywhere.
 ---
 
 # defineTenant
 
-Wires up **everything a service needs for org/tenant support** in a single call. It returns a `QPQConfig` (an array of config settings) composed of:
+Wires up **everything for org/tenant support**, declared identically in every service that needs it. You always pass the same `owner`; what actually materializes depends on whether the current module is that owner. It returns a `QPQConfig` (an array of config settings) composed of:
 
-- The tenant stores ([defineTenantStores](./tenant-stores.md)): the tenant event-doc collection plus the materialized record table and the membership links table.
-- The publish-to-record-store sync: an [inline function](../core/inline-function.md) (`askTenantOnPublish`) that runs on every published tenant document, re-folds the full event log, and upserts the resulting `TenantRecord`. It is a plain upsert of the fold result, so publish retries and repair re-runs are safe.
-- The scope resolver ([defineTenantScopeResolver](./tenant-scope-resolver.md), with no owner): the inline functions this service uses to tenant-scope its **other** collections. The tenant collection itself stays unscoped; it is the registry.
-- The generic event-doc CRUD under `{basePath}/docs` ([defineEventDocRoutes](./event-doc-routes.md) for the `tenants` store, `tenant` type, with the publish sync wired in as `onPublish`).
-- The tenant-specific routes at `{basePath}`: list my tenants, create, and get record.
+- The scope-resolver and connection-scope-validator [inline functions](../core/inline-function.md) (`TENANT_SCOPE_RESOLVER_FN`, `TENANT_CONNECTION_SCOPE_VALIDATOR_FN`) — registered in **every** service, so each can tenant-scope its own collections and WebSocket connections. The tenant collection itself stays unscoped; it is the registry.
+- The `userTenantLinks` membership table ([key-value store](../core/key-value-store.md)) — declared with `owner` everywhere, so non-owner services get a cross-module reference to the owner's table instead of their own copy.
+- Everything else, gated to the owner's deploy only via [defineServiceSettings](../core/service-settings.md):
+  - The tenant stores ([defineTenantStores](./tenant-stores.md)): the tenant event-doc collection plus the materialized record table.
+  - The publish-to-record-store sync: an inline function (`askTenantOnPublish`) that runs on every published tenant document, re-folds the full event log, and upserts the resulting `TenantRecord`. It is a plain upsert of the fold result, so publish retries and repair re-runs are safe.
+  - The generic event-doc CRUD under `{basePath}/docs` ([defineEventDocRoutes](./event-doc-routes.md) for the `tenants` store, `tenant` type, with the publish sync wired in as `onPublish`).
+  - The tenant-specific routes at `{basePath}`: list my tenants, create, and get record.
 
-- **On AWS:** deploys everything [defineTenantStores](./tenant-stores.md) deploys (three DynamoDB tables and an S3 bucket) plus the API Gateway routes and Lambda handlers from [defineEventDocRoutes](./event-doc-routes.md) and the three tenant routes below. The inline functions deploy no infrastructure of their own.
+- **On AWS:** on the owner's deploy, this deploys everything [defineTenantStores](./tenant-stores.md) deploys (two DynamoDB tables and an S3 bucket) plus the API Gateway routes and Lambda handlers from [defineEventDocRoutes](./event-doc-routes.md) and the three tenant routes below. On every other service's deploy, only the `userTenantLinks` reference resolves (no new table); the inline functions deploy no infrastructure of their own anywhere.
 
 ```typescript
 import { defineTenant } from 'quidproquo-features';
 
+// Declare identically in every service — the owner service and any other
+// service that needs to tenant-scope its own collections.
 export default [
   ...defineTenant({
+    owner: { module: 'ca' },
     basePath: '/tenants',
     routeAuthSettings: { userDirectoryName: 'users' },
   }),
@@ -41,31 +46,33 @@ On top of these, the full generic event-doc route set (create, append, list, ass
 ## Signature
 
 ```typescript
-function defineTenant(options: TenantRoutesOptions): QPQConfig;
+function defineTenant(options: TenantOptions): QPQConfig;
 ```
 
 ## Parameters
 
-The single `options` argument is a `TenantRoutesOptions`:
+The single `options` argument is a `TenantOptions` (a `TenantRoutesOptions` plus `owner`):
 
 | Property | Type | Default | Description |
 | --- | --- | --- | --- |
-| `basePath` | `` `/${string}` `` | – (required) | URL prefix the tenant routes mount under, e.g. `/tenants`. The generic event-doc CRUD mounts under `{basePath}/docs`. |
-| `routeAuthSettings` | `RouteAuthSettings` | – (required) | Auth applied to every mounted route (see [route](../webserver/route.md)). Required here, unlike the generic event-doc routes: tenant routes are meaningless unauthenticated, since membership keys off the user. |
-| `version` | `number` | `1` | Version number for the `/v{version}` path prefix on every route. |
-| `tenantHeaderName` | `string` | `'x-qpq-tenant-id'` | The header the client sends its selected tenant id on. Exposed to the tenant routes as the `tenantHeaderName` global, which the [scope resolver](./tenant-scope-resolver.md) reads. |
+| `owner` | `CrossModuleOwner & { module: string }` | – (required) | The service that owns the tenant registry, e.g. `{ module: 'ca' }`. Pass the **same** value in every service's `defineTenant` call; the registry (stores, publish sync, management routes) only materializes when the deploying module matches this. |
+| `basePath` | `` `/${string}` `` | – (required) | URL prefix the tenant routes mount under, e.g. `/tenants`. The generic event-doc CRUD mounts under `{basePath}/docs`. Only used on the owner's deploy, but required on every call for type consistency across services. |
+| `routeAuthSettings` | `RouteAuthSettings` | – (required) | Auth applied to every mounted route (see [route](../webserver/route.md)). Required here, unlike the generic event-doc routes: tenant routes are meaningless unauthenticated, since membership keys off the user. Only used on the owner's deploy. |
+| `version` | `number` | `1` | Version number for the `/v{version}` path prefix on every route. Only used on the owner's deploy. |
+| `tenantHeaderName` | `string` | `'x-qpq-tenant-id'` | The header the client sends its selected tenant id on. Exposed to the tenant routes as the `tenantHeaderName` global, which the scope resolver reads. |
 
 ## Notes
 
 - Tenant state is event-sourced: the `tenants` event-doc collection is the audit-trailed source of truth, and the `tenantRecords` table is a read model synced on publish. Request handlers never write the record table directly.
 - The `TenantRecord` produced by the publish sync carries `tenantId`, `name`, `brandColors`, `logoUrl`, `createdAt`, `updatedAt`, `createdByUserId`, and a `status` derived from the summary (`deleted` when the summary has a `deletedAt`, otherwise `active`).
-- `defineTenant` registers the scope resolver but does not apply it to anything. To tenant-scope one of your own collections, pass `TENANT_SCOPE_RESOLVER_FN` as that collection's `scopeResolver` option; see [defineTenantScopeResolver](./tenant-scope-resolver.md).
-- Other services that need to validate tenant membership (without owning these stores) call [defineTenantScopeResolver](./tenant-scope-resolver.md) with a `linksOwner` pointing at the service that ran `defineTenant`.
+- `defineTenant` registers the scope resolver but does not apply it to anything. To tenant-scope one of your own collections, pass `TENANT_SCOPE_RESOLVER_FN` as that collection's `scopeResolver` option (or use [defineTenantedEventDoc](./tenanted-event-doc.md), which does this for you).
+- Every service — owner and non-owner alike — calls `defineTenant` with the same `owner`. There is no separate call for non-owning services anymore: the gating happens internally via [defineServiceSettings](../core/service-settings.md).
 
 ## Related
 
-- [defineTenantStores](./tenant-stores.md): the store half of this helper.
-- [defineTenantScopeResolver](./tenant-scope-resolver.md): the scope-resolver half; call it directly (with `linksOwner`) in non-owning services.
+- [defineTenantStores](./tenant-stores.md): the store half of this helper (owner-only).
+- [defineTenantedEventDoc](./tenanted-event-doc.md): a `defineEventDoc` with `TENANT_SCOPE_RESOLVER_FN` pre-wired as `scopeResolver`.
 - [defineEventDocRoutes](./event-doc-routes.md): the generic CRUD mounted under `{basePath}/docs`, and home of the `scopeResolver` / `onPublish` options.
 - [defineWebSocketQueue](./web-socket-queue.md): where the tenant connection-scope validator plugs in.
 - [defineTenantedWebSocketQueue](./tenanted-web-socket-queue.md): a `defineWebSocketQueue` with that validator pre-wired.
+- [defineServiceSettings](../core/service-settings.md): the per-module gating mechanism this uses to materialize the registry only on the owner.

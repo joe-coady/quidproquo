@@ -9,8 +9,7 @@ export type QPQConfigAdvancedTenantedWebsocketQueueSettings = Omit<QPQConfigAdva
 // connection scope validator, so a scope claimed in the ws Authenticate
 // handshake is only stored when the user belongs to that tenant. The deploying
 // service must still register the validator implementation by calling
-// defineTenantScopeResolver (pass linksOwner when it does not own the tenant
-// stores).
+// defineTenant.
 export const defineTenantedWebSocketQueue = (
   eventBusName: string,
   apiName: string,

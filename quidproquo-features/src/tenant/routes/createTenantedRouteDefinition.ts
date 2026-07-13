@@ -1,0 +1,39 @@
+import { AskResponse, HTTPMethod } from 'quidproquo-core';
+import { HTTPEvent, HTTPEventResponse, RouteOptions } from 'quidproquo-webserver';
+
+import { createRouteDefinition, DynamicRouteHandler, DynamicRouteKnownErrors, ExtractRouteParams, RouteDefinition } from '../../routes';
+import { askTenantProvideRequestScope } from '../logic';
+
+// Like createRouteDefinition, but every handler runs inside the request's tenant
+// scope. The userDirectoryName is used twice: the gateway authenticates the JWT
+// against it (routeAuthSettings), and askTenantProvideRequestScope resolves the
+// tenant header against it (membership-checked, Forbidden on no access) then runs
+// the handler under that storage scope. No header = Personal, unscoped. Handlers
+// no longer wrap themselves with askTenantProvideRequestScope.
+export const createTenantedRouteDefinition = (
+  userDirectoryName: string,
+  options: RouteOptions = {},
+  commonKnownErrors: DynamicRouteKnownErrors = {},
+): RouteDefinition => {
+  const tenantedOptions: RouteOptions = {
+    ...options,
+    routeAuthSettings: {
+      ...options.routeAuthSettings,
+      userDirectoryName,
+    },
+  };
+
+  const routeDefinition = createRouteDefinition(tenantedOptions, commonKnownErrors);
+
+  return <S extends string>(
+    settings: [HTTPMethod, S] | [HTTPMethod, S, number],
+    runtime: (event: HTTPEvent, params: ExtractRouteParams<S>) => AskResponse<HTTPEventResponse>,
+    knownErrors?: DynamicRouteKnownErrors,
+  ): DynamicRouteHandler<S> => {
+    // Scope the whole handler to the request's tenant (and gate membership) before it runs.
+    const scopedRuntime = (event: HTTPEvent, params: ExtractRouteParams<S>): AskResponse<HTTPEventResponse> =>
+      askTenantProvideRequestScope(event, userDirectoryName, runtime(event, params));
+
+    return routeDefinition(settings, scopedRuntime, knownErrors);
+  };
+};

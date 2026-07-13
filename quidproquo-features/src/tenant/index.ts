@@ -6,5 +6,6 @@ export * from './fold';
 export * from './globals';
 export * from './logic';
 export * from './models';
+export * from './module';
 export * from './routes';
 export * from './types';

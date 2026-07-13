@@ -7,13 +7,17 @@ description: A defineWebSocketQueue with the tenant membership check pre-wired a
 
 A [defineWebSocketQueue](./web-socket-queue.md) with the tenant membership check pre-wired as its `connectionScopeValidator`, so a tenant id claimed in the WebSocket Authenticate handshake is only stored on the connection when the user actually belongs to that tenant. It takes the same arguments as `defineWebSocketQueue` minus `connectionScopeValidator`, which it fills in for you.
 
-The deploying service must still register the validator implementation by calling [defineTenantScopeResolver](./tenant-scope-resolver.md) (pass `linksOwner` when this service does not own the tenant stores).
+The deploying service must still register the validator implementation by calling [defineTenant](./tenant.md) (with the same `owner` used everywhere else).
 
 ```typescript
-import { defineTenantedWebSocketQueue, defineTenantScopeResolver } from 'quidproquo-features';
+import { defineTenantedWebSocketQueue, defineTenant } from 'quidproquo-features';
 
 export default [
-  ...defineTenantScopeResolver({ module: 'ca' }),
+  ...defineTenant({
+    owner: { module: 'ca' },
+    basePath: '/tenants',
+    routeAuthSettings: { userDirectoryName: 'users' },
+  }),
 
   defineTenantedWebSocketQueue('my-event-bus', 'api', 'example.com', {
     userDirectoryName: 'users',
@@ -45,5 +49,4 @@ Same as [defineWebSocketQueue](./web-socket-queue.md#returns) — a `QPQConfig` 
 ## Related
 
 - [defineWebSocketQueue](./web-socket-queue.md) — the underlying define this pre-configures.
-- [defineTenantScopeResolver](./tenant-scope-resolver.md) — registers `TENANT_CONNECTION_SCOPE_VALIDATOR_FN`, the inline function this wires in by name.
-- [defineTenant](./tenant.md) — the full tenant setup this connection-scope validator pairs with.
+- [defineTenant](./tenant.md) — registers `TENANT_CONNECTION_SCOPE_VALIDATOR_FN` (the inline function this wires in by name) plus the rest of the tenant setup.
