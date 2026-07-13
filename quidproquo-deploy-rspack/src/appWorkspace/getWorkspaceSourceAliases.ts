@@ -1,8 +1,14 @@
 // Maps each workspace lib package (by name) to its src/index.ts so the
-// dev-server rspack build can bundle workspace code from *source* instead of
+// dev rspack builds can bundle workspace code from *source* instead of
 // built dist. This is what puts lib edits in rspack's watch graph.
 // Service/tool packages without a src/index.ts are skipped; they're never
 // imported by package name.
+//
+// Linked quidproquo packages (npm link / file: deps) are covered too: those
+// node_modules entries are symlinks into the framework repo, so their src/ is
+// reachable and framework edits hot-reload the same way. Registry installs
+// are real directories shipping lib/ only (no src/index.ts), so they fail the
+// src check and keep resolving to built output.
 import fs from 'fs';
 import path from 'path';
 
@@ -36,25 +42,53 @@ const expandWorkspacePattern = (root: string, pattern: string): string[] => {
   return dirs;
 };
 
-export const getWorkspaceSourceAliases = (root: string): WorkspaceSourceAliases => {
+// Every workspace package directory (expanded from the root package.json
+// workspace globs) that actually holds a package.json.
+export const getWorkspacePackageDirs = (root: string): string[] => {
   const rootPackageJson = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf-8'));
   const workspaceGlobs: string[] = rootPackageJson.workspaces || [];
 
+  return workspaceGlobs.flatMap((pattern) => expandWorkspacePattern(root, pattern)).filter((dir) => fs.existsSync(path.join(dir, 'package.json')));
+};
+
+// Real directories of quidproquo packages symlinked into the consumer's
+// node_modules (npm link / file: deps point back into the framework repo).
+const getLinkedQuidproquoPackageDirs = (root: string): string[] => {
+  const nodeModulesDir = path.join(root, 'node_modules');
+  if (!fs.existsSync(nodeModulesDir)) {
+    return [];
+  }
+
+  return fs
+    .readdirSync(nodeModulesDir)
+    .filter((name) => name.startsWith('quidproquo'))
+    .map((name) => path.join(nodeModulesDir, name))
+    .filter((dir) => fs.lstatSync(dir).isSymbolicLink())
+    .map((dir) => fs.realpathSync(dir));
+};
+
+export const getWorkspaceSourceAliases = (root: string): WorkspaceSourceAliases => {
   const aliases: Record<string, string> = {};
   const packageNames = new Set<string>();
 
-  for (const pattern of workspaceGlobs) {
-    for (const dir of expandWorkspacePattern(root, pattern)) {
-      const packageJsonPath = path.join(dir, 'package.json');
-      const srcIndexPath = path.join(dir, 'src', 'index.ts');
-      if (!fs.existsSync(packageJsonPath) || !fs.existsSync(srcIndexPath)) {
-        continue;
-      }
-
-      const { name } = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
-      aliases[`${name}$`] = srcIndexPath;
-      packageNames.add(name);
+  const addSourceAlias = (dir: string): void => {
+    const packageJsonPath = path.join(dir, 'package.json');
+    const srcIndexPath = path.join(dir, 'src', 'index.ts');
+    if (!fs.existsSync(packageJsonPath) || !fs.existsSync(srcIndexPath)) {
+      return;
     }
+
+    const { name } = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+    aliases[`${name}$`] = srcIndexPath;
+    packageNames.add(name);
+  };
+
+  for (const dir of getWorkspacePackageDirs(root)) {
+    addSourceAlias(dir);
+  }
+
+  for (const dir of getLinkedQuidproquoPackageDirs(root)) {
+    addSourceAlias(dir);
   }
 
   return { aliases, packageNames };

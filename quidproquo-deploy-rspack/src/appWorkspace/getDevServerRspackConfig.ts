@@ -31,16 +31,45 @@ export const getDevServerRspackConfig = ({ root, entry, qpqConfigs }: DevServerR
   const ignoreModules = bundleOptions.flatMap((options) => options.ignoreModules);
 
   // Don't bundle node_modules — require them at runtime instead. This keeps
-  // native modules (e.g. sharp) and linked quidproquo packages loading from
-  // their own install locations. Workspace packages and the
+  // native modules (e.g. sharp) and third-party deps loading from their real
+  // install locations. Workspace packages, linked quidproquo packages and the
   // `quidproquo-dynamic-loader` virtual module are allowlisted so they get
   // bundled (from source, via the aliases above).
-  const externaliseBarePackages = ({ request }: ExternalItemFunctionData, callback: (err?: Error, result?: string) => void): void => {
+  //
+  // Externals are resolved to absolute paths from the *requiring* module's
+  // directory. Source-bundled linked packages live outside the consumer repo,
+  // so a bare runtime require from the bundle would miss deps that only exist
+  // in the framework repo's node_modules (e.g. quidproquo-dev-server's
+  // body-parser); build-time resolution reproduces what node would have done
+  // had the package not been bundled. Requests that don't resolve (optional
+  // deps behind try/catch) fall back to a plain bare require.
+  const externalResolutionCache = new Map<string, string>();
+
+  const resolveExternal = (request: string, context: string): string => {
+    const cacheKey = `${context}\n${request}`;
+    const cached = externalResolutionCache.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    let resolved = request;
+    try {
+      resolved = require.resolve(request, { paths: [context] });
+    } catch {
+      // Leave the bare request; the runtime require fails (or is caught by the
+      // requiring package) exactly as it would without bundling.
+    }
+
+    externalResolutionCache.set(cacheKey, resolved);
+    return resolved;
+  };
+
+  const externaliseBarePackages = ({ request, context }: ExternalItemFunctionData, callback: (err?: Error, result?: string) => void): void => {
     const isBarePackage = !!request && !request.startsWith('.') && !request.startsWith('!') && !path.isAbsolute(request);
     const isBundled = !!request && (request === 'quidproquo-dynamic-loader' || packageNames.has(request));
 
     if (isBarePackage && !isBundled) {
-      callback(undefined, `commonjs ${request}`);
+      callback(undefined, `commonjs ${resolveExternal(request, context || root)}`);
       return;
     }
 

@@ -13,6 +13,7 @@ import { Configuration, rspack } from '@rspack/core';
 import { ReactRefreshRspackPlugin } from '@rspack/plugin-react-refresh';
 
 import { scanFederatedExposes } from './federatedExports';
+import { getWorkspaceSourceAliases } from './getWorkspaceSourceAliases';
 import { getViewsContext } from './viewsWorkspace';
 
 type SharedConfig = Record<string, { singleton: boolean; requiredVersion?: string; eager?: boolean }>;
@@ -96,6 +97,12 @@ export const getViewsRspackConfig = (viewsDir: string): Configuration => {
   const { root, self, siblings } = getViewsContext(viewsDir);
   const isDev = !!process.env.LOCAL_DEV_SERVER || process.env.NODE_ENV !== 'production';
 
+  // Dev only: workspace packages (and linked quidproquo packages) bundle from
+  // src/ instead of built dist, the same as the API dev server. That puts
+  // their edits in rspack's watch graph, so views hot-reload without a build.
+  // Prod builds keep resolving to built output.
+  const aliases = isDev ? getWorkspaceSourceAliases(root).aliases : {};
+
   const exposes = scanFederatedExposes(viewsDir);
   const qpqConfig = loadQpqConfig(viewsDir);
 
@@ -177,6 +184,7 @@ export const getViewsRspackConfig = (viewsDir: string): Configuration => {
 
     resolve: {
       extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
+      alias: aliases,
       fallback: { path: require.resolve('path-browserify') },
     },
 

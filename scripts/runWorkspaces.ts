@@ -31,8 +31,10 @@ const getOrderedWorkspaces = (): string[] => readPackageJson(repoRoot).workspace
 // Scripts whose aggregate form is a sequence of sub-scripts. Driving the sub-steps
 // ourselves (rather than the package's own `build`) lets the bar tick per sub-step
 // and label the active one (e.g. "build:esm"). Order matters: clean before compile.
+// Packages missing a sub-script skip it (build:bin-perms only exists in
+// quidproquo-cli, where it restores the executable bit tsc drops from bin/).
 const STEP_EXPANSIONS: Record<string, string[]> = {
-  build: ['clean', 'build:esm', 'build:cjs'],
+  build: ['clean', 'build:esm', 'build:cjs', 'build:bin-perms'],
 };
 
 // Note: empty-string scripts (e.g. quidproquo-tsconfig's `"build": ""`) are falsy,

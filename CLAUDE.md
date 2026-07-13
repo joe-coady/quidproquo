@@ -12,8 +12,8 @@ npm run build
 # Build specific package
 npm run build -w <package-name>
 
-# Watch all packages (development)
-npm run watch-all
+# Build only packages changed since the last build
+npm run build:lite
 
 # Watch specific package
 npm run watch -w <package-name>
