@@ -8,9 +8,10 @@ import { TenantDocument } from '../models/TenantDocument';
 import { setBrand } from './stateUpdaters/setBrand';
 import { TenantEffect, TenantEffects } from './TenantEffect';
 
+// No brandColors seed: an unbranded tenant folds to undefined and the site
+// falls back to its default pair.
 const seedTenantDocument = (): TenantDocument => ({
   ...createEventDocInitialDocumentState(1),
-  brandColors: {},
 });
 
 const tenantFoldReducer = buildEventDocFoldReducer<TenantDocument, TenantEffects>(seedTenantDocument, {

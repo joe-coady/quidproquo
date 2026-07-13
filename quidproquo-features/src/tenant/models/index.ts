@@ -1,3 +1,4 @@
+export * from './TenantBrandColors';
 export * from './TenantDocument';
 export * from './TenantRecord';
 export * from './TenantSetBrandData';

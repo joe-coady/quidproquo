@@ -193,7 +193,7 @@ describe('tenant feature', () => {
       appendEvent(
         httpEvent({
           type: TenantEffect.setBrand,
-          payload: { data: { brandColors: { primary: '#123456' }, logoUrl: 'logo.png' }, metadata: { version: 1, clientMessageId: 'msg-1' } },
+          payload: { data: { brandColors: { primary: '#123456', secondary: '#abcdef' }, logoUrl: 'logo.png' }, metadata: { version: 1, clientMessageId: 'msg-1' } },
         }),
         { id: summary.id },
       ),
@@ -228,7 +228,7 @@ describe('tenant feature', () => {
     expect(records[0]).toMatchObject({
       tenantId: summary.id,
       name: 'credit-corp',
-      brandColors: { primary: '#123456' },
+      brandColors: { primary: '#123456', secondary: '#abcdef' },
       logoUrl: 'logo.png',
       createdByUserId: 'user-1',
       status: TenantStatus.active,

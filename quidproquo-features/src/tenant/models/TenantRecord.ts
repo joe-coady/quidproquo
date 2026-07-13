@@ -1,5 +1,6 @@
 import { QpqIsoDateTime } from 'quidproquo-core';
 
+import { TenantBrandColors } from './TenantBrandColors';
 import { TenantStatus } from './TenantStatus';
 
 // The materialized tenant row (pk = tenantId) - the fast path for membership
@@ -8,7 +9,7 @@ import { TenantStatus } from './TenantStatus';
 export type TenantRecord = {
   tenantId: string;
   name: string;
-  brandColors?: Record<string, string>;
+  brandColors?: TenantBrandColors;
   logoUrl?: string;
   createdAt: QpqIsoDateTime;
   updatedAt: QpqIsoDateTime;
