@@ -5,6 +5,7 @@ assembled quickly.
 
 ## vNext
 
+- `TenantDocument`, `TenantRecord`, and `TenantSetBrandData` in `quidproquo-features` replace `logoUrl?: string` with `logo?: EventDocAssetRef` (`{ guid, filename, mimetype }`). Pass the uploaded asset ref when setting the tenant logo instead of a URL; resolve it to a URL at read time.
 - `TenantDocument`, `TenantRecord`, and `TenantSetBrandData` in `quidproquo-features` narrow `brandColors` from `Record<string, string>` to the strict `TenantBrandColors` shape (`{ primary: string; secondary: string }`), and it's now optional (an unbranded tenant folds to `undefined` instead of `{}`). Pass both `primary` and `secondary` together when setting brand colors; arbitrary color keys are no longer accepted.
 - `defineTenant` in `quidproquo-features` now requires an `owner: { module: string }` field. Declare it identically in every service that needs tenant support (not just the service that used to own it) — the registry (stores, publish sync, routes) only materializes on the owner's deploy; every other service gets just the scope resolver and a cross-module reference to the membership table.
 - `defineTenantScopeResolver` is removed from `quidproquo-features`. Replace any standalone `defineTenantScopeResolver()` / `defineTenantScopeResolver(linksOwner)` call with `defineTenant({ ...options, owner })` — it now registers the scope resolver, connection-scope validator, and membership-table reference itself.

@@ -6,5 +6,5 @@ import { TenantSetBrandData } from '../../models/TenantSetBrandData';
 export const setBrand = (state: TenantDocument, payload: EventDocEventPayload<TenantSetBrandData>): TenantDocument => ({
   ...state,
   brandColors: payload.data.brandColors ?? state.brandColors,
-  logoUrl: payload.data.logoUrl ?? state.logoUrl,
+  logo: payload.data.logo ?? state.logo,
 });

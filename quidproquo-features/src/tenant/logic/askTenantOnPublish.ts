@@ -17,7 +17,7 @@ export function* askTenantOnPublish(input: EventDocOnPublishInput): AskResponse<
     tenantId: input.docId,
     name: input.summary.name,
     brandColors: doc.brandColors,
-    logoUrl: doc.logoUrl,
+    logo: doc.logo,
     createdAt: input.summary.createdAt,
     updatedAt: input.summary.updatedAt,
     createdByUserId: input.summary.createdBy,

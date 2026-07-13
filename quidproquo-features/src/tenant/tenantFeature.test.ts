@@ -193,7 +193,13 @@ describe('tenant feature', () => {
       appendEvent(
         httpEvent({
           type: TenantEffect.setBrand,
-          payload: { data: { brandColors: { primary: '#123456', secondary: '#abcdef' }, logoUrl: 'logo.png' }, metadata: { version: 1, clientMessageId: 'msg-1' } },
+          payload: {
+            data: {
+              brandColors: { primary: '#123456', secondary: '#abcdef' },
+              logo: { guid: 'logo-guid', filename: 'logo.png', mimetype: 'image/png' },
+            },
+            metadata: { version: 1, clientMessageId: 'msg-1' },
+          },
         }),
         { id: summary.id },
       ),
@@ -229,7 +235,7 @@ describe('tenant feature', () => {
       tenantId: summary.id,
       name: 'credit-corp',
       brandColors: { primary: '#123456', secondary: '#abcdef' },
-      logoUrl: 'logo.png',
+      logo: { guid: 'logo-guid', filename: 'logo.png', mimetype: 'image/png' },
       createdByUserId: 'user-1',
       status: TenantStatus.active,
     });
