@@ -67,6 +67,18 @@ export const mergeStreamParts = (parts: AiStreamPart[]): EventDocAiMessageSegmen
           tool.output = part.output;
         }
       }
+    } else if (part.type === AiStreamPartType.ToolError) {
+      // A thrown executor still resolves the call: fold the error in as the
+      // output so the model can react to it, and so the call is not mistaken
+      // for a client-side tool awaiting the user (output === undefined).
+      const last = segments[segments.length - 1];
+      if (last && last.type === 'tool-use') {
+        const tool = last.tools.find((t) => t.toolName === part.toolName && t.output === undefined);
+        if (tool) {
+          // TODO: the type of output here is a bit dubious.
+          tool.output = { error: part.message };
+        }
+      }
     }
   }
 

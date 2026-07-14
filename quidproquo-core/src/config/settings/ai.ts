@@ -5,7 +5,13 @@ import { convertCrossModuleOwnerToGenericResourceNameOverride } from '../utils/c
 export interface AiToolDefinition {
   name: string;
   description: string;
-  executor: string;
+  /**
+   * Inline function that resolves the tool call server-side. Omit it to declare a
+   * client-side tool: the AI loop halts when the model calls it, the pending call is
+   * surfaced to the client (e.g. a form on screen), and the client's answer comes
+   * back as the next message in the conversation.
+   */
+  executor?: string;
   inputSchema: Record<string, unknown>;
 }
 

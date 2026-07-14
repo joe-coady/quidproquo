@@ -57,31 +57,37 @@ export const prepareAiPromptCall = (
       return { error: { type: ErrorTypeEnum.NotFound, message: `AI config not found: ${payload.aiName}` } };
     }
 
+    // Runs the tool's inline-function executor as its own story.
+    const createToolExecute = (toolName: string, executor: string) => async (args: unknown) => {
+      const resolveStory = createImplementationRuntime(
+        qpqConfig,
+        [`AI Tool: ${toolName}`],
+        () => new Date().toISOString(),
+        randomGuid,
+        session,
+        actionProcessorList,
+        logger,
+        dynamicModuleLoader,
+        streamRegistry,
+      );
+
+      const storyResult = await resolveStory(askInlineFunctionExecute, [executor, args]);
+
+      if (storyResult.error) {
+        throw new Error(storyResult.error.errorText);
+      }
+
+      return storyResult.result;
+    };
+
     for (const toolDef of aiConfig.tools) {
       aiTools[toolDef.name] = {
         description: toolDef.description,
         inputSchema: jsonSchema(toolDef.inputSchema),
-        execute: async (args: unknown) => {
-          const resolveStory = createImplementationRuntime(
-            qpqConfig,
-            [`AI Tool: ${toolDef.name}`],
-            () => new Date().toISOString(),
-            randomGuid,
-            session,
-            actionProcessorList,
-            logger,
-            dynamicModuleLoader,
-            streamRegistry,
-          );
-
-          const storyResult = await resolveStory(askInlineFunctionExecute, [toolDef.executor, args]);
-
-          if (storyResult.error) {
-            throw new Error(storyResult.error.errorText);
-          }
-
-          return storyResult.result;
-        },
+        // A tool without an executor is client-side: the AI SDK emits the tool call
+        // but has nothing to run, so the loop halts with the call unresolved and the
+        // client answers it out-of-band (see AiToolDefinition.executor).
+        ...(toolDef.executor ? { execute: createToolExecute(toolDef.name, toolDef.executor) } : {}),
       };
     }
   }

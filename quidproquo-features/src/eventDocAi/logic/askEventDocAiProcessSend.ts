@@ -22,7 +22,13 @@ import {
 import { askEventDocAiChatHistoryLoad } from '../data/askEventDocAiChatHistoryLoad';
 import { askEventDocAiChatHistorySave } from '../data/askEventDocAiChatHistorySave';
 import { askEventDocAiChatTouch } from '../data/askEventDocAiChatTouch';
-import type { EventDocAiAttachment, EventDocAiChatMessage, EventDocAiChatSendResult, EventDocAiSystemPromptInput } from '../models';
+import type {
+  EventDocAiAttachment,
+  EventDocAiChatMessage,
+  EventDocAiChatSendResult,
+  EventDocAiMessageSegment,
+  EventDocAiSystemPromptInput,
+} from '../models';
 import {
   askUIEventDocAiAppendChatMessage,
   askUIEventDocAiAppendStreamChunk,
@@ -52,6 +58,12 @@ const getFinishReason = (parts: AiStreamPart[]): AiStreamFinishReasonEnum | unde
   const finishPart = parts.find((part): part is AiStreamFinish => part.type === AiStreamPartType.Finish);
   return finishPart?.finishReason;
 };
+
+// A tool call with no output after the stream has ended is a client-side tool
+// (a config tool with no executor): nothing server-side can resolve it, so the
+// turn must be handed to the client instead of resumed.
+const segmentHasPendingToolUse = (segment: EventDocAiMessageSegment): boolean =>
+  segment.type === 'tool-use' && segment.tools.some((tool) => tool.output === undefined);
 
 // The turn's system prompt, freshest source first: the configured generator
 // inline function (built per-turn so it can carry live document state), else
@@ -142,6 +154,20 @@ export function* askEventDocAiProcessSend(
     }
 
     yield* askUIEventDocAiClearStream();
+
+    // Checked BEFORE the resume decision: a pending client tool also finishes
+    // with `toolCalls`, and nudging the model to continue without its answer
+    // would just make it guess. The pending call is already saved in the
+    // history; the client renders it (e.g. as a form) and the answer arrives
+    // as the next chat message, which is the resume.
+    if (segments.some(segmentHasPendingToolUse)) {
+      yield* askEventDocAiChatTouch(docId, chatId);
+
+      // TODO: Send the tool call frontend request to the frontend via websocket, on this corrolation.
+      // the toolcall can be completed and send as a message back to the chat here, on another lambda invoke.
+
+      return { complete: false };
+    }
 
     const stoppedPrematurely = getFinishReason(assistantParts) === AiStreamFinishReasonEnum.toolCalls;
 

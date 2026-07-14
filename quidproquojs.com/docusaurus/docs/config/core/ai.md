@@ -56,7 +56,7 @@ The name of the AI config, and its `uniqueKey` within the config. This is the va
 interface AiToolDefinition {
   name: string;
   description: string;
-  executor: string;
+  executor?: string;
   inputSchema: Record<string, unknown>;
 }
 ```
@@ -65,12 +65,12 @@ interface AiToolDefinition {
 | --- | --- | --- |
 | `name` | `string` | Tool name the model uses to call it. |
 | `description` | `string` | Natural-language description of what the tool does — the model reads this to decide when to call it, so make it precise. |
-| `executor` | `string` | A `QpqFunctionRuntime` reference (`'/path/to/file::exportedFunction'`) to the story that runs when the model calls the tool. It receives the tool input (validated against `inputSchema`) and returns the tool output. |
+| `executor` | `string` (optional) | A `QpqFunctionRuntime` reference (`'/path/to/file::exportedFunction'`) to the story that runs when the model calls the tool. It receives the tool input (validated against `inputSchema`) and returns the tool output. Omit it to declare a **client-side tool**: the model's call isn't run server-side, the turn halts with the call unresolved, and the caller is expected to resolve it out-of-band (e.g. showing a form) and feed the answer back as the next message. |
 | `inputSchema` | `Record<string, unknown>` | A JSON Schema describing the tool's input. The model is constrained to produce arguments matching this schema. |
 
 ## Notes
 
-- When a bound prompt triggers a tool call, the AI action processor runs the tool's `executor` story and returns its result to the model, looping up to 10 tool-calling steps before finishing.
+- When a bound prompt triggers a tool call for a tool with an `executor`, the AI action processor runs that story and returns its result to the model, looping up to 10 tool-calling steps before finishing. A tool call for a tool with no `executor` is left unresolved for the caller to answer.
 - Streaming prompts surface each tool call, result, and approval request as `ToolCall` / `ToolResult` / `ToolApprovalRequest` parts on the stream — see [askAiPromptStream](../../actions/core/ai/ask-ai-prompt-stream.md#aistreamparttype).
 
 ## Related
