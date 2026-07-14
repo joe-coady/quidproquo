@@ -7,7 +7,7 @@ description: Wire up org/tenant support across every service in one call — the
 
 Wires up **everything for org/tenant support**, declared identically in every service that needs it. You always pass the same `owner`; what actually materializes depends on whether the current module is that owner. It returns a `QPQConfig` (an array of config settings) composed of:
 
-- The scope-resolver and connection-scope-validator [inline functions](../core/inline-function.md) (`TENANT_SCOPE_RESOLVER_FN`, `TENANT_CONNECTION_SCOPE_VALIDATOR_FN`) — registered in **every** service, so each can tenant-scope its own collections and WebSocket connections. The tenant collection itself stays unscoped; it is the registry.
+- The scope-resolver and connection-scope-resolver [inline functions](../core/inline-function.md) (`TENANT_SCOPE_RESOLVER_FN`, `TENANT_CONNECTION_SCOPE_RESOLVER_FN`) — registered in **every** service, so each can tenant-scope its own collections and WebSocket connections. The tenant collection itself stays unscoped; it is the registry.
 - The `userTenantLinks` membership table ([key-value store](../core/key-value-store.md)) — declared with `owner` everywhere, so non-owner services get a cross-module reference to the owner's table instead of their own copy.
 - Everything else, gated to the owner's deploy only via [defineServiceSettings](../core/service-settings.md):
   - The tenant stores ([defineTenantStores](./tenant-stores.md)): the tenant event-doc collection plus the materialized record table.
@@ -66,6 +66,7 @@ The single `options` argument is a `TenantOptions` (a `TenantRoutesOptions` plus
 - Tenant state is event-sourced: the `tenants` event-doc collection is the audit-trailed source of truth, and the `tenantRecords` table is a read model synced on publish. Request handlers never write the record table directly.
 - The `TenantRecord` produced by the publish sync carries `tenantId`, `name`, `brandColors`, `logoUrl`, `createdAt`, `updatedAt`, `createdByUserId`, and a `status` derived from the summary (`deleted` when the summary has a `deletedAt`, otherwise `active`).
 - `defineTenant` registers the scope resolver but does not apply it to anything. To tenant-scope one of your own collections, pass `TENANT_SCOPE_RESOLVER_FN` as that collection's `scopeResolver` option (or use [defineTenantedEventDoc](./tenanted-event-doc.md), which does this for you).
+- The scope resolver always resolves to a typed scope — a membership-checked `TENANT#<id>` for a request that names a tenant, or the caller's own `PERSONAL#<userId>` when it doesn't. A tenant-scoped collection or connection is never left unscoped.
 - Every service — owner and non-owner alike — calls `defineTenant` with the same `owner`. There is no separate call for non-owning services anymore: the gating happens internally via [defineServiceSettings](../core/service-settings.md).
 
 ## Related
@@ -73,6 +74,6 @@ The single `options` argument is a `TenantOptions` (a `TenantRoutesOptions` plus
 - [defineTenantStores](./tenant-stores.md): the store half of this helper (owner-only).
 - [defineTenantedEventDoc](./tenanted-event-doc.md): a `defineEventDoc` with `TENANT_SCOPE_RESOLVER_FN` pre-wired as `scopeResolver`.
 - [defineEventDocRoutes](./event-doc-routes.md): the generic CRUD mounted under `{basePath}/docs`, and home of the `scopeResolver` / `onPublish` options.
-- [defineWebSocketQueue](./web-socket-queue.md): where the tenant connection-scope validator plugs in.
-- [defineTenantedWebSocketQueue](./tenanted-web-socket-queue.md): a `defineWebSocketQueue` with that validator pre-wired.
+- [defineWebSocketQueue](./web-socket-queue.md): where the tenant connection-scope resolver plugs in.
+- [defineTenantedWebSocketQueue](./tenanted-web-socket-queue.md): a `defineWebSocketQueue` with that resolver pre-wired.
 - [defineServiceSettings](../core/service-settings.md): the per-module gating mechanism this uses to materialize the registry only on the owner.

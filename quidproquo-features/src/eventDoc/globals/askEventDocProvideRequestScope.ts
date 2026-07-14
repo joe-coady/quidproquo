@@ -5,9 +5,10 @@ import { askEventDocStoreRead } from '../context/askEventDocStoreRead';
 
 // Establish the request's ambient storage scope from the collection's
 // `scopeResolver` inline function (e.g. the tenant feature's resolver: header
-// -> membership check -> tenant id). No resolver configured, or a null result
-// (Personal), runs the story unscoped. Must run INSIDE the store context - the
-// resolver name is read off the provided store.
+// -> membership check -> TENANT# scope, no header -> the caller's PERSONAL#
+// scope). No resolver configured, or a null result, runs the story unscoped -
+// the tenant resolver never returns null. Must run INSIDE the store context -
+// the resolver name is read off the provided store.
 export function* askEventDocProvideRequestScope<T>(event: HTTPEvent, story: AskResponse<T>): AskResponse<T> {
   const { scopeResolver } = yield* askEventDocStoreRead();
 

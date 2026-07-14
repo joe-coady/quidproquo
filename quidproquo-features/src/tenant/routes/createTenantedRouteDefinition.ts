@@ -4,12 +4,14 @@ import { HTTPEvent, HTTPEventResponse, RouteOptions } from 'quidproquo-webserver
 import { createRouteDefinition, DynamicRouteHandler, DynamicRouteKnownErrors, ExtractRouteParams, RouteDefinition } from '../../routes';
 import { askTenantProvideRequestScope } from '../logic';
 
-// Like createRouteDefinition, but every handler runs inside the request's tenant
-// scope. The userDirectoryName is used twice: the gateway authenticates the JWT
-// against it (routeAuthSettings), and askTenantProvideRequestScope resolves the
-// tenant header against it (membership-checked, Forbidden on no access) then runs
-// the handler under that storage scope. No header = Personal, unscoped. Handlers
-// no longer wrap themselves with askTenantProvideRequestScope.
+// Like createRouteDefinition, but every handler runs inside the request's typed
+// storage scope. The userDirectoryName is used twice: the gateway authenticates
+// the JWT against it (routeAuthSettings), and askTenantProvideRequestScope
+// resolves the tenant header against it (membership-checked, Forbidden on no
+// access) then runs the handler under that scope. No header = the caller's own
+// personal scope - handlers NEVER run unscoped, so one user's personal data is
+// never visible to another. Handlers no longer wrap themselves with
+// askTenantProvideRequestScope.
 export const createTenantedRouteDefinition = (
   userDirectoryName: string,
   options: RouteOptions = {},

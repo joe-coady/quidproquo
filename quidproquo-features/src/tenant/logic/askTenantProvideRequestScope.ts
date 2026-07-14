@@ -1,20 +1,16 @@
 import { AskResponse, askStorageScopeProvide } from 'quidproquo-core';
 import { HTTPEvent } from 'quidproquo-webserver';
 
-import { askTenantResolveOptionalActiveTenant } from './askTenantResolveOptionalActiveTenant';
+import { askTenantResolveRequestScope } from './askTenantResolveRequestScope';
 
 // The one-call tenant gate for CUSTOM routes (anything not bridged through the
 // eventDoc controllers, which get this via askEventDocProvideRequestScope +
-// the collection's scopeResolver): resolve the request's optional tenant
-// header against the given user directory (membership-checked, Forbidden on
-// failure) and run the story under that storage scope. No header = Personal,
-// the story runs unscoped.
+// the collection's scopeResolver): resolve the request's typed scope - the
+// membership-checked tenant header (Forbidden on failure) or the caller's own
+// personal scope when no header is present - and run the story under it. The
+// story NEVER runs unscoped.
 export function* askTenantProvideRequestScope<T>(event: HTTPEvent, userDirectoryName: string, story: AskResponse<T>): AskResponse<T> {
-  const tenantId = yield* askTenantResolveOptionalActiveTenant(event, userDirectoryName);
+  const scope = yield* askTenantResolveRequestScope(event, userDirectoryName);
 
-  if (!tenantId) {
-    return yield* story;
-  }
-
-  return yield* askStorageScopeProvide(tenantId, story);
+  return yield* askStorageScopeProvide(scope, story);
 }

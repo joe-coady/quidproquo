@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   defineWebSocketQueue,
-  getWebSocketQueueGlobalConfigKeyForConnectionScopeValidator,
+  getWebSocketQueueGlobalConfigKeyForConnectionScopeResolver,
   getWebSocketQueueGlobalConfigKeyForEventBusName,
   getWebSocketQueueGlobalConfigKeyForUserDirectoryName,
   getWebSocketQueueKeyValueStoreName,
@@ -15,7 +15,7 @@ describe('webSocketQueue key helpers', () => {
   it('derives stable keys from the api name', () => {
     expect(getWebSocketQueueGlobalConfigKeyForEventBusName('chat')).toBe('qpq-wsq-eb-name-chat');
     expect(getWebSocketQueueGlobalConfigKeyForUserDirectoryName('chat')).toBe('qpq-wsq-kvs-name-chat');
-    expect(getWebSocketQueueGlobalConfigKeyForConnectionScopeValidator('chat')).toBe('qpq-wsq-scope-validator-chat');
+    expect(getWebSocketQueueGlobalConfigKeyForConnectionScopeResolver('chat')).toBe('qpq-wsq-scope-resolver-chat');
     expect(getWebSocketQueueKeyValueStoreName('chat')).toBe('qpq-wsq-chat');
   });
 });

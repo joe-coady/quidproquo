@@ -2,7 +2,7 @@ import { QPQCoreConfigSettingType } from 'quidproquo-core';
 
 import { describe, expect, it } from 'vitest';
 
-import { TENANT_CONNECTION_SCOPE_VALIDATOR_FN, TENANT_SCOPE_RESOLVER_FN, USER_TENANT_LINKS_STORE } from '../constants/tenantStoreNames';
+import { TENANT_CONNECTION_SCOPE_RESOLVER_FN, TENANT_SCOPE_RESOLVER_FN, USER_TENANT_LINKS_STORE } from '../constants/tenantStoreNames';
 import { defineTenant } from './defineTenant';
 
 const config = defineTenant({
@@ -12,12 +12,12 @@ const config = defineTenant({
 });
 
 describe('defineTenant', () => {
-  it('always registers the scope resolver + connection validator inline functions', () => {
+  it('always registers the request + connection scope resolver inline functions', () => {
     const inlineFnNames = config
       .filter((s) => (s as { configSettingType: string }).configSettingType === QPQCoreConfigSettingType.inlineFunction)
       .map((s) => (s as { functionName: string }).functionName);
 
-    expect(inlineFnNames).toEqual(expect.arrayContaining([TENANT_SCOPE_RESOLVER_FN, TENANT_CONNECTION_SCOPE_VALIDATOR_FN]));
+    expect(inlineFnNames).toEqual(expect.arrayContaining([TENANT_SCOPE_RESOLVER_FN, TENANT_CONNECTION_SCOPE_RESOLVER_FN]));
   });
 
   it('declares the membership table owned by the owner (a cross-module ref elsewhere)', () => {

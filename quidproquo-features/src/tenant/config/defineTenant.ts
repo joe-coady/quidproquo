@@ -2,7 +2,7 @@ import { defineInlineFunction, defineKeyValueStore, defineServiceSettings, QPQCo
 
 import { defineEventDocRoutes } from '../../eventDoc/routes/defineEventDocRoutes';
 import {
-  TENANT_CONNECTION_SCOPE_VALIDATOR_FN,
+  TENANT_CONNECTION_SCOPE_RESOLVER_FN,
   TENANT_DOC_TYPE,
   TENANT_EVENTDOC_STORE,
   TENANT_ON_PUBLISH_FN,
@@ -17,9 +17,9 @@ import { defineTenantStores } from './defineTenantStores';
 // Org/tenant support, declared identically in every service (pass the same
 // `owner` everywhere). What materialises depends on the deploying service:
 //
-// - Everywhere: the scope-resolver + connection-scope-validator inline functions
-//   (a service tenant-scopes its OTHER collections via the resolver, and validates
-//   ws scope claims via the validator).
+// - Everywhere: the scope-resolver + connection-scope-resolver inline functions
+//   (a service tenant-scopes its OTHER collections via the request resolver, and
+//   resolves ws connection scopes via the connection resolver).
 // - Owner deploy only: the registry stores (eventDoc collection + record store +
 //   membership links), the publish -> record sync, the generic eventDoc CRUD under
 //   {basePath}/docs, and the tenant routes at {basePath}.
@@ -39,10 +39,10 @@ export const defineTenant = ({ owner, ...routeOptions }: TenantOptions): QPQConf
   defineInlineFunction(
     {
       basePath: __dirname,
-      relativePath: '../logic/askTenantConnectionScopeValidator',
-      functionName: 'askTenantConnectionScopeValidator',
+      relativePath: '../logic/askTenantConnectionScopeResolver',
+      functionName: 'askTenantConnectionScopeResolver',
     },
-    { functionName: TENANT_CONNECTION_SCOPE_VALIDATOR_FN },
+    { functionName: TENANT_CONNECTION_SCOPE_RESOLVER_FN },
   ),
 
   // The membership table: created on the owner's deploy, a read-only cross-module

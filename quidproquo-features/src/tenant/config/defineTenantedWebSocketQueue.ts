@@ -1,15 +1,16 @@
 import { QPQConfig } from 'quidproquo-core';
 
 import { defineWebSocketQueue, QPQConfigAdvancedWebsocketQueueSettings } from '../../webSocketQueue';
-import { TENANT_CONNECTION_SCOPE_VALIDATOR_FN } from '../constants/tenantStoreNames';
+import { TENANT_CONNECTION_SCOPE_RESOLVER_FN } from '../constants/tenantStoreNames';
 
-export type QPQConfigAdvancedTenantedWebsocketQueueSettings = Omit<QPQConfigAdvancedWebsocketQueueSettings, 'connectionScopeValidator'>;
+export type QPQConfigAdvancedTenantedWebsocketQueueSettings = Omit<QPQConfigAdvancedWebsocketQueueSettings, 'connectionScopeResolver'>;
 
-// A defineWebSocketQueue with the tenant membership check pre-wired as the
-// connection scope validator, so a scope claimed in the ws Authenticate
-// handshake is only stored when the user belongs to that tenant. The deploying
-// service must still register the validator implementation by calling
-// defineTenant.
+// A defineWebSocketQueue with the tenant scope resolution pre-wired as the
+// connection scope resolver: a tenant claimed in the ws Authenticate
+// handshake is membership-checked before it is stored, and a handshake with
+// no claim is stored under the user's own personal scope - the connection is
+// never left unscoped. The deploying service must still register the resolver
+// implementation by calling defineTenant.
 export const defineTenantedWebSocketQueue = (
   eventBusName: string,
   apiName: string,
@@ -18,5 +19,5 @@ export const defineTenantedWebSocketQueue = (
 ): QPQConfig =>
   defineWebSocketQueue(eventBusName, apiName, rootDomain, {
     ...advancedSettings,
-    connectionScopeValidator: TENANT_CONNECTION_SCOPE_VALIDATOR_FN,
+    connectionScopeResolver: TENANT_CONNECTION_SCOPE_RESOLVER_FN,
   });

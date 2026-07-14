@@ -15,10 +15,11 @@ export interface QPQConfigAdvancedWebsocketQueueSettings extends QPQConfigAdvanc
   userDirectoryName?: string;
 
   // Registered inline-function name (see `defineInlineFunction`) invoked with
-  // `{ userId, requestedScope }` when an Authenticate message claims a storage
-  // scope (e.g. a tenant id); must return true for the claim to be stored on
-  // the connection. A claim with NO validator configured is rejected outright.
-  connectionScopeValidator?: string;
+  // `{ userId, requestedScope }` on EVERY Authenticate message; returns the
+  // effective storage scope to store on the connection (null = unscoped), or
+  // throws to reject the authenticate. A claim with NO resolver configured is
+  // rejected outright.
+  connectionScopeResolver?: string;
 }
 
 export function getWebSocketQueueGlobalConfigKeyForEventBusName(apiName: string): string {
@@ -29,8 +30,8 @@ export function getWebSocketQueueGlobalConfigKeyForUserDirectoryName(apiName: st
   return `qpq-wsq-kvs-name-${apiName}`;
 }
 
-export function getWebSocketQueueGlobalConfigKeyForConnectionScopeValidator(apiName: string): string {
-  return `qpq-wsq-scope-validator-${apiName}`;
+export function getWebSocketQueueGlobalConfigKeyForConnectionScopeResolver(apiName: string): string {
+  return `qpq-wsq-scope-resolver-${apiName}`;
 }
 
 export function getWebSocketQueueKeyValueStoreName(apiName: string): string {
@@ -47,7 +48,7 @@ export const defineWebSocketQueue = (
     // User defined vars (stored in config)
     defineGlobal(getWebSocketQueueGlobalConfigKeyForEventBusName(apiName), eventBusName),
     defineGlobal(getWebSocketQueueGlobalConfigKeyForUserDirectoryName(apiName), advancedSettings?.userDirectoryName || ''),
-    defineGlobal(getWebSocketQueueGlobalConfigKeyForConnectionScopeValidator(apiName), advancedSettings?.connectionScopeValidator || ''),
+    defineGlobal(getWebSocketQueueGlobalConfigKeyForConnectionScopeResolver(apiName), advancedSettings?.connectionScopeResolver || ''),
 
     // Store To Save Connection Info
     defineKeyValueStore(getWebSocketQueueKeyValueStoreName(apiName), 'id', undefined, {

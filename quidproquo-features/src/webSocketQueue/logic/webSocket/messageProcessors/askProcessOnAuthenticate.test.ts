@@ -123,9 +123,9 @@ describe('askProcessOnAuthenticate', () => {
     expect(broadcast.payload.eventBusMessages).toEqual([{ type: WebSocketQueueClientMessageEventType.Authenticate, payload: {} }]);
   });
 
-  it('stores a validated tenant claim on the connection', () => {
+  it('stores the scope the resolver returns for a tenant claim', () => {
     let upsert: any;
-    let validatorCall: any;
+    let resolverCall: any;
     const sends: any[] = [];
 
     runStory(askProcessOnAuthenticate('c1', 'token-1', 'tenant-a'), {
@@ -134,12 +134,12 @@ describe('askProcessOnAuthenticate', () => {
       [ConfigActionType.GetGlobal]: globalByKey({
         'qpq-wsq-kvs-name-demo': 'user-directory',
         'qpq-wsq-eb-name-demo': 'event-bus',
-        'qpq-wsq-scope-validator-demo': 'validateTenantScope',
+        'qpq-wsq-scope-resolver-demo': 'resolveTenantScope',
       }),
       [UserDirectoryActionType.SetAccessToken]: { userId: 'u1' },
       [InlineFunctionActionType.Execute]: (action: any) => {
-        validatorCall = action.payload;
-        return true;
+        resolverCall = action.payload;
+        return 'TENANT#tenant-a';
       },
       [KeyValueStoreActionType.Upsert]: (action: any) => {
         upsert = action;
@@ -152,12 +152,41 @@ describe('askProcessOnAuthenticate', () => {
       [EventBusActionType.SendMessages]: undefined,
     });
 
-    expect(validatorCall).toEqual({ functionName: 'validateTenantScope', payload: { userId: 'u1', requestedScope: 'tenant-a' } });
-    expect(upsert.payload.item.scope).toBe('tenant-a');
+    expect(resolverCall).toEqual({ functionName: 'resolveTenantScope', payload: { userId: 'u1', requestedScope: 'tenant-a' } });
+    expect(upsert.payload.item.scope).toBe('TENANT#tenant-a');
     expect(sends).toEqual([WebSocketQueueServerMessageEventType.Authenticated]);
   });
 
-  it('clears the connection auth when the tenant claim fails validation', () => {
+  it('stores the resolved personal scope when authenticating without a claim on a resolver queue', () => {
+    let upsert: any;
+    let resolverCall: any;
+
+    runStory(askProcessOnAuthenticate('c1', 'token-1'), {
+      [ContextActionType.Read]: { apiName: 'demo' },
+      [KeyValueStoreActionType.Query]: { items: [connection] },
+      [ConfigActionType.GetGlobal]: globalByKey({
+        'qpq-wsq-kvs-name-demo': 'user-directory',
+        'qpq-wsq-eb-name-demo': 'event-bus',
+        'qpq-wsq-scope-resolver-demo': 'resolveTenantScope',
+      }),
+      [UserDirectoryActionType.SetAccessToken]: { userId: 'u1' },
+      [InlineFunctionActionType.Execute]: (action: any) => {
+        resolverCall = action.payload;
+        return 'PERSONAL#u1';
+      },
+      [KeyValueStoreActionType.Upsert]: (action: any) => {
+        upsert = action;
+        return undefined;
+      },
+      [WebsocketActionType.SendMessage]: undefined,
+      [EventBusActionType.SendMessages]: undefined,
+    });
+
+    expect(resolverCall).toEqual({ functionName: 'resolveTenantScope', payload: { userId: 'u1', requestedScope: null } });
+    expect(upsert.payload.item.scope).toBe('PERSONAL#u1');
+  });
+
+  it('clears the connection auth when the resolver rejects the claim', () => {
     let upsert: any;
     const sends: any[] = [];
 
@@ -166,10 +195,10 @@ describe('askProcessOnAuthenticate', () => {
       [KeyValueStoreActionType.Query]: { items: [{ ...connection, userId: 'old-user', accessToken: 'old-token', scope: 'old-tenant' }] },
       [ConfigActionType.GetGlobal]: globalByKey({
         'qpq-wsq-kvs-name-demo': 'user-directory',
-        'qpq-wsq-scope-validator-demo': 'validateTenantScope',
+        'qpq-wsq-scope-resolver-demo': 'resolveTenantScope',
       }),
       [UserDirectoryActionType.SetAccessToken]: { userId: 'u1' },
-      [InlineFunctionActionType.Execute]: false,
+      [InlineFunctionActionType.Execute]: throwsError('Forbidden', 'not a member'),
       [KeyValueStoreActionType.Upsert]: (action: any) => {
         upsert = action;
         return undefined;
@@ -184,7 +213,7 @@ describe('askProcessOnAuthenticate', () => {
     expect(upsert.payload.item).toEqual(connection);
   });
 
-  it('clears the connection auth when a tenant is claimed but no scope validator is configured', () => {
+  it('clears the connection auth when a tenant is claimed but no scope resolver is configured', () => {
     let upsert: any;
     const sends: any[] = [];
 
@@ -207,7 +236,7 @@ describe('askProcessOnAuthenticate', () => {
     expect(upsert.payload.item).toEqual(connection);
   });
 
-  it('clears a previous tenant claim when re-authenticating without one', () => {
+  it('clears a previous scope when re-authenticating without a claim on a plain queue', () => {
     let upsert: any;
 
     runStory(askProcessOnAuthenticate('c1', 'token-1'), {

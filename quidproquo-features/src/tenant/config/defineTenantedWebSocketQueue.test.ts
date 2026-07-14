@@ -2,21 +2,21 @@ import { QPQCoreConfigSettingType } from 'quidproquo-core';
 
 import { describe, expect, it } from 'vitest';
 
-import { getWebSocketQueueGlobalConfigKeyForConnectionScopeValidator } from '../../webSocketQueue';
-import { TENANT_CONNECTION_SCOPE_VALIDATOR_FN } from '../constants/tenantStoreNames';
+import { getWebSocketQueueGlobalConfigKeyForConnectionScopeResolver } from '../../webSocketQueue';
+import { TENANT_CONNECTION_SCOPE_RESOLVER_FN } from '../constants/tenantStoreNames';
 import { defineTenantedWebSocketQueue } from './defineTenantedWebSocketQueue';
 
 describe('defineTenantedWebSocketQueue', () => {
-  it('pre-wires the tenant membership check as the connection scope validator', () => {
+  it('pre-wires the tenant scope resolution as the connection scope resolver', () => {
     const config = defineTenantedWebSocketQueue('chat-bus', 'chat', 'example.com');
 
-    const validatorGlobal = config.find(
+    const resolverGlobal = config.find(
       (setting) =>
         (setting as { configSettingType: string; key?: string }).configSettingType === QPQCoreConfigSettingType.global &&
-        (setting as { key?: string }).key === getWebSocketQueueGlobalConfigKeyForConnectionScopeValidator('chat'),
+        (setting as { key?: string }).key === getWebSocketQueueGlobalConfigKeyForConnectionScopeResolver('chat'),
     );
 
-    expect(validatorGlobal).toMatchObject({ value: TENANT_CONNECTION_SCOPE_VALIDATOR_FN });
+    expect(resolverGlobal).toMatchObject({ value: TENANT_CONNECTION_SCOPE_RESOLVER_FN });
   });
 
   it('forwards the remaining advanced settings to defineWebSocketQueue', () => {

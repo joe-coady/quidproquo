@@ -12,9 +12,11 @@ export const USER_TENANT_LINKS_STORE = 'userTenantLinks';
 export const TENANT_ON_PUBLISH_FN = 'askTenantOnPublish';
 
 // Inline-function name for the eventDoc `scopeResolver` hook: resolves the
-// request's optional tenant header into a validated storage scope.
+// request into a typed storage scope (membership-checked tenant, or the
+// caller's own personal scope when no tenant header is present).
 export const TENANT_SCOPE_RESOLVER_FN = 'askTenantScopeResolver';
 
-// Inline-function name for the websocket queue's `connectionScopeValidator`
-// hook: membership-checks a tenant claimed in the ws Authenticate handshake.
-export const TENANT_CONNECTION_SCOPE_VALIDATOR_FN = 'askTenantConnectionScopeValidator';
+// Inline-function name for the websocket queue's `connectionScopeResolver`
+// hook: resolves the ws Authenticate handshake into the scope stored on the
+// connection (membership-checked tenant claim, or the user's personal scope).
+export const TENANT_CONNECTION_SCOPE_RESOLVER_FN = 'askTenantConnectionScopeResolver';

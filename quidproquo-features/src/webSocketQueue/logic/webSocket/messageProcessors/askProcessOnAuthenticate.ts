@@ -5,10 +5,11 @@ import {
   AskResponse,
   askUserDirectorySetAccessToken,
   DecodedAccessToken,
+  Nullable,
 } from 'quidproquo-core';
 
 import {
-  getWebSocketQueueGlobalConfigKeyForConnectionScopeValidator,
+  getWebSocketQueueGlobalConfigKeyForConnectionScopeResolver,
   getWebSocketQueueGlobalConfigKeyForUserDirectoryName,
 } from '../../../config/defineWebSocketQueue';
 import { askWebsocketReadApiNameOrThrow } from '../../../context';
@@ -31,23 +32,36 @@ export function isWebSocketAuthenticateMessage(
   return event.type === WebSocketQueueClientMessageEventType.Authenticate;
 }
 
-// Validate a claimed storage scope (e.g. a tenant id) via the configured
-// connectionScopeValidator inline function. A claim with NO validator
-// configured is invalid by definition - an unvalidatable scope must never be
-// silently accepted (wrong partition) or silently dropped (data lands in the
-// unscoped partition while the client believes it is scoped).
-function* askValidateScopeClaim(apiName: string, userId: string, requestedScope: string): AskResponse<boolean> {
-  const scopeValidator = yield* askConfigGetGlobal<string>(getWebSocketQueueGlobalConfigKeyForConnectionScopeValidator(apiName));
+interface ConnectionScopeResolution {
+  accepted: boolean;
+  scope: string | undefined;
+}
 
-  if (!scopeValidator) {
-    return false;
+// Resolve the connection's storage scope via the configured
+// connectionScopeResolver inline function, which runs on EVERY authenticate
+// (claim or not) and returns the effective scope to store - e.g. the tenant
+// feature resolves a claim to a membership-checked tenant scope and no claim
+// to the user's own personal scope, never unscoped. A resolver throw rejects
+// the authenticate. A claim with NO resolver configured is invalid by
+// definition - an unvalidatable scope must never be silently accepted (wrong
+// partition) or silently dropped (data lands in the unscoped partition while
+// the client believes it is scoped); no claim on a plain queue stays unscoped.
+function* askResolveConnectionScope(apiName: string, userId: string, requestedScope: string | null): AskResponse<ConnectionScopeResolution> {
+  const scopeResolver = yield* askConfigGetGlobal<string>(getWebSocketQueueGlobalConfigKeyForConnectionScopeResolver(apiName));
+
+  if (!scopeResolver) {
+    return { accepted: !requestedScope, scope: undefined };
   }
 
-  const validation = yield* askCatch(
-    askInlineFunctionExecute<boolean, { userId: string; requestedScope: string }>(scopeValidator, { userId, requestedScope }),
+  const resolution = yield* askCatch(
+    askInlineFunctionExecute<Nullable<string>, { userId: string; requestedScope: string | null }>(scopeResolver, { userId, requestedScope }),
   );
 
-  return validation.success && validation.result === true;
+  if (!resolution.success) {
+    return { accepted: false, scope: undefined };
+  }
+
+  return { accepted: true, scope: resolution.result ?? undefined };
 }
 
 export function* askProcessOnAuthenticate(connectionId: string, accessToken: string, scope?: string): AskResponse<void> {
@@ -80,14 +94,12 @@ export function* askProcessOnAuthenticate(connectionId: string, accessToken: str
 
     const decodedAccessToken: DecodedAccessToken = result.result;
 
-    // A failed scope claim rejects the whole authenticate: the client must
-    // never end up authenticated on a different scope than it asked for.
-    if (scope) {
-      const isScopeValid = yield* askValidateScopeClaim(apiName, decodedAccessToken.userId, scope);
+    // A failed scope resolution rejects the whole authenticate: the client
+    // must never end up authenticated on a different scope than it asked for.
+    const scopeResolution = yield* askResolveConnectionScope(apiName, decodedAccessToken.userId, scope || null);
 
-      if (!isScopeValid) {
-        return yield* askProcessOnUnauthenticate(connectionId);
-      }
+    if (!scopeResolution.accepted) {
+      return yield* askProcessOnUnauthenticate(connectionId);
     }
 
     yield* webSocketConnectionData.askUpsert({
@@ -96,8 +108,10 @@ export function* askProcessOnAuthenticate(connectionId: string, accessToken: str
       userId: decodedAccessToken.userId,
       accessToken,
 
-      // No claim clears any previous one - re-authenticating back to Personal.
-      scope: scope || undefined,
+      // Always re-stamped from the resolution: on a plain queue no claim
+      // stays unscoped; on a queue with a resolver (tenant queues) no claim
+      // resolves to the user's own personal scope, never unscoped.
+      scope: scopeResolution.scope,
     });
 
     yield* askSendMessage(connectionId, {

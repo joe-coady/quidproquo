@@ -34,12 +34,12 @@ describe('tenant-aware wrapper requesters', () => {
     expect(seenOptions).toEqual({ ifNotExists: true, scope: 'tenant-a' });
   });
 
-  it('throws when no active tenant has been provided', () => {
+  it('throws when no active scope has been provided', () => {
     const unprovidedContext = {
       // No provider wraps the story, so the read falls back to the identifier default (null).
       [ContextActionType.Read]: () => null,
     };
 
-    expect(() => runStory(askTenantFileExists('media', 'a.txt'), unprovidedContext)).toThrow(/No active tenant/);
+    expect(() => runStory(askTenantFileExists('media', 'a.txt'), unprovidedContext)).toThrow(/No active scope/);
   });
 });
