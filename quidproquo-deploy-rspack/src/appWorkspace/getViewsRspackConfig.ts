@@ -221,6 +221,8 @@ export const getViewsRspackConfig = (viewsDir: string): Configuration => {
           type: 'javascript/auto',
         },
         { test: /\.css$/, type: 'css/auto' },
+        // Markdown imports resolve to the raw file contents (e.g. in-app help pages).
+        { test: /\.md$/, type: 'asset/source' },
         { test: /\.(png|jpe?g|gif|webp|avif|ico)$/, type: 'asset' },
         { test: /\.(woff2?|ttf|otf|eot)$/, type: 'asset/resource' },
       ],
