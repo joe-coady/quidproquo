@@ -28,6 +28,7 @@ export * from './mapAiStreamToolInputStart';
 export * from './mapAiStreamToolOutputDenied';
 export * from './mapAiStreamToolResult';
 export * from './prepareAiPromptCall';
+export * from './toAiStreamFinishReason';
 export * from './toAiStreamUsage';
 export * from './toCacheableMessages';
 export * from './toCacheableSystem';

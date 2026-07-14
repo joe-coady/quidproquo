@@ -8,7 +8,7 @@ description: Send a prompt to a large language model and get the full text respo
 Sends a prompt to a large language model and resolves with the model's complete text response. This is the buffered, non-streaming call — the story pauses until the model has finished generating, then resumes with the whole answer. If you want to consume tokens as they arrive, use [askAiPromptStream](./ask-ai-prompt-stream.md) instead.
 
 - **Action type:** `AiActionType.Prompt`
-- **On AWS:** runs through the [Vercel AI SDK](https://ai-sdk.dev) (`generateText`) against Amazon Bedrock. Any tools declared on the matching [defineAi](../../../config/core/ai.md) config are made available to the model, and the processor runs up to 10 tool-calling steps before returning.
+- **On AWS:** runs through the [Vercel AI SDK](https://ai-sdk.dev) (`generateText`) against Amazon Bedrock. Any tools declared on the matching [defineAi](../../../config/core/ai.md) config are made available to the model, and the processor runs up to 20 tool-calling steps before returning.
 
 ```typescript
 import { askAiPrompt, AiModel } from 'quidproquo-core';

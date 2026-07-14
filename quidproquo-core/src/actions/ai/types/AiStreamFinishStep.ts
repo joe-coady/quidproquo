@@ -1,3 +1,4 @@
+import { AiStreamFinishReasonEnum } from './AiStreamFinishReason';
 import { AiStreamPartType } from './AiStreamPartType';
 import { AiStreamUsage } from './AiStreamUsage';
 
@@ -8,8 +9,8 @@ import { AiStreamUsage } from './AiStreamUsage';
  */
 export interface AiStreamFinishStep {
   type: AiStreamPartType.FinishStep;
-  /** Why this step stopped — e.g. `'tool-calls'` between steps, `'stop'` on the final step. */
-  finishReason: string;
+  /** Why this step stopped — `toolCalls` between steps, `stop` on the final step. */
+  finishReason: AiStreamFinishReasonEnum;
   /** Token usage for this step only. */
   usage: AiStreamUsage;
 }

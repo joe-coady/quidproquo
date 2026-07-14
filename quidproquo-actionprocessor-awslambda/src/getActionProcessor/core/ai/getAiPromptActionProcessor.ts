@@ -44,7 +44,7 @@ const getProcessAiPrompt = (qpqConfig: QPQConfig): AiPromptActionProcessor => {
         ...promptOrMessages,
         tools: prepared.tools,
         providerOptions,
-        stopWhen: stepCountIs(10),
+        stopWhen: stepCountIs(20),
       });
 
       if (payload.caching) {

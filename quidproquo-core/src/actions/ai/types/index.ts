@@ -4,6 +4,7 @@ export * from './AiStreamError';
 export * from './AiStreamFile';
 export * from './AiStreamFilePart';
 export * from './AiStreamFinish';
+export * from './AiStreamFinishReason';
 export * from './AiStreamFinishStep';
 export * from './AiStreamPart';
 export * from './AiStreamPartType';

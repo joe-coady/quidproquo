@@ -14,7 +14,7 @@ describe('toCacheableMessages', () => {
     expect(toCacheableMessages([], true)).toEqual([]);
   });
 
-  it('marks only the last message with a bedrock cache point', () => {
+  it('marks the last two messages with bedrock cache points', () => {
     const messages = [
       { role: 'user' as const, content: 'what is 1+1' },
       { role: 'assistant' as const, content: 'it is 2' },
@@ -23,8 +23,16 @@ describe('toCacheableMessages', () => {
 
     expect(toCacheableMessages(messages, true)).toEqual([
       { role: 'user', content: 'what is 1+1' },
-      { role: 'assistant', content: 'it is 2' },
+      { role: 'assistant', content: 'it is 2', providerOptions: { bedrock: { cachePoint: { type: 'default' } } } },
       { role: 'user', content: 'oh nice', providerOptions: { bedrock: { cachePoint: { type: 'default' } } } },
+    ]);
+  });
+
+  it('marks a lone message with a cache point', () => {
+    const messages = [{ role: 'user' as const, content: 'hi' }];
+
+    expect(toCacheableMessages(messages, true)).toEqual([
+      { role: 'user', content: 'hi', providerOptions: { bedrock: { cachePoint: { type: 'default' } } } },
     ]);
   });
 

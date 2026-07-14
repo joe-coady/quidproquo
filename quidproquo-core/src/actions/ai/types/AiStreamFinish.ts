@@ -1,3 +1,4 @@
+import { AiStreamFinishReasonEnum } from './AiStreamFinishReason';
 import { AiStreamPartType } from './AiStreamPartType';
 import { AiStreamUsage } from './AiStreamUsage';
 
@@ -7,8 +8,8 @@ import { AiStreamUsage } from './AiStreamUsage';
  */
 export interface AiStreamFinish {
   type: AiStreamPartType.Finish;
-  /** Why the model stopped — e.g. `'stop'`, `'length'`, `'tool-calls'`. */
-  finishReason: string;
+  /** Why the model stopped. `toolCalls` here means the loop was halted early and is resumable. */
+  finishReason: AiStreamFinishReasonEnum;
   /** Aggregate token usage across all steps. */
   usage: AiStreamUsage;
 }

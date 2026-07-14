@@ -12,7 +12,15 @@ import {
 import { stepCountIs, streamText } from 'ai';
 
 import { randomGuid } from '../../../awsLambdaUtils';
-import { createDriveFileResolver, mapAiStreamPart, prepareAiPromptCall, toCacheableMessages, toCacheableSystem, toSdkMessages } from './logic';
+import {
+  createDriveFileResolver,
+  mapAiStreamPart,
+  prepareAiPromptCall,
+  toCacheableMessages,
+  toCacheableSystem,
+  toErrorMessage,
+  toSdkMessages,
+} from './logic';
 
 const getProcessAiPromptStream = (qpqConfig: QPQConfig): AiPromptStreamActionProcessor => {
   return async (payload, session, actionProcessorList, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
@@ -45,7 +53,9 @@ const getProcessAiPromptStream = (qpqConfig: QPQConfig): AiPromptStreamActionPro
         ...promptOrMessages,
         tools: prepared.tools,
         providerOptions,
-        stopWhen: stepCountIs(10),
+        // Proof of concept for halt/resume: stop after every single step so the
+        // caller sees finishReason 'tool-calls' and must loop the turn back in.
+        stopWhen: stepCountIs(20),
         // streamText swallows errors by default to keep the server alive — surface them to CloudWatch.
         onError: ({ error }) => {
           // todo yeild this out
@@ -61,10 +71,17 @@ const getProcessAiPromptStream = (qpqConfig: QPQConfig): AiPromptStreamActionPro
         }
 
         if (payload.caching) {
-          // The SDK's cross-provider usage breakdown, not providerMetadata.bedrock.usage — that
-          // field never carries cacheReadInputTokens through on @ai-sdk/amazon-bedrock (5.0.11).
-          const step = await finalStep;
-          console.log('AI prompt cache usage:', step.usage?.inputTokenDetails);
+          try {
+            // The SDK's cross-provider usage breakdown, not providerMetadata.bedrock.usage — that
+            // field never carries cacheReadInputTokens through on @ai-sdk/amazon-bedrock (5.0.11).
+            const step = await finalStep;
+            console.log('AI prompt cache usage:', step.usage?.inputTokenDetails);
+          } catch (error) {
+            // finalStep rejects (AI_NoOutputGeneratedError) when the stream errored before
+            // completing a step. The error part has already been streamed to the consumer;
+            // throwing here would replace that real error with the unhelpful wrapper.
+            console.warn('AI prompt cache usage unavailable:', toErrorMessage(error));
+          }
         }
       }
 
