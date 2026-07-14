@@ -214,11 +214,18 @@ implementation:
   `qpq go:dev:web` runs all views dev servers in-process via RspackDevServer.
   `qpq go:dev` composes both: the API watch plus every views dev server in one
   process, so a single ctrl+c stops the whole stack.
-- **Hooks**: `qpq hooks <name>` runs `qpq:<name>` from every
-  `apps/<app>/package.json`; doccypoccy root postinstall =
+- **Hooks**: `qpq hooks <name>` runs `qpq:<name>` (falling back to the plain
+  `<name>` script when no qpq:-prefixed one exists) from every
+  `apps/<app>/package.json` AND every package matched by the consumer root's
+  `workspaces` globs, in dependency order (declared deps resolved by package
+  name, edges only between packages in the run) with parallel execution
+  (default jobs = min(8, cores - 1); `--jobs=1` forces serial). Output is
+  line-prefixed per package; a failure skips that package's dependents but
+  lets unrelated packages finish. doccypoccy root postinstall =
   `qpq hooks postinstall || true` (non-fatal while quidproquo-cli is linked,
   not registry-installed); chakra:typegen lives in docgen's `qpq:postinstall`.
-  `qpq go` also fires a `qpq:predeploy` hook before building.
+  `qpq go` also fires a `qpq:predeploy` hook before building (single-app,
+  sequential, unchanged).
 - **`qpq go:docker`** is the parallel dockerized deploy, ported intact: local
   builds first (synth in-process, api/views bundles programmatic + concurrent,
   one CDK cloud assembly per service via `cdk synth --app <workspace app>`),

@@ -56,8 +56,10 @@ const DEPENDENCY_ORDERED_SCRIPTS = new Set(['build']);
 
 // Note: empty-string scripts (e.g. quidproquo-tsconfig's `"build": ""`) are falsy,
 // so they're excluded here and such workspaces contribute zero steps.
-const getStages = (pkg: PackageJson, script: string): string[][] => {
-  const stages = STEP_STAGES[script];
+// useStages=false (--no-stages) skips the sub-script expansion and runs the package's
+// own aggregate script as a single step, for comparing against staged execution.
+const getStages = (pkg: PackageJson, script: string, useStages: boolean): string[][] => {
+  const stages = useStages ? STEP_STAGES[script] : undefined;
   if (stages) {
     const present = stages.map((stage) => stage.filter((sub) => pkg.scripts?.[sub])).filter((stage) => stage.length > 0);
     if (present.length > 0) {
@@ -80,7 +82,7 @@ const getChangedDirs = (): Set<string> => {
   return new Set(changed);
 };
 
-const buildTasks = (script: string, mode: 'all' | 'changed'): PkgTask[] => {
+const buildTasks = (script: string, mode: 'all' | 'changed', useStages: boolean): PkgTask[] => {
   const workspaces = getOrderedWorkspaces();
   const changedDirs = mode === 'changed' ? getChangedDirs() : null;
 
@@ -100,7 +102,7 @@ const buildTasks = (script: string, mode: 'all' | 'changed'): PkgTask[] => {
       continue;
     }
     const pkg = pkgs.get(dir)!;
-    const stages = getStages(pkg, script);
+    const stages = getStages(pkg, script, useStages);
     if (stages.length > 0) {
       tasks.push({ dir, name: pkg.name, version: pkg.version ?? '', stages, deps: [] });
     }
@@ -187,13 +189,14 @@ const countSteps = (tasks: PkgTask[]): number =>
 const main = async (): Promise<void> => {
   const [script, ...args] = process.argv.slice(2);
   if (!script) {
-    console.error('runWorkspaces - usage: tsx ./scripts/runWorkspaces.ts <script-name> [--all|--changed] [--jobs=N]');
+    console.error('runWorkspaces - usage: tsx ./scripts/runWorkspaces.ts <script-name> [--all|--changed] [--jobs=N] [--no-stages]');
     process.exit(1);
   }
 
   const mode: 'all' | 'changed' = args.includes('--changed') ? 'changed' : 'all';
   const jobs = getJobs(args);
-  const tasks = buildTasks(script, mode);
+  const useStages = !args.includes('--no-stages');
+  const tasks = buildTasks(script, mode, useStages);
 
   if (tasks.length === 0) {
     const scope = mode === 'changed' ? 'changed workspace(s)' : 'workspace(s)';

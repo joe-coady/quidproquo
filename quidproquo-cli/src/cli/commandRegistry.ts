@@ -21,7 +21,9 @@ export type CliCommand = {
 
 // `qpq hooks` needs a hook name; when launched from the menu there is no
 // argv to pass it in, so ask.
-const promptHookName = async (): Promise<string[]> => [await promptText('Hook name (runs qpq:<name> in every app that defines it):')];
+const promptHookName = async (): Promise<string[]> => [
+  await promptText('Hook name (runs qpq:<name>, or plain <name>, in every app/package that defines it):'),
+];
 
 /* eslint-disable @typescript-eslint/no-require-imports */
 export const cliCommands: CliCommand[] = [
@@ -100,7 +102,7 @@ export const cliCommands: CliCommand[] = [
   {
     name: 'hooks',
     usageArgs: '<name>',
-    summary: 'Run qpq:<name> in every app that defines it',
+    summary: 'Run qpq:<name> (or plain <name>) in every app/package that defines it (dependency ordered, parallel; --jobs=N)',
     promptArgs: promptHookName,
     run: (a) => require('../commands/hooks').hooksCommand(a),
   },

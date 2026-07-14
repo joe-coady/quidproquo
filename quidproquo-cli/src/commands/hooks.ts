@@ -1,15 +1,32 @@
-// `qpq hooks <name>` — run the `qpq:<name>` script of every app that defines
-// one (apps/<app>/package.json). Wire the root package.json's lifecycle to it,
-// e.g. "postinstall": "qpq hooks postinstall".
-import { runAppHookForAllApps } from '../lib/hooks';
+// `qpq hooks <name>` — run the `qpq:<name>` script (or the plain `<name>`
+// script when no qpq:-prefixed one exists) of every app and workspace package
+// that defines one, in dependency order with parallel execution.
+// Wire the root package.json's lifecycle to it, e.g.
+// "postinstall": "qpq hooks postinstall". Use --jobs=1 to force serial runs.
+import os from 'os';
+
+import { getArgValue } from '../lib/args';
+import { runHookForAllPackages } from '../lib/hooks';
+import { assertNoFailures } from '../lib/runTasks';
+
+// Leave a core for the rest of the machine, capped so a wide dependency level
+// doesn't stack up too many concurrent npm processes.
+const getJobs = (argv: string[]): number => {
+  const parsed = Number(getArgValue(argv, '--jobs'));
+  if (Number.isFinite(parsed) && parsed >= 1) {
+    return Math.floor(parsed);
+  }
+  return Math.max(1, Math.min(8, os.availableParallelism() - 1));
+};
 
 export const hooksCommand = async (argv: string[]): Promise<void> => {
   const [hook] = argv.filter((a) => !a.startsWith('--'));
 
   if (!hook) {
-    console.error('Usage: qpq hooks <name>   (runs qpq:<name> in every app that defines it)');
+    console.error('Usage: qpq hooks <name> [--jobs=N]   (runs qpq:<name>, or plain <name>, in every app/package that defines it)');
     process.exit(1);
   }
 
-  await runAppHookForAllApps(hook);
+  const failures = await runHookForAllPackages(hook, getJobs(argv));
+  assertNoFailures(`hooks ${hook}`, failures);
 };
