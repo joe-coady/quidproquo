@@ -1,6 +1,7 @@
 import { AskResponse } from 'quidproquo-core';
 import { HTTPEvent, HTTPEventResponse, qpqWebServerUtils } from 'quidproquo-webserver';
 
+import { askEventDocProvideRequestScope } from '../../../eventDoc/globals/askEventDocProvideRequestScope';
 import { askEventDocProvideStoreFromGlobals } from '../../../eventDoc/globals/askEventDocProvideStoreFromGlobals';
 import { askEventDocResolveActor } from '../../../eventDoc/globals/askEventDocResolveActor';
 import { askEventDocParseBody } from '../../../eventDoc/routes/askEventDocParseBody';
@@ -15,7 +16,12 @@ function* askTenantRouteCreate(event: HTTPEvent): AskResponse<HTTPEventResponse>
   return qpqWebServerUtils.toJsonEventResponse(summary);
 }
 
-/** POST {basePath}: create a tenant (body `{ name }`); the caller becomes its first member. */
+/**
+ * POST {basePath}: create a tenant (body `{ name }`); the caller becomes its first member.
+ * Runs under the request's scope like any other scoped route, so the new tenant doc lands
+ * in the caller's current partition - their personal scope, or the active tenant when an
+ * org creates a sub-tenant - and stays manageable from that scope.
+ */
 export function* create(event: HTTPEvent): AskResponse<HTTPEventResponse> {
-  return yield* askEventDocProvideStoreFromGlobals(askTenantRouteCreate(event));
+  return yield* askEventDocProvideStoreFromGlobals(askEventDocProvideRequestScope(event, askTenantRouteCreate(event)));
 }

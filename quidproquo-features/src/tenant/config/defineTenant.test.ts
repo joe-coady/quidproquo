@@ -38,4 +38,18 @@ describe('defineTenant', () => {
 
     expect(Object.keys(serviceSettings.settingsByService)).toEqual(['owner-svc']);
   });
+
+  it('scopes the tenant collection itself with the standard tenant scope resolver', () => {
+    const serviceSettings = config.find(
+      (s) => (s as { configSettingType: string }).configSettingType === QPQCoreConfigSettingType.serviceSettings,
+    ) as { settingsByService: Record<string, unknown[]> };
+
+    // The standard resolver is threaded into the tenant collection's own route
+    // globals (the {basePath}/docs CRUD and the {basePath} custom routes) -
+    // without it every authenticated user could read and mutate every tenant's
+    // doc. The tenant collection is an ordinary tenanted collection.
+    const ownerSettings = JSON.stringify(serviceSettings.settingsByService['owner-svc']);
+    const occurrences = ownerSettings.split(TENANT_SCOPE_RESOLVER_FN).length - 1;
+    expect(occurrences).toBeGreaterThanOrEqual(2);
+  });
 });

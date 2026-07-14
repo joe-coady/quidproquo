@@ -22,6 +22,7 @@ import { describe, expect, it } from 'vitest';
 import {
   EVENT_DOC_EVENTS_STORE_NAME_GLOBAL,
   EVENT_DOC_ON_PUBLISH_GLOBAL,
+  EVENT_DOC_SCOPE_RESOLVER_GLOBAL,
   EVENT_DOC_STORE_NAME_GLOBAL,
   EVENT_DOC_TYPE_GLOBAL,
   EVENT_DOC_USER_DIRECTORY_GLOBAL,
@@ -35,6 +36,7 @@ import {
   TENANT_EVENTDOC_STORE,
   TENANT_ON_PUBLISH_FN,
   TENANT_RECORD_STORE,
+  TENANT_SCOPE_RESOLVER_FN,
   USER_TENANT_LINKS_STORE,
 } from './constants/tenantStoreNames';
 import { TenantEffect } from './fold/TenantEffect';
@@ -48,8 +50,16 @@ import { list } from './routes/controllers/list';
 // End-to-end story-level pass over the tenant feature: create links membership,
 // SET_BRAND + PUBLISH materializes the record via the onPublish sync, list/get
 // serve the record store, and the per-request tenant gate validates membership.
+// The tenant collection is an ordinary tenanted collection - every route runs
+// under the standard request scope (emulated by the Execute mock below), so a
+// created tenant doc lands in the caller's own partition.
 
-const store = buildEventDocStore({ storeName: TENANT_EVENTDOC_STORE, type: TENANT_DOC_TYPE, onPublish: TENANT_ON_PUBLISH_FN });
+const store = buildEventDocStore({
+  storeName: TENANT_EVENTDOC_STORE,
+  type: TENANT_DOC_TYPE,
+  onPublish: TENANT_ON_PUBLISH_FN,
+  scopeResolver: TENANT_SCOPE_RESOLVER_FN,
+});
 
 const globals: Record<string, string> = {
   [EVENT_DOC_STORE_NAME_GLOBAL]: store.storeName,
@@ -57,6 +67,7 @@ const globals: Record<string, string> = {
   [EVENT_DOC_TYPE_GLOBAL]: store.type,
   [EVENT_DOC_USER_DIRECTORY_GLOBAL]: 'test-user-directory',
   [EVENT_DOC_ON_PUBLISH_GLOBAL]: TENANT_ON_PUBLISH_FN,
+  [EVENT_DOC_SCOPE_RESOLVER_GLOBAL]: TENANT_SCOPE_RESOLVER_FN,
   [TENANT_HEADER_NAME_GLOBAL]: DEFAULT_TENANT_HEADER_NAME,
 };
 
@@ -85,6 +96,7 @@ const matches = (item: Record<string, unknown>, op: KvsQueryOperation): boolean 
 const buildMocks = () => {
   const tables: Record<string, Record<string, unknown>[]> = {};
   const inlinePayloads: EventDocOnPublishInput[] = [];
+  const upsertScopes: { store: string; scope?: string }[] = [];
   let guidCounter = 0;
   let clock = Date.parse('2026-07-11T00:00:00.000Z');
 
@@ -105,8 +117,16 @@ const buildMocks = () => {
     [DateActionType.Now]: () => new Date((clock += 1000)).toISOString(),
     [GuidActionType.New]: () => `guid-${++guidCounter}`,
 
-    [InlineFunctionActionType.Execute]: (action: { payload: { functionName: string; payload: EventDocOnPublishInput } }) => {
-      inlinePayloads.push(action.payload.payload);
+    [InlineFunctionActionType.Execute]: (action: { payload: { functionName: string; payload: unknown } }) => {
+      // Emulate the standard request-scope resolver: header names a tenant ->
+      // that tenant's scope; no header -> the caller's personal scope.
+      if (action.payload.functionName === TENANT_SCOPE_RESOLVER_FN) {
+        const { event } = action.payload.payload as { event: HTTPEvent };
+        const headerTenantId = event.headers?.[DEFAULT_TENANT_HEADER_NAME];
+        return headerTenantId ? `TENANT#${headerTenantId}` : 'PERSONAL#user-1';
+      }
+
+      inlinePayloads.push(action.payload.payload as EventDocOnPublishInput);
       return undefined;
     },
 
@@ -116,9 +136,10 @@ const buildMocks = () => {
     },
 
     [KeyValueStoreActionType.Upsert]: (action: {
-      payload: { keyValueStoreName: string; item: Record<string, unknown>; options?: { ifNotExists?: boolean } };
+      payload: { keyValueStoreName: string; item: Record<string, unknown>; options?: { ifNotExists?: boolean; scope?: string } };
     }) => {
       const { keyValueStoreName, item, options } = action.payload;
+      upsertScopes.push({ store: keyValueStoreName, scope: options?.scope });
       const table = (tables[keyValueStoreName] ??= []);
       const existingIndex = table.findIndex(sameRow(item));
 
@@ -155,7 +176,7 @@ const buildMocks = () => {
     },
   };
 
-  return { mocks, tables, inlinePayloads };
+  return { mocks, tables, inlinePayloads, upsertScopes };
 };
 
 const httpEvent = (body: unknown, headers: Record<string, string> = {}): HTTPEvent => ({
@@ -171,7 +192,7 @@ const httpEvent = (body: unknown, headers: Record<string, string> = {}): HTTPEve
 
 describe('tenant feature', () => {
   it('creates a tenant, links membership, materializes the record on publish, and serves it back', () => {
-    const { mocks, tables, inlinePayloads } = buildMocks();
+    const { mocks, tables, inlinePayloads, upsertScopes } = buildMocks();
 
     // Create: the caller becomes the first member.
     const createResponse = runStory(create(httpEvent({ name: 'credit-corp' })), mocks);
@@ -181,9 +202,18 @@ describe('tenant feature', () => {
     const links = tables[USER_TENANT_LINKS_STORE];
     expect(links).toEqual([{ userId: 'user-1', tenantIds: [summary.id] }]);
 
-    // The list serves the created tenant IMMEDIATELY (summary store, drafts
-    // included) - a never-published tenant must be reopenable to finish setup.
-    const draftListResponse = runStory(list(), mocks);
+    // The doc + its INIT event land in the CALLER'S OWN partition (no header ->
+    // personal scope), like any other scoped create - nowhere special. The
+    // membership link is the unscoped cross-scope registry.
+    const docWrites = upsertScopes.filter(({ store }) => store !== USER_TENANT_LINKS_STORE);
+    expect(docWrites.length).toBeGreaterThan(0);
+    expect(docWrites.every(({ scope }) => scope === 'PERSONAL#user-1')).toBe(true);
+    expect(upsertScopes.find(({ store }) => store === USER_TENANT_LINKS_STORE)?.scope).toBeUndefined();
+
+    // The list serves the created tenant IMMEDIATELY (live summary in the
+    // caller's scope, drafts included) - a never-published tenant must be
+    // reopenable to finish setup.
+    const draftListResponse = runStory(list(httpEvent(undefined)), mocks);
     const draftList = JSON.parse(draftListResponse.body!);
     expect(draftList).toHaveLength(1);
     expect(draftList[0]).toMatchObject({ id: summary.id, name: 'credit-corp' });
@@ -241,7 +271,7 @@ describe('tenant feature', () => {
     });
 
     // The list serves EventDocSummary rows; get serves the materialized record.
-    const listResponse = runStory(list(), mocks);
+    const listResponse = runStory(list(httpEvent(undefined)), mocks);
     const listed = JSON.parse(listResponse.body!);
     expect(listed).toHaveLength(1);
     expect(listed[0]).toMatchObject({ id: summary.id, name: 'credit-corp' });
@@ -261,8 +291,33 @@ describe('tenant feature', () => {
     const summaryRow = tables[TENANT_EVENTDOC_STORE].find((row) => row.id === summary.id)!;
     summaryRow.deletedAt = '2026-07-11T01:00:00.000Z';
 
-    const listResponse = runStory(list(), mocks);
+    const listResponse = runStory(list(httpEvent(undefined)), mocks);
     expect(JSON.parse(listResponse.body!)).toEqual([]);
+  });
+
+  it('hydrates memberships homed in other scopes from the published registry record', () => {
+    const { mocks, tables } = buildMocks();
+
+    // user-1 is a member of two tenants created elsewhere (no summary in the
+    // caller's scope): one published (has a record), one still a draft.
+    tables[USER_TENANT_LINKS_STORE] = [{ userId: 'user-1', tenantIds: ['tenant-published', 'tenant-draft'] }];
+    tables[TENANT_RECORD_STORE] = [
+      {
+        tenantId: 'tenant-published',
+        name: 'acme',
+        createdAt: '2026-07-10T00:00:00.000Z',
+        updatedAt: '2026-07-10T00:00:00.000Z',
+        createdByUserId: 'user-2',
+        status: TenantStatus.active,
+      },
+    ];
+
+    // The published one appears via its record; the foreign draft has no
+    // registry presence yet, so it is (correctly) not listed.
+    const listResponse = runStory(list(httpEvent(undefined)), mocks);
+    const listed = JSON.parse(listResponse.body!);
+    expect(listed).toHaveLength(1);
+    expect(listed[0]).toMatchObject({ id: 'tenant-published', name: 'acme', versions: [] });
   });
 
   it('gates requests on membership of the claimed tenant header', () => {

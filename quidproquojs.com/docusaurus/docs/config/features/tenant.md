@@ -7,7 +7,7 @@ description: Wire up org/tenant support across every service in one call — the
 
 Wires up **everything for org/tenant support**, declared identically in every service that needs it. You always pass the same `owner`; what actually materializes depends on whether the current module is that owner. It returns a `QPQConfig` (an array of config settings) composed of:
 
-- The scope-resolver and connection-scope-resolver [inline functions](../core/inline-function.md) (`TENANT_SCOPE_RESOLVER_FN`, `TENANT_CONNECTION_SCOPE_RESOLVER_FN`) — registered in **every** service, so each can tenant-scope its own collections and WebSocket connections. The tenant collection itself stays unscoped; it is the registry.
+- The scope-resolver and connection-scope-resolver [inline functions](../core/inline-function.md) (`TENANT_SCOPE_RESOLVER_FN`, `TENANT_CONNECTION_SCOPE_RESOLVER_FN`) — registered in **every** service, so each can tenant-scope its own collections and WebSocket connections. The tenant collection itself is an ordinary tenanted collection too: a tenant doc lives in whatever scope the request that created it ran under (the creator's personal partition, or the active tenant when an org creates a sub-tenant), and every tenant route resolves its scope with the same resolver. The cross-scope registry surface is the membership table plus the materialized `TenantRecord` store below, both unscoped.
 - The `userTenantLinks` membership table ([key-value store](../core/key-value-store.md)) — declared with `owner` everywhere, so non-owner services get a cross-module reference to the owner's table instead of their own copy.
 - Everything else, gated to the owner's deploy only via [defineServiceSettings](../core/service-settings.md):
   - The tenant stores ([defineTenantStores](./tenant-stores.md)): the tenant event-doc collection plus the materialized record table.
@@ -37,8 +37,8 @@ All paths are prefixed with the version segment `/v{version}` (default `/v1`) an
 
 | Method | Path | Purpose |
 | --- | --- | --- |
-| `GET` | `{basePath}` | The authenticated user's tenants, as `EventDocSummary` rows (drafts included). |
-| `POST` | `{basePath}` | Create a tenant (body `{ name }`); the caller becomes its first member. |
+| `GET` | `{basePath}` | The authenticated user's tenants, as `EventDocSummary` rows. Runs under the request's scope: memberships homed in the caller's current partition hydrate live (drafts included); the rest hydrate from the published `TenantRecord` registry. |
+| `POST` | `{basePath}` | Create a tenant (body `{ name }`); the caller becomes its first member. Runs under the request's scope, so the new tenant doc lands in the caller's current partition. |
 | `GET` | `{basePath}/{id}` | One tenant's materialized record (the fast path). Members only: non-members get `Forbidden`, a missing record gets `NotFound`. |
 
 On top of these, the full generic event-doc route set (create, append, list, assets, and so on) is mounted under `{basePath}/docs`; see [defineEventDocRoutes](./event-doc-routes.md#routes-mounted) for the list.
@@ -64,6 +64,7 @@ The single `options` argument is a `TenantOptions` (a `TenantRoutesOptions` plus
 ## Notes
 
 - Tenant state is event-sourced: the `tenants` event-doc collection is the audit-trailed source of truth, and the `tenantRecords` table is a read model synced on publish. Request handlers never write the record table directly.
+- The `tenants` collection is scope-resolved like any other tenanted collection (see [defineTenantedEventDoc](./tenanted-event-doc.md)): a doc is only visible/editable from the scope that owns it, including through the generic CRUD under `{basePath}/docs`. There is no cross-scope doc read — listing memberships homed in another scope goes through the published `TenantRecord`, not the doc store.
 - The `TenantRecord` produced by the publish sync carries `tenantId`, `name`, `brandColors`, `logoUrl`, `createdAt`, `updatedAt`, `createdByUserId`, and a `status` derived from the summary (`deleted` when the summary has a `deletedAt`, otherwise `active`).
 - `defineTenant` registers the scope resolver but does not apply it to anything. To tenant-scope one of your own collections, pass `TENANT_SCOPE_RESOLVER_FN` as that collection's `scopeResolver` option (or use [defineTenantedEventDoc](./tenanted-event-doc.md), which does this for you).
 - The scope resolver always resolves to a typed scope — a membership-checked `TENANT#<id>` for a request that names a tenant, or the caller's own `PERSONAL#<userId>` when it doesn't. A tenant-scoped collection or connection is never left unscoped.
