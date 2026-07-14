@@ -5,12 +5,12 @@ Scaffold a new [quidproquo](https://github.com/joe-coady/quidproquo) app:
 ```bash
 npx create-qpq-app my-app
 cd my-app
-npm run go:dev
+npm run dev
 ```
 
-You get a full QPQ workspace with five services — `admin`, `auth`, `design`,
-`shell` and `todo` — that builds, runs locally on the QPQ dev server, and
-deploys as a single docker image with `npm run go`.
+You get a full QPQ workspace with five services (`admin`, `auth`, `design`,
+`shell` and `todo`) that builds, runs locally on the QPQ dev server, and
+deploys as a single docker image with `npm run deploy`.
 
 ## Options
 

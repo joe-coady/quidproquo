@@ -64,6 +64,30 @@ const getProcessCwd = (pid: number): string | null => {
   }
 };
 
+// The sweep below must never target this process's own wrappers: launched as
+// `npx qpq go:dev:api` (or via any shell whose -c string names qpq), the
+// ancestor chain (`sh -c "npx ... qpq ..."`, `npm exec qpq ...`) matches
+// isQpqCliCommand and shares our cwd, so excluding just process.pid isn't
+// enough — SIGINTing an ancestor tears down our own tree. Walk ppid to the
+// top and exclude the whole chain.
+const getOwnAncestorPids = (): Set<number> => {
+  const ancestors = new Set<number>();
+  let pid = process.pid;
+  while (pid > 1 && !ancestors.has(pid)) {
+    ancestors.add(pid);
+    try {
+      pid = Number(
+        execSync(`ps -o ppid= -p ${pid}`, { stdio: ['ignore', 'pipe', 'ignore'] })
+          .toString()
+          .trim(),
+      );
+    } catch {
+      break;
+    }
+  }
+  return ancestors;
+};
+
 // killStaleListeners only sees processes currently BOUND to one of the given
 // ports — it can't catch a still-running `qpq go:dev*` watcher whose spawned
 // dev-server child already died (a crash, or us killing just the child):
@@ -77,6 +101,7 @@ const getProcessCwd = (pid: number): string | null => {
 // handler runs and tears down its child cleanly rather than orphaning it.
 export const killOtherQpqDevProcesses = (root: string): void => {
   const resolvedRoot = fs.realpathSync(root);
+  const ownPids = getOwnAncestorPids();
 
   let lines: string[] = [];
   try {
@@ -97,7 +122,7 @@ export const killOtherQpqDevProcesses = (root: string): void => {
     const pid = Number(trimmed.slice(0, spaceIndex));
     const command = trimmed.slice(spaceIndex + 1).trim();
 
-    if (!pid || pid === process.pid || !isQpqCliCommand(command)) continue;
+    if (!pid || ownPids.has(pid) || !isQpqCliCommand(command)) continue;
     if (getProcessCwd(pid) !== resolvedRoot) continue;
 
     console.log(`Killing other qpq dev process for this repo (pid ${pid}): ${command}`);

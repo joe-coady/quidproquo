@@ -15,8 +15,8 @@ deploys as a single docker image.
 Next steps:
 
   cd ${answers.appName}
-${install}  npm run go:dev     # api on http://localhost:8080, web on http://localhost:3080
-  npm run go         # build the docker image (then run the printed docker command)
+${install}  npm run dev        # api on http://localhost:8080, web on http://localhost:3080
+  npm run deploy     # build the docker image (then run the printed docker command)
 
 Deploy config lives in apps/${answers.appName}/deploy.config.json (domain: ${answers.domain}).
 `);
