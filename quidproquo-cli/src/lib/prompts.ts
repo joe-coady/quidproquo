@@ -6,6 +6,17 @@ export const promptSelect = async (message: string, choices: string[], defaultCh
   return select({ message, choices, default: defaultChoice });
 };
 
+// A single-choice list prompt over labelled values; a choice's optional
+// `short` replaces its name in the answer line once picked, and its optional
+// `description` renders under the list while it is highlighted.
+export const promptSelectDetailed = async <T>(
+  message: string,
+  choices: { name: string; value: T; short?: string; description?: string }[],
+): Promise<T> => {
+  const { select } = await import('@inquirer/prompts');
+  return select({ message, choices });
+};
+
 // A yes/no list prompt, returning true for "Yes".
 export const promptYesNo = async (message: string): Promise<boolean> => (await promptSelect(message, ['No', 'Yes'])) === 'Yes';
 
