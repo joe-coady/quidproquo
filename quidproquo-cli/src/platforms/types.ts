@@ -1,5 +1,6 @@
 import { QpqAppDeployEnvironment } from 'quidproquo-deploy-awscdk';
 
+import { ClearResourcesPlan } from '../lib/clearResourcesPlan';
 import { DeployPlan, TeardownPlan } from '../lib/deployPrompts';
 
 export enum QpqDeployPlatform {
@@ -30,6 +31,10 @@ export interface QpqPlatformDriver {
   // Destroy the web/api/inf stacks for selected services (`qpq teardown`) —
   // optional; drivers with no teardown strategy simply omit it.
   teardown?: (appName: string, plan: TeardownPlan) => Promise<void>;
+
+  // Empty the stored data of selected resources without touching the stacks
+  // (`qpq clear-resources`) — optional; drivers with no strategy omit it.
+  clearResources?: (appName: string, plan: ClearResourcesPlan) => Promise<void>;
 
   // Federated remote publishing (`qpq publish[:build|:upload|:deploy]`).
   publish: (appName: string, serviceNames: string[]) => Promise<void>;

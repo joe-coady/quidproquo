@@ -1,7 +1,7 @@
 {
   "name": "quidproquo-cli",
   "version": "0.1.7",
-  "description": "The qpq CLI — build, dev and deploy orchestration for QPQ apps",
+  "description": "The qpq CLI \u2014 build, dev and deploy orchestration for QPQ apps",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
   "types": "./lib/commonjs/index.d.ts",
@@ -34,6 +34,8 @@
   },
   "homepage": "https://github.com/joe-coady/quidproquo#readme",
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.621.0",
+    "@aws-sdk/client-s3": "^3.621.0",
     "@aws-sdk/client-sts": "^3.621.0",
     "@inquirer/prompts": "^8.5.2",
     "@rspack/dev-server": "^2.1.0",

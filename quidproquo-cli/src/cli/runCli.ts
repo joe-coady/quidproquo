@@ -12,6 +12,7 @@ Commands:
   go:dev:api       Run the local API dev server (hot reload)
   go:dev:web       Run every views microfrontend dev server
   teardown         Destroy web/api/inf stacks for selected services (interactive)
+  clear-resources  Empty selected buckets/tables (data only, stacks untouched; interactive)
   synth [service]  Synth QPQ configs to dist/apps/<app>/infrastructure
   prep             Regenerate apps/<app>/tsconfig.federated.json
   publish          Build + upload + deploy federated remotes
@@ -56,6 +57,7 @@ export const runCli = async (argv: string[]): Promise<void> => {
     'go:dev:api': (a) => require('../commands/goDevApi').goDevApiCommand(a),
     'go:dev:web': (a) => require('../commands/goDevWeb').goDevWebCommand(a),
     teardown: (a) => require('../commands/teardown').teardownCommand(a),
+    'clear-resources': (a) => require('../commands/clearResources').clearResourcesCommand(a),
     synth: (a) => require('../commands/synth').synthCommand(a),
     prep: (a) => require('../commands/prep').prepCommand(a),
     publish: (a) => require('../commands/publish').publishCommand(a),
