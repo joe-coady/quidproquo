@@ -19,23 +19,14 @@
     "apps/*/services/*/views"
   ],
   "scripts": {
-    "build": "npm run build --workspaces --if-present",
+    "build": "qpq hooks build",
     "validate-ts": "npm run build --workspaces --if-present && npm run validate-ts --workspaces --if-present",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "synth": "qpq synth",
-    "go:dev": "qpq go:dev",
-    "go:dev:api": "qpq go:dev:api",
-    "go:dev:web": "qpq go:dev:web",
+    "dev": "qpq go:dev",
+    "deploy": "qpq go:docker",
     "prep": "qpq prep",
-    "postinstall": "qpq hooks postinstall || true",
-    "go": "qpq go",
-    "publish": "qpq publish",
-    "publish:build": "qpq publish:build",
-    "publish:upload": "qpq publish:upload",
-    "publish:deploy": "qpq publish:deploy",
-    "go:docker": "qpq go:docker",
-    "teardown": "qpq teardown"
+    "postinstall": "qpq hooks postinstall || true"
   },
   "devDependencies": {
     "@chakra-ui/cli": "^3.0.0",
