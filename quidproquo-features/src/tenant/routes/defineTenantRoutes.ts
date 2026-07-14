@@ -9,7 +9,7 @@ import { DEFAULT_TENANT_HEADER_NAME, TENANT_HEADER_NAME_GLOBAL } from '../consta
 import { TENANT_DOC_TYPE, TENANT_EVENTDOC_STORE, TENANT_ON_PUBLISH_FN, TENANT_SCOPE_RESOLVER_FN } from '../constants/tenantStoreNames';
 import { TenantRoutesOptions } from '../types/TenantRoutesOptions';
 
-// The tenant-specific routes (list-my-tenants / create / get-record). The
+// The tenant-specific routes (list-my-tenants / create / get-record / get-logo). The
 // generic eventDoc CRUD (append SET_BRAND, publish, audit history) is mounted
 // separately by defineTenant under {basePath}/docs. The store carries the
 // STANDARD scope resolver so create/list run under the request's scope like
@@ -41,5 +41,10 @@ export const defineTenantRoutes = ({ basePath, routeAuthSettings, version, tenan
   const route = (method: HTTPMethod, path: string, functionName: string): QPQConfig =>
     defineVersionedRoute(method, path, runtime(functionName), options, version);
 
-  return [route('GET', basePath, 'list'), route('POST', basePath, 'create'), route('GET', `${basePath}/{id}`, 'get')];
+  return [
+    route('GET', basePath, 'list'),
+    route('POST', basePath, 'create'),
+    route('GET', `${basePath}/{id}`, 'get'),
+    route('GET', `${basePath}/{id}/logo`, 'getLogo'),
+  ];
 };

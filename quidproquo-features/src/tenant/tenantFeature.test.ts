@@ -2,6 +2,7 @@ import {
   ConfigActionType,
   ContextActionType,
   DateActionType,
+  FileActionType,
   GuidActionType,
   InlineFunctionActionType,
   KeyValueStoreActionType,
@@ -11,7 +12,9 @@ import {
   KvsQueryCondition,
   KvsQueryOperation,
   KvsQueryOperationType,
+  QpqContextIdentifier,
   runStory,
+  storageScopeContext,
   throwsError,
   UserDirectoryActionType,
 } from 'quidproquo-core';
@@ -45,6 +48,7 @@ import { askTenantResolveActiveTenant } from './logic/askTenantResolveActiveTena
 import { TenantStatus } from './models/TenantStatus';
 import { create } from './routes/controllers/create';
 import { get } from './routes/controllers/get';
+import { getLogo } from './routes/controllers/getLogo';
 import { list } from './routes/controllers/list';
 
 // End-to-end story-level pass over the tenant feature: create links membership,
@@ -251,12 +255,14 @@ describe('tenant feature', () => {
 
     // The hook fired through the inline-function boundary; run the real sync
     // with the exact payload it received. In production the inline function
-    // executes inside the append's session, so the store context is inherited;
-    // here the runStory harness needs the context read mocked to the store.
+    // executes inside the append's session, so the store context AND the ambient
+    // storage scope are inherited; here the runStory harness needs both context
+    // reads mocked (discriminated by identifier).
     expect(inlinePayloads).toHaveLength(1);
     runStory(askTenantOnPublish(inlinePayloads[0]), {
       ...mocks,
-      [ContextActionType.Read]: () => store,
+      [ContextActionType.Read]: (action: { payload: { contextIdentifier: QpqContextIdentifier<unknown> } }) =>
+        action.payload.contextIdentifier.uniqueName === storageScopeContext.uniqueName ? 'PERSONAL#user-1' : store,
     });
 
     const records = tables[TENANT_RECORD_STORE];
@@ -266,6 +272,8 @@ describe('tenant feature', () => {
       name: 'credit-corp',
       brandColors: { primary: '#123456', secondary: '#abcdef' },
       logo: { guid: 'logo-guid', filename: 'logo.png', mimetype: 'image/png' },
+      // The doc's home partition, recorded for the registry's cross-scope reads.
+      scope: 'PERSONAL#user-1',
       createdByUserId: 'user-1',
       status: TenantStatus.active,
     });
@@ -339,5 +347,67 @@ describe('tenant feature', () => {
     tables[USER_TENANT_LINKS_STORE] = [{ userId: 'user-1', tenantIds: ['tenant-a'] }];
 
     expect(() => runStory(get(httpEvent(undefined), { id: 'tenant-b' }), mocks)).toThrow(/not a member/);
+  });
+
+  describe('getLogo', () => {
+    const logoRecord = (scope?: string) => ({
+      tenantId: 'tenant-a',
+      name: 'acme',
+      logo: { guid: 'logo-guid', filename: 'logo.png', mimetype: 'image/png' },
+      scope,
+      createdAt: '2026-07-10T00:00:00.000Z',
+      updatedAt: '2026-07-10T00:00:00.000Z',
+      createdByUserId: 'user-2',
+      status: TenantStatus.active,
+    });
+
+    const withPresignMock = (mocks: Record<string, unknown>) => {
+      const presigns: { drive: string; filepath: string; expirationMs: number; scope?: string }[] = [];
+      const presignMocks = {
+        ...mocks,
+        [FileActionType.GenerateTemporarySecureUrl]: (action: {
+          payload: { drive: string; filepath: string; expirationMs: number; scope?: string };
+        }) => {
+          presigns.push(action.payload);
+          return 'https://signed.example/logo';
+        },
+      };
+      return { presignMocks, presigns };
+    };
+
+    it("presigns the logo blob in the DOC record's home scope, not the reader's", () => {
+      const { mocks, tables } = buildMocks();
+      tables[USER_TENANT_LINKS_STORE] = [{ userId: 'user-1', tenantIds: ['tenant-a'] }];
+      tables[TENANT_RECORD_STORE] = [logoRecord('PERSONAL#user-2')];
+      const { presignMocks, presigns } = withPresignMock(mocks);
+
+      // Reader browses under the tenant's scope (header set) - irrelevant to the presign.
+      const response = runStory(getLogo(httpEvent(undefined, { [DEFAULT_TENANT_HEADER_NAME]: 'tenant-a' }), { id: 'tenant-a' }), presignMocks);
+
+      expect(JSON.parse(response.body!)).toEqual({ url: 'https://signed.example/logo' });
+      expect(presigns).toEqual([
+        { drive: 'tenantsedocs', filepath: 'tenant-a/assets/logo-guid', expirationMs: 15 * 60 * 1000, scope: 'PERSONAL#user-2' },
+      ]);
+    });
+
+    it("falls back to the creator's personal scope for records published before scope was recorded", () => {
+      const { mocks, tables } = buildMocks();
+      tables[USER_TENANT_LINKS_STORE] = [{ userId: 'user-1', tenantIds: ['tenant-a'] }];
+      tables[TENANT_RECORD_STORE] = [logoRecord(undefined)];
+      const { presignMocks, presigns } = withPresignMock(mocks);
+
+      runStory(getLogo(httpEvent(undefined), { id: 'tenant-a' }), presignMocks);
+
+      expect(presigns[0].scope).toBe('PERSONAL#user-2');
+    });
+
+    it('denies non-members and 404s a missing logo', () => {
+      const { mocks, tables } = buildMocks();
+      tables[USER_TENANT_LINKS_STORE] = [{ userId: 'user-1', tenantIds: ['tenant-a'] }];
+      tables[TENANT_RECORD_STORE] = [{ ...logoRecord('PERSONAL#user-2'), logo: undefined }];
+
+      expect(() => runStory(getLogo(httpEvent(undefined), { id: 'tenant-b' }), mocks)).toThrow(/not a member/);
+      expect(() => runStory(getLogo(httpEvent(undefined), { id: 'tenant-a' }), mocks)).toThrow(/no logo/);
+    });
   });
 });

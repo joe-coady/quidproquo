@@ -1,4 +1,4 @@
-import { AskResponse } from 'quidproquo-core';
+import { AskResponse, askStorageScopeRead } from 'quidproquo-core';
 
 import { EventDocOnPublishInput } from '../../eventDoc/models';
 import { askTenantRecordUpsert } from '../data/askTenantRecordUpsert';
@@ -13,11 +13,17 @@ import { TenantStatus } from '../models/TenantStatus';
 export function* askTenantOnPublish(input: EventDocOnPublishInput): AskResponse<void> {
   const doc = foldTenantDocument(input.events);
 
+  // The publish request's ambient scope IS the doc's home partition (inline
+  // functions run within the caller's story, so the scope context rides along).
+  // Recorded so the registry can presign the doc's blobs for cross-scope readers.
+  const scope = yield* askStorageScopeRead();
+
   const record: TenantRecord = {
     tenantId: input.docId,
     name: input.summary.name,
     brandColors: doc.brandColors,
     logo: doc.logo,
+    scope: scope ?? undefined,
     createdAt: input.summary.createdAt,
     updatedAt: input.summary.updatedAt,
     createdByUserId: input.summary.createdBy,

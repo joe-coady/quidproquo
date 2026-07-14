@@ -13,6 +13,12 @@ export type TenantRecord = {
   name: string;
   brandColors?: TenantBrandColors;
   logo?: EventDocAssetRef;
+  // The storage scope the tenant DOC (and so its asset blobs) live under — the
+  // publishing request's ambient scope. The doc is an ordinary scoped doc, so a
+  // cross-scope read (serving the logo to a member browsing under TENANT#<id>)
+  // must presign the blob in ITS partition, not the reader's. Absent on records
+  // published before this field existed (fall back to the creator's personal scope).
+  scope?: string;
   createdAt: QpqIsoDateTime;
   updatedAt: QpqIsoDateTime;
   createdByUserId: string;
