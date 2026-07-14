@@ -8,6 +8,7 @@ import {
   defineBootstrapWaf,
   defineDomainCertificate,
   WafManagedRuleGroup,
+  WafRuleOverrideAction,
 } from 'quidproquo-config-aws';
 import { QpqAppDeployContext } from 'quidproquo-deploy-awscdk';
 
@@ -20,6 +21,11 @@ export default ({ domain, region }: QpqAppDeployContext): QPQConfig => [
       WafManagedRuleGroup.knownBadInputs,
       WafManagedRuleGroup.sqli,
     ],
+    managedRuleOverrides: {
+      [WafManagedRuleGroup.common]: [
+        { name: 'SizeRestrictions_BODY', action: WafRuleOverrideAction.count }, // Disable the 8kb limit
+      ],
+    },
   }),
 
   defineApi('api', domain),

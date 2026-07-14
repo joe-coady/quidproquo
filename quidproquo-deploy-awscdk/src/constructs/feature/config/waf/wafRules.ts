@@ -1,4 +1,10 @@
-import { BootstrapWafQPQConfigSetting, WafManagedRuleGroup, WafRateLimit } from 'quidproquo-config-aws';
+import {
+  BootstrapWafQPQConfigSetting,
+  WafManagedRuleGroup,
+  WafManagedRuleOverride,
+  WafRateLimit,
+  WafRuleOverrideAction,
+} from 'quidproquo-config-aws';
 
 import { aws_wafv2 } from 'aws-cdk-lib';
 
@@ -11,8 +17,23 @@ const managedRuleGroupVendorNames: Record<WafManagedRuleGroup, string> = {
 
 const defaultManagedRuleGroups: WafManagedRuleGroup[] = [WafManagedRuleGroup.common, WafManagedRuleGroup.knownBadInputs, WafManagedRuleGroup.sqli];
 
-const buildManagedRuleGroupRule = (ruleGroup: WafManagedRuleGroup, priority: number): aws_wafv2.CfnWebACL.RuleProperty => {
+const overrideActionsToUse: Record<WafRuleOverrideAction, aws_wafv2.CfnWebACL.RuleActionProperty> = {
+  [WafRuleOverrideAction.count]: { count: {} },
+};
+
+const buildManagedRuleGroupRule = (
+  ruleGroup: WafManagedRuleGroup,
+  priority: number,
+  overrides?: WafManagedRuleOverride[],
+): aws_wafv2.CfnWebACL.RuleProperty => {
   const vendorName = managedRuleGroupVendorNames[ruleGroup];
+
+  const ruleActionOverrides = overrides?.length
+    ? overrides.map((override) => ({
+        name: override.name,
+        actionToUse: overrideActionsToUse[override.action],
+      }))
+    : undefined;
 
   return {
     name: vendorName,
@@ -22,6 +43,7 @@ const buildManagedRuleGroupRule = (ruleGroup: WafManagedRuleGroup, priority: num
       managedRuleGroupStatement: {
         vendorName: 'AWS',
         name: vendorName,
+        ruleActionOverrides,
       },
     },
     visibilityConfig: {
@@ -65,7 +87,7 @@ export const buildWebAclRules = (wafConfig: BootstrapWafQPQConfigSetting): aws_w
   const rateLimitRules = (wafConfig.rateLimits || []).map((rateLimit, index) => buildRateLimitRule(rateLimit, index));
 
   const managedRules = (wafConfig.managedRuleGroups || defaultManagedRuleGroups).map((ruleGroup, index) =>
-    buildManagedRuleGroupRule(ruleGroup, rateLimitRules.length + index),
+    buildManagedRuleGroupRule(ruleGroup, rateLimitRules.length + index, wafConfig.managedRuleOverrides?.[ruleGroup]),
   );
 
   return [...rateLimitRules, ...managedRules];

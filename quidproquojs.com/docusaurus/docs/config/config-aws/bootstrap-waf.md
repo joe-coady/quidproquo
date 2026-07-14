@@ -26,6 +26,7 @@ function defineBootstrapWaf(
   options?: {
     managedRuleGroups?: WafManagedRuleGroup[];
     rateLimits?: WafRateLimit[];
+    managedRuleOverrides?: Partial<Record<WafManagedRuleGroup, WafManagedRuleOverride[]>>;
   },
 ): BootstrapWafQPQConfigSetting;
 ```
@@ -38,6 +39,7 @@ function defineBootstrapWaf(
 | --- | --- | --- | --- |
 | `managedRuleGroups` | `WafManagedRuleGroup[]` | `[common, knownBadInputs, sqli]` | AWS-managed rule groups to enable, each added as a managed-rule-group statement with `overrideAction: none`. See [`WafManagedRuleGroup`](#wafmanagedrulegroup). |
 | `rateLimits` | `WafRateLimit[]` | `[]` (none) | Rate-based blocking rules (e.g. brute-force throttling on auth endpoints). Evaluated **before** the managed rule groups. See [`WafRateLimit`](#wafratelimit). |
+| `managedRuleOverrides` | `Partial<Record<WafManagedRuleGroup, WafManagedRuleOverride[]>>` | `undefined` (none) | Per-rule action overrides within a managed group, e.g. force a specific rule to `count` instead of the group's default blocking action. See [`WafManagedRuleOverride`](#wafmanagedruleoverride). |
 
 ### `WafManagedRuleGroup`
 
@@ -73,10 +75,29 @@ export interface WafRateLimit {
 | `limit` | `number` | Maximum requests per 5-minute window per source IP before that IP is blocked (`aggregateKeyType: IP`). |
 | `uriPathStartsWith` | `string` | Optional. Scope the rate limit to URI paths with this prefix (e.g. `/auth`) via a scope-down byte-match statement. Omit to rate limit all paths. |
 
+### `WafManagedRuleOverride`
+
+```typescript
+export interface WafManagedRuleOverride {
+  name: string;
+  action: WafRuleOverrideAction;
+}
+
+export enum WafRuleOverrideAction {
+  count = 'count', // Observe and emit metrics for matching requests, but never block them.
+}
+```
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `name` | `string` | Rule name inside the managed group, e.g. `'SizeRestrictions_BODY'`. |
+| `action` | `WafRuleOverrideAction` | Action to force for this rule instead of the group's default. Currently only `count` (observe without blocking) is supported. |
+
 ## Notes
 
 - Rate-limit rules are given the lowest priorities (evaluated first as cheap counters), then the managed rule groups follow.
 - To actually apply these ACLs, a service opts in with `defineWafProtection()` in its (shared) service config; the ACL ARNs are resolved by convention from SSM at deploy time, so the bootstrap must be deployed before the service's API/web stacks.
+- `managedRuleOverrides` is keyed by `WafManagedRuleGroup`; overrides for a group only apply if that group is also present in `managedRuleGroups`.
 
 ## Examples
 
@@ -95,6 +116,21 @@ export default [
       { name: 'auth-brute-force', limit: 100, uriPathStartsWith: '/auth' },
       { name: 'global', limit: 5000 },
     ],
+  }),
+];
+```
+
+To let large request bodies through instead of being blocked by the `common` group's default 8kb body-size limit:
+
+```typescript
+import { defineBootstrapWaf, WafManagedRuleGroup, WafRuleOverrideAction } from 'quidproquo-config-aws';
+
+export default [
+  defineBootstrapWaf({
+    managedRuleGroups: [WafManagedRuleGroup.common, WafManagedRuleGroup.knownBadInputs, WafManagedRuleGroup.sqli],
+    managedRuleOverrides: {
+      [WafManagedRuleGroup.common]: [{ name: 'SizeRestrictions_BODY', action: WafRuleOverrideAction.count }],
+    },
   }),
 ];
 ```
