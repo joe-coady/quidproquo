@@ -1,22 +1,30 @@
 import { spawn } from 'child_process';
 import { execSync } from 'child_process';
 import * as fs from 'fs';
+import * as os from 'os';
 import * as path from 'path';
 
-import { clearLine, formatElapsed, ProgressState, renderLine } from './progressBar';
+import { ActiveStep, clearDown, cursorToBlockStart, formatElapsed, ProgressState, renderBlock } from './progressBar';
 
 interface PackageJson {
   name: string;
   version?: string;
   workspaces?: string[];
   scripts?: Record<string, string>;
+  dependencies?: Record<string, string>;
+  devDependencies?: Record<string, string>;
+  peerDependencies?: Record<string, string>;
 }
 
-interface Step {
+// One workspace's work for this run. Stages run in order, the scripts inside a stage
+// run concurrently, and the first stage doesn't start until every workspace listed in
+// `deps` has finished all of its stages.
+interface PkgTask {
   dir: string; // workspace directory, passed to `npm -w`
   name: string; // package name, for display
   version: string;
-  script: string; // package.json script to run
+  stages: string[][];
+  deps: string[]; // workspace dirs (within this run) that must build first
 }
 
 const repoRoot = path.join(__dirname, '..');
@@ -24,32 +32,39 @@ const repoRoot = path.join(__dirname, '..');
 const readPackageJson = (dir: string): PackageJson =>
   JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), 'utf8')) as PackageJson;
 
-// The `workspaces` array is the canonical build order (topologically sorted:
-// core first, dependents after), matching what `npm run <script> --ws` uses.
+// The `workspaces` array is only the launch-order tiebreak between tasks that become
+// ready at the same time. Real ordering constraints come from the dependency graph
+// wired up in buildTasks; the array itself is not reliably topological (deploy-webpack
+// and deploy-rspack sit before quidproquo-deploy-awscdk, which both declare as a dep).
 const getOrderedWorkspaces = (): string[] => readPackageJson(repoRoot).workspaces || [];
 
-// Scripts whose aggregate form is a sequence of sub-scripts. Driving the sub-steps
-// ourselves (rather than the package's own `build`) lets the bar tick per sub-step
-// and label the active one (e.g. "build:esm"). Order matters: clean before compile.
-// Packages missing a sub-script skip it (build:bin-perms only exists in
-// quidproquo-cli, where it restores the executable bit tsc drops from bin/;
-// build:extension only in quidproquo-actionprocessor-awslambda, where it
-// bundles the log-extension layer into lib/extension-layer, which clean wipes).
-const STEP_EXPANSIONS: Record<string, string[]> = {
-  build: ['clean', 'build:esm', 'build:cjs', 'build:bin-perms', 'build:extension'],
+// Scripts whose aggregate form is driven as sub-scripts, expressed as stages: the
+// outer array runs in order, scripts inside one stage run concurrently. esm and cjs
+// compile the same src into separate outDirs (no shared tsbuildinfo), so they overlap
+// safely; build:extension (only quidproquo-actionprocessor-awslambda) esbuild-bundles
+// the log-extension layer straight from src into lib/extension-layer, independent of
+// tsc; build:bin-perms (quidproquo-cli, create-qpq-app) chmods a bin file tsc just
+// emitted, so it must wait for the compiles. Packages missing a sub-script skip it.
+const STEP_STAGES: Record<string, string[][]> = {
+  build: [['clean'], ['build:esm', 'build:cjs', 'build:extension'], ['build:bin-perms']],
 };
+
+// Only `build` reads other workspaces' lib/ outputs (and its clean deletes them), so
+// only `build` needs dependency ordering. Everything else (lint, lint:fix) works on
+// src in isolation and can run fully parallel.
+const DEPENDENCY_ORDERED_SCRIPTS = new Set(['build']);
 
 // Note: empty-string scripts (e.g. quidproquo-tsconfig's `"build": ""`) are falsy,
 // so they're excluded here and such workspaces contribute zero steps.
-const getScriptNames = (pkg: PackageJson, script: string): string[] => {
-  const expansion = STEP_EXPANSIONS[script];
-  if (expansion) {
-    const present = expansion.filter((sub) => pkg.scripts?.[sub]);
+const getStages = (pkg: PackageJson, script: string): string[][] => {
+  const stages = STEP_STAGES[script];
+  if (stages) {
+    const present = stages.map((stage) => stage.filter((sub) => pkg.scripts?.[sub])).filter((stage) => stage.length > 0);
     if (present.length > 0) {
       return present;
     }
   }
-  return pkg.scripts?.[script] ? [script] : [];
+  return pkg.scripts?.[script] ? [[script]] : [];
 };
 
 // Every path git reports maps to at most one top-level workspace dir.
@@ -65,31 +80,54 @@ const getChangedDirs = (): Set<string> => {
   return new Set(changed);
 };
 
-const buildSteps = (script: string, mode: 'all' | 'changed'): Step[] => {
+const buildTasks = (script: string, mode: 'all' | 'changed'): PkgTask[] => {
   const workspaces = getOrderedWorkspaces();
   const changedDirs = mode === 'changed' ? getChangedDirs() : null;
 
-  const steps: Step[] = [];
+  // Read every workspace's package.json (not just the changed ones): the name -> dir
+  // map is needed to resolve declared dependencies into workspace dirs.
+  const pkgs = new Map<string, PackageJson>();
+  const dirByName = new Map<string, string>();
+  for (const dir of workspaces) {
+    const pkg = readPackageJson(path.join(repoRoot, dir));
+    pkgs.set(dir, pkg);
+    dirByName.set(pkg.name, dir);
+  }
+
+  const tasks: PkgTask[] = [];
   for (const dir of workspaces) {
     if (changedDirs && !changedDirs.has(dir)) {
       continue;
     }
-
-    const pkg = readPackageJson(path.join(repoRoot, dir));
-    for (const scriptName of getScriptNames(pkg, script)) {
-      steps.push({ dir, name: pkg.name, version: pkg.version ?? '', script: scriptName });
+    const pkg = pkgs.get(dir)!;
+    const stages = getStages(pkg, script);
+    if (stages.length > 0) {
+      tasks.push({ dir, name: pkg.name, version: pkg.version ?? '', stages, deps: [] });
     }
   }
 
-  return steps;
+  // Wire dependency edges, but only between workspaces that are part of this run:
+  // an unchanged dependency keeps its already-built lib/, so nothing to wait for.
+  if (DEPENDENCY_ORDERED_SCRIPTS.has(script)) {
+    const taskDirs = new Set(tasks.map((task) => task.dir));
+    for (const task of tasks) {
+      const pkg = pkgs.get(task.dir)!;
+      const declared = { ...pkg.dependencies, ...pkg.devDependencies, ...pkg.peerDependencies };
+      task.deps = Object.keys(declared)
+        .map((name) => dirByName.get(name))
+        .filter((depDir): depDir is string => depDir !== undefined && taskDirs.has(depDir));
+    }
+  }
+
+  return tasks;
 };
 
 // Run one workspace script to completion, capturing all output. Nothing is streamed
 // live: on success the output is discarded (tsc is quiet), on failure the caller
 // prints it. stdin is inherited-as-pipe so a stray prompt can't silently hang us.
-const runStep = (step: Step): Promise<{ code: number; output: string }> =>
+const runStep = (dir: string, script: string): Promise<{ code: number; output: string }> =>
   new Promise((resolve) => {
-    const child = spawn('npm', ['run', step.script, '-w', step.dir], {
+    const child = spawn('npm', ['run', script, '-w', dir], {
       cwd: repoRoot,
       shell: process.platform === 'win32',
     });
@@ -105,35 +143,81 @@ const runStep = (step: Step): Promise<{ code: number; output: string }> =>
     child.on('error', (err) => resolve({ code: 1, output: String(err) }));
   });
 
-const distinctDirs = (steps: Step[]): number => new Set(steps.map((s) => s.dir)).size;
+// Minimal counting semaphore, capping how many npm child processes run at once
+// across all workspaces and stages.
+class Semaphore {
+  private waiting: Array<() => void> = [];
+
+  constructor(private slots: number) {}
+
+  async acquire(): Promise<void> {
+    if (this.slots > 0) {
+      this.slots -= 1;
+      return;
+    }
+    await new Promise<void>((resolve) => this.waiting.push(resolve));
+  }
+
+  release(): void {
+    const next = this.waiting.shift();
+    if (next) {
+      next();
+    } else {
+      this.slots += 1;
+    }
+  }
+}
+
+// Default: leave a core for the rest of the machine, and cap at 8 so a wide
+// dependency level doesn't stack up a dozen memory-hungry tsc processes at once.
+const getJobs = (args: string[]): number => {
+  const flag = args.find((arg) => arg.startsWith('--jobs='));
+  if (flag) {
+    const parsed = Number(flag.split('=')[1]);
+    if (Number.isFinite(parsed) && parsed >= 1) {
+      return Math.floor(parsed);
+    }
+  }
+  return Math.max(1, Math.min(8, os.availableParallelism() - 1));
+};
+
+const countSteps = (tasks: PkgTask[]): number =>
+  tasks.reduce((sum, task) => sum + task.stages.reduce((stageSum, stage) => stageSum + stage.length, 0), 0);
 
 const main = async (): Promise<void> => {
-  const script = process.argv[2];
+  const [script, ...args] = process.argv.slice(2);
   if (!script) {
-    console.error('runWorkspaces - usage: tsx ./scripts/runWorkspaces.ts <script-name> [--all|--changed]');
+    console.error('runWorkspaces - usage: tsx ./scripts/runWorkspaces.ts <script-name> [--all|--changed] [--jobs=N]');
     process.exit(1);
   }
 
-  const mode = process.argv[3] === '--changed' ? 'changed' : 'all';
-  const steps = buildSteps(script, mode);
+  const mode: 'all' | 'changed' = args.includes('--changed') ? 'changed' : 'all';
+  const jobs = getJobs(args);
+  const tasks = buildTasks(script, mode);
 
-  if (steps.length === 0) {
+  if (tasks.length === 0) {
     const scope = mode === 'changed' ? 'changed workspace(s)' : 'workspace(s)';
     console.log(`${script} (${mode}) - no ${scope} with a "${script}" script, nothing to run.`);
     return;
   }
 
   const isTty = Boolean(process.stdout.isTTY);
-  const state: ProgressState = { total: steps.length, done: 0, label: '', startMs: Date.now() };
+  const state: ProgressState = { total: countSteps(tasks), done: 0, active: [], startMs: Date.now() };
   let frame = 0;
+  let drawnLines = 0;
 
   const draw = () => {
-    if (isTty) {
-      process.stdout.write(clearLine() + renderLine(state, frame));
+    if (!isTty) {
+      return;
     }
+    // Some ptys (e.g. `script`) report 0 columns; fall back to a sane width.
+    const lines = renderBlock(state, frame, Date.now(), process.stdout.columns || 120);
+    process.stdout.write(cursorToBlockStart(drawnLines) + clearDown() + lines.join('\n') + '\n');
+    drawnLines = lines.length;
   };
 
-  // The spinner animates on its own timer since runStep blocks (via await) on the child.
+  // The spinner animates on its own timer since the scheduler blocks (via await) on
+  // the child processes.
   const timer = isTty
     ? setInterval(() => {
         frame += 1;
@@ -146,35 +230,116 @@ const main = async (): Promise<void> => {
       clearInterval(timer);
     }
     if (isTty) {
-      process.stdout.write(clearLine());
+      process.stdout.write(cursorToBlockStart(drawnLines) + clearDown());
+      drawnLines = 0;
     }
   };
 
-  for (const step of steps) {
-    state.label = `${step.name}@${step.version} › ${step.script}`;
-    draw();
-    if (!isTty) {
-      console.log(`[${state.done + 1}/${state.total}] ${step.name} › ${step.script}`);
+  const semaphore = new Semaphore(jobs);
+  const failures: Array<{ name: string; script: string; code: number; output: string }> = [];
+  let aborted = false;
+
+  // dir -> deps that haven't finished yet; a task launches once its set is empty.
+  const remainingDeps = new Map(tasks.map((task) => [task.dir, new Set(task.deps)]));
+  const started = new Set<string>();
+  const pipelines: Array<Promise<void>> = [];
+
+  // Runs one script in one workspace under the global job cap, tracked as an active
+  // lane in the progress display. A failure flips `aborted`: nothing new starts,
+  // steps already in flight drain to completion so their output can't interleave.
+  const runTrackedStep = async (task: PkgTask, scriptName: string): Promise<boolean> => {
+    if (aborted) {
+      return false;
+    }
+    await semaphore.acquire();
+    if (aborted) {
+      semaphore.release();
+      return false;
     }
 
-    const { code, output } = await runStep(step);
+    const lane: ActiveStep = { label: `${task.name}@${task.version} › ${scriptName}`, startMs: Date.now() };
+    state.active.push(lane);
+    if (!isTty) {
+      console.log(`▶ ${task.name} › ${scriptName}`);
+    }
+    draw();
+
+    const { code, output } = await runStep(task.dir, scriptName);
+
+    state.active.splice(state.active.indexOf(lane), 1);
+    semaphore.release();
 
     if (code !== 0) {
-      finish();
-      console.error(`\n✖ ${step.name} › ${step.script} failed (exit ${code}):\n`);
-      console.error(output.trimEnd());
-      process.exit(code);
+      aborted = true;
+      failures.push({ name: task.name, script: scriptName, code, output });
+      return false;
     }
 
     state.done += 1;
+    if (!isTty) {
+      console.log(`✔ [${state.done}/${state.total}] ${task.name} › ${scriptName} (${formatElapsed(Date.now() - lane.startMs)})`);
+    }
     draw();
+    return true;
+  };
+
+  // Runs a workspace's stages in order (scripts within a stage concurrently), then
+  // unblocks whatever was waiting on this workspace. On failure the task stops
+  // between stages and never unblocks its dependents.
+  const runTask = async (task: PkgTask): Promise<void> => {
+    for (const stage of task.stages) {
+      const results = await Promise.all(stage.map((scriptName) => runTrackedStep(task, scriptName)));
+      if (results.includes(false)) {
+        return;
+      }
+    }
+    for (const deps of remainingDeps.values()) {
+      deps.delete(task.dir);
+    }
+    launchReady();
+  };
+
+  const launchReady = () => {
+    for (const task of tasks) {
+      if (aborted) {
+        return;
+      }
+      if (started.has(task.dir) || remainingDeps.get(task.dir)!.size > 0) {
+        continue;
+      }
+      started.add(task.dir);
+      pipelines.push(runTask(task));
+    }
+  };
+
+  launchReady();
+  // runTask pushes newly unblocked pipelines while earlier ones are being awaited,
+  // so keep draining until the array stays empty.
+  while (pipelines.length > 0) {
+    const batch = pipelines.splice(0, pipelines.length);
+    await Promise.all(batch);
   }
 
   finish();
+
+  if (failures.length > 0) {
+    for (const failure of failures) {
+      console.error(`\n✖ ${failure.name} › ${failure.script} failed (exit ${failure.code}):\n`);
+      console.error(failure.output.trimEnd());
+    }
+    process.exit(failures[0].code || 1);
+  }
+
+  if (started.size < tasks.length) {
+    const stuck = tasks.filter((task) => !started.has(task.dir)).map((task) => task.name);
+    console.error(`✖ dependency cycle between workspaces, could not schedule: ${stuck.join(', ')}`);
+    process.exit(1);
+  }
+
   console.log(
-    `✔ ${script} — ${steps.length} step(s) across ${distinctDirs(steps)} workspace(s) in ${formatElapsed(
+    `✔ ${script}: ${state.total} step(s) across ${tasks.length} workspace(s) in ${formatElapsed(
       Date.now() - state.startMs,
-    )}`,
+    )} (${jobs} jobs)`,
   );
 };
 
