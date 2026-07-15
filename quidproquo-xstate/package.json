@@ -1,6 +1,6 @@
 {
   "name": "quidproquo-xstate",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
@@ -32,11 +32,11 @@
   },
   "homepage": "https://github.com/joe-coady/quidproquo#readme",
   "dependencies": {
-    "quidproquo-core": "0.1.8",
+    "quidproquo-core": "0.1.9",
     "xstate": "^5.19.0"
   },
   "devDependencies": {
-    "quidproquo-tsconfig": "0.1.8",
+    "quidproquo-tsconfig": "0.1.9",
     "typescript": "^5.8.2"
   }
 }

@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.1.9
+
+- eventDoc render route honors `renderMode=published`: renders the version published as of a given time instead of always the full draft log, backed
+  by new `askEventDocPublishedVersionAsOf` and `askEventDocEventsAsOf` resolvers
+- tenant routes split: the tenant collection stays at `basePath`, membership routes (list mine, create, logo) move to a new `myTenantsBasePath`;
+  eventDoc routes gain an `excludeRoutes` option to skip stock endpoints
+- web-admin: show basePath in log summary details
+
+### Breaking changes
+
+- the eventDoc render route now throws `NotFound` for `renderMode=published` with nothing published; `EventDocRenderInput` gains a `version` field
+- `defineTenant` now requires `myTenantsBasePath`; membership routes move there and stock eventDoc CRUD mounts at `basePath` directly
+
 ## 0.1.8
 
 - tenant support: typed `TENANT#`/`PERSONAL#` storage scopes across file, kvs and websockets, an owner-gated tenant registry, and a scoped tenant
