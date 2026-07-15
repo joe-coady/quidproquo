@@ -16,9 +16,9 @@ const config = defineTenant({
 // The owner's settings arrive as arbitrarily nested config arrays (qpq flattens
 // them at load); the routes are what we assert paths against.
 const ownerRoutes = (): { method: string; path: string }[] => {
-  const serviceSettings = config.find(
-    (s) => (s as { configSettingType: string }).configSettingType === QPQCoreConfigSettingType.serviceSettings,
-  ) as { settingsByService: Record<string, unknown[]> };
+  const serviceSettings = config.find((s) => (s as { configSettingType: string }).configSettingType === QPQCoreConfigSettingType.serviceSettings) as {
+    settingsByService: Record<string, unknown[]>;
+  };
 
   return serviceSettings.settingsByService['owner-svc']
     .flat(Infinity)

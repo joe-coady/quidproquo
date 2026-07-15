@@ -27,4 +27,5 @@ export * from './EventDocSetNameData';
 export * from './EventDocStatus';
 export * from './EventDocSummary';
 export * from './EventDocVersion';
+export * from './EventDocVersionSlice';
 export * from './toEventDocListItem';

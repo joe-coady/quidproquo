@@ -3,8 +3,10 @@
 // mode are supplied at resolution time. For now only `Latest` is constructed/resolved —
 // `Version` and `Exact` are modelled ahead of use.
 export enum EventDocLinkMode {
-  // Published: the latest published version (publishedAt <= effectiveAt).
-  // Draft: the latest event (latest draft, or the published head if published).
+  // The target's latest event at or before the effective-at time — its state as the referrer's
+  // author saw it then, drafts included. The target needs NO published version of its own: a
+  // published render resolves its links against the moment IT was published, so the document
+  // renders as it looked at publish time. Draft: the latest event, full stop (no time bound).
   Latest = 'latest',
   // The latest event within a pinned documentVersion (modifiedAt <= effectiveAt).
   Version = 'version',

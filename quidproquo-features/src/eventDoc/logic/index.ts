@@ -1,6 +1,7 @@
 export * from './askEventDocAppendServerEvent';
 export * from './askEventDocCreate';
 export * from './askEventDocEventAppend';
+export * from './askEventDocEventsAsOf';
 export * from './askEventDocGetByCode';
 export * from './askEventDocGetByCodeOrCreate';
 export * from './askEventDocGetByIdOrThrow';
@@ -9,6 +10,7 @@ export * from './askEventDocGetIdByCode';
 export * from './askEventDocGetLatestPublished';
 export * from './askEventDocGetPublishedAsOf';
 export * from './askEventDocPublishedEventsAsOf';
+export * from './askEventDocPublishedVersionAsOf';
 export * from './askEventDocSeedInitState';
 export * from './askEventDocSoftDelete';
 export * from './selectors';
