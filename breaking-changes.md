@@ -5,6 +5,7 @@ assembled quickly.
 
 ## vNext
 
+- The eventDoc render route (`GET {basePath}/:id/render`) in `quidproquo-features` now actually honors `renderMode=published`: it resolves the version effective as of `effectiveAt` (or now) and truncates the log to that version's slice, throwing `NotFound` if nothing is published, instead of always returning the full draft log regardless of `renderMode`. `EventDocRenderInput` also gains an optional `version?: EventDocVersion` field carrying the resolved version (undefined for draft renders) — a custom `eventRenderer` inline function that resolves its own links can read `version.publishedAt` instead of guessing a clock.
 - `defineTenant` in `quidproquo-features` now requires a `myTenantsBasePath: string` field alongside `basePath`. The stock eventDoc CRUD (list/get/events/render/remove) now mounts at `{basePath}` instead of `{basePath}/docs`; the membership-gated routes (list mine / create / get-record / get-logo) move from `{basePath}` to `{myTenantsBasePath}` and `POST {basePath}` (stock create) is no longer mounted — creating a tenant is only reachable via `POST {myTenantsBasePath}`. Update route callers and add the new option.
 
 ## 0.1.8
