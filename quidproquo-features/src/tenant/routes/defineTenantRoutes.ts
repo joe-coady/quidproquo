@@ -9,13 +9,14 @@ import { DEFAULT_TENANT_HEADER_NAME, TENANT_HEADER_NAME_GLOBAL } from '../consta
 import { TENANT_DOC_TYPE, TENANT_EVENTDOC_STORE, TENANT_ON_PUBLISH_FN, TENANT_SCOPE_RESOLVER_FN } from '../constants/tenantStoreNames';
 import { TenantRoutesOptions } from '../types/TenantRoutesOptions';
 
-// The tenant-specific routes (list-my-tenants / create / get-record / get-logo). The
-// generic eventDoc CRUD (append SET_BRAND, publish, audit history) is mounted
-// separately by defineTenant under {basePath}/docs. The store carries the
-// STANDARD scope resolver so create/list run under the request's scope like
-// every other route - a new tenant doc lands in the caller's current partition
-// (personal, or the active tenant), nowhere special.
-export const defineTenantRoutes = ({ basePath, routeAuthSettings, version, tenantHeaderName }: TenantRoutesOptions): QPQConfig => {
+// The membership-gated tenant routes (list mine / create / get-record / get-logo),
+// mounted at myTenantsBasePath. Every one of them keys off the caller's membership,
+// so they are a different surface from the tenant collection itself - the stock
+// eventDoc CRUD (append SET_BRAND, publish, audit history) that defineTenant mounts
+// at basePath. The store carries the STANDARD scope resolver so create/list run
+// under the request's scope like every other route - a new tenant doc lands in the
+// caller's current partition (personal, or the active tenant), nowhere special.
+export const defineTenantRoutes = ({ myTenantsBasePath, routeAuthSettings, version, tenantHeaderName }: TenantRoutesOptions): QPQConfig => {
   const store = buildEventDocStore({
     storeName: TENANT_EVENTDOC_STORE,
     type: TENANT_DOC_TYPE,
@@ -42,9 +43,9 @@ export const defineTenantRoutes = ({ basePath, routeAuthSettings, version, tenan
     defineVersionedRoute(method, path, runtime(functionName), options, version);
 
   return [
-    route('GET', basePath, 'list'),
-    route('POST', basePath, 'create'),
-    route('GET', `${basePath}/{id}`, 'get'),
-    route('GET', `${basePath}/{id}/logo`, 'getLogo'),
+    route('GET', myTenantsBasePath, 'list'),
+    route('POST', myTenantsBasePath, 'create'),
+    route('GET', `${myTenantsBasePath}/{id}`, 'get'),
+    route('GET', `${myTenantsBasePath}/{id}/logo`, 'getLogo'),
   ];
 };

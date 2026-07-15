@@ -1,10 +1,23 @@
 import { RouteAuthSettings } from 'quidproquo-webserver';
 
+import { EventDocRouteName } from './EventDocRouteName';
+
 export type EventDocRoutesOptions = {
   /** Must match a `defineEventDocSummary` in the same service. */
   storeName: string;
   type: string;
+  /**
+   * The collection root, named after the model `type` like every other collection
+   * (`template` -> `/templates`, `style` -> `/styles`). Nothing else may mount a
+   * literal under it: `${basePath}/{id}` matches any single segment, so a sibling
+   * `${basePath}/thing` route is ambiguous with the id `'thing'`.
+   */
   basePath: `/${string}`;
+  // Routes to leave unmounted, for a collection that must own one itself (e.g. the
+  // tenant registry owns create, so creating also links the caller as first member;
+  // the stock create would silently make an unreachable doc). Everything else the
+  // collection needs the stock behaviour for still mounts.
+  excludeRoutes?: EventDocRouteName[];
   // Omit to leave routes open — mutations then have no user to attribute.
   routeAuthSettings?: RouteAuthSettings;
   version?: number;

@@ -21,8 +21,9 @@ import { defineTenantStores } from './defineTenantStores';
 //   (a service tenant-scopes its OTHER collections via the request resolver, and
 //   resolves ws connection scopes via the connection resolver).
 // - Owner deploy only: the registry stores (eventDoc collection + record store +
-//   membership links), the publish -> record sync, the generic eventDoc CRUD under
-//   {basePath}/docs, and the tenant routes at {basePath}.
+//   membership links), the publish -> record sync, the stock eventDoc CRUD for the
+//   tenant collection at {basePath}, and the membership-gated routes at
+//   {myTenantsBasePath}.
 // - Every non-owner deploy: a cross-module ref to the membership table, so the
 //   resolver can check membership locally against the owner's table.
 //
@@ -72,11 +73,16 @@ export const defineTenant = ({ owner, ...routeOptions }: TenantOptions): QPQConf
       defineEventDocRoutes({
         storeName: TENANT_EVENTDOC_STORE,
         type: TENANT_DOC_TYPE,
-        basePath: `${routeOptions.basePath}/docs`,
+        basePath: routeOptions.basePath,
         routeAuthSettings: routeOptions.routeAuthSettings,
         version: routeOptions.version,
         onPublish: TENANT_ON_PUBLISH_FN,
         scopeResolver: TENANT_SCOPE_RESOLVER_FN,
+        // Creating a tenant must also link the creator as its first member, or the
+        // doc is unreachable: nothing but the membership table can find it again.
+        // POST {myTenantsBasePath} owns that; the stock create would bypass it.
+        // TODO: Adding the user to the event doc, this could be done in the on publish... or something.
+        excludeRoutes: ['create'],
       }),
       defineTenantRoutes(routeOptions),
     ],

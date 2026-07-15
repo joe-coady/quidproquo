@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+- `defineTenant` in `quidproquo-features` now requires a `myTenantsBasePath: string` field alongside `basePath`. The stock eventDoc CRUD (list/get/events/render/remove) now mounts at `{basePath}` instead of `{basePath}/docs`; the membership-gated routes (list mine / create / get-record / get-logo) move from `{basePath}` to `{myTenantsBasePath}` and `POST {basePath}` (stock create) is no longer mounted — creating a tenant is only reachable via `POST {myTenantsBasePath}`. Update route callers and add the new option.
+
 ## 0.1.8
 
 - `AiStreamFinish.finishReason` and `AiStreamFinishStep.finishReason` in `quidproquo-core` narrow from `string` to the new `AiStreamFinishReasonEnum` (`stop`, `length`, `contentFilter`, `toolCalls`, `error`, `other`, `unknown`). Update any string comparisons (e.g. `finishReason === 'tool-calls'`) to use the enum member (`AiStreamFinishReasonEnum.toolCalls`); an unrecognized reason now maps to `unknown` instead of passing the raw string through.

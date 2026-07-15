@@ -1,4 +1,5 @@
 import { QPQCoreConfigSettingType } from 'quidproquo-core';
+import { QPQWebServerConfigSettingType } from 'quidproquo-webserver';
 
 import { describe, expect, it } from 'vitest';
 
@@ -8,8 +9,24 @@ import { defineTenant } from './defineTenant';
 const config = defineTenant({
   owner: { module: 'owner-svc' },
   basePath: '/tenants',
+  myTenantsBasePath: '/my-tenants',
   routeAuthSettings: { userDirectoryName: 'users' },
 });
+
+// The owner's settings arrive as arbitrarily nested config arrays (qpq flattens
+// them at load); the routes are what we assert paths against.
+const ownerRoutes = (): { method: string; path: string }[] => {
+  const serviceSettings = config.find(
+    (s) => (s as { configSettingType: string }).configSettingType === QPQCoreConfigSettingType.serviceSettings,
+  ) as { settingsByService: Record<string, unknown[]> };
+
+  return serviceSettings.settingsByService['owner-svc']
+    .flat(Infinity)
+    .filter((s) => (s as { configSettingType: string }).configSettingType === QPQWebServerConfigSettingType.Route) as {
+    method: string;
+    path: string;
+  }[];
+};
 
 describe('defineTenant', () => {
   it('always registers the request + connection scope resolver inline functions', () => {
@@ -45,11 +62,65 @@ describe('defineTenant', () => {
     ) as { settingsByService: Record<string, unknown[]> };
 
     // The standard resolver is threaded into the tenant collection's own route
-    // globals (the {basePath}/docs CRUD and the {basePath} custom routes) -
+    // globals (the {basePath} CRUD and the {myTenantsBasePath} membership routes) -
     // without it every authenticated user could read and mutate every tenant's
     // doc. The tenant collection is an ordinary tenanted collection.
     const ownerSettings = JSON.stringify(serviceSettings.settingsByService['owner-svc']);
     const occurrences = ownerSettings.split(TENANT_SCOPE_RESOLVER_FN).length - 1;
     expect(occurrences).toBeGreaterThanOrEqual(2);
+  });
+
+  it('mounts the tenant collection at basePath, named after the model type', () => {
+    const paths = ownerRoutes().map((r) => `${r.method} ${r.path}`);
+
+    // The stock eventDoc CRUD, at the collection root like every other collection
+    // (/templates, /styles) - not under a mechanism-named child path.
+    expect(paths).toEqual(
+      expect.arrayContaining(['GET /v1/tenants', 'GET /v1/tenants/{id}', 'GET /v1/tenants/{id}/events', 'DELETE /v1/tenants/{id}']),
+    );
+  });
+
+  it('mounts the membership-gated routes at myTenantsBasePath', () => {
+    const paths = ownerRoutes().map((r) => `${r.method} ${r.path}`);
+
+    expect(paths).toEqual(
+      expect.arrayContaining(['GET /v1/my-tenants', 'POST /v1/my-tenants', 'GET /v1/my-tenants/{id}', 'GET /v1/my-tenants/{id}/logo']),
+    );
+  });
+
+  it('leaves create to the membership route, so a new tenant always links its creator', () => {
+    const creates = ownerRoutes().filter((r) => r.method === 'POST' && r.path === '/v1/tenants');
+
+    // The stock eventDoc create would make a doc with no membership link - a tenant
+    // nothing can list again. POST /v1/my-tenants is the only way in.
+    expect(creates).toEqual([]);
+  });
+
+  it('mounts no literal route that a tenant id could be mistaken for', () => {
+    // The regression this layout exists to prevent: `{basePath}/{id}` matches any
+    // single segment, so a sibling `{basePath}/<literal>` is ambiguous with that id
+    // and the router picks by path-length precedence, not by intent. ('/tenants/docs'
+    // used to resolve to the tenant record get with id='docs' -> Forbidden.)
+    const idRoutes = ownerRoutes().filter((r) => r.path.endsWith('/{id}'));
+    expect(idRoutes.length).toBeGreaterThan(0);
+
+    for (const idRoute of idRoutes) {
+      const root = idRoute.path.slice(0, -'/{id}'.length);
+
+      // A same-method sibling that is exactly one literal segment under the same
+      // root is what `{id}` would swallow.
+      const ambiguous = ownerRoutes().filter((r) => {
+        if (r.method !== idRoute.method || r.path === idRoute.path) {
+          return false;
+        }
+        if (!r.path.startsWith(`${root}/`)) {
+          return false;
+        }
+        const segment = r.path.slice(root.length + 1);
+        return segment.length > 0 && !segment.includes('/') && !segment.includes('{');
+      });
+
+      expect(ambiguous).toEqual([]);
+    }
   });
 });

@@ -5,6 +5,7 @@ import { defineVersionedRoute } from '../../routes/defineVersionedRoute';
 import { EVENT_DOC_USER_DIRECTORY_GLOBAL } from '../constants/eventDocGlobalNames';
 import { buildEventDocStore } from '../context/buildEventDocStore';
 import { buildEventDocStoreGlobals } from '../globals/buildEventDocStoreGlobals';
+import { EventDocRouteName } from '../types/EventDocRouteName';
 import { EventDocRoutesOptions } from '../types/EventDocRoutesOptions';
 
 // Controllers ship inside this package (resolved relative to this file) and read
@@ -20,6 +21,7 @@ export const defineEventDocRoutes = ({
   eventRenderer,
   onPublish,
   scopeResolver,
+  excludeRoutes = [],
 }: EventDocRoutesOptions): QPQConfig => {
   // Same assembly a hand-written route uses via askEventDocProvideStore, so built-in and
   // custom routes describe the identical store.
@@ -50,15 +52,17 @@ export const defineEventDocRoutes = ({
   const route = (method: HTTPMethod, path: string, functionName: string): QPQConfig =>
     defineVersionedRoute(method, path, runtime(functionName), options, version);
 
-  return [
-    route('GET', basePath, 'list'),
-    route('GET', `${basePath}/{id}`, 'get'),
-    route('GET', `${basePath}/{id}/events`, 'listEvents'),
-    route('GET', `${basePath}/{id}/render`, 'render'),
-    route('POST', basePath, 'create'),
-    route('POST', `${basePath}/{id}/events`, 'appendEvent'),
-    route('POST', `${basePath}/{id}/assets`, 'createAsset'),
-    route('GET', `${basePath}/{id}/assets/{assetId}`, 'getAsset'),
-    route('DELETE', `${basePath}/{id}`, 'remove'),
+  const allRoutes: [HTTPMethod, string, EventDocRouteName][] = [
+    ['GET', basePath, 'list'],
+    ['GET', `${basePath}/{id}`, 'get'],
+    ['GET', `${basePath}/{id}/events`, 'listEvents'],
+    ['GET', `${basePath}/{id}/render`, 'render'],
+    ['POST', basePath, 'create'],
+    ['POST', `${basePath}/{id}/events`, 'appendEvent'],
+    ['POST', `${basePath}/{id}/assets`, 'createAsset'],
+    ['GET', `${basePath}/{id}/assets/{assetId}`, 'getAsset'],
+    ['DELETE', `${basePath}/{id}`, 'remove'],
   ];
+
+  return allRoutes.filter(([, , name]) => !excludeRoutes.includes(name)).map(([method, path, name]) => route(method, path, name));
 };
