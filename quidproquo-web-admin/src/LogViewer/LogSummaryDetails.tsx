@@ -1,4 +1,4 @@
-import { getFederatedKeyFromQpqFunctionRuntime, StoryResult } from 'quidproquo-core';
+import { getFederatedKeyFromQpqFunctionRuntime, isQpqFunctionRuntimeAdvanced, StoryResult } from 'quidproquo-core';
 
 import { useState } from 'react';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
@@ -20,6 +20,8 @@ export const LogSummaryDetails = ({ log }: LogSummaryDetailsProps) => {
   const functionKey = log.qpqFunctionRuntimeInfo
     ? getFederatedKeyFromQpqFunctionRuntime(log.qpqFunctionRuntimeInfo)
     : runtimeTypeToCamelCase(log.runtimeType);
+  const basePath =
+    log.qpqFunctionRuntimeInfo && isQpqFunctionRuntimeAdvanced(log.qpqFunctionRuntimeInfo) ? log.qpqFunctionRuntimeInfo.basePath : undefined;
 
   return (
     <>
@@ -41,6 +43,12 @@ export const LogSummaryDetails = ({ log }: LogSummaryDetailsProps) => {
               {'// src: '}
               {functionKey}
             </div>
+            {basePath && (
+              <div>
+                {'// basePath: '}
+                {basePath}
+              </div>
+            )}
             {log.fromCorrelation && (
               <div>
                 {'// Caller: '}
