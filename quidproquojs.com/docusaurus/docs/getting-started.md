@@ -96,7 +96,9 @@ export const health = dynamicRoute(
 The story never reads the clock itself — it *asks* for the time by yielding
 an action, and the runtime answers. On your machine that's the dev server;
 in production it's whatever platform the app is deployed to. Same story,
-zero changes.
+zero changes. That's why every quidproquo function starts with `ask`: see
+[why every function starts with ask](./core-concepts.md#why-every-function-starts-with-ask)
+for the full story.
 
 Add your own route by dropping a file next to `health.ts`, exporting it from
 the controller `index.ts`, and saving — the dev server rebuilds and restarts
