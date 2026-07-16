@@ -8,6 +8,11 @@ import { prettierConfigs } from './config/prettier.mjs';
 import { reactConfigs } from './config/react.mjs';
 import qpqPlugin from './plugin/index.mjs';
 
+// Standalone use, without adopting the whole shared config:
+//   import { qpqPlugin } from 'quidproquo-eslint-config';
+//   export default [qpqPlugin.configs.recommended];
+export { qpqPlugin };
+
 export default [
   { ignores: ['**/dist/**', '**/lib/**', '**/node_modules/**', '**/*.d.ts'] },
   { files: ['**/*.{js,mjs,cjs,jsx,ts,tsx}'] },

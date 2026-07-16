@@ -5,7 +5,23 @@ Not for prod
 ## qpq rules
 
 The shared config bundles a small ESLint plugin (`plugin/index.mjs`, namespace `qpq`)
-that enforces the framework's `ask` naming contract:
+that enforces the framework's `ask` naming contract.
+
+Using the shared config gets you the rules automatically. To use the plugin on its own,
+without the rest of the config:
+
+```js
+// eslint.config.mjs
+import { qpqPlugin } from 'quidproquo-eslint-config';
+
+export default [
+  qpqPlugin.configs.recommended,
+  // or pick rules individually:
+  // { plugins: { qpq: qpqPlugin }, rules: { 'qpq/require-yield-star': 'error' } },
+];
+```
+
+The rules:
 
 ### `qpq/require-yield-star`
 
