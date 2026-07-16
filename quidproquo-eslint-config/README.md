@@ -1,3 +1,39 @@
 # eslint config
 
 Not for prod
+
+## qpq rules
+
+The shared config bundles a small ESLint plugin (`plugin/index.mjs`, namespace `qpq`)
+that enforces the framework's `ask` naming contract:
+
+### `qpq/require-yield-star`
+
+Inside a generator, a call to any `ask*` function (including `obj.askX()`) must be
+delegated with `yield*`. A bare call or a plain `yield` creates a generator that never
+runs. Auto-fixable: the fix inserts `yield*` (adding parentheses where a bare yield
+expression is not allowed), upgrades `yield` to `yield*`, and replaces a wrong `await`.
+
+```ts
+const now = askDateNow();        // error, fixed to: yield* askDateNow()
+const now = yield askDateNow();  // error, fixed to: yield* askDateNow()
+const now = yield* askDateNow(); // correct
+```
+
+Allowed without `yield*`:
+
+- ask calls passed as arguments, that's how stories compose:
+  `yield* askRunParallel([askA(), askB()])`, `runStory(askDateNow(), mocks)`
+- ask calls outside generator functions (test drivers, forwarding wrappers), since
+  yielding is not possible there anyway
+
+### `qpq/ask-prefix-generator-only`
+
+The `ask` prefix is reserved for qpq stories, the same way `use` is reserved for React
+hooks. Any function literal named `ask*` (declaration, arrow, method, class property)
+must be a generator. Aliases and factory results like
+`const askRead = createContextReader(ctx)` are fine because they are not function
+literals. Not auto-fixable, rename the function or make it a generator.
+
+Tests live next to the rules (`plugin/rules/*.test.mjs`) and run with the repo's
+vitest suite: `npx vitest run --project quidproquo-eslint-config`.

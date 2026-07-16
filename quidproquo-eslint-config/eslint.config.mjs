@@ -6,6 +6,7 @@ import pluginJs from '@eslint/js';
 import { overrides } from './config/overrides.mjs';
 import { prettierConfigs } from './config/prettier.mjs';
 import { reactConfigs } from './config/react.mjs';
+import qpqPlugin from './plugin/index.mjs';
 
 export default [
   { ignores: ['**/dist/**', '**/lib/**', '**/node_modules/**', '**/*.d.ts'] },
@@ -53,6 +54,8 @@ export default [
       'simple-import-sort/exports': 'error',
     },
   },
+
+  qpqPlugin.configs.recommended,
 
   ...reactConfigs,
   ...prettierConfigs,

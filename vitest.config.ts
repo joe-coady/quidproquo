@@ -3,8 +3,7 @@ import { defineConfig } from 'vitest/config'
 import packageJson from './package.json'
 
 const packagesToSkip = [
-  'quidproquo-tsconfig',
-  'quidproquo-eslint-config'
+  'quidproquo-tsconfig'
 ];
 
 export default defineConfig({
