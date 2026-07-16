@@ -11,3 +11,4 @@ export * from './routes';
 export * from './summary';
 export * from './types';
 export * from './validation';
+export * from './workspace';
