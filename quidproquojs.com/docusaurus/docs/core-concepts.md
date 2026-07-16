@@ -53,3 +53,5 @@ Every action pairs a **requester** (the `ask` function your story calls) with a 
 Anything starting with `ask` must be invoked with `yield*` from inside another generator. The prefix works like a syntax marker, the same way `use` marks a React hook: see `ask`, write `yield*`. Higher-level stories that compose other ask functions follow the same rule and get the same prefix (`askGetCurrentEpochMs`, `askRunParallel`, `askCatch`).
 
 The practical payoff is testability and portability. Because `askDateNow` only describes intent, a test can run the same story with a fake processor that returns a fixed timestamp, and the identical story code runs on Lambda, Node, or the browser just by swapping the processor set.
+
+Both halves of this contract (always `yield*` an ask call, never name a plain function `ask*`) are enforced at edit time by the [quidproquo ESLint plugin](./eslint-plugin.md), which ships with the shared lint config and auto-fixes missing `yield*`s.
