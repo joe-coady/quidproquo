@@ -7,4 +7,5 @@ export * from './EventDocWorkspace';
 export * from './logic';
 export * from './reducer';
 export * from './selectors';
+export * from './transport';
 export * from './types';

@@ -1,4 +1,5 @@
 export * from './admin';
+export * from './api';
 export * from './apiKeyValidation';
 export * from './dns';
 export * from './genericDataResource';

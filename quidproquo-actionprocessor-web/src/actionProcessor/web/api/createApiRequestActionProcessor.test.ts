@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { ApiActionType } from 'quidproquo-web';
+import { ApiActionType } from 'quidproquo-webserver';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 

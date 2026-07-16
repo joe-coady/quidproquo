@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+- `ApiActionType`, `ApiRequestActionRequester` (`askApiRequest`), and its request/response types move from `quidproquo-web` to `quidproquo-webserver`. Update imports from `quidproquo-web` to `quidproquo-webserver`. The action type string also changed from `@quidproquo-web/Api/Request` to `@quidproquo-webserver/Api/Request`; any code matching on the raw string must update too.
+
 ## 0.1.9
 
 - The eventDoc render route (`GET {basePath}/:id/render`) in `quidproquo-features` now actually honors `renderMode=published`: it resolves the version effective as of `effectiveAt` (or now) and truncates the log to that version's slice, throwing `NotFound` if nothing is published, instead of always returning the full draft log regardless of `renderMode`. `EventDocRenderInput` also gains an optional `version?: EventDocVersion` field carrying the resolved version (undefined for draft renders) — a custom `eventRenderer` inline function that resolves its own links can read `version.publishedAt` instead of guessing a clock.

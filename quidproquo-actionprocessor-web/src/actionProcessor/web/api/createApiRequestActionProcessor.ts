@@ -1,5 +1,5 @@
 import { ActionProcessorList, ActionProcessorListResolver, actionResult } from 'quidproquo-core';
-import { ApiActionType, ApiRequestActionProcessor } from 'quidproquo-web';
+import { ApiActionType, ApiRequestActionProcessor } from 'quidproquo-webserver';
 import { preformNetworkRequest } from 'quidproquo-webserver';
 
 export interface ApiRequestActionProcessorOptions {

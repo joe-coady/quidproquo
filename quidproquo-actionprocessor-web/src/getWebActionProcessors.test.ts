@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { buildTestQpqConfig, ConfigActionType, noopDynamicModuleLoader } from 'quidproquo-core';
-import { ApiActionType, QueryParamsActionType, WindowActionType } from 'quidproquo-web';
+import { QueryParamsActionType, WindowActionType } from 'quidproquo-web';
+import { ApiActionType } from 'quidproquo-webserver';
 
 import { describe, expect, it } from 'vitest';
 
