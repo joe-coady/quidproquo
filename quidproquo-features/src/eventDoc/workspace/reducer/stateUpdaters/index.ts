@@ -1,4 +1,5 @@
 export * from './appendSlotHistoryEvents';
+export * from './clearError';
 export * from './createAppendHistoryEventsUpdater';
 export * from './createAppendHistoryEventUpdater';
 export * from './createApplyEventUpdater';

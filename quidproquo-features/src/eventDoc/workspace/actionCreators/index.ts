@@ -1,6 +1,7 @@
 export * from './askUIEventDocWorkspaceAppendHistoryEvent';
 export * from './askUIEventDocWorkspaceAppendHistoryEvents';
 export * from './askUIEventDocWorkspaceApplyEvent';
+export * from './askUIEventDocWorkspaceClearError';
 export * from './askUIEventDocWorkspaceRemovePendingEvent';
 export * from './askUIEventDocWorkspaceReset';
 export * from './askUIEventDocWorkspaceSetDocumentIdentity';

@@ -9,5 +9,6 @@ export enum EventDocWorkspaceEffect {
   SetLoading = '@quidproquo-features/eventDocWorkspace/setLoading',
   SetSaving = '@quidproquo-features/eventDocWorkspace/setSaving',
   SetError = '@quidproquo-features/eventDocWorkspace/setError',
+  ClearError = '@quidproquo-features/eventDocWorkspace/clearError',
   Reset = '@quidproquo-features/eventDocWorkspace/reset',
 }

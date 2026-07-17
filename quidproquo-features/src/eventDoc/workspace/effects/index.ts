@@ -1,6 +1,7 @@
 export * from './EventDocWorkspaceAppendHistoryEventEffect';
 export * from './EventDocWorkspaceAppendHistoryEventsEffect';
 export * from './EventDocWorkspaceApplyEventEffect';
+export * from './EventDocWorkspaceClearErrorEffect';
 export * from './EventDocWorkspaceEffect';
 export * from './EventDocWorkspaceEffects';
 export * from './EventDocWorkspaceRemovePendingEventEffect';

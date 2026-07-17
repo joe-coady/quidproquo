@@ -1,6 +1,7 @@
 import { Nullable } from 'quidproquo-core';
 
 import { EventDocEvent } from '../../models';
+import { EventDocWorkspaceSlotError } from './EventDocWorkspaceSlotError';
 import { EventDocWorkspaceSlotsConfig } from './EventDocWorkspaceSlotsConfig';
 import { EventDocWorkspaceSlotState } from './EventDocWorkspaceSlotState';
 import { EventDocWorkspaceSlotViewOf } from './EventDocWorkspaceSlotViewOf';
@@ -21,6 +22,7 @@ export type EventDocWorkspaceSelectors<TSlots extends EventDocWorkspaceSlotsConf
   isDirty: EventDocWorkspaceSelector<boolean>;
   isLoading: EventDocWorkspaceSelector<boolean>;
   isSaving: EventDocWorkspaceSelector<boolean>;
-  // First slot error, for a single workspace-level error surface.
-  error: EventDocWorkspaceSelector<Nullable<string>>;
+  // First non-null slot error, for a single workspace-level error surface. Typed
+  // (operation + QPQError) so the consumer owns the display phrasing.
+  error: EventDocWorkspaceSelector<Nullable<EventDocWorkspaceSlotError>>;
 };

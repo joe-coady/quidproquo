@@ -1,10 +1,12 @@
-import { askDateNow, askNewGuid, AskResponse, QpqIsoDateTime } from 'quidproquo-core';
+import { askDateNow, askNewGuid, AskResponse, ErrorTypeEnum, QpqIsoDateTime } from 'quidproquo-core';
 
 import { EventDocApplyEventActionPayload } from '../../actions';
 import { EventDocEvent } from '../../models';
 import { askUIEventDocWorkspaceApplyEvent } from '../actionCreators/askUIEventDocWorkspaceApplyEvent';
+import { askUIEventDocWorkspaceClearError } from '../actionCreators/askUIEventDocWorkspaceClearError';
 import { askUIEventDocWorkspaceSetError } from '../actionCreators/askUIEventDocWorkspaceSetError';
 import { EventDocWorkspaceSlotBinding } from '../types/EventDocWorkspaceSlotBinding';
+import { EventDocWorkspaceSlotOperation } from '../types/EventDocWorkspaceSlotOperation';
 import { askEventDocWorkspaceReadState } from './askEventDocWorkspaceReadState';
 import { getSlotLiveEvents } from './getSlotLiveEvents';
 
@@ -45,11 +47,14 @@ export function* askEventDocWorkspaceCommitEvent(
 
     const reason = binding.validate(event, liveEvents);
     if (reason) {
-      yield* askUIEventDocWorkspaceSetError(binding.slotKey, reason);
+      yield* askUIEventDocWorkspaceSetError(binding.slotKey, {
+        operation: EventDocWorkspaceSlotOperation.validation,
+        error: { errorType: ErrorTypeEnum.Invalid, errorText: reason },
+      });
       return;
     }
   }
 
-  yield* askUIEventDocWorkspaceSetError(binding.slotKey, null);
+  yield* askUIEventDocWorkspaceClearError(binding.slotKey);
   yield* askUIEventDocWorkspaceApplyEvent(binding.slotKey, event);
 }

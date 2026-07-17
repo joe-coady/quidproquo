@@ -1,9 +1,11 @@
 import { askCatch, AskResponse } from 'quidproquo-core';
 
 import { askUIEventDocWorkspaceAppendHistoryEvent } from '../actionCreators/askUIEventDocWorkspaceAppendHistoryEvent';
+import { askUIEventDocWorkspaceClearError } from '../actionCreators/askUIEventDocWorkspaceClearError';
 import { askUIEventDocWorkspaceRemovePendingEvent } from '../actionCreators/askUIEventDocWorkspaceRemovePendingEvent';
 import { askUIEventDocWorkspaceSetError } from '../actionCreators/askUIEventDocWorkspaceSetError';
 import { askUIEventDocWorkspaceSetSaving } from '../actionCreators/askUIEventDocWorkspaceSetSaving';
+import { EventDocWorkspaceSlotOperation } from '../types/EventDocWorkspaceSlotOperation';
 import { EventDocWorkspaceTransport } from '../types/EventDocWorkspaceTransport';
 import { askEventDocWorkspaceReadState } from './askEventDocWorkspaceReadState';
 import { toEventDocEventInput } from './toEventDocEventInput';
@@ -24,13 +26,13 @@ export function* askEventDocWorkspaceSaveSlot(transport: EventDocWorkspaceTransp
   }
 
   yield* askUIEventDocWorkspaceSetSaving(slotKey, true);
-  yield* askUIEventDocWorkspaceSetError(slotKey, null);
+  yield* askUIEventDocWorkspaceClearError(slotKey);
 
   for (const pending of pendingEvents) {
     const result = yield* askCatch(transport.askAppendEvent(documentIdentity, toEventDocEventInput(pending)));
 
     if (!result.success) {
-      yield* askUIEventDocWorkspaceSetError(slotKey, `Failed to save - ${result.error.errorText}`);
+      yield* askUIEventDocWorkspaceSetError(slotKey, { operation: EventDocWorkspaceSlotOperation.save, error: result.error });
       break;
     }
 

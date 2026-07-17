@@ -4,6 +4,7 @@ import { EventDocWorkspaceEffect } from '../effects/EventDocWorkspaceEffect';
 import { EventDocWorkspaceEffects } from '../effects/EventDocWorkspaceEffects';
 import { EventDocWorkspaceSlotsConfig } from '../types/EventDocWorkspaceSlotsConfig';
 import { EventDocWorkspaceState } from '../types/EventDocWorkspaceState';
+import { clearError } from './stateUpdaters/clearError';
 import { createAppendHistoryEventsUpdater } from './stateUpdaters/createAppendHistoryEventsUpdater';
 import { createAppendHistoryEventUpdater } from './stateUpdaters/createAppendHistoryEventUpdater';
 import { createApplyEventUpdater } from './stateUpdaters/createApplyEventUpdater';
@@ -35,6 +36,7 @@ export const createEventDocWorkspaceReducer = (slots: EventDocWorkspaceSlotsConf
     [EventDocWorkspaceEffect.SetLoading]: setLoading,
     [EventDocWorkspaceEffect.SetSaving]: setSaving,
     [EventDocWorkspaceEffect.SetError]: setError,
+    [EventDocWorkspaceEffect.ClearError]: clearError,
     [EventDocWorkspaceEffect.Reset]: createResetUpdater(slots),
   });
 };

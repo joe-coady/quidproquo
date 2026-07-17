@@ -1,6 +1,6 @@
 import { AskResponse } from 'quidproquo-core';
 
-import { askUIEventDocWorkspaceSetError } from '../actionCreators/askUIEventDocWorkspaceSetError';
+import { askUIEventDocWorkspaceClearError } from '../actionCreators/askUIEventDocWorkspaceClearError';
 import { askUIEventDocWorkspaceSetPendingEvents } from '../actionCreators/askUIEventDocWorkspaceSetPendingEvents';
 
 // Cancel = discard the pending buffer. The folded view reverts reactively: the saved
@@ -8,6 +8,6 @@ import { askUIEventDocWorkspaceSetPendingEvents } from '../actionCreators/askUIE
 export function* askEventDocWorkspaceCancel(slotKeys: string[]): AskResponse<void> {
   for (const slotKey of slotKeys) {
     yield* askUIEventDocWorkspaceSetPendingEvents(slotKey, []);
-    yield* askUIEventDocWorkspaceSetError(slotKey, null);
+    yield* askUIEventDocWorkspaceClearError(slotKey);
   }
 }

@@ -1,8 +1,9 @@
-import { AskResponse, askStateDispatchEffect, Nullable } from 'quidproquo-core';
+import { AskResponse, askStateDispatchEffect } from 'quidproquo-core';
 
 import { EventDocWorkspaceEffect } from '../effects/EventDocWorkspaceEffect';
 import { EventDocWorkspaceSetErrorEffect } from '../effects/EventDocWorkspaceSetErrorEffect';
+import { EventDocWorkspaceSlotError } from '../types/EventDocWorkspaceSlotError';
 
-export function* askUIEventDocWorkspaceSetError(slotKey: string, error: Nullable<string>): AskResponse<void> {
+export function* askUIEventDocWorkspaceSetError(slotKey: string, error: EventDocWorkspaceSlotError): AskResponse<void> {
   yield* askStateDispatchEffect<EventDocWorkspaceSetErrorEffect>(EventDocWorkspaceEffect.SetError, { slotKey, error });
 }

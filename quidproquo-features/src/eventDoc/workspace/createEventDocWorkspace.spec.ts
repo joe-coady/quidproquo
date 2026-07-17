@@ -29,6 +29,7 @@ import {
   EventDocWorkspaceDocumentIdentity,
   EventDocWorkspaceDocumentSlotConfig,
   EventDocWorkspaceSlotKind,
+  EventDocWorkspaceSlotOperation,
   EventDocWorkspaceState,
   EventDocWorkspaceTransport,
 } from './types';
@@ -186,13 +187,14 @@ type FakeTransport = {
   appended: EventDocEventInput[];
   fetchCalls: { afterIndex?: number }[];
   setServerEvents: (events: EventDocEvent[]) => void;
-  failAppendOnCall: (callNumber: number) => void;
+  failAppendOnCall: (callNumber: number, errorType?: ErrorTypeEnum) => void;
   failFetches: () => void;
 };
 
 const createFakeTransport = (initialServerEvents: EventDocEvent[] = []): FakeTransport => {
   let serverEvents = [...initialServerEvents];
   let failAppendOn: number | null = null;
+  let failAppendErrorType = ErrorTypeEnum.GenericError;
   let failFetch = false;
   let appendCalls = 0;
   const appended: EventDocEventInput[] = [];
@@ -212,7 +214,7 @@ const createFakeTransport = (initialServerEvents: EventDocEvent[] = []): FakeTra
     appendCalls += 1;
 
     if (appendCalls === failAppendOn) {
-      return yield* askThrowError(ErrorTypeEnum.GenericError, 'boom');
+      return yield* askThrowError(failAppendErrorType, 'boom');
     }
 
     appended.push(input);
@@ -241,8 +243,9 @@ const createFakeTransport = (initialServerEvents: EventDocEvent[] = []): FakeTra
     setServerEvents: (events) => {
       serverEvents = [...events];
     },
-    failAppendOnCall: (callNumber) => {
+    failAppendOnCall: (callNumber, errorType = ErrorTypeEnum.GenericError) => {
       failAppendOn = callNumber;
+      failAppendErrorType = errorType;
     },
     failFetches: () => {
       failFetch = true;
@@ -455,7 +458,8 @@ describe('createEventDocWorkspace validation', () => {
     const state = runWorkspaceStory(workspace, story);
 
     expect(state.pending.noteA).toHaveLength(0);
-    expect(state.slots.noteA.error).not.toBeNull();
+    expect(state.slots.noteA.error?.operation).toBe(EventDocWorkspaceSlotOperation.validation);
+    expect(state.slots.noteA.error?.error.errorType).toBe(ErrorTypeEnum.Invalid);
   });
 
   it('allows CREATE_DRAFT on a published document and clears the error', () => {
@@ -463,7 +467,7 @@ describe('createEventDocWorkspace validation', () => {
 
     function* story(): AskResponse<void> {
       yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent(0), publishEvent(1)]);
-      yield* workspace.api.noteA.askNoteSetTitle('rejected'); // sets the error
+      yield* workspace.api.noteA.askNoteSetTitle('rejected'); // sets the validation error
       yield* workspace.api.noteA.askNoteCreateDraft();
     }
 
@@ -471,6 +475,7 @@ describe('createEventDocWorkspace validation', () => {
 
     expect(state.pending.noteA).toHaveLength(1);
     expect(state.pending.noteA[0].type).toBe(EventDocEffect.CreateDraft);
+    // The successful commit wipes the earlier rejection via the ClearError effect.
     expect(state.slots.noteA.error).toBeNull();
   });
 
@@ -491,7 +496,10 @@ describe('createEventDocWorkspace validation', () => {
     const state = runWorkspaceStory(workspace, story);
 
     expect(state.pending.noteA).toHaveLength(0);
-    expect(state.slots.noteA.error).toBe('Title required');
+    expect(state.slots.noteA.error).toEqual({
+      operation: EventDocWorkspaceSlotOperation.validation,
+      error: { errorType: ErrorTypeEnum.Invalid, errorText: 'Title required' },
+    });
   });
 });
 
@@ -529,7 +537,10 @@ describe('createEventDocWorkspace built-in verbs', () => {
 
     const state = runWorkspaceStory(workspace, story);
 
-    expect(state.slots.noteA.error).toBe('Failed to load.');
+    // The caught transport error passes through untouched: typed, not flattened.
+    expect(state.slots.noteA.error?.operation).toBe(EventDocWorkspaceSlotOperation.load);
+    expect(state.slots.noteA.error?.error.errorType).toBe(ErrorTypeEnum.GenericError);
+    expect(state.slots.noteA.error?.error.errorText).toBe('fetch boom');
     expect(state.slots.noteA.isLoading).toBe(false);
     expect(state.history.noteA).toHaveLength(0);
   });
@@ -576,8 +587,29 @@ describe('createEventDocWorkspace built-in verbs', () => {
     expect(state.history.noteA).toHaveLength(2); // init + first line
     expect(state.pending.noteA).toHaveLength(1);
     expect(state.pending.noteA[0].payload.data).toEqual({ lineId: 'l2', text: 'two' });
-    expect(state.slots.noteA.error).toBe('Failed to save - boom');
+    expect(state.slots.noteA.error?.operation).toBe(EventDocWorkspaceSlotOperation.save);
+    expect(state.slots.noteA.error?.error.errorType).toBe(ErrorTypeEnum.GenericError);
+    expect(state.slots.noteA.error?.error.errorText).toBe('boom');
     expect(state.slots.noteA.isSaving).toBe(false);
+  });
+
+  it('a save failure preserves the transport error type', () => {
+    const fake = createFakeTransport([initStateEvent()]);
+    fake.failAppendOnCall(1, ErrorTypeEnum.NotFound);
+    const workspace = createTestWorkspace(fake.transport);
+
+    function* story(): AskResponse<void> {
+      yield* workspace.api.workspace.askInit({ noteA: identityA });
+      yield* workspace.api.noteA.askNoteAddLine('l1', 'one');
+      yield* workspace.api.workspace.askSave();
+    }
+
+    const state = runWorkspaceStory(workspace, story);
+
+    // The original errorType survives the channel; consumers can branch on it.
+    expect(state.slots.noteA.error?.operation).toBe(EventDocWorkspaceSlotOperation.save);
+    expect(state.slots.noteA.error?.error.errorType).toBe(ErrorTypeEnum.NotFound);
+    expect(state.pending.noteA).toHaveLength(1);
   });
 
   it('refresh tail-pulls only the events after the last held index', () => {

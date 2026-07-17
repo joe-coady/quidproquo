@@ -1,6 +1,7 @@
 import { EventDocWorkspaceAppendHistoryEventEffect } from './EventDocWorkspaceAppendHistoryEventEffect';
 import { EventDocWorkspaceAppendHistoryEventsEffect } from './EventDocWorkspaceAppendHistoryEventsEffect';
 import { EventDocWorkspaceApplyEventEffect } from './EventDocWorkspaceApplyEventEffect';
+import { EventDocWorkspaceClearErrorEffect } from './EventDocWorkspaceClearErrorEffect';
 import { EventDocWorkspaceRemovePendingEventEffect } from './EventDocWorkspaceRemovePendingEventEffect';
 import { EventDocWorkspaceResetEffect } from './EventDocWorkspaceResetEffect';
 import { EventDocWorkspaceSetDocumentIdentityEffect } from './EventDocWorkspaceSetDocumentIdentityEffect';
@@ -21,4 +22,5 @@ export type EventDocWorkspaceEffects =
   | EventDocWorkspaceSetLoadingEffect
   | EventDocWorkspaceSetSavingEffect
   | EventDocWorkspaceSetErrorEffect
+  | EventDocWorkspaceClearErrorEffect
   | EventDocWorkspaceResetEffect;

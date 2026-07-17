@@ -1,7 +1,9 @@
 import { askCatch, askMapParallel, AskResponse } from 'quidproquo-core';
 
 import { askUIEventDocWorkspaceAppendHistoryEvents } from '../actionCreators/askUIEventDocWorkspaceAppendHistoryEvents';
+import { askUIEventDocWorkspaceClearError } from '../actionCreators/askUIEventDocWorkspaceClearError';
 import { askUIEventDocWorkspaceSetError } from '../actionCreators/askUIEventDocWorkspaceSetError';
+import { EventDocWorkspaceSlotOperation } from '../types/EventDocWorkspaceSlotOperation';
 import { EventDocWorkspaceTransport } from '../types/EventDocWorkspaceTransport';
 import { askEventDocWorkspaceReadState } from './askEventDocWorkspaceReadState';
 
@@ -22,12 +24,12 @@ const getAskRefreshDocumentSlot = (transport: EventDocWorkspaceTransport) =>
     const history = state.history[slotKey] ?? [];
     const lastEvent = history[history.length - 1];
 
-    yield* askUIEventDocWorkspaceSetError(slotKey, null);
+    yield* askUIEventDocWorkspaceClearError(slotKey);
 
     const result = yield* askCatch(transport.askFetchEvents(documentIdentity, lastEvent?.payload.metadata.index));
 
     if (!result.success) {
-      yield* askUIEventDocWorkspaceSetError(slotKey, 'Failed to refresh.');
+      yield* askUIEventDocWorkspaceSetError(slotKey, { operation: EventDocWorkspaceSlotOperation.load, error: result.error });
       return;
     }
 
