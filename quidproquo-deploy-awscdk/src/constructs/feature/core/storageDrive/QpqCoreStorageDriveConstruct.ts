@@ -171,7 +171,12 @@ export class QpqCoreStorageDriveConstruct extends QpqCoreStorageDriveConstructBa
     }
   }
 
-  public static authorizeActionsForRole(scope: Construct, role: aws_iam.IRole, qpqConfig: QPQConfig, ownedStorageDrives: QpqCoreStorageDriveConstruct[]) {
+  public static authorizeActionsForRole(
+    scope: Construct,
+    role: aws_iam.IRole,
+    qpqConfig: QPQConfig,
+    ownedStorageDrives: QpqCoreStorageDriveConstruct[],
+  ) {
     // CDK-known ARNs for drives created in this stack.
     const ownedArns = ownedStorageDrives.flatMap((sd) => [sd.bucket.bucketArn, sd.bucket.arnForObjects('*')]);
 

@@ -68,12 +68,6 @@ export class QpqCoreSecretConstruct extends QpqCoreSecretConstructBase {
     if (resources.length === 0) return;
 
     // Off the inline DefaultPolicy (10,240-byte cap) onto managed policies.
-    qpqDeployAwsCdkUtils.attachManagedResourcePolicies(
-      scope,
-      role,
-      'webserverSecretAccess',
-      ['secretsmanager:GetSecretValue'],
-      resources,
-    );
+    qpqDeployAwsCdkUtils.attachManagedResourcePolicies(scope, role, 'webserverSecretAccess', ['secretsmanager:GetSecretValue'], resources);
   }
 }
