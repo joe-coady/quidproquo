@@ -14,12 +14,16 @@ import {
 
 import { describe, expect, it } from 'vitest';
 
-import { askApplyEventDocEvent } from '../actions';
+import { askApplyEventDocEvent, askApplyTransientEventDocEvent } from '../actions';
 import { buildEventDocFoldReducer, buildVersionRoutedReducer, createEventDocInitialDocumentState, foldEventDocLogStep } from '../fold';
 import { EventDocDocument, EventDocEffect, EventDocEvent, EventDocEventInput, EventDocEventPayload, EventDocStatus } from '../models';
 import { EventDocEditorValidator } from '../validation';
+import { getSlotLiveEvents } from './logic/getSlotLiveEvents';
+import { getSlotTransientEvents } from './logic/getSlotTransientEvents';
 import {
   askUIEventDocWorkspaceAppendHistoryEvent,
+  askUIEventDocWorkspaceApplyTransientEvent,
+  askUIEventDocWorkspaceDropTransient,
   askUIEventDocWorkspaceReset,
   askUIEventDocWorkspaceSetHistoryEvents,
   askUIEventDocWorkspaceSetPendingEvents,
@@ -83,7 +87,17 @@ function* askNoteCreateDraft(): AskResponse<void> {
   yield* askApplyEventDocEvent(EventDocEffect.CreateDraft, {});
 }
 
-const noteApi = { askNoteSetTitle, askNoteAddLine, askNoteSetLine, askNoteCreateDraft };
+// Transient siblings: same domain events, but committed into a never-saved group
+// keyed by transientKey (a stand-in for a websocket connection id).
+function* askNoteTransientSetTitle(transientKey: string, title: string): AskResponse<void> {
+  yield* askApplyTransientEventDocEvent(transientKey, NoteEvent.SetTitle, { title });
+}
+
+function* askNoteTransientAddLine(transientKey: string, lineId: string, text: string): AskResponse<void> {
+  yield* askApplyTransientEventDocEvent(transientKey, NoteEvent.AddLine, { lineId, text });
+}
+
+const noteApi = { askNoteSetTitle, askNoteAddLine, askNoteSetLine, askNoteCreateDraft, askNoteTransientSetTitle, askNoteTransientAddLine };
 
 const createNoteSlot = () =>
   ({
@@ -123,14 +137,20 @@ const createNoteV2Slot = () =>
 
 // ─── Test harness ───────────────────────────────────────────────────────────────────
 
+const constantNow = '2026-07-16T00:00:00.000Z';
+
 // Deterministic guid/date providers; everything else a workspace yields is handled by
 // askReduceState (state) or the bind (ApplyEvent), so nothing real reaches the runtime.
-const createActionMocks = (): ActionMockMap => {
+// `dates` are served in commit order then fall back to the constant — the transient
+// specs need crafted, distinct createdAt values (transient ordering is by time), while
+// every other spec keeps its stable constant timestamp.
+const createActionMocks = (dates: string[] = []): ActionMockMap => {
   let guidCount = 0;
+  let dateCount = 0;
 
   return {
     [GuidActionType.New]: () => `guid-${++guidCount}`,
-    [DateActionType.Now]: '2026-07-16T00:00:00.000Z',
+    [DateActionType.Now]: () => dates[dateCount++] ?? constantNow,
   };
 };
 
@@ -141,8 +161,8 @@ type WorkspaceUnderTest = {
 
 // The whole point: the workspace runs as pure story logic under askReduceState —
 // no React runtime, no processors, no network.
-const runWorkspaceStory = (workspace: WorkspaceUnderTest, story: () => AskResponse<void>): EventDocWorkspaceState =>
-  runStory(askReduceState(workspace.createInitialState(), workspace.reducer, story), createActionMocks());
+const runWorkspaceStory = (workspace: WorkspaceUnderTest, story: () => AskResponse<void>, dates?: string[]): EventDocWorkspaceState =>
+  runStory(askReduceState(workspace.createInitialState(), workspace.reducer, story), createActionMocks(dates));
 
 // Server-stamped events for seeding histories.
 const serverEvent = (type: string, data: unknown, index: number): EventDocEvent => ({
@@ -875,6 +895,231 @@ describe('createEventDocWorkspace selectors', () => {
 
     function* story(): AskResponse<void> {
       yield* askUIEventDocWorkspaceSetPendingEvents('noteA', [eventAtVersion(serverEvent(NoteEvent.SetTitle, { title: 'v2' }, 0), 2)]);
+    }
+
+    const state = runWorkspaceStory(workspace, story);
+
+    expect(() => workspace.selectors.view.noteA(state)).toThrow(/pending event/);
+  });
+});
+
+// ─── Transient streams: events that were never meant to survive ─────────────────────
+
+describe('createEventDocWorkspace transient streams', () => {
+  it('routes transient applies via the bind into the right slot AND key, stamped, unvalidated', () => {
+    const workspace = createTestWorkspace();
+
+    function* story(): AskResponse<void> {
+      yield* workspace.api.noteA.askNoteTransientSetTitle('conn-1', 'a1');
+      yield* workspace.api.noteA.askNoteTransientAddLine('conn-2', 'l1', 'from conn-2');
+      yield* workspace.api.noteB.askNoteTransientSetTitle('conn-1', 'b1');
+    }
+
+    const state = runWorkspaceStory(workspace, story);
+
+    expect(Object.keys(state.transient.noteA).sort()).toEqual(['conn-1', 'conn-2']);
+    expect(state.transient.noteA['conn-1']).toHaveLength(1);
+    expect(state.transient.noteA['conn-1'][0].payload.data).toEqual({ title: 'a1' });
+    expect(state.transient.noteA['conn-2'][0].payload.data).toEqual({ lineId: 'l1', text: 'from conn-2' });
+    expect(state.transient.noteB['conn-1'][0].payload.data).toEqual({ title: 'b1' });
+
+    // Same guid/date/schemaVersion stamping as the ordinary commit; index stays 0
+    // (never renumbered — transient ordering is by createdAt at read).
+    expect(state.transient.noteA['conn-1'][0].payload.metadata).toEqual({
+      version: 1,
+      clientMessageId: 'guid-1',
+      createdBy: { userId: '', userDisplayName: '' },
+      createdAt: constantNow,
+      index: 0,
+    });
+
+    // Nothing leaks into the persistable groups.
+    expect(state.pending.noteA).toHaveLength(0);
+    expect(state.pending.noteB).toHaveLength(0);
+    expect(state.history.noteA).toHaveLength(0);
+  });
+
+  it('skips validation: a published document still accepts transient events', () => {
+    const workspace = createTestWorkspace();
+
+    function* story(): AskResponse<void> {
+      yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent(0), publishEvent(1)]);
+      yield* workspace.api.noteA.askNoteTransientSetTitle('conn-1', 'observation, not an edit');
+    }
+
+    const state = runWorkspaceStory(workspace, story);
+
+    expect(state.transient.noteA['conn-1']).toHaveLength(1);
+    expect(state.slots.noteA.error).toBeNull();
+  });
+
+  it('folds base + pending + transient, transient ordered by createdAt across keys', () => {
+    const workspace = createTestWorkspace();
+
+    function* story(): AskResponse<void> {
+      yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent()]);
+      yield* workspace.api.noteA.askNoteAddLine('l1', 'pending line');
+      yield* workspace.api.noteA.askNoteTransientAddLine('conn-b', 'l2', 'late');
+      yield* workspace.api.noteA.askNoteTransientAddLine('conn-a', 'l3', 'early');
+    }
+
+    const state = runWorkspaceStory(workspace, story, [
+      '2026-07-16T00:00:00.000Z', // the pending commit
+      '2026-07-16T00:00:03.000Z', // conn-b's transient: committed FIRST, stamped LATER
+      '2026-07-16T00:00:01.000Z', // conn-a's transient: committed second, stamped earlier
+    ]);
+
+    // The merge is time-ordered, not commit-ordered.
+    const transientLineIds = getSlotTransientEvents(state, 'noteA').map((event) => (event.payload.data as NoteLine).lineId);
+    expect(transientLineIds).toEqual(['l3', 'l2']);
+
+    // Block order in the fold: pending before every transient; then time within transient.
+    const view = workspace.selectors.view.noteA(state);
+    expect(view.lines).toEqual([
+      { lineId: 'l1', text: 'pending line' },
+      { lineId: 'l3', text: 'early' },
+      { lineId: 'l2', text: 'late' },
+    ]);
+  });
+
+  it('breaks createdAt ties by transientKey then position for determinism', () => {
+    const workspace = createTestWorkspace();
+
+    function* story(): AskResponse<void> {
+      yield* workspace.api.noteA.askNoteTransientAddLine('zz', 'l1', 'zz first');
+      yield* workspace.api.noteA.askNoteTransientAddLine('aa', 'l2', 'aa first');
+      yield* workspace.api.noteA.askNoteTransientAddLine('zz', 'l3', 'zz second');
+    }
+
+    // The constant date mock stamps every event identically, so ONLY the tie-break
+    // orders the merge: 'aa' before 'zz', positions within a key preserved.
+    const state = runWorkspaceStory(workspace, story);
+
+    expect(getSlotTransientEvents(state, 'noteA').map((event) => (event.payload.data as NoteLine).lineId)).toEqual(['l2', 'l1', 'l3']);
+  });
+
+  it('coalesces within a transientKey with the slot rules, never across keys', () => {
+    const workspace = createTestWorkspace();
+
+    function* story(): AskResponse<void> {
+      yield* workspace.api.noteA.askNoteTransientSetTitle('conn-1', 'one');
+      yield* workspace.api.noteA.askNoteTransientSetTitle('conn-1', 'two');
+      yield* workspace.api.noteA.askNoteTransientSetTitle('conn-1', 'three');
+      yield* workspace.api.noteA.askNoteTransientSetTitle('conn-2', 'other');
+    }
+
+    const state = runWorkspaceStory(workspace, story);
+
+    // The one-per-type SetTitle rule collapses conn-1's burst to its latest ...
+    expect(state.transient.noteA['conn-1']).toHaveLength(1);
+    expect(state.transient.noteA['conn-1'][0].payload.data).toEqual({ title: 'three' });
+    // ... without reaching into conn-2's group.
+    expect(state.transient.noteA['conn-2']).toHaveLength(1);
+    expect(state.transient.noteA['conn-2'][0].payload.data).toEqual({ title: 'other' });
+  });
+
+  it('drop clears the key across ALL slots and the folded view reverts', () => {
+    const workspace = createTestWorkspace();
+
+    function* commits(): AskResponse<void> {
+      yield* workspace.api.noteA.askNoteSetTitle('pending title');
+      yield* workspace.api.noteA.askNoteTransientSetTitle('conn-1', 'transient title');
+      yield* workspace.api.noteB.askNoteTransientAddLine('conn-1', 'l1', 'b line');
+      yield* workspace.api.noteA.askNoteTransientAddLine('conn-2', 'l9', 'other connection');
+    }
+
+    const before = runWorkspaceStory(workspace, () => commits());
+    expect(workspace.selectors.view.noteA(before).title).toBe('transient title');
+    expect(workspace.selectors.view.noteB(before).lines).toEqual([{ lineId: 'l1', text: 'b line' }]);
+
+    function* dropStory(): AskResponse<void> {
+      yield* commits();
+      yield* askUIEventDocWorkspaceDropTransient('conn-1');
+    }
+
+    const after = runWorkspaceStory(workspace, dropStory);
+
+    // conn-1 is gone from EVERY slot; conn-2 and the pending buffer are untouched.
+    expect(after.transient.noteA['conn-1']).toBeUndefined();
+    expect(after.transient.noteB).toEqual({});
+    expect(after.transient.noteA['conn-2']).toHaveLength(1);
+    expect(workspace.selectors.view.noteA(after).title).toBe('pending title');
+    expect(workspace.selectors.view.noteA(after).lines).toEqual([{ lineId: 'l9', text: 'other connection' }]);
+    expect(workspace.selectors.view.noteB(after).lines).toEqual([]);
+  });
+
+  it('reset clears all transient groups', () => {
+    const workspace = createTestWorkspace();
+
+    function* story(): AskResponse<void> {
+      yield* workspace.api.noteA.askNoteTransientSetTitle('conn-1', 'gone');
+      yield* askUIEventDocWorkspaceReset();
+    }
+
+    const state = runWorkspaceStory(workspace, story);
+
+    expect(state.transient.noteA).toEqual({});
+    expect(workspace.selectors.view.noteA(state).title).toBe('');
+  });
+
+  it('save, cancel and isDirty ignore transient entirely', () => {
+    const fake = createFakeTransport([initStateEvent()]);
+    const workspace = createTestWorkspace(fake.transport);
+
+    function* story(): AskResponse<void> {
+      yield* workspace.api.workspace.askInit({ noteA: identityA });
+      yield* workspace.api.noteA.askNoteTransientSetTitle('conn-1', 'never saved');
+      yield* workspace.api.noteA.askNoteAddLine('l1', 'saved line');
+      yield* workspace.api.workspace.askSave();
+      yield* workspace.api.noteA.askNoteTransientAddLine('conn-1', 'l2', 'post-save transient');
+      yield* workspace.api.workspace.askCancel();
+    }
+
+    const state = runWorkspaceStory(workspace, story);
+
+    // Save streamed only the pending line; nothing transient touched the wire.
+    expect(fake.appended).toHaveLength(1);
+    expect(fake.appended[0].payload.data).toEqual({ lineId: 'l1', text: 'saved line' });
+    // Cancel drained nothing transient either: both of conn-1's events survive.
+    expect(state.transient.noteA['conn-1']).toHaveLength(2);
+    // Pending is drained and only transient remains: the workspace is not dirty.
+    expect(workspace.selectors.isDirty(state)).toBe(false);
+    expect(state.pending.noteA).toHaveLength(0);
+  });
+
+  it('fails loudly when a transient verb runs outside any workspace bind', () => {
+    const workspace = createTestWorkspace();
+
+    function* story(): AskResponse<void> {
+      yield* askNoteTransientSetTitle('conn-1', 'nowhere to go');
+    }
+
+    expect(() => runWorkspaceStory(workspace, story)).toThrow(/ApplyTransientEvent/);
+  });
+
+  it('keeps the persistable log transient-free: getSlotLiveEvents and liveEvents', () => {
+    const workspace = createTestWorkspace();
+
+    function* story(): AskResponse<void> {
+      yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent()]);
+      yield* workspace.api.noteA.askNoteSetTitle('pending');
+      yield* workspace.api.noteA.askNoteTransientSetTitle('conn-1', 'transient');
+    }
+
+    const state = runWorkspaceStory(workspace, story);
+
+    expect(getSlotLiveEvents(state, 'noteA')).toHaveLength(2); // history + pending only
+    expect(workspace.selectors.liveEvents.noteA(state)).toHaveLength(2);
+    expect(getSlotTransientEvents(state, 'noteA')).toHaveLength(1);
+  });
+
+  it('a transient event at a mismatched schema version throws at view read', () => {
+    const workspace = createTestWorkspace();
+
+    // Committed via the state effect directly to forge a stale version — the bind
+    // always stamps the slot's own schemaVersion, so this can't happen through it.
+    function* story(): AskResponse<void> {
+      yield* askUIEventDocWorkspaceApplyTransientEvent('noteA', 'conn-1', eventAtVersion(serverEvent(NoteEvent.SetTitle, { title: 'v2' }, 0), 2));
     }
 
     const state = runWorkspaceStory(workspace, story);

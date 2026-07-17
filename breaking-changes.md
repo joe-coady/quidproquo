@@ -13,6 +13,7 @@ assembled quickly.
 - `foldSlotHistory` is removed from `quidproquo-features`' `eventDoc/workspace/logic` exports. Read a slot's stored history fold via `getSlotHistoryView` (the raw, not-yet-latest-migrated accumulator) or a workspace's `selectors.view` (pending-folded and migrated to latest) instead.
 - `EventDocWorkspaceSlotState.error`, a workspace's `selectors.error`, and `askUIEventDocWorkspaceSetError`'s `error` argument in `quidproquo-features` change from `Nullable<string>` to the typed `Nullable<EventDocWorkspaceSlotError>` (`{ operation: EventDocWorkspaceSlotOperation, error: QPQError }`). Code reading a slot/workspace error as a display string must instead read `error.error.errorText` (or branch on `error.operation`/`error.error.errorType`); `askUIEventDocWorkspaceSetError` callers must pass the typed shape instead of a string.
 - `askUIEventDocWorkspaceClearError(slotKey)` is added to `quidproquo-features` as the way to clear a slot's error; passing `null` to `askUIEventDocWorkspaceSetError` no longer clears it.
+- `EventDocWorkspaceState` in `quidproquo-features` gains a required `transient: Record<string, Record<string, EventDocEvent[]>>` field (per-slot, per-transientKey groups of never-saved events). Any hand-constructed `EventDocWorkspaceState` must add it; `createInitialEventDocWorkspaceState` seeds it automatically.
 
 ## 0.1.9
 

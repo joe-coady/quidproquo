@@ -8,8 +8,10 @@ import { clearError } from './stateUpdaters/clearError';
 import { createAppendHistoryEventsUpdater } from './stateUpdaters/createAppendHistoryEventsUpdater';
 import { createAppendHistoryEventUpdater } from './stateUpdaters/createAppendHistoryEventUpdater';
 import { createApplyEventUpdater } from './stateUpdaters/createApplyEventUpdater';
+import { createApplyTransientEventUpdater } from './stateUpdaters/createApplyTransientEventUpdater';
 import { createResetUpdater } from './stateUpdaters/createResetUpdater';
 import { createSetHistoryEventsUpdater } from './stateUpdaters/createSetHistoryEventsUpdater';
+import { dropTransient } from './stateUpdaters/dropTransient';
 import { removePendingEvent } from './stateUpdaters/removePendingEvent';
 import { setDocumentIdentity } from './stateUpdaters/setDocumentIdentity';
 import { setError } from './stateUpdaters/setError';
@@ -27,6 +29,8 @@ export const createEventDocWorkspaceReducer = (slots: EventDocWorkspaceSlotsConf
 
   return buildEffectReducer<EventDocWorkspaceState, EventDocWorkspaceEffects>({
     [EventDocWorkspaceEffect.ApplyEvent]: createApplyEventUpdater(coalesceRulesBySlot),
+    [EventDocWorkspaceEffect.ApplyTransientEvent]: createApplyTransientEventUpdater(coalesceRulesBySlot),
+    [EventDocWorkspaceEffect.DropTransient]: dropTransient,
     [EventDocWorkspaceEffect.SetHistoryEvents]: createSetHistoryEventsUpdater(slots),
     [EventDocWorkspaceEffect.AppendHistoryEvent]: createAppendHistoryEventUpdater(slots),
     [EventDocWorkspaceEffect.AppendHistoryEvents]: createAppendHistoryEventsUpdater(slots),

@@ -1,5 +1,6 @@
 export * from './askEventDocWorkspaceCancel';
 export * from './askEventDocWorkspaceCommitEvent';
+export * from './askEventDocWorkspaceCommitTransientEvent';
 export * from './askEventDocWorkspaceInit';
 export * from './askEventDocWorkspaceReadState';
 export * from './askEventDocWorkspaceRefresh';
@@ -13,4 +14,5 @@ export * from './getSlotHistory';
 export * from './getSlotHistoryView';
 export * from './getSlotLiveEvents';
 export * from './getSlotPending';
+export * from './getSlotTransientEvents';
 export * from './toEventDocEventInput';
