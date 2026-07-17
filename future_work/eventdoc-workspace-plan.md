@@ -247,6 +247,13 @@ the view layer.
       Cross-slot flows are wiring-level composites over the bound slot apis (add-content
       + close-dialog, tenant logo upload, transformer add-step + select, templateTest
       run gating). All packages typecheck; not yet exercised in the running app.
+- [x] Extract ALL remaining event-doc code from exengne into quidproquo-features:
+      asset transport (workspace/transport), the reserved-event action creators +
+      plain-payload effects (eventDoc/actionCreators + eventDoc/effects, with fold's
+      ReservedEventDocEffects derived via EventDocFoldEffects), and the full
+      eventDocList module (eventDoc/list, live-state module with transport-style
+      fetches). exengne keeps only app glue: tab open/init wiring, the formDialog
+      create story, and the service-utils define* wrappers.
 - [ ] Doccypoccy: first real multi-slot experience (e.g. template + stylesheet side by
       side) — all machinery now exists; it's a slots-config away
 
