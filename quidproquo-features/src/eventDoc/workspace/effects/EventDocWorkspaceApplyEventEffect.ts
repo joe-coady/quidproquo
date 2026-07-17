@@ -10,4 +10,4 @@ export type EventDocWorkspaceApplyEventPayload = {
   event: EventDocEvent;
 };
 
-export type EventDocWorkspaceApplyEventEffect = Effect<EventDocWorkspaceEffect.applyEvent, EventDocWorkspaceApplyEventPayload>;
+export type EventDocWorkspaceApplyEventEffect = Effect<EventDocWorkspaceEffect.ApplyEvent, EventDocWorkspaceApplyEventPayload>;

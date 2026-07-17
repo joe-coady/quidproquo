@@ -8,6 +8,6 @@ export type EventDocWorkspaceRemovePendingEventPayload = {
 };
 
 export type EventDocWorkspaceRemovePendingEventEffect = Effect<
-  EventDocWorkspaceEffect.removePendingEvent,
+  EventDocWorkspaceEffect.RemovePendingEvent,
   EventDocWorkspaceRemovePendingEventPayload
 >;

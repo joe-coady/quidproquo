@@ -4,5 +4,5 @@ import { EventDocWorkspaceEffect } from '../effects/EventDocWorkspaceEffect';
 import { EventDocWorkspaceSetErrorEffect } from '../effects/EventDocWorkspaceSetErrorEffect';
 
 export function* askUIEventDocWorkspaceSetError(slotKey: string, error: Nullable<string>): AskResponse<void> {
-  yield* askStateDispatchEffect<EventDocWorkspaceSetErrorEffect>(EventDocWorkspaceEffect.setError, { slotKey, error });
+  yield* askStateDispatchEffect<EventDocWorkspaceSetErrorEffect>(EventDocWorkspaceEffect.SetError, { slotKey, error });
 }

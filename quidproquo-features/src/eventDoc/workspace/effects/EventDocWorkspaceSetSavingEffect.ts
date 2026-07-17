@@ -7,4 +7,4 @@ export type EventDocWorkspaceSetSavingPayload = {
   isSaving: boolean;
 };
 
-export type EventDocWorkspaceSetSavingEffect = Effect<EventDocWorkspaceEffect.setSaving, EventDocWorkspaceSetSavingPayload>;
+export type EventDocWorkspaceSetSavingEffect = Effect<EventDocWorkspaceEffect.SetSaving, EventDocWorkspaceSetSavingPayload>;

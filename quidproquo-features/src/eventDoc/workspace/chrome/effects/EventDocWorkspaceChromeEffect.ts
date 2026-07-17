@@ -1,0 +1,7 @@
+// Effect types on the workspace's default chrome stream: a local slot, session-only,
+// LWW-coalesced per type by default so toggles don't accumulate.
+export enum EventDocWorkspaceChromeEffect {
+  SetHistoryOpen = 'workspaceChromeSetHistoryOpen',
+  SetHelpOpen = 'workspaceChromeSetHelpOpen',
+  SetHistorySlotKey = 'workspaceChromeSetHistorySlotKey',
+}

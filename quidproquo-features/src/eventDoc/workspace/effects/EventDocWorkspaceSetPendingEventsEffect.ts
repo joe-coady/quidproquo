@@ -8,4 +8,4 @@ export type EventDocWorkspaceSetPendingEventsPayload = {
   events: EventDocEvent[];
 };
 
-export type EventDocWorkspaceSetPendingEventsEffect = Effect<EventDocWorkspaceEffect.setPendingEvents, EventDocWorkspaceSetPendingEventsPayload>;
+export type EventDocWorkspaceSetPendingEventsEffect = Effect<EventDocWorkspaceEffect.SetPendingEvents, EventDocWorkspaceSetPendingEventsPayload>;

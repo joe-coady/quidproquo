@@ -4,6 +4,7 @@ export * from './buildVersionRoutedReducer';
 export * from './CreateDraftEffect';
 export * from './createEventDocInitialDocumentState';
 export * from './EffectHandlers';
+export * from './EventDocFoldEffects';
 export * from './EventDocMigration';
 export * from './EventDocMigrations';
 export * from './foldEventDocBase';

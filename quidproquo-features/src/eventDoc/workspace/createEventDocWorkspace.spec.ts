@@ -31,9 +31,9 @@ import {
 // ─── A tiny "note" document domain, scope-blind like any real editor module ────────
 
 enum NoteEvent {
-  setTitle = 'NOTE_SET_TITLE',
-  addLine = 'NOTE_ADD_LINE',
-  setLine = 'NOTE_SET_LINE',
+  SetTitle = 'NOTE_SET_TITLE',
+  AddLine = 'NOTE_ADD_LINE',
+  SetLine = 'NOTE_SET_LINE',
 }
 
 type NoteLine = { lineId: string; text: string };
@@ -46,9 +46,9 @@ const createInitialNoteState = (): NoteState => ({
 });
 
 type NoteEffects =
-  | Effect<NoteEvent.setTitle, EventDocEventPayload<{ title: string }>>
-  | Effect<NoteEvent.addLine, EventDocEventPayload<NoteLine>>
-  | Effect<NoteEvent.setLine, EventDocEventPayload<NoteLine>>;
+  | Effect<NoteEvent.SetTitle, EventDocEventPayload<{ title: string }>>
+  | Effect<NoteEvent.AddLine, EventDocEventPayload<NoteLine>>
+  | Effect<NoteEvent.SetLine, EventDocEventPayload<NoteLine>>;
 
 const setLine = (state: NoteState, payload: EventDocEventPayload<NoteLine>): NoteState => ({
   ...state,
@@ -56,21 +56,21 @@ const setLine = (state: NoteState, payload: EventDocEventPayload<NoteLine>): Not
 });
 
 const noteFoldReducer = buildEventDocFoldReducer<NoteState, NoteEffects>(createInitialNoteState, {
-  [NoteEvent.setTitle]: (state, payload) => ({ ...state, title: payload.data.title }),
-  [NoteEvent.addLine]: (state, payload) => ({ ...state, lines: [...state.lines, payload.data] }),
-  [NoteEvent.setLine]: setLine,
+  [NoteEvent.SetTitle]: (state, payload) => ({ ...state, title: payload.data.title }),
+  [NoteEvent.AddLine]: (state, payload) => ({ ...state, lines: [...state.lines, payload.data] }),
+  [NoteEvent.SetLine]: setLine,
 }) as QpqReducer<NoteState, EventDocEvent>;
 
 function* askNoteSetTitle(title: string): AskResponse<void> {
-  yield* askApplyEventDocEvent(NoteEvent.setTitle, { title });
+  yield* askApplyEventDocEvent(NoteEvent.SetTitle, { title });
 }
 
 function* askNoteAddLine(lineId: string, text: string): AskResponse<void> {
-  yield* askApplyEventDocEvent(NoteEvent.addLine, { lineId, text });
+  yield* askApplyEventDocEvent(NoteEvent.AddLine, { lineId, text });
 }
 
 function* askNoteSetLine(lineId: string, text: string): AskResponse<void> {
-  yield* askApplyEventDocEvent(NoteEvent.setLine, { lineId, text });
+  yield* askApplyEventDocEvent(NoteEvent.SetLine, { lineId, text });
 }
 
 function* askNoteCreateDraft(): AskResponse<void> {
@@ -86,7 +86,7 @@ const createNoteSlot = () =>
     foldReducer: noteFoldReducer,
     createInitialViewState: createInitialNoteState,
     schemaVersion: 1,
-    coalesceEventTypes: [NoteEvent.setTitle, { type: NoteEvent.setLine, key: 'lineId' }],
+    coalesceEventTypes: [NoteEvent.SetTitle, { type: NoteEvent.SetLine, key: 'lineId' }],
   }) satisfies EventDocWorkspaceDocumentSlotConfig<NoteState, typeof noteApi>;
 
 // ─── Test harness ───────────────────────────────────────────────────────────────────
@@ -426,7 +426,7 @@ describe('createEventDocWorkspace validation', () => {
 
   it('runs a configured domain validator instead of the default', () => {
     const rejectEmptyTitle: EventDocEditorValidator = (event) =>
-      event.type === NoteEvent.setTitle && !(event.payload.data as { title: string }).title ? 'Title required' : null;
+      event.type === NoteEvent.SetTitle && !(event.payload.data as { title: string }).title ? 'Title required' : null;
 
     const workspace = createEventDocWorkspace({
       slots: {
@@ -538,7 +538,7 @@ describe('createEventDocWorkspace built-in verbs', () => {
     // refresh must fetch from afterIndex 0 and append only the tail.
     function* story(): AskResponse<void> {
       yield* workspace.api.workspace.askInit({ noteA: identityA });
-      fake.setServerEvents([initStateEvent(), serverEvent(NoteEvent.setTitle, { title: 'from elsewhere' }, 1)]);
+      fake.setServerEvents([initStateEvent(), serverEvent(NoteEvent.SetTitle, { title: 'from elsewhere' }, 1)]);
       yield* workspace.api.workspace.askRefresh('noteA');
     }
 

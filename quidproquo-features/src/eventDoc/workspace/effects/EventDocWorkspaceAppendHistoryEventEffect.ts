@@ -9,6 +9,6 @@ export type EventDocWorkspaceAppendHistoryEventPayload = {
 };
 
 export type EventDocWorkspaceAppendHistoryEventEffect = Effect<
-  EventDocWorkspaceEffect.appendHistoryEvent,
+  EventDocWorkspaceEffect.AppendHistoryEvent,
   EventDocWorkspaceAppendHistoryEventPayload
 >;

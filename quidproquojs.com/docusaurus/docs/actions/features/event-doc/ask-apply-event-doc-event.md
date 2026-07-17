@@ -15,22 +15,24 @@ A **purely declarative** way to apply an event-doc event: the story yields an `e
 import { askApplyEventDocEvent } from 'quidproquo-features';
 
 export function* askTenantSetBrand(data: TenantSetBrandData) {
-  yield* askApplyEventDocEvent(TenantEffect.setBrand, data);
+  yield* askApplyEventDocEvent<SetBrandEffect>(TenantEffect.setBrand, data);
 }
 ```
 
 ## Signature
 
 ```typescript
-function* askApplyEventDocEvent(eventType: string, data: unknown): AskResponse<void>;
+function* askApplyEventDocEvent<E extends Effect<string, any>>(eventType: E['type'], data: E['payload']): AskResponse<void>;
 ```
+
+Typed like [askStateDispatchEffect](../../core/state/ask-state-dispatch.md#effect-and-askstatedispatcheffect): an event-doc event IS a special kind of effect (`Effect<type, data>`), so an action creator passes its effect type as `E` and gets `data` checked against it.
 
 ## Parameters
 
 | Parameter | Type | Description |
 | --- | --- | --- |
-| `eventType` | `string` | The effect/event type discriminant, matched by the reducer that folds the document and by the registered processor. |
-| `data` | `unknown` | The typed domain data for the event, opaque to this action itself. |
+| `eventType` | `E['type']` | The effect/event type discriminant, matched by the reducer that folds the document and by the registered processor. |
+| `data` | `E['payload']` | The typed domain data for the event, checked against `E`, opaque to this action itself. |
 
 ## Returns
 

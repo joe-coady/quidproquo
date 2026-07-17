@@ -4,5 +4,5 @@ import { EventDocWorkspaceEffect } from '../effects/EventDocWorkspaceEffect';
 import { EventDocWorkspaceResetEffect } from '../effects/EventDocWorkspaceResetEffect';
 
 export function* askUIEventDocWorkspaceReset(): AskResponse<void> {
-  yield* askStateDispatchEffect<EventDocWorkspaceResetEffect>(EventDocWorkspaceEffect.reset);
+  yield* askStateDispatchEffect<EventDocWorkspaceResetEffect>(EventDocWorkspaceEffect.Reset);
 }

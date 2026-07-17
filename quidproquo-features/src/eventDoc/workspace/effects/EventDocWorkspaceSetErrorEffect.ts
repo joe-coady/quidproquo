@@ -7,4 +7,4 @@ export type EventDocWorkspaceSetErrorPayload = {
   error: Nullable<string>;
 };
 
-export type EventDocWorkspaceSetErrorEffect = Effect<EventDocWorkspaceEffect.setError, EventDocWorkspaceSetErrorPayload>;
+export type EventDocWorkspaceSetErrorEffect = Effect<EventDocWorkspaceEffect.SetError, EventDocWorkspaceSetErrorPayload>;

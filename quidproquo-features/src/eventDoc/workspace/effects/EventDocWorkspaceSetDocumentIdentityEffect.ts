@@ -9,6 +9,6 @@ export type EventDocWorkspaceSetDocumentIdentityPayload = {
 };
 
 export type EventDocWorkspaceSetDocumentIdentityEffect = Effect<
-  EventDocWorkspaceEffect.setDocumentIdentity,
+  EventDocWorkspaceEffect.SetDocumentIdentity,
   EventDocWorkspaceSetDocumentIdentityPayload
 >;

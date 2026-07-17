@@ -4,7 +4,7 @@ import { EventDocWorkspaceEffect } from '../effects/EventDocWorkspaceEffect';
 import { EventDocWorkspaceRemovePendingEventEffect } from '../effects/EventDocWorkspaceRemovePendingEventEffect';
 
 export function* askUIEventDocWorkspaceRemovePendingEvent(slotKey: string, clientMessageId: string): AskResponse<void> {
-  yield* askStateDispatchEffect<EventDocWorkspaceRemovePendingEventEffect>(EventDocWorkspaceEffect.removePendingEvent, {
+  yield* askStateDispatchEffect<EventDocWorkspaceRemovePendingEventEffect>(EventDocWorkspaceEffect.RemovePendingEvent, {
     slotKey,
     clientMessageId,
   });

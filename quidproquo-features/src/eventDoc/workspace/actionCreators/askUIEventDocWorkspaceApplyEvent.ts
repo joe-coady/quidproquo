@@ -5,5 +5,5 @@ import { EventDocWorkspaceApplyEventEffect } from '../effects/EventDocWorkspaceA
 import { EventDocWorkspaceEffect } from '../effects/EventDocWorkspaceEffect';
 
 export function* askUIEventDocWorkspaceApplyEvent(slotKey: string, isPending: boolean, event: EventDocEvent): AskResponse<void> {
-  yield* askStateDispatchEffect<EventDocWorkspaceApplyEventEffect>(EventDocWorkspaceEffect.applyEvent, { slotKey, isPending, event });
+  yield* askStateDispatchEffect<EventDocWorkspaceApplyEventEffect>(EventDocWorkspaceEffect.ApplyEvent, { slotKey, isPending, event });
 }

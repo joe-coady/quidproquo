@@ -5,7 +5,7 @@ import { EventDocWorkspaceSetDocumentIdentityEffect } from '../effects/EventDocW
 import { EventDocWorkspaceDocumentIdentity } from '../types/EventDocWorkspaceDocumentIdentity';
 
 export function* askUIEventDocWorkspaceSetDocumentIdentity(slotKey: string, documentIdentity: EventDocWorkspaceDocumentIdentity): AskResponse<void> {
-  yield* askStateDispatchEffect<EventDocWorkspaceSetDocumentIdentityEffect>(EventDocWorkspaceEffect.setDocumentIdentity, {
+  yield* askStateDispatchEffect<EventDocWorkspaceSetDocumentIdentityEffect>(EventDocWorkspaceEffect.SetDocumentIdentity, {
     slotKey,
     documentIdentity,
   });

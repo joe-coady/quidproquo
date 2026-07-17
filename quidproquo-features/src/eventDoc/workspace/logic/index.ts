@@ -11,5 +11,6 @@ export * from './createEventDocWorkspaceBuiltInApi';
 export * from './foldSlotHistory';
 export * from './foldSlotPendingTail';
 export * from './getSlotHistory';
+export * from './getSlotLiveEvents';
 export * from './getSlotPending';
 export * from './toEventDocEventInput';

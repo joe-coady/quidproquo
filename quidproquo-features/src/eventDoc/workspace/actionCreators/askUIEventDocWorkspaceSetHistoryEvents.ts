@@ -5,5 +5,5 @@ import { EventDocWorkspaceEffect } from '../effects/EventDocWorkspaceEffect';
 import { EventDocWorkspaceSetHistoryEventsEffect } from '../effects/EventDocWorkspaceSetHistoryEventsEffect';
 
 export function* askUIEventDocWorkspaceSetHistoryEvents(slotKey: string, events: EventDocEvent[]): AskResponse<void> {
-  yield* askStateDispatchEffect<EventDocWorkspaceSetHistoryEventsEffect>(EventDocWorkspaceEffect.setHistoryEvents, { slotKey, events });
+  yield* askStateDispatchEffect<EventDocWorkspaceSetHistoryEventsEffect>(EventDocWorkspaceEffect.SetHistoryEvents, { slotKey, events });
 }

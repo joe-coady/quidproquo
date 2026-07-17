@@ -5,5 +5,5 @@ import { EventDocWorkspaceAppendHistoryEventEffect } from '../effects/EventDocWo
 import { EventDocWorkspaceEffect } from '../effects/EventDocWorkspaceEffect';
 
 export function* askUIEventDocWorkspaceAppendHistoryEvent(slotKey: string, event: EventDocEvent): AskResponse<void> {
-  yield* askStateDispatchEffect<EventDocWorkspaceAppendHistoryEventEffect>(EventDocWorkspaceEffect.appendHistoryEvent, { slotKey, event });
+  yield* askStateDispatchEffect<EventDocWorkspaceAppendHistoryEventEffect>(EventDocWorkspaceEffect.AppendHistoryEvent, { slotKey, event });
 }

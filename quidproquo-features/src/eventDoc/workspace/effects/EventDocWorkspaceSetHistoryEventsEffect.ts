@@ -8,4 +8,4 @@ export type EventDocWorkspaceSetHistoryEventsPayload = {
   events: EventDocEvent[];
 };
 
-export type EventDocWorkspaceSetHistoryEventsEffect = Effect<EventDocWorkspaceEffect.setHistoryEvents, EventDocWorkspaceSetHistoryEventsPayload>;
+export type EventDocWorkspaceSetHistoryEventsEffect = Effect<EventDocWorkspaceEffect.SetHistoryEvents, EventDocWorkspaceSetHistoryEventsPayload>;

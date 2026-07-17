@@ -6,6 +6,7 @@ import { askUIEventDocWorkspaceApplyEvent } from '../actionCreators/askUIEventDo
 import { askUIEventDocWorkspaceSetError } from '../actionCreators/askUIEventDocWorkspaceSetError';
 import { EventDocWorkspaceSlotBinding } from '../types/EventDocWorkspaceSlotBinding';
 import { askEventDocWorkspaceReadState } from './askEventDocWorkspaceReadState';
+import { getSlotLiveEvents } from './getSlotLiveEvents';
 
 // The workspace interpretation of askApplyEventDocEvent: record ONE event into the
 // bound slot's stream (pending for document slots, history for local slots). Local
@@ -39,7 +40,7 @@ export function* askEventDocWorkspaceCommitEvent(
 
   if (binding.validate) {
     const state = yield* askEventDocWorkspaceReadState();
-    const liveEvents = [...(state.history[binding.slotKey] ?? []), ...(state.pending[binding.slotKey] ?? [])];
+    const liveEvents = getSlotLiveEvents(state, binding.slotKey);
 
     const reason = binding.validate(event, liveEvents);
     if (reason) {

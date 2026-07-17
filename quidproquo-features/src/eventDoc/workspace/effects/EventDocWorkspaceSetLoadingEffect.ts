@@ -7,4 +7,4 @@ export type EventDocWorkspaceSetLoadingPayload = {
   isLoading: boolean;
 };
 
-export type EventDocWorkspaceSetLoadingEffect = Effect<EventDocWorkspaceEffect.setLoading, EventDocWorkspaceSetLoadingPayload>;
+export type EventDocWorkspaceSetLoadingEffect = Effect<EventDocWorkspaceEffect.SetLoading, EventDocWorkspaceSetLoadingPayload>;
