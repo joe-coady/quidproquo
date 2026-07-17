@@ -1,7 +1,8 @@
-// How a slot's bound api routes askApplyEventDocEvent commits. A `document` slot
-// buffers them into `pending` (the edit/save/cancel contract, backed by a real
-// event-doc collection); a `local` slot writes straight into `history` (session-only
-// state like the editor experience or chrome: no save concept, never persisted).
+// What a slot's streams mean. Every slot's commits buffer into `pending`; `history` is
+// strictly append-only server truth. A `document` slot is backed by a real event-doc
+// collection (the edit/save/cancel contract moves pending into history); a `local`
+// slot is session-only state like the editor experience or chrome: it has no
+// documentIdentity, so its pending never saves and its history stays empty.
 export enum EventDocWorkspaceSlotKind {
   document = 'document',
   local = 'local',

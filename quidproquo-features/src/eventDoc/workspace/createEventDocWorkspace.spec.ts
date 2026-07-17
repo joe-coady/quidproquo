@@ -15,10 +15,15 @@ import {
 import { describe, expect, it } from 'vitest';
 
 import { askApplyEventDocEvent } from '../actions';
-import { buildEventDocFoldReducer, createEventDocInitialDocumentState } from '../fold';
+import { buildEventDocFoldReducer, buildVersionRoutedReducer, createEventDocInitialDocumentState, foldEventDocLogStep } from '../fold';
 import { EventDocDocument, EventDocEffect, EventDocEvent, EventDocEventInput, EventDocEventPayload, EventDocStatus } from '../models';
 import { EventDocEditorValidator } from '../validation';
-import { askUIEventDocWorkspaceSetHistoryEvents } from './actionCreators';
+import {
+  askUIEventDocWorkspaceAppendHistoryEvent,
+  askUIEventDocWorkspaceReset,
+  askUIEventDocWorkspaceSetHistoryEvents,
+  askUIEventDocWorkspaceSetPendingEvents,
+} from './actionCreators';
 import { createEventDocWorkspace } from './createEventDocWorkspace';
 import {
   EventDocWorkspaceDocumentIdentity,
@@ -89,6 +94,32 @@ const createNoteSlot = () =>
     coalesceEventTypes: [NoteEvent.SetTitle, { type: NoteEvent.SetLine, key: 'lineId' }],
   }) satisfies EventDocWorkspaceDocumentSlotConfig<NoteState, typeof noteApi>;
 
+// ─── v2 of the note domain: the document gains `archived` via the v2 migration ──────
+// Only what the accumulator-semantics spec needs; the log under test is all v1, so the
+// version-routed reducer carries just the v1 handlers.
+
+type NoteV2State = NoteState & { archived: boolean };
+
+const createInitialNoteV2State = (): NoteV2State => ({
+  ...createInitialNoteState(),
+  schemaVersion: 2,
+  archived: false,
+});
+
+const noteV2Migration = (state: EventDocDocument): EventDocDocument => ({ ...state, archived: false }) as NoteV2State;
+
+const createNoteV2Slot = () =>
+  ({
+    kind: EventDocWorkspaceSlotKind.document,
+    api: noteApi,
+    // Deliberately wider than the slot's TView: mid-fold the accumulator really is a
+    // v1 NoteState (no `archived`) until the read-side migrate, hence the unknown hop.
+    foldReducer: buildVersionRoutedReducer<NoteState>({ 1: noteFoldReducer }) as unknown as QpqReducer<NoteV2State, EventDocEvent>,
+    createInitialViewState: createInitialNoteV2State,
+    schemaVersion: 2,
+    migrations: { 2: noteV2Migration },
+  }) satisfies EventDocWorkspaceDocumentSlotConfig<NoteV2State, typeof noteApi>;
+
 // ─── Test harness ───────────────────────────────────────────────────────────────────
 
 // Deterministic guid/date providers; everything else a workspace yields is handled by
@@ -129,6 +160,24 @@ const serverEvent = (type: string, data: unknown, index: number): EventDocEvent 
 
 const initStateEvent = (index = 0): EventDocEvent => serverEvent(EventDocEffect.InitState, { id: 'doc-1', code: 'DOC', name: 'Doc' }, index);
 const publishEvent = (index: number): EventDocEvent => serverEvent(EventDocEffect.Publish, {}, index);
+
+const eventAtVersion = (event: EventDocEvent, version: number): EventDocEvent => ({
+  ...event,
+  payload: { ...event.payload, metadata: { ...event.payload.metadata, version } },
+});
+
+// The reference full refold the incremental historyViews maintenance must match: the
+// raw ACCUMULATOR (seed + per-event steps), never final-migrated — that is the read
+// side's job. Not foldEventDocLog, which climbs to the latest version at the end.
+const foldNoteHistory = (events: EventDocEvent[]): NoteState => {
+  let state: EventDocDocument = createInitialNoteState();
+
+  for (const event of events) {
+    state = foldEventDocLogStep(state, event, { reducer: noteFoldReducer, migrations: {}, latestVersion: 1 });
+  }
+
+  return state as NoteState;
+};
 
 const identityA: EventDocWorkspaceDocumentIdentity = { serviceName: 'notes', basePath: '/notes', id: 'doc-1' };
 
@@ -369,7 +418,7 @@ describe('createEventDocWorkspace coalescing', () => {
     expect(state.pending.noteA.map((event) => event.payload.metadata.index)).toEqual([1, 2]);
   });
 
-  it('local slots default to last-write-wins per type, straight into history', () => {
+  it('local slots default to last-write-wins per type, buffered in pending', () => {
     const workspace = createTestWorkspace();
 
     function* story(): AskResponse<void> {
@@ -380,10 +429,11 @@ describe('createEventDocWorkspace coalescing', () => {
 
     const state = runWorkspaceStory(workspace, story);
 
-    // No pending buffer for local slots, and one event per type in history.
-    expect(state.pending.chrome).toHaveLength(0);
-    expect(state.history.chrome).toHaveLength(2);
-    expect(state.history.chrome.map((event) => event.payload.metadata.index)).toEqual([0, 1]);
+    // Local commits buffer in pending like everything else (they just never save), so
+    // history stays strictly server truth: empty. One pending event per type.
+    expect(state.history.chrome).toHaveLength(0);
+    expect(state.pending.chrome).toHaveLength(2);
+    expect(state.pending.chrome.map((event) => event.payload.metadata.index)).toEqual([0, 1]);
 
     const chromeView = workspace.selectors.view.chrome(state);
     expect(chromeView.historyOpen).toBe(false);
@@ -566,6 +616,26 @@ describe('createEventDocWorkspace built-in verbs', () => {
     expect(state.slots.noteA.error).toBeNull();
   });
 
+  it('cancel clears document slots only; chrome pending survives', () => {
+    const fake = createFakeTransport([initStateEvent()]);
+    const workspace = createTestWorkspace(fake.transport);
+
+    function* story(): AskResponse<void> {
+      yield* workspace.api.workspace.askInit({ noteA: identityA });
+      yield* workspace.api.noteA.askNoteSetTitle('discard me');
+      yield* workspace.api.chrome.askChromeSetHelpOpen(true);
+      yield* workspace.api.workspace.askCancel();
+    }
+
+    const state = runWorkspaceStory(workspace, story);
+
+    // Local pending (tabs, panels) is session state, not an unsaved edit; Cancel
+    // only discards document drafts.
+    expect(state.pending.noteA).toHaveLength(0);
+    expect(state.pending.chrome).toHaveLength(1);
+    expect(workspace.selectors.view.chrome(state).helpOpen).toBe(true);
+  });
+
   it('transport verbs fail loudly on a transportless workspace', () => {
     const workspace = createTestWorkspace();
 
@@ -574,6 +644,116 @@ describe('createEventDocWorkspace built-in verbs', () => {
     }
 
     expect(() => runWorkspaceStory(workspace, story)).toThrow(/transport/);
+  });
+});
+
+// ─── historyViews: the stored fold ───────────────────────────────────────────────────
+
+describe('createEventDocWorkspace historyViews', () => {
+  it('seeds each slot with its initial view state', () => {
+    const workspace = createTestWorkspace();
+    const state = workspace.createInitialState();
+
+    expect(state.historyViews.noteA).toEqual(createInitialNoteState());
+    expect(state.historyViews.noteB).toEqual(createInitialNoteState());
+    expect(state.historyViews.chrome).toEqual({ historyOpen: false, helpOpen: false, historySlotKey: null });
+  });
+
+  it('init full-folds the loaded log into the stored view', () => {
+    const fake = createFakeTransport([initStateEvent(0), serverEvent(NoteEvent.SetTitle, { title: 'Loaded' }, 1)]);
+    const workspace = createTestWorkspace(fake.transport);
+
+    function* story(): AskResponse<void> {
+      yield* workspace.api.workspace.askInit({ noteA: identityA });
+    }
+
+    const state = runWorkspaceStory(workspace, story);
+
+    expect(state.historyViews.noteA).toEqual(foldNoteHistory(state.history.noteA));
+    expect((state.historyViews.noteA as NoteState).title).toBe('Loaded');
+  });
+
+  it('save landings fold incrementally and match a full refold of the final history', () => {
+    const fake = createFakeTransport([initStateEvent()]);
+    const workspace = createTestWorkspace(fake.transport);
+
+    function* story(): AskResponse<void> {
+      yield* workspace.api.workspace.askInit({ noteA: identityA });
+      yield* workspace.api.noteA.askNoteAddLine('l1', 'one');
+      yield* workspace.api.noteA.askNoteAddLine('l2', 'two');
+      yield* workspace.api.workspace.askSave();
+    }
+
+    const state = runWorkspaceStory(workspace, story);
+
+    expect(state.history.noteA).toHaveLength(3);
+    expect(state.historyViews.noteA).toEqual(foldNoteHistory(state.history.noteA));
+    expect((state.historyViews.noteA as NoteState).lines).toEqual([
+      { lineId: 'l1', text: 'one' },
+      { lineId: 'l2', text: 'two' },
+    ]);
+  });
+
+  it('refresh folds only the fetched tail into the stored view', () => {
+    const fake = createFakeTransport([initStateEvent()]);
+    const workspace = createTestWorkspace(fake.transport);
+
+    function* story(): AskResponse<void> {
+      yield* workspace.api.workspace.askInit({ noteA: identityA });
+      fake.setServerEvents([initStateEvent(), serverEvent(NoteEvent.SetTitle, { title: 'from elsewhere' }, 1)]);
+      yield* workspace.api.workspace.askRefresh('noteA');
+    }
+
+    const state = runWorkspaceStory(workspace, story);
+
+    // The tail-pull appended (not re-set) the log, and the incremental fold matches
+    // the reference full refold.
+    expect(fake.fetchCalls).toEqual([{ afterIndex: undefined }, { afterIndex: 0 }]);
+    expect((state.historyViews.noteA as NoteState).title).toBe('from elsewhere');
+    expect(state.historyViews.noteA).toEqual(foldNoteHistory(state.history.noteA));
+  });
+
+  it('an all-old-version log stores the raw accumulator; refresh tails at that version fold fine; the view reads latest', () => {
+    // The regression this revision fixes: the whole saved log is authored at v1
+    // inside a slot whose latest is v2. Storing a latest-migrated view used to
+    // force the doc to v2 at init, and the (perfectly valid) v1 refresh tail then
+    // tripped the below-version guard. The accumulator folds it naturally.
+    const workspace = createEventDocWorkspace({ slots: { noteA: createNoteV2Slot() } });
+
+    function* story(): AskResponse<void> {
+      yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent(0), serverEvent(NoteEvent.SetTitle, { title: 'Old doc' }, 1)]);
+      yield* askUIEventDocWorkspaceAppendHistoryEvent('noteA', serverEvent(NoteEvent.AddLine, { lineId: 'l1', text: 'still v1' }, 2));
+    }
+
+    const state = runWorkspaceStory(workspace, story);
+
+    // The stored view is the raw accumulator: still at the log's authored version,
+    // unmigrated (no `archived` yet).
+    const accumulator = state.historyViews.noteA as NoteV2State;
+    expect(accumulator.schemaVersion).toBe(1);
+    expect(accumulator.title).toBe('Old doc');
+    expect(accumulator.lines).toEqual([{ lineId: 'l1', text: 'still v1' }]);
+    expect('archived' in accumulator).toBe(false);
+
+    // The read side migrates: latest-shaped even with nothing pending.
+    const view = workspace.selectors.view.noteA(state);
+    expect(view.schemaVersion).toBe(2);
+    expect(view.archived).toBe(false);
+    expect(view.title).toBe('Old doc');
+  });
+
+  it('reset reseeds the initial history views', () => {
+    const workspace = createTestWorkspace();
+
+    function* story(): AskResponse<void> {
+      yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent(0), serverEvent(NoteEvent.SetTitle, { title: 'gone' }, 1)]);
+      yield* askUIEventDocWorkspaceReset();
+    }
+
+    const state = runWorkspaceStory(workspace, story);
+
+    expect(state.history.noteA).toHaveLength(0);
+    expect(state.historyViews.noteA).toEqual(createInitialNoteState());
   });
 });
 
@@ -620,5 +800,53 @@ describe('createEventDocWorkspace selectors', () => {
     expect(workspace.selectors.isDirty(state)).toBe(false);
     expect(workspace.selectors.view.noteA(state).title).toBe('to save');
     expect(workspace.selectors.error(state)).toBeNull();
+  });
+
+  it('view is the stored history view plus the pending fold', () => {
+    const workspace = createTestWorkspace();
+
+    function* story(): AskResponse<void> {
+      yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent()]);
+      yield* workspace.api.noteA.askNoteSetTitle('unsaved title');
+    }
+
+    const state = runWorkspaceStory(workspace, story);
+
+    // The stored base holds only saved truth; the live view layers pending on top.
+    expect((state.historyViews.noteA as NoteState).title).toBe('');
+    expect(workspace.selectors.view.noteA(state).title).toBe('unsaved title');
+    expect(workspace.selectors.view.noteA(state).id).toBe('doc-1');
+  });
+
+  it('isDirty counts document pending only: a chrome toggle does not dirty', () => {
+    const workspace = createTestWorkspace();
+
+    function* chromeOnlyStory(): AskResponse<void> {
+      yield* workspace.api.chrome.askChromeSetHelpOpen(true);
+    }
+
+    const chromeOnlyState = runWorkspaceStory(workspace, chromeOnlyStory);
+    expect(chromeOnlyState.pending.chrome).toHaveLength(1);
+    expect(workspace.selectors.isDirty(chromeOnlyState)).toBe(false);
+
+    function* documentEditStory(): AskResponse<void> {
+      yield* workspace.api.chrome.askChromeSetHelpOpen(true);
+      yield* workspace.api.noteA.askNoteSetTitle('unsaved');
+    }
+
+    const documentEditState = runWorkspaceStory(workspace, documentEditStory);
+    expect(workspace.selectors.isDirty(documentEditState)).toBe(true);
+  });
+
+  it('a pending event at a mismatched schema version throws at view read', () => {
+    const workspace = createTestWorkspace();
+
+    function* story(): AskResponse<void> {
+      yield* askUIEventDocWorkspaceSetPendingEvents('noteA', [eventAtVersion(serverEvent(NoteEvent.SetTitle, { title: 'v2' }, 0), 2)]);
+    }
+
+    const state = runWorkspaceStory(workspace, story);
+
+    expect(() => workspace.selectors.view.noteA(state)).toThrow(/pending event/);
   });
 });

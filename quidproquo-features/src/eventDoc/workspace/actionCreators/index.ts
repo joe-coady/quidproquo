@@ -1,4 +1,5 @@
 export * from './askUIEventDocWorkspaceAppendHistoryEvent';
+export * from './askUIEventDocWorkspaceAppendHistoryEvents';
 export * from './askUIEventDocWorkspaceApplyEvent';
 export * from './askUIEventDocWorkspaceRemovePendingEvent';
 export * from './askUIEventDocWorkspaceReset';

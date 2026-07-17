@@ -1,34 +1,34 @@
 import { EventDocEvent } from '../../models';
-import { foldSlotHistory } from '../logic/foldSlotHistory';
 import { foldSlotPendingTail } from '../logic/foldSlotPendingTail';
-import { getSlotHistory } from '../logic/getSlotHistory';
+import { getSlotHistoryView } from '../logic/getSlotHistoryView';
 import { getSlotPending } from '../logic/getSlotPending';
 import { EventDocWorkspaceSelector } from '../types/EventDocWorkspaceSelectors';
 import { EventDocWorkspaceSlotConfig } from '../types/EventDocWorkspaceSlotConfig';
 
-// The folded view for one slot. Memoized two-level: the saved-log fold is cached on
-// the history array's identity, so while you type only the pending tail refolds.
+// The live view for one slot: the pending tail folded onto the STORED history
+// accumulator (maintained incrementally by the reducer; history is never refolded at
+// read), then migrated to the slot's latest version — the stored accumulator may sit
+// below it, so the fold ALWAYS runs, even with no pending. Memoized on the (stored
+// view, pending) identities, so while you type only the pending tail refolds and the
+// migrate cost is paid once per stream change.
 export const createSlotViewSelector = (slotKey: string, slot: EventDocWorkspaceSlotConfig): EventDocWorkspaceSelector<unknown> => {
-  let cachedHistory: EventDocEvent[] | undefined;
+  let hasCachedView = false;
   let cachedHistoryView: unknown;
   let cachedPending: EventDocEvent[] | undefined;
   let cachedView: unknown;
 
   return (state) => {
-    const history = getSlotHistory(state, slotKey);
+    const historyView = getSlotHistoryView<unknown>(state, slotKey);
     const pending = getSlotPending(state, slotKey);
 
-    if (history === cachedHistory && pending === cachedPending) {
+    if (hasCachedView && historyView === cachedHistoryView && pending === cachedPending) {
       return cachedView;
     }
 
-    if (history !== cachedHistory) {
-      cachedHistory = history;
-      cachedHistoryView = foldSlotHistory(slot, history);
-    }
-
+    cachedHistoryView = historyView;
     cachedPending = pending;
-    cachedView = pending.length === 0 ? cachedHistoryView : foldSlotPendingTail(slot, cachedHistoryView, pending);
+    cachedView = foldSlotPendingTail(slot, historyView, pending);
+    hasCachedView = true;
 
     return cachedView;
   };

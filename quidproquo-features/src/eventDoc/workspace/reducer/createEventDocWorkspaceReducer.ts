@@ -2,35 +2,39 @@ import { buildEffectReducer, QpqReducer } from 'quidproquo-core';
 
 import { EventDocWorkspaceEffect } from '../effects/EventDocWorkspaceEffect';
 import { EventDocWorkspaceEffects } from '../effects/EventDocWorkspaceEffects';
-import { EventDocWorkspaceCoalesceRules } from '../types/EventDocWorkspaceCoalesceRules';
+import { EventDocWorkspaceSlotsConfig } from '../types/EventDocWorkspaceSlotsConfig';
 import { EventDocWorkspaceState } from '../types/EventDocWorkspaceState';
-import { appendHistoryEvent } from './stateUpdaters/appendHistoryEvent';
+import { createAppendHistoryEventsUpdater } from './stateUpdaters/createAppendHistoryEventsUpdater';
+import { createAppendHistoryEventUpdater } from './stateUpdaters/createAppendHistoryEventUpdater';
 import { createApplyEventUpdater } from './stateUpdaters/createApplyEventUpdater';
+import { createResetUpdater } from './stateUpdaters/createResetUpdater';
+import { createSetHistoryEventsUpdater } from './stateUpdaters/createSetHistoryEventsUpdater';
 import { removePendingEvent } from './stateUpdaters/removePendingEvent';
-import { reset } from './stateUpdaters/reset';
 import { setDocumentIdentity } from './stateUpdaters/setDocumentIdentity';
 import { setError } from './stateUpdaters/setError';
-import { setHistoryEvents } from './stateUpdaters/setHistoryEvents';
 import { setLoading } from './stateUpdaters/setLoading';
 import { setPendingEvents } from './stateUpdaters/setPendingEvents';
 import { setSaving } from './stateUpdaters/setSaving';
+import { getSlotCoalesceRules } from './getSlotCoalesceRules';
 
-// One dumb runtime reducer: route workspace effects into the right keyed slot. The
-// per-slot fold reducers never run here; they fold streams into views in selectors.
-// Built per workspace (closured over each slot's coalesce rules) by
-// createEventDocWorkspace.
-export const createEventDocWorkspaceReducer = (
-  coalesceRulesBySlot: Record<string, EventDocWorkspaceCoalesceRules>,
-): QpqReducer<EventDocWorkspaceState, EventDocWorkspaceEffects> =>
-  buildEffectReducer<EventDocWorkspaceState, EventDocWorkspaceEffects>({
+// One runtime reducer: route workspace effects into the right keyed slot. Built per
+// workspace (closured over the slot configs) by createEventDocWorkspace. The
+// history-writing updaters OWN the historyViews fold: every history mutation folds
+// into the stored view here, so no selector ever refolds a saved log at read time.
+export const createEventDocWorkspaceReducer = (slots: EventDocWorkspaceSlotsConfig): QpqReducer<EventDocWorkspaceState, EventDocWorkspaceEffects> => {
+  const coalesceRulesBySlot = Object.fromEntries(Object.entries(slots).map(([slotKey, slot]) => [slotKey, getSlotCoalesceRules(slot)]));
+
+  return buildEffectReducer<EventDocWorkspaceState, EventDocWorkspaceEffects>({
     [EventDocWorkspaceEffect.ApplyEvent]: createApplyEventUpdater(coalesceRulesBySlot),
-    [EventDocWorkspaceEffect.SetHistoryEvents]: setHistoryEvents,
-    [EventDocWorkspaceEffect.AppendHistoryEvent]: appendHistoryEvent,
+    [EventDocWorkspaceEffect.SetHistoryEvents]: createSetHistoryEventsUpdater(slots),
+    [EventDocWorkspaceEffect.AppendHistoryEvent]: createAppendHistoryEventUpdater(slots),
+    [EventDocWorkspaceEffect.AppendHistoryEvents]: createAppendHistoryEventsUpdater(slots),
     [EventDocWorkspaceEffect.SetPendingEvents]: setPendingEvents,
     [EventDocWorkspaceEffect.RemovePendingEvent]: removePendingEvent,
     [EventDocWorkspaceEffect.SetDocumentIdentity]: setDocumentIdentity,
     [EventDocWorkspaceEffect.SetLoading]: setLoading,
     [EventDocWorkspaceEffect.SetSaving]: setSaving,
     [EventDocWorkspaceEffect.SetError]: setError,
-    [EventDocWorkspaceEffect.Reset]: reset,
+    [EventDocWorkspaceEffect.Reset]: createResetUpdater(slots),
   });
+};

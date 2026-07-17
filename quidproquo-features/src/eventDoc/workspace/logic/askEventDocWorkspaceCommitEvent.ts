@@ -9,8 +9,9 @@ import { askEventDocWorkspaceReadState } from './askEventDocWorkspaceReadState';
 import { getSlotLiveEvents } from './getSlotLiveEvents';
 
 // The workspace interpretation of askApplyEventDocEvent: record ONE event into the
-// bound slot's stream (pending for document slots, history for local slots). Local
-// only, no network; Save streams the pending buffer later. Metadata is provisional:
+// bound slot's PENDING buffer (every slot; a local slot's pending simply never
+// saves). Local only, no network; Save streams the pending buffer later. Metadata is
+// provisional:
 // only `data` + `version` affect the fold, and the backend stamps
 // createdBy/createdAt/index on save. The validator runs against the slot's full live
 // log (saved + pending) BEFORE anything lands; a rejection surfaces as slot error
@@ -50,5 +51,5 @@ export function* askEventDocWorkspaceCommitEvent(
   }
 
   yield* askUIEventDocWorkspaceSetError(binding.slotKey, null);
-  yield* askUIEventDocWorkspaceApplyEvent(binding.slotKey, binding.isPending, event);
+  yield* askUIEventDocWorkspaceApplyEvent(binding.slotKey, event);
 }

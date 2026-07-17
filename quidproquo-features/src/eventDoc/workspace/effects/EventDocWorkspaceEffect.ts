@@ -2,6 +2,7 @@ export enum EventDocWorkspaceEffect {
   ApplyEvent = '@quidproquo-features/eventDocWorkspace/applyEvent',
   SetHistoryEvents = '@quidproquo-features/eventDocWorkspace/setHistoryEvents',
   AppendHistoryEvent = '@quidproquo-features/eventDocWorkspace/appendHistoryEvent',
+  AppendHistoryEvents = '@quidproquo-features/eventDocWorkspace/appendHistoryEvents',
   SetPendingEvents = '@quidproquo-features/eventDocWorkspace/setPendingEvents',
   RemovePendingEvent = '@quidproquo-features/eventDocWorkspace/removePendingEvent',
   SetDocumentIdentity = '@quidproquo-features/eventDocWorkspace/setDocumentIdentity',

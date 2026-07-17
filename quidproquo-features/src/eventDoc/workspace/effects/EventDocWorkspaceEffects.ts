@@ -1,4 +1,5 @@
 import { EventDocWorkspaceAppendHistoryEventEffect } from './EventDocWorkspaceAppendHistoryEventEffect';
+import { EventDocWorkspaceAppendHistoryEventsEffect } from './EventDocWorkspaceAppendHistoryEventsEffect';
 import { EventDocWorkspaceApplyEventEffect } from './EventDocWorkspaceApplyEventEffect';
 import { EventDocWorkspaceRemovePendingEventEffect } from './EventDocWorkspaceRemovePendingEventEffect';
 import { EventDocWorkspaceResetEffect } from './EventDocWorkspaceResetEffect';
@@ -13,6 +14,7 @@ export type EventDocWorkspaceEffects =
   | EventDocWorkspaceApplyEventEffect
   | EventDocWorkspaceSetHistoryEventsEffect
   | EventDocWorkspaceAppendHistoryEventEffect
+  | EventDocWorkspaceAppendHistoryEventsEffect
   | EventDocWorkspaceSetPendingEventsEffect
   | EventDocWorkspaceRemovePendingEventEffect
   | EventDocWorkspaceSetDocumentIdentityEffect

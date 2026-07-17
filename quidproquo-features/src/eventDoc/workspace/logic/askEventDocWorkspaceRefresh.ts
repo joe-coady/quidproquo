@@ -1,14 +1,15 @@
 import { askCatch, askMapParallel, AskResponse } from 'quidproquo-core';
 
+import { askUIEventDocWorkspaceAppendHistoryEvents } from '../actionCreators/askUIEventDocWorkspaceAppendHistoryEvents';
 import { askUIEventDocWorkspaceSetError } from '../actionCreators/askUIEventDocWorkspaceSetError';
-import { askUIEventDocWorkspaceSetHistoryEvents } from '../actionCreators/askUIEventDocWorkspaceSetHistoryEvents';
 import { EventDocWorkspaceTransport } from '../types/EventDocWorkspaceTransport';
 import { askEventDocWorkspaceReadState } from './askEventDocWorkspaceReadState';
 
 // Pull only the events appended since the last one we hold (afterIndex is exclusive,
-// so the concat can't duplicate) and append them. Touches the SAVED log only; the
-// pending buffer stays intact and the folded view re-derives reactively. A slot with
-// no identity (local, or not yet initialised) is skipped.
+// so the append can't duplicate) and append JUST the tail, so the reducer folds only
+// those events into the stored history view. Touches the SAVED log only; the pending
+// buffer stays intact and the folded view re-derives reactively. A slot with no
+// identity (local, or not yet initialised) is skipped.
 const getAskRefreshDocumentSlot = (transport: EventDocWorkspaceTransport) =>
   function* askRefreshDocumentSlot(slotKey: string): AskResponse<void> {
     const state = yield* askEventDocWorkspaceReadState();
@@ -31,7 +32,7 @@ const getAskRefreshDocumentSlot = (transport: EventDocWorkspaceTransport) =>
     }
 
     if (result.result.length > 0) {
-      yield* askUIEventDocWorkspaceSetHistoryEvents(slotKey, [...history, ...result.result]);
+      yield* askUIEventDocWorkspaceAppendHistoryEvents(slotKey, result.result);
     }
   };
 

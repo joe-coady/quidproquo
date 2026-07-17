@@ -1,4 +1,5 @@
 export * from './EventDocWorkspaceAppendHistoryEventEffect';
+export * from './EventDocWorkspaceAppendHistoryEventsEffect';
 export * from './EventDocWorkspaceApplyEventEffect';
 export * from './EventDocWorkspaceEffect';
 export * from './EventDocWorkspaceEffects';
