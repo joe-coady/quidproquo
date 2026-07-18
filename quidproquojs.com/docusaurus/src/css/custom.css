@@ -104,10 +104,54 @@ body {
 }
 
 .navbar__title {
+  position: relative;
   font-family: var(--qpq-font-display);
   font-size: 19px;
   font-weight: 600;
   letter-spacing: 0.02em;
+}
+
+/* Glint overlay: the same glyphs stacked over the title, transparent except
+   for a narrow band clipped to the letterforms. It rests off-canvas, then
+   makes one eased sweep across per cycle. The band is two-tone (white into
+   cyan) so it stays visible whatever the letter color underneath: the cyan
+   half carries the shimmer on this all-light title. The "/ ''" marks the
+   duplicated text as decorative; browsers without that syntax skip the
+   overlay entirely, which just means no shimmer. */
+.navbar__title::after {
+  content: 'quidproquo' / '';
+  position: absolute;
+  inset: 0;
+  color: transparent;
+  background-image: linear-gradient(
+    105deg,
+    rgba(255, 255, 255, 0) 38%,
+    rgba(255, 255, 255, 0.85) 45%,
+    rgba(34, 211, 238, 0.85) 53%,
+    rgba(34, 211, 238, 0) 60%
+  );
+  background-size: 250% 100%;
+  background-repeat: no-repeat;
+  background-position: 130% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: qpq-title-shine 7s ease-in-out infinite;
+}
+
+@keyframes qpq-title-shine {
+  0%,
+  72% {
+    background-position: 130% 0;
+  }
+  100% {
+    background-position: -130% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navbar__title::after {
+    animation: none;
+  }
 }
 
 .navbar__logo {
