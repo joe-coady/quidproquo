@@ -80,7 +80,7 @@ export interface QPQConfigAdvancedWebsocketQueueSettings extends QPQConfigAdvanc
 
 ## Returns
 
-A `QPQConfig` array containing: three globals, the connection [key-value store](../core/key-value-store.md), and the [WebSocket API](./websocket.md) with the queue's built-in handlers.
+A `QPQConfig` array containing: three globals, the connection [key-value store](../core/key-value-store.md), and the [WebSocket API](../webserver/websocket.md) with the queue's built-in handlers.
 
 ## Related
 

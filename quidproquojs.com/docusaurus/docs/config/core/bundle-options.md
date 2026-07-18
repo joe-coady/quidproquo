@@ -1,6 +1,6 @@
 ---
 title: defineBackendBundleOptions / defineFrontendBundleOptions
-description: Tune how the service's backend and frontend bundles are built: externals, ignored modules, suppressed warnings, and shared frontend singletons.
+description: "Tune how the service's backend and frontend bundles are built: externals, ignored modules, suppressed warnings, and shared frontend singletons."
 ---
 
 # defineBackendBundleOptions / defineFrontendBundleOptions

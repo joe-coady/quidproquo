@@ -13,14 +13,20 @@ Invokes a [service function](../../../config/webserver/service-function.md) — 
 ```typescript
 import { askServiceFunctionExecute } from 'quidproquo-webserver';
 
-interface ResizeRequest { drive: string; filepath: string; width: number; }
-interface ResizeResult { thumbnailPath: string; }
+interface ResizeRequest {
+  drive: string;
+  filepath: string;
+  width: number;
+}
+interface ResizeResult {
+  thumbnailPath: string;
+}
 
 export function* askMakeThumbnail(filepath: string) {
   const result = yield* askServiceFunctionExecute<ResizeResult, ResizeRequest>(
-    'media',        // service name
-    'resizeImage',  // function name
-    { drive: 'uploads', filepath, width: 256 },
+    'media', // service name
+    'resizeImage', // function name
+    { drive: 'uploads', filepath, width: 256 }
   );
 
   return result.thumbnailPath;
@@ -34,18 +40,18 @@ function* askServiceFunctionExecute<R, T>(
   service: string,
   functionName: string,
   payload: T,
-  isAsync?: boolean,
+  isAsync?: boolean
 ): AskResponse<R>;
 ```
 
 ## Parameters
 
-| Parameter | Type | Default | Description |
-| --- | --- | --- | --- |
-| `service` | `string` | – | Name of the service that owns the target function. |
-| `functionName` | `string` | – | Name of the [service function](../../../config/webserver/service-function.md) to invoke (its `functionName`, which defaults to the story name). |
-| `payload` | `T` | – | The typed payload passed to the function's story. |
-| `isAsync` | `boolean` | `false` | When `false`, wait for and return the result. When `true`, invoke fire-and-forget and resolve without a result. |
+| Parameter      | Type      | Default | Description                                                                                                                                     |
+| -------------- | --------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `service`      | `string`  | –       | Name of the service that owns the target function.                                                                                              |
+| `functionName` | `string`  | –       | Name of the [service function](../../../config/webserver/service-function.md) to invoke (its `functionName`, which defaults to the story name). |
+| `payload`      | `T`       | –       | The typed payload passed to the function's story.                                                                                               |
+| `isAsync`      | `boolean` | `false` | When `false`, wait for and return the result. When `true`, invoke fire-and-forget and resolve without a result.                                 |
 
 ## Returns
 
@@ -54,5 +60,5 @@ function* askServiceFunctionExecute<R, T>(
 ## Related
 
 - [defineServiceFunction](../../../config/webserver/service-function.md) — declares the function this action invokes.
-- [askServiceRequest](../service/ask-service-request.md) — a related request to another service, dispatched by method name.
+- [askServiceRequest](../../features/web-socket-queue/ask-service-request.md) — a related request to another service, dispatched by method name.
 - [askCatch](../../core/system/ask-catch.md) — catch errors thrown by the invoked function.
