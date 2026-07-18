@@ -2,14 +2,16 @@ import { Nullable } from 'quidproquo-core';
 
 import { EventDocEvent } from '../../models';
 import { EventDocWorkspaceSlotError } from './EventDocWorkspaceSlotError';
-import { EventDocWorkspaceSlotsConfig } from './EventDocWorkspaceSlotsConfig';
+import { EventDocWorkspaceSlotFoldsConfig } from './EventDocWorkspaceSlotFoldsConfig';
 import { EventDocWorkspaceSlotState } from './EventDocWorkspaceSlotState';
 import { EventDocWorkspaceSlotViewOf } from './EventDocWorkspaceSlotViewOf';
 import { EventDocWorkspaceState } from './EventDocWorkspaceState';
 
 export type EventDocWorkspaceSelector<T> = (state: EventDocWorkspaceState) => T;
 
-export type EventDocWorkspaceSelectors<TSlots extends EventDocWorkspaceSlotsConfig> = {
+// Constrained to the FOLD config — selectors are buildable (and typeable) with no
+// api anywhere in sight; a full slots config satisfies the constraint too.
+export type EventDocWorkspaceSelectors<TSlots extends EventDocWorkspaceSlotFoldsConfig> = {
   // The live log per slot: [...history, ...pending]. The PERSISTABLE log — transient
   // events are deliberately excluded (they never save).
   liveEvents: { [K in keyof TSlots]: EventDocWorkspaceSelector<EventDocEvent[]> };

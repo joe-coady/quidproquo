@@ -2,7 +2,7 @@ import { buildEffectReducer, QpqReducer } from 'quidproquo-core';
 
 import { EventDocWorkspaceEffect } from '../effects/EventDocWorkspaceEffect';
 import { EventDocWorkspaceEffects } from '../effects/EventDocWorkspaceEffects';
-import { EventDocWorkspaceSlotsConfig } from '../types/EventDocWorkspaceSlotsConfig';
+import { EventDocWorkspaceSlotFoldsConfig } from '../types/EventDocWorkspaceSlotFoldsConfig';
 import { EventDocWorkspaceState } from '../types/EventDocWorkspaceState';
 import { clearError } from './stateUpdaters/clearError';
 import { createAppendHistoryEventsUpdater } from './stateUpdaters/createAppendHistoryEventsUpdater';
@@ -24,7 +24,7 @@ import { getSlotCoalesceRules } from './getSlotCoalesceRules';
 // workspace (closured over the slot configs) by createEventDocWorkspace. The
 // history-writing updaters OWN the historyViews fold: every history mutation folds
 // into the stored view here, so no selector ever refolds a saved log at read time.
-export const createEventDocWorkspaceReducer = (slots: EventDocWorkspaceSlotsConfig): QpqReducer<EventDocWorkspaceState, EventDocWorkspaceEffects> => {
+export const createEventDocWorkspaceReducer = (slots: EventDocWorkspaceSlotFoldsConfig): QpqReducer<EventDocWorkspaceState, EventDocWorkspaceEffects> => {
   const coalesceRulesBySlot = Object.fromEntries(Object.entries(slots).map(([slotKey, slot]) => [slotKey, getSlotCoalesceRules(slot)]));
 
   return buildEffectReducer<EventDocWorkspaceState, EventDocWorkspaceEffects>({

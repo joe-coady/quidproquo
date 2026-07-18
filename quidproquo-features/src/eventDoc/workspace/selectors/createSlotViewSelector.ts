@@ -4,7 +4,7 @@ import { getSlotHistoryView } from '../logic/getSlotHistoryView';
 import { getSlotPending } from '../logic/getSlotPending';
 import { getSlotTransientEvents } from '../logic/getSlotTransientEvents';
 import { EventDocWorkspaceSelector } from '../types/EventDocWorkspaceSelectors';
-import { EventDocWorkspaceSlotConfig } from '../types/EventDocWorkspaceSlotConfig';
+import { EventDocWorkspaceSlotFoldConfig } from '../types/EventDocWorkspaceSlotFoldConfig';
 
 // The live view for one slot: the pending tail, then the transient merge, folded (in
 // that block order) onto the STORED history accumulator (maintained incrementally by
@@ -14,7 +14,7 @@ import { EventDocWorkspaceSlotConfig } from '../types/EventDocWorkspaceSlotConfi
 // slots keep the version guard over transient events too. Memoized on the (stored
 // view, pending, transient record) identities, so while you type only the tails
 // refold and the migrate cost is paid once per stream change.
-export const createSlotViewSelector = (slotKey: string, slot: EventDocWorkspaceSlotConfig): EventDocWorkspaceSelector<unknown> => {
+export const createSlotViewSelector = (slotKey: string, slot: EventDocWorkspaceSlotFoldConfig): EventDocWorkspaceSelector<unknown> => {
   let hasCachedView = false;
   let cachedHistoryView: unknown;
   let cachedPending: EventDocEvent[] | undefined;

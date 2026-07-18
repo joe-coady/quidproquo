@@ -3,11 +3,11 @@ import { defineWebsocket, WebsocketActionType } from 'quidproquo-webserver';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { sendMessageToWebSocketConnection } from '../../../implementations/webSocket/webSocketImplementation';
+import { sendMessageToWebSocketConnection } from '../../../implementations/webSocket/webSocketConnectionRegistry';
 import { invokeProcessor } from '../../../testing/testProcessorRuntime';
 import { getWebsocketSendMessageActionProcessor } from './getWebsocketSendMessageActionProcessor';
 
-vi.mock('../../../implementations/webSocket/webSocketImplementation', () => ({
+vi.mock('../../../implementations/webSocket/webSocketConnectionRegistry', () => ({
   sendMessageToWebSocketConnection: vi.fn(),
 }));
 

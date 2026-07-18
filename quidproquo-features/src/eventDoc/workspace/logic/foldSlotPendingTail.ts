@@ -2,7 +2,7 @@ import { replayEffects } from 'quidproquo-core';
 
 import { foldEventDocLiveView } from '../../fold/foldEventDocLiveView';
 import { EventDocDocument, EventDocEvent } from '../../models';
-import { EventDocWorkspaceSlotConfig } from '../types/EventDocWorkspaceSlotConfig';
+import { EventDocWorkspaceSlotFoldConfig } from '../types/EventDocWorkspaceSlotFoldConfig';
 import { EventDocWorkspaceSlotKind } from '../types/EventDocWorkspaceSlotKind';
 
 // Fold an unsaved tail (the pending buffer, and again for the transient merge — see
@@ -13,7 +13,7 @@ import { EventDocWorkspaceSlotKind } from '../types/EventDocWorkspaceSlotKind';
 // version at the end, so the live view is ALWAYS latest-shaped even when the stored
 // accumulator (and an empty pending) sit below it. Local slots are plain replays (no
 // versions, no migrations).
-export const foldSlotPendingTail = (slot: EventDocWorkspaceSlotConfig, view: unknown, pending: EventDocEvent[]): unknown => {
+export const foldSlotPendingTail = (slot: EventDocWorkspaceSlotFoldConfig, view: unknown, pending: EventDocEvent[]): unknown => {
   if (slot.kind !== EventDocWorkspaceSlotKind.document) {
     return replayEffects(view, slot.foldReducer, pending);
   }

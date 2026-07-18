@@ -101,7 +101,7 @@ export const cliCommands: CliCommand[] = [
   },
   {
     name: 'check:circular',
-    summary: 'Scan workspace sources for circular relative imports (--error to fail on cycles)',
+    summary: 'Scan workspace sources for circular imports (fails on cycles; --warn to only report)',
     run: (a) => require('../commands/checkCircular').checkCircularCommand(a),
   },
   {

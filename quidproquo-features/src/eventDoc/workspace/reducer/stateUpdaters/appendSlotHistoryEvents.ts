@@ -1,5 +1,5 @@
 import { EventDocEvent } from '../../../models';
-import { EventDocWorkspaceSlotsConfig } from '../../types/EventDocWorkspaceSlotsConfig';
+import { EventDocWorkspaceSlotFoldsConfig } from '../../types/EventDocWorkspaceSlotFoldsConfig';
 import { EventDocWorkspaceState } from '../../types/EventDocWorkspaceState';
 import { foldHistoryEventsIntoAccumulator } from './foldHistoryEventsIntoAccumulator';
 
@@ -8,7 +8,7 @@ import { foldHistoryEventsIntoAccumulator } from './foldHistoryEventsIntoAccumul
 // stored accumulator, so the two can never disagree. No-ops on an unknown slotKey
 // (slot keys are fixed at workspace definition time).
 export const appendSlotHistoryEvents = (
-  slots: EventDocWorkspaceSlotsConfig,
+  slots: EventDocWorkspaceSlotFoldsConfig,
   state: EventDocWorkspaceState,
   slotKey: string,
   events: EventDocEvent[],

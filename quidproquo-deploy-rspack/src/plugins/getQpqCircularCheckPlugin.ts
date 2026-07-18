@@ -10,8 +10,9 @@
 //
 // Cycles are reported through onDetected with a direct console print because
 // several build paths suppress warnings (views dev runs stats:'errors-only');
-// they are also pushed as compilation warnings so stats/CI output has them.
-// Set QPQ_CIRCULAR_DEPS_ERROR=1 to promote cycles to build errors.
+// they are also pushed as compilation ERRORS so the build fails. Cycles are
+// never acceptable — QPQ_CIRCULAR_DEPS_WARN=1 is a temporary escape hatch that
+// downgrades them to warnings while fixing.
 import { CircularCheckRspackPlugin, RspackPluginInstance } from '@rspack/core';
 
 export const getQpqCircularCheckPlugin = (): RspackPluginInstance =>
@@ -20,13 +21,13 @@ export const getQpqCircularCheckPlugin = (): RspackPluginInstance =>
     onDetected: ({ paths, compilation }) => {
       const message = `Circular dependency detected:\n    ${paths.join('\n  → ')}`;
 
-      console.warn(`\x1b[33m[qpq] ${message}\x1b[0m`);
+      console.warn(`\x1b[31m[qpq] ${message}\x1b[0m`);
 
       const diagnostic = new Error(`[qpq] ${message}`);
-      if (process.env.QPQ_CIRCULAR_DEPS_ERROR) {
-        compilation.errors.push(diagnostic);
-      } else {
+      if (process.env.QPQ_CIRCULAR_DEPS_WARN) {
         compilation.warnings.push(diagnostic);
+      } else {
+        compilation.errors.push(diagnostic);
       }
     },
   });

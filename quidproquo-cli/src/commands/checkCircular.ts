@@ -1,7 +1,8 @@
 // `qpq check:circular` — scan every workspace's src for circular imports (the
 // class of bug that TDZ-crashes ESM bundles and silently drops exports under
-// CJS). Warns by default; --error or QPQ_CIRCULAR_DEPS_ERROR=1 exits non-zero
-// so CI / validate-ts flows can hard-fail on cycles.
+// CJS). Cycles fail the command (exit 1) — they are never acceptable; --warn or
+// QPQ_CIRCULAR_DEPS_WARN=1 is a temporary escape hatch that reports without
+// failing while fixing.
 import { findWorkspaceImportCycles, ImportCycle } from '../lib/circularImports';
 import { getRoot } from '../lib/discovery';
 
@@ -42,7 +43,7 @@ const groupCycles = (cycles: ImportCycle[]): CycleGroup[] => {
 };
 
 export const checkCircularCommand = async (argv: string[]): Promise<void> => {
-  const failOnCycles = argv.includes('--error') || !!process.env.QPQ_CIRCULAR_DEPS_ERROR;
+  const warnOnly = argv.includes('--warn') || !!process.env.QPQ_CIRCULAR_DEPS_WARN;
 
   const cycles = await findWorkspaceImportCycles(getRoot());
 
@@ -53,13 +54,14 @@ export const checkCircularCommand = async (argv: string[]): Promise<void> => {
 
   const groups = groupCycles(cycles);
 
+  const colour = warnOnly ? '\x1b[33m' : '\x1b[31m';
   for (const group of groups) {
     const chainNote = group.chainCount > 1 ? `, ${group.chainCount} distinct loops` : '';
-    console.warn(`\x1b[33mCircular imports (${group.files.length} files${chainNote}):\n    ${group.files.join('\n    ')}\x1b[0m`);
+    console.warn(`${colour}Circular imports (${group.files.length} files${chainNote}):\n    ${group.files.join('\n    ')}\x1b[0m`);
   }
-  console.warn(`\x1b[33mcheck:circular: ${groups.length} circular import group(s) found (${cycles.length} loops)\x1b[0m`);
+  console.warn(`${colour}check:circular: ${groups.length} circular import group(s) found (${cycles.length} loops)\x1b[0m`);
 
-  if (failOnCycles) {
+  if (!warnOnly) {
     process.exitCode = 1;
   }
 };

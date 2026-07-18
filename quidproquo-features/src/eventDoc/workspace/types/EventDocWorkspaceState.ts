@@ -1,5 +1,5 @@
 import { EventDocEvent } from '../../models';
-import { EventDocWorkspaceSlotsConfig } from './EventDocWorkspaceSlotsConfig';
+import { EventDocWorkspaceSlotFoldsConfig } from './EventDocWorkspaceSlotFoldsConfig';
 import { createInitialEventDocWorkspaceSlotState, EventDocWorkspaceSlotState } from './EventDocWorkspaceSlotState';
 
 // A workspace is n named event streams, each holding three groups of events:
@@ -28,7 +28,7 @@ const mapFromSlotKeys = <T>(slotKeys: string[], createValue: () => T): Record<st
 
 // Takes the slot configs (not just keys) because historyViews seeds each slot's
 // createInitialViewState().
-export const createInitialEventDocWorkspaceState = (slots: EventDocWorkspaceSlotsConfig): EventDocWorkspaceState => {
+export const createInitialEventDocWorkspaceState = (slots: EventDocWorkspaceSlotFoldsConfig): EventDocWorkspaceState => {
   const slotKeys = Object.keys(slots);
 
   return {

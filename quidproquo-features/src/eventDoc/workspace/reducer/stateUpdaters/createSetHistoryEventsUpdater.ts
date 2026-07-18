@@ -1,5 +1,5 @@
 import { EventDocWorkspaceSetHistoryEventsPayload } from '../../effects/EventDocWorkspaceSetHistoryEventsEffect';
-import { EventDocWorkspaceSlotsConfig } from '../../types/EventDocWorkspaceSlotsConfig';
+import { EventDocWorkspaceSlotFoldsConfig } from '../../types/EventDocWorkspaceSlotFoldsConfig';
 import { EventDocWorkspaceState } from '../../types/EventDocWorkspaceState';
 import { foldSlotHistory } from './foldSlotHistory';
 
@@ -8,7 +8,7 @@ import { foldSlotHistory } from './foldSlotHistory';
 // slot keys are fixed at workspace definition time, so an unrecognised key is a
 // misdirected effect, not a request to grow the state shape.
 export const createSetHistoryEventsUpdater =
-  (slots: EventDocWorkspaceSlotsConfig) =>
+  (slots: EventDocWorkspaceSlotFoldsConfig) =>
   (state: EventDocWorkspaceState, { slotKey, events }: EventDocWorkspaceSetHistoryEventsPayload): EventDocWorkspaceState => {
     const slot = slots[slotKey];
 

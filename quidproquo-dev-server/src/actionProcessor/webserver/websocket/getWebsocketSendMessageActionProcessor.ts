@@ -8,7 +8,11 @@ import {
 } from 'quidproquo-core';
 import { qpqWebServerUtils, WebsocketActionType, WebsocketSendMessageActionProcessor, WebsocketSendMessageErrorTypeEnum } from 'quidproquo-webserver';
 
-import { sendMessageToWebSocketConnection } from '../../../implementations/webSocket/webSocketImplementation';
+// The connection REGISTRY, not the implementation: webSocketImplementation imports
+// the event-processing pipeline (which includes these processors), so importing it
+// here would close an import cycle. The registry is a leaf holding the live
+// connections both sides share.
+import { sendMessageToWebSocketConnection } from '../../../implementations/webSocket/webSocketConnectionRegistry';
 
 const getProcessSendMessage = (qpqConfig: QPQConfig): WebsocketSendMessageActionProcessor<any> => {
   return async ({ connectionId, payload, websocketApiName }) => {

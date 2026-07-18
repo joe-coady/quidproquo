@@ -2,7 +2,7 @@ import { replayEffects } from 'quidproquo-core';
 
 import { foldEventDocLogStep } from '../../../fold/foldEventDocLogStep';
 import { EventDocDocument, EventDocEvent } from '../../../models';
-import { EventDocWorkspaceSlotConfig } from '../../types/EventDocWorkspaceSlotConfig';
+import { EventDocWorkspaceSlotFoldConfig } from '../../types/EventDocWorkspaceSlotFoldConfig';
 import { EventDocWorkspaceSlotKind } from '../../types/EventDocWorkspaceSlotKind';
 
 // Fold history events onto the stored ACCUMULATOR (used for both the init full fold
@@ -15,7 +15,7 @@ import { EventDocWorkspaceSlotKind } from '../../types/EventDocWorkspaceSlotKind
 // tripped the guard). The backend enforces event ordering; the migrate-to-latest now
 // happens at read (foldEventDocLiveView / the view selector). Local slots are plain
 // replays (no migrations, no updatedAt stamping).
-export const foldHistoryEventsIntoAccumulator = (slot: EventDocWorkspaceSlotConfig, accumulator: unknown, events: EventDocEvent[]): unknown => {
+export const foldHistoryEventsIntoAccumulator = (slot: EventDocWorkspaceSlotFoldConfig, accumulator: unknown, events: EventDocEvent[]): unknown => {
   if (slot.kind !== EventDocWorkspaceSlotKind.document) {
     return replayEffects(accumulator, slot.foldReducer, events);
   }

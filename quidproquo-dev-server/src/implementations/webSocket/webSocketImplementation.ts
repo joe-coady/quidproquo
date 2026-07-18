@@ -4,10 +4,18 @@ import { qpqWebServerUtils, WebSocketEventType, WebSocketQPQWebServerConfigSetti
 import { createServer } from 'http';
 import { RawData, WebSocket, WebSocketServer } from 'ws';
 
-import { getWsWebsocketEventEventProcessor } from '../../actionProcessor';
+// Deep import (not the actionProcessor barrel): the barrel transitively imports this
+// file back through the webserver websocket processors, and entering that loop
+// barrel-first breaks module init. The deep path keeps the graph acyclic.
+import { getWsWebsocketEventEventProcessor } from '../../actionProcessor/core/event/ws/websocket';
 import { processEvent } from '../../logic';
 import { ResolvedDevServerConfig } from '../../types';
 import { WsEvent } from './types';
+import {
+  findRegisteredWebSocketServer,
+  getRegisteredWebSocketServers,
+  setRegisteredWebSocketServers,
+} from './webSocketConnectionRegistry';
 
 type WebSocketQPQWebServerConfigSettingMap = {
   service: string;
@@ -26,30 +34,6 @@ const getDynamicModuleLoader = (qpqConfig: QPQConfig, devServerConfig: ResolvedD
   return async (runtime: QpqFunctionRuntime): Promise<any> => devServerConfig.dynamicModuleLoader(serviceName, runtime);
 };
 
-const globals: { allServers: WebSocketQPQWebServerConfigSettingMapWithWebSocketServer[] } = {
-  allServers: [],
-};
-
-const findConnection = (service: string, apiName: string) => {
-  const serverInfo = globals.allServers.find((s) => s.service === service && s.apiName === apiName);
-
-  return serverInfo;
-};
-
-export const sendMessageToWebSocketConnection = async (
-  service: string,
-  websocketApiName: string,
-  connectionId: string,
-  payload: any,
-): Promise<void> => {
-  const wsConnection = findConnection(service, websocketApiName)?.connections?.[connectionId];
-  if (!wsConnection) {
-    return;
-  }
-
-  wsConnection.send(JSON.stringify(payload));
-};
-
 const startServer = (
   settingsMap: WebSocketQPQWebServerConfigSettingMap,
   devServerConfig: ResolvedDevServerConfig,
@@ -63,7 +47,7 @@ const startServer = (
     const sourceIp = req.socket.remoteAddress === '::1' || !req.socket.remoteAddress ? '127.0.0.1' : req.socket.remoteAddress;
     const userAgent = req.headers['user-agent'] || 'unknown agent';
 
-    const server = findConnection(settingsMap.service, settingsMap.apiName)!;
+    const server = findRegisteredWebSocketServer(settingsMap.service, settingsMap.apiName)!;
     server.connections[connectionId] = ws;
 
     const processWsEvent = (wsEvent: WsEvent) =>
@@ -182,12 +166,12 @@ export const webSocketImplementation = async (devServerConfig: ResolvedDevServer
 
   const server = createServer();
 
-  globals.allServers = webSocketQPQWebServerConfigSettingMaps.map((x) => startServer(x, devServerConfig));
+  setRegisteredWebSocketServers(webSocketQPQWebServerConfigSettingMaps.map((x) => startServer(x, devServerConfig)));
 
   server.on('upgrade', (request, socket, head) => {
     const { pathname } = new URL(request.url || '', 'wss://base.url');
 
-    const serverInfo = globals.allServers.find((s) => pathname === `/${s.service}/${s.apiName}`);
+    const serverInfo = getRegisteredWebSocketServers().find((s) => pathname === `/${s.service}/${s.apiName}`);
 
     if (serverInfo) {
       serverInfo.server.handleUpgrade(request, socket, head, (ws) => {

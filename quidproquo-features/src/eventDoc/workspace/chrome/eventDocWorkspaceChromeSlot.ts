@@ -1,8 +1,7 @@
 import { EventDocWorkspaceLocalSlotConfig } from '../types/EventDocWorkspaceLocalSlotConfig';
-import { EventDocWorkspaceSlotKind } from '../types/EventDocWorkspaceSlotKind';
-import { createInitialEventDocWorkspaceChromeState, EventDocWorkspaceChromeState } from './types/EventDocWorkspaceChromeState';
+import { EventDocWorkspaceChromeState } from './types/EventDocWorkspaceChromeState';
 import { eventDocWorkspaceChromeApi } from './eventDocWorkspaceChromeApi';
-import { eventDocWorkspaceChromeFoldReducer } from './eventDocWorkspaceChromeFoldReducer';
+import { eventDocWorkspaceChromeSlotFold } from './eventDocWorkspaceChromeSlotFold';
 
 export type EventDocWorkspaceChromeSlot = EventDocWorkspaceLocalSlotConfig<EventDocWorkspaceChromeState, typeof eventDocWorkspaceChromeApi>;
 
@@ -10,8 +9,6 @@ export type EventDocWorkspaceChromeSlot = EventDocWorkspaceLocalSlotConfig<Event
 // slot to replace it. No coalesceEventTypes = the local-slot 'all' default, so each
 // chrome field keeps only its latest event.
 export const eventDocWorkspaceChromeSlot: EventDocWorkspaceChromeSlot = {
-  kind: EventDocWorkspaceSlotKind.local,
+  ...eventDocWorkspaceChromeSlotFold,
   api: eventDocWorkspaceChromeApi,
-  foldReducer: eventDocWorkspaceChromeFoldReducer,
-  createInitialViewState: createInitialEventDocWorkspaceChromeState,
 };

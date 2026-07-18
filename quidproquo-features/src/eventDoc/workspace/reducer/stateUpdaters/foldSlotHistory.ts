@@ -1,5 +1,5 @@
 import { EventDocEvent } from '../../../models';
-import { EventDocWorkspaceSlotConfig } from '../../types/EventDocWorkspaceSlotConfig';
+import { EventDocWorkspaceSlotFoldConfig } from '../../types/EventDocWorkspaceSlotFoldConfig';
 import { foldHistoryEventsIntoAccumulator } from './foldHistoryEventsIntoAccumulator';
 
 // Fold a slot's FULL saved log into its stored accumulator (the setHistoryEvents
@@ -7,5 +7,5 @@ import { foldHistoryEventsIntoAccumulator } from './foldHistoryEventsIntoAccumul
 // appends use, so full and incremental folds cannot disagree. NOT foldEventDocLog —
 // that climbs to the latest version at the end, and the stored view must stay at the
 // last folded event's version (the migrate-to-latest belongs to the read side).
-export const foldSlotHistory = (slot: EventDocWorkspaceSlotConfig, history: EventDocEvent[]): unknown =>
+export const foldSlotHistory = (slot: EventDocWorkspaceSlotFoldConfig, history: EventDocEvent[]): unknown =>
   foldHistoryEventsIntoAccumulator(slot, slot.createInitialViewState(), history);
