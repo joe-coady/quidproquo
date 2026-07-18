@@ -4,7 +4,7 @@ import { Configuration, IgnorePlugin, RspackPluginInstance } from '@rspack/core'
 
 import { getQpqBundleExternals } from './getQpqBundleExternals';
 import { getRspackBuildMode } from './getRspackBuildMode';
-import { QpqPlugin } from './plugins';
+import { getQpqCircularCheckPlugin, QpqPlugin } from './plugins';
 
 export const getRspackConfig = (qpqConfig: QPQConfig, buildPath: string, entries: Record<string, string>, nodeModulePath: string): Configuration => {
   const bundleOptions = qpqCoreUtils.getBackendBundleOptions(qpqConfig);
@@ -42,7 +42,7 @@ export const getRspackConfig = (qpqConfig: QPQConfig, buildPath: string, entries
       fallback: {},
     },
 
-    plugins: [new QpqPlugin({ qpqConfigs: [qpqConfig], nodeModulePath }), ...ignoreModulePlugins],
+    plugins: [new QpqPlugin({ qpqConfigs: [qpqConfig], nodeModulePath }), getQpqCircularCheckPlugin(), ...ignoreModulePlugins],
 
     module: {
       rules: [

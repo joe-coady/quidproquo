@@ -19,6 +19,7 @@ import { Configuration, IgnorePlugin } from '@rspack/core';
 
 import { getQpqBundleExternals } from '../getQpqBundleExternals';
 import { getRspackBuildMode } from '../getRspackBuildMode';
+import { getQpqCircularCheckPlugin } from '../plugins';
 import { getFederatedRemoteInfoForQpqConfig } from './getFederatedRemoteInfoForQpqConfig';
 
 // The framework packages the lambda host provides as MF singletons. Built from the
@@ -130,6 +131,7 @@ export const getRspackConfigForQpqRemote = (qpqConfig: QPQConfig, buildPath: str
         // generation entirely (publishFederatedRemote drops @mf-types anyway).
         dts: false,
       }),
+      getQpqCircularCheckPlugin(),
       ...ignoreModulePlugins,
     ],
 

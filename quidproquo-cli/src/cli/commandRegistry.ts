@@ -100,6 +100,11 @@ export const cliCommands: CliCommand[] = [
     run: (a) => require('../commands/publish').publishDeployCommand(a),
   },
   {
+    name: 'check:circular',
+    summary: 'Scan workspace sources for circular relative imports (--error to fail on cycles)',
+    run: (a) => require('../commands/checkCircular').checkCircularCommand(a),
+  },
+  {
     name: 'hooks',
     usageArgs: '<name>',
     summary: 'Run qpq:<name> (or plain <name>) in every app/package that defines it (dependency ordered, parallel; --jobs=N)',

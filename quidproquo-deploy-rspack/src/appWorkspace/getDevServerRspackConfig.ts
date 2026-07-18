@@ -9,7 +9,7 @@ import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 import path from 'path';
 import { Configuration, ExternalItemFunctionData, IgnorePlugin } from '@rspack/core';
 
-import { QpqPlugin } from '../plugins';
+import { getQpqCircularCheckPlugin, QpqPlugin } from '../plugins';
 import { getWorkspaceSourceAliases } from './getWorkspaceSourceAliases';
 
 export interface DevServerRspackOptions {
@@ -153,6 +153,7 @@ export const getDevServerRspackConfig = ({ root, entry, qpqConfigs }: DevServerR
         nodeModulePath: path.join(root, 'node_modules'),
         alwaysBundleStoryCode: true,
       }),
+      getQpqCircularCheckPlugin(),
       ...ignoreModules.map(
         (ignoreModule) =>
           new IgnorePlugin({

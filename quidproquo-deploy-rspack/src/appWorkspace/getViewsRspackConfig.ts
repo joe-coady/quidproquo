@@ -12,6 +12,7 @@ import { ModuleFederationPlugin } from '@module-federation/enhanced/rspack';
 import { Configuration, rspack } from '@rspack/core';
 import { ReactRefreshRspackPlugin } from '@rspack/plugin-react-refresh';
 
+import { getQpqCircularCheckPlugin } from '../plugins';
 import { scanFederatedExposes } from './federatedExports';
 import { getWorkspaceSourceAliases } from './getWorkspaceSourceAliases';
 import { getViewsContext } from './viewsWorkspace';
@@ -248,6 +249,7 @@ export const getViewsRspackConfig = (viewsDir: string): Configuration => {
         ...(fs.existsSync(favicon) ? { favicon } : {}),
       }),
       new rspack.DefinePlugin(buildQpqDefines(qpqConfig)),
+      getQpqCircularCheckPlugin(),
       ...(isDev ? [new ReactRefreshRspackPlugin()] : []),
     ],
 
