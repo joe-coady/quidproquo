@@ -7,6 +7,8 @@ export enum UserDirectoryActionType {
   ForgotPassword = '@quidproquo-core/UserDirectory/ForgotPassword',
   ConfirmForgotPassword = '@quidproquo-core/UserDirectory/ConfirmForgotPassword',
   RefreshToken = '@quidproquo-core/UserDirectory/RefreshToken',
+  SignOutUser = '@quidproquo-core/UserDirectory/SignOutUser',
+  RevokeRefreshToken = '@quidproquo-core/UserDirectory/RevokeRefreshToken',
   RequestEmailVerification = '@quidproquo-core/UserDirectory/RequestEmailVerification',
   ConfirmEmailVerification = '@quidproquo-core/UserDirectory/ConfirmEmailVerification',
   ReadAccessToken = '@quidproquo-core/UserDirectory/ReadAccessToken',

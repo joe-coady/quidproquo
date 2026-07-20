@@ -57,6 +57,7 @@ The name of the [user directory](../../config/core/user-directory.md) to create 
 | `mfa` | `UserDirectoryMfaSettings` | – | Forwarded to the user directory: multi-factor authentication configuration. See [MFA](../../config/core/user-directory.md#mfa). |
 | `basePath` | `string` | `''` | A path prefix applied to every auth route. E.g. `'/auth'` produces `/auth/login`, `/auth/refreshToken`, and so on. |
 | `allowedOrigins` | `string[]` | – | Allowed browser origins (CORS) applied to every generated auth route. |
+| `accessTokenValidityMinutes` | `number` | `60` (Cognito default) | Forwarded to the user directory: access/ID token (JWT) lifetime in minutes (Cognito allows 5–1440). Shorter shrinks the window in which a revoked session's access token keeps working. Keep it comfortably above however long the client waits before refreshing (the stock web client refreshes ~10 minutes before expiry). See [defineUserDirectory](../../config/core/user-directory.md#parameters). |
 
 ## Generated routes
 
@@ -66,6 +67,8 @@ With `basePath` = `''` (the default), `defineAuthSystem` registers these `POST` 
 | --- | --- | --- |
 | `/login` | `login` | No |
 | `/refreshToken` | `refreshToken` | No |
+| `/logout` | `logout` | No |
+| `/logoutEverywhere` | `logoutEverywhere` | No |
 | `/challenge` | `respondToAuthChallenge` | No |
 | `/associateSoftwareToken` | `associateSoftwareToken` | No |
 | `/forgotPassword` | `forgotPassword` | No |
@@ -73,6 +76,11 @@ With `basePath` = `''` (the default), `defineAuthSystem` registers these `POST` 
 | `/changePassword` | `changePassword` | Yes — valid access token for `directoryName` |
 
 Each path is prefixed with `basePath` when provided (e.g. `/auth/login`). The handler stories correspond to the [User Directory actions](../../actions/core/user-directory/ask-user-directory-authenticate-user.md) — for example `login` authenticates a user, `refreshToken` refreshes an access token, and `respondToAuthChallenge` completes a challenge/MFA flow.
+
+`/logout` and `/logoutEverywhere` are unauthenticated routes that are each self-authorizing by the token they carry, and both are best-effort — they always respond `{ success: true }` even if the token was already invalid, since a client's local logout must never fail:
+
+- `/logout` takes `{ refreshToken }` in the body and revokes just that one session ([askUserDirectoryRevokeRefreshToken](../../actions/core/user-directory/ask-user-directory-revoke-refresh-token.md)) — "log out this device."
+- `/logoutEverywhere` reads the access token from the request headers and revokes every session for that user ([askUserDirectorySignOutUser](../../actions/core/user-directory/ask-user-directory-sign-out-user.md)) — "sign out of all devices."
 
 ## How auth ties routes to the user directory
 
@@ -106,5 +114,5 @@ export default [
 
 - [defineUserDirectory](../../config/core/user-directory.md) — the user directory `defineAuthSystem` creates; documents the directory options that `phoneRequired`, `selfSignUpEnabled`, `emailTemplates`, and `mfa` forward to, plus the AWS Cognito infrastructure.
 - [defineApiKey](./api-key.md) — the complementary auth mechanism (shared-secret / machine callers) for routes.
-- **User Directory actions** — the auth operations the generated handlers wrap: [askUserDirectoryAuthenticateUser](../../actions/core/user-directory/ask-user-directory-authenticate-user.md), [askUserDirectoryRefreshToken](../../actions/core/user-directory/ask-user-directory-refresh-token.md), [askUserDirectoryRespondToAuthChallenge](../../actions/core/user-directory/ask-user-directory-respond-to-auth-challenge.md), [askUserDirectoryChangePassword](../../actions/core/user-directory/ask-user-directory-change-password.md), [askUserDirectoryForgotPassword](../../actions/core/user-directory/ask-user-directory-forgot-password.md), [askUserDirectoryConfirmForgotPassword](../../actions/core/user-directory/ask-user-directory-confirm-forgot-password.md), [askUserDirectoryAssociateSoftwareToken](../../actions/core/user-directory/ask-user-directory-associate-software-token.md).
+- **User Directory actions** — the auth operations the generated handlers wrap: [askUserDirectoryAuthenticateUser](../../actions/core/user-directory/ask-user-directory-authenticate-user.md), [askUserDirectoryRefreshToken](../../actions/core/user-directory/ask-user-directory-refresh-token.md), [askUserDirectoryRevokeRefreshToken](../../actions/core/user-directory/ask-user-directory-revoke-refresh-token.md), [askUserDirectorySignOutUser](../../actions/core/user-directory/ask-user-directory-sign-out-user.md), [askUserDirectoryRespondToAuthChallenge](../../actions/core/user-directory/ask-user-directory-respond-to-auth-challenge.md), [askUserDirectoryChangePassword](../../actions/core/user-directory/ask-user-directory-change-password.md), [askUserDirectoryForgotPassword](../../actions/core/user-directory/ask-user-directory-forgot-password.md), [askUserDirectoryConfirmForgotPassword](../../actions/core/user-directory/ask-user-directory-confirm-forgot-password.md), [askUserDirectoryAssociateSoftwareToken](../../actions/core/user-directory/ask-user-directory-associate-software-token.md).
 - **Routes and APIs** — the generated endpoints are `defineRoute` settings; see the route / `defineApi` config settings in quidproquo-webserver to add and protect your own routes with this directory.

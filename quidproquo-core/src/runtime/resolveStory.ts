@@ -46,8 +46,7 @@ export async function resolveStory<TArgs extends Array<any>>(
     // user-directory global needed to resolve the actor). Transport entries
     // (http/queue/ws) start fresh from their own runtime registration only.
     functionGlobals:
-      runtimeType === QpqRuntimeType.EXECUTE_STORY ||
-      runtimeType === QpqRuntimeType.EXECUTE_IMPLEMENTATION_STORY
+      runtimeType === QpqRuntimeType.EXECUTE_STORY || runtimeType === QpqRuntimeType.EXECUTE_IMPLEMENTATION_STORY
         ? {
             ...callerSession.functionGlobals,
             ...runtimeGlobals,

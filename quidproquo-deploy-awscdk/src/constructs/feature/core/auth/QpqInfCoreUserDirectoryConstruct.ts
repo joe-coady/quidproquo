@@ -206,6 +206,13 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
       });
     }
 
+    // Short-lived JWTs shrink the window in which a revoked session's still-valid access
+    // token keeps working (access tokens are stateless, so RevokeToken/GlobalSignOut can't
+    // kill them before they expire). Omitted → Cognito's default (60 min). Applied to both
+    // the access and ID tokens so the ID token can't outlive the access token.
+    const accessTokenValidityMinutes = props.userDirectoryConfig.accessTokenValidityMinutes;
+    const tokenValidity = accessTokenValidityMinutes !== undefined ? cdk.Duration.minutes(accessTokenValidityMinutes) : undefined;
+
     const userPoolClient = new aws_cognito.UserPoolClient(this, 'user-pool-client', {
       userPoolClientName: this.qpqResourceName(props.userDirectoryConfig.name, 'upc'),
       userPool: this.userPool,
@@ -214,6 +221,8 @@ export class QpqInfCoreUserDirectoryConstruct extends QpqConstructBlock {
         adminUserPassword: true,
         custom: !!props.userDirectoryConfig.customAuthRuntime,
       },
+      accessTokenValidity: tokenValidity,
+      idTokenValidity: tokenValidity,
     });
 
     qpqDeployAwsCdkUtils.exportStackValue(

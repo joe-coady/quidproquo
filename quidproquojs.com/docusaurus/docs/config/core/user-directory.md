@@ -43,6 +43,7 @@ The name of the directory. This is the name you pass as the `userDirectoryName` 
 | `dnsRecord` | `AuthDirectoryDnsRecord` | – | Serves the pool's hosted UI / OAuth endpoints from a custom domain. See [DNS record](#dns-record). |
 | `customAuthRuntime` | `CustomAuthRuntime` | – | Enables Cognito's `CUSTOM_AUTH` flow, wiring story functions to the define/create/verify auth-challenge Lambda triggers. See [Custom auth runtime](#custom-auth-runtime). |
 | `mfa` | `UserDirectoryMfaSettings` | `{ mode: off, secondFactors: [totp] }` | Multi-factor authentication configuration. See [MFA](#mfa). |
+| `accessTokenValidityMinutes` | `number` | `60` (Cognito default) | Access/ID token (JWT) lifetime in minutes (Cognito allows 5–1440). Shorter shrinks the window in which a revoked session's still-valid access token keeps working, since access tokens are stateless and can't be revoked before they expire — see [askUserDirectoryRevokeRefreshToken](../../actions/core/user-directory/ask-user-directory-revoke-refresh-token.md) / [askUserDirectorySignOutUser](../../actions/core/user-directory/ask-user-directory-sign-out-user.md). Keep it comfortably above however long the client waits before refreshing. |
 | `deprecated` | `boolean` | `false` | Inherited from `QPQConfigAdvancedSettings`; marks the setting as deprecated. |
 
 ## MFA
@@ -132,7 +133,7 @@ The `QpqInfCoreUserDirectoryConstruct` deploys:
 - **Lambda triggers** (only when configured):
   - `CUSTOM_MESSAGE` — when any `emailTemplates` handler is set.
   - `DEFINE_AUTH_CHALLENGE`, and optionally `CREATE_AUTH_CHALLENGE` / `VERIFY_AUTH_CHALLENGE_RESPONSE` — when `customAuthRuntime` is set.
-- **An app client** with a generated secret, `ADMIN_USER_PASSWORD_AUTH` enabled, and `CUSTOM_AUTH` enabled when `customAuthRuntime` is set.
+- **An app client** with a generated secret, `ADMIN_USER_PASSWORD_AUTH` enabled, `CUSTOM_AUTH` enabled when `customAuthRuntime` is set, and access/ID token validity set from `accessTokenValidityMinutes` (Cognito's 60-minute default when omitted).
 - **A custom domain + Route 53 alias** — when `dnsRecord` is set (certificate from `us-east-1`).
 
 Services that own a directory get IAM for the admin Cognito operations the actions use (create user, initiate/respond to auth, list/get users, update attributes, set password, describe pool/client, etc.). Services that only reference a **foreign** directory (via `owner`) get no Cognito IAM — token validation runs against the pool's public JWKs over HTTPS and needs none.
@@ -183,6 +184,7 @@ export default [
 - **Passwords:** [askUserDirectoryChangePassword](../../actions/core/user-directory/ask-user-directory-change-password.md), [askUserDirectoryForgotPassword](../../actions/core/user-directory/ask-user-directory-forgot-password.md), [askUserDirectorySetPassword](../../actions/core/user-directory/ask-user-directory-set-password.md).
 - **MFA:** [askUserDirectoryAssociateSoftwareToken](../../actions/core/user-directory/ask-user-directory-associate-software-token.md).
 - **Tokens:** [askUserDirectoryReadAccessToken](../../actions/core/user-directory/ask-user-directory-read-access-token.md), [askUserDirectoryDecodeAccessToken](../../actions/core/user-directory/ask-user-directory-decode-access-token.md).
+- **Signing out:** [askUserDirectoryRevokeRefreshToken](../../actions/core/user-directory/ask-user-directory-revoke-refresh-token.md) (single session), [askUserDirectorySignOutUser](../../actions/core/user-directory/ask-user-directory-sign-out-user.md) (every session).
 - **All User Directory actions:** see the [User Directory actions](../../actions/core/user-directory/ask-user-directory-authenticate-user.md) group.
 - **Turn-key auth:** [defineAuthSystem](../webserver/auth-system.md) (quidproquo-webserver) creates a user directory and the login / refresh / password-recovery HTTP routes in one call.
 - **AWS tuning:** [defineAwsDataStoreRemovalPolicy](../config-aws/aws-data-store-removal-policy.md) — retain vs destroy the Cognito user pool on teardown.

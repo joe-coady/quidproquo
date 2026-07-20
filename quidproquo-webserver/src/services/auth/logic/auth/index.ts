@@ -6,3 +6,5 @@ export * from './askGetAuthUserDirectoryName';
 export * from './askLogin';
 export * from './askRefreshToken';
 export * from './askRespondToAuthChallenge';
+export * from './askRevokeSession';
+export * from './askSignOut';

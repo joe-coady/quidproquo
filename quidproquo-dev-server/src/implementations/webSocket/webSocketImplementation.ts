@@ -11,11 +11,7 @@ import { getWsWebsocketEventEventProcessor } from '../../actionProcessor/core/ev
 import { processEvent } from '../../logic';
 import { ResolvedDevServerConfig } from '../../types';
 import { WsEvent } from './types';
-import {
-  findRegisteredWebSocketServer,
-  getRegisteredWebSocketServers,
-  setRegisteredWebSocketServers,
-} from './webSocketConnectionRegistry';
+import { findRegisteredWebSocketServer, getRegisteredWebSocketServers, setRegisteredWebSocketServers } from './webSocketConnectionRegistry';
 
 type WebSocketQPQWebServerConfigSettingMap = {
   service: string;

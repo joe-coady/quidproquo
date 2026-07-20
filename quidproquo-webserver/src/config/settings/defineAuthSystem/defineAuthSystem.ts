@@ -16,6 +16,11 @@ export interface AuthSystemOptions {
   basePath?: string;
 
   allowedOrigins?: string[];
+
+  // Access/ID token (JWT) lifetime in minutes (Cognito 5–1440; omitted → default 60).
+  // Shorter shrinks the post-revocation window in which a stateless access token still
+  // works. Keep comfortably above 10 (the web client refreshes ~10 min before expiry).
+  accessTokenValidityMinutes?: number;
 }
 
 // Bundles a complete username/password login flow: a user directory plus the
@@ -38,6 +43,7 @@ export const defineAuthSystem = (service: string, directoryName: string, options
       selfSignUpEnabled: options?.selfSignUpEnabled,
       emailTemplates: options?.emailTemplates,
       mfa: options?.mfa,
+      accessTokenValidityMinutes: options?.accessTokenValidityMinutes,
       owner: { module: service },
     }),
 
@@ -48,6 +54,12 @@ export const defineAuthSystem = (service: string, directoryName: string, options
 
         defineAuthServiceRoute('POST', `${basePath}/login`, 'login', routeOptions),
         defineAuthServiceRoute('POST', `${basePath}/refreshToken`, 'refreshToken', routeOptions),
+        // Public + best-effort (logout must never fail for the client, so it isn't
+        // edge-gated). /logout revokes just the caller's own refresh token (this device);
+        // /logoutEverywhere revokes all of the user's sessions (settings "sign out of all
+        // devices"). Each is self-authorizing: the refresh token / access token it carries.
+        defineAuthServiceRoute('POST', `${basePath}/logout`, 'logout', routeOptions),
+        defineAuthServiceRoute('POST', `${basePath}/logoutEverywhere`, 'logoutEverywhere', routeOptions),
         defineAuthServiceRoute('POST', `${basePath}/challenge`, 'respondToAuthChallenge', routeOptions),
         defineAuthServiceRoute('POST', `${basePath}/associateSoftwareToken`, 'associateSoftwareToken', routeOptions),
         defineAuthServiceRoute('POST', `${basePath}/forgotPassword`, 'forgotPassword', routeOptions),

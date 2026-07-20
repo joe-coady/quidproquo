@@ -51,7 +51,9 @@ export const createEventDocWorkspace = <TSlots extends EventDocWorkspaceSlotsCon
     const selectorKeys = Object.keys(definition.selectors.view).sort().join(', ');
     const slotKeys = Object.keys(slotsConfig).sort().join(', ');
     if (selectorKeys !== slotKeys) {
-      throw new Error(`Workspace selectors cover slots [${selectorKeys}] but the workspace defines [${slotKeys}] - build them from the same fold configs.`);
+      throw new Error(
+        `Workspace selectors cover slots [${selectorKeys}] but the workspace defines [${slotKeys}] - build them from the same fold configs.`,
+      );
     }
   }
 
@@ -65,6 +67,8 @@ export const createEventDocWorkspace = <TSlots extends EventDocWorkspaceSlotsCon
     // The fold selectors never touch an api, so a definition-supplied instance is
     // interchangeable with a locally built one (same fold configs in, same
     // selectors out) — reusing it just shares the memoisation.
-    selectors: (definition.selectors ?? createEventDocWorkspaceSelectors(slots)) as EventDocWorkspace<EventDocWorkspaceResolvedSlots<TSlots>>['selectors'],
+    selectors: (definition.selectors ?? createEventDocWorkspaceSelectors(slots)) as EventDocWorkspace<
+      EventDocWorkspaceResolvedSlots<TSlots>
+    >['selectors'],
   };
 };

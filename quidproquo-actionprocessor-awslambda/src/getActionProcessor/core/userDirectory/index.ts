@@ -16,9 +16,11 @@ import { getUserDirectoryReadAccessTokenActionProcessor } from './getUserDirecto
 import { getUserDirectoryRefreshTokenActionProcessor } from './getUserDirectoryRefreshTokenActionProcessor';
 import { getUserDirectoryRequestEmailVerificationActionProcessor } from './getUserDirectoryRequestEmailVerificationActionProcessor';
 import { getUserDirectoryRespondToAuthChallengeActionProcessor } from './getUserDirectoryRespondToAuthChallengeActionProcessor';
+import { getUserDirectoryRevokeRefreshTokenActionProcessor } from './getUserDirectoryRevokeRefreshTokenActionProcessor';
 import { getUserDirectorySetAccessTokenActionProcessor } from './getUserDirectorySetAccessTokenActionProcessor';
 import { getUserDirectorySetPasswordActionProcessor } from './getUserDirectorySetPasswordActionProcessor';
 import { getUserDirectorySetUserAttributesActionProcessor } from './getUserDirectorySetUserAttributesActionProcessor';
+import { getUserDirectorySignOutUserActionProcessor } from './getUserDirectorySignOutUserActionProcessor';
 
 export const getUserDirectoryActionProcessor: ActionProcessorListResolver = async (
   qpqConfig: QPQConfig,
@@ -38,9 +40,11 @@ export const getUserDirectoryActionProcessor: ActionProcessorListResolver = asyn
   ...(await getUserDirectoryGetUsersByAttributeActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getUserDirectoryReadAccessTokenActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getUserDirectoryRefreshTokenActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getUserDirectoryRevokeRefreshTokenActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getUserDirectoryRequestEmailVerificationActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getUserDirectoryRespondToAuthChallengeActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getUserDirectorySetAccessTokenActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getUserDirectorySetPasswordActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getUserDirectorySetUserAttributesActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getUserDirectorySignOutUserActionProcessor(qpqConfig, dynamicModuleLoader)),
 });
