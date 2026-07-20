@@ -41,5 +41,16 @@ export const refreshToken = async (
   const issueDateTime = new Date().toISOString();
   const response = await cognitoClient.send(new AdminInitiateAuthCommand(params));
 
-  return cognitoAdminInitiateAuthResponseToQpqAuthenticationInfo(response, issueDateTime);
+  const authResponse = cognitoAdminInitiateAuthResponseToQpqAuthenticationInfo(response, issueDateTime);
+
+  // Cognito's REFRESH_TOKEN_AUTH flow does NOT return a refresh token — the existing one stays
+  // valid and is reused — so AuthenticationResult.RefreshToken is undefined here. Carry the
+  // caller's refresh token forward so the client keeps a usable session; without this it's
+  // dropped after the first refresh and the session can never refresh again. (If refresh-token
+  // rotation is ever enabled, Cognito DOES return a new one — then we keep that instead.)
+  if (authResponse.authenticationInfo && !authResponse.authenticationInfo.refreshToken) {
+    authResponse.authenticationInfo.refreshToken = refreshToken;
+  }
+
+  return authResponse;
 };
