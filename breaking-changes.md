@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+## 0.1.10
+
 - `ApiActionType`, `ApiRequestActionRequester` (`askApiRequest`), and its request/response types move from `quidproquo-web` to `quidproquo-webserver`. Update imports from `quidproquo-web` to `quidproquo-webserver`. The action type string also changed from `@quidproquo-web/Api/Request` to `@quidproquo-webserver/Api/Request`; any code matching on the raw string must update too.
 - `InitStateEffect`, `SetCodeEffect`, `SetNameEffect`, `CreateDraftEffect`, and `PublishEffect` are removed from `quidproquo-features`, replaced by `EventDocInitStateEffect`, `EventDocSetCodeEffect`, `EventDocSetNameEffect`, `EventDocCreateDraftEffect`, and `EventDocPublishEffect`. The new types carry the plain event data (e.g. `Effect<EventDocEffect.SetCode, EventDocSetCodeData>`) instead of data pre-wrapped in `EventDocEventPayload`; update any direct imports to the new names and unwrap accordingly.
 - `askUIEventDocWorkspaceApplyEvent(slotKey, isPending, event)` in `quidproquo-features` drops the `isPending` argument (`askUIEventDocWorkspaceApplyEvent(slotKey, event)`); `EventDocWorkspaceApplyEventPayload` and `EventDocWorkspaceSlotBinding` correspondingly lose their `isPending` field. Every commit, including local slots like chrome, now lands in the slot's `pending` buffer instead of `history` (a local slot's pending simply never saves) — code reading a local slot's `state.history` directly must read `state.pending` instead.
