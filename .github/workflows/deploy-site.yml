@@ -1,0 +1,60 @@
+name: deploy-site
+
+# Ship quidproquojs.com to production. Triggered by publishing a GitHub Release
+# (an explicit human "ship it"), or run manually from the Actions tab. Note:
+# this deliberately does NOT fire on every `v*` tag, because `npm run go`
+# creates version tags when publishing the libraries — you don't want a library
+# version bump to auto-deploy the production site.
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      env:
+        description: Target environment
+        type: choice
+        default: production
+        options: [development, staging, production]
+
+# Required for GitHub OIDC -> AWS role assumption. No long-lived keys stored.
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # Ties the run to the GitHub "production" environment — add required
+    # reviewers there for a manual approval gate before anything deploys.
+    environment: ${{ github.event.inputs.env || 'production' }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: quidproquojs.com/.nvmrc
+
+      # Build the monorepo first: quidproquojs.com pulls the quidproquo-*
+      # packages via file: refs, which resolve to each package's built lib/.
+      - run: npm ci
+      - run: npm run build
+
+      # Install the site (links the file: deps) and build the docs site — the
+      # web stack uploads docusaurus/build, and qpq does not build it for us.
+      - run: npm ci
+        working-directory: quidproquojs.com
+      - run: npm run build --workspace docusaurus
+        working-directory: quidproquojs.com
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          # Set per GitHub Environment (Settings -> Environments -> <env> ->
+          # Variables), so each account/region supplies its own role + region.
+          role-to-assume: ${{ vars.DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      # Fully non-interactive deploy: all services, all stacks (inf -> api ->
+      # web -> views), in parallel via docker. The AWS_* creds set by the step
+      # above are passed through to the deploy containers.
+      - run: npx qpq go:docker all all --app qpqjs --env ${{ github.event.inputs.env || 'production' }}
+        working-directory: quidproquojs.com
