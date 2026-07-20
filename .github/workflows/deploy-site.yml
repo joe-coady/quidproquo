@@ -46,7 +46,7 @@ jobs:
       - run: npm run build --workspace docusaurus
         working-directory: quidproquojs.com
 
-      - uses: aws-actions/configure-aws-credentials@v4
+      - uses: aws-actions/configure-aws-credentials@v6
         with:
           # Set per GitHub Environment (Settings -> Environments -> <env> ->
           # Variables), so each account/region supplies its own role + region.
