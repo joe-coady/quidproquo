@@ -112,7 +112,12 @@ export const fileStorageImplementation = async (devServerConfig: ResolvedDevServ
     }
   });
 
-  const writeUploadFromToken = async (token: string | undefined, buffer: Buffer | undefined, res: Response): Promise<void> => {
+  const writeUploadFromToken = async (
+    token: string | undefined,
+    buffer: Buffer | undefined,
+    res: Response,
+    objectMetadata?: { mimetype?: string; contentDisposition?: string },
+  ): Promise<void> => {
     if (!token) {
       console.log('Upload attempt with missing token');
       res.status(400).json({ error: 'Missing token parameter' });
@@ -144,6 +149,19 @@ export const fileStorageImplementation = async (devServerConfig: ResolvedDevServ
     await ensureParentDirectoryExists(tokenData.fullFilepath);
     await fs.writeFile(tokenData.fullFilepath, buffer);
 
+    // Mirror real S3: persist the PUT's Content-Type / Content-Disposition as the sidecar the
+    // secure-download endpoint reads, so an inline-uploaded PDF previews instead of force-downloading.
+    const meta: { mimetype?: string; contentDisposition?: string } = {};
+    if (objectMetadata?.mimetype) {
+      meta.mimetype = objectMetadata.mimetype;
+    }
+    if (objectMetadata?.contentDisposition) {
+      meta.contentDisposition = objectMetadata.contentDisposition;
+    }
+    if (meta.mimetype || meta.contentDisposition) {
+      await fs.writeFile(`${tokenData.fullFilepath}.qpqmeta.json`, JSON.stringify(meta));
+    }
+
     res.json({
       success: true,
       message: 'File uploaded successfully',
@@ -155,7 +173,10 @@ export const fileStorageImplementation = async (devServerConfig: ResolvedDevServ
   // Secure upload endpoint — PUT with raw body (matches S3 presigned PUT contract)
   app.put('/secure-upload', express.raw({ type: '*/*', limit: '500mb' }), async (req: Request, res: Response): Promise<void> => {
     try {
-      await writeUploadFromToken(req.query.token as string, req.body, res);
+      await writeUploadFromToken(req.query.token as string, req.body, res, {
+        mimetype: req.headers['content-type'],
+        contentDisposition: req.headers['content-disposition'],
+      });
     } catch (error) {
       console.error('Error in secure-upload (PUT):', error);
       res.status(500).json({ error: 'Internal server error' });
@@ -169,7 +190,9 @@ export const fileStorageImplementation = async (devServerConfig: ResolvedDevServ
         res.status(400).json({ error: 'No file uploaded' });
         return;
       }
-      await writeUploadFromToken(req.query.token as string, req.file.buffer, res);
+      await writeUploadFromToken(req.query.token as string, req.file.buffer, res, {
+        mimetype: req.file.mimetype,
+      });
     } catch (error) {
       console.error('Error in secure-upload (POST):', error);
       res.status(500).json({ error: 'Internal server error' });

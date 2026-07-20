@@ -15,7 +15,7 @@ import { resolveStorageDriveBucketName } from './utils';
 const maxExpirationMs = 7 * 24 * 60 * 60 * 1000;
 
 const getProcessFileGenerateTemporaryUploadSecureUrl = (qpqConfig: QPQConfig): FileGenerateTemporaryUploadSecureUrlActionProcessor => {
-  return async ({ drive, filepath, expirationMs, contentType, scope }, session) => {
+  return async ({ drive, filepath, expirationMs, contentType, contentDisposition, scope }, session) => {
     if (expirationMs > maxExpirationMs) {
       return actionResultError(
         FileGenerateTemporaryUploadSecureUrlErrorTypeEnum.ExpirationTooLong,
@@ -32,6 +32,7 @@ const getProcessFileGenerateTemporaryUploadSecureUrl = (qpqConfig: QPQConfig): F
         expirationMs,
         session.correlation,
         contentType,
+        contentDisposition,
       );
 
       return actionResult(url);

@@ -14,7 +14,7 @@ These three helpers cover the two flows: presigned URLs for a browser to upload/
 
 ## askEventDocGenerateAssetUploadUrl
 
-Mints a guid and a short-lived presigned `PUT` URL the client uploads the bytes to. Returns the guid (as `assetId`) so the caller can record it in a domain event. This is one complete storage operation — no bytes pass through your service.
+Mints a guid and a short-lived presigned `PUT` URL the client uploads the bytes to. Returns the guid (as `assetId`) so the caller can record it in a domain event. This is one complete storage operation — no bytes pass through your service. An optional `contentDisposition` is baked into the upload (the client must `PUT` the matching header) so the stored object serves with it, e.g. `inline` so a rendered PDF previews in an `<iframe>` instead of downloading.
 
 ```typescript
 import { askEventDocGenerateAssetUploadUrl } from 'quidproquo-features';
@@ -32,6 +32,7 @@ export function* startImageUpload(docId: string) {
 function* askEventDocGenerateAssetUploadUrl(
   docId: string,
   contentType: string,
+  contentDisposition?: string,
 ): AskResponse<EventDocAssetUploadUrl>;
 ```
 
@@ -41,6 +42,7 @@ function* askEventDocGenerateAssetUploadUrl(
 | --- | --- | --- |
 | `docId` | `string` | The document the asset belongs to — determines the `<docId>/assets/<guid>` blob key. |
 | `contentType` | `string` | The MIME type the client will upload; pinned into the presigned `PUT` URL. |
+| `contentDisposition` | `string` | Optional. Pinned into the presigned `PUT` URL so the stored asset serves with it, e.g. `inline` to preview instead of force-download. |
 
 ### Returns
 

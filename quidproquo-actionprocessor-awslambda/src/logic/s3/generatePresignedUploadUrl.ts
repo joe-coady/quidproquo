@@ -46,6 +46,7 @@ export const generatePresignedUploadUrl = async (
   expirationMs: number,
   correlationId?: string,
   contentType?: string,
+  contentDisposition?: string,
 ): Promise<string> => {
   // WHEN_REQUIRED disables the SDK v3 default request checksum (CRC32). Otherwise the
   // presigner bakes an empty-body checksum (x-amz-checksum-crc32=AAAAAA==) into the signed
@@ -60,6 +61,9 @@ export const generatePresignedUploadUrl = async (
     Bucket: bucketName,
     Key: objectKey,
     ContentType: contentType,
+    // Signed into the URL: the client's PUT must send the matching Content-Disposition header, and
+    // S3 stores it so later GETs serve it back (e.g. 'inline' to preview a PDF instead of downloading).
+    ContentDisposition: contentDisposition,
 
     Metadata: {
       ...(correlationId && { 'correlation-id': correlationId }),

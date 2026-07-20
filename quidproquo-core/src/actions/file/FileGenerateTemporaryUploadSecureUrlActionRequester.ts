@@ -16,6 +16,7 @@ export function* askFileGenerateTemporaryUploadSecureUrl(
   expirationMs: number,
   advancedOptions?: {
     contentType?: FileGenerateTemporaryUploadSecureUrlActionPayload['contentType'];
+    contentDisposition?: FileGenerateTemporaryUploadSecureUrlActionPayload['contentDisposition'];
     // maxSizeBytes?: FileGenerateTemporaryUploadSecureUrlActionPayload['maxSizeBytes']
   },
   scope?: string,
@@ -27,6 +28,7 @@ export function* askFileGenerateTemporaryUploadSecureUrl(
       filepath,
       expirationMs,
       contentType: advancedOptions?.contentType,
+      contentDisposition: advancedOptions?.contentDisposition,
       // maxSizeBytes: advancedOptions?.maxSizeBytes,
       scope,
     },

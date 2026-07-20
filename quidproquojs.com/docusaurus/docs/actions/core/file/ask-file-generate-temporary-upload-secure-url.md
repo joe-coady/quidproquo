@@ -8,7 +8,7 @@ description: Generate a time-limited, signed URL that lets a client upload a fil
 Generates a temporary, signed URL that lets a client **upload** a single file directly to a [storage drive](../../../config/core/storage-drive.md). The bytes go straight to storage instead of through your service, which is ideal for large uploads from a browser. The URL grants write access to just that one path and stops working once it expires.
 
 - **Action type:** `FileActionType.GenerateTemporaryUploadSecureUrl`
-- **On AWS:** returns a SigV4 presigned S3 `PutObject` URL for the object. The expiry cannot exceed **7 days** — the maximum lifetime of a SigV4 presigned URL. If `contentType` is supplied it is bound into the signature, so the upload's `Content-Type` header must match.
+- **On AWS:** returns a SigV4 presigned S3 `PutObject` URL for the object. The expiry cannot exceed **7 days** — the maximum lifetime of a SigV4 presigned URL. If `contentType` and/or `contentDisposition` are supplied they are bound into the signature, so the upload's `Content-Type` / `Content-Disposition` headers must match, and S3 stores them so later downloads serve the object with the same headers.
 
 ```typescript
 import { askFileGenerateTemporaryUploadSecureUrl } from 'quidproquo-core';
@@ -34,6 +34,7 @@ function* askFileGenerateTemporaryUploadSecureUrl(
   expirationMs: number,
   advancedOptions?: {
     contentType?: string;
+    contentDisposition?: string;
   },
   scope?: string,
 ): AskResponse<string>;
@@ -54,6 +55,7 @@ function* askFileGenerateTemporaryUploadSecureUrl(
 | Property | Type | Default | Description |
 | --- | --- | --- | --- |
 | `contentType` | `string` | – | Pins the `Content-Type` of the upload into the signature. When set, the client must send a matching `Content-Type` header or the `PUT` is rejected. |
+| `contentDisposition` | `string` | – | Pins the `Content-Disposition` of the upload into the signature (e.g. `inline` so a stored PDF previews in an `<iframe>` instead of force-downloading). When set, the client must send a matching `Content-Disposition` header, and S3 stores it so later downloads serve it back. |
 
 ## Returns
 
