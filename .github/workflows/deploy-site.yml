@@ -1,13 +1,11 @@
 name: deploy-site
 
-# Ship quidproquojs.com to production. Triggered by publishing a GitHub Release
-# (an explicit human "ship it"), or run manually from the Actions tab. Note:
-# this deliberately does NOT fire on every `v*` tag, because `npm run go`
-# creates version tags when publishing the libraries — you don't want a library
-# version bump to auto-deploy the production site.
+# Deploy quidproquojs.com. Every push to main auto-deploys the DEVELOPMENT
+# environment. Production (and staging) are manual only — run from the Actions
+# tab ("Run workflow") and pick the environment.
 on:
-  release:
-    types: [published]
+  push:
+    branches: [main]
   workflow_dispatch:
     inputs:
       env:
@@ -21,12 +19,20 @@ permissions:
   id-token: write
   contents: read
 
+# Serialize deploys per environment so rapid pushes queue instead of racing.
+# Never cancel a running deploy — a half-applied CloudFormation stack is worse
+# than waiting.
+concurrency:
+  group: deploy-site-${{ github.event_name == 'workflow_dispatch' && github.event.inputs.env || 'development' }}
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    # Ties the run to the GitHub "production" environment — add required
-    # reviewers there for a manual approval gate before anything deploys.
-    environment: ${{ github.event.inputs.env || 'production' }}
+    # push -> development; manual dispatch -> the chosen environment. The GitHub
+    # Environment supplies the per-account role ARN + region, and is where you
+    # add required reviewers to gate production behind a manual approval.
+    environment: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.env || 'development' }}
     steps:
       - uses: actions/checkout@v5
 
@@ -56,5 +62,5 @@ jobs:
       # Fully non-interactive deploy: all services, all stacks (inf -> api ->
       # web -> views), in parallel via docker. The AWS_* creds set by the step
       # above are passed through to the deploy containers.
-      - run: npx qpq go:docker all all --app qpqjs --env ${{ github.event.inputs.env || 'production' }}
+      - run: npx qpq go:docker all all --app qpqjs --env ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.env || 'development' }}
         working-directory: quidproquojs.com

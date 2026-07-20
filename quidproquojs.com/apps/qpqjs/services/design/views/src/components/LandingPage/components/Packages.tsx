@@ -40,8 +40,8 @@ export function Packages() {
       <p className="section__kicker">the grid</p>
       <h2 className="section__title">A package for every layer</h2>
       <p className="section__sub">
-        Core defines the actions. Everything else is an implementation you plug
-        in.
+        Every layer is its own package, so you never import dependencies you
+        don't use.
       </p>
 
       <div className="package-groups">
