@@ -40,6 +40,25 @@ export const runCommand = (command: string, args: string[], options: RunCommandO
     });
   });
 
+// Run a command for its side effect only, swallowing both its output and its
+// exit code — for best-effort cleanup steps (e.g. `docker rm -f` of a container
+// that may not exist) that must never fail the run. Without a shell there's no
+// `>/dev/null 2>&1 || true`, so quieting and non-failing happen here instead.
+export const runCommandBestEffort = (command: string, args: string[], options: RunCommandOptions = {}): Promise<void> =>
+  new Promise((resolve) => {
+    const validArgs = args.filter((a) => !!a);
+
+    const child = spawn(command, validArgs, {
+      stdio: 'ignore',
+      shell: process.platform === 'win32',
+      cwd: options.cwd ?? process.cwd(),
+      env: { ...process.env, ...(options.env ?? {}) },
+    });
+
+    child.on('error', () => resolve());
+    child.on('exit', () => resolve());
+  });
+
 export type RunCommandPrefixedOptions = {
   env?: Record<string, string>;
   cwd?: string;

@@ -37,7 +37,7 @@ import { getRoot, getServiceDirectory, getServiceNamesWithViews } from '../../li
 import { runAppHook } from '../../lib/hooks';
 import { getServiceNamesWithFederation, loadServiceQpqConfig } from '../../lib/qpqConfigs';
 import { runRspack } from '../../lib/rspackRun';
-import { nextPrefixColor, runCommand, runCommandPrefixed } from '../../lib/runCommand';
+import { nextPrefixColor, runCommand, runCommandBestEffort, runCommandPrefixed } from '../../lib/runCommand';
 import { assertNoFailures, runTasks } from '../../lib/runTasks';
 import { logTimeEnd, logTimeStart } from '../../lib/timing';
 import { bundleViews, getViewsDistDir } from '../../lib/views';
@@ -66,9 +66,15 @@ const AWS_ENV_PASSTHROUGH = [
 
 const assemblyDir = (appName: string, serviceName: string): string => path.join(getRoot(), 'dist', 'qpq', 'cdk-docker', appName, serviceName);
 
+// A container left behind by an interrupted run would block reusing its name.
+// Clear it first, best-effort: a missing container (exit 1) must not fail the
+// deploy. Was a `docker rm -f … >/dev/null 2>&1 ;` prefix on the run command,
+// but that only worked under `shell: true`; as a separate call it's shell-free.
+const removeContainer = (containerName: string): Promise<void> => runCommandBestEffort('docker', ['rm', '-f', containerName]);
+
 const assertDockerRunning = async (): Promise<void> => {
   try {
-    await runCommand('docker', ['info', '--format', '"docker daemon ok — server {{.ServerVersion}}"']);
+    await runCommand('docker', ['info', '--format', 'docker daemon ok — server {{.ServerVersion}}']);
   } catch {
     throw new Error('Docker daemon is not running (start Docker Desktop and retry).');
   }
@@ -88,7 +94,7 @@ const buildDeployerImage = async (): Promise<void> => {
 // The assembly mounts read-only and is copied container-local first — the CDK
 // CLI writes lock files next to the assembly it reads, and the copy keeps
 // parallel api/web deploys of the same service fully isolated.
-const dockerDeployStack = (
+const dockerDeployStack = async (
   color: number,
   appName: string,
   serviceName: string,
@@ -96,30 +102,22 @@ const dockerDeployStack = (
   stackName: string,
 ): Promise<void> => {
   const containerName = `${serviceName}-${stackType}`;
-  return runCommandPrefixed(
+  await removeContainer(containerName);
+  await runCommandPrefixed(
     `${stackType}:${serviceName}`,
     'docker',
     [
-      // A container left behind by an interrupted run would block reusing the
-      // name — clear it quietly first.
-      'rm',
-      '-f',
-      containerName,
-      '>/dev/null',
-      '2>&1',
-      ';',
-      'docker',
       'run',
       '--rm',
       '--name',
       containerName,
       '-v',
-      `"${assemblyDir(appName, serviceName)}:/assembly:ro"`,
+      `${assemblyDir(appName, serviceName)}:/assembly:ro`,
       ...AWS_ENV_PASSTHROUGH.flatMap((name) => ['-e', name]),
       IMAGE_TAG,
       'bash',
       '-c',
-      `"cp -r /assembly /work/assembly && cdk deploy ${stackName} --app /work/assembly --require-approval never --progress events"`,
+      `cp -r /assembly /work/assembly && cdk deploy ${stackName} --app /work/assembly --require-approval never --progress events`,
     ],
     { color },
   );
@@ -132,23 +130,17 @@ const dockerDeployStack = (
 const dockerSyncViews = async (color: number, appName: string, serviceName: string): Promise<void> => {
   const containerName = `${serviceName}-views`;
   for (const destination of getViewsS3Destinations(appName, serviceName)) {
+    await removeContainer(containerName);
     await runCommandPrefixed(
       `views:${serviceName}`,
       'docker',
       [
-        'rm',
-        '-f',
-        containerName,
-        '>/dev/null',
-        '2>&1',
-        ';',
-        'docker',
         'run',
         '--rm',
         '--name',
         containerName,
         '-v',
-        `"${getViewsDistDir(appName, serviceName)}:/views:ro"`,
+        `${getViewsDistDir(appName, serviceName)}:/views:ro`,
         ...AWS_ENV_PASSTHROUGH.flatMap((name) => ['-e', name]),
         AWS_CLI_IMAGE,
         's3',
@@ -179,23 +171,17 @@ const dockerPublishRemote = async (color: number, appName: string, serviceName: 
   ];
 
   for (const s3Operation of s3Operations) {
+    await removeContainer(containerName);
     await runCommandPrefixed(
       `publish:${serviceName}`,
       'docker',
       [
-        'rm',
-        '-f',
-        containerName,
-        '>/dev/null',
-        '2>&1',
-        ';',
-        'docker',
         'run',
         '--rm',
         '--name',
         containerName,
         '-v',
-        `"${publishPath}:/publish:ro"`,
+        `${publishPath}:/publish:ro`,
         ...AWS_ENV_PASSTHROUGH.flatMap((name) => ['-e', name]),
         AWS_CLI_IMAGE,
         ...s3Operation,
@@ -347,16 +333,11 @@ export const awsGoDocker = async (appName: string, plan: DeployPlan): Promise<vo
           run: async () => {
             const outputDir = assemblyDir(appName, service);
             fs.rmSync(outputDir, { recursive: true, force: true });
-            await runCommandPrefixed(
-              `cdk-synth:${service}`,
-              'npx',
-              ['cdk', 'synth', '--quiet', '--app', `'${getCdkAppCommand()}'`, '--output', `"${outputDir}"`],
-              {
-                cwd: getRoot(),
-                env: { DEPLOY_SERVICE_NAME: service, DEPLOY_APP_NAME: appName },
-                color: nextPrefixColor(),
-              },
-            );
+            await runCommandPrefixed(`cdk-synth:${service}`, 'npx', ['cdk', 'synth', '--quiet', '--app', getCdkAppCommand(), '--output', outputDir], {
+              cwd: getRoot(),
+              env: { DEPLOY_SERVICE_NAME: service, DEPLOY_APP_NAME: appName },
+              color: nextPrefixColor(),
+            });
           },
         })),
         BUILD_CONCURRENCY,
