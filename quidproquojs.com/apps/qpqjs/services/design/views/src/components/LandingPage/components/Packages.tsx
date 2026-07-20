@@ -40,8 +40,7 @@ export function Packages() {
       <p className="section__kicker">the grid</p>
       <h2 className="section__title">A package for every layer</h2>
       <p className="section__sub">
-        Every layer is its own package, so you never import dependencies you
-        don't use.
+        Every layer is its own package, so you only pull in what you need.
       </p>
 
       <div className="package-groups">

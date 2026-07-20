@@ -4,9 +4,15 @@ import { useEffect } from 'react';
 
 import { useFastCallback } from '../../hooks/useFastCallback';
 
+// How many minutes before a token expires to proactively refresh it. Must be shorter than
+// the token's lifetime, or `refreshTime` is always negative and every render refreshes
+// immediately (a loop). Apps with short-lived tokens should lower this.
+const DEFAULT_REFRESH_BUFFER_MINUTES = 10;
+
 export const useRefreshTokens = (
   authenticationInfo: AuthenticationInfo | undefined,
   refreshTokens: (authenticationInfo: AuthenticationInfo) => Promise<any>,
+  bufferMinutes: number = DEFAULT_REFRESH_BUFFER_MINUTES,
 ) => {
   const stableRefreshTokens = useFastCallback(refreshTokens);
 
@@ -17,8 +23,8 @@ export const useRefreshTokens = (
       const now = new Date().toISOString();
       const timeToExpire = new Date(authenticationInfo.expiresAt).getTime() - new Date(now).getTime();
 
-      // Refresh the token 10 minutes before it expires to ensure there's a buffer
-      const bufferTime = 10 * 60 * 1000;
+      // Refresh `bufferMinutes` before expiry so there's margin for the refresh round-trip.
+      const bufferTime = bufferMinutes * 60 * 1000;
       const refreshTime = timeToExpire - bufferTime;
 
       if (refreshTime > 0) {
@@ -49,5 +55,5 @@ export const useRefreshTokens = (
     // reference would re-run this effect every render — and when the token is
     // expired/near-expiry the "refresh immediately" branch would then fire a
     // network refresh on every render, an unbounded loop.
-  }, [refresh, authenticationInfo?.expiresAt, authenticationInfo?.refreshToken]);
+  }, [refresh, authenticationInfo?.expiresAt, authenticationInfo?.refreshToken, bufferMinutes]);
 };
