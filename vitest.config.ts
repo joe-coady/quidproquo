@@ -8,6 +8,12 @@ const packagesToSkip = [
 
 export default defineConfig({
   test: {
+    // Node 25+ enables the experimental Web Storage API by default, injecting a
+    // global `localStorage` that shadows jsdom's and is non-functional without a
+    // `--localstorage-file`. Disable it in the test workers so jsdom owns storage.
+    poolOptions: {
+      forks: { execArgv: ['--no-experimental-webstorage'] },
+    },
     // Hide console output from passing tests (the library logs on expected error paths),
     // but keep it for failing tests so debugging output is never lost.
     silent: 'passed-only',
