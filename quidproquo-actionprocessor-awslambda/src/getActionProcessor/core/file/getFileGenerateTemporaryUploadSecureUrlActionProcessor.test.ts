@@ -14,7 +14,7 @@ vi.mock('../../../logic/s3/generatePresignedUploadUrl', () => ({ generatePresign
 
 const session = { correlation: 'corr-1' };
 
-const invoke = async (payload: { drive: string; filepath: string; expirationMs: number; contentType?: string }) => {
+const invoke = async (payload: { drive: string; filepath: string; expirationMs: number; contentType?: string; contentDisposition?: string }) => {
   const processor = (await getFileGenerateTemporaryUploadSecureUrlActionProcessor({} as never, null as any))[
     FileActionType.GenerateTemporaryUploadSecureUrl
   ];
@@ -25,10 +25,24 @@ describe('getProcessFileGenerateTemporaryUploadSecureUrl', () => {
   it('returns the presigned upload url with the session correlation', async () => {
     vi.mocked(generatePresignedUploadUrl).mockResolvedValue('https://upload');
 
-    const [result] = await invoke({ drive: 'assets', filepath: 'a.txt', expirationMs: 1000, contentType: 'text/plain' });
+    const [result] = await invoke({
+      drive: 'assets',
+      filepath: 'a.txt',
+      expirationMs: 1000,
+      contentType: 'text/plain',
+      contentDisposition: 'attachment; filename="a.txt"',
+    });
 
     expect(result).toBe('https://upload');
-    expect(generatePresignedUploadUrl).toHaveBeenCalledWith('bucket-x', 'a.txt', 'us-test-1', 1000, 'corr-1', 'text/plain');
+    expect(generatePresignedUploadUrl).toHaveBeenCalledWith(
+      'bucket-x',
+      'a.txt',
+      'us-test-1',
+      1000,
+      'corr-1',
+      'text/plain',
+      'attachment; filename="a.txt"',
+    );
   });
 
   it('maps a thrown error to a generic error', async () => {
