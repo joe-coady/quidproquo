@@ -20,4 +20,7 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       - run: npm ci
+      # Cross-package imports resolve to each package's built lib/, so the
+      # suite needs the monorepo built before vitest can load the test files.
+      - run: npm run build
       - run: npm test

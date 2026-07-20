@@ -1,0 +1,22 @@
+name: smoke
+
+on: [push]
+
+concurrency:
+  group: smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      # Build the whole monorepo: the scaffold's file: refs pull built lib/
+      # outputs, and create-qpq-app's bin has to exist before the smoke runs.
+      - run: npm run build
+      - run: npm run smoke
