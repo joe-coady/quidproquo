@@ -103,7 +103,7 @@ describe('getRspackConfig', () => {
     it('adds an IgnorePlugin per ignored module', () => {
       const config = getRspackConfig(qpqConfig, 'out', entries, 'node_modules');
 
-      expect(config.plugins?.[1]).toBeInstanceOf(IgnorePlugin);
+      expect(config.plugins?.[2]).toBeInstanceOf(IgnorePlugin);
     });
 
     it('appends the configured ignore warnings', () => {

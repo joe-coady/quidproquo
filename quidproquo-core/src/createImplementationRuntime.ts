@@ -50,6 +50,14 @@ export const createImplementationRuntime = (
     qpqConfig,
     {
       context: session.context,
+      // Service-local context and the caller's function globals travel into the
+      // nested implementation runtime (a within-service child: tool executor,
+      // drive file resolver, custom implementation), so stories run under it can
+      // read route/function config (e.g. the eventDoc user-directory global an
+      // AI tool needs to resolve the actor, or the tenant scope resolver). Mirrors
+      // the inline-function execute processor, which carries the same fields.
+      localContext: session.localContext,
+      functionGlobals: session.functionGlobals,
       depth: (session.depth || 0) + 1,
       decodedAccessToken: session.decodedAccessToken,
       correlation: session.correlation,

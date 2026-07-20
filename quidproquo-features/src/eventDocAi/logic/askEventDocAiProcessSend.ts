@@ -11,7 +11,7 @@ import {
   askStreamMap,
 } from 'quidproquo-core';
 
-import { EVENT_DOC_STORAGE_DRIVE_GLOBAL } from '../../eventDoc';
+import { askEventDocResolveScope, EVENT_DOC_STORAGE_DRIVE_GLOBAL } from '../../eventDoc';
 import {
   EVENT_DOC_AI_MODEL_GLOBAL,
   EVENT_DOC_AI_NAME_GLOBAL,
@@ -98,6 +98,13 @@ export function* askEventDocAiProcessSend(
   // (uploaded via the eventDoc asset routes), not the chat-history drive.
   const docStorageDrive = yield* askConfigGetGlobal<string>(EVENT_DOC_STORAGE_DRIVE_GLOBAL);
 
+  // The collection's ambient storage scope (e.g. a tenant/personal partition set
+  // on the ws connection). A scoped collection stores its assets under it, so the
+  // model's attachment reads must apply the same scope — undefined for unscoped
+  // collections. This is read here, tenant-agnostic, exactly as attachment
+  // validation and chat-history storage read it.
+  const scope = yield* askEventDocResolveScope();
+
   yield* askEventDocAiAttachmentsValidate(docStorageDrive, docId, attachments);
 
   const fullHistory = [...(yield* askEventDocAiChatHistoryLoad(docId, chatId)), makeEventDocAiUserMessage(message, attachments)];
@@ -112,7 +119,7 @@ export function* askEventDocAiProcessSend(
   let history = fullHistory;
 
   for (let round = 0; round < MAX_CONTINUATION_ROUNDS; round++) {
-    const aiMessages = chatMessagesToAiMessages(history, docStorageDrive, docId);
+    const aiMessages = chatMessagesToAiMessages(history, docStorageDrive, docId, scope);
 
     if (round > 0) {
       aiMessages.push({ role: 'user', content: CONTINUATION_NUDGE });

@@ -37,12 +37,17 @@ export async function resolveStory<TArgs extends Array<any>>(
     decodedAccessToken: callerSession.decodedAccessToken,
     context: callerSession.context,
     localContext: callerSession.localContext,
-    // In-process story executions (inline functions) run WITHIN the caller's
-    // function, so they inherit its globals - their own registration wins on
-    // collision. Transport entries (http/queue/ws) start fresh from their own
-    // runtime registration only.
+    // In-process story executions run WITHIN the caller's function, so they
+    // inherit its globals - their own registration wins on collision. This
+    // covers inline functions (EXECUTE_STORY) AND implementation stories
+    // (EXECUTE_IMPLEMENTATION_STORY: tool executors, drive file resolvers,
+    // custom implementations) - both are nested, not transport boundaries, so
+    // an AI tool executor can read the queue/route globals (e.g. the eventDoc
+    // user-directory global needed to resolve the actor). Transport entries
+    // (http/queue/ws) start fresh from their own runtime registration only.
     functionGlobals:
-      runtimeType === QpqRuntimeType.EXECUTE_STORY
+      runtimeType === QpqRuntimeType.EXECUTE_STORY ||
+      runtimeType === QpqRuntimeType.EXECUTE_IMPLEMENTATION_STORY
         ? {
             ...callerSession.functionGlobals,
             ...runtimeGlobals,
