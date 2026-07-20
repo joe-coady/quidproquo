@@ -58,7 +58,19 @@ export const synthCommand = async (argv: string[]): Promise<void> => {
     // them from deploy.config.json (development default).
     primeDeployEnvFromConfig(appName);
 
-    const serviceNames = specifiedServiceName ? [specifiedServiceName] : getServiceNamesWithSubdir(appName, 'service');
+    // Validate a specified service against the app's discovered services before it
+    // reaches loadServiceQpqConfig -> require. The bare-service-name branch above
+    // already checks this; the --app/env branch used to skip it, letting a typo hit
+    // a cryptic module-resolution error and a `../` value normalize into an arbitrary
+    // require target. Both paths now validate identically.
+    const appServices = getServiceNamesWithSubdir(appName, 'service');
+    if (specifiedServiceName && !appServices.includes(specifiedServiceName)) {
+      console.error(`Service '${specifiedServiceName}' not found in app '${appName}'`);
+      process.exitCode = 1;
+      continue;
+    }
+
+    const serviceNames = specifiedServiceName ? [specifiedServiceName] : appServices;
 
     for (const folderName of serviceNames) {
       try {

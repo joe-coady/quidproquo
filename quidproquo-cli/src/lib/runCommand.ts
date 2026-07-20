@@ -22,7 +22,11 @@ export const runCommand = (command: string, args: string[], options: RunCommandO
 
     const child = spawn(command, validArgs, {
       stdio: 'inherit',
-      shell: true,
+      // Shell only on Windows (to resolve npm/aws/cdk .cmd shims). On posix, run
+      // without a shell so the already-array args are passed straight to the
+      // program and can't be re-interpreted by `sh -c` — no command injection via
+      // interpolated values (stack names, CI-supplied env, etc.).
+      shell: process.platform === 'win32',
       cwd: options.cwd ?? process.cwd(),
       env: { ...process.env, ...(options.env ?? {}) },
     });
@@ -64,7 +68,11 @@ export const runCommandPrefixed = (label: string, command: string, args: string[
 
     const child = spawn(command, validArgs, {
       stdio: ['ignore', 'pipe', 'pipe'],
-      shell: true,
+      // Shell only on Windows (to resolve npm/aws/cdk .cmd shims). On posix, run
+      // without a shell so the already-array args are passed straight to the
+      // program and can't be re-interpreted by `sh -c` — no command injection via
+      // interpolated values (stack names, CI-supplied env, etc.).
+      shell: process.platform === 'win32',
       cwd: options.cwd ?? process.cwd(),
       env: { ...process.env, ...(options.env ?? {}) },
     });
