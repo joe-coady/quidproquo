@@ -7,6 +7,7 @@ import { EventDocWorkspaceTransport } from '../types/EventDocWorkspaceTransport'
 import { askEventDocWorkspaceCancel } from './askEventDocWorkspaceCancel';
 import { askEventDocWorkspaceInit } from './askEventDocWorkspaceInit';
 import { askEventDocWorkspaceRefresh } from './askEventDocWorkspaceRefresh';
+import { askEventDocWorkspaceRestoreLocalPending } from './askEventDocWorkspaceRestoreLocalPending';
 import { askEventDocWorkspaceSave } from './askEventDocWorkspaceSave';
 
 // Init/save/refresh need the backend; cancel is pure state. The transport is optional
@@ -26,8 +27,12 @@ function* askEnsureTransport(transport?: EventDocWorkspaceTransport): AskRespons
 const resolveSlotKeys = (documentSlotKeys: string[], slotKey?: string): string[] =>
   slotKey === undefined ? documentSlotKeys : documentSlotKeys.filter((documentSlotKey) => documentSlotKey === slotKey);
 
-const getAskInit = (transport: EventDocWorkspaceTransport | undefined, documentSlotKeys: string[]) =>
+const getAskInit = (transport: EventDocWorkspaceTransport | undefined, documentSlotKeys: string[], localSlotKeys: string[]) =>
   function* askInit(identities: Record<string, EventDocWorkspaceDocumentIdentity>, snapshot?: EventDocWorkspaceSnapshot): AskResponse<void> {
+    // Local streams first: pure state, no transport, and the document loads run in
+    // parallel after — order between the two is immaterial.
+    yield* askEventDocWorkspaceRestoreLocalPending(snapshot ?? null, localSlotKeys);
+
     // Unknown keys are dropped rather than growing phantom slots.
     const known = Object.fromEntries(Object.entries(identities).filter(([slotKey]) => documentSlotKeys.includes(slotKey)));
 
@@ -52,8 +57,9 @@ const getAskRefresh = (transport: EventDocWorkspaceTransport | undefined, docume
 export const createEventDocWorkspaceBuiltInApi = (
   transport: EventDocWorkspaceTransport | undefined,
   documentSlotKeys: string[],
+  localSlotKeys: string[],
 ): EventDocWorkspaceBuiltInApi => ({
-  askInit: getAskInit(transport, documentSlotKeys),
+  askInit: getAskInit(transport, documentSlotKeys, localSlotKeys),
   askSave: getAskSave(transport, documentSlotKeys),
   askCancel: getAskCancel(documentSlotKeys),
   askRefresh: getAskRefresh(transport, documentSlotKeys),
