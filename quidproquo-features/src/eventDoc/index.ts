@@ -4,6 +4,7 @@ export * from './config';
 export * from './constants';
 export * from './context';
 export * from './data';
+export * from './definition';
 export * from './effects';
 export * from './fold';
 export * from './globals';

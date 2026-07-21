@@ -2,6 +2,7 @@ import { AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
 
 import { EventDocWorkspaceBuiltInApi } from '../types/EventDocWorkspaceBuiltInApi';
 import { EventDocWorkspaceDocumentIdentity } from '../types/EventDocWorkspaceDocumentIdentity';
+import { EventDocWorkspaceSnapshot } from '../types/EventDocWorkspaceSnapshot';
 import { EventDocWorkspaceTransport } from '../types/EventDocWorkspaceTransport';
 import { askEventDocWorkspaceCancel } from './askEventDocWorkspaceCancel';
 import { askEventDocWorkspaceInit } from './askEventDocWorkspaceInit';
@@ -26,11 +27,11 @@ const resolveSlotKeys = (documentSlotKeys: string[], slotKey?: string): string[]
   slotKey === undefined ? documentSlotKeys : documentSlotKeys.filter((documentSlotKey) => documentSlotKey === slotKey);
 
 const getAskInit = (transport: EventDocWorkspaceTransport | undefined, documentSlotKeys: string[]) =>
-  function* askInit(identities: Record<string, EventDocWorkspaceDocumentIdentity>): AskResponse<void> {
+  function* askInit(identities: Record<string, EventDocWorkspaceDocumentIdentity>, snapshot?: EventDocWorkspaceSnapshot): AskResponse<void> {
     // Unknown keys are dropped rather than growing phantom slots.
     const known = Object.fromEntries(Object.entries(identities).filter(([slotKey]) => documentSlotKeys.includes(slotKey)));
 
-    yield* askEventDocWorkspaceInit(yield* askEnsureTransport(transport), known);
+    yield* askEventDocWorkspaceInit(yield* askEnsureTransport(transport), known, snapshot ?? null);
   };
 
 const getAskSave = (transport: EventDocWorkspaceTransport | undefined, documentSlotKeys: string[]) =>

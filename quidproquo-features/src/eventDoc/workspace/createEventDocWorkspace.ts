@@ -2,6 +2,7 @@ import { defaultEventDocEventValidator } from '../validation';
 import { eventDocWorkspaceChromeSlot } from './chrome/eventDocWorkspaceChromeSlot';
 import { bindEventDocWorkspaceApi } from './logic/bindEventDocWorkspaceApi';
 import { createEventDocWorkspaceBuiltInApi } from './logic/createEventDocWorkspaceBuiltInApi';
+import { createEventDocWorkspaceSnapshot } from './logic/createEventDocWorkspaceSnapshot';
 import { createEventDocWorkspaceReducer } from './reducer/createEventDocWorkspaceReducer';
 import { createEventDocWorkspaceSelectors } from './selectors/createEventDocWorkspaceSelectors';
 import { EventDocWorkspaceDefinition } from './types/EventDocWorkspaceDefinition';
@@ -9,66 +10,69 @@ import { EventDocWorkspaceSlotBinding } from './types/EventDocWorkspaceSlotBindi
 import { EventDocWorkspaceSlotConfig } from './types/EventDocWorkspaceSlotConfig';
 import { EventDocWorkspaceSlotKind } from './types/EventDocWorkspaceSlotKind';
 import { EventDocWorkspaceSlotsConfig } from './types/EventDocWorkspaceSlotsConfig';
-import { createInitialEventDocWorkspaceState } from './types/EventDocWorkspaceState';
+import { createInitialEventDocWorkspaceState, EventDocWorkspaceState } from './types/EventDocWorkspaceState';
 import { EventDocWorkspace, EventDocWorkspaceResolvedSlots } from './EventDocWorkspace';
 
 // Document slots ALWAYS get a validator: an unconfigured one falls back to the
 // universal lifecycle guard (published = CREATE_DRAFT only), so a document slot can't
 // silently mutate a published document. Local slots default to accept-all.
-const getSlotBinding = (slotKey: string, slot: EventDocWorkspaceSlotConfig): EventDocWorkspaceSlotBinding => ({
+const getSlotBinding = (
+  slotKey: string,
+  slot: EventDocWorkspaceSlotConfig,
+  getView: (state: EventDocWorkspaceState) => unknown,
+): EventDocWorkspaceSlotBinding => ({
   slotKey,
   schemaVersion: slot.schemaVersion ?? 1,
   validate: slot.kind === EventDocWorkspaceSlotKind.document ? (slot.validate ?? defaultEventDocEventValidator) : (slot.validate ?? null),
+  getView,
 });
 
 const resolveWorkspaceSlots = <TSlots extends EventDocWorkspaceSlotsConfig>(slots: TSlots): EventDocWorkspaceResolvedSlots<TSlots> =>
   ('chrome' in slots ? slots : { chrome: eventDocWorkspaceChromeSlot, ...slots }) as EventDocWorkspaceResolvedSlots<TSlots>;
 
 // Takes a workspace definition and returns the parts you need to run one (see
-// EventDocWorkspace). The api keying is load-bearing: it lets one domain api mount at
-// n slot keys with no verb-name collisions.
+// EventDocWorkspace): one `docs.<key>` node per mounted doc — its bound api plus its
+// read surface — with the built-in init/save/cancel/refresh verbs at the root api.
+// The per-doc keying is load-bearing: it lets one doc definition mount at n slot
+// keys with no verb-name collisions.
 export const createEventDocWorkspace = <TSlots extends EventDocWorkspaceSlotsConfig>(
   definition: EventDocWorkspaceDefinition<TSlots>,
 ): EventDocWorkspace<EventDocWorkspaceResolvedSlots<TSlots>> => {
   const slots = resolveWorkspaceSlots(definition.slots);
 
-  if ('workspace' in slots) {
-    throw new Error("'workspace' is a reserved slot key (it holds the built-in init/save/cancel/refresh verbs) - rename the slot.");
-  }
-
   const slotsConfig = slots as EventDocWorkspaceSlotsConfig;
   const slotEntries = Object.entries(slotsConfig);
   const documentSlotKeys = slotEntries.filter(([, slot]) => slot.kind === EventDocWorkspaceSlotKind.document).map(([slotKey]) => slotKey);
 
-  const boundApis = Object.fromEntries(
-    slotEntries.map(([slotKey, slot]) => [slotKey, bindEventDocWorkspaceApi(getSlotBinding(slotKey, slot), slot.api)]),
-  );
+  // Built BEFORE the bindings: each slot's binding closes over its memoized view
+  // selector to answer askEventDocReadState. Kind-major internally; regrouped
+  // per-doc below.
+  const selectors = createEventDocWorkspaceSelectors(slots);
+  const selectorMap = <T>(keyed: unknown) => keyed as Record<string, (state: EventDocWorkspaceState) => T>;
 
-  // Pre-built selectors must cover exactly this workspace's slots — a mismatch
-  // means they were built from different fold configs, which would silently
-  // desynchronise reads from the reducer's stream routing.
-  if (definition.selectors) {
-    const selectorKeys = Object.keys(definition.selectors.view).sort().join(', ');
-    const slotKeys = Object.keys(slotsConfig).sort().join(', ');
-    if (selectorKeys !== slotKeys) {
-      throw new Error(
-        `Workspace selectors cover slots [${selectorKeys}] but the workspace defines [${slotKeys}] - build them from the same fold configs.`,
-      );
-    }
-  }
+  const docs = Object.fromEntries(
+    slotEntries.map(([slotKey, slot]) => [
+      slotKey,
+      {
+        api: bindEventDocWorkspaceApi(getSlotBinding(slotKey, slot, selectorMap(selectors.view)[slotKey]), slot.api),
+        view: selectorMap(selectors.view)[slotKey],
+        liveEvents: selectorMap(selectors.liveEvents)[slotKey],
+        slotState: selectorMap(selectors.slotState)[slotKey],
+      },
+    ]),
+  ) as EventDocWorkspace<EventDocWorkspaceResolvedSlots<TSlots>>['docs'];
 
   return {
-    api: {
-      ...boundApis,
-      workspace: createEventDocWorkspaceBuiltInApi(definition.transport, documentSlotKeys),
-    } as EventDocWorkspace<EventDocWorkspaceResolvedSlots<TSlots>>['api'],
+    docs,
+    api: createEventDocWorkspaceBuiltInApi(definition.transport, documentSlotKeys),
     reducer: createEventDocWorkspaceReducer(slotsConfig),
     createInitialState: () => createInitialEventDocWorkspaceState(slotsConfig),
-    // The fold selectors never touch an api, so a definition-supplied instance is
-    // interchangeable with a locally built one (same fold configs in, same
-    // selectors out) — reusing it just shares the memoisation.
-    selectors: (definition.selectors ?? createEventDocWorkspaceSelectors(slots)) as EventDocWorkspace<
-      EventDocWorkspaceResolvedSlots<TSlots>
-    >['selectors'],
+    createSnapshot: (state: EventDocWorkspaceState) => createEventDocWorkspaceSnapshot(state, documentSlotKeys),
+    selectors: {
+      isDirty: selectors.isDirty,
+      isLoading: selectors.isLoading,
+      isSaving: selectors.isSaving,
+      error: selectors.error,
+    },
   };
 };
