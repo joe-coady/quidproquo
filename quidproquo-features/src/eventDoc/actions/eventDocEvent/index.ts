@@ -3,3 +3,7 @@ export * from './EventDocApplyEventActionRequester';
 export * from './EventDocApplyEventActionRequesterTypes';
 export * from './EventDocApplyTransientEventActionRequester';
 export * from './EventDocApplyTransientEventActionRequesterTypes';
+export * from './EventDocReadIdentityActionRequester';
+export * from './EventDocReadIdentityActionRequesterTypes';
+export * from './EventDocReadStateActionRequester';
+export * from './EventDocReadStateActionRequesterTypes';

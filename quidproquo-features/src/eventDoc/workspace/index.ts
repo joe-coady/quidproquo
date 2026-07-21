@@ -2,7 +2,6 @@ export * from './actionCreators';
 export * from './chrome';
 export * from './constants';
 export * from './createEventDocWorkspace';
-export * from './createEventDocWorkspaceSlot';
 export * from './effects';
 export * from './EventDocWorkspace';
 export * from './logic';

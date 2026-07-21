@@ -14,7 +14,8 @@ import {
 
 import { describe, expect, it } from 'vitest';
 
-import { askApplyEventDocEvent, askApplyTransientEventDocEvent } from '../actions';
+import { askApplyEventDocEvent, askApplyTransientEventDocEvent, askEventDocReadIdentity, askEventDocReadState } from '../actions';
+import { createEventDocStateReader } from '../definition';
 import { buildEventDocFoldReducer, buildVersionRoutedReducer, createEventDocInitialDocumentState, foldEventDocLogStep } from '../fold';
 import { EventDocDocument, EventDocEffect, EventDocEvent, EventDocEventInput, EventDocEventPayload, EventDocStatus } from '../models';
 import { EventDocEditorValidator } from '../validation';
@@ -87,6 +88,24 @@ function* askNoteCreateDraft(): AskResponse<void> {
   yield* askApplyEventDocEvent(EventDocEffect.CreateDraft, {});
 }
 
+// The doc's typed read verb — scope-blind like the writes: the enclosing bind decides
+// WHICH note it reads.
+const askReadNote = createEventDocStateReader<NoteState>();
+
+// Read-to-derive-a-write: the shape every "compute from my own doc" verb takes
+// (sibling orders, duplicate checks, ...). Reads the folded view through the bind.
+function* askNoteAppendTitleLine(lineId: string): AskResponse<void> {
+  const note = yield* askReadNote();
+  yield* askApplyEventDocEvent(NoteEvent.AddLine, { lineId, text: `title: ${note.title}` });
+}
+
+// Commit then read, returning what the read saw — exercises read-your-own-writes.
+function* askNoteCommitAndReadTitle(title: string): AskResponse<string> {
+  yield* askApplyEventDocEvent(NoteEvent.SetTitle, { title });
+  const note = yield* askReadNote();
+  return note.title;
+}
+
 // Transient siblings: same domain events, but committed into a never-saved group
 // keyed by transientKey (a stand-in for a websocket connection id).
 function* askNoteTransientSetTitle(transientKey: string, title: string): AskResponse<void> {
@@ -97,7 +116,16 @@ function* askNoteTransientAddLine(transientKey: string, lineId: string, text: st
   yield* askApplyTransientEventDocEvent(transientKey, NoteEvent.AddLine, { lineId, text });
 }
 
-const noteApi = { askNoteSetTitle, askNoteAddLine, askNoteSetLine, askNoteCreateDraft, askNoteTransientSetTitle, askNoteTransientAddLine };
+const noteApi = {
+  askNoteSetTitle,
+  askNoteAddLine,
+  askNoteSetLine,
+  askNoteCreateDraft,
+  askNoteAppendTitleLine,
+  askNoteCommitAndReadTitle,
+  askNoteTransientSetTitle,
+  askNoteTransientAddLine,
+};
 
 const createNoteSlot = () =>
   ({
@@ -123,16 +151,29 @@ const createInitialNoteV2State = (): NoteV2State => ({
 
 const noteV2Migration = (state: EventDocDocument): EventDocDocument => ({ ...state, archived: false }) as NoteV2State;
 
+const noteV2FoldReducer = buildEventDocFoldReducer<NoteV2State, NoteEffects>(createInitialNoteV2State, {
+  [NoteEvent.SetTitle]: (state, payload) => ({ ...state, title: payload.data.title }),
+  [NoteEvent.AddLine]: (state, payload) => ({ ...state, lines: [...state.lines, payload.data] }),
+  [NoteEvent.SetLine]: (state, payload) => ({
+    ...state,
+    lines: state.lines.map((line) => (line.lineId === payload.data.lineId ? { ...line, text: payload.data.text } : line)),
+  }),
+}) as QpqReducer<NoteV2State, EventDocEvent>;
+
 const createNoteV2Slot = () =>
   ({
     kind: EventDocWorkspaceSlotKind.document,
     api: noteApi,
     // Deliberately wider than the slot's TView: mid-fold the accumulator really is a
     // v1 NoteState (no `archived`) until the read-side migrate, hence the unknown hop.
-    foldReducer: buildVersionRoutedReducer<NoteState>({ 1: noteFoldReducer }) as unknown as QpqReducer<NoteV2State, EventDocEvent>,
+    foldReducer: buildVersionRoutedReducer<NoteState>({
+      1: noteFoldReducer,
+      2: noteV2FoldReducer as unknown as QpqReducer<NoteState, EventDocEvent>,
+    }) as unknown as QpqReducer<NoteV2State, EventDocEvent>,
     createInitialViewState: createInitialNoteV2State,
     schemaVersion: 2,
     migrations: { 2: noteV2Migration },
+    coalesceEventTypes: [NoteEvent.SetTitle, { type: NoteEvent.SetLine, key: 'lineId' }],
   }) satisfies EventDocWorkspaceDocumentSlotConfig<NoteV2State, typeof noteApi>;
 
 // ─── Test harness ───────────────────────────────────────────────────────────────────
@@ -289,9 +330,9 @@ describe('createEventDocWorkspace scoped state', () => {
     const workspace = createTestWorkspace();
 
     function* story(): AskResponse<void> {
-      yield* workspace.api.noteA.askNoteSetTitle('A title');
-      yield* workspace.api.noteB.askNoteSetTitle('B title');
-      yield* workspace.api.noteB.askNoteAddLine('l1', 'first line');
+      yield* workspace.docs.noteA.api.askNoteSetTitle('A title');
+      yield* workspace.docs.noteB.api.askNoteSetTitle('B title');
+      yield* workspace.docs.noteB.api.askNoteAddLine('l1', 'first line');
     }
 
     const state = runWorkspaceStory(workspace, story);
@@ -312,7 +353,7 @@ describe('createEventDocWorkspace scoped state', () => {
     const workspace = createTestWorkspace();
 
     function* story(): AskResponse<void> {
-      yield* workspace.api.noteA.askNoteSetTitle('A title');
+      yield* workspace.docs.noteA.api.askNoteSetTitle('A title');
     }
 
     const state = runWorkspaceStory(workspace, story);
@@ -333,7 +374,7 @@ describe('createEventDocWorkspace scoped state', () => {
     // verb routes to the enclosing (noteA) bind; the bound call re-binds inward.
     function* askOuter(): AskResponse<void> {
       yield* askNoteSetTitle('outer title');
-      yield* workspaceRef.current!.api.noteB.askNoteSetTitle('inner title');
+      yield* workspaceRef.current!.docs.noteB.api.askNoteSetTitle('inner title');
     }
 
     const workspace = createEventDocWorkspace({
@@ -345,7 +386,7 @@ describe('createEventDocWorkspace scoped state', () => {
     workspaceRef.current = workspace as unknown as ReturnType<typeof createTestWorkspace>;
 
     function* story(): AskResponse<void> {
-      yield* workspace.api.noteA.askOuter();
+      yield* workspace.docs.noteA.api.askOuter();
     }
 
     const state = runWorkspaceStory(workspace, story);
@@ -363,7 +404,7 @@ describe('createEventDocWorkspace scoped state', () => {
       ['l2', 'two'],
     ];
 
-    const addLineStoryForEntry = ([lineId, text]: [string, string]) => workspace.api.noteA.askNoteAddLine(lineId, text);
+    const addLineStoryForEntry = ([lineId, text]: [string, string]) => workspace.docs.noteA.api.askNoteAddLine(lineId, text);
 
     function* story(): AskResponse<void> {
       yield* askMapParallel(lineEntries, addLineStoryForEntry);
@@ -385,9 +426,92 @@ describe('createEventDocWorkspace scoped state', () => {
 
     expect(() => runWorkspaceStory(workspace, story)).toThrow(/ApplyEvent/);
   });
+});
 
-  it("rejects a slot named 'workspace'", () => {
-    expect(() => createEventDocWorkspace({ slots: { workspace: createNoteSlot() } })).toThrow(/reserved slot key/);
+// ─── Declarative reads: askEventDocReadState through the bind ───────────────────────
+
+describe('createEventDocWorkspace declarative reads', () => {
+  it("answers a bound read with the slot's folded view (history + pending)", () => {
+    const workspace = createTestWorkspace();
+
+    function* story(): AskResponse<void> {
+      yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent(0), serverEvent(NoteEvent.SetTitle, { title: 'Saved title' }, 1)]);
+      yield* workspace.docs.noteA.api.askNoteAppendTitleLine('l1');
+    }
+
+    const state = runWorkspaceStory(workspace, story);
+
+    // The verb's read saw the fold of the SAVED history, and its derived write landed
+    // in its own slot's pending buffer.
+    expect(state.pending.noteA).toHaveLength(1);
+    expect(state.pending.noteA[0].payload.data).toEqual({ lineId: 'l1', text: 'title: Saved title' });
+  });
+
+  it('routes the SAME read verb to each slot via its binding', () => {
+    const workspace = createTestWorkspace();
+
+    function* story(): AskResponse<void> {
+      yield* workspace.docs.noteA.api.askNoteSetTitle('A title');
+      yield* workspace.docs.noteB.api.askNoteSetTitle('B title');
+      yield* workspace.docs.noteA.api.askNoteAppendTitleLine('l1');
+      yield* workspace.docs.noteB.api.askNoteAppendTitleLine('l1');
+    }
+
+    const state = runWorkspaceStory(workspace, story);
+
+    expect(state.pending.noteA.at(-1)?.payload.data).toEqual({ lineId: 'l1', text: 'title: A title' });
+    expect(state.pending.noteB.at(-1)?.payload.data).toEqual({ lineId: 'l1', text: 'title: B title' });
+  });
+
+  it('read-your-own-writes: a commit earlier in the story is visible to the read', () => {
+    const workspace = createTestWorkspace();
+    let readTitle = '';
+
+    function* story(): AskResponse<void> {
+      readTitle = yield* workspace.docs.noteA.api.askNoteCommitAndReadTitle('just committed');
+    }
+
+    runWorkspaceStory(workspace, story);
+
+    expect(readTitle).toBe('just committed');
+  });
+
+  it('fails loudly when a read runs outside any workspace bind', () => {
+    const workspace = createTestWorkspace();
+
+    function* story(): AskResponse<void> {
+      yield* askEventDocReadState();
+    }
+
+    expect(() => runWorkspaceStory(workspace, story)).toThrow(/ReadState/);
+  });
+
+  it('answers a bound identity read: null before init, the slot identity after', () => {
+    const fake = createFakeTransport([initStateEvent()]);
+    const identities: unknown[] = [];
+
+    // Bound through noteA below, so the raw ask resolves against noteA's slot.
+    function* askCaptureIdentity(): AskResponse<void> {
+      identities.push(yield* askEventDocReadIdentity());
+    }
+
+    const captureWorkspace = createEventDocWorkspace({
+      slots: {
+        noteA: { ...createNoteSlot(), api: { ...noteApi, askCaptureIdentity } },
+        noteB: createNoteSlot(),
+      },
+      transport: fake.transport,
+    });
+
+    function* story(): AskResponse<void> {
+      yield* captureWorkspace.docs.noteA.api.askCaptureIdentity();
+      yield* captureWorkspace.api.askInit({ noteA: identityA });
+      yield* captureWorkspace.docs.noteA.api.askCaptureIdentity();
+    }
+
+    runWorkspaceStory(captureWorkspace, story);
+
+    expect(identities).toEqual([null, identityA]);
   });
 });
 
@@ -398,9 +522,9 @@ describe('createEventDocWorkspace coalescing', () => {
     const workspace = createTestWorkspace();
 
     function* story(): AskResponse<void> {
-      yield* workspace.api.noteA.askNoteSetTitle('one');
-      yield* workspace.api.noteA.askNoteSetTitle('two');
-      yield* workspace.api.noteA.askNoteSetTitle('three');
+      yield* workspace.docs.noteA.api.askNoteSetTitle('one');
+      yield* workspace.docs.noteA.api.askNoteSetTitle('two');
+      yield* workspace.docs.noteA.api.askNoteSetTitle('three');
     }
 
     const state = runWorkspaceStory(workspace, story);
@@ -413,9 +537,9 @@ describe('createEventDocWorkspace coalescing', () => {
     const workspace = createTestWorkspace();
 
     function* story(): AskResponse<void> {
-      yield* workspace.api.noteA.askNoteSetLine('l1', 'first draft');
-      yield* workspace.api.noteA.askNoteSetLine('l2', 'other line');
-      yield* workspace.api.noteA.askNoteSetLine('l1', 'final');
+      yield* workspace.docs.noteA.api.askNoteSetLine('l1', 'first draft');
+      yield* workspace.docs.noteA.api.askNoteSetLine('l2', 'other line');
+      yield* workspace.docs.noteA.api.askNoteSetLine('l1', 'final');
     }
 
     const state = runWorkspaceStory(workspace, story);
@@ -431,9 +555,9 @@ describe('createEventDocWorkspace coalescing', () => {
 
     function* story(): AskResponse<void> {
       yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent()]);
-      yield* workspace.api.noteA.askNoteSetTitle('one');
-      yield* workspace.api.noteA.askNoteAddLine('l1', 'line');
-      yield* workspace.api.noteA.askNoteSetTitle('two'); // coalesces away 'one'
+      yield* workspace.docs.noteA.api.askNoteSetTitle('one');
+      yield* workspace.docs.noteA.api.askNoteAddLine('l1', 'line');
+      yield* workspace.docs.noteA.api.askNoteSetTitle('two'); // coalesces away 'one'
     }
 
     const state = runWorkspaceStory(workspace, story);
@@ -445,9 +569,9 @@ describe('createEventDocWorkspace coalescing', () => {
     const workspace = createTestWorkspace();
 
     function* story(): AskResponse<void> {
-      yield* workspace.api.chrome.askChromeSetHistoryOpen(true);
-      yield* workspace.api.chrome.askChromeSetHistoryOpen(false);
-      yield* workspace.api.chrome.askChromeSetHelpOpen(true);
+      yield* workspace.docs.chrome.api.askChromeSetHistoryOpen(true);
+      yield* workspace.docs.chrome.api.askChromeSetHistoryOpen(false);
+      yield* workspace.docs.chrome.api.askChromeSetHelpOpen(true);
     }
 
     const state = runWorkspaceStory(workspace, story);
@@ -458,9 +582,36 @@ describe('createEventDocWorkspace coalescing', () => {
     expect(state.pending.chrome).toHaveLength(2);
     expect(state.pending.chrome.map((event) => event.payload.metadata.index)).toEqual([0, 1]);
 
-    const chromeView = workspace.selectors.view.chrome(state);
+    const chromeView = workspace.docs.chrome.view(state);
     expect(chromeView.historyOpen).toBe(false);
     expect(chromeView.helpOpen).toBe(true);
+  });
+
+  it('coalescing across a version boundary keeps the tail monotonic', () => {
+    // Post-hot-swap shape: a restored v1 SetTitle sits in pending when the v2 module
+    // commits a fresh SetTitle. The coalesce removes the v1 event and appends the v2
+    // one at the END, so the buffer never interleaves a newer version before an
+    // older one — the live-view fold's non-decreasing rule holds by construction.
+    const workspace = createEventDocWorkspace({ slots: { noteA: createNoteV2Slot() } });
+
+    function* story(): AskResponse<void> {
+      yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent()]);
+      yield* askUIEventDocWorkspaceSetPendingEvents('noteA', [
+        serverEvent(NoteEvent.SetTitle, { title: 'restored v1 title' }, 1),
+        serverEvent(NoteEvent.AddLine, { lineId: 'l1', text: 'restored v1 line' }, 2),
+      ]);
+      yield* workspace.docs.noteA.api.askNoteSetTitle('fresh v2 title');
+    }
+
+    const state = runWorkspaceStory(workspace, story);
+
+    expect(state.pending.noteA.map((event) => event.payload.metadata.version)).toEqual([1, 2]);
+    expect(state.pending.noteA[0].payload.data).toEqual({ lineId: 'l1', text: 'restored v1 line' });
+    expect(state.pending.noteA[1].payload.data).toEqual({ title: 'fresh v2 title' });
+
+    const view = workspace.docs.noteA.view(state);
+    expect(view.title).toBe('fresh v2 title');
+    expect(view.lines).toEqual([{ lineId: 'l1', text: 'restored v1 line' }]);
   });
 });
 
@@ -472,7 +623,7 @@ describe('createEventDocWorkspace validation', () => {
 
     function* story(): AskResponse<void> {
       yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent(0), publishEvent(1)]);
-      yield* workspace.api.noteA.askNoteSetTitle('should be rejected');
+      yield* workspace.docs.noteA.api.askNoteSetTitle('should be rejected');
     }
 
     const state = runWorkspaceStory(workspace, story);
@@ -487,8 +638,8 @@ describe('createEventDocWorkspace validation', () => {
 
     function* story(): AskResponse<void> {
       yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent(0), publishEvent(1)]);
-      yield* workspace.api.noteA.askNoteSetTitle('rejected'); // sets the validation error
-      yield* workspace.api.noteA.askNoteCreateDraft();
+      yield* workspace.docs.noteA.api.askNoteSetTitle('rejected'); // sets the validation error
+      yield* workspace.docs.noteA.api.askNoteCreateDraft();
     }
 
     const state = runWorkspaceStory(workspace, story);
@@ -510,7 +661,7 @@ describe('createEventDocWorkspace validation', () => {
     });
 
     function* story(): AskResponse<void> {
-      yield* workspace.api.noteA.askNoteSetTitle('');
+      yield* workspace.docs.noteA.api.askNoteSetTitle('');
     }
 
     const state = runWorkspaceStory(workspace, story);
@@ -531,7 +682,7 @@ describe('createEventDocWorkspace built-in verbs', () => {
     const workspace = createTestWorkspace(fake.transport);
 
     function* story(): AskResponse<void> {
-      yield* workspace.api.workspace.askInit({ noteA: identityA });
+      yield* workspace.api.askInit({ noteA: identityA });
     }
 
     const state = runWorkspaceStory(workspace, story);
@@ -552,7 +703,7 @@ describe('createEventDocWorkspace built-in verbs', () => {
     const workspace = createTestWorkspace(fake.transport);
 
     function* story(): AskResponse<void> {
-      yield* workspace.api.workspace.askInit({ noteA: identityA });
+      yield* workspace.api.askInit({ noteA: identityA });
     }
 
     const state = runWorkspaceStory(workspace, story);
@@ -570,10 +721,10 @@ describe('createEventDocWorkspace built-in verbs', () => {
     const workspace = createTestWorkspace(fake.transport);
 
     function* story(): AskResponse<void> {
-      yield* workspace.api.workspace.askInit({ noteA: identityA });
-      yield* workspace.api.noteA.askNoteAddLine('l1', 'one');
-      yield* workspace.api.noteA.askNoteAddLine('l2', 'two');
-      yield* workspace.api.workspace.askSave();
+      yield* workspace.api.askInit({ noteA: identityA });
+      yield* workspace.docs.noteA.api.askNoteAddLine('l1', 'one');
+      yield* workspace.docs.noteA.api.askNoteAddLine('l2', 'two');
+      yield* workspace.api.askSave();
     }
 
     const state = runWorkspaceStory(workspace, story);
@@ -596,10 +747,10 @@ describe('createEventDocWorkspace built-in verbs', () => {
     const workspace = createTestWorkspace(fake.transport);
 
     function* story(): AskResponse<void> {
-      yield* workspace.api.workspace.askInit({ noteA: identityA });
-      yield* workspace.api.noteA.askNoteAddLine('l1', 'one');
-      yield* workspace.api.noteA.askNoteAddLine('l2', 'two');
-      yield* workspace.api.workspace.askSave();
+      yield* workspace.api.askInit({ noteA: identityA });
+      yield* workspace.docs.noteA.api.askNoteAddLine('l1', 'one');
+      yield* workspace.docs.noteA.api.askNoteAddLine('l2', 'two');
+      yield* workspace.api.askSave();
     }
 
     const state = runWorkspaceStory(workspace, story);
@@ -619,9 +770,9 @@ describe('createEventDocWorkspace built-in verbs', () => {
     const workspace = createTestWorkspace(fake.transport);
 
     function* story(): AskResponse<void> {
-      yield* workspace.api.workspace.askInit({ noteA: identityA });
-      yield* workspace.api.noteA.askNoteAddLine('l1', 'one');
-      yield* workspace.api.workspace.askSave();
+      yield* workspace.api.askInit({ noteA: identityA });
+      yield* workspace.docs.noteA.api.askNoteAddLine('l1', 'one');
+      yield* workspace.api.askSave();
     }
 
     const state = runWorkspaceStory(workspace, story);
@@ -639,9 +790,9 @@ describe('createEventDocWorkspace built-in verbs', () => {
     // The server log grows between init and refresh (another editor appended), so the
     // refresh must fetch from afterIndex 0 and append only the tail.
     function* story(): AskResponse<void> {
-      yield* workspace.api.workspace.askInit({ noteA: identityA });
+      yield* workspace.api.askInit({ noteA: identityA });
       fake.setServerEvents([initStateEvent(), serverEvent(NoteEvent.SetTitle, { title: 'from elsewhere' }, 1)]);
-      yield* workspace.api.workspace.askRefresh('noteA');
+      yield* workspace.api.askRefresh('noteA');
     }
 
     const state = runWorkspaceStory(workspace, story);
@@ -656,9 +807,9 @@ describe('createEventDocWorkspace built-in verbs', () => {
     const workspace = createTestWorkspace(fake.transport);
 
     function* story(): AskResponse<void> {
-      yield* workspace.api.workspace.askInit({ noteA: identityA });
-      yield* workspace.api.noteA.askNoteSetTitle('discard me');
-      yield* workspace.api.workspace.askCancel();
+      yield* workspace.api.askInit({ noteA: identityA });
+      yield* workspace.docs.noteA.api.askNoteSetTitle('discard me');
+      yield* workspace.api.askCancel();
     }
 
     const state = runWorkspaceStory(workspace, story);
@@ -673,10 +824,10 @@ describe('createEventDocWorkspace built-in verbs', () => {
     const workspace = createTestWorkspace(fake.transport);
 
     function* story(): AskResponse<void> {
-      yield* workspace.api.workspace.askInit({ noteA: identityA });
-      yield* workspace.api.noteA.askNoteSetTitle('discard me');
-      yield* workspace.api.chrome.askChromeSetHelpOpen(true);
-      yield* workspace.api.workspace.askCancel();
+      yield* workspace.api.askInit({ noteA: identityA });
+      yield* workspace.docs.noteA.api.askNoteSetTitle('discard me');
+      yield* workspace.docs.chrome.api.askChromeSetHelpOpen(true);
+      yield* workspace.api.askCancel();
     }
 
     const state = runWorkspaceStory(workspace, story);
@@ -685,17 +836,145 @@ describe('createEventDocWorkspace built-in verbs', () => {
     // only discards document drafts.
     expect(state.pending.noteA).toHaveLength(0);
     expect(state.pending.chrome).toHaveLength(1);
-    expect(workspace.selectors.view.chrome(state).helpOpen).toBe(true);
+    expect(workspace.docs.chrome.view(state).helpOpen).toBe(true);
   });
 
   it('transport verbs fail loudly on a transportless workspace', () => {
     const workspace = createTestWorkspace();
 
     function* story(): AskResponse<void> {
-      yield* workspace.api.workspace.askSave();
+      yield* workspace.api.askSave();
     }
 
     expect(() => runWorkspaceStory(workspace, story)).toThrow(/transport/);
+  });
+});
+
+// ─── Snapshot hand-off: pending carried across runtimes ─────────────────────────────
+
+describe('createEventDocWorkspace snapshot hand-off', () => {
+  it('captures identity + pending for initialised document slots only', () => {
+    const fake = createFakeTransport([initStateEvent()]);
+    const workspace = createTestWorkspace(fake.transport);
+
+    function* story(): AskResponse<void> {
+      yield* workspace.api.askInit({ noteA: identityA });
+      yield* workspace.docs.noteA.api.askNoteSetTitle('unsaved');
+      yield* workspace.docs.chrome.api.askChromeSetHelpOpen(true);
+    }
+
+    const snapshot = workspace.createSnapshot(runWorkspaceStory(workspace, story));
+
+    // noteB was never initialised; chrome is local — neither snapshots.
+    expect(Object.keys(snapshot.slots)).toEqual(['noteA']);
+    expect(snapshot.slots.noteA.documentIdentity).toEqual(identityA);
+    expect(snapshot.slots.noteA.pending).toHaveLength(1);
+    expect(snapshot.slots.noteA.pending[0].payload.data).toEqual({ title: 'unsaved' });
+  });
+
+  it('init restores snapshot pending into a fresh runtime, renumbered onto the refetched log', () => {
+    const fake = createFakeTransport([initStateEvent()]);
+    const workspace = createTestWorkspace(fake.transport);
+
+    function* editSession(): AskResponse<void> {
+      yield* workspace.api.askInit({ noteA: identityA });
+      yield* workspace.docs.noteA.api.askNoteSetTitle('carried title');
+      yield* workspace.docs.noteA.api.askNoteAddLine('l1', 'carried line');
+    }
+
+    const snapshot = workspace.createSnapshot(runWorkspaceStory(workspace, editSession));
+
+    // The server log grew between the runtimes (another editor appended), so the
+    // restored buffer renumbers to continue the refetched log.
+    fake.setServerEvents([initStateEvent(), serverEvent(NoteEvent.SetTitle, { title: 'from elsewhere' }, 1)]);
+
+    function* swappedSession(): AskResponse<void> {
+      yield* workspace.api.askInit({ noteA: identityA }, snapshot);
+    }
+
+    const state = runWorkspaceStory(workspace, swappedSession);
+
+    expect(state.history.noteA).toHaveLength(2);
+    expect(state.pending.noteA).toHaveLength(2);
+    expect(state.pending.noteA.map((event) => event.payload.metadata.index)).toEqual([2, 3]);
+    expect(workspace.selectors.isDirty(state)).toBe(true);
+
+    const view = workspace.docs.noteA.view(state);
+    expect(view.title).toBe('carried title');
+    expect(view.lines).toEqual([{ lineId: 'l1', text: 'carried line' }]);
+  });
+
+  it('restored pending saves through the normal pipeline, in order', () => {
+    const fake = createFakeTransport([initStateEvent()]);
+    const workspace = createTestWorkspace(fake.transport);
+
+    function* editSession(): AskResponse<void> {
+      yield* workspace.api.askInit({ noteA: identityA });
+      yield* workspace.docs.noteA.api.askNoteAddLine('l1', 'one');
+      yield* workspace.docs.noteA.api.askNoteAddLine('l2', 'two');
+    }
+
+    const snapshot = workspace.createSnapshot(runWorkspaceStory(workspace, editSession));
+
+    function* swappedSession(): AskResponse<void> {
+      yield* workspace.api.askInit({ noteA: identityA }, snapshot);
+      yield* workspace.api.askSave();
+    }
+
+    const state = runWorkspaceStory(workspace, swappedSession);
+
+    expect(fake.appended.map((input) => input.payload.data)).toEqual([
+      { lineId: 'l1', text: 'one' },
+      { lineId: 'l2', text: 'two' },
+    ]);
+    expect(state.pending.noteA).toHaveLength(0);
+    expect(state.history.noteA).toHaveLength(3);
+  });
+
+  it('drops snapshot pending when the identity does not match: intent never leaks across documents', () => {
+    const fake = createFakeTransport([initStateEvent()]);
+    const workspace = createTestWorkspace(fake.transport);
+
+    function* editSession(): AskResponse<void> {
+      yield* workspace.api.askInit({ noteA: identityA });
+      yield* workspace.docs.noteA.api.askNoteSetTitle('doc-1 edit');
+    }
+
+    const snapshot = workspace.createSnapshot(runWorkspaceStory(workspace, editSession));
+
+    function* otherDocSession(): AskResponse<void> {
+      yield* workspace.api.askInit({ noteA: { ...identityA, id: 'doc-2' } }, snapshot);
+    }
+
+    const state = runWorkspaceStory(workspace, otherDocSession);
+
+    expect(state.pending.noteA).toHaveLength(0);
+  });
+
+  it('a failed restore fetch keeps the restored pending: intent survives the error', () => {
+    const editFake = createFakeTransport([initStateEvent()]);
+    const workspace = createTestWorkspace(editFake.transport);
+
+    function* editSession(): AskResponse<void> {
+      yield* workspace.api.askInit({ noteA: identityA });
+      yield* workspace.docs.noteA.api.askNoteSetTitle('precious');
+    }
+
+    const snapshot = workspace.createSnapshot(runWorkspaceStory(workspace, editSession));
+
+    const failingFake = createFakeTransport();
+    failingFake.failFetches();
+    const swappedWorkspace = createTestWorkspace(failingFake.transport);
+
+    function* swappedSession(): AskResponse<void> {
+      yield* swappedWorkspace.api.askInit({ noteA: identityA }, snapshot);
+    }
+
+    const state = runWorkspaceStory(swappedWorkspace, swappedSession);
+
+    expect(state.slots.noteA.error?.operation).toBe(EventDocWorkspaceSlotOperation.load);
+    expect(state.pending.noteA).toHaveLength(1);
+    expect(state.pending.noteA[0].payload.data).toEqual({ title: 'precious' });
   });
 });
 
@@ -716,7 +995,7 @@ describe('createEventDocWorkspace historyViews', () => {
     const workspace = createTestWorkspace(fake.transport);
 
     function* story(): AskResponse<void> {
-      yield* workspace.api.workspace.askInit({ noteA: identityA });
+      yield* workspace.api.askInit({ noteA: identityA });
     }
 
     const state = runWorkspaceStory(workspace, story);
@@ -730,10 +1009,10 @@ describe('createEventDocWorkspace historyViews', () => {
     const workspace = createTestWorkspace(fake.transport);
 
     function* story(): AskResponse<void> {
-      yield* workspace.api.workspace.askInit({ noteA: identityA });
-      yield* workspace.api.noteA.askNoteAddLine('l1', 'one');
-      yield* workspace.api.noteA.askNoteAddLine('l2', 'two');
-      yield* workspace.api.workspace.askSave();
+      yield* workspace.api.askInit({ noteA: identityA });
+      yield* workspace.docs.noteA.api.askNoteAddLine('l1', 'one');
+      yield* workspace.docs.noteA.api.askNoteAddLine('l2', 'two');
+      yield* workspace.api.askSave();
     }
 
     const state = runWorkspaceStory(workspace, story);
@@ -751,9 +1030,9 @@ describe('createEventDocWorkspace historyViews', () => {
     const workspace = createTestWorkspace(fake.transport);
 
     function* story(): AskResponse<void> {
-      yield* workspace.api.workspace.askInit({ noteA: identityA });
+      yield* workspace.api.askInit({ noteA: identityA });
       fake.setServerEvents([initStateEvent(), serverEvent(NoteEvent.SetTitle, { title: 'from elsewhere' }, 1)]);
-      yield* workspace.api.workspace.askRefresh('noteA');
+      yield* workspace.api.askRefresh('noteA');
     }
 
     const state = runWorkspaceStory(workspace, story);
@@ -788,7 +1067,7 @@ describe('createEventDocWorkspace historyViews', () => {
     expect('archived' in accumulator).toBe(false);
 
     // The read side migrates: latest-shaped even with nothing pending.
-    const view = workspace.selectors.view.noteA(state);
+    const view = workspace.docs.noteA.view(state);
     expect(view.schemaVersion).toBe(2);
     expect(view.archived).toBe(false);
     expect(view.title).toBe('Old doc');
@@ -817,24 +1096,24 @@ describe('createEventDocWorkspace selectors', () => {
 
     function* story(): AskResponse<void> {
       yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent()]);
-      yield* workspace.api.noteA.askNoteSetTitle('Live title');
-      yield* workspace.api.noteA.askNoteAddLine('l1', 'a line');
+      yield* workspace.docs.noteA.api.askNoteSetTitle('Live title');
+      yield* workspace.docs.noteA.api.askNoteAddLine('l1', 'a line');
     }
 
     const state = runWorkspaceStory(workspace, story);
 
-    const view = workspace.selectors.view.noteA(state);
+    const view = workspace.docs.noteA.view(state);
     expect(view.id).toBe('doc-1'); // from the saved INIT_STATE
     expect(view.title).toBe('Live title'); // from pending
     expect(view.lines).toEqual([{ lineId: 'l1', text: 'a line' }]);
     expect(view.status).toBe(EventDocStatus.Draft);
 
     // Same streams = the exact same folded object, not a refold.
-    expect(workspace.selectors.view.noteA(state)).toBe(view);
+    expect(workspace.docs.noteA.view(state)).toBe(view);
 
-    expect(workspace.selectors.liveEvents.noteA(state)).toHaveLength(3);
+    expect(workspace.docs.noteA.liveEvents(state)).toHaveLength(3);
     expect(workspace.selectors.isDirty(state)).toBe(true);
-    expect(workspace.selectors.view.noteB(state).id).toBe(''); // untouched slot folds to its initial
+    expect(workspace.docs.noteB.view(state).id).toBe(''); // untouched slot folds to its initial
   });
 
   it('isDirty goes false once pending is drained by a save', () => {
@@ -842,15 +1121,15 @@ describe('createEventDocWorkspace selectors', () => {
     const workspace = createTestWorkspace(fake.transport);
 
     function* story(): AskResponse<void> {
-      yield* workspace.api.workspace.askInit({ noteA: identityA });
-      yield* workspace.api.noteA.askNoteSetTitle('to save');
-      yield* workspace.api.workspace.askSave();
+      yield* workspace.api.askInit({ noteA: identityA });
+      yield* workspace.docs.noteA.api.askNoteSetTitle('to save');
+      yield* workspace.api.askSave();
     }
 
     const state = runWorkspaceStory(workspace, story);
 
     expect(workspace.selectors.isDirty(state)).toBe(false);
-    expect(workspace.selectors.view.noteA(state).title).toBe('to save');
+    expect(workspace.docs.noteA.view(state).title).toBe('to save');
     expect(workspace.selectors.error(state)).toBeNull();
   });
 
@@ -859,22 +1138,22 @@ describe('createEventDocWorkspace selectors', () => {
 
     function* story(): AskResponse<void> {
       yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent()]);
-      yield* workspace.api.noteA.askNoteSetTitle('unsaved title');
+      yield* workspace.docs.noteA.api.askNoteSetTitle('unsaved title');
     }
 
     const state = runWorkspaceStory(workspace, story);
 
     // The stored base holds only saved truth; the live view layers pending on top.
     expect((state.historyViews.noteA as NoteState).title).toBe('');
-    expect(workspace.selectors.view.noteA(state).title).toBe('unsaved title');
-    expect(workspace.selectors.view.noteA(state).id).toBe('doc-1');
+    expect(workspace.docs.noteA.view(state).title).toBe('unsaved title');
+    expect(workspace.docs.noteA.view(state).id).toBe('doc-1');
   });
 
   it('isDirty counts document pending only: a chrome toggle does not dirty', () => {
     const workspace = createTestWorkspace();
 
     function* chromeOnlyStory(): AskResponse<void> {
-      yield* workspace.api.chrome.askChromeSetHelpOpen(true);
+      yield* workspace.docs.chrome.api.askChromeSetHelpOpen(true);
     }
 
     const chromeOnlyState = runWorkspaceStory(workspace, chromeOnlyStory);
@@ -882,24 +1161,69 @@ describe('createEventDocWorkspace selectors', () => {
     expect(workspace.selectors.isDirty(chromeOnlyState)).toBe(false);
 
     function* documentEditStory(): AskResponse<void> {
-      yield* workspace.api.chrome.askChromeSetHelpOpen(true);
-      yield* workspace.api.noteA.askNoteSetTitle('unsaved');
+      yield* workspace.docs.chrome.api.askChromeSetHelpOpen(true);
+      yield* workspace.docs.noteA.api.askNoteSetTitle('unsaved');
     }
 
     const documentEditState = runWorkspaceStory(workspace, documentEditStory);
     expect(workspace.selectors.isDirty(documentEditState)).toBe(true);
   });
 
-  it('a pending event at a mismatched schema version throws at view read', () => {
-    const workspace = createTestWorkspace();
+  it('a mixed-version pending tail folds: old-version events, migrate at the boundary, new-version events', () => {
+    // The federated hot-swap shape: pending authored at v1 survives a module upgrade,
+    // and events committed after the swap follow at v2. The tail is monotonically
+    // non-decreasing by design (the same rule the backend append enforces).
+    const workspace = createEventDocWorkspace({ slots: { noteA: createNoteV2Slot() } });
 
     function* story(): AskResponse<void> {
-      yield* askUIEventDocWorkspaceSetPendingEvents('noteA', [eventAtVersion(serverEvent(NoteEvent.SetTitle, { title: 'v2' }, 0), 2)]);
+      yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent()]);
+      yield* askUIEventDocWorkspaceSetPendingEvents('noteA', [
+        serverEvent(NoteEvent.AddLine, { lineId: 'l1', text: 'authored at v1' }, 1),
+        eventAtVersion(serverEvent(NoteEvent.SetTitle, { title: 'authored at v2' }, 2), 2),
+      ]);
     }
 
     const state = runWorkspaceStory(workspace, story);
 
-    expect(() => workspace.selectors.view.noteA(state)).toThrow(/pending event/);
+    const view = workspace.docs.noteA.view(state);
+    expect(view.schemaVersion).toBe(2);
+    expect(view.archived).toBe(false);
+    expect(view.lines).toEqual([{ lineId: 'l1', text: 'authored at v1' }]);
+    expect(view.title).toBe('authored at v2');
+  });
+
+  it('a pending event below the already-folded version throws at view read', () => {
+    // The stale-client guard the monotonic relaxation keeps: once the folded doc is
+    // at v2, a v1 pending event can only be a corrupt buffer.
+    const workspace = createEventDocWorkspace({ slots: { noteA: createNoteV2Slot() } });
+
+    function* story(): AskResponse<void> {
+      yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [
+        initStateEvent(0),
+        eventAtVersion(serverEvent(NoteEvent.SetTitle, { title: 'already v2' }, 1), 2),
+      ]);
+      yield* askUIEventDocWorkspaceSetPendingEvents('noteA', [serverEvent(NoteEvent.AddLine, { lineId: 'l1', text: 'stale v1' }, 2)]);
+    }
+
+    const state = runWorkspaceStory(workspace, story);
+
+    expect(() => workspace.docs.noteA.view(state)).toThrow(/non-decreasing/);
+  });
+
+  it('an old-version pending tail on a PRISTINE base folds without throwing (snapshot restore mid-load)', () => {
+    // During a snapshot-restore init the buffer is seeded before the history fetch
+    // lands: the base is the slot's pristine seed, which carries the latest version
+    // as a default with no events behind it. That must not reject the restored tail.
+    const workspace = createEventDocWorkspace({ slots: { noteA: createNoteV2Slot() } });
+
+    function* story(): AskResponse<void> {
+      yield* askUIEventDocWorkspaceSetPendingEvents('noteA', [serverEvent(NoteEvent.SetTitle, { title: 'restored v1' }, 0)]);
+    }
+
+    const state = runWorkspaceStory(workspace, story);
+
+    expect(() => workspace.docs.noteA.view(state)).not.toThrow();
+    expect(workspace.docs.noteA.view(state).title).toBe('restored v1');
   });
 });
 
@@ -910,9 +1234,9 @@ describe('createEventDocWorkspace transient streams', () => {
     const workspace = createTestWorkspace();
 
     function* story(): AskResponse<void> {
-      yield* workspace.api.noteA.askNoteTransientSetTitle('conn-1', 'a1');
-      yield* workspace.api.noteA.askNoteTransientAddLine('conn-2', 'l1', 'from conn-2');
-      yield* workspace.api.noteB.askNoteTransientSetTitle('conn-1', 'b1');
+      yield* workspace.docs.noteA.api.askNoteTransientSetTitle('conn-1', 'a1');
+      yield* workspace.docs.noteA.api.askNoteTransientAddLine('conn-2', 'l1', 'from conn-2');
+      yield* workspace.docs.noteB.api.askNoteTransientSetTitle('conn-1', 'b1');
     }
 
     const state = runWorkspaceStory(workspace, story);
@@ -944,7 +1268,7 @@ describe('createEventDocWorkspace transient streams', () => {
 
     function* story(): AskResponse<void> {
       yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent(0), publishEvent(1)]);
-      yield* workspace.api.noteA.askNoteTransientSetTitle('conn-1', 'observation, not an edit');
+      yield* workspace.docs.noteA.api.askNoteTransientSetTitle('conn-1', 'observation, not an edit');
     }
 
     const state = runWorkspaceStory(workspace, story);
@@ -958,9 +1282,9 @@ describe('createEventDocWorkspace transient streams', () => {
 
     function* story(): AskResponse<void> {
       yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent()]);
-      yield* workspace.api.noteA.askNoteAddLine('l1', 'pending line');
-      yield* workspace.api.noteA.askNoteTransientAddLine('conn-b', 'l2', 'late');
-      yield* workspace.api.noteA.askNoteTransientAddLine('conn-a', 'l3', 'early');
+      yield* workspace.docs.noteA.api.askNoteAddLine('l1', 'pending line');
+      yield* workspace.docs.noteA.api.askNoteTransientAddLine('conn-b', 'l2', 'late');
+      yield* workspace.docs.noteA.api.askNoteTransientAddLine('conn-a', 'l3', 'early');
     }
 
     const state = runWorkspaceStory(workspace, story, [
@@ -974,7 +1298,7 @@ describe('createEventDocWorkspace transient streams', () => {
     expect(transientLineIds).toEqual(['l3', 'l2']);
 
     // Block order in the fold: pending before every transient; then time within transient.
-    const view = workspace.selectors.view.noteA(state);
+    const view = workspace.docs.noteA.view(state);
     expect(view.lines).toEqual([
       { lineId: 'l1', text: 'pending line' },
       { lineId: 'l3', text: 'early' },
@@ -986,9 +1310,9 @@ describe('createEventDocWorkspace transient streams', () => {
     const workspace = createTestWorkspace();
 
     function* story(): AskResponse<void> {
-      yield* workspace.api.noteA.askNoteTransientAddLine('zz', 'l1', 'zz first');
-      yield* workspace.api.noteA.askNoteTransientAddLine('aa', 'l2', 'aa first');
-      yield* workspace.api.noteA.askNoteTransientAddLine('zz', 'l3', 'zz second');
+      yield* workspace.docs.noteA.api.askNoteTransientAddLine('zz', 'l1', 'zz first');
+      yield* workspace.docs.noteA.api.askNoteTransientAddLine('aa', 'l2', 'aa first');
+      yield* workspace.docs.noteA.api.askNoteTransientAddLine('zz', 'l3', 'zz second');
     }
 
     // The constant date mock stamps every event identically, so ONLY the tie-break
@@ -1002,10 +1326,10 @@ describe('createEventDocWorkspace transient streams', () => {
     const workspace = createTestWorkspace();
 
     function* story(): AskResponse<void> {
-      yield* workspace.api.noteA.askNoteTransientSetTitle('conn-1', 'one');
-      yield* workspace.api.noteA.askNoteTransientSetTitle('conn-1', 'two');
-      yield* workspace.api.noteA.askNoteTransientSetTitle('conn-1', 'three');
-      yield* workspace.api.noteA.askNoteTransientSetTitle('conn-2', 'other');
+      yield* workspace.docs.noteA.api.askNoteTransientSetTitle('conn-1', 'one');
+      yield* workspace.docs.noteA.api.askNoteTransientSetTitle('conn-1', 'two');
+      yield* workspace.docs.noteA.api.askNoteTransientSetTitle('conn-1', 'three');
+      yield* workspace.docs.noteA.api.askNoteTransientSetTitle('conn-2', 'other');
     }
 
     const state = runWorkspaceStory(workspace, story);
@@ -1022,15 +1346,15 @@ describe('createEventDocWorkspace transient streams', () => {
     const workspace = createTestWorkspace();
 
     function* commits(): AskResponse<void> {
-      yield* workspace.api.noteA.askNoteSetTitle('pending title');
-      yield* workspace.api.noteA.askNoteTransientSetTitle('conn-1', 'transient title');
-      yield* workspace.api.noteB.askNoteTransientAddLine('conn-1', 'l1', 'b line');
-      yield* workspace.api.noteA.askNoteTransientAddLine('conn-2', 'l9', 'other connection');
+      yield* workspace.docs.noteA.api.askNoteSetTitle('pending title');
+      yield* workspace.docs.noteA.api.askNoteTransientSetTitle('conn-1', 'transient title');
+      yield* workspace.docs.noteB.api.askNoteTransientAddLine('conn-1', 'l1', 'b line');
+      yield* workspace.docs.noteA.api.askNoteTransientAddLine('conn-2', 'l9', 'other connection');
     }
 
     const before = runWorkspaceStory(workspace, () => commits());
-    expect(workspace.selectors.view.noteA(before).title).toBe('transient title');
-    expect(workspace.selectors.view.noteB(before).lines).toEqual([{ lineId: 'l1', text: 'b line' }]);
+    expect(workspace.docs.noteA.view(before).title).toBe('transient title');
+    expect(workspace.docs.noteB.view(before).lines).toEqual([{ lineId: 'l1', text: 'b line' }]);
 
     function* dropStory(): AskResponse<void> {
       yield* commits();
@@ -1043,23 +1367,23 @@ describe('createEventDocWorkspace transient streams', () => {
     expect(after.transient.noteA['conn-1']).toBeUndefined();
     expect(after.transient.noteB).toEqual({});
     expect(after.transient.noteA['conn-2']).toHaveLength(1);
-    expect(workspace.selectors.view.noteA(after).title).toBe('pending title');
-    expect(workspace.selectors.view.noteA(after).lines).toEqual([{ lineId: 'l9', text: 'other connection' }]);
-    expect(workspace.selectors.view.noteB(after).lines).toEqual([]);
+    expect(workspace.docs.noteA.view(after).title).toBe('pending title');
+    expect(workspace.docs.noteA.view(after).lines).toEqual([{ lineId: 'l9', text: 'other connection' }]);
+    expect(workspace.docs.noteB.view(after).lines).toEqual([]);
   });
 
   it('reset clears all transient groups', () => {
     const workspace = createTestWorkspace();
 
     function* story(): AskResponse<void> {
-      yield* workspace.api.noteA.askNoteTransientSetTitle('conn-1', 'gone');
+      yield* workspace.docs.noteA.api.askNoteTransientSetTitle('conn-1', 'gone');
       yield* askUIEventDocWorkspaceReset();
     }
 
     const state = runWorkspaceStory(workspace, story);
 
     expect(state.transient.noteA).toEqual({});
-    expect(workspace.selectors.view.noteA(state).title).toBe('');
+    expect(workspace.docs.noteA.view(state).title).toBe('');
   });
 
   it('save, cancel and isDirty ignore transient entirely', () => {
@@ -1067,12 +1391,12 @@ describe('createEventDocWorkspace transient streams', () => {
     const workspace = createTestWorkspace(fake.transport);
 
     function* story(): AskResponse<void> {
-      yield* workspace.api.workspace.askInit({ noteA: identityA });
-      yield* workspace.api.noteA.askNoteTransientSetTitle('conn-1', 'never saved');
-      yield* workspace.api.noteA.askNoteAddLine('l1', 'saved line');
-      yield* workspace.api.workspace.askSave();
-      yield* workspace.api.noteA.askNoteTransientAddLine('conn-1', 'l2', 'post-save transient');
-      yield* workspace.api.workspace.askCancel();
+      yield* workspace.api.askInit({ noteA: identityA });
+      yield* workspace.docs.noteA.api.askNoteTransientSetTitle('conn-1', 'never saved');
+      yield* workspace.docs.noteA.api.askNoteAddLine('l1', 'saved line');
+      yield* workspace.api.askSave();
+      yield* workspace.docs.noteA.api.askNoteTransientAddLine('conn-1', 'l2', 'post-save transient');
+      yield* workspace.api.askCancel();
     }
 
     const state = runWorkspaceStory(workspace, story);
@@ -1102,28 +1426,34 @@ describe('createEventDocWorkspace transient streams', () => {
 
     function* story(): AskResponse<void> {
       yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent()]);
-      yield* workspace.api.noteA.askNoteSetTitle('pending');
-      yield* workspace.api.noteA.askNoteTransientSetTitle('conn-1', 'transient');
+      yield* workspace.docs.noteA.api.askNoteSetTitle('pending');
+      yield* workspace.docs.noteA.api.askNoteTransientSetTitle('conn-1', 'transient');
     }
 
     const state = runWorkspaceStory(workspace, story);
 
     expect(getSlotLiveEvents(state, 'noteA')).toHaveLength(2); // history + pending only
-    expect(workspace.selectors.liveEvents.noteA(state)).toHaveLength(2);
+    expect(workspace.docs.noteA.liveEvents(state)).toHaveLength(2);
     expect(getSlotTransientEvents(state, 'noteA')).toHaveLength(1);
   });
 
-  it('a transient event at a mismatched schema version throws at view read', () => {
-    const workspace = createTestWorkspace();
+  it('a transient event below the already-folded version throws at view read', () => {
+    const workspace = createEventDocWorkspace({ slots: { noteA: createNoteV2Slot() } });
 
     // Committed via the state effect directly to forge a stale version — the bind
     // always stamps the slot's own schemaVersion, so this can't happen through it.
+    // The transient tail reuses the pending fold, so it inherits the same
+    // monotonic guard: once the folded doc is at v2, a v1 transient is corrupt.
     function* story(): AskResponse<void> {
-      yield* askUIEventDocWorkspaceApplyTransientEvent('noteA', 'conn-1', eventAtVersion(serverEvent(NoteEvent.SetTitle, { title: 'v2' }, 0), 2));
+      yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [
+        initStateEvent(0),
+        eventAtVersion(serverEvent(NoteEvent.SetTitle, { title: 'already v2' }, 1), 2),
+      ]);
+      yield* askUIEventDocWorkspaceApplyTransientEvent('noteA', 'conn-1', serverEvent(NoteEvent.SetTitle, { title: 'stale v1' }, 2));
     }
 
     const state = runWorkspaceStory(workspace, story);
 
-    expect(() => workspace.selectors.view.noteA(state)).toThrow(/pending event/);
+    expect(() => workspace.docs.noteA.view(state)).toThrow(/non-decreasing/);
   });
 });
