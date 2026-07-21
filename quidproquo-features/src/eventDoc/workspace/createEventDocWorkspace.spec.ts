@@ -853,7 +853,7 @@ describe('createEventDocWorkspace built-in verbs', () => {
 // ─── Snapshot hand-off: pending carried across runtimes ─────────────────────────────
 
 describe('createEventDocWorkspace snapshot hand-off', () => {
-  it('captures identity + pending for initialised document slots only', () => {
+  it('captures document identity + pending, and local slot streams', () => {
     const fake = createFakeTransport([initStateEvent()]);
     const workspace = createTestWorkspace(fake.transport);
 
@@ -865,14 +865,62 @@ describe('createEventDocWorkspace snapshot hand-off', () => {
 
     const snapshot = workspace.createSnapshot(runWorkspaceStory(workspace, story));
 
-    // noteB was never initialised; chrome is local — neither snapshots.
+    // noteB was never initialised — documents without an identity don't snapshot.
     expect(Object.keys(snapshot.slots)).toEqual(['noteA']);
     expect(snapshot.slots.noteA.documentIdentity).toEqual(identityA);
     expect(snapshot.slots.noteA.pending).toHaveLength(1);
     expect(snapshot.slots.noteA.pending[0].payload.data).toEqual({ title: 'unsaved' });
+
+    // chrome is local: its pending stream IS its session state, carried wholesale.
+    expect(Object.keys(snapshot.localSlots ?? {})).toEqual(['chrome']);
+    expect(snapshot.localSlots?.chrome).toHaveLength(1);
   });
 
-  it('init restores snapshot pending into a fresh runtime, renumbered onto the refetched log', () => {
+  it('init restores local slot streams: the session experience survives a swap', () => {
+    const fake = createFakeTransport([initStateEvent()]);
+    const workspace = createTestWorkspace(fake.transport);
+
+    function* editSession(): AskResponse<void> {
+      yield* workspace.api.askInit({ noteA: identityA });
+      yield* workspace.docs.chrome.api.askChromeSetHelpOpen(true);
+    }
+
+    const snapshot = workspace.createSnapshot(runWorkspaceStory(workspace, editSession));
+
+    function* swappedSession(): AskResponse<void> {
+      yield* workspace.api.askInit({ noteA: identityA }, snapshot);
+    }
+
+    const state = runWorkspaceStory(workspace, swappedSession);
+
+    expect(state.pending.chrome).toHaveLength(1);
+    expect(workspace.docs.chrome.view(state).helpOpen).toBe(true);
+    // Local session state never dirties the workspace.
+    expect(workspace.selectors.isDirty(state)).toBe(false);
+  });
+
+  it('a snapshot without localSlots (older bundle) restores documents and nothing else', () => {
+    const fake = createFakeTransport([initStateEvent()]);
+    const workspace = createTestWorkspace(fake.transport);
+
+    function* editSession(): AskResponse<void> {
+      yield* workspace.api.askInit({ noteA: identityA });
+      yield* workspace.docs.noteA.api.askNoteSetTitle('carried');
+    }
+
+    const { slots } = workspace.createSnapshot(runWorkspaceStory(workspace, editSession));
+
+    function* swappedSession(): AskResponse<void> {
+      yield* workspace.api.askInit({ noteA: identityA }, { slots });
+    }
+
+    const state = runWorkspaceStory(workspace, swappedSession);
+
+    expect(state.pending.noteA).toHaveLength(1);
+    expect(state.pending.chrome).toHaveLength(0);
+  });
+
+  it('init restores a full snapshot instantly: history + pending seed with no loading, then a tail-pull syncs the delta', () => {
     const fake = createFakeTransport([initStateEvent()]);
     const workspace = createTestWorkspace(fake.transport);
 
@@ -883,9 +931,10 @@ describe('createEventDocWorkspace snapshot hand-off', () => {
     }
 
     const snapshot = workspace.createSnapshot(runWorkspaceStory(workspace, editSession));
+    expect(snapshot.slots.noteA.history).toHaveLength(1);
 
-    // The server log grew between the runtimes (another editor appended), so the
-    // restored buffer renumbers to continue the refetched log.
+    // The server log grew between the runtimes (another editor appended): the
+    // restore must NOT full-fetch — only the tail after the snapshot's last event.
     fake.setServerEvents([initStateEvent(), serverEvent(NoteEvent.SetTitle, { title: 'from elsewhere' }, 1)]);
 
     function* swappedSession(): AskResponse<void> {
@@ -894,14 +943,45 @@ describe('createEventDocWorkspace snapshot hand-off', () => {
 
     const state = runWorkspaceStory(workspace, swappedSession);
 
+    // First call is the edit session's full load; the restore adds ONLY a tail-pull.
+    expect(fake.fetchCalls).toEqual([{ afterIndex: undefined }, { afterIndex: 0 }]);
+    expect(state.slots.noteA.isLoading).toBe(false);
+
     expect(state.history.noteA).toHaveLength(2);
     expect(state.pending.noteA).toHaveLength(2);
-    expect(state.pending.noteA.map((event) => event.payload.metadata.index)).toEqual([2, 3]);
+    expect(state.pending.noteA.map((event) => event.payload.metadata.index)).toEqual([1, 2]);
     expect(workspace.selectors.isDirty(state)).toBe(true);
 
+    // The unsaved SetTitle still folds after the synced tail: client intent wins.
     const view = workspace.docs.noteA.view(state);
     expect(view.title).toBe('carried title');
     expect(view.lines).toEqual([{ lineId: 'l1', text: 'carried line' }]);
+  });
+
+  it('a snapshot slot without history falls back to the blocking full load', () => {
+    const fake = createFakeTransport([initStateEvent()]);
+    const workspace = createTestWorkspace(fake.transport);
+
+    function* editSession(): AskResponse<void> {
+      yield* workspace.api.askInit({ noteA: identityA });
+      yield* workspace.docs.noteA.api.askNoteSetTitle('carried');
+    }
+
+    const snapshot = workspace.createSnapshot(runWorkspaceStory(workspace, editSession));
+    // The caller's force-refetch knob (also the shape older bundles export).
+    const { history: _stripped, ...slotWithoutHistory } = snapshot.slots.noteA;
+
+    function* swappedSession(): AskResponse<void> {
+      yield* workspace.api.askInit({ noteA: identityA }, { slots: { noteA: slotWithoutHistory } });
+    }
+
+    const state = runWorkspaceStory(workspace, swappedSession);
+
+    // Two FULL loads — no tail-pull.
+    expect(fake.fetchCalls).toEqual([{ afterIndex: undefined }, { afterIndex: undefined }]);
+    expect(state.history.noteA).toHaveLength(1);
+    expect(state.pending.noteA).toHaveLength(1);
+    expect(state.pending.noteA[0].payload.data).toEqual({ title: 'carried' });
   });
 
   it('restored pending saves through the normal pipeline, in order', () => {
