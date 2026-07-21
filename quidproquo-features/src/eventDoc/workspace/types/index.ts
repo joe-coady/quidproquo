@@ -22,6 +22,7 @@ export * from './EventDocWorkspaceSlotOperation';
 export * from './EventDocWorkspaceSlotsConfig';
 export * from './EventDocWorkspaceSlotState';
 export * from './EventDocWorkspaceSlotViewOf';
+export * from './EventDocWorkspaceSnapshot';
 export * from './EventDocWorkspaceState';
 export * from './EventDocWorkspaceStoryApi';
 export * from './EventDocWorkspaceTransport';

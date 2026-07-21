@@ -5,6 +5,10 @@ assembled quickly.
 
 ## vNext
 
+- `createEventDocWorkspace`'s returned shape changes in `quidproquo-features`: per-slot verbs move from `api.<slotKey>.<verb>` to `docs.<slotKey>.api.<verb>`, and the built-in `init`/`save`/`cancel`/`refresh` verbs move from `api.workspace.<verb>` to `api.<verb>` directly (`workspace` is no longer a reserved/nested key). Per-slot `selectors.view/liveEvents/slotState[<slotKey>]` move to `docs.<slotKey>.view/liveEvents/slotState`; `.selectors` now only exposes the cross-doc aggregates `isDirty`/`isLoading`/`isSaving`/`error`. Update call sites to the new `docs.<slotKey>` shape.
+- `EventDocWorkspaceDefinition.selectors` (passing a pre-built `createEventDocWorkspaceSelectors` instance into `createEventDocWorkspace`) is removed; the workspace always builds its own selectors now. Drop the `selectors` field from any workspace definition.
+- `createEventDocWorkspaceSlot(foldConfig, api)` is removed from `quidproquo-features`. Use `createEventDocDefinition({ schemaVersion, foldReducer, createInitialViewState, migrations?, coalesceEventTypes?, validate?, api })` for a saved doc (drop the old `kind` field), or add `saved: false` for a local/unsaved slot. A saved definition now auto-merges the generic `askEventDocSetCode`/`askEventDocSetName`/`askEventDocCreateDraft`/`askEventDocPublish` verbs into `api` — remove them from a hand-written api or `createEventDocDefinition` throws.
+
 ## 0.1.10
 
 - `ApiActionType`, `ApiRequestActionRequester` (`askApiRequest`), and its request/response types move from `quidproquo-web` to `quidproquo-webserver`. Update imports from `quidproquo-web` to `quidproquo-webserver`. The action type string also changed from `@quidproquo-web/Api/Request` to `@quidproquo-webserver/Api/Request`; any code matching on the raw string must update too.

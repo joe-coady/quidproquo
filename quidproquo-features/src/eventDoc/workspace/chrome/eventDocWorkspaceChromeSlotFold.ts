@@ -5,9 +5,9 @@ import { eventDocWorkspaceChromeFoldReducer } from './eventDocWorkspaceChromeFol
 
 export type EventDocWorkspaceChromeSlotFold = EventDocWorkspaceLocalSlotFoldConfig<EventDocWorkspaceChromeState>;
 
-// The chrome slot's api-free fold config — what standalone selector creation
-// (createEventDocWorkspaceSelectors) resolves in when a workspace doesn't define
-// its own `chrome` slot. The full default slot spreads this plus the chrome api.
+// The chrome slot's api-free fold config — what internal selector creation
+// resolves in when a workspace doesn't define its own `chrome` slot. The full
+// default chrome definition composes this plus the chrome api.
 export const eventDocWorkspaceChromeSlotFold: EventDocWorkspaceChromeSlotFold = {
   kind: EventDocWorkspaceSlotKind.local,
   foldReducer: eventDocWorkspaceChromeFoldReducer,

@@ -4,10 +4,9 @@ import { EventDocEvent } from '../../models';
 import { EventDocEditorValidator } from '../../validation';
 
 // The api-free part of a slot config: everything the fold machinery (selectors,
-// reducer, initial state) needs. Kept separate from the api on purpose — the
-// fold selectors are buildable from this alone (createEventDocWorkspaceSelectors),
-// so api verbs can read live views through a selectors module that never imports
-// an api, keeping the workspace module cycle-free.
+// reducer, initial state) needs. The workspace builds its selectors from this
+// alone; verbs never need selector imports — own-doc reads go through the
+// declarative askEventDocReadState answered by the slot binding.
 export type EventDocWorkspaceSlotFoldConfigBase<TView> = {
   // Folds ONE event onto the view. Domain reducers are typed to their own effect
   // union and cast to EventDocEvent at this registration boundary, the same
