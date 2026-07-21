@@ -45,7 +45,7 @@ import { isAwsCredentialsValid } from './awsCredentials';
 import { getCdkAppCommand, getDockerDir } from './cdkApp';
 import { buildRemote, resolvePublishTarget } from './remote';
 import { deployAccountStack, deployBootstrapStack, deployDomainStack } from './stacks';
-import { getViewsS3Destinations } from './viewsSync';
+import { getViewsS3Destinations, NO_CACHE_FILES } from './viewsSync';
 
 const IMAGE_TAG = 'qpq-cdk-deployer';
 const AWS_CLI_IMAGE = 'amazon/aws-cli';
@@ -126,10 +126,14 @@ const dockerDeployStack = async (
 // Sync one service's pre-built views to S3 in a throwaway aws-cli container
 // named <service>-views. The official image's entrypoint is `aws`. Multiple
 // destinations (shell → website root + views prefix) run sequentially within
-// the service, reusing the container name.
+// the service, reusing the container name. Mirrors the host-side syncViewsToS3
+// cache policy: hashed assets immutable, the fixed-name entry points re-uploaded
+// with no-cache every deploy (see NO_CACHE_FILES).
 const dockerSyncViews = async (color: number, appName: string, serviceName: string): Promise<void> => {
   const containerName = `${serviceName}-views`;
-  for (const destination of getViewsS3Destinations(appName, serviceName)) {
+  const distDir = getViewsDistDir(appName, serviceName);
+
+  const runAwsCli = async (awsArgs: string[]): Promise<void> => {
     await removeContainer(containerName);
     await runCommandPrefixed(
       `views:${serviceName}`,
@@ -140,16 +144,33 @@ const dockerSyncViews = async (color: number, appName: string, serviceName: stri
         '--name',
         containerName,
         '-v',
-        `${getViewsDistDir(appName, serviceName)}:/views:ro`,
+        `${distDir}:/views:ro`,
         ...AWS_ENV_PASSTHROUGH.flatMap((name) => ['-e', name]),
         AWS_CLI_IMAGE,
-        's3',
-        'sync',
-        '/views',
-        destination,
+        ...awsArgs,
       ],
       { color },
     );
+  };
+
+  for (const destination of getViewsS3Destinations(appName, serviceName)) {
+    await runAwsCli([
+      's3',
+      'sync',
+      '/views',
+      destination,
+      '--cache-control',
+      'public,max-age=31536000,immutable',
+      ...NO_CACHE_FILES.flatMap((file) => ['--exclude', file]),
+    ]);
+
+    for (const file of NO_CACHE_FILES) {
+      if (!fs.existsSync(path.join(distDir, file))) {
+        continue;
+      }
+
+      await runAwsCli(['s3', 'cp', `/views/${file}`, `${destination}/${file}`, '--cache-control', 'no-cache']);
+    }
   }
 };
 
