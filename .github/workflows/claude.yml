@@ -43,12 +43,11 @@ jobs:
           # Optional: Give a custom prompt to Claude. If this is not specified, Claude will perform the instructions specified in the comment that tagged it.
           # prompt: 'Update the pull request description to include a summary of changes.'
 
-          # Skip the permission system entirely so Claude can read the event payload
-          # (outside the repo checkout) and use gh freely. Safe-ish here: the action
-          # only triggers for actors with write access, and the app token is read-only.
-          # The action omits the trigger comment's file/line anchor from its prompt,
-          # so point Claude at the raw event payload to recover it.
+          # The action omits the trigger comment's file/line anchor from its prompt
+          # (anthropics/claude-code-action#855), so pass the comment id in and have
+          # Claude fetch its own anchor via gh. The id is numeric, so interpolating
+          # it here is injection-safe; the app token is read-only regardless.
           claude_args: >-
-            --dangerously-skip-permissions
-            --append-system-prompt "When triggered by a PR review comment, first read the event payload file at the path in the GITHUB_EVENT_PATH environment variable; use .comment.path, .comment.line, and .comment.diff_hunk as the anchor. Words like 'this' in the trigger comment refer to that anchored code, not to earlier threads."
+            --allowed-tools "Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh api:*),Bash(gh issue view:*)"
+            --append-system-prompt "Trigger review comment id: '${{ github.event_name == 'pull_request_review_comment' && github.event.comment.id || '' }}'. If that id is non-empty, you were triggered by a PR review comment anchored to specific code: run gh api repos/${{ github.repository }}/pulls/comments/<id> to get its path, line, start_line, and diff_hunk. Words like 'this' in the trigger comment refer to that anchored code, not to earlier threads. Read the anchored file itself for full context before answering."
 
