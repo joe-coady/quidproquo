@@ -43,11 +43,12 @@ jobs:
           # Optional: Give a custom prompt to Claude. If this is not specified, Claude will perform the instructions specified in the comment that tagged it.
           # prompt: 'Update the pull request description to include a summary of changes.'
 
-          # Let Claude read PR/issue context (diffs, comment anchors) via gh.
-          # The app token only has read permissions, so gh can't write regardless.
+          # Skip the permission system entirely so Claude can read the event payload
+          # (outside the repo checkout) and use gh freely. Safe-ish here: the action
+          # only triggers for actors with write access, and the app token is read-only.
           # The action omits the trigger comment's file/line anchor from its prompt,
           # so point Claude at the raw event payload to recover it.
           claude_args: >-
-            --allowed-tools "Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh api:*),Bash(gh issue view:*),Bash(cat:*)"
+            --dangerously-skip-permissions
             --append-system-prompt "When triggered by a PR review comment, first read the event payload file at the path in the GITHUB_EVENT_PATH environment variable; use .comment.path, .comment.line, and .comment.diff_hunk as the anchor. Words like 'this' in the trigger comment refer to that anchored code, not to earlier threads."
 
