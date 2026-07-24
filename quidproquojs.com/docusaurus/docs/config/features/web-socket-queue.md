@@ -88,4 +88,5 @@ A `QPQConfig` array containing: three globals, the connection [key-value store](
 - [defineStateDispatchOverWebsockets](./state-dispatch-over-websockets.md) — routes core State-domain dispatches to clients through this queue.
 - [defineTenantedWebSocketQueue](./tenanted-web-socket-queue.md) — this define with the tenant connection-scope resolver pre-wired.
 - [askWebsocketSendMessage](../../actions/webserver/websocket/ask-websocket-send-message.md) — send a raw message to a connection on the queue's API.
+- [askWebSocketQueueBroadcastMessage](../../actions/features/web-socket-queue/ask-web-socket-queue-broadcast-message.md), [askWebSocketQueueBroadcastServiceUpdated](../../actions/features/web-socket-queue/ask-web-socket-queue-broadcast-service-updated.md) — push a server-initiated message to every live connection on this queue's API.
 - [defineEventBus](../core/event-bus.md), [defineKeyValueStore](../core/key-value-store.md), [defineUserDirectory](../core/user-directory.md) — the underlying resources it depends on.

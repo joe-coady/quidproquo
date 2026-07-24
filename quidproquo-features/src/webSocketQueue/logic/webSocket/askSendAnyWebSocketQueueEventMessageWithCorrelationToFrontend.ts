@@ -1,5 +1,5 @@
 import { askCatch, AskResponse } from 'quidproquo-core';
-import { askWebsocketSendMessage } from 'quidproquo-webserver';
+import { askWebsocketSendMessage, WebsocketSendMessageErrorTypeEnum } from 'quidproquo-webserver';
 
 import { askWebsocketReadApiNameOrThrow, askWebsocketReadConnectionInfo } from '../../context';
 import { webSocketConnectionData } from '../../data';
@@ -21,11 +21,30 @@ function* askSendAnyWebSocketQueueEventMessageWithCorrelationOnWebsocket(
   yield* askWebsocketSendMessage(apiName, connectionId, payload);
 }
 
+// A send that never throws: the connection store can hold records for sockets that
+// died without their onDisconnect firing, and one dead connection must not abort a
+// multi-connection send. A Disconnected failure deletes the stale record so the
+// store self-heals; any other failure (e.g. Throttled) just drops this message for
+// this connection. Returns whether the send succeeded.
+function* askSendToConnectionCleaningUpStale(connectionId: string, payload: AnyWebSocketQueueEventMessageWithCorrelation): AskResponse<boolean> {
+  const result = yield* askCatch(askSendAnyWebSocketQueueEventMessageWithCorrelationOnWebsocket(connectionId, payload));
+
+  if (result.success) {
+    return true;
+  }
+
+  if (result.error.errorType === WebsocketSendMessageErrorTypeEnum.Disconnected) {
+    yield* webSocketConnectionData.askDeleteByConnectionId(connectionId);
+  }
+
+  return false;
+}
+
 function* askSendMessageToEveryone(payload: AnyWebSocketQueueEventMessageWithCorrelation) {
   const connections = yield* webSocketConnectionData.askGetAllConnections();
 
   for (const connection of connections) {
-    yield* askSendAnyWebSocketQueueEventMessageWithCorrelationOnWebsocket(connection.id, payload);
+    yield* askSendToConnectionCleaningUpStale(connection.id, payload);
   }
 }
 
@@ -33,7 +52,7 @@ function* askSendMessageToUser(userId: string, payload: AnyWebSocketQueueEventMe
   const connections = yield* webSocketConnectionData.askGetConnectionsByUserId(userId);
 
   for (const connection of connections) {
-    yield* askSendAnyWebSocketQueueEventMessageWithCorrelationOnWebsocket(connection.id, payload);
+    yield* askSendToConnectionCleaningUpStale(connection.id, payload);
   }
 }
 
@@ -52,10 +71,10 @@ export function* askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend(
   }
 
   if (connectionId) {
-    const response = yield* askCatch(askSendAnyWebSocketQueueEventMessageWithCorrelationOnWebsocket(connectionId, payloadWithCorrelationId));
+    const sent = yield* askSendToConnectionCleaningUpStale(connectionId, payloadWithCorrelationId);
 
     // If we sent the message, or we don't have a direct user to send it to, bail
-    if (response.success || !userId) {
+    if (sent || !userId) {
       return;
     }
   }

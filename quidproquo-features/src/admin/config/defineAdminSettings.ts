@@ -28,6 +28,8 @@ import {
   QPQ_TRACE_LOG_SERVICE_FUNCTION_NAME,
   WebsocketAdminClientMessageEventType,
 } from '../log';
+import { defineAdminServiceMaintenanceRoute } from '../maintenance/config/defineAdminServiceMaintenanceRoute';
+import { QPQ_ADMIN_MAINTENANCE_WS_API_GLOBAL } from '../maintenance/config/maintenanceWebsocketApiGlobal';
 import { adminUserDirectoryResourceName } from './adminUserDirectory';
 import { adminLogAiTools, defineAdminLogAiTools } from './defineAdminLogAiTools';
 import { defineAdminSessionEventDoc } from './defineAdminSessionEventDoc';
@@ -37,6 +39,10 @@ export interface QPQConfigAdvancedLogSettings extends QPQConfigAdvancedSettings 
   coldStorageAfterDays?: number;
 
   services?: string[];
+
+  // The APPLICATION websocket api (defineWebSocketQueue apiName) the admin
+  // maintenance begin/end broadcasts on. Unset = the maintenance route rejects.
+  maintenanceWebsocketApiName?: string;
 }
 
 // Retention defaults to undefined (no expiry) unless `logRetentionDays` is set.
@@ -163,6 +169,8 @@ export const defineAdminSettings = (logServiceName: string, rootDomain: string, 
         defineAdminServiceLogRoute('GET', '/log/downloadurl/{correlationId}', 'downloadUrl', routeAuthSettings),
         defineAdminServiceLogRoute('POST', '/log/{correlationId}/trace', 'traceLog', routeAuthSettings),
 
+        defineAdminServiceMaintenanceRoute('POST', '/maintenance/set', 'setMaintenance', routeAuthSettings),
+
         // The log chat: a generic EventDocAi instance scoped to `docId` = log correlation id,
         // with tools instead of the log pasted into the prompt (see adminLogAiSystemPrompt).
         defineEventDocAi({
@@ -214,6 +222,7 @@ export const defineAdminSettings = (logServiceName: string, rootDomain: string, 
           },
         ),
 
+        defineGlobal(QPQ_ADMIN_MAINTENANCE_WS_API_GLOBAL, advancedSettings?.maintenanceWebsocketApiName ?? ''),
         defineGlobal('qpq-serviceNames', advancedSettings?.services ?? []),
         defineGlobal('qpq-log-retention-days', logRetentionDays),
         defineGlobal('qpq-log-service-name', logServiceName),
