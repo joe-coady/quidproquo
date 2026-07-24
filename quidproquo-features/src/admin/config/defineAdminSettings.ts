@@ -21,6 +21,8 @@ import { defineEventDoc } from '../../eventDoc/config/defineEventDoc';
 import { defineEventDocAi } from '../../eventDocAi';
 import { getFeatureEntryQpqFunctionRuntime } from '../../getFeatureEntryQpqFunctionRuntime';
 import { defineWebSocketQueue } from '../../webSocketQueue';
+import { defineAdminServiceActionSearchRoute } from '../actionSearch/config/defineAdminServiceActionSearchRoute';
+import { QPQ_LOG_ACTIONS_KVS_NAME, QPQ_LOG_ENTITIES_KVS_NAME, QPQ_LOG_ENTITY_LOOKUP_KVS_NAME } from '../actionSearch/constants';
 import { adminLogAiSystemPrompt } from '../constants/adminLogAiSystemPrompt';
 import {
   defineAdminServiceAuthRoute,
@@ -179,6 +181,28 @@ export const defineAdminSettings = (logServiceName: string, rootDomain: string, 
           deprecated: advancedSettings?.deprecated,
         }),
 
+        // Action search: per-action rows extracted at log ingestion, keyed for
+        // idempotent re-ingestion; linkKey groups rows into domain entities.
+        defineKeyValueStore(QPQ_LOG_ACTIONS_KVS_NAME, 'correlation', [{ key: 'actionIndex', type: 'number' }], {
+          indexes: [
+            { partitionKey: 'actionType', sortKey: 'startedAt' },
+            { partitionKey: 'linkKey', sortKey: 'startedAt' },
+          ],
+          ttlAttribute: 'ttl',
+          deprecated: advancedSettings?.deprecated,
+        }),
+
+        defineKeyValueStore(QPQ_LOG_ENTITIES_KVS_NAME, 'linkKey', [], {
+          indexes: [{ partitionKey: 'entityType', sortKey: 'createdAt' }],
+          ttlAttribute: 'ttl',
+          deprecated: advancedSettings?.deprecated,
+        }),
+
+        defineKeyValueStore(QPQ_LOG_ENTITY_LOOKUP_KVS_NAME, 'lookupKey', ['sortValue'], {
+          ttlAttribute: 'ttl',
+          deprecated: advancedSettings?.deprecated,
+        }),
+
         defineAdminServiceAuthRoute('POST', '/login', 'login'),
         defineAdminServiceAuthRoute('POST', '/refreshToken', 'refreshToken'),
         defineAdminServiceAuthRoute('POST', '/challenge', 'respondToAuthChallenge'),
@@ -193,6 +217,10 @@ export const defineAdminSettings = (logServiceName: string, rootDomain: string, 
         defineAdminServiceLogRoute('GET', '/log/{correlationId}/hierarchies', 'getHierarchies', routeAuthSettings),
         defineAdminServiceLogRoute('GET', '/log/downloadurl/{correlationId}', 'downloadUrl', routeAuthSettings),
         defineAdminServiceLogRoute('POST', '/log/{correlationId}/trace', 'traceLog', routeAuthSettings),
+
+        defineAdminServiceActionSearchRoute('POST', '/actionSearch/actions/list', 'listActionRows', routeAuthSettings),
+        defineAdminServiceActionSearchRoute('POST', '/actionSearch/entities/list', 'listEntityRows', routeAuthSettings),
+        defineAdminServiceActionSearchRoute('POST', '/actionSearch/entity/timeline', 'getEntityTimeline', routeAuthSettings),
 
         // The maintenance event doc: active = open draft, closed = published,
         // reopen = new draft. Every append re-broadcasts the active public folds

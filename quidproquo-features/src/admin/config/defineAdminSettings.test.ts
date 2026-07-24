@@ -58,6 +58,25 @@ describe('defineAdminSettings', () => {
     expect(kvsNames).toContain('qpq-logs');
   });
 
+  it('includes the action search stores and routes on the log service', () => {
+    const config = defineAdminSettings('log', 'example.com');
+    const logSettings = findLogServiceSettings(config, 'log');
+
+    const kvsNames = logSettings
+      .filter((s) => s.configSettingType === QPQCoreConfigSettingType.keyValueStore)
+      .map((s) => (s as KeyValueStoreQPQConfigSetting).keyValueStoreName);
+
+    expect(kvsNames).toContain('qpq-log-actions');
+    expect(kvsNames).toContain('qpq-log-entities');
+    expect(kvsNames).toContain('qpq-log-entity-lookup');
+
+    const routePaths = logSettings.map((s) => (s as unknown as { path?: string }).path).filter((path) => !!path);
+
+    expect(routePaths).toContain('/actionSearch/actions/list');
+    expect(routePaths).toContain('/actionSearch/entities/list');
+    expect(routePaths).toContain('/actionSearch/entity/timeline');
+  });
+
   it('defines the admin session event doc stores on the log service', () => {
     const config = defineAdminSettings('log', 'example.com');
 
