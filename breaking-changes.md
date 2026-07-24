@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+## 0.1.11
+
 - `askSetMaintenanceMode` and the admin `POST /maintenance/set` route (built by the now-removed `defineAdminServiceMaintenanceRoute`) are removed from `quidproquo-features`. Maintenance mode is now an event-doc collection (`defineEventDoc`) mounted at `/maintenance`, with a full CRUD API and an update-log model, instead of a single begin/end toggle. There is no direct functional replacement for `askSetMaintenanceMode`; drive maintenance windows through the new `/maintenance` routes (or the admin dashboard's maintenance UI) instead.
 - `WebSocketQueueMaintenanceLevel`, `WebSocketQueueServerEventPayloadMaintenance`, and `WebSocketQueueServerEventMessageMaintenance` are removed from `quidproquo-features`. The application WebSocket now broadcasts `MaintenanceServerEventMessage` (payload `{ maintenances: MaintenancePublicState[] }`, replacing the whole active set on every change) under the same `WebSocketQueueServerMessageEventType.Maintenance` event type, instead of a single `{ active, level, message }` toggle. Update any frontend listening for that event type to read the new list-based payload.
 - `createEventDocWorkspace`'s returned shape changes in `quidproquo-features`: per-slot verbs move from `api.<slotKey>.<verb>` to `docs.<slotKey>.api.<verb>`, and the built-in `init`/`save`/`cancel`/`refresh` verbs move from `api.workspace.<verb>` to `api.<verb>` directly (`workspace` is no longer a reserved/nested key). Per-slot `selectors.view/liveEvents/slotState[<slotKey>]` move to `docs.<slotKey>.view/liveEvents/slotState`; `.selectors` now only exposes the cross-doc aggregates `isDirty`/`isLoading`/`isSaving`/`error`. Update call sites to the new `docs.<slotKey>` shape.

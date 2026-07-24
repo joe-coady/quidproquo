@@ -1,6 +1,6 @@
 {
   "name": "quidproquo-deploy-webpack",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "",
   "main": "./lib/commonjs/webpack.config.js",
   "module": "./lib/esm/webpack.config.js",
@@ -34,18 +34,18 @@
   "dependencies": {
     "@module-federation/enhanced": "2.6.0",
     "@module-federation/node": "2.7.45",
-    "quidproquo-actionprocessor-awslambda": "0.1.10",
-    "quidproquo-actionprocessor-node": "0.1.10",
-    "quidproquo-config-aws": "0.1.10",
-    "quidproquo-core": "0.1.10",
-    "quidproquo-deploy-awscdk": "0.1.10",
-    "quidproquo-webserver": "0.1.10",
+    "quidproquo-actionprocessor-awslambda": "0.1.11",
+    "quidproquo-actionprocessor-node": "0.1.11",
+    "quidproquo-config-aws": "0.1.11",
+    "quidproquo-core": "0.1.11",
+    "quidproquo-deploy-awscdk": "0.1.11",
+    "quidproquo-webserver": "0.1.11",
     "source-map-loader": "^5.0.0",
     "webpack-virtual-modules": "^0.6.2"
   },
   "devDependencies": {
     "@types/node": "^22.13.13",
-    "quidproquo-tsconfig": "0.1.10",
+    "quidproquo-tsconfig": "0.1.11",
     "typescript": "^5.8.2",
     "webpack": "^5.108.4"
   },

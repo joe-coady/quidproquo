@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.1.11
+
+- email sending: new `askEmailSendEmail` action in quidproquo-webserver, backed by SES v2 on AWS, with `defineEmailSender` config and an AWS sender
+  allow list, plus `askEmailSetDeliveryStatus` for tracking delivery status
+- admin action search: searchable action and entity indexes built from service logs, with definition registries for email and network actions, new
+  admin routes, and an action search screen (filters, grid, entity timelines) in web-admin
+- admin maintenance mode rebuilt as an event doc collection with typed update logs, active windows broadcast to the app websocket as public state,
+  and stale websocket connections cleaned up during broadcasts
+- event doc definitions: `createEventDocDefinition` describes a saved or local doc in one place, with new `askEventDocReadState` and
+  `askEventDocReadIdentity` actions and generic set-code/set-name/draft/publish verbs merged in automatically
+- `forceReloadFederatedRemote` in quidproquo-web for hot-swapping a federated remote without a full page reload
+- event doc workspace snapshot restore now carries local slots and history through
+- cli: views s3 sync sets cache-control headers (long-lived hashed assets, no-cache html)
+- bump aws sdk clients, aws-cdk-lib, constructs, and lambda types; drop the adm-zip dependency
+
+### Breaking changes
+
+- `askSetMaintenanceMode` and the admin `POST /maintenance/set` route are removed; maintenance is now an event-doc collection at `/maintenance`
+- the websocket maintenance broadcast now carries the full list of public maintenance states; the old `{ active, level, message }` types are removed
+- `createEventDocWorkspace` output reshaped: per-slot verbs live at `docs.<slotKey>.api`, built-in verbs directly on `api`
+- `EventDocWorkspaceDefinition.selectors` is removed; the workspace always builds its own selectors
+- `createEventDocWorkspaceSlot` is removed; use `createEventDocDefinition` (with `saved: false` for local slots)
+
 ## 0.1.10
 
 - event-doc workspace frontend state module: fold history at write time, transient (never-saved) event streams, typed per-slot errors, typed effects
