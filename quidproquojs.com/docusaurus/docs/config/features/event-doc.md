@@ -48,6 +48,7 @@ function defineEventDoc(options: EventDocRoutesOptions): QPQConfig;
 | `eventValidator` | `string` | no | Inline-function name run on every append to reject invalid events. |
 | `eventRenderer` | `string` | no | Inline-function name that folds + renders the log to HTML; mounting it adds a `GET {basePath}/{id}/render` route. |
 | `onPublish` | `string` | no | Inline-function name invoked with `{ docId, event, summary }` after every successful Publish append: the seam for syncing the folded document into a materialized read model. |
+| `onAppend` | `string` | no | Inline-function name invoked with `{ docId, event, summary, events }` after EVERY successful append (domain events and lifecycle events alike): the seam for reacting to any mutation. Runs after `onPublish` when both fire on the same Publish event. |
 | `scopeResolver` | `string` | no | Inline-function name every route invokes with `{ event }` to resolve the request's ambient storage scope (e.g. per-tenant); null means unscoped. |
 
 ## Examples

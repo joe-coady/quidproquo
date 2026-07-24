@@ -1,4 +1,4 @@
-import { KeyValueStoreActionType, runStory } from 'quidproquo-core';
+import { ConfigActionType, KeyValueStoreActionType, runStory } from 'quidproquo-core';
 import { WebsocketActionType } from 'quidproquo-webserver';
 
 import { describe, expect, it } from 'vitest';
@@ -19,6 +19,7 @@ describe('onConnect', () => {
     let captured: any;
 
     runStory(onConnect(baseEvent), {
+      [ConfigActionType.GetGlobal]: '',
       [KeyValueStoreActionType.Upsert]: (action: any) => {
         captured = action;
         return undefined;

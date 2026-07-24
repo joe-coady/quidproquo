@@ -2,6 +2,7 @@ import {
   AiModel,
   defineEventBus,
   defineGlobal,
+  defineInlineFunction,
   defineKeyValueStore,
   defineNotifyError,
   defineQueue,
@@ -16,6 +17,7 @@ import {
 } from 'quidproquo-core';
 import { defineServiceFunction } from 'quidproquo-webserver';
 
+import { defineEventDoc } from '../../eventDoc/config/defineEventDoc';
 import { defineEventDocAi } from '../../eventDocAi';
 import { getFeatureEntryQpqFunctionRuntime } from '../../getFeatureEntryQpqFunctionRuntime';
 import { defineWebSocketQueue } from '../../webSocketQueue';
@@ -28,8 +30,16 @@ import {
   QPQ_TRACE_LOG_SERVICE_FUNCTION_NAME,
   WebsocketAdminClientMessageEventType,
 } from '../log';
-import { defineAdminServiceMaintenanceRoute } from '../maintenance/config/defineAdminServiceMaintenanceRoute';
 import { QPQ_ADMIN_MAINTENANCE_WS_API_GLOBAL } from '../maintenance/config/maintenanceWebsocketApiGlobal';
+import {
+  maintenanceBasePath,
+  maintenanceDocType,
+  maintenanceStoreName,
+  QPQ_ADMIN_SERVICE_NAME_GLOBAL,
+  QPQ_GET_ACTIVE_MAINTENANCES_FUNCTION_NAME,
+  QPQ_MAINTENANCE_ON_APPEND_FN,
+  QPQ_MAINTENANCE_WS_SYNC_FN,
+} from '../maintenance/constants/maintenanceConstants';
 import { adminUserDirectoryResourceName } from './adminUserDirectory';
 import { adminLogAiTools, defineAdminLogAiTools } from './defineAdminLogAiTools';
 import { defineAdminSessionEventDoc } from './defineAdminSessionEventDoc';
@@ -40,8 +50,8 @@ export interface QPQConfigAdvancedLogSettings extends QPQConfigAdvancedSettings 
 
   services?: string[];
 
-  // The APPLICATION websocket api (defineWebSocketQueue apiName) the admin
-  // maintenance begin/end broadcasts on. Unset = the maintenance route rejects.
+  // The APPLICATION websocket api (defineWebSocketQueue apiName) maintenance
+  // state broadcasts on. Unset = maintenance mutations skip broadcasting.
   maintenanceWebsocketApiName?: string;
 }
 
@@ -88,6 +98,21 @@ export const defineAdminSettings = (logServiceName: string, rootDomain: string, 
       userDirectoryName: adminUserDirectoryResourceName,
       owner: { module: logServiceName },
     }),
+
+    // App-wide: which module the admin service is, so ANY service (e.g. the app
+    // websocket's lambda) can service-function-call it.
+    defineGlobal(QPQ_ADMIN_SERVICE_NAME_GLOBAL, logServiceName),
+
+    // The app websocket's connect-time maintenance sync (see
+    // defineWebSocketQueue's onConnected — pre-auth, maintenance is public).
+    // Registered unowned so it resolves inside whichever service owns the
+    // websocket, not just the admin service.
+    defineInlineFunction(
+      getFeatureEntryQpqFunctionRuntime('admin/maintenance', 'inlineFunction', 'qpqMaintenanceWsConnectedSync::qpqMaintenanceWsConnectedSync'),
+      {
+        functionName: QPQ_MAINTENANCE_WS_SYNC_FN,
+      },
+    ),
 
     // Every service exposes the log-replay tracer as a service function, so the admin
     // log service can trace any log INSIDE the service that owns it (right module
@@ -169,7 +194,32 @@ export const defineAdminSettings = (logServiceName: string, rootDomain: string, 
         defineAdminServiceLogRoute('GET', '/log/downloadurl/{correlationId}', 'downloadUrl', routeAuthSettings),
         defineAdminServiceLogRoute('POST', '/log/{correlationId}/trace', 'traceLog', routeAuthSettings),
 
-        defineAdminServiceMaintenanceRoute('POST', '/maintenance/set', 'setMaintenance', routeAuthSettings),
+        // The maintenance event doc: active = open draft, closed = published,
+        // reopen = new draft. Every append re-broadcasts the active public folds
+        // over the application websocket (onAppend hook below).
+        defineEventDoc({
+          storeName: maintenanceStoreName,
+          type: maintenanceDocType,
+          basePath: maintenanceBasePath,
+          routeAuthSettings: { userDirectoryName: adminUserDirectoryResourceName },
+          onAppend: QPQ_MAINTENANCE_ON_APPEND_FN,
+        }),
+
+        defineInlineFunction(
+          getFeatureEntryQpqFunctionRuntime('admin/maintenance', 'inlineFunction', 'qpqMaintenanceOnAppend::qpqMaintenanceOnAppend'),
+          {
+            functionName: QPQ_MAINTENANCE_ON_APPEND_FN,
+          },
+        ),
+
+        // The cross-service read of the active maintenance folds — the websocket
+        // lambda's connect-time sync calls this.
+        defineServiceFunction(
+          getFeatureEntryQpqFunctionRuntime('admin/maintenance', 'serviceFunction', 'qpqGetActiveMaintenances::qpqGetActiveMaintenances'),
+          {
+            functionName: QPQ_GET_ACTIVE_MAINTENANCES_FUNCTION_NAME,
+          },
+        ),
 
         // The log chat: a generic EventDocAi instance scoped to `docId` = log correlation id,
         // with tools instead of the log pasted into the prompt (see adminLogAiSystemPrompt).

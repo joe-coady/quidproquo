@@ -20,6 +20,14 @@ export interface QPQConfigAdvancedWebsocketQueueSettings extends QPQConfigAdvanc
   // throws to reject the authenticate. A claim with NO resolver configured is
   // rejected outright.
   connectionScopeResolver?: string;
+
+  // Registered inline-function name (see `defineInlineFunction`) invoked with
+  // `{ connectionId }` (WebSocketQueueOnConnectedInput) as soon as a connection
+  // opens — BEFORE any authenticate, so only push PUBLIC state from it (e.g.
+  // the admin feature pushes the active maintenance set, which pre-login
+  // clients must also see). Runs in the websocket-owning service; failures are
+  // swallowed so a sync problem never breaks the connect.
+  onConnected?: string;
 }
 
 export function getWebSocketQueueGlobalConfigKeyForEventBusName(apiName: string): string {
@@ -32,6 +40,10 @@ export function getWebSocketQueueGlobalConfigKeyForUserDirectoryName(apiName: st
 
 export function getWebSocketQueueGlobalConfigKeyForConnectionScopeResolver(apiName: string): string {
   return `qpq-wsq-scope-resolver-${apiName}`;
+}
+
+export function getWebSocketQueueGlobalConfigKeyForOnConnected(apiName: string): string {
+  return `qpq-wsq-on-connected-${apiName}`;
 }
 
 export function getWebSocketQueueKeyValueStoreName(apiName: string): string {
@@ -49,6 +61,7 @@ export const defineWebSocketQueue = (
     defineGlobal(getWebSocketQueueGlobalConfigKeyForEventBusName(apiName), eventBusName),
     defineGlobal(getWebSocketQueueGlobalConfigKeyForUserDirectoryName(apiName), advancedSettings?.userDirectoryName || ''),
     defineGlobal(getWebSocketQueueGlobalConfigKeyForConnectionScopeResolver(apiName), advancedSettings?.connectionScopeResolver || ''),
+    defineGlobal(getWebSocketQueueGlobalConfigKeyForOnConnected(apiName), advancedSettings?.onConnected || ''),
 
     // Store To Save Connection Info
     defineKeyValueStore(getWebSocketQueueKeyValueStoreName(apiName), 'id', undefined, {

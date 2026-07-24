@@ -3,6 +3,7 @@ import { askCatch, askConfigGetGlobal, AskResponse } from 'quidproquo-core';
 import {
   EVENT_DOC_EVENT_VALIDATOR_GLOBAL,
   EVENT_DOC_EVENTS_STORE_NAME_GLOBAL,
+  EVENT_DOC_ON_APPEND_GLOBAL,
   EVENT_DOC_ON_PUBLISH_GLOBAL,
   EVENT_DOC_RENDERER_GLOBAL,
   EVENT_DOC_SCOPE_RESOLVER_GLOBAL,
@@ -36,6 +37,7 @@ export function* askEventDocProvideStoreFromGlobals<T>(story: AskResponse<T>): A
   const eventValidator = yield* askConfigGetGlobal<string>(EVENT_DOC_EVENT_VALIDATOR_GLOBAL);
   const eventRenderer = yield* askConfigGetGlobal<string>(EVENT_DOC_RENDERER_GLOBAL);
   const onPublish = yield* askConfigGetGlobalAddedAfterV1(EVENT_DOC_ON_PUBLISH_GLOBAL);
+  const onAppend = yield* askConfigGetGlobalAddedAfterV1(EVENT_DOC_ON_APPEND_GLOBAL);
   const scopeResolver = yield* askConfigGetGlobalAddedAfterV1(EVENT_DOC_SCOPE_RESOLVER_GLOBAL);
 
   return yield* askEventDocStoreProvide(
@@ -47,6 +49,7 @@ export function* askEventDocProvideStoreFromGlobals<T>(story: AskResponse<T>): A
       eventValidator,
       eventRenderer,
       onPublish,
+      onAppend,
       scopeResolver,
     },
     story,

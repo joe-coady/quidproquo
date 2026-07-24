@@ -5,3 +5,4 @@ export * from './serverMessages';
 export * from './WebSocketQueueEvent';
 export * from './WebSocketQueueEventMessage';
 export * from './WebSocketQueueEventMessageWithCorrelation';
+export * from './WebSocketQueueOnConnectedInput';
