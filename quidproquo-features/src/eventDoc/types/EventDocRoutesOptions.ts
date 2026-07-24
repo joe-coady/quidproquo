@@ -35,6 +35,13 @@ export type EventDocRoutesOptions = {
   // a materialized read model. Errors propagate to the caller: the event has landed, but the
   // side effect did not, so the caller learns the read model may be stale.
   onPublish?: string;
+  // Registered inline-function name (see `defineInlineFunction`). When set, EVERY successful
+  // append (domain events and lifecycle events alike) invokes it with
+  // `{ docId, event, summary, events }` after the event is durably written and the summary
+  // re-derived - the seam for reacting to any mutation (e.g. broadcasting the doc's fresh
+  // fold). Runs after `onPublish` when both fire on the same Publish event. Errors propagate
+  // to the caller: the event has landed, but the side effect did not.
+  onAppend?: string;
   // Registered inline-function name (see `defineInlineFunction`). When set, every route
   // invokes it with `{ event }` before running; a non-null result becomes the ambient
   // storage scope for the whole request, transparently partitioning the collection's

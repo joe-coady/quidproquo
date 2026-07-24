@@ -21,6 +21,7 @@ import {
   EventDocEventActor,
   EventDocEventInput,
   EventDocEventValidationInput,
+  EventDocOnAppendInput,
   EventDocOnPublishInput,
   EventDocSummary,
   eventDocSummarySchema,
@@ -162,19 +163,34 @@ export function* askEventDocEventAppend(modelId: string, input: EventDocEventInp
   // failed. A deduped publish retry also reaches here and re-fires the hook -
   // deliberate: hooks must be idempotent, and a retry after a failed hook is
   // exactly how a stale read model gets repaired.
-  const { onPublish } = yield* askEventDocStoreRead();
-  if (onPublish && appendedEvent.type === EventDocEffect.Publish) {
+  const { onPublish, onAppend } = yield* askEventDocStoreRead();
+  const firePublishHook = !!onPublish && appendedEvent.type === EventDocEffect.Publish;
+
+  if (firePublishHook || onAppend) {
     // The writing lap already read the log and upserted the summary; reuse
     // both. Only the dedup path (which skipped those reads) fetches fresh.
     const summary = result.result.summary ?? (yield* askEventDocGetByIdOrThrow(modelId));
     const events = result.result.priorEvents ? [...result.result.priorEvents, appendedEvent] : yield* askEventDocEventListAll(modelId);
 
-    yield* askInlineFunctionExecute<void, EventDocOnPublishInput>(onPublish, {
-      docId: modelId,
-      event: appendedEvent,
-      summary,
-      events,
-    });
+    if (firePublishHook) {
+      yield* askInlineFunctionExecute<void, EventDocOnPublishInput>(onPublish!, {
+        docId: modelId,
+        event: appendedEvent,
+        summary,
+        events,
+      });
+    }
+
+    // The every-append hook runs after the publish hook so a broadcast of the
+    // fresh fold always observes whatever read model onPublish just synced.
+    if (onAppend) {
+      yield* askInlineFunctionExecute<void, EventDocOnAppendInput>(onAppend, {
+        docId: modelId,
+        event: appendedEvent,
+        summary,
+        events,
+      });
+    }
   }
 
   return appendedEvent;

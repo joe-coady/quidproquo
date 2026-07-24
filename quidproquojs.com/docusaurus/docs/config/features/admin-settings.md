@@ -63,7 +63,7 @@ export interface QPQConfigAdvancedLogSettings extends QPQConfigAdvancedSettings 
 | `logRetentionDays` | `number` | – (no expiry) | How many days to keep the raw log objects on the logs storage drive before they are deleted. When unset, logs never expire. If `coldStorageAfterDays` is set, the effective retention is padded so that it is at least `coldStorageAfterDays + 180` days — logs always outlive the cold-storage transition window. |
 | `coldStorageAfterDays` | `number` | – (no transition) | When greater than 0, adds a lifecycle rule transitioning log objects to the `DEEP_COLD_STORAGE` tier after this many days, to cut storage cost for old logs. |
 | `services` | `string[]` | `[]` | The list of service names the admin dashboard should surface, exposed as the `qpq-serviceNames` global. Returned by the `/admin/services` route. |
-| `maintenanceWebsocketApiName` | `string` | `''` | Name of the **application** [WebSocket queue](./web-socket-queue.md) (its `apiName`, not the admin's own socket) that the `/maintenance/set` route broadcasts begin/end messages on. Unset means the route rejects every call. |
+| `maintenanceWebsocketApiName` | `string` | `''` | Name of the **application** [WebSocket queue](./web-socket-queue.md) (its `apiName`, not the admin's own socket) that maintenance state broadcasts on. Unset means maintenance mutations skip broadcasting. |
 | `deprecated` | `boolean` | `false` | Inherited from `QPQConfigAdvancedSettings`; marks the log storage drives and key-value stores as deprecated. |
 
 ## What it declares
@@ -74,7 +74,7 @@ export interface QPQConfigAdvancedLogSettings extends QPQConfigAdvancedSettings 
 - **Log indexes** — key-value stores for correlations (indexed by `runtimeType` and `fromCorrelation`, both sorted by `startedAt`, with a `ttl` attribute), log messages, and a log list.
 - **Auth routes** — `POST /login`, `POST /refreshToken`, `POST /challenge`, authenticated against the [admin user directory](./admin-user-directory.md).
 - **Log routes** — `GET /admin/services`, `POST /log/list`, `GET /log/{correlationId}`, its `/toggle`, `/children`, `/hierarchies`, `/downloadurl`, and the log-log list — all (except the service list) requiring an admin token.
-- **Maintenance route** — `POST /maintenance/set`, backed by [askSetMaintenanceMode](../../actions/features/admin/ask-set-maintenance-mode.md), broadcasting a begin/end message to every connection on the `maintenanceWebsocketApiName` application WebSocket queue.
+- **Maintenance collection** — an [event-doc collection](./event-doc.md) (`defineEventDoc`) mounted at `/maintenance`, admin-authenticated, storing maintenance windows as an append-only update log. Every append re-broadcasts the active maintenance set to every connection on the `maintenanceWebsocketApiName` application WebSocket queue (via its `onAppend` hook); a newly-opened connection gets the same set pre-auth through that queue's `onConnected` sync.
 - **Log chat** — a `defineEventDocAi` instance scoped to `docId` = log correlation id, with two tools (`getLogActions`, `getLogAction`) instead of the log's JSON pasted into the prompt. Runs on `AiModel.ClaudeSonnet46` over the same admin WebSocket connection, not a separate HTTP route.
 - **WebSocket sync** — an admin event bus (`qpq-admin-wsq`), a `defineWebSocketQueue`, and queues that fan out client messages (config sync, mark-log-checked, refresh-metadata) using `WebsocketAdminClientMessageEventType`.
 - **Alarms** — a `defineNotifyError` publishing to an `admin-notifier` event bus, with a queue handling its Error / Timeout / Throttle events.
@@ -103,6 +103,6 @@ export default [
 - [defineAdminUserDirectory](./admin-user-directory.md) — the directory admins authenticate against; declare it alongside these settings.
 - [defineAdminSessionEventDoc](./admin-session-event-doc.md) — the per-login admin session document, spread in by this define.
 - [askAdminGetLogs](../../actions/webserver/admin/ask-admin-get-logs.md), [askAdminGetLog](../../actions/webserver/admin/ask-admin-get-log.md), [askAdminGetLogMetadata](../../actions/webserver/admin/ask-admin-get-log-metadata.md) — the actions the admin log routes are built from.
-- [askSetMaintenanceMode](../../actions/features/admin/ask-set-maintenance-mode.md) — the action the maintenance route is built from.
-- [defineWebSocketQueue](./web-socket-queue.md) — declares the application WebSocket queue named by `maintenanceWebsocketApiName`.
+- [defineEventDoc](./event-doc.md) — the helper the maintenance collection is declared with.
+- [defineWebSocketQueue](./web-socket-queue.md) — declares the application WebSocket queue named by `maintenanceWebsocketApiName`, including its `onConnected` pre-auth sync.
 - [defineStorageDrive](../core/storage-drive.md), [defineKeyValueStore](../core/key-value-store.md), [defineQueue](../core/queue.md), [defineEventBus](../core/event-bus.md) — the core settings this feature composes.

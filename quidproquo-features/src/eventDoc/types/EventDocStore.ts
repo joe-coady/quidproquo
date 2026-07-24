@@ -14,6 +14,9 @@ export type EventDocStore = {
   // The collection's on-publish inline-function name, if configured. Invoked after a
   // Publish event has been durably appended and the summary re-derived.
   onPublish?: string;
+  // The collection's on-append inline-function name, if configured. Invoked after EVERY
+  // event (lifecycle included) has been durably appended and the summary re-derived.
+  onAppend?: string;
   // The collection's request-scope inline-function name, if configured. Invoked with the
   // HTTP event; a non-null result becomes the ambient storage scope for the request.
   scopeResolver?: string;

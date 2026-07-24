@@ -20,6 +20,7 @@ export const defineEventDocRoutes = ({
   eventValidator,
   eventRenderer,
   onPublish,
+  onAppend,
   scopeResolver,
   excludeRoutes = [],
 }: EventDocRoutesOptions): QPQConfig => {
@@ -31,6 +32,7 @@ export const defineEventDocRoutes = ({
     eventValidator,
     eventRenderer,
     onPublish,
+    onAppend,
     scopeResolver,
   });
 

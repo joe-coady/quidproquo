@@ -1,6 +1,7 @@
 import {
   EVENT_DOC_EVENT_VALIDATOR_GLOBAL,
   EVENT_DOC_EVENTS_STORE_NAME_GLOBAL,
+  EVENT_DOC_ON_APPEND_GLOBAL,
   EVENT_DOC_ON_PUBLISH_GLOBAL,
   EVENT_DOC_RENDERER_GLOBAL,
   EVENT_DOC_SCOPE_RESOLVER_GLOBAL,
@@ -24,5 +25,6 @@ export const buildEventDocStoreGlobals = (store: EventDocStore): Record<string, 
   [EVENT_DOC_EVENT_VALIDATOR_GLOBAL]: store.eventValidator ?? '',
   [EVENT_DOC_RENDERER_GLOBAL]: store.eventRenderer ?? '',
   [EVENT_DOC_ON_PUBLISH_GLOBAL]: store.onPublish ?? '',
+  [EVENT_DOC_ON_APPEND_GLOBAL]: store.onAppend ?? '',
   [EVENT_DOC_SCOPE_RESOLVER_GLOBAL]: store.scopeResolver ?? '',
 });

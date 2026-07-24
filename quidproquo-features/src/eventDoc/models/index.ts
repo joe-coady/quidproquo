@@ -15,6 +15,7 @@ export * from './EventDocInitData';
 export * from './EventDocLink';
 export * from './EventDocLinkMode';
 export * from './EventDocListItem';
+export * from './EventDocOnAppendInput';
 export * from './EventDocOnPublishInput';
 export * from './EventDocPublishData';
 export * from './EventDocRenderInput';

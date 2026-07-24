@@ -68,6 +68,7 @@ export interface QPQConfigAdvancedWebsocketQueueSettings extends QPQConfigAdvanc
   owner?: CrossModuleOwnerWithNoResourceOverride;
   userDirectoryName?: string;
   connectionScopeResolver?: string;
+  onConnected?: string;
 }
 ```
 
@@ -75,6 +76,7 @@ export interface QPQConfigAdvancedWebsocketQueueSettings extends QPQConfigAdvanc
 | --- | --- | --- | --- |
 | `userDirectoryName` | `string` | `''` | Name of the [user directory](../core/user-directory.md) used to authenticate clients (stored in the `qpq-wsq-kvs-name-<apiName>` global). Enables the authenticate client/server message flow. |
 | `connectionScopeResolver` | `string` | `''` | Name of a registered [inline function](../core/inline-function.md) invoked with `{ userId, requestedScope }` on **every** Authenticate message, whether or not it claims a storage scope (stored in the `qpq-wsq-scope-resolver-<apiName>` global). It returns the effective scope to store on the connection (e.g. a membership-checked tenant scope for a claim, or the user's own scope for no claim), or throws to reject the authenticate. A scope claim with no resolver configured is rejected outright, leaving the connection unauthenticated. |
+| `onConnected` | `string` | `''` | Name of a registered [inline function](../core/inline-function.md) invoked with `{ connectionId }` as soon as a connection opens, **before** any authenticate — so it must only push public state (e.g. broadcasting an already-active maintenance notice to a pre-login client). Runs in the websocket-owning service; failures are swallowed so a sync problem never breaks the connect. |
 | `owner` | `CrossModuleOwnerWithNoResourceOverride` | – | Declares the queue's resources as owned by another module/service, so this service references them instead of deploying its own. Applied to both the WebSocket API and the connection store. |
 | `deprecated` | `boolean` | `false` | Inherited from `QPQConfigAdvancedSettings`; when set, the underlying WebSocket API is not deployed. |
 

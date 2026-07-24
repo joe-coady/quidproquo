@@ -11,6 +11,7 @@ export type EventDocStoreOptions = {
   eventValidator?: string;
   eventRenderer?: string;
   onPublish?: string;
+  onAppend?: string;
   scopeResolver?: string;
 };
 
@@ -24,6 +25,7 @@ export const buildEventDocStore = ({
   eventValidator,
   eventRenderer,
   onPublish,
+  onAppend,
   scopeResolver,
 }: EventDocStoreOptions): EventDocStore => ({
   storeName,
@@ -33,5 +35,6 @@ export const buildEventDocStore = ({
   eventValidator,
   eventRenderer,
   onPublish,
+  onAppend,
   scopeResolver,
 });
