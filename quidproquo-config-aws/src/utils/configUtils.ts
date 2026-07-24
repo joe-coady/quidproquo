@@ -17,6 +17,7 @@ import {
   BootstrapWafQPQConfigSetting,
   defineAwsVirtualNetworkSettings,
   DomainCertificateQPQConfigSetting,
+  EmailSenderAllowListQPQConfigSetting,
   EventBusQuickSubscription,
   EventBusQuickSubscriptionQPQConfigSetting,
   QPQAwsConfigSettingType,
@@ -161,6 +162,17 @@ export const getEventBusQuickSubscriptions = (
     .filter((setting) => setting.eventBusName === eventBusName)
     .filter((setting) => !setting.owner || qpqCoreUtils.isSameCrossModuleOwner(setting.owner, busOwner))
     .flatMap((setting) => setting.subscriptions);
+};
+
+/**
+ * Sandbox recipient addresses declared for a given email sender root domain.
+ * Additive across calls. See defineEmailSenderAllowList for why this exists.
+ */
+export const getEmailSenderAllowedAddresses = (qpqConfig: QPQConfig, rootDomain: string): string[] => {
+  return qpqCoreUtils
+    .getConfigSettings<EmailSenderAllowListQPQConfigSetting>(qpqConfig, QPQAwsConfigSettingType.awsEmailSenderAllowList)
+    .filter((setting) => setting.rootDomain === rootDomain)
+    .flatMap((setting) => setting.allowedEmailAddresses);
 };
 
 export const getAwsAccountIds = (qpqConfig: QPQConfig): string[] => {

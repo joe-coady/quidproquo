@@ -7,6 +7,7 @@ import {
   DefaultRouteOptionsQPQWebServerConfigSetting,
   DnsQPQWebServerConfigSetting,
   DomainProxyQPQWebServerConfigSetting,
+  EmailSenderQPQWebServerConfigSetting,
   FileUploadSettings,
   FileUploadSettingsQPQWebServerConfigSetting,
   OpenApiQPQWebServerConfigSetting,
@@ -307,6 +308,13 @@ export const resolveDomainRoot = (rootDomain: string, qpqConfig: QPQConfig): str
   );
 
   return domain;
+};
+
+export const getEmailSenderSettings = (qpqConfig: QPQConfig): EmailSenderQPQWebServerConfigSetting[] => {
+  const emailSenderSettings =
+    qpqCoreUtils.getConfigSettings<EmailSenderQPQWebServerConfigSetting>(qpqConfig, QPQWebServerConfigSettingType.EmailSender) || [];
+
+  return emailSenderSettings;
 };
 
 export const getWebsocketSettings = (qpqConfig: QPQConfig): WebSocketQPQWebServerConfigSetting[] => {
