@@ -15,6 +15,7 @@ import {
   QpqInfCoreUserDirectoryConstruct,
   QpqWebserverApiKeyConstruct,
   QpqWebserverCertificateConstruct,
+  QpqWebserverEmailSenderConstruct,
   QpqWebserverWebsocketConstruct,
 } from '../constructs';
 import { WebserverRoll } from '../constructs/basic/WebserverRoll';
@@ -154,6 +155,18 @@ export class InfQpqServiceStack extends QpqServiceStack {
         }),
     );
     QpqWebserverWebsocketConstruct.authorizeManageConnectionsForRole(webserverRole, websockets, props.qpqConfig);
+
+    // Email senders (SES identities)
+    const emailSenderConfigs = qpqWebServerUtils.getEmailSenderSettings(props.qpqConfig);
+    emailSenderConfigs.map(
+      (setting) =>
+        new QpqWebserverEmailSenderConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
+          qpqConfig: props.qpqConfig,
+
+          emailSenderConfig: setting,
+        }),
+    );
+    QpqWebserverEmailSenderConstruct.authorizeSendEmailForRole(webserverRole, emailSenderConfigs, props.qpqConfig);
 
     // Cache settings
     const cache = qpqWebServerUtils.getAllOwnedCacheConfigs(props.qpqConfig).map(

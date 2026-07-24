@@ -6,6 +6,7 @@ export * from './awsKmsKey';
 export * from './awsServiceDashboard';
 export * from './awsVirtualNetworkSettings';
 export * from './domainCertificate';
+export * from './emailSenderAllowList';
 export * from './eventBusQuickSubscription';
 export * from './organizations';
 export * from './serviceAccountInfo';

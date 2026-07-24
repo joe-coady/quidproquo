@@ -2,6 +2,7 @@ export * from './admin';
 export * from './api';
 export * from './apiKeyValidation';
 export * from './dns';
+export * from './email';
 export * from './genericDataResource';
 export * from './openApiSpec';
 export * from './routeAuthValidation';
