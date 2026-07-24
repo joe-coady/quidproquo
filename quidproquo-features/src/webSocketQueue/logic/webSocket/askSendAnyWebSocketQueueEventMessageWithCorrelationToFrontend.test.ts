@@ -1,5 +1,5 @@
 import { ContextActionType, KeyValueStoreActionType, runStory, throwsError } from 'quidproquo-core';
-import { WebsocketActionType } from 'quidproquo-webserver';
+import { WebsocketActionType, WebsocketSendMessageErrorTypeEnum } from 'quidproquo-webserver';
 
 import { describe, expect, it } from 'vitest';
 
@@ -38,21 +38,27 @@ describe('askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend', () => 
 
   it('falls back to the user connections when the direct send fails and a user is given', () => {
     const sends: any[] = [];
+    const deletes: any[] = [];
 
     runStory(askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend(message, 'direct', 'u1'), {
       [ContextActionType.Read]: { apiName: 'demo' },
       [KeyValueStoreActionType.Query]: { items: [{ id: 'user-conn' }] },
+      [KeyValueStoreActionType.Delete]: (action: any) => {
+        deletes.push(action.payload.key);
+        return undefined;
+      },
       [WebsocketActionType.SendMessage]: (action: any) => {
         const connectionId = action.payload.connectionId;
         sends.push(connectionId);
         if (connectionId === 'direct') {
-          return throwsError('Disconnected', 'gone');
+          return throwsError(WebsocketSendMessageErrorTypeEnum.Disconnected, 'gone');
         }
         return undefined;
       },
     });
 
     expect(sends).toEqual(['direct', 'user-conn']);
+    expect(deletes).toEqual(['direct']);
   });
 
   it('broadcasts to everyone when neither a connection nor a user is given', () => {
@@ -68,5 +74,55 @@ describe('askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend', () => 
     });
 
     expect(sends).toEqual(['a', 'b']);
+  });
+
+  it('keeps broadcasting past a dead connection and deletes its stale record', () => {
+    const sends: any[] = [];
+    const deletes: any[] = [];
+
+    runStory(askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend(message), {
+      [ContextActionType.Read]: { apiName: 'demo' },
+      [KeyValueStoreActionType.Scan]: { items: [{ id: 'a' }, { id: 'dead' }, { id: 'b' }] },
+      [KeyValueStoreActionType.Delete]: (action: any) => {
+        deletes.push(action.payload.key);
+        return undefined;
+      },
+      [WebsocketActionType.SendMessage]: (action: any) => {
+        const connectionId = action.payload.connectionId;
+        sends.push(connectionId);
+        if (connectionId === 'dead') {
+          return throwsError(WebsocketSendMessageErrorTypeEnum.Disconnected, 'Connection no longer exists');
+        }
+        return undefined;
+      },
+    });
+
+    expect(sends).toEqual(['a', 'dead', 'b']);
+    expect(deletes).toEqual(['dead']);
+  });
+
+  it('skips a throttled connection without deleting its record or aborting the loop', () => {
+    const sends: any[] = [];
+    const deletes: any[] = [];
+
+    runStory(askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend(message), {
+      [ContextActionType.Read]: { apiName: 'demo' },
+      [KeyValueStoreActionType.Scan]: { items: [{ id: 'a' }, { id: 'busy' }, { id: 'b' }] },
+      [KeyValueStoreActionType.Delete]: (action: any) => {
+        deletes.push(action.payload.key);
+        return undefined;
+      },
+      [WebsocketActionType.SendMessage]: (action: any) => {
+        const connectionId = action.payload.connectionId;
+        sends.push(connectionId);
+        if (connectionId === 'busy') {
+          return throwsError(WebsocketSendMessageErrorTypeEnum.Throttled, 'slow down');
+        }
+        return undefined;
+      },
+    });
+
+    expect(sends).toEqual(['a', 'busy', 'b']);
+    expect(deletes).toEqual([]);
   });
 });

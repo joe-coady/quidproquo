@@ -1,4 +1,5 @@
 import BugReportIcon from '@mui/icons-material/BugReport';
+import EngineeringIcon from '@mui/icons-material/Engineering';
 import ExtensionIcon from '@mui/icons-material/Extension';
 import RestoreIcon from '@mui/icons-material/Restore';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -9,6 +10,7 @@ import { FederatedTab } from '../../../FederatedAddon';
 import { AdminLogs } from '../../../LogViewer/AdminLogs/AdminLogs';
 import { Dashboard } from '../../../LogViewer/Dashboard';
 import { LogSearch } from '../../../LogViewer/LogSearch';
+import { Maintenance } from '../../../Maintenance';
 import { useFederatedAddon } from '../../../useFederatedAddon';
 
 export function useTabs(): {
@@ -37,6 +39,11 @@ export function useTabs(): {
       name: 'Advanced',
       View: Config,
       icon: <SettingsIcon />,
+    },
+    {
+      name: 'Maintenance',
+      View: Maintenance,
+      icon: <EngineeringIcon />,
     },
     ...addons.map((addon) => ({
       ...addon.tab,
