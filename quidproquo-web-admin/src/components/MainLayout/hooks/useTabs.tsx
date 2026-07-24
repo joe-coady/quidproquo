@@ -2,9 +2,11 @@ import BugReportIcon from '@mui/icons-material/BugReport';
 import EngineeringIcon from '@mui/icons-material/Engineering';
 import ExtensionIcon from '@mui/icons-material/Extension';
 import RestoreIcon from '@mui/icons-material/Restore';
+import SearchIcon from '@mui/icons-material/Search';
 import SettingsIcon from '@mui/icons-material/Settings';
 import TerminalIcon from '@mui/icons-material/Terminal';
 
+import { ActionSearch } from '../../../ActionSearch';
 import { Config } from '../../../Config';
 import { FederatedTab } from '../../../FederatedAddon';
 import { AdminLogs } from '../../../LogViewer/AdminLogs/AdminLogs';
@@ -29,6 +31,11 @@ export function useTabs(): {
       name: 'Logs',
       View: AdminLogs,
       icon: <TerminalIcon />,
+    },
+    {
+      name: 'Search',
+      View: ActionSearch,
+      icon: <SearchIcon />,
     },
     {
       name: 'Errors',

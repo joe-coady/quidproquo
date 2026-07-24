@@ -1,6 +1,7 @@
 import webserverAdminActionComponentMap from './webserverAdminActionComponentMap';
 import webserverApiKeyValidationActionComponentMap from './webserverApiKeyValidationActionComponentMap';
 import webserverDnsActionComponentMap from './webserverDnsActionComponentMap';
+import webserverEmailActionComponentMap from './webserverEmailActionComponentMap';
 import webserverGenericDataResourceActionComponentMap from './webserverGenericDataResourceActionComponentMap';
 import webserverOpenApiSpecActionComponentMap from './webserverOpenApiSpecActionComponentMap';
 import webserverRouteAuthValidationActionComponentMap from './webserverRouteAuthValidationActionComponentMap';
@@ -13,6 +14,7 @@ export default {
   ...webserverAdminActionComponentMap,
   ...webserverApiKeyValidationActionComponentMap,
   ...webserverDnsActionComponentMap,
+  ...webserverEmailActionComponentMap,
   ...webserverGenericDataResourceActionComponentMap,
   ...webserverOpenApiSpecActionComponentMap,
   ...webserverRouteAuthValidationActionComponentMap,

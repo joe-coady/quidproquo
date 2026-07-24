@@ -20,6 +20,7 @@ import {
   UserDirectorySetAccessTokenActionPayload,
 } from 'quidproquo-core';
 
+import { askUpdateActionSearchFromStoryResult } from '../../actionSearch/logic/askUpdateActionSearchFromStoryResult';
 import { askUpsert as askUpsertLogLog } from '../entry/data/logLogData';
 import * as logMetadataData from '../entry/data/logMetadataData';
 import { LogLog, LogMetadata } from '../entry/domain';
@@ -193,6 +194,8 @@ export function* askUpdateDatabaseFromLogFile(storageDriveName: string, filesPat
   });
 
   yield* askMap(logLogs, askUpsertLogLog);
+
+  yield* askUpdateActionSearchFromStoryResult(logObj.result, ttl);
 }
 
 export function* askUpdateDatabaseFromLogFiles(storageDriveName: string, filesPaths: string[]): AskResponse<void> {
