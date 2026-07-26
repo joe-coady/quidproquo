@@ -32,5 +32,5 @@ export const goDevCommand = async (argv: string[]): Promise<void> => {
     return;
   }
 
-  await goDevWebCommand(argv, { plainStatusLines: true });
+  await goDevWebCommand(argv, { hideStartedStatus: true });
 };

@@ -23,8 +23,10 @@ import { resolveAppSelection } from '../lib/resolveAppSelection';
 export type GoDevWebOptions = {
   // The in-place "(started)" chip rewrite assumes this command owns the
   // terminal; when stdout is shared with the API dev server (combined
-  // `qpq go:dev`) the cursor math breaks, so fall back to plain lines.
-  plainStatusLines?: boolean;
+  // `qpq go:dev`) the cursor math breaks. The plain-line fallback is just a
+  // wall of "  auth started" noise interleaved with the API output, so drop
+  // the ready status altogether there.
+  hideStartedStatus?: boolean;
 };
 
 export const goDevWebCommand = async (argv: string[], options: GoDevWebOptions = {}): Promise<void> => {
@@ -84,7 +86,7 @@ export const goDevWebCommand = async (argv: string[], options: GoDevWebOptions =
 
   const markStarted = (index: number): void => {
     const v = views[index];
-    if (!process.stdout.isTTY || options.plainStatusLines) {
+    if (!process.stdout.isTTY) {
       logBelowList(`  ${v.service} started`);
       return;
     }
@@ -128,7 +130,9 @@ export const goDevWebCommand = async (argv: string[], options: GoDevWebOptions =
       return;
     }
 
-    pollUntilStarted(index);
+    // markStarted is the only consumer of the ready signal, so there is
+    // nothing to poll for when the status is hidden.
+    if (!options.hideStartedStatus) pollUntilStarted(index);
   }
 
   process.on('SIGINT', () => shutdown(0));
