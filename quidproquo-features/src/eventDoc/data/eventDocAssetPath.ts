@@ -4,3 +4,7 @@
 // `<docId>/runtime/<...>` prefix (derived, disposable artifacts) is written by
 // generation, not here. Swapping this scheme touches only this file.
 export const eventDocAssetPath = (docId: string, assetId: string): string => `${docId}/assets/${assetId}`;
+
+// The same scheme's prefix form: the folder every one of a doc's assets sits in, for
+// enumerating them (askEventDocListAssets). Lives here so the layout stays in one file.
+export const eventDocAssetFolderPath = (docId: string): string => `${docId}/assets`;

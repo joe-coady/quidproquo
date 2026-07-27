@@ -1,4 +1,5 @@
-import { foldEventDocLog } from '../fold/foldEventDocLog';
+import { collectEventDocReferences } from '../fold/collectEventDocReferences';
+import { foldEventDocLog, FoldEventDocLogConfig } from '../fold/foldEventDocLog';
 import { EventDocEvent } from '../models';
 import { EventDocDocument } from '../models';
 import { EventDocWorkspaceSlotKind } from '../workspace/types/EventDocWorkspaceSlotKind';
@@ -47,16 +48,22 @@ export function createEventDocDefinition(
 
   const { saved: _saved, api, ...slotConfig } = config;
 
+  const foldConfig: FoldEventDocLogConfig<EventDocDocument> = {
+    seed: config.createInitialViewState(),
+    reducer: config.foldReducer,
+    migrations: config.migrations ?? {},
+    latestVersion: config.schemaVersion,
+  };
+
+  const { references } = config;
+
   return {
     kind: EventDocWorkspaceSlotKind.document,
     ...slotConfig,
     api: withGenericVerbs(api),
-    fold: (events: EventDocEvent[]) =>
-      foldEventDocLog(events, {
-        seed: config.createInitialViewState(),
-        reducer: config.foldReducer,
-        migrations: config.migrations ?? {},
-        latestVersion: config.schemaVersion,
-      }),
+    fold: (events: EventDocEvent[]) => foldEventDocLog(events, foldConfig),
+    // Always defined so a collection's referenceResolver is a one-liner with no optional call. A doc
+    // type that declares no `references` is a leaf: skip the walk rather than scan for nothing.
+    collectReferences: (events: EventDocEvent[]) => (references ? collectEventDocReferences(events, { ...foldConfig, references }) : []),
   };
 }

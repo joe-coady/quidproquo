@@ -4,6 +4,8 @@ export * from './createAsset';
 export * from './get';
 export * from './getAsset';
 export * from './list';
+export * from './listAssets';
 export * from './listEvents';
+export * from './references';
 export * from './remove';
 export * from './render';

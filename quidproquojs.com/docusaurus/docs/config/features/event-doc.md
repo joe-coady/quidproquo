@@ -50,6 +50,7 @@ function defineEventDoc(options: EventDocRoutesOptions): QPQConfig;
 | `onPublish` | `string` | no | Inline-function name invoked with `{ docId, event, summary }` after every successful Publish append: the seam for syncing the folded document into a materialized read model. |
 | `onAppend` | `string` | no | Inline-function name invoked with `{ docId, event, summary, events }` after EVERY successful append (domain events and lifecycle events alike): the seam for reacting to any mutation. Runs after `onPublish` when both fire on the same Publish event. |
 | `scopeResolver` | `string` | no | Inline-function name every route invokes with `{ event }` to resolve the request's ambient storage scope (e.g. per-tenant); null means unscoped. |
+| `referenceResolver` | `string` | no | Inline-function name `GET {basePath}/{id}/references` invokes with the document's `{ events, docId }` log to return the `EventDocLink`s that view depends on. Omit for a leaf collection — the route still resolves, just always to `[]`. |
 
 ## Examples
 

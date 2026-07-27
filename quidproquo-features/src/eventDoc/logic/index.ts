@@ -11,6 +11,7 @@ export * from './askEventDocGetLatestPublished';
 export * from './askEventDocGetPublishedAsOf';
 export * from './askEventDocPublishedEventsAsOf';
 export * from './askEventDocPublishedVersionAsOf';
+export * from './askEventDocReferences';
 export * from './askEventDocSeedInitState';
 export * from './askEventDocSoftDelete';
 export * from './selectors';

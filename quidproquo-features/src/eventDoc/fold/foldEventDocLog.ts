@@ -1,17 +1,13 @@
-import { QpqReducer } from 'quidproquo-core';
-
 import { EventDocDocument, EventDocEvent } from '../models';
-import { EventDocMigrations } from './EventDocMigrations';
-import { foldEventDocLogStep } from './foldEventDocLogStep';
+import { foldEventDocLogStep, FoldEventDocLogStepConfig } from './foldEventDocLogStep';
 import { migrateEventDocDocumentTo } from './migrateEventDocDocumentTo';
 
-type FoldEventDocLogConfig<TState extends EventDocDocument> = {
+// Folding a WHOLE log is the per-event step config plus somewhere to start, so the shape is derived
+// rather than restated - a new field on the step config cannot be forgotten here.
+export type FoldEventDocLogConfig<TState extends EventDocDocument> = FoldEventDocLogStepConfig<TState> & {
   // INIT_STATE resets to the version's initial anyway, so the seed is overwritten;
   // pass the latest version's initial for the empty-log case.
   seed: TState;
-  reducer: QpqReducer<TState, EventDocEvent>;
-  migrations: EventDocMigrations;
-  latestVersion: number;
 };
 
 // Migrate the accumulator UP to each event's version BEFORE folding it (events are

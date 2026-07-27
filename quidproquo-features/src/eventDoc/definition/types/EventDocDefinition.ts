@@ -1,8 +1,9 @@
-import { EventDocDocument, EventDocEvent } from '../../models';
+import { EventDocDocument, EventDocEvent, EventDocLink } from '../../models';
 import { EventDocWorkspaceDocumentSlotConfig } from '../../workspace/types/EventDocWorkspaceDocumentSlotConfig';
 import { EventDocWorkspaceLocalSlotConfig } from '../../workspace/types/EventDocWorkspaceLocalSlotConfig';
 import { EventDocWorkspaceStoryApi } from '../../workspace/types/EventDocWorkspaceStoryApi';
 import { EventDocGenericApi } from '../eventDocGenericApi';
+import { EventDocReferenceCollector } from './EventDocReferenceCollector';
 
 // The canonical home of a doc type: fold config + the doc's own api, structurally a
 // workspace slot config so it mounts VERBATIM at any slot key. The api includes the
@@ -14,6 +15,11 @@ export type EventDocDefinition<TView extends EventDocDocument, TApi extends Even
   TApi & EventDocGenericApi
 > & {
   fold: (events: EventDocEvent[]) => TView;
+  // Carried through from the config, for callers that already hold a folded view.
+  references?: EventDocReferenceCollector<TView>;
+  // Every doc this one has ever referenced, across its whole log. THE thing a collection's
+  // referenceResolver inline function calls; [] for a doc type that declares no `references`.
+  collectReferences: (events: EventDocEvent[]) => EventDocLink[];
 };
 
 // An unsaved doc has no server log, so nothing to fold — it IS its slot config.

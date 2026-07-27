@@ -16,6 +16,7 @@ export const toEventDocListItem = (model: EventDocSummary): EventDocListItem => 
 
   return {
     id: model.id,
+    type: model.type,
     name: model.name,
     version: latest?.version ?? null,
     hasDraft: latest ? latest.publishedAt === undefined : false,

@@ -1,4 +1,5 @@
 export * from './askEventDocDelete';
+export * from './askEventDocEventDelete';
 export * from './askEventDocEventLast';
 export * from './askEventDocEventList';
 export * from './askEventDocEventListAll';
@@ -7,6 +8,7 @@ export * from './askEventDocGenerateAssetDownloadUrl';
 export * from './askEventDocGenerateAssetUploadUrl';
 export * from './askEventDocGetById';
 export * from './askEventDocList';
+export * from './askEventDocListAssets';
 export * from './askEventDocResolveScope';
 export * from './askEventDocUpsert';
 export * from './askEventDocWriteAsset';

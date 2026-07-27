@@ -49,3 +49,4 @@ Same as [defineEventDoc](./event-doc.md) — a `QPQConfig` array with the collec
 - [defineEventDoc](./event-doc.md) — the underlying define this pre-configures.
 - [defineTenant](./tenant.md) — registers `TENANT_SCOPE_RESOLVER_FN`, the inline function this wires in by name.
 - [defineTenantedWebSocketQueue](./tenanted-web-socket-queue.md) — the same pattern applied to a WebSocket queue's `connectionScopeResolver`.
+- [defineTenantedEventDocTransfer](./tenanted-event-doc-transfer.md) — the same pattern applied to a collection's export/import routes.

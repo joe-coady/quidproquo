@@ -8,6 +8,8 @@ import { Nullable } from 'quidproquo-core';
  */
 export type EventDocListItem = {
   id: string;
+  /** The collection's event-doc `type`, carried through so a row can be addressed as an EventDocLink target. */
+  type: string;
   name: string;
   /** The highest version number, or null when the item has no versions yet. */
   version: Nullable<number>;

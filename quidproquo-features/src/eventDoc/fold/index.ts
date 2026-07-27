@@ -1,6 +1,7 @@
 export * from './buildEventDocBaseReducer';
 export * from './buildEventDocFoldReducer';
 export * from './buildVersionRoutedReducer';
+export * from './collectEventDocReferences';
 export * from './createEventDocInitialDocumentState';
 export * from './EffectHandlers';
 export * from './EventDocFoldEffects';

@@ -48,4 +48,11 @@ export type EventDocRoutesOptions = {
   // stores and assets (e.g. per-tenant via the tenant feature's TENANT_SCOPE_RESOLVER_FN).
   // Null means unscoped. Omit for collections that never partition.
   scopeResolver?: string;
+  // Registered inline-function name (see `defineInlineFunction`). When set, a
+  // `GET {basePath}/{id}/references` route is mounted; it invokes the collector with one
+  // `{ events, docId }` log, which folds + returns the `EventDocLink`s that view depends on
+  // (e.g. a template's layout/style/content links). The transfer manifest walk follows those
+  // links recursively. Omit for a leaf collection (a stylesheet, a layout) - the walk then
+  // stops at its docs instead of calling a collector that would always return nothing.
+  referenceResolver?: string;
 };

@@ -5,6 +5,7 @@ import { EventDocDocument, EventDocEvent } from '../../models';
 import { EventDocEditorValidator } from '../../validation';
 import { CoalesceEventType } from '../../workspace/types/CoalesceEventType';
 import { EventDocWorkspaceStoryApi } from '../../workspace/types/EventDocWorkspaceStoryApi';
+import { EventDocReferenceCollector } from './EventDocReferenceCollector';
 
 // A SAVED doc: persisted event log, versioned, draft/published lifecycle. The default —
 // omit `saved` (or pass true).
@@ -24,6 +25,11 @@ export type EventDocSavedDefinitionConfig<TView extends EventDocDocument, TApi e
   coalesceEventTypes?: CoalesceEventType[];
   // Omitted = the universal lifecycle guard (published = CREATE_DRAFT only).
   validate?: EventDocEditorValidator;
+  // The other docs this one depends on, read off the folded view (a template -> its layout,
+  // styles and content). Omit for a leaf doc type; the transfer manifest walk then stops here.
+  // The backend reaches this through the collection's `referenceResolver` inline function, which
+  // is a thin `references(fold(events))` adapter.
+  references?: EventDocReferenceCollector<TView>;
   // The doc's OWN verbs: own-doc writes (askApplyEventDocEvent) and own-doc reads
   // (via the doc's createEventDocStateReader) ONLY — workspace-blind by contract.
   // Cross-doc flows belong to the editor api layer, never here.

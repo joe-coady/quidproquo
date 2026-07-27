@@ -19,6 +19,8 @@ This is the same pattern as [askContextProvideValue](../../core/context/ask-cont
 | `storageDriveName` | `string` | The collection's blob bucket (assets + runtime artifacts), keyed per-doc. |
 | `eventValidator` | `string` (optional) | The collection's append-time validator inline-function name, if configured. |
 | `eventRenderer` | `string` (optional) | The collection's render inline-function name, if configured (powers `GET .../render`). |
+| `scopeResolver` | `string` (optional) | The collection's ambient storage scope resolver inline-function name, if configured (e.g. per-tenant). |
+| `referenceResolver` | `string` (optional) | The collection's reference-collector inline-function name, if configured (powers `GET .../references` and the transfer feature's manifest walk). |
 
 There are two ways to establish the context — one for custom routes, one for the built-in routes — plus the raw provide/read primitives and a resolver that throws when the binding is missing.
 
@@ -64,6 +66,10 @@ function* askEventDocProvideStore<T>(
 | `type` | `string` | The document type pinned within the store. |
 | `eventValidator` | `string` (optional) | Append-time validator inline-function name. |
 | `eventRenderer` | `string` (optional) | Render inline-function name. |
+| `onPublish` | `string` (optional) | Inline-function name invoked after a Publish append. |
+| `onAppend` | `string` (optional) | Inline-function name invoked after every append. |
+| `scopeResolver` | `string` (optional) | Ambient storage scope resolver inline-function name. |
+| `referenceResolver` | `string` (optional) | Reference-collector inline-function name (powers `GET .../references`). |
 
 ### Returns
 

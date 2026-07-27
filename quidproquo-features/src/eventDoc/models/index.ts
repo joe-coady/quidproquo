@@ -18,6 +18,7 @@ export * from './EventDocListItem';
 export * from './EventDocOnAppendInput';
 export * from './EventDocOnPublishInput';
 export * from './EventDocPublishData';
+export * from './EventDocReferencesInput';
 export * from './EventDocRenderInput';
 export * from './EventDocRenderKind';
 export * from './EventDocRenderMode';

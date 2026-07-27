@@ -5,6 +5,9 @@ assembled quickly.
 
 ## vNext
 
+- `EventDocListConfig` (and `askUIEventDocListSetConfig`'s payload) requires a new `canTransfer: boolean` field. Existing callers must add it explicitly: `true` to show Export/Import on that list, `false` otherwise.
+- `EventDocListItem` requires a new `type: string` field (the collection's event-doc type). Code constructing `EventDocListItem` values directly (outside `toEventDocListItem`) must supply it.
+
 ## 0.1.11
 
 - `askSetMaintenanceMode` and the admin `POST /maintenance/set` route (built by the now-removed `defineAdminServiceMaintenanceRoute`) are removed from `quidproquo-features`. Maintenance mode is now an event-doc collection (`defineEventDoc`) mounted at `/maintenance`, with a full CRUD API and an update-log model, instead of a single begin/end toggle. There is no direct functional replacement for `askSetMaintenanceMode`; drive maintenance windows through the new `/maintenance` routes (or the admin dashboard's maintenance UI) instead.

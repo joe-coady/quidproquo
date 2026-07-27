@@ -1,0 +1,1 @@
+{ "label": "Event Doc Transfer", "link": { "type": "generated-index", "description": "Stories behind the export/import bundle feature — walk a doc's references into a manifest, stage a bundle, and plan/apply an import against the target's own collections." } }

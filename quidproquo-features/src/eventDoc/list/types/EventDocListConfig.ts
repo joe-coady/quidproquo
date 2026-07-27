@@ -16,4 +16,8 @@ export type EventDocListConfig = {
   // create route (e.g. tenants create at /my-tenants, scoped list at
   // /tenants). Empty means: use basePath.
   listBasePath: string;
+  // Whether this collection's SERVICE mounts defineEventDocTransfer. Off by default and opt-in per
+  // list, because the generic list is hosted by one service's views but points at several services'
+  // collections - showing Export/Import for a service with no transfer routes would just 404.
+  canTransfer: boolean;
 };

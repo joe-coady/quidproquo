@@ -35,10 +35,12 @@ All paths are prefixed with the version segment `/v{version}` (default `/v1`):
 | `GET` | `{basePath}/{id}` | Get one document's summary record. |
 | `GET` | `{basePath}/{id}/events` | List a document's event log. |
 | `GET` | `{basePath}/{id}/render` | Render the document to HTML. **Only mounted when `eventRenderer` is set.** |
+| `GET` | `{basePath}/{id}/references` | List the `EventDocLink`s this document depends on. |
 | `POST` | `{basePath}` | Create a document. |
 | `POST` | `{basePath}/{id}/events` | Append an event to a document. |
 | `POST` | `{basePath}/{id}/assets` | Request an asset upload URL. |
 | `GET` | `{basePath}/{id}/assets/{assetId}` | Download an asset. |
+| `GET` | `{basePath}/{id}/assets` | List a document's stored assets. |
 | `DELETE` | `{basePath}/{id}` | Remove a document. |
 
 ## Signature
@@ -63,7 +65,8 @@ The single `options` argument is an `EventDocRoutesOptions`:
 | `onPublish` | `string` | – | Name of a registered inline function. When set, every successful append of a Publish event invokes it with `{ docId, event, summary }`, after the event is durably written and the summary re-derived. This is the seam for syncing a folded document into a materialized read model. Errors propagate to the caller: the event has landed but the side effect did not, so the caller learns the read model may be stale. |
 | `onAppend` | `string` | – | Name of a registered inline function. When set, EVERY successful append (domain events and lifecycle events alike) invokes it with `{ docId, event, summary, events }`, after the event is durably written and the summary re-derived. This is the seam for reacting to any mutation (e.g. broadcasting the doc's fresh fold). Runs after `onPublish` when both fire on the same Publish event. Errors propagate to the caller: the event has landed but the side effect did not. |
 | `scopeResolver` | `string` | – | Name of a registered inline function. When set, every route invokes it with `{ event }` before running; a non-null result becomes the ambient storage scope for the whole request, transparently partitioning the collection's stores and assets (e.g. per-tenant). Null means unscoped. Omit for collections that never partition. |
-| `excludeRoutes` | `EventDocRouteName[]` | `[]` | Route names to leave unmounted (`'list' \| 'get' \| 'listEvents' \| 'render' \| 'create' \| 'appendEvent' \| 'createAsset' \| 'getAsset' \| 'remove'`). For a collection that must own one of these itself instead of using the stock behavior — e.g. a `create` that must also perform some side effect the stock controller doesn't know about. |
+| `referenceResolver` | `string` | – | Name of a registered inline function. When set, `GET {basePath}/{id}/references` invokes it with the document's `{ events, docId }` log, which folds and returns the `EventDocLink`s that view depends on (e.g. a template's layout/style/content links). The transfer feature's manifest walk follows those links recursively. Omit for a leaf collection (a stylesheet, a layout) — the route is still mounted but always resolves to `[]`. |
+| `excludeRoutes` | `EventDocRouteName[]` | `[]` | Route names to leave unmounted (`'list' \| 'get' \| 'listEvents' \| 'render' \| 'references' \| 'create' \| 'appendEvent' \| 'createAsset' \| 'getAsset' \| 'listAssets' \| 'remove'`). For a collection that must own one of these itself instead of using the stock behavior — e.g. a `create` that must also perform some side effect the stock controller doesn't know about. |
 
 ### `RouteAuthSettings`
 
@@ -100,5 +103,6 @@ export default [
 
 - [defineEventDocSummary](./event-doc-summary.md) — declares the store these routes serve (required before mounting routes).
 - [defineEventDoc](./event-doc.md) — declares the store *and* these routes in one call for the single-type case.
+- [defineEventDocTransfer](./event-doc-transfer.md) — mounts the export/import routes that read every registered collection's `referenceResolver` to build a transfer manifest.
 - [defineRoute](../webserver/route.md) — the underlying webserver route config (source of `RouteAuthSettings`).
 - **Custom routes over the same store:** wrap your controllers in `askEventDocProvideStore({ storeName, type }, ...)` (from quidproquo-features) so the generic [reads](../../actions/features/event-doc/ask-event-doc-get-by-id.md) resolve the collection, then compose actions like [askEventDocCreate](../../actions/features/event-doc/ask-event-doc-create.md).

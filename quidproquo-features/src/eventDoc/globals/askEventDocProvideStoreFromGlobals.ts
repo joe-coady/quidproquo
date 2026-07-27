@@ -5,6 +5,7 @@ import {
   EVENT_DOC_EVENTS_STORE_NAME_GLOBAL,
   EVENT_DOC_ON_APPEND_GLOBAL,
   EVENT_DOC_ON_PUBLISH_GLOBAL,
+  EVENT_DOC_REFERENCE_RESOLVER_GLOBAL,
   EVENT_DOC_RENDERER_GLOBAL,
   EVENT_DOC_SCOPE_RESOLVER_GLOBAL,
   EVENT_DOC_STORAGE_DRIVE_GLOBAL,
@@ -39,6 +40,7 @@ export function* askEventDocProvideStoreFromGlobals<T>(story: AskResponse<T>): A
   const onPublish = yield* askConfigGetGlobalAddedAfterV1(EVENT_DOC_ON_PUBLISH_GLOBAL);
   const onAppend = yield* askConfigGetGlobalAddedAfterV1(EVENT_DOC_ON_APPEND_GLOBAL);
   const scopeResolver = yield* askConfigGetGlobalAddedAfterV1(EVENT_DOC_SCOPE_RESOLVER_GLOBAL);
+  const referenceResolver = yield* askConfigGetGlobalAddedAfterV1(EVENT_DOC_REFERENCE_RESOLVER_GLOBAL);
 
   return yield* askEventDocStoreProvide(
     {
@@ -51,6 +53,7 @@ export function* askEventDocProvideStoreFromGlobals<T>(story: AskResponse<T>): A
       onPublish,
       onAppend,
       scopeResolver,
+      referenceResolver,
     },
     story,
   );

@@ -13,6 +13,7 @@ export type EventDocStoreOptions = {
   onPublish?: string;
   onAppend?: string;
   scopeResolver?: string;
+  referenceResolver?: string;
 };
 
 // Assemble an EventDocStore from a collection's storeName + type. The single source for the
@@ -27,6 +28,7 @@ export const buildEventDocStore = ({
   onPublish,
   onAppend,
   scopeResolver,
+  referenceResolver,
 }: EventDocStoreOptions): EventDocStore => ({
   storeName,
   eventsStoreName: eventDocEventsStoreName(storeName),
@@ -37,4 +39,5 @@ export const buildEventDocStore = ({
   onPublish,
   onAppend,
   scopeResolver,
+  referenceResolver,
 });

@@ -22,6 +22,7 @@ export const defineEventDocRoutes = ({
   onPublish,
   onAppend,
   scopeResolver,
+  referenceResolver,
   excludeRoutes = [],
 }: EventDocRoutesOptions): QPQConfig => {
   // Same assembly a hand-written route uses via askEventDocProvideStore, so built-in and
@@ -34,6 +35,7 @@ export const defineEventDocRoutes = ({
     onPublish,
     onAppend,
     scopeResolver,
+    referenceResolver,
   });
 
   const globals: Record<string, unknown> = buildEventDocStoreGlobals(store);
@@ -59,10 +61,12 @@ export const defineEventDocRoutes = ({
     ['GET', `${basePath}/{id}`, 'get'],
     ['GET', `${basePath}/{id}/events`, 'listEvents'],
     ['GET', `${basePath}/{id}/render`, 'render'],
+    ['GET', `${basePath}/{id}/references`, 'references'],
     ['POST', basePath, 'create'],
     ['POST', `${basePath}/{id}/events`, 'appendEvent'],
     ['POST', `${basePath}/{id}/assets`, 'createAsset'],
     ['GET', `${basePath}/{id}/assets/{assetId}`, 'getAsset'],
+    ['GET', `${basePath}/{id}/assets`, 'listAssets'],
     ['DELETE', `${basePath}/{id}`, 'remove'],
   ];
 
