@@ -9,7 +9,7 @@ export const printNextSteps: CreateQpqAppStep = {
     console.log(`
 Created ${answers.appName}!
 
-Your app has five services — admin, auth, design, shell and todo — and
+Your app has five services (admin, auth, design, shell and todo) and
 deploys as a single docker image.
 
 Next steps:

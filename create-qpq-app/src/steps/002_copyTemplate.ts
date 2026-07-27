@@ -11,7 +11,7 @@ export const copyTemplate: CreateQpqAppStep = {
   run: async ({ templateDirectory, targetDirectory }) => {
     if (!fs.existsSync(templateDirectory)) {
       throw new Error(
-        `Template snapshot missing at ${templateDirectory} — run "npm run snapshot-template" (dev checkout only; published packages ship it).`,
+        `Template snapshot missing at ${templateDirectory}: run "npm run snapshot-template" (dev checkout only; published packages ship it).`,
       );
     }
 

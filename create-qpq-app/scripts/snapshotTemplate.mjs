@@ -1,4 +1,4 @@
-// Snapshot ../quidproquojs.com into template/ — the living template that
+// Snapshot ../quidproquojs.com into template/, the living template that
 // create-qpq-app ships in its tarball. Runs on prepack so every publish
 // captures the repo as it is that release; the scaffolding steps do all
 // pruning/renaming at generate time.
@@ -30,7 +30,7 @@ const EXCLUDED_DIR_NAMES = new Set([
   'tmp',
 ]);
 
-// Relative paths (from the repo root) excluded specifically — build output
+// Relative paths (from the repo root) excluded specifically: build output
 // dirs whose names are too generic to exclude globally.
 const EXCLUDED_RELATIVE_PATHS = new Set(['docusaurus/build']);
 
@@ -67,7 +67,7 @@ const copyTree = (fromDir, toDir, relativeDir) => {
 };
 
 if (!fs.existsSync(sourceDir)) {
-  console.error(`snapshot-template: source not found at ${sourceDir} — run from the quidproquo monorepo checkout.`);
+  console.error(`snapshot-template: source not found at ${sourceDir}. Run from the quidproquo monorepo checkout.`);
   process.exit(1);
 }
 

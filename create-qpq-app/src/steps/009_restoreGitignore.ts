@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import { listFilesRecursive } from '../lib/files';
+import { listFilesRecursive } from '../lib/listFilesRecursive';
 import { CreateQpqAppStep } from '../types';
 
 // npm strips .gitignore files from published tarballs, so the snapshot stores

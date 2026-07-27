@@ -1,6 +1,8 @@
 import path from 'path';
 
-import { readJsonFile, replaceInFileExact, writeJsonFile } from '../lib/files';
+import { readJsonFile } from '../lib/readJsonFile';
+import { replaceInFileExact } from '../lib/replaceInFileExact';
+import { writeJsonFile } from '../lib/writeJsonFile';
 import { CreateQpqAppStep } from '../types';
 
 // The template's domain, replaced wherever it's authoritative: the deploy

@@ -13,7 +13,7 @@ import { npmInstall } from './011_npmInstall';
 import { buildWorkspaces } from './012_buildWorkspaces';
 import { printNextSteps } from './013_printNextSteps';
 
-// The pipeline: always this list, always this order — the numeric file
+// The pipeline: always this list, always this order; the numeric file
 // prefixes match, so the steps directory reads top to bottom. Steps decide
 // for themselves (shouldRun) whether the collected answers apply to them.
 export const createQpqAppSteps: CreateQpqAppStep[] = [

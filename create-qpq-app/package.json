@@ -1,7 +1,7 @@
 {
   "name": "create-qpq-app",
   "version": "0.1.11",
-  "description": "Scaffold a new quidproquo app — npx create-qpq-app my-app",
+  "description": "Scaffold a new quidproquo app: npx create-qpq-app my-app",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/esm/index.js",
   "types": "./lib/commonjs/index.d.ts",
@@ -14,7 +14,8 @@
     "template"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "clean": "npx rimraf lib && npx rimraf template && npx rimraf node_modules",
     "build": "npm run clean && npm run build:esm && npm run build:cjs && npm run build:bin-perms",
     "watch": "tsc -p tsconfig.commonjs.json -w",

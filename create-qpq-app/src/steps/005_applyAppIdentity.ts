@@ -1,11 +1,14 @@
 import fs from 'fs';
 import path from 'path';
 
-import { readJsonFile, replaceInFileExact, replaceInFiles, writeJsonFile } from '../lib/files';
+import { readJsonFile } from '../lib/readJsonFile';
+import { replaceInFileExact } from '../lib/replaceInFileExact';
+import { replaceInFiles } from '../lib/replaceInFiles';
+import { writeJsonFile } from '../lib/writeJsonFile';
 import { CreateQpqAppStep } from '../types';
 
 // Give the app its identity. Only targeted, collision-free tokens are
-// rewritten — the app FOLDER, the package SCOPE and the deploy PREFIX take
+// rewritten: the app FOLDER, the package SCOPE and the deploy PREFIX take
 // the app name, while template vocabulary (TodoServiceEnum, services/todo,
 // TodoList, TODO comments) is deliberately left alone so every generated app
 // shares the same internal layout.
@@ -28,7 +31,7 @@ export const applyAppIdentity: CreateQpqAppStep = {
       ['apps/todo/', `apps/${appName}/`],
     ]);
 
-    // The deploy prefix names every stack/resource — this is the app name.
+    // The deploy prefix names every stack/resource; this is the app name.
     const deployConfigPath = path.join(targetDirectory, 'apps', appName, 'deploy.config.json');
     const deployConfig = readJsonFile(deployConfigPath);
     deployConfig.prefix = appName;

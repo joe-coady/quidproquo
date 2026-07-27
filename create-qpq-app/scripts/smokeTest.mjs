@@ -5,7 +5,7 @@
 //
 //   npm run build -w create-qpq-app && npm run smoke-test -w create-qpq-app
 //
-// The file: ref swap mirrors what CI must do pre-publish — the scaffolded
+// The file: ref swap mirrors what CI must do pre-publish: the scaffolded
 // pins point at registry versions that may not exist yet.
 import { execSync, spawn } from 'child_process';
 import fs from 'fs';
@@ -32,7 +32,7 @@ const run = (command, args, cwd) =>
   });
 
 // Kill any listener on the dev ports that is running a qpq dev-server bundle
-// (leftovers from an aborted run). Anything else on the ports is fatal — it
+// (leftovers from an aborted run). Anything else on the ports is fatal: it
 // isn't ours to kill, and the boot would fail confusingly.
 const clearDevServerPorts = () => {
   for (const port of DEV_SERVER_PORTS) {
@@ -58,7 +58,7 @@ const clearDevServerPorts = () => {
         log(`killing stale dev server on port ${port} (pid ${pid})`);
         process.kill(pid);
       } else {
-        throw new Error(`Port ${port} is held by an unrelated process (pid ${pid}: ${command}) — free it and re-run.`);
+        throw new Error(`Port ${port} is held by an unrelated process (pid ${pid}: ${command}). Free it and re-run.`);
       }
     }
   }
@@ -111,14 +111,14 @@ const smokeTestLanguage = async (workDir, language) => {
 
   log(`--- ${language}: booting dev server`);
   clearDevServerPorts();
-  // qpq go:dev:api, not the `dev` script (qpq go:dev) — the smoke test only
+  // qpq go:dev:api, not the `dev` script (qpq go:dev): the smoke test only
   // asserts the API health endpoint, and the views dev servers would add
   // minutes of Rspack compile plus a fleet of ports this script doesn't sweep.
   const devServer = spawn('npx', ['--no-install', 'qpq', 'go:dev:api'], { cwd: appDir, shell: true, detached: true, stdio: 'ignore' });
 
   try {
     const health = await waitForHealthy(BOOT_TIMEOUT_MS);
-    log(`--- ${language}: healthy — ${JSON.stringify(health)}`);
+    log(`--- ${language}: healthy: ${JSON.stringify(health)}`);
   } finally {
     try {
       process.kill(-devServer.pid, 'SIGTERM');
@@ -135,7 +135,7 @@ const main = async () => {
     throw new Error(`smoke test needs node >= 24 (you are on ${process.versions.node})`);
   }
   if (!fs.existsSync(binPath)) {
-    throw new Error(`${binPath} missing — build create-qpq-app first.`);
+    throw new Error(`${binPath} missing. Build create-qpq-app first.`);
   }
 
   log('refreshing template snapshot');
@@ -154,7 +154,7 @@ const main = async () => {
   }
 
   fs.rmSync(workDir, { recursive: true, force: true });
-  log('PASS — both languages scaffold, build and serve.');
+  log('PASS: both languages scaffold, build and serve.');
 };
 
 main();

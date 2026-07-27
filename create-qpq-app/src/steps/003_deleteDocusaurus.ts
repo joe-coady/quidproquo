@@ -1,10 +1,11 @@
 import fs from 'fs';
 import path from 'path';
 
-import { readJsonFile, writeJsonFile } from '../lib/files';
+import { readJsonFile } from '../lib/readJsonFile';
+import { writeJsonFile } from '../lib/writeJsonFile';
 import { CreateQpqAppStep } from '../types';
 
-// The docusaurus workspace is the quidproquojs.com documentation site — new
+// The docusaurus workspace is the quidproquojs.com documentation site; new
 // apps don't want it. Remove the directory and its workspaces entry.
 export const deleteDocusaurus: CreateQpqAppStep = {
   name: 'Removing docusaurus docs site',

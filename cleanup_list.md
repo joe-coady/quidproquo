@@ -103,33 +103,33 @@ If your change touched files in more than one package (e.g. you moved a shared h
 
 ## File list
 
-[ ] create-qpq-app/eslint.config.mjs
-[ ] create-qpq-app/scripts/smokeTest.mjs
-[ ] create-qpq-app/scripts/snapshotTemplate.mjs
-[ ] create-qpq-app/src/bin/createQpqApp.ts
-[ ] create-qpq-app/src/cli/runCreateQpqApp.ts
-[ ] create-qpq-app/src/index.ts
-[ ] create-qpq-app/src/lib/args.ts
-[ ] create-qpq-app/src/lib/files.ts
-[ ] create-qpq-app/src/lib/packageRoot.ts
-[ ] create-qpq-app/src/lib/prompts.ts
-[ ] create-qpq-app/src/lib/runCommand.ts
-[ ] create-qpq-app/src/steps/001_preflight.ts
-[ ] create-qpq-app/src/steps/002_copyTemplate.ts
-[ ] create-qpq-app/src/steps/003_deleteDocusaurus.ts
-[ ] create-qpq-app/src/steps/004_deleteQpqjsApp.ts
-[ ] create-qpq-app/src/steps/005_applyAppIdentity.ts
-[ ] create-qpq-app/src/steps/006_applyDomain.ts
-[ ] create-qpq-app/src/steps/007_pinRegistryVersions.ts
-[ ] create-qpq-app/src/steps/008_transpileToJavaScript.ts
-[ ] create-qpq-app/src/steps/009_restoreGitignore.ts
-[ ] create-qpq-app/src/steps/010_gitInit.ts
-[ ] create-qpq-app/src/steps/011_npmInstall.ts
-[ ] create-qpq-app/src/steps/012_buildWorkspaces.ts
-[ ] create-qpq-app/src/steps/013_printNextSteps.ts
-[ ] create-qpq-app/src/steps/index.ts
-[ ] create-qpq-app/src/types.ts
-[ ] create-qpq-app/vitest.config.ts
+[x] create-qpq-app/eslint.config.mjs
+[x] create-qpq-app/scripts/smokeTest.mjs
+[x] create-qpq-app/scripts/snapshotTemplate.mjs
+[x] create-qpq-app/src/bin/createQpqApp.ts
+[x] create-qpq-app/src/cli/runCreateQpqApp.ts - note: --domain unvalidated, recorded in security_findings.md (low)
+[x] create-qpq-app/src/index.ts
+[x] create-qpq-app/src/lib/args.ts - note: split into lib/getArgValue.ts + lib/getPositionalArgs.ts (one export per file)
+[x] create-qpq-app/src/lib/files.ts - note: split into lib/listFilesRecursive.ts, replaceInFiles.ts, replaceInFileExact.ts, readJsonFile.ts, writeJsonFile.ts
+[x] create-qpq-app/src/lib/packageRoot.ts - note: split into lib/getOwnPackageRoot.ts + lib/getOwnVersion.ts
+[x] create-qpq-app/src/lib/prompts.ts - note: renamed to lib/promptSelect.ts (file named after export)
+[x] create-qpq-app/src/lib/runCommand.ts
+[x] create-qpq-app/src/steps/001_preflight.ts
+[x] create-qpq-app/src/steps/002_copyTemplate.ts
+[x] create-qpq-app/src/steps/003_deleteDocusaurus.ts
+[x] create-qpq-app/src/steps/004_deleteQpqjsApp.ts
+[x] create-qpq-app/src/steps/005_applyAppIdentity.ts
+[x] create-qpq-app/src/steps/006_applyDomain.ts
+[x] create-qpq-app/src/steps/007_pinRegistryVersions.ts
+[x] create-qpq-app/src/steps/008_transpileToJavaScript.ts
+[x] create-qpq-app/src/steps/009_restoreGitignore.ts
+[x] create-qpq-app/src/steps/010_gitInit.ts
+[x] create-qpq-app/src/steps/011_npmInstall.ts
+[x] create-qpq-app/src/steps/012_buildWorkspaces.ts
+[x] create-qpq-app/src/steps/013_printNextSteps.ts
+[x] create-qpq-app/src/steps/index.ts
+[x] create-qpq-app/src/types.ts - note: split into types/ folder (AppLanguage, CreateQpqAppAnswers, StepContext, CreateQpqAppStep), interface -> type
+[x] create-qpq-app/vitest.config.ts
 [ ] quidproquo-actionprocessor-awslambda/eslint.config.mjs
 [ ] quidproquo-actionprocessor-awslambda/scripts/buildLogExtensionLayer.mjs
 [ ] quidproquo-actionprocessor-awslambda/src/awsLambdaUtils.test.ts

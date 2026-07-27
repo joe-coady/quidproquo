@@ -1,8 +1,10 @@
 import path from 'path';
 
-import { getArgValue, getPositionalArgs } from '../lib/args';
-import { getOwnPackageRoot, getOwnVersion } from '../lib/packageRoot';
-import { promptSelect } from '../lib/prompts';
+import { getArgValue } from '../lib/getArgValue';
+import { getOwnPackageRoot } from '../lib/getOwnPackageRoot';
+import { getOwnVersion } from '../lib/getOwnVersion';
+import { getPositionalArgs } from '../lib/getPositionalArgs';
+import { promptSelect } from '../lib/promptSelect';
 import { createQpqAppSteps } from '../steps';
 import { AppLanguage, CreateQpqAppAnswers, StepContext } from '../types';
 
@@ -15,13 +17,13 @@ Options:
   --no-install                         skip npm install
 `;
 
-// Resolve the language from a flag when given, otherwise prompt — flags keep
+// Resolve the language from a flag when given, otherwise prompt. Flags keep
 // CI and tests non-interactive.
 const resolveLanguage = async (argv: string[]): Promise<AppLanguage> => {
   const flagValue = getArgValue(argv, '--language')?.toLowerCase();
   if (flagValue) {
     if (!(flagValue in AppLanguage)) {
-      throw new Error(`Unknown --language "${flagValue}" — use typescript or javascript.`);
+      throw new Error(`Unknown --language "${flagValue}", use typescript or javascript.`);
     }
     return AppLanguage[flagValue as keyof typeof AppLanguage];
   }
@@ -38,7 +40,7 @@ export const runCreateQpqApp = async (argv: string[]): Promise<void> => {
     process.exit(appName ? 0 : 1);
   }
 
-  // All answers are locked in before the first step runs — no mid-pipeline
+  // All answers are locked in before the first step runs, no mid-pipeline
   // prompting, so every step sees the same complete answers object.
   const answers: CreateQpqAppAnswers = {
     appName,

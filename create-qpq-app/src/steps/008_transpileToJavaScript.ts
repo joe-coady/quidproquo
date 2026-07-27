@@ -1,7 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 
-import { listFilesRecursive, readJsonFile, writeJsonFile } from '../lib/files';
+import { listFilesRecursive } from '../lib/listFilesRecursive';
+import { readJsonFile } from '../lib/readJsonFile';
+import { writeJsonFile } from '../lib/writeJsonFile';
 import { AppLanguage, CreateQpqAppStep } from '../types';
 
 // Convert the scaffolded TypeScript app to JavaScript: per-file type
@@ -50,7 +52,7 @@ export const transpileToJavaScript: CreateQpqAppStep = {
       const source = fs.readFileSync(filePath, 'utf8');
       const { outputText } = ts.transpileModule(source, { compilerOptions, fileName: filePath });
 
-      // Type-only statements leave blank gaps behind — collapse runs of them.
+      // Type-only statements leave blank gaps behind; collapse runs of them.
       const collapsed = outputText.replace(/\n{3,}/g, '\n\n');
 
       const outputPath = filePath.replace(/\.tsx?$/, isTsx ? '.jsx' : '.js');
@@ -62,7 +64,7 @@ export const transpileToJavaScript: CreateQpqAppStep = {
     }
 
     // TypeScript build plumbing: tsconfigs, the ambient types/ dir, and the
-    // per-package tsc scripts all go. Lib packages no longer build — their
+    // per-package tsc scripts all go. Lib packages no longer build; their
     // package.json main points straight at src.
     let libsRepointed = 0;
     for (const filePath of listFilesRecursive(targetDirectory)) {
@@ -84,11 +86,11 @@ export const transpileToJavaScript: CreateQpqAppStep = {
 
         // Lib packages (identified by their tsc build) get served from
         // source. A tsc build with an unexpected main means the template's
-        // conventions moved — fail loudly rather than scaffold a broken app.
+        // conventions moved: fail loudly rather than scaffold a broken app.
         if (packageJson.scripts?.build === 'tsc -b') {
           if (packageJson.main !== './dist/src/index.js') {
             throw new Error(
-              `${filePath} has a tsc build but main is "${packageJson.main}" (expected "./dist/src/index.js") — update transpileToJavaScript for the new template convention.`,
+              `${filePath} has a tsc build but main is "${packageJson.main}" (expected "./dist/src/index.js"). Update transpileToJavaScript for the new template convention.`,
             );
           }
 
@@ -109,11 +111,11 @@ export const transpileToJavaScript: CreateQpqAppStep = {
 
     if (converted === 0 || libsRepointed === 0) {
       throw new Error(
-        `JavaScript conversion looks wrong: ${converted} files transpiled, ${libsRepointed} lib packages repointed — has the template changed shape?`,
+        `JavaScript conversion looks wrong: ${converted} files transpiled, ${libsRepointed} lib packages repointed. Has the template changed shape?`,
       );
     }
 
-    // The ROOT tsconfig.json stays — the qpq CLI's ts-node require hook reads
+    // The ROOT tsconfig.json stays: the qpq CLI's ts-node require hook reads
     // its ts-node block, and allowJs makes that hook compile the app's
     // ESM-syntax .js files (imports, __dirname) at load time.
     fs.rmSync(path.join(targetDirectory, 'types'), { recursive: true, force: true });
@@ -122,7 +124,7 @@ export const transpileToJavaScript: CreateQpqAppStep = {
     const rootTsconfigPath = path.join(targetDirectory, 'tsconfig.json');
     const rootTsconfig = readJsonFile(rootTsconfigPath);
     rootTsconfig['ts-node'].compilerOptions.allowJs = true;
-    // Scope the hook to this repo — allowJs must never recompile quidproquo
+    // Scope the hook to this repo: allowJs must never recompile quidproquo
     // libs living outside node_modules (file:-linked dev setups).
     rootTsconfig['ts-node'].scope = true;
     rootTsconfig['ts-node'].scopeDir = '.';
