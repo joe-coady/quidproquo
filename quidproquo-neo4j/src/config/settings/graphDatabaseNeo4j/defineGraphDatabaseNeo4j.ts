@@ -6,24 +6,19 @@ import {
   defineSecret,
   QPQConfig,
   QPQConfigAdvancedSettings,
-  QPQConfigSetting,
   QpqFunctionRuntimeAdvanced,
 } from 'quidproquo-core';
 
-export interface QPQConfigAdvancedGraphDatabaseNeo4jSettings extends QPQConfigAdvancedSettings {
+import { Neo4jVersion } from './Neo4jVersion';
+
+export type QPQConfigAdvancedGraphDatabaseNeo4jSettings = QPQConfigAdvancedSettings & {
   owner?: CrossModuleOwner<'graphDatabaseName'>;
   version?: Neo4jVersion;
-}
+};
 
-export interface GraphDatabaseNeo4jQPQConfigSetting extends QPQConfigSetting {
-  name: string;
-}
-
-export enum Neo4jVersion {
-  Version5 = 'version5',
-}
-
-const fullQpqFunctionRuntime = (relativePath: string, functionName: string): QpqFunctionRuntimeAdvanced => {
+// Entry points are resolved at runtime relative to this file's compiled
+// location (basePath), so the deployed bundle can load them dynamically.
+const buildQpqFunctionRuntime = (relativePath: string, functionName: string): QpqFunctionRuntimeAdvanced => {
   return {
     basePath: __dirname,
     relativePath: relativePath,
@@ -31,8 +26,16 @@ const fullQpqFunctionRuntime = (relativePath: string, functionName: string): Qpq
   };
 };
 
+/**
+ * Backs a qpq graph database with a Neo4j Aura instance.
+ *
+ * Declares the `neo4j-<db>-instance` parameter and `neo4j-<db>-password`
+ * secret the query story reads, overrides the graph database action
+ * processors, and schedules a daily keep-alive query (Aura pauses instances
+ * that sit idle for a few days).
+ */
 export const defineGraphDatabaseNeo4j = (databaseName: string, options?: QPQConfigAdvancedGraphDatabaseNeo4jSettings): QPQConfig => {
-  const version = options?.version || Neo4jVersion.Version5;
+  const version = options?.version ?? Neo4jVersion.Version5;
 
   return [
     defineParameter(`neo4j-${databaseName}-instance`, {
@@ -42,12 +45,11 @@ export const defineGraphDatabaseNeo4j = (databaseName: string, options?: QPQConf
       owner: options?.owner,
     }),
 
-    defineActionProcessors(fullQpqFunctionRuntime(`../../../actionProcessor/graphDatabaseOverride/${version}`, 'getGraphDatabaseActionProcessor')),
+    defineActionProcessors(buildQpqFunctionRuntime(`../../../actionProcessor/graphDatabaseOverride/${version}`, 'getGraphDatabaseActionProcessor')),
 
     defineRecurringSchedule(
       '0 0 * * ? *', // 12am every day (UTC)
-      // '* * * * ? *', // every min (for testing)
-      fullQpqFunctionRuntime('../../../entry/scheduledEvents/keepAlive', 'keepAlive'),
+      buildQpqFunctionRuntime('../../../entry/scheduledEvents/keepAlive', 'keepAlive'),
       {
         metadata: {
           databaseName: databaseName,

@@ -1,15 +1,9 @@
-import { AnyNeo4jResult, Neo4jNodeResult, Neo4jRelationshipResult } from '../../types';
+import { AnyNeo4jResult, Neo4jNodeResult } from '../../types';
+import { isNeo4jRelationshipResult } from './isNeo4jRelationshipResult';
+import { isNeo4jScalarResult } from './isNeo4jScalarResult';
 
 export function isNeo4jNodeResult(anyNeo4jResult: AnyNeo4jResult): anyNeo4jResult is Neo4jNodeResult {
-  // Must be a scaler
-  if (typeof anyNeo4jResult !== 'object') {
-    return false;
-  }
-
-  // must be a relationship
-  if ((anyNeo4jResult as Neo4jRelationshipResult).startNodeElementId) {
-    return false;
-  }
-
-  return true;
+  // There is no positive node marker in the wire format: a node is anything
+  // that is neither a scalar nor a relationship.
+  return !isNeo4jScalarResult(anyNeo4jResult) && !isNeo4jRelationshipResult(anyNeo4jResult);
 }

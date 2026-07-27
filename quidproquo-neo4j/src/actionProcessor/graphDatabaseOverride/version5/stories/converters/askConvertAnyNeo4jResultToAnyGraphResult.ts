@@ -1,4 +1,4 @@
-import { AnyGraphResult, AskResponse, askThrowError, ErrorTypeEnum, GraphScalarResult } from 'quidproquo-core';
+import { AnyGraphResult, AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
 
 import { AnyNeo4jResult } from '../types';
 import { askConvertNeo4jNodeResultToGraphNodeResult } from './askConvertNeo4jNodeResultToGraphNodeResult';
@@ -7,7 +7,7 @@ import { isNeo4jNodeResult, isNeo4jRelationshipResult, isNeo4jScalarResult } fro
 
 export function* askConvertAnyNeo4jResultToAnyGraphResult(anyNeo4jResult: AnyNeo4jResult): AskResponse<AnyGraphResult> {
   if (isNeo4jScalarResult(anyNeo4jResult)) {
-    return anyNeo4jResult as GraphScalarResult;
+    return anyNeo4jResult;
   }
 
   if (isNeo4jNodeResult(anyNeo4jResult)) {
@@ -18,5 +18,7 @@ export function* askConvertAnyNeo4jResultToAnyGraphResult(anyNeo4jResult: AnyNeo
     return yield* askConvertNeo4jRelationshipResultToGraphRelationshipResult(anyNeo4jResult);
   }
 
-  return yield* askThrowError(ErrorTypeEnum.GenericError, 'Unable to convert neptune query result');
+  // The guards above cover every AnyNeo4jResult; this is a backstop in case
+  // the wire format ever drifts from the declared types.
+  return yield* askThrowError(ErrorTypeEnum.GenericError, 'Unable to convert neo4j query result');
 }

@@ -15,6 +15,7 @@ describe('isNeo4jNodeResult', () => {
     ['a number', 42],
     ['a string', 'hello'],
     ['a boolean', true],
+    ['null', null],
   ])('returns false for %s', (_label: string, value: any) => {
     expect(isNeo4jNodeResult(value)).toBe(false);
   });

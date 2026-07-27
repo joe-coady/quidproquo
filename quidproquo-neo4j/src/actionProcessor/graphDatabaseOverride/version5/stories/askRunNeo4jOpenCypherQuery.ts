@@ -1,5 +1,4 @@
 import {
-  askConfigGetGlobal,
   askConfigGetParameter,
   askConfigGetSecret,
   askNetworkRequest,
@@ -14,18 +13,22 @@ import { askConvertNeo4jCypherResponseToCypherResponse } from './converters';
 import { Neo4jCypherRequest, Neo4jCypherResponse } from './types';
 import { convertQpqQueryToNeo4j } from './utils';
 
+/**
+ * Runs an openCypher query against a Neo4j Aura instance via the Query API.
+ *
+ * The instance name and password come from the `neo4j-<db>-instance` parameter
+ * and `neo4j-<db>-password` secret that defineGraphDatabaseNeo4j declares.
+ * Query values must go through `params` (sent as Cypher parameters), never be
+ * interpolated into the query string.
+ */
 export function* askRunNeo4jOpenCypherQuery({
   graphDatabaseName,
   openCypherQuery,
   params,
 }: GraphDatabaseExecuteOpenCypherQueryActionPayload): AskResponse<GraphCypherResponse> {
-  // Convert qpq functions to neo4j
   const neo4jQuery = convertQpqQueryToNeo4j(openCypherQuery);
 
-  // Get the neo4j instance name
   const instanceName = yield* askConfigGetParameter(`neo4j-${graphDatabaseName}-instance`);
-
-  // Get password
   const password = yield* askConfigGetSecret(`neo4j-${graphDatabaseName}-password`);
 
   const response = yield* askNetworkRequest<Neo4jCypherRequest, Neo4jCypherResponse>(

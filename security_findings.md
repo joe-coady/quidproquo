@@ -146,3 +146,17 @@
 - **Where**: both files.
 - **Suggested fix**: shared constant in core.
 - **Status**: recorded
+
+## quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/askRunNeo4jOpenCypherQuery.ts
+- **Severity**: medium
+- **Issue**: The Neo4j password and derived Basic Authorization header travel through story action payloads/results, and resolveStory records every action and result unmasked into response.history, which the logger persists; the database password is recoverable from stored story logs.
+- **Where**: askRunNeo4jOpenCypherQuery; root cause in quidproquo-core/src/runtime/resolveStory.ts history capture (no masking).
+- **Suggested fix**: mask secret action results and Authorization-style headers in story history at the core runtime level, or move credential resolution into the platform network processor so secrets never appear in story-land payloads.
+- **Status**: recorded
+
+## quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/askRunNeo4jOpenCypherQuery.ts
+- **Severity**: low
+- **Issue**: Request host is built by interpolating the neo4j-<db>-instance config parameter into the URL; a compromised or malformed value containing / or . segments redirects the query (including Basic auth credentials) to an attacker-controlled host.
+- **Where**: askRunNeo4jOpenCypherQuery URL construction.
+- **Suggested fix**: validate the instance name against a strict pattern (e.g. ^[a-z0-9]+$) before building the URL.
+- **Status**: recorded

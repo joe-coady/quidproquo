@@ -3048,44 +3048,44 @@ If your change touched files in more than one package (e.g. you moved a shared h
 [ ] quidproquo-features/src/webSocketQueue/types/serverMessages/WebSocketQueueServerMessageEventType.ts
 [ ] quidproquo-features/src/webSocketQueue/types/serverMessages/index.ts
 [ ] quidproquo-features/vitest.config.ts
-[ ] quidproquo-neo4j/eslint.config.mjs
-[ ] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/getGraphDatabaseExecuteOpenCypherQueryActionProcessor.test.ts
-[ ] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/getGraphDatabaseExecuteOpenCypherQueryActionProcessor.ts
-[ ] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/index.ts
-[ ] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/askRunNeo4jOpenCypherQuery.test.ts
-[ ] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/askRunNeo4jOpenCypherQuery.ts
-[ ] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/converters/askConvertAnyNeo4jResultToAnyGraphResult.test.ts
-[ ] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/converters/askConvertAnyNeo4jResultToAnyGraphResult.ts
-[ ] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/converters/askConvertNeo4jCypherResponseToCypherResponse.test.ts
-[ ] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/converters/askConvertNeo4jCypherResponseToCypherResponse.ts
-[ ] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/converters/askConvertNeo4jNodeResultToGraphNodeResult.test.ts
-[ ] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/converters/askConvertNeo4jNodeResultToGraphNodeResult.ts
-[ ] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/converters/askConvertNeo4jRelationshipResultToGraphRelationshipResult.test.ts
-[ ] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/converters/askConvertNeo4jRelationshipResultToGraphRelationshipResult.ts
-[ ] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/converters/index.ts
-[ ] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/converters/utils/index.ts
-[ ] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/converters/utils/isNeo4jNodeResult.test.ts
-[ ] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/converters/utils/isNeo4jNodeResult.ts
-[ ] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/converters/utils/isNeo4jRelationshipResult.test.ts
-[ ] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/converters/utils/isNeo4jRelationshipResult.ts
-[ ] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/converters/utils/isNeo4jScalarResult.test.ts
-[ ] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/converters/utils/isNeo4jScalarResult.ts
-[ ] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/index.ts
-[ ] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/types/index.ts
-[ ] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/types/neo4j.ts
-[ ] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/utils/convertQpqQueryToNeo4j.test.ts
-[ ] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/utils/convertQpqQueryToNeo4j.ts
-[ ] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/utils/index.ts
-[ ] quidproquo-neo4j/src/config/index.ts
-[ ] quidproquo-neo4j/src/config/settings/graphDatabaseNeo4j/defineGraphDatabaseNeo4j.test.ts
-[ ] quidproquo-neo4j/src/config/settings/graphDatabaseNeo4j/defineGraphDatabaseNeo4j.ts
-[ ] quidproquo-neo4j/src/config/settings/graphDatabaseNeo4j/index.ts
-[ ] quidproquo-neo4j/src/config/settings/index.ts
-[ ] quidproquo-neo4j/src/entry/scheduledEvents/keepAlive.test.ts
-[ ] quidproquo-neo4j/src/entry/scheduledEvents/keepAlive.ts
-[ ] quidproquo-neo4j/src/index.test.ts
-[ ] quidproquo-neo4j/src/index.ts
-[ ] quidproquo-neo4j/vitest.config.ts
+[x] quidproquo-neo4j/eslint.config.mjs
+[x] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/getGraphDatabaseExecuteOpenCypherQueryActionProcessor.test.ts
+[x] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/getGraphDatabaseExecuteOpenCypherQueryActionProcessor.ts
+[x] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/index.ts
+[x] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/askRunNeo4jOpenCypherQuery.test.ts
+[x] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/askRunNeo4jOpenCypherQuery.ts - note: secrets flow through story history unmasked (medium, recorded, root cause core resolveStory); instance-name URL interpolation recorded (low)
+[x] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/converters/askConvertAnyNeo4jResultToAnyGraphResult.test.ts
+[x] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/converters/askConvertAnyNeo4jResultToAnyGraphResult.ts
+[x] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/converters/askConvertNeo4jCypherResponseToCypherResponse.test.ts
+[x] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/converters/askConvertNeo4jCypherResponseToCypherResponse.ts
+[x] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/converters/askConvertNeo4jNodeResultToGraphNodeResult.test.ts
+[x] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/converters/askConvertNeo4jNodeResultToGraphNodeResult.ts
+[x] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/converters/askConvertNeo4jRelationshipResultToGraphRelationshipResult.test.ts
+[x] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/converters/askConvertNeo4jRelationshipResultToGraphRelationshipResult.ts
+[x] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/converters/index.ts
+[x] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/converters/utils/index.ts
+[x] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/converters/utils/isNeo4jNodeResult.test.ts
+[x] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/converters/utils/isNeo4jNodeResult.ts
+[x] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/converters/utils/isNeo4jRelationshipResult.test.ts
+[x] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/converters/utils/isNeo4jRelationshipResult.ts
+[x] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/converters/utils/isNeo4jScalarResult.test.ts
+[x] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/converters/utils/isNeo4jScalarResult.ts
+[x] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/index.ts
+[x] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/types/index.ts
+[x] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/types/neo4j.ts
+[x] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/utils/convertQpqQueryToNeo4j.test.ts
+[x] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/utils/convertQpqQueryToNeo4j.ts
+[x] quidproquo-neo4j/src/actionProcessor/graphDatabaseOverride/version5/stories/utils/index.ts
+[x] quidproquo-neo4j/src/config/index.ts
+[x] quidproquo-neo4j/src/config/settings/graphDatabaseNeo4j/defineGraphDatabaseNeo4j.test.ts
+[x] quidproquo-neo4j/src/config/settings/graphDatabaseNeo4j/defineGraphDatabaseNeo4j.ts - note: dead GraphDatabaseNeo4jQPQConfigSetting export deleted (changelog-worthy); Neo4jVersion moved to own file
+[x] quidproquo-neo4j/src/config/settings/graphDatabaseNeo4j/index.ts
+[x] quidproquo-neo4j/src/config/settings/index.ts
+[x] quidproquo-neo4j/src/entry/scheduledEvents/keepAlive.test.ts
+[x] quidproquo-neo4j/src/entry/scheduledEvents/keepAlive.ts
+[x] quidproquo-neo4j/src/index.test.ts - note: real smoke test
+[x] quidproquo-neo4j/src/index.ts
+[x] quidproquo-neo4j/vitest.config.ts
 [x] quidproquo-testing/eslint.config.mjs
 [x] quidproquo-testing/src/generatorExpect.test.ts
 [x] quidproquo-testing/src/generatorExpect.ts - note: deleted unreachable mockGeneratorReturn/mockGeneratorYieldReturn (not on package surface, zero call sites); alias methods kept as published API

@@ -3,14 +3,14 @@ import { AskResponse, GraphEntityType, GraphRelationshipResult } from 'quidproqu
 import { Neo4jRelationshipResult } from '../types';
 
 export function* askConvertNeo4jRelationshipResultToGraphRelationshipResult(
-  neptuneRelationshipResult: Neo4jRelationshipResult,
+  neo4jRelationshipResult: Neo4jRelationshipResult,
 ): AskResponse<GraphRelationshipResult> {
   return {
     $entityType: GraphEntityType.Relationship,
-    $id: neptuneRelationshipResult.elementId,
-    $start: neptuneRelationshipResult.startNodeElementId,
-    $end: neptuneRelationshipResult.endNodeElementId,
-    $type: neptuneRelationshipResult.type,
-    $properties: neptuneRelationshipResult.properties,
+    $id: neo4jRelationshipResult.elementId,
+    $start: neo4jRelationshipResult.startNodeElementId,
+    $end: neo4jRelationshipResult.endNodeElementId,
+    $type: neo4jRelationshipResult.type,
+    $properties: neo4jRelationshipResult.properties,
   };
 }
