@@ -1,9 +1,9 @@
-// Shared Rspack config for a views microfrontend — no per-service
+// Shared Rspack config for a views microfrontend, with no per-service
 // module-federation.config.ts. Exposes are computed from `// federated.export`
 // markers at config-eval time; remotes are discovered from sibling views
 // packages. Dev-only remotes: everything points at
 // http://localhost:<port>/mf-manifest.json.
-import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { Nullable, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import fs from 'fs';
@@ -13,21 +13,19 @@ import { Configuration, rspack } from '@rspack/core';
 import { ReactRefreshRspackPlugin } from '@rspack/plugin-react-refresh';
 
 import { getQpqCircularCheckPlugin } from '../plugins';
-import { scanFederatedExposes } from './federatedExports';
+import { getViewsContext } from './getViewsContext';
 import { getWorkspaceSourceAliases } from './getWorkspaceSourceAliases';
-import { getViewsContext } from './viewsWorkspace';
+import { requireQpqConfig } from './requireQpqConfig';
+import { scanFederatedExposes } from './scanFederatedExposes';
 
 type SharedConfig = Record<string, { singleton: boolean; requiredVersion?: string; eager?: boolean }>;
 
 // The service's QPQ config (the same no-synth source-of-truth used by the
 // backend dev server). Relies on the caller running with TS require hooks, as
 // rspack.config.ts evaluation / ts-node already do.
-const loadQpqConfig = (viewsDir: string): QPQConfig | null => {
+const loadQpqConfig = (viewsDir: string): Nullable<QPQConfig> => {
   try {
-    const infraPath = path.join(viewsDir, '..', 'service', 'src', 'infrastructure');
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const infraModule = require(infraPath);
-    return infraModule.default || infraModule;
+    return requireQpqConfig(path.join(viewsDir, '..', 'service', 'src', 'infrastructure'));
   } catch (e) {
     console.warn(`[views-rspack] could not load QPQ config for ${viewsDir}:`, (e as Error).message);
     return null;
@@ -35,17 +33,17 @@ const loadQpqConfig = (viewsDir: string): QPQConfig | null => {
 };
 
 // Module-federation `shared` rules: react/react-dom singleton, quidproquo-web*
-// singleton, any react-ish dep singleton — plus whatever the service's
+// singleton, any react-ish dep singleton, plus whatever the service's
 // `defineFrontendBundleOptions({ sharedSingletons })` adds (substring-matched
 // against the hoisted root dependency names, e.g. 'chakra', 'zod').
-const buildShared = (root: string, qpqConfig: QPQConfig | null): SharedConfig => {
+const buildShared = (root: string, qpqConfig: Nullable<QPQConfig>): SharedConfig => {
   const rootPkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
   const deps: Record<string, string> = rootPkg.dependencies || {};
   const shared: SharedConfig = {};
 
   const sharedSingletons = qpqConfig ? qpqCoreUtils.getFrontendBundleOptions(qpqConfig).sharedSingletons : [];
 
-  // NOTE: no `eager` anywhere — every app (host included) enters through the
+  // NOTE: no `eager` anywhere: every app (host included) enters through the
   // `import('./bootstrap')` async boundary, so shared modules are always
   // consumed after share-scope init. (Under MF 2.0 manifest remotes, eager
   // shared modules deadlock container init.)
@@ -66,7 +64,7 @@ const buildShared = (root: string, qpqConfig: QPQConfig | null): SharedConfig =>
 
 // Two DefinePlugin entries carrying the service's application config info into
 // the views bundle (same shape the QpqWebPlugin injects for full web builds).
-const buildQpqDefines = (qpqConfig: QPQConfig | null): Record<string, string> => {
+const buildQpqDefines = (qpqConfig: Nullable<QPQConfig>): Record<string, string> => {
   if (!qpqConfig) {
     return { 'process.env.QPQ_APPLICATION_CONFIG_INFO': JSON.stringify({}) };
   }
@@ -111,7 +109,7 @@ export const getViewsRspackConfig = (viewsDir: string): Configuration => {
   // other service at views.<domainRoot>/<svc>. Domain comes from the
   // app-scoped apps/<app>/deploy.config.json; environment/feature from the
   // service's own QPQ config.
-  const getProdBaseUrl = (service: string): string | null => {
+  const getProdBaseUrl = (service: string): Nullable<string> => {
     try {
       const deployConfig = JSON.parse(fs.readFileSync(path.join(root, 'apps', self.appName, 'deploy.config.json'), 'utf8'));
       if (!qpqConfig) {
@@ -131,18 +129,18 @@ export const getViewsRspackConfig = (viewsDir: string): Configuration => {
 
   // Same-origin remote base for single-host deploys (the docker platform
   // image): QPQ_VIEWS_REMOTE_BASE='/views' makes every remote resolve
-  // root-relative against whatever origin serves the bundle — shell at /,
-  // remotes at <base>/<svc> — instead of localhost ports or the AWS domains.
+  // root-relative against whatever origin serves the bundle (shell at /,
+  // remotes at <base>/<svc>) instead of localhost ports or the AWS domains.
   const remoteBase = process.env.QPQ_VIEWS_REMOTE_BASE;
 
-  const getRemoteBaseUrl = (service: string): string | null => {
+  const getRemoteBaseUrl = (service: string): Nullable<string> => {
     if (isDev) return `http://localhost:${siblings.find((sib) => sib.service === service)?.port}`;
     if (remoteBase) return service === 'shell' ? '' : `${remoteBase}/${service}`;
     return getProdBaseUrl(service);
   };
 
   // Remotes: alias -> mfName@<base>/mf-manifest.json (dev = localhost ports).
-  // ONLY siblings that actually expose something — an app with no exposes emits a
+  // ONLY siblings that actually expose something: an app with no exposes emits a
   // consumer-style manifest with no remoteEntry, and registering it as a remote
   // makes the MF runtime fail snapshot resolution (RUNTIME-011/015).
   const remotes: Record<string, string> = {};
@@ -155,6 +153,10 @@ export const getViewsRspackConfig = (viewsDir: string): Configuration => {
 
   const htmlTemplate = path.join(viewsDir, 'src', 'index.html');
   const favicon = path.join(viewsDir, 'src', 'favicon.ico');
+
+  // Optional static assets served from the output root (web app manifest,
+  // service worker, PWA icons…): anything under src/public is copied verbatim.
+  const publicDir = path.join(viewsDir, 'src', 'public');
 
   // main.ts for TypeScript apps, main.js for JavaScript apps
   const tsEntry = path.join(viewsDir, 'src', 'main.ts');
@@ -197,7 +199,7 @@ export const getViewsRspackConfig = (viewsDir: string): Configuration => {
     // this undefined, and its proxy breaks module-federation entries (the
     // `import('./bootstrap')` async boundary hangs forever with
     // "…bootstrap.tsx!lazy-compilation-proxy" errors). Top-level option in
-    // Rspack 2 (not experiments.*) — set it explicitly off.
+    // Rspack 2 (not experiments.*), so set it explicitly off.
     lazyCompilation: false,
 
     module: {
@@ -238,7 +240,7 @@ export const getViewsRspackConfig = (viewsDir: string): Configuration => {
         remotes,
         shared: buildShared(root, qpqConfig),
         // Default 'version-first' blocks module evaluation on collecting share
-        // info from every remote entry — with nested manifest remotes
+        // info from every remote entry; with nested manifest remotes
         // (host -> shell -> design/auth) it deadlocks silently and the app never
         // mounts. 'loaded-first' resolves shares from whatever is already loaded.
         shareStrategy: 'loaded-first',
@@ -248,6 +250,7 @@ export const getViewsRspackConfig = (viewsDir: string): Configuration => {
         template: htmlTemplate,
         ...(fs.existsSync(favicon) ? { favicon } : {}),
       }),
+      ...(fs.existsSync(publicDir) ? [new rspack.CopyRspackPlugin({ patterns: [{ from: publicDir, to: '.' }] })] : []),
       new rspack.DefinePlugin(buildQpqDefines(qpqConfig)),
       getQpqCircularCheckPlugin(),
       ...(isDev ? [new ReactRefreshRspackPlugin()] : []),
@@ -256,7 +259,7 @@ export const getViewsRspackConfig = (viewsDir: string): Configuration => {
     watchOptions: { ignored: ['**/dist', '**/dist-tsc', '**/node_modules'] },
 
     // Dev terminal output: errors only. Many servers share one terminal in
-    // go:dev:web — stats covers compiler output (rebuild summaries, plugin
+    // go:dev:web; stats covers compiler output (rebuild summaries, plugin
     // warnings), infrastructureLogging covers dev-server chatter (the
     // Local/Network URLs, which the boot script already prints itself).
     stats: isDev ? 'errors-only' : 'normal',
