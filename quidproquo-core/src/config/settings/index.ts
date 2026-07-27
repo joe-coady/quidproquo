@@ -7,6 +7,7 @@ export * from './applicationVersion';
 export * from './bundleOptions';
 export * from './claudeAi';
 export * from './configValue';
+export * from './cryptoKey';
 export * from './definePromiseMode';
 export * from './deployEvent';
 export * from './emailTemplates';

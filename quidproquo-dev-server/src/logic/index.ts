@@ -1,4 +1,5 @@
 export * from './config';
+export * from './cryptoKeys';
 export * from './eventBus';
 export * from './fifoDeduplication';
 export * from './jsonFileStore';

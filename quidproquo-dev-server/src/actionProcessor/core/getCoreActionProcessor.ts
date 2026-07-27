@@ -6,6 +6,7 @@ import { getRouteAuthValidationActionProcessor } from 'quidproquo-webserver';
 import { ResolvedDevServerConfig } from '../../types';
 import { getApiKeyValidationActionProcessor } from './apiKeyValidation';
 import { getConfigActionProcessor } from './config';
+import { getCryptoActionProcessor } from './crypto';
 import { getEventBusActionProcessor } from './eventBus';
 import { getGraphDatabaseActionProcessor } from './graphDatabaseOverride';
 import { getKeyValueStoreActionProcessor } from './keyValueStore';
@@ -43,6 +44,7 @@ export const getCoreActionProcessor = async (
   return {
     ...(await getApiKeyValidationActionProcessor(qpqConfig, dynamicModuleLoader)),
     ...(await getConfigActionProcessor(devServerConfig)(qpqConfig, dynamicModuleLoader)),
+    ...(await getCryptoActionProcessor(devServerConfig)(qpqConfig, dynamicModuleLoader)),
     ...(await getGraphDatabaseActionProcessor(qpqConfig, dynamicModuleLoader)),
     ...(await getEventBusActionProcessor(qpqConfig, dynamicModuleLoader)),
     ...(await getQueueActionProcessor(qpqConfig, dynamicModuleLoader)),

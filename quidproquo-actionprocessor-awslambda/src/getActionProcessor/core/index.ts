@@ -1,6 +1,7 @@
 export * from './ai';
 export * from './apiKeyValidation';
 export * from './config';
+export * from './crypto';
 export * from './event';
 export * from './eventBus';
 export * from './file';
@@ -17,6 +18,7 @@ import { getRouteAuthValidationActionProcessor } from 'quidproquo-webserver';
 import { getAiActionProcessor } from './ai';
 import { getApiKeyValidationActionProcessor } from './apiKeyValidation';
 import { getConfigActionProcessor } from './config';
+import { getCryptoActionProcessor } from './crypto';
 import { getApiGatewayApiEventEventProcessor } from './event';
 import { getEventBusActionProcessor } from './eventBus';
 import { getFileActionProcessor } from './file';
@@ -41,6 +43,7 @@ export const getCoreActionProcessor: ActionProcessorListResolver = async (
   ...(await getEventBusActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getSystemActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getConfigActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getCryptoActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getApiGatewayApiEventEventProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getGraphDatabaseActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getRouteAuthValidationActionProcessor(qpqConfig, dynamicModuleLoader)),

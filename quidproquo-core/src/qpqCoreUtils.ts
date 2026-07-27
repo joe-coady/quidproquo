@@ -6,6 +6,7 @@ import {
   BackendBundleOptions,
   BackendBundleOptionsQPQConfigSetting,
   ClaudeAIQPQConfigSetting,
+  CryptoKeyQPQConfigSetting,
   defineJavascriptRuntime,
   DeployEventsQPQConfigSetting,
   EmailTemplates,
@@ -461,6 +462,30 @@ export const getOwnedSecrets = (qpqConfig: QPQConfig): SecretQPQConfigSetting[] 
   const secrets = getAllSecretConfigs(qpqConfig);
 
   return getOwnedItems(secrets, qpqConfig);
+};
+
+export const getCryptoKeyByName = (cryptoKeyName: string, qpqConfig: QPQConfig): CryptoKeyQPQConfigSetting => {
+  const cryptoKeys = getConfigSettings<CryptoKeyQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.cryptoKey);
+
+  const cryptoKey = cryptoKeys.find((k) => k.keyName === cryptoKeyName);
+
+  if (!cryptoKey) {
+    throw new Error(`Can not find crypto key [${cryptoKeyName}]`);
+  }
+
+  return cryptoKey;
+};
+
+export const getAllCryptoKeyConfigs = (qpqConfig: QPQConfig): CryptoKeyQPQConfigSetting[] => {
+  const cryptoKeys = getConfigSettings<CryptoKeyQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.cryptoKey);
+
+  return cryptoKeys;
+};
+
+export const getOwnedCryptoKeys = (qpqConfig: QPQConfig): CryptoKeyQPQConfigSetting[] => {
+  const cryptoKeys = getAllCryptoKeyConfigs(qpqConfig);
+
+  return getOwnedItems(cryptoKeys, qpqConfig);
 };
 
 export const getGlobalConfigValue = <T>(qpqConfig: QPQConfig, name: string): T => {

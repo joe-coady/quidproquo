@@ -1,0 +1,7 @@
+{
+  "label": "Crypto",
+  "link": {
+    "type": "generated-index",
+    "description": "Crypto actions encrypt and decrypt values with a key declared by defineCryptoKey. Envelope encryption with an optional context that binds ciphertext to the place it was created."
+  }
+}

@@ -6,6 +6,7 @@ import { Construct } from 'constructs';
 import {
   QpqCoreAiConstruct,
   QpqCoreApiGraphDatabaseConstruct,
+  QpqCoreCryptoKeyConstruct,
   QpqCoreEventBusConstruct,
   QpqCoreKeyValueStoreConstruct,
   QpqCoreParameterConstruct,
@@ -71,6 +72,18 @@ export class InfQpqServiceStack extends QpqServiceStack {
     );
     QpqCoreSecretConstruct.authorizeActionsForRole(this, webserverRole, qpqCoreUtils.getAllSecretConfigs(props.qpqConfig), props.qpqConfig);
     // end secrets
+
+    // Crypto keys
+    const cryptoKeys = qpqCoreUtils.getOwnedCryptoKeys(props.qpqConfig).map(
+      (setting) =>
+        new QpqCoreCryptoKeyConstruct(this, qpqCoreUtils.getUniqueKeyForSetting(setting), {
+          qpqConfig: props.qpqConfig,
+
+          cryptoKeyConfig: setting,
+        }),
+    );
+    QpqCoreCryptoKeyConstruct.authorizeActionsForRole(webserverRole, qpqCoreUtils.getAllCryptoKeyConfigs(props.qpqConfig), props.qpqConfig);
+    // end crypto keys
 
     // Queues
     const queues = qpqCoreUtils.getQueues(props.qpqConfig).map(

@@ -1,5 +1,6 @@
 export * from './ai';
 export * from './auth';
+export * from './cryptoKey';
 export * from './deployEvents';
 export * from './eventBus';
 export * from './graphDatabase';

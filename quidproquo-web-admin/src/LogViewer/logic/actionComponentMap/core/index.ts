@@ -2,6 +2,7 @@ import coreAiActionComponentMap from './coreAiActionComponentMap';
 import coreClaudeAiActionComponentMap from './coreClaudeAiActionComponentMap';
 import coreConfigActionComponentMap from './coreConfigActionComponentMap';
 import coreContextActionComponentMap from './coreContextActionComponentMap';
+import coreCryptoActionComponentMap from './coreCryptoActionComponentMap';
 import coreDateActionComponentMap from './coreDateActionComponentMap';
 import coreDeployEventActionComponentMap from './coreDeployEventActionComponentMap';
 import coreErrorActionComponentMap from './coreErrorActionComponentMap';
@@ -26,6 +27,7 @@ export default {
   ...coreClaudeAiActionComponentMap,
   ...coreConfigActionComponentMap,
   ...coreContextActionComponentMap,
+  ...coreCryptoActionComponentMap,
   ...coreDateActionComponentMap,
   ...coreErrorActionComponentMap,
   ...coreEventActionComponentMap,
