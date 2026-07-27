@@ -6,15 +6,13 @@ const getProcessQueryParamsSet = (qpqConfig: QPQConfig): QueryParamsSetActionPro
     const url = new URL(window.location.href);
     const urlParams = new URLSearchParams(url.search);
 
-    // Ensure values is an array and remove key if empty
-    if (values.length === 0) {
-      urlParams.delete(key);
-    } else {
-      urlParams.delete(key);
-      values.forEach((value) => urlParams.append(key, value));
-    }
+    // Replace every existing value for the key; no values means remove it.
+    urlParams.delete(key);
+    values.forEach((value) => urlParams.append(key, value));
 
-    const newUrl = `${url.pathname}?${urlParams.toString()}`;
+    // Only the query changes: keep the hash, and drop the '?' when no params remain.
+    const search = urlParams.toString();
+    const newUrl = `${url.pathname}${search ? `?${search}` : ''}${url.hash}`;
 
     if (createHistoryEntry) {
       window.history.pushState(null, '', newUrl);

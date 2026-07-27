@@ -10,9 +10,16 @@ const getProcessor = async () => {
   return processors[ConfigActionType.SetParameter] as (p: any, ...rest: any[]) => Promise<any>;
 };
 
+// Simulates the browser's storage-full DOMException, which is discriminated by name.
+const throwQuotaExceededError = () => {
+  const quotaError = new Error('full');
+  quotaError.name = 'QuotaExceededError';
+  throw quotaError;
+};
+
 describe('getConfigSetParameterActionProcessor', () => {
   beforeEach(() => {
-    localStorage.clear();
+    window.localStorage.clear();
   });
 
   afterEach(() => {
@@ -25,15 +32,11 @@ describe('getConfigSetParameterActionProcessor', () => {
     const [, error] = await processor({ parameterName: 'token', parameterValue: 'abc' });
 
     expect(error).toBeUndefined();
-    expect(localStorage.getItem('token')).toBe('abc');
+    expect(window.localStorage.getItem('token')).toBe('abc');
   });
 
   it('maps a QuotaExceededError to the QuotaExceeded error type', async () => {
-    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
-      const quotaError = new Error('full');
-      quotaError.name = 'QuotaExceededError';
-      throw quotaError;
-    });
+    vi.spyOn(window.localStorage, 'setItem').mockImplementation(throwQuotaExceededError);
     const processor = await getProcessor();
 
     const [, error] = await processor({ parameterName: 'token', parameterValue: 'abc' });
@@ -42,9 +45,10 @@ describe('getConfigSetParameterActionProcessor', () => {
   });
 
   it('maps an unrecognised error to a generic error', async () => {
-    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+    const throwUnrecognisedError = () => {
       throw new Error('boom');
-    });
+    };
+    vi.spyOn(window.localStorage, 'setItem').mockImplementation(throwUnrecognisedError);
     const processor = await getProcessor();
 
     const [, error] = await processor({ parameterName: 'token', parameterValue: 'abc' });

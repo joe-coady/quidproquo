@@ -10,6 +10,8 @@ import {
   getWebserverActionProcessor as getWebWebserverActionProcessor,
 } from './actionProcessor';
 
+// Later spreads win: the browser implementations below override the generic js
+// processors for any action type both packages provide.
 export const getWebActionProcessors: ActionProcessorListResolver = async (
   qpqConfig: QPQConfig,
   dynamicModuleLoader: DynamicModuleLoader,

@@ -12,12 +12,12 @@ const getProcessor = async () => {
 
 describe('getConfigGetParametersActionProcessor', () => {
   beforeEach(() => {
-    localStorage.clear();
+    window.localStorage.clear();
   });
 
   it('returns the values for every requested parameter, in order', async () => {
-    localStorage.setItem('a', '1');
-    localStorage.setItem('b', '2');
+    window.localStorage.setItem('a', '1');
+    window.localStorage.setItem('b', '2');
     const processor = await getProcessor();
 
     const [result] = await processor({ parameterNames: ['a', 'b'] });
@@ -26,7 +26,7 @@ describe('getConfigGetParametersActionProcessor', () => {
   });
 
   it('returns a NotFound error listing the missing parameters', async () => {
-    localStorage.setItem('a', '1');
+    window.localStorage.setItem('a', '1');
     const processor = await getProcessor();
 
     const [, error] = await processor({ parameterNames: ['a', 'b'] });

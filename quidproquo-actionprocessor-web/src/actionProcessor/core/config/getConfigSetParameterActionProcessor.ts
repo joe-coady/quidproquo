@@ -13,7 +13,9 @@ import {
 const getProcessConfigSetParameter = (qpqConfig: QPQConfig): ConfigSetParameterActionProcessor => {
   return async ({ parameterName, parameterValue }) => {
     try {
-      localStorage.setItem(parameterName, parameterValue);
+      // window.localStorage (not the bare global): Node exposes a non-functional
+      // localStorage global that shadows jsdom's in tests.
+      window.localStorage.setItem(parameterName, parameterValue);
 
       return actionResult(void 0);
     } catch (error: unknown) {

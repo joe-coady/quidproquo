@@ -7,11 +7,7 @@ const getProcessQueryParamsGetAll = (qpqConfig: QPQConfig): QueryParamsGetAllAct
     const paramsObject: Record<string, string[]> = {};
 
     urlParams.forEach((value, key) => {
-      if (paramsObject[key]) {
-        paramsObject[key] = [...(paramsObject[key] as string[]), value];
-      } else {
-        paramsObject[key] = [value];
-      }
+      paramsObject[key] = [...(paramsObject[key] ?? []), value];
     });
 
     return actionResult(paramsObject);

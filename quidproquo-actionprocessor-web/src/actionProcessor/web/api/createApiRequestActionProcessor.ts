@@ -1,22 +1,23 @@
-import { ActionProcessorList, ActionProcessorListResolver, actionResult } from 'quidproquo-core';
-import { ApiActionType, ApiRequestActionProcessor } from 'quidproquo-webserver';
-import { preformNetworkRequest } from 'quidproquo-webserver';
+import { ActionProcessorList, ActionProcessorListResolver, actionResult, Nullable } from 'quidproquo-core';
+import { ApiActionType, ApiRequestActionProcessor, preformNetworkRequest } from 'quidproquo-webserver';
 
-export interface ApiRequestActionProcessorOptions {
+export type ApiRequestActionProcessorOptions = {
   // Resolve the base url for a given service. The default ignores the service name
-  // and targets api.<currentHost> — the single-backend case that covers most apps.
+  // and targets api.<currentHost>, the single-backend case that covers most apps.
   resolveServiceBaseUrl?: (service: string) => string;
 
-  // Provide headers to attach to every request — e.g. auth (any scheme), tracing,
+  // Provide headers to attach to every request, e.g. auth (any scheme), tracing,
   // tenant ids. Merged into (and overriding) the per-call headers. Default: none.
-  getHeaders?: () => Record<string, string> | undefined;
-}
+  getHeaders?: () => Nullable<Record<string, string>>;
+};
 
 const defaultResolveServiceBaseUrl = (_service: string): string => {
   const { protocol, hostname, port } = window.location;
   return `${protocol}//api.${hostname}${port ? `:${port}` : ''}`;
 };
 
+// any/any: the processor serves every ApiRequestAction<T> regardless of body/response
+// type, and T is contravariant in the action, so no single unknown-based signature fits.
 const getProcessApiRequest = (options?: ApiRequestActionProcessorOptions): ApiRequestActionProcessor<any, any> => {
   return async ({ service, endpoint, method, body, params, headers, responseType }) => {
     const basePath = (options?.resolveServiceBaseUrl ?? defaultResolveServiceBaseUrl)(service);

@@ -11,25 +11,18 @@ import {
 
 const getProcessConfigGetParameters = (qpqConfig: QPQConfig): ConfigGetParametersActionProcessor => {
   return async ({ parameterNames }) => {
-    // Retrieve values from Local Storage for each parameter name
+    // window.localStorage (not the bare global): Node exposes a non-functional
+    // localStorage global that shadows jsdom's in tests.
     const parameterValues = parameterNames.map((name) => ({
       name,
-      value: localStorage.getItem(name),
-      found: localStorage.getItem(name) !== null, // Check if it exists
+      value: window.localStorage.getItem(name),
     }));
 
-    // Find missing parameters
-    const missingParameters = parameterValues.filter((param) => !param.found);
-
-    // If any parameters are missing, return an error
-    if (missingParameters.length > 0) {
-      return actionResultError(
-        ErrorTypeEnum.NotFound,
-        `Parameters not found in Local Storage: ${missingParameters.map((param) => param.name).join(', ')}`,
-      );
+    const missingNames = parameterValues.filter((param) => param.value === null).map((param) => param.name);
+    if (missingNames.length > 0) {
+      return actionResultError(ErrorTypeEnum.NotFound, `Parameters not found in Local Storage: ${missingNames.join(', ')}`);
     }
 
-    // Return an array of values
     return actionResult(parameterValues.map((param) => param.value));
   };
 };

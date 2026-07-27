@@ -9,6 +9,7 @@ assembled quickly.
 - `EventDocListItem` requires a new `type: string` field (the collection's event-doc type). Code constructing `EventDocListItem` values directly (outside `toEventDocListItem`) must supply it.
 - `EventDocBundleApplyOptions` in `quidproquo-features` requires a new `importerUserId: string` field. Callers of `askEventDocBundleApply`/`askEventDocBundleApplyDoc` must pass the importing user's id; every imported event's `createdBy.userId` is rewritten to it (the original `userDisplayName` is kept).
 - `askEventDocWriteForeignEvents(docId, events, fromIndex, logRewritten?)` in `quidproquo-features` is now `askEventDocWriteForeignEvents(docId, events, fromIndex, { importerUserId, logRewritten? })`. Pass the importing user's id in the new required options object instead of a trailing boolean.
+- `ApiRequestActionProcessorOptions.getHeaders` in `quidproquo-actionprocessor-web` now returns `Nullable<Record<string, string>>` instead of `Record<string, string> | undefined`. A `getHeaders` callback that returned `undefined` for "no headers" must return `null`.
 
 ## 0.1.11
 

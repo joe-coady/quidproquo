@@ -37,6 +37,26 @@ describe('getQueryParamsSetActionProcessor', () => {
     expect(params.get('keep')).toBe('1');
   });
 
+  it('preserves the hash fragment when setting params', async () => {
+    window.history.replaceState(null, '', '/page?keep=1#section');
+    const processor = await getProcessor();
+
+    await processor({ key: 'tag', values: ['a'], createHistoryEntry: false });
+
+    expect(window.location.hash).toBe('#section');
+    expect(new URLSearchParams(window.location.search).getAll('tag')).toEqual(['a']);
+  });
+
+  it('leaves no dangling ? when the last param is removed', async () => {
+    window.history.replaceState(null, '', '/page?tag=a');
+    const processor = await getProcessor();
+
+    await processor({ key: 'tag', values: [], createHistoryEntry: false });
+
+    expect(window.location.search).toBe('');
+    expect(window.location.href.endsWith('?')).toBe(false);
+  });
+
   it('pushes a new history entry when createHistoryEntry is true', async () => {
     const before = window.history.length;
     const processor = await getProcessor();

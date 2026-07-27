@@ -798,36 +798,36 @@ If your change touched files in more than one package (e.g. you moved a shared h
 [ ] quidproquo-actionprocessor-node/src/traceStoryExecution/traceStoryExecution.test.ts
 [ ] quidproquo-actionprocessor-node/src/traceStoryExecution/traceStoryExecution.ts
 [ ] quidproquo-actionprocessor-node/vitest.config.ts
-[ ] quidproquo-actionprocessor-web/eslint.config.mjs
-[ ] quidproquo-actionprocessor-web/src/actionProcessor/core/config/getConfigGetParameterActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-web/src/actionProcessor/core/config/getConfigGetParameterActionProcessor.ts
-[ ] quidproquo-actionprocessor-web/src/actionProcessor/core/config/getConfigGetParametersActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-web/src/actionProcessor/core/config/getConfigGetParametersActionProcessor.ts
-[ ] quidproquo-actionprocessor-web/src/actionProcessor/core/config/getConfigSetParameterActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-web/src/actionProcessor/core/config/getConfigSetParameterActionProcessor.ts
-[ ] quidproquo-actionprocessor-web/src/actionProcessor/core/config/index.ts
-[ ] quidproquo-actionprocessor-web/src/actionProcessor/core/index.ts
-[ ] quidproquo-actionprocessor-web/src/actionProcessor/index.ts
-[ ] quidproquo-actionprocessor-web/src/actionProcessor/web/api/createApiRequestActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-web/src/actionProcessor/web/api/createApiRequestActionProcessor.ts
-[ ] quidproquo-actionprocessor-web/src/actionProcessor/web/api/index.ts
-[ ] quidproquo-actionprocessor-web/src/actionProcessor/web/index.ts
-[ ] quidproquo-actionprocessor-web/src/actionProcessor/web/queryParams/getQueryParamsGetActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-web/src/actionProcessor/web/queryParams/getQueryParamsGetActionProcessor.ts
-[ ] quidproquo-actionprocessor-web/src/actionProcessor/web/queryParams/getQueryParamsGetAllActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-web/src/actionProcessor/web/queryParams/getQueryParamsGetAllActionProcessor.ts
-[ ] quidproquo-actionprocessor-web/src/actionProcessor/web/queryParams/getQueryParamsSetActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-web/src/actionProcessor/web/queryParams/getQueryParamsSetActionProcessor.ts
-[ ] quidproquo-actionprocessor-web/src/actionProcessor/web/queryParams/index.ts
-[ ] quidproquo-actionprocessor-web/src/actionProcessor/web/window/getWindowGetLocationActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-web/src/actionProcessor/web/window/getWindowGetLocationActionProcessor.ts
-[ ] quidproquo-actionprocessor-web/src/actionProcessor/web/window/index.ts
-[ ] quidproquo-actionprocessor-web/src/actionProcessor/webserver/index.ts
-[ ] quidproquo-actionprocessor-web/src/getWebActionProcessors.test.ts
-[ ] quidproquo-actionprocessor-web/src/getWebActionProcessors.ts
-[ ] quidproquo-actionprocessor-web/src/index.test.ts
-[ ] quidproquo-actionprocessor-web/src/index.ts
-[ ] quidproquo-actionprocessor-web/vitest.config.ts
+[x] quidproquo-actionprocessor-web/eslint.config.mjs
+[x] quidproquo-actionprocessor-web/src/actionProcessor/core/config/getConfigGetParameterActionProcessor.test.ts
+[x] quidproquo-actionprocessor-web/src/actionProcessor/core/config/getConfigGetParameterActionProcessor.ts - note: NotFound missing from ConfigGetParameterErrorTypeEnum in core (returns generic ErrorTypeEnum.NotFound); cross-package backlog, same gap in awslambda flavour
+[x] quidproquo-actionprocessor-web/src/actionProcessor/core/config/getConfigGetParametersActionProcessor.test.ts
+[x] quidproquo-actionprocessor-web/src/actionProcessor/core/config/getConfigGetParametersActionProcessor.ts - note: same NotFound enum gap as getConfigGetParameterActionProcessor
+[x] quidproquo-actionprocessor-web/src/actionProcessor/core/config/getConfigSetParameterActionProcessor.test.ts
+[x] quidproquo-actionprocessor-web/src/actionProcessor/core/config/getConfigSetParameterActionProcessor.ts
+[x] quidproquo-actionprocessor-web/src/actionProcessor/core/config/index.ts
+[x] quidproquo-actionprocessor-web/src/actionProcessor/core/index.ts
+[x] quidproquo-actionprocessor-web/src/actionProcessor/index.ts
+[x] quidproquo-actionprocessor-web/src/actionProcessor/web/api/createApiRequestActionProcessor.test.ts
+[x] quidproquo-actionprocessor-web/src/actionProcessor/web/api/createApiRequestActionProcessor.ts
+[x] quidproquo-actionprocessor-web/src/actionProcessor/web/api/index.ts
+[x] quidproquo-actionprocessor-web/src/actionProcessor/web/index.ts
+[x] quidproquo-actionprocessor-web/src/actionProcessor/web/queryParams/getQueryParamsGetActionProcessor.test.ts
+[x] quidproquo-actionprocessor-web/src/actionProcessor/web/queryParams/getQueryParamsGetActionProcessor.ts
+[x] quidproquo-actionprocessor-web/src/actionProcessor/web/queryParams/getQueryParamsGetAllActionProcessor.test.ts
+[x] quidproquo-actionprocessor-web/src/actionProcessor/web/queryParams/getQueryParamsGetAllActionProcessor.ts
+[x] quidproquo-actionprocessor-web/src/actionProcessor/web/queryParams/getQueryParamsSetActionProcessor.test.ts
+[x] quidproquo-actionprocessor-web/src/actionProcessor/web/queryParams/getQueryParamsSetActionProcessor.ts - note: 2 real bugs fixed test-first (hash fragment wiped on set; dangling ? when last param removed)
+[x] quidproquo-actionprocessor-web/src/actionProcessor/web/queryParams/index.ts
+[x] quidproquo-actionprocessor-web/src/actionProcessor/web/window/getWindowGetLocationActionProcessor.test.ts
+[x] quidproquo-actionprocessor-web/src/actionProcessor/web/window/getWindowGetLocationActionProcessor.ts
+[x] quidproquo-actionprocessor-web/src/actionProcessor/web/window/index.ts
+[x] quidproquo-actionprocessor-web/src/actionProcessor/webserver/index.ts
+[x] quidproquo-actionprocessor-web/src/getWebActionProcessors.test.ts
+[x] quidproquo-actionprocessor-web/src/getWebActionProcessors.ts
+[x] quidproquo-actionprocessor-web/src/index.test.ts - note: 1+1 placeholder replaced with real public-surface smoke test
+[x] quidproquo-actionprocessor-web/src/index.ts
+[x] quidproquo-actionprocessor-web/vitest.config.ts
 [ ] quidproquo-cli/eslint.config.mjs
 [ ] quidproquo-cli/src/bin/qpq.ts
 [ ] quidproquo-cli/src/bin/qpqCdkApp.ts

@@ -12,11 +12,11 @@ const getProcessor = async () => {
 
 describe('getConfigGetParameterActionProcessor', () => {
   beforeEach(() => {
-    localStorage.clear();
+    window.localStorage.clear();
   });
 
   it('returns the value stored in local storage', async () => {
-    localStorage.setItem('apiUrl', 'https://example.com');
+    window.localStorage.setItem('apiUrl', 'https://example.com');
     const processor = await getProcessor();
 
     const [result] = await processor({ parameterName: 'apiUrl' });

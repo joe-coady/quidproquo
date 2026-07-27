@@ -11,10 +11,10 @@ import {
 
 const getProcessConfigGetParameter = (qpqConfig: QPQConfig): ConfigGetParameterActionProcessor => {
   return async ({ parameterName }) => {
-    // Read the value from Local Storage
-    const parameterValue = localStorage.getItem(parameterName);
+    // window.localStorage (not the bare global): Node exposes a non-functional
+    // localStorage global that shadows jsdom's in tests.
+    const parameterValue = window.localStorage.getItem(parameterName);
 
-    // If the parameter doesn't exist, return an error
     if (parameterValue === null) {
       return actionResultError(ErrorTypeEnum.NotFound, `Parameter '${parameterName}' not found in Local Storage`);
     }
