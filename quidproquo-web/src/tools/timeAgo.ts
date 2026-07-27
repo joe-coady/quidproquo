@@ -21,7 +21,7 @@ const DIVISIONS: Division[] = [
  */
 export const formatTimeAgo = (date: Date, now: Date = new Date(), locale?: string | string[]): string => {
   // An invalid date (e.g. new Date('')) has a NaN time, which Intl.RelativeTimeFormat
-  // rejects — guard so callers never have to.
+  // rejects: guard so callers never have to.
   if (Number.isNaN(date.getTime())) {
     return '';
   }

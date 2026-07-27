@@ -1,7 +1,6 @@
-import { AnyEventMessage, EventMessage } from 'quidproquo-core';
+import { AnyEventMessage, Nullable } from 'quidproquo-core';
 
-// Private / internal types
-type WebSocketEventListenerFunction = (this: WebSocket, ev: Event) => any;
+type WebSocketEventListenerFunction = (this: WebSocket, ev: Event) => void;
 
 export enum WebsocketServiceEvent {
   OPEN = 'open',
@@ -14,7 +13,7 @@ export type SubscriptionHandle = {
   type: WebsocketServiceEvent;
 };
 
-export type WebSocketServiceSubscriptionFunction = (websocketService: WebsocketService, event?: Event) => any;
+export type WebSocketServiceSubscriptionFunction = (websocketService: WebsocketService, event?: Event) => void;
 
 type SubscriptionMap = Map<SubscriptionHandle, WebSocketServiceSubscriptionFunction>;
 
@@ -26,10 +25,15 @@ type WebsocketSendPayload = string | ArrayBufferLike | Blob | ArrayBufferView;
 
 export type WebSocketServiceEventSubscriptionFunction<E extends AnyEventMessage> = (websocketService: WebsocketService, event: E) => void;
 
+/**
+ * Browser WebSocket wrapper that reconnects automatically (exponential backoff
+ * with jitter), queues sends while disconnected, and fans events out to
+ * subscribers. Call destroy() to stop reconnecting and release the socket.
+ */
 export class WebsocketService {
   public readonly url: string;
-  private socket: WebSocket | null = null;
-  private eventListeners: { [key: string]: WebSocketEventListenerFunction[] } = {};
+  private socket: Nullable<WebSocket> = null;
+  private eventListeners: Partial<Record<WebsocketServiceEvent, WebSocketEventListenerFunction[]>> = {};
   private isDestroyed: boolean = false;
   private pendingMessages: WebsocketSendPayload[] = [];
 
@@ -85,19 +89,24 @@ export class WebsocketService {
     subscriptionType: E['type'],
     callback: WebSocketServiceEventSubscriptionFunction<E>,
   ): SubscriptionHandle {
-    return this.subscribe(WebsocketServiceEvent.MESSAGE, (websocketService: WebsocketService, event?: Event) => {
-      if (event) {
-        const data = (event as MessageEvent).data;
-        try {
-          const parsedEvent: E = JSON.parse(data);
-          if (parsedEvent.type === subscriptionType) {
-            callback(websocketService, parsedEvent);
-          }
-        } catch (e) {
-          // Must have been some other message format / type do nothing.
-        }
+    // Forwards only MESSAGE frames that parse as json and carry the subscribed
+    // type; anything else on the socket is some other protocol's traffic.
+    const forwardMatchingMessage: WebSocketServiceSubscriptionFunction = (websocketService, event) => {
+      if (!event) {
+        return;
       }
-    });
+
+      try {
+        const parsedEvent: E = JSON.parse((event as MessageEvent).data);
+        if (parsedEvent.type === subscriptionType) {
+          callback(websocketService, parsedEvent);
+        }
+      } catch {
+        // Not json: ignore.
+      }
+    };
+
+    return this.subscribe(WebsocketServiceEvent.MESSAGE, forwardMatchingMessage);
   }
 
   public unsubscribe(subscriptionHandle: SubscriptionHandle) {
@@ -105,10 +114,8 @@ export class WebsocketService {
   }
 
   public unsubscribeAll() {
-    for (const subscriptionType in this.subscriptions) {
-      if (Object.prototype.hasOwnProperty.call(this.subscriptions, subscriptionType)) {
-        this.subscriptions[subscriptionType as WebsocketServiceEvent].clear();
-      }
+    for (const subscriptionMap of Object.values(this.subscriptions)) {
+      subscriptionMap.clear();
     }
   }
 
@@ -124,24 +131,19 @@ export class WebsocketService {
   }
 
   private addEventListener(event: WebsocketServiceEvent, listener: WebSocketEventListenerFunction) {
-    if (this.socket) {
-      this.socket.addEventListener(event, listener);
-
-      if (!this.eventListeners[event]) {
-        this.eventListeners[event] = [];
-      }
-
-      this.eventListeners[event].push(listener);
+    if (!this.socket) {
+      return;
     }
+
+    this.socket.addEventListener(event, listener);
+    (this.eventListeners[event] ??= []).push(listener);
   }
 
   private removeAllEventListeners() {
     if (this.socket) {
-      for (const event in this.eventListeners) {
-        if (Object.prototype.hasOwnProperty.call(this.eventListeners, event)) {
-          for (const listener of this.eventListeners[event]) {
-            this.socket.removeEventListener(event, listener);
-          }
+      for (const [event, listeners] of Object.entries(this.eventListeners)) {
+        for (const listener of listeners) {
+          this.socket.removeEventListener(event, listener);
         }
       }
     }
@@ -157,8 +159,6 @@ export class WebsocketService {
     const delay = Math.max(0, baseDelay + jitter);
 
     this.reconnectAttempts++;
-
-    console.log('Delay: ', delay);
 
     setTimeout(() => {
       if (!this.isDestroyed) {
@@ -205,7 +205,7 @@ export class WebsocketService {
     }
   }
 
-  public sendEvent<E extends EventMessage<any, string | number>>(event: E) {
+  public sendEvent<E extends AnyEventMessage>(event: E) {
     this.send(JSON.stringify(event));
   }
 }

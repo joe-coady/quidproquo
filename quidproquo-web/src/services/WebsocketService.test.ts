@@ -41,7 +41,6 @@ class FakeWebSocket {
 beforeEach(() => {
   FakeWebSocket.instances = [];
   vi.stubGlobal('WebSocket', FakeWebSocket);
-  vi.spyOn(console, 'log').mockImplementation(() => undefined);
 });
 
 afterEach(() => {

@@ -7,25 +7,25 @@
 //      with a nonce'd entry URL clears them and guarantees a fresh manifest fetch.
 //   2. The container global: loadEntryScript short-circuits on `window[globalName]`
 //      BEFORE fetching the entry, silently reusing the old container. Cleared by
-//      ASSIGNING undefined, not `delete` — the global is a top-level `var` from a
+//      ASSIGNING undefined, not `delete`: the global is a top-level `var` from a
 //      classic script, so the window property is non-configurable and delete throws;
 //      the runtime's short-circuit is a truthiness check, so undefined is enough.
 //   3. The bundler's chunk-loading global (`rspackChunk<name>` / `webpackChunk<name>`):
-//      shared by BUILD NAME — every chunk file of every previously loaded copy of the
+//      shared by BUILD NAME: every chunk file of every previously loaded copy of the
 //      remote pushed its modules into it, and a fresh container drains that array on
 //      boot. Chunk ids are stable across builds, so without a reset the new container
-//      sees the old build's chunks as already loaded and NEVER fetches its own files —
+//      sees the old build's chunks as already loaded and NEVER fetches its own files:
 //      the swap re-executes the OLD code under a new identity. The old container keeps
 //      its captured reference to the old array, so it is unaffected.
 //   4. The DOM script-tag dedup: both the MF sdk and the chunk loader reuse an existing
 //      <script> tag whose src matches (never re-executing it), so every one of the
 //      remote's tags (entry AND chunks) is swept.
 //   5. The browser HTTP cache of the fixed-name remoteEntry.js: a createScript runtime
-//      plugin serves the entry script with the reload nonce on its src — a never-seen
+//      plugin serves the entry script with the reload nonce on its src, a never-seen
 //      URL that no cache layer can answer.
 //
 // The MF runtime bindings are INJECTED (see FederationRuntimeApi): they must be the
-// host bundle's own instance — the bundler aliases '@module-federation/enhanced/runtime'
+// host bundle's own instance. The bundler aliases '@module-federation/enhanced/runtime'
 // onto the runtime it embeds, and importing a second copy here would target the wrong
 // (or no) instance. Injection also keeps this package dependency-free.
 

@@ -3748,37 +3748,37 @@ If your change touched files in more than one package (e.g. you moved a shared h
 [ ] quidproquo-web-react/src/websocket/hooks/useWebsocketSendEvent.ts
 [ ] quidproquo-web-react/src/websocket/index.ts
 [ ] quidproquo-web-react/vitest.config.ts
-[ ] quidproquo-web/eslint.config.mjs
-[ ] quidproquo-web/src/actions/index.ts
-[ ] quidproquo-web/src/actions/queryParams/QueryParamsActionType.ts
-[ ] quidproquo-web/src/actions/queryParams/QueryParamsGetActionRequester.test.ts
-[ ] quidproquo-web/src/actions/queryParams/QueryParamsGetActionRequester.ts
-[ ] quidproquo-web/src/actions/queryParams/QueryParamsGetActionRequesterTypes.ts
-[ ] quidproquo-web/src/actions/queryParams/QueryParamsGetAllActionRequester.test.ts
-[ ] quidproquo-web/src/actions/queryParams/QueryParamsGetAllActionRequester.ts
-[ ] quidproquo-web/src/actions/queryParams/QueryParamsGetAllActionRequesterTypes.ts
-[ ] quidproquo-web/src/actions/queryParams/QueryParamsSetActionRequester.test.ts
-[ ] quidproquo-web/src/actions/queryParams/QueryParamsSetActionRequester.ts
-[ ] quidproquo-web/src/actions/queryParams/QueryParamsSetActionRequesterTypes.ts
-[ ] quidproquo-web/src/actions/queryParams/index.ts
-[ ] quidproquo-web/src/actions/window/WindowActionType.ts
-[ ] quidproquo-web/src/actions/window/WindowGetLocationActionRequester.test.ts
-[ ] quidproquo-web/src/actions/window/WindowGetLocationActionRequester.ts
-[ ] quidproquo-web/src/actions/window/WindowGetLocationActionRequesterTypes.ts
-[ ] quidproquo-web/src/actions/window/index.ts
-[ ] quidproquo-web/src/federation/forceReloadFederatedRemote.ts
-[ ] quidproquo-web/src/federation/index.ts
-[ ] quidproquo-web/src/index.test.ts
-[ ] quidproquo-web/src/index.ts
-[ ] quidproquo-web/src/services/WebsocketService.test.ts
-[ ] quidproquo-web/src/services/WebsocketService.ts
-[ ] quidproquo-web/src/services/index.ts
-[ ] quidproquo-web/src/tools/index.ts
-[ ] quidproquo-web/src/tools/timeAgo.test.ts
-[ ] quidproquo-web/src/tools/timeAgo.ts
-[ ] quidproquo-web/src/tools/uniqueBy.test.ts
-[ ] quidproquo-web/src/tools/uniqueBy.ts
-[ ] quidproquo-web/vitest.config.ts
+[x] quidproquo-web/eslint.config.mjs
+[x] quidproquo-web/src/actions/index.ts
+[x] quidproquo-web/src/actions/queryParams/QueryParamsActionType.ts
+[x] quidproquo-web/src/actions/queryParams/QueryParamsGetActionRequester.test.ts
+[x] quidproquo-web/src/actions/queryParams/QueryParamsGetActionRequester.ts
+[x] quidproquo-web/src/actions/queryParams/QueryParamsGetActionRequesterTypes.ts
+[x] quidproquo-web/src/actions/queryParams/QueryParamsGetAllActionRequester.test.ts
+[x] quidproquo-web/src/actions/queryParams/QueryParamsGetAllActionRequester.ts
+[x] quidproquo-web/src/actions/queryParams/QueryParamsGetAllActionRequesterTypes.ts
+[x] quidproquo-web/src/actions/queryParams/QueryParamsSetActionRequester.test.ts
+[x] quidproquo-web/src/actions/queryParams/QueryParamsSetActionRequester.ts
+[x] quidproquo-web/src/actions/queryParams/QueryParamsSetActionRequesterTypes.ts
+[x] quidproquo-web/src/actions/queryParams/index.ts
+[x] quidproquo-web/src/actions/window/WindowActionType.ts
+[x] quidproquo-web/src/actions/window/WindowGetLocationActionRequester.test.ts
+[x] quidproquo-web/src/actions/window/WindowGetLocationActionRequester.ts
+[x] quidproquo-web/src/actions/window/WindowGetLocationActionRequesterTypes.ts
+[x] quidproquo-web/src/actions/window/index.ts
+[x] quidproquo-web/src/federation/forceReloadFederatedRemote.ts - note: new 7-test suite added; startsWith script sweep watch-item deliberate, left as-is
+[x] quidproquo-web/src/federation/index.ts
+[x] quidproquo-web/src/index.test.ts - note: 1+1 placeholder replaced with real barrel test
+[x] quidproquo-web/src/index.ts
+[x] quidproquo-web/src/services/WebsocketService.test.ts
+[x] quidproquo-web/src/services/WebsocketService.ts - note: 3 low security findings recorded (unvalidated ws frames, unbounded pending queue, token-bearing url on endless reconnect); debug console.log removed
+[x] quidproquo-web/src/services/index.ts
+[x] quidproquo-web/src/tools/index.ts
+[x] quidproquo-web/src/tools/timeAgo.test.ts
+[x] quidproquo-web/src/tools/timeAgo.ts
+[x] quidproquo-web/src/tools/uniqueBy.test.ts
+[x] quidproquo-web/src/tools/uniqueBy.ts
+[x] quidproquo-web/vitest.config.ts
 [ ] quidproquo-webserver/eslint.config.mjs
 [ ] quidproquo-webserver/src/actionProcessor/api/getHttpApiEventAutoRespondActionProcessor.test.ts
 [ ] quidproquo-webserver/src/actionProcessor/api/getHttpApiEventAutoRespondActionProcessor.ts
