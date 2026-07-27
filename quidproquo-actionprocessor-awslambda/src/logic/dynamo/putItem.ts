@@ -5,45 +5,31 @@ import { AttributeValue, DynamoDBClient, PutItemCommand } from '@aws-sdk/client-
 import { createAwsClient } from '../createAwsClient';
 import { buildAttributeValue } from './qpqDynamoOrm';
 
-export interface PutItemOptions {
+export type PutItemOptions = {
+  // Requested TTL in seconds. Not currently applied: the table's ttlAttribute
+  // name is not plumbed through to this call, so the value is silently
+  // dropped. Wire storeConfig.ttlAttribute through and write the epoch expiry
+  // before relying on it.
   expires?: number;
 
   // When set, the put becomes a conditional insert: it fails with
   // ConditionalCheckFailedException if an item with the same primary key
   // already exists. The value is the attribute name to condition on (any
-  // key attribute works — the condition evaluates against the item at the
+  // key attribute works: the condition evaluates against the item at the
   // full primary key).
   ifNotExistsAttribute?: string;
-}
+};
 
-// We currently only support objects as root items in dynamo
-// Storing a list (array) as the root of your DynamoDB record is indeed possible,
-// but there are some caveats. One of the main challenges is that DynamoDB doesn't support
-// complex operations on list items. For instance, you can't perform a conditional update or
-// delete on a specific item in the list based on its value. However, you can read and write
-// entire lists, and you can append items to a list with an update operation.
-//
-// TODO?: support lists as root items in dynamo ~ Probably not worth it
-// a root list probably should be a table!
-// Something like this:
-// const convertObjectOrListToDynamoMap = (value: KvsObjectDataType | KvsListDataType): AttributeValue => {
-//   const attributeValue = buildAttributeValue(value);
-//   if ('M' in attributeValue) {
-//     return attributeValue.M!;
-//   }
-//   if ('L' in attributeValue) {
-//     return attributeValue.L!;
-//   }
-//   throw new Error("Value must be an object or a list");
-// }
-
+// Root items must be objects. A root-level list is technically storable, but
+// DynamoDB cannot conditionally update or delete individual list elements,
+// and a root list is usually better modelled as its own table.
 const convertObjectToDynamoItem = (obj: KvsObjectDataType): Record<string, AttributeValue> => {
   return buildAttributeValue(obj).M!;
 };
 
-export async function putItem<Item, T extends object = any>(
+export async function putItem(
   tableName: string,
-  item: Item,
+  item: KvsObjectDataType,
   attributes: KvsKey[],
   options: PutItemOptions,
   region: string,
@@ -53,7 +39,7 @@ export async function putItem<Item, T extends object = any>(
   await dynamoDBClient.send(
     new PutItemCommand({
       TableName: tableName,
-      Item: convertObjectToDynamoItem(item as KvsObjectDataType),
+      Item: convertObjectToDynamoItem(item),
       ...(options.ifNotExistsAttribute
         ? {
             ConditionExpression: 'attribute_not_exists(#ineAttr)',

@@ -9,7 +9,7 @@ import {
 } from 'quidproquo-core';
 
 import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
-import { scan } from '../../../logic/dynamo/scan';
+import { scan } from '../../../logic/dynamo';
 
 const getProcessKeyValueStoreScan = (qpqConfig: QPQConfig): KeyValueStoreScanActionProcessor<any> => {
   return async ({ keyValueStoreName, filterCondition, nextPageKey, options }) => {

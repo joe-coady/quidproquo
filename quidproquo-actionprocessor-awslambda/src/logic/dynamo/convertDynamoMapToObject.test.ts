@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { convertDynamoMapToObject } from './convertObjectToDynamoMap';
+import { convertDynamoMapToObject } from './convertDynamoMapToObject';
 
 describe('convertDynamoMapToObject', () => {
   it('converts scalar attribute values to their js equivalents', () => {
@@ -23,7 +23,11 @@ describe('convertDynamoMapToObject', () => {
     ).toEqual({ tags: ['a', 1], meta: { nested: 'value' } });
   });
 
+  it('converts a missing map to an empty object', () => {
+    expect(convertDynamoMapToObject(undefined)).toEqual({});
+  });
+
   it('throws on an unsupported attribute type', () => {
-    expect(() => convertDynamoMapToObject({ bin: { B: 'x' } })).toThrow('Unsupported DynamoDB data type: B');
+    expect(() => convertDynamoMapToObject({ bin: { B: 'x' } as never })).toThrow('Unsupported DynamoDB data type: B');
   });
 });

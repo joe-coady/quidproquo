@@ -4,8 +4,8 @@ import { DynamoDBClient, ScanCommand, ScanCommandInput } from '@aws-sdk/client-d
 
 import { createAwsClient } from '../createAwsClient';
 import { itemsToQpqPagedData } from './utils/itemsToQpqPagedData';
-import { convertDynamoMapToObject } from './convertObjectToDynamoMap';
-import { stringToLastEvaluatedKey } from './logs';
+import { stringToLastEvaluatedKey } from './utils/stringToLastEvaluatedKey';
+import { convertDynamoMapToObject } from './convertDynamoMapToObject';
 import { buildDynamoQueryExpression, buildExpressionAttributeNames, buildExpressionAttributeValues } from './qpqDynamoOrm';
 
 export async function scan<Item>(
@@ -14,7 +14,6 @@ export async function scan<Item>(
   filterExpression?: KvsQueryOperation,
   pageKey?: string,
 ): Promise<QpqPagedData<Item>> {
-  // Instantiate DynamoDB client
   const dynamoDBClient = createAwsClient(DynamoDBClient, { region });
 
   const params: ScanCommandInput = {
@@ -28,11 +27,9 @@ export async function scan<Item>(
     params.ExclusiveStartKey = stringToLastEvaluatedKey(pageKey);
   }
 
-  // Create ScanCommand
-  const command = new ScanCommand(params);
+  const data = await dynamoDBClient.send(new ScanCommand(params));
 
-  // TODO: Catch errors and throw QPQ ones
-  const data = await dynamoDBClient.send(command);
+  const items = (data.Items || []).map((item) => convertDynamoMapToObject(item)) as Item[];
 
-  return itemsToQpqPagedData((data.Items?.map((i) => convertDynamoMapToObject(i)) || []) as Item[], data.LastEvaluatedKey);
+  return itemsToQpqPagedData<Item>(items, data.LastEvaluatedKey);
 }

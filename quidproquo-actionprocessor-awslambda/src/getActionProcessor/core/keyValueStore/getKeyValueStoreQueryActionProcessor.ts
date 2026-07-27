@@ -33,7 +33,7 @@ const getProcessKeyValueStoreQuery = (qpqConfig: QPQConfig): KeyValueStoreQueryA
         effectiveKeyCondition,
         scoped.filter(options?.filter),
         options?.nextPageKey,
-        getDynamoTableIndexByConfigAndQuery(storeConfig, effectiveKeyCondition),
+        getDynamoTableIndexByConfigAndQuery(storeConfig, effectiveKeyCondition) ?? undefined,
         options?.limit,
         options?.sortAscending,
       );

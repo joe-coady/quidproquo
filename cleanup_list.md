@@ -574,36 +574,36 @@ If your change touched files in more than one package (e.g. you moved a shared h
 [ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/verifySoftwareToken.ts
 [ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/verifyUserEmail.ts
 [ ] quidproquo-actionprocessor-awslambda/src/logic/createAwsClient.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/dynamo/convertObjectToDynamoMap.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/dynamo/convertObjectToDynamoMap.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/dynamo/deleteItem.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/dynamo/getAllItems.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/dynamo/getItem.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/dynamo/getLogByCorrelation.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/dynamo/getLogChildrenByFromCorrelation.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/dynamo/getPagedItemsOverRange.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/dynamo/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/dynamo/logs/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/dynamo/logs/utils/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/dynamo/logs/utils/lastEvaluatedKeyToString.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/dynamo/logs/utils/lastEvaluatedKeyToString.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/dynamo/logs/utils/stringToLastEvaluatedKey.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/dynamo/logs/utils/stringToLastEvaluatedKey.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/dynamo/putItem.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/dynamo/qpqDynamoOrm/buildDynamoQuery.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/dynamo/qpqDynamoOrm/buildDynamoQuery.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/dynamo/qpqDynamoOrm/buildDynamoUpdate.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/dynamo/qpqDynamoOrm/buildDynamoUpdate.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/dynamo/qpqDynamoOrm/getDynamoTableIndexByConfigAndQuery.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/dynamo/qpqDynamoOrm/getDynamoTableIndexByConfigAndQuery.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/dynamo/qpqDynamoOrm/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/dynamo/query.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/dynamo/scan.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/dynamo/updateItem.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/dynamo/utils/itemsToQpqPagedData.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/dynamo/utils/itemsToQpqPagedData.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/dynamo/utils/qpqPagedDataToItems.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/dynamo/utils/qpqPagedDataToItems.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/dynamo/convertObjectToDynamoMap.test.ts - note: renamed alongside convertDynamoMapToObject.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/dynamo/convertObjectToDynamoMap.ts - note: renamed to convertDynamoMapToObject.ts (file named after its one export)
+[x] quidproquo-actionprocessor-awslambda/src/logic/dynamo/deleteItem.ts - note: bug fixed test-first: falsy sort key (0/empty) silently dropped from Key; now shared buildDynamoKey
+[x] quidproquo-actionprocessor-awslambda/src/logic/dynamo/getAllItems.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/dynamo/getItem.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/dynamo/getLogByCorrelation.ts - note: deleted, zero call sites monorepo-wide
+[x] quidproquo-actionprocessor-awslambda/src/logic/dynamo/getLogChildrenByFromCorrelation.ts - note: deleted, zero call sites
+[x] quidproquo-actionprocessor-awslambda/src/logic/dynamo/getPagedItemsOverRange.ts - note: deleted, zero call sites
+[x] quidproquo-actionprocessor-awslambda/src/logic/dynamo/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/dynamo/logs/index.ts - note: logs/ folder removed; pagination utils moved to dynamo/utils
+[x] quidproquo-actionprocessor-awslambda/src/logic/dynamo/logs/utils/index.ts - note: moved to dynamo/utils
+[x] quidproquo-actionprocessor-awslambda/src/logic/dynamo/logs/utils/lastEvaluatedKeyToString.test.ts - note: moved to dynamo/utils
+[x] quidproquo-actionprocessor-awslambda/src/logic/dynamo/logs/utils/lastEvaluatedKeyToString.ts - note: moved to dynamo/utils
+[x] quidproquo-actionprocessor-awslambda/src/logic/dynamo/logs/utils/stringToLastEvaluatedKey.test.ts - note: moved to dynamo/utils
+[x] quidproquo-actionprocessor-awslambda/src/logic/dynamo/logs/utils/stringToLastEvaluatedKey.ts - note: moved to dynamo/utils; unsafe client token deserialization recorded in security_findings.md (low)
+[x] quidproquo-actionprocessor-awslambda/src/logic/dynamo/putItem.ts - note: expires/ttl silently dropped (needs cross-layer ttlAttribute plumbing) and attributes param dead; documented, follow-up needed
+[x] quidproquo-actionprocessor-awslambda/src/logic/dynamo/qpqDynamoOrm/buildDynamoQuery.test.ts - note: split alongside
+[x] quidproquo-actionprocessor-awslambda/src/logic/dynamo/qpqDynamoOrm/buildDynamoQuery.ts - note: split to one-export-per-file (operator map, flatten helper); BETWEEN falsy-bound, missing-value placeholder and IN non-array bugs fixed test-first; IN values map bug fixed (was broken for every IN query)
+[x] quidproquo-actionprocessor-awslambda/src/logic/dynamo/qpqDynamoOrm/buildDynamoUpdate.test.ts - note: split alongside
+[x] quidproquo-actionprocessor-awslambda/src/logic/dynamo/qpqDynamoOrm/buildDynamoUpdate.ts - note: split; update-expression injection via non-string path segments FIXED (medium, security_findings.md); caller-mutation bug fixed; debug console.log removed
+[x] quidproquo-actionprocessor-awslambda/src/logic/dynamo/qpqDynamoOrm/getDynamoTableIndexByConfigAndQuery.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/dynamo/qpqDynamoOrm/getDynamoTableIndexByConfigAndQuery.ts - note: Nullable return, shared flatten helper
+[x] quidproquo-actionprocessor-awslambda/src/logic/dynamo/qpqDynamoOrm/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/dynamo/query.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/dynamo/scan.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/dynamo/updateItem.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/dynamo/utils/itemsToQpqPagedData.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/dynamo/utils/itemsToQpqPagedData.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/dynamo/utils/qpqPagedDataToItems.test.ts - note: deleted with its subject
+[x] quidproquo-actionprocessor-awslambda/src/logic/dynamo/utils/qpqPagedDataToItems.ts - note: deleted, dead code (also mis-exported duplicate name)
 [ ] quidproquo-actionprocessor-awslambda/src/logic/federatedModuleStore/FederatedModuleLoadError.ts
 [ ] quidproquo-actionprocessor-awslambda/src/logic/federatedModuleStore/FederatedModuleStoreManifest.ts
 [ ] quidproquo-actionprocessor-awslambda/src/logic/federatedModuleStore/index.ts

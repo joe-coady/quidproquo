@@ -1,36 +1,24 @@
-import { KeyValueStoreQPQConfigSetting, KvsQueryOperation } from 'quidproquo-core';
+import { KeyValueStoreQPQConfigSetting, KvsQueryOperation, Nullable } from 'quidproquo-core';
 
-import { isKvsLogicalOperator, isKvsQueryCondition } from './buildDynamoQuery';
+import { flattenKvsQueryConditions } from './flattenKvsQueryConditions';
 
-export const getDynamoTableIndexByConfigAndQuery = <T extends object = any>(
-  setting: KeyValueStoreQPQConfigSetting,
-  query: KvsQueryOperation,
-): string | undefined => {
-  // Function to extract keys from a query
-  const extractKeysFromQuery = (query: KvsQueryOperation): string[] => {
-    if (isKvsQueryCondition(query)) {
-      return [query.key];
-    } else if (isKvsLogicalOperator(query)) {
-      return query.conditions.flatMap(extractKeysFromQuery);
-    }
-    return [];
-  };
+/**
+ * Pick the GSI that can serve the query, or null to query the primary table.
+ * Returns the GSI's partition key name, which is also its index name (the CDK
+ * construct names each GSI after its partition key).
+ */
+export const getDynamoTableIndexByConfigAndQuery = (setting: KeyValueStoreQPQConfigSetting, query: KvsQueryOperation): Nullable<string> => {
+  const queriedKeys = flattenKvsQueryConditions(query).map((condition) => condition.key);
 
-  const queriedKeys = extractKeysFromQuery(query);
-
-  // If the query includes the primary sort key, the primary table is a direct match —
-  // prefer it over any GSI so we never land on a GSI with a non-SK condition.
+  // If the query includes the primary sort key, the primary table is a direct
+  // match: prefer it over any GSI so we never land on a GSI with a non-SK
+  // condition.
   const primarySortKey = setting.sortKeys[0]?.key;
   if (primarySortKey && queriedKeys.includes(primarySortKey)) {
-    return undefined;
+    return null;
   }
 
-  // Find a GSI whose partition key is in the query.
-  for (const index of setting.indexes) {
-    if (queriedKeys.includes(index.partitionKey.key)) {
-      return index.partitionKey.key;
-    }
-  }
+  const matchingIndex = setting.indexes.find((index) => queriedKeys.includes(index.partitionKey.key));
 
-  return undefined;
+  return matchingIndex ? matchingIndex.partitionKey.key : null;
 };

@@ -27,3 +27,24 @@
 - **Where**: reconnectIfNotDestroyed / connect.
 - **Suggested fix**: accept a url-provider callback so each reconnect fetches a fresh token, or expose a max-attempts/backoff ceiling.
 - **Status**: recorded
+
+## quidproquo-actionprocessor-awslambda/src/logic/dynamo/qpqDynamoOrm/buildDynamoUpdateExpression.ts
+- **Severity**: medium
+- **Issue**: Attribute path segments that were not strings were interpolated raw into the UpdateExpression; a non-number smuggled through a JSON payload stringifies into the expression, allowing update-expression injection (rewriting which attributes a single update touches).
+- **Where**: getNestedItemName (previously in buildDynamoUpdate.ts).
+- **Suggested fix**: Only interpolate non-negative integers; throw on everything else.
+- **Status**: fixed in this pass (with proving test)
+
+## quidproquo-actionprocessor-awslambda/src/logic/dynamo/utils/stringToLastEvaluatedKey.ts
+- **Severity**: low
+- **Issue**: Unsafe deserialization of the client-supplied pagination token: base64 JSON.parse with no shape validation or integrity protection. Malformed tokens throw an uncaught SyntaxError; a forged ExclusiveStartKey goes straight to DynamoDB (impact bounded by DynamoDB key-schema validation to the caller's own result set).
+- **Where**: stringToLastEvaluatedKey.
+- **Suggested fix**: try/catch the decode into a typed "invalid page key" error and validate the decoded shape; optionally HMAC the token.
+- **Status**: recorded
+
+## quidproquo-actionprocessor-awslambda/src/logic/dynamo/qpqDynamoOrm/getHash.ts
+- **Severity**: low
+- **Issue**: Expression placeholders are md5-derived from attribute names/values; an md5 collision between two values in one expression would silently substitute one value for another. Not attacker-practical (colliding inputs are the attacker's own values).
+- **Where**: getHash (used by getItemName / getValueName).
+- **Suggested fix**: Switch the digest to sha256.
+- **Status**: recorded

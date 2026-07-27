@@ -1,16 +1,17 @@
 import { KvsQueryOperation } from 'quidproquo-core';
 
-import { DynamoDBClient, ScanCommand, ScanCommandInput } from '@aws-sdk/client-dynamodb';
+import { AttributeValue, DynamoDBClient, ScanCommand, ScanCommandInput } from '@aws-sdk/client-dynamodb';
 
 import { createAwsClient } from '../createAwsClient';
-import { convertDynamoMapToObject } from './convertObjectToDynamoMap';
+import { convertDynamoMapToObject } from './convertDynamoMapToObject';
 import { buildDynamoQueryExpression, buildExpressionAttributeNames, buildExpressionAttributeValues } from './qpqDynamoOrm';
 
-export async function getAllItems(tableName: string, region: string, filterExpression?: KvsQueryOperation): Promise<any[]> {
+/** Scan every page of the table, optionally filtered, and return all items. */
+export async function getAllItems(tableName: string, region: string, filterExpression?: KvsQueryOperation): Promise<Record<string, unknown>[]> {
   const dynamoDBClient = createAwsClient(DynamoDBClient, { region });
 
-  let records: any[] = [];
-  let lastEvaluatedKey: { [key: string]: any } | undefined;
+  let records: Record<string, unknown>[] = [];
+  let lastEvaluatedKey: Record<string, AttributeValue> | undefined;
 
   do {
     const scanParams: ScanCommandInput = {
@@ -21,14 +22,10 @@ export async function getAllItems(tableName: string, region: string, filterExpre
       ExclusiveStartKey: lastEvaluatedKey,
     };
 
-    try {
-      const result = await dynamoDBClient.send(new ScanCommand(scanParams));
-      records = records.concat((result.Items || []).map((item) => convertDynamoMapToObject(item)));
-      lastEvaluatedKey = result.LastEvaluatedKey;
-    } catch (error) {
-      console.error('Error scanning DynamoDB table:', error);
-      throw error;
-    }
+    const result = await dynamoDBClient.send(new ScanCommand(scanParams));
+
+    records = records.concat((result.Items || []).map((item) => convertDynamoMapToObject(item)));
+    lastEvaluatedKey = result.LastEvaluatedKey;
   } while (lastEvaluatedKey);
 
   return records;

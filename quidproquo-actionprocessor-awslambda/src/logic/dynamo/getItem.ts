@@ -1,10 +1,10 @@
-import { KvsCoreDataType } from 'quidproquo-core';
+import { KvsCoreDataType, Nullable } from 'quidproquo-core';
 
-import { DynamoDBClient, GetItemCommand, GetItemCommandInput } from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, GetItemCommand } from '@aws-sdk/client-dynamodb';
 
 import { createAwsClient } from '../createAwsClient';
-import { convertDynamoMapToObject } from './convertObjectToDynamoMap';
-import { buildAttributeValue } from './qpqDynamoOrm';
+import { buildDynamoKey } from './utils/buildDynamoKey';
+import { convertDynamoMapToObject } from './convertDynamoMapToObject';
 
 export async function getItem(
   tableName: string,
@@ -13,25 +13,15 @@ export async function getItem(
   key: KvsCoreDataType,
   sortKeyName?: string,
   sortKey?: KvsCoreDataType,
-): Promise<any | null> {
+): Promise<Nullable<Record<string, unknown>>> {
   const dynamoDBClient = createAwsClient(DynamoDBClient, { region });
 
-  const getItemParams: GetItemCommandInput = {
-    TableName: tableName,
-    Key: {
-      [keyName]: buildAttributeValue(key),
-    },
-  };
+  const result = await dynamoDBClient.send(
+    new GetItemCommand({
+      TableName: tableName,
+      Key: buildDynamoKey(keyName, key, sortKeyName, sortKey),
+    }),
+  );
 
-  if (sortKeyName && sortKey !== undefined) {
-    getItemParams.Key![sortKeyName] = buildAttributeValue(sortKey);
-  }
-
-  try {
-    const result = await dynamoDBClient.send(new GetItemCommand(getItemParams));
-    return result.Item ? convertDynamoMapToObject(result.Item) : null;
-  } catch (error) {
-    console.error('Error getting item from DynamoDB:', error);
-    throw error;
-  }
+  return result.Item ? convertDynamoMapToObject(result.Item) : null;
 }

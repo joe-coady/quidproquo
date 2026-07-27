@@ -4,8 +4,8 @@ import { DynamoDBClient, QueryCommand, QueryCommandInput } from '@aws-sdk/client
 
 import { createAwsClient } from '../createAwsClient';
 import { itemsToQpqPagedData } from './utils/itemsToQpqPagedData';
-import { convertDynamoMapToObject } from './convertObjectToDynamoMap';
-import { stringToLastEvaluatedKey } from './logs';
+import { stringToLastEvaluatedKey } from './utils/stringToLastEvaluatedKey';
+import { convertDynamoMapToObject } from './convertDynamoMapToObject';
 import { buildDynamoQueryExpression, buildExpressionAttributeNames, buildExpressionAttributeValues } from './qpqDynamoOrm';
 
 export async function query<Item>(
@@ -18,7 +18,6 @@ export async function query<Item>(
   limit?: number,
   sortAscending?: boolean,
 ): Promise<QpqPagedData<Item>> {
-  // Instantiate DynamoDB client
   const dynamoDBClient = createAwsClient(DynamoDBClient, { region });
 
   const params: QueryCommandInput = {
@@ -36,11 +35,9 @@ export async function query<Item>(
     params.ExclusiveStartKey = stringToLastEvaluatedKey(pageKey);
   }
 
-  // Create QueryCommand
-  const command = new QueryCommand(params);
+  const data = await dynamoDBClient.send(new QueryCommand(params));
 
-  // TODO: Catch errors and throw QPQ ones
-  const data = await dynamoDBClient.send(command);
+  const items = (data.Items || []).map((item) => convertDynamoMapToObject(item)) as Item[];
 
-  return itemsToQpqPagedData<Item>((data.Items?.map((i) => convertDynamoMapToObject(i)) || []) as Item[], data.LastEvaluatedKey);
+  return itemsToQpqPagedData<Item>(items, data.LastEvaluatedKey);
 }

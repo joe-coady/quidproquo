@@ -2,8 +2,9 @@ import { KvsUpdate, KvsUpdateActionType } from 'quidproquo-core';
 
 import { describe, expect, it } from 'vitest';
 
-import { getItemName, getValueName } from './buildDynamoQuery';
-import { buildDynamoUpdateExpression, buildUpdateExpressionAttributeNames, buildUpdateExpressionAttributeValues } from './buildDynamoUpdate';
+import { buildDynamoUpdateExpression } from './buildDynamoUpdateExpression';
+import { getItemName } from './getItemName';
+import { getValueName } from './getValueName';
 
 describe('buildDynamoUpdateExpression', () => {
   it('builds a SET clause for Set actions', () => {
@@ -42,6 +43,19 @@ describe('buildDynamoUpdateExpression', () => {
     expect(buildDynamoUpdateExpression(updates)).toBe(`SET ${getItemName('items')}[0] = ${getValueName('x')}`);
   });
 
+  it('rejects attribute path segments that are not strings or non-negative integers', () => {
+    expect(() => buildDynamoUpdateExpression([{ attributePath: ['items', 1.5], action: KvsUpdateActionType.Set, value: 'x' }])).toThrow(
+      'Invalid attribute path segment',
+    );
+
+    // A non-string, non-number segment smuggled through JSON must never be
+    // stringified into the expression (that would be expression injection).
+    const smuggled = ['items', { toString: () => '0] , #a = :b' }] as unknown as KvsUpdate[number]['attributePath'];
+    expect(() => buildDynamoUpdateExpression([{ attributePath: smuggled, action: KvsUpdateActionType.Set, value: 'x' }])).toThrow(
+      'Invalid attribute path segment',
+    );
+  });
+
   it('combines clauses across action types', () => {
     const updates: KvsUpdate = [
       { attributePath: 'name', action: KvsUpdateActionType.Set, value: 'Ada' },
@@ -61,35 +75,5 @@ describe('buildDynamoUpdateExpression', () => {
     expect(() => buildDynamoUpdateExpression([{ attributePath: 'count', action: KvsUpdateActionType.Increment, value: 1 }])).toThrow(
       "Default value must be provided for 'Increment' action",
     );
-  });
-});
-
-describe('buildUpdateExpressionAttributeValues', () => {
-  it('collects value and defaultValue placeholders', () => {
-    const updates: KvsUpdate = [{ attributePath: 'count', action: KvsUpdateActionType.Increment, value: 1, defaultValue: 0 }];
-
-    expect(buildUpdateExpressionAttributeValues(updates)).toEqual({
-      [getValueName(1)]: { N: '1' },
-      [getValueName(0)]: { N: '0' },
-    });
-  });
-
-  it('returns undefined when no updates carry a value', () => {
-    expect(buildUpdateExpressionAttributeValues([{ attributePath: 'old', action: KvsUpdateActionType.Remove }])).toBeUndefined();
-  });
-});
-
-describe('buildUpdateExpressionAttributeNames', () => {
-  it('maps a top-level attribute placeholder to its name', () => {
-    expect(buildUpdateExpressionAttributeNames([{ attributePath: 'name', action: KvsUpdateActionType.Set, value: 'x' }])).toEqual({
-      [getItemName('name')]: 'name',
-    });
-  });
-
-  it('maps each segment of a nested attribute path', () => {
-    expect(buildUpdateExpressionAttributeNames([{ attributePath: ['a', 'b'], action: KvsUpdateActionType.Set, value: 'x' }])).toEqual({
-      [getItemName('a')]: 'a',
-      [getItemName('b')]: 'b',
-    });
   });
 });

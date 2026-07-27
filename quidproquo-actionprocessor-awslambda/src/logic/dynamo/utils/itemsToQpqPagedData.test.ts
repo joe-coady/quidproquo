@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { lastEvaluatedKeyToString } from '../logs';
 import { itemsToQpqPagedData } from './itemsToQpqPagedData';
+import { lastEvaluatedKeyToString } from './lastEvaluatedKeyToString';
 
 describe('itemsToQpqPagedData', () => {
   it('encodes the last evaluated key into nextPageKey', () => {

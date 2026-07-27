@@ -13,7 +13,7 @@ describe('getDynamoTableIndexByConfigAndQuery', () => {
   it('prefers the primary table when the query uses the sort key', () => {
     const query = { key: 'createdAt', operation: KvsQueryOperationType.GreaterThan, valueA: 0 };
 
-    expect(getDynamoTableIndexByConfigAndQuery(setting, query)).toBeUndefined();
+    expect(getDynamoTableIndexByConfigAndQuery(setting, query)).toBeNull();
   });
 
   it('returns the GSI partition key when the query targets it', () => {
@@ -31,9 +31,9 @@ describe('getDynamoTableIndexByConfigAndQuery', () => {
     expect(getDynamoTableIndexByConfigAndQuery(setting, query)).toBe('email');
   });
 
-  it('returns undefined when no key matches the sort key or a GSI', () => {
+  it('returns null when no key matches the sort key or a GSI', () => {
     const query = { key: 'name', operation: KvsQueryOperationType.Equal, valueA: 'x' };
 
-    expect(getDynamoTableIndexByConfigAndQuery(setting, query)).toBeUndefined();
+    expect(getDynamoTableIndexByConfigAndQuery(setting, query)).toBeNull();
   });
 });
