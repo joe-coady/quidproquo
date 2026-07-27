@@ -7,7 +7,7 @@ import {
   QPQConfig,
 } from 'quidproquo-core';
 
-import { getQpqAttributesFromCognitoStringMap } from '../../../../../logic/cognito/cognitoAttributeMap';
+import { getQpqAttributesFromCognitoStringMap } from '../../../../../logic/cognito/getQpqAttributesFromCognitoStringMap';
 import { EventInput, InternalEventRecord } from './types';
 
 const getProcessGetRecords = (qpqConfig: QPQConfig): EventGetRecordsActionProcessor<EventInput, InternalEventRecord> => {

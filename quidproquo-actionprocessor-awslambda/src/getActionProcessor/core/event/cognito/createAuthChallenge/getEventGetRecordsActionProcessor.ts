@@ -7,7 +7,7 @@ import {
   QPQConfig,
 } from 'quidproquo-core';
 
-import { getQpqAttributesFromCognitoStringMap } from '../../../../../logic/cognito/cognitoAttributeMap';
+import { getQpqAttributesFromCognitoStringMap } from '../../../../../logic/cognito/getQpqAttributesFromCognitoStringMap';
 import { getChallengeSessionFromCognitoTriggerEventSession } from '../utils';
 import { EventInput, InternalEventRecord } from './types';
 

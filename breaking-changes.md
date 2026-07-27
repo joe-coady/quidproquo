@@ -13,6 +13,10 @@ assembled quickly.
 - `getStateMachineByName` in `quidproquo-xstate` now returns `Nullable<StateMachineQPQConfigSetting>` — `null` instead of `undefined` when no machine matches. Update any `=== undefined` checks to `null` (truthiness checks are unaffected).
 - `askStateMachineSendEvent` in `quidproquo-xstate` now fails with `ErrorTypeEnum.BadRequest` when the machine has already reached a final state (previously it silently succeeded), and valid self/internal transitions that keep the same state value are now accepted instead of wrongly rejected as `BadRequest`.
 - `StateMachineEvent` in `quidproquo-xstate` narrows its extra-field index signature from `any` to `unknown`. Guard/action stories reading payload fields off the event must narrow or cast before use.
+- `storyLogger`, `storyLoggerFs`, `getS3Logger`, `getS3LoggerViaExtension`, and `moveLogsToPerminateStorage` are removed from `quidproquo-actionprocessor-awslambda`. Use `getLogger(qpqConfig)` (unchanged) to build a story logger; the lower-level helpers have no replacement.
+- `viewerRequestEventHandler` is removed from `quidproquo-actionprocessor-awslambda`. Call `getCloudFrontRequestEvent_viewerRequest()` to get the handler instead.
+- The `QpqWarmLambdaEvent` type (`{ qpqWarm: boolean }`) is removed from `quidproquo-actionprocessor-awslambda`; warm invokes arrive as SNS warmer records (use `isSnsWarmerRecord` to detect them). `QpqFunctionExecutionEvent<T>` is unchanged.
+- `findMatchingCertificates` and `getDomainValidationOptions` (deep imports from `quidproquo-actionprocessor-awslambda`'s `logic/acm`) are removed with no replacement.
 
 ## 0.1.11
 

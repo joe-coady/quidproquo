@@ -6,7 +6,8 @@ import {
 
 import { createAwsClient } from '../createAwsClient';
 
-export const verifyUserEmail = async (region: string, accessToken: string, verificationCode: string) => {
+/** Confirms the email attribute with the verification code sent to the user. */
+export const verifyUserEmail = async (region: string, accessToken: string, verificationCode: string): Promise<void> => {
   const cognitoClient = createAwsClient(CognitoIdentityProviderClient, {
     region,
   });

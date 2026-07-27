@@ -8,7 +8,7 @@ import {
   QPQConfig,
 } from 'quidproquo-core';
 
-import { LambdaRuntimeConfig } from '../../../../../runtimeConfig/QPQAWSResourceMap';
+import { LambdaRuntimeConfig } from '../../../../../runtimeConfig/LambdaRuntimeConfig';
 import { EventInput, InternalEventRecord, MatchResult } from './types';
 
 // TODO: Clean this shit up

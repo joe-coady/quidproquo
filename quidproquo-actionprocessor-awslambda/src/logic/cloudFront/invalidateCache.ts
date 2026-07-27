@@ -1,31 +1,29 @@
 import crypto from 'crypto';
-import { CloudFrontClient, CreateInvalidationCommand, CreateInvalidationCommandInput } from '@aws-sdk/client-cloudfront';
+import { CloudFrontClient, CreateInvalidationCommand } from '@aws-sdk/client-cloudfront';
 
 import { createAwsClient } from '../createAwsClient';
 
-export const getInvalidationCallerReference = (paths: string[]): string => {
-  const allPaths = paths.join('');
+// CloudFront dedupes CreateInvalidation calls by CallerReference, so it must be unique
+// per request: hash of the paths plus the current time.
+const getInvalidationCallerReference = (paths: string[]): string => {
+  const allPathHash = crypto.createHash('md5').update(paths.join('')).digest('hex');
 
-  // All paths as a hash
-  const allPathHash = crypto.createHash('md5').update(allPaths).digest('hex');
-
-  // Unique key is the now time with all paths hash
   return allPathHash + new Date().toISOString();
 };
 
 export const invalidateCache = async (distributionId: string, region: string, paths: string[]): Promise<void> => {
   const cloudFrontClient = createAwsClient(CloudFrontClient, { region });
 
-  const input: CreateInvalidationCommandInput = {
-    DistributionId: distributionId,
-    InvalidationBatch: {
-      Paths: {
-        Quantity: paths.length,
-        Items: paths,
+  await cloudFrontClient.send(
+    new CreateInvalidationCommand({
+      DistributionId: distributionId,
+      InvalidationBatch: {
+        Paths: {
+          Quantity: paths.length,
+          Items: paths,
+        },
+        CallerReference: getInvalidationCallerReference(paths),
       },
-      CallerReference: getInvalidationCallerReference(paths),
-    },
-  };
-
-  await cloudFrontClient.send(new CreateInvalidationCommand(input));
+    }),
+  );
 };

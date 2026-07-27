@@ -11,6 +11,10 @@ import { calculateSecretHash } from './utils/calculateSecretHash';
 import { authenticateUser } from './authenticateUser';
 import { getUserPoolClientSecret } from './getUserPoolClientSecret';
 
+/**
+ * Confirms a forgot-password reset with the emailed code and new password, then
+ * signs the user straight in with it.
+ */
 export const confirmForgotPassword = async (
   userPoolId: string,
   clientId: string,
@@ -37,8 +41,5 @@ export const confirmForgotPassword = async (
 
   await cognitoClient.send(new ConfirmForgotPasswordCommand(params));
 
-  // Authenticate the user
-  const authResponse: AuthenticateUserResponse = await authenticateUser(userPoolId, clientId, region, false, username, password);
-
-  return authResponse;
+  return authenticateUser(userPoolId, clientId, region, false, username, password);
 };

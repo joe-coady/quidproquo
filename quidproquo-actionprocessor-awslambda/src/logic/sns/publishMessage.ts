@@ -2,45 +2,38 @@ import { PublishBatchCommand, PublishBatchRequestEntry, SNSClient } from '@aws-s
 
 import { createAwsClient } from '../createAwsClient';
 
-export interface SnsPublishMessageEntry {
+// PublishBatch accepts at most 10 entries per request (and 256 KB total payload)
+const MAX_ENTRIES_PER_BATCH = 10;
+
+export type SnsPublishMessageEntry = {
   message: string;
 
   // FIFO topics only
   groupId?: string;
   deduplicationId?: string;
-}
+};
 
+/**
+ * Publishes the messages to the topic in sequential batches of 10. Batches are awaited
+ * one at a time so FIFO topics keep their ordering; callers that don't need ordering can
+ * split the messages and publish in parallel themselves.
+ */
 export const publishMessage = async (topicArn: string, region: string, messages: SnsPublishMessageEntry[]): Promise<void> => {
-  const sqsClient = createAwsClient(SNSClient, { region });
+  const snsClient = createAwsClient(SNSClient, { region });
 
-  // Convert them to entries
   const entries: PublishBatchRequestEntry[] = messages.map((message, index) => ({
     Message: message.message,
     Id: `${index}`,
 
     ...(message.groupId !== undefined ? { MessageGroupId: message.groupId } : {}),
     ...(message.deduplicationId !== undefined ? { MessageDeduplicationId: message.deduplicationId } : {}),
-    // MessageAttributes: {
-    //   type: {
-    //     DataType: 'String',
-    //     StringValue: JSON.parse(message).type,
-    //   },
-    // },
   }));
 
-  // now send them off in batches of 10
-  // We want to await incase of FIFO
-  // If you don't care about order, you can split and askParallel outside of this
-
-  while (entries.length > 0) {
-    // Not sure the max batch size, although the entire payload cant be bigger then 256 KB
-    // TODO: So maybe we should split based on payload sizes
-    const entriesBatch = entries.splice(0, 10);
-
-    await sqsClient.send(
+  for (let offset = 0; offset < entries.length; offset += MAX_ENTRIES_PER_BATCH) {
+    await snsClient.send(
       new PublishBatchCommand({
         TopicArn: topicArn,
-        PublishBatchRequestEntries: entriesBatch,
+        PublishBatchRequestEntries: entries.slice(offset, offset + MAX_ENTRIES_PER_BATCH),
       }),
     );
   }

@@ -13,16 +13,15 @@ export const getNeptuneEndpoints = async (clusterIdentifier: string, region: str
   try {
     const response = await neptuneClient.send(command);
 
-    if (response.DBClusters && response.DBClusters.length > 0) {
-      const cluster = response.DBClusters[0];
-
-      const writeEndpoint = cluster.Endpoint && cluster.Port ? `https://${cluster.Endpoint}:${cluster.Port}` : undefined;
-      const readEndpoint = cluster.ReaderEndpoint && cluster.Port ? `https://${cluster.ReaderEndpoint}:${cluster.Port}` : undefined;
-
-      return { writeEndpoint, readEndpoint };
+    const cluster = response.DBClusters?.[0];
+    if (!cluster) {
+      return {};
     }
 
-    return {};
+    return {
+      writeEndpoint: cluster.Endpoint && cluster.Port ? `https://${cluster.Endpoint}:${cluster.Port}` : undefined,
+      readEndpoint: cluster.ReaderEndpoint && cluster.Port ? `https://${cluster.ReaderEndpoint}:${cluster.Port}` : undefined,
+    };
   } catch (error) {
     console.error('Error fetching Neptune cluster endpoints:', error);
     throw new Error(`Failed to retrieve Neptune endpoints: ${error}`);

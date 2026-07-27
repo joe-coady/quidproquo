@@ -9,10 +9,15 @@ import {
 
 import { createAwsClient } from '../createAwsClient';
 import { calculateSecretHash } from './utils/calculateSecretHash';
-import { cognitoAdminInitiateAuthResponseToQpqAuthenticationInfo } from './utils/transformCognitoResponse';
+import { cognitoAdminInitiateAuthResponseToQpqAuthenticationInfo } from './utils/cognitoAdminInitiateAuthResponseToQpqAuthenticationInfo';
 import { getUserPoolClientSecret } from './getUserPoolClientSecret';
 
-export const respondToAuthChallengeChallenge = async (
+/**
+ * Answers a pending Cognito auth challenge (new password, TOTP code, custom
+ * challenge, ...) using the session from the previous auth step. Returns either
+ * issued tokens or the next challenge.
+ */
+export const respondToAuthChallenge = async (
   userPoolId: string,
   clientId: string,
   region: string,
@@ -40,9 +45,10 @@ export const respondToAuthChallengeChallenge = async (
     },
   };
 
+  // Token expiry is computed relative to this; captured before the call so the
+  // derived expiresAt errs early rather than late.
   const issueDateTime = new Date().toISOString();
   const response = await cognitoClient.send(new RespondToAuthChallengeCommand(params));
 
-  // transform the response into your custom format, similar to your refreshToken function
   return cognitoAdminInitiateAuthResponseToQpqAuthenticationInfo(response, issueDateTime);
 };

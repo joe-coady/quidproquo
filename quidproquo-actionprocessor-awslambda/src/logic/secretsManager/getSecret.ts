@@ -14,11 +14,9 @@ export const getSecret = memoFuncAsync(async (secretName: string, region: string
     }),
   );
 
-  const secretValue = response.SecretString || '';
-
-  if (!secretValue) {
+  if (!response.SecretString) {
     throw new Error(`Failed to get secret value for secret name: [${secretName}]`);
   }
 
-  return secretValue;
+  return response.SecretString;
 }, 60);

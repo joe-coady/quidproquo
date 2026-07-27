@@ -1,41 +1,46 @@
-type ClientConstructor<T> = new (args: any) => T;
+// AWS SDK client constructors vary in config type and optionality (some take an optional
+// config); `any` here is the variance boundary that lets one helper accept them all.
+type AnyClientConstructor = new (args: any) => unknown;
 
-const cache = new WeakMap<ClientConstructor<any>, Map<string, any>>();
+type CachedClient = {
+  send?: (...sendArgs: unknown[]) => Promise<unknown>;
+};
 
-export function createAwsClient<T>(ClientClass: ClientConstructor<T>, args: any): T {
-  // Get or create the Map for the ClientClass
+// One client instance per (client class, config) pair, reused across invocations in a
+// warm lambda container so connection pools and SDK middleware are not rebuilt per call.
+const cache = new WeakMap<AnyClientConstructor, Map<string, unknown>>();
+
+/**
+ * Returns a cached AWS SDK v3 client for the given class and config, creating it on first
+ * use. The client's `send` is wrapped so failed calls log the client, config, and command
+ * before rethrowing (CloudWatch visibility for which AWS call failed and why).
+ */
+export function createAwsClient<TClient>(ClientClass: new (args: any) => TClient, args: object): TClient {
   let argsCache = cache.get(ClientClass);
   if (!argsCache) {
     argsCache = new Map();
     cache.set(ClientClass, argsCache);
   }
 
-  // Generate a key for the arguments
   const argsKey = JSON.stringify(args);
 
-  // Check if the instance already exists in the cache
   if (!argsCache.has(argsKey)) {
-    const newClient = new ClientClass(args) as {
-      send?: (...args: any[]) => any;
-    };
+    const newClient = new ClientClass(args) as CachedClient;
 
-    // If the send method exists, wrap it with error handling so we can see it in the logs
     if (typeof newClient.send === 'function') {
       const originalSend = newClient.send;
-      newClient.send = async function (...sendArgs: any[]) {
+      newClient.send = async function (...sendArgs: unknown[]) {
         try {
           return await originalSend.apply(this, sendArgs);
-        } catch (error: any) {
-          console.log(ClientClass.name || 'aws client', args, 'send args', sendArgs, 'error', error.message);
+        } catch (error) {
+          console.log(ClientClass.name || 'aws client', args, 'send args', sendArgs, 'error', (error as Error).message);
           throw error;
         }
       };
     }
 
-    // Create a new instance and store it in the cache
     argsCache.set(argsKey, newClient);
   }
 
-  // Return the cached instance
-  return argsCache.get(argsKey)!;
+  return argsCache.get(argsKey) as TClient;
 }

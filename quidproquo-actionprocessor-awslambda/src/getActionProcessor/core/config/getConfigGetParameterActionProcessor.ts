@@ -12,7 +12,7 @@ import {
 } from 'quidproquo-core';
 
 import { getParameter } from '../../../logic/parametersManager/getParameter';
-import { resolveParameterKey } from '../../../runtimeConfig/qpqAwsLambdaRuntimeConfigUtils';
+import { resolveParameterKey } from '../../../runtimeConfig/resolveParameterKey';
 
 const getProcessConfigGetParameter = (qpqConfig: QPQConfig): ConfigGetParameterActionProcessor => {
   return async ({ parameterName }) => {

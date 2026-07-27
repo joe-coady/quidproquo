@@ -4,6 +4,7 @@ import { CognitoIdentityProviderClient, ForgotPasswordCommand, ForgotPasswordCom
 
 import { createAwsClient } from '../createAwsClient';
 import { calculateSecretHash } from './utils/calculateSecretHash';
+import { cognitoCodeDeliveryDetailsToQpqDeliveryDetails } from './utils/cognitoCodeDeliveryDetailsToQpqDeliveryDetails';
 import { getUserPoolClientSecret } from './getUserPoolClientSecret';
 
 export const forgotPassword = async (
@@ -30,11 +31,5 @@ export const forgotPassword = async (
 
   const response = await cognitoClient.send(new ForgotPasswordCommand(params));
 
-  const deliveryInfo = {
-    attributeName: response.CodeDeliveryDetails!.AttributeName || 'email',
-    destination: response.CodeDeliveryDetails!.Destination || 'unknown@email.com',
-    deliveryMedium: response.CodeDeliveryDetails!.DeliveryMedium || 'EMAIL',
-  } as AuthenticationDeliveryDetails;
-
-  return deliveryInfo;
+  return cognitoCodeDeliveryDetailsToQpqDeliveryDetails(response.CodeDeliveryDetails);
 };

@@ -29,7 +29,7 @@ import { LOG_EXTENSION_PORT } from '../logExtensionPort';
 const EXTENSION_NAME = 'qpq-log-extension';
 const API_VERSION = '2020-01-01';
 
-// The handler talks to us here. Hardcoded on both ends — see logExtensionPort.ts.
+// The handler talks to us here. Hardcoded on both ends: see logExtensionPort.ts.
 const HTTP_PORT = LOG_EXTENSION_PORT;
 
 // host:port of the Lambda Extensions/Runtime API. Always present in a real Lambda.
@@ -47,8 +47,9 @@ const TEST_DELAY_MS = parseInt(process.env.QPQ_LOG_EXTENSION_TEST_DELAY_MS || '0
 const MAX_SHIP_ATTEMPTS = 3;
 const RETRY_BASE_MS = 100;
 
-const log = (...args: any[]) => console.log(`[${EXTENSION_NAME}]`, ...args);
+const log = (...args: unknown[]) => console.log(`[${EXTENSION_NAME}]`, ...args);
 const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+const errorMessage = (error: unknown): string => (error instanceof Error ? error.message : String(error));
 
 type LogEnvelope = {
   bucketName: string;
@@ -92,9 +93,9 @@ const shipEnvelope = async (envelope: LogEnvelope): Promise<boolean> => {
         }),
       );
       return true;
-    } catch (error: any) {
+    } catch (error) {
       if (attempt === MAX_SHIP_ATTEMPTS) {
-        log(`failed to ship ${envelope.key} after ${attempt} attempts:`, error?.message || error);
+        log(`failed to ship ${envelope.key} after ${attempt} attempts:`, errorMessage(error));
         return false;
       }
       await sleep(RETRY_BASE_MS * attempt * attempt);
@@ -170,11 +171,11 @@ const register = async (): Promise<string> => {
   return id;
 };
 
-const nextEvent = (extensionId: string): Promise<any> =>
+const nextEvent = (extensionId: string): Promise<{ eventType?: string }> =>
   // Long-poll. Resolves when the platform has the next INVOKE/SHUTDOWN event, which can
   // be arbitrarily far away. Plain http.request, NOT fetch: undici's default 300s
-  // headersTimeout aborts any poll that blocks past 5 minutes — i.e. during every
-  // invocation that runs longer than that — crashing this extension and, with it, the
+  // headersTimeout aborts any poll that blocks past 5 minutes (i.e. during every
+  // invocation that runs longer than that), crashing this extension and, with it, the
   // whole sandbox (REPORT ... Error Type: Extension.Crash). http.request has no
   // default timeout, which is exactly what an indefinite long-poll needs.
   new Promise((resolve, reject) => {
@@ -235,8 +236,8 @@ const startHttpServer = (): Promise<void> =>
           res.writeHead(202, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ queued: true }));
           void flush();
-        } catch (error: any) {
-          log('bad /log payload:', error?.message || error);
+        } catch (error) {
+          log('bad /log payload:', errorMessage(error));
           res.writeHead(400);
           res.end();
         }
@@ -287,6 +288,6 @@ const main = async (): Promise<void> => {
 };
 
 main().catch((error) => {
-  log('fatal:', error?.message || error);
+  log('fatal:', errorMessage(error));
   process.exit(1);
 });

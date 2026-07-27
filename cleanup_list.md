@@ -472,108 +472,108 @@ If your change touched files in more than one package (e.g. you moved a shared h
 [x] quidproquo-actionprocessor-awslambda/src/getLambdaEntries.ts
 [x] quidproquo-actionprocessor-awslambda/src/index.test.ts
 [x] quidproquo-actionprocessor-awslambda/src/index.ts - note: entryNames/memoFunc/getParameter(s) have zero monorepo consumers but are intentional published root exports, kept
-[ ] quidproquo-actionprocessor-awslambda/src/lambdaExtensions/getLogExtensionLayerPath.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdaExtensions/getLogExtensionLayerPath.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdaExtensions/logExtensionPort.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdaExtensions/logExtensionPort.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdaExtensions/qpqLogExtension/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/getAnyExecuteServiceFunctionEvent_serviceFunction.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/getApiGatewayEventHandler.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/getApiGatewayEventHandler_redirect.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/getApiGatewayEventHandler_redirect.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/getApiGatwayEventWebsocketWithIdentity_websocketEvent.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/getCloudFrontRequestEvent_originRequest.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/getCloudFrontRequestEvent_viewerRequest.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/getCloudFrontRequestEvent_viewerRequest.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/getCustomMessageTriggerEvent_createAuthChallenge.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/getCustomMessageTriggerEvent_customMessage.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/getCustomMessageTriggerEvent_defineAuthChallenge.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/getCustomMessageTriggerEvent_verifyAuthChallenge.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/getEventBridgeEvent_recurringSchedule.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/getEventBridgeEvent_stackDeploy.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/getS3Event_fileEvent.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/getSqsEvent_queueEvent.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/helpers/dynamicModuleLoaderWarmer.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/helpers/getQpqLambdaRuntimeForEvent.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/helpers/getRuntimeCorrelation.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/helpers/getRuntimeCorrelation.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/helpers/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/helpers/logger.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/types/QpqWarmLambdaEvent.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/types/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdas/anyExecuteServiceFunctionEvent_serviceFunction.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdas/apiGatewayEventHandler.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdas/apiGatewayEventHandler_redirect.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdas/apiGatwayEventWebsocketWithIdentity_websocketEvent.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdas/cloudFrontRequestEvent_originRequest.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdas/cloudFrontRequestEvent_viewerRequest.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdas/customMessageTriggerEvent_createAuthChallenge.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdas/customMessageTriggerEvent_customMessage.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdas/customMessageTriggerEvent_defineAuthChallenge.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdas/customMessageTriggerEvent_verifyAuthChallenge.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdas/dynamicModuleLoader/dynamicModuleLoader.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdas/dynamicModuleLoader/dynamicModuleLoaderWarmer.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdas/dynamicModuleLoader/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdas/eventBridgeEvent_recurringSchedule.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdas/eventBridgeEvent_stackDeploy.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdas/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdas/lambda-utils/QpqWarmLambdaEvent.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdas/lambda-utils/getQpqConfig.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdas/lambda-utils/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdas/lambdaSQSEvent.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdas/s3Event_fileEvent.ts
-[ ] quidproquo-actionprocessor-awslambda/src/lambdas/sqsEvent_queueEvent.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/acm/findMatchingCertificates.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/acm/getDomainValidationOptions.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/apiGateway/getApiKeyValue.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/apiGateway/websocketSendMessage.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cache/memoFunc.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cache/memoFunc.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cache/memoFuncAsync.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cache/memoFuncAsync.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cloudFront/invalidateCache.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cloudformation/getExportedValue.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/associateSoftwareToken.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/authenticateUser.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/changePassword.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/cognitoAttributeMap.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/cognitoAttributeMap.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/confirmForgotPassword.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/createUser.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/decodeAccessToken.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/decodeValidJwt.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/decodeValidJwt.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/forgotPassword.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/getUser.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/getUserAttributes.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/getUserAttributesBySub.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/getUserPoolClientSecret.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/globalSignOut.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/listPagedUsers.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/listPagedUsersByAttribute.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/refreshToken.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/requestEmailVerificationCode.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/resolveUsernameByPreferredUsername.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/respondToAuthChallengeChallenge.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/revokeRefreshToken.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/setUserAttributes.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/setUserPassword.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/utils/calculateSecretHash.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/utils/calculateSecretHash.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/utils/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/utils/pageKeyToPaginationToken.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/utils/pageKeyToPaginationToken.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/utils/paginationTokenToPageKey.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/utils/paginationTokenToPageKey.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/utils/transformCognitoResponse.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/utils/transformCognitoResponse.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/verifyJwt.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/verifyJwt.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/verifySoftwareToken.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/cognito/verifyUserEmail.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/createAwsClient.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdaExtensions/getLogExtensionLayerPath.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdaExtensions/getLogExtensionLayerPath.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdaExtensions/logExtensionPort.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdaExtensions/logExtensionPort.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdaExtensions/qpqLogExtension/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/getAnyExecuteServiceFunctionEvent_serviceFunction.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/getApiGatewayEventHandler.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/getApiGatewayEventHandler_redirect.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/getApiGatewayEventHandler_redirect.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/getApiGatwayEventWebsocketWithIdentity_websocketEvent.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/getCloudFrontRequestEvent_originRequest.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/getCloudFrontRequestEvent_viewerRequest.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/getCloudFrontRequestEvent_viewerRequest.ts - note: medium fixed: full viewer request (cookies/auth headers) no longer logged
+[x] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/getCustomMessageTriggerEvent_createAuthChallenge.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/getCustomMessageTriggerEvent_customMessage.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/getCustomMessageTriggerEvent_defineAuthChallenge.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/getCustomMessageTriggerEvent_verifyAuthChallenge.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/getEventBridgeEvent_recurringSchedule.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/getEventBridgeEvent_stackDeploy.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/getS3Event_fileEvent.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/getSqsEvent_queueEvent.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/helpers/dynamicModuleLoaderWarmer.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/helpers/getQpqLambdaRuntimeForEvent.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/helpers/getRuntimeCorrelation.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/helpers/getRuntimeCorrelation.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/helpers/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/helpers/logger.ts - note: renamed getLogger.ts; dead storyLoggerFs deleted; internals un-exported
+[x] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/types/QpqWarmLambdaEvent.ts - note: deleted, dead type
+[x] quidproquo-actionprocessor-awslambda/src/lambdaHandlers/types/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdas/anyExecuteServiceFunctionEvent_serviceFunction.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdas/apiGatewayEventHandler.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdas/apiGatewayEventHandler_redirect.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdas/apiGatwayEventWebsocketWithIdentity_websocketEvent.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdas/cloudFrontRequestEvent_originRequest.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdas/cloudFrontRequestEvent_viewerRequest.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdas/customMessageTriggerEvent_createAuthChallenge.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdas/customMessageTriggerEvent_customMessage.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdas/customMessageTriggerEvent_defineAuthChallenge.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdas/customMessageTriggerEvent_verifyAuthChallenge.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdas/dynamicModuleLoader/dynamicModuleLoader.ts - note: no-integrity-check on federated code bucket recorded (low, deploy-time trust boundary)
+[x] quidproquo-actionprocessor-awslambda/src/lambdas/dynamicModuleLoader/dynamicModuleLoaderWarmer.ts - note: deleted, duplicate of helpers version
+[x] quidproquo-actionprocessor-awslambda/src/lambdas/dynamicModuleLoader/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdas/eventBridgeEvent_recurringSchedule.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdas/eventBridgeEvent_stackDeploy.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdas/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdas/lambda-utils/QpqWarmLambdaEvent.ts - note: deleted, duplicate
+[x] quidproquo-actionprocessor-awslambda/src/lambdas/lambda-utils/getQpqConfig.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdas/lambda-utils/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdas/lambdaSQSEvent.ts - note: deleted, dead legacy entry (not in entryNames, FIFO-ordering hazard)
+[x] quidproquo-actionprocessor-awslambda/src/lambdas/s3Event_fileEvent.ts
+[x] quidproquo-actionprocessor-awslambda/src/lambdas/sqsEvent_queueEvent.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/acm/findMatchingCertificates.ts - note: deleted, dead (abandoned cloudflare-dns work), folder removed
+[x] quidproquo-actionprocessor-awslambda/src/logic/acm/getDomainValidationOptions.ts - note: deleted with folder
+[x] quidproquo-actionprocessor-awslambda/src/logic/apiGateway/getApiKeyValue.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/apiGateway/websocketSendMessage.ts - note: renamed sendMessageToWebSocketConnection.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/cache/memoFunc.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/cache/memoFunc.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/cache/memoFuncAsync.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/cache/memoFuncAsync.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/cloudFront/invalidateCache.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/cloudformation/getExportedValue.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/associateSoftwareToken.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/authenticateUser.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/changePassword.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/cognitoAttributeMap.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/cognitoAttributeMap.ts - note: split into per-function files; undefined attribute wrote literal "undefined" string, fixed test-first
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/confirmForgotPassword.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/createUser.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/decodeAccessToken.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/decodeValidJwt.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/decodeValidJwt.ts - note: HIGH security fix test-first: token_use=access now enforced (ID tokens verified before), issuer pinned; client_id check still missing (recorded, low)
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/forgotPassword.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/getUser.ts - note: deleted, dead code zero call sites
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/getUserAttributes.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/getUserAttributesBySub.ts - note: filter injection fixed
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/getUserPoolClientSecret.ts - note: uncached DescribeUserPoolClient per auth op recorded (low)
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/globalSignOut.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/listPagedUsers.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/listPagedUsersByAttribute.ts - note: filter injection fixed via shared buildCognitoUserFilter (medium, fixed)
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/refreshToken.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/requestEmailVerificationCode.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/resolveUsernameByPreferredUsername.ts - note: filter injection fixed
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/respondToAuthChallengeChallenge.ts - note: renamed respondToAuthChallenge.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/revokeRefreshToken.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/setUserAttributes.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/setUserPassword.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/utils/calculateSecretHash.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/utils/calculateSecretHash.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/utils/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/utils/pageKeyToPaginationToken.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/utils/pageKeyToPaginationToken.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/utils/paginationTokenToPageKey.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/utils/paginationTokenToPageKey.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/utils/transformCognitoResponse.test.ts - note: split alongside
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/utils/transformCognitoResponse.ts - note: split into one-export-per-file
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/verifyJwt.test.ts - note: deleted with its subject
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/verifyJwt.ts - note: deleted, dead code
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/verifySoftwareToken.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/cognito/verifyUserEmail.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/createAwsClient.ts - note: HIGH finding recorded: error path console.logs full client config + command input (can contain secrets); deliberate debug aid, left for dedicated pass
 [x] quidproquo-actionprocessor-awslambda/src/logic/dynamo/convertObjectToDynamoMap.test.ts - note: renamed alongside convertDynamoMapToObject.ts
 [x] quidproquo-actionprocessor-awslambda/src/logic/dynamo/convertObjectToDynamoMap.ts - note: renamed to convertDynamoMapToObject.ts (file named after its one export)
 [x] quidproquo-actionprocessor-awslambda/src/logic/dynamo/deleteItem.ts - note: bug fixed test-first: falsy sort key (0/empty) silently dropped from Key; now shared buildDynamoKey
@@ -604,51 +604,51 @@ If your change touched files in more than one package (e.g. you moved a shared h
 [x] quidproquo-actionprocessor-awslambda/src/logic/dynamo/utils/itemsToQpqPagedData.ts
 [x] quidproquo-actionprocessor-awslambda/src/logic/dynamo/utils/qpqPagedDataToItems.test.ts - note: deleted with its subject
 [x] quidproquo-actionprocessor-awslambda/src/logic/dynamo/utils/qpqPagedDataToItems.ts - note: deleted, dead code (also mis-exported duplicate name)
-[ ] quidproquo-actionprocessor-awslambda/src/logic/federatedModuleStore/FederatedModuleLoadError.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/federatedModuleStore/FederatedModuleStoreManifest.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/federatedModuleStore/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/federatedModuleStore/loadFederatedStory.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/federatedModuleStore/loadFederatedStory.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/federatedModuleStore/sharedPackages.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/kms/decryptDataKey.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/kms/generateDataKey.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/kms/getCachedGeneratedDataKey.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/kms/getCachedUnwrappedDataKey.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/kms/toKmsEncryptionContext.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/lambda/executeLambdaByName.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/neptune/getNeptuneEndpoints.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/neptune/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/parametersManager/getParameter.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/parametersManager/getParameters.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/parametersManager/setParameter.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/s3/deleteFiles.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/s3/generatePresignedUploadUrl.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/s3/generatePresignedUrl.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/s3/getObjectStorageClass.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/s3/listFiles.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/s3/objectExists.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/s3/readBinaryFile.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/s3/readTextFile.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/s3/s3Utils.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/s3/writeBinaryFile.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/s3/writeTextFile.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/secretsManager/getSecret.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/sesV2/buildRawMimeMessage.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/sesV2/buildRawMimeMessage.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/sesV2/sendEmail.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/sesV2/sendEmail.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/sns/publishMessage.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/sns/publishMessage.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/sqs/getQueueUrl.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/sqs/getQueueUrl.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/sqs/sendMessages.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/logic/sqs/sendMessages.ts
-[ ] quidproquo-actionprocessor-awslambda/src/runtimeConfig/QPQAWSResourceMap.ts
-[ ] quidproquo-actionprocessor-awslambda/src/runtimeConfig/qpqAwsLambdaRuntimeConfigUtils.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/runtimeConfig/qpqAwsLambdaRuntimeConfigUtils.ts
-[ ] quidproquo-actionprocessor-awslambda/src/testing/eventProcessorTestHelpers.ts
-[ ] quidproquo-actionprocessor-awslambda/src/testing/processorTestHelpers.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/federatedModuleStore/FederatedModuleLoadError.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/federatedModuleStore/FederatedModuleStoreManifest.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/federatedModuleStore/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/federatedModuleStore/loadFederatedStory.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/federatedModuleStore/loadFederatedStory.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/federatedModuleStore/sharedPackages.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/kms/decryptDataKey.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/kms/generateDataKey.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/kms/getCachedGeneratedDataKey.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/kms/getCachedUnwrappedDataKey.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/kms/toKmsEncryptionContext.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/lambda/executeLambdaByName.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/neptune/getNeptuneEndpoints.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/neptune/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/parametersManager/getParameter.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/parametersManager/getParameters.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/parametersManager/setParameter.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/s3/deleteFiles.ts - note: real bug fixed test-first: DeleteObjects 1000-key cap now batched
+[x] quidproquo-actionprocessor-awslambda/src/logic/s3/generatePresignedUploadUrl.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/s3/generatePresignedUrl.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/s3/getObjectStorageClass.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/s3/listFiles.ts - note: 3 real bugs fixed test-first (CommonPrefixes dropped on continuation pages; folder marker leaked; dead drive prop)
+[x] quidproquo-actionprocessor-awslambda/src/logic/s3/objectExists.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/s3/readBinaryFile.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/s3/readTextFile.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/s3/s3Utils.ts - note: now the folder barrel; rename to index.ts deferred until getActionProcessor pass (25 import sites)
+[x] quidproquo-actionprocessor-awslambda/src/logic/s3/writeBinaryFile.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/s3/writeTextFile.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/secretsManager/getSecret.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/sesV2/buildRawMimeMessage.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/sesV2/buildRawMimeMessage.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/sesV2/sendEmail.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/sesV2/sendEmail.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/sns/publishMessage.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/sns/publishMessage.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/sqs/getQueueUrl.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/sqs/getQueueUrl.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/sqs/sendMessages.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/logic/sqs/sendMessages.ts
+[x] quidproquo-actionprocessor-awslambda/src/runtimeConfig/QPQAWSResourceMap.ts - note: renamed LambdaRuntimeConfig.ts (named after export)
+[x] quidproquo-actionprocessor-awslambda/src/runtimeConfig/qpqAwsLambdaRuntimeConfigUtils.test.ts - note: renamed alongside
+[x] quidproquo-actionprocessor-awslambda/src/runtimeConfig/qpqAwsLambdaRuntimeConfigUtils.ts - note: renamed resolveParameterKey.ts; dead resolveResourceName/resolveSecretKey deleted
+[x] quidproquo-actionprocessor-awslambda/src/testing/eventProcessorTestHelpers.ts
+[x] quidproquo-actionprocessor-awslambda/src/testing/processorTestHelpers.ts
 [x] quidproquo-actionprocessor-awslambda/vitest.config.ts - note: added alias for deep traceStoryExecution import so the package root resolves under vitest
 [ ] quidproquo-actionprocessor-js/eslint.config.mjs
 [ ] quidproquo-actionprocessor-js/src/actionProcessor/core/claudeAi/getClaudeAiMessagesApiActionProcessor.test.ts

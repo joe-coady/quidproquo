@@ -1,4 +1,4 @@
-import { AuthenticateUserChallenge, AuthenticateUserResponse, UserDirectoryAuthenticateUserActionPayload } from 'quidproquo-core';
+import { AuthenticateUserResponse } from 'quidproquo-core';
 
 import {
   AdminInitiateAuthCommand,
@@ -9,11 +9,15 @@ import {
 
 import { createAwsClient } from '../createAwsClient';
 import { calculateSecretHash } from './utils/calculateSecretHash';
-import { cognitoAdminInitiateAuthResponseToQpqAuthenticationInfo } from './utils/transformCognitoResponse';
+import { cognitoAdminInitiateAuthResponseToQpqAuthenticationInfo } from './utils/cognitoAdminInitiateAuthResponseToQpqAuthenticationInfo';
 import { getUserPoolClientSecret } from './getUserPoolClientSecret';
 
 // TODO: retry for TooManyRequestsException
 
+/**
+ * Starts a Cognito auth flow (password auth, or CUSTOM_AUTH when isCustom) and
+ * returns the qpq response: either issued tokens or a pending challenge.
+ */
 export const authenticateUser = async (
   userPoolId: string,
   clientId: string,
@@ -29,7 +33,8 @@ export const authenticateUser = async (
   const clientSecret = await getUserPoolClientSecret(userPoolId, clientId, region);
   const secretHash = calculateSecretHash(username, clientId, clientSecret);
 
-  // Time we issued the request
+  // Token expiry is computed relative to this; captured before the call so the
+  // derived expiresAt errs early rather than late.
   const issueDateTime = new Date().toISOString();
 
   const params: AdminInitiateAuthCommandInput = {

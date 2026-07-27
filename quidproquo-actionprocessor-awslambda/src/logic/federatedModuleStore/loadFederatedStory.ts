@@ -16,7 +16,7 @@ import { FederatedModuleStoreManifest } from './FederatedModuleStoreManifest';
 import { FEDERATED_SHARED_PACKAGE_NAMES } from './sharedPackages';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// loadFederatedStory — the RUNTIME half of module federation on lambda. Given a
+// loadFederatedStory: the RUNTIME half of module federation on lambda. Given a
 // QpqFunctionRuntime, it returns the published story function from the service's
 // code store, or undefined so dynamicModuleLoader falls back to the bundled copy.
 //
@@ -206,7 +206,7 @@ const loadStoreVersion = async (getFile: (p: string) => Promise<Buffer>, manifes
 
   // entryGlobalName is the container's real (build-time) library name; the registered
   // remote name is hash-unique so each version is a distinct loadRemote key.
-  (globalThis as any)[manifest.containerName] = container;
+  (globalThis as Record<string, unknown>)[manifest.containerName] = container;
   ensureHostInitialised();
 
   const runtimeName = `${manifest.containerName}__${manifest.hash}`;
@@ -295,7 +295,7 @@ const resolveStore = (qpqConfig: QPQConfig, storeUrl: string): Promise<StoreStat
 // Called by dynamicModuleLoader for every story load. Returns the story function, or
 // undefined to signal "use the bundled module" (no store, nothing published, runtime
 // not exposed, or any error - availability always wins over federation).
-export const loadFederatedStory = async <T = any>(qpqConfig: QPQConfig, qpqFunctionRuntime: QpqFunctionRuntime): Promise<T | undefined> => {
+export const loadFederatedStory = async <T = unknown>(qpqConfig: QPQConfig, qpqFunctionRuntime: QpqFunctionRuntime): Promise<T | undefined> => {
   const storeUrl = process.env.federatedCodeStoreUrl;
   if (!storeUrl) {
     return undefined;

@@ -3,22 +3,16 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 import { createAwsClient } from '../createAwsClient';
 
+/** Presigns a GET of the object, valid for expirationMs from now. */
 export const generatePresignedUrl = async (bucketName: string, objectKey: string, region: string, expirationMs: number): Promise<string> => {
   const s3Client = createAwsClient(S3Client, { region });
 
-  // Define the command for getting an object, which will be presigned
   const getObjectCommand = new GetObjectCommand({
     Bucket: bucketName,
     Key: objectKey,
   });
 
-  try {
-    const url = await getSignedUrl(s3Client, getObjectCommand, {
-      expiresIn: expirationMs / 1000,
-    });
-    return url;
-  } catch (error) {
-    console.error('Error generating presigned URL', error);
-    throw error;
-  }
+  return await getSignedUrl(s3Client, getObjectCommand, {
+    expiresIn: expirationMs / 1000,
+  });
 };

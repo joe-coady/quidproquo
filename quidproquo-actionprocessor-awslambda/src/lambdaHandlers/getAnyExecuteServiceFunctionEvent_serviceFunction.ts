@@ -4,17 +4,18 @@ import { ExecuteServiceFunctionEvent } from 'quidproquo-webserver';
 import { getLambdaServiceFunctionEventProcessor } from '../getActionProcessor';
 import { getQpqLambdaRuntimeForEvent } from './helpers/getQpqLambdaRuntimeForEvent';
 
-// TODO: Unify this once the lambda code moves from CDK to awslambda
-type AnyExecuteServiceFunctionEventWithSession = ExecuteServiceFunctionEvent<any[]> & {
+// TODO: also declared in quidproquo-dev-server (serviceFunction/types.ts); this
+// cross-layer shape belongs in quidproquo-webserver as a named model.
+type AnyExecuteServiceFunctionEventWithSession = ExecuteServiceFunctionEvent<unknown[]> & {
   storySession: StorySession;
 };
 
 export const getAnyExecuteServiceFunctionEvent_serviceFunction = (dynamicModuleLoader: DynamicModuleLoader, qpqConfig: QPQConfig) =>
   getQpqLambdaRuntimeForEvent<AnyExecuteServiceFunctionEventWithSession>(
     QpqRuntimeType.SERVICE_FUNCTION_EXE,
-    (event) => {
-      return event.storySession;
-    },
+    // Service functions are invoked by another qpq service, which passes its
+    // session along so depth/context carry across the boundary.
+    (event) => event.storySession,
     getLambdaServiceFunctionEventProcessor,
     dynamicModuleLoader,
     qpqConfig,

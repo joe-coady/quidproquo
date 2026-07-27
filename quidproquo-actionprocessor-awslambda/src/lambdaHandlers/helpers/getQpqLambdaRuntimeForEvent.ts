@@ -1,5 +1,6 @@
 import { getCustomActionActionProcessor } from 'quidproquo-actionprocessor-js';
 import {
+  ActionProcessorList,
   ActionProcessorListResolver,
   askProcessEvent,
   createRuntime,
@@ -9,15 +10,18 @@ import {
   StorySession,
 } from 'quidproquo-core';
 
-import { Context } from 'aws-lambda';
-import { SNSEvent } from 'aws-lambda';
+import { Context, SNSEvent } from 'aws-lambda';
 
 import { getAwsActionProcessors } from '../../getActionProcessor';
 import { QpqFunctionExecutionEvent } from '../types';
 import { dynamicModuleLoaderWarmer } from './dynamicModuleLoaderWarmer';
+import { getLogger } from './getLogger';
 import { getRuntimeCorrelation } from './getRuntimeCorrelation';
-import { getLogger } from './logger';
+import { isSnsWarmerRecord } from './isSnsWarmerRecord';
 
+// SQS/S3/CloudFront events also have a Records array, so this matches more than
+// real SNS events. That is harmless: the warmer scan below only acts on records
+// whose EventSource is 'aws:sns', everything else falls through to processEvent.
 const isSnsEvent = <T>(event: QpqFunctionExecutionEvent<T>): event is SNSEvent => {
   if (event && typeof event === 'object') {
     const possibleSnsEvent = event as unknown as SNSEvent;
@@ -27,6 +31,10 @@ const isSnsEvent = <T>(event: QpqFunctionExecutionEvent<T>): event is SNSEvent =
   return false;
 };
 
+/**
+ * Builds the shared lambda handler: wires a qpq runtime for the event type,
+ * short-circuits SNS warmer pings, runs the process-event story and ships logs.
+ */
 export const getQpqLambdaRuntimeForEvent = <E extends QpqFunctionExecutionEvent<any>>(
   runtimeType: QpqRuntimeType,
   getStorySession: (event: E) => StorySession,
@@ -35,6 +43,14 @@ export const getQpqLambdaRuntimeForEvent = <E extends QpqFunctionExecutionEvent<
   qpqConfig: QPQConfig,
   getProcessEventStory: () => typeof askProcessEvent = () => askProcessEvent,
 ) => {
+  const resolveActionProcessorList = async (): Promise<ActionProcessorList> => ({
+    ...(await getAwsActionProcessors(qpqConfig, dynamicModuleLoader)),
+    ...(await getActionProcessorList(qpqConfig, dynamicModuleLoader)),
+
+    // Always done last, so they can override the default ones if the user wants.
+    ...(await getCustomActionActionProcessor(qpqConfig, dynamicModuleLoader)),
+  });
+
   return async (event: E, context: Context) => {
     console.log('tick: ', JSON.stringify(event, null, 2));
 
@@ -43,13 +59,7 @@ export const getQpqLambdaRuntimeForEvent = <E extends QpqFunctionExecutionEvent<
     const resolveStory = createRuntime(
       qpqConfig,
       getStorySession(event),
-      async () => ({
-        ...(await getAwsActionProcessors(qpqConfig, dynamicModuleLoader)),
-        ...(await getActionProcessorList(qpqConfig, dynamicModuleLoader)),
-
-        // Always done last, so they can ovveride the default ones if the user wants.
-        ...(await getCustomActionActionProcessor(qpqConfig, dynamicModuleLoader)),
-      }),
+      resolveActionProcessorList,
       () => new Date().toISOString(),
       logger,
       getRuntimeCorrelation(qpqConfig),
@@ -70,12 +80,10 @@ export const getQpqLambdaRuntimeForEvent = <E extends QpqFunctionExecutionEvent<
     };
 
     if (isSnsEvent(event)) {
-      // Non warmer records
-      const recordsNoWarm = event.Records.filter(
-        (record) => record.EventSource !== 'aws:sns' || JSON.parse(record.Sns.Message).type !== 'QpqLambdaWarmerEvent',
-      );
+      const recordsNoWarm = event.Records.filter((record) => !isSnsWarmerRecord(record));
 
-      // if we have found some warmers - then we need to warm the lambda
+      // A warmer ping arrives as its own single-record SNS event; any warmer
+      // present means this invoke exists only to keep the sandbox warm.
       if (recordsNoWarm.length !== event.Records.length) {
         console.log('Found SNS warmer');
 
@@ -87,13 +95,6 @@ export const getQpqLambdaRuntimeForEvent = <E extends QpqFunctionExecutionEvent<
         await logger.moveToPermanentStorage();
 
         return 'Warmed up!';
-      }
-
-      // If we have events that are not warmers, then we should execute them
-      if (recordsNoWarm.length > 0) {
-        console.log('Running other actions');
-
-        return await processEvent();
       }
     }
 

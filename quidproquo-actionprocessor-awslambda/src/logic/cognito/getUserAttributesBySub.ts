@@ -3,7 +3,9 @@ import { UserAttributes } from 'quidproquo-core';
 import { CognitoIdentityProviderClient, ListUsersCommand } from '@aws-sdk/client-cognito-identity-provider';
 
 import { createAwsClient } from '../createAwsClient';
-import { getQpqAttributesFromCognitoUserAttributes } from './cognitoAttributeMap';
+import { buildCognitoUserFilter, InvalidCognitoFilterError } from './utils/buildCognitoUserFilter';
+import { getValidCognitoUserAttributes } from './utils/getValidCognitoUserAttributes';
+import { getQpqAttributesFromCognitoUserAttributes } from './getQpqAttributesFromCognitoUserAttributes';
 
 // ListUsers returns an empty list rather than throwing for no match, so we throw
 // our own error with a discriminable `code` for the processor's catch to map.
@@ -16,7 +18,22 @@ export class UserNotFoundError extends Error {
   }
 }
 
+// A sub that cannot be embedded in a Cognito filter cannot belong to any user,
+// so unsafe input resolves to not-found instead of reaching Cognito.
+const buildSubFilter = (sub: string): string => {
+  try {
+    return buildCognitoUserFilter('sub', sub);
+  } catch (error) {
+    if (error instanceof InvalidCognitoFilterError) {
+      throw new UserNotFoundError();
+    }
+    throw error;
+  }
+};
+
 export const getUserAttributesBySub = async (userPoolId: string, region: string, sub: string): Promise<UserAttributes> => {
+  const filter = buildSubFilter(sub);
+
   const cognitoClient = createAwsClient(CognitoIdentityProviderClient, {
     region,
   });
@@ -24,7 +41,7 @@ export const getUserAttributesBySub = async (userPoolId: string, region: string,
   const response = await cognitoClient.send(
     new ListUsersCommand({
       UserPoolId: userPoolId,
-      Filter: `sub = "${sub}"`,
+      Filter: filter,
     }),
   );
 
@@ -33,10 +50,5 @@ export const getUserAttributesBySub = async (userPoolId: string, region: string,
     throw new UserNotFoundError();
   }
 
-  const validAttributes = (user.Attributes || []).filter((attr) => attr.Name && attr.Value) as {
-    Name: string;
-    Value: string;
-  }[];
-
-  return getQpqAttributesFromCognitoUserAttributes(validAttributes);
+  return getQpqAttributesFromCognitoUserAttributes(getValidCognitoUserAttributes(user.Attributes));
 };

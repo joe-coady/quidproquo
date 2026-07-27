@@ -4,12 +4,12 @@ import { defineWebsocket, WebsocketActionType, WebsocketSendMessageErrorTypeEnum
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { sendMessageToWebSocketConnection } from '../../../logic/apiGateway/websocketSendMessage';
+import { sendMessageToWebSocketConnection } from '../../../logic/apiGateway/sendMessageToWebSocketConnection';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { invokeProcessor } from '../../../testing/processorTestHelpers';
 import { getWebsocketSendMessageActionProcessor } from './getWebsocketSendMessageActionProcessor';
 
-vi.mock('../../../logic/apiGateway/websocketSendMessage', () => ({
+vi.mock('../../../logic/apiGateway/sendMessageToWebSocketConnection', () => ({
   sendMessageToWebSocketConnection: vi.fn(),
 }));
 vi.mock('../../../logic/cloudformation/getExportedValue', () => ({

@@ -2,13 +2,11 @@ import { createHmac } from 'crypto';
 
 import { memoFunc } from '../../cache/memoFunc';
 
-export const calculateSecretHash = memoFunc((username: string, clientId: string, clientSecret: string) => {
-  // create the hmac with the sha256 algorithm and a secret key
-  const hasher = createHmac('sha256', clientSecret);
-
-  // add the value we want to hash
-  hasher.update(`${username}${clientId}`);
-
-  // get the hashed value as base64
-  return hasher.digest('base64');
+/**
+ * Computes the Cognito SECRET_HASH for an app client with a secret: the base64
+ * HMAC-SHA256 of username + clientId, keyed by the client secret. Memoized
+ * because every auth call for the same user recomputes the same value.
+ */
+export const calculateSecretHash = memoFunc((username: string, clientId: string, clientSecret: string): string => {
+  return createHmac('sha256', clientSecret).update(`${username}${clientId}`).digest('base64');
 });

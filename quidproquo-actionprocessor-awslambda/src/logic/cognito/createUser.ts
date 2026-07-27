@@ -10,9 +10,13 @@ import {
 
 import { createAwsClient } from '../createAwsClient';
 import { authenticateUser } from './authenticateUser';
-import { getCognitoUserAttributesFromQpqUserAttributes } from './cognitoAttributeMap';
+import { getCognitoUserAttributesFromQpqUserAttributes } from './getCognitoUserAttributesFromQpqUserAttributes';
 import { setUserPassword } from './setUserPassword';
 
+/**
+ * Creates a Cognito user with the requested attributes, activates their password
+ * and signs them in, returning the authenticated session.
+ */
 export const createUser = async (
   userPoolId: string,
   region: string,
@@ -28,6 +32,8 @@ export const createUser = async (
     Username: createUserRequest.email,
     MessageAction: MessageActionType.SUPPRESS, // Don't contact the user
     DesiredDeliveryMediums: [DeliveryMediumType.EMAIL],
+    // createUserRequest includes password; it has no cognitoAttributeMap entry,
+    // so the mapper drops it rather than writing it as a user attribute.
     UserAttributes: getCognitoUserAttributesFromQpqUserAttributes(createUserRequest),
     ForceAliasCreation: false,
   };
@@ -40,11 +46,7 @@ export const createUser = async (
 
   const username = response.User?.Username || '';
 
-  // Set the user's password
   await setUserPassword(region, userPoolId, username, createUserRequest.password);
 
-  // Authenticate the user
-  const authResponse: AuthenticateUserResponse = await authenticateUser(userPoolId, clientId, region, false, username, createUserRequest.password);
-
-  return authResponse;
+  return authenticateUser(userPoolId, clientId, region, false, username, createUserRequest.password);
 };

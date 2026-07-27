@@ -17,7 +17,7 @@ import { ChallengeNameType } from '@aws-sdk/client-cognito-identity-provider';
 
 import { getCFExportNameUserPoolClientIdFromConfig, getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
-import { respondToAuthChallengeChallenge } from '../../../logic/cognito/respondToAuthChallengeChallenge';
+import { respondToAuthChallenge } from '../../../logic/cognito/respondToAuthChallenge';
 import { verifySoftwareToken } from '../../../logic/cognito/verifySoftwareToken';
 
 const anyAuthChallengeToCognitoAttributes = (authChallenge: AnyAuthChallenge): Record<string, string> => {
@@ -83,7 +83,7 @@ const getProcessRespondToAuthChallenge = (qpqConfig: QPQConfig): UserDirectoryRe
         session = await verifySoftwareToken(region, session, authChallenge.mfaCode);
       }
 
-      const response = await respondToAuthChallengeChallenge(
+      const response = await respondToAuthChallenge(
         userPoolId,
         userPoolClientId,
         region,

@@ -14,5 +14,6 @@ export const getParameters = memoFuncAsync(async (parameterNames: string[], regi
 
   const resolvedParams = response.Parameters || [];
 
-  return parameterNames.map((pn) => resolvedParams.find((rp) => rp.Name == pn)?.Value || '');
+  // Preserve the requested order; a missing parameter resolves to an empty string
+  return parameterNames.map((parameterName) => resolvedParams.find((resolvedParam) => resolvedParam.Name === parameterName)?.Value || '');
 }, 60);

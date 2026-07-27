@@ -10,7 +10,7 @@
 // The loader reads manifest.json first, so publishing = upload the <hash>/ dir, then
 // overwrite manifest.json. A new `hash` is what tells a warm lambda a new version exists.
 // ─────────────────────────────────────────────────────────────────────────────
-export interface FederatedModuleStoreManifest {
+export type FederatedModuleStoreManifest = {
   // MF container name (qpq_<service>). The build bakes it in as the container's library
   // name; the loader stores the loaded container on globalThis under this key.
   containerName: string;
@@ -33,4 +33,4 @@ export interface FederatedModuleStoreManifest {
   // (getFederatedKeyFromQpqFunctionRuntime) -> the container's expose path (no './'
   // prefix). Built on the publish side by getFederatedRemoteInfoForQpqConfig.
   exposes: Record<string, string>;
-}
+};
