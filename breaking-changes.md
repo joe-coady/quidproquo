@@ -10,6 +10,9 @@ assembled quickly.
 - `EventDocBundleApplyOptions` in `quidproquo-features` requires a new `importerUserId: string` field. Callers of `askEventDocBundleApply`/`askEventDocBundleApplyDoc` must pass the importing user's id; every imported event's `createdBy.userId` is rewritten to it (the original `userDisplayName` is kept).
 - `askEventDocWriteForeignEvents(docId, events, fromIndex, logRewritten?)` in `quidproquo-features` is now `askEventDocWriteForeignEvents(docId, events, fromIndex, { importerUserId, logRewritten? })`. Pass the importing user's id in the new required options object instead of a trailing boolean.
 - `ApiRequestActionProcessorOptions.getHeaders` in `quidproquo-actionprocessor-web` now returns `Nullable<Record<string, string>>` instead of `Record<string, string> | undefined`. A `getHeaders` callback that returned `undefined` for "no headers" must return `null`.
+- `getStateMachineByName` in `quidproquo-xstate` now returns `Nullable<StateMachineQPQConfigSetting>` — `null` instead of `undefined` when no machine matches. Update any `=== undefined` checks to `null` (truthiness checks are unaffected).
+- `askStateMachineSendEvent` in `quidproquo-xstate` now fails with `ErrorTypeEnum.BadRequest` when the machine has already reached a final state (previously it silently succeeded), and valid self/internal transitions that keep the same state value are now accepted instead of wrongly rejected as `BadRequest`.
+- `StateMachineEvent` in `quidproquo-xstate` narrows its extra-field index signature from `any` to `unknown`. Guard/action stories reading payload fields off the event must narrow or cast before use.
 
 ## 0.1.11
 

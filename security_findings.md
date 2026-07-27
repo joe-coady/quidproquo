@@ -48,3 +48,10 @@
 - **Where**: getHash (used by getItemName / getValueName).
 - **Suggested fix**: Switch the digest to sha256.
 - **Status**: recorded
+
+## quidproquo-xstate/src/actionProcessor/getStateMachineSendEventActionProcessor.ts
+- **Severity**: medium
+- **Issue**: SendEvent is an unlocked read-modify-write: entity loaded, guards evaluated, can() checked, then the new snapshot upserted with no concurrency control; two concurrent SendEvents can both validate against the same state and last-write-wins (a transition can fire twice, or be lost).
+- **Where**: getProcessStateMachineSendEvent.
+- **Suggested fix**: optimistic-concurrency condition (version field or condition on stored snapshot) returning Conflict on mismatch; needs KVS conditional-update support, dedicated pass.
+- **Status**: recorded

@@ -1,18 +1,11 @@
-import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
-  actionResult,
-  actionResultError,
-  askKeyValueStoreGet,
-  createImplementationRuntime,
-  ErrorTypeEnum,
-  QPQConfig,
-} from 'quidproquo-core';
+import { ActionProcessorList, ActionProcessorListResolver, actionResult, actionResultError, ErrorTypeEnum, QPQConfig } from 'quidproquo-core';
 
-import { createActor, createMachine } from 'xstate';
+import { createActor, createMachine, Snapshot } from 'xstate';
 
 import { StateMachineActionType, StateMachineGetStateActionProcessor } from '../actions';
 import { getStateMachineByName } from '../config';
+import { createStateMachineStoryResolver } from './utils/createStateMachineStoryResolver';
+import { loadStateMachineEntity } from './utils/loadStateMachineEntity';
 
 const getProcessStateMachineGetState = (qpqConfig: QPQConfig): StateMachineGetStateActionProcessor => {
   return async (payload, session, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
@@ -21,11 +14,9 @@ const getProcessStateMachineGetState = (qpqConfig: QPQConfig): StateMachineGetSt
       return actionResultError(ErrorTypeEnum.NotFound, `State machine not found: ${payload.stateMachineName}`);
     }
 
-    const resolveStory = createImplementationRuntime(
+    const resolveStory = createStateMachineStoryResolver(
+      'StateMachine GetState',
       qpqConfig,
-      ['StateMachine GetState'],
-      () => new Date().toISOString(),
-      () => `${Date.now()}-${Math.random().toString(36).slice(2)}`,
       session,
       actionProcessors,
       logger,
@@ -33,33 +24,28 @@ const getProcessStateMachineGetState = (qpqConfig: QPQConfig): StateMachineGetSt
       streamRegistry,
     );
 
-    // Load entity from KVS
-    const getResult = await resolveStory(function* () {
-      return yield* askKeyValueStoreGet<Record<string, any>>(smConfig.keyValueStoreName, payload.id);
-    }, []);
-    if (getResult.error) {
-      return actionResultError(getResult.error.errorType, getResult.error.errorText);
+    const entityResult = await loadStateMachineEntity(resolveStory, smConfig, payload.id);
+    if (!entityResult.success) {
+      return actionResultError(entityResult.error.errorType, entityResult.error.errorText);
     }
+    const entity = entityResult.result;
 
-    const entity = getResult.result;
-    if (!entity) {
-      return actionResultError(ErrorTypeEnum.NotFound, `Entity not found: ${payload.id}`);
-    }
-
-    const persistedSnapshot = entity[smConfig.stateField];
+    // The snapshot round-trips through the key value store untyped.
+    const persistedSnapshot = entity[smConfig.stateField] as Snapshot<unknown> | undefined;
     if (!persistedSnapshot) {
       return actionResultError(ErrorTypeEnum.NotFound, `No state machine state found on entity: ${payload.id}`);
     }
 
-    // XState: rehydrate to read current state
+    // any: createMachine's setup generics cannot infer from a pre-typed MachineConfig; third-party boundary.
     const machine = createMachine(smConfig.config as any);
     const actor = createActor(machine, { snapshot: persistedSnapshot });
     actor.start();
-
     const snapshot = actor.getSnapshot();
     actor.stop();
 
     return actionResult({
+      // Compound and parallel state values are objects; serialise them so
+      // StateMachineStateInfo.value is always a string.
       value: typeof snapshot.value === 'string' ? snapshot.value : JSON.stringify(snapshot.value),
       done: snapshot.status === 'done',
     });

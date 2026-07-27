@@ -2,15 +2,16 @@ import { Action, ActionProcessor, ActionRequester } from 'quidproquo-core';
 
 import { StateMachineActionType } from './StateMachineActionType';
 
-export interface StateMachineGetStateActionPayload {
+export type StateMachineGetStateActionPayload = {
   stateMachineName: string;
   id: string;
-}
+};
 
-export interface StateMachineStateInfo {
+/** The current machine state: the state value (objects serialised to JSON) and whether a final state was reached. */
+export type StateMachineStateInfo = {
   value: string;
   done: boolean;
-}
+};
 
 export interface StateMachineGetStateAction extends Action<StateMachineGetStateActionPayload> {
   type: StateMachineActionType.GetState;

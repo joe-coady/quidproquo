@@ -47,6 +47,23 @@ const actionConfig = {
   },
 } as any;
 
+const internalConfig = {
+  id: 'internal',
+  initial: 'a',
+  states: {
+    a: { on: { PING: { actions: ['notify'] } } },
+  },
+} as any;
+
+const finalConfig = {
+  id: 'final',
+  initial: 'a',
+  states: {
+    a: { on: { FINISH: 'done' } },
+    done: { type: 'final' },
+  },
+} as any;
+
 const session = buildTestStorySession();
 const logger = createStubLogger();
 const updateSession = async () => {};
@@ -136,6 +153,33 @@ describe('getStateMachineSendEventActionProcessor', () => {
     const [entity] = await invoke(processor, { stateMachineName: 'order', id: 'order-1', event: { type: 'TOGGLE' } }, kvsStore(store));
 
     expect(stateValueOf(toggleConfig, entity.__machineState)).toBe('active');
+  });
+
+  it('accepts a valid internal transition that keeps the same state value and runs its action story', async () => {
+    const processor = await getProcessor(
+      buildTestQpqConfig(defineStateMachine('order', { config: internalConfig, actions: { notify: 'rt' as any } })),
+    );
+    const store = new Map<string, any>([['order-1', { id: 'order-1', __machineState: makeSnapshot(internalConfig) }]]);
+    let ran = 0;
+    const loader = async () =>
+      function* notify() {
+        ran++;
+      };
+
+    const [entity, error] = await invoke(processor, { stateMachineName: 'order', id: 'order-1', event: { type: 'PING' } }, kvsStore(store), loader);
+
+    expect(error).toBeUndefined();
+    expect(entity).toBeDefined();
+    expect(ran).toBe(1);
+  });
+
+  it('returns a BadRequest error when the machine has already reached its final state', async () => {
+    const processor = await getProcessor(buildTestQpqConfig(defineStateMachine('order', { config: finalConfig })));
+    const store = new Map<string, any>([['order-1', { id: 'order-1', __machineState: makeSnapshot(finalConfig, [{ type: 'FINISH' }]) }]]);
+
+    const [, error] = await invoke(processor, { stateMachineName: 'order', id: 'order-1', event: { type: 'FINISH' } }, kvsStore(store));
+
+    expect(error?.errorType).toBe(ErrorTypeEnum.BadRequest);
   });
 
   it('returns a BadRequest error when the event does not apply to the current state', async () => {

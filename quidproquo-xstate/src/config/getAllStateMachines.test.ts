@@ -3,7 +3,7 @@ import { buildTestQpqConfig } from 'quidproquo-core';
 import { describe, expect, it } from 'vitest';
 
 import { defineStateMachine } from './settings/stateMachine';
-import { getAllStateMachines, getStateMachineByName } from './qpqXStateConfigUtils';
+import { getAllStateMachines } from './getAllStateMachines';
 
 const toggleConfig = {
   id: 'toggle',
@@ -23,19 +23,5 @@ describe('getAllStateMachines', () => {
 
   it('returns an empty list when none are defined', () => {
     expect(getAllStateMachines(buildTestQpqConfig())).toEqual([]);
-  });
-});
-
-describe('getStateMachineByName', () => {
-  it('returns the matching state machine', () => {
-    const config = buildTestQpqConfig(defineStateMachine('order', { config: toggleConfig }));
-
-    expect(getStateMachineByName(config, 'order')?.stateMachineName).toBe('order');
-  });
-
-  it('returns undefined when no state machine matches', () => {
-    const config = buildTestQpqConfig(defineStateMachine('order', { config: toggleConfig }));
-
-    expect(getStateMachineByName(config, 'missing')).toBeUndefined();
   });
 });

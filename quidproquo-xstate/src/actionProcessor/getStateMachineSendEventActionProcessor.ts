@@ -3,30 +3,31 @@ import {
   ActionProcessorListResolver,
   actionResult,
   actionResultError,
-  askKeyValueStoreGet,
   askKeyValueStoreUpsert,
-  createImplementationRuntime,
   ErrorTypeEnum,
   QPQConfig,
 } from 'quidproquo-core';
 
-import { createActor, createMachine } from 'xstate';
+import { createActor, createMachine, Snapshot } from 'xstate';
 
 import { StateMachineActionType, StateMachineSendEventActionProcessor } from '../actions';
 import { getStateMachineByName } from '../config';
+import { StateMachineEntity } from '../models/StateMachineEntity';
+import { createFiredActionRecorder } from './utils/createFiredActionRecorder';
+import { createStateMachineStoryResolver } from './utils/createStateMachineStoryResolver';
+import { loadStateMachineEntity } from './utils/loadStateMachineEntity';
+import { runFiredActionStories } from './utils/runFiredActionStories';
 
-const getProcessStateMachineSendEvent = (qpqConfig: QPQConfig): StateMachineSendEventActionProcessor<any> => {
+const getProcessStateMachineSendEvent = (qpqConfig: QPQConfig): StateMachineSendEventActionProcessor<StateMachineEntity> => {
   return async (payload, session, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
     const smConfig = getStateMachineByName(qpqConfig, payload.stateMachineName);
     if (!smConfig) {
       return actionResultError(ErrorTypeEnum.NotFound, `State machine not found: ${payload.stateMachineName}`);
     }
 
-    const resolveStory = createImplementationRuntime(
+    const resolveStory = createStateMachineStoryResolver(
+      'StateMachine SendEvent',
       qpqConfig,
-      ['StateMachine SendEvent'],
-      () => new Date().toISOString(),
-      () => `${Date.now()}-${Math.random().toString(36).slice(2)}`,
       session,
       actionProcessors,
       logger,
@@ -34,93 +35,66 @@ const getProcessStateMachineSendEvent = (qpqConfig: QPQConfig): StateMachineSend
       streamRegistry,
     );
 
-    // Load entity from KVS
-    let entity: Record<string, any> | undefined;
-    const getResult = await resolveStory(function* () {
-      return yield* askKeyValueStoreGet<Record<string, any>>(smConfig.keyValueStoreName, payload.id);
-    }, []);
-    if (getResult.error) {
-      return actionResultError(getResult.error.errorType, getResult.error.errorText);
+    const entityResult = await loadStateMachineEntity(resolveStory, smConfig, payload.id);
+    if (!entityResult.success) {
+      return actionResultError(entityResult.error.errorType, entityResult.error.errorText);
     }
-    entity = getResult.result;
+    const entity = entityResult.result;
 
-    if (!entity) {
-      return actionResultError(ErrorTypeEnum.NotFound, `Entity not found: ${payload.id}`);
-    }
-
-    // Pre-evaluate guards via QPQ stories
-    const guardResults: Record<string, boolean> = {};
+    // xstate guards are synchronous, so guard stories cannot run inside the
+    // machine. Pre-evaluate every configured guard against the current entity
+    // and event, and hand xstate constant implementations of the outcomes.
+    const guardImpls: Record<string, () => boolean> = {};
     for (const [guardName, guardRuntime] of Object.entries(smConfig.guards)) {
       const guardModule = await dynamicModuleLoader(guardRuntime);
       const guardResult = await resolveStory(guardModule, [entity, payload.event]);
       if (guardResult.error) {
         return actionResultError(guardResult.error.errorType, guardResult.error.errorText);
       }
-      guardResults[guardName] = guardResult.result;
+
+      const guardOutcome: boolean = guardResult.result;
+      guardImpls[guardName] = () => guardOutcome;
     }
 
-    const guardImpls: Record<string, () => boolean> = {};
-    for (const [guardName, result] of Object.entries(guardResults)) {
-      guardImpls[guardName] = () => result;
-    }
+    const { firedActions, actionImpls } = createFiredActionRecorder(Object.keys(smConfig.actions));
 
-    // Track which actions fire during the transition
-    const firedActions: string[] = [];
-    const actionImpls: Record<string, () => void> = {};
-    for (const actionName of Object.keys(smConfig.actions)) {
-      actionImpls[actionName] = () => {
-        firedActions.push(actionName);
-      };
-    }
+    // any: createMachine's setup generics cannot infer from a pre-typed MachineConfig; third-party boundary.
+    const machine = createMachine(smConfig.config as any, { actions: actionImpls, guards: guardImpls });
 
-    // XState: build machine, rehydrate, send event
-    const machine = createMachine(smConfig.config as any, {
-      actions: actionImpls,
-      guards: guardImpls,
-    });
-
-    const persistedSnapshot = entity[smConfig.stateField];
-    const actor = createActor(machine, {
-      snapshot: persistedSnapshot || undefined,
-    });
-
-    const previousState = actor.getSnapshot().value;
-
+    // The snapshot round-trips through the key value store untyped. Entities
+    // written before the machine was configured may have none; the machine
+    // then starts from its initial state.
+    const persistedSnapshot = entity[smConfig.stateField] as Snapshot<unknown> | undefined;
+    const actor = createActor(machine, { snapshot: persistedSnapshot || undefined });
     actor.start();
-    actor.send(payload.event);
 
-    const newSnapshot = actor.getPersistedSnapshot();
-    const currentState = actor.getSnapshot().value;
-    const isDone = actor.getSnapshot().status === 'done';
-
-    actor.stop();
-
-    if (previousState === currentState && !isDone) {
+    // can() (with the guard outcomes resolved above) is the validity test:
+    // comparing state values before and after the send would wrongly reject
+    // internal and self transitions that keep the same state value.
+    const currentSnapshot = actor.getSnapshot();
+    if (!currentSnapshot.can(payload.event)) {
+      actor.stop();
       return actionResultError(
         ErrorTypeEnum.BadRequest,
-        `Event '${payload.event.type}' is not valid for current state '${JSON.stringify(previousState)}'`,
+        `Event '${payload.event.type}' is not valid for current state '${JSON.stringify(currentSnapshot.value)}'`,
       );
     }
 
-    // Persist new snapshot
+    actor.send(payload.event);
+    const newSnapshot = actor.getPersistedSnapshot();
+    actor.stop();
+
     entity[smConfig.stateField] = newSnapshot;
-    const upsertResult = await resolveStory(function* () {
+    const upsertResult = await resolveStory(function* askPersistEntity() {
       yield* askKeyValueStoreUpsert(smConfig.keyValueStoreName, entity);
     }, []);
     if (upsertResult.error) {
       return actionResultError(upsertResult.error.errorType, upsertResult.error.errorText);
     }
 
-    // Execute side-effect stories for fired actions
-    for (const actionName of firedActions) {
-      const runtime = smConfig.actions[actionName];
-      if (runtime) {
-        const storyModule = await dynamicModuleLoader(runtime);
-        const storyResult = await resolveStory(storyModule, [entity, payload.event]);
-        if (storyResult.error) {
-          return actionResultError(storyResult.error.errorType, storyResult.error.errorText);
-        }
-      }
+    const sideEffectError = await runFiredActionStories(resolveStory, dynamicModuleLoader, smConfig, firedActions, [entity, payload.event]);
+    if (sideEffectError) {
+      return actionResultError(sideEffectError.errorType, sideEffectError.errorText);
     }
 
     return actionResult(entity);

@@ -2,11 +2,11 @@ import { Action, ActionProcessor, ActionRequester } from 'quidproquo-core';
 
 import { StateMachineActionType } from './StateMachineActionType';
 
-export interface StateMachineCreateActionPayload<T> {
+export type StateMachineCreateActionPayload<T> = {
   stateMachineName: string;
   id: string;
   item: T;
-}
+};
 
 export interface StateMachineCreateAction<T> extends Action<StateMachineCreateActionPayload<T>> {
   type: StateMachineActionType.Create;

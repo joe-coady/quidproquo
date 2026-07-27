@@ -4007,40 +4007,40 @@ If your change touched files in more than one package (e.g. you moved a shared h
 [ ] quidproquo-webserver/src/utils/websocketEventUtils.test.ts
 [ ] quidproquo-webserver/src/utils/websocketEventUtils.ts
 [ ] quidproquo-webserver/vitest.config.ts
-[ ] quidproquo-xstate/eslint.config.mjs
-[ ] quidproquo-xstate/src/actionProcessor/getStateMachineCreateActionProcessor.test.ts
-[ ] quidproquo-xstate/src/actionProcessor/getStateMachineCreateActionProcessor.ts
-[ ] quidproquo-xstate/src/actionProcessor/getStateMachineGetActionProcessor.test.ts
-[ ] quidproquo-xstate/src/actionProcessor/getStateMachineGetActionProcessor.ts
-[ ] quidproquo-xstate/src/actionProcessor/getStateMachineGetStateActionProcessor.test.ts
-[ ] quidproquo-xstate/src/actionProcessor/getStateMachineGetStateActionProcessor.ts
-[ ] quidproquo-xstate/src/actionProcessor/getStateMachineSendEventActionProcessor.test.ts
-[ ] quidproquo-xstate/src/actionProcessor/getStateMachineSendEventActionProcessor.ts
-[ ] quidproquo-xstate/src/actionProcessor/index.test.ts
-[ ] quidproquo-xstate/src/actionProcessor/index.ts
-[ ] quidproquo-xstate/src/actions/StateMachineActionType.ts
-[ ] quidproquo-xstate/src/actions/StateMachineCreateActionRequester.test.ts
-[ ] quidproquo-xstate/src/actions/StateMachineCreateActionRequester.ts
-[ ] quidproquo-xstate/src/actions/StateMachineCreateActionTypes.ts
-[ ] quidproquo-xstate/src/actions/StateMachineGetActionRequester.test.ts
-[ ] quidproquo-xstate/src/actions/StateMachineGetActionRequester.ts
-[ ] quidproquo-xstate/src/actions/StateMachineGetActionTypes.ts
-[ ] quidproquo-xstate/src/actions/StateMachineGetStateActionRequester.test.ts
-[ ] quidproquo-xstate/src/actions/StateMachineGetStateActionRequester.ts
-[ ] quidproquo-xstate/src/actions/StateMachineGetStateActionTypes.ts
-[ ] quidproquo-xstate/src/actions/StateMachineSendEventActionRequester.test.ts
-[ ] quidproquo-xstate/src/actions/StateMachineSendEventActionRequester.ts
-[ ] quidproquo-xstate/src/actions/StateMachineSendEventActionTypes.ts
-[ ] quidproquo-xstate/src/actions/index.ts
-[ ] quidproquo-xstate/src/config/QPQConfig.ts
-[ ] quidproquo-xstate/src/config/index.ts
-[ ] quidproquo-xstate/src/config/qpqXStateConfigUtils.test.ts
-[ ] quidproquo-xstate/src/config/qpqXStateConfigUtils.ts
-[ ] quidproquo-xstate/src/config/settings/index.ts
-[ ] quidproquo-xstate/src/config/settings/stateMachine.test.ts
-[ ] quidproquo-xstate/src/config/settings/stateMachine.ts
-[ ] quidproquo-xstate/src/index.ts
-[ ] quidproquo-xstate/vitest.config.ts
+[x] quidproquo-xstate/eslint.config.mjs
+[x] quidproquo-xstate/src/actionProcessor/getStateMachineCreateActionProcessor.test.ts
+[x] quidproquo-xstate/src/actionProcessor/getStateMachineCreateActionProcessor.ts
+[x] quidproquo-xstate/src/actionProcessor/getStateMachineGetActionProcessor.test.ts
+[x] quidproquo-xstate/src/actionProcessor/getStateMachineGetActionProcessor.ts
+[x] quidproquo-xstate/src/actionProcessor/getStateMachineGetStateActionProcessor.test.ts
+[x] quidproquo-xstate/src/actionProcessor/getStateMachineGetStateActionProcessor.ts
+[x] quidproquo-xstate/src/actionProcessor/getStateMachineSendEventActionProcessor.test.ts
+[x] quidproquo-xstate/src/actionProcessor/getStateMachineSendEventActionProcessor.ts - note: 2 real bugs fixed test-first (valid self-transition rejected as BadRequest; events to final-state machines silently succeeded); unlocked read-modify-write concurrency finding recorded (medium)
+[x] quidproquo-xstate/src/actionProcessor/index.test.ts
+[x] quidproquo-xstate/src/actionProcessor/index.ts
+[x] quidproquo-xstate/src/actions/StateMachineActionType.ts - note: values keep historical @quidproquo-core wire prefix deliberately (stored story logs); documented in code
+[x] quidproquo-xstate/src/actions/StateMachineCreateActionRequester.test.ts
+[x] quidproquo-xstate/src/actions/StateMachineCreateActionRequester.ts
+[x] quidproquo-xstate/src/actions/StateMachineCreateActionTypes.ts
+[x] quidproquo-xstate/src/actions/StateMachineGetActionRequester.test.ts
+[x] quidproquo-xstate/src/actions/StateMachineGetActionRequester.ts
+[x] quidproquo-xstate/src/actions/StateMachineGetActionTypes.ts
+[x] quidproquo-xstate/src/actions/StateMachineGetStateActionRequester.test.ts
+[x] quidproquo-xstate/src/actions/StateMachineGetStateActionRequester.ts
+[x] quidproquo-xstate/src/actions/StateMachineGetStateActionTypes.ts
+[x] quidproquo-xstate/src/actions/StateMachineSendEventActionRequester.test.ts
+[x] quidproquo-xstate/src/actions/StateMachineSendEventActionRequester.ts
+[x] quidproquo-xstate/src/actions/StateMachineSendEventActionTypes.ts
+[x] quidproquo-xstate/src/actions/index.ts
+[x] quidproquo-xstate/src/config/QPQConfig.ts
+[x] quidproquo-xstate/src/config/index.ts
+[x] quidproquo-xstate/src/config/qpqXStateConfigUtils.test.ts
+[x] quidproquo-xstate/src/config/qpqXStateConfigUtils.ts - note: split into getAllStateMachines.ts + getStateMachineByName.ts; getStateMachineByName now returns Nullable (null not undefined), changelog-worthy
+[x] quidproquo-xstate/src/config/settings/index.ts
+[x] quidproquo-xstate/src/config/settings/stateMachine.test.ts
+[x] quidproquo-xstate/src/config/settings/stateMachine.ts
+[x] quidproquo-xstate/src/index.ts
+[x] quidproquo-xstate/vitest.config.ts
 [x] quidproquo/eslint.config.mjs
 [x] quidproquo/src/index.test.ts
 [x] quidproquo/src/index.ts
