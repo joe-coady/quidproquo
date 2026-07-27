@@ -140,7 +140,7 @@ export default {
       return fixer.replaceText(effectiveNode, `(yield* ${sourceCode.getText(effectiveNode)})`);
     };
 
-    // Shared for plain calls (askDateNow()) and tagged templates (askLog`...`) —
+    // Shared for plain calls (askDateNow()) and tagged templates (askLog`...`);
     // both produce a generator that must be delegated with yield*.
     const checkAskExpression = (node, name) => {
       const enclosingFunction = getEnclosingFunction(node);

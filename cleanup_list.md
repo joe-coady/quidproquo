@@ -1950,15 +1950,15 @@ If your change touched files in more than one package (e.g. you moved a shared h
 [ ] quidproquo-dev-server/src/types/TinkerInterface.ts
 [ ] quidproquo-dev-server/src/types/index.ts
 [ ] quidproquo-dev-server/vitest.config.ts
-[ ] quidproquo-eslint-config/config/overrides.mjs
-[ ] quidproquo-eslint-config/config/prettier.mjs
-[ ] quidproquo-eslint-config/config/react.mjs
-[ ] quidproquo-eslint-config/eslint.config.mjs
-[ ] quidproquo-eslint-config/plugin/index.mjs
-[ ] quidproquo-eslint-config/plugin/rules/ask-prefix-generator-only.mjs
-[ ] quidproquo-eslint-config/plugin/rules/ask-prefix-generator-only.test.mjs
-[ ] quidproquo-eslint-config/plugin/rules/require-yield-star.mjs
-[ ] quidproquo-eslint-config/plugin/rules/require-yield-star.test.mjs
+[x] quidproquo-eslint-config/config/overrides.mjs
+[x] quidproquo-eslint-config/config/prettier.mjs
+[x] quidproquo-eslint-config/config/react.mjs
+[x] quidproquo-eslint-config/eslint.config.mjs
+[x] quidproquo-eslint-config/plugin/index.mjs
+[x] quidproquo-eslint-config/plugin/rules/ask-prefix-generator-only.mjs
+[x] quidproquo-eslint-config/plugin/rules/ask-prefix-generator-only.test.mjs
+[x] quidproquo-eslint-config/plugin/rules/require-yield-star.mjs
+[x] quidproquo-eslint-config/plugin/rules/require-yield-star.test.mjs
 [ ] quidproquo-features/eslint.config.mjs
 [ ] quidproquo-features/src/admin/actionSearch/config/defineAdminServiceActionSearchRoute.ts
 [ ] quidproquo-features/src/admin/actionSearch/config/index.ts
@@ -3086,17 +3086,17 @@ If your change touched files in more than one package (e.g. you moved a shared h
 [ ] quidproquo-neo4j/src/index.test.ts
 [ ] quidproquo-neo4j/src/index.ts
 [ ] quidproquo-neo4j/vitest.config.ts
-[ ] quidproquo-testing/eslint.config.mjs
-[ ] quidproquo-testing/src/generatorExpect.test.ts
-[ ] quidproquo-testing/src/generatorExpect.ts
-[ ] quidproquo-testing/src/index.test.ts
-[ ] quidproquo-testing/src/index.ts
-[ ] quidproquo-testing/src/types.ts
-[ ] quidproquo-testing/src/vitest.test.ts
-[ ] quidproquo-testing/src/vitest.ts
-[ ] quidproquo-testing/src/vitestMatchers.test.ts
-[ ] quidproquo-testing/src/vitestMatchers.ts
-[ ] quidproquo-testing/vitest.config.ts
+[x] quidproquo-testing/eslint.config.mjs
+[x] quidproquo-testing/src/generatorExpect.test.ts
+[x] quidproquo-testing/src/generatorExpect.ts - note: deleted unreachable mockGeneratorReturn/mockGeneratorYieldReturn (not on package surface, zero call sites); alias methods kept as published API
+[x] quidproquo-testing/src/index.test.ts
+[x] quidproquo-testing/src/index.ts
+[x] quidproquo-testing/src/types.ts
+[x] quidproquo-testing/src/vitest.test.ts
+[x] quidproquo-testing/src/vitest.ts
+[x] quidproquo-testing/src/vitestMatchers.test.ts
+[x] quidproquo-testing/src/vitestMatchers.ts - note: bug fixed: toYieldSequence dropped a step given before a following yields step; file must stay a script (no top-level imports) so declare module vitest stays a declaration
+[x] quidproquo-testing/vitest.config.ts
 [ ] quidproquo-web-admin/eslint.config.mjs
 [ ] quidproquo-web-admin/src/ActionSearch/ActionSearch.tsx
 [ ] quidproquo-web-admin/src/ActionSearch/components/ActionSearchFilterForm.tsx
@@ -4041,15 +4041,15 @@ If your change touched files in more than one package (e.g. you moved a shared h
 [ ] quidproquo-xstate/src/config/settings/stateMachine.ts
 [ ] quidproquo-xstate/src/index.ts
 [ ] quidproquo-xstate/vitest.config.ts
-[ ] quidproquo/eslint.config.mjs
-[ ] quidproquo/src/index.test.ts
-[ ] quidproquo/src/index.ts
-[ ] quidproquo/vitest.config.ts
-[ ] scripts/applyPatch.ts
-[ ] scripts/progressBar.ts
-[ ] scripts/runWorkspaces.ts
-[ ] spikes/trace-replay/controller.js
-[ ] spikes/trace-replay/runner.js
-[ ] spikes/trace-replay/story.js
-[ ] vitest-env.d.ts
-[ ] vitest.config.ts
+[x] quidproquo/eslint.config.mjs
+[x] quidproquo/src/index.test.ts
+[x] quidproquo/src/index.ts
+[x] quidproquo/vitest.config.ts
+[x] scripts/applyPatch.ts
+[x] scripts/progressBar.ts - note: multiple exports kept, one cohesive renderer concept consumed only by runWorkspaces
+[x] scripts/runWorkspaces.ts
+[x] spikes/trace-replay/controller.js - note: spike prototype, light pass (comments only)
+[x] spikes/trace-replay/runner.js - note: spike prototype, light pass (comments only)
+[x] spikes/trace-replay/story.js - note: spike prototype, light pass (comments only)
+[x] vitest-env.d.ts - note: deliberate editor-only shim, added explanatory header, any is intentional
+[x] vitest.config.ts

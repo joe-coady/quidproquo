@@ -53,9 +53,23 @@ describe('toCompleteWith', () => {
   });
 });
 
+function* echoInput(): Generator<any, string, any> {
+  const first = yield { type: 'FIRST' };
+  const second = yield { type: 'SECOND', payload: first };
+  return second;
+}
+
 describe('toYieldSequence', () => {
   it('passes for a matching yield and return sequence', () => {
     expect(twoYields()).toYieldSequence([{ yields: { type: 'A' } }, { yields: { type: 'B' }, given: 'final' }, { returns: 'final' }]);
+  });
+
+  it('feeds a step given into the following yield, not just a following return', () => {
+    expect(echoInput()).toYieldSequence([
+      { yields: { type: 'FIRST' }, given: 'fed' },
+      { yields: { type: 'SECOND', payload: 'fed' }, given: 'done' },
+      { returns: 'done' },
+    ]);
   });
 
   it('negates a non-matching sequence', () => {

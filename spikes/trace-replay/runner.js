@@ -1,7 +1,7 @@
-// The "framework" side — mimics qpqExecuteLog/resolveStory: drives the story
+// The "framework" side: mimics qpqExecuteLog/resolveStory: drives the story
 // generator, answering every yielded action from recorded history, with an async
 // boundary between every action (like processAction). This file must NOT appear
-// in the trace — only story.js should.
+// in the trace; only story.js should.
 //
 // Usage:
 //   node runner.js step                 free stepInto + blackboxing
@@ -9,7 +9,7 @@
 //   node runner.js step --macrotask     harder async boundary (setImmediate)
 //
 // Prints: baseline vs traced timing, steps/sec, and story.js source annotated
-// with the values each line produced — the target UX of the real feature.
+// with the values each line produced (the target UX of the real feature).
 
 const fs = require('node:fs');
 const path = require('node:path');
@@ -58,7 +58,7 @@ const replay = async (story, args, processor) => {
   return { result: progress.value, actions };
 };
 
-// The tracer's start signal — mirrors the `debugger;` statement in qpqExecuteLog.
+// The tracer's start signal; mirrors the `debugger;` statement in qpqExecuteLog.
 // In step mode the controller arms blackboxing on this pause.
 const traceStart = () => {
   // eslint-disable-next-line no-debugger
@@ -160,7 +160,7 @@ const main = async () => {
   const stray = Object.entries(stats.strayPauses || {});
   if (stray.length) console.log(`stray pauses:          ${stray.map(([url, n]) => `${url}×${n}`).join(', ')}`);
   if (stats.bailed) console.log('⚠ controller hit MAX_COMMANDS and bailed');
-  if (stats.storySteps === 0) console.log('⚠ NO story steps captured — stepping chain lost');
+  if (stats.storySteps === 0) console.log('⚠ NO story steps captured, stepping chain lost');
   console.log(`trace written:         ${tracePath}`);
 
   process.exit(0);

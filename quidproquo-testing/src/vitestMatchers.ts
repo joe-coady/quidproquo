@@ -1,8 +1,15 @@
-// Extend Vitest's expect with custom matchers for generators
+// NO top-level imports here: they would make this file a module, turning the
+// `declare module 'vitest'` below into an augmentation that node10 module
+// resolution cannot resolve. The import() type syntax keeps it a script.
+type GeneratorTestSequence = import('./types').GeneratorTestSequence;
+
+// Extend Vitest's expect with custom matchers for generators.
+// An interface (not a type) because it participates in declaration merging
+// with vitest's Assertion/AsymmetricMatchersContaining below.
 interface CustomMatchers<R = unknown> {
   toYieldValue(expected: any): R;
   toCompleteWith(expected: any): R;
-  toYieldSequence(sequence: Array<{ yields?: any; given?: any; returns?: any }>): R;
+  toYieldSequence(sequence: GeneratorTestSequence): R;
 }
 
 declare module 'vitest' {
@@ -62,13 +69,17 @@ if (typeof globalThis !== 'undefined' && (globalThis as any).expect) {
       };
     },
 
-    toYieldSequence(received: Generator, sequence: any[]) {
+    toYieldSequence(received: Generator, sequence: GeneratorTestSequence) {
       const results: any[] = [];
       let currentStep = 0;
+      // A step's `given` is the input for the generator's NEXT resumption,
+      // whether that resumption is a `yields` or a `returns` step.
+      let pendingInput: any = undefined;
 
       for (const step of sequence) {
         if (step.yields !== undefined) {
-          const { value, done } = received.next();
+          const { value, done } = received.next(pendingInput);
+          pendingInput = undefined;
           results.push({ step: currentStep, yielded: value, done });
 
           if (done) {
@@ -93,12 +104,12 @@ if (typeof globalThis !== 'undefined' && (globalThis as any).expect) {
         }
 
         if (step.given !== undefined) {
-          // Input will be used in next iteration
+          pendingInput = step.given;
         }
 
         if (step.returns !== undefined) {
-          const input = sequence[currentStep - 1]?.given;
-          const { value, done } = received.next(input);
+          const { value, done } = received.next(pendingInput);
+          pendingInput = undefined;
           results.push({ step: currentStep, returned: value, done });
 
           if (!done) {

@@ -32,7 +32,7 @@ export default [
             ['^quidproquo'],
             [
               '^\\u0000[^.]',
-              // Packages. `react`\`react-dom` packages come first.
+              // Packages. `react`/`react-dom` packages come first.
               '^react(-dom)?$',
               '^prop-types',
               // Internal packages come last.

@@ -19,7 +19,7 @@ export const reactConfigs = [
   {
     files: ['**/*.{jsx,tsx}'],
     rules: {
-      // New JSX transform — no React import needed
+      // New JSX transform, no React import needed
       'react/react-in-jsx-scope': 'off',
 
       // TypeScript owns prop shapes
@@ -41,7 +41,7 @@ export const reactConfigs = [
     },
   },
   {
-    // Hooks live in .ts files too (custom hooks) — apply everywhere
+    // Hooks live in .ts files too (custom hooks), so apply everywhere
     plugins: {
       'react-hooks': reactHooks,
     },

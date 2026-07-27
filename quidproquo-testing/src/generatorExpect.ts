@@ -1,19 +1,20 @@
-interface GeneratorStep {
+type GeneratorStep = {
   type: 'yield' | 'return';
   value: any;
   input?: any;
-}
+};
 
 export class GeneratorExpectChain<T = any> {
   private steps: GeneratorStep[] = [];
   private lastInput: any;
+  // `any` because this is the host test framework's expect function; typing it
+  // would couple this framework-agnostic chain to vitest's types.
   private expect: any;
 
   constructor(
     private generator: Generator<any, any, any>,
     expect?: any,
   ) {
-    // Use global expect if available, otherwise use provided expect
     this.expect = expect || (globalThis as any).expect;
     if (!this.expect) {
       throw new Error('expect function not found. Please ensure Vitest or another test framework is available.');
@@ -28,16 +29,17 @@ export class GeneratorExpectChain<T = any> {
     return this;
   }
 
+  // Alias of toYield kept for published-API compatibility.
   toYieldAction(expected: any): this {
     return this.toYield(expected);
   }
 
-  // Multiple name options for clarity in different contexts
   whenGiven(input: any): this {
     this.lastInput = input;
     return this;
   }
 
+  // Aliases of whenGiven kept for published-API compatibility.
   andReceive(input: any): this {
     return this.whenGiven(input);
   }
@@ -79,27 +81,7 @@ export class GeneratorExpectChain<T = any> {
   }
 }
 
+/** Drive a generator step by step, asserting each yielded action and the final return. */
 export function expectGenerator<T>(gen: Generator<any, T, any>, expect?: any): GeneratorExpectChain<T> {
   return new GeneratorExpectChain(gen, expect);
-}
-
-/**
- * Helper to create a generator that returns immediately without yielding
- * Useful for mocking sub-generators in tests
- */
-export function mockGeneratorReturn<T>(value: T): Generator<any, T, any> {
-  return (function* () {
-    return value;
-  })();
-}
-
-/**
- * Helper to create a generator that yields once then returns
- * Useful for mocking sub-generators that need to yield an action
- */
-export function mockGeneratorYieldReturn<Y, R>(yieldValue: Y, returnValue: R): Generator<Y, R, any> {
-  return (function* () {
-    yield yieldValue;
-    return returnValue;
-  })();
 }

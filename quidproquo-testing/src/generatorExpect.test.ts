@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { expectGenerator, GeneratorExpectChain, mockGeneratorReturn, mockGeneratorYieldReturn } from './generatorExpect';
+import { expectGenerator, GeneratorExpectChain } from './generatorExpect';
 
 function* simpleGenerator(): Generator<any, string, string> {
   const first = yield { type: 'ACTION_1', payload: 'test' };
@@ -96,19 +96,5 @@ describe('expectGenerator', () => {
 
       expect(snapshots).toEqual([{ value: undefined, name: 'my-snapshot' }]);
     });
-  });
-});
-
-describe('mockGeneratorReturn', () => {
-  it('returns immediately without yielding', () => {
-    expect(mockGeneratorReturn(42).next()).toEqual({ done: true, value: 42 });
-  });
-});
-
-describe('mockGeneratorYieldReturn', () => {
-  it('yields once then returns', () => {
-    const gen = mockGeneratorYieldReturn('yielded', 'returned');
-    expect(gen.next()).toEqual({ done: false, value: 'yielded' });
-    expect(gen.next()).toEqual({ done: true, value: 'returned' });
   });
 });

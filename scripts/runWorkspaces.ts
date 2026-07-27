@@ -1,12 +1,11 @@
-import { spawn } from 'child_process';
-import { execSync } from 'child_process';
+import { execSync, spawn } from 'child_process';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 
 import { ActiveStep, clearDown, cursorToBlockStart, formatElapsed, ProgressState, renderBlock } from './progressBar';
 
-interface PackageJson {
+type PackageJson = {
   name: string;
   version?: string;
   workspaces?: string[];
@@ -14,18 +13,18 @@ interface PackageJson {
   dependencies?: Record<string, string>;
   devDependencies?: Record<string, string>;
   peerDependencies?: Record<string, string>;
-}
+};
 
 // One workspace's work for this run. Stages run in order, the scripts inside a stage
 // run concurrently, and the first stage doesn't start until every workspace listed in
 // `deps` has finished all of its stages.
-interface PkgTask {
+type PkgTask = {
   dir: string; // workspace directory, passed to `npm -w`
   name: string; // package name, for display
   version: string;
   stages: string[][];
   deps: string[]; // workspace dirs (within this run) that must build first
-}
+};
 
 const repoRoot = path.join(__dirname, '..');
 

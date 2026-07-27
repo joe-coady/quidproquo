@@ -1,16 +1,16 @@
-// The debug controller — runs on a WORKER THREAD and debugs the MAIN thread via
+// The debug controller: runs on a WORKER THREAD and debugs the MAIN thread via
 // the in-process V8 inspector (no port, no attach). This is the mechanism the
 // real tracer would use inside a lambda.
 //
 // Two strategies (workerData.mode):
-//   'step'        — blackbox every script except story.js, then Debugger.stepInto
+//   'step'        : blackbox every script except story.js, then Debugger.stepInto
 //                   repeatedly. Tests whether stepping survives the async boundary
 //                   in the replay loop (yield -> await processor() -> reader.next()).
-//   'breakpoints' — Debugger.getPossibleBreakpoints over story.js, set a breakpoint
+//   'breakpoints' : Debugger.getPossibleBreakpoints over story.js, set a breakpoint
 //                   on every statement, and plain resume between hits. Immune to
 //                   async-boundary step loss; the fallback strategy in the plan.
 //
-// On every pause in story.js it records {line, column, fn, locals} — locals come
+// On every pause in story.js it records {line, column, fn, locals}; locals come
 // from Runtime.getProperties on the frame's local/block scopes.
 
 const inspector = require('node:inspector');
@@ -34,7 +34,7 @@ session.on('Debugger.scriptParsed', (message) => {
   scriptsById.set(message.params.scriptId, message.params.url);
 });
 
-// Node 20 reports callFrames[0].url as '' — the script URL must be resolved via
+// Node 20 reports callFrames[0].url as '', so the script URL must be resolved via
 // location.scriptId against the scriptParsed map.
 const frameUrl = (frame) => frame.url || scriptsById.get(frame.location.scriptId) || '';
 
@@ -114,7 +114,7 @@ const onPaused = async (message) => {
   }
 
   if (MODE === 'step') {
-    // Arm blackboxing on the FIRST pause (the `debugger;` statement in the runner) —
+    // Arm blackboxing on the FIRST pause (the `debugger;` statement in the runner);
     // mirrors the real tracer arming on qpqExecuteLog's debugger statement. A debugger
     // statement inside an already-blackboxed script would never fire, so arm-after-pause
     // is the required ordering.

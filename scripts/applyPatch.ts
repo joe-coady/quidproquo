@@ -3,18 +3,13 @@ import * as path from 'path';
 
 type Dependencies = Record<string, string>;
 
-interface PackageJson {
+type PackageJson = {
   name: string;
   version: string;
   workspaces?: string[];
   dependencies?: Dependencies;
   devDependencies?: Dependencies;
-}
-
-interface PackageJsonVersionInfo {
-  name: string;
-  version: string;
-}
+};
 
 const readPackageJson = (dir: string): PackageJson => {
   const packageJsonPath = path.join(__dirname, dir, 'package.json');
@@ -28,13 +23,6 @@ const writePackageJson = (dir: string, packageJson: PackageJson): void => {
   const json = JSON.stringify(packageJson, null, 2);
 
   fs.writeFileSync(packageJsonPath, json, 'utf8');
-};
-
-const getPackageVersionInfo = (packageJson: PackageJson): PackageJsonVersionInfo => {
-  return {
-    name: packageJson.name,
-    version: packageJson.version,
-  };
 };
 
 const linkDependencies = (
@@ -69,9 +57,8 @@ const main = () => {
 
   const versionInfo = workspaces.reduce((acc, workspace) => {
     const workspacePackageJson = readPackageJson(`../${workspace}`);
-    const workspaceVersionInfo = getPackageVersionInfo(workspacePackageJson);
 
-    return { ...acc, [workspaceVersionInfo.name]: workspaceVersionInfo.version };
+    return { ...acc, [workspacePackageJson.name]: workspacePackageJson.version };
   }, {});
 
   for (const workspace of workspaces) {

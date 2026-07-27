@@ -4,19 +4,19 @@
 const SPINNER = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
 const BAR_WIDTH = 28;
 
-export interface ActiveStep {
+export type ActiveStep = {
   label: string; // e.g. "quidproquo-features@0.1.7 › build:esm"
   startMs: number;
-}
+};
 
-export interface ProgressState {
+export type ProgressState = {
   total: number;
   done: number;
   active: ActiveStep[];
   startMs: number;
-}
+};
 
-const formatElapsed = (ms: number): string => `${(ms / 1000).toFixed(1)}s`;
+export const formatElapsed = (ms: number): string => `${(ms / 1000).toFixed(1)}s`;
 
 const renderBar = (ratio: number): string => {
   const filled = Math.min(BAR_WIDTH, Math.round(BAR_WIDTH * ratio));
@@ -61,5 +61,3 @@ export const renderBlock = (state: ProgressState, frame: number, now: number, co
 export const cursorToBlockStart = (lines: number): string => (lines > 0 ? `\x1b[${lines}F` : '');
 
 export const clearDown = (): string => '\x1b[J';
-
-export { formatElapsed };

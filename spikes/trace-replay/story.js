@@ -1,4 +1,4 @@
-// The "user code" — the file the tracer must step through and capture.
+// The "user code": the file the tracer must step through and capture.
 // Mirrors a qpq story: a generator that yields actions, delegates with yield*,
 // calls a plain helper, branches, and loops. Everything OUTSIDE this file is
 // framework code and must not appear in the trace.
