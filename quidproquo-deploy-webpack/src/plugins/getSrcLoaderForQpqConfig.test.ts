@@ -3,10 +3,9 @@
 // emits a fail-fast throw with NO require() (so webpack bundles no user code).
 import { buildTestQpqConfig, defineFederatedModuleStore, defineInlineFunction } from 'quidproquo-core';
 
-import path from 'path';
 import { describe, expect, it } from 'vitest';
 
-import { getFullSrcPathFromQpqFunctionRuntime, getSrcLoaderForQpqConfig } from './getSrcLoaderForQpqConfig';
+import { getSrcLoaderForQpqConfig } from './getSrcLoaderForQpqConfig';
 
 describe('getSrcLoaderForQpqConfig bundleFallback', () => {
   it('emits a fail-fast throw and NO require() when bundleFallback is disabled (thin shell)', () => {
@@ -44,20 +43,6 @@ describe('getSrcLoaderForQpqConfig bundleFallback', () => {
     expect(src).toContain('src/handlers/doThing');
     expect(src).toContain("module['handler']");
     expect(src).not.toContain('bundleFallback is disabled');
-  });
-});
-
-describe('getFullSrcPathFromQpqFunctionRuntime', () => {
-  it('joins the basePath and relativePath for an advanced runtime', () => {
-    const runtime = { basePath: '/abs/base', relativePath: 'src/handler.ts', functionName: 'handler' };
-
-    expect(getFullSrcPathFromQpqFunctionRuntime(runtime, buildTestQpqConfig())).toBe(path.join('/abs/base', 'src/handler.ts'));
-  });
-
-  it('joins the config root with the src path for a string runtime', () => {
-    const config = buildTestQpqConfig([], { configRoot: '/abs/root' });
-
-    expect(getFullSrcPathFromQpqFunctionRuntime('/src/handlers/doThing::handler', config)).toBe(path.join('/abs/root', 'src/handlers/doThing'));
   });
 });
 

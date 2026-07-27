@@ -11,34 +11,22 @@
 // ModuleFederationPlugin (exposes auto-derived from every QpqFunctionRuntime,
 // quidproquo-core/webserver shared), and chunked output. On top we add the same
 // swc-loader getServiceRspackConfig uses. We deliberately do NOT copy its
-// splitChunks:false / eager-import settings — federation NEEDS async chunks.
+// splitChunks:false / eager-import settings: federation NEEDS async chunks.
 import { QPQConfig } from 'quidproquo-core';
 
 import path from 'path';
 import { Configuration } from '@rspack/core';
 
 import { getRspackConfigForQpqRemote } from '../federation';
-import { serviceTsRules } from './serviceRspackShared';
-
-// Derive the remote output location from the service directory
-// (apps/<app>/services/<svc>/service). Output goes to a `service-remote` sibling
-// of the static `service` build so the two never clobber each other.
-const resolvePaths = (serviceDir: string) => {
-  const parts = serviceDir.split(path.sep);
-  const appsIdx = parts.lastIndexOf('apps');
-  if (appsIdx < 0 || parts[appsIdx + 2] !== 'services' || parts[appsIdx + 4] !== 'service') {
-    throw new Error(`Expected apps/<app>/services/<svc>/service, got ${serviceDir}`);
-  }
-  const root = parts.slice(0, appsIdx).join(path.sep);
-  const appName = parts[appsIdx + 1];
-  const serviceName = parts[appsIdx + 3];
-  return {
-    remoteBuildPath: path.join(root, 'dist', 'apps', appName, 'services', serviceName, 'service-remote'),
-  };
-};
+import { parseServiceDir } from './parseServiceDir';
+import { serviceTsRules } from './serviceTsRules';
 
 export const getServiceRemoteRspackConfig = (qpqConfig: QPQConfig, serviceDir: string): Configuration => {
-  const { remoteBuildPath } = resolvePaths(serviceDir);
+  const { root, appName, serviceName } = parseServiceDir(serviceDir, 'service');
+
+  // Output goes to a `service-remote` sibling of the static `service` build so
+  // the two never clobber each other.
+  const remoteBuildPath = path.join(root, 'dist', 'apps', appName, 'services', serviceName, 'service-remote');
 
   const qpqRemote = getRspackConfigForQpqRemote(qpqConfig, remoteBuildPath);
 

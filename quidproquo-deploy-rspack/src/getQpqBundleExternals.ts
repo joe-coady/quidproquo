@@ -3,9 +3,9 @@ import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
 import { ExternalItem } from '@rspack/core';
 
-// Externalize every package the runtime environment provides — lambda layer
-// modules (`ApiLayer.modules`) plus the `defineBackendBundleOptions` externals
-// escape hatch — including subpath imports like `pkg/bin/foo`.
+// Externalize every package the runtime environment provides (lambda layer
+// modules from `ApiLayer.modules` plus the `defineBackendBundleOptions`
+// externals escape hatch), including subpath imports like `pkg/bin/foo`.
 export const getQpqBundleExternals = (qpqConfig: QPQConfig): ExternalItem[] => {
   const externalModules = [...getLayerProvidedModules(qpqConfig), ...qpqCoreUtils.getBackendBundleOptions(qpqConfig).externals];
 

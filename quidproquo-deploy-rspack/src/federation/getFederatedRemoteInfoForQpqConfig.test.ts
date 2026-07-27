@@ -7,13 +7,7 @@ import { buildTestQpqConfig, defineInlineFunction } from 'quidproquo-core';
 import path from 'path';
 import { describe, expect, it } from 'vitest';
 
-import { getFederatedContainerName, getFederatedRemoteInfoForQpqConfig } from './getFederatedRemoteInfoForQpqConfig';
-
-describe('getFederatedContainerName', () => {
-  it('sanitizes the service name into a valid js identifier', () => {
-    expect(getFederatedContainerName('my-cool-service')).toBe('qpq_my_cool_service');
-  });
-});
+import { getFederatedRemoteInfoForQpqConfig } from './getFederatedRemoteInfoForQpqConfig';
 
 describe('getFederatedRemoteInfoForQpqConfig', () => {
   it('exposes a string runtime under its config-root-relative path', () => {

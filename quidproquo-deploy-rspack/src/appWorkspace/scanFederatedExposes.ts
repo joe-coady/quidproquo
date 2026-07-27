@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-// The `// federated.export` marker system — single source of truth for module
+// The `// federated.export` marker system: single source of truth for module
 // federation exposes:
 //  - any .ts/.tsx/.js/.jsx file whose content CONTAINS the substring `// federated.export`
 //    is exposed as `./<basename-without-ext>` -> `./src/<relative-path>`

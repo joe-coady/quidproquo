@@ -18,6 +18,7 @@ assembled quickly.
 - `viewerRequestEventHandler` is removed from `quidproquo-actionprocessor-awslambda`. Call `getCloudFrontRequestEvent_viewerRequest()` to get the handler instead.
 - The `QpqWarmLambdaEvent` type (`{ qpqWarm: boolean }`) is removed from `quidproquo-actionprocessor-awslambda`; warm invokes arrive as SNS warmer records (use `isSnsWarmerRecord` to detect them). `QpqFunctionExecutionEvent<T>` is unchanged.
 - `findMatchingCertificates` and `getDomainValidationOptions` (deep imports from `quidproquo-actionprocessor-awslambda`'s `logic/acm`) are removed with no replacement.
+- `getDefaultAppName` in `quidproquo-deploy-rspack` now returns `Nullable<string>`: `null` instead of `undefined` when no app is found. Update any `=== undefined` checks to `null` (truthiness checks are unaffected).
 
 ## 0.1.11
 

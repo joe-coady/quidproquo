@@ -2,9 +2,9 @@ import { ApplicationConfigInfo, QPQConfig, qpqCoreUtils } from 'quidproquo-core'
 
 import type { Compiler, WebpackPluginInstance } from 'webpack';
 
-interface QpqWebPluginOptions {
+type QpqWebPluginOptions = {
   qpqConfig: QPQConfig;
-}
+};
 
 export class QpqWebPlugin implements WebpackPluginInstance {
   private options: QpqWebPluginOptions;

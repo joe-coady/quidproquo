@@ -1669,68 +1669,68 @@ If your change touched files in more than one package (e.g. you moved a shared h
 [ ] quidproquo-core/src/validators/isString.test.ts
 [ ] quidproquo-core/src/validators/isString.ts
 [ ] quidproquo-core/vitest.config.ts
-[ ] quidproquo-deploy-rspack/eslint.config.mjs
-[ ] quidproquo-deploy-rspack/src/appWorkspace/federatedExports.ts
-[ ] quidproquo-deploy-rspack/src/appWorkspace/getAppServiceQpqConfigs.ts
-[ ] quidproquo-deploy-rspack/src/appWorkspace/getDevServerRspackConfig.ts
-[ ] quidproquo-deploy-rspack/src/appWorkspace/getServiceRemoteRspackConfig.ts
-[ ] quidproquo-deploy-rspack/src/appWorkspace/getServiceRspackConfig.ts
-[ ] quidproquo-deploy-rspack/src/appWorkspace/getViewsRspackConfig.ts
-[ ] quidproquo-deploy-rspack/src/appWorkspace/getWorkspaceSourceAliases.ts
-[ ] quidproquo-deploy-rspack/src/appWorkspace/index.ts
-[ ] quidproquo-deploy-rspack/src/appWorkspace/serviceRspackShared.ts
-[ ] quidproquo-deploy-rspack/src/appWorkspace/viewsWorkspace.ts
-[ ] quidproquo-deploy-rspack/src/appWorkspace/writeFederatedTsconfig.ts
-[ ] quidproquo-deploy-rspack/src/federation/getFederatedRemoteInfoForQpqConfig.test.ts
-[ ] quidproquo-deploy-rspack/src/federation/getFederatedRemoteInfoForQpqConfig.ts
-[ ] quidproquo-deploy-rspack/src/federation/getRspackConfigForQpqRemote.ts
-[ ] quidproquo-deploy-rspack/src/federation/index.ts
-[ ] quidproquo-deploy-rspack/src/federation/publishFederatedRemote.ts
-[ ] quidproquo-deploy-rspack/src/getQpqBundleExternals.ts
-[ ] quidproquo-deploy-rspack/src/getRspackBuildMode.ts
-[ ] quidproquo-deploy-rspack/src/getRspackConfigForQpq.test.ts
-[ ] quidproquo-deploy-rspack/src/getRspackConfigForQpq.ts
-[ ] quidproquo-deploy-rspack/src/index.test.ts
-[ ] quidproquo-deploy-rspack/src/index.ts
-[ ] quidproquo-deploy-rspack/src/loaders/sourceMapLoader.test.ts
-[ ] quidproquo-deploy-rspack/src/loaders/sourceMapLoader.ts
-[ ] quidproquo-deploy-rspack/src/plugins/QpqPlugin.test.ts
-[ ] quidproquo-deploy-rspack/src/plugins/QpqPlugin.ts
-[ ] quidproquo-deploy-rspack/src/plugins/QpqWebPlugin.test.ts
-[ ] quidproquo-deploy-rspack/src/plugins/QpqWebPlugin.ts
-[ ] quidproquo-deploy-rspack/src/plugins/getModuleLoaderSrcForService.js
-[ ] quidproquo-deploy-rspack/src/plugins/getModuleLoaderSrcForService.test.ts
-[ ] quidproquo-deploy-rspack/src/plugins/getQpqCircularCheckPlugin.ts
-[ ] quidproquo-deploy-rspack/src/plugins/getQpqDyanmicLoaderSrcFromQpqConfigs.js
-[ ] quidproquo-deploy-rspack/src/plugins/getQpqDyanmicLoaderSrcFromQpqConfigs.test.ts
-[ ] quidproquo-deploy-rspack/src/plugins/getSrcLoaderForQpqConfig.js
-[ ] quidproquo-deploy-rspack/src/plugins/getSrcLoaderForQpqConfig.test.ts
-[ ] quidproquo-deploy-rspack/src/plugins/index.ts
-[ ] quidproquo-deploy-rspack/vitest.config.ts
-[ ] quidproquo-deploy-webpack/eslint.config.mjs
-[ ] quidproquo-deploy-webpack/src/federation/getFederatedRemoteInfoForQpqConfig.test.ts
-[ ] quidproquo-deploy-webpack/src/federation/getFederatedRemoteInfoForQpqConfig.ts
-[ ] quidproquo-deploy-webpack/src/federation/getWebpackConfigForQpqRemote.ts
-[ ] quidproquo-deploy-webpack/src/federation/index.ts
-[ ] quidproquo-deploy-webpack/src/federation/publishFederatedRemote.ts
-[ ] quidproquo-deploy-webpack/src/getQpqBundleExternals.ts
-[ ] quidproquo-deploy-webpack/src/getWebpackBuildMode.ts
-[ ] quidproquo-deploy-webpack/src/getWebpackConfigForQpq.test.ts
-[ ] quidproquo-deploy-webpack/src/getWebpackConfigForQpq.ts
-[ ] quidproquo-deploy-webpack/src/index.test.ts
-[ ] quidproquo-deploy-webpack/src/plugins/QpqPlugin.test.ts
-[ ] quidproquo-deploy-webpack/src/plugins/QpqPlugin.ts
-[ ] quidproquo-deploy-webpack/src/plugins/QpqWebPlugin.test.ts
-[ ] quidproquo-deploy-webpack/src/plugins/QpqWebPlugin.ts
-[ ] quidproquo-deploy-webpack/src/plugins/getModuleLoaderSrcForService.js
-[ ] quidproquo-deploy-webpack/src/plugins/getModuleLoaderSrcForService.test.ts
-[ ] quidproquo-deploy-webpack/src/plugins/getQpqDyanmicLoaderSrcFromQpqConfigs.js
-[ ] quidproquo-deploy-webpack/src/plugins/getQpqDyanmicLoaderSrcFromQpqConfigs.test.ts
-[ ] quidproquo-deploy-webpack/src/plugins/getSrcLoaderForQpqConfig.js
-[ ] quidproquo-deploy-webpack/src/plugins/getSrcLoaderForQpqConfig.test.ts
-[ ] quidproquo-deploy-webpack/src/plugins/index.ts
-[ ] quidproquo-deploy-webpack/src/webpack.config.ts
-[ ] quidproquo-deploy-webpack/vitest.config.ts
+[x] quidproquo-deploy-rspack/eslint.config.mjs
+[x] quidproquo-deploy-rspack/src/appWorkspace/federatedExports.ts - note: renamed scanFederatedExposes.ts
+[x] quidproquo-deploy-rspack/src/appWorkspace/getAppServiceQpqConfigs.ts - note: split; getDefaultAppName now Nullable (null not undefined)
+[x] quidproquo-deploy-rspack/src/appWorkspace/getDevServerRspackConfig.ts
+[x] quidproquo-deploy-rspack/src/appWorkspace/getServiceRemoteRspackConfig.ts
+[x] quidproquo-deploy-rspack/src/appWorkspace/getServiceRspackConfig.ts
+[x] quidproquo-deploy-rspack/src/appWorkspace/getViewsRspackConfig.ts - note: dev server allowedHosts:all + CORS * recorded (low)
+[x] quidproquo-deploy-rspack/src/appWorkspace/getWorkspaceSourceAliases.ts
+[x] quidproquo-deploy-rspack/src/appWorkspace/index.ts
+[x] quidproquo-deploy-rspack/src/appWorkspace/serviceRspackShared.ts - note: renamed serviceTsRules.ts
+[x] quidproquo-deploy-rspack/src/appWorkspace/viewsWorkspace.ts - note: split into ViewsInfo/ViewsContext/sanitizeMfName/readViewsInfo/getViewsContext/getAllViews
+[x] quidproquo-deploy-rspack/src/appWorkspace/writeFederatedTsconfig.ts - note: renamed writeFederatedTsconfigForApp.ts
+[x] quidproquo-deploy-rspack/src/federation/getFederatedRemoteInfoForQpqConfig.test.ts
+[x] quidproquo-deploy-rspack/src/federation/getFederatedRemoteInfoForQpqConfig.ts
+[x] quidproquo-deploy-rspack/src/federation/getRspackConfigForQpqRemote.ts
+[x] quidproquo-deploy-rspack/src/federation/index.ts
+[x] quidproquo-deploy-rspack/src/federation/publishFederatedRemote.ts - note: recursive rmSync on caller-supplied path recorded (low)
+[x] quidproquo-deploy-rspack/src/getQpqBundleExternals.ts
+[x] quidproquo-deploy-rspack/src/getRspackBuildMode.ts
+[x] quidproquo-deploy-rspack/src/getRspackConfigForQpq.test.ts
+[x] quidproquo-deploy-rspack/src/getRspackConfigForQpq.ts
+[x] quidproquo-deploy-rspack/src/index.test.ts
+[x] quidproquo-deploy-rspack/src/index.ts
+[x] quidproquo-deploy-rspack/src/loaders/sourceMapLoader.test.ts
+[x] quidproquo-deploy-rspack/src/loaders/sourceMapLoader.ts
+[x] quidproquo-deploy-rspack/src/plugins/QpqPlugin.test.ts
+[x] quidproquo-deploy-rspack/src/plugins/QpqPlugin.ts
+[x] quidproquo-deploy-rspack/src/plugins/QpqWebPlugin.test.ts
+[x] quidproquo-deploy-rspack/src/plugins/QpqWebPlugin.ts
+[x] quidproquo-deploy-rspack/src/plugins/getModuleLoaderSrcForService.js
+[x] quidproquo-deploy-rspack/src/plugins/getModuleLoaderSrcForService.test.ts
+[x] quidproquo-deploy-rspack/src/plugins/getQpqCircularCheckPlugin.ts
+[x] quidproquo-deploy-rspack/src/plugins/getQpqDyanmicLoaderSrcFromQpqConfigs.js - note: renamed getQpqDynamicLoaderSrcFromQpqConfigs.js (typo)
+[x] quidproquo-deploy-rspack/src/plugins/getQpqDyanmicLoaderSrcFromQpqConfigs.test.ts - note: renamed alongside
+[x] quidproquo-deploy-rspack/src/plugins/getSrcLoaderForQpqConfig.js
+[x] quidproquo-deploy-rspack/src/plugins/getSrcLoaderForQpqConfig.test.ts
+[x] quidproquo-deploy-rspack/src/plugins/index.ts
+[x] quidproquo-deploy-rspack/vitest.config.ts
+[x] quidproquo-deploy-webpack/eslint.config.mjs
+[x] quidproquo-deploy-webpack/src/federation/getFederatedRemoteInfoForQpqConfig.test.ts
+[x] quidproquo-deploy-webpack/src/federation/getFederatedRemoteInfoForQpqConfig.ts
+[x] quidproquo-deploy-webpack/src/federation/getWebpackConfigForQpqRemote.ts - note: behavioural drift vs rspack twin (no externals/ignoreModules/ignoreWarnings applied) noted deliberately, needs product decision
+[x] quidproquo-deploy-webpack/src/federation/index.ts
+[x] quidproquo-deploy-webpack/src/federation/publishFederatedRemote.ts - note: recursive rmSync on caller-supplied path recorded (low)
+[x] quidproquo-deploy-webpack/src/getQpqBundleExternals.ts
+[x] quidproquo-deploy-webpack/src/getWebpackBuildMode.ts
+[x] quidproquo-deploy-webpack/src/getWebpackConfigForQpq.test.ts
+[x] quidproquo-deploy-webpack/src/getWebpackConfigForQpq.ts
+[x] quidproquo-deploy-webpack/src/index.test.ts
+[x] quidproquo-deploy-webpack/src/plugins/QpqPlugin.test.ts
+[x] quidproquo-deploy-webpack/src/plugins/QpqPlugin.ts
+[x] quidproquo-deploy-webpack/src/plugins/QpqWebPlugin.test.ts
+[x] quidproquo-deploy-webpack/src/plugins/QpqWebPlugin.ts
+[x] quidproquo-deploy-webpack/src/plugins/getModuleLoaderSrcForService.js
+[x] quidproquo-deploy-webpack/src/plugins/getModuleLoaderSrcForService.test.ts
+[x] quidproquo-deploy-webpack/src/plugins/getQpqDyanmicLoaderSrcFromQpqConfigs.js - note: renamed getQpqDynamicLoaderSrcFromQpqConfigs.js (typo)
+[x] quidproquo-deploy-webpack/src/plugins/getQpqDyanmicLoaderSrcFromQpqConfigs.test.ts - note: renamed alongside
+[x] quidproquo-deploy-webpack/src/plugins/getSrcLoaderForQpqConfig.js
+[x] quidproquo-deploy-webpack/src/plugins/getSrcLoaderForQpqConfig.test.ts
+[x] quidproquo-deploy-webpack/src/plugins/index.ts
+[x] quidproquo-deploy-webpack/src/webpack.config.ts - note: split setupWebpackQPQRuntime/getResolveLoaderModules; entry now pure barrel
+[x] quidproquo-deploy-webpack/vitest.config.ts
 [ ] quidproquo-dev-server/eslint.config.mjs
 [ ] quidproquo-dev-server/src/actionProcessor/core/apiKeyValidation/getApiKeyValidationValidateActionProcessor.test.ts
 [ ] quidproquo-dev-server/src/actionProcessor/core/apiKeyValidation/getApiKeyValidationValidateActionProcessor.ts

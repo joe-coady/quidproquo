@@ -2,9 +2,9 @@ import { ApplicationConfigInfo, QPQConfig, qpqCoreUtils } from 'quidproquo-core'
 
 import type { Compiler, RspackPluginInstance } from '@rspack/core';
 
-interface QpqWebPluginOptions {
+type QpqWebPluginOptions = {
   qpqConfig: QPQConfig;
-}
+};
 
 export class QpqWebPlugin implements RspackPluginInstance {
   private options: QpqWebPluginOptions;

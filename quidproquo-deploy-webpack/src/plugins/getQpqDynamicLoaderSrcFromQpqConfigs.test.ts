@@ -2,24 +2,24 @@ import { buildTestQpqConfig } from 'quidproquo-core';
 
 import { describe, expect, it } from 'vitest';
 
-import { getQpqDyanmicLoaderSrcFromQpqConfigs } from './getQpqDyanmicLoaderSrcFromQpqConfigs';
+import { getQpqDynamicLoaderSrcFromQpqConfigs } from './getQpqDynamicLoaderSrcFromQpqConfigs';
 
-describe('getQpqDyanmicLoaderSrcFromQpqConfigs', () => {
+describe('getQpqDynamicLoaderSrcFromQpqConfigs', () => {
   it('returns an empty-loader module when no configs are provided', () => {
-    const src = getQpqDyanmicLoaderSrcFromQpqConfigs([]);
+    const src = getQpqDynamicLoaderSrcFromQpqConfigs([]);
 
     expect(src).toContain('qpqConfig = undefined');
     expect(src).toContain('qpqConfigs = []');
   });
 
   it('returns an empty-loader module when configs is undefined', () => {
-    const src = getQpqDyanmicLoaderSrcFromQpqConfigs(undefined);
+    const src = getQpqDynamicLoaderSrcFromQpqConfigs(undefined);
 
     expect(src).toContain('qpqConfigs = []');
   });
 
   it('embeds the serialised configs and both loader functions', () => {
-    const src = getQpqDyanmicLoaderSrcFromQpqConfigs([buildTestQpqConfig()]);
+    const src = getQpqDynamicLoaderSrcFromQpqConfigs([buildTestQpqConfig()]);
 
     expect(src).toContain('test-app');
     expect(src).toContain('qpqDynamicModuleLoader');

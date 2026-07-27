@@ -1,7 +1,7 @@
 import { getModuleLoaderSrcForService } from './getModuleLoaderSrcForService';
 import { getSrcLoaderForQpqConfig } from './getSrcLoaderForQpqConfig';
 
-export const getQpqDyanmicLoaderSrcFromQpqConfigs = (qpqConfigs, alwaysBundleStoryCode) => {
+export const getQpqDynamicLoaderSrcFromQpqConfigs = (qpqConfigs, alwaysBundleStoryCode) => {
   if (!qpqConfigs || qpqConfigs.length === 0) {
     return `
       export const qpqConfig = undefined;

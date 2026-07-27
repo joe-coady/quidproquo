@@ -6,9 +6,9 @@ export type RspackBuildMode = 'none' | 'development' | 'production';
 // the static lambda build, the federated remote build, and any other consumer -
 // so they never optimize/minify differently.
 export const getRspackBuildMode = (qpqConfig: QPQConfig): RspackBuildMode => {
-  const moduleEnvironment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig) as RspackBuildMode;
+  const moduleEnvironment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
 
-  if (['development', 'production'].indexOf(moduleEnvironment) >= 0) {
+  if (moduleEnvironment === 'development' || moduleEnvironment === 'production') {
     return moduleEnvironment;
   }
 

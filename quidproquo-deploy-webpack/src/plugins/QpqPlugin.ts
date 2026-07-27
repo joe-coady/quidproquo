@@ -4,9 +4,9 @@ import path from 'path';
 import { Compiler, WebpackPluginInstance } from 'webpack';
 import VirtualModulesPlugin from 'webpack-virtual-modules';
 
-import { getQpqDyanmicLoaderSrcFromQpqConfigs } from './getQpqDyanmicLoaderSrcFromQpqConfigs';
+import { getQpqDynamicLoaderSrcFromQpqConfigs } from './getQpqDynamicLoaderSrcFromQpqConfigs';
 
-interface QpqPluginOptions {
+type QpqPluginOptions = {
   qpqConfigs: QPQConfig[];
   nodeModulePath: string;
   aliases?: Record<string, string>;
@@ -15,7 +15,7 @@ interface QpqPluginOptions {
   // Set by the dev-server build: thin shells only exist to keep lambda zips small,
   // and the dev server always runs code from the local source instead.
   alwaysBundleStoryCode?: boolean;
-}
+};
 
 export class QpqPlugin implements WebpackPluginInstance {
   private options: QpqPluginOptions;
@@ -37,8 +37,11 @@ export class QpqPlugin implements WebpackPluginInstance {
       ...this.options.aliases,
     };
 
+    // webpack itself ships no virtual-modules plugin, so unlike QpqWebPlugin's
+    // DefinePlugin (taken from compiler.webpack for npm-link safety) this one
+    // has to come from the third-party webpack-virtual-modules package.
     new VirtualModulesPlugin({
-      [dynamicLoaderPath]: getQpqDyanmicLoaderSrcFromQpqConfigs(this.options.qpqConfigs, this.options.alwaysBundleStoryCode),
+      [dynamicLoaderPath]: getQpqDynamicLoaderSrcFromQpqConfigs(this.options.qpqConfigs, this.options.alwaysBundleStoryCode),
     }).apply(compiler);
   }
 }

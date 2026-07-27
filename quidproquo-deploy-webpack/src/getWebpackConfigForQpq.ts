@@ -1,5 +1,3 @@
-// import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
-
 import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
 import { Configuration, IgnorePlugin, WebpackPluginInstance } from 'webpack';
@@ -11,7 +9,7 @@ import { QpqPlugin } from './plugins';
 export const getWebpackConfig = (qpqConfig: QPQConfig, buildPath: string, entries: Record<string, string>, nodeModulePath: string): Configuration => {
   const bundleOptions = qpqCoreUtils.getBackendBundleOptions(qpqConfig);
 
-  // `defineBackendBundleOptions` — optional requires inside dependencies that
+  // `defineBackendBundleOptions`: optional requires inside dependencies that
   // should resolve to nothing instead of bundling (or warning).
   const ignoreModulePlugins: WebpackPluginInstance[] = bundleOptions.ignoreModules.map(
     (ignoreModule) =>
@@ -26,7 +24,6 @@ export const getWebpackConfig = (qpqConfig: QPQConfig, buildPath: string, entrie
     entry: entries,
 
     mode: getWebpackBuildMode(qpqConfig),
-    // mode: 'production',
 
     externals: [/aws-sdk/, ...getQpqBundleExternals(qpqConfig)],
 
@@ -63,7 +60,7 @@ export const getWebpackConfig = (qpqConfig: QPQConfig, buildPath: string, entrie
         module: /@module-federation/,
         message: /Failed to parse source map/,
       },
-      // `defineBackendBundleOptions` — known-noisy warnings from dependencies.
+      // `defineBackendBundleOptions`: known-noisy warnings from dependencies.
       ...bundleOptions.ignoreWarnings.map((ignoreWarning) => ({
         module: ignoreWarning.module ? new RegExp(ignoreWarning.module) : undefined,
         message: ignoreWarning.message ? new RegExp(ignoreWarning.message) : undefined,

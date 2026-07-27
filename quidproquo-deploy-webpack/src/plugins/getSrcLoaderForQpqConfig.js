@@ -1,35 +1,25 @@
-import { isQpqFunctionRuntimeAdvanced, qpqCoreUtils } from 'quidproquo-core';
+import { qpqCoreUtils } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import path from 'path';
 
-export const getFullSrcPathFromQpqFunctionRuntime = (qpqFunctionRuntime, qpqConfig) => {
-  if (isQpqFunctionRuntimeAdvanced(qpqFunctionRuntime)) {
-    return path.join(qpqFunctionRuntime.basePath, qpqFunctionRuntime.relativePath);
-  }
-
-  const [srcPath] = qpqFunctionRuntime.split('::');
-
-  const configRoot = qpqCoreUtils.getApplicationConfigRoot(qpqConfig);
-
-  return path.join(configRoot, srcPath);
-};
+import { getFullSrcPathFromQpqFunctionRuntime } from './getFullSrcPathFromQpqFunctionRuntime';
 
 /**
  * Generates the JavaScript source (as a string) that forms the body of the generated
- * `quidproquo-dynamic-loader` virtual module's loader — the code that turns a
+ * `quidproquo-dynamic-loader` virtual module's loader: the code that turns a
  * QpqFunctionRuntime into its loaded story at runtime.
  *
  * For every QpqFunctionRuntime the config references (core + webserver src entries), it
- * emits an `if` guard that matches the incoming runtime — string equality for relative
- * runtimes, or `basePath`/`relativePath`/`functionName` equality for advanced ones — and,
+ * emits an `if` guard that matches the incoming runtime (string equality for relative
+ * runtimes, or `basePath`/`relativePath`/`functionName` equality for advanced ones) and,
  * on a match, `require()`s that runtime's source file and returns its named story export.
  * Because those `require()` paths are string literals, webpack statically resolves them
  * and bundles every referenced module into the lambda zip.
  *
  * If the service opted into federation with `bundleFallback: false` (a "thin shell"), it
  * instead emits a single fail-fast `throw` and NO `require()` calls, so no user story code
- * is bundled — the lambda then runs only federated code and errors loudly if nothing is
+ * is bundled; the lambda then runs only federated code and errors loudly if nothing is
  * published for the requested runtime.
  *
  * @param {QPQConfig} qpqConfig - the service config whose src entries the loader covers.
@@ -56,7 +46,8 @@ export function getSrcLoaderForQpqConfig(qpqConfig, qpqFunctionRuntimeVariableNa
   const ifStatements = allQpqFunctionRuntimes.map((qpqFunctionRuntime) => {
     const fullPath = getFullSrcPathFromQpqFunctionRuntime(qpqFunctionRuntime, qpqConfig);
     const method = qpqCoreUtils.getStoryNameFromQpqFunctionRuntime(qpqFunctionRuntime);
-    const srcPath = path.posix.join(fullPath.replace(/\\/g, '/')); // Ensure proper path format
+    // Forward slashes so the emitted require('<path>') literal stays valid on Windows.
+    const srcPath = path.posix.join(fullPath.replace(/\\/g, '/'));
 
     return `
       if (typeof ${qpqFunctionRuntimeVariableName} === '${typeof qpqFunctionRuntime}' && !!${qpqFunctionRuntimeVariableName}) {

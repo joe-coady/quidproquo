@@ -1,8 +1,8 @@
-// Shared TypeScript module rules for the QPQ backend service builds (static
-// lambda bundles + federated remotes). The views build has its own
+// Shared TypeScript module rules for the QPQ backend builds (static lambda
+// bundles, federated remotes, the dev server). The views build has its own
 // react-flavoured swc options in getViewsRspackConfig. Dependency-specific
 // build quirks (ignored modules/warnings) are config-driven via
-// `defineBackendBundleOptions` — nothing package-specific lives here.
+// `defineBackendBundleOptions`: nothing package-specific lives here.
 import { RuleSetRule } from '@rspack/core';
 
 // TypeScript via rspack's builtin swc loader. Decorators on to match

@@ -10,6 +10,8 @@
 // Anything else (http(s) URLs, missing/unreadable/unparseable maps) passes the
 // source through untouched - the module simply stays as-is in traces, exactly the
 // behaviour source-map-loader + our ignoreWarnings config produced.
+import { Nullable } from 'quidproquo-core';
+
 import fs from 'fs';
 import path from 'path';
 import type { LoaderContext } from '@rspack/core';
@@ -17,17 +19,19 @@ import type { LoaderContext } from '@rspack/core';
 // Last sourceMappingURL comment in the file, line (`//`) or block (`/* */`) form.
 const SOURCE_MAPPING_URL_REGEX = /(?:\/\/[#@][ \t]*sourceMappingURL=([^\s'"]+)[ \t]*$|\/\*[#@][ \t]*sourceMappingURL=([^\s'"*]+)[ \t]*\*\/)/gm;
 
-interface RawSourceMap {
+// The parts of the standard source-map JSON shape this loader touches; nulls
+// mirror the spec (a source with no retrievable content is null).
+type RawSourceMap = {
   sources?: (string | null)[];
   sourcesContent?: (string | null)[];
   sourceRoot?: string;
   [key: string]: unknown;
-}
+};
 
-const readDataUrlMap = (url: string): string | undefined => {
+const readDataUrlMap = (url: string): Nullable<string> => {
   const match = /^data:(?:[^;,]+)?(?:;charset=[^;,]+)?(;base64)?,(.*)$/i.exec(url);
   if (!match) {
-    return undefined;
+    return null;
   }
 
   const [, isBase64, data] = match;
@@ -75,7 +79,7 @@ export default function sourceMapLoader(this: LoaderContext, content: string): v
   const url = lastMatch[1] || lastMatch[2];
   const resourceDirectory = path.dirname(this.resourcePath);
 
-  let rawMap: string | undefined;
+  let rawMap: Nullable<string> = null;
   let mapDirectory = resourceDirectory;
 
   if (url.startsWith('data:')) {
@@ -87,11 +91,11 @@ export default function sourceMapLoader(this: LoaderContext, content: string): v
       mapDirectory = path.dirname(mapPath);
       this.addDependency(mapPath);
     } catch {
-      rawMap = undefined;
+      rawMap = null;
     }
   }
 
-  if (rawMap === undefined) {
+  if (rawMap === null) {
     callback(null, content);
     return;
   }

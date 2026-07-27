@@ -7,6 +7,9 @@ import { IgnorePlugin } from '@rspack/core';
 import { getAllRspackConfig, getRspackConfig } from './getRspackConfigForQpq';
 import { QpqPlugin } from './plugins';
 
+// The function form of a webpack/rspack external, as this package emits it.
+type ExternalFunction = (data: { request: string }, callback: (err?: unknown, external?: string) => void) => void;
+
 describe('getRspackConfig', () => {
   const entries = { handler: './src/handler.ts' };
 
@@ -53,7 +56,7 @@ describe('getRspackConfig', () => {
 
     const resolveExternal = (request: string): string | undefined => {
       const config = getRspackConfig(qpqConfig, 'out', entries, 'node_modules');
-      const externals = config.externals as any[];
+      const externals = config.externals as unknown as ExternalFunction[];
 
       expect(externals).toHaveLength(2);
 
@@ -90,7 +93,7 @@ describe('getRspackConfig', () => {
 
     it('externalizes configured externals', () => {
       const config = getRspackConfig(qpqConfig, 'out', entries, 'node_modules');
-      const externals = config.externals as any[];
+      const externals = config.externals as unknown as ExternalFunction[];
 
       let result: string | undefined = undefined;
       externals[1]({ request: 'sharp' }, (_err?: unknown, external?: string) => {

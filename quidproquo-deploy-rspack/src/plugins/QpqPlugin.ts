@@ -3,9 +3,9 @@ import { QPQConfig } from 'quidproquo-core';
 import path from 'path';
 import type { Compiler, RspackPluginInstance } from '@rspack/core';
 
-import { getQpqDyanmicLoaderSrcFromQpqConfigs } from './getQpqDyanmicLoaderSrcFromQpqConfigs';
+import { getQpqDynamicLoaderSrcFromQpqConfigs } from './getQpqDynamicLoaderSrcFromQpqConfigs';
 
-interface QpqPluginOptions {
+type QpqPluginOptions = {
   qpqConfigs: QPQConfig[];
   nodeModulePath: string;
   aliases?: Record<string, string>;
@@ -14,7 +14,7 @@ interface QpqPluginOptions {
   // Set by the dev-server build: thin shells only exist to keep lambda zips small,
   // and the dev server always runs code from the local source instead.
   alwaysBundleStoryCode?: boolean;
-}
+};
 
 export class QpqPlugin implements RspackPluginInstance {
   private options: QpqPluginOptions;
@@ -41,7 +41,7 @@ export class QpqPlugin implements RspackPluginInstance {
     // @rspack/core, and a virtual module registered on the wrong instance's binding
     // is invisible to the build ("Cannot find module" on the aliased key).
     new compiler.rspack.experiments.VirtualModulesPlugin({
-      [dynamicLoaderPath]: getQpqDyanmicLoaderSrcFromQpqConfigs(this.options.qpqConfigs, this.options.alwaysBundleStoryCode),
+      [dynamicLoaderPath]: getQpqDynamicLoaderSrcFromQpqConfigs(this.options.qpqConfigs, this.options.alwaysBundleStoryCode),
     }).apply(compiler);
   }
 }

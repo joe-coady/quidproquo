@@ -12,28 +12,13 @@ import path from 'path';
 import { Configuration } from '@rspack/core';
 
 import { getAllRspackConfig } from '../getRspackConfigForQpq';
-import { serviceTsRules } from './serviceRspackShared';
-
-// Derive repo root + output location from the service directory
-// (apps/<app>/services/<svc>/service).
-const resolvePaths = (serviceDir: string) => {
-  const parts = serviceDir.split(path.sep);
-  const appsIdx = parts.lastIndexOf('apps');
-  if (appsIdx < 0 || parts[appsIdx + 2] !== 'services' || parts[appsIdx + 4] !== 'service') {
-    throw new Error(`Expected apps/<app>/services/<svc>/service, got ${serviceDir}`);
-  }
-  const root = parts.slice(0, appsIdx).join(path.sep);
-  const appName = parts[appsIdx + 1];
-  const serviceName = parts[appsIdx + 3];
-  return {
-    root,
-    outputPath: path.join(root, 'dist', 'apps', appName, 'services', serviceName, 'service'),
-    nodeModulePath: path.join(root, 'node_modules'),
-  };
-};
+import { parseServiceDir } from './parseServiceDir';
+import { serviceTsRules } from './serviceTsRules';
 
 export const getServiceRspackConfig = (qpqConfig: QPQConfig, serviceDir: string): Configuration => {
-  const { outputPath, nodeModulePath } = resolvePaths(serviceDir);
+  const { root, appName, serviceName } = parseServiceDir(serviceDir, 'service');
+  const outputPath = path.join(root, 'dist', 'apps', appName, 'services', serviceName, 'service');
+  const nodeModulePath = path.join(root, 'node_modules');
 
   const qpqRspack = getAllRspackConfig(qpqConfig, getLambdaEntries(), outputPath, nodeModulePath);
 

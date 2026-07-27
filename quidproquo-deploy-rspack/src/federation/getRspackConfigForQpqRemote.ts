@@ -39,7 +39,7 @@ export const getRspackConfigForQpqRemote = (qpqConfig: QPQConfig, buildPath: str
   const { containerName, exposes } = getFederatedRemoteInfoForQpqConfig(qpqConfig);
   const bundleOptions = qpqCoreUtils.getBackendBundleOptions(qpqConfig);
 
-  // `defineBackendBundleOptions` — optional requires inside dependencies that
+  // `defineBackendBundleOptions`: optional requires inside dependencies that
   // should resolve to nothing instead of bundling (or warning).
   const ignoreModulePlugins = bundleOptions.ignoreModules.map(
     (ignoreModule) =>
@@ -167,7 +167,7 @@ export const getRspackConfigForQpqRemote = (qpqConfig: QPQConfig, buildPath: str
       {
         message: /Failed to parse source map/,
       },
-      // `defineBackendBundleOptions` — known-noisy warnings from dependencies.
+      // `defineBackendBundleOptions`: known-noisy warnings from dependencies.
       ...bundleOptions.ignoreWarnings.map((ignoreWarning) => ({
         module: ignoreWarning.module ? new RegExp(ignoreWarning.module) : undefined,
         message: ignoreWarning.message ? new RegExp(ignoreWarning.message) : undefined,

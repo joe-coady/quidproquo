@@ -160,3 +160,24 @@
 - **Where**: askRunNeo4jOpenCypherQuery URL construction.
 - **Suggested fix**: validate the instance name against a strict pattern (e.g. ^[a-z0-9]+$) before building the URL.
 - **Status**: recorded
+
+## quidproquo-deploy-rspack/src/appWorkspace/getViewsRspackConfig.ts
+- **Severity**: low
+- **Issue**: views dev server is reachable from any host: devServer.allowedHosts 'all' plus Access-Control-Allow-Origin '*'; dev-only but exposes source/HMR to the LAN.
+- **Where**: devServer block.
+- **Suggested fix**: default allowedHosts to localhost with an env opt-out.
+- **Status**: recorded
+
+## quidproquo-deploy-webpack + quidproquo-deploy-rspack src/federation/publishFederatedRemote.ts
+- **Severity**: low
+- **Issue**: fs.rmSync(publishPath, { recursive: true, force: true }) on a caller-supplied path; a bad path deletes an arbitrary tree.
+- **Where**: publishFederatedRemote.
+- **Suggested fix**: refuse to rm when publishPath is /, empty, or contains/equals remoteBuildPath.
+- **Status**: recorded
+
+## quidproquo-deploy-* generated loader source
+- **Severity**: low
+- **Issue**: generated-loader code interpolates config-derived strings (service names, paths) into template literals; a backtick in those values breaks or injects into emitted bundle source. Input is the trusted build config, so not a real trust boundary.
+- **Where**: getSrcLoaderForQpqConfig.js, getModuleLoaderSrcForService.js (both packages).
+- **Suggested fix**: backtick/escape guard when emitting.
+- **Status**: recorded

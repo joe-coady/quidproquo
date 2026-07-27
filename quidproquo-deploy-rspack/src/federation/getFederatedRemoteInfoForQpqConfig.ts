@@ -13,9 +13,10 @@ import { qpqWebServerUtils } from 'quidproquo-webserver';
 import crypto from 'crypto';
 import path from 'path';
 
-import { getFullSrcPathFromQpqFunctionRuntime } from '../plugins/getSrcLoaderForQpqConfig';
+import { getFullSrcPathFromQpqFunctionRuntime } from '../plugins/getFullSrcPathFromQpqFunctionRuntime';
+import { getFederatedContainerName } from './getFederatedContainerName';
 
-export interface FederatedRemoteInfo {
+export type FederatedRemoteInfo = {
   // Module federation container name (a valid js identifier derived from the service name).
   containerName: string;
 
@@ -31,7 +32,7 @@ export interface FederatedRemoteInfo {
   // re-deriving expose paths, and the key is machine-independent so a remote published
   // on one machine matches a lambda shell built on another.
   runtimeExposeMap: Record<string, string>;
-}
+};
 
 // The stable expose path for a source file. Normally the file's path relative to the
 // config root (e.g. 'src/routes/getOrders'). For a source OUTSIDE the config root
@@ -46,12 +47,6 @@ const getExposePathForFullSrcPath = (fullSrcPath: string, configRoot: string): s
 
   const pathHash = crypto.createHash('sha256').update(fullSrcPath).digest('hex').slice(0, 16);
   return `external/${pathHash}/${path.basename(fullSrcPath)}`;
-};
-
-// The MF container name for a service. Sanitized to a valid JS identifier because it
-// becomes a global variable name at runtime (qpq_my_service).
-export const getFederatedContainerName = (serviceName: string): string => {
-  return `qpq_${serviceName.replace(/[^a-zA-Z0-9_]/g, '_')}`;
 };
 
 export const getFederatedRemoteInfoForQpqConfig = (qpqConfig: QPQConfig): FederatedRemoteInfo => {
