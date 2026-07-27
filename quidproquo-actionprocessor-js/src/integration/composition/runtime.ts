@@ -6,6 +6,7 @@ import {
   AskResponse,
   createRuntime,
   defineApplicationModule,
+  DynamicModuleLoader,
   QpqLogger,
   QpqRuntimeType,
   StoryResult,
@@ -18,7 +19,7 @@ import { getCoreActionProcessor } from '../../actionProcessor/core';
 // ─── Real-runtime composition harness ─────────────────────────────────────────────
 //
 // Integration tests in this folder run control-flow primitives (askCatch, askRunParallel,
-// askContextProvideValue, askOverrideActions …) through the ACTUAL runtime — createRuntime
+// askContextProvideValue, askOverrideActions ...) through the ACTUAL runtime: createRuntime
 // driving the real core action processors (getCoreActionProcessor), with no mocking of the
 // runtime or its control flow.
 //
@@ -60,7 +61,7 @@ export const boundary = (storyFactory: () => AskResponse<any>): AskResponse<any>
     return yield { type: BOUNDARY_ACTION, payload: { storyFactory } };
   })();
 
-const buildRuntime = (callerSession: StorySession, getActionProcessors: ActionProcessorListResolver, dynamicModuleLoader: any) =>
+const buildRuntime = (callerSession: StorySession, getActionProcessors: ActionProcessorListResolver, dynamicModuleLoader: DynamicModuleLoader) =>
   createRuntime(
     RUNTIME_CONFIG,
     callerSession,

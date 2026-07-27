@@ -15,7 +15,7 @@ function getActionProcessorListLoader(dynamicModuleLoader: DynamicModuleLoader, 
         throw new Error(`Expected action processor list to be an object, but got ${typeof apl}`);
       }
 
-      if (Object.values(apl).find((aplv) => typeof aplv !== 'function')) {
+      if (Object.values(apl).some((aplv) => typeof aplv !== 'function')) {
         throw new Error('Expected all action processors to be functions');
       }
 
@@ -35,7 +35,7 @@ const getProcessCustomAction = async (qpqConfig: QPQConfig, dynamicModuleLoader:
 
     const possibleModuleResults = await Promise.allSettled(getCustomActionProcessors.map(actionProcessorListLoader));
 
-    // Filter out successfully loaded modules that are functions
+    // Keep the lists that loaded and validated; failures were already logged by the loader.
     const actionProcessorLists: ActionProcessorList[] = possibleModuleResults
       .filter((result): result is PromiseFulfilledResult<ActionProcessorList> => result.status === 'fulfilled')
       .map((result) => result.value);
@@ -49,6 +49,12 @@ const getProcessCustomAction = async (qpqConfig: QPQConfig, dynamicModuleLoader:
   }
 };
 
+/**
+ * Loads and merges the user-defined action processor lists declared via
+ * defineActionProcessors. A source that fails to load or does not validate is
+ * skipped (logged), never fatal. Composition roots spread this LAST so custom
+ * processors can override the built-in ones.
+ */
 export const getCustomActionActionProcessor: ActionProcessorListResolver = async (
   qpqConfig: QPQConfig,
   dynamicModuleLoader: DynamicModuleLoader,

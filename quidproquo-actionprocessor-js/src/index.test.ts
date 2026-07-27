@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
-describe('quidproquo-actionprocessor-js', () => {
-  it('should pass smoke test', () => {
-    expect(1 + 1).toBe(2);
+import * as publicApi from './index';
+
+describe('quidproquo-actionprocessor-js public surface', () => {
+  it('exports the processor resolvers consumers depend on', () => {
+    expect(typeof publicApi.getCoreActionProcessor).toBe('function');
+    expect(typeof publicApi.getWebserverActionProcessor).toBe('function');
+    expect(typeof publicApi.getCustomActionActionProcessor).toBe('function');
+    expect(typeof publicApi.getGuidActionProcessor).toBe('function');
+    expect(typeof publicApi.getDnsActionProcessor).toBe('function');
   });
 });

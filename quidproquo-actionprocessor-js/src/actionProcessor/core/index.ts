@@ -5,7 +5,7 @@ import { getConfigActionProcessor } from './config';
 import { getContextActionProcessor } from './context';
 import { getDateActionProcessor } from './date';
 import { getErrorActionProcessor } from './error';
-import { getGuidProcessor } from './guid';
+import { getGuidActionProcessor } from './guid';
 import { getLogActionProcessor } from './log';
 import { getMathActionProcessor } from './math';
 import { getMetricActionProcessor } from './metric';
@@ -26,7 +26,9 @@ export * from './network';
 export * from './platform';
 export * from './system';
 
-// Custom actions is not done here, as it has to be done last after all
+// customActions is exported but deliberately NOT merged into getCoreActionProcessor:
+// composition roots (dev-server, awslambda) spread it last so user-defined processors
+// can override the built-in ones.
 export * from './customActions';
 
 export const getCoreActionProcessor: ActionProcessorListResolver = async (
@@ -38,7 +40,7 @@ export const getCoreActionProcessor: ActionProcessorListResolver = async (
   ...(await getClaudeAiActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getDateActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getErrorActionProcessor(qpqConfig, dynamicModuleLoader)),
-  ...(await getGuidProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getGuidActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getLogActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getMathActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getMetricActionProcessor(qpqConfig, dynamicModuleLoader)),

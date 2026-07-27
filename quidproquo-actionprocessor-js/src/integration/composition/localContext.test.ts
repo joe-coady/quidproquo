@@ -8,7 +8,7 @@ import { assignIds, buildStory, evaluate, generateLocalContext, show, Spec } fro
 //
 // The contract: local context (createLocalContextIdentifier) flows down the story tree and
 // through in-process batches exactly like global context, but is STRIPPED when a story crosses
-// a service boundary (toCrossServiceSession) — while global context survives the crossing.
+// a service boundary (toCrossServiceSession), while global context survives the crossing.
 
 const specs = generateLocalContext(2);
 

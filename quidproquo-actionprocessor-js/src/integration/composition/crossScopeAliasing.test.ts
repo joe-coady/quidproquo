@@ -7,7 +7,7 @@ import { boundary, runComposition } from './runtime';
 // ─── Finding: context providers match reads by uniqueName, ignoring scope ───────────
 //
 // The local-context matrix surfaced this. `askContextProvideValue` intercepts a ContextRead
-// when the read's identifier has the SAME uniqueName as the provider's — it does NOT also
+// when the read's identifier has the SAME uniqueName as the provider's; it does NOT also
 // check the `local` flag. So within a runtime a global provider answers a same-name LOCAL
 // read, and a local provider answers a same-name GLOBAL read.
 //

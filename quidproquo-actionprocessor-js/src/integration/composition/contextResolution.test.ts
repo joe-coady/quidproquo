@@ -9,7 +9,7 @@ import { assignIds, buildStory, evaluate, generateContext, show, Spec } from './
 //
 // The contract: a read resolves to the value from the nearest enclosing provider of that key
 // (so a nested provide shadows an outer one, and a different key falls through), or the
-// identifier's default when no provider encloses it — even across parallel batches and catches.
+// identifier's default when no provider encloses it, even across parallel batches and catches.
 
 const specs = generateContext(2);
 

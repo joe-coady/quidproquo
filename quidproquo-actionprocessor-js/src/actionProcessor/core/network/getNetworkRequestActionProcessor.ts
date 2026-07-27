@@ -11,10 +11,10 @@ import {
 } from 'quidproquo-core';
 import { executeNetworkRequest } from 'quidproquo-webserver';
 
+// any: this single processor serves every request/response body type; the per-call
+// generics are only meaningful at the requester, so the variance boundary needs any.
 const getProcessNetworkRequest = (qpqConfig: QPQConfig): NetworkRequestActionProcessor<any, any> => {
   return async (payload) => {
-    console.log(payload.url);
-
     try {
       return actionResult(await executeNetworkRequest(payload));
     } catch (error: unknown) {

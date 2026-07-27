@@ -31,4 +31,15 @@ describe('getLogCreateActionProcessor', () => {
 
     expect(log).toHaveBeenCalledWith(`${LogLevelEnum.Error}: hello`, data);
   });
+
+  it('appends falsy-but-present data values like 0 and false', async () => {
+    const log = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const processor = await resolve();
+
+    await processor({ msg: 'count', logLevel: LogLevelEnum.Info, data: 0 }, undefined as any);
+    await processor({ msg: 'flag', logLevel: LogLevelEnum.Info, data: false }, undefined as any);
+
+    expect(log).toHaveBeenNthCalledWith(1, `${LogLevelEnum.Info}: count`, 0);
+    expect(log).toHaveBeenNthCalledWith(2, `${LogLevelEnum.Info}: flag`, false);
+  });
 });

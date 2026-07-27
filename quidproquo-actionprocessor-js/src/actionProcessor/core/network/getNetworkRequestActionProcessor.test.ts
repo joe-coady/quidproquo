@@ -1,6 +1,6 @@
 import { buildTestQpqConfig, ErrorTypeEnum, NetworkActionType, resolveActionResult, resolveActionResultError } from 'quidproquo-core';
 
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { getNetworkRequestActionProcessor } from './getNetworkRequestActionProcessor';
 
@@ -14,10 +14,6 @@ describe('getNetworkRequestActionProcessor', () => {
       p: any,
       ...rest: any[]
     ) => Promise<any>;
-
-  beforeEach(() => {
-    vi.spyOn(console, 'log').mockImplementation(() => {});
-  });
 
   afterEach(() => {
     vi.restoreAllMocks();

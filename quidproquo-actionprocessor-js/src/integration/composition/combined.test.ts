@@ -5,8 +5,8 @@ import { assignIds, buildStory, evaluate, generateCombined, show, Spec } from '.
 
 // Combined matrix: ok/fail/read leaves freely nested under provide + override + catch +
 // parallel, run through the REAL runtime, asserted against the contract oracle. This is the
-// cross-interaction surface — a context provide wrapping an override wrapping a parallel with
-// a catch at any level — where a flag dropped at one seam would show up as a mismatch.
+// cross-interaction surface (a context provide wrapping an override wrapping a parallel with
+// a catch at any level) where a flag dropped at one seam would show up as a mismatch.
 
 const specs = generateCombined(2);
 

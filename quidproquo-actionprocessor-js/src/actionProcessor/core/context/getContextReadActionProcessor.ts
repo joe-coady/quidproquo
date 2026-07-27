@@ -9,6 +9,8 @@ import {
   QpqContextIdentifier,
 } from 'quidproquo-core';
 
+// any: one processor serves context identifiers of every value type; the per-call
+// generic is only meaningful at the requester, so the variance boundary needs any.
 const getContextValue = (context: QpqContext<any>, contextIdentifier: QpqContextIdentifier<any>): any => {
   return contextIdentifier.uniqueName in context ? context[contextIdentifier.uniqueName] : contextIdentifier.defaultValue;
 };

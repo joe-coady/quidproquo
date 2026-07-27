@@ -5,7 +5,7 @@ import { assignIds, buildStory, evaluate, generateTowers, Spec } from './spec';
 
 // Mega-tower stress test: every control-flow primitive (catch, override, global/local provide,
 // boundary, parallel) stacked many levels deep down a single chain, in every rotation order,
-// over each leaf kind — run through the REAL runtime and asserted against the contract oracle.
+// over each leaf kind, run through the REAL runtime and asserted against the contract oracle.
 // This is where a flag dropped at a seam, or context/overrides leaking across a boundary in a
 // tall stack, would accumulate and show up.
 

@@ -1,6 +1,7 @@
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
+  ActionProcessorResult,
   actionResult,
   actionResultError,
   EitherActionResult,
@@ -13,46 +14,35 @@ import {
   SystemBatchActionProcessor,
 } from 'quidproquo-core';
 
+// Unwraps one processed batch item. Actions flagged returnErrors get the Either
+// envelope (so callers like askCatch can branch); the rest have already been
+// screened for failures, so their raw result is safe to resolve.
+const unwrapBatchItem = (batchItemResult: ActionProcessorResult<any>, returnErrors?: boolean): unknown => {
+  if (returnErrors) {
+    const result: EitherActionResult<any> = isErroredActionResult(batchItemResult)
+      ? { success: false, error: resolveActionResultError(batchItemResult) }
+      : { success: true, result: resolveActionResult(batchItemResult) };
+
+    return result;
+  }
+
+  return resolveActionResult(batchItemResult);
+};
+
 const getProcessSystemBatch = (qpqConfig: QPQConfig): SystemBatchActionProcessor<any[]> => {
   return async (payload, session, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
-    // console.log('~~~~~~~~~~~ RUNNING BATCH ~~~~~~~~~: ', payload);
-
     const batchRes = await Promise.all(
-      payload.actions.map((a: any) => processAction(a, actionProcessors, session, logger, updateSession, dynamicModuleLoader, streamRegistry)),
+      payload.actions.map((a) => processAction(a, actionProcessors, session, logger, updateSession, dynamicModuleLoader, streamRegistry)),
     );
 
-    // console.log('~~~~~~~~~~~ RESULT BATCH ~~~~~~~~~: ', batchRes);
-
-    // If there was an error, that does not want to be returned, throw that error back
+    // A failure in any action NOT flagged returnErrors fails the whole batch.
     const erroredBatchItem = batchRes.find((br, i) => isErroredActionResult(br) && !payload.actions[i].returnErrors);
     if (erroredBatchItem) {
       const error = resolveActionResultError(erroredBatchItem);
       return actionResultError(error.errorType, error.errorText, error.errorStack);
     }
 
-    // unwrap the values
-    return actionResult(
-      batchRes.map((br, i) => {
-        // If we want to return errors, return the either result.
-        if (payload.actions[i].returnErrors) {
-          const isSuccess = !isErroredActionResult(br);
-          const result: EitherActionResult<any> = isSuccess
-            ? {
-                success: true,
-                result: resolveActionResult(br),
-              }
-            : {
-                success: false,
-                error: resolveActionResultError(br),
-              };
-
-          return result;
-        }
-
-        // return the resolved result
-        return resolveActionResult(br);
-      }),
-    );
+    return actionResult(batchRes.map((br, i) => unwrapBatchItem(br, payload.actions[i].returnErrors)));
   };
 };
 

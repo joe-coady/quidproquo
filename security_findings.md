@@ -181,3 +181,45 @@
 - **Where**: getSrcLoaderForQpqConfig.js, getModuleLoaderSrcForService.js (both packages).
 - **Suggested fix**: backtick/escape guard when emitting.
 - **Status**: recorded
+
+## quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/askRunNeptuneOpenCypherQuery.ts
+- **Severity**: medium
+- **Issue**: Neptune openCypher call is unsigned: POSTs to https://<cluster>:<port>/openCypher via askNetworkRequest with no SigV4 signing and no IAM DB auth; security rests entirely on VPC isolation, and anything with VPC network reach can query.
+- **Where**: askRunNeptuneOpenCypherQuery.
+- **Suggested fix**: SigV4-sign the request (service neptune-db) or document/enforce the no-IAM-auth assumption at deploy.
+- **Status**: recorded
+
+## quidproquo-dev-server/src/entry/serviceFunction/runCypherQuery.ts
+- **Severity**: medium
+- **Issue**: Arbitrary Cypher execution service function: forwards a fully caller-supplied query string to any named graph database. Fine as a dev tool; must never ship in a deployable module.
+- **Where**: runCypherQuery.
+- **Suggested fix**: gate behind dev-server-only wiring and document.
+- **Status**: recorded
+
+## quidproquo-actionprocessor-awslambda/src/logic/sesV2/buildRawMimeMessage.ts
+- **Severity**: low
+- **Issue**: CR/LF are sanitized (no header injection) but an attachment filename containing a double quote can break out of the quoted filename="..." parameter in Content-Type/Content-Disposition.
+- **Where**: encodeHeaderText / filename path.
+- **Suggested fix**: strip or backslash-escape double quotes in header parameter values.
+- **Status**: recorded
+
+## quidproquo-actionprocessor-js/src/actionProcessor/core/network/getNetworkRequestActionProcessor.ts
+- **Severity**: low
+- **Issue**: console.log(payload.url) logged every outbound request URL on all runtimes; query strings routinely carry signed-URL tokens/keys, landing in CloudWatch/console logs.
+- **Where**: top of the request processor (from a "wip" commit).
+- **Suggested fix**: remove the log.
+- **Status**: fixed in this pass
+
+## quidproquo-actionprocessor-js/src/actionProcessor/core/claudeAi/getClaudeAiMessagesApiActionProcessor.ts
+- **Severity**: low
+- **Issue**: the Anthropic apiKey travels inside the action payload; any payload-persisting log/event-history layer could persist the secret.
+- **Where**: processor payload { body, apiKey }.
+- **Suggested fix**: resolve the key processor-side from config/secrets, or guarantee payload redaction in the logging layer.
+- **Status**: recorded (cross-package contract change)
+
+## quidproquo-actionprocessor-js (uuidv7 dependency)
+- **Severity**: low
+- **Issue**: uuidv7 silently falls back to Math.random on platforms without WebCrypto (never Node 20+/browsers).
+- **Where**: guid v7 processor dependency.
+- **Suggested fix**: set UUIDV7_DENY_WEAK_RNG if sortable guids ever need CSPRNG guarantees.
+- **Status**: recorded

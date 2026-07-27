@@ -3,7 +3,7 @@ import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, 
 import { getGuidNewActionProcessor } from './getGuidNewActionProcessor';
 import { getGuidNewSortableActionProcessor } from './getGuidNewSortableActionProcessor';
 
-export const getGuidProcessor: ActionProcessorListResolver = async (
+export const getGuidActionProcessor: ActionProcessorListResolver = async (
   qpqConfig: QPQConfig,
   dynamicModuleLoader: DynamicModuleLoader,
 ): Promise<ActionProcessorList> => ({

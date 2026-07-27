@@ -19,6 +19,7 @@ assembled quickly.
 - The `QpqWarmLambdaEvent` type (`{ qpqWarm: boolean }`) is removed from `quidproquo-actionprocessor-awslambda`; warm invokes arrive as SNS warmer records (use `isSnsWarmerRecord` to detect them). `QpqFunctionExecutionEvent<T>` is unchanged.
 - `findMatchingCertificates` and `getDomainValidationOptions` (deep imports from `quidproquo-actionprocessor-awslambda`'s `logic/acm`) are removed with no replacement.
 - `getDefaultAppName` in `quidproquo-deploy-rspack` now returns `Nullable<string>`: `null` instead of `undefined` when no app is found. Update any `=== undefined` checks to `null` (truthiness checks are unaffected).
+- `getGuidProcessor` in `quidproquo-actionprocessor-js` is renamed to `getGuidActionProcessor`. Update imports; behavior is unchanged.
 
 ## 0.1.11
 

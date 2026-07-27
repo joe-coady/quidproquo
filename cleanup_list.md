@@ -136,60 +136,60 @@ If your change touched files in more than one package (e.g. you moved a shared h
 [x] quidproquo-actionprocessor-awslambda/src/awsLambdaUtils.ts
 [x] quidproquo-actionprocessor-awslambda/src/awsNamingUtils.test.ts
 [x] quidproquo-actionprocessor-awslambda/src/awsNamingUtils.ts - note: DRY pass behind existing name-table tests; getKvsDynamoTableNameFromConfig honours only owner.module, flagged in code, changing it would orphan deployed tables
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/aiModelMap.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/aiModelMap.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/getAiPromptActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/getAiPromptActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/getAiPromptStreamActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/getAiPromptStreamActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/aiStreamPartMappers.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/aiStreamPartMappers.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/createDriveFileResolver.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamAbort.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamCustom.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamError.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamFilePart.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamFinish.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamFinishStep.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamPart.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamPart.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamRaw.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamReasoningDelta.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamReasoningEnd.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamReasoningFilePart.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamReasoningStart.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamSourcePart.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamStart.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamStartStep.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamTextDelta.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamTextEnd.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamTextStart.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamToolApprovalRequest.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamToolApprovalResponse.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamToolCall.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamToolError.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamToolInputDelta.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamToolInputEnd.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamToolInputStart.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamToolOutputDenied.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamToolResult.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/prepareAiPromptCall.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/prepareAiPromptCall.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/toAiStreamFinishReason.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/toAiStreamUsage.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/toAiStreamUsage.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/toCacheableMessages.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/toCacheableMessages.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/toCacheableSystem.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/toCacheableSystem.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/toErrorMessage.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/toErrorMessage.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/toSdkMessages.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/toSdkMessages.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/types/aiSdkStreamPart.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/types/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/aiModelMap.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/aiModelMap.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/getAiPromptActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/getAiPromptActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/getAiPromptStreamActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/getAiPromptStreamActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/aiStreamPartMappers.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/aiStreamPartMappers.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/createDriveFileResolver.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamAbort.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamCustom.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamError.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamFilePart.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamFinish.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamFinishStep.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamPart.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamPart.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamRaw.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamReasoningDelta.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamReasoningEnd.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamReasoningFilePart.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamReasoningStart.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamSourcePart.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamStart.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamStartStep.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamTextDelta.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamTextEnd.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamTextStart.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamToolApprovalRequest.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamToolApprovalResponse.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamToolCall.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamToolError.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamToolInputDelta.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamToolInputEnd.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamToolInputStart.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamToolOutputDenied.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/mapAiStreamToolResult.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/prepareAiPromptCall.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/prepareAiPromptCall.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/toAiStreamFinishReason.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/toAiStreamUsage.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/toAiStreamUsage.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/toCacheableMessages.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/toCacheableMessages.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/toCacheableSystem.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/toCacheableSystem.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/toErrorMessage.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/toErrorMessage.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/toSdkMessages.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/toSdkMessages.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/types/aiSdkStreamPart.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/types/index.ts
 [ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/apiKeyValidation/getApiKeyValidationValidateActionProcessor.test.ts
 [ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/apiKeyValidation/getApiKeyValidationValidateActionProcessor.ts
 [ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/apiKeyValidation/index.ts
@@ -358,46 +358,46 @@ If your change touched files in more than one package (e.g. you moved a shared h
 [ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/utils/index.ts
 [ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/utils/resolveStorageDriveBucketName.test.ts
 [ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/utils/resolveStorageDriveBucketName.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/customActions/actions/GraphDatabaseForNeptuneActionType.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/customActions/actions/GraphDatabaseForNeptuneGetEndpointsActionRequester.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/customActions/actions/GraphDatabaseForNeptuneGetEndpointsActionRequester.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/customActions/actions/GraphDatabaseForNeptuneGetEndpointsActionTypes.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/customActions/actions/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/customActions/getActionProcessor/getGraphDatabaseForNeptuneGetEndpointsActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/customActions/getActionProcessor/getGraphDatabaseForNeptuneGetEndpointsActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/customActions/getActionProcessor/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/customActions/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/getGraphDatabaseExecuteOpenCypherQueryActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/getGraphDatabaseExecuteOpenCypherQueryActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/getGraphDatabaseInternalFieldNamesActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/getGraphDatabaseInternalFieldNamesActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/askRunNeptuneOpenCypherQuery.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/askRunNeptuneOpenCypherQuery.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/converters/askConvertAnyNeptuneResultToAnyGraphResult.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/converters/askConvertAnyNeptuneResultToAnyGraphResult.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/converters/askConvertNeptuneCypherResponseToCypherResponse.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/converters/askConvertNeptuneCypherResponseToCypherResponse.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/converters/askConvertNeptuneNodeResultToGraphNodeResult.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/converters/askConvertNeptuneNodeResultToGraphNodeResult.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/converters/askConvertNeptuneQueryResultToGraphQueryResult.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/converters/askConvertNeptuneQueryResultToGraphQueryResult.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/converters/askConvertNeptuneRelationshipResultToGraphRelationshipResult.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/converters/askConvertNeptuneRelationshipResultToGraphRelationshipResult.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/converters/utils/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/converters/utils/isNeptuneNodeResult.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/converters/utils/isNeptuneNodeResult.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/converters/utils/isNeptuneRelationshipResult.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/converters/utils/isNeptuneRelationshipResult.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/converters/utils/isNeptuneScalarResult.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/converters/utils/isNeptuneScalarResult.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/types/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/types/neptune.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/utils/convertQpqQueryToNeptune.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/utils/convertQpqQueryToNeptune.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/utils/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/customActions/actions/GraphDatabaseForNeptuneActionType.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/customActions/actions/GraphDatabaseForNeptuneGetEndpointsActionRequester.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/customActions/actions/GraphDatabaseForNeptuneGetEndpointsActionRequester.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/customActions/actions/GraphDatabaseForNeptuneGetEndpointsActionTypes.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/customActions/actions/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/customActions/getActionProcessor/getGraphDatabaseForNeptuneGetEndpointsActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/customActions/getActionProcessor/getGraphDatabaseForNeptuneGetEndpointsActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/customActions/getActionProcessor/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/customActions/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/getGraphDatabaseExecuteOpenCypherQueryActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/getGraphDatabaseExecuteOpenCypherQueryActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/getGraphDatabaseInternalFieldNamesActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/getGraphDatabaseInternalFieldNamesActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/askRunNeptuneOpenCypherQuery.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/askRunNeptuneOpenCypherQuery.ts - note: unsigned Neptune openCypher call recorded (medium); empty GraphDatabaseExecuteOpenCypherQueryErrorTypeEnum needs core additions (EndpointNotFound/QueryFailed/UnconvertibleResult)
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/converters/askConvertAnyNeptuneResultToAnyGraphResult.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/converters/askConvertAnyNeptuneResultToAnyGraphResult.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/converters/askConvertNeptuneCypherResponseToCypherResponse.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/converters/askConvertNeptuneCypherResponseToCypherResponse.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/converters/askConvertNeptuneNodeResultToGraphNodeResult.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/converters/askConvertNeptuneNodeResultToGraphNodeResult.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/converters/askConvertNeptuneQueryResultToGraphQueryResult.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/converters/askConvertNeptuneQueryResultToGraphQueryResult.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/converters/askConvertNeptuneRelationshipResultToGraphRelationshipResult.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/converters/askConvertNeptuneRelationshipResultToGraphRelationshipResult.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/converters/utils/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/converters/utils/isNeptuneNodeResult.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/converters/utils/isNeptuneNodeResult.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/converters/utils/isNeptuneRelationshipResult.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/converters/utils/isNeptuneRelationshipResult.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/converters/utils/isNeptuneScalarResult.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/converters/utils/isNeptuneScalarResult.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/types/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/types/neptune.ts - note: split into 8 one-type files
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/utils/convertQpqQueryToNeptune.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/utils/convertQpqQueryToNeptune.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/utils/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/index.ts
 [ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/keyValueStore/getKeyValueStoreDeleteActionProcessor.test.ts
 [ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/keyValueStore/getKeyValueStoreDeleteActionProcessor.ts
 [ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/keyValueStore/getKeyValueStoreGetActionProcessor.test.ts
@@ -454,20 +454,20 @@ If your change touched files in more than one package (e.g. you moved a shared h
 [ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectorySetUserAttributesActionProcessor.ts
 [ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectorySignOutUserActionProcessor.ts
 [ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/webserver/email/getEmailSendEmailActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/webserver/email/getEmailSetDeliveryStatusActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/webserver/email/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/webserver/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/webserver/serviceFunction/getServiceFunctionExecuteActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/webserver/serviceFunction/getServiceFunctionExecuteActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/webserver/serviceFunction/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/webserver/webEntry/getWebEntryInvalidateCacheActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/webserver/webEntry/getWebEntryInvalidateCacheActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/webserver/webEntry/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/webserver/websocket/getWebsocketSendMessageActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/webserver/websocket/getWebsocketSendMessageActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/webserver/websocket/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/index.ts - note: documented load-bearing spread order (aws wins over node)
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/webserver/email/getEmailSendEmailActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/webserver/email/getEmailSetDeliveryStatusActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/webserver/email/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/webserver/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/webserver/serviceFunction/getServiceFunctionExecuteActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/webserver/serviceFunction/getServiceFunctionExecuteActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/webserver/serviceFunction/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/webserver/webEntry/getWebEntryInvalidateCacheActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/webserver/webEntry/getWebEntryInvalidateCacheActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/webserver/webEntry/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/webserver/websocket/getWebsocketSendMessageActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/webserver/websocket/getWebsocketSendMessageActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/webserver/websocket/index.ts
 [x] quidproquo-actionprocessor-awslambda/src/getLambdaEntries.test.ts
 [x] quidproquo-actionprocessor-awslambda/src/getLambdaEntries.ts
 [x] quidproquo-actionprocessor-awslambda/src/index.test.ts
@@ -650,75 +650,75 @@ If your change touched files in more than one package (e.g. you moved a shared h
 [x] quidproquo-actionprocessor-awslambda/src/testing/eventProcessorTestHelpers.ts
 [x] quidproquo-actionprocessor-awslambda/src/testing/processorTestHelpers.ts
 [x] quidproquo-actionprocessor-awslambda/vitest.config.ts - note: added alias for deep traceStoryExecution import so the package root resolves under vitest
-[ ] quidproquo-actionprocessor-js/eslint.config.mjs
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/claudeAi/getClaudeAiMessagesApiActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/claudeAi/getClaudeAiMessagesApiActionProcessor.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/claudeAi/index.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/config/getConfigGetApplicationInfoActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/config/getConfigGetApplicationInfoActionProcessor.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/config/getConfigGetGlobalActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/config/getConfigGetGlobalActionProcessor.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/config/index.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/context/getContextListActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/context/getContextListActionProcessor.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/context/getContextReadActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/context/getContextReadActionProcessor.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/context/index.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/customActions/getCustomActionActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/customActions/getCustomActionActionProcessor.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/customActions/index.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/date/getDateNowActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/date/getDateNowActionProcessor.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/date/index.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/error/getErrorThrowErrorActionProcessor.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/error/index.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/guid/getGuidNewActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/guid/getGuidNewActionProcessor.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/guid/getGuidNewSortableActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/guid/getGuidNewSortableActionProcessor.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/guid/index.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/index.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/log/getLogCreateActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/log/getLogCreateActionProcessor.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/log/getLogDisableEventHistoryActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/log/getLogDisableEventHistoryActionProcessor.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/log/getLogTemplateLiteralActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/log/getLogTemplateLiteralActionProcessor.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/log/index.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/math/getMathRandomNumberActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/math/getMathRandomNumberActionProcessor.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/math/index.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/metric/getMetricPutActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/metric/getMetricPutActionProcessor.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/metric/index.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/network/getNetworkRequestActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/network/getNetworkRequestActionProcessor.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/network/index.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/platform/getPlatformDelayActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/platform/getPlatformDelayActionProcessor.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/platform/index.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/system/getSystemBatchActionProcessor.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/system/getSystemGetRuntimeCorrelationActionProcessor.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/core/system/index.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/index.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/webserver/dns/getDnsListActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/webserver/dns/getDnsListActionProcessor.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/webserver/dns/index.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/webserver/index.test.ts
-[ ] quidproquo-actionprocessor-js/src/actionProcessor/webserver/index.ts
-[ ] quidproquo-actionprocessor-js/src/index.test.ts
-[ ] quidproquo-actionprocessor-js/src/index.ts
-[ ] quidproquo-actionprocessor-js/src/integration/composition/combined.test.ts
-[ ] quidproquo-actionprocessor-js/src/integration/composition/contextResolution.test.ts
-[ ] quidproquo-actionprocessor-js/src/integration/composition/crossScopeAliasing.test.ts
-[ ] quidproquo-actionprocessor-js/src/integration/composition/deepTowers.test.ts
-[ ] quidproquo-actionprocessor-js/src/integration/composition/errorReachability.test.ts
-[ ] quidproquo-actionprocessor-js/src/integration/composition/localContext.test.ts
-[ ] quidproquo-actionprocessor-js/src/integration/composition/overrideInterception.test.ts
-[ ] quidproquo-actionprocessor-js/src/integration/composition/runtime.ts
-[ ] quidproquo-actionprocessor-js/src/integration/composition/scenarios.test.ts
-[ ] quidproquo-actionprocessor-js/src/integration/composition/spec.ts
-[ ] quidproquo-actionprocessor-js/vitest.config.ts
+[x] quidproquo-actionprocessor-js/eslint.config.mjs
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/claudeAi/getClaudeAiMessagesApiActionProcessor.test.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/claudeAi/getClaudeAiMessagesApiActionProcessor.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/claudeAi/index.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/config/getConfigGetApplicationInfoActionProcessor.test.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/config/getConfigGetApplicationInfoActionProcessor.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/config/getConfigGetGlobalActionProcessor.test.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/config/getConfigGetGlobalActionProcessor.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/config/index.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/context/getContextListActionProcessor.test.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/context/getContextListActionProcessor.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/context/getContextReadActionProcessor.test.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/context/getContextReadActionProcessor.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/context/index.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/customActions/getCustomActionActionProcessor.test.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/customActions/getCustomActionActionProcessor.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/customActions/index.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/date/getDateNowActionProcessor.test.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/date/getDateNowActionProcessor.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/date/index.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/error/getErrorThrowErrorActionProcessor.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/error/index.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/guid/getGuidNewActionProcessor.test.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/guid/getGuidNewActionProcessor.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/guid/getGuidNewSortableActionProcessor.test.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/guid/getGuidNewSortableActionProcessor.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/guid/index.ts - note: public rename getGuidProcessor -> getGuidActionProcessor (changelog-worthy)
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/index.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/log/getLogCreateActionProcessor.test.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/log/getLogCreateActionProcessor.ts - note: real bug fixed test-first: if (data) dropped falsy-but-present data (0/false/empty); SAME BUG exists in quidproquo-dev-server flavour, flag for that pass
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/log/getLogDisableEventHistoryActionProcessor.test.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/log/getLogDisableEventHistoryActionProcessor.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/log/getLogTemplateLiteralActionProcessor.test.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/log/getLogTemplateLiteralActionProcessor.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/log/index.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/math/getMathRandomNumberActionProcessor.test.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/math/getMathRandomNumberActionProcessor.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/math/index.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/metric/getMetricPutActionProcessor.test.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/metric/getMetricPutActionProcessor.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/metric/index.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/network/getNetworkRequestActionProcessor.test.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/network/getNetworkRequestActionProcessor.ts - note: debug console.log of every request URL removed (low finding, fixed)
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/network/index.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/platform/getPlatformDelayActionProcessor.test.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/platform/getPlatformDelayActionProcessor.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/platform/index.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/system/getSystemBatchActionProcessor.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/system/getSystemGetRuntimeCorrelationActionProcessor.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/core/system/index.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/index.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/webserver/dns/getDnsListActionProcessor.test.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/webserver/dns/getDnsListActionProcessor.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/webserver/dns/index.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/webserver/index.test.ts
+[x] quidproquo-actionprocessor-js/src/actionProcessor/webserver/index.ts - note: dns resolver was unreachable from package root, added to barrel
+[x] quidproquo-actionprocessor-js/src/index.test.ts - note: real smoke test
+[x] quidproquo-actionprocessor-js/src/index.ts
+[x] quidproquo-actionprocessor-js/src/integration/composition/combined.test.ts
+[x] quidproquo-actionprocessor-js/src/integration/composition/contextResolution.test.ts
+[x] quidproquo-actionprocessor-js/src/integration/composition/crossScopeAliasing.test.ts
+[x] quidproquo-actionprocessor-js/src/integration/composition/deepTowers.test.ts
+[x] quidproquo-actionprocessor-js/src/integration/composition/errorReachability.test.ts
+[x] quidproquo-actionprocessor-js/src/integration/composition/localContext.test.ts
+[x] quidproquo-actionprocessor-js/src/integration/composition/overrideInterception.test.ts
+[x] quidproquo-actionprocessor-js/src/integration/composition/runtime.ts
+[x] quidproquo-actionprocessor-js/src/integration/composition/scenarios.test.ts
+[x] quidproquo-actionprocessor-js/src/integration/composition/spec.ts
+[x] quidproquo-actionprocessor-js/vitest.config.ts
 [ ] quidproquo-actionprocessor-node/eslint.config.mjs
 [ ] quidproquo-actionprocessor-node/src/actionProcessor/core/index.test.ts
 [ ] quidproquo-actionprocessor-node/src/actionProcessor/core/index.ts

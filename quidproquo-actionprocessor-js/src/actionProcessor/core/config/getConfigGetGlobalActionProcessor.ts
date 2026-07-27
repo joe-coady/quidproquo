@@ -8,6 +8,8 @@ import {
   qpqCoreUtils,
 } from 'quidproquo-core';
 
+// any: one processor serves globals of every declared type; the per-call generic
+// is only meaningful at the requester, so the variance boundary needs any.
 const getProcessConfigGetGlobal = (qpqConfig: QPQConfig): ConfigGetGlobalActionProcessor<any> => {
   return async ({ globalName }, session) => {
     const globalValue = qpqCoreUtils.resolveGlobalValue(qpqConfig, session.functionGlobals, globalName);

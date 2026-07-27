@@ -2,6 +2,8 @@ import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, 
 
 import { getDnsActionProcessor } from './dns';
 
+export * from './dns';
+
 export const getWebserverActionProcessor: ActionProcessorListResolver = async (
   qpqConfig: QPQConfig,
   dynamicModuleLoader: DynamicModuleLoader,

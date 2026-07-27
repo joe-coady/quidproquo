@@ -18,7 +18,7 @@ import { boundary, echo, ECHO_ACTION, FAIL_ACTION, failLeaf } from './runtime';
 // qpq story; `evaluate` is an independent oracle that computes the intended outcome from
 // the same tree under a context state (global + local bags) and an override stack. The
 // matrices assert that the real runtime's result matches the oracle for every generated
-// tree — any mismatch is a finding.
+// tree; any mismatch is a finding.
 //
 //   ok / fail        leaves that succeed with a value / fail with an error
 //   read(scope,key)  reads a context value (nearest provider of that scope wins, else default)
@@ -119,15 +119,15 @@ export const buildStory = (spec: IdSpec): AskResponse<any> => {
 
 export type Outcome = { ok: true; value: any } | { ok: false; error: string };
 
-interface OverrideFrame {
+type OverrideFrame = {
   target: OverrideTarget;
   id: number;
-}
+};
 
-interface ContextState {
+type ContextState = {
   global: Record<string, string>;
   local: Record<string, string>;
-}
+};
 
 const nearestOverride = (overrides: OverrideFrame[], leafKind: 'ok' | 'fail'): OverrideFrame | undefined => {
   for (let i = overrides.length - 1; i >= 0; i--) {
@@ -280,7 +280,7 @@ export const generateTowers = (depth: number): Spec[] => {
 };
 
 // global + local read/provide with service boundaries, wrapped in catch/parallel. Global and
-// local use distinct identifier names ('g' / 'l') so the two scopes are separate namespaces —
+// local use distinct identifier names ('g' / 'l') so the two scopes are separate namespaces;
 // same-name cross-scope aliasing is covered separately (see crossScopeAliasing.test.ts).
 export const generateLocalContext = (depth: number, globalKey = 'g', localKey = 'l'): Spec[] =>
   subtrees(

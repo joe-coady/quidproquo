@@ -2,7 +2,8 @@ import { ActionProcessorList, ActionProcessorListResolver, actionResult, LogActi
 
 const getProcessLogCreate = (qpqConfig: QPQConfig): LogCreateActionProcessor => {
   return async ({ msg, logLevel, data }) => {
-    if (data) {
+    // Presence check, not truthiness: falsy payloads like 0 or false still get logged.
+    if (data !== undefined) {
       console.log(`${logLevel}: ${msg}`, data);
     } else {
       console.log(`${logLevel}: ${msg}`);
