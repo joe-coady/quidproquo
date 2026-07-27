@@ -46,7 +46,9 @@ export function* askEventDocBundleApplyDoc(doc: EventDocBundleDoc, options: Even
   const row = yield* askEventDocBundlePlanDoc(doc);
 
   if (isWritable(row.status)) {
-    const eventsWritten = yield* askEventDocWriteForeignEvents(doc.id, doc.events, row.existingEvents);
+    const eventsWritten = yield* askEventDocWriteForeignEvents(doc.id, doc.events, row.existingEvents, {
+      importerUserId: options.importerUserId,
+    });
     const assetsWritten = yield* askEventDocTransferWriteAssets(doc.id, doc.assets);
 
     return { ...row, eventsWritten, assetsWritten };
@@ -60,7 +62,10 @@ export function* askEventDocBundleApplyDoc(doc: EventDocBundleDoc, options: Even
   const fromIndex = overwriteFromIndex(existingEvents, doc.events);
 
   const discarded = yield* askEventDocTransferTruncateLog(options.transferId, doc.id, existingEvents, fromIndex);
-  const eventsWritten = yield* askEventDocWriteForeignEvents(doc.id, doc.events, fromIndex, discarded.length > 0);
+  const eventsWritten = yield* askEventDocWriteForeignEvents(doc.id, doc.events, fromIndex, {
+    importerUserId: options.importerUserId,
+    logRewritten: discarded.length > 0,
+  });
   const assetsWritten = yield* askEventDocTransferWriteAssets(doc.id, doc.assets);
 
   return {

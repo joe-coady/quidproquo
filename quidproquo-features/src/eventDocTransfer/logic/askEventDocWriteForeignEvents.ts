@@ -13,6 +13,32 @@ import {
 import { foldEventDocSummary } from '../../eventDoc/summary';
 import { askValidateModelOrThrowError } from '../../validation/askValidateModelOrThrowError';
 
+export type EventDocWriteForeignEventsOptions = {
+  // Attribution for the imported events - see EventDocBundleApplyOptions.importerUserId.
+  importerUserId: string;
+  // The tail was DISCARDED rather than appended to, so the hooks must fire even if nothing new was
+  // written: the summary still changed.
+  logRewritten?: boolean;
+};
+
+/**
+ * Re-attribute one event to the importing user, keeping the original author's display name.
+ *
+ * The source id would be a dangling reference in the target directory, while the display name is a
+ * denormalised snapshot that stays true regardless of which system it is read in. So the id becomes
+ * answerable ("who put this here") and the name stays honest ("who wrote it").
+ */
+const toLocalActor = (event: EventDocEvent, importerUserId: string): EventDocEvent => ({
+  ...event,
+  payload: {
+    ...event.payload,
+    metadata: {
+      ...event.payload.metadata,
+      createdBy: { ...event.payload.metadata.createdBy, userId: importerUserId },
+    },
+  },
+});
+
 // The last Publish in a log, if any: what onPublish is fired for once the whole log has landed.
 const findLatestPublishEvent = (events: EventDocEvent[]): Nullable<EventDocEvent> =>
   [...events].reverse().find((event) => event.type === EventDocEffect.Publish) ?? null;
@@ -41,9 +67,11 @@ function* askEventDocFireImportHooks(docId: string, events: EventDocEvent[], sum
 }
 
 /**
- * Write foreign events into this collection's log VERBATIM: original index, createdAt, createdBy
- * and clientMessageId all preserved, so the target's history is byte-identical to the source's and
- * a later comparison can still recognise it.
+ * Write foreign events into this collection's log almost verbatim: original index, createdAt and
+ * clientMessageId preserved, so a later comparison still recognises them.
+ *
+ * The ONE thing rewritten is `createdBy.userId`, which becomes the importing user (see
+ * toLocalActor). Event identity excludes it, so this does not disturb the fast-forward comparison.
  *
  * This deliberately does NOT go through askEventDocEventAppend, which restamps metadata and runs
  * the collection's validator. Replayed history was already validated at its origin, and a
@@ -54,23 +82,30 @@ function* askEventDocFireImportHooks(docId: string, events: EventDocEvent[], sum
  * writes are conditional on (docId, index) in the store, which is what makes a partial import safe
  * to re-run.
  */
-export function* askEventDocWriteForeignEvents(docId: string, events: EventDocEvent[], fromIndex: number, logRewritten = false): AskResponse<number> {
+export function* askEventDocWriteForeignEvents(
+  docId: string,
+  events: EventDocEvent[],
+  fromIndex: number,
+  { importerUserId, logRewritten = false }: EventDocWriteForeignEventsOptions,
+): AskResponse<number> {
   const { type } = yield* askEventDocResolveStore();
 
-  const missing = events.slice(fromIndex);
+  const localised = events.map((event) => toLocalActor(event, importerUserId));
+  const missing = localised.slice(fromIndex);
 
   for (const event of missing) {
     yield* askEventDocEventWrite(docId, event);
   }
 
-  const summary = foldEventDocSummary(type, events);
+  // Folded from the LOCALISED log, so the summary's createdBy/updatedBy are local ids too.
+  const summary = foldEventDocSummary(type, localised);
   yield* askValidateModelOrThrowError(summary, eventDocSummarySchema);
   yield* askEventDocUpsert(summary);
 
   // `logRewritten` covers the forced-overwrite case where the tail was DISCARDED and nothing new
   // needed writing: the summary still changed, so a materialized read model is still stale.
   if (missing.length > 0 || logRewritten) {
-    yield* askEventDocFireImportHooks(docId, events, summary);
+    yield* askEventDocFireImportHooks(docId, localised, summary);
   }
 
   return missing.length;

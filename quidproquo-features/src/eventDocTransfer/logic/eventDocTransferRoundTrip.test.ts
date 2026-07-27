@@ -14,6 +14,7 @@ import {
   QPQBinaryData,
   runStory,
   throwsError,
+  UserDirectoryActionType,
 } from 'quidproquo-core';
 import { HTTPEvent } from 'quidproquo-webserver';
 
@@ -166,6 +167,16 @@ const buildEnvironment = (environmentName: string): TestEnvironment => {
     [ConfigActionType.GetGlobal]: (action: { payload: { globalName: string } }) => globals[action.payload.globalName] ?? '',
 
     [ConfigActionType.GetApplicationInfo]: { name: 'testapp', environment: environmentName, module: SERVICE },
+
+    // Whoever is importing here. Deliberately different per environment: a source user id is
+    // meaningless in the target directory, so the import re-attributes to this one.
+    [UserDirectoryActionType.ReadAccessToken]: {
+      userId: `${environmentName}-importer`,
+      username: `${environmentName} importer`,
+      exp: 0,
+      userDirectory: 'test-user-directory',
+      wasValid: true,
+    },
 
     [DateActionType.Now]: () => new Date((clock += 1000)).toISOString(),
     [GuidActionType.New]: () => `${environmentName}-guid-${++guidCounter}`,
@@ -333,6 +344,13 @@ const eventsFor = (environment: TestEnvironment, type: string, docId: string): E
     .sort((a, b) => (a.sk as number) - (b.sk as number))
     .map((row) => row.data as EventDocEvent);
 
+// Import localises createdBy.userId on purpose, so comparing source and target logs has to ignore it.
+const withoutActorIds = (events: EventDocEvent[]): EventDocEvent[] =>
+  events.map((event) => ({
+    ...event,
+    payload: { ...event.payload, metadata: { ...event.payload.metadata, createdBy: { ...event.payload.metadata.createdBy, userId: 'ANY' } } },
+  }));
+
 const summaryFor = (environment: TestEnvironment, type: string, docId: string): EventDocSummary =>
   (environment.tables[storeNameForType(type)] ?? []).find((row) => row.id === docId) as unknown as EventDocSummary;
 
@@ -428,7 +446,7 @@ describe('askEventDocManifest across several roots', () => {
     const rows = JSON.parse(runStory(importBundle(httpEvent({ transferId: uploadTarget.transferId })), target.mocks).body!);
 
     expect(rows.every((row: { status: string }) => row.status === EventDocTransferStatus.New)).toBe(true);
-    expect(eventsFor(target, TEMPLATE_TYPE, 'template-2')).toEqual(eventsFor(source, TEMPLATE_TYPE, 'template-2'));
+    expect(withoutActorIds(eventsFor(target, TEMPLATE_TYPE, 'template-2'))).toEqual(withoutActorIds(eventsFor(source, TEMPLATE_TYPE, 'template-2')));
   });
 });
 
@@ -463,13 +481,19 @@ describe('eventDoc transfer round trip', () => {
     expect(importRows.find((row: { id: string }) => row.id === 'template-1').eventsWritten).toBe(4);
     expect(importRows.find((row: { id: string }) => row.id === 'template-1').assetsWritten).toBe(1);
 
-    // The logs are byte-identical, so the target folds to exactly the source's state.
+    // The logs match event for event APART from the actor id, which is localised on purpose.
     for (const doc of bundle.docs) {
-      expect(eventsFor(target, doc.type, doc.id)).toEqual(eventsFor(source, doc.type, doc.id));
-      expect(foldEventDocSummary(doc.type, eventsFor(target, doc.type, doc.id))).toEqual(
-        foldEventDocSummary(doc.type, eventsFor(source, doc.type, doc.id)),
-      );
+      expect(withoutActorIds(eventsFor(target, doc.type, doc.id))).toEqual(withoutActorIds(eventsFor(source, doc.type, doc.id)));
     }
+
+    // Attribution: the id is the importer (the source's would dangle in this directory), while the
+    // author's display name survives so history still reads as the person who wrote it.
+    const importedTemplateEvents = eventsFor(target, TEMPLATE_TYPE, 'template-1');
+    expect(importedTemplateEvents.map((imported) => imported.payload.metadata.createdBy)).toEqual(
+      importedTemplateEvents.map(() => ({ userId: 'uat-importer', userDisplayName: 'Author One' })),
+    );
+    expect(summaryFor(target, TEMPLATE_TYPE, 'template-1').createdBy).toBe('uat-importer');
+    expect(summaryFor(target, TEMPLATE_TYPE, 'template-1').updatedBy).toBe('uat-importer');
 
     // Publish history survived: the summary the target derived carries the published version.
     expect(summaryFor(target, TEMPLATE_TYPE, 'template-1').versions[0].publishedAt).toBeDefined();
@@ -539,7 +563,7 @@ describe('eventDoc transfer round trip', () => {
 
     const applied = JSON.parse(runStory(importBundle(httpEvent({ transferId: secondUpload.transferId })), target.mocks).body!);
     expect(applied.find((row: { id: string }) => row.id === 'template-1').eventsWritten).toBe(1);
-    expect(eventsFor(target, TEMPLATE_TYPE, 'template-1')).toEqual(eventsFor(source, TEMPLATE_TYPE, 'template-1'));
+    expect(withoutActorIds(eventsFor(target, TEMPLATE_TYPE, 'template-1'))).toEqual(withoutActorIds(eventsFor(source, TEMPLATE_TYPE, 'template-1')));
 
     // Now someone edits the target directly: the next promotion of that doc must refuse.
     target.tables[eventDocEventsStoreName(TEMPLATES_STORE)].push({
@@ -636,7 +660,7 @@ describe('eventDoc transfer round trip', () => {
     expect(forcedRow.eventsWritten).toBe(2);
 
     // The log now matches the source exactly.
-    expect(eventsFor(target, TEMPLATE_TYPE, 'template-1')).toEqual(eventsFor(source, TEMPLATE_TYPE, 'template-1'));
+    expect(withoutActorIds(eventsFor(target, TEMPLATE_TYPE, 'template-1'))).toEqual(withoutActorIds(eventsFor(source, TEMPLATE_TYPE, 'template-1')));
 
     // And what was thrown away is recoverable off the transfer drive.
     const discarded = target.files[`${EVENT_DOC_TRANSFER_DRIVE_NAME}/${eventDocTransferDiscardedPath(upload2.transferId, 'template-1')}`] as {

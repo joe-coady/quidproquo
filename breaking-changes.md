@@ -7,6 +7,8 @@ assembled quickly.
 
 - `EventDocListConfig` (and `askUIEventDocListSetConfig`'s payload) requires a new `canTransfer: boolean` field. Existing callers must add it explicitly: `true` to show Export/Import on that list, `false` otherwise.
 - `EventDocListItem` requires a new `type: string` field (the collection's event-doc type). Code constructing `EventDocListItem` values directly (outside `toEventDocListItem`) must supply it.
+- `EventDocBundleApplyOptions` in `quidproquo-features` requires a new `importerUserId: string` field. Callers of `askEventDocBundleApply`/`askEventDocBundleApplyDoc` must pass the importing user's id; every imported event's `createdBy.userId` is rewritten to it (the original `userDisplayName` is kept).
+- `askEventDocWriteForeignEvents(docId, events, fromIndex, logRewritten?)` in `quidproquo-features` is now `askEventDocWriteForeignEvents(docId, events, fromIndex, { importerUserId, logRewritten? })`. Pass the importing user's id in the new required options object instead of a trailing boolean.
 
 ## 0.1.11
 

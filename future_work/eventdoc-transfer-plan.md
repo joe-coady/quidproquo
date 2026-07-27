@@ -123,15 +123,28 @@ Five properties the event-doc layer already has:
    then it would narrow DISCOVERY only: a discovered doc always transfers its whole log,
    because fast-forward needs it.
 
-7. **Events are written verbatim, validators bypassed.** Original `index`, `createdAt`,
-   `createdBy`, `clientMessageId`. `askEventDocEventAppend` deliberately restamps
-   metadata and validates, so it cannot reproduce a foreign event; import needs its own
+7. **Events are written verbatim, validators bypassed.** Original `index`, `createdAt`
+   and `clientMessageId` (the sole exception is `createdBy.userId` - see 8).
+   `askEventDocEventAppend` deliberately restamps metadata and validates, so it cannot
+   reproduce a foreign event; import needs its own
    write path. Bypassing the validator is correct for replaying already-validated
    history (a validator that got stricter since must not rewrite the past).
 
-8. **Actors travel verbatim.** `createdBy` is a denormalised `{ userId, userDisplayName }`
-   snapshot, so history still renders in the target even though the user id does not
-   exist there. No actor mapping.
+8. **The actor id is localised to the importer; the display name is not.** (Revised
+   2026-07-27; was "actors travel verbatim, no mapping".) Every imported event's
+   `createdBy.userId` becomes the importing user's id, while `createdBy.userDisplayName`
+   is kept from the source. The source id is guaranteed to resolve to nobody in the target
+   directory - the one exception being two tenants of a single system - so carrying it over
+   would leave a foreign key pointing at nothing. The display name is a denormalised
+   snapshot that stays true wherever it is read. Net: the id answers "who put this here",
+   the name still answers "who wrote it". The summary is folded from the localised log, so
+   its `createdBy`/`updatedBy` are local too.
+
+   Safe for the fast-forward comparison because event identity is (type, index, version,
+   clientMessageId, createdAt) and deliberately excludes the actor, so exporting from the
+   target and importing it back still fast-forwards rather than looking diverged. The
+   original decision rested partly on a belief that rewriting the actor WOULD break that
+   comparison. It does not.
 
 9. **Hooks fire once per doc, at the end.** `onPublish` for the latest publish event,
    then `onAppend` for the tail, after the whole log is written. Per-event firing would
