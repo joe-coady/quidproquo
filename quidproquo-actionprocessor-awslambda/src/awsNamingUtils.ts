@@ -2,6 +2,23 @@ import { getAwsServiceAccountInfoByDeploymentInfo, qpqConfigAwsUtils } from 'qui
 import { CrossModuleOwner, QPQConfig, qpqCoreUtils, ResourceName } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
+type AwsDeploymentContext = {
+  application: string;
+  service: string;
+  environment: string;
+  feature?: string;
+};
+
+// A resource declared with a CrossModuleOwner belongs to another service. Every owner field
+// falls back to the executing service's own deployment context, so all consumers resolve the
+// exact name the owning service deployed under.
+const resolveOwnerDeploymentContext = (qpqConfig: QPQConfig, owner?: CrossModuleOwner): AwsDeploymentContext => ({
+  application: owner?.application || qpqCoreUtils.getApplicationName(qpqConfig),
+  service: owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig),
+  environment: owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
+  feature: owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig),
+});
+
 export const getGlobalConfigRuntimeResourceName = (resourceName: string, application: string, environment: string, feature?: string) => {
   const baseName = `${resourceName}-${application}-${environment}`;
 
@@ -33,24 +50,19 @@ export const getConfigRuntimeResourceName = (resourceName: string, application: 
   return baseName;
 };
 
-export const getConfigRuntimeBootstrapResourceName = (resourceName: string, application: string, environment: string, feature?: string) => {
-  const baseName = `${resourceName}-${application}-${environment}`;
+// Bootstrap resources are shared per app+environment, so like global names they carry no
+// service segment.
+export const getConfigRuntimeBootstrapResourceName = (resourceName: string, application: string, environment: string, feature?: string) =>
+  getGlobalConfigRuntimeResourceName(resourceName, application, environment, feature);
 
-  if (feature) {
-    return `${baseName}-${feature}`;
-  }
-
-  return baseName;
-};
-
-export const getConfigRuntimeResourceNameFromConfig = (resourceName: string, qpqConfig: QPQConfig) => {
-  const application = qpqCoreUtils.getApplicationName(qpqConfig);
-  const service = qpqCoreUtils.getApplicationModuleName(qpqConfig);
-  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
-  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+export const resolveConfigRuntimeResourceNameFromConfig = (resourceName: string, qpqConfig: QPQConfig, owner?: CrossModuleOwner) => {
+  const { application, service, environment, feature } = resolveOwnerDeploymentContext(qpqConfig, owner);
 
   return getConfigRuntimeResourceName(resourceName, application, service, environment, feature);
 };
+
+export const getConfigRuntimeResourceNameFromConfig = (resourceName: string, qpqConfig: QPQConfig) =>
+  resolveConfigRuntimeResourceNameFromConfig(resourceName, qpqConfig);
 
 // AWS FIFO resources (SQS queues, SNS topics) must be named with a trailing .fifo - it has
 // to be the final characters, so it goes after the app-service-env decoration. Every FIFO
@@ -64,15 +76,6 @@ export const getQueueRuntimeResourceNameFromConfig = (queueName: string, qpqConf
   return withFifoSuffix(baseName, qpqCoreUtils.getQueueByName(qpqConfig, queueName)?.isFifo);
 };
 
-export const resolveConfigRuntimeResourceNameFromConfig = (resourceName: string, qpqConfig: QPQConfig, owner?: CrossModuleOwner) => {
-  const application = owner?.application || qpqCoreUtils.getApplicationName(qpqConfig);
-  const service = owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig);
-  const environment = owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
-  const feature = owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
-
-  return getConfigRuntimeResourceName(resourceName, application, service, environment, feature);
-};
-
 export const getConfigRuntimeBootstrapResourceNameFromConfig = (resourceName: string, qpqConfig: QPQConfig) => {
   const application = qpqCoreUtils.getApplicationName(qpqConfig);
   const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
@@ -81,14 +84,8 @@ export const getConfigRuntimeBootstrapResourceNameFromConfig = (resourceName: st
   return getConfigRuntimeBootstrapResourceName(resourceName, application, environment, feature);
 };
 
-export const getConfigRuntimeResourceNameFromConfigWithServiceOverride = (resourceName: string, qpqConfig: QPQConfig, serviceOverride?: string) => {
-  const application = qpqCoreUtils.getApplicationName(qpqConfig);
-  const service = serviceOverride || qpqCoreUtils.getApplicationModuleName(qpqConfig);
-  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
-  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
-
-  return getConfigRuntimeResourceName(resourceName, application, service, environment, feature);
-};
+export const getConfigRuntimeResourceNameFromConfigWithServiceOverride = (resourceName: string, qpqConfig: QPQConfig, serviceOverride?: string) =>
+  resolveConfigRuntimeResourceNameFromConfig(resourceName, qpqConfig, { module: serviceOverride });
 
 export const getQpqRuntimeResourceName = (
   resourceName: string,
@@ -105,14 +102,13 @@ export const getQpqRuntimeResourceName = (
 export const getQpqRuntimeResourceNameFromConfig = (resourceName: ResourceName, qpqConfig: QPQConfig, resourceType: string = '') => {
   const crossServiceResourceName = qpqCoreUtils.resolveCrossServiceResourceName(resourceName);
 
-  const application = qpqCoreUtils.getApplicationName(qpqConfig);
-  const service = crossServiceResourceName.service || qpqCoreUtils.getApplicationModuleName(qpqConfig);
-  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
-  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+  const { application, service, environment, feature } = resolveOwnerDeploymentContext(qpqConfig, { module: crossServiceResourceName.service });
 
   return getQpqRuntimeResourceName(crossServiceResourceName.name, application, service, environment, feature, resourceType);
 };
 
+// Note: only the owner's module is honoured here; an owner application/environment/feature on
+// a kvs config does not change the table name. Changing that now would orphan deployed tables.
 export const getKvsDynamoTableNameFromConfig = (resourceName: string, qpqConfig: QPQConfig, resourceType: string = '') => {
   const tableNameOverride = qpqConfigAwsUtils.getDynamoTableNameOverrride(resourceName, qpqConfig);
   if (tableNameOverride) {
@@ -121,26 +117,39 @@ export const getKvsDynamoTableNameFromConfig = (resourceName: string, qpqConfig:
 
   const storeConfig = qpqCoreUtils.getKeyValueStoreByName(qpqConfig, resourceName);
 
-  const application = qpqCoreUtils.getApplicationName(qpqConfig);
-  const service = storeConfig?.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig);
-
-  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
-  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+  const { application, service, environment, feature } = resolveOwnerDeploymentContext(qpqConfig, { module: storeConfig?.owner?.module });
 
   return getQpqRuntimeResourceName(resourceName, application, service, environment, feature, resourceType);
 };
 
-export const getCFExportNameUserPoolIdFromConfig = (userDirectoryName: string, qpqConfig: QPQConfig) => {
+const getUserPoolCFExportName = (userDirectoryName: string, qpqConfig: QPQConfig, resourceType: string) => {
   const userDirectoryConfig = qpqCoreUtils.getUserDirectoryByName(userDirectoryName, qpqConfig);
 
-  const application = userDirectoryConfig.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig);
-  const service = userDirectoryConfig.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig);
-  const environment = userDirectoryConfig.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
-  const feature = userDirectoryConfig.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
-
+  const { application, service, environment, feature } = resolveOwnerDeploymentContext(qpqConfig, userDirectoryConfig.owner);
   const resourceName = userDirectoryConfig.owner?.resourceNameOverride || userDirectoryName;
 
-  return getQpqRuntimeResourceName(resourceName, application, service, environment, feature, 'user-pool-id-export');
+  return getQpqRuntimeResourceName(resourceName, application, service, environment, feature, resourceType);
+};
+
+export const getCFExportNameUserPoolIdFromConfig = (userDirectoryName: string, qpqConfig: QPQConfig) =>
+  getUserPoolCFExportName(userDirectoryName, qpqConfig, 'user-pool-id-export');
+
+export const getCFExportNameUserPoolClientIdFromConfig = (userDirectoryName: string, qpqConfig: QPQConfig) =>
+  getUserPoolCFExportName(userDirectoryName, qpqConfig, 'user-pool-client-id-export');
+
+const getOverridableQpqResourceExportName = (
+  resourceName: string,
+  qpqConfig: QPQConfig,
+  resourceType: string,
+  serviceOverride?: string,
+  applicationOverride?: string,
+) => {
+  const { application, service, environment, feature } = resolveOwnerDeploymentContext(qpqConfig, {
+    application: applicationOverride,
+    module: serviceOverride,
+  });
+
+  return getQpqRuntimeResourceName(resourceName, application, service, environment, feature, resourceType);
 };
 
 export const getCFExportNameCachePolicyIdFromConfig = (
@@ -149,27 +158,7 @@ export const getCFExportNameCachePolicyIdFromConfig = (
 
   serviceOverride?: string,
   applicationOverride?: string,
-) => {
-  const application = applicationOverride || qpqCoreUtils.getApplicationName(qpqConfig);
-  const service = serviceOverride || qpqCoreUtils.getApplicationModuleName(qpqConfig);
-  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
-  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
-
-  return getQpqRuntimeResourceName(cacheConfigName, application, service, environment, feature, 'cache-policy-name-export');
-};
-
-export const getCFExportNameUserPoolClientIdFromConfig = (userDirectoryName: string, qpqConfig: QPQConfig) => {
-  const userDirectoryConfig = qpqCoreUtils.getUserDirectoryByName(userDirectoryName, qpqConfig);
-
-  const application = userDirectoryConfig.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig);
-  const service = userDirectoryConfig.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig);
-  const environment = userDirectoryConfig.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
-  const feature = userDirectoryConfig.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
-
-  const resourceName = userDirectoryConfig.owner?.resourceNameOverride || userDirectoryName;
-
-  return getQpqRuntimeResourceName(resourceName, application, service, environment, feature, 'user-pool-client-id-export');
-};
+) => getOverridableQpqResourceExportName(cacheConfigName, qpqConfig, 'cache-policy-name-export', serviceOverride, applicationOverride);
 
 export const getCFExportNameApiKeyIdFromConfig = (
   apiKeyName: string,
@@ -177,14 +166,7 @@ export const getCFExportNameApiKeyIdFromConfig = (
 
   serviceOverride?: string,
   applicationOverride?: string,
-) => {
-  const application = applicationOverride || qpqCoreUtils.getApplicationName(qpqConfig);
-  const service = serviceOverride || qpqCoreUtils.getApplicationModuleName(qpqConfig);
-  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
-  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
-
-  return getQpqRuntimeResourceName(apiKeyName, application, service, environment, feature, 'api-key-id-export');
-};
+) => getOverridableQpqResourceExportName(apiKeyName, qpqConfig, 'api-key-id-export', serviceOverride, applicationOverride);
 
 export const getCFExportNameSnsTopicArnFromConfig = (
   eventBusName: string,
@@ -205,26 +187,28 @@ export const getCFExportNameDistributionIdArnFromConfig = (
 
   serviceOverride?: string,
   applicationOverride?: string,
-) => {
-  const application = applicationOverride || qpqCoreUtils.getApplicationName(qpqConfig);
-  const service = serviceOverride || qpqCoreUtils.getApplicationModuleName(qpqConfig);
-  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
-  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+) => getOverridableQpqResourceExportName(webEntryName, qpqConfig, 'distribution-id-export', serviceOverride, applicationOverride);
 
-  return getQpqRuntimeResourceName(webEntryName, application, service, environment, feature, 'distribution-id-export');
+const resolveWebsocketApiNaming = (websocketApiName: string, qpqConfig: QPQConfig) => {
+  const websocketApiConfig = qpqWebServerUtils.getWebsocketEntryByApiName(websocketApiName, qpqConfig);
+
+  return {
+    context: resolveOwnerDeploymentContext(qpqConfig, websocketApiConfig.owner),
+    resourceName: websocketApiConfig.owner?.resourceNameOverride || websocketApiName,
+  };
 };
 
 export const getCFExportNameWebsocketApiIdFromConfig = (websocketApiName: string, qpqConfig: QPQConfig) => {
-  const websocketApiConfig = qpqWebServerUtils.getWebsocketEntryByApiName(websocketApiName, qpqConfig);
+  const { context, resourceName } = resolveWebsocketApiNaming(websocketApiName, qpqConfig);
 
-  const application = websocketApiConfig.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig);
-  const service = websocketApiConfig.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig);
-  const environment = websocketApiConfig.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
-  const feature = websocketApiConfig.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
-
-  const resourceName = websocketApiConfig.owner?.resourceNameOverride || websocketApiName;
-
-  return getQpqRuntimeResourceName(resourceName, application, service, environment, feature, 'websocket-api-id-export');
+  return getQpqRuntimeResourceName(
+    resourceName,
+    context.application,
+    context.service,
+    context.environment,
+    context.feature,
+    'websocket-api-id-export',
+  );
 };
 
 // SSM parameter holding a websocket api's AWS-generated id, written by the owning service's
@@ -232,16 +216,9 @@ export const getCFExportNameWebsocketApiIdFromConfig = (websocketApiName: string
 // grants (deploy the owning inf stack first - same owner-publishes/others-read pattern as
 // the domain certificate arn parameter).
 export const getWebsocketApiIdSsmParameterName = (websocketApiName: string, qpqConfig: QPQConfig) => {
-  const websocketApiConfig = qpqWebServerUtils.getWebsocketEntryByApiName(websocketApiName, qpqConfig);
+  const { context, resourceName } = resolveWebsocketApiNaming(websocketApiName, qpqConfig);
 
-  const application = websocketApiConfig.owner?.application || qpqCoreUtils.getApplicationName(qpqConfig);
-  const service = websocketApiConfig.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig);
-  const environment = websocketApiConfig.owner?.environment || qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
-  const feature = websocketApiConfig.owner?.feature || qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
-
-  const resourceName = websocketApiConfig.owner?.resourceNameOverride || websocketApiName;
-
-  return `/qpq/websocket/api-id/${getConfigRuntimeResourceName(resourceName, application, service, environment, feature)}`;
+  return `/qpq/websocket/api-id/${getConfigRuntimeResourceName(resourceName, context.application, context.service, context.environment, context.feature)}`;
 };
 
 export const getEventBusSnsTopicArn = (
@@ -274,12 +251,9 @@ export const getEventBusSnsTopicArn = (
 export const getAccountStackName = () => 'qpq-account';
 
 export const getBaseStackName = (qpqConfig: QPQConfig) => {
-  const appName = qpqCoreUtils.getApplicationName(qpqConfig);
-  const moduleName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
-  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
-  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+  const { application, service, environment, feature } = resolveOwnerDeploymentContext(qpqConfig);
 
-  const baseName = `${appName}-${moduleName}-${environment}`;
+  const baseName = `${application}-${service}-${environment}`;
 
   if (feature) {
     return `${baseName}-${feature}`;
@@ -300,7 +274,9 @@ export const getApiStackName = (qpqConfig: QPQConfig) => {
   return `${getBaseStackName(qpqConfig)}-api`;
 };
 
-export const getBootstrapStackName = (qpqConfig: QPQConfig) => {
+// App-level stacks (bootstrap, domain) are shared by every module of the app, so their
+// names carry no module segment.
+const getAppStackName = (qpqConfig: QPQConfig, suffix: string) => {
   const appName = qpqCoreUtils.getApplicationName(qpqConfig);
   const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
   const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
@@ -308,22 +284,12 @@ export const getBootstrapStackName = (qpqConfig: QPQConfig) => {
   const baseName = `${appName}-${environment}`;
 
   if (feature) {
-    return `${baseName}-${feature}-bs`;
+    return `${baseName}-${feature}-${suffix}`;
   }
 
-  return `${baseName}-bs`;
+  return `${baseName}-${suffix}`;
 };
 
-export const getDomainStackName = (qpqConfig: QPQConfig) => {
-  const appName = qpqCoreUtils.getApplicationName(qpqConfig);
-  const environment = qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig);
-  const feature = qpqCoreUtils.getApplicationModuleFeature(qpqConfig);
+export const getBootstrapStackName = (qpqConfig: QPQConfig) => getAppStackName(qpqConfig, 'bs');
 
-  const baseName = `${appName}-${environment}`;
-
-  if (feature) {
-    return `${baseName}-${feature}-domain`;
-  }
-
-  return `${baseName}-domain`;
-};
+export const getDomainStackName = (qpqConfig: QPQConfig) => getAppStackName(qpqConfig, 'domain');

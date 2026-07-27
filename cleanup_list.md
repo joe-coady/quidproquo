@@ -130,12 +130,12 @@ If your change touched files in more than one package (e.g. you moved a shared h
 [x] create-qpq-app/src/steps/index.ts
 [x] create-qpq-app/src/types.ts - note: split into types/ folder (AppLanguage, CreateQpqAppAnswers, StepContext, CreateQpqAppStep), interface -> type
 [x] create-qpq-app/vitest.config.ts
-[ ] quidproquo-actionprocessor-awslambda/eslint.config.mjs
-[ ] quidproquo-actionprocessor-awslambda/scripts/buildLogExtensionLayer.mjs
-[ ] quidproquo-actionprocessor-awslambda/src/awsLambdaUtils.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/awsLambdaUtils.ts
-[ ] quidproquo-actionprocessor-awslambda/src/awsNamingUtils.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/awsNamingUtils.ts
+[x] quidproquo-actionprocessor-awslambda/eslint.config.mjs
+[x] quidproquo-actionprocessor-awslambda/scripts/buildLogExtensionLayer.mjs
+[x] quidproquo-actionprocessor-awslambda/src/awsLambdaUtils.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/awsLambdaUtils.ts
+[x] quidproquo-actionprocessor-awslambda/src/awsNamingUtils.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/awsNamingUtils.ts - note: DRY pass behind existing name-table tests; getKvsDynamoTableNameFromConfig honours only owner.module, flagged in code, changing it would orphan deployed tables
 [ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/aiModelMap.test.ts
 [ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/aiModelMap.ts
 [ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/getAiPromptActionProcessor.test.ts
@@ -468,10 +468,10 @@ If your change touched files in more than one package (e.g. you moved a shared h
 [ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/webserver/websocket/getWebsocketSendMessageActionProcessor.test.ts
 [ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/webserver/websocket/getWebsocketSendMessageActionProcessor.ts
 [ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/webserver/websocket/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getLambdaEntries.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getLambdaEntries.ts
-[ ] quidproquo-actionprocessor-awslambda/src/index.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/getLambdaEntries.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getLambdaEntries.ts
+[x] quidproquo-actionprocessor-awslambda/src/index.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/index.ts - note: entryNames/memoFunc/getParameter(s) have zero monorepo consumers but are intentional published root exports, kept
 [ ] quidproquo-actionprocessor-awslambda/src/lambdaExtensions/getLogExtensionLayerPath.test.ts
 [ ] quidproquo-actionprocessor-awslambda/src/lambdaExtensions/getLogExtensionLayerPath.ts
 [ ] quidproquo-actionprocessor-awslambda/src/lambdaExtensions/logExtensionPort.test.ts
@@ -649,7 +649,7 @@ If your change touched files in more than one package (e.g. you moved a shared h
 [ ] quidproquo-actionprocessor-awslambda/src/runtimeConfig/qpqAwsLambdaRuntimeConfigUtils.ts
 [ ] quidproquo-actionprocessor-awslambda/src/testing/eventProcessorTestHelpers.ts
 [ ] quidproquo-actionprocessor-awslambda/src/testing/processorTestHelpers.ts
-[ ] quidproquo-actionprocessor-awslambda/vitest.config.ts
+[x] quidproquo-actionprocessor-awslambda/vitest.config.ts - note: added alias for deep traceStoryExecution import so the package root resolves under vitest
 [ ] quidproquo-actionprocessor-js/eslint.config.mjs
 [ ] quidproquo-actionprocessor-js/src/actionProcessor/core/claudeAi/getClaudeAiMessagesApiActionProcessor.test.ts
 [ ] quidproquo-actionprocessor-js/src/actionProcessor/core/claudeAi/getClaudeAiMessagesApiActionProcessor.ts

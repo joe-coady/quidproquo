@@ -1,5 +1,7 @@
 import path from 'path';
 
+// One entry per lambda handler under ./lambdas; each name must match its source
+// filename exactly (yes, including the apiGatway spelling).
 export const entryNames = [
   'anyExecuteServiceFunctionEvent_serviceFunction',
 
@@ -23,11 +25,9 @@ export const entryNames = [
   'sqsEvent_queueEvent',
 ];
 
+/**
+ * Maps each lambda entry name to its handler path, for deploy bundlers
+ * (quidproquo-deploy-rspack/webpack) to use as bundle entry points.
+ */
 export const getLambdaEntries = (): Record<string, string> =>
-  entryNames.reduce(
-    (acc, name) => ({
-      ...acc,
-      [name]: path.join(__dirname, `./lambdas/${name}`),
-    }),
-    {},
-  );
+  Object.fromEntries(entryNames.map((name) => [name, path.join(__dirname, `./lambdas/${name}`)]));

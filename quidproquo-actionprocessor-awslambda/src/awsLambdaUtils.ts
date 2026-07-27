@@ -1,4 +1,4 @@
-import { StorageDriveTier } from 'quidproquo-core';
+import { Nullable, StorageDriveTier } from 'quidproquo-core';
 
 import { randomUUID } from 'crypto';
 import { match } from 'node-match-path';
@@ -8,15 +8,13 @@ export const randomGuid = () => {
   return randomUUID();
 };
 
-export interface UrlMatch {
+export type UrlMatch = {
   didMatch: boolean;
-  params: Record<string, string> | null;
-}
+  params: Nullable<Record<string, string>>;
+};
 
+/** Matches a url against a `{param}` templated route path, extracting the path params on a hit. */
 export const matchUrl = (path: string, url: string): UrlMatch => {
-  // console.log('Matching (path): ', path);
-  // console.log('Matching (url): ', url);
-
   // /attempt/{attemptUuid}/result/{test} => /attempt/:attemptUuid/result/:test
   const modifiedPath = path.replaceAll(/{(.+?)}/g, (m, g) => `:${g}`);
 
@@ -27,6 +25,7 @@ export const matchUrl = (path: string, url: string): UrlMatch => {
   };
 };
 
+/** Maps a qpq storage drive tier to its S3 storage class. An unset tier lets S3 pick (INTELLIGENT_TIERING). */
 export const getS3BucketStorageClassFromStorageDriveTier = (driveTier?: StorageDriveTier): keyof typeof StorageClass => {
   switch (driveTier) {
     case StorageDriveTier.REGULAR:
