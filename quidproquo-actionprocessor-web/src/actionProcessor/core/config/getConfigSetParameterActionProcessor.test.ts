@@ -36,7 +36,9 @@ describe('getConfigSetParameterActionProcessor', () => {
   });
 
   it('maps a QuotaExceededError to the QuotaExceeded error type', async () => {
-    vi.spyOn(window.localStorage, 'setItem').mockImplementation(throwQuotaExceededError);
+    // Spy on the prototype: jsdom's localStorage is proxy-backed, so an instance-level
+    // spy is silently swallowed and never intercepts the call.
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(throwQuotaExceededError);
     const processor = await getProcessor();
 
     const [, error] = await processor({ parameterName: 'token', parameterValue: 'abc' });
@@ -48,7 +50,7 @@ describe('getConfigSetParameterActionProcessor', () => {
     const throwUnrecognisedError = () => {
       throw new Error('boom');
     };
-    vi.spyOn(window.localStorage, 'setItem').mockImplementation(throwUnrecognisedError);
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(throwUnrecognisedError);
     const processor = await getProcessor();
 
     const [, error] = await processor({ parameterName: 'token', parameterValue: 'abc' });
