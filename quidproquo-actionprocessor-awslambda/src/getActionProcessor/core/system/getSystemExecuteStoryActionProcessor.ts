@@ -19,8 +19,7 @@ import {
 } from 'quidproquo-core';
 
 import { randomGuid } from '../../../awsLambdaUtils';
-
-export const getDateNow = () => new Date().toISOString();
+import { getDateNow } from './getDateNow';
 
 const getProcessExecuteStory = <T extends Array<any>, R>(qpqConfig: QPQConfig): SystemExecuteStoryActionProcessor<T, R> => {
   const moduleName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
@@ -32,7 +31,7 @@ const getProcessExecuteStory = <T extends Array<any>, R>(qpqConfig: QPQConfig): 
     updateSession: StorySessionUpdater,
     dynamicModuleLoader: DynamicModuleLoader,
   ): Promise<any> => {
-    let story = await dynamicModuleLoader(payload.runtime);
+    const story = await dynamicModuleLoader(payload.runtime);
 
     if (!story) {
       return actionResultError(ErrorTypeEnum.NotFound, `Unable to dynamically load: [${payload.runtime}]`);

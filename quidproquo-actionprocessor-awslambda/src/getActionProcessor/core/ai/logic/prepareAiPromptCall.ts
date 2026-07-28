@@ -13,22 +13,23 @@ import {
   StreamRegistry,
 } from 'quidproquo-core';
 
+import type { ToolSet } from 'ai';
 import { jsonSchema } from 'ai';
 import { createAmazonBedrock } from '@ai-sdk/amazon-bedrock';
 
 import { randomGuid } from '../../../../awsLambdaUtils';
 import { bedrockModelMap } from '../aiModelMap';
 
-export interface PrepareAiPromptCallPayload {
+export type PrepareAiPromptCallPayload = {
   model: AiModel;
   aiName?: string;
-}
+};
 
 type BedrockProvider = ReturnType<typeof createAmazonBedrock>;
 type BedrockLanguageModel = ReturnType<BedrockProvider>;
 
 export type PrepareAiPromptCallResult =
-  { error: { type: ErrorTypeEnum; message: string } } | { model: BedrockLanguageModel; tools: Record<string, any> | undefined };
+  { error: { type: ErrorTypeEnum; message: string } } | { model: BedrockLanguageModel; tools: ToolSet | undefined };
 
 export const prepareAiPromptCall = (
   qpqConfig: QPQConfig,
@@ -47,7 +48,7 @@ export const prepareAiPromptCall = (
     return { error: { type: ErrorTypeEnum.NotImplemented, message: `Unsupported AI model: ${payload.model}` } };
   }
 
-  const aiTools: Record<string, any> = {};
+  const aiTools: ToolSet = {};
 
   if (payload.aiName) {
     const aiConfigs = qpqCoreUtils.getAllAiConfigs(qpqConfig);

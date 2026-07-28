@@ -47,30 +47,30 @@ const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): EventBusSendMessag
       eventBusConfig.isFifo,
     );
 
+    // Each entry carries the caller's session so the consuming service resumes
+    // with the same correlation/context.
+    const toSnsEntry = (message: EventBusMessage<any>): SnsPublishMessageEntry => {
+      const eventBusMessageWithSession: AnyEventBusMessageWithSession = {
+        ...message,
+        storySession: toCrossServiceSession(session),
+      };
+
+      return {
+        message: JSON.stringify(eventBusMessageWithSession),
+
+        // FIFO: default to one group per bus (global ordering) and a unique
+        // dedup id (no dedup) - callers opt in to per-entity groups / real dedup
+        ...(eventBusConfig.isFifo
+          ? {
+              groupId: message.groupId ?? eventBusName,
+              deduplicationId: message.deduplicationId ?? generateUuid(),
+            }
+          : {}),
+      };
+    };
+
     try {
-      await publishMessage(
-        topicArn,
-        region,
-        eventBusMessages.map((message): SnsPublishMessageEntry => {
-          const eventBusMessageWithSession: AnyEventBusMessageWithSession = {
-            ...message,
-            storySession: toCrossServiceSession(session),
-          };
-
-          return {
-            message: JSON.stringify(eventBusMessageWithSession),
-
-            // FIFO: default to one group per bus (global ordering) and a unique
-            // dedup id (no dedup) - callers opt in to per-entity groups / real dedup
-            ...(eventBusConfig.isFifo
-              ? {
-                  groupId: message.groupId ?? eventBusName,
-                  deduplicationId: message.deduplicationId ?? generateUuid(),
-                }
-              : {}),
-          };
-        }),
-      );
+      await publishMessage(topicArn, region, eventBusMessages.map(toSnsEntry));
 
       return actionResult(void 0);
     } catch (error: unknown) {

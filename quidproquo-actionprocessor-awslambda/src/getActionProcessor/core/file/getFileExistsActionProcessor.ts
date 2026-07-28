@@ -17,9 +17,8 @@ import { resolveStorageDriveBucketName } from './utils';
 
 const getProcessFileExists = (qpqConfig: QPQConfig): FileExistsActionProcessor => {
   return async ({ drive, filepath, scope }) => {
-    const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
-
     try {
+      const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
       const key = composeScopedFilePath(scope, filepath);
       return actionResult(await objectExists(s3BucketName, key, qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig)));
     } catch (error: unknown) {

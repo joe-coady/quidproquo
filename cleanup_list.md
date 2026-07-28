@@ -190,32 +190,32 @@ If your change touched files in more than one package (e.g. you moved a shared h
 [x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/logic/toSdkMessages.ts
 [x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/types/aiSdkStreamPart.ts
 [x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/ai/types/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/apiKeyValidation/getApiKeyValidationValidateActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/apiKeyValidation/getApiKeyValidationValidateActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/apiKeyValidation/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/config/getConfigGetParameterActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/config/getConfigGetParameterActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/config/getConfigGetParametersActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/config/getConfigGetParametersActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/config/getConfigGetSecretActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/config/getConfigGetSecretActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/config/getConfigListParametersActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/config/getConfigListParametersActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/config/getConfigSetParameterActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/config/getConfigSetParameterActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/config/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/config/utils/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/config/utils/resolveSecretResourceName.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/config/utils/resolveSecretResourceName.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/crypto/getCryptoDecryptActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/crypto/getCryptoDecryptActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/crypto/getCryptoEncryptActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/crypto/getCryptoEncryptActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/crypto/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/crypto/utils/createKmsDataKeyProvider.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/crypto/utils/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/crypto/utils/resolveCryptoKeyAlias.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/crypto/utils/resolveCryptoKeyAlias.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/apiKeyValidation/getApiKeyValidationValidateActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/apiKeyValidation/getApiKeyValidationValidateActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/apiKeyValidation/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/config/getConfigGetParameterActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/config/getConfigGetParameterActionProcessor.ts - note: known NotFound enum gap (core change needed)
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/config/getConfigGetParametersActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/config/getConfigGetParametersActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/config/getConfigGetSecretActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/config/getConfigGetSecretActionProcessor.ts - note: getSecretByName throws bare Error for unconfigured secret, needs named core error
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/config/getConfigListParametersActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/config/getConfigListParametersActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/config/getConfigSetParameterActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/config/getConfigSetParameterActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/config/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/config/utils/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/config/utils/resolveSecretResourceName.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/config/utils/resolveSecretResourceName.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/crypto/getCryptoDecryptActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/crypto/getCryptoDecryptActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/crypto/getCryptoEncryptActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/crypto/getCryptoEncryptActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/crypto/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/crypto/utils/createKmsDataKeyProvider.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/crypto/utils/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/crypto/utils/resolveCryptoKeyAlias.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/crypto/utils/resolveCryptoKeyAlias.ts
 [ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/event/apiGatwayEvent/api/api.test.ts
 [ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/event/apiGatwayEvent/api/getEventAutoRespondActionProcessor.ts
 [ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/event/apiGatwayEvent/api/getEventGetRecordsActionProcessor.ts
@@ -324,40 +324,40 @@ If your change touched files in more than one package (e.g. you moved a shared h
 [ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/event/sqs/queue/types.ts
 [ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/event/utils/parseMultipartFormData.test.ts
 [ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/event/utils/parseMultipartFormData.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/eventBus/getEventBusSendMessagesActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/eventBus/getEventBusSendMessagesActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/eventBus/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileDeleteActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileDeleteActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileExistsActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileExistsActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileGenerateTemporarySecureUrlActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileGenerateTemporarySecureUrlActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileGenerateTemporaryUploadSecureUrlActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileGenerateTemporaryUploadSecureUrlActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileIsColdStorageActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileIsColdStorageActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileListDirectoryActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileListDirectoryActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileReadBinaryContentsActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileReadBinaryContentsActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileReadObjectJsonActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileReadObjectJsonActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileReadTextContentsActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileReadTextContentsActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileStreamOpenActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileStreamOpenActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileWriteBinaryContentsActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileWriteBinaryContentsActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileWriteObjectJsonActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileWriteObjectJsonActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileWriteTextContentsActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileWriteTextContentsActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/invalidScopeRealmSafety.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/utils/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/utils/resolveStorageDriveBucketName.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/utils/resolveStorageDriveBucketName.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/eventBus/getEventBusSendMessagesActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/eventBus/getEventBusSendMessagesActionProcessor.ts - note: bus-not-configured pre-check uses generic NotFound; EventBusSendMessagesErrorTypeEnum needs BusNotConfigured
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/eventBus/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileDeleteActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileDeleteActionProcessor.ts - note: commented-out error block deleted; errored deletes documented as retryable result
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileExistsActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileExistsActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileGenerateTemporarySecureUrlActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileGenerateTemporarySecureUrlActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileGenerateTemporaryUploadSecureUrlActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileGenerateTemporaryUploadSecureUrlActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileIsColdStorageActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileIsColdStorageActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileListDirectoryActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileListDirectoryActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileReadBinaryContentsActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileReadBinaryContentsActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileReadObjectJsonActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileReadObjectJsonActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileReadTextContentsActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileReadTextContentsActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileStreamOpenActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileStreamOpenActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileWriteBinaryContentsActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileWriteBinaryContentsActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileWriteObjectJsonActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileWriteObjectJsonActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileWriteTextContentsActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/getFileWriteTextContentsActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/invalidScopeRealmSafety.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/utils/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/utils/resolveStorageDriveBucketName.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/file/utils/resolveStorageDriveBucketName.ts
 [x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/customActions/actions/GraphDatabaseForNeptuneActionType.ts
 [x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/customActions/actions/GraphDatabaseForNeptuneGetEndpointsActionRequester.test.ts
 [x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/customActions/actions/GraphDatabaseForNeptuneGetEndpointsActionRequester.ts
@@ -398,62 +398,62 @@ If your change touched files in more than one package (e.g. you moved a shared h
 [x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/utils/convertQpqQueryToNeptune.ts
 [x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/stories/utils/index.ts
 [x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/keyValueStore/getKeyValueStoreDeleteActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/keyValueStore/getKeyValueStoreDeleteActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/keyValueStore/getKeyValueStoreGetActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/keyValueStore/getKeyValueStoreGetActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/keyValueStore/getKeyValueStoreGetAllActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/keyValueStore/getKeyValueStoreGetAllActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/keyValueStore/getKeyValueStoreQueryActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/keyValueStore/getKeyValueStoreQueryActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/keyValueStore/getKeyValueStoreScanActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/keyValueStore/getKeyValueStoreScanActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/keyValueStore/getKeyValueStoreUpdateActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/keyValueStore/getKeyValueStoreUpdateActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/keyValueStore/getKeyValueStoreUpsertActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/keyValueStore/getKeyValueStoreUpsertActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/keyValueStore/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/keyValueStore/keyValueStoreActionProcessorIndex.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/keyValueStore/storeNotFound.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/metric/getMetricPutActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/metric/getMetricPutActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/metric/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/queue/getQueueSendMessageActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/queue/getQueueSendMessageActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/queue/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/system/getSystemExecuteStoryActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/system/getSystemExecuteStoryActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/system/getSystemTraceStoryActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/system/index.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryAssociateSoftwareTokenActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryAssociateSoftwareTokenActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryAuthenticateUserActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryAuthenticateUserActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryChangePasswordActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryChangePasswordActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryConfirmEmailVerificationActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryConfirmEmailVerificationActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryConfirmForgotPasswordActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryCreateUserActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryCreateUserActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryDecodeAccessTokenActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryForgotPasswordActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryGetUserAttributesActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryGetUserAttributesByUserIdActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryGetUsersActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryGetUsersByAttributeActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryReadAccessTokenActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryRefreshTokenActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryRequestEmailVerificationActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryRequestEmailVerificationActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryRespondToAuthChallengeActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryRevokeRefreshTokenActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectorySetAccessTokenActionProcessor.test.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectorySetAccessTokenActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectorySetPasswordActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectorySetUserAttributesActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectorySignOutUserActionProcessor.ts
-[ ] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/keyValueStore/getKeyValueStoreDeleteActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/keyValueStore/getKeyValueStoreDeleteActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/keyValueStore/getKeyValueStoreGetActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/keyValueStore/getKeyValueStoreGetActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/keyValueStore/getKeyValueStoreGetAllActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/keyValueStore/getKeyValueStoreGetAllActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/keyValueStore/getKeyValueStoreQueryActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/keyValueStore/getKeyValueStoreQueryActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/keyValueStore/getKeyValueStoreScanActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/keyValueStore/getKeyValueStoreScanActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/keyValueStore/getKeyValueStoreUpdateActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/keyValueStore/getKeyValueStoreUpdateActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/keyValueStore/getKeyValueStoreUpsertActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/keyValueStore/getKeyValueStoreUpsertActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/keyValueStore/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/keyValueStore/keyValueStoreActionProcessorIndex.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/keyValueStore/storeNotFound.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/metric/getMetricPutActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/metric/getMetricPutActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/metric/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/queue/getQueueSendMessageActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/queue/getQueueSendMessageActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/queue/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/system/getSystemExecuteStoryActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/system/getSystemExecuteStoryActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/system/getSystemTraceStoryActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/system/index.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryAssociateSoftwareTokenActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryAssociateSoftwareTokenActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryAuthenticateUserActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryAuthenticateUserActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryChangePasswordActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryChangePasswordActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryConfirmEmailVerificationActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryConfirmEmailVerificationActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryConfirmForgotPasswordActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryCreateUserActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryCreateUserActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryDecodeAccessTokenActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryForgotPasswordActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryGetUserAttributesActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryGetUserAttributesByUserIdActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryGetUsersActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryGetUsersByAttributeActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryReadAccessTokenActionProcessor.ts - note: medium bug fixed test-first: invalid tokens escaped as GenericError instead of Unauthorized (dead branch after throwing decodeAccessToken)
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryRefreshTokenActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryRequestEmailVerificationActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryRequestEmailVerificationActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryRespondToAuthChallengeActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryRevokeRefreshTokenActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectorySetAccessTokenActionProcessor.test.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectorySetAccessTokenActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectorySetPasswordActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectorySetUserAttributesActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectorySignOutUserActionProcessor.ts
+[x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/index.ts
 [x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/index.ts - note: documented load-bearing spread order (aws wins over node)
 [x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/webserver/email/getEmailSendEmailActionProcessor.ts
 [x] quidproquo-actionprocessor-awslambda/src/getActionProcessor/webserver/email/getEmailSetDeliveryStatusActionProcessor.ts

@@ -3,7 +3,8 @@ import { buildTestQpqConfig, buildTestStorySession, createStubLogger, ErrorTypeE
 import { describe, expect, it, vi } from 'vitest';
 
 import { invokeProcessor } from '../../../testing/processorTestHelpers';
-import { getDateNow, getSystemExecuteStoryActionProcessor } from './getSystemExecuteStoryActionProcessor';
+import { getDateNow } from './getDateNow';
+import { getSystemExecuteStoryActionProcessor } from './getSystemExecuteStoryActionProcessor';
 
 const resolveProcessor = async () => {
   const processors = await getSystemExecuteStoryActionProcessor(buildTestQpqConfig(), {} as any);

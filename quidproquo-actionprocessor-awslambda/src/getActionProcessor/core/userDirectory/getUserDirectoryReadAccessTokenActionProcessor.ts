@@ -21,13 +21,14 @@ const getProcessReadAccessToken = (qpqConfig: QPQConfig): UserDirectoryReadAcces
       return actionResult(decodedAccessToken);
     }
 
-    const decodedAuthToken = await decodeAccessToken(userDirectoryName, qpqConfig, accessToken, ignoreExpiration);
-
-    if (!decodedAuthToken || !decodedAuthToken.username) {
+    // decodeAccessToken throws on a missing/unverifiable token; surface that as
+    // a typed Unauthorized result (matching the SetAccessToken processor)
+    // instead of letting the raw error escape as a GenericError.
+    try {
+      return actionResult(await decodeAccessToken(userDirectoryName, qpqConfig, accessToken, ignoreExpiration));
+    } catch {
       return actionResultError(ErrorTypeEnum.Unauthorized, 'Invalid accessToken');
     }
-
-    return actionResult(decodedAuthToken);
   };
 };
 

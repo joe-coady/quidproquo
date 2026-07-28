@@ -10,17 +10,15 @@ import { getWebserverActionProcessor as getAwsWebserverActionProcessor } from '.
 export const getAwsActionProcessors: ActionProcessorListResolver = async (
   qpqConfig: QPQConfig,
   dynamicModuleLoader: DynamicModuleLoader,
-): Promise<ActionProcessorList> => {
-  const storyActionProcessor = {
-    ...(await getNodeCoreActionProcessor(qpqConfig, dynamicModuleLoader)),
-    ...(await getNodeWebserverActionProcessor(qpqConfig, dynamicModuleLoader)),
+): Promise<ActionProcessorList> => ({
+  // Node processors supply the platform-neutral implementations; the AWS ones spread
+  // after so any action implemented in both resolves to the AWS-specific processor.
+  ...(await getNodeCoreActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getNodeWebserverActionProcessor(qpqConfig, dynamicModuleLoader)),
 
-    ...(await getAwsCoreActionProcessor(qpqConfig, dynamicModuleLoader)),
-    ...(await getAwsWebserverActionProcessor(qpqConfig, dynamicModuleLoader)),
-  };
-
-  return storyActionProcessor;
-};
+  ...(await getAwsCoreActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getAwsWebserverActionProcessor(qpqConfig, dynamicModuleLoader)),
+});
 
 export * from './core';
 export * from './webserver';

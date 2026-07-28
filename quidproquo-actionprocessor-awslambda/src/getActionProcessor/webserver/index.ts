@@ -1,3 +1,5 @@
+import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
+
 import { getEmailActionProcessor } from './email';
 import { getServiceFunctionActionProcessor } from './serviceFunction';
 import { getWebEntryActionProcessor } from './webEntry';
@@ -7,8 +9,6 @@ export * from './email';
 export * from './serviceFunction';
 export * from './webEntry';
 export * from './websocket';
-
-import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
 
 export const getWebserverActionProcessor: ActionProcessorListResolver = async (
   qpqConfig: QPQConfig,

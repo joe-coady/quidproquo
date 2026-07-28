@@ -21,35 +21,33 @@ type AnyQueueMessageWithSession = QueueMessage<any> & {
 
 const getProcessQueueSendMessage = (qpqConfig: QPQConfig): QueueSendMessageActionProcessor<any> => {
   return async ({ queueName, queueMessages }, session) => {
-    // While we have some uuids
     const sqsQueueName = getQueueRuntimeResourceNameFromConfig(queueName, qpqConfig);
     const isFifo = qpqCoreUtils.getQueueByName(qpqConfig, queueName)?.isFifo || false;
 
+    // Each entry carries the caller's session so the consuming service resumes
+    // with the same correlation/context.
+    const toSqsEntry = (message: QueueMessage<any>): SqsQueueMessageEntry => {
+      const queueMessageWithSession: AnyQueueMessageWithSession = {
+        ...message,
+        storySession: toCrossServiceSession(session),
+      };
+
+      return {
+        body: JSON.stringify(queueMessageWithSession),
+
+        // FIFO: default to one group per queue (global ordering) and a unique
+        // dedup id (no dedup) - callers opt in to per-entity groups / real dedup
+        ...(isFifo
+          ? {
+              groupId: message.groupId ?? queueName,
+              deduplicationId: message.deduplicationId ?? generateUuid(),
+            }
+          : {}),
+      };
+    };
+
     try {
-      await sendMessages(
-        sqsQueueName,
-        qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig),
-        queueMessages.map((message): SqsQueueMessageEntry => {
-          // Add the session info to the message
-          const queueMessageWithSession: AnyQueueMessageWithSession = {
-            ...message,
-            storySession: toCrossServiceSession(session),
-          };
-
-          return {
-            body: JSON.stringify(queueMessageWithSession),
-
-            // FIFO: default to one group per queue (global ordering) and a unique
-            // dedup id (no dedup) - callers opt in to per-entity groups / real dedup
-            ...(isFifo
-              ? {
-                  groupId: message.groupId ?? queueName,
-                  deduplicationId: message.deduplicationId ?? generateUuid(),
-                }
-              : {}),
-          };
-        }),
-      );
+      await sendMessages(sqsQueueName, qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig), queueMessages.map(toSqsEntry));
 
       return actionResult(void 0);
     } catch (error: unknown) {

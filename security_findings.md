@@ -223,3 +223,10 @@
 - **Where**: guid v7 processor dependency.
 - **Suggested fix**: set UUIDV7_DENY_WEAK_RNG if sortable guids ever need CSPRNG guarantees.
 - **Status**: recorded
+
+## quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/userDirectory/getUserDirectoryReadAccessTokenActionProcessor.ts
+- **Severity**: medium
+- **Issue**: Invalid access tokens returned GenericError instead of Unauthorized (decodeAccessToken throws, making the Unauthorized branch dead code); callers branching on error type for auth gating could misclassify a forged/expired token as an infrastructure error.
+- **Where**: getProcessUserDirectoryReadAccessToken.
+- **Suggested fix**: wrap decode in try/catch returning typed Unauthorized.
+- **Status**: fixed in this pass (with proving tests)

@@ -33,7 +33,7 @@ const getProcessAiPrompt = (qpqConfig: QPQConfig): AiPromptActionProcessor => {
           }
         : { prompt: payload.prompt };
 
-      // Extended thinking — the model reasons before answering, within the token budget.
+      // Extended thinking: the model reasons before answering, within the token budget.
       const providerOptions = payload.reasoning
         ? { bedrock: { reasoningConfig: { type: 'enabled' as const, budgetTokens: payload.reasoning.budgetTokens ?? 4096 } } }
         : undefined;
@@ -48,7 +48,7 @@ const getProcessAiPrompt = (qpqConfig: QPQConfig): AiPromptActionProcessor => {
       });
 
       if (payload.caching) {
-        // The SDK's cross-provider usage breakdown, not providerMetadata.bedrock.usage — that
+        // The SDK's cross-provider usage breakdown, not providerMetadata.bedrock.usage; that
         // field never carries cacheReadInputTokens through on @ai-sdk/amazon-bedrock (5.0.11).
         console.log('AI prompt cache usage:', result.finalStep?.usage?.inputTokenDetails);
       }

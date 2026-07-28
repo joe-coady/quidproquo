@@ -17,7 +17,7 @@ import { resolveUsernameByPreferredUsername } from '../../../logic/cognito/resol
 import { setUserPassword } from '../../../logic/cognito/setUserPassword';
 
 const getProcessSetPassword = (qpqConfig: QPQConfig): UserDirectorySetPasswordActionProcessor => {
-  return async ({ userDirectoryName, newPassword, username }, session) => {
+  return async ({ userDirectoryName, newPassword, username }) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const userPoolId = await getExportedValue(getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig), region);

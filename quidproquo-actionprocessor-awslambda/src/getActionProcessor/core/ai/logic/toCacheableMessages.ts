@@ -13,7 +13,7 @@ const withCachePoint = (message: ModelMessage): ModelMessage => ({
 // resume a halted turn append a transport-only continuation message each round, so the boundary
 // after it never matches again. The second-to-last boundary (the newest durable message) is the
 // one a resumed round's prefix actually re-sends byte-identically. See toCacheableSystem for the
-// fixed system/tools cache point this is meant to be used alongside — Bedrock's cache lookback
+// fixed system/tools cache point this is meant to be used alongside; Bedrock's cache lookback
 // only covers a limited number of recent content blocks, so long conversations still need both.
 export const toCacheableMessages = (messages: ModelMessage[], caching: boolean | undefined): ModelMessage[] => {
   if (!caching || messages.length === 0) {

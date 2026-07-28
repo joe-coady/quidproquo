@@ -1,12 +1,18 @@
 import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
 import { getConfigRuntimeResourceNameFromConfigWithServiceOverride } from '../../../../awsNamingUtils';
+import { StorageDriveNotFoundError } from './StorageDriveNotFoundError';
 
-export const resolveStorageDriveBucketName = (drive: string, qpqConfig: QPQConfig) => {
+/**
+ * Resolves the runtime S3 bucket name for a configured storage drive,
+ * honouring cross-module ownership overrides. Throws StorageDriveNotFoundError
+ * when no defineStorageDrive matches the drive name.
+ */
+export const resolveStorageDriveBucketName = (drive: string, qpqConfig: QPQConfig): string => {
   const storageDriveConfig = qpqCoreUtils.getStorageDriveByName(drive, qpqConfig);
 
   if (!storageDriveConfig) {
-    throw new Error(`Could not find storage drive config for [${drive}]`);
+    throw new StorageDriveNotFoundError(drive);
   }
 
   return getConfigRuntimeResourceNameFromConfigWithServiceOverride(

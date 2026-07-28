@@ -42,7 +42,7 @@ const getProcessAiPromptStream = (qpqConfig: QPQConfig): AiPromptStreamActionPro
           }
         : { prompt: payload.prompt };
 
-      // Extended thinking — thinking progress streams out as Reasoning* parts.
+      // Extended thinking: thinking progress streams out as Reasoning* parts.
       const providerOptions = payload.reasoning
         ? { bedrock: { reasoningConfig: { type: 'enabled' as const, budgetTokens: payload.reasoning.budgetTokens ?? 4096 } } }
         : undefined;
@@ -53,12 +53,12 @@ const getProcessAiPromptStream = (qpqConfig: QPQConfig): AiPromptStreamActionPro
         ...promptOrMessages,
         tools: prepared.tools,
         providerOptions,
-        // Proof of concept for halt/resume: stop after every single step so the
-        // caller sees finishReason 'tool-calls' and must loop the turn back in.
+        // Caps the server-side tool loop. Client-side tools (no executor) still halt
+        // immediately with finishReason 'tool-calls' so the caller can resume the turn.
         stopWhen: stepCountIs(20),
-        // streamText swallows errors by default to keep the server alive — surface them to CloudWatch.
+        // streamText swallows errors by default to keep the server alive; surface them to
+        // CloudWatch. The same error also reaches the consumer as an Error stream part.
         onError: ({ error }) => {
-          // todo yeild this out
           console.error('AI prompt stream error:', error);
         },
       });
@@ -72,7 +72,7 @@ const getProcessAiPromptStream = (qpqConfig: QPQConfig): AiPromptStreamActionPro
 
         if (payload.caching) {
           try {
-            // The SDK's cross-provider usage breakdown, not providerMetadata.bedrock.usage — that
+            // The SDK's cross-provider usage breakdown, not providerMetadata.bedrock.usage; that
             // field never carries cacheReadInputTokens through on @ai-sdk/amazon-bedrock (5.0.11).
             const step = await finalStep;
             console.log('AI prompt cache usage:', step.usage?.inputTokenDetails);

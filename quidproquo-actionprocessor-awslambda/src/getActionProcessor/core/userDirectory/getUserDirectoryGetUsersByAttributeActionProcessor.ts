@@ -16,7 +16,7 @@ import { getExportedValue } from '../../../logic/cloudformation/getExportedValue
 import { listPagedUsersByAttribute } from '../../../logic/cognito/listPagedUsersByAttribute';
 
 const getProcessGetUsersByAttribute = (qpqConfig: QPQConfig): UserDirectoryGetUsersByAttributeActionProcessor => {
-  return async ({ userDirectoryName, attribueName, attribueValue, limit, nextPageKey }, _session) => {
+  return async ({ userDirectoryName, attribueName, attribueValue, limit, nextPageKey }) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const userPoolId = await getExportedValue(getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig), region);

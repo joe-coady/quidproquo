@@ -15,25 +15,20 @@ import { resolveStorageDriveBucketName } from './utils';
 
 const getProcessFileDelete = (qpqConfig: QPQConfig): FileDeleteActionProcessor => {
   return async ({ drive, filepaths, scope }) => {
-    const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
-
     try {
+      const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
       const keys = filepaths.map((filepath) => composeScopedFilePath(scope, filepath));
-      const errored = await deleteFiles(s3BucketName, keys, qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig));
 
-      // errored deletes are a graceful success ~ Retry
-      // if (errored.length > 0) {
-      //   return actionResultError(
-      //     ErrorTypeEnum.GenericError,
-      //     `Could not delete files ${errored.length}`,
-      //   );
-      // }
+      // Per-file delete failures come back as a normal result (the keys that
+      // errored) so callers can retry them; only whole-call failures error.
+      const errored = await deleteFiles(s3BucketName, keys, qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig));
 
       return actionResult(errored);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         AccessDenied: () => actionResultError(FileDeleteErrorTypeEnum.AccessDenied, 'Access denied deleting files'),
         NoSuchBucket: () => actionResultError(FileDeleteErrorTypeEnum.DriveNotFound, `Storage drive not found: ${drive}`),
+        StorageDriveNotFoundError: (error) => actionResultError(FileDeleteErrorTypeEnum.DriveNotFound, error.message),
         InvalidScopeError: (error) => actionResultError(FileDeleteErrorTypeEnum.InvalidScope, error.message),
       });
     }

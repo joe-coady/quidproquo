@@ -18,11 +18,10 @@ import { resolveStorageDriveBucketName } from './utils';
 
 const getProcessFileWriteObjectJson = (qpqConfig: QPQConfig): FileWriteObjectJsonActionProcessor<object> => {
   return async ({ drive, filepath, data, storageDriveAdvancedWriteOptions, scope }) => {
-    const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
-
     const dataJson = JSON.stringify(data);
 
     try {
+      const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
       await writeTextFile(
         s3BucketName,
         composeScopedFilePath(scope, filepath),
@@ -37,6 +36,7 @@ const getProcessFileWriteObjectJson = (qpqConfig: QPQConfig): FileWriteObjectJso
         AccessDenied: () => actionResultError(FileWriteObjectJsonErrorTypeEnum.AccessDenied, 'Access denied writing file'),
         Forbidden: () => actionResultError(FileWriteObjectJsonErrorTypeEnum.AccessDenied, 'Access denied writing file'),
         NoSuchBucket: () => actionResultError(FileWriteObjectJsonErrorTypeEnum.DriveNotFound, `Storage drive not found: ${drive}`),
+        StorageDriveNotFoundError: (error) => actionResultError(FileWriteObjectJsonErrorTypeEnum.DriveNotFound, error.message),
         InvalidScopeError: (error) => actionResultError(FileWriteObjectJsonErrorTypeEnum.InvalidScope, error.message),
       });
     }

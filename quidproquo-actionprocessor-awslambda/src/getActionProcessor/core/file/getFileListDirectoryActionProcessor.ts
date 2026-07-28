@@ -18,9 +18,8 @@ import { resolveStorageDriveBucketName } from './utils';
 
 const getProcessFileListDirectory = (qpqConfig: QPQConfig): FileListDirectoryActionProcessor => {
   return async ({ drive, folderPath, maxFiles, pageToken, scope }) => {
-    const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
-
     try {
+      const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
       const s3FileList = await listFiles(
         s3BucketName,
         qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig),
@@ -46,6 +45,7 @@ const getProcessFileListDirectory = (qpqConfig: QPQConfig): FileListDirectoryAct
         AccessDenied: () => actionResultError(FileListDirectoryErrorTypeEnum.AccessDenied, 'Access denied listing directory'),
         Forbidden: () => actionResultError(FileListDirectoryErrorTypeEnum.AccessDenied, 'Access denied listing directory'),
         NoSuchBucket: () => actionResultError(FileListDirectoryErrorTypeEnum.DriveNotFound, `Storage drive not found: ${drive}`),
+        StorageDriveNotFoundError: (error) => actionResultError(FileListDirectoryErrorTypeEnum.DriveNotFound, error.message),
         InvalidScopeError: (error) => actionResultError(FileListDirectoryErrorTypeEnum.InvalidScope, error.message),
       });
     }

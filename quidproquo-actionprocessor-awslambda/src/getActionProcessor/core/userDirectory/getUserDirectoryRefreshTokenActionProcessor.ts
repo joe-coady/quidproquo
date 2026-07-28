@@ -35,13 +35,7 @@ const getProcessRefreshToken = (qpqConfig: QPQConfig): UserDirectoryRefreshToken
     // so a forged/unverified username cannot mint tokens for another user.
 
     try {
-      const authResponse = await cognitoRefreshToken(
-        userPoolId,
-        userPoolClientId,
-        qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig),
-        session.decodedAccessToken.username,
-        refreshToken,
-      );
+      const authResponse = await cognitoRefreshToken(userPoolId, userPoolClientId, region, session.decodedAccessToken.username, refreshToken);
 
       return actionResult(authResponse);
     } catch (error: unknown) {

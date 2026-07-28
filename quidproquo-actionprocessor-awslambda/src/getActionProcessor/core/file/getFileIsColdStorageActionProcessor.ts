@@ -17,9 +17,8 @@ import { resolveStorageDriveBucketName } from './utils';
 
 const getProcessFileIsColdStorage = (qpqConfig: QPQConfig): FileIsColdStorageActionProcessor => {
   return async ({ drive, filepath, scope }) => {
-    const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
-
     try {
+      const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
       const key = composeScopedFilePath(scope, filepath);
       const isColdStorage =
         (await getObjectStorageClass(s3BucketName, key, qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig))) === 'cold_storage';
@@ -32,6 +31,7 @@ const getProcessFileIsColdStorage = (qpqConfig: QPQConfig): FileIsColdStorageAct
         NotFound: () => actionResultError(FileIsColdStorageErrorTypeEnum.FileNotFound, `File not found: ${filepath}`),
         NoSuchKey: () => actionResultError(FileIsColdStorageErrorTypeEnum.FileNotFound, `File not found: ${filepath}`),
         NoSuchBucket: () => actionResultError(FileIsColdStorageErrorTypeEnum.DriveNotFound, `Storage drive not found: ${drive}`),
+        StorageDriveNotFoundError: (error) => actionResultError(FileIsColdStorageErrorTypeEnum.DriveNotFound, error.message),
         InvalidScopeError: (error) => actionResultError(FileIsColdStorageErrorTypeEnum.InvalidScope, error.message),
       });
     }

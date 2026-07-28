@@ -18,9 +18,8 @@ import { resolveStorageDriveBucketName } from './utils';
 
 const getProcessFileWriteBinaryContents = (qpqConfig: QPQConfig): FileWriteBinaryContentsActionProcessor => {
   return async ({ drive, filepath, data, storageDriveAdvancedWriteOptions, scope }) => {
-    const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
-
     try {
+      const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
       await writeBinaryFile(
         s3BucketName,
         composeScopedFilePath(scope, filepath),
@@ -35,6 +34,7 @@ const getProcessFileWriteBinaryContents = (qpqConfig: QPQConfig): FileWriteBinar
         AccessDenied: () => actionResultError(FileWriteBinaryContentsErrorTypeEnum.AccessDenied, 'Access denied writing file'),
         Forbidden: () => actionResultError(FileWriteBinaryContentsErrorTypeEnum.AccessDenied, 'Access denied writing file'),
         NoSuchBucket: () => actionResultError(FileWriteBinaryContentsErrorTypeEnum.DriveNotFound, `Storage drive not found: ${drive}`),
+        StorageDriveNotFoundError: (error) => actionResultError(FileWriteBinaryContentsErrorTypeEnum.DriveNotFound, error.message),
         InvalidScopeError: (error) => actionResultError(FileWriteBinaryContentsErrorTypeEnum.InvalidScope, error.message),
       });
     }

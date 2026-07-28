@@ -7,7 +7,6 @@ import {
   actionResultErrorFromCaughtError,
   AuthenticateUserResponse,
   QPQConfig,
-  qpqCoreUtils,
   UserDirectoryActionType,
   UserDirectoryCreateUserActionProcessor,
   UserDirectoryCreateUserErrorTypeEnum,

@@ -15,6 +15,8 @@ import { ExecuteServiceFunctionEvent, ServiceFunctionActionType, ServiceFunction
 import { getConfigRuntimeResourceName } from '../../../awsNamingUtils';
 import { executeLambdaByName } from '../../../logic/lambda/executeLambdaByName';
 
+// `any` here is a variance boundary: this processor forwards whatever payload/result
+// types the calling story used, so it cannot name them without over-constraining.
 type AnyExecuteServiceFunctionEventWithSession = ExecuteServiceFunctionEvent<any[]> & {
   storySession: StorySession;
 };

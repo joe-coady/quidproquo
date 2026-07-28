@@ -17,7 +17,7 @@ import { resolveUsernameByPreferredUsername } from '../../../logic/cognito/resol
 import { setUserAttributes } from '../../../logic/cognito/setUserAttributes';
 
 const getProcessSetUserAttributes = (qpqConfig: QPQConfig): UserDirectorySetUserAttributesActionProcessor => {
-  return async ({ userDirectoryName, username, userAttributes }, session) => {
+  return async ({ userDirectoryName, username, userAttributes }) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
     const userPoolId = await getExportedValue(getCFExportNameUserPoolIdFromConfig(userDirectoryName, qpqConfig), region);
