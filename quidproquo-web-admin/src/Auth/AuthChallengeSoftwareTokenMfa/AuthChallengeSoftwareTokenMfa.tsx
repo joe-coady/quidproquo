@@ -15,10 +15,15 @@ interface AuthChallengeSoftwareTokenMfaProps {
   authState: AuthState;
 }
 
-const atom = createQpqRuntimeDefinition(authChallengeMfaLogic, authChallengeMfaInitalState, authChallengeMfaReducer);
+const challengeRuntime = createQpqRuntimeDefinition({
+  uniqueName: 'qpq/admin/authChallengeSoftwareTokenMfa',
+  api: authChallengeMfaLogic,
+  initialState: authChallengeMfaInitalState,
+  reducer: authChallengeMfaReducer,
+});
 
 export function AuthChallengeSoftwareTokenMfa({ authState }: AuthChallengeSoftwareTokenMfaProps) {
-  const [api, state] = useQpqRuntime(atom);
+  const [api, state] = useQpqRuntime(challengeRuntime);
   const isCodeValid = /^\d{6}$/.test(state.mfaCode);
 
   if (!authState.authenticateUserResponse || !authState.authenticateUserResponse.challenge || !authState.authenticateUserResponse.session) {

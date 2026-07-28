@@ -1,13 +1,12 @@
 import { AuthenticateUserChallenge } from 'quidproquo-core';
 import { authContext, QpqRuntimeEffectCatcher, useQpqRuntime } from 'quidproquo-web-react';
 
-import { ReactNode, useEffect } from 'react';
+import { ReactNode } from 'react';
 
 import { AuthChallengeMfaSetup } from './AuthChallengeMfaSetup/AuthChallengeMfaSetup';
 import { AuthChallengeNewPasswordRequired } from './AuthChallengeNewPasswordRequired/AuthChallengeNewPasswordRequired';
 import { AuthChallengeSoftwareTokenMfa } from './AuthChallengeSoftwareTokenMfa/AuthChallengeSoftwareTokenMfa';
 import { isLoggedOn } from './logic/isLoggedOn';
-import { askAuthMain } from './logic/runtime/askAuthMain';
 import { authRuntime } from './logic';
 import { Login } from './Login';
 
@@ -16,7 +15,7 @@ interface AuthProps {
 }
 
 export function Auth({ children }: AuthProps) {
-  const [api, state, dispatch] = useQpqRuntime(authRuntime, askAuthMain);
+  const [api, state] = useQpqRuntime(authRuntime);
 
   const isAuthenticated = isLoggedOn(state);
 

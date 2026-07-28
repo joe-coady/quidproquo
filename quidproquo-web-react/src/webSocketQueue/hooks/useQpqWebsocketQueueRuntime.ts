@@ -1,18 +1,17 @@
-import { Story } from 'quidproquo-core';
 import { AnyWebSocketQueueEventMessageWithCorrelation, WebSocketQueueServerMessageEventType } from 'quidproquo-features';
 
 import { useRef } from 'react';
 
-import { QpqRuntimeDefinition } from '../../hooks/asmj/createQpqRuntimeDefinition';
-import { QpqApi, QpqMappedApi } from '../../hooks/asmj/QpqMappedApi';
-import { ActionProcessorListResolverFactory, useQpqRuntime } from '../../hooks/asmj/useQpqRuntime';
+import { ActionProcessorListResolverFactory } from '../../runtime/ActionProcessorListResolverFactory';
+import { QpqRuntimeDefinition } from '../../runtime/createQpqRuntimeDefinition';
+import { QpqApi, QpqMappedApi } from '../../runtime/QpqMappedApi';
+import { useQpqRuntime } from '../../runtime/useQpqRuntime';
 import { getServiceRequestActionProcessor } from './actionProcessor/getServiceRequestActionProcessor';
 import { useWebsocketQueueSendEvent } from './useWebsocketQueueSendEvent';
 
 export function useQpqWebsocketQueueRuntime<TState, TAction, TApi extends QpqApi>(
-  atom: QpqRuntimeDefinition<TState, TAction, TApi>,
-  mainStory?: Story<any, any>,
-  name?: string,
+  definition: QpqRuntimeDefinition<TState, TAction, TApi>,
+  instanceName?: string,
   getActionProcessors?: ActionProcessorListResolverFactory<TState>,
 ): [QpqMappedApi<TApi>, TState, (action: any) => void, (event: Omit<AnyWebSocketQueueEventMessageWithCorrelation, 'correlationId'>) => Promise<any>] {
   const sendEventRef = useRef<((event: Omit<AnyWebSocketQueueEventMessageWithCorrelation, 'correlationId'>) => Promise<any>) | null>(null);
@@ -27,7 +26,7 @@ export function useQpqWebsocketQueueRuntime<TState, TAction, TApi extends QpqApi
     });
   };
 
-  const [api, state, dispatch] = useQpqRuntime(atom, mainStory, name, mergedFactory);
+  const [api, state, dispatch] = useQpqRuntime(definition, instanceName, mergedFactory);
 
   const sendEvent = useWebsocketQueueSendEvent((event) => {
     if (event.type === WebSocketQueueServerMessageEventType.StateDispatch) {

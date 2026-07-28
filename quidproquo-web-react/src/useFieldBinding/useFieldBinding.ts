@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import { QpqRuntimeComputed, useQpqRuntimeComputed } from '../hooks/asmj/createQpqRuntimeDefinition';
+import { QpqRuntimeComputed } from '../runtime/createQpqRuntimeComputed';
+import { useQpqRuntimeComputed } from '../runtime/useQpqRuntimeComputed';
 
 export const useFieldBinding = <TState, V, E = any>(
   computedAtom: QpqRuntimeComputed<TState, V>,

@@ -1,24 +1,13 @@
-import { QpqContext, QpqContextIdentifier } from 'quidproquo-core';
+import { QpqContextIdentifier } from 'quidproquo-core';
 
-import { createContext, ReactNode, useContext, useMemo } from 'react';
+import { ReactNode, useContext, useMemo } from 'react';
 
-// Define a generic type for the React Context
-const qpqReactContext = createContext<QpqContext<any>>({});
+import { qpqReactContext } from './qpqReactContext';
 
-interface QpqContextProviderProps<T> {
+type QpqContextProviderProps<T> = {
   contextIdentifier: QpqContextIdentifier<T>; // Ensures the identifier carries the type of the value
   value: T; // The value must match the type expected by the identifier
   children: ReactNode;
-}
-
-export const useQpqContextValues = (): QpqContext<any> => {
-  return useContext(qpqReactContext);
-};
-
-export const useQpqContextValue = <T,>(contextIdentifier: QpqContextIdentifier<T>): T => {
-  const context = useQpqContextValues();
-
-  return contextIdentifier.uniqueName in context ? context[contextIdentifier.uniqueName] : contextIdentifier.defaultValue;
 };
 
 export const QpqContextProvider = <T,>({ contextIdentifier, value, children }: QpqContextProviderProps<T>) => {
