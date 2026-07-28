@@ -4,7 +4,9 @@ import { createElement, ReactNode } from 'react';
 import { describe, expect, it } from 'vitest';
 import { renderHook } from '@testing-library/react';
 
-import { QpqContextProvider, useQpqContextValue, useQpqContextValues } from './QpqContextProvider';
+import { QpqContextProvider } from './QpqContextProvider';
+import { useQpqContextValue } from './useQpqContextValue';
+import { useQpqContextValues } from './useQpqContextValues';
 
 const identifier = createContextIdentifier<string>('greeting', 'default');
 

@@ -1,6 +1,7 @@
 import { useCallback, useContext, useRef, useState } from 'react';
 
-import { BubbleReducerDispatchContext, QpqBubbleReducer } from './bubbleReducer';
+import { BubbleReducerDispatchContext } from './BubbleReducerDispatchContext';
+import { QpqBubbleReducer } from './QpqBubbleReducer';
 
 export const useBubbleReducer = <TState>(
   reducer: QpqBubbleReducer<TState, any>,

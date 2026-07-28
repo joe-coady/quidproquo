@@ -15,10 +15,15 @@ interface AuthChallengeNewPasswordRequiredProps {
   authState: AuthState;
 }
 
-const atom = createQpqRuntimeDefinition(authChallengeLogic, authChallengeInitalState, authChallengeReducer);
+const challengeRuntime = createQpqRuntimeDefinition({
+  uniqueName: 'qpq/admin/authChallengeNewPasswordRequired',
+  api: authChallengeLogic,
+  initialState: authChallengeInitalState,
+  reducer: authChallengeReducer,
+});
 
 export function AuthChallengeNewPasswordRequired({ authState }: AuthChallengeNewPasswordRequiredProps) {
-  const [api, state] = useQpqRuntime(atom);
+  const [api, state] = useQpqRuntime(challengeRuntime);
   const arePasswordsMatching = state.passwordA === state.passwordB && state.passwordA !== '';
 
   if (!authState.authenticateUserResponse || !authState.authenticateUserResponse.challenge || !authState.authenticateUserResponse.session) {

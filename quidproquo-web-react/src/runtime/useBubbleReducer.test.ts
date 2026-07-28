@@ -2,7 +2,8 @@ import { createElement, ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 
-import { BubbleReducerDispatchContext, QpqBubbleReducer } from './bubbleReducer';
+import { BubbleReducerDispatchContext } from './BubbleReducerDispatchContext';
+import { QpqBubbleReducer } from './QpqBubbleReducer';
 import { useBubbleReducer } from './useBubbleReducer';
 
 type State = { count: number };

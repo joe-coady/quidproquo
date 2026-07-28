@@ -14,7 +14,7 @@ import {
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import { useActionProcessors } from '../actionProcessor';
-import { useQpqContextValues } from './asmj/QpqContextProvider';
+import { useQpqContextValues } from '../qpqContext/useQpqContextValues';
 import { useEffectCallback } from './useEffectCallback';
 
 function* withVersionCheck<R>(story: AskResponse<R>, versionRef: React.RefObject<number>, capturedVersion: number): AskResponse<R | undefined> {

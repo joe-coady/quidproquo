@@ -15,7 +15,12 @@ interface AuthChallengeMfaSetupProps {
   authState: AuthState;
 }
 
-const atom = createQpqRuntimeDefinition(authChallengeMfaSetupLogic, authChallengeMfaSetupInitalState, authChallengeMfaSetupReducer);
+const challengeRuntime = createQpqRuntimeDefinition({
+  uniqueName: 'qpq/admin/authChallengeMfaSetup',
+  api: authChallengeMfaSetupLogic,
+  initialState: authChallengeMfaSetupInitalState,
+  reducer: authChallengeMfaSetupReducer,
+});
 
 // otpauth:// URI consumed by authenticator apps when scanning / importing.
 const buildOtpAuthUri = (email: string, secretCode: string): string => {
@@ -25,7 +30,7 @@ const buildOtpAuthUri = (email: string, secretCode: string): string => {
 };
 
 export function AuthChallengeMfaSetup({ authState }: AuthChallengeMfaSetupProps) {
-  const [api, state] = useQpqRuntime(atom);
+  const [api, state] = useQpqRuntime(challengeRuntime);
   const isCodeValid = /^\d{6}$/.test(state.mfaCode);
 
   const challenge = authState.authenticateUserResponse?.challenge;

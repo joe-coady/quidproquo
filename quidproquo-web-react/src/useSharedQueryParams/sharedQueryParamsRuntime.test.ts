@@ -6,9 +6,8 @@ import { sharedQueryParamsRuntime } from './sharedQueryParamsRuntime';
 
 describe('sharedQueryParamsRuntime', () => {
   it('builds a runtime definition seeded with the shared query params logic and state', () => {
-    const info = sharedQueryParamsRuntime('test');
-
-    expect(info.api).toBe(sharedQueryParamsLogic);
-    expect(info.initialState).toBe(sharedQueryParamsInitalState);
+    expect(sharedQueryParamsRuntime.uniqueName).toBe('qpq/web-react/sharedQueryParams');
+    expect(sharedQueryParamsRuntime.api).toBe(sharedQueryParamsLogic);
+    expect(sharedQueryParamsRuntime.initialState).toBe(sharedQueryParamsInitalState);
   });
 });

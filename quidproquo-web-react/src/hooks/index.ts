@@ -1,4 +1,3 @@
-export * from './asmj';
 export * from './useAsyncEffect';
 export * from './useComputed';
 export * from './useEffectCallback';

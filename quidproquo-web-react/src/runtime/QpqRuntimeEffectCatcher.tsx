@@ -1,23 +1,17 @@
 import { memo, ReactNode } from 'react';
 
-import { BubbleReducerDispatchContext } from './bubbleReducer';
+import { BubbleReducerDispatchContext } from './BubbleReducerDispatchContext';
 import { QpqRuntimeDefinition } from './createQpqRuntimeDefinition';
-import { QpqApi } from './QpqMappedApi';
 import { useQpqRuntime } from './useQpqRuntime';
 
-type QpqRuntimeEffectCatcher = {
+type QpqRuntimeEffectCatcherProps = {
   runtime: QpqRuntimeDefinition<any, any, any>;
   name?: string;
+  children: ReactNode;
 };
 
-export const QpqRuntimeEffectCatcherComponent = <TState, TAction, TApi extends QpqApi>({
-  children,
-  runtime,
-  name,
-}: QpqRuntimeEffectCatcher & {
-  children: ReactNode;
-}) => {
-  const [api, state, dispatch] = useQpqRuntime(runtime, undefined, name);
+const QpqRuntimeEffectCatcherComponent = ({ children, runtime, name }: QpqRuntimeEffectCatcherProps) => {
+  const [, , dispatch] = useQpqRuntime(runtime, name);
 
   return <BubbleReducerDispatchContext.Provider value={dispatch}>{children}</BubbleReducerDispatchContext.Provider>;
 };

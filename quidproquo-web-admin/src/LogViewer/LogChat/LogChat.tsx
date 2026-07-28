@@ -7,7 +7,6 @@ import { Android as AndroidIcon, Person as PersonIcon } from '@mui/icons-materia
 import { Avatar, Box, Button, CircularProgress, Paper, TextField, Typography } from '@mui/material';
 
 import { useAdminApp } from '../../adminApp';
-import { askEventDocAiLogChatBoot } from './logic/askEventDocAiLogChatBoot';
 import { eventDocAiLogChatRuntime } from './eventDocAiLogChatRuntime';
 import { EventDocAiSegments } from './EventDocAiSegments';
 
@@ -20,7 +19,7 @@ const LogChatConversation: React.FC<{ logCorrelation: string }> = ({ logCorrelat
   const [inputMessage, setInputMessage] = useState('');
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
-  const [api, state] = useQpqWebsocketQueueRuntime(eventDocAiLogChatRuntime, askEventDocAiLogChatBoot, logCorrelation);
+  const [api, state] = useQpqWebsocketQueueRuntime(eventDocAiLogChatRuntime, logCorrelation);
   const [adminApi] = useAdminApp();
 
   const streamSegments = mergeStreamParts(state.streamParts);
