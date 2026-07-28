@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+## 0.1.12
+
 - `GraphDatabaseNeo4jQPQConfigSetting` is removed from `quidproquo-neo4j` with no replacement. It was never used by the package (`defineGraphDatabaseNeo4j` doesn't return it); delete any import of it.
 - `EventDocListConfig` (and `askUIEventDocListSetConfig`'s payload) requires a new `canTransfer: boolean` field. Existing callers must add it explicitly: `true` to show Export/Import on that list, `false` otherwise.
 - `EventDocListItem` requires a new `type: string` field (the collection's event-doc type). Code constructing `EventDocListItem` values directly (outside `toEventDocListItem`) must supply it.

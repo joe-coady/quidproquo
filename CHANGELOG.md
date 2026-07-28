@@ -1,5 +1,38 @@
 # Changelog
 
+## 0.1.12
+
+- generic crypto: new `askCryptoEncrypt`/`askCryptoDecrypt` actions in core with `defineCryptoKey` config, KMS envelope encryption on AWS and a
+  local master-key provider for node/dev-server
+- event doc transfer: export a doc (events, assets, references) as a bundle and import it into another collection, with `defineEventDocTransfer`
+  config, export/import on list screens gated by `canTransfer`, and imported events attributed to the importing user
+- deploy-rspack: static assets in `src/public` are copied into the views build output
+- aws lambda processor fixes: missing storage drives and undecodable auth tokens now raise typed errors, dynamo orm query/update expression fixes,
+  jwt/s3/cognito filter fixes
+- `askQueryParamsSet` in the browser keeps the url hash and no longer leaves a dangling `?` when the last param is removed
+- log create no longer drops falsy log data, and network request logs no longer include urls
+- neo4j: result type guards no longer throw on null cells
+- quidproquo-testing: fix `toYieldSequence` dropping the given input
+- cli: combined `go:dev` no longer interleaves "started" noise lines with the api output
+
+### Breaking changes
+
+- `GraphDatabaseNeo4jQPQConfigSetting` is removed from quidproquo-neo4j (it was never used)
+- `EventDocListConfig` requires a new `canTransfer: boolean` field
+- `EventDocListItem` requires a new `type: string` field
+- `EventDocBundleApplyOptions` requires a new `importerUserId: string` field
+- `askEventDocWriteForeignEvents` now takes an options object (`{ importerUserId, logRewritten? }`) instead of a trailing boolean
+- `ApiRequestActionProcessorOptions.getHeaders` now returns `Nullable<Record<string, string>>`; return `null` instead of `undefined`
+- `getStateMachineByName` now returns `Nullable`; check for `null` instead of `undefined`
+- `askStateMachineSendEvent` now fails with `BadRequest` on a finished machine, and valid self transitions are accepted
+- `StateMachineEvent` extra fields narrow from `any` to `unknown`
+- `storyLogger`, `storyLoggerFs`, `getS3Logger`, `getS3LoggerViaExtension`, and `moveLogsToPerminateStorage` are removed; use `getLogger`
+- `viewerRequestEventHandler` is removed; call `getCloudFrontRequestEvent_viewerRequest()` instead
+- `QpqWarmLambdaEvent` is removed; warm invokes arrive as SNS warmer records
+- `findMatchingCertificates` and `getDomainValidationOptions` (acm deep imports) are removed
+- `getDefaultAppName` in quidproquo-deploy-rspack now returns `Nullable`; check for `null` instead of `undefined`
+- `getGuidProcessor` is renamed to `getGuidActionProcessor`
+
 ## 0.1.11
 
 - email sending: new `askEmailSendEmail` action in quidproquo-webserver, backed by SES v2 on AWS, with `defineEmailSender` config and an AWS sender
