@@ -1,3 +1,4 @@
+export * from './kvsStreamImplementation';
 export * from './apiImplementation';
 export * from './eventBusImplementation';
 export * from './fileStorageImplementation';

@@ -7,15 +7,18 @@ import {
   KeyValueStoreActionType,
   KeyValueStoreUpsertActionProcessor,
   KeyValueStoreUpsertErrorTypeEnum,
+  KvsStreamEventType,
   QPQConfig,
   validateScopedKvsItemOrThrow,
 } from 'quidproquo-core';
 
+import { emitKvsStreamEvent } from '../../../logic/kvsStream';
 import { getKvsRepository } from '../../../logic/keyValueStore/getKvsRepository';
+import { toKvsCompositeKey, toKvsStreamKeys } from '../../../logic/keyValueStore/toKvsStreamKeys';
 import { ResolvedDevServerConfig } from '../../../types';
 
 const getProcessKeyValueStoreUpsert = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): KeyValueStoreUpsertActionProcessor<any> => {
-  return async ({ keyValueStoreName, item, options }) => {
+  return async ({ keyValueStoreName, item, options }, session) => {
     try {
       const scope = options?.scope;
       const repository = getKvsRepository(qpqConfig, devServerConfig);
@@ -27,7 +30,21 @@ const getProcessKeyValueStoreUpsert = (qpqConfig: QPQConfig, devServerConfig: Re
       // scoped or not) must fail locally too.
       validateScopedKvsItemOrThrow(qpqConfig, keyValueStoreName, scope, item);
 
+      // Read first only to tell an insert from a modify, the one thing the write itself does
+      // not reveal. Cheap locally, and it keeps eventType honest for a generic consumer.
+      const existing = await repository.get(keyValueStoreName, toKvsCompositeKey(qpqConfig, keyValueStoreName, item), scope);
       const result = await repository.upsert(keyValueStoreName, item, { ifNotExists: options?.ifNotExists }, scope);
+
+      // Stand in for the change stream, AFTER the write has committed - see emitKvsStreamEvent.
+      await emitKvsStreamEvent(qpqConfig, session, {
+        keyValueStoreName,
+        eventType: existing ? KvsStreamEventType.Modify : KvsStreamEventType.Insert,
+        scope,
+        keys: toKvsStreamKeys(qpqConfig, keyValueStoreName, item),
+        newImage: item,
+        oldImage: existing ?? undefined,
+      });
+
       return actionResult(result);
     } catch (error: any) {
       return actionResultErrorFromCaughtError(error, {

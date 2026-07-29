@@ -7,15 +7,18 @@ import {
   KeyValueStoreActionType,
   KeyValueStoreDeleteActionProcessor,
   KeyValueStoreDeleteErrorTypeEnum,
+  KvsStreamEventType,
   QPQConfig,
   validateScopedKvsKeyOrThrow,
 } from 'quidproquo-core';
 
 import { getKvsRepository } from '../../../logic/keyValueStore/getKvsRepository';
+import { emitKvsStreamEvent } from '../../../logic/kvsStream';
+import { toKvsStreamKeys } from '../../../logic/keyValueStore/toKvsStreamKeys';
 import { ResolvedDevServerConfig } from '../../../types';
 
 const getProcessKeyValueStoreDelete = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): KeyValueStoreDeleteActionProcessor => {
-  return async ({ keyValueStoreName, key, sortKey, options }) => {
+  return async ({ keyValueStoreName, key, sortKey, options }, session) => {
     try {
       const scope = options?.scope;
       const repository = getKvsRepository(qpqConfig, devServerConfig);
@@ -28,11 +31,23 @@ const getProcessKeyValueStoreDelete = (qpqConfig: QPQConfig, devServerConfig: Re
       validateScopedKvsKeyOrThrow(qpqConfig, keyValueStoreName, scope, key);
 
       const compositeKey = sortKey !== undefined ? `${key}#${sortKey}` : String(key);
+
+      // Grab it before it goes: a Remove record's only payload is what used to be there.
+      const removed = await repository.get(keyValueStoreName, compositeKey, scope);
       const result = await repository.delete(keyValueStoreName, compositeKey, scope);
 
       if (!result) {
         return actionResultError('ResourceNotFound', `Item with key '${key}' not found`);
       }
+
+      // Stand in for the change stream, AFTER the delete has committed.
+      await emitKvsStreamEvent(qpqConfig, session, {
+        keyValueStoreName,
+        eventType: KvsStreamEventType.Remove,
+        scope,
+        keys: removed ? toKvsStreamKeys(qpqConfig, keyValueStoreName, removed) : {},
+        oldImage: removed ?? undefined,
+      });
 
       return actionResult(undefined);
     } catch (error: any) {

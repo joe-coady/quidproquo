@@ -10,6 +10,7 @@ import {
   eventBusImplementation,
   fileStorageImplementation,
   fileWatcherImplementation,
+  kvsStreamImplementation,
   queueImplementation,
   serviceFunctionImplementation,
   webSocketImplementation,
@@ -69,6 +70,7 @@ export const startDevServer = async (devServerConfig: DevServerConfig, devServer
 
     eventBusImplementation(resolvedDevServerConfig),
 
+    kvsStreamImplementation(resolvedDevServerConfig),
     queueImplementation(resolvedDevServerConfig),
 
     webSocketImplementation(resolvedDevServerConfig),
@@ -96,6 +98,7 @@ export const startTinker = async (
 
   serviceFunctionImplementation(resolvedDevServerConfig);
   eventBusImplementation(resolvedDevServerConfig);
+  kvsStreamImplementation(resolvedDevServerConfig);
   queueImplementation(resolvedDevServerConfig);
   webSocketImplementation(resolvedDevServerConfig);
   fileStorageImplementation(resolvedDevServerConfig);
