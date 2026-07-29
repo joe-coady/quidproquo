@@ -68,6 +68,34 @@ describe('useWebsocketQueueSendEvent', () => {
     expect(onCorrelated).toHaveBeenCalledWith({ correlationId, type: WebSocketQueueServerMessageEventType.StateDispatch, payload: { x: 1 } });
   });
 
+  it('keeps delivering correlated messages that arrive AFTER the response', () => {
+    // The correlation is a subscription for the life of the component, not a one-shot for the
+    // request. A handler that responds first and then streams (a batch reporting progress per
+    // record) depends on this: retiring the correlation on response silently dropped
+    // everything that followed.
+    const service = buildService();
+    const onCorrelated = vi.fn();
+    const { result } = renderWith(service, onCorrelated);
+
+    act(() => {
+      result.current({ type: 'qpq/serviceRequest/svc/method', payload: {} } as any);
+    });
+    const { correlationId } = service.sentEvents[0];
+
+    act(() => {
+      service.deliver({ correlationId, type: WebSocketQueueServerMessageEventType.ServiceRequestResponse, payload: { ok: true } });
+    });
+    act(() => {
+      service.deliver({ correlationId, type: WebSocketQueueServerMessageEventType.StateDispatch, payload: { row: 1 } });
+    });
+
+    expect(onCorrelated).toHaveBeenCalledWith({
+      correlationId,
+      type: WebSocketQueueServerMessageEventType.StateDispatch,
+      payload: { row: 1 },
+    });
+  });
+
   it('ignores messages with unknown correlation ids', () => {
     const service = buildService();
     const onCorrelated = vi.fn();

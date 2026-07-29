@@ -32,8 +32,15 @@ export const useWebsocketQueueSendEvent = <TSend extends AnyWebSocketQueueEventM
         if (resolve) {
           resolve((parsed as WebSocketQueueServerEventMessageServiceRequestResponse).payload);
 
+          // Only the resolver is retired: it has done its job, and a promise settles once.
+          //
+          // The CORRELATION deliberately stays active. It is a subscription, not a request,
+          // and it is live for as long as the component that opened it is mounted. Retiring
+          // it here used to be invisible because a response was always the last message sent,
+          // but a handler that responds first and keeps streaming (a batch that reports
+          // progress per record, say) would have every later message silently dropped by the
+          // guard above.
           pendingResolversRef.current.delete(parsed.correlationId);
-          activeCorrelationsRef.current.delete(parsed.correlationId);
         }
       } else {
         onCorrelatedMessage?.(parsed);
