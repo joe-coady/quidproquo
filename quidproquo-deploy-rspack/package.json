@@ -43,7 +43,8 @@
     "quidproquo-core": "0.1.12",
     "quidproquo-deploy-awscdk": "0.1.12",
     "quidproquo-dev-server": "0.1.12",
-    "quidproquo-webserver": "0.1.12"
+    "quidproquo-webserver": "0.1.12",
+    "react-refresh": "^0.18.0"
   },
   "devDependencies": {
     "@rspack/core": "^2.1.2",
