@@ -1,11 +1,12 @@
 import { QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { askRunPendingMigrations } from 'quidproquo-webserver';
 
 import * as crypto from 'crypto';
 import path from 'path';
 
-import { warnIfLegacyKvsDatabase } from './logic/keyValueStore/warnIfLegacyKvsDatabase';
 import {
   apiImplementation,
+  awaitQueueIdle,
   createTinkerInterface,
   eventBusImplementation,
   fileStorageImplementation,
@@ -61,7 +62,6 @@ export const startDevServer = async (devServerConfig: DevServerConfig, devServer
   console.log('Starting QPQ Dev Server!!! - this is a note');
 
   const resolvedDevServerConfig = resolveDevServerConfig(devServerConfig, devServerConfigOverrides);
-  warnIfLegacyKvsDatabase(resolvedDevServerConfig.runtimePath);
 
   await Promise.all([
     apiImplementation(resolvedDevServerConfig),
@@ -80,6 +80,50 @@ export const startDevServer = async (devServerConfig: DevServerConfig, devServer
   ]);
 };
 
+/**
+ * Run every pending migration once, then resolve. The engine behind `qpq migrate`.
+ *
+ * Migrations are triggered by a deploy event, and nothing locally ever deploys, so without
+ * this they simply never run on a dev machine — you find out what a migration does the first
+ * time you ship it. This runs them through the SAME queue the deployed path uses, so a local
+ * run rehearses the real thing rather than a convenient approximation.
+ *
+ * Each service is migrated in turn, and the queue is drained before moving on, so ordering
+ * between a migration and anything it enqueues holds.
+ */
+export const runMigrations = async (
+  devServerConfig: DevServerConfig,
+  devServerConfigOverrides?: DevServerConfigOverrides,
+): Promise<Record<string, string[]>> => {
+  const resolvedDevServerConfig = resolveDevServerConfig(devServerConfig, devServerConfigOverrides);
+
+  // The queue is what actually executes a migration, and the kvs stream keeps projections in
+  // step with whatever it writes. Nothing else is needed: no http server, no websockets.
+  await queueImplementation(resolvedDevServerConfig);
+  await kvsStreamImplementation(resolvedDevServerConfig);
+
+  const tinker = createTinkerInterface(resolvedDevServerConfig);
+  const ran: Record<string, string[]> = {};
+
+  for (const serviceName of tinker.getServices()) {
+    tinker.switchService(serviceName);
+
+    const result = await tinker.run(askRunPendingMigrations);
+
+    if (result.error) {
+      throw new Error(`Migration failed for service [${serviceName}]: ${result.error.errorText}`);
+    }
+
+    // Enqueueing is not running: wait for the handlers themselves before calling this service
+    // done, or a failure would surface after we had already reported success.
+    await awaitQueueIdle();
+
+    ran[serviceName] = result.result ?? [];
+  }
+
+  return ran;
+};
+
 export const startTinker = async (
   devServerConfig: DevServerConfig,
   devServerConfigOverrides?: DevServerConfigOverrides,
@@ -88,7 +132,6 @@ export const startTinker = async (
   console.log('Starting QPQ Tinker Environment...');
 
   const resolvedDevServerConfig = resolveDevServerConfig(devServerConfig, devServerConfigOverrides);
-  warnIfLegacyKvsDatabase(resolvedDevServerConfig.runtimePath);
 
   // Start all implementations without awaiting (they run forever)
   // Just fire them off in the background

@@ -11,18 +11,12 @@ export const eventSaved = (state: SessionLogState, payload: SessionLogEventSaved
 
   const remaining = savedAt === -1 ? state.pendingEvents : [...state.pendingEvents.slice(0, savedAt), ...state.pendingEvents.slice(savedAt + 1)];
 
-  const renumbered = remaining.map((event, offset): EventDocEvent => ({
-    ...event,
-    payload: {
-      ...event.payload,
-      metadata: { ...event.payload.metadata, index: payload.storedEvent.payload.metadata.index + 1 + offset },
-    },
-  }));
-
+  // No renumbering: each pending event minted its own sortable id, which already sorts after
+  // the saved log. Removing one from the middle leaves the rest correctly ordered.
   return {
     ...state,
     events: [...state.events, payload.storedEvent],
-    pendingEvents: renumbered,
+    pendingEvents: remaining,
     flush: { inFlight: false, lastError: null, retryCount: 0 },
   };
 };

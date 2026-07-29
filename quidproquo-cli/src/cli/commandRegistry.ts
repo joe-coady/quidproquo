@@ -59,6 +59,17 @@ export const cliCommands: CliCommand[] = [
     run: (a) => require('../commands/goDevWeb').goDevWebCommand(a),
   },
   {
+    name: 'migrate',
+    usageArgs: '[app]',
+    summary: 'Run pending migrations against the LOCAL dev store, once, then exit.',
+    usageExtra: [
+      'Deployed, migrations run on a stack update; nothing local ever deploys, so',
+      'this is how you exercise one before shipping it. Records what it runs, so a',
+      'second call is a no-op.',
+    ],
+    run: (a) => require('../commands/migrate').migrateCommand(a),
+  },
+  {
     name: 'teardown',
     summary: 'Destroy web/api/inf stacks for selected services (interactive)',
     run: (a) => require('../commands/teardown').teardownCommand(a),

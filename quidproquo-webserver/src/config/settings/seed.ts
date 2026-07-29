@@ -1,6 +1,6 @@
 import { defineDeployEvent, defineGlobal, defineQueue, getUniqueKeyFromQpqFunctionRuntime, QPQConfig, QpqFunctionRuntime } from 'quidproquo-core';
 
-import { getServiceEntryQpqFunctionRuntime } from '../../services';
+import { getServiceEntryQpqFunctionRuntime } from '../../services/getServiceEntryQpqFunctionRuntime';
 
 export const defineSeed = (seeds: QpqFunctionRuntime[]): QPQConfig => {
   return [

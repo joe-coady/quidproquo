@@ -32,6 +32,10 @@ The generated deploy event fires on each qualifying stack status change:
 - **On the first (Create) deploy** every migration is recorded as *already run* without executing it — a freshly created service is expected to start from clean [seed](./seed.md) data, so there is nothing to migrate.
 - **On later (Update) deploys** each migration whose `deployType` matches the stack that changed and that has **not** already been recorded is enqueued on the `qpqMigrations` queue (which runs its story) and then recorded as run. Migrations already recorded are skipped, so re-deploying is safe.
 
+## Testing locally
+
+Nothing local ever deploys, so a migration never runs on its own while you develop against `go:dev`. Run `qpq migrate` to execute every pending migration against the local dev store, once, through the same queue the deployed path uses. It records what it ran in the same tracking store, so a second call is a no-op until you add a new migration.
+
 ## Signature
 
 ```typescript

@@ -10,7 +10,7 @@ import {
   QpqFunctionRuntime,
 } from 'quidproquo-core';
 
-import { getServiceEntryQpqFunctionRuntime } from '../../services';
+import { getServiceEntryQpqFunctionRuntime } from '../../services/getServiceEntryQpqFunctionRuntime';
 
 export interface Migration {
   runtime: QpqFunctionRuntime;

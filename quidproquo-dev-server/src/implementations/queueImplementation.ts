@@ -122,6 +122,37 @@ const processQueueEventBusSubscriptions = async (qpqConfig: QPQConfig, ebMessage
   // console.log('------------------------');
 };
 
+// Messages currently being processed. The bus is fire-and-forget (emit does not await its
+// listeners), which is right for emulating a queue but leaves a one-shot caller no way to know
+// when the work is done. A long-running dev server never asks; `qpq migrate` has to, or it
+// exits mid-migration and reports success.
+const inFlight = new Set<Promise<void>>();
+
+const trackInFlight = <T>(work: Promise<T>): Promise<T> => {
+  const tracked = work.then(
+    () => undefined,
+    () => undefined,
+  );
+
+  inFlight.add(tracked);
+  void tracked.finally(() => inFlight.delete(tracked));
+
+  return work;
+};
+
+/**
+ * Resolve once nothing is being processed.
+ *
+ * Loops rather than awaiting once, because a message can enqueue more work while it runs and
+ * the set can refill after the first await settles. Draining to empty is the only honest
+ * answer to "is it finished".
+ */
+export const awaitQueueIdle = async (): Promise<void> => {
+  while (inFlight.size > 0) {
+    await Promise.all([...inFlight]);
+  }
+};
+
 export const queueImplementation = async (devServerConfig: ResolvedDevServerConfig) => {
   // Fail fast when a FIFO queue subscribes to a standard bus (AWS can't deliver those)
   for (const qpqConfig of devServerConfig.qpqConfigs) {
@@ -145,12 +176,12 @@ export const queueImplementation = async (devServerConfig: ResolvedDevServerConf
     };
 
     if (payload.groupId === undefined) {
-      await processAll();
+      await trackInFlight(processAll());
       return;
     }
 
     const groupKey = `${payload.queueName}:${payload.groupId}`;
-    const groupTail = (fifoGroupTails.get(groupKey) ?? Promise.resolve()).then(processAll);
+    const groupTail = trackInFlight((fifoGroupTails.get(groupKey) ?? Promise.resolve()).then(processAll));
     fifoGroupTails.set(groupKey, groupTail);
 
     await groupTail;

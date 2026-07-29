@@ -184,16 +184,14 @@ rebuild is just replaying the log.
 
 1. ~~Fold-time validation.~~ Done.
 2. ~~Sortable ids in the framework, plus delete and restore as events.~~ Done.
-3. The stream projector, so summaries are rebuilt from the log rather than by the writer.
-   In progress: core, the AWS action processors and the CDK constructs exist; the dev server
-   emulation and the projector itself do not.
-4. Migration tooling, then the per-collection table copy and cutover. Not started.
+3. ~~The stream projector, so summaries are rebuilt from the log rather than by the writer.~~
+   Done, including the dev server emulation, so `go:dev` projects too.
+4. Migration tooling, then the per-collection table copy and cutover. NOT STARTED, and the
+   only thing standing between this work and an environment with real data in it.
 5. DocGen picks up the new framework. Not started.
 
-Step 3 must land before any deployed environment is cut over. Step 2 was the writer's last
-excuse for maintaining the summary, and the projector is what replaces it: until then,
-`askEventDocEventAppend` still calls `askEventDocSummaryRederive`, which is the one piece of
-read-model maintenance left on the write path.
+Steps 1 to 3 are in. `askEventDocEventAppend` no longer touches a read model at all: it mints
+an id, writes the event, and stops. Everything else about a document is derived.
 
 ## 5. What landed alongside
 

@@ -4,11 +4,6 @@ import { coalesceEventTypes } from '../../constants/coalesceEventTypes';
 import { AdminSessionEventType } from '../../effects/session/AdminSessionEventType';
 import { SessionLogState } from '../../SessionLogState';
 
-const nextLocalIndex = (state: SessionLogState): number => {
-  const tail = state.pendingEvents[state.pendingEvents.length - 1] ?? state.events[state.events.length - 1];
-  return tail ? tail.payload.metadata.index + 1 : 0;
-};
-
 // Optimistic append with coalescing: while the previous event of the same
 // coalescable type is still pending, the new one replaces it (latest value
 // wins). The head is never coalesced while the flush has it in flight — the
@@ -25,7 +20,9 @@ export const eventAppended = (state: SessionLogState, event: EventDocEvent): Ses
       ...event,
       payload: {
         ...event.payload,
-        metadata: { ...event.payload.metadata, index: last.payload.metadata.index },
+        // Keeps the replaced event's id, so the coalesced event holds its place in the log
+        // rather than jumping to the end.
+        metadata: { ...event.payload.metadata, eventId: last.payload.metadata.eventId },
       },
     };
 
@@ -35,16 +32,10 @@ export const eventAppended = (state: SessionLogState, event: EventDocEvent): Ses
     };
   }
 
-  const appended: EventDocEvent = {
-    ...event,
-    payload: {
-      ...event.payload,
-      metadata: { ...event.payload.metadata, index: nextLocalIndex(state) },
-    },
-  };
-
+  // The event already carries the id minted when it was created, and sortable ids order
+  // themselves, so there is nothing to assign here.
   return {
     ...state,
-    pendingEvents: [...state.pendingEvents, appended],
+    pendingEvents: [...state.pendingEvents, event],
   };
 };

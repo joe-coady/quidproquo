@@ -2,6 +2,7 @@ import { askConfigGetGlobal, askQueueSendMessages, AskResponse, DeployEventStatu
 
 import { getQpqMigrationQueueTypeFromQpqFunctionRuntime, Migration } from '../../../config/settings/migration';
 import * as migrationInfoData from '../data/migrationInfoData';
+import { askIsMigrationPending, getMigrationKey } from './pendingMigrations';
 
 export function* askProcessOnDeployCreate(): AskResponse<void> {
   const allMigrations = yield* askConfigGetGlobal<Migration[]>('qpqMigrations');
@@ -23,11 +24,11 @@ export function* askProcessOnDeployUpdate(deployEventType: DeployEventType): Ask
   const migrationsForThisDeploy = allMigrations.filter((m) => m.deployType === deployEventType);
 
   for (const migration of migrationsForThisDeploy) {
-    const srcPathType = getQpqMigrationQueueTypeFromQpqFunctionRuntime(migration.runtime);
-    const migrationInfo = yield* migrationInfoData.askGetMigrationBySrcPath(srcPathType);
+    const srcPathType = getMigrationKey(migration);
 
-    // Ignore if we have already run it.
-    if (migrationInfo) {
+    // Ignore if we have already run it. Shared with the local runner (qpq migrate) so both
+    // agree on what pending means.
+    if (!(yield* askIsMigrationPending(migration))) {
       continue;
     }
 
