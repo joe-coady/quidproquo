@@ -6,6 +6,7 @@ import { getKeyValueStoreGetActionProcessor } from './getKeyValueStoreGetActionP
 import { getKeyValueStoreGetAllActionProcessor } from './getKeyValueStoreGetAllActionProcessor';
 import { getKeyValueStoreQueryActionProcessor } from './getKeyValueStoreQueryActionProcessor';
 import { getKeyValueStoreScanActionProcessor } from './getKeyValueStoreScanActionProcessor';
+import { getKeyValueStoreScanAllScopesActionProcessor } from './getKeyValueStoreScanAllScopesActionProcessor';
 import { getKeyValueStoreUpdateActionProcessor } from './getKeyValueStoreUpdateActionProcessor';
 import { getKeyValueStoreUpsertActionProcessor } from './getKeyValueStoreUpsertActionProcessor';
 
@@ -18,6 +19,7 @@ export const getKeyValueStoreActionProcessor =
       ...(await getKeyValueStoreGetAllActionProcessor(devServerConfig)(qpqConfig, dynamicModuleLoader)),
       ...(await getKeyValueStoreQueryActionProcessor(devServerConfig)(qpqConfig, dynamicModuleLoader)),
       ...(await getKeyValueStoreScanActionProcessor(devServerConfig)(qpqConfig, dynamicModuleLoader)),
+      ...(await getKeyValueStoreScanAllScopesActionProcessor(devServerConfig)(qpqConfig, dynamicModuleLoader)),
       ...(await getKeyValueStoreUpdateActionProcessor(devServerConfig)(qpqConfig, dynamicModuleLoader)),
       ...(await getKeyValueStoreUpsertActionProcessor(devServerConfig)(qpqConfig, dynamicModuleLoader)),
     };

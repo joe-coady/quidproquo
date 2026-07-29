@@ -69,6 +69,25 @@ export class JsonKvsRepository implements KvsRepository {
       : path.join(this.runtimePath, 'kvs', serviceName, `${keyValueStoreName}.json`);
   }
 
+  // A scope is a folder under `kvs/<service>/`, and a scope "has" this store if the folder
+  // holds its json file. Reading the directory rather than tracking scopes anywhere keeps
+  // this honest even when files are added by hand, which happens plenty in local dev.
+  async listScopes(keyValueStoreName: string): Promise<string[]> {
+    const storeConfig = this.getStoreConfig(keyValueStoreName);
+    const serviceName = qpqCoreUtils.getApplicationModuleName(this.qpqConfig);
+    const serviceRoot = path.join(this.runtimePath, 'kvs', serviceName);
+
+    if (!fs.existsSync(serviceRoot)) {
+      return [];
+    }
+
+    return fs
+      .readdirSync(serviceRoot, { withFileTypes: true })
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => entry.name)
+      .filter((scope) => fs.existsSync(this.getStoreFilePath(keyValueStoreName, storeConfig, scope)));
+  }
+
   private buildStorageKey(item: any, storeConfig: KeyValueStoreQPQConfigSetting): string {
     const pk = getPk(item, storeConfig);
     const sk = getSk(item, storeConfig);

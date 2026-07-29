@@ -17,6 +17,7 @@ describe('getKeyValueStoreActionProcessor (index)', () => {
         KeyValueStoreActionType.Delete,
         KeyValueStoreActionType.Query,
         KeyValueStoreActionType.Scan,
+        KeyValueStoreActionType.ScanAllScopes,
         KeyValueStoreActionType.Update,
         KeyValueStoreActionType.Upsert,
       ].sort(),

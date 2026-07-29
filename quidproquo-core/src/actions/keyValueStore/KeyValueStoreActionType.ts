@@ -6,4 +6,5 @@ export enum KeyValueStoreActionType {
   Update = '@quidproquo-core/KeyValueStore/Update',
   Query = '@quidproquo-core/KeyValueStore/Query',
   Scan = '@quidproquo-core/KeyValueStore/Scan',
+  ScanAllScopes = '@quidproquo-core/KeyValueStore/ScanAllScopes',
 }

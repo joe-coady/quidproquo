@@ -1,3 +1,5 @@
+export * from './KeyValueStoreScanAllScopesActionTypes';
+export * from './KeyValueStoreScanAllScopesActionRequester';
 export * from './KeyValueStoreActionType';
 export * from './KeyValueStoreDeleteActionRequester';
 export * from './KeyValueStoreDeleteActionTypes';

@@ -26,6 +26,11 @@ export interface KvsRepository {
 
   getAll(keyValueStoreName: string, scope?: string): Promise<any[]>;
 
+  // Every scope this store currently holds data for, unscoped excluded (the caller adds it).
+  // Scopes are folders on disk, so this is a directory listing rather than anything derived
+  // from the data. Migration-only: see askKeyValueStoreScanAllScopes.
+  listScopes(keyValueStoreName: string): Promise<string[]>;
+
   upsert(keyValueStoreName: string, item: any, options?: { ifNotExists?: boolean }, scope?: string): Promise<any>;
 
   update(keyValueStoreName: string, key: string, sortKey: string | undefined, updates: KvsUpdate, scope?: string): Promise<any>;
