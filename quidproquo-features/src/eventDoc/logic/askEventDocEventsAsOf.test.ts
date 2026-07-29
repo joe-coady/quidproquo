@@ -45,6 +45,7 @@ const EVENTS: EventDocEvent[] = [
 const storedEvents: EventDocStoredEvent[] = EVENTS.map((event) => ({
   pk: DOC_ID,
   sk: event.payload.metadata.eventId,
+  type: 'adminSession',
   data: event,
 }));
 

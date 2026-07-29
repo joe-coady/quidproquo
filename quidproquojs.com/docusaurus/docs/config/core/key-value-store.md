@@ -56,6 +56,7 @@ Zero or more sort keys. The list is significant:
 | `ttlAttribute` | `string` | – | Name of a record attribute holding a Unix-epoch (seconds) timestamp. DynamoDB automatically deletes records once that time passes. |
 | `disablePointInTimeRecovery` | `boolean` | `false` | Point-in-time recovery (35-day continuous backups / restore) is on by default; set this to opt out. |
 | `encryption` | `boolean` | `false` | Enables customer-managed KMS encryption for the table (the KMS key comes from the service's AWS config). When a customer-managed key isn't configured, AWS-managed encryption is used instead; when `false`, DynamoDB's default provider-managed encryption still applies. |
+| `onStream` | `KvsStreamSettings` | – | Turns on change data capture and runs a story for every insert/modify/remove on the store. See [Change data capture (`onStream`)](#change-data-capture-onstream). |
 
 ## Keys (`CompositeKvsKey`)
 
@@ -98,6 +99,56 @@ defineKeyValueStore('orders', 'orderId', [], {
 
 On AWS each index becomes a Global Secondary Index whose name is the index's partition-key attribute (`customerId`, `status` above).
 
+## Change data capture (`onStream`)
+
+```typescript
+export type KvsStreamSettings = {
+  runtime: QpqFunctionRuntime;
+  coalesceByPartitionKey?: boolean;
+  batchSize?: number;
+  maximumBatchingWindowInSeconds?: number;
+};
+```
+
+Declaring `onStream` puts the table into DynamoDB's `NEW_AND_OLD_IMAGES` stream mode and deploys a handler lambda subscribed to it. Records for a given partition key are always delivered to the handler in order; different partition keys may be processed concurrently. A table nothing subscribes to gets no stream at all, since a stream on it would be pure cost.
+
+| Property | Type | Default | Description |
+| --- | --- | --- | --- |
+| `runtime` | `QpqFunctionRuntime` | – (required) | The handler story, usually a relative path string in the form `'/path/to/file::exportedFunctionName'`. Invoked once per record with a `KvsStreamRecord<T>` (exported from `quidproquo-core`). |
+| `coalesceByPartitionKey` | `boolean` | `false` | Collapse each delivered batch down to one record per partition key (the latest), instead of invoking the handler once per record. Off by default, since a generic consumer (audit trail, change notifications) needs to see every change. Turn it on for a projection, where the handler re-derives state from source and only needs to know a key changed. |
+| `batchSize` | `number` | `100` | Records per invocation. DynamoDB streams allow up to 1000. |
+| `maximumBatchingWindowInSeconds` | `number` | – | How long to wait accumulating records before invoking, 0–300 seconds. Trades latency for fewer invocations, and gives `coalesceByPartitionKey` more to collapse. |
+
+The handler receives a `KvsStreamRecord<T>`:
+
+```typescript
+export enum KvsStreamEventType {
+  Insert = 'Insert',
+  Modify = 'Modify',
+  Remove = 'Remove',
+}
+
+export type KvsStreamRecord<TItem extends object = any> = {
+  keyValueStoreName: string;
+  eventType: KvsStreamEventType;
+  scope?: string;                  // present when the item was written under a storage scope
+  keys: Record<string, unknown>;   // always present, including on Remove
+  newImage?: TItem;                // absent on Remove
+  oldImage?: TItem;                // absent on Insert
+};
+```
+
+Images are plain objects, already unmarshalled from DynamoDB's wire format and with any storage scope stripped back out of the key values — a handler is ordinary story code and never sees a raw AttributeValue or a composed partition key.
+
+```typescript
+defineKeyValueStore('documents', 'id', [], {
+  onStream: {
+    runtime: '/entry/kvsStream/onDocumentChanged::onDocumentChanged',
+    coalesceByPartitionKey: true,
+  },
+});
+```
+
 ## Examples
 
 ```typescript
@@ -132,4 +183,5 @@ export default [
 - **Query & scan:** [askKeyValueStoreQuery](../../actions/core/key-value-store/ask-key-value-store-query.md) · [askKeyValueStoreScan](../../actions/core/key-value-store/ask-key-value-store-scan.md)
 - **Write:** [askKeyValueStoreUpsert](../../actions/core/key-value-store/ask-key-value-store-upsert.md) · [askKeyValueStoreUpdate](../../actions/core/key-value-store/ask-key-value-store-update.md) · [askKeyValueStoreDelete](../../actions/core/key-value-store/ask-key-value-store-delete.md)
 - **AWS tuning:** [defineAwsKmsKey](../config-aws/aws-kms-key.md) (customer-managed encryption key for the `encryption` flag), [defineAwsDyanmoOverrideForKvs](../config-aws/aws-dyanmo-override-for-kvs.md) (back the store with a pre-existing DynamoDB table), and [defineAwsDataStoreRemovalPolicy](../config-aws/aws-data-store-removal-policy.md) (retain vs destroy the table on teardown).
-- **AWS implementation:** `QpqCoreKeyValueStoreConstruct` (DynamoDB table, LSIs, GSIs, TTL, PITR, KMS, IAM grants) in `quidproquo-deploy-awscdk`; KVS action processors in `quidproquo-actionprocessor-awslambda`.
+- [defineEventDocSummary](../features/event-doc-summary.md) — a real `onStream` consumer: rebuilds a document's summary record from its event log on every change.
+- **AWS implementation:** `QpqCoreKeyValueStoreConstruct` (DynamoDB table, LSIs, GSIs, TTL, PITR, KMS, IAM grants) and `QpqApiCoreKeyValueStoreStreamConstruct` (the `onStream` handler lambda + event source) in `quidproquo-deploy-awscdk`; KVS action processors in `quidproquo-actionprocessor-awslambda`.

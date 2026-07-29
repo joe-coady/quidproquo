@@ -8,6 +8,7 @@ import {
   ApiQpqWebserverApiConstruct,
   LambdaLayers,
   QpqApiCoreQueueConstruct,
+  QpqApiCoreKeyValueStoreStreamConstruct,
   QpqApiCoreStorageDriveConstruct,
   QpqApiWebserverWebsocketConstruct,
   QpqConfigAwsAlarmConstruct,
@@ -122,6 +123,18 @@ export class ApiQpqServiceStack extends QpqServiceStack {
           qpqConfig: props.qpqConfig,
 
           storageDriveConfig: setting,
+        }),
+    );
+
+    // Key value store streams — the projector lambda + event source for any store that
+    // declares onStream. Lives here rather than on the Inf stack because that stack builds
+    // no lambdas; the stream ARN crosses via SSM (see the construct).
+    const keyValueStoreStreams = qpqCoreUtils.getAllKeyValueStores(props.qpqConfig).map(
+      (setting) =>
+        new QpqApiCoreKeyValueStoreStreamConstruct(this, `kvs-stream-${qpqCoreUtils.getUniqueKeyForSetting(setting)}`, {
+          qpqConfig: props.qpqConfig,
+
+          keyValueStoreConfig: setting,
         }),
     );
 

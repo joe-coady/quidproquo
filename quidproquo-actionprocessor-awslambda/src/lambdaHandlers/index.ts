@@ -1,3 +1,4 @@
+export * from './getDynamoStreamEvent_kvsStreamEvent';
 export * from './getAnyExecuteServiceFunctionEvent_serviceFunction';
 export * from './getApiGatewayEventHandler';
 export * from './getApiGatewayEventHandler_redirect';

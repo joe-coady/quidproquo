@@ -5,7 +5,6 @@ import { askEventDocEventListAll } from '../data/askEventDocEventListAll';
 import { askEventDocEventWrite } from '../data/askEventDocEventWrite';
 import { EventDocEffect, EventDocEvent, EventDocEventActor, EventDocEventInput, EventDocOnAppendInput, EventDocOnPublishInput } from '../models';
 import { askEventDocGetByIdOrThrow } from './askEventDocGetByIdOrThrow';
-import { askEventDocSummaryRederive } from './askEventDocSummaryRederive';
 
 /**
  * Append a client event to a model's log.
@@ -32,8 +31,13 @@ import { askEventDocSummaryRederive } from './askEventDocSummaryRederive';
  * outcome the same way it learns everything else — by folding the log it gets back.
  *
  * The verdict for an event is a pure function of that event and the ACCEPTED events
- * before it in index order. It can never change, so folds stay reproducible no matter how
- * many appends land afterwards.
+ * before it in id order. It can never change, so folds stay reproducible no matter how many
+ * appends land afterwards.
+ *
+ * NOTHING here maintains a read model. The summary is rebuilt from the log by the event
+ * store's stream projector (see defineEventDocSummary's `onStream`), so it is eventually
+ * consistent and entirely disposable — which is the whole point: a projection that the
+ * writer maintains is not a projection, it is a second source of truth.
  */
 export function* askEventDocEventAppend(modelId: string, input: EventDocEventInput, actor: EventDocEventActor): AskResponse<EventDocEvent> {
   const { metadata } = input.payload;
@@ -59,11 +63,6 @@ export function* askEventDocEventAppend(modelId: string, input: EventDocEventInp
   // assertion — if it ever fires, two writers minted the same id, which is a bug worth
   // surfacing loudly rather than a race to retry.
   yield* askEventDocEventWrite(modelId, event);
-
-  // Keep the projection in step. This is the last thing the writer does for a read model and
-  // it goes away entirely once the stream projector lands: the summary is derived from the
-  // log, so nothing about it belongs on the write path.
-  yield* askEventDocSummaryRederive(modelId);
 
   // Hooks run after the event is durably written. A hook may itself throw; that
   // propagates so the caller knows the side effect failed, not the append.

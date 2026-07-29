@@ -13,6 +13,7 @@ export * from './EventMessage';
 export * from './ExcludeKeys';
 export * from './FullyQualifiedResource';
 export * from './KeyOf';
+export * from './KvsStreamEvent';
 export * from './LogLevelEnum';
 export * from './Lookup';
 export * from './NotifyErrorQueueEvent';

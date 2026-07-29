@@ -75,6 +75,7 @@ const VERSION_DRAFT: EventDocVersion = { version: 4, eventId: eventId(5) };
 const storedEvents: EventDocStoredEvent[] = EVENTS.map((event) => ({
   pk: DOC_ID,
   sk: event.payload.metadata.eventId,
+  type: 'template',
   data: event,
 }));
 

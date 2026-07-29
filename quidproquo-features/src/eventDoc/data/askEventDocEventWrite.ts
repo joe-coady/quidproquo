@@ -11,8 +11,8 @@ import { askEventDocResolveScope } from './askEventDocResolveScope';
 // overwriting the event. Ordering, index assignment, validation and the
 // conflict-retry live in the logic layer (askEventDocEventAppend).
 export function* askEventDocEventWrite(modelId: string, event: EventDocEvent): AskResponse<void> {
-  const { eventsStoreName } = yield* askEventDocResolveStore();
+  const { eventsStoreName, type } = yield* askEventDocResolveStore();
   const scope = yield* askEventDocResolveScope();
 
-  yield* askKeyValueStoreUpsertWithRetry(eventsStoreName, eventDocEventToStoredEvent(modelId, event), { ifNotExists: true, scope });
+  yield* askKeyValueStoreUpsertWithRetry(eventsStoreName, eventDocEventToStoredEvent(modelId, type, event), { ifNotExists: true, scope });
 }

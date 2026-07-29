@@ -29,6 +29,26 @@ export function composeScopedKvsValue(scope: string | undefined, rawValue: KvsCo
   return `${scope}${KVS_SCOPE_DELIMITER}${rawValue}`;
 }
 
+// The inverse of composeScopedKvsValue: split a stored partition key value back into the
+// scope it was written under and the caller's raw key.
+//
+// Needed by anything reading a RAW stored key rather than going through a scoped request.
+// Change data capture is the case that forced it: a stream record carries the composed pk,
+// and the consumer has to re-enter the same scope before it can act on the item. An
+// unscoped value has no delimiter and comes back with `scope: undefined`.
+export const decomposeScopedKvsValue = (composedValue: string): { scope?: string; rawValue: string } => {
+  const at = composedValue.indexOf(KVS_SCOPE_DELIMITER);
+
+  if (at < 0) {
+    return { rawValue: composedValue };
+  }
+
+  return {
+    scope: composedValue.slice(0, at),
+    rawValue: composedValue.slice(at + KVS_SCOPE_DELIMITER.length),
+  };
+};
+
 // The delimiter is reserved in scoped partition-key values: a raw value
 // carrying it would strip ambiguously and could collide with (or forge)
 // another scope's composed rows. File-partitioned backends call this directly

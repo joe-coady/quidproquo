@@ -42,6 +42,7 @@ const EVENTS: EventDocEvent[] = [0, 1, 2, 3].map(buildEvent);
 const storedEvents: EventDocStoredEvent[] = EVENTS.map((event) => ({
   pk: DOC_ID,
   sk: event.payload.metadata.eventId,
+  type: 'template',
   data: event,
 }));
 
