@@ -10,6 +10,10 @@ import { eventDocVersionSchema } from './EventDocVersion';
  *
  * `createdAt`/`createdBy` are write-once; every event refreshes `updatedAt`/`updatedBy`.
  * Deletion is soft, via `deletedAt`.
+ *
+ * Every field here is DERIVED from the event log. The record is a projection and holds no
+ * authoritative state of its own, so it can be dropped and rebuilt at any time — which is
+ * what makes many views per document possible.
  */
 export const eventDocSummarySchema = z.object({
   type: z.string(),

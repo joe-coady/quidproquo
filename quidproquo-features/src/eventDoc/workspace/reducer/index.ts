@@ -3,4 +3,3 @@
 export * from './coalesceWorkspaceEvents';
 export * from './createEventDocWorkspaceReducer';
 export * from './getSlotCoalesceRules';
-export * from './renumberWorkspaceEvents';

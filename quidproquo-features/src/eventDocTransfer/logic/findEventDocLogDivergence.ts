@@ -6,9 +6,9 @@ import { EventDocLogComparison } from '../models';
 // same position they ARE the same event; there is no need to deep-compare payload data, which
 // would mean depending on JSON key order surviving a round trip through two stores.
 const eventIdentity = (event: EventDocEvent): string => {
-  const { index, version, clientMessageId, createdAt } = event.payload.metadata;
+  const { eventId, version, clientMessageId, createdAt } = event.payload.metadata;
 
-  return [event.type, index, version, clientMessageId, createdAt].join('|');
+  return [event.type, eventId, version, clientMessageId, createdAt].join('|');
 };
 
 /**

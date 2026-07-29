@@ -8,4 +8,11 @@ export enum EventDocEffect {
   SetName = 'SET_NAME',
   CreateDraft = 'CREATE_DRAFT',
   Publish = 'PUBLISH',
+
+  // Soft delete lives in the log, not on a record. `deletedAt` used to be written straight
+  // onto the summary, which made the summary hold state no fold could reproduce — rebuilding
+  // it would have resurrected deleted documents. As events, deletion and restoration are
+  // history like everything else, and every projection derives them.
+  Delete = 'DELETE',
+  Restore = 'RESTORE',
 }

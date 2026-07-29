@@ -10,7 +10,7 @@ import { effectiveAsOf } from './selectors/effectiveAsOf';
  * The version published and effective at `clock`, together with the events that compose it — the
  * log truncated at that version's head. Resolves the version from the persisted summary
  * (`effectiveAsOf`, keyed on `effectiveFrom`), then returns the events with index <= the version's
- * `eventIndex` (the head stamped at publish time). Returns null when the doc is missing/deleted or
+ * `eventId` (the head stamped at publish time). Returns null when the doc is missing/deleted or
  * nothing is effective yet. Assumes the store context is provided (wrap in
  * `askEventDocProvideStore`). The generic backbone of a "render published" flow: fold the events for
  * the published state, and read `version.publishedAt` to pin the doc's linked assets to the moment
@@ -31,6 +31,6 @@ export function* askEventDocPublishedVersionAsOf(id: string, clock: QpqIsoDateTi
 
   return {
     version,
-    events: events.filter((event) => event.payload.metadata.index <= version.eventIndex),
+    events: events.filter((event) => event.payload.metadata.eventId <= version.eventId),
   };
 }

@@ -8,6 +8,9 @@ import { EventDocEvent } from '../models';
 import { EventDocStoredEvent } from '../types/EventDocStoredEvent';
 import { askEventDocEventsAsOf } from './askEventDocEventsAsOf';
 
+// Sortable event ids are opaque strings ordered lexicographically; padded counters stand in.
+const eventId = (n: number): string => String(n).padStart(4, '0');
+
 // This is the "as you would have seen it then" resolver: a Latest link renders its target as of the
 // moment the referrer was published. It deliberately does NOT consult the target's versions — an
 // unpublished draft is still what renders — so the tests pin that a doc with no published version
@@ -26,7 +29,7 @@ const buildEvent = (index: number, createdAt: string): EventDocEvent => ({
       clientMessageId: `msg-${index}`,
       createdBy: { userId: 'user-1' } as EventDocEvent['payload']['metadata']['createdBy'],
       createdAt: createdAt as QpqIsoDateTime,
-      index,
+      eventId: eventId(index),
     },
   },
 });
@@ -41,7 +44,7 @@ const EVENTS: EventDocEvent[] = [
 
 const storedEvents: EventDocStoredEvent[] = EVENTS.map((event) => ({
   pk: DOC_ID,
-  sk: event.payload.metadata.index,
+  sk: event.payload.metadata.eventId,
   data: event,
 }));
 
@@ -55,21 +58,21 @@ const eventsAsOf = (clock: string): EventDocEvent[] =>
     },
   });
 
-const indexesAsOf = (clock: string): number[] => eventsAsOf(clock).map((event) => event.payload.metadata.index);
+const indexesAsOf = (clock: string): string[] => eventsAsOf(clock).map((event) => event.payload.metadata.eventId);
 
 describe('askEventDocEventsAsOf', () => {
   it('returns the events stamped at or before the clock, for a doc that was never published', () => {
     // The referring template published 2026-05-01, so the June edit must not leak in.
-    expect(indexesAsOf('2026-05-01T00:00:00.000Z')).toEqual([0, 1, 2]);
+    expect(indexesAsOf('2026-05-01T00:00:00.000Z')).toEqual([eventId(0), eventId(1), eventId(2)]);
   });
 
   it('includes an event stamped exactly at the clock', () => {
     // The bound is inclusive: an edit made at the publish instant is part of what the author saw.
-    expect(indexesAsOf('2026-04-10T00:00:00.000Z')).toEqual([0, 1]);
+    expect(indexesAsOf('2026-04-10T00:00:00.000Z')).toEqual([eventId(0), eventId(1)]);
   });
 
   it('returns the whole log when the clock is after every event', () => {
-    expect(indexesAsOf('2026-07-15T00:00:00.000Z')).toEqual([0, 1, 2, 3]);
+    expect(indexesAsOf('2026-07-15T00:00:00.000Z')).toEqual([eventId(0), eventId(1), eventId(2), eventId(3)]);
   });
 
   it('returns nothing when the clock predates the doc', () => {

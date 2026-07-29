@@ -12,6 +12,9 @@ import { maintenanceEventDoc } from './maintenanceEventDoc';
 import { MaintenanceLevel } from './MaintenanceLevel';
 import { MaintenanceType } from './MaintenanceType';
 
+// Sortable event ids are opaque strings ordered lexicographically; padded counters stand in.
+const eventId = (n: number): string => String(n).padStart(4, '0');
+
 const buildEvent = (type: string, data: unknown, createdAt: string, index: number): EventDocEvent => ({
   type,
   payload: {
@@ -21,7 +24,7 @@ const buildEvent = (type: string, data: unknown, createdAt: string, index: numbe
       clientMessageId: `m${index}`,
       createdBy: { userId: 'u1', userDisplayName: 'Joe' },
       createdAt: createdAt as QpqIsoDateTime,
-      index,
+      eventId: eventId(index),
     },
   },
 });

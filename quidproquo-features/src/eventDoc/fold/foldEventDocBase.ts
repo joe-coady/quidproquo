@@ -1,6 +1,7 @@
 import { QpqReducer } from 'quidproquo-core';
 
 import { EventDocDocument, EventDocEvent } from '../models';
+import { reservedEventDocEventValidators } from '../validation/reservedEventDocEventValidators';
 import { buildEventDocBaseReducer } from './buildEventDocBaseReducer';
 import { createEventDocInitialDocumentState } from './createEventDocInitialDocumentState';
 import { foldEventDocLog } from './foldEventDocLog';
@@ -16,10 +17,16 @@ const baseSeed = (): EventDocDocument => createEventDocInitialDocumentState(1);
 
 const baseReducer = buildEventDocBaseReducer(baseSeed) as QpqReducer<EventDocDocument, EventDocEvent>;
 
+// Validated with the RESERVED registry: since appends no longer validate, the universal
+// lifecycle guard has to be applied somewhere, and the base fold is the one path every
+// collection shares. A second PUBLISH racing the first is ignored here rather than
+// doubling the version history. Collections with domain rules pass their own registry
+// (reserved entries spread in via createEventDocEventValidator) to their own fold.
 export const foldEventDocBase = (events: EventDocEvent[]): EventDocDocument =>
   foldEventDocLog(events, {
     seed: baseSeed(),
     reducer: baseReducer,
     migrations: {},
     latestVersion: 1,
+    validators: reservedEventDocEventValidators,
   });

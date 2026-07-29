@@ -6,6 +6,9 @@ import { createEventDocDefinition } from '../definition/createEventDocDefinition
 import { EventDocDocument, EventDocEffect, EventDocEvent, EventDocLink, EventDocLinkMode } from '../models';
 import { createEventDocInitialDocumentState } from './createEventDocInitialDocumentState';
 
+// Sortable event ids are opaque strings ordered lexicographically; padded counters stand in.
+const eventId = (n: number): string => String(n).padStart(4, '0');
+
 const SERVICE = 'template';
 const STYLE_TYPE = 'style';
 
@@ -32,7 +35,7 @@ const event = (index: number, version: number, type: string, data: unknown): Eve
       clientMessageId: `msg-${index}`,
       createdBy: { userId: 'author-1', userDisplayName: 'Author One' },
       createdAt: `2026-07-27T00:00:0${index}.000Z`,
-      index,
+      eventId: eventId(index),
     },
   },
 });

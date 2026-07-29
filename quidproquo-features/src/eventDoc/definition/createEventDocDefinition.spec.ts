@@ -10,6 +10,11 @@ import { EventDocWorkspaceSlotKind, EventDocWorkspaceState } from '../workspace/
 import { createEventDocDefinition } from './createEventDocDefinition';
 import { createEventDocStateReader } from './createEventDocStateReader';
 
+// Sortable event ids are opaque strings ordered lexicographically; padded counters stand in.
+const eventId = (n: number): string => String(n).padStart(4, '0');
+
+let sortableGuidCount = 0;
+
 // ─── A tiny "memo" doc domain ───────────────────────────────────────────────────────
 
 enum MemoEvent {
@@ -55,6 +60,8 @@ const createMemoDefinition = () =>
 
 const actionMocks: ActionMockMap = {
   [GuidActionType.New]: () => 'guid-1',
+  // Sortable ids must sort lexicographically in creation order; pad so they do.
+  [GuidActionType.NewSortable]: () => `sguid-${String(++sortableGuidCount).padStart(4, '0')}`,
   [DateActionType.Now]: () => '2026-07-21T00:00:00.000Z',
 };
 
@@ -75,7 +82,7 @@ const serverEvent = (type: string, data: unknown, index: number, version = 1): E
       clientMessageId: `server-${index}`,
       createdBy: { userId: 'server', userDisplayName: 'Server' },
       createdAt: '2026-07-01T00:00:00.000Z',
-      index,
+      eventId: eventId(index),
     },
   },
 });

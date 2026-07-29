@@ -21,6 +21,8 @@ const REQUEST_NOW = '2026-07-15T00:00:00.000Z';
 
 const store = buildEventDocStore({ storeName: 'templates', type: 'template', eventRenderer: RENDERER_FN });
 
+const eventId = (n: number): string => String(n).padStart(4, '0');
+
 const buildEvent = (index: number): EventDocEvent => ({
   type: 'SET_BODY',
   payload: {
@@ -30,7 +32,7 @@ const buildEvent = (index: number): EventDocEvent => ({
       clientMessageId: `msg-${index}`,
       createdBy: { userId: 'user-1' } as EventDocEvent['payload']['metadata']['createdBy'],
       createdAt: '2026-01-01T00:00:00.000Z' as QpqIsoDateTime,
-      index,
+      eventId: eventId(index),
     },
   },
 });
@@ -39,18 +41,18 @@ const EVENTS: EventDocEvent[] = [0, 1, 2, 3].map(buildEvent);
 
 const storedEvents: EventDocStoredEvent[] = EVENTS.map((event) => ({
   pk: DOC_ID,
-  sk: event.payload.metadata.index,
+  sk: event.payload.metadata.eventId,
   data: event,
 }));
 
 // v1 published 03-01 with head @1 — so a published render must cut events 2 and 3.
 const VERSION_1: EventDocVersion = {
   version: 1,
-  eventIndex: 1,
+  eventId: eventId(1),
   publishedAt: '2026-03-01T00:00:00.000Z' as QpqIsoDateTime,
   effectiveFrom: '2026-03-01T00:00:00.000Z' as QpqIsoDateTime,
 };
-const VERSION_DRAFT: EventDocVersion = { version: 2, eventIndex: 3 };
+const VERSION_DRAFT: EventDocVersion = { version: 2, eventId: eventId(3) };
 
 const buildSummary = (versions: EventDocVersion[]): EventDocSummary => ({
   type: 'template',
@@ -108,14 +110,14 @@ describe('render route', () => {
   it('hands the renderer the whole log and no version for a draft render', () => {
     const { renderInput } = renderWith({ renderMode: EventDocRenderMode.Draft });
 
-    expect(renderInput.events.map((event) => event.payload.metadata.index)).toEqual([0, 1, 2, 3]);
+    expect(renderInput.events.map((event) => event.payload.metadata.eventId)).toEqual([eventId(0), eventId(1), eventId(2), eventId(3)]);
     expect(renderInput.version).toBeUndefined();
   });
 
   it('defaults to the whole log when no mode is given', () => {
     const { renderInput } = renderWith({});
 
-    expect(renderInput.events.map((event) => event.payload.metadata.index)).toEqual([0, 1, 2, 3]);
+    expect(renderInput.events.map((event) => event.payload.metadata.eventId)).toEqual([eventId(0), eventId(1), eventId(2), eventId(3)]);
     expect(renderInput.version).toBeUndefined();
   });
 
@@ -123,7 +125,7 @@ describe('render route', () => {
     const { renderInput } = renderWith({ renderMode: EventDocRenderMode.Published });
 
     // Truncated at v1's head — the draft edits (2, 3) must not reach a published render.
-    expect(renderInput.events.map((event) => event.payload.metadata.index)).toEqual([0, 1]);
+    expect(renderInput.events.map((event) => event.payload.metadata.eventId)).toEqual([eventId(0), eventId(1)]);
     // The version is what carries publishedAt, the clock the renderer resolves its links at.
     expect(renderInput.version).toEqual(VERSION_1);
   });

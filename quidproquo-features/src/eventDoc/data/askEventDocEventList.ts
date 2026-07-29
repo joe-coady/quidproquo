@@ -9,10 +9,10 @@ import { askEventDocResolveScope } from './askEventDocResolveScope';
 export type EventDocEventListOptions = {
   limit?: number;
   nextPageKey?: string;
-  // Return only events whose log index is greater than this (exclusive) — the tail since a known
+  // Return only events whose log id is greater than this (exclusive) — the tail since a known
   // point, for an incremental refresh. The events store is keyed pk=modelId / sk=index on its
   // primary key, so this is a sort-key range condition (no GSI involved).
-  afterIndex?: number;
+  afterEventId?: string;
 };
 
 export function* askEventDocEventList(modelId: string, options?: EventDocEventListOptions): AskResponse<QpqPagedData<EventDocEvent>> {
@@ -20,7 +20,7 @@ export function* askEventDocEventList(modelId: string, options?: EventDocEventLi
   const scope = yield* askEventDocResolveScope();
 
   const keyCondition =
-    options?.afterIndex !== undefined ? kvsAnd([kvsEqual('pk', modelId), kvsGreaterThan('sk', options.afterIndex)]) : kvsEqual('pk', modelId);
+    options?.afterEventId !== undefined ? kvsAnd([kvsEqual('pk', modelId), kvsGreaterThan('sk', options.afterEventId)]) : kvsEqual('pk', modelId);
 
   const page = yield* askKeyValueStoreQuery<EventDocStoredEvent>(eventsStoreName, keyCondition, {
     sortAscending: true,

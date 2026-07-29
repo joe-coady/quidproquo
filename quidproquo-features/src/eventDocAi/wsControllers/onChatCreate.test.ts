@@ -18,6 +18,8 @@ import { websocketConnectionInfoContext } from '../../webSocketQueue/context';
 import { EVENT_DOC_AI_CHAT_LIST_STORE_GLOBAL, EVENT_DOC_AI_SERVICE_NAME_GLOBAL } from '../constants/eventDocAiGlobalNames';
 import { onChatCreate } from './onChatCreate';
 
+let sortableGuidCount = 0;
+
 const globals: Record<string, string> = {
   [EVENT_DOC_AI_CHAT_LIST_STORE_GLOBAL]: 'logAiChats',
   [EVENT_DOC_AI_SERVICE_NAME_GLOBAL]: 'log',
@@ -46,6 +48,8 @@ describe('onChatCreate', () => {
       [ConfigActionType.GetGlobal]: (action: { payload: { globalName: string } }) => globals[action.payload.globalName] ?? '',
       [UserDirectoryActionType.ReadAccessToken]: { userId: 'user-1', username: 'joe' },
       [GuidActionType.New]: 'chat-1',
+      // Sortable ids must sort lexicographically in creation order; pad so they do.
+      [GuidActionType.NewSortable]: () => `sguid-${String(++sortableGuidCount).padStart(4, '0')}`,
       [DateActionType.Now]: '2026-07-11T00:00:00.000Z',
       [KeyValueStoreActionType.Upsert]: (action: { payload: { keyValueStoreName: string; item: unknown } }) => {
         upserts.push({ keyValueStoreName: action.payload.keyValueStoreName, item: action.payload.item });

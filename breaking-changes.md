@@ -5,6 +5,12 @@ assembled quickly.
 
 ## vNext
 
+- Event-doc event ids move from a numeric counter to a sortable string id (UUIDv7). `EventDocEventMetadata.index: number` is renamed to `eventId: string`; `EventDocVersion.eventIndex: number` is renamed to `eventId: string`; `EventDocLink`'s `Exact` variant's `eventIndex: number` is renamed to `eventId: string`; `EventDocStoredEvent.sk` changes from `number` to `string`. Update any code reading/writing these fields, and compare with `<`/`<=` rather than arithmetic.
+- `EventDocEventListOptions.afterIndex?: number` (used by `askEventDocEventList` in `quidproquo-features`) is renamed to `afterEventId?: string`. The `?afterIndex=` query param on the list-events route is renamed to `?afterEventId=` too; update callers on both ends.
+- `askEventDocSoftDelete(id, updatedBy)` in `quidproquo-features` now requires a third `schemaVersion: number` argument: `askEventDocSoftDelete(id, updatedBy, schemaVersion)`. Soft delete is now recorded as a `DELETE` event rather than a direct write to `deletedAt`, and every event carries the caller's schema version.
+- `askEventDocRestore(id, updatedBy, schemaVersion)` is added to `quidproquo-features` to undo a soft delete by appending a `RESTORE` event; there was previously no restore path since `deletedAt` had to be cleared by hand.
+- `renumberWorkspaceEvents` is removed from `quidproquo-features`' `eventDoc/workspace/reducer` exports with no replacement. Committed workspace events now mint a real sortable id at commit time instead of being re-stamped with a provisional sequential index.
+
 ## 0.1.12
 
 - `GraphDatabaseNeo4jQPQConfigSetting` is removed from `quidproquo-neo4j` with no replacement. It was never used by the package (`defineGraphDatabaseNeo4j` doesn't return it); delete any import of it.

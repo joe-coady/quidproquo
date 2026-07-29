@@ -50,11 +50,11 @@ function* askEventDocAppendServerEvent<T>(
 
 ## Returns
 
-`AskResponse<EventDocEvent>` — the appended event with its server-stamped metadata (`index`, `createdAt`, `createdBy`, and the generated `clientMessageId`).
+`AskResponse<EventDocEvent>` — the appended event with its server-stamped metadata (`eventId`, `createdAt`, `createdBy`, and the generated `clientMessageId`).
 
 ## Notes
 
-- All of [askEventDocEventAppend](./ask-event-doc-event-append.md)'s invariants apply — version monotonicity, lifecycle/payload validation, and optimistic-concurrency retry — since this is a thin envelope-building wrapper over it. It can therefore throw the same `ErrorTypeEnum.NotFound` / `ErrorTypeEnum.Conflict`.
+- This is a thin envelope-building wrapper over [askEventDocEventAppend](./ask-event-doc-event-append.md), so the same caveat applies: the event is written unconditionally, and version/lifecycle validation is decided later at fold time, not here. A server event that a validator would reject is written but silently skipped by every fold.
 - A fresh `clientMessageId` is generated on every call, so this path does not participate in client retry dedup — each call is a distinct intended event.
 
 ## Related

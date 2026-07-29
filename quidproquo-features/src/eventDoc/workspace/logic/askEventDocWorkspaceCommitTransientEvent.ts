@@ -1,4 +1,4 @@
-import { askDateNow, askNewGuid, AskResponse, QpqIsoDateTime } from 'quidproquo-core';
+import { askDateNow, askNewGuid, askNewSortableGuid, AskResponse, QpqIsoDateTime } from 'quidproquo-core';
 
 import { EventDocApplyTransientEventActionPayload } from '../../actions';
 import { EventDocEvent } from '../../models';
@@ -11,12 +11,13 @@ import { EventDocWorkspaceSlotBinding } from '../types/EventDocWorkspaceSlotBind
 // version-guard at read), but NO validation and no clear-error: validators guard the
 // integrity of the to-be-saved log, and transient never saves — it is dropped by key,
 // not persisted. `createdAt` is load-bearing here: transient ordering at read is by
-// time (see getSlotTransientEvents), not by index.
+// time (see getSlotTransientEvents), not by event id.
 export function* askEventDocWorkspaceCommitTransientEvent(
   binding: EventDocWorkspaceSlotBinding,
   { transientKey, eventType, data }: EventDocApplyTransientEventActionPayload,
 ): AskResponse<void> {
   const clientMessageId = yield* askNewGuid();
+  const eventId = yield* askNewSortableGuid();
   const createdAt = (yield* askDateNow()) as QpqIsoDateTime;
 
   const event: EventDocEvent = {
@@ -29,7 +30,8 @@ export function* askEventDocWorkspaceCommitTransientEvent(
         clientMessageId,
         createdBy: { userId: '', userDisplayName: '' },
         createdAt,
-        index: 0, // never renumbered: transient events are ordered by createdAt at read
+        // Minted like any other event, though transient ordering is by createdAt at read.
+        eventId,
       },
     },
   };

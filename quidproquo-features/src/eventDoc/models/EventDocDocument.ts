@@ -16,4 +16,8 @@ export type EventDocDocument = {
   status: EventDocStatus;
   createdAt: QpqIsoDateTime;
   updatedAt: QpqIsoDateTime;
+
+  // Soft delete, folded from DELETE / RESTORE. Absent means live.
+  deletedAt?: QpqIsoDateTime;
+  deletedBy?: string;
 };

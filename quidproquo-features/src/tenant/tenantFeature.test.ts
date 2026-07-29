@@ -22,6 +22,8 @@ import { HTTPEvent } from 'quidproquo-webserver';
 
 import { describe, expect, it } from 'vitest';
 
+import { createKvsUpdateMock } from '../eventDoc/testing/kvsUpdateActionMock';
+
 import {
   EVENT_DOC_EVENTS_STORE_NAME_GLOBAL,
   EVENT_DOC_ON_PUBLISH_GLOBAL,
@@ -50,6 +52,8 @@ import { create } from './routes/controllers/create';
 import { get } from './routes/controllers/get';
 import { getLogo } from './routes/controllers/getLogo';
 import { list } from './routes/controllers/list';
+
+let sortableGuidCount = 0;
 
 // End-to-end story-level pass over the tenant feature: create links membership,
 // SET_BRAND + PUBLISH materializes the record via the onPublish sync, list/get
@@ -121,6 +125,8 @@ const buildMocks = () => {
     [DateActionType.Now]: () => new Date((clock += 1000)).toISOString(),
     [GuidActionType.New]: () => `guid-${++guidCounter}`,
 
+    // Sortable ids must sort lexicographically in creation order; pad so they do.
+    [GuidActionType.NewSortable]: () => `sguid-${String(++sortableGuidCount).padStart(4, '0')}`,
     [InlineFunctionActionType.Execute]: (action: { payload: { functionName: string; payload: unknown } }) => {
       // Emulate the standard request-scope resolver: header names a tenant ->
       // that tenant's scope; no header -> the caller's personal scope.
@@ -138,6 +144,12 @@ const buildMocks = () => {
       const table = tables[action.payload.keyValueStoreName] ?? [];
       return table.find((row) => row.tenantId === action.payload.key || row.userId === action.payload.key || row.id === action.payload.key) ?? null;
     },
+
+    [KeyValueStoreActionType.Update]: createKvsUpdateMock({
+      tableFor: (_scope, storeName) => (tables[storeName] ??= []),
+      keyName: 'type',
+      sortKeyName: 'id',
+    }),
 
     [KeyValueStoreActionType.Upsert]: (action: {
       payload: { keyValueStoreName: string; item: Record<string, unknown>; options?: { ifNotExists?: boolean; scope?: string } };

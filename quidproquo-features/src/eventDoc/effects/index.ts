@@ -1,3 +1,5 @@
+export * from './EventDocDeleteEffect';
+export * from './EventDocRestoreEffect';
 export * from './EventDocCreateDraftEffect';
 export * from './EventDocEffects';
 export * from './EventDocInitStateEffect';

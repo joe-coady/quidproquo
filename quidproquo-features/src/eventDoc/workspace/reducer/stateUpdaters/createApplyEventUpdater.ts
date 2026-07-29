@@ -2,7 +2,6 @@ import { EventDocWorkspaceApplyEventPayload } from '../../effects/EventDocWorksp
 import { EventDocWorkspaceCoalesceRules } from '../../types/EventDocWorkspaceCoalesceRules';
 import { EventDocWorkspaceState } from '../../types/EventDocWorkspaceState';
 import { coalesceWorkspaceEvents } from '../coalesceWorkspaceEvents';
-import { renumberWorkspaceEvents } from '../renumberWorkspaceEvents';
 
 // Every commit lands in the slot's PENDING buffer (history is server truth only).
 // Coalesce + renumber live IN the reducer (not the commit story) so a commit is
@@ -25,7 +24,7 @@ export const createApplyEventUpdater =
       ...state,
       pending: {
         ...state.pending,
-        [slotKey]: renumberWorkspaceEvents([...retained, event], history.length),
+        [slotKey]: [...retained, event],
       },
     };
   };

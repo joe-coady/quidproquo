@@ -7,7 +7,7 @@ import { EventDocWorkspaceSlotOperation } from '../types/EventDocWorkspaceSlotOp
 import { EventDocWorkspaceTransport } from '../types/EventDocWorkspaceTransport';
 import { askEventDocWorkspaceReadState } from './askEventDocWorkspaceReadState';
 
-// Pull only the events appended since the last one we hold (afterIndex is exclusive,
+// Pull only the events appended since the last one we hold (afterEventId is exclusive,
 // so the append can't duplicate) and append JUST the tail, so the reducer folds only
 // those events into the stored history view. Touches the SAVED log only; the pending
 // buffer stays intact and the folded view re-derives reactively. A slot with no
@@ -26,7 +26,7 @@ const getAskRefreshDocumentSlot = (transport: EventDocWorkspaceTransport) =>
 
     yield* askUIEventDocWorkspaceClearError(slotKey);
 
-    const result = yield* askCatch(transport.askFetchEvents(documentIdentity, lastEvent?.payload.metadata.index));
+    const result = yield* askCatch(transport.askFetchEvents(documentIdentity, lastEvent?.payload.metadata.eventId));
 
     if (!result.success) {
       yield* askUIEventDocWorkspaceSetError(slotKey, { operation: EventDocWorkspaceSlotOperation.load, error: result.error });

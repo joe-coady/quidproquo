@@ -5,21 +5,21 @@ description: Read a document's event log — a page of events, the whole log fla
 
 # Reading the event log
 
-Three read helpers over a document's event stream. All three resolve the collection's events store from the store context and query it by `pk = modelId`, ascending by log index (except `askEventDocEventLast`, which reads the tail). They are the read side of the event-sourcing core, feeding the fold that reconstructs a document from its events.
+Three read helpers over a document's event stream. All three resolve the collection's events store from the store context and query it by `pk = modelId`, ascending by event id (except `askEventDocEventLast`, which reads the tail). Event ids are sortable ids (UUIDv7) whose string form sorts lexicographically in creation order, so ascending-by-id and ascending-by-creation-time agree. They are the read side of the event-sourcing core, feeding the fold that reconstructs a document from its events.
 
 - **Requires the store context** — provide it via [askEventDocProvideStore](./ask-event-doc-provide-store.md) / [askEventDocProvideStoreFromGlobals](./ask-event-doc-provide-store.md#askeventdocprovidestorefromglobals).
 - **Built from:** [askKeyValueStoreQuery](../../core/key-value-store/ask-key-value-store-query.md) against the events store, plus [askEventDocResolveStore](./ask-event-doc-provide-store.md#askeventdocresolvestore). Not single actions.
 
 ## askEventDocEventList
 
-Returns one page of events for a document, oldest first. Supports paging and, via `afterIndex`, fetching only the tail since a known index — an incremental refresh.
+Returns one page of events for a document, oldest first. Supports paging and, via `afterEventId`, fetching only the tail since a known event — an incremental refresh.
 
 ```typescript
 import { askEventDocEventList } from 'quidproquo-features';
 
-export function* refreshSince(docId: string, lastSeenIndex: number) {
-  const page = yield* askEventDocEventList(docId, { afterIndex: lastSeenIndex });
-  return page.items; // events with index > lastSeenIndex
+export function* refreshSince(docId: string, lastSeenEventId: string) {
+  const page = yield* askEventDocEventList(docId, { afterEventId: lastSeenEventId });
+  return page.items; // events after lastSeenEventId
 }
 ```
 
@@ -45,11 +45,11 @@ function* askEventDocEventList(
 | --- | --- | --- | --- |
 | `limit` | `number` | (store default) | Max number of events to return in the page. |
 | `nextPageKey` | `string` | — | Continuation token from a previous page's `nextPageKey`. |
-| `afterIndex` | `number` | — | Return only events whose log index is greater than this (exclusive). A sort-key range condition on the events store's primary key — no GSI involved. |
+| `afterEventId` | `string` | — | Return only events whose event id sorts after this one (exclusive). A sort-key range condition on the events store's primary key — no GSI involved. |
 
 ### Returns
 
-`AskResponse<QpqPagedData<EventDocEvent>>` — `{ items: EventDocEvent[]; nextPageKey?: string }`. Events are ordered ascending by index; `nextPageKey` is present when more events remain.
+`AskResponse<QpqPagedData<EventDocEvent>>` — `{ items: EventDocEvent[]; nextPageKey?: string }`. Events are ordered ascending by event id (equivalently, creation order); `nextPageKey` is present when more events remain.
 
 ## askEventDocEventListAll
 
@@ -77,11 +77,11 @@ function* askEventDocEventListAll(modelId: string): AskResponse<EventDocEvent[]>
 
 ### Returns
 
-`AskResponse<EventDocEvent[]>` — every event for the document, ordered ascending by index. Internally loops [askEventDocEventList](#askeventdoceventlist) until there is no `nextPageKey`.
+`AskResponse<EventDocEvent[]>` — every event for the document, ordered ascending by event id. Internally loops [askEventDocEventList](#askeventdoceventlist) until there is no `nextPageKey`.
 
 ## askEventDocEventLast
 
-Returns the newest event in the log, or `null` if the document has no events. Used to assign the next index, dedup, and validate during an append. Relies on numeric sort-key ordering (the dev server sorts numeric sort keys numerically, matching DynamoDB), so it returns the true latest.
+Returns the newest event in the log, or `null` if the document has no events. Relies on string sort-key ordering (a sortable event id's string form sorts lexicographically in creation order, and the dev server sorts string sort keys the same way DynamoDB does), so it returns the true latest.
 
 ```typescript
 import { askEventDocEventLast } from 'quidproquo-features';

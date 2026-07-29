@@ -4,6 +4,6 @@ import type { EventDocEvent } from '../models';
 // storage concerns.
 export type EventDocStoredEvent = {
   pk: string;
-  sk: number;
+  sk: string;
   data: EventDocEvent;
 };

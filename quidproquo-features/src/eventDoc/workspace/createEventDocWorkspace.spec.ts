@@ -187,10 +187,13 @@ const constantNow = '2026-07-16T00:00:00.000Z';
 // every other spec keeps its stable constant timestamp.
 const createActionMocks = (dates: string[] = []): ActionMockMap => {
   let guidCount = 0;
+  let sortableGuidCount = 0;
   let dateCount = 0;
 
   return {
     [GuidActionType.New]: () => `guid-${++guidCount}`,
+    // Sortable ids must sort lexicographically in creation order; pad so they do.
+    [GuidActionType.NewSortable]: () => `sguid-${String(++sortableGuidCount).padStart(4, '0')}`,
     [DateActionType.Now]: () => dates[dateCount++] ?? constantNow,
   };
 };
@@ -205,6 +208,18 @@ type WorkspaceUnderTest = {
 const runWorkspaceStory = (workspace: WorkspaceUnderTest, story: () => AskResponse<void>, dates?: string[]): EventDocWorkspaceState =>
   runStory(askReduceState(workspace.createInitialState(), workspace.reducer, story), createActionMocks(dates));
 
+// Sortable ids are opaque strings ordered lexicographically; padded counters stand in, so a
+// fixture's ordering is still obvious at a glance.
+const eventId = (n: number): string => String(n).padStart(4, '0');
+
+// Pending events no longer carry a renumbered position — each mints its own sortable id — so
+// what the tests care about is that the buffer stays strictly ordered.
+const expectStrictlyIncreasing = (events: EventDocEvent[]): void => {
+  const ids = events.map((event) => event.payload.metadata.eventId);
+  expect(ids).toEqual([...ids].sort());
+  expect(new Set(ids).size).toBe(ids.length);
+};
+
 // Server-stamped events for seeding histories.
 const serverEvent = (type: string, data: unknown, index: number): EventDocEvent => ({
   type,
@@ -215,7 +230,7 @@ const serverEvent = (type: string, data: unknown, index: number): EventDocEvent 
       clientMessageId: `server-${index}`,
       createdBy: { userId: 'server', userDisplayName: 'Server' },
       createdAt: '2026-07-01T00:00:00.000Z',
-      index,
+      eventId: eventId(index),
     },
   },
 });
@@ -246,7 +261,7 @@ const identityA: EventDocWorkspaceDocumentIdentity = { serviceName: 'notes', bas
 type FakeTransport = {
   transport: EventDocWorkspaceTransport;
   appended: EventDocEventInput[];
-  fetchCalls: { afterIndex?: number }[];
+  fetchCalls: { afterEventId?: string }[];
   setServerEvents: (events: EventDocEvent[]) => void;
   failAppendOnCall: (callNumber: number, errorType?: ErrorTypeEnum) => void;
   failFetches: () => void;
@@ -259,16 +274,16 @@ const createFakeTransport = (initialServerEvents: EventDocEvent[] = []): FakeTra
   let failFetch = false;
   let appendCalls = 0;
   const appended: EventDocEventInput[] = [];
-  const fetchCalls: { afterIndex?: number }[] = [];
+  const fetchCalls: { afterEventId?: string }[] = [];
 
-  function* askFetchEvents(_identity: EventDocWorkspaceDocumentIdentity, afterIndex?: number): AskResponse<EventDocEvent[]> {
-    fetchCalls.push({ afterIndex });
+  function* askFetchEvents(_identity: EventDocWorkspaceDocumentIdentity, afterEventId?: string): AskResponse<EventDocEvent[]> {
+    fetchCalls.push({ afterEventId });
 
     if (failFetch) {
       return yield* askThrowError(ErrorTypeEnum.GenericError, 'fetch boom');
     }
 
-    return serverEvents.filter((event) => afterIndex === undefined || event.payload.metadata.index > afterIndex);
+    return serverEvents.filter((event) => afterEventId === undefined || event.payload.metadata.eventId > afterEventId);
   }
 
   function* askAppendEvent(_identity: EventDocWorkspaceDocumentIdentity, input: EventDocEventInput): AskResponse<EventDocEvent> {
@@ -288,7 +303,7 @@ const createFakeTransport = (initialServerEvents: EventDocEvent[] = []): FakeTra
           ...input.payload.metadata,
           createdBy: { userId: 'server', userDisplayName: 'Server' },
           createdAt: '2026-07-16T01:00:00.000Z',
-          index: serverEvents.length,
+          eventId: eventId(serverEvents.length),
         },
       },
     };
@@ -363,7 +378,8 @@ describe('createEventDocWorkspace scoped state', () => {
       clientMessageId: 'guid-1',
       createdBy: { userId: '', userDisplayName: '' },
       createdAt: '2026-07-16T00:00:00.000Z',
-      index: 0,
+      // Minted client-side: sortable ids need no allocator, so there is no placeholder.
+      eventId: 'sguid-0001',
     });
   });
 
@@ -414,7 +430,7 @@ describe('createEventDocWorkspace scoped state', () => {
 
     expect(state.pending.noteA).toHaveLength(2);
     expect(state.pending.noteA.map((event) => (event.payload.data as NoteLine).lineId).sort()).toEqual(['l1', 'l2']);
-    expect(state.pending.noteA.map((event) => event.payload.metadata.index)).toEqual([0, 1]);
+    expectStrictlyIncreasing(state.pending.noteA);
   });
 
   it('fails loudly when a document verb runs outside any workspace bind', () => {
@@ -550,7 +566,7 @@ describe('createEventDocWorkspace coalescing', () => {
     expect(state.pending.noteA[1].payload.data).toEqual({ lineId: 'l1', text: 'final' });
   });
 
-  it('renumbers pending indexes to continue the saved log', () => {
+  it('keeps pending events ordered after the saved log without renumbering', () => {
     const workspace = createTestWorkspace();
 
     function* story(): AskResponse<void> {
@@ -562,7 +578,7 @@ describe('createEventDocWorkspace coalescing', () => {
 
     const state = runWorkspaceStory(workspace, story);
 
-    expect(state.pending.noteA.map((event) => event.payload.metadata.index)).toEqual([1, 2]);
+    expectStrictlyIncreasing(state.pending.noteA);
   });
 
   it('local slots default to last-write-wins per type, buffered in pending', () => {
@@ -580,7 +596,7 @@ describe('createEventDocWorkspace coalescing', () => {
     // history stays strictly server truth: empty. One pending event per type.
     expect(state.history.chrome).toHaveLength(0);
     expect(state.pending.chrome).toHaveLength(2);
-    expect(state.pending.chrome.map((event) => event.payload.metadata.index)).toEqual([0, 1]);
+    expectStrictlyIncreasing(state.pending.chrome);
 
     const chromeView = workspace.docs.chrome.view(state);
     expect(chromeView.historyOpen).toBe(false);
@@ -737,7 +753,7 @@ describe('createEventDocWorkspace built-in verbs', () => {
     expect(state.history.noteA).toHaveLength(3);
     // Server-stamped metadata replaces the provisional buffer metadata.
     expect(state.history.noteA[1].payload.metadata.createdBy.userId).toBe('server');
-    expect(state.history.noteA[1].payload.metadata.index).toBe(1);
+    expect(state.history.noteA[1].payload.metadata.eventId).toBe(eventId(1));
     expect(state.slots.noteA.isSaving).toBe(false);
   });
 
@@ -788,7 +804,7 @@ describe('createEventDocWorkspace built-in verbs', () => {
     const workspace = createTestWorkspace(fake.transport);
 
     // The server log grows between init and refresh (another editor appended), so the
-    // refresh must fetch from afterIndex 0 and append only the tail.
+    // refresh must fetch from afterEventId 0 and append only the tail.
     function* story(): AskResponse<void> {
       yield* workspace.api.askInit({ noteA: identityA });
       fake.setServerEvents([initStateEvent(), serverEvent(NoteEvent.SetTitle, { title: 'from elsewhere' }, 1)]);
@@ -797,7 +813,7 @@ describe('createEventDocWorkspace built-in verbs', () => {
 
     const state = runWorkspaceStory(workspace, story);
 
-    expect(fake.fetchCalls).toEqual([{ afterIndex: undefined }, { afterIndex: 0 }]);
+    expect(fake.fetchCalls).toEqual([{ afterEventId: undefined }, { afterEventId: eventId(0) }]);
     expect(state.history.noteA).toHaveLength(2);
     expect(state.history.noteA[1].payload.data).toEqual({ title: 'from elsewhere' });
   });
@@ -944,12 +960,12 @@ describe('createEventDocWorkspace snapshot hand-off', () => {
     const state = runWorkspaceStory(workspace, swappedSession);
 
     // First call is the edit session's full load; the restore adds ONLY a tail-pull.
-    expect(fake.fetchCalls).toEqual([{ afterIndex: undefined }, { afterIndex: 0 }]);
+    expect(fake.fetchCalls).toEqual([{ afterEventId: undefined }, { afterEventId: eventId(0) }]);
     expect(state.slots.noteA.isLoading).toBe(false);
 
     expect(state.history.noteA).toHaveLength(2);
     expect(state.pending.noteA).toHaveLength(2);
-    expect(state.pending.noteA.map((event) => event.payload.metadata.index)).toEqual([1, 2]);
+    expectStrictlyIncreasing(state.pending.noteA);
     expect(workspace.selectors.isDirty(state)).toBe(true);
 
     // The unsaved SetTitle still folds after the synced tail: client intent wins.
@@ -978,7 +994,7 @@ describe('createEventDocWorkspace snapshot hand-off', () => {
     const state = runWorkspaceStory(workspace, swappedSession);
 
     // Two FULL loads — no tail-pull.
-    expect(fake.fetchCalls).toEqual([{ afterIndex: undefined }, { afterIndex: undefined }]);
+    expect(fake.fetchCalls).toEqual([{ afterEventId: undefined }, { afterEventId: undefined }]);
     expect(state.history.noteA).toHaveLength(1);
     expect(state.pending.noteA).toHaveLength(1);
     expect(state.pending.noteA[0].payload.data).toEqual({ title: 'carried' });
@@ -1119,7 +1135,7 @@ describe('createEventDocWorkspace historyViews', () => {
 
     // The tail-pull appended (not re-set) the log, and the incremental fold matches
     // the reference full refold.
-    expect(fake.fetchCalls).toEqual([{ afterIndex: undefined }, { afterIndex: 0 }]);
+    expect(fake.fetchCalls).toEqual([{ afterEventId: undefined }, { afterEventId: eventId(0) }]);
     expect((state.historyViews.noteA as NoteState).title).toBe('from elsewhere');
     expect(state.historyViews.noteA).toEqual(foldNoteHistory(state.history.noteA));
   });
@@ -1327,14 +1343,15 @@ describe('createEventDocWorkspace transient streams', () => {
     expect(state.transient.noteA['conn-2'][0].payload.data).toEqual({ lineId: 'l1', text: 'from conn-2' });
     expect(state.transient.noteB['conn-1'][0].payload.data).toEqual({ title: 'b1' });
 
-    // Same guid/date/schemaVersion stamping as the ordinary commit; index stays 0
-    // (never renumbered — transient ordering is by createdAt at read).
+    // Same guid/date/schemaVersion stamping as the ordinary commit. The id is minted like
+    // any other, but it is never used to order transient events — that is by createdAt at
+    // read time.
     expect(state.transient.noteA['conn-1'][0].payload.metadata).toEqual({
       version: 1,
       clientMessageId: 'guid-1',
       createdBy: { userId: '', userDisplayName: '' },
       createdAt: constantNow,
-      index: 0,
+      eventId: 'sguid-0001',
     });
 
     // Nothing leaks into the persistable groups.

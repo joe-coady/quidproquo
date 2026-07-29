@@ -17,6 +17,8 @@ import { HTTPEvent } from 'quidproquo-webserver';
 
 import { describe, expect, it } from 'vitest';
 
+import { createKvsUpdateMock } from '../../testing/kvsUpdateActionMock';
+
 import {
   EVENT_DOC_EVENTS_STORE_NAME_GLOBAL,
   EVENT_DOC_STORE_NAME_GLOBAL,
@@ -27,6 +29,8 @@ import { buildEventDocStore } from '../../context/buildEventDocStore';
 import { appendEvent } from './appendEvent';
 import { create } from './create';
 import { listEvents } from './listEvents';
+
+let sortableGuidCount = 0;
 
 // Proves the real create -> appendEvent -> listEvents story logic (the exact path
 // admin session docs use) actually round-trips through a key-value store, not just
@@ -80,6 +84,14 @@ const buildMocks = () => {
 
     [DateActionType.Now]: () => new Date((clock += 1000)).toISOString(),
     [GuidActionType.New]: () => `guid-${++guidCounter}`,
+
+    // Sortable ids must sort lexicographically in creation order; pad so they do.
+    [GuidActionType.NewSortable]: () => `sguid-${String(++sortableGuidCount).padStart(4, '0')}`,
+    [KeyValueStoreActionType.Update]: createKvsUpdateMock({
+      tableFor: (_scope, storeName) => (tables[storeName] ??= []),
+      keyName: 'type',
+      sortKeyName: 'id',
+    }),
 
     [KeyValueStoreActionType.Upsert]: (action: {
       payload: { keyValueStoreName: string; item: Record<string, unknown>; options?: { ifNotExists?: boolean } };
@@ -161,9 +173,12 @@ describe('eventDoc session round trip (create -> appendEvent -> listEvents)', ()
     expect(appendResponse.status).toBe(200);
     const appendedEvent = JSON.parse(appendResponse.body!);
     expect(appendedEvent.type).toBe('tabChanged');
-    expect(appendedEvent.payload.metadata.index).toBe(1);
+    expect(appendedEvent.payload.metadata.eventId).toBe('sguid-0002');
 
-    // A retried append (same clientMessageId) must dedup, not create a second event.
+    // A retried append (same clientMessageId) is WRITTEN — the append path does not read
+    // the log and so cannot dedup — and mints its own id. Dedup is the fold's job now: see
+    // foldEventDocLog's acceptance rules, which drop the second occurrence so the document
+    // is identical either way.
     const retryResponse = runStory(
       appendEvent(
         baseHttpEvent({
@@ -174,13 +189,17 @@ describe('eventDoc session round trip (create -> appendEvent -> listEvents)', ()
       ),
       mocks,
     );
-    expect(JSON.parse(retryResponse.body!).payload.metadata.index).toBe(1);
+    expect(JSON.parse(retryResponse.body!).payload.metadata.eventId).toBe('sguid-0003');
 
     const listResponse = runStory(listEvents(baseHttpEvent(undefined), { id: summary.id }), mocks);
     expect(listResponse.status).toBe(200);
     const page = JSON.parse(listResponse.body!);
 
-    expect(page.items).toHaveLength(2);
+    // Ids are unique and sort in creation order — minted per event, never allocated.
+    const ids = page.items.map((event: { payload: { metadata: { eventId: string } } }) => event.payload.metadata.eventId);
+    expect(ids).toEqual([...ids].sort());
+    expect(new Set(ids).size).toBe(ids.length);
+    expect(ids).toHaveLength(3);
     expect(page.items[0].type).toBe('INIT_STATE');
     expect(page.items[1].type).toBe('tabChanged');
     expect(page.items[1].payload.data).toEqual({ tab: 2 });

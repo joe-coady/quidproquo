@@ -1,6 +1,8 @@
 import { EventDocCreateDraftEffect } from './EventDocCreateDraftEffect';
+import { EventDocDeleteEffect } from './EventDocDeleteEffect';
 import { EventDocInitStateEffect } from './EventDocInitStateEffect';
 import { EventDocPublishEffect } from './EventDocPublishEffect';
+import { EventDocRestoreEffect } from './EventDocRestoreEffect';
 import { EventDocSetCodeEffect } from './EventDocSetCodeEffect';
 import { EventDocSetNameEffect } from './EventDocSetNameEffect';
 
@@ -8,4 +10,10 @@ import { EventDocSetNameEffect } from './EventDocSetNameEffect';
 // creators pass to askApplyEventDocEvent). The fold side derives its stored shapes
 // from this union via EventDocFoldEffects (see fold/ReservedEventDocEffects).
 export type EventDocEffects =
-  EventDocInitStateEffect | EventDocSetCodeEffect | EventDocSetNameEffect | EventDocCreateDraftEffect | EventDocPublishEffect;
+  | EventDocInitStateEffect
+  | EventDocSetCodeEffect
+  | EventDocSetNameEffect
+  | EventDocCreateDraftEffect
+  | EventDocPublishEffect
+  | EventDocDeleteEffect
+  | EventDocRestoreEffect;

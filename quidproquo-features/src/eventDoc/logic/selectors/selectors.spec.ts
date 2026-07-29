@@ -9,6 +9,9 @@ import { latestVersion } from './latestVersion';
 import { maxByVersion } from './maxByVersion';
 import { publishedAsOf } from './publishedAsOf';
 
+// Sortable event ids are opaque strings ordered lexicographically; padded counters stand in.
+const eventId = (n: number): string => String(n).padStart(4, '0');
+
 const iso = (s: string): QpqIsoDateTime => s as QpqIsoDateTime;
 
 const model = (versions: EventDocVersion[]): EventDocSummary => ({
@@ -25,7 +28,7 @@ const model = (versions: EventDocVersion[]): EventDocSummary => ({
 
 const v = (version: number, publishedAt?: string): EventDocVersion => ({
   version,
-  eventIndex: version,
+  eventId: eventId(version),
   ...(publishedAt ? { publishedAt: iso(publishedAt) } : {}),
 });
 

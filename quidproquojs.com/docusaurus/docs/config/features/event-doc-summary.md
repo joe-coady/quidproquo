@@ -5,15 +5,16 @@ description: Declare the stores for an event-sourced document collection — its
 
 # defineEventDocSummary
 
-Declares the **stores** that back an event-document collection, without any routes. It returns a `QPQConfig` (an array of config settings) that expands to three underlying core stores:
+Declares the **stores** that back an event-document collection, without any routes. It returns a `QPQConfig` (an array of config settings) that expands to four underlying core stores:
 
 1. A **summary key-value store** (partition key `type`, sort key `id`) — the queryable record for each document, derived by folding the identity/lifecycle events of its log. Rows are the [`EventDocSummary`](../../actions/features/event-doc/ask-event-doc-get-by-id.md) shape and carry the version history. A secondary index on `(type, updatedAt)` supports the recently-updated ordering [askEventDocList](../../actions/features/event-doc/ask-event-doc-list.md) returns.
-2. An **append-only events store** (`<storeName>Events`, partition key `pk`, numeric sort key `sk`) — the ordered log every document is folded from. It has **no** secondary index on purpose: the local dev-server query processor can't target one, so all event reads go through the main table.
-3. A **storage drive** (`<storeName>edocs`, lower-cased) — the collection's blob bucket, holding each document's immutable uploaded assets (and later its derived runtime artifacts) under per-document prefixes.
+2. An **append-only events store** (`<storeName>EventLog`, partition key `pk`, string sort key `sk`) — the live ordered log every document is folded from, keyed on a sortable event id (UUIDv7). It has **no** secondary index on purpose: the local dev-server query processor can't target one, so all event reads go through the main table.
+3. A **legacy events store** (`<storeName>Events`, partition key `pk`, numeric sort key `sk`) — the pre-sortable-id log, kept declared but unread/unwritten at runtime so its data stays reachable until it is migrated into the events store above.
+4. A **storage drive** (`<storeName>edocs`, lower-cased) — the collection's blob bucket, holding each document's immutable uploaded assets (and later its derived runtime artifacts) under per-document prefixes.
 
-Point-in-time recovery is enabled on both tables.
+Point-in-time recovery is enabled on all three tables.
 
-- **On AWS:** deploys two DynamoDB tables (via [defineKeyValueStore](../core/key-value-store.md)) and one S3 bucket (via [defineStorageDrive](../core/storage-drive.md)). All physical names are derived from `keyValueStoreName`, so a collection needs only that one name.
+- **On AWS:** deploys three DynamoDB tables (via [defineKeyValueStore](../core/key-value-store.md)) and one S3 bucket (via [defineStorageDrive](../core/storage-drive.md)). All physical names are derived from `keyValueStoreName`, so a collection needs only that one name.
 
 ```typescript
 import { defineEventDocSummary } from 'quidproquo-features';

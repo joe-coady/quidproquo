@@ -1,6 +1,6 @@
 import { defineKeyValueStore, defineStorageDrive, kvsKey, QPQConfig } from 'quidproquo-core';
 
-import { eventDocEventsStoreName } from '../constants/eventDocEventsStoreName';
+import { eventDocEventsStoreName, eventDocLegacyEventsStoreName } from '../constants/eventDocEventsStoreName';
 import { eventDocStorageDriveName } from '../constants/eventDocStorageDriveName';
 import { EventDocSummary } from '../models';
 import { EventDocStoredEvent } from '../types/EventDocStoredEvent';
@@ -14,7 +14,15 @@ export const defineEventDocSummary = (keyValueStoreName: string): QPQConfig => [
     indexes: [{ partitionKey: 'type', sortKey: 'updatedAt' }],
     disablePointInTimeRecovery: false,
   }),
-  defineKeyValueStore<EventDocStoredEvent>(eventDocEventsStoreName(keyValueStoreName), 'pk', [kvsKey('sk', 'number')], {
+  // The live log: pk=modelId, sk=sortable event id (string).
+  defineKeyValueStore<EventDocStoredEvent>(eventDocEventsStoreName(keyValueStoreName), 'pk', [kvsKey('sk', 'string')], {
+    disablePointInTimeRecovery: false,
+  }),
+
+  // The legacy log, numeric sort key. Declared but unused: a DynamoDB key schema cannot be
+  // altered in place, so the switch to sortable ids meant a new table. This keeps the old
+  // one deployed and its data reachable until the migration copies it across.
+  defineKeyValueStore<{ pk: string; sk: number; data: unknown }>(eventDocLegacyEventsStoreName(keyValueStoreName), 'pk', [kvsKey('sk', 'number')], {
     disablePointInTimeRecovery: false,
   }),
   defineStorageDrive(eventDocStorageDriveName(keyValueStoreName)),

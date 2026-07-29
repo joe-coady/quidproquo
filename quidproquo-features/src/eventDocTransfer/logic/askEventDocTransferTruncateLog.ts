@@ -21,7 +21,10 @@ export function* askEventDocTransferTruncateLog(
   existingEvents: EventDocEvent[],
   fromIndex: number,
 ): AskResponse<EventDocEvent[]> {
-  const discarded = existingEvents.filter((event) => event.payload.metadata.index >= fromIndex);
+  // `fromIndex` is a POSITION in the log (what findEventDocLogDivergence reports and what
+  // askEventDocWriteForeignEvents slices on), not an event id. Those coincided while ids were a
+  // contiguous counter; with sortable ids they are different things, so slice by position.
+  const discarded = existingEvents.slice(fromIndex);
 
   if (discarded.length === 0) {
     return [];
@@ -38,7 +41,7 @@ export function* askEventDocTransferTruncateLog(
   );
 
   for (const event of discarded) {
-    yield* askEventDocEventDelete(docId, event.payload.metadata.index);
+    yield* askEventDocEventDelete(docId, event.payload.metadata.eventId);
   }
 
   return discarded;

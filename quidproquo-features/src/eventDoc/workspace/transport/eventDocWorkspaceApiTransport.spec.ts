@@ -8,6 +8,9 @@ import { EventDocWorkspaceDocumentIdentity } from '../types/EventDocWorkspaceDoc
 import { askEventDocWorkspaceApiAppendEvent } from './askEventDocWorkspaceApiAppendEvent';
 import { askEventDocWorkspaceApiFetchEvents } from './askEventDocWorkspaceApiFetchEvents';
 
+// Sortable event ids are opaque strings ordered lexicographically; padded counters stand in.
+const eventId = (n: number): string => String(n).padStart(4, '0');
+
 const identity: EventDocWorkspaceDocumentIdentity = { serviceName: 'notes', basePath: '/notes', id: 'doc-1' };
 
 const storedEvent = (index: number): EventDocEvent => ({
@@ -19,7 +22,7 @@ const storedEvent = (index: number): EventDocEvent => ({
       clientMessageId: `m-${index}`,
       createdBy: { userId: 'server', userDisplayName: 'Server' },
       createdAt: '2026-07-17T00:00:00.000Z',
-      index,
+      eventId: eventId(index),
     },
   },
 });
@@ -42,13 +45,13 @@ describe('eventDocWorkspaceApiTransport', () => {
       [ApiActionType.Request]: respondWithPage,
     });
 
-    expect(events.map((event) => event.payload.metadata.index)).toEqual([0, 1, 2]);
+    expect(events.map((event) => event.payload.metadata.eventId)).toEqual([eventId(0), eventId(1), eventId(2)]);
     expect(requests).toHaveLength(2);
     expect(requests[0]).toMatchObject({ service: 'notes', method: 'GET', endpoint: '/v1/notes/doc-1/events' });
     expect(requests[1].params).toMatchObject({ nextPageKey: 'page-2' });
   });
 
-  it('passes afterIndex through for incremental tail pulls', () => {
+  it('passes afterEventId through for incremental tail pulls', () => {
     const requests: ApiRequestActionPayload<unknown>[] = [];
 
     const respondEmpty = (action: Action<ApiRequestActionPayload<unknown>>) => {
@@ -56,11 +59,11 @@ describe('eventDocWorkspaceApiTransport', () => {
       return { status: 200, data: { items: [] } };
     };
 
-    runStory(askEventDocWorkspaceApiFetchEvents(identity, 7), {
+    runStory(askEventDocWorkspaceApiFetchEvents(identity, eventId(7)), {
       [ApiActionType.Request]: respondEmpty,
     });
 
-    expect(requests[0].params).toMatchObject({ afterIndex: '7' });
+    expect(requests[0].params).toMatchObject({ afterEventId: eventId(7) });
   });
 
   it('POSTs an append and returns the stored event', () => {
@@ -81,7 +84,7 @@ describe('eventDocWorkspaceApiTransport', () => {
     });
 
     expect(requests[0]).toMatchObject({ service: 'notes', method: 'POST', endpoint: '/v1/notes/doc-1/events', body: input });
-    expect(stored.payload.metadata.index).toBe(3);
+    expect(stored.payload.metadata.eventId).toBe(eventId(3));
   });
 
   it('throws on a non-2xx response', () => {

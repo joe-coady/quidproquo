@@ -15,6 +15,8 @@ import { askEventDocPublishedVersionAsOf } from './askEventDocPublishedVersionAs
 
 const DOC_ID = 'doc-1';
 
+const eventId = (n: number): string => String(n).padStart(4, '0');
+
 const buildEvent = (index: number): EventDocEvent => ({
   type: 'SET_BODY',
   payload: {
@@ -24,12 +26,14 @@ const buildEvent = (index: number): EventDocEvent => ({
       clientMessageId: `msg-${index}`,
       createdBy: { userId: 'user-1' } as EventDocEvent['payload']['metadata']['createdBy'],
       createdAt: '2026-01-01T00:00:00.000Z' as QpqIsoDateTime,
-      index,
+      eventId: eventId(index),
     },
   },
 });
 
-// A log of 6 events (index 0..5) — enough that a version head genuinely truncates it.
+// Sortable ids are opaque strings; the tests only need them to sort in creation order, so
+// they are zero-padded counters.
+// A log of 6 events (ids 0000..0005) — enough that a version head genuinely truncates it.
 const EVENTS: EventDocEvent[] = [0, 1, 2, 3, 4, 5].map(buildEvent);
 
 const buildSummary = (versions: EventDocVersion[], deletedAt?: QpqIsoDateTime): EventDocSummary => ({
@@ -49,28 +53,28 @@ const buildSummary = (versions: EventDocVersion[], deletedAt?: QpqIsoDateTime): 
 // until 09-01 — a publish scheduled for the future.
 const VERSION_1: EventDocVersion = {
   version: 1,
-  eventIndex: 1,
+  eventId: eventId(1),
   publishedAt: '2026-03-01T00:00:00.000Z' as QpqIsoDateTime,
   effectiveFrom: '2026-03-01T00:00:00.000Z' as QpqIsoDateTime,
 };
 const VERSION_2: EventDocVersion = {
   version: 2,
-  eventIndex: 3,
+  eventId: eventId(3),
   publishedAt: '2026-05-01T00:00:00.000Z' as QpqIsoDateTime,
   effectiveFrom: '2026-05-01T00:00:00.000Z' as QpqIsoDateTime,
 };
 const VERSION_3_SCHEDULED: EventDocVersion = {
   version: 3,
-  eventIndex: 5,
+  eventId: eventId(5),
   publishedAt: '2026-06-01T00:00:00.000Z' as QpqIsoDateTime,
   effectiveFrom: '2026-09-01T00:00:00.000Z' as QpqIsoDateTime,
 };
 // The open draft — no publish stamps at all.
-const VERSION_DRAFT: EventDocVersion = { version: 4, eventIndex: 5 };
+const VERSION_DRAFT: EventDocVersion = { version: 4, eventId: eventId(5) };
 
 const storedEvents: EventDocStoredEvent[] = EVENTS.map((event) => ({
   pk: DOC_ID,
-  sk: event.payload.metadata.index,
+  sk: event.payload.metadata.eventId,
   data: event,
 }));
 
@@ -95,14 +99,14 @@ describe('askEventDocPublishedVersionAsOf', () => {
 
     expect(slice?.version).toEqual(VERSION_2);
     // v2's head is index 3, so events 4 and 5 (written after it published) are cut.
-    expect(slice?.events.map((event) => event.payload.metadata.index)).toEqual([0, 1, 2, 3]);
+    expect(slice?.events.map((event) => event.payload.metadata.eventId)).toEqual([eventId(0), eventId(1), eventId(2), eventId(3)]);
   });
 
   it('resolves an older version when the clock predates the newer publish', () => {
     const slice = resolveAsOf(buildSummary([VERSION_1, VERSION_2, VERSION_DRAFT]), '2026-04-01T00:00:00.000Z');
 
     expect(slice?.version).toEqual(VERSION_1);
-    expect(slice?.events.map((event) => event.payload.metadata.index)).toEqual([0, 1]);
+    expect(slice?.events.map((event) => event.payload.metadata.eventId)).toEqual([eventId(0), eventId(1)]);
   });
 
   it('ignores a publish scheduled to take effect in the future', () => {

@@ -98,6 +98,8 @@ export function* askEventDocWriteForeignEvents(
   }
 
   // Folded from the LOCALISED log, so the summary's createdBy/updatedBy are local ids too.
+  // Nothing has to be renumbered: sortable ids are globally unique, so imported events keep
+  // their own and slot into the local log in their original order.
   const summary = foldEventDocSummary(type, localised);
   yield* askValidateModelOrThrowError(summary, eventDocSummarySchema);
   yield* askEventDocUpsert(summary);

@@ -8,6 +8,9 @@ import { all } from './all';
 import { reservedEventDocEventValidators } from './reservedEventDocEventValidators';
 import { validateEventDocEvent } from './validateEventDocEvent';
 
+// Sortable event ids are opaque strings ordered lexicographically; padded counters stand in.
+const eventId = (n: number): string => String(n).padStart(4, '0');
+
 const { InitState, CreateDraft, Publish, SetCode } = EventDocEffect;
 
 const iso = (s: string): QpqIsoDateTime => s as QpqIsoDateTime;
@@ -21,7 +24,7 @@ const event = (type: string): EventDocEvent => ({
       clientMessageId: 'cm',
       createdBy: { userId: 'u1', userDisplayName: 'U' },
       createdAt: iso('2026-01-01T00:00:00.000Z'),
-      index: 0,
+      eventId: eventId(0),
     },
   },
 });

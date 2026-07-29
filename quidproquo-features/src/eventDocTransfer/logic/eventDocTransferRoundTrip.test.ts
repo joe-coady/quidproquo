@@ -39,6 +39,8 @@ import { manifest } from '../routes/controllers/manifest';
 import { plan } from '../routes/controllers/plan';
 import { upload } from '../routes/controllers/upload';
 
+let sortableGuidCount = 0;
+
 // Proves the transfer end to end through the REAL controllers, across two independent
 // "environments" that share nothing but the bundle: export from one, import into the other, and
 // assert the folded state matches. The reference collector is mocked exactly as an app would
@@ -77,6 +79,9 @@ const link = (type: string, id: string): EventDocLink => ({
   mode: EventDocLinkMode.Latest,
 });
 
+// Sortable ids are opaque strings ordered lexicographically; padded counters stand in.
+const eventId = (n: number): string => String(n).padStart(4, '0');
+
 const event = (index: number, type: string, data: unknown): EventDocEvent => ({
   type,
   payload: {
@@ -86,7 +91,7 @@ const event = (index: number, type: string, data: unknown): EventDocEvent => ({
       clientMessageId: `msg-${index}`,
       createdBy: { userId: 'author-1', userDisplayName: 'Author One' },
       createdAt: `2026-07-20T00:00:0${index}.000Z`,
-      index,
+      eventId: eventId(index),
     },
   },
 });
@@ -155,7 +160,7 @@ const buildEnvironment = (environmentName: string): TestEnvironment => {
 
     tableFor(storeName).push({ ...summary });
     events.forEach((seeded) =>
-      tableFor(eventDocEventsStoreName(storeName)).push({ pk: summary.id, sk: seeded.payload.metadata.index, data: seeded }),
+      tableFor(eventDocEventsStoreName(storeName)).push({ pk: summary.id, sk: seeded.payload.metadata.eventId, data: seeded }),
     );
 
     assets.forEach((asset) => {
@@ -181,6 +186,8 @@ const buildEnvironment = (environmentName: string): TestEnvironment => {
     [DateActionType.Now]: () => new Date((clock += 1000)).toISOString(),
     [GuidActionType.New]: () => `${environmentName}-guid-${++guidCounter}`,
 
+    // Sortable ids must sort lexicographically in creation order; pad so they do.
+    [GuidActionType.NewSortable]: () => `sguid-${String(++sortableGuidCount).padStart(4, '0')}`,
     // The app-registered reference collector: read the links straight off the doc's events, which is
     // what a real adapter does after folding (`references(fold(events))`).
     [InlineFunctionActionType.Execute]: (action: { payload: { functionName: string; payload: { events: EventDocEvent[] } } }) => {
@@ -543,7 +550,7 @@ describe('eventDoc transfer round trip', () => {
     // The source keeps working on the template: two more events after the promotion.
     const templateEvents = source.tables[eventDocEventsStoreName(TEMPLATES_STORE)];
     const extra = event(4, 'ADD_STYLE_LINK', link(STYLE_TYPE, 'style-content'));
-    templateEvents.push({ pk: 'template-1', sk: 4, data: extra });
+    templateEvents.push({ pk: 'template-1', sk: eventId(4), data: extra });
     const sourceSummaryRow = summaryFor(source, TEMPLATE_TYPE, 'template-1');
     Object.assign(sourceSummaryRow, foldEventDocSummary(TEMPLATE_TYPE, eventsFor(source, TEMPLATE_TYPE, 'template-1')));
 
@@ -568,7 +575,7 @@ describe('eventDoc transfer round trip', () => {
     // Now someone edits the target directly: the next promotion of that doc must refuse.
     target.tables[eventDocEventsStoreName(TEMPLATES_STORE)].push({
       pk: 'template-1',
-      sk: 5,
+      sk: eventId(5),
       data: event(5, 'ADD_STYLE_LINK', link(STYLE_TYPE, 'style-shared')),
     });
 
@@ -631,16 +638,16 @@ describe('eventDoc transfer round trip', () => {
           clientMessageId: `target-edit-${index}`,
           createdBy: { userId: 'uat-user', userDisplayName: 'UAT User' },
           createdAt: `2026-07-25T10:00:0${index}.000Z`,
-          index,
+          eventId: eventId(index),
         },
       },
     });
 
     const targetEvents = target.tables[eventDocEventsStoreName(TEMPLATES_STORE)];
     const templateRows = targetEvents.filter((row) => row.pk === 'template-1');
-    templateRows.filter((row) => (row.sk as number) >= 2).forEach((row) => targetEvents.splice(targetEvents.indexOf(row), 1));
-    targetEvents.push({ pk: 'template-1', sk: 2, data: targetEdit(2, 'style-content') });
-    targetEvents.push({ pk: 'template-1', sk: 3, data: targetEdit(3, 'style-shared') });
+    templateRows.filter((row) => (row.sk as string) >= eventId(2)).forEach((row) => targetEvents.splice(targetEvents.indexOf(row), 1));
+    targetEvents.push({ pk: 'template-1', sk: eventId(2), data: targetEdit(2, 'style-content') });
+    targetEvents.push({ pk: 'template-1', sk: eventId(3), data: targetEdit(3, 'style-shared') });
 
     const upload2 = JSON.parse(runStory(upload(httpEvent({})), target.mocks).body!);
     target.files[`${EVENT_DOC_TRANSFER_DRIVE_NAME}/${eventDocTransferImportPath(upload2.transferId)}`] = bundle;
@@ -669,7 +676,7 @@ describe('eventDoc transfer round trip', () => {
     };
 
     expect(discarded.discardedFromIndex).toBe(2);
-    expect(discarded.events.map((discardedEvent) => discardedEvent.payload.metadata.index)).toEqual([2, 3]);
+    expect(discarded.events.map((discardedEvent) => discardedEvent.payload.metadata.eventId)).toEqual([eventId(2), eventId(3)]);
   });
 
   it('blocks a rename that would collide with a sibling, not just a new doc', () => {
@@ -688,7 +695,7 @@ describe('eventDoc transfer round trip', () => {
     // dev renames its template onto the sibling's code.
     source.tables[eventDocEventsStoreName(TEMPLATES_STORE)].push({
       pk: 'template-1',
-      sk: 1,
+      sk: eventId(1),
       data: event(1, EventDocEffect.SetCode, { code: 'receipt' }),
     });
     Object.assign(

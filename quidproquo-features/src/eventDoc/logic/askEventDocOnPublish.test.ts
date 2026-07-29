@@ -18,6 +18,8 @@ import { HTTPEvent } from 'quidproquo-webserver';
 
 import { describe, expect, it } from 'vitest';
 
+import { createKvsUpdateMock } from '../testing/kvsUpdateActionMock';
+
 import {
   EVENT_DOC_EVENTS_STORE_NAME_GLOBAL,
   EVENT_DOC_ON_PUBLISH_GLOBAL,
@@ -29,6 +31,8 @@ import { buildEventDocStore } from '../context/buildEventDocStore';
 import { EventDocEffect } from '../models';
 import { appendEvent } from '../routes/controllers/appendEvent';
 import { create } from '../routes/controllers/create';
+
+let sortableGuidCount = 0;
 
 // Exercises the new onPublish hook through the real append path: it must fire
 // exactly on Publish-effect appends (after the event and summary are written),
@@ -84,10 +88,18 @@ const buildMocks = (onPublish: string, onInlineExecute?: () => unknown) => {
     [DateActionType.Now]: () => new Date((clock += 1000)).toISOString(),
     [GuidActionType.New]: () => `guid-${++guidCounter}`,
 
+    // Sortable ids must sort lexicographically in creation order; pad so they do.
+    [GuidActionType.NewSortable]: () => `sguid-${String(++sortableGuidCount).padStart(4, '0')}`,
     [InlineFunctionActionType.Execute]: (action: { payload: InlineInvocation }) => {
       inlineInvocations.push(action.payload);
       return onInlineExecute ? onInlineExecute() : undefined;
     },
+
+    [KeyValueStoreActionType.Update]: createKvsUpdateMock({
+      tableFor: (_scope, storeName) => (tables[storeName] ??= []),
+      keyName: 'type',
+      sortKeyName: 'id',
+    }),
 
     [KeyValueStoreActionType.Upsert]: (action: {
       payload: { keyValueStoreName: string; item: Record<string, unknown>; options?: { ifNotExists?: boolean } };
@@ -217,7 +229,7 @@ describe('eventDoc onPublish hook', () => {
     expect(events).toHaveLength(2);
   });
 
-  it('re-fires the hook on a deduped publish retry so a stale read model can be repaired', () => {
+  it('re-fires the hook on a publish retry so a stale read model can be repaired', () => {
     const { mocks, inlineInvocations, tables } = buildMocks('syncTenantRecord');
     const summary = createDoc(mocks);
 
@@ -226,12 +238,19 @@ describe('eventDoc onPublish hook', () => {
 
     expect(inlineInvocations).toHaveLength(2);
 
-    // The deduped retry skipped the writing lap, so its hook input is rebuilt
-    // from a fresh read and must still carry the full log.
-    expect(inlineInvocations[1].payload.events).toHaveLength(2);
+    // The retry is written rather than deduped (the append reads nothing), so the log
+    // carries both copies and the hook sees the fuller log the second time. Hooks must be
+    // idempotent, and re-firing is exactly how a read model left stale by a failed first
+    // hook gets repaired.
+    expect(inlineInvocations[1].payload.events).toHaveLength(3);
     expect(inlineInvocations[1].payload.summary.id).toBe(summary.id);
 
     const events = tables[store.eventsStoreName] ?? [];
-    expect(events).toHaveLength(2);
+    expect(events).toHaveLength(3);
+
+    // The duplicate does NOT double the version history: the fold drops it on
+    // clientMessageId, so the record still shows one published version.
+    const record = (tables[store.storeName] ?? []).find((row) => row.id === summary.id) as { versions: unknown[] };
+    expect(record.versions).toHaveLength(1);
   });
 });

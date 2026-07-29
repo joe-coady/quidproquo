@@ -5,6 +5,9 @@ import { EventDocEffect, EventDocEvent } from '../models';
 import { EventDocEventValidators } from './types/EventDocEventValidators';
 import { createEventDocEventValidator } from './createEventDocEventValidator';
 
+// Sortable event ids are opaque strings ordered lexicographically; padded counters stand in.
+const eventId = (n: number): string => String(n).padStart(4, '0');
+
 const { InitState, Publish } = EventDocEffect;
 
 let seq = 0;
@@ -17,7 +20,7 @@ const ev = (type: string, data: unknown = {}): EventDocEvent => ({
       clientMessageId: `m${seq}`,
       createdBy: { userId: 'u', userDisplayName: 'U' },
       createdAt: '2026-01-01T00:00:00.000Z',
-      index: seq++,
+      eventId: eventId(seq++),
     },
   },
 });

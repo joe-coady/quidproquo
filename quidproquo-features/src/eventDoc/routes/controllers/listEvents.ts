@@ -8,12 +8,12 @@ import { askEventDocProvideStoreFromGlobals } from '../../globals/askEventDocPro
 function* askEventDocStoreListEvents(event: HTTPEvent, modelId: string): AskResponse<HTTPEventResponse> {
   const limit = qpqWebServerUtils.readUriQueryParamFromEvent(event, 'limit');
   const nextPageKey = qpqWebServerUtils.readUriQueryParamFromEvent(event, 'nextPageKey');
-  const afterIndex = qpqWebServerUtils.readUriQueryParamFromEvent(event, 'afterIndex');
+  const afterEventId = qpqWebServerUtils.readUriQueryParamFromEvent(event, 'afterEventId');
 
   const page = yield* askEventDocEventList(modelId, {
     limit: limit ? Number(limit) : undefined,
     nextPageKey,
-    afterIndex: afterIndex ? Number(afterIndex) : undefined,
+    afterEventId: afterEventId || undefined,
   });
 
   return qpqWebServerUtils.toJsonEventResponse(page);

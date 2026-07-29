@@ -19,6 +19,8 @@ import { HTTPEvent } from 'quidproquo-webserver';
 
 import { describe, expect, it } from 'vitest';
 
+import { createKvsUpdateMock } from '../../testing/kvsUpdateActionMock';
+
 import {
   EVENT_DOC_EVENTS_STORE_NAME_GLOBAL,
   EVENT_DOC_SCOPE_RESOLVER_GLOBAL,
@@ -31,6 +33,8 @@ import { appendEvent } from './appendEvent';
 import { create } from './create';
 import { createAsset } from './createAsset';
 import { list } from './list';
+
+let sortableGuidCount = 0;
 
 // Proves the scopeResolver option end-to-end through the REAL controllers: when
 // the resolver returns a scope, every storage action the request performs
@@ -92,6 +96,8 @@ const buildMocks = (resolvedScope: string | null) => {
     [DateActionType.Now]: () => new Date((clock += 1000)).toISOString(),
     [GuidActionType.New]: () => `guid-${++guidCounter}`,
 
+    // Sortable ids must sort lexicographically in creation order; pad so they do.
+    [GuidActionType.NewSortable]: () => `sguid-${String(++sortableGuidCount).padStart(4, '0')}`,
     [InlineFunctionActionType.Execute]: (action: { payload: { functionName: string } }) => {
       if (action.payload.functionName !== 'resolveTestScope') {
         throw new Error(`Unexpected inline function: ${action.payload.functionName}`);
@@ -103,6 +109,13 @@ const buildMocks = (resolvedScope: string | null) => {
       seenFileScopes.push(action.payload.scope);
       return 'https://example.com/upload';
     },
+
+    [KeyValueStoreActionType.Update]: createKvsUpdateMock({
+      tableFor,
+      keyName: 'type',
+      sortKeyName: 'id',
+      onScope: (scope) => seenKvsScopes.push(scope),
+    }),
 
     [KeyValueStoreActionType.Upsert]: (action: {
       payload: { keyValueStoreName: string; item: Record<string, unknown>; options?: { ifNotExists?: boolean; scope?: string } };

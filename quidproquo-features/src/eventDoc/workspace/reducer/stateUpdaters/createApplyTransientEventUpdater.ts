@@ -7,7 +7,7 @@ import { coalesceWorkspaceEvents } from '../coalesceWorkspaceEvents';
 // never in pending. The slot's own coalesce rules apply WITHIN the key's array (a
 // progress burst under one connection collapses; separate connections don't touch
 // each other). Closured over the per-slot rules like createApplyEventUpdater. No
-// renumbering: metadata.index stays 0 — transient ordering is by createdAt at read
+// renumbering: metadata.eventId stays 0 — transient ordering is by createdAt at read
 // (see getSlotTransientEvents), not by log position.
 export const createApplyTransientEventUpdater =
   (coalesceRulesBySlot: Record<string, EventDocWorkspaceCoalesceRules>) =>

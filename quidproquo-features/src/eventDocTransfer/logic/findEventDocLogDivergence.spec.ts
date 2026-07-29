@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
+import { QpqIsoDateTime } from 'quidproquo-core';
+
 import { EventDocEvent } from '../../eventDoc/models';
 import { findEventDocLogDivergence } from './findEventDocLogDivergence';
+
+// Sortable event ids are opaque strings ordered lexicographically; padded counters stand in.
+const eventId = (n: number): string => String(n).padStart(4, '0');
 
 const event = (index: number, overrides?: { type?: string; clientMessageId?: string; createdAt?: string }): EventDocEvent => ({
   type: overrides?.type ?? 'SET_THING',
@@ -11,8 +16,8 @@ const event = (index: number, overrides?: { type?: string; clientMessageId?: str
       version: 1,
       clientMessageId: overrides?.clientMessageId ?? `msg-${index}`,
       createdBy: { userId: 'user-1', userDisplayName: 'User One' },
-      createdAt: overrides?.createdAt ?? `2026-07-26T00:00:0${index}.000Z`,
-      index,
+      createdAt: (overrides?.createdAt ?? `2026-07-26T00:00:0${index}.000Z`) as QpqIsoDateTime,
+      eventId: eventId(index),
     },
   },
 });

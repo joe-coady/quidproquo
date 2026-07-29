@@ -3,8 +3,10 @@ import { buildEffectReducer, QpqReducer } from 'quidproquo-core';
 import { ReservedEventDocEffects } from '../fold/ReservedEventDocEffects';
 import { EventDocEffect, EventDocEvent, EventDocSummary } from '../models';
 import { createSummaryDraft } from './stateUpdaters/createSummaryDraft';
+import { deleteSummary } from './stateUpdaters/deleteSummary';
 import { initSummary } from './stateUpdaters/initSummary';
 import { publishSummary } from './stateUpdaters/publishSummary';
+import { restoreSummary } from './stateUpdaters/restoreSummary';
 import { setSummaryCode } from './stateUpdaters/setSummaryCode';
 import { setSummaryName } from './stateUpdaters/setSummaryName';
 
@@ -18,4 +20,6 @@ export const eventDocSummaryReducer = buildEffectReducer<EventDocSummary, Reserv
   [EventDocEffect.SetName]: setSummaryName,
   [EventDocEffect.CreateDraft]: createSummaryDraft,
   [EventDocEffect.Publish]: publishSummary,
+  [EventDocEffect.Delete]: deleteSummary,
+  [EventDocEffect.Restore]: restoreSummary,
 }) as QpqReducer<EventDocSummary, EventDocEvent>;

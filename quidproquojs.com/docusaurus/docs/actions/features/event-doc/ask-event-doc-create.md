@@ -64,7 +64,7 @@ A point-in-time snapshot of who produced an event, captured server-side at appen
 
 ## askEventDocSeedInitState
 
-Seeds a new document's log with its `INIT_STATE` event at index `0`, carrying the identity (`id`/`code`/`name`). This is the create-only primitive `askEventDocCreate` composes; clients never send `INIT_STATE` themselves. It writes the event and returns it.
+Seeds a new document's log with its `INIT_STATE` event, carrying the identity (`id`/`code`/`name`). This is the create-only primitive `askEventDocCreate` composes; clients never send `INIT_STATE` themselves. It writes the event and returns it.
 
 ```typescript
 function* askEventDocSeedInitState(
@@ -82,7 +82,7 @@ function* askEventDocSeedInitState(
 | `name` | `string` | The document's name. |
 | `actor` | `EventDocEventActor` | Who is creating the document. |
 
-**Returns** `EventDocEvent` — the written `INIT_STATE` event, with `payload.metadata.index === 0` and `version === 1`.
+**Returns** `EventDocEvent` — the written `INIT_STATE` event, with a freshly minted sortable `payload.metadata.eventId` and `version === 1`.
 
 Use `askEventDocCreate` unless you are building a custom create flow that needs the raw event; `askEventDocSeedInitState` alone writes the log but does **not** derive or persist the summary record.
 

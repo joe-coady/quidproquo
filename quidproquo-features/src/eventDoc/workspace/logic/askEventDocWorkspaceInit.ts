@@ -7,7 +7,6 @@ import { askUIEventDocWorkspaceSetError } from '../actionCreators/askUIEventDocW
 import { askUIEventDocWorkspaceSetHistoryEvents } from '../actionCreators/askUIEventDocWorkspaceSetHistoryEvents';
 import { askUIEventDocWorkspaceSetLoading } from '../actionCreators/askUIEventDocWorkspaceSetLoading';
 import { askUIEventDocWorkspaceSetPendingEvents } from '../actionCreators/askUIEventDocWorkspaceSetPendingEvents';
-import { renumberWorkspaceEvents } from '../reducer/renumberWorkspaceEvents';
 import { EventDocWorkspaceDocumentIdentity } from '../types/EventDocWorkspaceDocumentIdentity';
 import { EventDocWorkspaceSlotOperation } from '../types/EventDocWorkspaceSlotOperation';
 import { EventDocWorkspaceSlotSnapshot, EventDocWorkspaceSnapshot } from '../types/EventDocWorkspaceSnapshot';
@@ -18,7 +17,7 @@ import { isSameEventDocWorkspaceIdentity } from './isSameEventDocWorkspaceIdenti
 // Instant restore from a runtime hand-off (federated module hot-swap): seed history
 // AND pending straight from the snapshot — the view renders immediately, exactly as
 // it looked before the swap, with NO loading state — then tail-pull only the events
-// that landed server-side since (the refresh path: afterIndex fetch, no isLoading).
+// that landed server-side since (the refresh path: afterEventId fetch, no isLoading).
 // The restored history refolds through THIS runtime's reducer/migrations, so a
 // schema-bump swap folds correctly.
 const getAskInitDocumentSlotFromSnapshot = (transport: EventDocWorkspaceTransport) =>
@@ -30,7 +29,7 @@ const getAskInitDocumentSlotFromSnapshot = (transport: EventDocWorkspaceTranspor
   ): AskResponse<void> {
     yield* askUIEventDocWorkspaceSetDocumentIdentity(slotKey, documentIdentity);
     yield* askUIEventDocWorkspaceSetHistoryEvents(slotKey, history);
-    yield* askUIEventDocWorkspaceSetPendingEvents(slotKey, renumberWorkspaceEvents(pending, history.length));
+    yield* askUIEventDocWorkspaceSetPendingEvents(slotKey, pending);
     yield* askUIEventDocWorkspaceClearError(slotKey);
 
     yield* askEventDocWorkspaceRefresh(transport, [slotKey]);
@@ -74,7 +73,7 @@ const getAskInitDocumentSlot = (transport: EventDocWorkspaceTransport, snapshot:
     yield* askUIEventDocWorkspaceSetHistoryEvents(slotKey, result.result);
 
     if (preservedPending.length > 0) {
-      yield* askUIEventDocWorkspaceSetPendingEvents(slotKey, renumberWorkspaceEvents(preservedPending, result.result.length));
+      yield* askUIEventDocWorkspaceSetPendingEvents(slotKey, preservedPending);
     }
 
     yield* askUIEventDocWorkspaceSetLoading(slotKey, false);

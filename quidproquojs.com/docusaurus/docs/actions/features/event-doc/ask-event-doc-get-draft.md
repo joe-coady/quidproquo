@@ -9,7 +9,7 @@ Resolves the current **draft** version pointer for a document by `id`, or `null`
 
 - **Built from:** [askEventDocGetById](./ask-event-doc-get-by-id.md) plus an in-memory version selector. Requires the store context — call it inside `askEventDocProvideStore({ storeName, type }, ...)`, or from a built-in route where the context is already provided.
 
-First, a quick recap of the model (full detail on the [read-by-id page](./ask-event-doc-get-by-id.md#the-event-document-model)): an event document is derived by folding its event log. Each **version** pointer in the summary's `versions` array records the `eventIndex` of its last event (its head) and, once published, its `publishedAt` and `effectiveFrom` times. The tail version with no `publishedAt` is the **draft**; a `PUBLISH` event freezes a version and opens the next draft.
+First, a quick recap of the model (full detail on the [read-by-id page](./ask-event-doc-get-by-id.md#the-event-document-model)): an event document is derived by folding its event log. Each **version** pointer in the summary's `versions` array records the `eventId` of its last event (its head) and, once published, its `publishedAt` and `effectiveFrom` times. The tail version with no `publishedAt` is the **draft**; a `PUBLISH` event freezes a version and opens the next draft.
 
 ```typescript
 import { askEventDocGetDraft } from 'quidproquo-features';
@@ -41,13 +41,13 @@ function* askEventDocGetDraft(id: string): AskResponse<Nullable<EventDocVersion>
 ```typescript
 type EventDocVersion = {
   version: number;
-  eventIndex: number;    // log index of this version's head event
+  eventId: string;       // sortable id of this version's head event
   publishedAt?: string;  // unset while it is the tail draft
   effectiveFrom?: string; // when the publish takes effect (as-of selection)
 };
 ```
 
-To fold or render a version's content, fold the log's events with index ≤ its `eventIndex`.
+To fold or render a version's content, fold the log's events whose `eventId` sorts at or before the version's `eventId`.
 
 ---
 
@@ -85,7 +85,7 @@ function* askEventDocGetPublishedAsOf(
 
 ## askEventDocPublishedEventsAsOf
 
-Returns the **events** that make up the version published and *effective* at `clock` — the log truncated at that version's head. It resolves the version from the summary via `effectiveFrom` (when the publish takes effect, so a publish scheduled for the future stays invisible until then), then returns every event with `index <= version.eventIndex`. Fold the returned events to get the published, as-of-`clock` content — the generic backbone of a "render published" flow. (This mirrors `askEventDocGetPublishedAsOf`, which returns the version pointer rather than its events, and keys on `publishedAt` rather than `effectiveFrom`.)
+Returns the **events** that make up the version published and *effective* at `clock` — the log truncated at that version's head. It resolves the version from the summary via `effectiveFrom` (when the publish takes effect, so a publish scheduled for the future stays invisible until then), then returns every event whose `eventId` sorts at or before `version.eventId`. Fold the returned events to get the published, as-of-`clock` content — the generic backbone of a "render published" flow. (This mirrors `askEventDocGetPublishedAsOf`, which returns the version pointer rather than its events, and keys on `publishedAt` rather than `effectiveFrom`.)
 
 ```typescript
 function* askEventDocPublishedEventsAsOf(

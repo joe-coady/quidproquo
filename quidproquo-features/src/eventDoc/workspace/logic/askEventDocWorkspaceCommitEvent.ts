@@ -1,4 +1,4 @@
-import { askDateNow, askNewGuid, AskResponse, ErrorTypeEnum, QpqIsoDateTime } from 'quidproquo-core';
+import { askDateNow, askNewGuid, askNewSortableGuid, AskResponse, ErrorTypeEnum, QpqIsoDateTime } from 'quidproquo-core';
 
 import { EventDocApplyEventActionPayload } from '../../actions';
 import { EventDocEvent } from '../../models';
@@ -24,6 +24,7 @@ export function* askEventDocWorkspaceCommitEvent(
   { eventType, data }: EventDocApplyEventActionPayload,
 ): AskResponse<void> {
   const clientMessageId = yield* askNewGuid();
+  const index = yield* askNewSortableGuid();
   const createdAt = (yield* askDateNow()) as QpqIsoDateTime;
 
   const event: EventDocEvent = {
@@ -36,7 +37,9 @@ export function* askEventDocWorkspaceCommitEvent(
         clientMessageId,
         createdBy: { userId: '', userDisplayName: '' },
         createdAt,
-        index: 0, // assigned by the reducer's renumber
+        // Sortable ids need no allocator, so the client mints a real one. It sorts after
+        // every saved event and after earlier pending ones, with no renumbering.
+        eventId: index,
       },
     },
   };
