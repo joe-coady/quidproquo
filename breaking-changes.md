@@ -14,6 +14,21 @@ assembled quickly.
 - The reserved lifecycle guard (and any `validators` supplied) is now enforced by the fold itself, not just the editor pre-flight — a document
   folded from a stored log that contains an event the guard rejects (e.g. an edit appended after publish) now ignores that event instead of applying
   it. Code relying on the fold applying every event in the log regardless of legality should re-check folded output against expectations.
+- `defineQueue`'s `batchWindowInSeconds` default changes from `5` to `0` (invoke as soon as a message arrives). A queue that relied on the implicit
+  5-second default to accumulate a batch must now pass `batchWindowInSeconds` explicitly.
+- The event-doc collection list route (`GET {basePath}`, mounted by `defineEventDocRoutes`) now returns `QpqPagedData<EventDocSummary>`
+  (`{ items, nextPageKey? }`) instead of a bare `EventDocSummary[]`, and accepts `?limit=`/`?nextPageKey=` query params. Any direct HTTP consumer of
+  this route must read `.items` and page on `nextPageKey`.
+- `askEventDocListFetch` (`quidproquo-features`) now returns `QpqPagedData<EventDocSummary>` instead of `EventDocSummary[]`, and takes a third
+  `options?: { limit?, nextPageKey? }` argument. Callers that want the full collection should switch to the new `askEventDocListFetchAll`, which
+  preserves the old all-in-one-array behavior by paging internally.
+- The event-doc list frontend state module (`quidproquo-features`' `eventDoc/list`) moves from numbered pages to cursor-based paging:
+  - `EventDocListState.page: number` is replaced by `pageIndex: number`, `cursors: Nullable<string>[]`, and `nextPageKey: Nullable<string>`.
+  - `EventDocListEffect.SetItems` / `SetPage` are renamed to `PageLoaded` / `SetPageIndex`, with corresponding payload/effect type renames
+    (`EventDocListSetItemsEffect` → `EventDocListPageLoadedEffect`, `EventDocListSetPageEffect` → `EventDocListSetPageIndexEffect`).
+  - `askUIEventDocListSetItems` / `askUIEventDocListSetPage` and `askEventDocListSetPage` are removed; use `askUIEventDocListPageLoaded` and the new
+    `askEventDocListNextPage` / `askEventDocListPreviousPage` (exposed on `sharedEventDocListApi`) instead of jumping to a numbered page.
+  - `clampEventDocListPage` is removed with no replacement — paging validity is now driven by `nextPageKey`, not a clamped page number.
 
 ## 0.1.13
 

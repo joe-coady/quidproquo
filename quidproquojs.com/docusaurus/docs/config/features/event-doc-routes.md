@@ -31,7 +31,7 @@ All paths are prefixed with the version segment `/v{version}` (default `/v1`):
 
 | Method | Path | Purpose |
 | --- | --- | --- |
-| `GET` | `{basePath}` | List the collection's documents. |
+| `GET` | `{basePath}` | List one page of the collection's documents (newest first). Accepts `?limit=` and `?nextPageKey=` and returns `QpqPagedData`. |
 | `GET` | `{basePath}/{id}` | Get one document's summary record. |
 | `GET` | `{basePath}/{id}/events` | List a document's event log. |
 | `GET` | `{basePath}/{id}/render` | Render the document to HTML. **Only mounted when `eventRenderer` is set.** |

@@ -8,6 +8,9 @@ import { askEventDocResolveScope } from './askEventDocResolveScope';
 
 export type EventDocEventListOptions = {
   limit?: number;
+  // Read the writer's own most recent appends. Needed by a caller that appended and is now folding to
+  // decide something; not needed by a viewer. Costs twice the read capacity, so it stays opt-in.
+  consistentRead?: boolean;
   nextPageKey?: string;
   // Return only events whose log id is greater than this (exclusive) — the tail since a known
   // point, for an incremental refresh. The events store is keyed pk=modelId / sk=index on its
@@ -26,6 +29,7 @@ export function* askEventDocEventList(modelId: string, options?: EventDocEventLi
     sortAscending: true,
     limit: options?.limit,
     nextPageKey: options?.nextPageKey,
+    consistentRead: options?.consistentRead,
     scope,
   });
 

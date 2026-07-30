@@ -16,4 +16,8 @@ export * from './askEventDocRestore';
 export * from './askEventDocSeedInitState';
 export * from './askEventDocSoftDelete';
 export * from './askEventDocSummaryRederive';
+export * from './isInlineEventDocValueRef';
+export * from './readInlineEventDocValueRefs';
+export * from './resolveEventDocValueRef';
 export * from './selectors';
+export * from './serializeEventDocValue';

@@ -12,7 +12,7 @@ describe('defineQueue', () => {
       uniqueKey: 'Jobs',
       name: 'Jobs',
       batchSize: 0,
-      batchWindowInSeconds: 5,
+      batchWindowInSeconds: 0,
       concurrency: 1,
       maxTries: 1,
       ttRetryInSeconds: 15 * 60,
@@ -22,6 +22,16 @@ describe('defineQueue', () => {
       maxConcurrentExecutions: undefined,
       isFifo: false,
     });
+  });
+
+  it('honours an explicit zero batching window', () => {
+    // Regression: this used to be `|| 5`, so 0 was falsy and a caller asking for no window silently got 5 —
+    // the setting could not be turned off at all.
+    expect(defineQueue('Jobs', processors, { batchWindowInSeconds: 0 }).batchWindowInSeconds).toBe(0);
+  });
+
+  it('still honours an explicit window for a queue that wants to accumulate', () => {
+    expect(defineQueue('Jobs', processors, { batchWindowInSeconds: 20 }).batchWindowInSeconds).toBe(20);
   });
 
   it('caps ttRetryInSeconds at 15 minutes', () => {

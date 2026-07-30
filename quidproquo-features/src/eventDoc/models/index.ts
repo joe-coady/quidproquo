@@ -28,6 +28,7 @@ export * from './EventDocSetCodeData';
 export * from './EventDocSetNameData';
 export * from './EventDocStatus';
 export * from './EventDocSummary';
+export * from './EventDocValueRef';
 export * from './EventDocVersion';
 export * from './EventDocVersionSlice';
 export * from './toEventDocListItem';

@@ -7,3 +7,4 @@ export * from './lookup';
 export * from './scope';
 export * from './stateEffects';
 export * from './stream';
+export * from './transientErrorNames';

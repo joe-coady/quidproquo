@@ -1,6 +1,6 @@
 import { askCatch, AskResponse } from 'quidproquo-core';
 
-import { askEventDocListFetch } from '../../../eventDoc/list/transport/askEventDocListFetch';
+import { askEventDocListFetchAll } from '../../../eventDoc/list/transport/askEventDocListFetchAll';
 import { askUIEventDocExportOpen } from '../actionCreators/askUIEventDocExportOpen';
 import { askUIEventDocExportSetCandidates } from '../actionCreators/askUIEventDocExportSetCandidates';
 import { askUIEventDocExportSetError } from '../actionCreators/askUIEventDocExportSetError';
@@ -10,7 +10,7 @@ import { askUIEventDocExportSetError } from '../actionCreators/askUIEventDocExpo
 export function* askEventDocExportUiOpen(serviceName: string, basePath: string): AskResponse<void> {
   yield* askUIEventDocExportOpen();
 
-  const result = yield* askCatch(askEventDocListFetch(serviceName, basePath));
+  const result = yield* askCatch(askEventDocListFetchAll(serviceName, basePath));
 
   if (!result.success) {
     yield* askUIEventDocExportSetError('Could not load the documents to choose from.');

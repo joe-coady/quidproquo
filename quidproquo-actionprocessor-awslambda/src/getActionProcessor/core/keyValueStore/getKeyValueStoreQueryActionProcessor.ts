@@ -36,6 +36,7 @@ const getProcessKeyValueStoreQuery = (qpqConfig: QPQConfig): KeyValueStoreQueryA
         getDynamoTableIndexByConfigAndQuery(storeConfig, effectiveKeyCondition) ?? undefined,
         options?.limit,
         options?.sortAscending,
+        options?.consistentRead,
       );
 
       items.items = items.items.map((item: any) => scoped.strip(item));

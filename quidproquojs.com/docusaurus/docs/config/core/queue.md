@@ -52,7 +52,7 @@ Each key is matched against a delivered message's `type` field. The key may be a
 | Property | Type | Default | Description |
 | --- | --- | --- | --- |
 | `batchSize` | `number` | `0` | Max number of messages delivered to the consumer Lambda per invocation. `0` leaves the SQS default. When set (> 0), the event source uses this batch size. |
-| `batchWindowInSeconds` | `number` | `5` | Max time SQS waits to fill a batch before invoking the consumer. Only applied when `batchSize > 0`, and **not** applied to FIFO queues (which don't support a batching window). |
+| `batchWindowInSeconds` | `number` | `0` | Max time SQS waits to fill a batch before invoking the consumer — invoke as soon as a message arrives. Only applied when `batchSize > 0`, and **not** applied to FIFO queues (which don't support a batching window). A queue that wants to accumulate a batch before invoking should set this explicitly. |
 | `concurrency` | `number` | `1` | Consumer concurrency hint. |
 | `maxTries` | `number` | `1` | How many times a message is delivered before it is sent to the dead-letter queue (SQS `maxReceiveCount`). |
 | `ttRetryInSeconds` | `number` | `900` | Retry/visibility timeout in seconds — how long a message stays invisible while being processed before it can be redelivered. Also used as the consumer Lambda timeout. Capped at 900 (15 minutes). |
