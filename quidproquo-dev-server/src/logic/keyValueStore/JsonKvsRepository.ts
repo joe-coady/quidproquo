@@ -174,6 +174,21 @@ export class JsonKvsRepository implements KvsRepository {
     return state.flushPromise;
   }
 
+  // Force every dirty store to disk now, bypassing the debounce, and wait for all of it.
+  // See KvsRepository.flushAll for why a short-lived process needs this.
+  async flushAll(): Promise<void> {
+    const pending = [...this.stores.values()].map((state) => {
+      if (state.flushTimer) {
+        clearTimeout(state.flushTimer);
+        state.flushTimer = null;
+      }
+
+      return this.runFlush(state, this.getStoreConfig(state.keyValueStoreName));
+    });
+
+    await Promise.all(pending);
+  }
+
   private scheduleFlush(state: KvsStoreState, storeConfig: KeyValueStoreQPQConfigSetting): void {
     state.dirty = true;
 

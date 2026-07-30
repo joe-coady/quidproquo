@@ -31,6 +31,13 @@ export interface KvsRepository {
   // from the data. Migration-only: see askKeyValueStoreScanAllScopes.
   listScopes(keyValueStoreName: string): Promise<string[]>;
 
+  // Write out anything still buffered, and wait for it to hit disk.
+  //
+  // Writes are debounced and their timer is unref'd, so a short-lived process (a one-shot
+  // `qpq migrate`, say) can finish its work and exit with everything it "wrote" still sitting
+  // in memory. Long-running callers never notice; a command that exits has to ask.
+  flushAll(): Promise<void>;
+
   upsert(keyValueStoreName: string, item: any, options?: { ifNotExists?: boolean }, scope?: string): Promise<any>;
 
   update(keyValueStoreName: string, key: string, sortKey: string | undefined, updates: KvsUpdate, scope?: string): Promise<any>;

@@ -4,6 +4,7 @@ import { askRunPendingMigrations } from 'quidproquo-webserver';
 import * as crypto from 'crypto';
 import path from 'path';
 
+import { getKvsRepository } from './logic/keyValueStore/getKvsRepository';
 import {
   apiImplementation,
   awaitQueueIdle,
@@ -99,8 +100,14 @@ export const runMigrations = async (
 
   // The queue is what actually executes a migration, and the kvs stream keeps projections in
   // step with whatever it writes. Nothing else is needed: no http server, no websockets.
-  await queueImplementation(resolvedDevServerConfig);
-  await kvsStreamImplementation(resolvedDevServerConfig);
+  // NOT awaited: these block forever by design (startDevServer runs them inside Promise.all
+  // alongside the http server). Awaiting one hangs the whole command silently.
+  void queueImplementation(resolvedDevServerConfig);
+  void kvsStreamImplementation(resolvedDevServerConfig);
+
+  // Let them register their bus listeners before anything is published, exactly as
+  // startTinker does.
+  await new Promise((resolve) => setTimeout(resolve, 100));
 
   const tinker = createTinkerInterface(resolvedDevServerConfig);
   const ran: Record<string, string[]> = {};
@@ -120,6 +127,15 @@ export const runMigrations = async (
 
     ran[serviceName] = result.result ?? [];
   }
+
+  // Kvs writes are debounced behind an unref'd timer, so without this a one-shot command can
+  // report a successful migration and exit with the rows still only in memory. Found the hard
+  // way: the last service migrated always lost its writes.
+  //
+  // One repository per service, so every config has to be flushed, not just the first.
+  await Promise.all(
+    resolvedDevServerConfig.qpqConfigs.map((serviceQpqConfig) => getKvsRepository(serviceQpqConfig, resolvedDevServerConfig).flushAll()),
+  );
 
   return ran;
 };
