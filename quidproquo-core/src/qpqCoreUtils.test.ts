@@ -571,6 +571,17 @@ describe('qpqCoreUtils', () => {
       const entries = getAllSrcEntries(config);
       expect(entries).toEqual(expect.arrayContaining(['/ap/get::handler', '/s/daily::run', '/q/created::run', '/inline/run::handler']));
     });
+
+    it("includes a store's change-stream handler", () => {
+      // Anything missing here is never bundled, so its handler cannot be resolved at runtime
+      // and simply never runs. Nothing throws — the only symptom is whatever it maintained
+      // quietly going stale, which is how this was found.
+      const withStream = buildTestQpqConfig([
+        defineKeyValueStore('events', 'pk', [], { onStream: { runtime: '/entry/kvsStream/project::project' } }),
+      ]);
+
+      expect(getAllSrcEntries(withStream)).toContain('/entry/kvsStream/project::project');
+    });
   });
 
   describe('getSrcFilenameFromQpqFunctionRuntime', () => {
