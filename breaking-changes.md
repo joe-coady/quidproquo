@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+## 0.1.14
+
 - `EventDocSavedDefinitionConfig.validate?: EventDocEditorValidator` (`quidproquo-features`, the config passed to `createEventDocDefinition`) is
   replaced by `validators?: EventDocEventValidators<TView>`, a registry keyed by event type (`(event, state) => Nullable<string>`, `state` being the
   folded view) rather than one function over the raw event list. Convert a hand-written `validate` into per-type entries; the universal lifecycle

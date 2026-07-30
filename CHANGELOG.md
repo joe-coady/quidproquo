@@ -1,5 +1,33 @@
 # Changelog
 
+## 0.1.14
+
+- event docs: a recorded value picks its own storage. `askEventDocWriteValue` carries small values inline (4KB per value, 32KB per event) and falls
+  back to a blob asset above that, so a five byte output no longer costs two blob objects to store and two round trips to read back
+- event docs: the collection list is cursor paged. The list route takes `?limit=`/`?nextPageKey=` and returns `{ items, nextPageKey }`,
+  `askEventDocListFetchAll` keeps the old read-everything behaviour, and the list state module pages with next/previous instead of numbered pages
+- event docs: a collection's rules are declared as `validators` keyed by event type, and the fold is what enforces them. An event the validators
+  reject is now skipped when folding a stored log, not just blocked in the editor
+- kvs: `askKeyValueStoreQuery` takes `consistentRead`, for a caller that just wrote and is reading back to decide something
+- transient AWS failures (throttles, capacity, service unavailable, connection resets) are classified as `OutOfResources` instead of falling through
+  to a generic error, so a caller can tell "busy, try again" from "this request is wrong" without matching on error text
+- `defineQueue`'s `batchWindowInSeconds` defaults to 0 (invoke as soon as a message arrives) and now honours an explicit 0, which used to be swallowed
+  as falsy
+- kvs stream handlers are included in the bundled src entries, so the handler ships in the lambda zip and resolves in the dev server instead of
+  silently never running, and their invocations are indexed for admin log search
+- dev-server: `qpq migrate` flushes pending kvs writes before the process exits
+
+### Breaking changes
+
+- `EventDocSavedDefinitionConfig.validate` is replaced by `validators`, a registry keyed by event type
+- `EventDocUnsavedDefinitionConfig.validate` is removed with no replacement
+- validators are enforced by the fold, so a stored event the guard rejects is skipped rather than applied
+- `defineQueue`'s `batchWindowInSeconds` default changes from 5 to 0; pass it explicitly to accumulate a batch
+- the event-doc list route returns `QpqPagedData<EventDocSummary>` instead of a bare array, and takes `?limit=`/`?nextPageKey=`
+- `askEventDocListFetch` returns `QpqPagedData` and takes an options argument; use the new `askEventDocListFetchAll` for the old behaviour
+- the event-doc list state module moves from numbered pages to cursors: `page` becomes `pageIndex`/`cursors`/`nextPageKey`, `SetItems`/`SetPage`
+  become `PageLoaded`/`SetPageIndex`, and `clampEventDocListPage` is removed
+
 ## 0.1.13
 
 - web-react: the runtime store is rewritten from jotai to an internal refcounted qpq store. Definitions take a single options object with a
