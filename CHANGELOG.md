@@ -1,5 +1,37 @@
 # Changelog
 
+## 0.1.13
+
+- web-react: the runtime store is rewritten from jotai to an internal refcounted qpq store. Definitions take a single options object with a
+  `uniqueName` (federated modules that bind the same name share state) and an optional `onInit` story, and area state is cleaned up when its last
+  consumer unmounts. Apps wrap their tree in a `QpqStoreProvider`
+- kvs change data capture: `defineKeyValueStore` accepts an `onStream` handler that receives insert/modify/remove records with old and new values,
+  backed by DynamoDB streams on AWS and fully supported in the dev server, with batch size, batching window, and per-partition-key coalescing options
+- event docs: event ids move from a numeric counter to sortable uuidv7 strings (admin session logs use the same ids), soft delete and restore are
+  recorded as reserved DELETE/RESTORE events with a new `askEventDocRestore` to undo a delete, and the summary row is rebuilt asynchronously by a kvs
+  stream projector instead of on the append path
+- new `askKeyValueStoreScanAllScopes` action: scan a store across every tenant/personal scope, for writing migrations
+- cli: new `qpq migrate` command runs pending migrations against the local dev server
+- web-react: a websocket service-request correlation stays alive after the response arrives, so a handler that responds first and keeps streaming no
+  longer has its later messages dropped
+- deploy-rspack: `react-refresh` is now a declared dependency instead of being assumed from the consumer
+
+### Breaking changes
+
+- `EventDocStoredEvent` gains a required `type` field; `eventDocEventToStoredEvent` takes a new `type` argument
+- event-doc summaries rebuild asynchronously after append; re-read after a delay or fold the log if you need the just-appended event
+- event-doc event ids are strings now: `EventDocEventMetadata.index`, `EventDocVersion.eventIndex`, and `EventDocLink`'s `eventIndex` become
+  `eventId: string`, and `EventDocStoredEvent.sk` becomes a string
+- `EventDocEventListOptions.afterIndex` is renamed to `afterEventId` (the `?afterIndex=` query param too)
+- `askEventDocSoftDelete` requires a new `schemaVersion` argument; delete is now an event and `askEventDocRestore` undoes it
+- `renumberWorkspaceEvents` is removed; committed workspace events mint a real id at commit time
+- web-react runtimes must be bound inside a `QpqStoreProvider`; the jotai dependency is gone
+- `createQpqRuntimeDefinition` takes a single options object with a required `uniqueName`
+- `useQpqRuntime` drops the `mainStory` argument; move that story to the definition's `onInit`
+- `createQpqRuntimeComputed` returns a `{ definition, compute }` object instead of a callable
+- runtime state is deleted when its last consumer unmounts instead of persisting for the page's lifetime
+- web-react's `hooks/asmj/*` deep imports are removed; import from the package root
+
 ## 0.1.12
 
 - generic crypto: new `askCryptoEncrypt`/`askCryptoDecrypt` actions in core with `defineCryptoKey` config, KMS envelope encryption on AWS and a

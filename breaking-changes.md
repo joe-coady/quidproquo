@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+## 0.1.13
+
 - `EventDocStoredEvent` in `quidproquo-features` gains a required `type: string` field (the collection type, denormalised onto every stored row).
   `eventDocEventToStoredEvent(modelId, event)` correspondingly becomes `eventDocEventToStoredEvent(modelId, type, event)`. Update any code
   constructing `EventDocStoredEvent` directly or calling `eventDocEventToStoredEvent`.
