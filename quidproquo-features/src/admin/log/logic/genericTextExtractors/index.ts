@@ -3,6 +3,7 @@ export * from './AUTH_CREATE_AUTH_CHALLENGE_GenericTextExtractor';
 export * from './AUTH_DEFINE_AUTH_CHALLENGE_GenericTextExtractor';
 export * from './AUTH_VERIFY_AUTH_CHALLENGE_GenericTextExtractor';
 export * from './deployEventGenericTextExtractor';
+export * from './kvsStreamEventGenericTextExtractor';
 export * from './queueEventGenericTextExtractor';
 export * from './seoORGenericTextExtractor';
 export * from './serviceFunctionExeGenericTextExtractor';

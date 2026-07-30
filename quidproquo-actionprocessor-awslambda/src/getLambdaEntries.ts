@@ -18,6 +18,8 @@ export const entryNames = [
   'customMessageTriggerEvent_createAuthChallenge',
   'customMessageTriggerEvent_verifyAuthChallenge',
 
+  'dynamoStreamEvent_kvsStreamEvent',
+
   'eventBridgeEvent_recurringSchedule',
   'eventBridgeEvent_stackDeploy',
 

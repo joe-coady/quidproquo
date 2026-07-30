@@ -1,4 +1,4 @@
-import { existsSync } from 'fs';
+import { existsSync, readdirSync } from 'fs';
 import path from 'path';
 import { describe, expect, it } from 'vitest';
 
@@ -24,6 +24,19 @@ describe('getLambdaEntries', () => {
   it('has a lambda source file for every entry name', () => {
     for (const name of entryNames) {
       expect(existsSync(path.join(__dirname, 'lambdas', `${name}.ts`)), `missing lambda source for entry ${name}`).toBe(true);
+    }
+  });
+
+  // ...and the other direction, which is the one that actually bit: a NEW handler added to
+  // ./lambdas but not listed here is never bundled, so the deploy fails at synth with
+  // "Cannot find asset" pointing at a path nothing ever built.
+  it('has an entry name for every lambda source file', () => {
+    const sources = readdirSync(path.join(__dirname, 'lambdas'))
+      .filter((file) => file.endsWith('.ts') && file !== 'index.ts')
+      .map((file) => path.parse(file).name);
+
+    for (const source of sources) {
+      expect(entryNames, `lambdas/${source}.ts is not in entryNames, so it will never be bundled`).toContain(source);
     }
   });
 });

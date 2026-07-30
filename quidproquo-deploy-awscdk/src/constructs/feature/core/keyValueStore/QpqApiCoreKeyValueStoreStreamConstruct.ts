@@ -45,9 +45,7 @@ export class QpqApiCoreKeyValueStoreStreamConstruct extends QpqConstructBlock {
       return;
     }
 
-    const isOwnedHere = qpqCoreUtils
-      .getOwnedKeyValueStores(props.qpqConfig)
-      .some((kvs) => kvs.uniqueKey === props.keyValueStoreConfig.uniqueKey);
+    const isOwnedHere = qpqCoreUtils.getOwnedKeyValueStores(props.qpqConfig).some((kvs) => kvs.uniqueKey === props.keyValueStoreConfig.uniqueKey);
 
     if (!isOwnedHere) {
       return;
@@ -67,7 +65,18 @@ export class QpqApiCoreKeyValueStoreStreamConstruct extends QpqConstructBlock {
 
     const func = new Function(this, 'stream', {
       reacreateOnFunctionNameChange: true,
-      functionName: this.qpqResourceName(props.keyValueStoreConfig.keyValueStoreName, 'kvsStream'),
+      // Two characters, and that is not a style choice - it is the whole budget.
+      //
+      // A Lambda name is capped at 64 characters, and this resource carries the longest
+      // prefix of anything qpq names: the store name already has `EventLog` appended before
+      // the app-service-environment-feature decoration and the `-qpq` marker are added. The
+      // longest today is `qpq-admin-sessionsEventLog`, which leaves exactly two characters
+      // for the type. `kvsStream` overran by four; even `str` overruns by one.
+      //
+      // So this sits at exactly 64 with no headroom: a longer store name, service, feature
+      // or actor name will fail synth again, and the fix at that point is a general
+      // shortening rule in Function.ts rather than more characters shaved off here.
+      functionName: this.qpqResourceName(props.keyValueStoreConfig.keyValueStoreName, 'ks'),
 
       functionType: 'dynamoStreamEvent_kvsStreamEvent',
       executorName: 'dynamoStreamEvent_kvsStreamEvent',
