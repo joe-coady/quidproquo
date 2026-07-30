@@ -4,9 +4,10 @@ import { EventDocWorkspaceState } from '../../types/EventDocWorkspaceState';
 import { coalesceWorkspaceEvents } from '../coalesceWorkspaceEvents';
 
 // Every commit lands in the slot's PENDING buffer (history is server truth only).
-// Coalesce + renumber live IN the reducer (not the commit story) so a commit is
-// atomic: parallel commits each fold onto the latest state instead of racing a
-// read-modify-write of the whole buffer. Closured over the per-slot rules so the
+// Coalescing lives IN the reducer (not the commit story) so a commit is atomic:
+// parallel commits each fold onto the latest state instead of racing a
+// read-modify-write of the whole buffer. Nothing is renumbered — each event carries
+// the sortable id it was minted with, which already orders it. Closured over the per-slot rules so the
 // effect payload stays lean and serializable; the local-slot 'all' default applies
 // here too, so session streams hold one pending event per type.
 export const createApplyEventUpdater =
@@ -17,7 +18,6 @@ export const createApplyEventUpdater =
     }
 
     const rules = coalesceRulesBySlot[slotKey] ?? [];
-    const history = state.history[slotKey] ?? [];
     const retained = coalesceWorkspaceEvents(state.pending[slotKey] ?? [], event, rules);
 
     return {

@@ -2,6 +2,8 @@ import { collectEventDocReferences } from '../fold/collectEventDocReferences';
 import { foldEventDocLog, FoldEventDocLogConfig } from '../fold/foldEventDocLog';
 import { EventDocEvent } from '../models';
 import { EventDocDocument } from '../models';
+import { createEventDocEventValidator } from '../validation/createEventDocEventValidator';
+import { reservedEventDocEventValidators } from '../validation/reservedEventDocEventValidators';
 import { EventDocWorkspaceSlotKind } from '../workspace/types/EventDocWorkspaceSlotKind';
 import { EventDocWorkspaceStoryApi } from '../workspace/types/EventDocWorkspaceStoryApi';
 import { EventDocDefinition, EventDocUnsavedDefinition } from './types/EventDocDefinition';
@@ -53,13 +55,29 @@ export function createEventDocDefinition(
     reducer: config.foldReducer,
     migrations: config.migrations ?? {},
     latestVersion: config.schemaVersion,
+    // The fold is the gate now. Appends write unconditionally, so an event earns its place in
+    // the document here or nowhere.
+    //
+    // The reserved guard is ALWAYS applied, whether or not the collection adds rules of its
+    // own. Making it conditional on `validators` meant every doc that declared no domain rules
+    // silently folded edits made after publish — the guard existed and nothing ran it.
+    validators: { ...reservedEventDocEventValidators, ...(config.validators ?? {}) },
   };
 
   const { references } = config;
 
+  // The editor's pre-flight, derived from the SAME rules the fold applies, so a client cannot
+  // consider legal something the fold will silently drop. Always present, for the same reason
+  // the reserved guard always is: without it an edit on a published document is accepted by
+  // the editor, ignored by the fold, and simply appears to do nothing.
+  const validate = createEventDocEventValidator((events: EventDocEvent[]) => foldEventDocLog(events, foldConfig), config.validators ?? {});
+
   return {
     kind: EventDocWorkspaceSlotKind.document,
     ...slotConfig,
+    // Overrides the raw domain rules the spread carried: the workspace needs the merged set.
+    validators: foldConfig.validators,
+    validate,
     api: withGenericVerbs(api),
     fold: (events: EventDocEvent[]) => foldEventDocLog(events, foldConfig),
     // Always defined so a collection's referenceResolver is a one-liner with no optional call. A doc

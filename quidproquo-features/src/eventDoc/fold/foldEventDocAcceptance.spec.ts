@@ -176,3 +176,33 @@ describe('foldEventDocBase soft delete', () => {
     expect(state.deletedAt).toBe('2026-07-29T00:00:02.000Z');
   });
 });
+
+describe('foldEventDocBase INIT handling', () => {
+  const init = (index: number): EventDocEvent => ({
+    ...event(EventDocEffect.InitState, index),
+    payload: { ...event(EventDocEffect.InitState, index).payload, data: { id: 'doc-1', code: 'the-code', name: 'The Name' } },
+  });
+
+  it('applies the log-opening INIT rather than dropping it', () => {
+    // Regression: forbidInit used to refuse every INIT, which is right at append time and
+    // wrong in a fold. Folds silently lost every document's identity, and the placeholders
+    // survived — visible only if you looked at id/code/name rather than status.
+    const state = foldEventDocBase([init(0)]);
+
+    expect(state.id).toBe('doc-1');
+    expect(state.code).toBe('the-code');
+    expect(state.name).toBe('The Name');
+  });
+
+  it('still ignores a SECOND INIT on an already-initialised document', () => {
+    const reinit: EventDocEvent = {
+      ...init(1),
+      payload: { ...init(1).payload, data: { id: 'hijacked', code: 'hijacked', name: 'Hijacked' } },
+    };
+
+    const state = foldEventDocBase([init(0), reinit]);
+
+    expect(state.id).toBe('doc-1');
+    expect(state.code).toBe('the-code');
+  });
+});

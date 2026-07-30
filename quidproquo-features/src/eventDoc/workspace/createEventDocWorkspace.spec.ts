@@ -1554,3 +1554,39 @@ describe('createEventDocWorkspace transient streams', () => {
     expect(() => workspace.docs.noteA.view(state)).toThrow(/non-decreasing/);
   });
 });
+
+describe('createEventDocWorkspace history validation', () => {
+  // The editor's live view folds history through the workspace's own incremental path, not
+  // through definition.fold. Without the slot's validators reaching it, the editor showed
+  // events that every other reader rejects — an edit made after publish appeared to stick.
+  it('ignores a history event that lands after PUBLISH', () => {
+    const workspace = createTestWorkspace();
+
+    function* story(): AskResponse<void> {
+      yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [
+        initStateEvent(0),
+        serverEvent(NoteEvent.SetTitle, { title: 'Before publish' }, 1),
+        publishEvent(2),
+        serverEvent(NoteEvent.SetTitle, { title: 'After publish' }, 3),
+      ]);
+    }
+
+    const state = runWorkspaceStory(workspace, story);
+
+    expect(workspace.docs.noteA.view(state).title).toBe('Before publish');
+  });
+
+  it('still folds the log-opening INIT, so identity survives', () => {
+    // The other half of the same regression: a guard that refused every INIT left the folded
+    // document holding placeholder identity.
+    const workspace = createTestWorkspace();
+
+    function* story(): AskResponse<void> {
+      yield* askUIEventDocWorkspaceSetHistoryEvents('noteA', [initStateEvent(0)]);
+    }
+
+    const state = runWorkspaceStory(workspace, story);
+
+    expect(workspace.docs.noteA.view(state).id).toBe('doc-1');
+  });
+});

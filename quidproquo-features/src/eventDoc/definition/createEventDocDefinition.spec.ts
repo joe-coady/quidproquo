@@ -167,3 +167,119 @@ describe('createEventDocDefinition', () => {
     expect('askEventDocSetCode' in experienceDefinition.api).toBe(false);
   });
 });
+
+describe('createEventDocDefinition validators', () => {
+  // Appends no longer validate, so a rule that does not reach the FOLD is a rule nothing
+  // applies. These pin that the definition carries them all the way there.
+  const noEmptyBody = {
+    [MemoEvent.SetBody]: (event: EventDocEvent) => ((event.payload.data as { body: string }).body ? null : 'A memo body cannot be empty'),
+  };
+
+  const withValidators = () =>
+    createEventDocDefinition({
+      schemaVersion: 1,
+      foldReducer: memoFoldReducer,
+      createInitialViewState: createInitialMemoState,
+      api: memoApi,
+      validators: noEmptyBody,
+    });
+
+  const setBody = (body: string, index: number): EventDocEvent => ({
+    type: MemoEvent.SetBody,
+    payload: {
+      data: { body },
+      metadata: {
+        version: 1,
+        clientMessageId: `msg-${index}`,
+        createdBy: { userId: 'u', userDisplayName: 'U' },
+        createdAt: `2026-07-30T00:00:0${index}.000Z` as EventDocEvent['payload']['metadata']['createdAt'],
+        eventId: String(index).padStart(4, '0'),
+      },
+    },
+  });
+
+  it('folds an event its rules accept', () => {
+    expect(withValidators().fold([setBody('hello', 0)]).body).toBe('hello');
+  });
+
+  it('IGNORES an event its rules reject, rather than folding it in', () => {
+    // The event is in the log — nothing stopped it being written — so the fold is the only
+    // thing standing between a bad event and the document.
+    const state = withValidators().fold([setBody('hello', 0), setBody('', 1)]);
+
+    expect(state.body).toBe('hello');
+  });
+
+  it('applies the reserved guard to event types the collection says nothing about', () => {
+    // A collection declares only its own rules; everything else still falls to the reserved
+    // wildcard, so supplying `validators` cannot accidentally unguard the whole doc.
+    const published: EventDocEvent = {
+      ...setBody('x', 1),
+      type: EventDocEffect.Publish,
+      payload: { ...setBody('x', 1).payload, data: { effectiveFrom: '2026-07-30T00:00:00.000Z' } },
+    };
+
+    const setName: EventDocEvent = {
+      ...setBody('x', 2),
+      type: EventDocEffect.SetName,
+      payload: { ...setBody('x', 2).payload, data: { name: 'renamed' } },
+    };
+
+    const state = withValidators().fold([setBody('before', 0), published, setName]);
+
+    // SET_NAME has no domain rule, so requireDraft applies and the rename after publish is
+    // dropped — the document keeps the name it had.
+    expect(state.name).not.toBe('renamed');
+  });
+
+  it('lets a domain rule REPLACE the reserved guard for its own event type', () => {
+    // Sharp edge, and deliberate: validateEventDocEvent resolves `validators[type] ?? '*'`, so
+    // naming a type takes full responsibility for it — the lifecycle guard no longer applies.
+    // client-access depends on exactly this to allow secret rotation on a PUBLISHED client. The
+    // cost is that a collection wanting the guard as well has to compose it in itself.
+    const published: EventDocEvent = {
+      ...setBody('x', 1),
+      type: EventDocEffect.Publish,
+      payload: { ...setBody('x', 1).payload, data: { effectiveFrom: '2026-07-30T00:00:00.000Z' } },
+    };
+
+    const state = withValidators().fold([setBody('before', 0), published, setBody('after', 2)]);
+
+    expect(state.body).toBe('after');
+  });
+
+  it('derives the editor pre-flight from the same rules', () => {
+    // Two sources of truth here would let a client consider legal something the fold drops.
+    expect(withValidators().validate?.(setBody('', 0), [])).toMatch(/cannot be empty/);
+    expect(withValidators().validate?.(setBody('ok', 0), [])).toBeNull();
+  });
+
+  it('applies the reserved guard even when a doc declares NO rules of its own', () => {
+    // The regression that prompted this: making the guard conditional on `validators` meant
+    // every doc without domain rules folded edits made after publish. Only one doc in DocGen
+    // had domain rules, so in practice the lifecycle guard was running almost nowhere.
+    const published: EventDocEvent = {
+      ...setBody('x', 1),
+      type: EventDocEffect.Publish,
+      payload: { ...setBody('x', 1).payload, data: { effectiveFrom: '2026-07-30T00:00:00.000Z' } },
+    };
+
+    const state = createMemoDefinition().fold([setBody('before', 0), published, setBody('after', 2)]);
+
+    expect(state.body).toBe('before');
+  });
+
+  it('gives a doc with no rules an editor pre-flight too, so the edit is refused not ignored', () => {
+    // Without this the editor accepts the edit, the fold drops it, and the UI just does
+    // nothing — the worst of the three outcomes.
+    const published: EventDocEvent = {
+      ...setBody('x', 1),
+      type: EventDocEffect.Publish,
+      payload: { ...setBody('x', 1).payload, data: { effectiveFrom: '2026-07-30T00:00:00.000Z' } },
+    };
+
+    const reason = createMemoDefinition().validate?.(setBody('after', 2), [setBody('before', 0), published]);
+
+    expect(reason).toMatch(/draft/i);
+  });
+});

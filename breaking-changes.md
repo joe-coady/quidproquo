@@ -5,6 +5,16 @@ assembled quickly.
 
 ## vNext
 
+- `EventDocSavedDefinitionConfig.validate?: EventDocEditorValidator` (`quidproquo-features`, the config passed to `createEventDocDefinition`) is
+  replaced by `validators?: EventDocEventValidators<TView>`, a registry keyed by event type (`(event, state) => Nullable<string>`, `state` being the
+  folded view) rather than one function over the raw event list. Convert a hand-written `validate` into per-type entries; the universal lifecycle
+  guard is now composed in automatically (merged with the supplied `validators`, or applied alone if `validators` is omitted) instead of being
+  something a custom `validate` had to reimplement or call into.
+- `EventDocUnsavedDefinitionConfig.validate` is removed with no replacement; unsaved (session-only) docs no longer accept a validator.
+- The reserved lifecycle guard (and any `validators` supplied) is now enforced by the fold itself, not just the editor pre-flight — a document
+  folded from a stored log that contains an event the guard rejects (e.g. an edit appended after publish) now ignores that event instead of applying
+  it. Code relying on the fold applying every event in the log regardless of legality should re-check folded output against expectations.
+
 ## 0.1.13
 
 - `EventDocStoredEvent` in `quidproquo-features` gains a required `type: string` field (the collection type, denormalised onto every stored row).
