@@ -208,8 +208,9 @@ describe('eventDoc scoped round trip (scopeResolver)', () => {
     const tenantA = buildMocks('tenant-a');
     runStory(create(httpEvent({ name: 'Doc A', code: 'doc-a' })), tenantA.mocks);
 
+    // list returns a page (QpqPagedData), not a bare array.
     const tenantAList = JSON.parse(runStory(list(httpEvent(undefined)), tenantA.mocks).body!);
-    expect(tenantAList).toHaveLength(1);
+    expect(tenantAList.items).toHaveLength(1);
 
     // Same underlying tables, resolver now yields a different scope / Personal.
     const shared = tenantA;
@@ -218,8 +219,8 @@ describe('eventDoc scoped round trip (scopeResolver)', () => {
       [InlineFunctionActionType.Execute]: () => scope,
     });
 
-    expect(JSON.parse(runStory(list(httpEvent(undefined)), asScope('tenant-b')).body!)).toHaveLength(0);
-    expect(JSON.parse(runStory(list(httpEvent(undefined)), asScope(null)).body!)).toHaveLength(0);
+    expect(JSON.parse(runStory(list(httpEvent(undefined)), asScope('tenant-b')).body!).items).toHaveLength(0);
+    expect(JSON.parse(runStory(list(httpEvent(undefined)), asScope(null)).body!).items).toHaveLength(0);
   });
 
   it('runs unscoped when the resolver returns null (Personal)', () => {
