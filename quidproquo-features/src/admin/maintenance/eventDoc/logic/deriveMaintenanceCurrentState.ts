@@ -1,8 +1,8 @@
 import { QpqIsoDateTime } from 'quidproquo-core';
 
-import { MaintenanceLevel } from '../MaintenanceLevel';
-import { MaintenanceState } from '../MaintenanceState';
-import { MaintenanceType } from '../MaintenanceType';
+import { MaintenanceLevel } from '../v1/types/MaintenanceLevel';
+import { MaintenanceType } from '../v1/types/MaintenanceType';
+import { MaintenanceState } from '../v1/views/document/MaintenanceState';
 
 const MS_PER_MINUTE = 60_000;
 

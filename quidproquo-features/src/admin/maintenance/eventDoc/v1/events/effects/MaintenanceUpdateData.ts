@@ -1,7 +1,7 @@
 import { Nullable } from 'quidproquo-core';
 
-import { MaintenanceLevel } from '../MaintenanceLevel';
-import { MaintenanceType } from '../MaintenanceType';
+import { MaintenanceLevel } from '../../types/MaintenanceLevel';
+import { MaintenanceType } from '../../types/MaintenanceType';
 
 // The full status snapshot one update carries — shared by ADD_UPDATE and
 // EDIT_UPDATE.

@@ -1,7 +1,7 @@
 import { Nullable, QpqIsoDateTime } from 'quidproquo-core';
 
-import { MaintenanceLevel } from './MaintenanceLevel';
-import { MaintenanceType } from './MaintenanceType';
+import { MaintenanceLevel } from '../../types/MaintenanceLevel';
+import { MaintenanceType } from '../../types/MaintenanceType';
 
 // One folded update — a full status snapshot. `reason` is the user-visible
 // status line; `internalNotes` never leaves the admin surface. The ETA pair is
