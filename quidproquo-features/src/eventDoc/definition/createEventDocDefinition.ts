@@ -1,8 +1,8 @@
 import { buildEventDocViewFoldConfig } from '../fold/buildEventDocViewFoldConfig';
 import { collectEventDocReferences } from '../fold/collectEventDocReferences';
-import { foldEventDocLog, foldEventDocLogAccepted } from '../fold/foldEventDocLog';
+import { foldEventDocLog, foldEventDocLogAccepted, foldEventDocLogAsWritten, FoldEventDocLogConfig } from '../fold/foldEventDocLog';
 import { migrateEventDocDocumentTo } from '../fold/migrateEventDocDocumentTo';
-import { EventDocDocument, EventDocEvent } from '../models';
+import { EventDocDocument, EventDocEvent, EventDocSnapshotViews } from '../models';
 import { foldEventDocSummary } from '../summary/foldEventDocSummary';
 import { createEventDocEventValidator } from '../validation/createEventDocEventValidator';
 import { reservedEventDocEventValidators } from '../validation/reservedEventDocEventValidators';
@@ -86,6 +86,10 @@ export function createEventDocDefinition(
     },
   };
 
+  // Secondary view fold configs, assembled once and shared by the live views and the
+  // snapshot fold — the two cannot drift on what a view's rules are.
+  const secondaryFoldConfigs: Record<string, FoldEventDocLogConfig<EventDocDocument>> = {};
+
   Object.keys(versions[0].views).forEach((viewName) => {
     if (viewName === EVENT_DOC_SUMMARY_VIEW) {
       throw new Error(
@@ -101,10 +105,31 @@ export function createEventDocDefinition(
     // No validators of its own — the rules ran once, on the gate. Re-running them here
     // would hand a domain rule a state shape it was never written against.
     const foldConfig = buildEventDocViewFoldConfig(versions, viewName, schemaVersion);
+    secondaryFoldConfigs[viewName] = foldConfig;
     views[viewName] = {
       fold: (events: EventDocEvent[]) => foldEventDocLog(foldEventDocLogAccepted(events, primaryFoldConfig).accepted, foldConfig),
     };
   });
+
+  // Every view of one log prefix, era-pinned — what a snapshot stores. One gate pass
+  // decides the accepted set; the document state falls out of that same pass, and each
+  // secondary view replays the accepted set through its own rules. No view climbs to the
+  // code's latest version: a snapshot records what the document WAS when its last event
+  // landed, and the read side owns any migration up (see foldEventDocLogAsWritten).
+  const foldSnapshotViews = (events: EventDocEvent[]): EventDocSnapshotViews => {
+    const { state, accepted } = foldEventDocLogAsWritten(events, primaryFoldConfig);
+
+    const snapshotViews: EventDocSnapshotViews = {
+      [EVENT_DOC_PRIMARY_VIEW]: state,
+      [EVENT_DOC_SUMMARY_VIEW]: foldEventDocSummary(accepted),
+    };
+
+    Object.entries(secondaryFoldConfigs).forEach(([viewName, foldConfig]) => {
+      snapshotViews[viewName] = foldEventDocLogAsWritten(accepted, foldConfig).state;
+    });
+
+    return snapshotViews;
+  };
 
   // The editor's pre-flight, derived from the SAME rules the fold applies, so a client cannot
   // consider legal something the fold will silently drop. Always present, for the same reason
@@ -129,6 +154,7 @@ export function createEventDocDefinition(
     validate,
     api: withGenericVerbs(api),
     views,
+    foldSnapshotViews,
     references,
     // Always defined so a collection's referenceResolver is a one-liner with no optional call. A doc
     // type that declares no `references` is a leaf: skip the walk rather than scan for nothing.

@@ -23,6 +23,13 @@ assembled quickly.
   `EventDocSummaryView` (no `type` field) instead of `EventDocSummary`; stamp `type` onto the result yourself if you need the stored shape.
 - `createEventDocSummarySeed(type)` (`quidproquo-features`) drops the `type` param and now returns `EventDocSummaryView` instead of `EventDocSummary`.
 - `eventDocSummarySchema` (`quidproquo-features`) is now the STORED shape (with `type`); the plain view (no `type`) is the new `eventDocSummaryViewSchema`/`EventDocSummaryView`. Code that validated a fold result without a `type` field against `eventDocSummarySchema` should switch to `eventDocSummaryViewSchema`.
+- `EventDocAcceptance`, `createEventDocAcceptance`, and `recordEventDocAcceptance` (`quidproquo-features`) are removed with no replacement. Retry
+  dedup and the schema-version floor are now read straight off the folded state (`EventDocDocument.recentClientMessageIds`, `schemaVersion`) instead
+  of loop-local bookkeeping; there is nothing for a caller to construct or thread through anymore.
+- `rejectEventDocEvent(event, state, acceptance, validators)` (`quidproquo-features`) drops the `acceptance` parameter: call it as
+  `rejectEventDocEvent(event, state, validators)`.
+- `foldEventDocLogStep`'s config (`FoldEventDocLogStepConfig`, `quidproquo-features`) drops the `acceptance` field; a step reads its acceptance rules
+  off the `state` it is passed instead.
 
 ## 0.1.14
 

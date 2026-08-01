@@ -485,3 +485,93 @@ describe('createEventDocDefinition summary view', () => {
     ).toThrow(/built-in view name/);
   });
 });
+
+// ─── Snapshot fold ──────────────────────────────────────────────────────────────────
+
+describe('createEventDocDefinition foldSnapshotViews', () => {
+  type MemoStatsState = EventDocDocument & { edits: number };
+
+  const createInitialMemoStatsState = (): MemoStatsState => ({
+    ...createEventDocInitialDocumentState(1),
+    edits: 0,
+  });
+
+  const memoStatsFoldReducer = buildEventDocFoldReducer<MemoStatsState, MemoEffects>(createInitialMemoStatsState, {
+    [MemoEvent.SetBody]: (state) => ({ ...state, edits: state.edits + 1 }),
+  }) as QpqReducer<MemoStatsState, EventDocEvent>;
+
+  const noEmptyBody = {
+    [MemoEvent.SetBody]: (event: EventDocEvent) => ((event.payload.data as { body: string }).body ? null : 'A memo body cannot be empty'),
+  };
+
+  const createTwoViewDefinition = () =>
+    createEventDocDefinition({
+      schemaVersion: 1,
+      versions: [
+        {
+          version: 1,
+          views: {
+            document: memoDocumentV1,
+            stats: { foldReducer: memoStatsFoldReducer, createInitialViewState: createInitialMemoStatsState },
+          },
+        },
+      ],
+      validators: noEmptyBody,
+      api: memoApi,
+    });
+
+  const log = () => [
+    serverEvent(EventDocEffect.InitState, { id: 'memo-1', code: 'MEMO', name: 'Memo' }, 0),
+    serverEvent(MemoEvent.SetBody, { body: 'kept' }, 1),
+  ];
+
+  it('folds EVERY view of the prefix — document, summary, and declared secondaries', () => {
+    const snapshotViews = createTwoViewDefinition().foldSnapshotViews(log());
+
+    expect((snapshotViews.document as MemoState).body).toBe('kept');
+    expect((snapshotViews.summary as { name: string }).name).toBe('Memo');
+    expect((snapshotViews.stats as MemoStatsState).edits).toBe(1);
+  });
+
+  it('folds only the events the document accepted into every view', () => {
+    // Same gate-once rule the live views follow: a rejected event must not exist in ANY
+    // snapshot view, or two snapshots of one prefix would disagree about its contents.
+    const snapshotViews = createTwoViewDefinition().foldSnapshotViews([...log(), serverEvent(MemoEvent.SetBody, { body: '' }, 2)]);
+
+    expect((snapshotViews.document as MemoState).body).toBe('kept');
+    expect((snapshotViews.stats as MemoStatsState).edits).toBe(1);
+  });
+
+  it('pins the era: the snapshot stays at the version the log reached, while the live view climbs', () => {
+    type MemoV2State = MemoState & { pinned: boolean };
+
+    const memoV2Definition = createEventDocDefinition({
+      schemaVersion: 2,
+      versions: [
+        { version: 1, views: { document: memoDocumentV1 } },
+        {
+          version: 2,
+          views: {
+            document: {
+              foldReducer: memoFoldReducer as unknown as QpqReducer<MemoV2State, EventDocEvent>,
+              migrateFromPrevious: (state) => ({ ...state, pinned: false }) as MemoV2State,
+            },
+          },
+        },
+      ],
+      api: memoApi,
+    });
+
+    const v1Log = log();
+
+    // The live view is latest-shaped; the snapshot is what the document WAS when its last
+    // event landed — an immutable fact of the log that a later deploy cannot rewrite.
+    expect(memoV2Definition.views.document.fold(v1Log).schemaVersion).toBe(2);
+
+    const snapshotDocument = memoV2Definition.foldSnapshotViews(v1Log).document as MemoV2State;
+
+    expect(snapshotDocument.schemaVersion).toBe(1);
+    expect('pinned' in snapshotDocument).toBe(false);
+    expect(snapshotDocument.body).toBe('kept');
+  });
+});

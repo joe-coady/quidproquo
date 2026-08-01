@@ -55,4 +55,11 @@ export type EventDocRoutesOptions = {
   // links recursively. Omit for a leaf collection (a stylesheet, a layout) - the walk then
   // stops at its docs instead of calling a collector that would always return nothing.
   referenceResolver?: string;
+  // Registered inline-function name (see `defineInlineFunction`). When set, the event
+  // store's stream projector snapshots this type: on each stream batch it invokes the fold
+  // with `{ events, docId }` (the log prefix up to the batch's newest event) and writes the
+  // returned per-view states to the snapshots store — one fragment per burst of appends.
+  // The registered function is a one-liner over the doc type's definition:
+  // `definition.foldSnapshotViews(events)`. Omit to not snapshot the collection.
+  snapshotFold?: string;
 };

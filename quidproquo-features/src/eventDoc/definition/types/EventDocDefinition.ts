@@ -1,4 +1,4 @@
-import { EventDocEvent, EventDocLink, EventDocSummaryView } from '../../models';
+import { EventDocEvent, EventDocLink, EventDocSnapshotViews, EventDocSummaryView } from '../../models';
 import { EventDocWorkspaceDocumentSlotConfig } from '../../workspace/types/EventDocWorkspaceDocumentSlotConfig';
 import { EventDocWorkspaceLocalSlotConfig } from '../../workspace/types/EventDocWorkspaceLocalSlotConfig';
 import { EventDocWorkspaceStoryApi } from '../../workspace/types/EventDocWorkspaceStoryApi';
@@ -42,6 +42,12 @@ export type EventDocDefinition<TVersions extends EventDocVersions, TApi extends 
   // Every doc this one has ever referenced, across its whole log. THE thing a collection's
   // referenceResolver inline function calls; [] for a doc type that declares no `references`.
   collectReferences: (events: EventDocEvent[]) => EventDocLink[];
+
+  // Every view of the given log prefix in one pass, ERA-PINNED (no climb to the code's
+  // latest version) — the states a snapshot stores. The gate runs ONCE and every view
+  // folds the same accepted set, so a snapshot's view rows can never disagree about what
+  // the prefix contains. THE thing a collection's snapshotFold inline function calls.
+  foldSnapshotViews: (events: EventDocEvent[]) => EventDocSnapshotViews;
 };
 
 // An unsaved doc has no server log, so nothing to fold — it IS its slot config.

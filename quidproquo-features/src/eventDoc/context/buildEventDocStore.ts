@@ -1,4 +1,5 @@
 import { eventDocEventsStoreName } from '../constants/eventDocEventsStoreName';
+import { eventDocSnapshotsStoreName } from '../constants/eventDocSnapshotsStoreName';
 import { eventDocStorageDriveName } from '../constants/eventDocStorageDriveName';
 import { EventDocStore } from '../types/EventDocStore';
 
@@ -32,6 +33,7 @@ export const buildEventDocStore = ({
 }: EventDocStoreOptions): EventDocStore => ({
   storeName,
   eventsStoreName: eventDocEventsStoreName(storeName),
+  snapshotsStoreName: eventDocSnapshotsStoreName(storeName),
   type,
   storageDriveName: eventDocStorageDriveName(storeName),
   eventValidator,

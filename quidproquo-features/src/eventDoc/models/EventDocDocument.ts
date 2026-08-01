@@ -20,4 +20,11 @@ export type EventDocDocument = {
   // Soft delete, folded from DELETE / RESTORE. Absent means live.
   deletedAt?: QpqIsoDateTime;
   deletedBy?: string;
+
+  // The clientMessageIds of the most recently ACCEPTED events (rolling window, newest
+  // last), stamped by foldEventDocLogStep outside any reducer — like updatedAt. This is
+  // the retry-dedup memory: it lives ON the state, rather than in fold-loop bookkeeping,
+  // so that any fold resuming from a stored state (a snapshot, the workspace's
+  // accumulator) reaches the same accept/reject verdicts as a fold from scratch.
+  recentClientMessageIds?: string[];
 };

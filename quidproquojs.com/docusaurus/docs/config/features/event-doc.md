@@ -9,7 +9,7 @@ Defines a complete **event-document collection**: the data stores that hold it *
 
 An event document is not stored as a mutable row. It is derived by folding an ordered, append-only log of events. `defineEventDoc` provisions that log (plus a queryable summary table and a blob bucket) and mounts the REST routes that create documents, append events, read them back, and resolve their draft/published versions.
 
-- **On AWS:** deploys everything [defineEventDocSummary](./event-doc-summary.md) deploys (two DynamoDB tables — a summary table and an append-only events table — plus an S3 bucket for assets) and everything [defineEventDocRoutes](./event-doc-routes.md) deploys (the API Gateway routes and their Lambda handlers). It creates no infrastructure of its own; it is exactly `[defineEventDocSummary(options.storeName), defineEventDocRoutes(options)]`.
+- **On AWS:** deploys everything [defineEventDocSummary](./event-doc-summary.md) deploys (DynamoDB tables for the summary, events, and snapshots, plus an S3 bucket for assets) and everything [defineEventDocRoutes](./event-doc-routes.md) deploys (the API Gateway routes and their Lambda handlers). It creates no infrastructure of its own; it is exactly `[defineEventDocSummary(options.storeName, ...), defineEventDocRoutes(options)]`, threading `options.snapshotFold` through to `defineEventDocSummary` as that type's entry in `snapshotFolds` when set.
 
 ```typescript
 import { defineEventDoc } from 'quidproquo-features';
@@ -51,6 +51,7 @@ function defineEventDoc(options: EventDocRoutesOptions): QPQConfig;
 | `onAppend` | `string` | no | Inline-function name invoked with `{ docId, event, summary, events }` after EVERY successful append (domain events and lifecycle events alike): the seam for reacting to any mutation. Runs after `onPublish` when both fire on the same Publish event. |
 | `scopeResolver` | `string` | no | Inline-function name every route invokes with `{ event }` to resolve the request's ambient storage scope (e.g. per-tenant); null means unscoped. |
 | `referenceResolver` | `string` | no | Inline-function name `GET {basePath}/{id}/references` invokes with the document's `{ events, docId }` log to return the `EventDocLink`s that view depends on. Omit for a leaf collection — the route still resolves, just always to `[]`. |
+| `snapshotFold` | `string` | no | Inline-function name that folds a log prefix (`{ events, docId }`) to every view's state, typically `definition.foldSnapshotViews(events)`. When set, the event store's stream projector stores the folded views to the snapshots store on each batch. Omit to not snapshot the collection. |
 
 ## Examples
 
