@@ -1,14 +1,41 @@
-import { askConfigGetGlobal, AskResponse, askStorageScopeProvide, KvsStreamEventResponse, KvsStreamRecord } from 'quidproquo-core';
+import {
+  askConfigGetGlobal,
+  AskResponse,
+  askStorageScopeProvide,
+  KvsStreamEventResponse,
+  KvsStreamEventType,
+  KvsStreamRecord,
+} from 'quidproquo-core';
 
-import { eventDocEventsStoreName } from '../../constants/eventDocEventsStoreName';
-import { EVENT_DOC_STORE_NAME_GLOBAL } from '../../constants/eventDocGlobalNames';
-import { eventDocStorageDriveName } from '../../constants/eventDocStorageDriveName';
+import { EVENT_DOC_SNAPSHOT_FOLDS_GLOBAL, EVENT_DOC_STORE_NAME_GLOBAL } from '../../constants/eventDocGlobalNames';
 import { askEventDocStoreProvide } from '../../context/askEventDocStoreProvide';
+import { buildEventDocStore } from '../../context/buildEventDocStore';
+import { askEventDocSnapshotAtEvent } from '../../logic/askEventDocSnapshotAtEvent';
 import { askEventDocSummaryRederive } from '../../logic/askEventDocSummaryRederive';
 import { EventDocStoredEvent } from '../../types/EventDocStoredEvent';
 
+// The per-document work one stream delivery triggers: rebuild the queryable record from
+// the log, then (for a collection that registered a snapshot fold) store the folded views
+// as of the batch's newest event. Both are pure derivations of the log, which is what
+// makes the stream's at-least-once delivery and its retries harmless — re-running either
+// rewrites the same facts.
+function* askEventDocProjectStreamRecord(record: KvsStreamRecord, modelId: string, snapshotFold?: string): AskResponse<void> {
+  yield* askEventDocSummaryRederive(modelId);
+
+  // Snapshots fragment along the stream's own batching: coalescing hands this handler the
+  // LAST event per document per batch, so a lone append snapshots at that event while a
+  // burst of a hundred snapshots once, at the burst's newest. A Remove is not a new event
+  // to snapshot at — the summary rebuild above already reflects whatever the log now says.
+  if (!snapshotFold || record.eventType === KvsStreamEventType.Remove) {
+    return;
+  }
+
+  yield* askEventDocSnapshotAtEvent(modelId, String(record.keys.sk), snapshotFold);
+}
+
 /**
- * Rebuild a document's summary from its log, driven by the event store's change stream.
+ * Rebuild a document's summary from its log — and store its snapshot — driven by the
+ * event store's change stream.
  *
  * This is what lets the summary be a pure projection. The writer appends an event and stops;
  * nothing on the write path maintains a read model, so the record can be dropped and rebuilt
@@ -21,6 +48,7 @@ import { EventDocStoredEvent } from '../../types/EventDocStoredEvent';
  */
 export function* projectEventDocSummary(record: KvsStreamRecord): AskResponse<KvsStreamEventResponse> {
   const storeName = yield* askConfigGetGlobal<string>(EVENT_DOC_STORE_NAME_GLOBAL);
+  const snapshotFolds = yield* askConfigGetGlobal<Record<string, string>>(EVENT_DOC_SNAPSHOT_FOLDS_GLOBAL);
 
   // Keys arrive raw and the scope arrives beside them, so the rebuild simply re-enters the
   // scope the append ran under. That matters more than it looks: reading or writing under the
@@ -39,22 +67,18 @@ export function* projectEventDocSummary(record: KvsStreamRecord): AskResponse<Kv
     return;
   }
 
-  const store = {
-    storeName,
-    eventsStoreName: eventDocEventsStoreName(storeName),
-    storageDriveName: eventDocStorageDriveName(storeName),
-    type: image.type,
-  };
+  const store = buildEventDocStore({ storeName, type: image.type });
 
-  const rebuild = askEventDocStoreProvide(store, askEventDocSummaryRederive(modelId));
+  // eslint-disable-next-line qpq/require-yield-star
+  const project = askEventDocStoreProvide(store, askEventDocProjectStreamRecord(record, modelId, snapshotFolds[image.type]));
 
   // Unscoped rows carry no scope to re-enter, and the ambient default is already "none", so
   // only a scoped row wraps the rebuild in a provider.
   if (scope === undefined) {
-    yield* rebuild;
+    yield* project;
 
     return;
   }
 
-  yield* askStorageScopeProvide(scope, rebuild);
+  yield* askStorageScopeProvide(scope, project);
 }

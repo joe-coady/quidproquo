@@ -12,6 +12,7 @@ import {
   EVENT_DOC_STORE_NAME_GLOBAL,
   EVENT_DOC_TYPE_GLOBAL,
 } from '../constants/eventDocGlobalNames';
+import { eventDocSnapshotsStoreName } from '../constants/eventDocSnapshotsStoreName';
 import { askEventDocStoreProvide } from '../context/askEventDocStoreProvide';
 
 // TOOD: Revisit this, i feel like we dont need this function?.
@@ -46,6 +47,10 @@ export function* askEventDocProvideStoreFromGlobals<T>(story: AskResponse<T>): A
     {
       storeName,
       eventsStoreName,
+      // Derived, not a global: the name is a pure convention over storeName (the same one
+      // buildEventDocStore applies), so routes registered before snapshots existed still
+      // resolve it — a global would read as missing for them and need a legacy fallback.
+      snapshotsStoreName: eventDocSnapshotsStoreName(storeName),
       type,
       storageDriveName,
       eventValidator,

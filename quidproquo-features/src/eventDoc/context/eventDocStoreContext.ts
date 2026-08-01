@@ -7,6 +7,7 @@ import { EventDocStore } from '../types/EventDocStore';
 export const eventDocStoreContext = createLocalContextIdentifier<EventDocStore>('exengne-event-doc-store', {
   storeName: '',
   eventsStoreName: '',
+  snapshotsStoreName: '',
   type: '',
   storageDriveName: '',
 });

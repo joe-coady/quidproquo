@@ -14,6 +14,7 @@ export * from './askEventDocPublishedVersionAsOf';
 export * from './askEventDocReferences';
 export * from './askEventDocRestore';
 export * from './askEventDocSeedInitState';
+export * from './askEventDocSnapshotAtEvent';
 export * from './askEventDocSoftDelete';
 export * from './askEventDocSummaryRederive';
 export * from './isInlineEventDocValueRef';

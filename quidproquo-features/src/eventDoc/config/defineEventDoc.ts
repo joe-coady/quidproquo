@@ -6,8 +6,9 @@ import { defineEventDocSummary } from './defineEventDocSummary';
 
 // Store + routes in one call, for the one-store-one-type case. For multiple
 // types in one store, call defineEventDocSummary once and
-// defineEventDocRoutes per type so the store isn't defined twice.
+// defineEventDocRoutes per type so the store isn't defined twice — passing it
+// the snapshotFolds map for every type it hosts.
 export const defineEventDoc = (options: EventDocRoutesOptions): QPQConfig => [
-  defineEventDocSummary(options.storeName),
+  defineEventDocSummary(options.storeName, options.snapshotFold ? { snapshotFolds: { [options.type]: options.snapshotFold } } : undefined),
   defineEventDocRoutes(options),
 ];

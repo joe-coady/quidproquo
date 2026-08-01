@@ -2,6 +2,7 @@ import { QpqReducer } from 'quidproquo-core';
 
 import { describe, expect, it } from 'vitest';
 
+import { EVENT_DOC_RECENT_CLIENT_MESSAGE_ID_WINDOW } from '../constants/eventDocRecentClientMessageIdWindow';
 import { EventDocDocument, EventDocEffect, EventDocEvent, EventDocStatus } from '../models';
 import { EventDocEventValidators } from '../validation/types/EventDocEventValidators';
 import { createEventDocInitialDocumentState } from './createEventDocInitialDocumentState';
@@ -67,8 +68,42 @@ describe('foldEventDocLog acceptance', () => {
     expect(state.hits).toEqual([`a:${eventId(0)}`]);
   });
 
-  it('ignores an event authored against an older schema version than the log has reached', () => {
+  it('ignores an event authored against an older schema version than the document has folded to', () => {
+    // The floor is the STATE's schemaVersion: accepting the v2 event migrates the document
+    // to v2, so the trailing v1 event would fold through a reducer that no longer matches
+    // the state's shape, and is skipped instead. The seed carries an id because the floor
+    // only arms on a real document (real logs open with INIT_STATE, which sets it).
+    const state = foldEventDocLog<CounterState>([event('a', 0, { version: 2 }), event('b', 1, { version: 1 })], {
+      seed: { ...seed(), id: 'doc-1' },
+      reducer: countingReducer,
+      migrations: { 2: (v1State) => v1State },
+      latestVersion: 2,
+    });
+
+    expect(state.hits).toEqual([`a:${eventId(0)}`]);
+  });
+
+  it('does not let a FUTURE-version event inflate the floor past what the document folded to', () => {
+    // latestVersion is 1, so the v2 event folds CLAMPED at v1 and the document stays at
+    // schema version 1 — a following v1 event still matches the state's shape and folds.
+    // (The old loop-local floor recorded the raw claimed version and rejected it.)
     const state = foldCounting([event('a', 0, { version: 2 }), event('b', 1, { version: 1 })]);
+
+    expect(state.hits).toEqual([`a:${eventId(0)}`, `b:${eventId(1)}`]);
+  });
+
+  it('does not apply the version floor to a pristine latest-shaped seed', () => {
+    // The workspace's initial view state is latest-shaped (schemaVersion at latest) with
+    // no INIT_STATE behind it (empty id). A real old-version log folding onto it must not
+    // be rejected as "below the floor" — there is no floor until an event has folded.
+    const pristineLatestSeed: CounterState = { ...createEventDocInitialDocumentState(2), hits: [] };
+
+    const state = foldEventDocLog<CounterState>([event('a', 0, { version: 1 })], {
+      seed: pristineLatestSeed,
+      reducer: countingReducer,
+      migrations: { 2: (v1State) => v1State },
+      latestVersion: 2,
+    });
 
     expect(state.hits).toEqual([`a:${eventId(0)}`]);
   });
@@ -95,6 +130,33 @@ describe('foldEventDocLog acceptance', () => {
     const state = foldCounting([event('blocked', 0, { clientMessageId: 'same' }), event('a', 1, { clientMessageId: 'same' })], validators);
 
     expect(state.hits).toEqual([`a:${eventId(1)}`]);
+  });
+
+  it('remembers the accepted ids ON the state, as a rolling window, newest last', () => {
+    // The dedup memory lives on the document rather than in fold-loop bookkeeping, so a
+    // fold resuming from a stored state reaches the same verdicts as one from scratch.
+    const state = foldCounting([event('a', 0, { clientMessageId: 'first' }), event('b', 1, { clientMessageId: 'second' })]);
+
+    expect(state.recentClientMessageIds).toEqual(['first', 'second']);
+
+    const many = foldCounting(Array.from({ length: 15 }, (_, index) => event('e', index)));
+
+    expect(many.recentClientMessageIds).toHaveLength(EVENT_DOC_RECENT_CLIENT_MESSAGE_ID_WINDOW);
+    expect(many.recentClientMessageIds).toEqual(Array.from({ length: EVENT_DOC_RECENT_CLIENT_MESSAGE_ID_WINDOW }, (_, index) => `msg-${index + 5}`));
+  });
+
+  it('applies a duplicate that arrives after its original has left the rolling window', () => {
+    // The documented trade of a bounded window: dedup protects against RETRIES, which land
+    // immediately — an id repeated more than a window later is treated as a new event.
+    const log = [
+      event('a', 0, { clientMessageId: 'dup' }),
+      ...Array.from({ length: EVENT_DOC_RECENT_CLIENT_MESSAGE_ID_WINDOW }, (_, index) => event('filler', index + 1)),
+      event('a', 11, { clientMessageId: 'dup' }),
+    ];
+
+    const state = foldCounting(log);
+
+    expect(state.hits).toContain(`a:${eventId(11)}`);
   });
 
   it('reaches the same verdict regardless of how much log follows', () => {

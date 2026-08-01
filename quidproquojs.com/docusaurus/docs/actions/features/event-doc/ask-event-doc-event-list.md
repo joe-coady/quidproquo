@@ -46,6 +46,7 @@ function* askEventDocEventList(
 | `limit` | `number` | (store default) | Max number of events to return in the page. |
 | `nextPageKey` | `string` | — | Continuation token from a previous page's `nextPageKey`. |
 | `afterEventId` | `string` | — | Return only events whose event id sorts after this one (exclusive). A sort-key range condition on the events store's primary key — no GSI involved. |
+| `upToEventId` | `string` | — | Return only events whose event id sorts at or before this one (inclusive) — the log prefix up to a known event, for folding a document as of that event (a snapshot). Not combinable with `afterEventId`: a key condition holds one sort-key range. |
 | `consistentRead` | `boolean` | `false` | Strongly consistent read. Needed by a caller that just appended and is now folding to decide something — the default eventually-consistent read can otherwise miss that caller's own most recent event. Costs roughly double the read capacity, so leave it off for ordinary reads. |
 
 ### Returns
@@ -69,7 +70,7 @@ export function* fullHistory(docId: string) {
 ```typescript
 function* askEventDocEventListAll(
   modelId: string,
-  options?: { consistentRead?: boolean },
+  options?: { consistentRead?: boolean; upToEventId?: string },
 ): AskResponse<EventDocEvent[]>;
 ```
 
@@ -79,6 +80,7 @@ function* askEventDocEventListAll(
 | --- | --- | --- |
 | `modelId` | `string` | The document id to read the full log for. |
 | `options.consistentRead` | `boolean` | Optional, default `false`. Strongly consistent read — for a caller that just appended and is now folding to decide something, so it does not miss its own most recent event. Leave off for ordinary reads; it doubles the read cost. |
+| `options.upToEventId` | `string` | Optional. Return only the log prefix up to and including this event id — for folding a document as of a known event (a snapshot). |
 
 ### Returns
 

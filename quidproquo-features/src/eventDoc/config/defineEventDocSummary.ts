@@ -2,16 +2,31 @@ import { defineKeyValueStore, defineStorageDrive, kvsKey, QPQConfig } from 'quid
 
 import { getFeatureEntryQpqFunctionRuntime } from '../../getFeatureEntryQpqFunctionRuntime';
 import { eventDocEventsStoreName, eventDocLegacyEventsStoreName } from '../constants/eventDocEventsStoreName';
-import { EVENT_DOC_STORE_NAME_GLOBAL } from '../constants/eventDocGlobalNames';
+import { EVENT_DOC_SNAPSHOT_FOLDS_GLOBAL, EVENT_DOC_STORE_NAME_GLOBAL } from '../constants/eventDocGlobalNames';
+import { eventDocSnapshotsStoreName } from '../constants/eventDocSnapshotsStoreName';
 import { eventDocStorageDriveName } from '../constants/eventDocStorageDriveName';
 import { EventDocSummary } from '../models';
 import { EventDocStoredEvent } from '../types/EventDocStoredEvent';
+import { EventDocStoredSnapshot } from '../types/EventDocStoredSnapshot';
 
-// Model store + append-only event store + blob bucket for a collection. Event store has
-// no GSI deliberately: the local dev-server query processor can't target one, so all
-// event reads go through the main table. The blob bucket holds the collection's
-// immutable assets (and later its derived runtime artifacts) under per-doc prefixes.
-export const defineEventDocSummary = (keyValueStoreName: string): QPQConfig => [
+export type EventDocSummaryOptions = {
+  // Registered inline-function names (see `defineInlineFunction`) of each collection's
+  // snapshot fold, keyed by doc TYPE — the store-level twin of the per-type
+  // `snapshotFold` routes option, keyed because one events table can host several
+  // collections and its ONE stream serves them all. When a row's type has an entry, the
+  // stream projector invokes it with the doc's log prefix and writes the folded views to
+  // the snapshots store; a type with no entry is simply not snapshotted. defineEventDoc
+  // threads the single-type case through automatically; multi-type stores that call
+  // defineEventDocSummary directly pass the whole map here.
+  snapshotFolds?: Record<string, string>;
+};
+
+// Model store + append-only event store + snapshot store + blob bucket for a collection.
+// Event store has no GSI deliberately: the local dev-server query processor can't target
+// one, so all event reads go through the main table. The blob bucket holds the
+// collection's immutable assets (and later its derived runtime artifacts) under per-doc
+// prefixes.
+export const defineEventDocSummary = (keyValueStoreName: string, options?: EventDocSummaryOptions): QPQConfig => [
   defineKeyValueStore<EventDocSummary>(keyValueStoreName, 'type', ['id'], {
     indexes: [{ partitionKey: 'type', sortKey: 'updatedAt' }],
     disablePointInTimeRecovery: false,
@@ -30,10 +45,22 @@ export const defineEventDocSummary = (keyValueStoreName: string): QPQConfig => [
         // The projector resolves the rest of the store (events table, blob bucket) from this
         // by the same naming convention, and reads the collection `type` off each row, since
         // one events table can host several collections.
-        globals: { [EVENT_DOC_STORE_NAME_GLOBAL]: keyValueStoreName },
+        globals: {
+          [EVENT_DOC_STORE_NAME_GLOBAL]: keyValueStoreName,
+          [EVENT_DOC_SNAPSHOT_FOLDS_GLOBAL]: options?.snapshotFolds ?? {},
+        },
       },
       coalesceByPartitionKey: true,
     },
+  }),
+
+  // The snapshot stream: per-view folded states at points along the log, written by the
+  // same stream that projects the summary. pk=docId#view / sk=the SAME sortable event id
+  // the log is ordered by, so a snapshot addresses the exact event it captures. Defined
+  // for every collection (rows only appear for types that register a snapshot fold) so a
+  // collection turning snapshots on later is a config change, not a migration.
+  defineKeyValueStore<EventDocStoredSnapshot>(eventDocSnapshotsStoreName(keyValueStoreName), 'pk', [kvsKey('sk', 'string')], {
+    disablePointInTimeRecovery: false,
   }),
 
   // The legacy log, numeric sort key. Declared but unused: a DynamoDB key schema cannot be
