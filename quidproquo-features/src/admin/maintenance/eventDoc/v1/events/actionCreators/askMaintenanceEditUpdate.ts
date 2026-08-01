@@ -1,6 +1,6 @@
 import { AskResponse } from 'quidproquo-core';
 
-import { askApplyEventDocEvent } from '../../../../eventDoc/actions/eventDocEvent/EventDocApplyEventActionRequester';
+import { askApplyEventDocEvent } from '../../../../../../eventDoc/actions/eventDocEvent/EventDocApplyEventActionRequester';
 import { MaintenanceEditUpdateEffect } from '../effects/MaintenanceEditUpdateEffect';
 import { MaintenanceEffect } from '../effects/MaintenanceEffect';
 import { MaintenanceUpdateData } from '../effects/MaintenanceUpdateData';

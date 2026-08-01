@@ -4,13 +4,13 @@ import { describe, expect, it } from 'vitest';
 
 import { EventDocEvent } from '../../../eventDoc/models/EventDocEvent';
 import { EventDocStatus } from '../../../eventDoc/models/EventDocStatus';
-import { MaintenanceEffect } from './effects/MaintenanceEffect';
-import { MaintenanceUpdateData } from './effects/MaintenanceUpdateData';
+import { MaintenanceEffect } from './v1/events/effects/MaintenanceEffect';
+import { MaintenanceUpdateData } from './v1/events/effects/MaintenanceUpdateData';
 import { toMaintenancePublicState } from './logic/toMaintenancePublicState';
 import { isMaintenancePubliclyVisible } from './isMaintenancePubliclyVisible';
 import { maintenanceEventDoc } from './maintenanceEventDoc';
-import { MaintenanceLevel } from './MaintenanceLevel';
-import { MaintenanceType } from './MaintenanceType';
+import { MaintenanceLevel } from './v1/types/MaintenanceLevel';
+import { MaintenanceType } from './v1/types/MaintenanceType';
 
 // Sortable event ids are opaque strings ordered lexicographically; padded counters stand in.
 const eventId = (n: number): string => String(n).padStart(4, '0');

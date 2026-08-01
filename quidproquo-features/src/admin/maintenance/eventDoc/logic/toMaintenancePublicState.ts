@@ -1,5 +1,5 @@
 import { MaintenancePublicState } from '../MaintenancePublicState';
-import { MaintenanceState } from '../MaintenanceState';
+import { MaintenanceState } from '../v1/views/document/MaintenanceState';
 
 // The one place the public projection is built — internal notes and authoring
 // metadata are stripped HERE, never filtered client-side.

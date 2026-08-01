@@ -1,10 +1,10 @@
 import { Nullable, QpqIsoDateTime } from 'quidproquo-core';
 
-import { createEventDocInitialDocumentState } from '../../../eventDoc/fold/createEventDocInitialDocumentState';
-import { EventDocDocument } from '../../../eventDoc/models/EventDocDocument';
-import { MAINTENANCE_SCHEMA_VERSION } from '../constants/maintenanceConstants';
-import { MaintenanceLevel } from './MaintenanceLevel';
-import { MaintenanceType } from './MaintenanceType';
+import { createEventDocInitialDocumentState } from '../../../../../../eventDoc/fold/createEventDocInitialDocumentState';
+import { EventDocDocument } from '../../../../../../eventDoc/models/EventDocDocument';
+import { MAINTENANCE_VERSION } from '../../constants/maintenanceVersion';
+import { MaintenanceLevel } from '../../types/MaintenanceLevel';
+import { MaintenanceType } from '../../types/MaintenanceType';
 import { MaintenanceUpdateEntry } from './MaintenanceUpdateEntry';
 
 // Folded purely from the event log. The updates list IS the document — the
@@ -29,7 +29,7 @@ export type MaintenanceState = EventDocDocument & {
 };
 
 export const createInitialMaintenanceState = (): MaintenanceState => ({
-  ...createEventDocInitialDocumentState(MAINTENANCE_SCHEMA_VERSION),
+  ...createEventDocInitialDocumentState(MAINTENANCE_VERSION),
   bannerText: '',
   reason: '',
   level: MaintenanceLevel.Low,

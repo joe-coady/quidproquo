@@ -1,13 +1,9 @@
-import { QpqReducer } from 'quidproquo-core';
-
 import { createEventDocDefinition } from '../../../eventDoc/definition/createEventDocDefinition';
-import { EventDocEvent } from '../../../eventDoc/models/EventDocEvent';
 import { MAINTENANCE_SCHEMA_VERSION } from '../constants/maintenanceConstants';
-import { askMaintenanceAddUpdate } from './actionCreators/askMaintenanceAddUpdate';
-import { askMaintenanceEditUpdate } from './actionCreators/askMaintenanceEditUpdate';
-import { askMaintenanceRemoveUpdate } from './actionCreators/askMaintenanceRemoveUpdate';
-import { maintenanceFoldReducer } from './maintenanceFoldReducer';
-import { createInitialMaintenanceState, MaintenanceState } from './MaintenanceState';
+import { askMaintenanceAddUpdate } from './v1/events/actionCreators/askMaintenanceAddUpdate';
+import { askMaintenanceEditUpdate } from './v1/events/actionCreators/askMaintenanceEditUpdate';
+import { askMaintenanceRemoveUpdate } from './v1/events/actionCreators/askMaintenanceRemoveUpdate';
+import { maintenanceV1 } from './v1/maintenanceV1';
 
 // THE maintenance event doc: its version history + the doc's own verbs. Folds anywhere
 // via `maintenanceEventDoc.views.document.fold(events)` — the admin editor, the broadcast
@@ -16,25 +12,18 @@ import { createInitialMaintenanceState, MaintenanceState } from './MaintenanceSt
 // active maintenance, published = closed; reopening branches a new draft (the
 // generic lifecycle verbs merge in).
 //
-// One version, one view. A doc type declares every view at every version, so adding
-// either later means saying what this version means by it.
+// `versions` is the doc type's whole history, oldest first — each entry a frozen bundle
+// owning its own folder. `schemaVersion` is the LATEST, stamped on newly authored events;
+// it is asserted equal to the newest entry, so a version folder that was written but never
+// listed here is a crash rather than a silently inert one.
+//
+// The api verbs are NOT versioned: you only ever write at the latest version, so a v1
+// creator would be dead the moment v2 landed. What v1 must keep forever is the shape of
+// the events it wrote and the reducer that folds them — which is exactly what its folder
+// holds.
 export const maintenanceEventDoc = createEventDocDefinition({
   schemaVersion: MAINTENANCE_SCHEMA_VERSION,
-  versions: [
-    {
-      // This ENTRY's version, not the doc type's latest — the base is always 1, and each
-      // later entry carries its own number. `schemaVersion` above is the latest.
-      version: 1,
-      views: {
-        document: {
-          // Typed to its own effect union; speaks the generic EventDocEvent at the
-          // registration boundary (same convention as every doc type).
-          foldReducer: maintenanceFoldReducer as QpqReducer<MaintenanceState, EventDocEvent>,
-          createInitialViewState: createInitialMaintenanceState,
-        },
-      },
-    },
-  ],
+  versions: [maintenanceV1],
   api: {
     askMaintenanceAddUpdate,
     askMaintenanceEditUpdate,
