@@ -1,9 +1,9 @@
-import { EventDocEvent, EventDocLink } from '../../models';
+import { EventDocEvent, EventDocLink, EventDocSummaryView } from '../../models';
 import { EventDocWorkspaceDocumentSlotConfig } from '../../workspace/types/EventDocWorkspaceDocumentSlotConfig';
 import { EventDocWorkspaceLocalSlotConfig } from '../../workspace/types/EventDocWorkspaceLocalSlotConfig';
 import { EventDocWorkspaceStoryApi } from '../../workspace/types/EventDocWorkspaceStoryApi';
 import { EventDocGenericApi } from '../eventDocGenericApi';
-import { EventDocLatestViews, EventDocPrimaryView } from './EventDocLatestViews';
+import { EventDocLatestViews, EventDocPrimaryView, EventDocSummaryViewName } from './EventDocLatestViews';
 import { EventDocReferenceCollector } from './EventDocReferenceCollector';
 import { EventDocVersions } from './EventDocVersion';
 
@@ -25,12 +25,16 @@ export type EventDocDefinition<TVersions extends EventDocVersions, TApi extends 
   EventDocPrimaryView<TVersions>,
   TApi & EventDocGenericApi
 > & {
-  // Every projection this doc type declares, keyed by view name and typed at the LATEST
-  // version — `views.document.fold(events)` is the document, `views.summary.fold(events)`
-  // the queryable record, both from the same log and the same accepted event set.
+  // Every projection of this doc type, keyed by view name and typed at the LATEST version —
+  // `views.document.fold(events)` is the document, `views.summary.fold(events)` the
+  // queryable record, both from the same log and the same accepted event set.
+  //
+  // `summary` is here without being declared: every event doc has one, folded from the
+  // reserved lifecycle events, needing no version entries because those event shapes are
+  // quidproquo's rather than the doc type's.
   views: {
     [K in keyof EventDocLatestViews<TVersions>]: EventDocView<EventDocLatestViews<TVersions>[K]>;
-  };
+  } & Record<EventDocSummaryViewName, EventDocView<EventDocSummaryView>>;
 
   // Carried through from the config, for callers that already hold a folded view.
   references?: EventDocReferenceCollector<EventDocPrimaryView<TVersions>>;

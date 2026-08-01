@@ -1,10 +1,12 @@
-import { EventDocSummary } from '../models';
+import { EventDocSummaryView } from '../models';
 
-// Empty record carrying only the store `type`; INIT_STATE overlays the real identity.
-// Like createEventDocInitialDocumentState, the placeholders only surface before
-// INIT is folded (which a real log always opens with).
-export const createEventDocSummarySeed = (type: string): EventDocSummary => ({
-  type,
+// Where the summary view starts. INIT_STATE overlays the real identity, so like
+// createEventDocInitialDocumentState these placeholders only surface before INIT is folded
+// (which a real log always opens with).
+//
+// No `type`: that is the summary store's partition key, stamped where the view is
+// persisted, not folded from any event.
+export const createEventDocSummarySeed = (): EventDocSummaryView => ({
   id: 'NO_INIT',
   code: 'NO_INIT',
   name: 'NO_INIT',

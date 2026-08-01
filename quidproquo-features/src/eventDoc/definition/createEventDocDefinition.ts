@@ -3,13 +3,14 @@ import { collectEventDocReferences } from '../fold/collectEventDocReferences';
 import { foldEventDocLog, foldEventDocLogAccepted } from '../fold/foldEventDocLog';
 import { migrateEventDocDocumentTo } from '../fold/migrateEventDocDocumentTo';
 import { EventDocDocument, EventDocEvent } from '../models';
+import { foldEventDocSummary } from '../summary/foldEventDocSummary';
 import { createEventDocEventValidator } from '../validation/createEventDocEventValidator';
 import { reservedEventDocEventValidators } from '../validation/reservedEventDocEventValidators';
 import { EventDocWorkspaceSlotKind } from '../workspace/types/EventDocWorkspaceSlotKind';
 import { EventDocWorkspaceStoryApi } from '../workspace/types/EventDocWorkspaceStoryApi';
 import { EventDocDefinition, EventDocUnsavedDefinition, EventDocView } from './types/EventDocDefinition';
 import { EventDocSavedDefinitionConfig, EventDocUnsavedDefinitionConfig } from './types/EventDocDefinitionConfig';
-import { EVENT_DOC_PRIMARY_VIEW } from './types/EventDocLatestViews';
+import { EVENT_DOC_PRIMARY_VIEW, EVENT_DOC_SUMMARY_VIEW } from './types/EventDocLatestViews';
 import { EventDocVersions } from './types/EventDocVersion';
 import { assertEventDocVersions } from './assertEventDocVersions';
 import { EventDocGenericApi, eventDocGenericApi } from './eventDocGenericApi';
@@ -69,8 +70,29 @@ export function createEventDocDefinition(
   // disagree about its contents, which nothing downstream could reconcile.
   const primaryFoldConfig = buildEventDocViewFoldConfig(versions, EVENT_DOC_PRIMARY_VIEW, schemaVersion, validators);
 
-  const views: Record<string, EventDocView<EventDocDocument>> = {};
+  // Every event doc gets a summary — the fold of the RESERVED identity/lifecycle events
+  // (INIT_STATE, SET_CODE, SET_NAME, CREATE_DRAFT, PUBLISH, DELETE, RESTORE) that the list
+  // screens and the queryable record are built from.
+  //
+  // Built in rather than declared, and it needs no version entries or migrations: reserved
+  // event shapes belong to quidproquo, not to any doc type, so a doc going v1 -> v8 changes
+  // only its DOMAIN events — which this view does not read. That is exactly why one generic
+  // summary has always worked across every doc type; this just gives it a name on the
+  // definition. (A doc type that one day wants domain fields in its list row declares its
+  // own view on its own version line, and pays the version tax for it.)
+  const views: Record<string, EventDocView<unknown>> = {
+    [EVENT_DOC_SUMMARY_VIEW]: {
+      fold: (events: EventDocEvent[]) => foldEventDocSummary(foldEventDocLogAccepted(events, primaryFoldConfig).accepted),
+    },
+  };
+
   Object.keys(versions[0].views).forEach((viewName) => {
+    if (viewName === EVENT_DOC_SUMMARY_VIEW) {
+      throw new Error(
+        `'${EVENT_DOC_SUMMARY_VIEW}' is a built-in view name — every event doc has one, folded from the reserved lifecycle events. Remove it from \`views\`, or name the domain-specific projection something else.`,
+      );
+    }
+
     if (viewName === EVENT_DOC_PRIMARY_VIEW) {
       views[viewName] = { fold: (events: EventDocEvent[]) => foldEventDocLog(events, primaryFoldConfig) };
       return;

@@ -26,3 +26,11 @@ export type EventDocLatestViews<TVersions extends readonly unknown[]> = TVersion
 // workspace slot are all typed against.
 export type EventDocPrimaryView<TVersions extends readonly unknown[]> =
   EventDocLatestViews<TVersions> extends Record<EventDocPrimaryViewName, infer TView extends EventDocDocument> ? TView : never;
+
+// The view EVERY event doc has, without declaring it: the fold of the reserved
+// identity/lifecycle events into the queryable record. Reserved event shapes belong to
+// quidproquo rather than to any doc type, so this view never needs version entries or
+// migrations — which is what makes it free to hand to every definition.
+export const EVENT_DOC_SUMMARY_VIEW = 'summary';
+
+export type EventDocSummaryViewName = typeof EVENT_DOC_SUMMARY_VIEW;

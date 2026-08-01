@@ -17,6 +17,12 @@ assembled quickly.
 - `buildVersionRoutedReducer` (`quidproquo-features`) now throws when an event's version has no registered reducer, instead of silently returning
   `[state, false]`. This should only surface a previously-inert bug (an incomplete version registration); there is no supported way to opt back into
   the silent-skip behavior.
+- `createEventDocDefinition` now provides a built-in `summary` view on every definition, folded from the reserved lifecycle events. A `versions`
+  entry that declares its own view named `summary` now throws at definition time; rename that view.
+- `foldEventDocSummary(type, events)` (`quidproquo-features`) drops the `type` param: call it as `foldEventDocSummary(events)`. It now returns an
+  `EventDocSummaryView` (no `type` field) instead of `EventDocSummary`; stamp `type` onto the result yourself if you need the stored shape.
+- `createEventDocSummarySeed(type)` (`quidproquo-features`) drops the `type` param and now returns `EventDocSummaryView` instead of `EventDocSummary`.
+- `eventDocSummarySchema` (`quidproquo-features`) is now the STORED shape (with `type`); the plain view (no `type`) is the new `eventDocSummaryViewSchema`/`EventDocSummaryView`. Code that validated a fold result without a `type` field against `eventDocSummarySchema` should switch to `eventDocSummaryViewSchema`.
 
 ## 0.1.14
 

@@ -223,19 +223,19 @@ describe('createEventDocDefinition version guards', () => {
       createEventDocDefinition({
         schemaVersion: 2,
         versions: [
-          { version: 1, views: { document: memoDocumentV1, summary: memoDocumentV1 } },
+          { version: 1, views: { document: memoDocumentV1, stats: memoDocumentV1 } },
           { version: 2, views: nextDocument },
         ],
         api: memoApi,
       }),
-    ).toThrow(/missing: summary/);
+    ).toThrow(/missing: stats/);
   });
 
   it('throws when no document view is declared', () => {
     expect(() =>
       createEventDocDefinition({
         schemaVersion: 1,
-        versions: [{ version: 1, views: { summary: memoDocumentV1 } }],
+        versions: [{ version: 1, views: { stats: memoDocumentV1 } }],
         api: memoApi,
       }),
     ).toThrow(/must declare a 'document' view/);
@@ -253,16 +253,16 @@ describe('createEventDocDefinition version guards', () => {
 // ─── Secondary views ────────────────────────────────────────────────────────────────
 
 describe('createEventDocDefinition secondary views', () => {
-  type MemoSummaryState = EventDocDocument & { edits: number };
+  type MemoStatsState = EventDocDocument & { edits: number };
 
-  const createInitialMemoSummaryState = (): MemoSummaryState => ({
+  const createInitialMemoStatsState = (): MemoStatsState => ({
     ...createEventDocInitialDocumentState(1),
     edits: 0,
   });
 
-  const memoSummaryFoldReducer = buildEventDocFoldReducer<MemoSummaryState, MemoEffects>(createInitialMemoSummaryState, {
+  const memoStatsFoldReducer = buildEventDocFoldReducer<MemoStatsState, MemoEffects>(createInitialMemoStatsState, {
     [MemoEvent.SetBody]: (state) => ({ ...state, edits: state.edits + 1 }),
-  }) as QpqReducer<MemoSummaryState, EventDocEvent>;
+  }) as QpqReducer<MemoStatsState, EventDocEvent>;
 
   const noEmptyBody = {
     [MemoEvent.SetBody]: (event: EventDocEvent) => ((event.payload.data as { body: string }).body ? null : 'A memo body cannot be empty'),
@@ -276,7 +276,7 @@ describe('createEventDocDefinition secondary views', () => {
           version: 1,
           views: {
             document: memoDocumentV1,
-            summary: { foldReducer: memoSummaryFoldReducer, createInitialViewState: createInitialMemoSummaryState },
+            stats: { foldReducer: memoStatsFoldReducer, createInitialViewState: createInitialMemoStatsState },
           },
         },
       ],
@@ -293,7 +293,7 @@ describe('createEventDocDefinition secondary views', () => {
     ];
 
     expect(definition.views.document.fold(log).body).toBe('two');
-    expect(definition.views.summary.fold(log).edits).toBe(2);
+    expect(definition.views.stats.fold(log).edits).toBe(2);
   });
 
   it('replays only the events the primary view ACCEPTED, so views cannot disagree', () => {
@@ -308,7 +308,7 @@ describe('createEventDocDefinition secondary views', () => {
     ];
 
     expect(definition.views.document.fold(log).body).toBe('kept');
-    expect(definition.views.summary.fold(log).edits).toBe(1);
+    expect(definition.views.stats.fold(log).edits).toBe(1);
   });
 });
 
@@ -424,5 +424,64 @@ describe('createEventDocDefinition validators', () => {
     const reason = createMemoDefinition().validate?.(setBody('after', 2), [setBody('before', 0), published]);
 
     expect(reason).toMatch(/draft/i);
+  });
+});
+
+// ─── The built-in summary view ──────────────────────────────────────────────────────
+
+describe('createEventDocDefinition summary view', () => {
+  const publishEvent = (index: number): EventDocEvent => ({
+    ...serverEvent(EventDocEffect.Publish, { effectiveFrom: '2026-07-02T00:00:00.000Z' }, index),
+  });
+
+  it('gives EVERY event doc a summary without it being declared', () => {
+    // The whole point: no version entry, no migration, nothing in `views`. Reserved event
+    // shapes are quidproquo's, not the doc type's, so this view cannot go stale when a doc
+    // type bumps its own version.
+    const summary = createMemoDefinition().views.summary.fold([
+      serverEvent(EventDocEffect.InitState, { id: 'memo-1', code: 'MEMO', name: 'Memo' }, 0),
+      serverEvent(EventDocEffect.SetName, { name: 'Renamed' }, 1),
+    ]);
+
+    expect(summary.id).toBe('memo-1');
+    expect(summary.code).toBe('MEMO');
+    expect(summary.name).toBe('Renamed');
+  });
+
+  it('carries no `type` — that is the store\'s partition key, not part of the view', () => {
+    // It used to be seeded into the fold, which is why foldEventDocSummary needed a `type`
+    // argument no reducer ever derived. Keeping it out is what lets this fold with the same
+    // fold(events) signature as every other view.
+    const summary = createMemoDefinition().views.summary.fold([
+      serverEvent(EventDocEffect.InitState, { id: 'memo-1', code: 'MEMO', name: 'Memo' }, 0),
+    ]);
+
+    expect('type' in summary).toBe(false);
+  });
+
+  it('folds only the events the document ACCEPTED', () => {
+    // The divergence this closes: the summary used to reduce the raw log with no validators,
+    // so an edit made after publish was dropped by the document and applied by the summary —
+    // a list row whose "last modified" moved on a document that never changed.
+    const log = [
+      serverEvent(EventDocEffect.InitState, { id: 'memo-1', code: 'MEMO', name: 'Memo' }, 0),
+      publishEvent(1),
+      serverEvent(EventDocEffect.SetName, { name: 'Renamed after publish' }, 2),
+    ];
+
+    const definition = createMemoDefinition();
+
+    expect(definition.views.document.fold(log).name).not.toBe('Renamed after publish');
+    expect(definition.views.summary.fold(log).name).not.toBe('Renamed after publish');
+  });
+
+  it('refuses a doc type that declares its own view called summary', () => {
+    expect(() =>
+      createEventDocDefinition({
+        schemaVersion: 1,
+        versions: [{ version: 1, views: { document: memoDocumentV1, summary: memoDocumentV1 } }],
+        api: memoApi,
+      }),
+    ).toThrow(/built-in view name/);
   });
 });
