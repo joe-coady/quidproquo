@@ -1,3 +1,4 @@
+export * from './buildEventDocViewFoldConfig';
 export * from './acceptEventDocEvent';
 export * from './buildEventDocBaseReducer';
 export * from './buildEventDocFoldReducer';

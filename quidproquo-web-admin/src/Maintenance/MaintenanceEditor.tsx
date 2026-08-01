@@ -62,7 +62,7 @@ export function MaintenanceEditor({ docId, onBack }: MaintenanceEditorProps) {
   const [busy, setBusy] = useState(false);
   const [dialog, setDialog] = useState<DialogMode>({ kind: 'closed' });
 
-  const folded = useMemo(() => (events ? maintenanceEventDoc.fold(events) : null), [events]);
+  const folded = useMemo(() => (events ? maintenanceEventDoc.views.document.fold(events) : null), [events]);
   const isClosed = folded?.status === EventDocStatus.Published;
 
   useEffect(() => {

@@ -22,7 +22,7 @@ export function* askGetActiveMaintenancePublicStates(): AskResponse<MaintenanceP
 
   for (const summary of activeSummaries) {
     const events = yield* askEventDocEventListAll(summary.id);
-    const state = maintenanceEventDoc.fold(events);
+    const state = maintenanceEventDoc.views.document.fold(events);
 
     if (isMaintenancePubliclyVisible(state)) {
       states.push(toMaintenancePublicState(state));

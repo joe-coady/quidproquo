@@ -28,4 +28,11 @@ export type EventDocNextVersion<TViews extends Record<string, EventDocDocument> 
 // versions are RUNTIME guards checked at definition time, not type guards — the same
 // trade migrationChain already makes. They throw where they are cheapest to diagnose:
 // at module load, not mid-fold on someone's document.
-export type EventDocVersions = [EventDocBaseVersion, ...EventDocNextVersion[]];
+//
+// The `any` is load-bearing, not laziness: a fold reducer is CONTRAVARIANT in its view
+// type, so a precisely-typed version (views of ContentItemState, ContentItemSummary)
+// does not satisfy a constraint written over EventDocDocument. Constraining loosely and
+// recovering the precise shapes with EventDocLatestViews is what lets a definition infer
+// `views.document.fold(): ContentItemState` from the versions the author declared.
+
+export type EventDocVersions = readonly [EventDocBaseVersion<any>, ...EventDocNextVersion<any>[]];

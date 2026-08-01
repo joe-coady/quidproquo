@@ -46,7 +46,7 @@ export const collectEventDocReferences = <TState extends EventDocDocument>(
   let state: EventDocDocument = { ...seed };
 
   for (const event of events) {
-    state = foldEventDocLogStep(state, event, { reducer, migrations, latestVersion });
+    [state] = foldEventDocLogStep(state, event, { reducer, migrations, latestVersion });
 
     const view = migrateEventDocDocumentTo(state, latestVersion, migrations) as TState;
 

@@ -24,16 +24,31 @@ export type FoldEventDocLogConfig<TState extends EventDocDocument> = FoldEventDo
 // event is skipped silently and never touches the state. Ordering is still the log's
 // index order, so the verdict for any given event is fixed forever once its predecessors
 // are known.
-export const foldEventDocLog = <TState extends EventDocDocument>(
+export const foldEventDocLog = <TState extends EventDocDocument>(events: EventDocEvent[], config: FoldEventDocLogConfig<TState>): TState =>
+  foldEventDocLogAccepted(events, config).state;
+
+// The same fold, additionally reporting WHICH events earned their place. A doc type's
+// secondary views (summaries, projections) fold this accepted set rather than the raw log:
+// acceptance is decided once, by the document view acting as the gate, so every view of a
+// log sees the identical event set. Folding the raw log in each view instead would let a
+// secondary view apply an event the document rejected — two views of one document that
+// disagree about its contents, which is unfixable after the fact.
+export const foldEventDocLogAccepted = <TState extends EventDocDocument>(
   events: EventDocEvent[],
   { seed, reducer, migrations, latestVersion, validators }: FoldEventDocLogConfig<TState>,
-): TState => {
+): { state: TState; accepted: EventDocEvent[] } => {
   let state: EventDocDocument = { ...seed };
   const acceptance = createEventDocAcceptance();
+  const accepted: EventDocEvent[] = [];
 
   for (const event of events) {
-    state = foldEventDocLogStep(state, event, { reducer, migrations, latestVersion, validators, acceptance });
+    const [next, wasAccepted] = foldEventDocLogStep(state, event, { reducer, migrations, latestVersion, validators, acceptance });
+
+    state = next;
+    if (wasAccepted) {
+      accepted.push(event);
+    }
   }
 
-  return migrateEventDocDocumentTo(state, latestVersion, migrations) as TState;
+  return { state: migrateEventDocDocumentTo(state, latestVersion, migrations) as TState, accepted };
 };

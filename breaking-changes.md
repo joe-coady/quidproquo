@@ -5,6 +5,19 @@ assembled quickly.
 
 ## vNext
 
+- `createEventDocDefinition`'s saved-doc config drops top-level `foldReducer`, `createInitialViewState`, and `migrations` in favor of `versions`: an
+  array of `{ version, views }` entries, oldest first, where `views` is a map keyed by view name (every saved doc must declare a `document` view).
+  The base entry's view supplies `{ foldReducer, createInitialViewState }`; every later entry's view supplies `{ foldReducer, migrateFromPrevious }`
+  instead of a separate `migrations: { [version]: fn }` map. `schemaVersion` must equal the last entry's `version`, and every non-base entry must
+  declare exactly the same view names as the base — both are now asserted at definition time instead of failing silently later.
+- The object `createEventDocDefinition` returns no longer has a top-level `fold`; fold via `definition.views.document.fold(events)` (or
+  `views.<name>.fold(events)` for any other declared view). Update every call site that used `definition.fold(events)`.
+- `foldEventDocLogStep` (`quidproquo-features`) now returns `[state, accepted: boolean]` instead of just `state`. Callers assigning its return value
+  directly must destructure the tuple.
+- `buildVersionRoutedReducer` (`quidproquo-features`) now throws when an event's version has no registered reducer, instead of silently returning
+  `[state, false]`. This should only surface a previously-inert bug (an incomplete version registration); there is no supported way to opt back into
+  the silent-skip behavior.
+
 ## 0.1.14
 
 - `EventDocSavedDefinitionConfig.validate?: EventDocEditorValidator` (`quidproquo-features`, the config passed to `createEventDocDefinition`) is

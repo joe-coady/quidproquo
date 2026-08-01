@@ -26,8 +26,11 @@ export type FoldEventDocLogStepConfig<TState extends EventDocDocument> = {
 // (clamped to latestVersion, so a future-version event folds at latest), decide whether
 // the event is accepted, apply the version-routed reducer, stamp updatedAt.
 //
-// A REJECTED event returns the accumulator untouched — not even updatedAt moves, because
-// an ignored event is not part of the document and must not look like activity on it.
+// Returns [state, accepted]. A REJECTED event returns the accumulator untouched — not even
+// updatedAt moves, because an ignored event is not part of the document and must not look
+// like activity on it. The flag is what lets a caller RECORD the accepted set rather than
+// infer it: a doc type's secondary views replay exactly the events the document view let
+// in, so no two views of one log can disagree about what the log contains.
 // Rejection is silent by design: appends no longer validate, so an invalid event in a log
 // is the rare residue of a client that skipped its own pre-flight validation, and the
 // right behaviour is for the document to read as though it never happened.
@@ -38,18 +41,18 @@ export const foldEventDocLogStep = <TState extends EventDocDocument>(
   state: EventDocDocument,
   event: EventDocEvent,
   { reducer, migrations, latestVersion, validators, acceptance }: FoldEventDocLogStepConfig<TState>,
-): EventDocDocument => {
+): [EventDocDocument, boolean] => {
   const target = Math.min(event.payload.metadata.version, latestVersion);
 
   let next: EventDocDocument = migrateEventDocDocumentTo(state, target, migrations);
 
   const book = acceptance ?? createEventDocAcceptance();
   if (rejectEventDocEvent(event, next as TState, book, validators)) {
-    return state;
+    return [state, false];
   }
   recordEventDocAcceptance(book, event);
 
   [next] = reducer(next as TState, event);
 
-  return { ...next, updatedAt: event.payload.metadata.createdAt };
+  return [{ ...next, updatedAt: event.payload.metadata.createdAt }, true];
 };

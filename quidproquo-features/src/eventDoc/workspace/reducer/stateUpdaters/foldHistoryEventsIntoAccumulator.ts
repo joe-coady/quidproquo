@@ -41,7 +41,7 @@ export const foldHistoryEventsIntoAccumulator = (slot: EventDocWorkspaceSlotFold
   let next = accumulator as EventDocDocument;
 
   for (const event of events) {
-    next = foldEventDocLogStep(next, event, { reducer: slot.foldReducer, migrations, latestVersion, validators });
+    [next] = foldEventDocLogStep(next, event, { reducer: slot.foldReducer, migrations, latestVersion, validators });
   }
 
   return next;
