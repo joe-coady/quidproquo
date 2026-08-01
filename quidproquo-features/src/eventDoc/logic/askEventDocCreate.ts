@@ -3,7 +3,7 @@ import { askNewGuid, AskResponse } from 'quidproquo-core';
 import { askValidateModelOrThrowError } from '../../validation/askValidateModelOrThrowError';
 import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
 import { askEventDocUpsert } from '../data/askEventDocUpsert';
-import { EventDocEventActor, EventDocSummary, eventDocSummarySchema } from '../models';
+import { EventDocEventActor, EventDocSummary, eventDocSummaryViewSchema } from '../models';
 import { applyEventDocSummaryEvent, createEventDocSummarySeed } from '../summary';
 import { askEventDocSeedInitState } from './askEventDocSeedInitState';
 
@@ -18,10 +18,12 @@ export function* askEventDocCreate(name: string, code: string, actor: EventDocEv
 
   const initEvent = yield* askEventDocSeedInitState(id, code, name, actor);
 
-  const model = applyEventDocSummaryEvent(createEventDocSummarySeed(type), initEvent);
+  const model = applyEventDocSummaryEvent(createEventDocSummarySeed(), initEvent);
 
-  yield* askValidateModelOrThrowError(model, eventDocSummarySchema);
+  yield* askValidateModelOrThrowError(model, eventDocSummaryViewSchema);
   yield* askEventDocUpsert(model);
 
-  return model;
+  // Callers get the stored shape back; `type` is the store's, and the store is what just
+  // wrote it.
+  return { ...model, type };
 }

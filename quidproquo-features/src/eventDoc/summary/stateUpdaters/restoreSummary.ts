@@ -1,7 +1,7 @@
-import { EventDocEventPayload, EventDocSummary } from '../../models';
+import { EventDocEventPayload, EventDocSummaryView } from '../../models';
 
 // RESTORE clears the projected `deletedAt`, putting the document back in default listings.
-export const restoreSummary = (model: EventDocSummary, _payload: EventDocEventPayload): EventDocSummary => {
+export const restoreSummary = (model: EventDocSummaryView, _payload: EventDocEventPayload): EventDocSummaryView => {
   const { deletedAt, ...restored } = model;
 
   return restored;

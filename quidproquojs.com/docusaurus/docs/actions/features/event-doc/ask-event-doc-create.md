@@ -57,7 +57,7 @@ A point-in-time snapshot of who produced an event, captured server-side at appen
 
 ## Notes
 
-- The record is validated against `eventDocSummarySchema` before it is written; a schema violation throws (`ErrorTypeEnum` from quidproquo-core).
+- The record is validated against `eventDocSummaryViewSchema` before it is written; a schema violation throws (`ErrorTypeEnum` from quidproquo-core).
 - Not concurrency-safe against duplicate codes on its own. If two callers may create the same `code` at once, prefer [askEventDocGetByCodeOrCreate](./ask-event-doc-get-by-code.md#askeventdocgetbycodeorcreate) and serialise, or add a conditional create.
 
 ---
@@ -91,12 +91,12 @@ Use `askEventDocCreate` unless you are building a custom create flow that needs 
 The bare storage write for a summary record — a thin wrapper over the key-value store upsert (with retry). Business rules and validation live in the logic layer (e.g. `askEventDocCreate`, [askEventDocSoftDelete](./ask-event-doc-soft-delete.md)); this just persists whatever record you hand it.
 
 ```typescript
-function* askEventDocUpsert(model: EventDocSummary): AskResponse<void>;
+function* askEventDocUpsert(view: EventDocSummaryView): AskResponse<void>;
 ```
 
 | Parameter | Type | Description |
 | --- | --- | --- |
-| `model` | `EventDocSummary` | The full summary record to write (create or overwrite). |
+| `view` | `EventDocSummaryView` | The summary view to write (create or overwrite) — `type` is resolved from the store context and stamped on internally. |
 
 **Returns** `void`.
 

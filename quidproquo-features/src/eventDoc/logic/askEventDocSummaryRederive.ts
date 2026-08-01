@@ -31,7 +31,7 @@ export function* askEventDocSummaryRederive(modelId: string): AskResponse<void> 
   const scope = yield* askEventDocResolveScope();
 
   const events = yield* askEventDocEventListAll(modelId);
-  const record = foldEventDocSummary(type, events);
+  const record = foldEventDocSummary(events);
 
   yield* askKeyValueStoreUpdate<EventDocSummary>(
     storeName,

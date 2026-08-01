@@ -39,7 +39,7 @@ const toPlanRow = (
  * match) even when the two logs agree perfectly.
  */
 export function* askEventDocBundlePlanDoc(doc: EventDocBundleDoc): AskResponse<EventDocTransferPlanRow> {
-  const { code, name } = foldEventDocSummary(doc.type, doc.events);
+  const { code, name } = foldEventDocSummary(doc.events);
 
   // Defensive: an export never emits an empty log (every doc opens with INIT_STATE), so this only
   // fires for a hand-edited bundle. Nothing to write and nothing to compare against.

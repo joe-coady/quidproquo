@@ -1,6 +1,6 @@
-import { EventDocEventPayload, EventDocSetCodeData, EventDocSummary } from '../../models';
+import { EventDocEventPayload, EventDocSetCodeData, EventDocSummaryView } from '../../models';
 
-export const setSummaryCode = (model: EventDocSummary, { data }: EventDocEventPayload<EventDocSetCodeData>): EventDocSummary => ({
+export const setSummaryCode = (model: EventDocSummaryView, { data }: EventDocEventPayload<EventDocSetCodeData>): EventDocSummaryView => ({
   ...model,
   code: data.code,
 });

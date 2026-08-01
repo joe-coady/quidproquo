@@ -1,4 +1,4 @@
-import { EventDocEvent, EventDocSummary } from '../models';
+import { EventDocEvent, EventDocSummaryView } from '../models';
 import { eventDocSummaryReducer } from './eventDocSummaryReducer';
 
 // Apply one event to the record: fold the reserved handlers, then stamp updatedAt/
@@ -8,7 +8,7 @@ import { eventDocSummaryReducer } from './eventDocSummaryReducer';
 // event (a published version lands on its PUBLISH event; the open draft tracks the log
 // head). That head is the cutoff to fold/render the version: events with index <= it.
 // Used incrementally by the backend append handler.
-export const applyEventDocSummaryEvent = (model: EventDocSummary, event: EventDocEvent): EventDocSummary => {
+export const applyEventDocSummaryEvent = (model: EventDocSummaryView, event: EventDocEvent): EventDocSummaryView => {
   const [next] = eventDocSummaryReducer(model, event);
   const { eventId, createdAt, createdBy } = event.payload.metadata;
   const tail = next.versions.length - 1;

@@ -155,7 +155,7 @@ const buildEnvironment = (environmentName: string): TestEnvironment => {
   const tableFor = (storeName: string): Record<string, unknown>[] => (tables[storeName] ??= []);
 
   const seedDoc = (type: string, events: EventDocEvent[], assets: { guid: string; data: QPQBinaryData }[] = []): void => {
-    const summary = foldEventDocSummary(type, events);
+    const summary = { ...foldEventDocSummary(events), type };
     const storeName = storeNameForType(type);
 
     tableFor(storeName).push({ ...summary });
@@ -552,7 +552,7 @@ describe('eventDoc transfer round trip', () => {
     const extra = event(4, 'ADD_STYLE_LINK', link(STYLE_TYPE, 'style-content'));
     templateEvents.push({ pk: 'template-1', sk: eventId(4), data: extra });
     const sourceSummaryRow = summaryFor(source, TEMPLATE_TYPE, 'template-1');
-    Object.assign(sourceSummaryRow, foldEventDocSummary(TEMPLATE_TYPE, eventsFor(source, TEMPLATE_TYPE, 'template-1')));
+    Object.assign(sourceSummaryRow, { ...foldEventDocSummary(eventsFor(source, TEMPLATE_TYPE, 'template-1')), type: TEMPLATE_TYPE });
 
     delete source.files[firstKey];
     runStory(exportBundle(httpEvent({ docs: [templateRef] })), source.mocks);
@@ -700,7 +700,7 @@ describe('eventDoc transfer round trip', () => {
     });
     Object.assign(
       summaryFor(source, TEMPLATE_TYPE, 'template-1'),
-      foldEventDocSummary(TEMPLATE_TYPE, eventsFor(source, TEMPLATE_TYPE, 'template-1')),
+      { ...foldEventDocSummary(eventsFor(source, TEMPLATE_TYPE, 'template-1')), type: TEMPLATE_TYPE },
     );
 
     runStory(exportBundle(httpEvent({ docs: [templateRef] })), source.mocks);

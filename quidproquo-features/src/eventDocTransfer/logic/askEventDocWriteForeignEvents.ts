@@ -8,7 +8,7 @@ import {
   EventDocOnAppendInput,
   EventDocOnPublishInput,
   EventDocSummary,
-  eventDocSummarySchema,
+  eventDocSummaryViewSchema,
 } from '../../eventDoc/models';
 import { foldEventDocSummary } from '../../eventDoc/summary';
 import { askValidateModelOrThrowError } from '../../validation/askValidateModelOrThrowError';
@@ -100,14 +100,16 @@ export function* askEventDocWriteForeignEvents(
   // Folded from the LOCALISED log, so the summary's createdBy/updatedBy are local ids too.
   // Nothing has to be renumbered: sortable ids are globally unique, so imported events keep
   // their own and slot into the local log in their original order.
-  const summary = foldEventDocSummary(type, localised);
-  yield* askValidateModelOrThrowError(summary, eventDocSummarySchema);
+  const summary = foldEventDocSummary(localised);
+  yield* askValidateModelOrThrowError(summary, eventDocSummaryViewSchema);
   yield* askEventDocUpsert(summary);
 
   // `logRewritten` covers the forced-overwrite case where the tail was DISCARDED and nothing new
   // needed writing: the summary still changed, so a materialized read model is still stale.
   if (missing.length > 0 || logRewritten) {
-    yield* askEventDocFireImportHooks(docId, localised, summary);
+    // The hook payload crosses into an inline function, which receives the STORED shape —
+    // hence the key here, at the serialisation boundary rather than in the fold.
+    yield* askEventDocFireImportHooks(docId, localised, { ...summary, type });
   }
 
   return missing.length;
