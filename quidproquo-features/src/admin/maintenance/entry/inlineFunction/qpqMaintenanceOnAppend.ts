@@ -16,8 +16,8 @@ import { askGetActiveMaintenancePublicStates } from '../../logic/askGetActiveMai
 // self-heals on the next visible append or on each connection's
 // connect-time sync — so a websocket hiccup must not fail the admin's save.
 export function* qpqMaintenanceOnAppend(input: EventDocOnAppendInput): AskResponse<void> {
-  const visibleAfter = isMaintenancePubliclyVisible(maintenanceEventDoc.fold(input.events));
-  const visibleBefore = isMaintenancePubliclyVisible(maintenanceEventDoc.fold(input.events.slice(0, -1)));
+  const visibleAfter = isMaintenancePubliclyVisible(maintenanceEventDoc.views.document.fold(input.events));
+  const visibleBefore = isMaintenancePubliclyVisible(maintenanceEventDoc.views.document.fold(input.events.slice(0, -1)));
 
   if (!visibleBefore && !visibleAfter) {
     return;

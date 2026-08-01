@@ -2,6 +2,7 @@ import { QpqReducer } from 'quidproquo-core';
 
 import { describe, expect, it } from 'vitest';
 
+import { EventDocMigration } from './EventDocMigration';
 import { createEventDocDefinition } from '../definition/createEventDocDefinition';
 import { EventDocDocument, EventDocEffect, EventDocEvent, EventDocLink, EventDocLinkMode } from '../models';
 import { createEventDocInitialDocumentState } from './createEventDocInitialDocumentState';
@@ -42,31 +43,36 @@ const event = (index: number, version: number, type: string, data: unknown): Eve
 
 const initEvent = (version: number): EventDocEvent => event(0, version, EventDocEffect.InitState, { id: 'doc-1', code: 'doc', name: 'Doc' });
 
-// One reducer per version, each seeing its own shape - the same version-routed arrangement a real
-// doc type has. INIT_STATE resets to the EVENT's version's initial shape, which is how a v1 log ends
-// up with a v1-shaped accumulator even though the seed is the latest shape (see foldEventDocLog).
-const reducer: QpqReducer<StyleDocV2, EventDocEvent> = (state, incoming) => {
-  if (incoming.payload.metadata.version === 1) {
-    if (incoming.type === EventDocEffect.InitState) {
-      return [{ ...createEventDocInitialDocumentState(1), styleList: [] } as unknown as StyleDocV2, true];
-    }
+// One reducer per version, each seeing its own shape. The BASE version seeds — a v1 log folds onto a
+// v1-shaped accumulator and only climbs to v2 through the migration, which is the whole arrangement
+// these tests exist to pin.
+const createInitialStyleDocV1 = (): StyleDocV1 => ({
+  ...createEventDocInitialDocumentState(1),
+  styleList: [],
+});
 
-    const v1 = state as unknown as StyleDocV1;
-
-    if (incoming.type === 'ADD_STYLE') {
-      return [{ ...v1, styleList: [...v1.styleList, incoming.payload.data as EventDocLink] } as unknown as StyleDocV2, true];
-    }
-
-    if (incoming.type === 'REMOVE_STYLE') {
-      return [
-        { ...v1, styleList: v1.styleList.filter((entry) => entry.id !== (incoming.payload.data as EventDocLink).id) } as unknown as StyleDocV2,
-        true,
-      ];
-    }
-
-    return [state, false];
+const reducerV1: QpqReducer<StyleDocV1, EventDocEvent> = (state, incoming) => {
+  if (incoming.type === EventDocEffect.InitState) {
+    return [createInitialStyleDocV1(), true];
   }
 
+  if (incoming.type === 'ADD_STYLE') {
+    return [{ ...state, styleList: [...state.styleList, incoming.payload.data as EventDocLink] }, true];
+  }
+
+  if (incoming.type === 'REMOVE_STYLE') {
+    return [{ ...state, styleList: state.styleList.filter((entry) => entry.id !== (incoming.payload.data as EventDocLink).id) }, true];
+  }
+
+  return [state, false];
+};
+
+const createInitialViewState = (): StyleDocV2 => ({
+  ...createEventDocInitialDocumentState(LATEST_VERSION),
+  styles: [],
+});
+
+const reducerV2: QpqReducer<StyleDocV2, EventDocEvent> = (state, incoming) => {
   if (incoming.type === EventDocEffect.InitState) {
     return [createInitialViewState(), true];
   }
@@ -78,22 +84,21 @@ const reducer: QpqReducer<StyleDocV2, EventDocEvent> = (state, incoming) => {
   return [state, false];
 };
 
-const createInitialViewState = (): StyleDocV2 => ({
-  ...createEventDocInitialDocumentState(LATEST_VERSION),
-  styles: [],
-});
+// v1 called the field `styleList`; v2 renamed it. The rename lives here and nowhere else.
+const renameStyleListToStyles = (state: StyleDocV1): StyleDocV2 => {
+  const { styleList, ...rest } = state;
 
-const definition = createEventDocDefinition<StyleDocV2, Record<string, never>>({
+  return { ...rest, styles: styleList } as StyleDocV2;
+};
+
+const styleDocumentV1 = { foldReducer: reducerV1, createInitialViewState: createInitialStyleDocV1 };
+
+const definition = createEventDocDefinition({
   schemaVersion: LATEST_VERSION,
-  foldReducer: reducer,
-  createInitialViewState,
-  migrations: {
-    2: (state) => {
-      const { styleList, ...rest } = state as StyleDocV1;
-
-      return { ...rest, styles: styleList } as StyleDocV2;
-    },
-  },
+  versions: [
+    { version: 1, views: { document: styleDocumentV1 } },
+    { version: 2, views: { document: { foldReducer: reducerV2, migrateFromPrevious: renameStyleListToStyles as EventDocMigration } } },
+  ],
   references: (view) => view.styles,
   api: {},
 });
@@ -113,7 +118,7 @@ describe('collectEventDocReferences', () => {
 
     expect(definition.collectReferences(events).map((reference) => reference.id)).toEqual(['style-a']);
     // ...and it is genuinely gone from the current state, which is what the renderer sees today.
-    expect(definition.fold(events).styles).toEqual([]);
+    expect(definition.views.document.fold(events).styles).toEqual([]);
   });
 
   it('unions across the version boundary and dedupes', () => {
@@ -130,11 +135,15 @@ describe('collectEventDocReferences', () => {
   it('drops references a migration removed, so they are never promoted', () => {
     // A migration that discards the concept takes the links with it. The renderer stops seeing them
     // too, so the collector agreeing is the correct behaviour, not a miss.
-    const droppingDefinition = createEventDocDefinition<StyleDocV2, Record<string, never>>({
+    const droppingDefinition = createEventDocDefinition({
       schemaVersion: LATEST_VERSION,
-      foldReducer: reducer,
-      createInitialViewState,
-      migrations: { 2: (state) => ({ ...(state as StyleDocV1), styles: [] }) as StyleDocV2 },
+      versions: [
+        { version: 1, views: { document: styleDocumentV1 } },
+        {
+          version: 2,
+          views: { document: { foldReducer: reducerV2, migrateFromPrevious: ((state: StyleDocV1) => ({ ...state, styles: [] })) as EventDocMigration } },
+        },
+      ],
       references: (view) => view.styles,
       api: {},
     });
@@ -145,10 +154,12 @@ describe('collectEventDocReferences', () => {
   });
 
   it('is empty for a doc type that declares no references', () => {
-    const leaf = createEventDocDefinition<StyleDocV2, Record<string, never>>({
+    const leaf = createEventDocDefinition({
       schemaVersion: LATEST_VERSION,
-      foldReducer: reducer,
-      createInitialViewState,
+      versions: [
+        { version: 1, views: { document: styleDocumentV1 } },
+        { version: 2, views: { document: { foldReducer: reducerV2, migrateFromPrevious: renameStyleListToStyles as EventDocMigration } } },
+      ],
       api: {},
     });
 

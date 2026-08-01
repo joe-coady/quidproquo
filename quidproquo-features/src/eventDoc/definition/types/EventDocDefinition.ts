@@ -1,22 +1,40 @@
-import { EventDocDocument, EventDocEvent, EventDocLink } from '../../models';
+import { EventDocEvent, EventDocLink } from '../../models';
 import { EventDocWorkspaceDocumentSlotConfig } from '../../workspace/types/EventDocWorkspaceDocumentSlotConfig';
 import { EventDocWorkspaceLocalSlotConfig } from '../../workspace/types/EventDocWorkspaceLocalSlotConfig';
 import { EventDocWorkspaceStoryApi } from '../../workspace/types/EventDocWorkspaceStoryApi';
 import { EventDocGenericApi } from '../eventDocGenericApi';
+import { EventDocLatestViews, EventDocPrimaryView } from './EventDocLatestViews';
 import { EventDocReferenceCollector } from './EventDocReferenceCollector';
+import { EventDocVersions } from './EventDocVersion';
 
-// The canonical home of a doc type: fold config + the doc's own api, structurally a
-// workspace slot config so it mounts VERBATIM at any slot key. The api includes the
-// generic identity/lifecycle verbs (merged by createEventDocDefinition), and `fold`
-// is the doc's one true log fold — list pages, backend logic, and tests all fold
-// through here instead of hand-assembling {seed, reducer, migrations, latestVersion}.
-export type EventDocDefinition<TView extends EventDocDocument, TApi extends EventDocWorkspaceStoryApi> = EventDocWorkspaceDocumentSlotConfig<
-  TView,
+// One projection of a doc type's log. `fold` is the only way to read it — list pages,
+// backend renders and tests all fold through here instead of hand-assembling
+// {seed, reducer, migrations, latestVersion}, which is what keeps every reader of a log
+// agreeing on what it says.
+export type EventDocView<TView> = {
+  fold: (events: EventDocEvent[]) => TView;
+};
+
+// The canonical home of a doc type: its versions folded into one view per projection,
+// plus the doc's own api. Structurally a workspace slot config so it mounts VERBATIM at
+// any slot key — the mounted view is always the PRIMARY one (`document`), because an
+// editor edits a document and never a summary. Secondary views are fold-only.
+//
+// The api includes the generic identity/lifecycle verbs, merged by createEventDocDefinition.
+export type EventDocDefinition<TVersions extends EventDocVersions, TApi extends EventDocWorkspaceStoryApi> = EventDocWorkspaceDocumentSlotConfig<
+  EventDocPrimaryView<TVersions>,
   TApi & EventDocGenericApi
 > & {
-  fold: (events: EventDocEvent[]) => TView;
+  // Every projection this doc type declares, keyed by view name and typed at the LATEST
+  // version — `views.document.fold(events)` is the document, `views.summary.fold(events)`
+  // the queryable record, both from the same log and the same accepted event set.
+  views: {
+    [K in keyof EventDocLatestViews<TVersions>]: EventDocView<EventDocLatestViews<TVersions>[K]>;
+  };
+
   // Carried through from the config, for callers that already hold a folded view.
-  references?: EventDocReferenceCollector<TView>;
+  references?: EventDocReferenceCollector<EventDocPrimaryView<TVersions>>;
+
   // Every doc this one has ever referenced, across its whole log. THE thing a collection's
   // referenceResolver inline function calls; [] for a doc type that declares no `references`.
   collectReferences: (events: EventDocEvent[]) => EventDocLink[];

@@ -47,7 +47,7 @@ const init = buildEvent('INIT_STATE', { id: 'doc1', code: 'incident', name: 'Inv
 
 describe('maintenanceEventDoc', () => {
   it('derives the current state from the last update; the eta clock carries over from the last announcement', () => {
-    const state = maintenanceEventDoc.fold([
+    const state = maintenanceEventDoc.views.document.fold([
       init,
       buildEvent(
         MaintenanceEffect.AddUpdate,
@@ -83,15 +83,15 @@ describe('maintenanceEventDoc', () => {
     ];
 
     // 10 mins from T2, not 120 from T0.
-    expect(maintenanceEventDoc.fold(log).etaEndsAt).toBe('2026-07-24T10:20:00.000Z');
+    expect(maintenanceEventDoc.views.document.fold(log).etaEndsAt).toBe('2026-07-24T10:20:00.000Z');
 
     // Deleting the newest update rolls both the status line and the clock back.
-    const rolledBack = maintenanceEventDoc.fold([...log, buildEvent(MaintenanceEffect.RemoveUpdate, { updateId: 'up2' }, T2, 3)]);
+    const rolledBack = maintenanceEventDoc.views.document.fold([...log, buildEvent(MaintenanceEffect.RemoveUpdate, { updateId: 'up2' }, T2, 3)]);
     expect(rolledBack.reason).toBe('Investigating');
     expect(rolledBack.etaEndsAt).toBe('2026-07-24T12:00:00.000Z');
 
     // null explicitly clears to unknown.
-    const cleared = maintenanceEventDoc.fold([
+    const cleared = maintenanceEventDoc.views.document.fold([
       ...log,
       buildEvent(MaintenanceEffect.AddUpdate, update({ updateId: 'up3', reason: 'Unsure now', etaDurationMins: null }), T2, 3),
     ]);
@@ -103,7 +103,7 @@ describe('maintenanceEventDoc', () => {
     const log = [init, buildEvent(MaintenanceEffect.AddUpdate, update({ updateId: 'up1', reason: 'Investigating', etaDurationMins: 30 }), T0, 1)];
 
     // Edit WITHOUT an eta: text changes, the T0-anchored clock stays.
-    const textEdit = maintenanceEventDoc.fold([
+    const textEdit = maintenanceEventDoc.views.document.fold([
       ...log,
       buildEvent(MaintenanceEffect.EditUpdate, update({ updateId: 'up1', reason: 'Investigating hard' }), T1, 2),
     ]);
@@ -112,7 +112,7 @@ describe('maintenanceEventDoc', () => {
     expect(textEdit.updates[0].updatedAt).toBe(T1);
 
     // Edit WITH an eta: fresh announcement anchored to the edit's own time.
-    const etaEdit = maintenanceEventDoc.fold([
+    const etaEdit = maintenanceEventDoc.views.document.fold([
       ...log,
       buildEvent(MaintenanceEffect.EditUpdate, update({ updateId: 'up1', reason: 'Investigating', etaDurationMins: 30 }), T2, 2),
     ]);
@@ -120,7 +120,7 @@ describe('maintenanceEventDoc', () => {
   });
 
   it('an explicit banner text wins over the update reason', () => {
-    const state = maintenanceEventDoc.fold([
+    const state = maintenanceEventDoc.views.document.fold([
       init,
       buildEvent(
         MaintenanceEffect.AddUpdate,
@@ -137,28 +137,28 @@ describe('maintenanceEventDoc', () => {
 
   it('is publicly visible only as an open draft with updates at a non-Internal level', () => {
     // A fresh doc with no updates has announced nothing.
-    expect(isMaintenancePubliclyVisible(maintenanceEventDoc.fold([init]))).toBe(false);
+    expect(isMaintenancePubliclyVisible(maintenanceEventDoc.views.document.fold([init]))).toBe(false);
 
     const internal = [
       init,
       buildEvent(MaintenanceEffect.AddUpdate, update({ updateId: 'up1', reason: 'Poking around', level: MaintenanceLevel.Internal }), T1, 1),
     ];
-    expect(isMaintenancePubliclyVisible(maintenanceEventDoc.fold(internal))).toBe(false);
+    expect(isMaintenancePubliclyVisible(maintenanceEventDoc.views.document.fold(internal))).toBe(false);
 
     // Promoted to Low → visible.
     const promoted = [
       ...internal,
       buildEvent(MaintenanceEffect.AddUpdate, update({ updateId: 'up2', reason: 'Found it', level: MaintenanceLevel.Low }), T2, 2),
     ];
-    expect(isMaintenancePubliclyVisible(maintenanceEventDoc.fold(promoted))).toBe(true);
+    expect(isMaintenancePubliclyVisible(maintenanceEventDoc.views.document.fold(promoted))).toBe(true);
 
     // Closed → invisible again, whatever the level was.
     const closed = [...promoted, buildEvent('PUBLISH', { effectiveFrom: T2 }, T2, 3)];
-    expect(isMaintenancePubliclyVisible(maintenanceEventDoc.fold(closed))).toBe(false);
+    expect(isMaintenancePubliclyVisible(maintenanceEventDoc.views.document.fold(closed))).toBe(false);
   });
 
   it('strips internal notes and authors from the public projection; the public update text is the reason', () => {
-    const state = maintenanceEventDoc.fold([
+    const state = maintenanceEventDoc.views.document.fold([
       init,
       buildEvent(MaintenanceEffect.AddUpdate, update({ updateId: 'up1', reason: 'Working on it', internalNotes: 'SECRET' }), T1, 1),
     ]);

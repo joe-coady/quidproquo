@@ -48,11 +48,16 @@ function* askMemoAppendLine(line: string): AskResponse<void> {
 
 const memoApi = { askMemoSetBody, askMemoAppendLine };
 
+// The base version's document view — the one shape every memo log starts from.
+const memoDocumentV1 = {
+  foldReducer: memoFoldReducer,
+  createInitialViewState: createInitialMemoState,
+};
+
 const createMemoDefinition = () =>
   createEventDocDefinition({
     schemaVersion: 1,
-    foldReducer: memoFoldReducer,
-    createInitialViewState: createInitialMemoState,
+    versions: [{ version: 1, views: { document: memoDocumentV1 } }],
     api: memoApi,
   });
 
@@ -125,8 +130,7 @@ describe('createEventDocDefinition', () => {
     expect(() =>
       createEventDocDefinition({
         schemaVersion: 1,
-        foldReducer: memoFoldReducer,
-        createInitialViewState: createInitialMemoState,
+        versions: [{ version: 1, views: { document: memoDocumentV1 } }],
         api: { ...memoApi, askEventDocSetCode: askMemoSetBody },
       }),
     ).toThrow(/askEventDocSetCode/);
@@ -137,18 +141,29 @@ describe('createEventDocDefinition', () => {
 
     const memoV2Definition = createEventDocDefinition({
       schemaVersion: 2,
-      foldReducer: memoFoldReducer as unknown as QpqReducer<MemoV2State, EventDocEvent>,
-      createInitialViewState: (): MemoV2State => ({ ...createInitialMemoState(), schemaVersion: 2, pinned: false }),
-      migrations: { 2: (state) => ({ ...state, pinned: false }) as MemoV2State },
+      versions: [
+        { version: 1, views: { document: memoDocumentV1 } },
+        {
+          version: 2,
+          views: {
+            document: {
+              foldReducer: memoFoldReducer as unknown as QpqReducer<MemoV2State, EventDocEvent>,
+              migrateFromPrevious: (state) => ({ ...state, pinned: false }) as MemoV2State,
+            },
+          },
+        },
+      ],
       api: memoApi,
     });
 
-    const folded = memoV2Definition.fold([
+    const folded = memoV2Definition.views.document.fold([
       serverEvent(EventDocEffect.InitState, { id: 'memo-1', code: 'MEMO', name: 'Memo' }, 0),
       serverEvent(MemoEvent.SetBody, { body: 'from the log' }, 1),
     ]);
 
-    // The v1-authored log folds and the read-side migration carries it to v2.
+    // The v1-authored log folds through the v1 reducer and the read-side migration
+    // carries it to v2 — the ONLY way any document ever reaches v2, since INIT_STATE is
+    // always stamped v1 and only the base version can seed.
     expect(folded.body).toBe('from the log');
     expect(folded.schemaVersion).toBe(2);
     expect(folded.pinned).toBe(false);
@@ -163,8 +178,137 @@ describe('createEventDocDefinition', () => {
     });
 
     expect(experienceDefinition.kind).toBe(EventDocWorkspaceSlotKind.local);
-    expect('fold' in experienceDefinition).toBe(false);
+    expect('views' in experienceDefinition).toBe(false);
     expect('askEventDocSetCode' in experienceDefinition.api).toBe(false);
+  });
+});
+
+// ─── Version history guards ─────────────────────────────────────────────────────────
+
+describe('createEventDocDefinition version guards', () => {
+  // Every rule here fails SILENTLY if it is not checked, which is why they are checked at
+  // definition time rather than left to surface mid-fold on someone's document.
+  const documentOnly = { document: memoDocumentV1 };
+  const nextDocument = { document: { foldReducer: memoFoldReducer, migrateFromPrevious: (state: EventDocDocument) => state } };
+
+  it('throws on a gap in the version chain', () => {
+    expect(() =>
+      createEventDocDefinition({
+        schemaVersion: 3,
+        versions: [
+          { version: 1, views: documentOnly },
+          { version: 3, views: nextDocument },
+        ],
+        api: memoApi,
+      }),
+    ).toThrow(/contiguous/);
+  });
+
+  it('throws when schemaVersion outruns the declared versions', () => {
+    // The copy-forward mistake: a v2 folder written, the constant bumped, and the array
+    // never updated. Without this the doc silently keeps authoring at v1.
+    expect(() =>
+      createEventDocDefinition({
+        schemaVersion: 2,
+        versions: [{ version: 1, views: documentOnly }],
+        api: memoApi,
+      }),
+    ).toThrow(/schemaVersion is 2 but the newest declared version is 1/);
+  });
+
+  it('throws when a later version forgets a view the base declared', () => {
+    // The no-op migration must be TYPED OUT. A view that silently inherits is a view that
+    // silently stops folding the moment its events move on.
+    expect(() =>
+      createEventDocDefinition({
+        schemaVersion: 2,
+        versions: [
+          { version: 1, views: { document: memoDocumentV1, summary: memoDocumentV1 } },
+          { version: 2, views: nextDocument },
+        ],
+        api: memoApi,
+      }),
+    ).toThrow(/missing: summary/);
+  });
+
+  it('throws when no document view is declared', () => {
+    expect(() =>
+      createEventDocDefinition({
+        schemaVersion: 1,
+        versions: [{ version: 1, views: { summary: memoDocumentV1 } }],
+        api: memoApi,
+      }),
+    ).toThrow(/must declare a 'document' view/);
+  });
+
+  it('throws rather than silently skipping an event at a version it cannot fold', () => {
+    // The old behaviour returned [state, false] here, so an incomplete registration read as
+    // a document that simply stopped changing. There is no safe partial read of a log.
+    const definition = createMemoDefinition();
+
+    expect(() => definition.views.document.fold([serverEvent(MemoEvent.SetBody, { body: 'x' }, 0, 7)])).toThrow(/No event-doc fold reducer/);
+  });
+});
+
+// ─── Secondary views ────────────────────────────────────────────────────────────────
+
+describe('createEventDocDefinition secondary views', () => {
+  type MemoSummaryState = EventDocDocument & { edits: number };
+
+  const createInitialMemoSummaryState = (): MemoSummaryState => ({
+    ...createEventDocInitialDocumentState(1),
+    edits: 0,
+  });
+
+  const memoSummaryFoldReducer = buildEventDocFoldReducer<MemoSummaryState, MemoEffects>(createInitialMemoSummaryState, {
+    [MemoEvent.SetBody]: (state) => ({ ...state, edits: state.edits + 1 }),
+  }) as QpqReducer<MemoSummaryState, EventDocEvent>;
+
+  const noEmptyBody = {
+    [MemoEvent.SetBody]: (event: EventDocEvent) => ((event.payload.data as { body: string }).body ? null : 'A memo body cannot be empty'),
+  };
+
+  const createTwoViewDefinition = () =>
+    createEventDocDefinition({
+      schemaVersion: 1,
+      versions: [
+        {
+          version: 1,
+          views: {
+            document: memoDocumentV1,
+            summary: { foldReducer: memoSummaryFoldReducer, createInitialViewState: createInitialMemoSummaryState },
+          },
+        },
+      ],
+      validators: noEmptyBody,
+      api: memoApi,
+    });
+
+  it('folds each view of the same log to its own shape', () => {
+    const definition = createTwoViewDefinition();
+    const log = [
+      serverEvent(EventDocEffect.InitState, { id: 'memo-1', code: 'MEMO', name: 'Memo' }, 0),
+      serverEvent(MemoEvent.SetBody, { body: 'one' }, 1),
+      serverEvent(MemoEvent.SetBody, { body: 'two' }, 2),
+    ];
+
+    expect(definition.views.document.fold(log).body).toBe('two');
+    expect(definition.views.summary.fold(log).edits).toBe(2);
+  });
+
+  it('replays only the events the primary view ACCEPTED, so views cannot disagree', () => {
+    // The rejected event is in the log — nothing stopped it being written. If the summary
+    // folded the raw log it would count an edit the document does not have, and no reader
+    // downstream could tell which of the two was right.
+    const definition = createTwoViewDefinition();
+    const log = [
+      serverEvent(EventDocEffect.InitState, { id: 'memo-1', code: 'MEMO', name: 'Memo' }, 0),
+      serverEvent(MemoEvent.SetBody, { body: 'kept' }, 1),
+      serverEvent(MemoEvent.SetBody, { body: '' }, 2),
+    ];
+
+    expect(definition.views.document.fold(log).body).toBe('kept');
+    expect(definition.views.summary.fold(log).edits).toBe(1);
   });
 });
 
@@ -178,8 +322,7 @@ describe('createEventDocDefinition validators', () => {
   const withValidators = () =>
     createEventDocDefinition({
       schemaVersion: 1,
-      foldReducer: memoFoldReducer,
-      createInitialViewState: createInitialMemoState,
+      versions: [{ version: 1, views: { document: memoDocumentV1 } }],
       api: memoApi,
       validators: noEmptyBody,
     });
@@ -199,13 +342,13 @@ describe('createEventDocDefinition validators', () => {
   });
 
   it('folds an event its rules accept', () => {
-    expect(withValidators().fold([setBody('hello', 0)]).body).toBe('hello');
+    expect(withValidators().views.document.fold([setBody('hello', 0)]).body).toBe('hello');
   });
 
   it('IGNORES an event its rules reject, rather than folding it in', () => {
     // The event is in the log — nothing stopped it being written — so the fold is the only
     // thing standing between a bad event and the document.
-    const state = withValidators().fold([setBody('hello', 0), setBody('', 1)]);
+    const state = withValidators().views.document.fold([setBody('hello', 0), setBody('', 1)]);
 
     expect(state.body).toBe('hello');
   });
@@ -225,7 +368,7 @@ describe('createEventDocDefinition validators', () => {
       payload: { ...setBody('x', 2).payload, data: { name: 'renamed' } },
     };
 
-    const state = withValidators().fold([setBody('before', 0), published, setName]);
+    const state = withValidators().views.document.fold([setBody('before', 0), published, setName]);
 
     // SET_NAME has no domain rule, so requireDraft applies and the rename after publish is
     // dropped — the document keeps the name it had.
@@ -243,7 +386,7 @@ describe('createEventDocDefinition validators', () => {
       payload: { ...setBody('x', 1).payload, data: { effectiveFrom: '2026-07-30T00:00:00.000Z' } },
     };
 
-    const state = withValidators().fold([setBody('before', 0), published, setBody('after', 2)]);
+    const state = withValidators().views.document.fold([setBody('before', 0), published, setBody('after', 2)]);
 
     expect(state.body).toBe('after');
   });
@@ -264,7 +407,7 @@ describe('createEventDocDefinition validators', () => {
       payload: { ...setBody('x', 1).payload, data: { effectiveFrom: '2026-07-30T00:00:00.000Z' } },
     };
 
-    const state = createMemoDefinition().fold([setBody('before', 0), published, setBody('after', 2)]);
+    const state = createMemoDefinition().views.document.fold([setBody('before', 0), published, setBody('after', 2)]);
 
     expect(state.body).toBe('before');
   });

@@ -44,7 +44,7 @@ export const foldEventDocLiveView = <TState extends EventDocDocument>(
     }
 
     versionFloor = eventVersion;
-    state = foldEventDocLogStep(state, event, { reducer, migrations, latestVersion });
+    [state] = foldEventDocLogStep(state, event, { reducer, migrations, latestVersion });
   }
 
   return migrateEventDocDocumentTo(state, latestVersion, migrations) as TState;

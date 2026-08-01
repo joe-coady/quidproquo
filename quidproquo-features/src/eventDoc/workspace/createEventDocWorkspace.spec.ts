@@ -250,7 +250,7 @@ const foldNoteHistory = (events: EventDocEvent[]): NoteState => {
   let state: EventDocDocument = createInitialNoteState();
 
   for (const event of events) {
-    state = foldEventDocLogStep(state, event, { reducer: noteFoldReducer, migrations: {}, latestVersion: 1 });
+    [state] = foldEventDocLogStep(state, event, { reducer: noteFoldReducer, migrations: {}, latestVersion: 1 });
   }
 
   return state as NoteState;
