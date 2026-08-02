@@ -1,4 +1,5 @@
 export * from './buildAttributeValue';
+export * from './convertObjectToDynamoItem';
 export * from './buildDynamoQueryExpression';
 export * from './buildDynamoUpdateExpression';
 export * from './buildExpressionAttributeNames';

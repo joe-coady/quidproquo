@@ -32,6 +32,7 @@ describe('getCoreActionProcessor', () => {
       ErrorActionType.ThrowError,
       GuidActionType.New,
       GuidActionType.NewSortable,
+      GuidActionType.NewSortableMany,
       LogActionType.Create,
       LogActionType.DisableEventHistory,
       LogActionType.TemplateLiteral,

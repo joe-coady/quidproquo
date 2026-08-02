@@ -24,6 +24,7 @@ export * from './EventDocRenderKind';
 export * from './EventDocRenderMode';
 export * from './EventDocRenderOptions';
 export * from './EventDocRenderResult';
+export * from './EventDocServerEventInput';
 export * from './EventDocSetCodeData';
 export * from './EventDocSetNameData';
 export * from './EventDocSnapshot';

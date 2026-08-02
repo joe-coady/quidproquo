@@ -8,6 +8,7 @@ import { getKeyValueStoreScanActionProcessor } from './getKeyValueStoreScanActio
 import { getKeyValueStoreScanAllScopesActionProcessor } from './getKeyValueStoreScanAllScopesActionProcessor';
 import { getKeyValueStoreUpdateActionProcessor } from './getKeyValueStoreUpdateActionProcessor';
 import { getKeyValueStoreUpsertActionProcessor } from './getKeyValueStoreUpsertActionProcessor';
+import { getKeyValueStoreUpsertManyActionProcessor } from './getKeyValueStoreUpsertManyActionProcessor';
 
 export const getKeyValueStoreActionProcessor: ActionProcessorListResolver = async (
   qpqConfig: QPQConfig,
@@ -17,6 +18,7 @@ export const getKeyValueStoreActionProcessor: ActionProcessorListResolver = asyn
   ...(await getKeyValueStoreGetActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getKeyValueStoreGetAllActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getKeyValueStoreUpsertActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getKeyValueStoreUpsertManyActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getKeyValueStoreUpdateActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getKeyValueStoreQueryActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getKeyValueStoreScanActionProcessor(qpqConfig, dynamicModuleLoader)),

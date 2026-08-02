@@ -15,5 +15,7 @@ export * from './KeyValueStoreUpdateActionRequester';
 export * from './KeyValueStoreUpdateActionTypes';
 export * from './KeyValueStoreUpsertActionRequester';
 export * from './KeyValueStoreUpsertActionTypes';
+export * from './KeyValueStoreUpsertManyActionRequester';
+export * from './KeyValueStoreUpsertManyActionTypes';
 export * from './types';
 export * from './utils';

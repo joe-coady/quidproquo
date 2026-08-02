@@ -3,3 +3,5 @@ export * from './GuidNewActionRequester';
 export * from './GuidNewActionRequesterTypes';
 export * from './GuidNewSortableActionRequester';
 export * from './GuidNewSortableActionRequesterTypes';
+export * from './GuidNewSortableManyActionRequester';
+export * from './GuidNewSortableManyActionRequesterTypes';

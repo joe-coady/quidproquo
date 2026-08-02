@@ -2,6 +2,7 @@ import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, 
 
 import { getGuidNewActionProcessor } from './getGuidNewActionProcessor';
 import { getGuidNewSortableActionProcessor } from './getGuidNewSortableActionProcessor';
+import { getGuidNewSortableManyActionProcessor } from './getGuidNewSortableManyActionProcessor';
 
 export const getGuidActionProcessor: ActionProcessorListResolver = async (
   qpqConfig: QPQConfig,
@@ -9,4 +10,5 @@ export const getGuidActionProcessor: ActionProcessorListResolver = async (
 ): Promise<ActionProcessorList> => ({
   ...(await getGuidNewActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getGuidNewSortableActionProcessor(qpqConfig, dynamicModuleLoader)),
+  ...(await getGuidNewSortableManyActionProcessor(qpqConfig, dynamicModuleLoader)),
 });
