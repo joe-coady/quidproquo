@@ -526,7 +526,7 @@ describe('createEventDocDefinition foldSnapshotViews', () => {
   ];
 
   it('folds EVERY view of the prefix — document, summary, and declared secondaries', () => {
-    const snapshotViews = createTwoViewDefinition().foldSnapshotViews(log());
+    const snapshotViews = createTwoViewDefinition().foldSnapshotViews(log())!;
 
     expect((snapshotViews.document as MemoState).body).toBe('kept');
     expect((snapshotViews.summary as { name: string }).name).toBe('Memo');
@@ -536,10 +536,56 @@ describe('createEventDocDefinition foldSnapshotViews', () => {
   it('folds only the events the document accepted into every view', () => {
     // Same gate-once rule the live views follow: a rejected event must not exist in ANY
     // snapshot view, or two snapshots of one prefix would disagree about its contents.
-    const snapshotViews = createTwoViewDefinition().foldSnapshotViews([...log(), serverEvent(MemoEvent.SetBody, { body: '' }, 2)]);
+    const snapshotViews = createTwoViewDefinition().foldSnapshotViews([...log(), serverEvent(MemoEvent.SetBody, { body: '' }, 2)])!;
 
     expect((snapshotViews.document as MemoState).body).toBe('kept');
     expect((snapshotViews.stats as MemoStatsState).edits).toBe(1);
+  });
+
+  it('resumes from a seed exactly as a from-scratch fold of the whole prefix', () => {
+    // The incremental path: seed = the snapshot at event 1, then fold only the gap. The
+    // gap deliberately contains a validator-rejected event (empty body) and an accepted
+    // one — the gate must keep working mid-resume, seeded only by the stored state.
+    const definition = createTwoViewDefinition();
+    const fullLog = [...log(), serverEvent(MemoEvent.SetBody, { body: '' }, 2), serverEvent(MemoEvent.SetBody, { body: 'final' }, 3)];
+
+    const seed = definition.foldSnapshotViews(fullLog.slice(0, 2))!;
+    const resumed = definition.foldSnapshotViews(fullLog.slice(2), seed);
+
+    expect(resumed).toEqual(definition.foldSnapshotViews(fullLog));
+    expect((resumed!.document as MemoState).body).toBe('final');
+    expect((resumed!.stats as MemoStatsState).edits).toBe(2);
+  });
+
+  it('rejects a duplicate clientMessageId across the seed boundary, like a from-scratch fold', () => {
+    // The dedup window rides INSIDE the seed state — that is the whole reason the
+    // bookkeeping moved onto the document. A retry of a pre-seed event arriving in the
+    // gap must be dropped by the resumed fold too.
+    const definition = createTwoViewDefinition();
+    const retryOfEventOne: EventDocEvent = {
+      ...serverEvent(MemoEvent.SetBody, { body: 'replayed' }, 2),
+      payload: {
+        ...serverEvent(MemoEvent.SetBody, { body: 'replayed' }, 2).payload,
+        metadata: { ...serverEvent(MemoEvent.SetBody, { body: 'replayed' }, 2).payload.metadata, clientMessageId: 'server-1' },
+      },
+    };
+    const fullLog = [...log(), retryOfEventOne];
+
+    const seed = definition.foldSnapshotViews(fullLog.slice(0, 2))!;
+    const resumed = definition.foldSnapshotViews([retryOfEventOne], seed)!;
+
+    expect(resumed).toEqual(definition.foldSnapshotViews(fullLog));
+    expect((resumed.document as MemoState).body).toBe('kept');
+  });
+
+  it('returns null for a seed that lacks one of the current views, rather than guessing', () => {
+    // A view added since the seed snapshot was written has no state to resume from;
+    // folding it from nothing would silently produce a wrong view. The caller reads null
+    // as "fold the whole prefix from scratch".
+    const definition = createTwoViewDefinition();
+    const { stats: _stats, ...seedWithoutStats } = definition.foldSnapshotViews(log())!;
+
+    expect(definition.foldSnapshotViews([], seedWithoutStats)).toBeNull();
   });
 
   it('pins the era: the snapshot stays at the version the log reached, while the live view climbs', () => {
@@ -568,10 +614,20 @@ describe('createEventDocDefinition foldSnapshotViews', () => {
     // event landed — an immutable fact of the log that a later deploy cannot rewrite.
     expect(memoV2Definition.views.document.fold(v1Log).schemaVersion).toBe(2);
 
-    const snapshotDocument = memoV2Definition.foldSnapshotViews(v1Log).document as MemoV2State;
+    const snapshotDocument = memoV2Definition.foldSnapshotViews(v1Log)!.document as MemoV2State;
 
     expect(snapshotDocument.schemaVersion).toBe(1);
     expect('pinned' in snapshotDocument).toBe(false);
     expect(snapshotDocument.body).toBe('kept');
+
+    // Resuming across an era boundary: a v1-era seed plus a v2-authored gap event climbs
+    // the seed through the migration mid-fold, exactly as the from-scratch fold does.
+    const v2Event = serverEvent(MemoEvent.SetBody, { body: 'v2 edit' }, 2, 2);
+    const resumedDocument = memoV2Definition.foldSnapshotViews([v2Event], memoV2Definition.foldSnapshotViews(v1Log)!)!.document as MemoV2State;
+
+    expect(resumedDocument).toEqual(memoV2Definition.foldSnapshotViews([...v1Log, v2Event])!.document);
+    expect(resumedDocument.schemaVersion).toBe(2);
+    expect(resumedDocument.pinned).toBe(false);
+    expect(resumedDocument.body).toBe('v2 edit');
   });
 });

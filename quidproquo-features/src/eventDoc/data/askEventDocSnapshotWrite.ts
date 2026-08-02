@@ -15,7 +15,11 @@ import { eventDocSnapshotPath } from './eventDocSnapshotPath';
 // nothing is stored twice. Writes are unconditional upserts: snapshots are pure
 // derivations of the log, so a replay (the stream's at-least-once delivery) rewrites the
 // identical fact, and last-write-wins is exactly right.
-export function* askEventDocSnapshotWrite(docId: string, viewName: string, eventId: string, state: unknown): AskResponse<void> {
+//
+// `views` is the manifest stamped on the document row (see EventDocSnapshot) — callers
+// write a whole per-view set via askEventDocSnapshotViewsWrite, which owns the ordering
+// that makes the manifest-carrying row the set's commit marker.
+export function* askEventDocSnapshotWrite(docId: string, viewName: string, eventId: string, state: unknown, views?: string[]): AskResponse<void> {
   const { snapshotsStoreName, storageDriveName, type } = yield* askEventDocResolveStore();
   const scope = yield* askEventDocResolveScope();
 
@@ -26,7 +30,11 @@ export function* askEventDocSnapshotWrite(docId: string, viewName: string, event
     yield* askFileWriteTextContents(storageDriveName, eventDocSnapshotPath(docId, viewName, eventId), json, undefined, scope);
   }
 
-  const data: EventDocSnapshot = inline ? { type: 'inline', snapshot: state } : { type: 'storageDrive' };
+  // The manifest key is omitted (not written undefined) so non-document rows stay free of it.
+  const data: EventDocSnapshot = {
+    ...(inline ? { type: 'inline' as const, snapshot: state } : { type: 'storageDrive' as const }),
+    ...(views ? { views } : {}),
+  };
 
   yield* askKeyValueStoreUpsert<EventDocStoredSnapshot>(
     snapshotsStoreName,

@@ -13,7 +13,7 @@ import { askEventDocEventList } from './askEventDocEventList';
 // cost and buys nothing when nobody is racing a write.
 export function* askEventDocEventListAll(
   modelId: string,
-  options?: { consistentRead?: boolean; upToEventId?: string },
+  options?: { consistentRead?: boolean; afterEventId?: string; upToEventId?: string },
 ): AskResponse<EventDocEvent[]> {
   const events: EventDocEvent[] = [];
   let nextPageKey: string | undefined;
@@ -22,6 +22,7 @@ export function* askEventDocEventListAll(
     const page = yield* askEventDocEventList(modelId, {
       nextPageKey,
       consistentRead: options?.consistentRead,
+      afterEventId: options?.afterEventId,
       upToEventId: options?.upToEventId,
     });
     events.push(...page.items);

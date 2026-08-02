@@ -51,7 +51,7 @@ function defineEventDoc(options: EventDocRoutesOptions): QPQConfig;
 | `onAppend` | `string` | no | Inline-function name invoked with `{ docId, event, summary, events }` after EVERY successful append (domain events and lifecycle events alike): the seam for reacting to any mutation. Runs after `onPublish` when both fire on the same Publish event. |
 | `scopeResolver` | `string` | no | Inline-function name every route invokes with `{ event }` to resolve the request's ambient storage scope (e.g. per-tenant); null means unscoped. |
 | `referenceResolver` | `string` | no | Inline-function name `GET {basePath}/{id}/references` invokes with the document's `{ events, docId }` log to return the `EventDocLink`s that view depends on. Omit for a leaf collection — the route still resolves, just always to `[]`. |
-| `snapshotFold` | `string` | no | Inline-function name that folds a log prefix (`{ events, docId }`) to every view's state, typically `definition.foldSnapshotViews(events)`. When set, the event store's stream projector stores the folded views to the snapshots store on each batch. Omit to not snapshot the collection. |
+| `snapshotFold` | `string` | no | Inline-function name that folds a log slice to every view's state, typically `definition.foldSnapshotViews(events, seedViews?)`. Called with the whole prefix (`{ events, docId }`) when there is no usable prior snapshot, or with just the gap since the newest one (`{ events, docId, seedViews }`) otherwise — return `null` to decline a seed and force a from-scratch retry. When set, the event store's stream projector stores the folded views to the snapshots store on each batch. Omit to not snapshot the collection. |
 
 ## Examples
 

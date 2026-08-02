@@ -1,3 +1,5 @@
+import { Nullable } from 'quidproquo-core';
+
 import { EventDocEvent, EventDocLink, EventDocSnapshotViews, EventDocSummaryView } from '../../models';
 import { EventDocWorkspaceDocumentSlotConfig } from '../../workspace/types/EventDocWorkspaceDocumentSlotConfig';
 import { EventDocWorkspaceLocalSlotConfig } from '../../workspace/types/EventDocWorkspaceLocalSlotConfig';
@@ -47,7 +49,12 @@ export type EventDocDefinition<TVersions extends EventDocVersions, TApi extends 
   // latest version) — the states a snapshot stores. The gate runs ONCE and every view
   // folds the same accepted set, so a snapshot's view rows can never disagree about what
   // the prefix contains. THE thing a collection's snapshotFold inline function calls.
-  foldSnapshotViews: (events: EventDocEvent[]) => EventDocSnapshotViews;
+  //
+  // Given `seedViews` (a previous snapshot's states), `events` is only the gap since that
+  // snapshot and each view resumes from its seed — equivalent to folding the whole prefix,
+  // at the cost of the gap alone. Null means the seed is unusable (missing a current
+  // view); fold from scratch instead. Never null without a seed.
+  foldSnapshotViews: (events: EventDocEvent[], seedViews?: EventDocSnapshotViews) => Nullable<EventDocSnapshotViews>;
 };
 
 // An unsaved doc has no server log, so nothing to fold — it IS its slot config.

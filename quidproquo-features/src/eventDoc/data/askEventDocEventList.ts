@@ -1,4 +1,4 @@
-import { askKeyValueStoreQuery, AskResponse, kvsAnd, kvsEqual, kvsGreaterThan, kvsLessThanOrEqual, QpqPagedData } from 'quidproquo-core';
+import { askKeyValueStoreQuery, AskResponse, kvsAnd, kvsBetween, kvsEqual, kvsGreaterThan, kvsLessThanOrEqual, QpqPagedData } from 'quidproquo-core';
 
 import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
 import { EventDocEvent } from '../models';
@@ -17,28 +17,35 @@ export type EventDocEventListOptions = {
   // primary key, so this is a sort-key range condition (no GSI involved).
   afterEventId?: string;
   // Return only events whose log id is at or before this (inclusive) — the PREFIX up to a known
-  // event, for folding the document as of that event (a snapshot). NOT combinable with
-  // afterEventId: a DynamoDB key condition permits one condition per key, so a two-ended range
-  // would need kvsBetween — whose inclusive lower bound cannot express afterEventId's exclusive
-  // one. No caller wants both today; the guard keeps the failure loud if one ever tries.
+  // event, for folding the document as of that event (a snapshot). Combined with afterEventId it
+  // reads the slice between two known points — the gap an incremental fold applies on top of a
+  // snapshot's state.
   upToEventId?: string;
+};
+
+// The sort-key condition for the requested slice. A DynamoDB key condition permits ONE
+// condition per key, so the two-ended case must be a kvsBetween — which is inclusive at
+// both ends, while afterEventId is exclusive. The boundary row (sk === afterEventId) is
+// therefore dropped after the read: one known extra row per query, rather than a second
+// key condition the store would reject.
+const eventRangeCondition = (options?: EventDocEventListOptions) => {
+  if (options?.afterEventId !== undefined && options?.upToEventId !== undefined) {
+    return kvsBetween('sk', options.afterEventId, options.upToEventId);
+  }
+  if (options?.afterEventId !== undefined) {
+    return kvsGreaterThan('sk', options.afterEventId);
+  }
+  if (options?.upToEventId !== undefined) {
+    return kvsLessThanOrEqual('sk', options.upToEventId);
+  }
+  return undefined;
 };
 
 export function* askEventDocEventList(modelId: string, options?: EventDocEventListOptions): AskResponse<QpqPagedData<EventDocEvent>> {
   const { eventsStoreName } = yield* askEventDocResolveStore();
   const scope = yield* askEventDocResolveScope();
 
-  if (options?.afterEventId !== undefined && options?.upToEventId !== undefined) {
-    throw new Error('askEventDocEventList: afterEventId and upToEventId cannot be combined - a key condition holds one sort-key range.');
-  }
-
-  const rangeCondition =
-    options?.afterEventId !== undefined
-      ? kvsGreaterThan('sk', options.afterEventId)
-      : options?.upToEventId !== undefined
-        ? kvsLessThanOrEqual('sk', options.upToEventId)
-        : undefined;
-
+  const rangeCondition = eventRangeCondition(options);
   const keyCondition = rangeCondition ? kvsAnd([kvsEqual('pk', modelId), rangeCondition]) : kvsEqual('pk', modelId);
 
   const page = yield* askKeyValueStoreQuery<EventDocStoredEvent>(eventsStoreName, keyCondition, {
@@ -51,6 +58,8 @@ export function* askEventDocEventList(modelId: string, options?: EventDocEventLi
 
   return {
     nextPageKey: page.nextPageKey,
-    items: page.items.map((record) => eventDocStoredEventToEvent(record)),
+    // The between's inclusive lower boundary — see eventRangeCondition. Only the first
+    // page can contain it; filtering every page is harmless.
+    items: page.items.filter((record) => record.sk !== options?.afterEventId).map((record) => eventDocStoredEventToEvent(record)),
   };
 }
