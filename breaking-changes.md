@@ -5,6 +5,11 @@ assembled quickly.
 
 ## vNext
 
+- `EventDocDefinition.foldSnapshotViews` (the object `createEventDocDefinition` returns, `quidproquo-features`) now takes an optional second
+  `seedViews: EventDocSnapshotViews` argument and returns `Nullable<EventDocSnapshotViews>` instead of `EventDocSnapshotViews`. A registered
+  `snapshotFold` inline function that calls `definition.foldSnapshotViews(events)` and returns the result directly must widen its return type to allow
+  `null` (it can now be invoked with just the log gap plus a prior snapshot's `seedViews`, and declines by returning `null` to force a from-scratch
+  retry).
 - `createEventDocDefinition`'s saved-doc config drops top-level `foldReducer`, `createInitialViewState`, and `migrations` in favor of `versions`: an
   array of `{ version, views }` entries, oldest first, where `views` is a map keyed by view name (every saved doc must declare a `document` view).
   The base entry's view supplies `{ foldReducer, createInitialViewState }`; every later entry's view supplies `{ foldReducer, migrateFromPrevious }`

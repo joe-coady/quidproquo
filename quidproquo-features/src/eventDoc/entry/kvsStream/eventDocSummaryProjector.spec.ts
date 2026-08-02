@@ -52,15 +52,23 @@ const LOG: EventDocEvent[] = [
 
 type Row = Record<string, unknown>;
 
-// Pull the sort-key ceiling out of a query's key condition, if it carries one — the mock
-// applies it so a "fold the prefix" read genuinely returns the prefix.
-const skCeiling = (keyCondition: KvsQueryOperation): string | undefined => {
+// Pull one sort-key condition of the given operation out of a query's key condition tree.
+const skCondition = (keyCondition: KvsQueryOperation, operation: KvsQueryOperationType): KvsQueryCondition | undefined => {
   if ('conditions' in keyCondition) {
-    return (keyCondition as KvsLogicalOperator).conditions.map(skCeiling).find((ceiling) => ceiling !== undefined);
+    return (keyCondition as KvsLogicalOperator).conditions.map((nested) => skCondition(nested, operation)).find((match) => match !== undefined);
   }
 
   const condition = keyCondition as KvsQueryCondition;
-  return condition.key === 'sk' && condition.operation === KvsQueryOperationType.LessThanOrEqual ? String(condition.valueA) : undefined;
+  return condition.operation === operation ? condition : undefined;
+};
+
+const conditionValue = (keyCondition: KvsQueryOperation, key: string, operation: KvsQueryOperationType): string | undefined => {
+  if ('conditions' in keyCondition) {
+    return (keyCondition as KvsLogicalOperator).conditions.map((nested) => conditionValue(nested, key, operation)).find((v) => v !== undefined);
+  }
+
+  const condition = keyCondition as KvsQueryCondition;
+  return condition.key === key && condition.operation === operation ? String(condition.valueA) : undefined;
 };
 
 const buildMocks = (streamPk: string, type = 'template', options?: { snapshotFold?: string; log?: EventDocEvent[] }) => {
@@ -68,6 +76,7 @@ const buildMocks = (streamPk: string, type = 'template', options?: { snapshotFol
   const updates: { key: unknown; scope?: string }[] = [];
   const upserts: { keyValueStoreName: string; item: Row; scope?: string }[] = [];
   const fileWrites: { drive: string; filepath: string; data: string; scope?: string }[] = [];
+  const blobs: Record<string, string> = {};
   const foldCalls: { functionName: string; input: EventDocSnapshotFoldInput }[] = [];
 
   // The log as the events table actually holds it: pk composed with the scope, and the
@@ -90,19 +99,38 @@ const buildMocks = (streamPk: string, type = 'template', options?: { snapshotFol
       return '';
     },
 
+    // A faithful mini key-value store: honours the pk equality, the sort-key conditions
+    // the data layer issues (equal, at-or-before, between), sort direction and limit —
+    // enough that the incremental read paths are exercised for real, not hand-waved.
     [KeyValueStoreActionType.Query]: (action: {
-      payload: { keyValueStoreName: string; keyCondition: KvsQueryOperation; options?: { scope?: string } };
+      payload: {
+        keyValueStoreName: string;
+        keyCondition: KvsQueryOperation;
+        options?: { scope?: string; sortAscending?: boolean; limit?: number };
+      };
     }) => {
       const { keyValueStoreName, keyCondition, options: queryOptions } = action.payload;
       // The processor composes the scope into the pk, so the mock reproduces that: a query
       // finds rows whose stored pk matches the scope it was issued under.
-      const wantPk = queryOptions?.scope ? `${queryOptions.scope}${SCOPE_DELIMITER}doc-1` : 'doc-1';
-      const ceiling = skCeiling(keyCondition);
+      const rawPk = conditionValue(keyCondition, 'pk', KvsQueryOperationType.Equal) ?? '';
+      const wantPk = queryOptions?.scope ? `${queryOptions.scope}${SCOPE_DELIMITER}${rawPk}` : rawPk;
+
+      const skEqual = conditionValue(keyCondition, 'sk', KvsQueryOperationType.Equal);
+      const skAtOrBefore = conditionValue(keyCondition, 'sk', KvsQueryOperationType.LessThanOrEqual);
+      const between = skCondition(keyCondition, KvsQueryOperationType.Between);
+
       const items = (tables[keyValueStoreName] ?? []).filter(
-        (row) => row.pk === wantPk && (ceiling === undefined || String(row.sk) <= ceiling),
+        (row) =>
+          row.pk === wantPk &&
+          (skEqual === undefined || String(row.sk) === skEqual) &&
+          (skAtOrBefore === undefined || String(row.sk) <= skAtOrBefore) &&
+          (between === undefined || (String(row.sk) >= String(between.valueA) && String(row.sk) <= String(between.valueB))),
       );
 
-      return { items: [...items].sort((a, b) => String(a.sk).localeCompare(String(b.sk))), nextPageKey: undefined };
+      const ascending = queryOptions?.sortAscending !== false;
+      const sorted = [...items].sort((a, b) => String(a.sk).localeCompare(String(b.sk)) * (ascending ? 1 : -1));
+
+      return { items: sorted.slice(0, queryOptions?.limit), nextPageKey: undefined };
     },
 
     [KeyValueStoreActionType.Update]: (action: {
@@ -129,6 +157,15 @@ const buildMocks = (streamPk: string, type = 'template', options?: { snapshotFol
         data: action.payload.data,
         scope: action.payload.scope,
       });
+      blobs[action.payload.filepath] = action.payload.data;
+    },
+
+    [FileActionType.ReadTextContents]: (action: { payload: { filepath: string } }) => {
+      const blob = blobs[action.payload.filepath];
+      if (blob === undefined) {
+        throw new Error(`No blob at ${action.payload.filepath}`);
+      }
+      return blob;
     },
 
     // Stands in for the app-registered fold: echoes what it was invoked with (so the spec
@@ -142,7 +179,7 @@ const buildMocks = (streamPk: string, type = 'template', options?: { snapshotFol
     },
   };
 
-  return { mocks, tables, updates, upserts, fileWrites, foldCalls };
+  return { mocks, tables, updates, upserts, fileWrites, blobs, foldCalls };
 };
 
 // Shaped as the action processor hands them over: keys already raw, scope alongside.
@@ -224,7 +261,12 @@ describe('projectEventDocSummary snapshots', () => {
     expect(rows.every((row) => row.type === 'template')).toBe(true);
 
     const documentRow = rows.find((row) => row.pk === 'doc-1#document')!;
-    expect(documentRow.data).toEqual({ type: 'inline', snapshot: { foldedEvents: 2 } });
+    expect(documentRow.data).toEqual({ type: 'inline', snapshot: { foldedEvents: 2 }, views: ['document', 'summary'] });
+
+    // Only the document row carries the manifest, and it lands LAST — the set's commit
+    // marker, so a seed reader anchored on it never sees a partially written set.
+    const summaryRow = rows.find((row) => row.pk === 'doc-1#summary')!;
+    expect(summaryRow.data).toEqual({ type: 'inline', snapshot: { name: 'from-fold' } });
   });
 
   it('folds the PREFIX up to the stream record, not the whole log', () => {
@@ -276,7 +318,7 @@ describe('projectEventDocSummary snapshots', () => {
     const rows = (tables[SNAPSHOTS_STORE] ?? []) as EventDocStoredSnapshot[];
     expect(rows).toHaveLength(1);
     // No path on the row: it is derived from the row's own keys, so the two cannot drift.
-    expect(rows[0].data).toEqual({ type: 'storageDrive' });
+    expect(rows[0].data).toEqual({ type: 'storageDrive', views: ['document'] });
   });
 
   it('carries the tenant scope through the prefix read and every snapshot write', () => {
@@ -290,5 +332,104 @@ describe('projectEventDocSummary snapshots', () => {
     const snapshotUpserts = upserts.filter((upsert) => upsert.keyValueStoreName === SNAPSHOTS_STORE);
     expect(snapshotUpserts).toHaveLength(2);
     expect(snapshotUpserts.every((upsert) => upsert.scope === 'tenant-a')).toBe(true);
+  });
+
+  it('writes the document row LAST, so a torn set never has a commit marker', () => {
+    const { mocks, upserts } = buildMocks('doc-1', 'template', { snapshotFold: FOLD_FN });
+
+    runStory(projectEventDocSummary(streamRecord(undefined)), mocks);
+
+    const snapshotPks = upserts.filter((upsert) => upsert.keyValueStoreName === SNAPSHOTS_STORE).map((upsert) => upsert.item.pk);
+    expect(snapshotPks).toEqual(['doc-1#summary', 'doc-1#document']);
+  });
+});
+
+// The incremental path: seed from the newest complete snapshot at or before the target
+// event and fold only the gap — the reason snapshot cost tracks the burst, not the log.
+describe('projectEventDocSummary incremental snapshots', () => {
+  const SNAPSHOTS_STORE = eventDocSnapshotsStoreName(STORE);
+  const FOLD_FN = 'foldTemplateSnapshot';
+
+  const seedRowsAt = (sk: string): Row[] => [
+    { pk: 'doc-1#summary', sk, type: 'template', data: { type: 'inline', snapshot: { seedSummary: true } } },
+    { pk: 'doc-1#document', sk, type: 'template', data: { type: 'inline', snapshot: { seedDocument: true }, views: ['document', 'summary'] } },
+  ];
+
+  it('hands the fold the seed and ONLY the gap since it', () => {
+    const { mocks, tables, foldCalls } = buildMocks('doc-1', 'template', { snapshotFold: FOLD_FN });
+    tables[SNAPSHOTS_STORE] = seedRowsAt(eventId(0));
+
+    runStory(projectEventDocSummary(streamRecord(undefined)), mocks);
+
+    expect(foldCalls).toHaveLength(1);
+    expect(foldCalls[0].input.events.map((e) => e.payload.metadata.eventId)).toEqual([eventId(1)]);
+    expect(foldCalls[0].input.seedViews).toEqual({ document: { seedDocument: true }, summary: { seedSummary: true } });
+
+    // The new snapshot lands at the target event, alongside the seed rows.
+    const rows = tables[SNAPSHOTS_STORE] as EventDocStoredSnapshot[];
+    expect(rows.filter((row) => row.sk === eventId(1)).map((row) => row.pk).sort()).toEqual(['doc-1#document', 'doc-1#summary']);
+  });
+
+  it('skips entirely when a complete snapshot already exists at the target event', () => {
+    // The document row is the set's last write, so its presence at the target means a
+    // replayed delivery has nothing left to do.
+    const { mocks, tables, foldCalls, upserts } = buildMocks('doc-1', 'template', { snapshotFold: FOLD_FN });
+    tables[SNAPSHOTS_STORE] = seedRowsAt(eventId(1));
+
+    runStory(projectEventDocSummary(streamRecord(undefined)), mocks);
+
+    expect(foldCalls).toHaveLength(0);
+    expect(upserts.filter((upsert) => upsert.keyValueStoreName === SNAPSHOTS_STORE)).toHaveLength(0);
+  });
+
+  it('falls back to a from-scratch fold when the fold declines the seed', () => {
+    // A view added since the seed was written: the fold returns null rather than fold the
+    // new view from nothing, and the projector retries with the whole prefix.
+    const { mocks, tables, foldCalls } = buildMocks('doc-1', 'template', { snapshotFold: FOLD_FN });
+    tables[SNAPSHOTS_STORE] = seedRowsAt(eventId(0));
+
+    mocks[InlineFunctionActionType.Execute] = (action: { payload: { functionName: string; payload: EventDocSnapshotFoldInput } }) => {
+      foldCalls.push({ functionName: action.payload.functionName, input: action.payload.payload });
+      return action.payload.payload.seedViews ? null : { document: { refolded: true } };
+    };
+
+    runStory(projectEventDocSummary(streamRecord(undefined)), mocks);
+
+    expect(foldCalls).toHaveLength(2);
+    expect(foldCalls[0].input.seedViews).toBeDefined();
+    expect(foldCalls[1].input.seedViews).toBeUndefined();
+    expect(foldCalls[1].input.events.map((e) => e.payload.metadata.eventId)).toEqual([eventId(0), eventId(1)]);
+
+    const documentRow = (tables[SNAPSHOTS_STORE] as EventDocStoredSnapshot[]).find((row) => row.sk === eventId(1))!;
+    expect(documentRow.data).toEqual({ type: 'inline', snapshot: { refolded: true }, views: ['document'] });
+  });
+
+  it('ignores a pre-manifest snapshot and folds the whole prefix', () => {
+    // Rows written before manifests existed cannot prove the set is complete, so they are
+    // not seeds; the next full fold rewrites them with one.
+    const { mocks, tables, foldCalls } = buildMocks('doc-1', 'template', { snapshotFold: FOLD_FN });
+    tables[SNAPSHOTS_STORE] = [
+      { pk: 'doc-1#document', sk: eventId(0), type: 'template', data: { type: 'inline', snapshot: { seedDocument: true } } },
+    ];
+
+    runStory(projectEventDocSummary(streamRecord(undefined)), mocks);
+
+    expect(foldCalls).toHaveLength(1);
+    expect(foldCalls[0].input.seedViews).toBeUndefined();
+    expect(foldCalls[0].input.events.map((e) => e.payload.metadata.eventId)).toEqual([eventId(0), eventId(1)]);
+  });
+
+  it('resolves an offloaded seed state from the blob drive', () => {
+    const { mocks, tables, blobs, foldCalls } = buildMocks('doc-1', 'template', { snapshotFold: FOLD_FN });
+    tables[SNAPSHOTS_STORE] = [
+      { pk: 'doc-1#summary', sk: eventId(0), type: 'template', data: { type: 'inline', snapshot: { seedSummary: true } } },
+      { pk: 'doc-1#document', sk: eventId(0), type: 'template', data: { type: 'storageDrive', views: ['document', 'summary'] } },
+    ];
+    blobs[`doc-1/snapshots/document/${eventId(0)}`] = JSON.stringify({ offloadedDocument: true });
+
+    runStory(projectEventDocSummary(streamRecord(undefined)), mocks);
+
+    expect(foldCalls[0].input.seedViews).toEqual({ document: { offloadedDocument: true }, summary: { seedSummary: true } });
+    expect(foldCalls[0].input.events.map((e) => e.payload.metadata.eventId)).toEqual([eventId(1)]);
   });
 });

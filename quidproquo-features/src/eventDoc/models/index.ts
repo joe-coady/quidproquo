@@ -28,6 +28,7 @@ export * from './EventDocSetCodeData';
 export * from './EventDocSetNameData';
 export * from './EventDocSnapshot';
 export * from './EventDocSnapshotFoldInput';
+export * from './EventDocSnapshotSeed';
 export * from './EventDocSnapshotViews';
 export * from './EventDocStatus';
 export * from './EventDocSummary';

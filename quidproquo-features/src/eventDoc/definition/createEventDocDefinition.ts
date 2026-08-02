@@ -1,8 +1,11 @@
+import { Nullable } from 'quidproquo-core';
+
 import { buildEventDocViewFoldConfig } from '../fold/buildEventDocViewFoldConfig';
 import { collectEventDocReferences } from '../fold/collectEventDocReferences';
 import { foldEventDocLog, foldEventDocLogAccepted, foldEventDocLogAsWritten, FoldEventDocLogConfig } from '../fold/foldEventDocLog';
 import { migrateEventDocDocumentTo } from '../fold/migrateEventDocDocumentTo';
-import { EventDocDocument, EventDocEvent, EventDocSnapshotViews } from '../models';
+import { EventDocDocument, EventDocEvent, EventDocSnapshotViews, EventDocSummaryView } from '../models';
+import { applyEventDocSummaryEvent } from '../summary/applyEventDocSummaryEvent';
 import { foldEventDocSummary } from '../summary/foldEventDocSummary';
 import { createEventDocEventValidator } from '../validation/createEventDocEventValidator';
 import { reservedEventDocEventValidators } from '../validation/reservedEventDocEventValidators';
@@ -116,16 +119,37 @@ export function createEventDocDefinition(
   // secondary view replays the accepted set through its own rules. No view climbs to the
   // code's latest version: a snapshot records what the document WAS when its last event
   // landed, and the read side owns any migration up (see foldEventDocLogAsWritten).
-  const foldSnapshotViews = (events: EventDocEvent[]): EventDocSnapshotViews => {
-    const { state, accepted } = foldEventDocLogAsWritten(events, primaryFoldConfig);
+  //
+  // With `seedViews` — a previous snapshot's states — `events` is only the gap since that
+  // snapshot and every view RESUMES from its own seed. This is exactly equivalent to a
+  // from-scratch fold of the whole prefix, and it is the fold-layer changes that make it
+  // so: the acceptance rules read the state alone (the seed carries the dedup window and
+  // the version floor), and the seed is era-pinned (its schemaVersion is the true accepted
+  // floor, not the code's latest). Returns null for a seed missing one of the current
+  // views (a view added since the seed was written) — resuming would leave that view
+  // folded from nothing — and the caller falls back to a from-scratch fold.
+  const foldSnapshotViews = (events: EventDocEvent[], seedViews?: EventDocSnapshotViews): Nullable<EventDocSnapshotViews> => {
+    const viewNames = [EVENT_DOC_PRIMARY_VIEW, EVENT_DOC_SUMMARY_VIEW, ...Object.keys(secondaryFoldConfigs)];
+
+    if (seedViews && viewNames.some((viewName) => !(viewName in seedViews))) {
+      return null;
+    }
+
+    // Seed states come back as `unknown` (snapshots are stored, not typed); the definition
+    // wrote them from these same folds, so the casts restate that provenance.
+    const primarySeed = seedViews ? { ...primaryFoldConfig, seed: seedViews[EVENT_DOC_PRIMARY_VIEW] as EventDocDocument } : primaryFoldConfig;
+    const { state, accepted } = foldEventDocLogAsWritten(events, primarySeed);
 
     const snapshotViews: EventDocSnapshotViews = {
       [EVENT_DOC_PRIMARY_VIEW]: state,
-      [EVENT_DOC_SUMMARY_VIEW]: foldEventDocSummary(accepted),
+      [EVENT_DOC_SUMMARY_VIEW]: seedViews
+        ? accepted.reduce(applyEventDocSummaryEvent, seedViews[EVENT_DOC_SUMMARY_VIEW] as EventDocSummaryView)
+        : foldEventDocSummary(accepted),
     };
 
     Object.entries(secondaryFoldConfigs).forEach(([viewName, foldConfig]) => {
-      snapshotViews[viewName] = foldEventDocLogAsWritten(accepted, foldConfig).state;
+      const viewSeed = seedViews ? { ...foldConfig, seed: seedViews[viewName] as EventDocDocument } : foldConfig;
+      snapshotViews[viewName] = foldEventDocLogAsWritten(accepted, viewSeed).state;
     });
 
     return snapshotViews;

@@ -11,6 +11,8 @@ export * from './askEventDocList';
 export * from './askEventDocListAssets';
 export * from './askEventDocListPage';
 export * from './askEventDocResolveScope';
+export * from './askEventDocSnapshotSeedLatest';
+export * from './askEventDocSnapshotViewsWrite';
 export * from './askEventDocSnapshotWrite';
 export * from './askEventDocUpsert';
 export * from './askEventDocWriteAsset';
