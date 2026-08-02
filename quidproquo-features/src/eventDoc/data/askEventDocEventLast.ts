@@ -10,7 +10,14 @@ import { askEventDocResolveScope } from './askEventDocResolveScope';
 // Tail of the log — the newest event by sort key. Event ids are sortable guids, so
 // lexicographic sort-key order (DynamoDB's, and the dev-server's for strings) is
 // creation order and this returns the true latest.
-export function* askEventDocEventLast(modelId: string): AskResponse<Nullable<EventDocEvent>> {
+//
+// `consistentRead` matters MORE here than on any other event read: this is how
+// "latest" resolvers pick the head everything else clamps to. A stale replica
+// answering this query doesn't just delay data — it silently truncates the log
+// (or empties it: no rows -> null -> callers fall back to pristine state), and a
+// consistent gap read clamped to a stale head inherits the truncation. A writer
+// reading back its own appends must pass it.
+export function* askEventDocEventLast(modelId: string, options?: { consistentRead?: boolean }): AskResponse<Nullable<EventDocEvent>> {
   const { eventsStoreName } = yield* askEventDocResolveStore();
   const scope = yield* askEventDocResolveScope();
 
@@ -18,6 +25,7 @@ export function* askEventDocEventLast(modelId: string): AskResponse<Nullable<Eve
     sortAscending: false,
     limit: 1,
     scope,
+    consistentRead: options?.consistentRead,
   });
 
   const record = page.items[0];
