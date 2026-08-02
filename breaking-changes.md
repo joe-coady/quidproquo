@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+## 0.1.15
+
 - `defineEventDoc(options)` (`quidproquo-features`) is replaced by `defineEventDoc(functions, runtime, options)`: `functions` is the collection's `EventDocFunctions` object (`{ storeName, type, foldSnapshotViews, collectReferences, render? }` — a saved `EventDocDefinition` satisfies it directly), `runtime` is a `QpqFunctionRuntime` path to that same exported object, and `options` drops `storeName`/`type` (now read off `functions`) along with `eventValidator`, `eventRenderer`, `referenceResolver`, and `snapshotFold` (now members of `functions`, registered as a whole). `defineTenantedEventDoc` changes the same way. A collection with no functions object (no render/references/snapshots) should compose `defineEventDocSummary` + `defineEventDocRoutes` directly instead of calling `defineEventDoc`.
 - `EventDocRoutesOptions` (the options `defineEventDocRoutes` takes) drops `eventValidator`, `eventRenderer`, `referenceResolver`, and `snapshotFold`. `GET {basePath}/{id}/render` and `GET {basePath}/{id}/references` are now always mounted and resolve their behaviour from the collection's registered `EventDocFunctions` object (looked up by `eventDocFunctionsName(storeName, type)`) instead of per-route inline-function names.
 - `defineEventDocSummary`'s `options.snapshotFolds: Record<string, string>` is renamed to `options.snapshotFunctions`, and its values are now `defineDynamicFunctions` names (an `EventDocFunctions` object's registration) instead of `defineInlineFunction` names.

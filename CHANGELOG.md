@@ -1,5 +1,59 @@
 # Changelog
 
+## 0.1.15
+
+- event docs: a definition declares `versions` (oldest first) with a view map per version, instead of a top-level `foldReducer` plus a `migrations`
+  map. Folds are per view (`definition.views.document.fold`), every definition gets a built-in `summary` view, and a version that skips a view or a
+  mismatched `schemaVersion` throws at definition time instead of failing quietly later
+- event docs: reads fold from the newest snapshot plus the events after it instead of replaying the whole log. Snapshots are written per view along
+  the log and seeded from the prior snapshot, and the workspace opens from a snapshot base rather than the full history
+- event docs: a collection registers one functions object (fold, snapshots, render, references, validator) as a single dynamic-functions
+  registration, so `defineEventDoc(functions, runtime, options)` replaces the per-hook inline function names, and the render and references routes are
+  always mounted
+- dynamic functions: `defineDynamicFunctions` registers a whole exported object of functions and `askDynamicFunctionExecute` calls one of them by
+  name, so a feature can hand a caller a named bundle instead of one inline function per hook
+- event docs: `askEventDocAppendServerEvents` writes a burst of server-authored events in one batch, one clock read and one id mint and one write per
+  burst where a loop of single appends paid five actions per event. Backed by new `askKeyValueStoreUpsertMany` and `askGuidNewSortableMany` core
+  actions (DynamoDB `BatchWriteItem` with backoff on AWS, per-item stream emission on the dev server so projectors see the same records)
+- event docs: an append runs the collection's registered validator before the write and rejects there, so an event a rule forbids never lands in the
+  append-only log. Server-authored appends stay write-and-go and are still gated by the fold
+- event docs: the workspace history panel pages through the log (`askLoadOlderHistory`, newest first) instead of loading every event up front
+- event docs: `createEventDocBackend` binds the generic document verbs to one collection, so a caller stops threading `storeName`/`type` through every
+  call
+- `askEventDocDocumentStateLatest` resolves its head with a consistent read, so a writer reading back its own append no longer sees a truncated or
+  empty log
+- cdk: the shared key-value-store role policy grants `dynamodb:BatchWriteItem`, so batch writes work on deployed functions
+
+### Breaking changes
+
+- `defineEventDoc(options)` becomes `defineEventDoc(functions, runtime, options)`; `defineTenantedEventDoc` changes the same way
+- `EventDocRoutesOptions`, `EventDocStoreOptions`, and `EventDocStore` drop `eventValidator`, `eventRenderer`, `referenceResolver`, and `snapshotFold`;
+  the render and references routes resolve from the registered functions object instead
+- `defineEventDocSummary`'s `snapshotFolds` is renamed `snapshotFunctions` and its values are dynamic-function names, not inline function names
+- `EventDocTransferCollection` drops `referenceResolver`, and `defineEventDocTransfer`'s `collections` takes `EventDocTransferCollectionSource[]`
+- `createEventDocDefinition`'s saved-doc config drops `foldReducer`, `createInitialViewState`, and `migrations` in favor of a `versions` array
+- the object `createEventDocDefinition` returns has no top-level `fold`; use `definition.views.document.fold(events)`
+- every definition now has a built-in `summary` view, so a `versions` entry declaring its own view named `summary` throws
+- `foldSnapshotViews` takes an optional `seedViews` second argument and returns `Nullable<EventDocSnapshotViews>`
+- `EventDocFunctions`, `EventDocDefinition`, and `EventDocInvokableFunctions` gain required `foldDocumentState` and `collectReferencesFromState`
+- `foldEventDocLogStep` returns `[state, accepted]` instead of just the state, and its config drops `acceptance`
+- `buildVersionRoutedReducer` throws when an event's version has no registered reducer instead of silently skipping it
+- `foldEventDocSummary` and `createEventDocSummarySeed` drop their `type` param and return `EventDocSummaryView`; `eventDocSummarySchema` is now the
+  stored shape and `eventDocSummaryViewSchema` the plain view
+- `EventDocAcceptance`, `createEventDocAcceptance`, and `recordEventDocAcceptance` are removed, and `rejectEventDocEvent` drops its `acceptance` param
+- `EventDocRenderInput` drops `events` for `state`; `EventDocOnAppendInput` and `EventDocOnPublishInput` drop `events` for `state`/`previousState`
+- `EventDocBackend.askEventsAsOf` is renamed `askDocumentStateAsOfTime` and returns folded state, `askDocumentStateLatest` is added, and
+  `askPublishedEventsAsOf` is removed
+- `askEventDocEventsAsOf`, `askEventDocPublishedEventsAsOf`, and `askEventDocSnapshotAtEvent` are removed; use the document-state stories and
+  `askEventDocProjectAtEvent`
+- `EventDocVersionSlice` is replaced by `EventDocVersionState`, so `askEventDocPublishedVersionAsOf` returns `{ version, state }`
+- `askEventDocReferences` is the full-history walk only; use the new `askEventDocReferencesFromState` for what a document references right now
+- `EventDocWorkspaceTransport` gains a required `askFetchEventsPage` and `EventDocWorkspaceBuiltInApi` gains a required `askLoadOlderHistory`
+- `EventDocWorkspaceState.fullHistory` holds an `EventDocWorkspaceHistoryPage` instead of an event array, and `askUIEventDocWorkspaceSetFullHistory`
+  takes that page
+- an append to a collection with a registered functions object now fails pre-write when the validator rejects the event, instead of being written and
+  dropped at fold time
+
 ## 0.1.14
 
 - event docs: a recorded value picks its own storage. `askEventDocWriteValue` carries small values inline (4KB per value, 32KB per event) and falls
