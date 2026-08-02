@@ -8,6 +8,8 @@ const docFunctions: EventDocFunctions = {
   storeName: 'docs',
   type: 'doc',
   foldSnapshotViews: () => null,
+  foldDocumentState: () => null,
+  collectReferencesFromState: () => [],
   collectReferences: () => [],
 };
 

@@ -4,6 +4,10 @@ import {
   DynamicFunctionsActionType,
   DynamicFunctionsExecuteErrorTypeEnum,
   KeyValueStoreActionType,
+  KvsLogicalOperator,
+  KvsQueryCondition,
+  KvsQueryOperation,
+  KvsQueryOperationType,
   QpqIsoDateTime,
   runStory,
   throwsError,
@@ -88,9 +92,22 @@ const httpEvent = (query: Record<string, string>): HTTPEvent => ({
   isBase64Encoded: false,
 });
 
-type ExecutePayload = { dynamicFunctionsName: string; functionName: string; args: [EventDocRenderInput] };
+type ExecutePayload = { dynamicFunctionsName: string; functionName: string; args: [EventDocRenderInput] | [EventDocEvent[], unknown?] };
 
-// Captures what the route hands the renderer — the thing under test.
+// The sort-key bound the state resolver issues (upToEventId → at-or-before), honoured
+// for real so a published render's truncation at the version's head is exercised.
+const skAtOrBefore = (keyCondition: KvsQueryOperation): string | undefined => {
+  if ('conditions' in keyCondition) {
+    return (keyCondition as KvsLogicalOperator).conditions.map(skAtOrBefore).find((v) => v !== undefined);
+  }
+
+  const condition = keyCondition as KvsQueryCondition;
+  return condition.key === 'sk' && condition.operation === KvsQueryOperationType.LessThanOrEqual ? String(condition.valueA) : undefined;
+};
+
+// Captures what the route hands the renderer — the thing under test. The registered
+// fold echoes the event ids it was handed (no snapshots exist, so the resolver folds
+// the prefix from scratch), so `state` in the render input identifies the exact prefix.
 const renderWith = (query: Record<string, string>, versions: EventDocVersion[] = [VERSION_1, VERSION_DRAFT]) => {
   const globals = buildEventDocStoreGlobals(store);
   const renderInputs: EventDocRenderInput[] = [];
@@ -103,16 +120,31 @@ const renderWith = (query: Record<string, string>, versions: EventDocVersion[] =
       return globals[action.payload.globalName];
     },
     [DateActionType.Now]: () => REQUEST_NOW,
-    [KeyValueStoreActionType.Query]: (action: { payload: { keyValueStoreName: string } }) => {
+    [KeyValueStoreActionType.Query]: (action: {
+      payload: { keyValueStoreName: string; keyCondition: KvsQueryOperation; options?: { sortAscending?: boolean; limit?: number } };
+    }) => {
+      if (action.payload.keyValueStoreName === store.snapshotsStoreName) {
+        return { items: [], nextPageKey: undefined };
+      }
       if (action.payload.keyValueStoreName === store.eventsStoreName) {
-        return { items: storedEvents, nextPageKey: undefined };
+        const upTo = skAtOrBefore(action.payload.keyCondition);
+        const matching = storedEvents.filter((row) => upTo === undefined || row.sk <= upTo);
+        const ascending = action.payload.options?.sortAscending !== false;
+        const sorted = [...matching].sort((a, b) => String(a.sk).localeCompare(String(b.sk)) * (ascending ? 1 : -1));
+        return { items: sorted.slice(0, action.payload.options?.limit), nextPageKey: undefined };
       }
       return { items: [buildSummary(versions)], nextPageKey: undefined };
     },
     [DynamicFunctionsActionType.Execute]: (action: { payload: ExecutePayload }) => {
       expect(action.payload.dynamicFunctionsName).toBe(FUNCTIONS_NAME);
+
+      if (action.payload.functionName === 'foldDocumentState') {
+        const [events] = action.payload.args as [EventDocEvent[]];
+        return { foldedEventIds: events.map((event) => event.payload.metadata.eventId) };
+      }
+
       expect(action.payload.functionName).toBe('render');
-      renderInputs.push(action.payload.args[0]);
+      renderInputs.push(action.payload.args[0] as EventDocRenderInput);
       return { kind: EventDocRenderKind.Html, html: '<p>rendered</p>' };
     },
   });
@@ -121,25 +153,26 @@ const renderWith = (query: Record<string, string>, versions: EventDocVersion[] =
 };
 
 describe('render route', () => {
-  it('hands the renderer the whole log and no version for a draft render', () => {
+  it('hands the renderer the state at the head and no version for a draft render', () => {
     const { renderInput } = renderWith({ renderMode: EventDocRenderMode.Draft });
 
-    expect(renderInput.events.map((event) => event.payload.metadata.eventId)).toEqual([eventId(0), eventId(1), eventId(2), eventId(3)]);
+    expect(renderInput.state).toEqual({ foldedEventIds: [eventId(0), eventId(1), eventId(2), eventId(3)] });
     expect(renderInput.version).toBeUndefined();
   });
 
-  it('defaults to the whole log when no mode is given', () => {
+  it('defaults to the head state when no mode is given', () => {
     const { renderInput } = renderWith({});
 
-    expect(renderInput.events.map((event) => event.payload.metadata.eventId)).toEqual([eventId(0), eventId(1), eventId(2), eventId(3)]);
+    expect(renderInput.state).toEqual({ foldedEventIds: [eventId(0), eventId(1), eventId(2), eventId(3)] });
     expect(renderInput.version).toBeUndefined();
   });
 
-  it('hands the renderer the version slice and the version itself for a published render', () => {
+  it('hands the renderer the state at the version head and the version itself for a published render', () => {
     const { renderInput } = renderWith({ renderMode: EventDocRenderMode.Published });
 
-    // Truncated at v1's head — the draft edits (2, 3) must not reach a published render.
-    expect(renderInput.events.map((event) => event.payload.metadata.eventId)).toEqual([eventId(0), eventId(1)]);
+    // Folded from the prefix truncated at v1's head — the draft edits (2, 3) must not
+    // reach a published render.
+    expect(renderInput.state).toEqual({ foldedEventIds: [eventId(0), eventId(1)] });
     // The version is what carries publishedAt, the clock the renderer resolves its links at.
     expect(renderInput.version).toEqual(VERSION_1);
   });
@@ -162,7 +195,8 @@ describe('render route', () => {
     const renderMissing = () =>
       runStory(render(httpEvent({}), { id: DOC_ID }), {
         [ConfigActionType.GetGlobal]: (action: { payload: { globalName: string } }) => globals[action.payload.globalName],
-        [KeyValueStoreActionType.Query]: () => ({ items: storedEvents, nextPageKey: undefined }),
+        [KeyValueStoreActionType.Query]: (action: { payload: { keyValueStoreName: string } }) =>
+          action.payload.keyValueStoreName === store.eventsStoreName ? { items: storedEvents, nextPageKey: undefined } : { items: [], nextPageKey: undefined },
         [DynamicFunctionsActionType.Execute]: throwsError(
           DynamicFunctionsExecuteErrorTypeEnum.DynamicFunctionsNotFound,
           `Dynamic functions not found: [${FUNCTIONS_NAME}]`,
@@ -178,7 +212,8 @@ describe('render route', () => {
     const renderFailing = () =>
       runStory(render(httpEvent({}), { id: DOC_ID }), {
         [ConfigActionType.GetGlobal]: (action: { payload: { globalName: string } }) => globals[action.payload.globalName],
-        [KeyValueStoreActionType.Query]: () => ({ items: storedEvents, nextPageKey: undefined }),
+        [KeyValueStoreActionType.Query]: (action: { payload: { keyValueStoreName: string } }) =>
+          action.payload.keyValueStoreName === store.eventsStoreName ? { items: storedEvents, nextPageKey: undefined } : { items: [], nextPageKey: undefined },
         [DynamicFunctionsActionType.Execute]: throwsError(
           DynamicFunctionsExecuteErrorTypeEnum.ModuleLoadFailed,
           `Unable to dynamically load dynamic functions: [${FUNCTIONS_NAME}]`,

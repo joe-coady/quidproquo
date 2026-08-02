@@ -47,6 +47,7 @@ function* askEventDocEventList(
 | `nextPageKey` | `string` | — | Continuation token from a previous page's `nextPageKey`. |
 | `afterEventId` | `string` | — | Return only events whose event id sorts after this one (exclusive). A sort-key range condition on the events store's primary key — no GSI involved. |
 | `upToEventId` | `string` | — | Return only events whose event id sorts at or before this one (inclusive) — the log prefix up to a known event, for folding a document as of that event (a snapshot). Not combinable with `afterEventId`: a key condition holds one sort-key range. |
+| `sortDescending` | `boolean` | `false` | Newest first, for a display read that walks backwards in time (e.g. a history panel's latest-page-then-load-older). Folding reads never set this — a fold consumes the log in order. |
 | `consistentRead` | `boolean` | `false` | Strongly consistent read. Needed by a caller that just appended and is now folding to decide something — the default eventually-consistent read can otherwise miss that caller's own most recent event. Costs roughly double the read capacity, so leave it off for ordinary reads. |
 
 ### Returns

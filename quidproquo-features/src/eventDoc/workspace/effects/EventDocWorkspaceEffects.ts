@@ -1,3 +1,4 @@
+import { EventDocWorkspaceAppendFullHistoryEffect } from './EventDocWorkspaceAppendFullHistoryEffect';
 import { EventDocWorkspaceAppendHistoryEventEffect } from './EventDocWorkspaceAppendHistoryEventEffect';
 import { EventDocWorkspaceAppendHistoryEventsEffect } from './EventDocWorkspaceAppendHistoryEventsEffect';
 import { EventDocWorkspaceApplyEventEffect } from './EventDocWorkspaceApplyEventEffect';
@@ -20,6 +21,7 @@ export type EventDocWorkspaceEffects =
   | EventDocWorkspaceDropTransientEffect
   | EventDocWorkspaceSetHistoryEventsEffect
   | EventDocWorkspaceSetFullHistoryEffect
+  | EventDocWorkspaceAppendFullHistoryEffect
   | EventDocWorkspaceAppendHistoryEventEffect
   | EventDocWorkspaceAppendHistoryEventsEffect
   | EventDocWorkspaceSetPendingEventsEffect

@@ -9,6 +9,7 @@ import {
   ErrorTypeEnum,
   GuidActionType,
   Nullable,
+  QpqPagedData,
   QpqReducer,
   runStory,
 } from 'quidproquo-core';
@@ -35,6 +36,7 @@ import {
   EventDocWorkspaceBootstrap,
   EventDocWorkspaceDocumentIdentity,
   EventDocWorkspaceDocumentSlotConfig,
+  EventDocWorkspaceEventsPageRequest,
   EventDocWorkspaceSlotKind,
   EventDocWorkspaceSlotOperation,
   EventDocWorkspaceState,
@@ -290,6 +292,25 @@ const createFakeTransport = (initialServerEvents: EventDocEvent[] = []): FakeTra
     return serverEvents.filter((event) => afterEventId === undefined || event.payload.metadata.eventId > afterEventId);
   }
 
+  // A single page for the history panel's newest-first walk: honours newestFirst, limit
+  // and a plain index cursor — enough to exercise paging without a real store.
+  function* askFetchEventsPage(
+    _identity: EventDocWorkspaceDocumentIdentity,
+    request?: EventDocWorkspaceEventsPageRequest,
+  ): AskResponse<QpqPagedData<EventDocEvent>> {
+    if (failFetch) {
+      return yield* askThrowError(ErrorTypeEnum.GenericError, 'fetch boom');
+    }
+
+    const ordered = request?.newestFirst ? [...serverEvents].reverse() : [...serverEvents];
+    const start = request?.nextPageKey ? Number(request.nextPageKey) : 0;
+    const limit = request?.limit ?? ordered.length;
+    const items = ordered.slice(start, start + limit);
+    const nextIndex = start + limit;
+
+    return { items, nextPageKey: nextIndex < ordered.length ? String(nextIndex) : undefined };
+  }
+
   // The bootstrap read: the configured base plus the events after it (all events when
   // no base is set — the fallback the real route serves as base: null). Logged into
   // fetchCalls with the base's cursor so call sequences read the same either way.
@@ -333,7 +354,7 @@ const createFakeTransport = (initialServerEvents: EventDocEvent[] = []): FakeTra
   }
 
   return {
-    transport: { askFetchBootstrap, askFetchEvents, askAppendEvent },
+    transport: { askFetchBootstrap, askFetchEvents, askFetchEventsPage, askAppendEvent },
     appended,
     fetchCalls,
     setServerEvents: (events) => {
@@ -926,6 +947,50 @@ describe('createEventDocWorkspace built-in verbs', () => {
     const view = workspace.docs.noteA.view(state);
     expect(view.title).toBe('snapped');
     expect(view.lines).toEqual([{ lineId: 'l1', text: 'unsaved' }]);
+  });
+
+  it('the history panel pages the saved log newest-first and walks older on demand', () => {
+    // 60 saved events: one page (50) plus a tail, so the cursor genuinely continues.
+    const manyEvents = [
+      initStateEvent(),
+      ...Array.from({ length: 59 }, (_, i) => serverEvent(NoteEvent.SetTitle, { title: `t${i + 1}` }, i + 1)),
+    ];
+
+    const firstPageOnly = (() => {
+      const fake = createFakeTransport(manyEvents);
+      const workspace = createTestWorkspace(fake.transport);
+
+      function* story(): AskResponse<void> {
+        yield* workspace.api.askInit({ noteA: identityA });
+        yield* workspace.api.askLoadHistory('noteA');
+      }
+
+      return runWorkspaceStory(workspace, story).fullHistory.noteA!;
+    })();
+
+    expect(firstPageOnly.events).toHaveLength(50);
+    // Newest first: the panel shows the latest change at the top without reversing.
+    expect(firstPageOnly.events[0].payload.metadata.eventId).toBe(eventId(59));
+    expect(firstPageOnly.nextPageKey).toBeDefined();
+
+    const walkedOlder = (() => {
+      const fake = createFakeTransport(manyEvents);
+      const workspace = createTestWorkspace(fake.transport);
+
+      function* story(): AskResponse<void> {
+        yield* workspace.api.askInit({ noteA: identityA });
+        yield* workspace.api.askLoadHistory('noteA');
+        yield* workspace.api.askLoadOlderHistory('noteA');
+        // A walk past the log's beginning is a no-op, not an error.
+        yield* workspace.api.askLoadOlderHistory('noteA');
+      }
+
+      return runWorkspaceStory(workspace, story).fullHistory.noteA!;
+    })();
+
+    expect(walkedOlder.events).toHaveLength(60);
+    expect(walkedOlder.events[59].payload.metadata.eventId).toBe(eventId(0));
+    expect(walkedOlder.nextPageKey).toBeUndefined();
   });
 
   it('cancel discards pending and leaves history untouched', () => {

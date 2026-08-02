@@ -21,6 +21,10 @@ export type EventDocEventListOptions = {
   // reads the slice between two known points — the gap an incremental fold applies on top of a
   // snapshot's state.
   upToEventId?: string;
+  // Newest first. For display reads that walk BACKWARDS in time (the history panel's
+  // latest-page-then-load-older). Folding reads never set this — a fold consumes the log
+  // in order.
+  sortDescending?: boolean;
 };
 
 // The sort-key condition for the requested slice. A DynamoDB key condition permits ONE
@@ -49,7 +53,7 @@ export function* askEventDocEventList(modelId: string, options?: EventDocEventLi
   const keyCondition = rangeCondition ? kvsAnd([kvsEqual('pk', modelId), rangeCondition]) : kvsEqual('pk', modelId);
 
   const page = yield* askKeyValueStoreQuery<EventDocStoredEvent>(eventsStoreName, keyCondition, {
-    sortAscending: true,
+    sortAscending: !options?.sortDescending,
     limit: options?.limit,
     nextPageKey: options?.nextPageKey,
     consistentRead: options?.consistentRead,
@@ -58,8 +62,9 @@ export function* askEventDocEventList(modelId: string, options?: EventDocEventLi
 
   return {
     nextPageKey: page.nextPageKey,
-    // The between's inclusive lower boundary — see eventRangeCondition. Only the first
-    // page can contain it; filtering every page is harmless.
+    // The between's inclusive lower boundary — see eventRangeCondition. Only one page can
+    // contain it (the first ascending, the last descending); filtering every page is
+    // harmless.
     items: page.items.filter((record) => record.sk !== options?.afterEventId).map((record) => eventDocStoredEventToEvent(record)),
   };
 }

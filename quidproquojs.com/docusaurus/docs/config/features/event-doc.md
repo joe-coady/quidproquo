@@ -55,9 +55,11 @@ The collection's callable surface, read for its identity (`storeName`, `type`) a
 | --- | --- | --- | --- |
 | `storeName` | `string` | yes | Name of the summary store to create and serve. Also derives the events table and asset bucket names. |
 | `type` | `string` | yes | The document type this collection holds — the store's partition value, so one store can (via the split helpers) hold several types. |
-| `foldSnapshotViews` | `(events, seedViews?) => Nullable<EventDocSnapshotViews>` | yes | Every view of a log prefix, era-pinned — what a snapshot stores. Invoked by the event store's stream projector. |
-| `collectReferences` | `(events) => EventDocLink[]` | yes | The `EventDocLink`s this doc's log depends on; `[]` for a leaf doc type. Invoked by the references route and the transfer manifest walk. |
-| `render` | `(input: EventDocRenderInput) => EventDocRenderResult \| AskResponse<EventDocRenderResult>` | no | Fold + render the resolved log. Omit and `GET {basePath}/{id}/render` 404s as "no renderer configured". Plain function or story — the dynamic-functions processor runs either. |
+| `foldSnapshotViews` | `(events, seedViews?) => Nullable<EventDocSnapshotViews>` | yes | Every view of a log prefix, era-pinned — what a snapshot stores. Invoked by the event store's stream projector (which also writes the summary row from the fold's `summary` view). |
+| `foldDocumentState` | `(events, seedState?) => unknown` | yes | The document view at one point, LATEST-shaped, resumable from a stored snapshot's era-pinned document state. The read side's fold: render, references, as-of reads, and the append hooks' state derivation all go through it. |
+| `collectReferences` | `(events) => EventDocLink[]` | yes | The `EventDocLink`s this doc's whole HISTORY depends on; `[]` for a leaf doc type. Invoked by the transfer manifest walk (it exports the whole history). |
+| `collectReferencesFromState` | `(state) => EventDocLink[]` | yes | The `EventDocLink`s the CURRENT state depends on; `[]` for a leaf doc type. Invoked by the references route against a snapshot-seeded folded state. |
+| `render` | `(input: EventDocRenderInput) => EventDocRenderResult \| AskResponse<EventDocRenderResult>` | no | Render the resolved, already-folded document state (`input.state`, resolved snapshot-seeded by the route). Omit and `GET {basePath}/{id}/render` 404s as "no renderer configured". Plain function or story — the dynamic-functions processor runs either. |
 
 ### `runtime` — `QpqFunctionRuntime` (required)
 

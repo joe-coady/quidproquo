@@ -1,5 +1,6 @@
 import {
   AiModel,
+  defineDynamicFunctions,
   defineEventBus,
   defineGlobal,
   defineInlineFunction,
@@ -18,6 +19,7 @@ import {
 import { defineServiceFunction } from 'quidproquo-webserver';
 
 import { defineEventDocSummary } from '../../eventDoc/config/defineEventDocSummary';
+import { eventDocFunctionsName } from '../../eventDoc/constants/eventDocFunctionsName';
 import { defineEventDocRoutes } from '../../eventDoc/routes/defineEventDocRoutes';
 import { defineEventDocAi } from '../../eventDocAi';
 import { getFeatureEntryQpqFunctionRuntime } from '../../getFeatureEntryQpqFunctionRuntime';
@@ -225,11 +227,19 @@ export const defineAdminSettings = (logServiceName: string, rootDomain: string, 
 
         // The maintenance event doc: active = open draft, closed = published,
         // reopen = new draft. Every append re-broadcasts the active public folds
-        // over the application websocket (onAppend hook below). Composed from the
-        // low-level pair: the collection registers no functions object (no render,
-        // no references, no snapshots), which is exactly what defineEventDoc's
-        // definition form would require.
-        defineEventDocSummary(maintenanceStoreName),
+        // over the application websocket (onAppend hook below). The definition is
+        // registered as the collection's functions object: the append derives the
+        // hook's before/after states through its fold (see askEventDocHookStates),
+        // and the stream projector snapshots maintenance docs like any other
+        // collection.
+        defineDynamicFunctions(eventDocFunctionsName(maintenanceStoreName, maintenanceDocType), {
+          basePath: __dirname,
+          relativePath: '../maintenance/eventDoc/maintenanceEventDoc',
+          functionName: 'maintenanceEventDoc',
+        }),
+        defineEventDocSummary(maintenanceStoreName, {
+          snapshotFunctions: { [maintenanceDocType]: eventDocFunctionsName(maintenanceStoreName, maintenanceDocType) },
+        }),
         defineEventDocRoutes({
           storeName: maintenanceStoreName,
           type: maintenanceDocType,

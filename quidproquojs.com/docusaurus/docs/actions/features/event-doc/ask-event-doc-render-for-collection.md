@@ -9,13 +9,13 @@ Renders a document of **another** collection in-process — the in-lambda twin o
 
 Unlike the render route, nothing here is soft: the caller names a specific collection expecting a renderer, so a missing registration or a functions object with no `render` member propagates as its dynamic-functions error rather than a 404.
 
-- **Built from:** `askEventDocProvideStore` (to bind the target collection's store context) and `createDynamicFunctionCaller<EventDocInvokableFunctions>` (to invoke `render` on `eventDocFunctionsName(storeName, type)`, see [defineEventDoc](../../../config/features/event-doc.md)). The caller resolves WHICH events to render first — this only renders the input it's handed.
+- **Built from:** `askEventDocProvideStore` (to bind the target collection's store context) and `createDynamicFunctionCaller<EventDocInvokableFunctions>` (to invoke `render` on `eventDocFunctionsName(storeName, type)`, see [defineEventDoc](../../../config/features/event-doc.md)). The caller resolves WHICH state to render first — this only renders the input it's handed.
 
 ```typescript
 import { askEventDocRenderForCollection } from 'quidproquo-features';
 
-export function* renderTemplateLayout(events: EventDocEvent[], docId: string) {
-  const result = yield* askEventDocRenderForCollection('layouts', 'layout', { events, docId });
+export function* renderTemplateLayout(state: unknown, docId: string) {
+  const result = yield* askEventDocRenderForCollection('layouts', 'layout', { state, docId });
 
   return result.html;
 }
@@ -37,7 +37,7 @@ function* askEventDocRenderForCollection(
 | --- | --- | --- |
 | `storeName` | `string` | The target collection's store name (not necessarily the caller's own). |
 | `type` | `string` | The target collection's document type. |
-| `input` | `EventDocRenderInput` | `{ events, docId, version?, renderMode?, effectiveAt? }` — the already-resolved log to render, exactly as the render route builds it. |
+| `input` | `EventDocRenderInput` | `{ state, docId, version?, renderMode?, effectiveAt? }` — the already-folded document state to render, exactly as the render route builds it. |
 
 ## Returns
 
@@ -46,7 +46,7 @@ function* askEventDocRenderForCollection(
 ## Notes
 
 - Requires the target collection to have a `render` member on its registered `EventDocFunctions` object; a collection with none throws the dynamic-functions "not found" error rather than resolving to an empty result.
-- The caller is responsible for resolving `renderMode`/`effectiveAt` into a concrete `events` slice before calling this — it renders exactly what it's handed, the same contract the render route's controller follows.
+- The caller is responsible for resolving `renderMode`/`effectiveAt` into a concrete, already-folded `state` before calling this — it renders exactly what it's handed, the same contract the render route's controller follows.
 
 ## Related
 

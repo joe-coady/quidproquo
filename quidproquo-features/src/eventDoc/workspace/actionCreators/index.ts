@@ -1,3 +1,4 @@
+export * from './askUIEventDocWorkspaceAppendFullHistory';
 export * from './askUIEventDocWorkspaceAppendHistoryEvent';
 export * from './askUIEventDocWorkspaceAppendHistoryEvents';
 export * from './askUIEventDocWorkspaceApplyEvent';

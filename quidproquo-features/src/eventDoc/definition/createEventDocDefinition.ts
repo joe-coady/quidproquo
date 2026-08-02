@@ -163,6 +163,20 @@ export function createEventDocDefinition(
     return snapshotViews;
   };
 
+  // The document view at ONE point, LATEST-shaped: an as-written fold — resumable from a
+  // stored snapshot's document state, exactly like foldSnapshotViews' primary pass — with
+  // one migrate-to-latest at the end. The read side's fold: render, references, hooks and
+  // backend reads consume THE document at the current schema, not every stored view.
+  // `seedState` must be an era-pinned stored state (a snapshot's document view), never an
+  // already-migrated one — the as-written fold's acceptance rules read the seed's own
+  // schemaVersion as the floor.
+  const foldDocumentState = (events: EventDocEvent[], seedState?: unknown): unknown => {
+    const seeded = seedState !== undefined ? { ...primaryFoldConfig, seed: seedState as EventDocDocument } : primaryFoldConfig;
+    const { state } = foldEventDocLogAsWritten(events, seeded);
+
+    return migrateEventDocDocumentTo(state, schemaVersion, primaryFoldConfig.migrations);
+  };
+
   // The editor's pre-flight, derived from the SAME rules the fold applies, so a client cannot
   // consider legal something the fold will silently drop. Always present, for the same reason
   // the reserved guard always is: without it an edit on a published document is accepted by
@@ -191,9 +205,14 @@ export function createEventDocDefinition(
     api: withGenericVerbs(api),
     views,
     foldSnapshotViews,
+    foldDocumentState,
     references,
     // Always defined so the references invocation needs no optional call. A doc
     // type that declares no `references` is a leaf: skip the walk rather than scan for nothing.
+    // The events walk collects every link ANY historical state referenced (the transfer
+    // export's read — it exports the whole history); the state walk collects what the
+    // CURRENT document references (the references route's read).
     collectReferences: (events: EventDocEvent[]) => (references ? collectEventDocReferences(events, { ...primaryFoldConfig, references }) : []),
+    collectReferencesFromState: (state: unknown) => (references ? references(state as never) : []),
   };
 }

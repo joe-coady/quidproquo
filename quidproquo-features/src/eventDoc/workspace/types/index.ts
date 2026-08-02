@@ -4,6 +4,7 @@ export * from './EventDocWorkspaceBuiltInApi';
 export * from './EventDocWorkspaceCoalesceRules';
 export * from './EventDocWorkspaceDefinition';
 export * from './EventDocWorkspaceDocumentIdentity';
+export * from './EventDocWorkspaceHistoryPage';
 export * from './EventDocWorkspaceDocumentSlotConfig';
 export * from './EventDocWorkspaceDocumentSlotFoldConfig';
 export * from './EventDocWorkspaceLocalSlotConfig';

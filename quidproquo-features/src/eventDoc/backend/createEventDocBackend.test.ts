@@ -10,6 +10,8 @@ const memoFunctions: EventDocFunctions = {
   storeName: 'memos',
   type: 'memo',
   foldSnapshotViews: () => null,
+  foldDocumentState: () => null,
+  collectReferencesFromState: () => [],
   collectReferences: () => [],
 };
 
@@ -45,7 +47,9 @@ describe('createEventDocBackend', () => {
   });
 
   it('throws at build time for a definition with no identity', () => {
-    const identityless: EventDocFunctions = { foldSnapshotViews: () => null, collectReferences: () => [] };
+    const identityless: EventDocFunctions = { foldSnapshotViews: () => null,
+  foldDocumentState: () => null,
+  collectReferencesFromState: () => [], collectReferences: () => [] };
 
     expect(() => createEventDocBackend(identityless)).toThrow('no identity');
   });

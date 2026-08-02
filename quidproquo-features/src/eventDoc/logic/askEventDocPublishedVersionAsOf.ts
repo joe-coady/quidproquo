@@ -1,22 +1,23 @@
 import { AskResponse } from 'quidproquo-core';
 import { Nullable, QpqIsoDateTime } from 'quidproquo-core';
 
-import { askEventDocEventListAll } from '../data/askEventDocEventListAll';
 import { askEventDocGetById } from '../data/askEventDocGetById';
-import { EventDocVersionSlice } from '../models';
+import { EventDocVersionState } from '../models';
+import { askEventDocDocumentStateAsOf } from './askEventDocDocumentStateAsOf';
 import { effectiveAsOf } from './selectors/effectiveAsOf';
 
 /**
- * The version published and effective at `clock`, together with the events that compose it — the
- * log truncated at that version's head. Resolves the version from the persisted summary
- * (`effectiveAsOf`, keyed on `effectiveFrom`), then returns the events with index <= the version's
- * `eventId` (the head stamped at publish time). Returns null when the doc is missing/deleted or
- * nothing is effective yet. Assumes the store context is provided (wrap in
- * `askEventDocProvideStore`). The generic backbone of a "render published" flow: fold the events for
- * the published state, and read `version.publishedAt` to pin the doc's linked assets to the moment
- * it was published. Use `askEventDocPublishedEventsAsOf` when only the events are needed.
+ * The version published and effective at `clock`, together with the document state at
+ * that version's head. Resolves the version from the persisted summary (`effectiveAsOf`,
+ * keyed on `effectiveFrom`), then folds the state as of the version's `eventId` — the
+ * head stamped at publish time — snapshot-seeded, so cost tracks the gap since the
+ * nearest snapshot rather than the log. Returns null when the doc is missing/deleted,
+ * nothing is effective yet, or the version's events are gone (a rewritten log). Assumes
+ * the store context is provided (wrap in `askEventDocProvideStore`). The generic
+ * backbone of a "render published" flow: use the state, and read `version.publishedAt`
+ * to pin the doc's linked assets to the moment it was published.
  */
-export function* askEventDocPublishedVersionAsOf(id: string, clock: QpqIsoDateTime): AskResponse<Nullable<EventDocVersionSlice>> {
+export function* askEventDocPublishedVersionAsOf(id: string, clock: QpqIsoDateTime): AskResponse<Nullable<EventDocVersionState>> {
   const summary = yield* askEventDocGetById(id);
   if (!summary || summary.deletedAt) {
     return null;
@@ -27,10 +28,10 @@ export function* askEventDocPublishedVersionAsOf(id: string, clock: QpqIsoDateTi
     return null;
   }
 
-  const events = yield* askEventDocEventListAll(id);
+  const stateAtVersion = yield* askEventDocDocumentStateAsOf(id, version.eventId);
+  if (!stateAtVersion) {
+    return null;
+  }
 
-  return {
-    version,
-    events: events.filter((event) => event.payload.metadata.eventId <= version.eventId),
-  };
+  return { version, state: stateAtVersion.state };
 }

@@ -81,7 +81,7 @@ describe('defineTenant', () => {
   it('registers the registry definition and points the snapshot projector at it', () => {
     const serviceSettings = config.find(
       (s) => (s as { configSettingType: string }).configSettingType === QPQCoreConfigSettingType.serviceSettings,
-    ) as { settingsByService: Record<string, unknown[]> };
+    ) as unknown as { settingsByService: Record<string, unknown[]> };
 
     const ownerSettings = serviceSettings.settingsByService['owner-svc'].flat(Infinity) as {
       configSettingType: string;

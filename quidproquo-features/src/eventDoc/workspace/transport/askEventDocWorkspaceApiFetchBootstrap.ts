@@ -18,7 +18,7 @@ export function* askEventDocWorkspaceApiFetchBootstrap(identity: EventDocWorkspa
   let nextPageKey = firstPage.nextPageKey;
 
   while (nextPageKey) {
-    const page = yield* askEventDocWorkspaceApiFetchEventsPage(identity, nextPageKey, firstPage.base?.eventId);
+    const page = yield* askEventDocWorkspaceApiFetchEventsPage(identity, { nextPageKey, afterEventId: firstPage.base?.eventId });
     events.push(...page.items);
     nextPageKey = page.nextPageKey;
   }

@@ -1,5 +1,6 @@
 export * from './askEventDocDelete';
 export * from './askEventDocEventDelete';
+export * from './askEventDocEventIdAsOf';
 export * from './askEventDocEventLast';
 export * from './askEventDocEventList';
 export * from './askEventDocEventListAll';
@@ -14,6 +15,7 @@ export * from './askEventDocResolveScope';
 export * from './askEventDocSnapshotBaseLatest';
 export * from './askEventDocSnapshotSeedLatest';
 export * from './askEventDocSnapshotStateResolve';
+export * from './askEventDocSummaryViewWrite';
 export * from './askEventDocSnapshotViewsWrite';
 export * from './askEventDocSnapshotWrite';
 export * from './askEventDocUpsert';

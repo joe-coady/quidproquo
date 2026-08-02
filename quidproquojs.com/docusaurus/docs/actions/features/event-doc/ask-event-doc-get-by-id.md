@@ -29,7 +29,7 @@ An event document is never stored as a mutable blob. Its authoritative state is 
 - **Draft vs published** — the tail (highest) version with no `publishedAt` is the **draft**; a `PUBLISH` event freezes it and starts the next draft. Each version pointer records the `eventId` (a sortable id) of its last event (its head), so folding events whose `eventId` sorts at or before that head reconstructs the version's content as it was. `publishedAt` is when a version was published; `effectiveFrom` is when that publish takes effect (used for as-of time-travel).
 - **Code** — the caller-chosen, stable business key set at create (via `INIT_STATE`) and editable with `SET_CODE`. It stays constant across versions and is expected unique within the collection (and any owner scope), so you can address a document by `code` instead of its generated `id`.
 
-The version-pointer reads ([askEventDocGetDraft, askEventDocGetLatestPublished, askEventDocGetPublishedAsOf, askEventDocPublishedEventsAsOf](./ask-event-doc-get-draft.md)) resolve entries in this model.
+The version-pointer reads ([askEventDocGetDraft, askEventDocGetLatestPublished, askEventDocGetPublishedAsOf, askEventDocPublishedVersionAsOf](./ask-event-doc-get-draft.md)) resolve entries in this model.
 
 ### The summary record
 

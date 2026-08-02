@@ -2,6 +2,7 @@ import {
   ConfigActionType,
   ContextActionType,
   DateActionType,
+  DynamicFunctionsActionType,
   FileActionType,
   GuidActionType,
   InlineFunctionActionType,
@@ -33,7 +34,7 @@ import {
   EVENT_DOC_USER_DIRECTORY_GLOBAL,
 } from '../eventDoc/constants/eventDocGlobalNames';
 import { buildEventDocStore } from '../eventDoc/context/buildEventDocStore';
-import { EventDocEffect, EventDocOnPublishInput } from '../eventDoc/models';
+import { EventDocEffect, EventDocEvent, EventDocOnPublishInput } from '../eventDoc/models';
 import { appendEvent } from '../eventDoc/routes/controllers/appendEvent';
 import { DEFAULT_TENANT_HEADER_NAME, TENANT_HEADER_NAME_GLOBAL } from './constants/tenantGlobalNames';
 import {
@@ -45,6 +46,7 @@ import {
   USER_TENANT_LINKS_STORE,
 } from './constants/tenantStoreNames';
 import { TenantEffect } from './fold/TenantEffect';
+import { tenantRegistryEventDoc } from './module/tenantRegistryEventDoc';
 import { askTenantOnPublish } from './logic/askTenantOnPublish';
 import { askTenantResolveActiveTenant } from './logic/askTenantResolveActiveTenant';
 import { TenantStatus } from './models/TenantStatus';
@@ -88,7 +90,9 @@ const matches = (item: Record<string, unknown>, op: KvsQueryOperation): boolean 
       case KvsQueryOperationType.Equal:
         return actual === op.valueA;
       case KvsQueryOperationType.GreaterThan:
-        return typeof actual === 'number' && typeof op.valueA === 'number' && actual > op.valueA;
+        return typeof actual === typeof op.valueA && (actual as string | number) > (op.valueA as string | number);
+      case KvsQueryOperationType.LessThanOrEqual:
+        return typeof actual === typeof op.valueA && (actual as string | number) <= (op.valueA as string | number);
       default:
         throw new Error(`Test KVS mock does not support operator: ${op.operation}`);
     }
@@ -127,6 +131,16 @@ const buildMocks = () => {
 
     // Sortable ids must sort lexicographically in creation order; pad so they do.
     [GuidActionType.NewSortable]: () => `sguid-${String(++sortableGuidCount).padStart(4, '0')}`,
+    // The registered tenant registry definition, invoked for real: the hook-state
+    // derivation folds the document through it, so the hook payload carries the true
+    // TenantDocument state (brand, logo) rather than a stub.
+    [DynamicFunctionsActionType.Execute]: (action: { payload: { functionName: string; args: [EventDocEvent[], unknown?] } }) => {
+      if (action.payload.functionName !== 'foldDocumentState') {
+        throw new Error(`Unexpected dynamic function: ${action.payload.functionName}`);
+      }
+      return tenantRegistryEventDoc.foldDocumentState(action.payload.args[0], action.payload.args[1]);
+    },
+
     [InlineFunctionActionType.Execute]: (action: { payload: { functionName: string; payload: unknown } }) => {
       // Emulate the standard request-scope resolver: header names a tenant ->
       // that tenant's scope; no header -> the caller's personal scope.
@@ -181,7 +195,7 @@ const buildMocks = () => {
       let items = table.filter((item) => matches(item, keyCondition));
 
       if ('sk' in (items[0] ?? {})) {
-        items = [...items].sort((a, b) => ((a.sk as number) - (b.sk as number)) * (options?.sortAscending === false ? -1 : 1));
+        items = [...items].sort((a, b) => String(a.sk).localeCompare(String(b.sk)) * (options?.sortAscending === false ? -1 : 1));
       }
 
       if (options?.limit !== undefined) {

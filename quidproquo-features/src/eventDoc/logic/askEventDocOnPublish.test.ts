@@ -1,6 +1,8 @@
 import {
   ConfigActionType,
   DateActionType,
+  DynamicFunctionsActionType,
+  DynamicFunctionsExecuteErrorTypeEnum,
   GuidActionType,
   InlineFunctionActionType,
   KeyValueStoreActionType,
@@ -28,7 +30,7 @@ import {
   EVENT_DOC_USER_DIRECTORY_GLOBAL,
 } from '../constants/eventDocGlobalNames';
 import { buildEventDocStore } from '../context/buildEventDocStore';
-import { EventDocEffect } from '../models';
+import { EventDocEffect, EventDocStatus } from '../models';
 import { appendEvent } from '../routes/controllers/appendEvent';
 import { create } from '../routes/controllers/create';
 
@@ -58,7 +60,11 @@ const matches = (item: Record<string, unknown>, op: KvsQueryOperation): boolean 
       case KvsQueryOperationType.Equal:
         return actual === op.valueA;
       case KvsQueryOperationType.GreaterThan:
-        return typeof actual === 'number' && typeof op.valueA === 'number' && actual > op.valueA;
+        // Sort keys are sortable-guid STRINGS on the live stores (and numbers on legacy
+        // fixtures); compare whichever arrives.
+        return typeof actual === typeof op.valueA && (actual as string | number) > (op.valueA as string | number);
+      case KvsQueryOperationType.LessThanOrEqual:
+        return typeof actual === typeof op.valueA && (actual as string | number) <= (op.valueA as string | number);
       default:
         throw new Error(`Test KVS mock does not support operator: ${op.operation}`);
     }
@@ -94,6 +100,13 @@ const buildMocks = (onPublish: string, onInlineExecute?: () => unknown) => {
       inlineInvocations.push(action.payload);
       return onInlineExecute ? onInlineExecute() : undefined;
     },
+
+    // No functions object registered for this collection: the hook-state derivation
+    // falls back to the reserved base fold (see askEventDocHookStates).
+    [DynamicFunctionsActionType.Execute]: throwsError(
+      DynamicFunctionsExecuteErrorTypeEnum.DynamicFunctionsNotFound,
+      'Dynamic functions not found: [test-tenants#tenant#eventDocFunctions]',
+    ),
 
     [KeyValueStoreActionType.Update]: createKvsUpdateMock({
       tableFor: (_scope, storeName) => (tables[storeName] ??= []),
@@ -134,7 +147,7 @@ const buildMocks = (onPublish: string, onInlineExecute?: () => unknown) => {
       let items = table.filter((item) => matches(item, keyCondition));
 
       if ('sk' in (items[0] ?? {})) {
-        items = [...items].sort((a, b) => ((a.sk as number) - (b.sk as number)) * (options?.sortAscending === false ? -1 : 1));
+        items = [...items].sort((a, b) => String(a.sk).localeCompare(String(b.sk)) * (options?.sortAscending === false ? -1 : 1));
       }
 
       if (options?.limit !== undefined) {
@@ -184,8 +197,10 @@ describe('eventDoc onPublish hook', () => {
     expect(inlineInvocations[0].payload.event.type).toBe(EventDocEffect.Publish);
     expect(inlineInvocations[0].payload.summary.id).toBe(summary.id);
 
-    // The full log (INIT_STATE + PUBLISH) rides along so the hook never re-reads it.
-    expect(inlineInvocations[0].payload.events.map((e: { type: string }) => e.type)).toEqual([EventDocEffect.InitState, EventDocEffect.Publish]);
+    // The folded state pair rides along so the hook never re-reads or re-folds the log:
+    // published after the event, still a draft before it.
+    expect(inlineInvocations[0].payload.state.status).toBe(EventDocStatus.Published);
+    expect(inlineInvocations[0].payload.previousState.status).toBe(EventDocStatus.Draft);
   });
 
   it('does not invoke the hook for non-Publish events', () => {
@@ -238,11 +253,12 @@ describe('eventDoc onPublish hook', () => {
 
     expect(inlineInvocations).toHaveLength(2);
 
-    // The retry is written rather than deduped (the append reads nothing), so the log
-    // carries both copies and the hook sees the fuller log the second time. Hooks must be
+    // The retry is written rather than deduped (the append reads nothing), so the hook
+    // fires again with the state as of the retried event — the duplicate is dropped by
+    // the fold's clientMessageId window, so the state is identical. Hooks must be
     // idempotent, and re-firing is exactly how a read model left stale by a failed first
     // hook gets repaired.
-    expect(inlineInvocations[1].payload.events).toHaveLength(3);
+    expect(inlineInvocations[1].payload.state.status).toBe(EventDocStatus.Published);
     expect(inlineInvocations[1].payload.summary.id).toBe(summary.id);
 
     const events = tables[store.eventsStoreName] ?? [];
