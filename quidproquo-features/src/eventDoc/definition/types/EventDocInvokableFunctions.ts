@@ -14,4 +14,5 @@ export type EventDocInvokableFunctions = {
   collectReferences: (events: EventDocEvent[]) => EventDocLink[];
   collectReferencesFromState: (state: unknown) => EventDocLink[];
   render: (input: EventDocRenderInput) => EventDocRenderResult;
+  validateEvent: (event: EventDocEvent, state: unknown) => Nullable<string>;
 };

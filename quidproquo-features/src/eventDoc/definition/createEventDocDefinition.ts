@@ -202,6 +202,9 @@ export function createEventDocDefinition(
     coalesceEventTypes,
     validators,
     validate,
+    // The registered pre-write gate IS the editor validator — one registry, three
+    // enforcement points (editor pre-flight, append pre-write, fold acceptance).
+    validateEvent: validate,
     api: withGenericVerbs(api),
     views,
     foldSnapshotViews,

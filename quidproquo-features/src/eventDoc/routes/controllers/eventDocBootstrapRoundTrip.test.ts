@@ -1,5 +1,7 @@
 import {
   ConfigActionType,
+  DynamicFunctionsActionType,
+  DynamicFunctionsExecuteErrorTypeEnum,
   DateActionType,
   FileActionType,
   GuidActionType,
@@ -82,6 +84,13 @@ const buildMocks = () => {
 
   const mocks = {
     [ConfigActionType.GetGlobal]: (action: { payload: { globalName: string } }) => globals[action.payload.globalName] ?? '',
+
+    // No functions object registered for this collection: the append's pre-write gate
+    // and any state read fall back exactly as an unregistered collection does.
+    [DynamicFunctionsActionType.Execute]: throwsError(
+      DynamicFunctionsExecuteErrorTypeEnum.DynamicFunctionsNotFound,
+      'Dynamic functions not found (test collection registers none)',
+    ),
 
     [UserDirectoryActionType.ReadAccessToken]: { userId: 'user-1', username: 'joe', exp: 0, userDirectory: 'test-user-directory', wasValid: true },
 

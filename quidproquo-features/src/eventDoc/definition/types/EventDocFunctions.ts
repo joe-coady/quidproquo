@@ -33,4 +33,13 @@ export type EventDocFunctions = {
   // without one 404s its render route. Plain function or story - the dynamic-functions
   // processor runs either.
   render?: (input: EventDocRenderInput) => EventDocRenderResult | AskResponse<EventDocRenderResult>;
+
+  // The PRE-WRITE gate: the append path resolves the document's current state
+  // (snapshot-seeded) and runs this BEFORE writing; a non-null reason rejects the append
+  // so the event never enters the log. The fold's acceptance still drops anything that
+  // slips past (a race, an unregistered collection) — this exists because some rules must
+  // stop the WRITE itself (an append-only log holds a smuggled value forever). A saved
+  // definition supplies its editor validator here (same registry as the fold's gate);
+  // extendEventDocFunctions can wrap it with service-side I/O gates (a story is fine).
+  validateEvent?: (event: EventDocEvent, state: unknown) => Nullable<string> | AskResponse<Nullable<string>>;
 };
