@@ -9,6 +9,7 @@ import {
   CryptoKeyQPQConfigSetting,
   defineJavascriptRuntime,
   DeployEventsQPQConfigSetting,
+  DynamicFunctionsQPQConfigSetting,
   EmailTemplates,
   EnvironmentSettingsQPQConfigSetting,
   EventBusQPQConfigSetting,
@@ -406,6 +407,14 @@ export const getOwnedInlineFunctions = (qpqConfig: QPQConfig): InlineFunctionQPQ
   return getOwnedItems(getAllInlineFunctions(qpqConfig), qpqConfig);
 };
 
+export const getAllDynamicFunctions = (qpqConfig: QPQConfig): DynamicFunctionsQPQConfigSetting[] => {
+  return getConfigSettings<DynamicFunctionsQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.dynamicFunctions);
+};
+
+export const getOwnedDynamicFunctions = (qpqConfig: QPQConfig): DynamicFunctionsQPQConfigSetting[] => {
+  return getOwnedItems(getAllDynamicFunctions(qpqConfig), qpqConfig);
+};
+
 // Used in bundlers to know where and what to build and index
 export const getAllSrcEntries = (qpqConfig: QPQConfig): QpqFunctionRuntime[] => {
   const result = [
@@ -423,6 +432,7 @@ export const getAllSrcEntries = (qpqConfig: QPQConfig): QpqFunctionRuntime[] => 
       .map((kvs) => kvs.onStream?.runtime)
       .filter((runtime) => !!runtime) as QpqFunctionRuntime[]),
     ...getAllInlineFunctions(qpqConfig).map((f) => f.runtime),
+    ...getAllDynamicFunctions(qpqConfig).map((f) => f.runtime),
   ];
 
   return result;

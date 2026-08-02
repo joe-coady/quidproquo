@@ -27,6 +27,7 @@ export enum QPQCoreConfigSettingType {
   virtualNetwork = '@quidproquo-core/config/VirtualNetwork',
   notifyError = '@quidproquo-core/config/notifyError',
   inlineFunction = '@quidproquo-core/config/InlineFunction',
+  dynamicFunctions = '@quidproquo-core/config/DynamicFunctions',
   javascriptRuntime = '@quidproquo-core/config/JavascriptRuntime',
   federatedModuleStore = '@quidproquo-core/config/FederatedModuleStore',
 }

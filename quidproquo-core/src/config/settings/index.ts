@@ -10,6 +10,7 @@ export * from './configValue';
 export * from './cryptoKey';
 export * from './definePromiseMode';
 export * from './deployEvent';
+export * from './dynamicFunctions';
 export * from './emailTemplates';
 export * from './environmentSettings';
 export * from './eventBus';

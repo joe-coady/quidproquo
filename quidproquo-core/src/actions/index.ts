@@ -4,6 +4,7 @@ export * from './config';
 export * from './context';
 export * from './crypto';
 export * from './date';
+export * from './dynamicFunctions';
 export * from './error';
 export * from './event';
 export * from './eventBus';
