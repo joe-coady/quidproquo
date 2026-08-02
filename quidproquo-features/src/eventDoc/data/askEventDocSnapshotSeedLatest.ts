@@ -1,36 +1,11 @@
-import {
-  askCatch,
-  askFileReadTextContents,
-  askKeyValueStoreQuery,
-  AskResponse,
-  kvsAnd,
-  kvsEqual,
-  kvsLessThanOrEqual,
-  Nullable,
-} from 'quidproquo-core';
+import { askKeyValueStoreQuery, AskResponse, kvsAnd, kvsEqual, kvsLessThanOrEqual, Nullable } from 'quidproquo-core';
 
 import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
 import { EVENT_DOC_PRIMARY_VIEW } from '../definition/types/EventDocLatestViews';
 import { EventDocSnapshotSeed, EventDocSnapshotViews } from '../models';
 import { eventDocSnapshotPk, EventDocStoredSnapshot } from '../types/EventDocStoredSnapshot';
 import { askEventDocResolveScope } from './askEventDocResolveScope';
-import { eventDocSnapshotPath } from './eventDocSnapshotPath';
-
-// A snapshot row's state, wherever it lives: on the row, or offloaded on the blob drive at
-// the path derived from the row's own keys. A missing/unreadable blob resolves to null —
-// the caller treats the whole seed as unusable rather than folding a view from nothing.
-function* askResolveSnapshotState(docId: string, viewName: string, row: EventDocStoredSnapshot): AskResponse<Nullable<{ state: unknown }>> {
-  if (row.data.type === 'inline') {
-    return { state: row.data.snapshot };
-  }
-
-  const { storageDriveName } = yield* askEventDocResolveStore();
-  const scope = yield* askEventDocResolveScope();
-
-  const read = yield* askCatch(askFileReadTextContents(storageDriveName, eventDocSnapshotPath(docId, viewName, row.sk), scope));
-
-  return read.success ? { state: JSON.parse(read.result) } : null;
-}
+import { askEventDocSnapshotStateResolve } from './askEventDocSnapshotStateResolve';
 
 /**
  * Load the newest COMPLETE snapshot at or before `upToEventId` — the seed an incremental
@@ -81,7 +56,7 @@ export function* askEventDocSnapshotSeedLatest(docId: string, upToEventId: strin
       return null;
     }
 
-    const resolved = yield* askResolveSnapshotState(docId, viewName, row);
+    const resolved = yield* askEventDocSnapshotStateResolve(docId, viewName, row);
 
     if (!resolved) {
       return null;

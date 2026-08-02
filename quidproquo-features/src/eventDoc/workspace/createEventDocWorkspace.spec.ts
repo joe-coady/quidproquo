@@ -8,6 +8,7 @@ import {
   Effect,
   ErrorTypeEnum,
   GuidActionType,
+  Nullable,
   QpqReducer,
   runStory,
 } from 'quidproquo-core';
@@ -17,7 +18,7 @@ import { describe, expect, it } from 'vitest';
 import { askApplyEventDocEvent, askApplyTransientEventDocEvent, askEventDocReadIdentity, askEventDocReadState } from '../actions';
 import { createEventDocStateReader } from '../definition';
 import { buildEventDocFoldReducer, buildVersionRoutedReducer, createEventDocInitialDocumentState, foldEventDocLogStep } from '../fold';
-import { EventDocDocument, EventDocEffect, EventDocEvent, EventDocEventInput, EventDocEventPayload, EventDocStatus } from '../models';
+import { EventDocDocument, EventDocEffect, EventDocEvent, EventDocEventInput, EventDocEventPayload, EventDocSnapshotBase, EventDocStatus } from '../models';
 import { EventDocEditorValidator } from '../validation';
 import { getSlotLiveEvents } from './logic/getSlotLiveEvents';
 import { getSlotTransientEvents } from './logic/getSlotTransientEvents';
@@ -31,6 +32,7 @@ import {
 } from './actionCreators';
 import { createEventDocWorkspace } from './createEventDocWorkspace';
 import {
+  EventDocWorkspaceBootstrap,
   EventDocWorkspaceDocumentIdentity,
   EventDocWorkspaceDocumentSlotConfig,
   EventDocWorkspaceSlotKind,
@@ -263,12 +265,14 @@ type FakeTransport = {
   appended: EventDocEventInput[];
   fetchCalls: { afterEventId?: string }[];
   setServerEvents: (events: EventDocEvent[]) => void;
+  setServerBase: (base: Nullable<EventDocSnapshotBase>) => void;
   failAppendOnCall: (callNumber: number, errorType?: ErrorTypeEnum) => void;
   failFetches: () => void;
 };
 
 const createFakeTransport = (initialServerEvents: EventDocEvent[] = []): FakeTransport => {
   let serverEvents = [...initialServerEvents];
+  let serverBase: Nullable<EventDocSnapshotBase> = null;
   let failAppendOn: number | null = null;
   let failAppendErrorType = ErrorTypeEnum.GenericError;
   let failFetch = false;
@@ -284,6 +288,22 @@ const createFakeTransport = (initialServerEvents: EventDocEvent[] = []): FakeTra
     }
 
     return serverEvents.filter((event) => afterEventId === undefined || event.payload.metadata.eventId > afterEventId);
+  }
+
+  // The bootstrap read: the configured base plus the events after it (all events when
+  // no base is set — the fallback the real route serves as base: null). Logged into
+  // fetchCalls with the base's cursor so call sequences read the same either way.
+  function* askFetchBootstrap(_identity: EventDocWorkspaceDocumentIdentity): AskResponse<EventDocWorkspaceBootstrap> {
+    fetchCalls.push({ afterEventId: serverBase?.eventId });
+
+    if (failFetch) {
+      return yield* askThrowError(ErrorTypeEnum.GenericError, 'fetch boom');
+    }
+
+    return {
+      base: serverBase,
+      events: serverEvents.filter((event) => serverBase === null || event.payload.metadata.eventId > serverBase.eventId),
+    };
   }
 
   function* askAppendEvent(_identity: EventDocWorkspaceDocumentIdentity, input: EventDocEventInput): AskResponse<EventDocEvent> {
@@ -313,11 +333,14 @@ const createFakeTransport = (initialServerEvents: EventDocEvent[] = []): FakeTra
   }
 
   return {
-    transport: { askFetchEvents, askAppendEvent },
+    transport: { askFetchBootstrap, askFetchEvents, askAppendEvent },
     appended,
     fetchCalls,
     setServerEvents: (events) => {
       serverEvents = [...events];
+    },
+    setServerBase: (base) => {
+      serverBase = base;
     },
     failAppendOnCall: (callNumber, errorType = ErrorTypeEnum.GenericError) => {
       failAppendOn = callNumber;
@@ -816,6 +839,93 @@ describe('createEventDocWorkspace built-in verbs', () => {
     expect(fake.fetchCalls).toEqual([{ afterEventId: undefined }, { afterEventId: eventId(0) }]);
     expect(state.history.noteA).toHaveLength(2);
     expect(state.history.noteA[1].payload.data).toEqual({ title: 'from elsewhere' });
+  });
+
+  it('init seeds the fold from a server snapshot base and holds only the tail', () => {
+    const allEvents = [
+      initStateEvent(),
+      serverEvent(NoteEvent.SetTitle, { title: 'snapped title' }, 1),
+      serverEvent(NoteEvent.AddLine, { lineId: 'l1', text: 'after the snapshot' }, 2),
+    ];
+    // The base is what the server's snapshot store holds: the era-pinned fold of the
+    // log up to the snapshot event.
+    const base: EventDocSnapshotBase = { eventId: eventId(1), state: foldNoteHistory(allEvents.slice(0, 2)) };
+
+    const fake = createFakeTransport(allEvents);
+    fake.setServerBase(base);
+    const workspace = createTestWorkspace(fake.transport);
+
+    function* story(): AskResponse<void> {
+      yield* workspace.api.askInit({ noteA: identityA });
+    }
+
+    const state = runWorkspaceStory(workspace, story);
+
+    // Only the tail crossed the wire and is held; the base fills in the rest.
+    expect(state.history.noteA.map((event) => event.payload.metadata.eventId)).toEqual([eventId(2)]);
+    expect(state.bases.noteA).toEqual(base);
+
+    // Resuming from the base equals folding the whole log from scratch.
+    expect(state.historyViews.noteA).toEqual(foldNoteHistory(allEvents));
+
+    const view = workspace.docs.noteA.view(state);
+    expect(view.title).toBe('snapped title');
+    expect(view.lines).toEqual([{ lineId: 'l1', text: 'after the snapshot' }]);
+  });
+
+  it('refresh on a bootstrap-loaded slot with an empty tail cursors from the base, not event zero', () => {
+    const baseEvents = [initStateEvent(), serverEvent(NoteEvent.SetTitle, { title: 'snapped' }, 1)];
+    const base: EventDocSnapshotBase = { eventId: eventId(1), state: foldNoteHistory(baseEvents) };
+
+    // The snapshot is current: nothing after it, so the slot holds NO events at all.
+    const fake = createFakeTransport(baseEvents);
+    fake.setServerBase(base);
+    const workspace = createTestWorkspace(fake.transport);
+
+    function* story(): AskResponse<void> {
+      yield* workspace.api.askInit({ noteA: identityA });
+      fake.setServerEvents([...baseEvents, serverEvent(NoteEvent.AddLine, { lineId: 'l1', text: 'from elsewhere' }, 2)]);
+      yield* workspace.api.askRefresh('noteA');
+    }
+
+    const state = runWorkspaceStory(workspace, story);
+
+    // Both calls cursor from the base's event — never a full refetch.
+    expect(fake.fetchCalls).toEqual([{ afterEventId: eventId(1) }, { afterEventId: eventId(1) }]);
+    expect(state.history.noteA).toHaveLength(1);
+    expect(workspace.docs.noteA.view(state).lines).toEqual([{ lineId: 'l1', text: 'from elsewhere' }]);
+  });
+
+  it('a runtime snapshot carries the fold base and restores it with the partial history', () => {
+    const allEvents = [initStateEvent(), serverEvent(NoteEvent.SetTitle, { title: 'snapped' }, 1)];
+    const base: EventDocSnapshotBase = { eventId: eventId(0), state: foldNoteHistory(allEvents.slice(0, 1)) };
+
+    const fake = createFakeTransport(allEvents);
+    fake.setServerBase(base);
+    const workspace = createTestWorkspace(fake.transport);
+
+    function* editSession(): AskResponse<void> {
+      yield* workspace.api.askInit({ noteA: identityA });
+      yield* workspace.docs.noteA.api.askNoteAddLine('l1', 'unsaved');
+    }
+
+    const snapshot = workspace.createSnapshot(runWorkspaceStory(workspace, editSession));
+
+    // The snapshot's history is partial (post-base only) — the base must ride along.
+    expect(snapshot.slots.noteA.history).toHaveLength(1);
+    expect(snapshot.slots.noteA.base).toEqual(base);
+
+    function* swappedSession(): AskResponse<void> {
+      yield* workspace.api.askInit({ noteA: identityA }, snapshot);
+    }
+
+    const state = runWorkspaceStory(workspace, swappedSession);
+
+    // Restored partial history refolds from the restored base, not from pristine.
+    expect(state.bases.noteA).toEqual(base);
+    const view = workspace.docs.noteA.view(state);
+    expect(view.title).toBe('snapped');
+    expect(view.lines).toEqual([{ lineId: 'l1', text: 'unsaved' }]);
   });
 
   it('cancel discards pending and leaves history untouched', () => {

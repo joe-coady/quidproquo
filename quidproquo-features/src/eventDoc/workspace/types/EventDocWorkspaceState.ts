@@ -1,24 +1,35 @@
-import { EventDocEvent } from '../../models';
+import { Nullable } from 'quidproquo-core';
+
+import { EventDocEvent, EventDocSnapshotBase } from '../../models';
 import { EventDocWorkspaceSlotFoldsConfig } from './EventDocWorkspaceSlotFoldsConfig';
 import { createInitialEventDocWorkspaceSlotState, EventDocWorkspaceSlotState } from './EventDocWorkspaceSlotState';
 
 // A workspace is n named event streams, each holding three groups of events:
-// - `history` — server truth: the confirmed (saved) log per slot.
+// - `history` — server truth: the confirmed (saved) log per slot, starting AFTER the
+//   slot's `base` (from the base's event zero when the base is null).
 // - `pending` — client intent: the unsaved buffer; EVERY commit lands here, Save moves
 //   it via the server into history, and a local slot's pending simply never saves.
 // - `transient` — never-saved observations (progress messages, ephemeral status),
 //   grouped per slot by transientKey (usually a websocket connection id — the unit you
 //   drop); dropping a key clears it across all slots and the folded views revert.
-// `historyViews` is the fold ACCUMULATOR of each slot's history, maintained
+// `bases` is each document slot's server-snapshot fold base: the folded state the
+// slot's history follows from, so the client holds base + tail instead of the whole
+// log. Null means the history IS the whole log (no usable server snapshot; local
+// slots always). `historyViews` is the fold ACCUMULATOR of base + history, maintained
 // incrementally by the reducer's state updaters; it sits at the last folded event's
 // schema version, which may be below the slot's latest. The live view is the (tiny)
-// pending tail, then the transient tail, folded onto that stored base and migrated to
-// the latest version in selectors. The log stays the source of truth: historyViews is
-// a pure fold of it, never edited directly.
+// pending tail, then the transient tail, folded onto that stored accumulator and
+// migrated to the latest version in selectors. Base + log stay the source of truth:
+// historyViews is a pure fold of them, never edited directly.
+// `fullHistory` is a display side-channel: the COMPLETE saved log from event zero,
+// loaded on demand (askLoadHistory — the history dialog's read) because the working
+// `history` starts after the base. Nothing folds from it; null until requested.
 export type EventDocWorkspaceState = {
   history: Record<string, EventDocEvent[]>;
   pending: Record<string, EventDocEvent[]>;
   transient: Record<string, Record<string, EventDocEvent[]>>;
+  bases: Record<string, Nullable<EventDocSnapshotBase>>;
+  fullHistory: Record<string, Nullable<EventDocEvent[]>>;
   historyViews: Record<string, unknown>;
   slots: Record<string, EventDocWorkspaceSlotState>;
 };
@@ -35,6 +46,8 @@ export const createInitialEventDocWorkspaceState = (slots: EventDocWorkspaceSlot
     history: mapFromSlotKeys(slotKeys, () => []),
     pending: mapFromSlotKeys(slotKeys, () => []),
     transient: mapFromSlotKeys(slotKeys, () => ({})),
+    bases: mapFromSlotKeys(slotKeys, () => null),
+    fullHistory: mapFromSlotKeys(slotKeys, () => null),
     historyViews: Object.fromEntries(Object.entries(slots).map(([slotKey, slot]) => [slotKey, slot.createInitialViewState()])),
     slots: mapFromSlotKeys(slotKeys, createInitialEventDocWorkspaceSlotState),
   };

@@ -8,6 +8,7 @@ export * from './askUIEventDocWorkspaceRemovePendingEvent';
 export * from './askUIEventDocWorkspaceReset';
 export * from './askUIEventDocWorkspaceSetDocumentIdentity';
 export * from './askUIEventDocWorkspaceSetError';
+export * from './askUIEventDocWorkspaceSetFullHistory';
 export * from './askUIEventDocWorkspaceSetHistoryEvents';
 export * from './askUIEventDocWorkspaceSetLoading';
 export * from './askUIEventDocWorkspaceSetPendingEvents';

@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { EventDocEvent, EventDocEventInput } from '../../models';
 import { EventDocWorkspaceDocumentIdentity } from '../types/EventDocWorkspaceDocumentIdentity';
 import { askEventDocWorkspaceApiAppendEvent } from './askEventDocWorkspaceApiAppendEvent';
+import { askEventDocWorkspaceApiFetchBootstrap } from './askEventDocWorkspaceApiFetchBootstrap';
 import { askEventDocWorkspaceApiFetchEvents } from './askEventDocWorkspaceApiFetchEvents';
 
 // Sortable event ids are opaque strings ordered lexicographically; padded counters stand in.
@@ -64,6 +65,44 @@ describe('eventDocWorkspaceApiTransport', () => {
     });
 
     expect(requests[0].params).toMatchObject({ afterEventId: eventId(7) });
+  });
+
+  it('bootstrap asks for the base on the first page only, then pages the tail pinned to it', () => {
+    const requests: ApiRequestActionPayload<unknown>[] = [];
+    const base = { eventId: eventId(3), state: { title: 'snapped' } };
+
+    // Two pages: the bootstrap page carries the base and a nextPageKey, the follow-up
+    // is a plain events page pinned to the base's cursor.
+    const respondWithPage = (action: Action<ApiRequestActionPayload<unknown>>) => {
+      requests.push(action.payload!);
+      const isFirstPage = action.payload!.params?.nextPageKey === undefined;
+
+      return isFirstPage
+        ? { status: 200, data: { base, items: [storedEvent(4)], nextPageKey: 'page-2' } }
+        : { status: 200, data: { items: [storedEvent(5)] } };
+    };
+
+    const bootstrap = runStory(askEventDocWorkspaceApiFetchBootstrap(identity), {
+      [ApiActionType.Request]: respondWithPage,
+    });
+
+    expect(bootstrap.base).toEqual(base);
+    expect(bootstrap.events.map((event) => event.payload.metadata.eventId)).toEqual([eventId(4), eventId(5)]);
+
+    expect(requests[0]).toMatchObject({ service: 'notes', method: 'GET', endpoint: '/v1/notes/doc-1/events', params: { includeBase: 'true' } });
+    expect(requests[1].params).toMatchObject({ nextPageKey: 'page-2', afterEventId: eventId(3) });
+    expect(requests[1].params?.includeBase).toBeUndefined();
+  });
+
+  it('bootstrap passes a null base through with the full log', () => {
+    const respondWithFallback = () => ({ status: 200, data: { base: null, items: [storedEvent(0), storedEvent(1)] } });
+
+    const bootstrap = runStory(askEventDocWorkspaceApiFetchBootstrap(identity), {
+      [ApiActionType.Request]: respondWithFallback,
+    });
+
+    expect(bootstrap.base).toBeNull();
+    expect(bootstrap.events).toHaveLength(2);
   });
 
   it('POSTs an append and returns the stored event', () => {

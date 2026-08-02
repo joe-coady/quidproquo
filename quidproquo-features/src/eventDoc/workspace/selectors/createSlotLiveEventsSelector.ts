@@ -4,7 +4,9 @@ import { getSlotHistory } from '../logic/getSlotHistory';
 import { getSlotPending } from '../logic/getSlotPending';
 import { EventDocWorkspaceSelector } from '../types/EventDocWorkspaceSelectors';
 
-// The live log for one slot: [...history, ...pending], memoized on stream identity.
+// The live events for one slot: [...history, ...pending], memoized on stream
+// identity. Everything since the slot's fold base — not the whole log (see
+// getSlotLiveEvents).
 export const createSlotLiveEventsSelector = (slotKey: string): EventDocWorkspaceSelector<EventDocEvent[]> => {
   let cachedHistory: EventDocEvent[] | undefined;
   let cachedPending: EventDocEvent[] | undefined;

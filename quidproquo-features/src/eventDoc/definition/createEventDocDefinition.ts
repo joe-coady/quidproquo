@@ -166,8 +166,10 @@ export function createEventDocDefinition(
   // The editor's pre-flight, derived from the SAME rules the fold applies, so a client cannot
   // consider legal something the fold will silently drop. Always present, for the same reason
   // the reserved guard always is: without it an edit on a published document is accepted by
-  // the editor, ignored by the fold, and simply appears to do nothing.
-  const validate = createEventDocEventValidator((events: EventDocEvent[]) => foldEventDocLog(events, primaryFoldConfig), config.validators ?? {});
+  // the editor, ignored by the fold, and simply appears to do nothing. Runs against the
+  // editor's folded live state (the workspace supplies it), never the raw log — the editor may
+  // hold only the events after its snapshot base.
+  const validate = createEventDocEventValidator(config.validators ?? {});
 
   return {
     storeName,

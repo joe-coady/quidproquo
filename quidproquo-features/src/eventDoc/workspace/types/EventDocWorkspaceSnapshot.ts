@@ -1,4 +1,6 @@
-import { EventDocEvent } from '../../models';
+import { Nullable } from 'quidproquo-core';
+
+import { EventDocEvent, EventDocSnapshotBase } from '../../models';
 import { EventDocWorkspaceDocumentIdentity } from './EventDocWorkspaceDocumentIdentity';
 
 // A serializable capture of everything worth carrying ACROSS a workspace runtime
@@ -19,6 +21,11 @@ export type EventDocWorkspaceSlotSnapshot = {
   // back to the blocking full fetch); also the caller's knob — strip it to force a
   // full refetch on restore.
   history?: EventDocEvent[];
+  // The fold base `history` follows from — MUST travel with it: a bootstrap-loaded
+  // slot's history starts after its base, and restoring that history without the
+  // base would refold a partial log from pristine. Absent (older bundle) or null
+  // means the history is the whole log.
+  base?: Nullable<EventDocSnapshotBase>;
 };
 
 export type EventDocWorkspaceSnapshot = {

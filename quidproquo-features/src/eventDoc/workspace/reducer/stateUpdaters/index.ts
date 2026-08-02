@@ -12,6 +12,7 @@ export * from './foldSlotHistory';
 export * from './removePendingEvent';
 export * from './setDocumentIdentity';
 export * from './setError';
+export * from './setFullHistory';
 export * from './setLoading';
 export * from './setPendingEvents';
 export * from './setSaving';

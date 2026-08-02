@@ -7,9 +7,9 @@ import { EventDocStoredEvent } from '../types/EventDocStoredEvent';
 import { eventDocStoredEventToEvent } from './storedEvent/eventDocStoredEventToEvent';
 import { askEventDocResolveScope } from './askEventDocResolveScope';
 
-// Tail of the log, used to assign the next index, dedup, and validate. Relies on
-// numeric sort-key ordering: the dev-server sorts numeric sort keys numerically
-// (matching DynamoDB), so this returns the true latest.
+// Tail of the log — the newest event by sort key. Event ids are sortable guids, so
+// lexicographic sort-key order (DynamoDB's, and the dev-server's for strings) is
+// creation order and this returns the true latest.
 export function* askEventDocEventLast(modelId: string): AskResponse<Nullable<EventDocEvent>> {
   const { eventsStoreName } = yield* askEventDocResolveStore();
   const scope = yield* askEventDocResolveScope();

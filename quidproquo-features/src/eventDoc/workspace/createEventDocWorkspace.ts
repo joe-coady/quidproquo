@@ -1,6 +1,9 @@
 import { defaultEventDocEventValidator } from '../validation';
 import { eventDocWorkspaceChromeSlot } from './chrome/eventDocWorkspaceChromeSlot';
 import { bindEventDocWorkspaceApi } from './logic/bindEventDocWorkspaceApi';
+import { foldSlotPendingTail } from './logic/foldSlotPendingTail';
+import { getSlotHistoryView } from './logic/getSlotHistoryView';
+import { getSlotPending } from './logic/getSlotPending';
 import { createEventDocWorkspaceBuiltInApi } from './logic/createEventDocWorkspaceBuiltInApi';
 import { createEventDocWorkspaceSnapshot } from './logic/createEventDocWorkspaceSnapshot';
 import { createEventDocWorkspaceReducer } from './reducer/createEventDocWorkspaceReducer';
@@ -25,6 +28,9 @@ const getSlotBinding = (
   schemaVersion: slot.schemaVersion ?? 1,
   validate: slot.kind === EventDocWorkspaceSlotKind.document ? (slot.validate ?? defaultEventDocEventValidator) : (slot.validate ?? null),
   getView,
+  // Unmemoized on purpose: it runs once per commit, and the view selector's cache
+  // (which includes transients) can't be reused for a transient-free fold.
+  getValidationView: (state) => foldSlotPendingTail(slot, getSlotHistoryView(state, slotKey), getSlotPending(state, slotKey)),
 });
 
 const resolveWorkspaceSlots = <TSlots extends EventDocWorkspaceSlotsConfig>(slots: TSlots): EventDocWorkspaceResolvedSlots<TSlots> =>

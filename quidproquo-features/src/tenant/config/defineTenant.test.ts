@@ -3,7 +3,15 @@ import { QPQWebServerConfigSettingType } from 'quidproquo-webserver';
 
 import { describe, expect, it } from 'vitest';
 
-import { TENANT_CONNECTION_SCOPE_RESOLVER_FN, TENANT_SCOPE_RESOLVER_FN, USER_TENANT_LINKS_STORE } from '../constants/tenantStoreNames';
+import { eventDocFunctionsName } from '../../eventDoc/constants/eventDocFunctionsName';
+import { EVENT_DOC_SNAPSHOT_FUNCTIONS_GLOBAL } from '../../eventDoc/constants/eventDocGlobalNames';
+import {
+  TENANT_CONNECTION_SCOPE_RESOLVER_FN,
+  TENANT_DOC_TYPE,
+  TENANT_EVENTDOC_STORE,
+  TENANT_SCOPE_RESOLVER_FN,
+  USER_TENANT_LINKS_STORE,
+} from '../constants/tenantStoreNames';
 import { defineTenant } from './defineTenant';
 
 const config = defineTenant({
@@ -68,6 +76,31 @@ describe('defineTenant', () => {
     const ownerSettings = JSON.stringify(serviceSettings.settingsByService['owner-svc']);
     const occurrences = ownerSettings.split(TENANT_SCOPE_RESOLVER_FN).length - 1;
     expect(occurrences).toBeGreaterThanOrEqual(2);
+  });
+
+  it('registers the registry definition and points the snapshot projector at it', () => {
+    const serviceSettings = config.find(
+      (s) => (s as { configSettingType: string }).configSettingType === QPQCoreConfigSettingType.serviceSettings,
+    ) as { settingsByService: Record<string, unknown[]> };
+
+    const ownerSettings = serviceSettings.settingsByService['owner-svc'].flat(Infinity) as {
+      configSettingType: string;
+      dynamicFunctionsName?: string;
+      onStream?: { runtime: { globals?: Record<string, unknown> } };
+    }[];
+
+    const functionsName = eventDocFunctionsName(TENANT_EVENTDOC_STORE, TENANT_DOC_TYPE);
+
+    // The dynamic-functions registration under the conventional name...
+    const registration = ownerSettings.find((s) => s.dynamicFunctionsName === functionsName);
+    expect(registration).toBeDefined();
+
+    // ...and the event log's stream projector wired to fold tenant snapshots through
+    // it (the map rides the stream runtime's globals — see defineEventDocSummary).
+    const snapshotMaps = ownerSettings
+      .map((s) => s.onStream?.runtime.globals?.[EVENT_DOC_SNAPSHOT_FUNCTIONS_GLOBAL] as Record<string, string> | undefined)
+      .filter(Boolean);
+    expect(snapshotMaps).toContainEqual({ [TENANT_DOC_TYPE]: functionsName });
   });
 
   it('mounts the tenant collection at basePath, named after the model type', () => {

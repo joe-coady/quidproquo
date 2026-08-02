@@ -1,5 +1,6 @@
 import { EventDocWorkspaceTransport } from '../types/EventDocWorkspaceTransport';
 import { askEventDocWorkspaceApiAppendEvent } from './askEventDocWorkspaceApiAppendEvent';
+import { askEventDocWorkspaceApiFetchBootstrap } from './askEventDocWorkspaceApiFetchBootstrap';
 import { askEventDocWorkspaceApiFetchEvents } from './askEventDocWorkspaceApiFetchEvents';
 
 // The standard transport: speaks the feature's own event routes over
@@ -7,6 +8,7 @@ import { askEventDocWorkspaceApiFetchEvents } from './askEventDocWorkspaceApiFet
 // runtime, the dev server) can drive a workspace with zero wiring. Other hosts (tests,
 // backend stories) inject their own EventDocWorkspaceTransport instead.
 export const eventDocWorkspaceApiTransport: EventDocWorkspaceTransport = {
+  askFetchBootstrap: askEventDocWorkspaceApiFetchBootstrap,
   askFetchEvents: askEventDocWorkspaceApiFetchEvents,
   askAppendEvent: askEventDocWorkspaceApiAppendEvent,
 };

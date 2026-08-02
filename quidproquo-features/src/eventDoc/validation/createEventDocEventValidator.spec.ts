@@ -34,24 +34,24 @@ const init = () => ev(InitState, { id: 'd1', code: 'C', name: 'N' });
 const domainValidators: EventDocEventValidators = {
   ROTATE: () => null,
 };
-const validate = createEventDocEventValidator(foldEventDocBase, domainValidators);
+const validate = createEventDocEventValidator(domainValidators);
 
 describe('createEventDocEventValidator', () => {
   it('composes the reserved guard: an un-overridden edit is rejected on a published doc', () => {
-    expect(validate(ev('EDIT'), [init(), ev(Publish)])).toBeTruthy();
+    expect(validate(ev('EDIT'), foldEventDocBase([init(), ev(Publish)]))).toBeTruthy();
   });
 
   it('lets a domain entry OVERRIDE (relax) the guard on a published doc', () => {
-    expect(validate(ev('ROTATE'), [init(), ev(Publish)])).toBeNull();
+    expect(validate(ev('ROTATE'), foldEventDocBase([init(), ev(Publish)]))).toBeNull();
   });
 
   it('allows un-overridden edits on an open draft', () => {
-    expect(validate(ev('EDIT'), [init()])).toBeNull();
+    expect(validate(ev('EDIT'), foldEventDocBase([init()]))).toBeNull();
   });
 
   it('with no domain rules, is just the lifecycle guard', () => {
-    const guardOnly = createEventDocEventValidator(foldEventDocBase);
-    expect(guardOnly(ev('EDIT'), [init(), ev(Publish)])).toBeTruthy();
-    expect(guardOnly(ev('EDIT'), [init()])).toBeNull();
+    const guardOnly = createEventDocEventValidator();
+    expect(guardOnly(ev('EDIT'), foldEventDocBase([init(), ev(Publish)]))).toBeTruthy();
+    expect(guardOnly(ev('EDIT'), foldEventDocBase([init()]))).toBeNull();
   });
 });
