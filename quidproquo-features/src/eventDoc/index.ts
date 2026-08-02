@@ -1,5 +1,6 @@
 export * from './actionCreators';
 export * from './actions';
+export * from './backend';
 export * from './config';
 export * from './constants';
 export * from './context';
