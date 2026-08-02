@@ -33,7 +33,7 @@ All paths are prefixed with the version segment `/v{version}` (default `/v1`):
 | --- | --- | --- |
 | `GET` | `{basePath}` | List one page of the collection's documents (newest first). Accepts `?limit=` and `?nextPageKey=` and returns `QpqPagedData`. |
 | `GET` | `{basePath}/{id}` | Get one document's summary record. |
-| `GET` | `{basePath}/{id}/events` | List a document's event log. |
+| `GET` | `{basePath}/{id}/events` | List a document's event log. Accepts `?limit=`, `?nextPageKey=`, and `?afterEventId=` (exclusive — the tail since a known event). With `?includeBase=true` the response becomes the bootstrap shape: `{ base, items, nextPageKey }`, where `base` is the newest usable document-view snapshot (`{ eventId, state }`, era-pinned) and `items` starts after it — or `base: null` with the log from event zero when no usable snapshot exists, so the fallback needs no second request shape. The base rides the first page only; page the rest with `?afterEventId=base.eventId`. |
 | `GET` | `{basePath}/{id}/render` | Render the document to HTML. 404s as "no renderer configured" when the collection's registered functions object has no `render` member. |
 | `GET` | `{basePath}/{id}/references` | List the `EventDocLink`s this document depends on. Resolves to `[]` when the collection has no registered functions object. |
 | `POST` | `{basePath}` | Create a document. |

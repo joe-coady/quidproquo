@@ -1,5 +1,6 @@
-import { defineInlineFunction, defineKeyValueStore, defineServiceSettings, QPQConfig } from 'quidproquo-core';
+import { defineDynamicFunctions, defineInlineFunction, defineKeyValueStore, defineServiceSettings, QPQConfig } from 'quidproquo-core';
 
+import { eventDocFunctionsName } from '../../eventDoc/constants/eventDocFunctionsName';
 import { defineEventDocRoutes } from '../../eventDoc/routes/defineEventDocRoutes';
 import {
   TENANT_CONNECTION_SCOPE_RESOLVER_FN,
@@ -62,6 +63,14 @@ export const defineTenant = ({ owner, ...routeOptions }: TenantOptions): QPQConf
   defineServiceSettings({
     [owner.module]: [
       ...defineTenantStores(),
+      // The registry definition's live functions, registered under the name the
+      // snapshot projector (and any other eventDocFunctionsName consumer) addresses —
+      // what makes tenant docs snapshot like every other collection.
+      defineDynamicFunctions(eventDocFunctionsName(TENANT_EVENTDOC_STORE, TENANT_DOC_TYPE), {
+        basePath: __dirname,
+        relativePath: '../module/tenantRegistryEventDoc',
+        functionName: 'tenantRegistryEventDoc',
+      }),
       defineInlineFunction(
         {
           basePath: __dirname,

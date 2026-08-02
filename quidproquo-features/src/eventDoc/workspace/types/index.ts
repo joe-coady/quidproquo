@@ -1,4 +1,5 @@
 export * from './CoalesceEventType';
+export * from './EventDocWorkspaceBootstrap';
 export * from './EventDocWorkspaceBuiltInApi';
 export * from './EventDocWorkspaceCoalesceRules';
 export * from './EventDocWorkspaceDefinition';

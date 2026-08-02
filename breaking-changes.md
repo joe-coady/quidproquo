@@ -48,6 +48,15 @@ assembled quickly.
   folded view) rather than one function over the raw event list. Convert a hand-written `validate` into per-type entries; the universal lifecycle
   guard is now composed in automatically (merged with the supplied `validators`, or applied alone if `validators` is omitted) instead of being
   something a custom `validate` had to reimplement or call into.
+- `EventDocEditorValidator` (`quidproquo-features`) changes shape from `(event, events: EventDocEvent[]) => Nullable<string>` to
+  `(event, state: unknown) => Nullable<string>`: it now receives the already-folded document state instead of the raw event log. A hand-written
+  validator that folded its own list must fold once upstream and pass the state through instead.
+- `createEventDocEventValidator(fold, domainValidators)` (`quidproquo-features`) drops the `fold` parameter: call it as
+  `createEventDocEventValidator(domainValidators)`. The returned validator now takes the folded state directly (see `EventDocEditorValidator` above)
+  rather than folding the event log itself.
+- `EventDocWorkspaceTransport` (`quidproquo-features`) gains a required `askFetchBootstrap: (identity) => AskResponse<{ base, events }>` member. A
+  hand-written transport (anything other than the built-in `eventDocWorkspaceApiTransport`) must implement it: the opening load's newest fold base
+  plus the events after it, or `{ base: null, events }` with the whole log when there is no usable base.
 - `EventDocUnsavedDefinitionConfig.validate` is removed with no replacement; unsaved (session-only) docs no longer accept a validator.
 - The reserved lifecycle guard (and any `validators` supplied) is now enforced by the fold itself, not just the editor pre-flight — a document
   folded from a stored log that contains an event the guard rejects (e.g. an edit appended after publish) now ignores that event instead of applying

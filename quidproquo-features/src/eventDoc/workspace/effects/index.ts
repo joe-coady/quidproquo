@@ -10,6 +10,7 @@ export * from './EventDocWorkspaceRemovePendingEventEffect';
 export * from './EventDocWorkspaceResetEffect';
 export * from './EventDocWorkspaceSetDocumentIdentityEffect';
 export * from './EventDocWorkspaceSetErrorEffect';
+export * from './EventDocWorkspaceSetFullHistoryEffect';
 export * from './EventDocWorkspaceSetHistoryEventsEffect';
 export * from './EventDocWorkspaceSetLoadingEffect';
 export * from './EventDocWorkspaceSetPendingEventsEffect';

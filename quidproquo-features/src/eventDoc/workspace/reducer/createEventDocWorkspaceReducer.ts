@@ -15,6 +15,7 @@ import { dropTransient } from './stateUpdaters/dropTransient';
 import { removePendingEvent } from './stateUpdaters/removePendingEvent';
 import { setDocumentIdentity } from './stateUpdaters/setDocumentIdentity';
 import { setError } from './stateUpdaters/setError';
+import { setFullHistory } from './stateUpdaters/setFullHistory';
 import { setLoading } from './stateUpdaters/setLoading';
 import { setPendingEvents } from './stateUpdaters/setPendingEvents';
 import { setSaving } from './stateUpdaters/setSaving';
@@ -34,6 +35,7 @@ export const createEventDocWorkspaceReducer = (
     [EventDocWorkspaceEffect.ApplyTransientEvent]: createApplyTransientEventUpdater(coalesceRulesBySlot),
     [EventDocWorkspaceEffect.DropTransient]: dropTransient,
     [EventDocWorkspaceEffect.SetHistoryEvents]: createSetHistoryEventsUpdater(slots),
+    [EventDocWorkspaceEffect.SetFullHistory]: setFullHistory,
     [EventDocWorkspaceEffect.AppendHistoryEvent]: createAppendHistoryEventUpdater(slots),
     [EventDocWorkspaceEffect.AppendHistoryEvents]: createAppendHistoryEventsUpdater(slots),
     [EventDocWorkspaceEffect.SetPendingEvents]: setPendingEvents,

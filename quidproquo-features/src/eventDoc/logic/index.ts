@@ -1,6 +1,7 @@
 export * from './askEventDocAppendServerEvent';
 export * from './askEventDocCreate';
 export * from './askEventDocEventAppend';
+export * from './askEventDocEventBootstrapPage';
 export * from './askEventDocEventsAsOf';
 export * from './askEventDocGetByCode';
 export * from './askEventDocGetByCodeOrCreate';

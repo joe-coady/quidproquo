@@ -21,7 +21,19 @@ export const createEventDocWorkspaceSnapshot = (
         return [];
       }
 
-      return [[slotKey, { documentIdentity, pending: state.pending[slotKey] ?? [], history: state.history[slotKey] ?? [] }]];
+      return [
+        [
+          slotKey,
+          {
+            documentIdentity,
+            pending: state.pending[slotKey] ?? [],
+            history: state.history[slotKey] ?? [],
+            // The base travels with the history it anchors — a bootstrap-loaded
+            // slot's history is partial and refolds wrongly without it.
+            base: state.bases[slotKey] ?? null,
+          },
+        ],
+      ];
     }),
   ),
   localSlots: Object.fromEntries(

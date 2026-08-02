@@ -1,4 +1,6 @@
 export * from './askEventDocWorkspaceApiAppendEvent';
+export * from './askEventDocWorkspaceApiFetchBootstrap';
+export * from './askEventDocWorkspaceApiFetchBootstrapPage';
 export * from './askEventDocWorkspaceApiFetchEvents';
 export * from './askEventDocWorkspaceApiFetchEventsPage';
 export * from './askEventDocWorkspaceApiRequestAssetDownloadUrl';

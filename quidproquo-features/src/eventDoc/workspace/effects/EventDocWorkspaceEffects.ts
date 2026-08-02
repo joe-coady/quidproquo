@@ -8,6 +8,7 @@ import { EventDocWorkspaceRemovePendingEventEffect } from './EventDocWorkspaceRe
 import { EventDocWorkspaceResetEffect } from './EventDocWorkspaceResetEffect';
 import { EventDocWorkspaceSetDocumentIdentityEffect } from './EventDocWorkspaceSetDocumentIdentityEffect';
 import { EventDocWorkspaceSetErrorEffect } from './EventDocWorkspaceSetErrorEffect';
+import { EventDocWorkspaceSetFullHistoryEffect } from './EventDocWorkspaceSetFullHistoryEffect';
 import { EventDocWorkspaceSetHistoryEventsEffect } from './EventDocWorkspaceSetHistoryEventsEffect';
 import { EventDocWorkspaceSetLoadingEffect } from './EventDocWorkspaceSetLoadingEffect';
 import { EventDocWorkspaceSetPendingEventsEffect } from './EventDocWorkspaceSetPendingEventsEffect';
@@ -18,6 +19,7 @@ export type EventDocWorkspaceEffects =
   | EventDocWorkspaceApplyTransientEventEffect
   | EventDocWorkspaceDropTransientEffect
   | EventDocWorkspaceSetHistoryEventsEffect
+  | EventDocWorkspaceSetFullHistoryEffect
   | EventDocWorkspaceAppendHistoryEventEffect
   | EventDocWorkspaceAppendHistoryEventsEffect
   | EventDocWorkspaceSetPendingEventsEffect

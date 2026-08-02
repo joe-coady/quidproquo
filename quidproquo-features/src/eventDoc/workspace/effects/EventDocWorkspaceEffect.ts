@@ -3,6 +3,7 @@ export enum EventDocWorkspaceEffect {
   ApplyTransientEvent = '@quidproquo-features/eventDocWorkspace/applyTransientEvent',
   DropTransient = '@quidproquo-features/eventDocWorkspace/dropTransient',
   SetHistoryEvents = '@quidproquo-features/eventDocWorkspace/setHistoryEvents',
+  SetFullHistory = '@quidproquo-features/eventDocWorkspace/setFullHistory',
   AppendHistoryEvent = '@quidproquo-features/eventDocWorkspace/appendHistoryEvent',
   AppendHistoryEvents = '@quidproquo-features/eventDocWorkspace/appendHistoryEvents',
   SetPendingEvents = '@quidproquo-features/eventDocWorkspace/setPendingEvents',

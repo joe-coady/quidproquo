@@ -1,6 +1,6 @@
 import { askCatch, askMapParallel, AskResponse, Nullable } from 'quidproquo-core';
 
-import { EventDocEvent } from '../../models';
+import { EventDocEvent, EventDocSnapshotBase } from '../../models';
 import { askUIEventDocWorkspaceClearError } from '../actionCreators/askUIEventDocWorkspaceClearError';
 import { askUIEventDocWorkspaceSetDocumentIdentity } from '../actionCreators/askUIEventDocWorkspaceSetDocumentIdentity';
 import { askUIEventDocWorkspaceSetError } from '../actionCreators/askUIEventDocWorkspaceSetError';
@@ -26,22 +26,23 @@ const getAskInitDocumentSlotFromSnapshot = (transport: EventDocWorkspaceTranspor
     documentIdentity: EventDocWorkspaceDocumentIdentity,
     history: EventDocEvent[],
     pending: EventDocEvent[],
+    base: Nullable<EventDocSnapshotBase>,
   ): AskResponse<void> {
     yield* askUIEventDocWorkspaceSetDocumentIdentity(slotKey, documentIdentity);
-    yield* askUIEventDocWorkspaceSetHistoryEvents(slotKey, history);
+    yield* askUIEventDocWorkspaceSetHistoryEvents(slotKey, history, base);
     yield* askUIEventDocWorkspaceSetPendingEvents(slotKey, pending);
     yield* askUIEventDocWorkspaceClearError(slotKey);
 
     yield* askEventDocWorkspaceRefresh(transport, [slotKey]);
   };
 
-// Seed identity, seed the buffer, and load the full saved log for ONE slot. The
-// buffer is normally dropped (a stale buffer from a previous session must not leak
-// into a fresh open), but a snapshot slot whose identity matches the incoming one
-// restores its pending — that's a runtime hand-off (e.g. a federated module
-// hot-swap), where pending is precious. It seeds BEFORE the fetch so a failed load
-// never discards intent, and renumbers after the fetched history lands so
-// provisional indexes continue the saved log.
+// Seed identity, seed the buffer, and bootstrap-load ONE slot: the newest server
+// snapshot as the fold base plus only the events after it (or the whole log when the
+// server has no usable snapshot — same shape, null base). The buffer is normally
+// dropped (a stale buffer from a previous session must not leak into a fresh open),
+// but a snapshot slot whose identity matches the incoming one restores its pending —
+// that's a runtime hand-off (e.g. a federated module hot-swap), where pending is
+// precious. It seeds BEFORE the fetch so a failed load never discards intent.
 const getAskInitDocumentSlot = (transport: EventDocWorkspaceTransport, snapshot: Nullable<EventDocWorkspaceSnapshot>) =>
   function* askInitDocumentSlot([slotKey, documentIdentity]: [string, EventDocWorkspaceDocumentIdentity]): AskResponse<void> {
     const snapshotSlot: EventDocWorkspaceSlotSnapshot | undefined = snapshot?.slots[slotKey];
@@ -49,9 +50,15 @@ const getAskInitDocumentSlot = (transport: EventDocWorkspaceTransport, snapshot:
 
     // A matching snapshot WITH history takes the instant path. Without history (an
     // older bundle's snapshot, or a caller that stripped it to force a refetch)
-    // only pending restores and the blocking full load below runs as always.
+    // only pending restores and the blocking load below runs as always.
     if (snapshotMatches && snapshotSlot.history) {
-      yield* getAskInitDocumentSlotFromSnapshot(transport)(slotKey, documentIdentity, snapshotSlot.history, snapshotSlot.pending);
+      yield* getAskInitDocumentSlotFromSnapshot(transport)(
+        slotKey,
+        documentIdentity,
+        snapshotSlot.history,
+        snapshotSlot.pending,
+        snapshotSlot.base ?? null,
+      );
       return;
     }
 
@@ -62,7 +69,7 @@ const getAskInitDocumentSlot = (transport: EventDocWorkspaceTransport, snapshot:
     yield* askUIEventDocWorkspaceClearError(slotKey);
     yield* askUIEventDocWorkspaceSetLoading(slotKey, true);
 
-    const result = yield* askCatch(transport.askFetchEvents(documentIdentity));
+    const result = yield* askCatch(transport.askFetchBootstrap(documentIdentity));
 
     if (!result.success) {
       yield* askUIEventDocWorkspaceSetError(slotKey, { operation: EventDocWorkspaceSlotOperation.load, error: result.error });
@@ -70,7 +77,7 @@ const getAskInitDocumentSlot = (transport: EventDocWorkspaceTransport, snapshot:
       return;
     }
 
-    yield* askUIEventDocWorkspaceSetHistoryEvents(slotKey, result.result);
+    yield* askUIEventDocWorkspaceSetHistoryEvents(slotKey, result.result.events, result.result.base);
 
     if (preservedPending.length > 0) {
       yield* askUIEventDocWorkspaceSetPendingEvents(slotKey, preservedPending);

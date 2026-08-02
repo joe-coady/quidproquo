@@ -16,4 +16,8 @@ export type EventDocWorkspaceSlotBinding = {
   // current folded state (history + pending + transient). unknown at this altitude —
   // the per-doc createEventDocStateReader owns the narrowing.
   getView: (state: EventDocWorkspaceState) => unknown;
+  // The PERSISTABLE live state for validation: history + pending folded and migrated
+  // to latest, transients deliberately excluded — they never save, so they must never
+  // influence a validation verdict. This is the state `validate` receives.
+  getValidationView: (state: EventDocWorkspaceState) => unknown;
 };
