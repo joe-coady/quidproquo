@@ -22,9 +22,15 @@ const baseReducer = buildEventDocBaseReducer(baseSeed) as QpqReducer<EventDocDoc
 // collection shares. A second PUBLISH racing the first is ignored here rather than
 // doubling the version history. Collections with domain rules pass their own registry
 // (reserved entries spread in via createEventDocEventValidator) to their own fold.
-export const foldEventDocBase = (events: EventDocEvent[]): EventDocDocument =>
+//
+// `seedState` resumes the fold from a snapshot base (the document-view state at some
+// event) so `events` need only be the tail after it. The seed's documentVersion is
+// CLAMPED to 1 on the way in: this fold's whole universe is version-1 (each event's
+// version is clamped to 1 too), so a domain seed's real schema version would otherwise
+// trip the stale-version floor and silently reject every tail event.
+export const foldEventDocBase = (events: EventDocEvent[], seedState?: unknown): EventDocDocument =>
   foldEventDocLog(events, {
-    seed: baseSeed(),
+    seed: seedState ? { ...(seedState as EventDocDocument), documentVersion: 1 } : baseSeed(),
     reducer: baseReducer,
     migrations: {},
     latestVersion: 1,
