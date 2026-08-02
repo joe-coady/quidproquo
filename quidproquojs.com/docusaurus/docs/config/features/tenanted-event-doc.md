@@ -11,6 +11,7 @@ The deploying service must still register the resolver implementation by calling
 
 ```typescript
 import { defineTenantedEventDoc, defineTenant } from 'quidproquo-features';
+import { articleDefinition } from './articleDefinition';
 
 export default [
   ...defineTenant({
@@ -19,9 +20,7 @@ export default [
     routeAuthSettings: { userDirectoryName: 'users' },
   }),
 
-  ...defineTenantedEventDoc({
-    storeName: 'content',
-    type: 'article',
+  ...defineTenantedEventDoc(articleDefinition, '/entry/eventDocs::articleDefinition', {
     basePath: '/articles',
     routeAuthSettings: { userDirectoryName: 'users' },
   }),
@@ -31,14 +30,18 @@ export default [
 ## Signature
 
 ```typescript
-function defineTenantedEventDoc(options: TenantedEventDocOptions): QPQConfig;
+function defineTenantedEventDoc(
+  functions: EventDocFunctions,
+  runtime: QpqFunctionRuntime,
+  options: TenantedEventDocCollectionOptions,
+): QPQConfig;
 ```
 
-`TenantedEventDocOptions` is `EventDocRoutesOptions` with `scopeResolver` omitted — see [defineEventDoc](./event-doc.md#parameters) for the remaining options.
+`TenantedEventDocCollectionOptions` is `EventDocCollectionOptions` with `scopeResolver` omitted — see [defineEventDoc](./event-doc.md#parameters) for the remaining options.
 
 ## Parameters
 
-Same as [defineEventDoc](./event-doc.md#parameters): `storeName`, `type`, `basePath`, `routeAuthSettings`, `version`, `eventValidator`, `eventRenderer`, `onPublish` (without `scopeResolver`, which this always sets to `TENANT_SCOPE_RESOLVER_FN`).
+Same as [defineEventDoc](./event-doc.md#parameters): `functions`, `runtime`, and `options` (`basePath`, `routeAuthSettings`, `version`, `onPublish`, `onAppend`, without `scopeResolver`, which this always sets to `TENANT_SCOPE_RESOLVER_FN`).
 
 ## Returns
 

@@ -21,14 +21,6 @@ export type EventDocRoutesOptions = {
   // Omit to leave routes open — mutations then have no user to attribute.
   routeAuthSettings?: RouteAuthSettings;
   version?: number;
-  // Registered inline-function name (see `defineInlineFunction`). When set, every append
-  // invokes it with `{ event, events }` to reject lifecycle/payload-invalid events before
-  // they reach the log. The frontend editor runs the same rule for instant feedback.
-  eventValidator?: string;
-  // Registered inline-function name (see `defineInlineFunction`). When set, a
-  // `GET {basePath}/{id}/render` route is mounted; it invokes the renderer with the doc's
-  // full `{ events }` log, which folds + renders to HTML (e.g. `foldLayout(events).html`).
-  eventRenderer?: string;
   // Registered inline-function name (see `defineInlineFunction`). When set, every successful
   // append of a Publish event invokes it with `{ docId, event, summary }` after the event is
   // durably written and the summary re-derived - the seam for syncing a folded document into
@@ -48,18 +40,4 @@ export type EventDocRoutesOptions = {
   // stores and assets (e.g. per-tenant via the tenant feature's TENANT_SCOPE_RESOLVER_FN).
   // Null means unscoped. Omit for collections that never partition.
   scopeResolver?: string;
-  // Registered inline-function name (see `defineInlineFunction`). When set, a
-  // `GET {basePath}/{id}/references` route is mounted; it invokes the collector with one
-  // `{ events, docId }` log, which folds + returns the `EventDocLink`s that view depends on
-  // (e.g. a template's layout/style/content links). The transfer manifest walk follows those
-  // links recursively. Omit for a leaf collection (a stylesheet, a layout) - the walk then
-  // stops at its docs instead of calling a collector that would always return nothing.
-  referenceResolver?: string;
-  // Registered inline-function name (see `defineInlineFunction`). When set, the event
-  // store's stream projector snapshots this type: on each stream batch it invokes the fold
-  // with `{ events, docId }` (the log prefix up to the batch's newest event) and writes the
-  // returned per-view states to the snapshots store — one fragment per burst of appends.
-  // The registered function is a one-liner over the doc type's definition:
-  // `definition.foldSnapshotViews(events)`. Omit to not snapshot the collection.
-  snapshotFold?: string;
 };

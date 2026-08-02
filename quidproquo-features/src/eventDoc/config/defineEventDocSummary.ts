@@ -2,7 +2,7 @@ import { defineKeyValueStore, defineStorageDrive, kvsKey, QPQConfig } from 'quid
 
 import { getFeatureEntryQpqFunctionRuntime } from '../../getFeatureEntryQpqFunctionRuntime';
 import { eventDocEventsStoreName, eventDocLegacyEventsStoreName } from '../constants/eventDocEventsStoreName';
-import { EVENT_DOC_SNAPSHOT_FOLDS_GLOBAL, EVENT_DOC_STORE_NAME_GLOBAL } from '../constants/eventDocGlobalNames';
+import { EVENT_DOC_SNAPSHOT_FUNCTIONS_GLOBAL, EVENT_DOC_STORE_NAME_GLOBAL } from '../constants/eventDocGlobalNames';
 import { eventDocSnapshotsStoreName } from '../constants/eventDocSnapshotsStoreName';
 import { eventDocStorageDriveName } from '../constants/eventDocStorageDriveName';
 import { EventDocSummary } from '../models';
@@ -10,15 +10,15 @@ import { EventDocStoredEvent } from '../types/EventDocStoredEvent';
 import { EventDocStoredSnapshot } from '../types/EventDocStoredSnapshot';
 
 export type EventDocSummaryOptions = {
-  // Registered inline-function names (see `defineInlineFunction`) of each collection's
-  // snapshot fold, keyed by doc TYPE — the store-level twin of the per-type
-  // `snapshotFold` routes option, keyed because one events table can host several
-  // collections and its ONE stream serves them all. When a row's type has an entry, the
-  // stream projector invokes it with the doc's log prefix and writes the folded views to
-  // the snapshots store; a type with no entry is simply not snapshotted. defineEventDoc
-  // threads the single-type case through automatically; multi-type stores that call
-  // defineEventDocSummary directly pass the whole map here.
-  snapshotFolds?: Record<string, string>;
+  // Registered dynamic-functions names (see `defineDynamicFunctions`) of each collection's
+  // EventDocFunctions object, keyed by doc TYPE — keyed because one events table can host
+  // several collections and its ONE stream serves them all. When a row's type has an
+  // entry, the stream projector invokes that object's `foldSnapshotViews` with the doc's
+  // log prefix and writes the folded views to the snapshots store; a type with no entry is
+  // simply not snapshotted. defineEventDoc threads the single-type case through
+  // automatically; multi-type stores that call defineEventDocSummary directly pass the
+  // whole map here.
+  snapshotFunctions?: Record<string, string>;
 };
 
 // Model store + append-only event store + snapshot store + blob bucket for a collection.
@@ -47,7 +47,7 @@ export const defineEventDocSummary = (keyValueStoreName: string, options?: Event
         // one events table can host several collections.
         globals: {
           [EVENT_DOC_STORE_NAME_GLOBAL]: keyValueStoreName,
-          [EVENT_DOC_SNAPSHOT_FOLDS_GLOBAL]: options?.snapshotFolds ?? {},
+          [EVENT_DOC_SNAPSHOT_FUNCTIONS_GLOBAL]: options?.snapshotFunctions ?? {},
         },
       },
       coalesceByPartitionKey: true,

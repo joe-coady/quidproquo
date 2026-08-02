@@ -1,7 +1,8 @@
 import {
+  ActionMockMap,
   ConfigActionType,
+  DynamicFunctionsActionType,
   FileActionType,
-  InlineFunctionActionType,
   KeyValueStoreActionType,
   KvsLogicalOperator,
   KvsQueryCondition,
@@ -15,9 +16,9 @@ import {
 import { describe, expect, it } from 'vitest';
 
 import { eventDocEventsStoreName } from '../../constants/eventDocEventsStoreName';
-import { EVENT_DOC_SNAPSHOT_FOLDS_GLOBAL, EVENT_DOC_STORE_NAME_GLOBAL } from '../../constants/eventDocGlobalNames';
+import { EVENT_DOC_SNAPSHOT_FUNCTIONS_GLOBAL, EVENT_DOC_STORE_NAME_GLOBAL } from '../../constants/eventDocGlobalNames';
 import { eventDocSnapshotsStoreName } from '../../constants/eventDocSnapshotsStoreName';
-import { EventDocEffect, EventDocEvent, EventDocSnapshotFoldInput } from '../../models';
+import { EventDocEffect, EventDocEvent, EventDocSnapshotViews } from '../../models';
 import { createKvsUpdateMock } from '../../testing/kvsUpdateActionMock';
 import { EventDocStoredSnapshot } from '../../types/EventDocStoredSnapshot';
 import { projectEventDocSummary } from './eventDocSummaryProjector';
@@ -71,13 +72,23 @@ const conditionValue = (keyCondition: KvsQueryOperation, key: string, operation:
   return condition.key === key && condition.operation === operation ? String(condition.valueA) : undefined;
 };
 
-const buildMocks = (streamPk: string, type = 'template', options?: { snapshotFold?: string; log?: EventDocEvent[] }) => {
+// What the projector hands the registered functions object, reassembled from the Execute
+// action's positional args for easy asserting.
+type FoldCall = {
+  dynamicFunctionsName: string;
+  member: string;
+  input: { events: EventDocEvent[]; seedViews?: EventDocSnapshotViews };
+};
+
+type ExecutePayload = { dynamicFunctionsName: string; functionName: string; args: [EventDocEvent[], EventDocSnapshotViews?] };
+
+const buildMocks = (streamPk: string, type = 'template', options?: { functionsName?: string; log?: EventDocEvent[] }) => {
   const tables: Record<string, Row[]> = {};
   const updates: { key: unknown; scope?: string }[] = [];
   const upserts: { keyValueStoreName: string; item: Row; scope?: string }[] = [];
   const fileWrites: { drive: string; filepath: string; data: string; scope?: string }[] = [];
   const blobs: Record<string, string> = {};
-  const foldCalls: { functionName: string; input: EventDocSnapshotFoldInput }[] = [];
+  const foldCalls: FoldCall[] = [];
 
   // The log as the events table actually holds it: pk composed with the scope, and the
   // collection type denormalised onto every row.
@@ -88,13 +99,13 @@ const buildMocks = (streamPk: string, type = 'template', options?: { snapshotFol
     data: e,
   }));
 
-  const mocks = {
+  const mocks: ActionMockMap = {
     [ConfigActionType.GetGlobal]: (action: { payload: { globalName: string } }) => {
       if (action.payload.globalName === EVENT_DOC_STORE_NAME_GLOBAL) {
         return STORE;
       }
-      if (action.payload.globalName === EVENT_DOC_SNAPSHOT_FOLDS_GLOBAL) {
-        return options?.snapshotFold ? { [type]: options.snapshotFold } : {};
+      if (action.payload.globalName === EVENT_DOC_SNAPSHOT_FUNCTIONS_GLOBAL) {
+        return options?.functionsName ? { [type]: options.functionsName } : {};
       }
       return '';
     },
@@ -168,12 +179,17 @@ const buildMocks = (streamPk: string, type = 'template', options?: { snapshotFol
       return blob;
     },
 
-    // Stands in for the app-registered fold: echoes what it was invoked with (so the spec
-    // can assert the prefix) and returns one small state per view.
-    [InlineFunctionActionType.Execute]: (action: { payload: { functionName: string; payload: EventDocSnapshotFoldInput } }) => {
-      foldCalls.push({ functionName: action.payload.functionName, input: action.payload.payload });
+    // Stands in for the app-registered functions object: echoes what it was invoked with
+    // (so the spec can assert the prefix) and returns one small state per view.
+    [DynamicFunctionsActionType.Execute]: (action: { payload: ExecutePayload }) => {
+      const [events, seedViews] = action.payload.args;
+      foldCalls.push({
+        dynamicFunctionsName: action.payload.dynamicFunctionsName,
+        member: action.payload.functionName,
+        input: { events, seedViews },
+      });
       return {
-        document: { foldedEvents: action.payload.payload.events.length },
+        document: { foldedEvents: events.length },
         summary: { name: 'from-fold' },
       };
     },
@@ -245,13 +261,13 @@ describe('projectEventDocSummary snapshots', () => {
   const FOLD_FN = 'foldTemplateSnapshot';
 
   it('stores one row per view the fold returns, keyed at the batch newest event', () => {
-    const { mocks, tables, foldCalls } = buildMocks('doc-1', 'template', { snapshotFold: FOLD_FN });
+    const { mocks, tables, foldCalls } = buildMocks('doc-1', 'template', { functionsName: FOLD_FN });
 
     runStory(projectEventDocSummary(streamRecord(undefined)), mocks);
 
     expect(foldCalls).toHaveLength(1);
-    expect(foldCalls[0].functionName).toBe(FOLD_FN);
-    expect(foldCalls[0].input.docId).toBe('doc-1');
+    expect(foldCalls[0].dynamicFunctionsName).toBe(FOLD_FN);
+    expect(foldCalls[0].member).toBe('foldSnapshotViews');
 
     const rows = (tables[SNAPSHOTS_STORE] ?? []) as EventDocStoredSnapshot[];
     expect(rows.map((row) => row.pk).sort()).toEqual(['doc-1#document', 'doc-1#summary']);
@@ -274,7 +290,7 @@ describe('projectEventDocSummary snapshots', () => {
     // a later append may already be in the table. The snapshot at THIS event must not
     // include it, or the row would claim a state the event id contradicts.
     const logWithLaterAppend = [...LOG, event(EventDocEffect.SetName, 2, { name: 'Renamed again' })];
-    const { mocks, foldCalls } = buildMocks('doc-1', 'template', { snapshotFold: FOLD_FN, log: logWithLaterAppend });
+    const { mocks, foldCalls } = buildMocks('doc-1', 'template', { functionsName: FOLD_FN, log: logWithLaterAppend });
 
     runStory(projectEventDocSummary(streamRecord(undefined)), mocks);
 
@@ -295,7 +311,7 @@ describe('projectEventDocSummary snapshots', () => {
   it('does not snapshot on a Remove, but still rebuilds the summary', () => {
     // A Remove is not a new event to snapshot at; the log shrank and the summary rebuild
     // reflects whatever it now says.
-    const { mocks, tables, updates } = buildMocks('doc-1', 'template', { snapshotFold: FOLD_FN });
+    const { mocks, tables, updates } = buildMocks('doc-1', 'template', { functionsName: FOLD_FN });
 
     runStory(projectEventDocSummary({ ...streamRecord(undefined), eventType: KvsStreamEventType.Remove }), mocks);
 
@@ -304,10 +320,10 @@ describe('projectEventDocSummary snapshots', () => {
   });
 
   it('offloads a state over the inline cap to the blob drive, row recording only that', () => {
-    const { mocks, tables, fileWrites } = buildMocks('doc-1', 'template', { snapshotFold: FOLD_FN });
+    const { mocks, tables, fileWrites } = buildMocks('doc-1', 'template', { functionsName: FOLD_FN });
 
     // A fold whose document state cannot fit a KVS row.
-    mocks[InlineFunctionActionType.Execute] = () => ({ document: { huge: 'x'.repeat(301 * 1024) } });
+    mocks[DynamicFunctionsActionType.Execute] = () => ({ document: { huge: 'x'.repeat(301 * 1024) } });
 
     runStory(projectEventDocSummary(streamRecord(undefined)), mocks);
 
@@ -322,7 +338,7 @@ describe('projectEventDocSummary snapshots', () => {
   });
 
   it('carries the tenant scope through the prefix read and every snapshot write', () => {
-    const { mocks, upserts, foldCalls } = buildMocks(`tenant-a${SCOPE_DELIMITER}doc-1`, 'template', { snapshotFold: FOLD_FN });
+    const { mocks, upserts, foldCalls } = buildMocks(`tenant-a${SCOPE_DELIMITER}doc-1`, 'template', { functionsName: FOLD_FN });
 
     runStory(projectEventDocSummary(streamRecord('tenant-a')), mocks);
 
@@ -335,7 +351,7 @@ describe('projectEventDocSummary snapshots', () => {
   });
 
   it('writes the document row LAST, so a torn set never has a commit marker', () => {
-    const { mocks, upserts } = buildMocks('doc-1', 'template', { snapshotFold: FOLD_FN });
+    const { mocks, upserts } = buildMocks('doc-1', 'template', { functionsName: FOLD_FN });
 
     runStory(projectEventDocSummary(streamRecord(undefined)), mocks);
 
@@ -356,7 +372,7 @@ describe('projectEventDocSummary incremental snapshots', () => {
   ];
 
   it('hands the fold the seed and ONLY the gap since it', () => {
-    const { mocks, tables, foldCalls } = buildMocks('doc-1', 'template', { snapshotFold: FOLD_FN });
+    const { mocks, tables, foldCalls } = buildMocks('doc-1', 'template', { functionsName: FOLD_FN });
     tables[SNAPSHOTS_STORE] = seedRowsAt(eventId(0));
 
     runStory(projectEventDocSummary(streamRecord(undefined)), mocks);
@@ -367,13 +383,18 @@ describe('projectEventDocSummary incremental snapshots', () => {
 
     // The new snapshot lands at the target event, alongside the seed rows.
     const rows = tables[SNAPSHOTS_STORE] as EventDocStoredSnapshot[];
-    expect(rows.filter((row) => row.sk === eventId(1)).map((row) => row.pk).sort()).toEqual(['doc-1#document', 'doc-1#summary']);
+    expect(
+      rows
+        .filter((row) => row.sk === eventId(1))
+        .map((row) => row.pk)
+        .sort(),
+    ).toEqual(['doc-1#document', 'doc-1#summary']);
   });
 
   it('skips entirely when a complete snapshot already exists at the target event', () => {
     // The document row is the set's last write, so its presence at the target means a
     // replayed delivery has nothing left to do.
-    const { mocks, tables, foldCalls, upserts } = buildMocks('doc-1', 'template', { snapshotFold: FOLD_FN });
+    const { mocks, tables, foldCalls, upserts } = buildMocks('doc-1', 'template', { functionsName: FOLD_FN });
     tables[SNAPSHOTS_STORE] = seedRowsAt(eventId(1));
 
     runStory(projectEventDocSummary(streamRecord(undefined)), mocks);
@@ -385,12 +406,17 @@ describe('projectEventDocSummary incremental snapshots', () => {
   it('falls back to a from-scratch fold when the fold declines the seed', () => {
     // A view added since the seed was written: the fold returns null rather than fold the
     // new view from nothing, and the projector retries with the whole prefix.
-    const { mocks, tables, foldCalls } = buildMocks('doc-1', 'template', { snapshotFold: FOLD_FN });
+    const { mocks, tables, foldCalls } = buildMocks('doc-1', 'template', { functionsName: FOLD_FN });
     tables[SNAPSHOTS_STORE] = seedRowsAt(eventId(0));
 
-    mocks[InlineFunctionActionType.Execute] = (action: { payload: { functionName: string; payload: EventDocSnapshotFoldInput } }) => {
-      foldCalls.push({ functionName: action.payload.functionName, input: action.payload.payload });
-      return action.payload.payload.seedViews ? null : { document: { refolded: true } };
+    mocks[DynamicFunctionsActionType.Execute] = (action: { payload: ExecutePayload }) => {
+      const [events, seedViews] = action.payload.args;
+      foldCalls.push({
+        dynamicFunctionsName: action.payload.dynamicFunctionsName,
+        member: action.payload.functionName,
+        input: { events, seedViews },
+      });
+      return seedViews ? null : { document: { refolded: true } };
     };
 
     runStory(projectEventDocSummary(streamRecord(undefined)), mocks);
@@ -407,7 +433,7 @@ describe('projectEventDocSummary incremental snapshots', () => {
   it('ignores a pre-manifest snapshot and folds the whole prefix', () => {
     // Rows written before manifests existed cannot prove the set is complete, so they are
     // not seeds; the next full fold rewrites them with one.
-    const { mocks, tables, foldCalls } = buildMocks('doc-1', 'template', { snapshotFold: FOLD_FN });
+    const { mocks, tables, foldCalls } = buildMocks('doc-1', 'template', { functionsName: FOLD_FN });
     tables[SNAPSHOTS_STORE] = [
       { pk: 'doc-1#document', sk: eventId(0), type: 'template', data: { type: 'inline', snapshot: { seedDocument: true } } },
     ];
@@ -420,7 +446,7 @@ describe('projectEventDocSummary incremental snapshots', () => {
   });
 
   it('resolves an offloaded seed state from the blob drive', () => {
-    const { mocks, tables, blobs, foldCalls } = buildMocks('doc-1', 'template', { snapshotFold: FOLD_FN });
+    const { mocks, tables, blobs, foldCalls } = buildMocks('doc-1', 'template', { functionsName: FOLD_FN });
     tables[SNAPSHOTS_STORE] = [
       { pk: 'doc-1#summary', sk: eventId(0), type: 'template', data: { type: 'inline', snapshot: { seedSummary: true } } },
       { pk: 'doc-1#document', sk: eventId(0), type: 'template', data: { type: 'storageDrive', views: ['document', 'summary'] } },

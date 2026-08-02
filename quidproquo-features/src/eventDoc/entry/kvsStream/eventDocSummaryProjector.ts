@@ -7,7 +7,7 @@ import {
   KvsStreamRecord,
 } from 'quidproquo-core';
 
-import { EVENT_DOC_SNAPSHOT_FOLDS_GLOBAL, EVENT_DOC_STORE_NAME_GLOBAL } from '../../constants/eventDocGlobalNames';
+import { EVENT_DOC_SNAPSHOT_FUNCTIONS_GLOBAL, EVENT_DOC_STORE_NAME_GLOBAL } from '../../constants/eventDocGlobalNames';
 import { askEventDocStoreProvide } from '../../context/askEventDocStoreProvide';
 import { buildEventDocStore } from '../../context/buildEventDocStore';
 import { askEventDocSnapshotAtEvent } from '../../logic/askEventDocSnapshotAtEvent';
@@ -15,22 +15,22 @@ import { askEventDocSummaryRederive } from '../../logic/askEventDocSummaryRederi
 import { EventDocStoredEvent } from '../../types/EventDocStoredEvent';
 
 // The per-document work one stream delivery triggers: rebuild the queryable record from
-// the log, then (for a collection that registered a snapshot fold) store the folded views
-// as of the batch's newest event. Both are pure derivations of the log, which is what
-// makes the stream's at-least-once delivery and its retries harmless — re-running either
-// rewrites the same facts.
-function* askEventDocProjectStreamRecord(record: KvsStreamRecord, modelId: string, snapshotFold?: string): AskResponse<void> {
+// the log, then (for a collection with a registered functions object) store the folded
+// views as of the batch's newest event. Both are pure derivations of the log, which is
+// what makes the stream's at-least-once delivery and its retries harmless — re-running
+// either rewrites the same facts.
+function* askEventDocProjectStreamRecord(record: KvsStreamRecord, modelId: string, functionsName?: string): AskResponse<void> {
   yield* askEventDocSummaryRederive(modelId);
 
   // Snapshots fragment along the stream's own batching: coalescing hands this handler the
   // LAST event per document per batch, so a lone append snapshots at that event while a
   // burst of a hundred snapshots once, at the burst's newest. A Remove is not a new event
   // to snapshot at — the summary rebuild above already reflects whatever the log now says.
-  if (!snapshotFold || record.eventType === KvsStreamEventType.Remove) {
+  if (!functionsName || record.eventType === KvsStreamEventType.Remove) {
     return;
   }
 
-  yield* askEventDocSnapshotAtEvent(modelId, String(record.keys.sk), snapshotFold);
+  yield* askEventDocSnapshotAtEvent(modelId, String(record.keys.sk), functionsName);
 }
 
 /**
@@ -48,7 +48,7 @@ function* askEventDocProjectStreamRecord(record: KvsStreamRecord, modelId: strin
  */
 export function* projectEventDocSummary(record: KvsStreamRecord): AskResponse<KvsStreamEventResponse> {
   const storeName = yield* askConfigGetGlobal<string>(EVENT_DOC_STORE_NAME_GLOBAL);
-  const snapshotFolds = yield* askConfigGetGlobal<Record<string, string>>(EVENT_DOC_SNAPSHOT_FOLDS_GLOBAL);
+  const snapshotFunctions = yield* askConfigGetGlobal<Record<string, string>>(EVENT_DOC_SNAPSHOT_FUNCTIONS_GLOBAL);
 
   // Keys arrive raw and the scope arrives beside them, so the rebuild simply re-enters the
   // scope the append ran under. That matters more than it looks: reading or writing under the
@@ -70,7 +70,7 @@ export function* projectEventDocSummary(record: KvsStreamRecord): AskResponse<Kv
   const store = buildEventDocStore({ storeName, type: image.type });
 
   // eslint-disable-next-line qpq/require-yield-star
-  const project = askEventDocStoreProvide(store, askEventDocProjectStreamRecord(record, modelId, snapshotFolds[image.type]));
+  const project = askEventDocStoreProvide(store, askEventDocProjectStreamRecord(record, modelId, snapshotFunctions[image.type]));
 
   // Unscoped rows carry no scope to re-enter, and the ambient default is already "none", so
   // only a scoped row wraps the rebuild in a provider.

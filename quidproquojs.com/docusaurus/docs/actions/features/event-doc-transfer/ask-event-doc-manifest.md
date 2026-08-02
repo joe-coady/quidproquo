@@ -5,7 +5,7 @@ description: Walk one or more docs' references outward to find everything that h
 
 # askEventDocManifest
 
-Finds every doc that has to travel with a list of starting docs, by following each doc's `referenceResolver` links outward — breadth-first, across collections, with a visited set so a stylesheet three templates share is walked once and lands in the result once. Also the source of a cycle's termination: a link cycle (template → content → template) stops on the visited check instead of recursing forever.
+Finds every doc that has to travel with a list of starting docs, by following each doc's `collectReferences` links outward — breadth-first, across collections, with a visited set so a stylesheet three templates share is walked once and lands in the result once. Also the source of a cycle's termination: a link cycle (template → content → template) stops on the visited check instead of recursing forever.
 
 Takes a **list** of roots so selecting several documents produces one merged manifest, rather than one per selection. A soft-deleted doc is reported (`deleted: true`) but not walked into — it will never be bundled, so its own dependencies are moot.
 

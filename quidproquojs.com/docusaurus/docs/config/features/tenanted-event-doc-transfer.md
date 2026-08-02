@@ -11,8 +11,9 @@ The pairing matters: transferring collections declared with [defineTenantedEvent
 
 ```typescript
 import { defineTenant, defineTenantedEventDoc, defineTenantedEventDocTransfer } from 'quidproquo-features';
+import { articleDefinition } from './articleDefinition';
 
-const collections = [{ storeName: 'content', type: 'article' }];
+const collections = [articleDefinition];
 
 export default [
   ...defineTenant({
@@ -21,9 +22,7 @@ export default [
     routeAuthSettings: { userDirectoryName: 'users' },
   }),
 
-  ...defineTenantedEventDoc({
-    storeName: 'content',
-    type: 'article',
+  ...defineTenantedEventDoc(articleDefinition, '/entry/eventDocs::articleDefinition', {
     basePath: '/articles',
     routeAuthSettings: { userDirectoryName: 'users' },
   }),

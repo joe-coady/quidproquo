@@ -55,9 +55,17 @@ export function createEventDocDefinition(
     };
   }
 
-  const { saved: _saved, api, versions, schemaVersion, references, coalesceEventTypes } = config;
+  const { saved: _saved, api, versions, schemaVersion, references, coalesceEventTypes, storeName, type } = config;
 
   assertEventDocVersions(versions, schemaVersion);
+
+  // Identity is both-or-neither: config reads {storeName, type} off the definition, and
+  // half an identity would register a collection that can never resolve its own stores.
+  if (!storeName !== !type) {
+    throw new Error(
+      `event doc definition sets ${storeName ? 'storeName' : 'type'} without ${storeName ? 'type' : 'storeName'} - set both or neither.`,
+    );
+  }
 
   // The fold is the gate. Appends write unconditionally, so an event earns its place in
   // the document here or nowhere.
@@ -162,6 +170,8 @@ export function createEventDocDefinition(
   const validate = createEventDocEventValidator((events: EventDocEvent[]) => foldEventDocLog(events, primaryFoldConfig), config.validators ?? {});
 
   return {
+    storeName,
+    type,
     // TODO: This seems like the wrong place for a workspace slot kind...
     // likely should be defined at the workspace, when we define the slots.
     kind: EventDocWorkspaceSlotKind.document,
@@ -180,7 +190,7 @@ export function createEventDocDefinition(
     views,
     foldSnapshotViews,
     references,
-    // Always defined so a collection's referenceResolver is a one-liner with no optional call. A doc
+    // Always defined so the references invocation needs no optional call. A doc
     // type that declares no `references` is a leaf: skip the walk rather than scan for nothing.
     collectReferences: (events: EventDocEvent[]) => (references ? collectEventDocReferences(events, { ...primaryFoldConfig, references }) : []),
   };

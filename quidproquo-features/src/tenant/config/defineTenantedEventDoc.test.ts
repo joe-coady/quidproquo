@@ -1,13 +1,19 @@
 import { describe, expect, it } from 'vitest';
 
+import { EventDocFunctions } from '../../eventDoc';
 import { TENANT_SCOPE_RESOLVER_FN } from '../constants/tenantStoreNames';
 import { defineTenantedEventDoc } from './defineTenantedEventDoc';
 
+const docFunctions: EventDocFunctions = {
+  storeName: 'docs',
+  type: 'doc',
+  foldSnapshotViews: () => null,
+  collectReferences: () => [],
+};
+
 describe('defineTenantedEventDoc', () => {
   it('pre-wires the tenant scope resolver onto the event doc', () => {
-    const config = defineTenantedEventDoc({
-      storeName: 'docs',
-      type: 'doc',
+    const config = defineTenantedEventDoc(docFunctions, '/entry/eventDocs::docEventDoc', {
       basePath: '/docs',
     });
 

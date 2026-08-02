@@ -7,7 +7,15 @@ import { EVENT_DOC_USER_DIRECTORY_GLOBAL } from '../../eventDoc/constants/eventD
 import { EVENT_DOC_TRANSFER_COLLECTIONS_GLOBAL, EVENT_DOC_TRANSFER_SERVICE_GLOBAL } from '../constants';
 import { defineEventDocTransfer } from './defineEventDocTransfer';
 
-const collections = [{ storeName: 'templates', type: 'template', referenceResolver: 'templateReferences' }];
+const collections = [{ storeName: 'templates', type: 'template' }];
+
+// A live functions object as a service would list one (identity + behaviour members).
+const templateFunctions = {
+  storeName: 'templates',
+  type: 'template',
+  foldSnapshotViews: () => null,
+  collectReferences: () => [],
+};
 
 // The config is a flat array of settings; routes are the ones carrying a runtime with globals.
 const routeGlobals = (config: unknown[]): Record<string, unknown>[] =>
@@ -46,6 +54,19 @@ describe('defineEventDocTransfer', () => {
     const globals = routeGlobals(defineEventDocTransfer({ service: 'template', collections }));
 
     expect(globals.every((entry) => !(EVENT_DOC_USER_DIRECTORY_GLOBAL in entry))).toBe(true);
+  });
+
+  it('normalizes a live functions object to its bare identity in the registry', () => {
+    const globals = routeGlobals(defineEventDocTransfer({ service: 'template', collections: [templateFunctions] }));
+
+    expect(globals[0][EVENT_DOC_TRANSFER_COLLECTIONS_GLOBAL]).toEqual([{ storeName: 'templates', type: 'template', onPublish: '', onAppend: '' }]);
+  });
+
+  it('accepts a collection-list entry carrying its functions object, unmapped', () => {
+    const listEntry = { functions: templateFunctions, runtime: '/entry/eventDocs::templateEventDoc', basePath: '/templates' };
+    const globals = routeGlobals(defineEventDocTransfer({ service: 'template', collections: [listEntry] }));
+
+    expect(globals[0][EVENT_DOC_TRANSFER_COLLECTIONS_GLOBAL]).toEqual([{ storeName: 'templates', type: 'template', onPublish: '', onAppend: '' }]);
   });
 
   it('provisions the staging drive', () => {

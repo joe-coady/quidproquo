@@ -13,12 +13,11 @@ export type EventDocTransferGlobalsOptions = {
 // when unconfigured) so the bridge can read unconditionally.
 export const buildEventDocTransferGlobals = ({ service, collections, scopeResolver }: EventDocTransferGlobalsOptions): Record<string, unknown> => ({
   [EVENT_DOC_TRANSFER_SERVICE_GLOBAL]: service,
-  [EVENT_DOC_TRANSFER_COLLECTIONS_GLOBAL]: collections.map(({ storeName, type, onPublish, onAppend, referenceResolver }) => ({
+  [EVENT_DOC_TRANSFER_COLLECTIONS_GLOBAL]: collections.map(({ storeName, type, onPublish, onAppend }) => ({
     storeName,
     type,
     onPublish: onPublish ?? '',
     onAppend: onAppend ?? '',
-    referenceResolver: referenceResolver ?? '',
   })),
   [EVENT_DOC_TRANSFER_SCOPE_RESOLVER_GLOBAL]: scopeResolver ?? '',
 });

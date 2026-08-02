@@ -448,7 +448,7 @@ describe('createEventDocDefinition summary view', () => {
     expect(summary.name).toBe('Renamed');
   });
 
-  it('carries no `type` — that is the store\'s partition key, not part of the view', () => {
+  it("carries no `type` — that is the store's partition key, not part of the view", () => {
     // It used to be seeded into the fold, which is why foldEventDocSummary needed a `type`
     // argument no reducer ever derived. Keeping it out is what lets this fold with the same
     // fold(events) signature as every other view.
@@ -629,5 +629,39 @@ describe('createEventDocDefinition foldSnapshotViews', () => {
     expect(resumedDocument.schemaVersion).toBe(2);
     expect(resumedDocument.pinned).toBe(false);
     expect(resumedDocument.body).toBe('v2 edit');
+  });
+});
+
+describe('createEventDocDefinition identity', () => {
+  it('carries storeName and type onto the definition', () => {
+    const definition = createEventDocDefinition({
+      storeName: 'memos',
+      type: 'memo',
+      schemaVersion: 1,
+      versions: [{ version: 1, views: { document: memoDocumentV1 } }],
+      api: memoApi,
+    });
+
+    expect(definition.storeName).toBe('memos');
+    expect(definition.type).toBe('memo');
+  });
+
+  it('leaves identity absent for client-only definitions', () => {
+    const definition = createMemoDefinition();
+
+    expect(definition.storeName).toBeUndefined();
+    expect(definition.type).toBeUndefined();
+  });
+
+  it('throws on half an identity', () => {
+    const half = () =>
+      createEventDocDefinition({
+        storeName: 'memos',
+        schemaVersion: 1,
+        versions: [{ version: 1, views: { document: memoDocumentV1 } }],
+        api: memoApi,
+      });
+
+    expect(half).toThrow('set both or neither');
   });
 });

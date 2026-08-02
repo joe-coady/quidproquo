@@ -1,4 +1,5 @@
 export * from './eventDocEventsStoreName';
+export * from './eventDocFunctionsName';
 export * from './eventDocGlobalNames';
 export * from './eventDocRecentClientMessageIdWindow';
 export * from './eventDocSnapshotInlineLimits';

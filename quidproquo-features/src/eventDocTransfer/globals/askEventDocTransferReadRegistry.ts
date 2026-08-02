@@ -10,7 +10,6 @@ const toCollection = (collection: EventDocTransferCollection): EventDocTransferC
   type: collection.type,
   onPublish: collection.onPublish || undefined,
   onAppend: collection.onAppend || undefined,
-  referenceResolver: collection.referenceResolver || undefined,
 });
 
 // Bridge the transfer routes' globals into the registry the stories take explicitly.
