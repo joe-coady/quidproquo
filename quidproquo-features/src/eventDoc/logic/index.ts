@@ -1,6 +1,8 @@
 export * from './askEventDocAppendServerEvent';
+export * from './askEventDocAppendServerEvents';
 export * from './askEventDocCreate';
 export * from './askEventDocEventAppend';
+
 export * from './askEventDocDocumentStateAsOf';
 export * from './askEventDocDocumentStateLatest';
 export * from './askEventDocEventBootstrapPage';

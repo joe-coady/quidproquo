@@ -20,6 +20,7 @@ describe('getKeyValueStoreActionProcessor (index)', () => {
         KeyValueStoreActionType.ScanAllScopes,
         KeyValueStoreActionType.Update,
         KeyValueStoreActionType.Upsert,
+        KeyValueStoreActionType.UpsertMany,
       ].sort(),
     );
   });

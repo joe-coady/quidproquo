@@ -1,3 +1,4 @@
+export * from './batchPutItems';
 export * from './convertDynamoMapToObject';
 export * from './deleteItem';
 export * from './getAllItems';

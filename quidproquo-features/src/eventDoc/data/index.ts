@@ -5,6 +5,7 @@ export * from './askEventDocEventLast';
 export * from './askEventDocEventList';
 export * from './askEventDocEventListAll';
 export * from './askEventDocEventWrite';
+export * from './askEventDocEventWriteMany';
 export * from './askEventDocGenerateAssetDownloadUrl';
 export * from './askEventDocGenerateAssetUploadUrl';
 export * from './askEventDocGetById';

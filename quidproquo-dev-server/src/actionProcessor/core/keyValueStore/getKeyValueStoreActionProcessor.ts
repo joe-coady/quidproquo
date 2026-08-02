@@ -9,6 +9,7 @@ import { getKeyValueStoreScanActionProcessor } from './getKeyValueStoreScanActio
 import { getKeyValueStoreScanAllScopesActionProcessor } from './getKeyValueStoreScanAllScopesActionProcessor';
 import { getKeyValueStoreUpdateActionProcessor } from './getKeyValueStoreUpdateActionProcessor';
 import { getKeyValueStoreUpsertActionProcessor } from './getKeyValueStoreUpsertActionProcessor';
+import { getKeyValueStoreUpsertManyActionProcessor } from './getKeyValueStoreUpsertManyActionProcessor';
 
 export const getKeyValueStoreActionProcessor =
   (devServerConfig: ResolvedDevServerConfig): ActionProcessorListResolver =>
@@ -22,5 +23,6 @@ export const getKeyValueStoreActionProcessor =
       ...(await getKeyValueStoreScanAllScopesActionProcessor(devServerConfig)(qpqConfig, dynamicModuleLoader)),
       ...(await getKeyValueStoreUpdateActionProcessor(devServerConfig)(qpqConfig, dynamicModuleLoader)),
       ...(await getKeyValueStoreUpsertActionProcessor(devServerConfig)(qpqConfig, dynamicModuleLoader)),
+      ...(await getKeyValueStoreUpsertManyActionProcessor(devServerConfig)(qpqConfig, dynamicModuleLoader)),
     };
   };

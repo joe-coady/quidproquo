@@ -1,9 +1,9 @@
 import { KvsKey, KvsObjectDataType } from 'quidproquo-core';
 
-import { AttributeValue, DynamoDBClient, PutItemCommand } from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, PutItemCommand } from '@aws-sdk/client-dynamodb';
 
 import { createAwsClient } from '../createAwsClient';
-import { buildAttributeValue } from './qpqDynamoOrm';
+import { convertObjectToDynamoItem } from './qpqDynamoOrm';
 
 export type PutItemOptions = {
   // Requested TTL in seconds. Not currently applied: the table's ttlAttribute
@@ -18,13 +18,6 @@ export type PutItemOptions = {
   // key attribute works: the condition evaluates against the item at the
   // full primary key).
   ifNotExistsAttribute?: string;
-};
-
-// Root items must be objects. A root-level list is technically storable, but
-// DynamoDB cannot conditionally update or delete individual list elements,
-// and a root list is usually better modelled as its own table.
-const convertObjectToDynamoItem = (obj: KvsObjectDataType): Record<string, AttributeValue> => {
-  return buildAttributeValue(obj).M!;
 };
 
 export async function putItem(
