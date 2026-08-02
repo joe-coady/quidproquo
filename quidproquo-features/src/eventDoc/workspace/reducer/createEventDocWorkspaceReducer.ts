@@ -4,6 +4,7 @@ import { EventDocWorkspaceEffect } from '../effects/EventDocWorkspaceEffect';
 import { EventDocWorkspaceEffects } from '../effects/EventDocWorkspaceEffects';
 import { EventDocWorkspaceSlotFoldsConfig } from '../types/EventDocWorkspaceSlotFoldsConfig';
 import { EventDocWorkspaceState } from '../types/EventDocWorkspaceState';
+import { appendFullHistory } from './stateUpdaters/appendFullHistory';
 import { clearError } from './stateUpdaters/clearError';
 import { createAppendHistoryEventsUpdater } from './stateUpdaters/createAppendHistoryEventsUpdater';
 import { createAppendHistoryEventUpdater } from './stateUpdaters/createAppendHistoryEventUpdater';
@@ -36,6 +37,7 @@ export const createEventDocWorkspaceReducer = (
     [EventDocWorkspaceEffect.DropTransient]: dropTransient,
     [EventDocWorkspaceEffect.SetHistoryEvents]: createSetHistoryEventsUpdater(slots),
     [EventDocWorkspaceEffect.SetFullHistory]: setFullHistory,
+    [EventDocWorkspaceEffect.AppendFullHistory]: appendFullHistory,
     [EventDocWorkspaceEffect.AppendHistoryEvent]: createAppendHistoryEventUpdater(slots),
     [EventDocWorkspaceEffect.AppendHistoryEvents]: createAppendHistoryEventsUpdater(slots),
     [EventDocWorkspaceEffect.SetPendingEvents]: setPendingEvents,

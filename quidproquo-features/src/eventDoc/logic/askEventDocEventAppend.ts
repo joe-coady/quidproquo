@@ -1,10 +1,10 @@
 import { askDateNow, askInlineFunctionExecute, askNewSortableGuid, AskResponse } from 'quidproquo-core';
 
 import { askEventDocStoreRead } from '../context/askEventDocStoreRead';
-import { askEventDocEventListAll } from '../data/askEventDocEventListAll';
 import { askEventDocEventWrite } from '../data/askEventDocEventWrite';
 import { EventDocEffect, EventDocEvent, EventDocEventActor, EventDocEventInput, EventDocOnAppendInput, EventDocOnPublishInput } from '../models';
 import { askEventDocGetByIdOrThrow } from './askEventDocGetByIdOrThrow';
+import { askEventDocHookStates } from './askEventDocHookStates';
 
 /**
  * Append a client event to a model's log.
@@ -71,16 +71,18 @@ export function* askEventDocEventAppend(modelId: string, input: EventDocEventInp
 
   if (firePublishHook || onAppend) {
     // Only read on the hook path. A collection with no hooks (every high-volume one)
-    // never pays for these.
+    // never pays for these. The states are snapshot-seeded (gap since the nearest
+    // snapshot, never the log), so hook cost tracks the burst.
     const summary = yield* askEventDocGetByIdOrThrow(modelId);
-    const events = yield* askEventDocEventListAll(modelId);
+    const { state, previousState } = yield* askEventDocHookStates(modelId, event);
 
     if (firePublishHook) {
       yield* askInlineFunctionExecute<void, EventDocOnPublishInput>(onPublish!, {
         docId: modelId,
         event,
         summary,
-        events,
+        state,
+        previousState,
       });
     }
 
@@ -91,7 +93,8 @@ export function* askEventDocEventAppend(modelId: string, input: EventDocEventInp
         docId: modelId,
         event,
         summary,
-        events,
+        state,
+        previousState,
       });
     }
   }

@@ -1,8 +1,18 @@
-import { KeyValueStoreActionType, QpqIsoDateTime, runStory } from 'quidproquo-core';
+import {
+  DynamicFunctionsActionType,
+  KeyValueStoreActionType,
+  KvsLogicalOperator,
+  KvsQueryCondition,
+  KvsQueryOperation,
+  KvsQueryOperationType,
+  QpqIsoDateTime,
+  runStory,
+} from 'quidproquo-core';
 
 import { describe, expect, it } from 'vitest';
 
 import { eventDocEventsStoreName } from '../constants/eventDocEventsStoreName';
+import { eventDocSnapshotsStoreName } from '../constants/eventDocSnapshotsStoreName';
 import { askEventDocProvideStore } from '../context/askEventDocProvideStore';
 import { EventDocEvent, EventDocSummary, EventDocVersion } from '../models';
 import { EventDocStoredEvent } from '../types/EventDocStoredEvent';
@@ -81,17 +91,39 @@ const storedEvents: EventDocStoredEvent[] = EVENTS.map((event) => ({
 
 const STORE_NAME = 'templates';
 const EVENTS_STORE_NAME = eventDocEventsStoreName(STORE_NAME);
+const SNAPSHOTS_STORE_NAME = eventDocSnapshotsStoreName(STORE_NAME);
 
-// The summary lookup and the event list both land on the Query action (askKeyValueStoreQuerySingle
-// is built on it), so the mock partitions by store name.
+// The sort-key bound the state resolver issues (upToEventId → at-or-before) — honoured
+// for real so the truncation at the version's head is exercised, not hand-waved.
+const skAtOrBefore = (keyCondition: KvsQueryOperation): string | undefined => {
+  if ('conditions' in keyCondition) {
+    return (keyCondition as KvsLogicalOperator).conditions.map(skAtOrBefore).find((v) => v !== undefined);
+  }
+
+  const condition = keyCondition as KvsQueryCondition;
+  return condition.key === 'sk' && condition.operation === KvsQueryOperationType.LessThanOrEqual ? String(condition.valueA) : undefined;
+};
+
+// The summary lookup, the snapshot-base lookup and the event list all land on the Query
+// action, so the mock partitions by store name: no snapshots exist (the resolver folds
+// from scratch), and the registered fold echoes the event ids it was handed so the
+// assertions can see exactly which prefix reached it.
 const resolveAsOf = (summary: EventDocSummary | null, clock: string) =>
   runStory(askEventDocProvideStore({ storeName: STORE_NAME, type: 'template' }, askEventDocPublishedVersionAsOf(DOC_ID, clock as QpqIsoDateTime)), {
-    [KeyValueStoreActionType.Query]: (action: { payload: { keyValueStoreName: string } }) => {
+    [KeyValueStoreActionType.Query]: (action: { payload: { keyValueStoreName: string; keyCondition: KvsQueryOperation } }) => {
+      if (action.payload.keyValueStoreName === SNAPSHOTS_STORE_NAME) {
+        return { items: [], nextPageKey: undefined };
+      }
       if (action.payload.keyValueStoreName === EVENTS_STORE_NAME) {
-        return { items: storedEvents, nextPageKey: undefined };
+        const upTo = skAtOrBefore(action.payload.keyCondition);
+        return { items: storedEvents.filter((row) => upTo === undefined || row.sk <= upTo), nextPageKey: undefined };
       }
       return { items: summary ? [summary] : [], nextPageKey: undefined };
     },
+
+    [DynamicFunctionsActionType.Execute]: (action: { payload: { functionName: string; args: [EventDocEvent[]] } }) => ({
+      foldedEventIds: action.payload.args[0].map((event) => event.payload.metadata.eventId),
+    }),
   });
 
 describe('askEventDocPublishedVersionAsOf', () => {
@@ -99,15 +131,16 @@ describe('askEventDocPublishedVersionAsOf', () => {
     const slice = resolveAsOf(buildSummary([VERSION_1, VERSION_2, VERSION_DRAFT]), '2026-07-15T00:00:00.000Z');
 
     expect(slice?.version).toEqual(VERSION_2);
-    // v2's head is index 3, so events 4 and 5 (written after it published) are cut.
-    expect(slice?.events.map((event) => event.payload.metadata.eventId)).toEqual([eventId(0), eventId(1), eventId(2), eventId(3)]);
+    // v2's head is index 3, so events 4 and 5 (written after it published) never reach
+    // the fold — the state is folded from the truncated prefix.
+    expect(slice?.state).toEqual({ foldedEventIds: [eventId(0), eventId(1), eventId(2), eventId(3)] });
   });
 
   it('resolves an older version when the clock predates the newer publish', () => {
     const slice = resolveAsOf(buildSummary([VERSION_1, VERSION_2, VERSION_DRAFT]), '2026-04-01T00:00:00.000Z');
 
     expect(slice?.version).toEqual(VERSION_1);
-    expect(slice?.events.map((event) => event.payload.metadata.eventId)).toEqual([eventId(0), eventId(1)]);
+    expect(slice?.state).toEqual({ foldedEventIds: [eventId(0), eventId(1)] });
   });
 
   it('ignores a publish scheduled to take effect in the future', () => {

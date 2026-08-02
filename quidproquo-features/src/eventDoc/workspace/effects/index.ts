@@ -1,3 +1,4 @@
+export * from './EventDocWorkspaceAppendFullHistoryEffect';
 export * from './EventDocWorkspaceAppendHistoryEventEffect';
 export * from './EventDocWorkspaceAppendHistoryEventsEffect';
 export * from './EventDocWorkspaceApplyEventEffect';

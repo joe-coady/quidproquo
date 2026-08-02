@@ -10,27 +10,32 @@ import {
 import { EVENT_DOC_SNAPSHOT_FUNCTIONS_GLOBAL, EVENT_DOC_STORE_NAME_GLOBAL } from '../../constants/eventDocGlobalNames';
 import { askEventDocStoreProvide } from '../../context/askEventDocStoreProvide';
 import { buildEventDocStore } from '../../context/buildEventDocStore';
-import { askEventDocSnapshotAtEvent } from '../../logic/askEventDocSnapshotAtEvent';
+import { askEventDocProjectAtEvent } from '../../logic/askEventDocProjectAtEvent';
 import { askEventDocSummaryRederive } from '../../logic/askEventDocSummaryRederive';
 import { EventDocStoredEvent } from '../../types/EventDocStoredEvent';
 
-// The per-document work one stream delivery triggers: rebuild the queryable record from
-// the log, then (for a collection with a registered functions object) store the folded
-// views as of the batch's newest event. Both are pure derivations of the log, which is
-// what makes the stream's at-least-once delivery and its retries harmless — re-running
-// either rewrites the same facts.
+// The per-document work one stream delivery triggers: ONE incremental fold that writes
+// both the queryable summary record and the per-view snapshot set as of the batch's
+// newest event — so per-delivery cost tracks the burst, not the log. Pure derivations
+// of the log, which is what makes the stream's at-least-once delivery and its retries
+// harmless — re-running rewrites the same facts.
+//
+// The whole-log rederive remains for the cases the incremental fold can't serve: a
+// collection with no registered functions object (nothing to fold views with), and a
+// Remove record — rows were deleted out from under the stream (a transfer rewrote the
+// log), so a snapshot-seeded fold could resume from a snapshot of the OLD log; there is
+// also no new event to snapshot at.
+//
+// Snapshots fragment along the stream's own batching: coalescing hands this handler the
+// LAST event per document per batch, so a lone append projects at that event while a
+// burst of a hundred projects once, at the burst's newest.
 function* askEventDocProjectStreamRecord(record: KvsStreamRecord, modelId: string, functionsName?: string): AskResponse<void> {
-  yield* askEventDocSummaryRederive(modelId);
-
-  // Snapshots fragment along the stream's own batching: coalescing hands this handler the
-  // LAST event per document per batch, so a lone append snapshots at that event while a
-  // burst of a hundred snapshots once, at the burst's newest. A Remove is not a new event
-  // to snapshot at — the summary rebuild above already reflects whatever the log now says.
   if (!functionsName || record.eventType === KvsStreamEventType.Remove) {
+    yield* askEventDocSummaryRederive(modelId);
     return;
   }
 
-  yield* askEventDocSnapshotAtEvent(modelId, String(record.keys.sk), functionsName);
+  yield* askEventDocProjectAtEvent(modelId, String(record.keys.sk), functionsName);
 }
 
 /**

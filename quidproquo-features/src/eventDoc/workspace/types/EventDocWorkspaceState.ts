@@ -1,6 +1,7 @@
 import { Nullable } from 'quidproquo-core';
 
 import { EventDocEvent, EventDocSnapshotBase } from '../../models';
+import { EventDocWorkspaceHistoryPage } from './EventDocWorkspaceHistoryPage';
 import { EventDocWorkspaceSlotFoldsConfig } from './EventDocWorkspaceSlotFoldsConfig';
 import { createInitialEventDocWorkspaceSlotState, EventDocWorkspaceSlotState } from './EventDocWorkspaceSlotState';
 
@@ -21,15 +22,16 @@ import { createInitialEventDocWorkspaceSlotState, EventDocWorkspaceSlotState } f
 // pending tail, then the transient tail, folded onto that stored accumulator and
 // migrated to the latest version in selectors. Base + log stay the source of truth:
 // historyViews is a pure fold of them, never edited directly.
-// `fullHistory` is a display side-channel: the COMPLETE saved log from event zero,
-// loaded on demand (askLoadHistory — the history dialog's read) because the working
-// `history` starts after the base. Nothing folds from it; null until requested.
+// `fullHistory` is a display side-channel: the saved log NEWEST-FIRST, loaded a page at
+// a time on demand (askLoadHistory / askLoadOlderHistory — the history dialog's read)
+// because the working `history` starts after the base. Nothing folds from it; null
+// until requested.
 export type EventDocWorkspaceState = {
   history: Record<string, EventDocEvent[]>;
   pending: Record<string, EventDocEvent[]>;
   transient: Record<string, Record<string, EventDocEvent[]>>;
   bases: Record<string, Nullable<EventDocSnapshotBase>>;
-  fullHistory: Record<string, Nullable<EventDocEvent[]>>;
+  fullHistory: Record<string, Nullable<EventDocWorkspaceHistoryPage>>;
   historyViews: Record<string, unknown>;
   slots: Record<string, EventDocWorkspaceSlotState>;
 };

@@ -10,6 +10,8 @@ import { EventDocEvent, EventDocLink, EventDocRenderInput, EventDocRenderResult,
 // not-configured behaviour.
 export type EventDocInvokableFunctions = {
   foldSnapshotViews: (events: EventDocEvent[], seedViews?: EventDocSnapshotViews) => Nullable<EventDocSnapshotViews>;
+  foldDocumentState: (events: EventDocEvent[], seedState?: unknown) => unknown;
   collectReferences: (events: EventDocEvent[]) => EventDocLink[];
+  collectReferencesFromState: (state: unknown) => EventDocLink[];
   render: (input: EventDocRenderInput) => EventDocRenderResult;
 };

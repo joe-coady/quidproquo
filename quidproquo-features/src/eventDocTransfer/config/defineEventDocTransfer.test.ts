@@ -14,6 +14,8 @@ const templateFunctions = {
   storeName: 'templates',
   type: 'template',
   foldSnapshotViews: () => null,
+  foldDocumentState: () => null,
+  collectReferencesFromState: () => [],
   collectReferences: () => [],
 };
 

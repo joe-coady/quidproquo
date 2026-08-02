@@ -12,7 +12,7 @@ export function* askEventDocWorkspaceApiFetchEvents(identity: EventDocWorkspaceD
   let nextPageKey: string | undefined;
 
   do {
-    const page = yield* askEventDocWorkspaceApiFetchEventsPage(identity, nextPageKey, afterEventId);
+    const page = yield* askEventDocWorkspaceApiFetchEventsPage(identity, { nextPageKey, afterEventId });
     all.push(...page.items);
     nextPageKey = page.nextPageKey;
   } while (nextPageKey);

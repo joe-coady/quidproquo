@@ -11,6 +11,7 @@ function* askEventDocStoreListEvents(event: HTTPEvent, modelId: string): AskResp
   const nextPageKey = qpqWebServerUtils.readUriQueryParamFromEvent(event, 'nextPageKey');
   const afterEventId = qpqWebServerUtils.readUriQueryParamFromEvent(event, 'afterEventId');
   const includeBase = qpqWebServerUtils.readUriQueryParamFromEvent(event, 'includeBase');
+  const newestFirst = qpqWebServerUtils.readUriQueryParamFromEvent(event, 'newestFirst');
 
   // includeBase asks for the bootstrap shape: the newest snapshot base plus the events
   // after it, with a from-the-start fallback carried in-band as base: null. It replaces
@@ -29,6 +30,8 @@ function* askEventDocStoreListEvents(event: HTTPEvent, modelId: string): AskResp
     limit: limit ? Number(limit) : undefined,
     nextPageKey,
     afterEventId: afterEventId || undefined,
+    // Newest first — the history panel's latest-page-then-walk-backwards read.
+    sortDescending: newestFirst === 'true' || undefined,
   });
 
   return qpqWebServerUtils.toJsonEventResponse(page);

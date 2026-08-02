@@ -285,6 +285,44 @@ describe('projectEventDocSummary snapshots', () => {
     expect(summaryRow.data).toEqual({ type: 'inline', snapshot: { name: 'from-fold' } });
   });
 
+  it('derives the summary row from the fold, not a whole-log refold', () => {
+    const { mocks, tables } = buildMocks('doc-1', 'template', { functionsName: FOLD_FN });
+
+    runStory(projectEventDocSummary(streamRecord(undefined)), mocks);
+
+    const record = (tables[STORE] ?? []).find((row) => row.id === 'doc-1');
+    // The fake fold's sentinel, NOT the log's 'Renamed' — one incremental fold now
+    // feeds both the snapshot set and the queryable record.
+    expect(record!.name).toBe('from-fold');
+  });
+
+  it('sets and removes deletedAt on the summary row as the fold view carries it', () => {
+    const { mocks, tables } = buildMocks('doc-1', 'template', { functionsName: FOLD_FN });
+
+    // The record starts soft-deleted; the fold's summary view carries no deletedAt (a
+    // RESTORE landed), so the attribute must be REMOVED — the list read hides deleted
+    // rows by attribute existence, and a stale flag would hide the doc forever.
+    tables[STORE] = [{ type: 'template', id: 'doc-1', name: 'old', deletedAt: '2026-07-01T00:00:00.000Z' }];
+
+    runStory(projectEventDocSummary(streamRecord(undefined)), mocks);
+
+    const record = (tables[STORE] ?? []).find((row) => row.id === 'doc-1');
+    expect(record!.name).toBe('from-fold');
+    expect('deletedAt' in record!).toBe(false);
+
+    // And the inverse: a view carrying deletedAt lands it on the row.
+    mocks[DynamicFunctionsActionType.Execute] = () => ({
+      document: {},
+      summary: { name: 'gone', deletedAt: '2026-07-30T00:00:00.000Z' },
+    });
+    // A fresh event id so the seed-at-event replay skip doesn't short-circuit the fold.
+    tables[eventDocEventsStoreName(STORE)].push({ pk: 'doc-1', sk: eventId(2), type: 'template', data: event(EventDocEffect.Delete, 2, {}) });
+    runStory(projectEventDocSummary({ ...streamRecord(undefined), keys: { pk: 'doc-1', sk: eventId(2) } }), mocks);
+
+    const deleted = (tables[STORE] ?? []).find((row) => row.id === 'doc-1');
+    expect(deleted!.deletedAt).toBe('2026-07-30T00:00:00.000Z');
+  });
+
   it('folds the PREFIX up to the stream record, not the whole log', () => {
     // The batch's newest event may not be the log's newest by the time the handler runs —
     // a later append may already be in the table. The snapshot at THIS event must not
@@ -308,15 +346,21 @@ describe('projectEventDocSummary snapshots', () => {
     expect(tables[SNAPSHOTS_STORE]).toBeUndefined();
   });
 
-  it('does not snapshot on a Remove, but still rebuilds the summary', () => {
-    // A Remove is not a new event to snapshot at; the log shrank and the summary rebuild
-    // reflects whatever it now says.
-    const { mocks, tables, updates } = buildMocks('doc-1', 'template', { functionsName: FOLD_FN });
+  it('does not snapshot on a Remove, and rebuilds the summary from the WHOLE log', () => {
+    // A Remove means rows were deleted out from under the stream (a transfer rewrote the
+    // log) — a snapshot-seeded fold could resume from a snapshot of the OLD log, so the
+    // summary re-derives from scratch and no snapshot is written.
+    const { mocks, tables, updates, foldCalls } = buildMocks('doc-1', 'template', { functionsName: FOLD_FN });
 
     runStory(projectEventDocSummary({ ...streamRecord(undefined), eventType: KvsStreamEventType.Remove }), mocks);
 
     expect(updates).toHaveLength(1);
+    expect(foldCalls).toHaveLength(0);
     expect(tables[SNAPSHOTS_STORE]).toBeUndefined();
+
+    const record = (tables[STORE] ?? []).find((row) => row.id === 'doc-1');
+    // From the log ('Renamed'), not the registered fold's sentinel ('from-fold').
+    expect(record!.name).toBe('Renamed');
   });
 
   it('offloads a state over the inline cap to the blob drive, row recording only that', () => {
@@ -391,16 +435,24 @@ describe('projectEventDocSummary incremental snapshots', () => {
     ).toEqual(['doc-1#document', 'doc-1#summary']);
   });
 
-  it('skips entirely when a complete snapshot already exists at the target event', () => {
-    // The document row is the set's last write, so its presence at the target means a
-    // replayed delivery has nothing left to do.
+  it('skips the fold when a complete snapshot already exists at the target event, but still rewrites the summary from it', () => {
+    // The document row is the set's last write, so its presence at the target means the
+    // snapshot work is done — but an earlier delivery may have died between the summary
+    // write and the snapshot writes, so the replay re-covers the summary row from the
+    // seed's own summary view rather than trusting it landed.
     const { mocks, tables, foldCalls, upserts } = buildMocks('doc-1', 'template', { functionsName: FOLD_FN });
-    tables[SNAPSHOTS_STORE] = seedRowsAt(eventId(1));
+    tables[SNAPSHOTS_STORE] = [
+      { pk: 'doc-1#summary', sk: eventId(1), type: 'template', data: { type: 'inline', snapshot: { name: 'from-seed' } } },
+      { pk: 'doc-1#document', sk: eventId(1), type: 'template', data: { type: 'inline', snapshot: { seedDocument: true }, views: ['document', 'summary'] } },
+    ];
 
     runStory(projectEventDocSummary(streamRecord(undefined)), mocks);
 
     expect(foldCalls).toHaveLength(0);
     expect(upserts.filter((upsert) => upsert.keyValueStoreName === SNAPSHOTS_STORE)).toHaveLength(0);
+
+    const record = (tables[STORE] ?? []).find((row) => row.id === 'doc-1');
+    expect(record!.name).toBe('from-seed');
   });
 
   it('falls back to a from-scratch fold when the fold declines the seed', () => {

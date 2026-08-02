@@ -14,6 +14,8 @@ const memoFunctions: EventDocFunctions = {
   storeName: 'memos',
   type: 'memo',
   foldSnapshotViews: () => null,
+  foldDocumentState: () => null,
+  collectReferencesFromState: () => [],
   collectReferences: () => [],
 };
 

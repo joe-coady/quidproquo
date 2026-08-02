@@ -10,6 +10,7 @@ import {
   EventDocSummary,
   eventDocSummaryViewSchema,
 } from '../../eventDoc/models';
+import { askEventDocHookStates } from '../../eventDoc/logic/askEventDocHookStates';
 import { foldEventDocSummary } from '../../eventDoc/summary';
 import { askValidateModelOrThrowError } from '../../validation/askValidateModelOrThrowError';
 
@@ -46,6 +47,8 @@ const findLatestPublishEvent = (events: EventDocEvent[]): Nullable<EventDocEvent
 // Fire the collection's post-append hooks ONCE for the doc, not once per imported event: per-event
 // firing would replay every historical publish and (for onAppend) spam the target's websockets.
 // Both hooks are contractually idempotent, and this is the shape a resumed import repeats safely.
+// States are derived per fired event (askEventDocHookStates reads the just-written log back
+// consistently), matching the append path's contract: the hook sees the document as of ITS event.
 function* askEventDocFireImportHooks(docId: string, events: EventDocEvent[], summary: EventDocSummary): AskResponse<void> {
   const { onPublish, onAppend } = yield* askEventDocResolveStore();
 
@@ -58,11 +61,13 @@ function* askEventDocFireImportHooks(docId: string, events: EventDocEvent[], sum
   const publishEvent = findLatestPublishEvent(events);
 
   if (onPublish && publishEvent) {
-    yield* askInlineFunctionExecute<void, EventDocOnPublishInput>(onPublish, { docId, event: publishEvent, summary, events });
+    const { state, previousState } = yield* askEventDocHookStates(docId, publishEvent);
+    yield* askInlineFunctionExecute<void, EventDocOnPublishInput>(onPublish, { docId, event: publishEvent, summary, state, previousState });
   }
 
   if (onAppend) {
-    yield* askInlineFunctionExecute<void, EventDocOnAppendInput>(onAppend, { docId, event: tailEvent, summary, events });
+    const { state, previousState } = yield* askEventDocHookStates(docId, tailEvent);
+    yield* askInlineFunctionExecute<void, EventDocOnAppendInput>(onAppend, { docId, event: tailEvent, summary, state, previousState });
   }
 }
 

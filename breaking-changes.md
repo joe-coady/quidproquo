@@ -40,6 +40,38 @@ assembled quickly.
   `rejectEventDocEvent(event, state, validators)`.
 - `foldEventDocLogStep`'s config (`FoldEventDocLogStepConfig`, `quidproquo-features`) drops the `acceptance` field; a step reads its acceptance rules
   off the `state` it is passed instead.
+- `EventDocFunctions` / `EventDocDefinition` / `EventDocInvokableFunctions` (`quidproquo-features`) gain two new required members: `foldDocumentState:
+  (events, seedState?) => unknown` (the latest-shaped document view at one point, resumable from a stored snapshot's document state) and
+  `collectReferencesFromState: (state) => EventDocLink[]` (the links the current state depends on). Any hand-written `EventDocFunctions` object (not
+  produced by `createEventDocDefinition`, which now supplies both automatically) must implement them.
+- `EventDocRenderInput` (`quidproquo-features`) drops `events: EventDocEvent[]` in favor of `state: unknown` — a registered `render` function must
+  read `input.state` (already folded, latest-shaped) instead of folding `input.events` itself.
+- `EventDocOnAppendInput` and `EventDocOnPublishInput` (`quidproquo-features`) drop `events: EventDocEvent[]` in favor of `state: unknown` and a new
+  `previousState: unknown` — a registered `onAppend`/`onPublish` inline function must read `input.state`/`input.previousState` (already folded,
+  latest-shaped, snapshot-seeded) instead of folding `input.events` itself.
+- `EventDocBackend` (`quidproquo-features`, the object `createEventDocBackend` returns) renames `askEventsAsOf(id, clock)` to
+  `askDocumentStateAsOfTime(id, clock)` and adds `askDocumentStateLatest(id)`; both now return `Nullable<EventDocDocumentStateAtEvent>`
+  (`{ eventId, state }`) instead of `EventDocEvent[]`. `askPublishedEventsAsOf` is removed with no replacement — use `askPublishedVersionAsOf` and
+  read `.state` instead. `askPublishedVersionAsOf` now returns `Nullable<EventDocVersionState>` (`{ version, state }`) instead of
+  `Nullable<EventDocVersionSlice>` (`{ version, events }`).
+- `askEventDocEventsAsOf`, `askEventDocPublishedEventsAsOf`, and `askEventDocSnapshotAtEvent` (`quidproquo-features`) are removed. Use
+  `askEventDocDocumentStateAsOfTime`/`askEventDocDocumentStateLatest`/`askEventDocDocumentStateAsOf` (return folded state, not raw events) and
+  `askEventDocProjectAtEvent` respectively.
+- `askEventDocPublishedVersionAsOf` (`quidproquo-features`) now returns `Nullable<EventDocVersionState>` (`{ version, state }`) instead of
+  `Nullable<EventDocVersionSlice>` (`{ version, events }`).
+- `askEventDocReferences` (`quidproquo-features`) is now the full-history walk only (used by the transfer export); the references route uses the
+  new `askEventDocReferencesFromState(docId)` instead. A caller that wants "what does the document reference right now" should switch to the new
+  function.
+- `EventDocVersionSlice` (`quidproquo-features`, `{ version, events }`) is replaced by `EventDocVersionState` (`{ version, state }`).
+- `EventDocWorkspaceTransport` (`quidproquo-features`) gains a required `askFetchEventsPage: (identity, request?) => AskResponse<QpqPagedData<EventDocEvent>>`
+  member — the history panel's paged, newest-first read. A hand-written transport must implement it alongside the existing `askFetchEvents`.
+- `EventDocWorkspaceBuiltInApi` (`quidproquo-features`) gains a required `askLoadOlderHistory: (slotKey?) => AskResponse<void>` member.
+- `EventDocWorkspaceState.fullHistory` (`quidproquo-features`) changes from `Record<string, Nullable<EventDocEvent[]>>` to
+  `Record<string, Nullable<EventDocWorkspaceHistoryPage>>` (`{ events, nextPageKey? }`, newest-first, paged) — code reading a slot's `fullHistory`
+  directly as an event array must read `.events` instead.
+- `askUIEventDocWorkspaceSetFullHistory(slotKey, events)` (`quidproquo-features`) is now `askUIEventDocWorkspaceSetFullHistory(slotKey, history)`,
+  taking `Nullable<EventDocWorkspaceHistoryPage>` instead of `Nullable<EventDocEvent[]>`. `EventDocWorkspaceSetFullHistoryEffect`'s payload renames
+  `events` to `history` with the same type change.
 
 ## 0.1.14
 

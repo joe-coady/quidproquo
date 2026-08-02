@@ -6,7 +6,7 @@ import { EventDocWorkspaceSnapshot } from '../types/EventDocWorkspaceSnapshot';
 import { EventDocWorkspaceTransport } from '../types/EventDocWorkspaceTransport';
 import { askEventDocWorkspaceCancel } from './askEventDocWorkspaceCancel';
 import { askEventDocWorkspaceInit } from './askEventDocWorkspaceInit';
-import { askEventDocWorkspaceLoadFullHistory } from './askEventDocWorkspaceLoadFullHistory';
+import { askEventDocWorkspaceLoadFullHistory, askEventDocWorkspaceLoadOlderHistory } from './askEventDocWorkspaceLoadFullHistory';
 import { askEventDocWorkspaceRefresh } from './askEventDocWorkspaceRefresh';
 import { askEventDocWorkspaceRestoreLocalPending } from './askEventDocWorkspaceRestoreLocalPending';
 import { askEventDocWorkspaceSave } from './askEventDocWorkspaceSave';
@@ -60,6 +60,11 @@ const getAskLoadHistory = (transport: EventDocWorkspaceTransport | undefined, do
     yield* askEventDocWorkspaceLoadFullHistory(yield* askEnsureTransport(transport), resolveSlotKeys(documentSlotKeys, slotKey));
   };
 
+const getAskLoadOlderHistory = (transport: EventDocWorkspaceTransport | undefined, documentSlotKeys: string[]) =>
+  function* askLoadOlderHistory(slotKey?: string): AskResponse<void> {
+    yield* askEventDocWorkspaceLoadOlderHistory(yield* askEnsureTransport(transport), resolveSlotKeys(documentSlotKeys, slotKey));
+  };
+
 export const createEventDocWorkspaceBuiltInApi = (
   transport: EventDocWorkspaceTransport | undefined,
   documentSlotKeys: string[],
@@ -70,4 +75,5 @@ export const createEventDocWorkspaceBuiltInApi = (
   askCancel: getAskCancel(documentSlotKeys),
   askRefresh: getAskRefresh(transport, documentSlotKeys),
   askLoadHistory: getAskLoadHistory(transport, documentSlotKeys),
+  askLoadOlderHistory: getAskLoadOlderHistory(transport, documentSlotKeys),
 });

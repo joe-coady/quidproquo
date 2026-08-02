@@ -12,50 +12,56 @@ import { HTTPEvent, HTTPEventResponse, qpqWebServerUtils } from 'quidproquo-webs
 
 import { eventDocFunctionsName } from '../../constants/eventDocFunctionsName';
 import { askEventDocResolveStore } from '../../context/askEventDocResolveStore';
-import { askEventDocEventListAll } from '../../data/askEventDocEventListAll';
 import { EventDocInvokableFunctions } from '../../definition/types/EventDocInvokableFunctions';
 import { askEventDocProvideRequestScope } from '../../globals/askEventDocProvideRequestScope';
 import { askEventDocProvideStoreFromGlobals } from '../../globals/askEventDocProvideStoreFromGlobals';
+import { askEventDocDocumentStateLatest } from '../../logic/askEventDocDocumentStateLatest';
 import { askEventDocPublishedVersionAsOf } from '../../logic/askEventDocPublishedVersionAsOf';
 import { isEventDocFunctionsMissing } from '../../logic/isEventDocFunctionsMissing';
-import { EventDocEvent, EventDocRenderMode, EventDocVersion } from '../../models';
+import { EventDocRenderMode, EventDocVersion } from '../../models';
 
 type ResolvedRender = {
-  events: EventDocEvent[];
+  state: unknown;
   version?: EventDocVersion;
 };
 
-// Apply the request's resolution options to get the log the renderer should fold. Published resolves
-// the version effective at the clock (defaulting to now) and returns its event slice plus the version
-// itself — the renderer needs `version.publishedAt` to resolve its own links as of the publish
-// moment, which it cannot derive from the events. Draft (or an unspecified mode) is the whole log,
-// as it stands: a draft has no time bound. Published with nothing effective is a 404 rather than a
-// silent fallback to the draft — a caller asking for the published document must not be handed
-// unpublished work.
+// Apply the request's resolution options to get the STATE the renderer should render — folded
+// snapshot-seeded, never a whole-log replay. Published resolves the version effective at the
+// clock (defaulting to now) and returns the state at that version's head plus the version itself
+// — the renderer needs `version.publishedAt` to resolve its own links as of the publish moment,
+// which it cannot derive from the state. Draft (or an unspecified mode) is the state at the log's
+// head, as it stands: a draft has no time bound. Published with nothing effective is a 404 rather
+// than a silent fallback to the draft — a caller asking for the published document must not be
+// handed unpublished work. A doc with no events at all is a 404: there is no document to render.
 function* askEventDocRenderResolve(
   modelId: string,
   renderMode: EventDocRenderMode | undefined,
   effectiveAt?: QpqIsoDateTime,
 ): AskResponse<ResolvedRender> {
   if (renderMode !== EventDocRenderMode.Published) {
-    return { events: yield* askEventDocEventListAll(modelId) };
+    const stateAtHead = yield* askEventDocDocumentStateLatest(modelId);
+    if (!stateAtHead) {
+      return yield* askThrowError(ErrorTypeEnum.NotFound, `Document not found: ${modelId}`);
+    }
+
+    return { state: stateAtHead.state };
   }
 
   const clock = effectiveAt ?? ((yield* askDateNow()) as QpqIsoDateTime);
-  const slice = yield* askEventDocPublishedVersionAsOf(modelId, clock);
-  if (!slice) {
+  const versionState = yield* askEventDocPublishedVersionAsOf(modelId, clock);
+  if (!versionState) {
     return yield* askThrowError(ErrorTypeEnum.NotFound, `No published version is effective as of ${clock}.`);
   }
 
-  return { events: slice.events, version: slice.version };
+  return { state: versionState.state, version: versionState.version };
 }
 
-// Render the document to HTML: resolve the event log the request asked for and invoke the
-// `render` member of the collection's registered EventDocFunctions object (which folds +
-// renders). The generic controller stays app-agnostic — the per-type render (e.g.
-// `foldLayout(events).html`) lives on the service's registered object. `renderMode`
-// (draft|published) and `effectiveAt` (as-of time) are read from the query string and applied HERE,
-// so the renderer receives an already-resolved log plus the version behind it; the options are
+// Render the document to HTML: resolve the state the request asked for and invoke the
+// `render` member of the collection's registered EventDocFunctions object. The generic
+// controller stays app-agnostic — the per-type render (e.g. `renderLayoutHtml(state)`)
+// lives on the service's registered object. `renderMode` (draft|published) and
+// `effectiveAt` (as-of time) are read from the query string and applied HERE, so the
+// renderer receives an already-folded state plus the version behind it; the options are
 // echoed into the input for context only.
 function* askEventDocStoreRender(event: HTTPEvent, modelId: string): AskResponse<HTTPEventResponse> {
   const { storeName, type } = yield* askEventDocResolveStore();
@@ -64,12 +70,25 @@ function* askEventDocStoreRender(event: HTTPEvent, modelId: string): AskResponse
   const renderMode = renderModeParam === EventDocRenderMode.Draft || renderModeParam === EventDocRenderMode.Published ? renderModeParam : undefined;
   const effectiveAt = getValidQpqIsoDateTime(qpqWebServerUtils.readUriQueryParamFromEvent(event, 'effectiveAt'));
 
-  const { events, version } = yield* askEventDocRenderResolve(modelId, renderMode, effectiveAt);
+  // State resolution folds through the registered functions object too, so a
+  // collection with none surfaces functions-missing HERE, before the render call —
+  // same outcome, same 404.
+  const resolved = yield* askCatch(askEventDocRenderResolve(modelId, renderMode, effectiveAt));
+
+  if (!resolved.success) {
+    if (isEventDocFunctionsMissing(resolved.error.errorType)) {
+      return yield* askThrowError(ErrorTypeEnum.NotFound, 'This collection has no renderer configured.');
+    }
+
+    return yield* askThrowError(resolved.error.errorType, resolved.error.errorText);
+  }
+
+  const { state, version } = resolved.result;
 
   const functionsCaller = createDynamicFunctionCaller<EventDocInvokableFunctions>(eventDocFunctionsName(storeName, type));
   const rendered = yield* askCatch(
     functionsCaller.render({
-      events,
+      state,
       docId: modelId,
       version,
       renderMode,

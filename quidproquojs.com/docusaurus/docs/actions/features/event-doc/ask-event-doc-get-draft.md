@@ -83,15 +83,15 @@ function* askEventDocGetPublishedAsOf(
 
 **Returns** `EventDocVersion | null` — the highest version with `publishedAt <= clock`, or `null`.
 
-## askEventDocPublishedEventsAsOf
+## askEventDocPublishedVersionAsOf
 
-Returns the **events** that make up the version published and *effective* at `clock` — the log truncated at that version's head. It resolves the version from the summary via `effectiveFrom` (when the publish takes effect, so a publish scheduled for the future stays invisible until then), then returns every event whose `eventId` sorts at or before `version.eventId`. Fold the returned events to get the published, as-of-`clock` content — the generic backbone of a "render published" flow. (This mirrors `askEventDocGetPublishedAsOf`, which returns the version pointer rather than its events, and keys on `publishedAt` rather than `effectiveFrom`.)
+Returns the version published and *effective* at `clock`, together with the document **state** at that version's head — folded snapshot-seeded (via `askEventDocDocumentStateAsOf`), so cost tracks the gap since the nearest snapshot rather than the whole log. It resolves the version from the summary via `effectiveFrom` (when the publish takes effect, so a publish scheduled for the future stays invisible until then), then folds the state as of `version.eventId`. Use `state` directly to render the published, as-of-`clock` content, and `version.publishedAt` to pin the doc's own linked assets to the moment it was published — the generic backbone of a "render published" flow. (This mirrors `askEventDocGetPublishedAsOf`, which returns only the version pointer, and keys on `publishedAt` rather than `effectiveFrom`.)
 
 ```typescript
-function* askEventDocPublishedEventsAsOf(
+function* askEventDocPublishedVersionAsOf(
   id: string,
   clock: QpqIsoDateTime,
-): AskResponse<Nullable<EventDocEvent[]>>;
+): AskResponse<Nullable<EventDocVersionState>>;
 ```
 
 | Parameter | Type | Description |
@@ -99,7 +99,7 @@ function* askEventDocPublishedEventsAsOf(
 | `id` | `string` | Id of the document. |
 | `clock` | `QpqIsoDateTime` | ISO-8601 timestamp to resolve the effective version as-of. |
 
-**Returns** `EventDocEvent[] | null` — the truncated event log for the effective version, or `null` when the document is missing/deleted or nothing is effective yet. Reads the full log via `askEventDocEventListAll` (quidproquo-features).
+**Returns** `EventDocVersionState | null` — `{ version, state }` for the effective version, or `null` when the document is missing/deleted, nothing is effective yet, or the version's events are gone (a rewritten log).
 
 ## Related
 

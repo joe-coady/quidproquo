@@ -16,9 +16,18 @@ export type EventDocFunctions = {
   // event store's stream projector (was the `snapshotFold` inline function).
   foldSnapshotViews: (events: EventDocEvent[], seedViews?: EventDocSnapshotViews) => Nullable<EventDocSnapshotViews>;
 
-  // The EventDocLinks this doc's log depends on; [] for a leaf doc type. Invoked by the
-  // references route and the transfer manifest walk (was the `referenceResolver`).
+  // The EventDocLinks this doc's whole log has ever depended on; [] for a leaf doc type.
+  // Invoked by the transfer manifest walk (was the `referenceResolver`).
   collectReferences: (events: EventDocEvent[]) => EventDocLink[];
+
+  // The EventDocLinks the CURRENT state depends on; [] for a leaf doc type. Invoked by
+  // the references route against a snapshot-seeded folded state.
+  collectReferencesFromState: (state: unknown) => EventDocLink[];
+
+  // The document view at one point, latest-shaped, resumable from a stored snapshot's
+  // era-pinned document state. Invoked by the render/references/as-of reads and the
+  // append hooks' state derivation.
+  foldDocumentState: (events: EventDocEvent[], seedState?: unknown) => unknown;
 
   // Fold + render the resolved log (was the `eventRenderer`). Optional: a collection
   // without one 404s its render route. Plain function or story - the dynamic-functions

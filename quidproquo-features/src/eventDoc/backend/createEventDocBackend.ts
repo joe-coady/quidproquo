@@ -9,11 +9,11 @@ import { getEventDocFunctionsIdentity } from '../definition/getEventDocFunctions
 import { EventDocFunctions } from '../definition/types/EventDocFunctions';
 import { askEventDocAppendServerEvent } from '../logic/askEventDocAppendServerEvent';
 import { askEventDocCreate } from '../logic/askEventDocCreate';
-import { askEventDocEventsAsOf } from '../logic/askEventDocEventsAsOf';
+import { askEventDocDocumentStateAsOfTime } from '../logic/askEventDocDocumentStateAsOfTime';
+import { askEventDocDocumentStateLatest } from '../logic/askEventDocDocumentStateLatest';
 import { askEventDocGetByCodeOrCreate } from '../logic/askEventDocGetByCodeOrCreate';
 import { askEventDocGetByIdOrThrow } from '../logic/askEventDocGetByIdOrThrow';
 import { askEventDocGetIdByCode } from '../logic/askEventDocGetIdByCode';
-import { askEventDocPublishedEventsAsOf } from '../logic/askEventDocPublishedEventsAsOf';
 import { askEventDocPublishedVersionAsOf } from '../logic/askEventDocPublishedVersionAsOf';
 import { EventDocBackend } from './EventDocBackend';
 
@@ -48,14 +48,14 @@ export const createEventDocBackend = (functions: EventDocFunctions): EventDocBac
     *askEventListAll(modelId, options) {
       return yield* askProvideStore(askEventDocEventListAll(modelId, options));
     },
-    *askEventsAsOf(id, clock) {
-      return yield* askProvideStore(askEventDocEventsAsOf(id, clock));
+    *askDocumentStateLatest(id) {
+      return yield* askProvideStore(askEventDocDocumentStateLatest(id));
+    },
+    *askDocumentStateAsOfTime(id, clock) {
+      return yield* askProvideStore(askEventDocDocumentStateAsOfTime(id, clock));
     },
     *askPublishedVersionAsOf(id, clock) {
       return yield* askProvideStore(askEventDocPublishedVersionAsOf(id, clock));
-    },
-    *askPublishedEventsAsOf(id, clock) {
-      return yield* askProvideStore(askEventDocPublishedEventsAsOf(id, clock));
     },
     *askAppendServerEvent(modelId, type, data, version, actor) {
       return yield* askProvideStore(askEventDocAppendServerEvent(modelId, type, data, version, actor));

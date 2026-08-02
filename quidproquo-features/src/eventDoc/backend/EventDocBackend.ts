@@ -5,10 +5,11 @@ import { askEventDocList } from '../data/askEventDocList';
 import {
   EventDocAssetDownloadUrl,
   EventDocAssetUploadUrl,
+  EventDocDocumentStateAtEvent,
   EventDocEvent,
   EventDocEventActor,
   EventDocSummary,
-  EventDocVersionSlice,
+  EventDocVersionState,
 } from '../models';
 
 // A doc type's generic verbs BOUND to its collection: every call establishes the store
@@ -23,9 +24,11 @@ export type EventDocBackend = {
   askList: (options?: Parameters<typeof askEventDocList>[0]) => AskResponse<EventDocSummary[]>;
   askCreate: (name: string, code: string, actor: EventDocEventActor) => AskResponse<EventDocSummary>;
   askEventListAll: (modelId: string, options?: Parameters<typeof askEventDocEventListAll>[1]) => AskResponse<EventDocEvent[]>;
-  askEventsAsOf: (id: string, clock: QpqIsoDateTime) => AskResponse<EventDocEvent[]>;
-  askPublishedVersionAsOf: (id: string, clock: QpqIsoDateTime) => AskResponse<Nullable<EventDocVersionSlice>>;
-  askPublishedEventsAsOf: (id: string, clock: QpqIsoDateTime) => AskResponse<Nullable<EventDocEvent[]>>;
+  // Snapshot-seeded state reads — the document view latest-shaped, at the cost of the
+  // gap since the nearest snapshot rather than the log (see askEventDocDocumentStateAsOf).
+  askDocumentStateLatest: (id: string) => AskResponse<Nullable<EventDocDocumentStateAtEvent>>;
+  askDocumentStateAsOfTime: (id: string, clock: QpqIsoDateTime) => AskResponse<Nullable<EventDocDocumentStateAtEvent>>;
+  askPublishedVersionAsOf: (id: string, clock: QpqIsoDateTime) => AskResponse<Nullable<EventDocVersionState>>;
   askAppendServerEvent: <T>(modelId: string, type: string, data: T, version: number, actor: EventDocEventActor) => AskResponse<EventDocEvent>;
   askGenerateAssetUploadUrl: (docId: string, contentType: string, contentDisposition?: string) => AskResponse<EventDocAssetUploadUrl>;
   askGenerateAssetDownloadUrl: (docId: string, assetId: string) => AskResponse<EventDocAssetDownloadUrl>;

@@ -3,21 +3,29 @@ import { askApiRequest } from 'quidproquo-webserver';
 
 import { EventDocEvent } from '../../models';
 import { EventDocWorkspaceDocumentIdentity } from '../types/EventDocWorkspaceDocumentIdentity';
+import { EventDocWorkspaceEventsPageRequest } from '../types/EventDocWorkspaceTransport';
 import { eventDocWorkspaceEventsEndpoint } from './eventDocWorkspaceEventsEndpoint';
 
 // One page of a document's event log. `afterEventId` (exclusive) fetches only events
-// after that log index: the tail since a known point, for incremental refresh.
+// after that log index (the tail since a known point, for incremental refresh);
+// `newestFirst` walks the log backwards (the history panel's latest-page read). This is
+// the EventDocWorkspaceTransport.askFetchEventsPage shape.
 export function* askEventDocWorkspaceApiFetchEventsPage(
   identity: EventDocWorkspaceDocumentIdentity,
-  nextPageKey?: string,
-  afterEventId?: string,
+  request?: EventDocWorkspaceEventsPageRequest,
 ): AskResponse<QpqPagedData<EventDocEvent>> {
   const params: Record<string, string> = {};
-  if (nextPageKey !== undefined) {
-    params.nextPageKey = nextPageKey;
+  if (request?.limit !== undefined) {
+    params.limit = String(request.limit);
   }
-  if (afterEventId !== undefined) {
-    params.afterEventId = String(afterEventId);
+  if (request?.nextPageKey !== undefined) {
+    params.nextPageKey = request.nextPageKey;
+  }
+  if (request?.afterEventId !== undefined) {
+    params.afterEventId = String(request.afterEventId);
+  }
+  if (request?.newestFirst) {
+    params.newestFirst = 'true';
   }
 
   const response = yield* askApiRequest<void, QpqPagedData<EventDocEvent>>(

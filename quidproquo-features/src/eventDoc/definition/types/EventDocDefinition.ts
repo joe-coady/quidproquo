@@ -47,10 +47,20 @@ export type EventDocDefinition<TVersions extends EventDocVersions, TApi extends 
   // Carried through from the config, for callers that already hold a folded view.
   references?: EventDocReferenceCollector<EventDocPrimaryView<TVersions>>;
 
-  // Every doc this one has ever referenced, across its whole log. THE thing a collection's
-  // references route + transfer walk invoke (via the registered EventDocFunctions object);
-  // [] for a doc type that declares no `references`.
+  // Every doc this one has ever referenced, across its whole log — the transfer export's
+  // walk (it exports the whole history, so it must chase links from every historical
+  // state); [] for a doc type that declares no `references`.
   collectReferences: (events: EventDocEvent[]) => EventDocLink[];
+
+  // What the CURRENT document references — `references` applied to an already-folded,
+  // latest-shaped state. The references route's read: no log walk, just the state.
+  collectReferencesFromState: (state: unknown) => EventDocLink[];
+
+  // The document view at one point, LATEST-shaped: an as-written fold resumable from a
+  // stored snapshot's document state (the seed must be era-pinned, never pre-migrated),
+  // migrated up once at the end. The read side's fold — render, references, hooks and
+  // backend reads consume the document at the current schema.
+  foldDocumentState: (events: EventDocEvent[], seedState?: unknown) => unknown;
 
   // Every view of the given log prefix in one pass, ERA-PINNED (no climb to the code's
   // latest version) — the states a snapshot stores. The gate runs ONCE and every view
