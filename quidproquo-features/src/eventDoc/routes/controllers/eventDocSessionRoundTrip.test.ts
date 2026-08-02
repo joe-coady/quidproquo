@@ -1,5 +1,7 @@
 import {
   ConfigActionType,
+  DynamicFunctionsActionType,
+  DynamicFunctionsExecuteErrorTypeEnum,
   DateActionType,
   GuidActionType,
   KeyValueStoreActionType,
@@ -59,7 +61,9 @@ const matches = (item: Record<string, unknown>, op: KvsQueryOperation): boolean 
       case KvsQueryOperationType.Equal:
         return actual === op.valueA;
       case KvsQueryOperationType.GreaterThan:
-        return typeof actual === 'number' && typeof op.valueA === 'number' && actual > op.valueA;
+        return typeof actual === typeof op.valueA && (actual as string | number) > (op.valueA as string | number);
+      case KvsQueryOperationType.LessThanOrEqual:
+        return typeof actual === typeof op.valueA && (actual as string | number) <= (op.valueA as string | number);
       default:
         throw new Error(`Test KVS mock does not support operator: ${op.operation}`);
     }
@@ -79,6 +83,13 @@ const buildMocks = () => {
 
   return {
     [ConfigActionType.GetGlobal]: (action: { payload: { globalName: string } }) => globals[action.payload.globalName] ?? '',
+
+    // No functions object registered for this collection: the append's pre-write gate
+    // and any state read fall back exactly as an unregistered collection does.
+    [DynamicFunctionsActionType.Execute]: throwsError(
+      DynamicFunctionsExecuteErrorTypeEnum.DynamicFunctionsNotFound,
+      'Dynamic functions not found (test collection registers none)',
+    ),
 
     [UserDirectoryActionType.ReadAccessToken]: { userId: 'user-1', username: 'joe', exp: 0, userDirectory: 'test-user-directory', wasValid: true },
 

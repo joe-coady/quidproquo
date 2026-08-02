@@ -62,6 +62,11 @@ export type EventDocDefinition<TVersions extends EventDocVersions, TApi extends 
   // backend reads consume the document at the current schema.
   foldDocumentState: (events: EventDocEvent[], seedState?: unknown) => unknown;
 
+  // The registered pre-write append gate: the editor validator (same registry as the
+  // fold's), run by the append path against the document's current state BEFORE the
+  // event is written. See EventDocFunctions.validateEvent.
+  validateEvent: (event: EventDocEvent, state: unknown) => Nullable<string>;
+
   // Every view of the given log prefix in one pass, ERA-PINNED (no climb to the code's
   // latest version) — the states a snapshot stores. The gate runs ONCE and every view
   // folds the same accepted set, so a snapshot's view rows can never disagree about what

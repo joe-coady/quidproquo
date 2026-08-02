@@ -5,6 +5,7 @@ import { askEventDocEventWrite } from '../data/askEventDocEventWrite';
 import { EventDocEffect, EventDocEvent, EventDocEventActor, EventDocEventInput, EventDocOnAppendInput, EventDocOnPublishInput } from '../models';
 import { askEventDocGetByIdOrThrow } from './askEventDocGetByIdOrThrow';
 import { askEventDocHookStates } from './askEventDocHookStates';
+import { askEventDocValidateAppend } from './askEventDocValidateAppend';
 
 /**
  * Append a client event to a model's log.
@@ -58,6 +59,16 @@ export function* askEventDocEventAppend(modelId: string, input: EventDocEventInp
       },
     },
   };
+
+  // THE PRE-WRITE GATE, for collections with a registered definition: resolve the
+  // document's current state (snapshot-seeded — cost tracks the gap, never the log) and
+  // run the registered validateEvent BEFORE the write. Some rules must stop the write
+  // itself, not just the fold: an append-only log holds a rejected-but-written secret
+  // forever. A collection with no registered functions object skips this (functions
+  // missing), keeping the original write-and-go contract; the fold's acceptance rules
+  // remain the last word either way (dedup + version floor are NOT validator rules and
+  // still resolve at fold time).
+  yield* askEventDocValidateAppend(modelId, event);
 
   // The id is unique by construction, so this cannot collide. ifNotExists stays as a cheap
   // assertion — if it ever fires, two writers minted the same id, which is a bug worth

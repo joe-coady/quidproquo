@@ -134,11 +134,14 @@ const buildMocks = () => {
     // The registered tenant registry definition, invoked for real: the hook-state
     // derivation folds the document through it, so the hook payload carries the true
     // TenantDocument state (brand, logo) rather than a stub.
-    [DynamicFunctionsActionType.Execute]: (action: { payload: { functionName: string; args: [EventDocEvent[], unknown?] } }) => {
-      if (action.payload.functionName !== 'foldDocumentState') {
-        throw new Error(`Unexpected dynamic function: ${action.payload.functionName}`);
+    [DynamicFunctionsActionType.Execute]: (action: { payload: { functionName: string; args: [never, never] } }) => {
+      if (action.payload.functionName === 'foldDocumentState') {
+        return tenantRegistryEventDoc.foldDocumentState(action.payload.args[0], action.payload.args[1]);
       }
-      return tenantRegistryEventDoc.foldDocumentState(action.payload.args[0], action.payload.args[1]);
+      if (action.payload.functionName === 'validateEvent') {
+        return tenantRegistryEventDoc.validateEvent(action.payload.args[0], action.payload.args[1]);
+      }
+      throw new Error(`Unexpected dynamic function: ${action.payload.functionName}`);
     },
 
     [InlineFunctionActionType.Execute]: (action: { payload: { functionName: string; payload: unknown } }) => {

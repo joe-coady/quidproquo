@@ -22,6 +22,7 @@ export * from './askEventDocSeedInitState';
 export * from './askEventDocProjectAtEvent';
 export * from './askEventDocSoftDelete';
 export * from './askEventDocSummaryRederive';
+export * from './askEventDocValidateAppend';
 export * from './isEventDocFunctionsMissing';
 export * from './isInlineEventDocValueRef';
 export * from './readInlineEventDocValueRefs';
