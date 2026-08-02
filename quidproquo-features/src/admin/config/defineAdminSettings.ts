@@ -17,7 +17,8 @@ import {
 } from 'quidproquo-core';
 import { defineServiceFunction } from 'quidproquo-webserver';
 
-import { defineEventDoc } from '../../eventDoc/config/defineEventDoc';
+import { defineEventDocSummary } from '../../eventDoc/config/defineEventDocSummary';
+import { defineEventDocRoutes } from '../../eventDoc/routes/defineEventDocRoutes';
 import { defineEventDocAi } from '../../eventDocAi';
 import { getFeatureEntryQpqFunctionRuntime } from '../../getFeatureEntryQpqFunctionRuntime';
 import { defineWebSocketQueue } from '../../webSocketQueue';
@@ -224,8 +225,12 @@ export const defineAdminSettings = (logServiceName: string, rootDomain: string, 
 
         // The maintenance event doc: active = open draft, closed = published,
         // reopen = new draft. Every append re-broadcasts the active public folds
-        // over the application websocket (onAppend hook below).
-        defineEventDoc({
+        // over the application websocket (onAppend hook below). Composed from the
+        // low-level pair: the collection registers no functions object (no render,
+        // no references, no snapshots), which is exactly what defineEventDoc's
+        // definition form would require.
+        defineEventDocSummary(maintenanceStoreName),
+        defineEventDocRoutes({
           storeName: maintenanceStoreName,
           type: maintenanceDocType,
           basePath: maintenanceBasePath,

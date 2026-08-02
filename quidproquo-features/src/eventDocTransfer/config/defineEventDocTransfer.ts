@@ -5,7 +5,7 @@ import { EVENT_DOC_USER_DIRECTORY_GLOBAL } from '../../eventDoc/constants/eventD
 import { defineVersionedRoute } from '../../routes/defineVersionedRoute';
 import { EVENT_DOC_TRANSFER_DRIVE_NAME } from '../constants';
 import { buildEventDocTransferGlobals } from '../globals';
-import { EventDocTransferCollection } from '../models';
+import { EventDocTransferCollectionSource, toEventDocTransferCollection } from './toEventDocTransferCollection';
 
 export type EventDocTransferOptions = {
   /**
@@ -15,11 +15,12 @@ export type EventDocTransferOptions = {
    */
   service: string;
   /**
-   * The collections a transfer may read and write. Feed this the SAME array the service maps over
-   * for its `defineEventDoc` calls, so the two cannot drift; the extra fields on a routes-options
-   * object (basePath, auth, version) are simply unused here.
+   * The collections a transfer may read and write. Feed this the SAME array the service maps into
+   * its `defineEventDoc` calls (each entry's `functions` object carries the identity), so the two
+   * cannot drift. Live functions objects work directly too, and a collection that needs the import
+   * hooks (onPublish/onAppend) passes a bare `{ storeName, type, onPublish?, onAppend? }` entry.
    */
-  collections: EventDocTransferCollection[];
+  collections: EventDocTransferCollectionSource[];
   /**
    * Establishes the ambient storage scope for the whole request, exactly like a collection's own
    * `scopeResolver`. Needed separately because a transfer spans collections, so there is no single
@@ -46,7 +47,11 @@ const TRANSFER_BASE_PATH = '/transfer';
  * `defineEventDoc` calls.
  */
 export const defineEventDocTransfer = ({ service, collections, scopeResolver, routeAuthSettings, version }: EventDocTransferOptions): QPQConfig => {
-  const globals: Record<string, unknown> = buildEventDocTransferGlobals({ service, collections, scopeResolver });
+  const globals: Record<string, unknown> = buildEventDocTransferGlobals({
+    service,
+    collections: collections.map(toEventDocTransferCollection),
+    scopeResolver,
+  });
 
   // Same contract every eventDoc-context definer has (defineEventDocRoutes, defineTenantRoutes,
   // defineEventDocAi): anything reaching askEventDocResolveUserId/Actor - which the tenant scope

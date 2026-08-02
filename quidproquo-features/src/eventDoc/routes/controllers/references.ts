@@ -12,7 +12,7 @@ function* askEventDocStoreReferences(docId: string): AskResponse<HTTPEventRespon
 
 /**
  * GET {basePath}/{id}/references — the docs this one depends on, ONE hop out (empty for a
- * collection with no referenceResolver). The recursive manifest is a transfer-feature concern
+ * collection with no registered functions object). The recursive manifest is a transfer-feature concern
  * (POST /transfer/manifest), because only that layer knows every collection.
  */
 export function* references(event: HTTPEvent, params: { id: string }): AskResponse<HTTPEventResponse> {

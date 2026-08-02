@@ -7,7 +7,7 @@ description: Declare the event document that records one audited session per adm
 
 Declares the **admin session event document** — the audit record behind the admin dashboard. It creates one event doc per admin login, appending every user-intent event for that session so operator activity in the dashboard is fully auditable.
 
-It is built on the quidproquo **eventDoc** feature (`defineEventDoc`): an event document is an append-only, per-instance record backed by storage, routes, and a WebSocket feed. This define fixes that eventDoc's store name, type, base path, and auth directory to the admin conventions, so you don't configure them yourself.
+It is built on the quidproquo **eventDoc** feature — an event document is an append-only, per-instance record backed by storage, routes, and a WebSocket feed — composed directly from [defineEventDocSummary](./event-doc-summary.md) and [defineEventDocRoutes](./event-doc-routes.md) rather than [defineEventDoc](./event-doc.md), since the session collection registers no functions object (no render, no references, no snapshots). This define fixes the store name, type, base path, and auth directory to the admin conventions, so you don't configure them yourself.
 
 `defineAdminSessionEventDoc` returns a `QPQConfig` array. It is spread in automatically by [defineAdminSettings](./admin-settings.md), so you rarely call it directly — but it is exported for services that assemble the admin feature piece by piece.
 

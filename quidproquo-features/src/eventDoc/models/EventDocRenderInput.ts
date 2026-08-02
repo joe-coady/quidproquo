@@ -2,9 +2,9 @@ import { EventDocEvent } from './EventDocEvent';
 import { EventDocRenderOptions } from './EventDocRenderOptions';
 import { EventDocVersion } from './EventDocVersion';
 
-// Input to a collection's render inline function: the event log to render plus the doc's id (so the
-// renderer can resolve the doc's own assets — e.g. an image content item's blob at
-// `<docId>/assets/<guid>`). Mirrors EventDocEventValidationInput.
+// Input to a collection's `render` function (on its registered EventDocFunctions object): the event
+// log to render plus the doc's id (so the renderer can resolve the doc's own assets — e.g. an image
+// content item's blob at `<docId>/assets/<guid>`).
 //
 // The caller has ALREADY applied `renderMode`/`effectiveAt` — `events` is the resolved log (the
 // whole thing for a draft, the version's slice for a published render), and `version` is what that

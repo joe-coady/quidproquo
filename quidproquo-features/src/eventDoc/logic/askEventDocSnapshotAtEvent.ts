@@ -1,9 +1,10 @@
-import { askInlineFunctionExecute, AskResponse, Nullable } from 'quidproquo-core';
+import { AskResponse, createDynamicFunctionCaller, Nullable } from 'quidproquo-core';
 
 import { askEventDocEventListAll } from '../data/askEventDocEventListAll';
 import { askEventDocSnapshotSeedLatest } from '../data/askEventDocSnapshotSeedLatest';
 import { askEventDocSnapshotViewsWrite } from '../data/askEventDocSnapshotViewsWrite';
-import { EventDocSnapshotFoldInput, EventDocSnapshotViews } from '../models';
+import { EventDocInvokableFunctions } from '../definition/types/EventDocInvokableFunctions';
+import { EventDocSnapshotViews } from '../models';
 
 /**
  * Fold a document as of ONE event and store the result: every view of the log up to (and
@@ -21,10 +22,10 @@ import { EventDocSnapshotFoldInput, EventDocSnapshotViews } from '../models';
  * A seed AT the event itself means the snapshot is already fully written (the document
  * row is the set's last write), so a replayed delivery skips the work entirely.
  *
- * The fold itself is the collection's registered snapshot-fold inline function — a
- * one-liner over the doc type's definition, app-registered because the definition's
- * reducers are app code this package cannot import. What comes back is era-pinned
- * per-view state, stored verbatim.
+ * The fold itself is the `foldSnapshotViews` member of the collection's registered
+ * dynamic-functions object (the doc type's definition), app-registered because the
+ * definition's reducers are app code this package cannot import. What comes back is
+ * era-pinned per-view state, stored verbatim.
  *
  * Event reads are CONSISTENT: the caller is the event store's stream handler, so the
  * event being snapshotted was durably written moments ago, and an eventually-consistent
@@ -33,7 +34,8 @@ import { EventDocSnapshotFoldInput, EventDocSnapshotViews } from '../models';
  * The seed read stays eventually consistent — a stale seed only means folding a longer
  * gap for the same answer.
  */
-export function* askEventDocSnapshotAtEvent(modelId: string, eventId: string, snapshotFold: string): AskResponse<void> {
+export function* askEventDocSnapshotAtEvent(modelId: string, eventId: string, functionsName: string): AskResponse<void> {
+  const functionsCaller = createDynamicFunctionCaller<EventDocInvokableFunctions>(functionsName);
   const seed = yield* askEventDocSnapshotSeedLatest(modelId, eventId);
 
   if (seed?.eventId === eventId) {
@@ -46,11 +48,7 @@ export function* askEventDocSnapshotAtEvent(modelId: string, eventId: string, sn
     const gap = yield* askEventDocEventListAll(modelId, { afterEventId: seed.eventId, upToEventId: eventId, consistentRead: true });
 
     if (gap.length > 0) {
-      snapshotViews = yield* askInlineFunctionExecute<Nullable<EventDocSnapshotViews>, EventDocSnapshotFoldInput>(snapshotFold, {
-        events: gap,
-        docId: modelId,
-        seedViews: seed.views,
-      });
+      snapshotViews = yield* functionsCaller.foldSnapshotViews(gap, seed.views);
     }
   }
 
@@ -64,10 +62,7 @@ export function* askEventDocSnapshotAtEvent(modelId: string, eventId: string, sn
       return;
     }
 
-    snapshotViews = yield* askInlineFunctionExecute<Nullable<EventDocSnapshotViews>, EventDocSnapshotFoldInput>(snapshotFold, {
-      events,
-      docId: modelId,
-    });
+    snapshotViews = yield* functionsCaller.foldSnapshotViews(events);
 
     // A fold given no seed has nothing to decline; null here is a broken registration,
     // and writing nothing beats writing a snapshot that claims the document is empty.

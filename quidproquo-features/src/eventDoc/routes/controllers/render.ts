@@ -1,20 +1,24 @@
 import {
+  askCatch,
   askDateNow,
-  askInlineFunctionExecute,
   AskResponse,
   askThrowError,
+  createDynamicFunctionCaller,
   ErrorTypeEnum,
   getValidQpqIsoDateTime,
   QpqIsoDateTime,
 } from 'quidproquo-core';
 import { HTTPEvent, HTTPEventResponse, qpqWebServerUtils } from 'quidproquo-webserver';
 
+import { eventDocFunctionsName } from '../../constants/eventDocFunctionsName';
 import { askEventDocResolveStore } from '../../context/askEventDocResolveStore';
 import { askEventDocEventListAll } from '../../data/askEventDocEventListAll';
+import { EventDocInvokableFunctions } from '../../definition/types/EventDocInvokableFunctions';
 import { askEventDocProvideRequestScope } from '../../globals/askEventDocProvideRequestScope';
 import { askEventDocProvideStoreFromGlobals } from '../../globals/askEventDocProvideStoreFromGlobals';
 import { askEventDocPublishedVersionAsOf } from '../../logic/askEventDocPublishedVersionAsOf';
-import { EventDocEvent, EventDocRenderInput, EventDocRenderMode, EventDocRenderResult, EventDocVersion } from '../../models';
+import { isEventDocFunctionsMissing } from '../../logic/isEventDocFunctionsMissing';
+import { EventDocEvent, EventDocRenderMode, EventDocVersion } from '../../models';
 
 type ResolvedRender = {
   events: EventDocEvent[];
@@ -47,18 +51,14 @@ function* askEventDocRenderResolve(
 }
 
 // Render the document to HTML: resolve the event log the request asked for and invoke the
-// collection's configured renderer inline function (which folds + renders). The generic controller
-// stays app-agnostic — the per-type render (e.g. `foldLayout(events).html`) lives in the service's
-// registered inline function, exactly like the `eventValidator` pattern. `renderMode`
+// `render` member of the collection's registered EventDocFunctions object (which folds +
+// renders). The generic controller stays app-agnostic — the per-type render (e.g.
+// `foldLayout(events).html`) lives on the service's registered object. `renderMode`
 // (draft|published) and `effectiveAt` (as-of time) are read from the query string and applied HERE,
 // so the renderer receives an already-resolved log plus the version behind it; the options are
 // echoed into the input for context only.
 function* askEventDocStoreRender(event: HTTPEvent, modelId: string): AskResponse<HTTPEventResponse> {
-  const { eventRenderer } = yield* askEventDocResolveStore();
-
-  if (!eventRenderer) {
-    return yield* askThrowError(ErrorTypeEnum.NotFound, 'This collection has no renderer configured.');
-  }
+  const { storeName, type } = yield* askEventDocResolveStore();
 
   const renderModeParam = qpqWebServerUtils.readUriQueryParamFromEvent(event, 'renderMode');
   const renderMode = renderModeParam === EventDocRenderMode.Draft || renderModeParam === EventDocRenderMode.Published ? renderModeParam : undefined;
@@ -66,18 +66,32 @@ function* askEventDocStoreRender(event: HTTPEvent, modelId: string): AskResponse
 
   const { events, version } = yield* askEventDocRenderResolve(modelId, renderMode, effectiveAt);
 
-  const result = yield* askInlineFunctionExecute<EventDocRenderResult, EventDocRenderInput>(eventRenderer, {
-    events,
-    docId: modelId,
-    version,
-    renderMode,
-    effectiveAt,
-  });
+  const functionsCaller = createDynamicFunctionCaller<EventDocInvokableFunctions>(eventDocFunctionsName(storeName, type));
+  const rendered = yield* askCatch(
+    functionsCaller.render({
+      events,
+      docId: modelId,
+      version,
+      renderMode,
+      effectiveAt,
+    }),
+  );
 
-  return qpqWebServerUtils.toJsonEventResponse(result);
+  if (!rendered.success) {
+    // No registered functions object, or one without a render member, is simply "no
+    // renderer configured" — the same 404 as before the object existed. Anything else is
+    // a configured renderer failing and must propagate as-is.
+    if (isEventDocFunctionsMissing(rendered.error.errorType)) {
+      return yield* askThrowError(ErrorTypeEnum.NotFound, 'This collection has no renderer configured.');
+    }
+
+    return yield* askThrowError(rendered.error.errorType, rendered.error.errorText);
+  }
+
+  return qpqWebServerUtils.toJsonEventResponse(rendered.result);
 }
 
-// GET {basePath}/{id}/render — mounted only when the collection configures an eventRenderer.
+// GET {basePath}/{id}/render — 404s unless the collection's functions object has a render member.
 export function* render(event: HTTPEvent, params: { id: string }): AskResponse<HTTPEventResponse> {
   return yield* askEventDocProvideStoreFromGlobals(askEventDocProvideRequestScope(event, askEventDocStoreRender(event, params.id)));
 }

@@ -1,25 +1,35 @@
-import { ConfigActionType, DateActionType, InlineFunctionActionType, KeyValueStoreActionType, QpqIsoDateTime, runStory } from 'quidproquo-core';
+import {
+  ConfigActionType,
+  DateActionType,
+  DynamicFunctionsActionType,
+  DynamicFunctionsExecuteErrorTypeEnum,
+  KeyValueStoreActionType,
+  QpqIsoDateTime,
+  runStory,
+  throwsError,
+} from 'quidproquo-core';
 import { HTTPEvent } from 'quidproquo-webserver';
 
 import { describe, expect, it } from 'vitest';
 
+import { eventDocFunctionsName } from '../../constants/eventDocFunctionsName';
 import { buildEventDocStore } from '../../context/buildEventDocStore';
 import { buildEventDocStoreGlobals } from '../../globals/buildEventDocStoreGlobals';
 import { EventDocEvent, EventDocRenderInput, EventDocRenderKind, EventDocRenderMode, EventDocSummary, EventDocVersion } from '../../models';
 import { EventDocStoredEvent } from '../../types/EventDocStoredEvent';
 import { render } from './render';
 
-// The route — not the renderer — is what applies renderMode/effectiveAt. It hands the inline
-// function an already-resolved log plus the version behind it, because a renderer cannot derive the
-// publish moment from events alone (it needs version.publishedAt to resolve ITS links as of then).
-// These pin that contract: the params are honoured here, and a published request never silently
-// degrades to draft content.
+// The route — not the renderer — is what applies renderMode/effectiveAt. It hands the
+// collection's registered render function an already-resolved log plus the version behind it,
+// because a renderer cannot derive the publish moment from events alone (it needs
+// version.publishedAt to resolve ITS links as of then). These pin that contract: the params are
+// honoured here, and a published request never silently degrades to draft content.
 
 const DOC_ID = 'doc-1';
-const RENDERER_FN = 'renderTemplate';
 const REQUEST_NOW = '2026-07-15T00:00:00.000Z';
 
-const store = buildEventDocStore({ storeName: 'templates', type: 'template', eventRenderer: RENDERER_FN });
+const store = buildEventDocStore({ storeName: 'templates', type: 'template' });
+const FUNCTIONS_NAME = eventDocFunctionsName('templates', 'template');
 
 const eventId = (n: number): string => String(n).padStart(4, '0');
 
@@ -78,6 +88,8 @@ const httpEvent = (query: Record<string, string>): HTTPEvent => ({
   isBase64Encoded: false,
 });
 
+type ExecutePayload = { dynamicFunctionsName: string; functionName: string; args: [EventDocRenderInput] };
+
 // Captures what the route hands the renderer — the thing under test.
 const renderWith = (query: Record<string, string>, versions: EventDocVersion[] = [VERSION_1, VERSION_DRAFT]) => {
   const globals = buildEventDocStoreGlobals(store);
@@ -97,9 +109,10 @@ const renderWith = (query: Record<string, string>, versions: EventDocVersion[] =
       }
       return { items: [buildSummary(versions)], nextPageKey: undefined };
     },
-    [InlineFunctionActionType.Execute]: (action: { payload: { functionName: string; payload: EventDocRenderInput } }) => {
-      expect(action.payload.functionName).toBe(RENDERER_FN);
-      renderInputs.push(action.payload.payload);
+    [DynamicFunctionsActionType.Execute]: (action: { payload: ExecutePayload }) => {
+      expect(action.payload.dynamicFunctionsName).toBe(FUNCTIONS_NAME);
+      expect(action.payload.functionName).toBe('render');
+      renderInputs.push(action.payload.args[0]);
       return { kind: EventDocRenderKind.Html, html: '<p>rendered</p>' };
     },
   });
@@ -141,5 +154,37 @@ describe('render route', () => {
 
   it('fails rather than falling back to the draft when nothing is published', () => {
     expect(() => renderWith({ renderMode: EventDocRenderMode.Published }, [VERSION_DRAFT])).toThrow('No published version is effective as of');
+  });
+
+  it('404s as "no renderer configured" when the collection has no registered functions object', () => {
+    const globals = buildEventDocStoreGlobals(store);
+
+    const renderMissing = () =>
+      runStory(render(httpEvent({}), { id: DOC_ID }), {
+        [ConfigActionType.GetGlobal]: (action: { payload: { globalName: string } }) => globals[action.payload.globalName],
+        [KeyValueStoreActionType.Query]: () => ({ items: storedEvents, nextPageKey: undefined }),
+        [DynamicFunctionsActionType.Execute]: throwsError(
+          DynamicFunctionsExecuteErrorTypeEnum.DynamicFunctionsNotFound,
+          `Dynamic functions not found: [${FUNCTIONS_NAME}]`,
+        ),
+      });
+
+    expect(renderMissing).toThrow('This collection has no renderer configured.');
+  });
+
+  it('propagates a configured renderer failure as-is, never as a 404', () => {
+    const globals = buildEventDocStoreGlobals(store);
+
+    const renderFailing = () =>
+      runStory(render(httpEvent({}), { id: DOC_ID }), {
+        [ConfigActionType.GetGlobal]: (action: { payload: { globalName: string } }) => globals[action.payload.globalName],
+        [KeyValueStoreActionType.Query]: () => ({ items: storedEvents, nextPageKey: undefined }),
+        [DynamicFunctionsActionType.Execute]: throwsError(
+          DynamicFunctionsExecuteErrorTypeEnum.ModuleLoadFailed,
+          `Unable to dynamically load dynamic functions: [${FUNCTIONS_NAME}]`,
+        ),
+      });
+
+    expect(renderFailing).toThrow(`Unable to dynamically load dynamic functions: [${FUNCTIONS_NAME}]`);
   });
 });

@@ -1,72 +1,83 @@
 ---
 title: defineEventDoc
-description: Define an event-sourced document collection — its stores plus its HTTP routes — in one call.
+description: Register an event-sourced document collection's functions object, declare its stores, and mount its HTTP routes, in one call.
 ---
 
 # defineEventDoc
 
-Defines a complete **event-document collection**: the data stores that hold it *and* the HTTP routes that serve it, in a single call. This is the all-in-one helper for the common **one-store-one-type** case. It returns a `QPQConfig` (an array of config settings) that you spread into a service's infrastructure default export.
+Registers a document collection's **functions object** (its identity plus its behaviour — fold, references, and optionally render — as a [dynamic-functions](../core/dynamic-functions.md) surface), declares the stores that back it, and mounts the HTTP routes that serve it, all in one call. This is the all-in-one helper for the common **one-store-one-type** case. It returns a `QPQConfig` (an array of config settings) that you spread into a service's infrastructure default export.
 
-An event document is not stored as a mutable row. It is derived by folding an ordered, append-only log of events. `defineEventDoc` provisions that log (plus a queryable summary table and a blob bucket) and mounts the REST routes that create documents, append events, read them back, and resolve their draft/published versions.
+An event document is not stored as a mutable row. It is derived by folding an ordered, append-only log of events. `defineEventDoc` provisions that log (plus a queryable summary table and a blob bucket), registers the collection's functions object so the backend can invoke it by name, and mounts the REST routes that create documents, append events, read them back, and resolve their draft/published versions.
 
-- **On AWS:** deploys everything [defineEventDocSummary](./event-doc-summary.md) deploys (DynamoDB tables for the summary, events, and snapshots, plus an S3 bucket for assets) and everything [defineEventDocRoutes](./event-doc-routes.md) deploys (the API Gateway routes and their Lambda handlers). It creates no infrastructure of its own; it is exactly `[defineEventDocSummary(options.storeName, ...), defineEventDocRoutes(options)]`, threading `options.snapshotFold` through to `defineEventDocSummary` as that type's entry in `snapshotFolds` when set.
+- **On AWS:** deploys everything [defineEventDocSummary](./event-doc-summary.md) deploys (DynamoDB tables for the summary, events, and snapshots, plus an S3 bucket for assets), everything [defineEventDocRoutes](./event-doc-routes.md) deploys (the API Gateway routes and their Lambda handlers), and a [defineDynamicFunctions](../core/dynamic-functions.md) registration for `functions` — no infrastructure of its own. It reads `functions`' `storeName`/`type` off the object itself, so `options` carries no identity fields.
 
 ```typescript
 import { defineEventDoc } from 'quidproquo-features';
+import { articleDefinition } from './articleDefinition';
 
 export default [
-  ...defineEventDoc({
-    storeName: 'content',
-    type: 'article',
+  ...defineEventDoc(articleDefinition, '/entry/eventDocs::articleDefinition', {
     basePath: '/articles',
     routeAuthSettings: { userDirectoryName: 'editors' },
   }),
 ];
 ```
 
+## Registering a collection's functions
+
+`functions` is an `EventDocFunctions` object: `{ storeName, type, foldSnapshotViews, collectReferences, render? }`. The object `createEventDocDefinition` returns — given `storeName`/`type` in its config — satisfies this shape directly, so a collection with no service-only render can register its definition verbatim. A collection that needs a render step only service code can perform (resolving linked docs, reading blob-drive assets) layers it on with `extendEventDocFunctions(definition, { render })`, which returns a new object and never mutates the definition itself.
+
+`runtime` is a [`QpqFunctionRuntime`](../core/dynamic-functions.md#runtime--qpqfunctionruntime-required) path to that SAME export — the dynamic-functions pattern: identity is read off the object here at config time, behaviour is loaded from the path by the processors at request time. Both must point at the exact object being registered, or the registration and the runtime will disagree about what the collection can do.
+
 ## When to use `defineEventDoc` vs `defineEventDocSummary` + `defineEventDocRoutes`
 
-`defineEventDoc` defines the store **and** the routes together, so it assumes exactly one document `type` per store. If you want several document types to share one physical store (one summary table, one events table, one bucket), you must not define the store more than once. In that case, call [defineEventDocSummary](./event-doc-summary.md) **once** for the shared store, then [defineEventDocRoutes](./event-doc-routes.md) **per type** — each with the same `storeName` but a different `type` and `basePath`. Use `defineEventDoc` whenever the store backs a single type.
+`defineEventDoc` defines the store, the functions registration, **and** the routes together, so it assumes exactly one document `type` per store. If you want several document types to share one physical store (one summary table, one events table, one bucket), you must not define the store more than once. In that case, call [defineEventDocSummary](./event-doc-summary.md) **once** for the shared store, then [defineDynamicFunctions](../core/dynamic-functions.md) and [defineEventDocRoutes](./event-doc-routes.md) **per type** — each with the same `storeName` but a different `type`, `basePath`, and functions object, passing `defineEventDocSummary` the whole `snapshotFunctions` map. Use `defineEventDoc` whenever the store backs a single type.
+
+A collection with no definition at all (no render, no references, no snapshots) composes the low-level pair directly instead of calling `defineEventDoc`: `[...defineEventDocSummary(storeName), ...defineEventDocRoutes({ storeName, type, ...options })]`.
 
 ## Signature
 
 ```typescript
-function defineEventDoc(options: EventDocRoutesOptions): QPQConfig;
+function defineEventDoc(
+  functions: EventDocFunctions,
+  runtime: QpqFunctionRuntime,
+  options: EventDocCollectionOptions,
+): QPQConfig;
 ```
 
 ## Parameters
 
-`defineEventDoc` takes the same `EventDocRoutesOptions` object as [defineEventDocRoutes](./event-doc-routes.md); `options.storeName` is also passed straight through to [defineEventDocSummary](./event-doc-summary.md). See the [defineEventDocRoutes parameter reference](./event-doc-routes.md#parameters) for every field.
+### `functions` — `EventDocFunctions` (required)
+
+The collection's callable surface, read for its identity (`storeName`, `type`) at config time and registered under `runtime` for invocation at request time.
 
 | Property | Type | Required | Description |
 | --- | --- | --- | --- |
 | `storeName` | `string` | yes | Name of the summary store to create and serve. Also derives the events table and asset bucket names. |
 | `type` | `string` | yes | The document type this collection holds — the store's partition value, so one store can (via the split helpers) hold several types. |
-| `basePath` | `` `/${string}` `` | yes | URL prefix the routes mount under, e.g. `/articles`. |
-| `routeAuthSettings` | `RouteAuthSettings` | no | Auth for the mounted routes. Omit to leave them open — mutations then have no user to attribute. |
-| `version` | `number` | no | Route version prefix (`/v{version}`), default `1`. |
-| `eventValidator` | `string` | no | Inline-function name run on every append to reject invalid events. |
-| `eventRenderer` | `string` | no | Inline-function name that folds + renders the log to HTML; mounting it adds a `GET {basePath}/{id}/render` route. |
-| `onPublish` | `string` | no | Inline-function name invoked with `{ docId, event, summary }` after every successful Publish append: the seam for syncing the folded document into a materialized read model. |
-| `onAppend` | `string` | no | Inline-function name invoked with `{ docId, event, summary, events }` after EVERY successful append (domain events and lifecycle events alike): the seam for reacting to any mutation. Runs after `onPublish` when both fire on the same Publish event. |
-| `scopeResolver` | `string` | no | Inline-function name every route invokes with `{ event }` to resolve the request's ambient storage scope (e.g. per-tenant); null means unscoped. |
-| `referenceResolver` | `string` | no | Inline-function name `GET {basePath}/{id}/references` invokes with the document's `{ events, docId }` log to return the `EventDocLink`s that view depends on. Omit for a leaf collection — the route still resolves, just always to `[]`. |
-| `snapshotFold` | `string` | no | Inline-function name that folds a log slice to every view's state, typically `definition.foldSnapshotViews(events, seedViews?)`. Called with the whole prefix (`{ events, docId }`) when there is no usable prior snapshot, or with just the gap since the newest one (`{ events, docId, seedViews }`) otherwise — return `null` to decline a seed and force a from-scratch retry. When set, the event store's stream projector stores the folded views to the snapshots store on each batch. Omit to not snapshot the collection. |
+| `foldSnapshotViews` | `(events, seedViews?) => Nullable<EventDocSnapshotViews>` | yes | Every view of a log prefix, era-pinned — what a snapshot stores. Invoked by the event store's stream projector. |
+| `collectReferences` | `(events) => EventDocLink[]` | yes | The `EventDocLink`s this doc's log depends on; `[]` for a leaf doc type. Invoked by the references route and the transfer manifest walk. |
+| `render` | `(input: EventDocRenderInput) => EventDocRenderResult \| AskResponse<EventDocRenderResult>` | no | Fold + render the resolved log. Omit and `GET {basePath}/{id}/render` 404s as "no renderer configured". Plain function or story — the dynamic-functions processor runs either. |
+
+### `runtime` — `QpqFunctionRuntime` (required)
+
+A reference to the module exporting `functions`, usually a relative path string of the form `'/path/to/file::exportedObjectName'` — see [defineDynamicFunctions](../core/dynamic-functions.md#runtime--qpqfunctionruntime-required). Must resolve to the SAME object passed as `functions`.
+
+### `options` — `EventDocCollectionOptions` (required)
+
+The same object [defineEventDocRoutes](./event-doc-routes.md#parameters) takes, minus `storeName`/`type` (read off `functions` instead). See the [defineEventDocRoutes parameter reference](./event-doc-routes.md#parameters) for every field: `basePath`, `routeAuthSettings`, `version`, `onPublish`, `onAppend`, `scopeResolver`, `excludeRoutes`.
 
 ## Examples
 
 ```typescript
 import { defineEventDoc } from 'quidproquo-features';
+import { articleDefinition } from './articleDefinition';
 
 export default [
   // A single "article" collection with authenticated mutations.
-  ...defineEventDoc({
-    storeName: 'content',
-    type: 'article',
+  ...defineEventDoc(articleDefinition, '/entry/eventDocs::articleDefinition', {
     basePath: '/articles',
     routeAuthSettings: { userDirectoryName: 'editors' },
-    eventValidator: 'validateArticleEvent',
-    eventRenderer: 'renderArticle',
   }),
 ];
 ```
@@ -75,6 +86,7 @@ export default [
 
 - [defineEventDocSummary](./event-doc-summary.md) — the store half of this helper; call it directly when several types share one store.
 - [defineEventDocRoutes](./event-doc-routes.md) — the routes half; call it per type in the split setup.
+- [defineDynamicFunctions](../core/dynamic-functions.md) — the registration this threads `functions`/`runtime` through.
 - [defineKeyValueStore](../core/key-value-store.md) / [defineStorageDrive](../core/storage-drive.md) — the underlying core config the summary helper composes.
 - **Reading a document in your own stories:** [askEventDocGetByIdOrThrow](../../actions/features/event-doc/ask-event-doc-get-by-id.md), [askEventDocList](../../actions/features/event-doc/ask-event-doc-list.md), and the [version reads](../../actions/features/event-doc/ask-event-doc-get-draft.md).
 - **Creating a document in your own stories:** [askEventDocCreate](../../actions/features/event-doc/ask-event-doc-create.md).

@@ -27,6 +27,12 @@ export type EventDocDefinition<TVersions extends EventDocVersions, TApi extends 
   EventDocPrimaryView<TVersions>,
   TApi & EventDocGenericApi
 > & {
+  // The collection's identity, carried through from the config (see
+  // EventDocSavedDefinitionConfig). Present on any doc type registered as a backend
+  // collection; absent on client-only definitions.
+  storeName?: string;
+  type?: string;
+
   // Every projection of this doc type, keyed by view name and typed at the LATEST version —
   // `views.document.fold(events)` is the document, `views.summary.fold(events)` the
   // queryable record, both from the same log and the same accepted event set.
@@ -42,13 +48,15 @@ export type EventDocDefinition<TVersions extends EventDocVersions, TApi extends 
   references?: EventDocReferenceCollector<EventDocPrimaryView<TVersions>>;
 
   // Every doc this one has ever referenced, across its whole log. THE thing a collection's
-  // referenceResolver inline function calls; [] for a doc type that declares no `references`.
+  // references route + transfer walk invoke (via the registered EventDocFunctions object);
+  // [] for a doc type that declares no `references`.
   collectReferences: (events: EventDocEvent[]) => EventDocLink[];
 
   // Every view of the given log prefix in one pass, ERA-PINNED (no climb to the code's
   // latest version) — the states a snapshot stores. The gate runs ONCE and every view
   // folds the same accepted set, so a snapshot's view rows can never disagree about what
-  // the prefix contains. THE thing a collection's snapshotFold inline function calls.
+  // the prefix contains. THE thing the stream projector invokes through the collection's
+  // registered EventDocFunctions object.
   //
   // Given `seedViews` (a previous snapshot's states), `events` is only the gap since that
   // snapshot and each view resumes from its seed — equivalent to folding the whole prefix,

@@ -9,10 +9,6 @@ export type EventDocStore = {
   type: string;
   // The collection's blob bucket (assets + runtime artifacts), keyed per-doc.
   storageDriveName: string;
-  // The collection's append-time validator inline-function name, if configured.
-  eventValidator?: string;
-  // The collection's render inline-function name, if configured (powers GET .../render).
-  eventRenderer?: string;
   // The collection's on-publish inline-function name, if configured. Invoked after a
   // Publish event has been durably appended and the summary re-derived.
   onPublish?: string;
@@ -22,8 +18,4 @@ export type EventDocStore = {
   // The collection's request-scope inline-function name, if configured. Invoked with the
   // HTTP event; a non-null result becomes the ambient storage scope for the request.
   scopeResolver?: string;
-  // The collection's reference-collector inline-function name, if configured. Invoked with one
-  // event log; returns the EventDocLinks that log's folded view depends on. Unset means this
-  // collection is a leaf and the manifest walk stops at its docs.
-  referenceResolver?: string;
 };

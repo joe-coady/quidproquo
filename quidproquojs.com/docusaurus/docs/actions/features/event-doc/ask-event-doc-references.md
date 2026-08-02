@@ -1,13 +1,13 @@
 ---
 title: askEventDocReferences
-description: The other docs one document depends on, one hop out, via its collection's referenceResolver.
+description: The other docs one document depends on, one hop out, via its collection's registered EventDocFunctions object.
 ---
 
 # askEventDocReferences
 
-Reads the `EventDocLink`s a document depends on, one hop out. Hands the collection's `referenceResolver` inline function (see [defineEventDocRoutes](../../../config/features/event-doc-routes.md#parameters)) the document's whole event log and lets it fold + walk it. A collection with no resolver configured is a leaf: this returns `[]` without reading the log at all.
+Reads the `EventDocLink`s a document depends on, one hop out. Hands the document's whole event log to the `collectReferences` member of the collection's registered `EventDocFunctions` object (looked up as `eventDocFunctionsName(storeName, type)`, see [defineEventDoc](../../../config/features/event-doc.md)) and lets it fold + walk it. A collection with no registered functions object is a leaf: this returns `[]`.
 
-- **Built from:** [askEventDocResolveStore](./ask-event-doc-provide-store.md#askeventdocresolvestore) (to read the collection's `referenceResolver` name) and `askEventDocEventListAll` (the full log the resolver folds). Requires the store context — call it inside `askEventDocProvideStore({ storeName, type }, ...)`, or from a built-in route where the context is already provided.
+- **Built from:** [askEventDocResolveStore](./ask-event-doc-provide-store.md#askeventdocresolvestore) (to read the collection's `storeName`/`type`, which address its functions registration) and `askEventDocEventListAll` (the full log `collectReferences` folds). Requires the store context — call it inside `askEventDocProvideStore({ storeName, type }, ...)`, or from a built-in route where the context is already provided.
 
 ```typescript
 import { askEventDocReferences } from 'quidproquo-features';
@@ -33,15 +33,16 @@ function* askEventDocReferences(docId: string): AskResponse<EventDocLink[]>;
 
 ## Returns
 
-`EventDocLink[]` — the doc's outbound links, one hop out. Empty when the collection has no `referenceResolver` configured.
+`EventDocLink[]` — the doc's outbound links, one hop out. Empty when the collection has no registered `EventDocFunctions` object, or that object's `collectReferences` returns none.
 
 ## Notes
 
 - This is a **one-hop** read. The recursive walk over these edges (following a template into its content, then that content's own references, and so on) is the transfer feature's job — see [askEventDocManifest](../event-doc-transfer/ask-event-doc-manifest.md).
-- `GET {basePath}/{id}/references`, mounted by [defineEventDocRoutes](../../../config/features/event-doc-routes.md), calls this for one document; the route is always mounted, resolving to `[]` when no `referenceResolver` is configured.
+- `GET {basePath}/{id}/references`, mounted by [defineEventDocRoutes](../../../config/features/event-doc-routes.md), calls this for one document; the route is always mounted, resolving to `[]` when no functions object is registered.
 
 ## Related
 
-- [defineEventDocRoutes](../../../config/features/event-doc-routes.md) — declares the `referenceResolver` this reads.
+- [defineEventDoc](../../../config/features/event-doc.md) — registers the `EventDocFunctions` object (`collectReferences`) this reads.
+- [askEventDocRenderForCollection](./ask-event-doc-render-for-collection.md) — the sibling read (`render`) on the same registered object.
 - [askEventDocManifest](../event-doc-transfer/ask-event-doc-manifest.md) — the recursive walk built on top of this, one collection at a time.
 - [askEventDocGetByIdOrThrow](./ask-event-doc-get-by-id.md) — read the document's own summary alongside its references.

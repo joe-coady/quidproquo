@@ -17,10 +17,11 @@ This is the same pattern as [askContextProvideValue](../../core/context/ask-cont
 | `eventsStoreName` | `string` | The events-log store name — by convention `` `${storeName}Events` ``. |
 | `type` | `string` | Pins the document type within a store that can hold several. |
 | `storageDriveName` | `string` | The collection's blob bucket (assets + runtime artifacts), keyed per-doc. |
-| `eventValidator` | `string` (optional) | The collection's append-time validator inline-function name, if configured. |
-| `eventRenderer` | `string` (optional) | The collection's render inline-function name, if configured (powers `GET .../render`). |
+| `onPublish` | `string` (optional) | The collection's on-publish inline-function name, if configured. Invoked after a Publish event is durably appended. |
+| `onAppend` | `string` (optional) | The collection's on-append inline-function name, if configured. Invoked after every successful append. |
 | `scopeResolver` | `string` (optional) | The collection's ambient storage scope resolver inline-function name, if configured (e.g. per-tenant). |
-| `referenceResolver` | `string` (optional) | The collection's reference-collector inline-function name, if configured (powers `GET .../references` and the transfer feature's manifest walk). |
+
+Render, references, and snapshot behaviour are no longer carried on the store binding — they come from the collection's registered `EventDocFunctions` object, addressed by `storeName`/`type` via `eventDocFunctionsName(storeName, type)` (see [defineEventDoc](../../../config/features/event-doc.md)).
 
 There are two ways to establish the context — one for custom routes, one for the built-in routes — plus the raw provide/read primitives and a resolver that throws when the binding is missing.
 
@@ -64,12 +65,9 @@ function* askEventDocProvideStore<T>(
 | --- | --- | --- |
 | `storeName` | `string` | The collection's record store name; the events-table and blob-drive names are derived from it. |
 | `type` | `string` | The document type pinned within the store. |
-| `eventValidator` | `string` (optional) | Append-time validator inline-function name. |
-| `eventRenderer` | `string` (optional) | Render inline-function name. |
 | `onPublish` | `string` (optional) | Inline-function name invoked after a Publish append. |
 | `onAppend` | `string` (optional) | Inline-function name invoked after every append. |
 | `scopeResolver` | `string` (optional) | Ambient storage scope resolver inline-function name. |
-| `referenceResolver` | `string` (optional) | Reference-collector inline-function name (powers `GET .../references`). |
 
 ### Returns
 
@@ -77,7 +75,7 @@ function* askEventDocProvideStore<T>(
 
 ## askEventDocProvideStoreFromGlobals
 
-The built-in-routes counterpart: bridges the per-route **globals** that `defineEventDocRoutes` sets (store name, events-store name, type, storage drive, and the optional validator/renderer) into the store context, then runs the controller sub-story. Reads each global with [askConfigGetGlobal](../../core/config/ask-config-get-global.md), which throws if a route forgot to set them.
+The built-in-routes counterpart: bridges the per-route **globals** that `defineEventDocRoutes` sets (store name, events-store name, type, storage drive, and the optional onPublish/onAppend/scopeResolver hooks) into the store context, then runs the controller sub-story. Reads each global with [askConfigGetGlobal](../../core/config/ask-config-get-global.md), which throws if a route forgot to set them.
 
 ```typescript
 import { askEventDocProvideStoreFromGlobals } from 'quidproquo-features';
@@ -123,7 +121,7 @@ function* askEventDocStoreProvide<T>(
 
 ## askEventDocStoreRead
 
-The raw context **reader**: returns the currently bound [`EventDocStore`](#eventdocstore--the-binding). Built with `createContextReader`. Outside a provider it returns the **empty default** (blank `storeName` / `type`) rather than throwing — so most callers should prefer [askEventDocResolveStore](#askeventdocresolvestore). Internal data stories that only need one field (e.g. `eventValidator`) read it directly.
+The raw context **reader**: returns the currently bound [`EventDocStore`](#eventdocstore--the-binding). Built with `createContextReader`. Outside a provider it returns the **empty default** (blank `storeName` / `type`) rather than throwing — so most callers should prefer [askEventDocResolveStore](#askeventdocresolvestore). Internal data stories that only need one field (e.g. `scopeResolver`) read it directly.
 
 ### Signature
 

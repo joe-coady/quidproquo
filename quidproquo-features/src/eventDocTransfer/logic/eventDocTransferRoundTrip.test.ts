@@ -1,9 +1,10 @@
 import {
   ConfigActionType,
   DateActionType,
+  DynamicFunctionsActionType,
+  DynamicFunctionsExecuteErrorTypeEnum,
   FileActionType,
   GuidActionType,
-  InlineFunctionActionType,
   KeyValueStoreActionType,
   KeyValueStoreUpsertErrorTypeEnum,
   KvsLogicalOperator,
@@ -20,7 +21,7 @@ import { HTTPEvent } from 'quidproquo-webserver';
 
 import { describe, expect, it } from 'vitest';
 
-import { eventDocEventsStoreName, eventDocStorageDriveName } from '../../eventDoc/constants';
+import { eventDocEventsStoreName, eventDocFunctionsName, eventDocStorageDriveName } from '../../eventDoc/constants';
 import { eventDocAssetPath } from '../../eventDoc/data';
 import { EventDocEffect, EventDocEvent, EventDocLink, EventDocLinkMode, EventDocSummary } from '../../eventDoc/models';
 import { foldEventDocSummary } from '../../eventDoc/summary';
@@ -44,7 +45,8 @@ let sortableGuidCount = 0;
 // Proves the transfer end to end through the REAL controllers, across two independent
 // "environments" that share nothing but the bundle: export from one, import into the other, and
 // assert the folded state matches. The reference collector is mocked exactly as an app would
-// register it (an inline function that reads links off the doc's own events).
+// register it (a dynamic-functions object whose collectReferences reads links off the doc's own
+// events).
 
 const SERVICE = 'template';
 
@@ -56,18 +58,19 @@ const TEMPLATE_TYPE = 'template';
 const CONTENT_TYPE = 'content';
 const STYLE_TYPE = 'style';
 
-const REFERENCES_FN = 'collectReferences';
-
 // The event types the mocked collector treats as reference-bearing, mirroring how doccypoccy's
 // templates carry layout/style/content links in their own domain events.
 const LINK_EVENT_TYPES = ['ADD_STYLE_LINK', 'SET_CONTENT_LINK'];
 
 const COLLECTIONS = [
-  { storeName: TEMPLATES_STORE, type: TEMPLATE_TYPE, referenceResolver: REFERENCES_FN },
-  { storeName: CONTENT_STORE, type: CONTENT_TYPE, referenceResolver: REFERENCES_FN },
-  // Styles are a leaf: no resolver, so the walk stops at them.
+  { storeName: TEMPLATES_STORE, type: TEMPLATE_TYPE },
+  { storeName: CONTENT_STORE, type: CONTENT_TYPE },
   { storeName: STYLES_STORE, type: STYLE_TYPE },
 ];
+
+// Styles are a leaf: no registered functions object, so the walk stops at them (the execute
+// resolves to DynamicFunctionsNotFound, which askEventDocReferences reads as "leaf").
+const REGISTERED_FUNCTIONS = new Set([eventDocFunctionsName(TEMPLATES_STORE, TEMPLATE_TYPE), eventDocFunctionsName(CONTENT_STORE, CONTENT_TYPE)]);
 
 const storeNameForType = (type: string): string =>
   ({ [TEMPLATE_TYPE]: TEMPLATES_STORE, [CONTENT_TYPE]: CONTENT_STORE, [STYLE_TYPE]: STYLES_STORE })[type] ?? TEMPLATES_STORE;
@@ -147,7 +150,6 @@ const buildEnvironment = (environmentName: string): TestEnvironment => {
       type: collection.type,
       onPublish: '',
       onAppend: '',
-      referenceResolver: collection.referenceResolver ?? '',
     })),
     [EVENT_DOC_TRANSFER_SCOPE_RESOLVER_GLOBAL]: '',
   };
@@ -188,16 +190,22 @@ const buildEnvironment = (environmentName: string): TestEnvironment => {
 
     // Sortable ids must sort lexicographically in creation order; pad so they do.
     [GuidActionType.NewSortable]: () => `sguid-${String(++sortableGuidCount).padStart(4, '0')}`,
-    // The app-registered reference collector: read the links straight off the doc's events, which is
-    // what a real adapter does after folding (`references(fold(events))`).
-    [InlineFunctionActionType.Execute]: (action: { payload: { functionName: string; payload: { events: EventDocEvent[] } } }) => {
-      if (action.payload.functionName !== REFERENCES_FN) {
-        throw new Error(`Unexpected inline function: ${action.payload.functionName}`);
+    // The app-registered functions objects: collectReferences reads the links straight off the
+    // doc's events, which is what a real definition does after folding. Leaf collections have no
+    // registration, surfacing as the processor's DynamicFunctionsNotFound.
+    [DynamicFunctionsActionType.Execute]: (action: { payload: { dynamicFunctionsName: string; functionName: string; args: [EventDocEvent[]] } }) => {
+      if (!REGISTERED_FUNCTIONS.has(action.payload.dynamicFunctionsName)) {
+        return throwsError(
+          DynamicFunctionsExecuteErrorTypeEnum.DynamicFunctionsNotFound,
+          `Dynamic functions not found: [${action.payload.dynamicFunctionsName}]`,
+        );
       }
 
-      return action.payload.payload.events
-        .filter((candidate) => LINK_EVENT_TYPES.includes(candidate.type))
-        .map((candidate) => candidate.payload.data);
+      if (action.payload.functionName !== 'collectReferences') {
+        throw new Error(`Unexpected dynamic function member: ${action.payload.functionName}`);
+      }
+
+      return action.payload.args[0].filter((candidate) => LINK_EVENT_TYPES.includes(candidate.type)).map((candidate) => candidate.payload.data);
     },
 
     [KeyValueStoreActionType.Upsert]: (action: {
@@ -698,10 +706,10 @@ describe('eventDoc transfer round trip', () => {
       sk: eventId(1),
       data: event(1, EventDocEffect.SetCode, { code: 'receipt' }),
     });
-    Object.assign(
-      summaryFor(source, TEMPLATE_TYPE, 'template-1'),
-      { ...foldEventDocSummary(eventsFor(source, TEMPLATE_TYPE, 'template-1')), type: TEMPLATE_TYPE },
-    );
+    Object.assign(summaryFor(source, TEMPLATE_TYPE, 'template-1'), {
+      ...foldEventDocSummary(eventsFor(source, TEMPLATE_TYPE, 'template-1')),
+      type: TEMPLATE_TYPE,
+    });
 
     runStory(exportBundle(httpEvent({ docs: [templateRef] })), source.mocks);
     const exportedKey = Object.keys(source.files).find((key) => key.startsWith(`${EVENT_DOC_TRANSFER_DRIVE_NAME}/exports/`))!;

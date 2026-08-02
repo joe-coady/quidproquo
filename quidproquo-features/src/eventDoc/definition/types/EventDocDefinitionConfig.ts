@@ -13,6 +13,14 @@ import { EventDocVersions } from './EventDocVersion';
 export type EventDocSavedDefinitionConfig<TVersions extends EventDocVersions, TApi extends EventDocWorkspaceStoryApi> = {
   saved?: true;
 
+  // The collection's identity, making the definition the ONE place a doc type is
+  // described: config (defineEventDoc) reads these off the live object instead of
+  // taking its own storeName/type options. Set both for any doc type registered as a
+  // backend collection; omit both for definitions that only ever mount client-side
+  // (editor experiences). Setting one without the other throws at definition time.
+  storeName?: string;
+  type?: string;
+
   // The doc type's revision counter: stamped on every event it authors, and the fold's
   // migration target. Bumped when the EVENTS change or when any VIEW's shape changes —
   // both alter how a log folds, so both need every view to say what they mean by it.
@@ -45,8 +53,8 @@ export type EventDocSavedDefinitionConfig<TVersions extends EventDocVersions, TA
 
   // The other docs this one depends on, read off the folded primary view (a template -> its
   // layout, styles and content). Omit for a leaf doc type; the transfer manifest walk then
-  // stops here. The backend reaches this through the collection's `referenceResolver` inline
-  // function, which is a thin `references(fold(events))` adapter.
+  // stops here. The backend reaches this through `collectReferences` on the collection's
+  // registered EventDocFunctions object.
   references?: EventDocReferenceCollector<EventDocPrimaryView<TVersions>>;
 
   // The doc's OWN verbs: own-doc writes (askApplyEventDocEvent) and own-doc reads

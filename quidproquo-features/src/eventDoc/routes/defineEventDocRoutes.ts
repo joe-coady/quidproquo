@@ -17,12 +17,9 @@ export const defineEventDocRoutes = ({
   basePath,
   routeAuthSettings,
   version,
-  eventValidator,
-  eventRenderer,
   onPublish,
   onAppend,
   scopeResolver,
-  referenceResolver,
   excludeRoutes = [],
 }: EventDocRoutesOptions): QPQConfig => {
   // Same assembly a hand-written route uses via askEventDocProvideStore, so built-in and
@@ -30,12 +27,9 @@ export const defineEventDocRoutes = ({
   const store = buildEventDocStore({
     storeName,
     type,
-    eventValidator,
-    eventRenderer,
     onPublish,
     onAppend,
     scopeResolver,
-    referenceResolver,
   });
 
   const globals: Record<string, unknown> = buildEventDocStoreGlobals(store);
