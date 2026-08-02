@@ -40,7 +40,23 @@ import { askEventDocValidateAppend } from './askEventDocValidateAppend';
  * consistent and entirely disposable — which is the whole point: a projection that the
  * writer maintains is not a projection, it is a second source of truth.
  */
-export function* askEventDocEventAppend(modelId: string, input: EventDocEventInput, actor: EventDocEventActor): AskResponse<EventDocEvent> {
+export type EventDocEventAppendOptions = {
+  // Run the registered pre-write gate (askEventDocValidateAppend) before the write.
+  // TRUE for the append route — the trust boundary, where client-authored events must
+  // be stopped before they enter the log. FALSE for server-authored appends
+  // (askEventDocAppendServerEvent): server code is trusted to author valid events, the
+  // fold remains their gate, and the walker's fan-out depends on appends staying
+  // WRITE-AND-GO — a per-append state resolve turned an 800-event run into thousands
+  // of reads.
+  validate: boolean;
+};
+
+export function* askEventDocEventAppend(
+  modelId: string,
+  input: EventDocEventInput,
+  actor: EventDocEventActor,
+  options: EventDocEventAppendOptions = { validate: true },
+): AskResponse<EventDocEvent> {
   const { metadata } = input.payload;
 
   const now = yield* askDateNow();
@@ -64,11 +80,14 @@ export function* askEventDocEventAppend(modelId: string, input: EventDocEventInp
   // document's current state (snapshot-seeded — cost tracks the gap, never the log) and
   // run the registered validateEvent BEFORE the write. Some rules must stop the write
   // itself, not just the fold: an append-only log holds a rejected-but-written secret
-  // forever. A collection with no registered functions object skips this (functions
-  // missing), keeping the original write-and-go contract; the fold's acceptance rules
-  // remain the last word either way (dedup + version floor are NOT validator rules and
-  // still resolve at fold time).
-  yield* askEventDocValidateAppend(modelId, event);
+  // forever. Client-boundary appends only (see EventDocEventAppendOptions); a collection
+  // with no registered functions object also skips (functions missing), keeping the
+  // original write-and-go contract. The fold's acceptance rules remain the last word
+  // either way (dedup + version floor are NOT validator rules and still resolve at fold
+  // time).
+  if (options.validate) {
+    yield* askEventDocValidateAppend(modelId, event);
+  }
 
   // The id is unique by construction, so this cannot collide. ifNotExists stays as a cheap
   // assertion — if it ever fires, two writers minted the same id, which is a bug worth

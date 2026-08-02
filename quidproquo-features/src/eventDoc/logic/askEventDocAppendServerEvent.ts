@@ -20,5 +20,9 @@ export function* askEventDocAppendServerEvent<T>(
 ): AskResponse<EventDocEvent> {
   const clientMessageId = yield* askNewGuid();
 
-  return yield* askEventDocEventAppend(modelId, { type, payload: { data, metadata: { version, clientMessageId } } }, actor);
+  // WRITE-AND-GO: server-authored appends skip the pre-write gate (the fold is their
+  // gate). The walker streams hundreds of events per run — a per-append state resolve
+  // here multiplied the hot path's cost several-fold; the gate guards the CLIENT
+  // boundary (the append route), which this is not.
+  return yield* askEventDocEventAppend(modelId, { type, payload: { data, metadata: { version, clientMessageId } } }, actor, { validate: false });
 }
