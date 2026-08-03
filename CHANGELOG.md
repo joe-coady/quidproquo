@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.16
+
+- event docs: paging an ascending event list no longer races a snapshot written between pages (the continuation dropped the stale lower bound that could push the cursor outside the key condition and trip a DynamoDB ValidationException)
+- websockets: `defineWebsocket` keys its resources on the api subdomain alone, so changing a service's root domain no longer renames the logical id and leaves the stack undeployable
+
+### Breaking changes
+
+- `defineWebsocket`'s `uniqueKey` drops the root domain; expect WebSocket API resources to be replaced on the next deploy
+
 ## 0.1.15
 
 - event docs: a definition declares `versions` (oldest first) with a view map per version, instead of a top-level `foldReducer` plus a `migrations`

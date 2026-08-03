@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+## 0.1.16
+
 - `defineWebsocket`'s `uniqueKey` (`quidproquo-webserver`) changes from `` `${apiSubdomain}.${rootDomain}` `` to `apiSubdomain` alone. This is the setting's CDK construct/logical id, so a service redeploying after this change will rename (recreate) its WebSocket API resources; no code change is required, but expect a resource replacement on the next deploy.
 
 ## 0.1.15
