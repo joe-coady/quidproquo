@@ -49,7 +49,16 @@ export function* askEventDocEventList(modelId: string, options?: EventDocEventLi
   const { eventsStoreName } = yield* askEventDocResolveStore();
   const scope = yield* askEventDocResolveScope();
 
-  const rangeCondition = eventRangeCondition(options);
+  // An ascending continuation is positioned by its cursor, not by afterEventId — the cursor
+  // is at or past the lower bound the first page ran with. Keeping BOTH is not just redundant,
+  // it races: a caller (e.g. the bootstrap page) that re-derives afterEventId per page can see a
+  // snapshot written BETWEEN pages land exactly on the cursor's event, making the condition
+  // `sk > cursor.sk` — and DynamoDB rejects a starting key outside the range key predicate
+  // (ValidationException). Descending reads keep afterEventId: there it is the termination
+  // bound at the far end of the scan and can never contradict the cursor.
+  const effectiveOptions = options?.nextPageKey && !options.sortDescending ? { ...options, afterEventId: undefined } : options;
+
+  const rangeCondition = eventRangeCondition(effectiveOptions);
   const keyCondition = rangeCondition ? kvsAnd([kvsEqual('pk', modelId), rangeCondition]) : kvsEqual('pk', modelId);
 
   const page = yield* askKeyValueStoreQuery<EventDocStoredEvent>(eventsStoreName, keyCondition, {

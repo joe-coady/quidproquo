@@ -51,7 +51,17 @@ export const defineWebsocket = (
 ): WebSocketQPQWebServerConfigSetting => {
   return {
     configSettingType: QPQWebServerConfigSettingType.WebSocket,
-    uniqueKey: `${apiSubdomain}.${rootDomain}`,
+    // Deliberately domain-free. uniqueKey becomes the CDK construct id and therefore the
+    // CloudFormation LOGICAL id, but every physical resource this setting creates is named
+    // from app/service/environment only (e.g. the api-id SSM parameter
+    // `/qpq/websocket/api-id/<apiSubdomain>-<app>-<service>-<env>`). Including rootDomain
+    // meant renaming an app's domain renamed the logical id while the physical name stayed
+    // put, so CloudFormation tried to CREATE a second resource holding a name the old one
+    // still claimed — and it enforces name uniqueness within a stack at create time, before
+    // cleanup deletes the old. Result: an undeployable stack, recoverable only by removing
+    // the old logical resource in a separate update. apiSubdomain alone is unique per module
+    // (that is the granularity getOwnedWebsocketSettings materialises at).
+    uniqueKey: apiSubdomain,
 
     apiSubdomain,
     rootDomain,

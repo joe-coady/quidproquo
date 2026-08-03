@@ -5,6 +5,8 @@ assembled quickly.
 
 ## vNext
 
+- `defineWebsocket`'s `uniqueKey` (`quidproquo-webserver`) changes from `` `${apiSubdomain}.${rootDomain}` `` to `apiSubdomain` alone. This is the setting's CDK construct/logical id, so a service redeploying after this change will rename (recreate) its WebSocket API resources; no code change is required, but expect a resource replacement on the next deploy.
+
 ## 0.1.15
 
 - `defineEventDoc(options)` (`quidproquo-features`) is replaced by `defineEventDoc(functions, runtime, options)`: `functions` is the collection's `EventDocFunctions` object (`{ storeName, type, foldSnapshotViews, collectReferences, render? }` — a saved `EventDocDefinition` satisfies it directly), `runtime` is a `QpqFunctionRuntime` path to that same exported object, and `options` drops `storeName`/`type` (now read off `functions`) along with `eventValidator`, `eventRenderer`, `referenceResolver`, and `snapshotFold` (now members of `functions`, registered as a whole). `defineTenantedEventDoc` changes the same way. A collection with no functions object (no render/references/snapshots) should compose `defineEventDocSummary` + `defineEventDocRoutes` directly instead of calling `defineEventDoc`.

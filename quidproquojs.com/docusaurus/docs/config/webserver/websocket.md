@@ -64,7 +64,7 @@ function defineWebsocket(
 
 ### `apiSubdomain` — `string` (required)
 
-The subdomain the WebSocket API is served on. Combined with `rootDomain` it forms the connection host (`apiSubdomain.rootDomain`) and the setting's `uniqueKey`.
+The subdomain the WebSocket API is served on. Combined with `rootDomain` it forms the connection host (`apiSubdomain.rootDomain`). It alone is the setting's `uniqueKey`.
 
 ### `rootDomain` — `string` (required)
 
@@ -97,7 +97,7 @@ Each value is a `QpqFunctionRuntime` — a reference to a story entry point, wri
 
 ## Returns
 
-A `WebSocketQPQWebServerConfigSetting` config setting (`configSettingType: WebSocket`) with `uniqueKey` = `` `${apiSubdomain}.${rootDomain}` ``. Return it (or spread it) from a config array.
+A `WebSocketQPQWebServerConfigSetting` config setting (`configSettingType: WebSocket`) with `uniqueKey` = `apiSubdomain`. Return it (or spread it) from a config array.
 
 ## Notes
 
