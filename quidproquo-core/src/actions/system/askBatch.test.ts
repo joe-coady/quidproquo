@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { captureRequester, runStory, StoryError, throwsError } from '../../testing';
 import { SystemActionType } from './SystemActionType';
-import { askBatch } from './SystemBatchActionRequester';
+import { askBatch } from './askBatch';
 
 describe('askBatch', () => {
   it('batches multiple actions into a single Batch action', () => {

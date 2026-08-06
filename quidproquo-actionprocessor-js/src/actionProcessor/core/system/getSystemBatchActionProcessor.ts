@@ -1,17 +1,16 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   ActionProcessorResult,
   actionResult,
   actionResultError,
+  askBatchBase,
+  createActionProcessor,
   EitherActionResult,
   isErroredActionResult,
   processAction,
+  ProcessorFor,
   QPQConfig,
   resolveActionResult,
   resolveActionResultError,
-  SystemActionType,
-  SystemBatchActionProcessor,
 } from 'quidproquo-core';
 
 // Unwraps one processed batch item. Actions flagged returnErrors get the Either
@@ -29,7 +28,7 @@ const unwrapBatchItem = (batchItemResult: ActionProcessorResult<any>, returnErro
   return resolveActionResult(batchItemResult);
 };
 
-const getProcessSystemBatch = (qpqConfig: QPQConfig): SystemBatchActionProcessor<any[]> => {
+const getProcessSystemBatch = (qpqConfig: QPQConfig): ProcessorFor<typeof askBatchBase> => {
   return async (payload, session, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
     const batchRes = await Promise.all(
       payload.actions.map((a) => processAction(a, actionProcessors, session, logger, updateSession, dynamicModuleLoader, streamRegistry)),
@@ -46,6 +45,4 @@ const getProcessSystemBatch = (qpqConfig: QPQConfig): SystemBatchActionProcessor
   };
 };
 
-export const getSystemBatchActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [SystemActionType.Batch]: getProcessSystemBatch(qpqConfig),
-});
+export const getSystemBatchActionProcessor = createActionProcessor(askBatchBase, getProcessSystemBatch);

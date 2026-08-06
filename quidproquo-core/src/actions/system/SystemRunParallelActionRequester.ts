@@ -1,7 +1,7 @@
 // NOTE: System actions have no platform specific processors and/or requestors
 // and therefore do not need to implement a SystemActionProcessor.ts
 
-import { askBatch } from './SystemBatchActionRequester';
+import { askBatch } from './askBatch';
 import { SystemRunParallelActionRequester } from './SystemRunParallelActionTypes';
 
 /**
