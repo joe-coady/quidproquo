@@ -1,18 +1,14 @@
-import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
-  actionResult,
-  EventActionType,
-  EventGetRecordsActionProcessor,
-  HTTPMethod,
-  QPQConfig,
-} from 'quidproquo-core';
+import { actionResult, askEventGetRecordsBase, createActionProcessor, EventActionType, HTTPMethod, ProcessorFor, QPQConfig } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
 import { EventInput, InternalEventRecord } from './types';
 
-const getProcessGetRecords = (qpqConfig: QPQConfig): EventGetRecordsActionProcessor<EventInput, InternalEventRecord> => {
-  return async ({ eventParams: [cloudFrontRequestEvent, context] }) => {
+const getProcessGetRecords = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventGetRecordsBase> => {
+  return async ({ eventParams }) => {
+    // Registered for one event source only, so the base requester's
+    // source-agnostic payload is narrowed to this source's types here.
+    const [cloudFrontRequestEvent, context] = eventParams as EventInput;
+
     const records = cloudFrontRequestEvent.Records.map((record) => {
       const cfRecordRequest = record.cf.request;
 
@@ -43,6 +39,4 @@ const getProcessGetRecords = (qpqConfig: QPQConfig): EventGetRecordsActionProces
   };
 };
 
-export const getEventGetRecordsActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [EventActionType.GetRecords]: getProcessGetRecords(qpqConfig),
-});
+export const getEventGetRecordsActionProcessor = createActionProcessor(askEventGetRecordsBase, getProcessGetRecords);

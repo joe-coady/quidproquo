@@ -7,7 +7,6 @@ export interface EventMatchStoryActionPayload<QpqEventRecord, EventParams extend
   eventParams: EventParams;
 }
 
-// Action
 export interface EventMatchStoryAction<QpqEventRecord, EventParams extends Array<unknown>> extends Action<
   EventMatchStoryActionPayload<QpqEventRecord, EventParams>
 > {

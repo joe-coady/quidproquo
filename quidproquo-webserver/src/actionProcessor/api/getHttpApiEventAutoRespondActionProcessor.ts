@@ -1,12 +1,12 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
+  askEventAutoRespondBase,
+  createActionProcessor,
   EventActionType,
-  EventAutoRespondActionProcessor,
   generateUuid,
   getProcessCustomImplementation,
   MatchStoryResult,
+  ProcessorFor,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -25,7 +25,7 @@ const fileUploadErrorHttpStatusMap: Record<FileUploadErrorTypeEnum, number> = {
   [FileUploadErrorTypeEnum.malformed]: 400,
 };
 
-const getProcessAutoRespond = (qpqConfig: QPQConfig): EventAutoRespondActionProcessor<HTTPEvent, InternalMatchResult, HTTPEventResponse> => {
+const getProcessAutoRespond = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventAutoRespondBase> => {
   const validateAuth = getProcessCustomImplementation<any>(
     qpqConfig,
     askValidateRouteAuth,
@@ -35,7 +35,10 @@ const getProcessAutoRespond = (qpqConfig: QPQConfig): EventAutoRespondActionProc
     generateUuid,
   );
 
-  return async ({ qpqEventRecord, matchResult }, session, actionProcessorList, logger, updateSession, dynamicModuleLoader) => {
+  return async ({ qpqEventRecord: rawEventRecord, matchResult }, session, actionProcessorList, logger, updateSession, dynamicModuleLoader) => {
+    // This processor is registered only for the http api event source, so the base's
+    // source-agnostic record is an HTTPEvent here.
+    const qpqEventRecord = rawEventRecord as HTTPEvent;
     // Just auto respond for options requests
     if (qpqEventRecord.method === 'OPTIONS') {
       return actionResult({
@@ -81,6 +84,4 @@ const getProcessAutoRespond = (qpqConfig: QPQConfig): EventAutoRespondActionProc
   };
 };
 
-export const getHttpApiEventAutoRespondActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [EventActionType.AutoRespond]: getProcessAutoRespond(qpqConfig),
-});
+export const getHttpApiEventAutoRespondActionProcessor = createActionProcessor(askEventAutoRespondBase, getProcessAutoRespond);

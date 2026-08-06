@@ -1,17 +1,14 @@
-import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
-  actionResult,
-  EventActionType,
-  EventGetRecordsActionProcessor,
-  QPQConfig,
-} from 'quidproquo-core';
+import { actionResult, askEventGetRecordsBase, createActionProcessor, EventActionType, ProcessorFor, QPQConfig } from 'quidproquo-core';
 
 import { EventInput, InternalEventRecord } from './types';
 
 const getProcessGetRecords =
-  (_qpqConfig: QPQConfig): EventGetRecordsActionProcessor<EventInput, InternalEventRecord> =>
-  async ({ eventParams: [expressEvent] }) => {
+  (_qpqConfig: QPQConfig): ProcessorFor<typeof askEventGetRecordsBase> =>
+  async ({ eventParams }) => {
+    // Registered for one event source only, so the base requester's
+    // source-agnostic payload is narrowed to this source's types here.
+    const [expressEvent] = eventParams as EventInput;
+
     const path = expressEvent.path || '';
 
     // Mirror AWS API Gateway / Lambda behaviour: incoming bodies arrive base64 encoded
@@ -34,6 +31,4 @@ const getProcessGetRecords =
     return actionResult([internalEventRecord]);
   };
 
-export const getEventGetRecordsActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [EventActionType.GetRecords]: getProcessGetRecords(qpqConfig),
-});
+export const getEventGetRecordsActionProcessor = createActionProcessor(askEventGetRecordsBase, getProcessGetRecords);

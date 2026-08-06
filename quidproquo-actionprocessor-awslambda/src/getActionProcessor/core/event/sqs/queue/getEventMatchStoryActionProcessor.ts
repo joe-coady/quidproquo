@@ -1,11 +1,11 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
+  askEventMatchStoryBase,
+  createActionProcessor,
   ErrorTypeEnum,
   EventActionType,
-  EventMatchStoryActionProcessor,
+  ProcessorFor,
   QPQConfig,
   qpqCoreUtils,
   QueueQPQConfigSetting,
@@ -27,12 +27,16 @@ export const getQueueConfigSetting = (qpqConfig: QPQConfig): QueueQPQConfigSetti
   return queueQPQConfigSetting;
 };
 
-const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProcessor<InternalEventRecord, MatchResult, EventInput> => {
+const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventMatchStoryBase> => {
   const queueQPQConfigSetting = getQueueConfigSetting(qpqConfig);
   const queueQueueProcessors = queueQPQConfigSetting.qpqQueueProcessors;
   const queueTypes = Object.keys(queueQueueProcessors).sort();
 
-  return async ({ qpqEventRecord }) => {
+  return async ({ qpqEventRecord: rawQpqEventRecord }) => {
+    // Registered for one event source only, so the base requester's
+    // source-agnostic payload is narrowed to this source's types here.
+    const qpqEventRecord = rawQpqEventRecord as InternalEventRecord;
+
     console.log('qpqEventRecord', JSON.stringify(qpqEventRecord, null, 2));
 
     // Find the most relevant match
@@ -63,6 +67,4 @@ const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProces
   };
 };
 
-export const getEventMatchStoryActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [EventActionType.MatchStory]: getProcessMatchStory(qpqConfig),
-});
+export const getEventMatchStoryActionProcessor = createActionProcessor(askEventMatchStoryBase, getProcessMatchStory);

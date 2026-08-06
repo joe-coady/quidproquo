@@ -1,16 +1,14 @@
-import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
-  actionResult,
-  EventActionType,
-  EventGetStorySessionActionProcessor,
-  QPQConfig,
-} from 'quidproquo-core';
+import { actionResult, askEventGetStorySessionBase, createActionProcessor, EventActionType, ProcessorFor, QPQConfig } from 'quidproquo-core';
 
 import { AnyQueueMessageWithSession, EventInput, InternalEventRecord, MatchResult } from './types';
 
-const getProcessGetStorySession = (qpqConfig: QPQConfig): EventGetStorySessionActionProcessor<EventInput, InternalEventRecord, MatchResult> => {
-  return async ({ qpqEventRecord, eventParams: [sqsEvent] }) => {
+const getProcessGetStorySession = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventGetStorySessionBase> => {
+  return async ({ eventParams, qpqEventRecord: rawQpqEventRecord }) => {
+    // Registered for one event source only, so the base requester's
+    // source-agnostic payload is narrowed to this source's types here.
+    const [sqsEvent] = eventParams as EventInput;
+    const qpqEventRecord = rawQpqEventRecord as InternalEventRecord;
+
     // Find the src record and pull out the session from that if we can
     const srcRecord = sqsEvent.Records.find((r) => r.messageId === qpqEventRecord.id);
     if (srcRecord) {
@@ -22,6 +20,4 @@ const getProcessGetStorySession = (qpqConfig: QPQConfig): EventGetStorySessionAc
   };
 };
 
-export const getEventGetStorySessionActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [EventActionType.GetStorySession]: getProcessGetStorySession(qpqConfig),
-});
+export const getEventGetStorySessionActionProcessor = createActionProcessor(askEventGetStorySessionBase, getProcessGetStorySession);

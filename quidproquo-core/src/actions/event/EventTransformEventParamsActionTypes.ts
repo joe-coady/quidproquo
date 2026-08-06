@@ -6,7 +6,6 @@ export interface EventTransformEventParamsActionPayload<T extends Array<unknown>
   eventParams: T;
 }
 
-// Action
 export interface EventTransformEventParamsAction<T extends Array<unknown>> extends Action<EventTransformEventParamsActionPayload<T>> {
   type: EventActionType.TransformEventParams;
   payload: EventTransformEventParamsActionPayload<T>;

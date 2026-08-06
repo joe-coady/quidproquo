@@ -1,11 +1,11 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
+  askEventGetRecordsBase,
+  createActionProcessor,
   decomposeScopedKvsValue,
   EventActionType,
-  EventGetRecordsActionProcessor,
   KvsStreamEventType,
+  ProcessorFor,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -85,14 +85,16 @@ const coalesceByPartitionKey = (records: InternalEventRecord[]): InternalEventRe
   return [...latest.values()];
 };
 
-const getProcessGetRecords = (qpqConfig: QPQConfig): EventGetRecordsActionProcessor<EventInput, InternalEventRecord> => {
-  return async ({ eventParams: [streamEvent] }) => {
+const getProcessGetRecords = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventGetRecordsBase> => {
+  return async ({ eventParams }) => {
+    // Registered for one event source only, so the base requester's
+    // source-agnostic payload is narrowed to this source's types here.
+    const [streamEvent] = eventParams as EventInput;
+
     const records = streamEvent.Records.map(toInternalRecord);
 
     return actionResult(GLOBAL_KVS_STREAM_COALESCE ? coalesceByPartitionKey(records) : records);
   };
 };
 
-export const getEventGetRecordsActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [EventActionType.GetRecords]: getProcessGetRecords(qpqConfig),
-});
+export const getEventGetRecordsActionProcessor = createActionProcessor(askEventGetRecordsBase, getProcessGetRecords);

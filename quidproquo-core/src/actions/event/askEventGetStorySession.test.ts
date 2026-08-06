@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { captureRequester, runStory, throwsError } from '../../testing';
 import { EventActionType } from './EventActionType';
-import { askEventGetStorySession } from './EventGetStorySessionActionRequester';
+import { askEventGetStorySession } from './askEventGetStorySession';
 
 describe('askEventGetStorySession', () => {
   it('yields a GetStorySession action with params, record and match result', () => {

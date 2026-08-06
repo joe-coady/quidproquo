@@ -1,17 +1,8 @@
-import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
-  actionResult,
-  EventActionType,
-  EventTransformResponseResultActionProcessor,
-  QPQConfig,
-} from 'quidproquo-core';
+import { actionResult, askEventTransformResponseResultBase, createActionProcessor, EventActionType, ProcessorFor, QPQConfig } from 'quidproquo-core';
 
 import { EventInput, EventOutput, InternalEventOutput, InternalEventRecord } from './types';
 
-const getProcessTransformResponseResult = (
-  qpqConfig: QPQConfig,
-): EventTransformResponseResultActionProcessor<EventInput, InternalEventOutput, EventOutput> => {
+const getProcessTransformResponseResult = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventTransformResponseResultBase> => {
   // We might need to JSON.stringify the body.
   return async ({ eventParams, qpqEventRecordResponses }) => {
     // Transform back to api gateway
@@ -19,8 +10,7 @@ const getProcessTransformResponseResult = (
   };
 };
 
-export const getEventTransformResponseResultActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [EventActionType.TransformResponseResult]: getProcessTransformResponseResult(qpqConfig),
-});
+export const getEventTransformResponseResultActionProcessor = createActionProcessor(
+  askEventTransformResponseResultBase,
+  getProcessTransformResponseResult,
+);

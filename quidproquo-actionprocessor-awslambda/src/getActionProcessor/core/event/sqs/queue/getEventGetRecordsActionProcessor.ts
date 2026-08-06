@@ -1,14 +1,14 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
+  askEventGetRecordsBase,
+  createActionProcessor,
   EventActionType,
-  EventGetRecordsActionProcessor,
   NotifyErrorQueueBaseEventPayload,
   NotifyErrorQueueErrorQueueEvent,
   NotifyErrorQueueEvents,
   NotifyErrorQueueThrottleQueueEvent,
   NotifyErrorQueueTimeoutQueueEvent,
+  ProcessorFor,
   QPQConfig,
   QueueEvent,
 } from 'quidproquo-core';
@@ -53,8 +53,12 @@ function buildQueueBaseEvent(
   return queueEvent;
 }
 
-const getProcessGetRecords = (qpqConfig: QPQConfig): EventGetRecordsActionProcessor<EventInput, InternalEventRecord> => {
-  return async ({ eventParams: [sqsEvent, context] }) => {
+const getProcessGetRecords = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventGetRecordsBase> => {
+  return async ({ eventParams }) => {
+    // Registered for one event source only, so the base requester's
+    // source-agnostic payload is narrowed to this source's types here.
+    const [sqsEvent, context] = eventParams as EventInput;
+
     const records = sqsEvent.Records.map((record) => {
       const parsedInternalEventRecord = JSON.parse(record.body) as AnyQueueMessageWithSession;
 
@@ -117,6 +121,4 @@ const getProcessGetRecords = (qpqConfig: QPQConfig): EventGetRecordsActionProces
   };
 };
 
-export const getEventGetRecordsActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [EventActionType.GetRecords]: getProcessGetRecords(qpqConfig),
-});
+export const getEventGetRecordsActionProcessor = createActionProcessor(askEventGetRecordsBase, getProcessGetRecords);

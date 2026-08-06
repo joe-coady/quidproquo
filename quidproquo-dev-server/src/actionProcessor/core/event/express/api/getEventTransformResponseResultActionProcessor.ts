@@ -1,10 +1,11 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
+  askEventTransformResponseResultBase,
+  createActionProcessor,
+  EitherActionResult,
   ErrorTypeEnum,
   EventActionType,
-  EventTransformResponseResultActionProcessor,
+  ProcessorFor,
   QPQConfig,
   QPQError,
 } from 'quidproquo-core';
@@ -40,10 +41,14 @@ const getResponseFromErrorResult = (error: QPQError): InternalEventOutput => {
 };
 
 const getProcessTransformResponseResult =
-  (qpqConfig: QPQConfig): EventTransformResponseResultActionProcessor<EventInput, InternalEventOutput, EventOutput> =>
+  (qpqConfig: QPQConfig): ProcessorFor<typeof askEventTransformResponseResultBase> =>
   // We might need to JSON.stringify the body.
-  async ({ eventParams, qpqEventRecordResponses }) => {
-    const [record] = qpqEventRecordResponses;
+  async ({ eventParams: rawEventParams, qpqEventRecordResponses }) => {
+    // Registered for one event source only, so the base requester's
+    // source-agnostic payload is narrowed to this source's types here.
+    const eventParams = rawEventParams as EventInput;
+
+    const [record] = qpqEventRecordResponses as EitherActionResult<InternalEventOutput>[];
     const [expressEvent] = eventParams;
 
     // If we have an error, we need to transform it to a response, otherwise we can just use the record as is
@@ -63,8 +68,7 @@ const getProcessTransformResponseResult =
     });
   };
 
-export const getEventTransformResponseResultActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [EventActionType.TransformResponseResult]: getProcessTransformResponseResult(qpqConfig),
-});
+export const getEventTransformResponseResultActionProcessor = createActionProcessor(
+  askEventTransformResponseResultBase,
+  getProcessTransformResponseResult,
+);

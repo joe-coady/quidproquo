@@ -6,7 +6,6 @@ export interface EventGetRecordsActionPayload<EventParams extends Array<unknown>
   eventParams: EventParams;
 }
 
-// Action
 export interface EventGetRecordsAction<EventParams extends Array<unknown>> extends Action<EventGetRecordsActionPayload<EventParams>> {
   type: EventActionType.GetRecords;
   payload: EventGetRecordsActionPayload<EventParams>;

@@ -9,7 +9,6 @@ export interface EventGetStorySessionActionPayload<EventParams extends Array<unk
   matchStoryResult: MSR;
 }
 
-// Action
 export interface EventGetStorySessionAction<EventParams extends Array<unknown>, QpqEventRecord, MSR extends AnyMatchStoryResult> extends Action<
   EventGetStorySessionActionPayload<EventParams, QpqEventRecord, MSR>
 > {

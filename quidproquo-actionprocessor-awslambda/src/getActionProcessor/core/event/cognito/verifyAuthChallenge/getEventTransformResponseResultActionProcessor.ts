@@ -1,9 +1,10 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
+  askEventTransformResponseResultBase,
+  createActionProcessor,
+  EitherActionResult,
   EventActionType,
-  EventTransformResponseResultActionProcessor,
+  ProcessorFor,
   QPQConfig,
   QPQError,
 } from 'quidproquo-core';
@@ -16,11 +17,14 @@ const getResponseFromErrorResult = (error: QPQError): InternalEventOutput => {
   };
 };
 
-const getProcessTransformResponseResult = (
-  qpqConfig: QPQConfig,
-): EventTransformResponseResultActionProcessor<EventInput, InternalEventOutput, EventOutput> => {
+const getProcessTransformResponseResult = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventTransformResponseResultBase> => {
   // We might need to JSON.stringify the body.
-  return async ({ eventParams, qpqEventRecordResponses }) => {
+  return async ({ eventParams: rawEventParams, qpqEventRecordResponses: rawQpqEventRecordResponses }) => {
+    // Registered for one event source only, so the base requester's
+    // source-agnostic payload is narrowed to this source's types here.
+    const eventParams = rawEventParams as EventInput;
+    const qpqEventRecordResponses = rawQpqEventRecordResponses as EitherActionResult<InternalEventOutput>[];
+
     const [customMessageTriggerEvent] = eventParams;
     const [qpqEventRecordResponse] = qpqEventRecordResponses;
 
@@ -40,8 +44,7 @@ const getProcessTransformResponseResult = (
   };
 };
 
-export const getEventTransformResponseResultActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [EventActionType.TransformResponseResult]: getProcessTransformResponseResult(qpqConfig),
-});
+export const getEventTransformResponseResultActionProcessor = createActionProcessor(
+  askEventTransformResponseResultBase,
+  getProcessTransformResponseResult,
+);

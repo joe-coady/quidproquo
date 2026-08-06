@@ -1,11 +1,4 @@
-import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
-  actionResult,
-  EventActionType,
-  EventGetRecordsActionProcessor,
-  QPQConfig,
-} from 'quidproquo-core';
+import { actionResult, askEventGetRecordsBase, createActionProcessor, EventActionType, ProcessorFor, QPQConfig } from 'quidproquo-core';
 
 import { EventInput, InternalEventRecord } from './types';
 
@@ -28,8 +21,12 @@ function processBody(body: ArrayBuffer | Buffer | Buffer[] | undefined): string 
   throw new Error('Unsupported body type');
 }
 
-const getProcessGetRecords = (qpqConfig: QPQConfig): EventGetRecordsActionProcessor<EventInput, InternalEventRecord> => {
-  return async ({ eventParams: [wsEvent] }) => {
+const getProcessGetRecords = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventGetRecordsBase> => {
+  return async ({ eventParams }) => {
+    // Registered for one event source only, so the base requester's
+    // source-agnostic payload is narrowed to this source's types here.
+    const [wsEvent] = eventParams as EventInput;
+
     const internalEventRecord: InternalEventRecord = {
       eventType: wsEvent.eventType,
 
@@ -47,6 +44,4 @@ const getProcessGetRecords = (qpqConfig: QPQConfig): EventGetRecordsActionProces
   };
 };
 
-export const getEventGetRecordsActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [EventActionType.GetRecords]: getProcessGetRecords(qpqConfig),
-});
+export const getEventGetRecordsActionProcessor = createActionProcessor(askEventGetRecordsBase, getProcessGetRecords);

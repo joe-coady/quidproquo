@@ -1,10 +1,10 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
+  askEventMatchStoryBase,
+  createActionProcessor,
   EventActionType,
-  EventMatchStoryActionProcessor,
+  ProcessorFor,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -14,7 +14,7 @@ import { EventInput, InternalEventRecord, MatchResult } from './types';
 // TODO: Clean this shit up
 const lambdaRuntimeConfig: LambdaRuntimeConfig = JSON.parse(process.env.lambdaRuntimeConfig || '{}');
 
-const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProcessor<InternalEventRecord, MatchResult, EventInput> => {
+const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventMatchStoryBase> => {
   return async ({ qpqEventRecord }) => {
     return actionResult<MatchResult>({
       runtime: lambdaRuntimeConfig.runtime,
@@ -23,6 +23,4 @@ const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProces
   };
 };
 
-export const getEventMatchStoryActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [EventActionType.MatchStory]: getProcessMatchStory(qpqConfig),
-});
+export const getEventMatchStoryActionProcessor = createActionProcessor(askEventMatchStoryBase, getProcessMatchStory);

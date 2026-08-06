@@ -189,15 +189,15 @@ item commits only its note in this file, with a message like
 
 #### event
 
-- [ ] **askEventAutoRespond** `quidproquo-core/src/actions/event/EventAutoRespondActionRequester.ts` · processors: actionprocessor-awslambda, dev-server · generic return: base + casting story · 18 processors (per event source) · also overridden by quidproquo-webserver getHttpApiEventAutoRespondActionProcessor
-- [ ] **askEventGetRecords** `quidproquo-core/src/actions/event/EventGetRecordsActionRequester.ts` · processors: actionprocessor-awslambda, dev-server · generic return: base + casting story · 18 processors (per event source)
-- [ ] **askEventGetStorySession** `quidproquo-core/src/actions/event/EventGetStorySessionActionRequester.ts` · processors: actionprocessor-awslambda, dev-server · generic return: base + casting story · 18 processors (per event source) · also overridden by quidproquo-webserver getHttpApiEventGetStorySessionActionProcessor
-- [ ] **askEventMatchStory** `quidproquo-core/src/actions/event/EventMatchStoryActionRequester.ts` · processors: actionprocessor-awslambda, dev-server · generic return: base + casting story · 18 processors (per event source)
-- [ ] **askEventResolveCaughtError** `quidproquo-core/src/actions/event/EventResolveCaughtErrorActionRequester.ts` · generic return: base + casting story · no get*ActionProcessor found: grep the ActionType member
-- [ ] **askEventTransformEventParams** `quidproquo-core/src/actions/event/EventTransformEventParamsActionRequester.ts` · generic return: base + casting story · no get*ActionProcessor found: grep the ActionType member
-- [ ] **askEventTransformEventRecord** `quidproquo-core/src/actions/event/EventTransformEventRecordActionRequester.ts` · generic return: base + casting story · no get*ActionProcessor found: grep the ActionType member
-- [ ] **askEventTransformEventRecordResponse** `quidproquo-core/src/actions/event/EventTransformEventRecordResponseActionRequester.ts` · generic return: base + casting story · no get*ActionProcessor found: grep the ActionType member
-- [ ] **askEventTransformResponseResult** `quidproquo-core/src/actions/event/EventTransformResponseResultActionRequester.ts` · processors: actionprocessor-awslambda, dev-server · generic return: base + casting story · 18 processors (per event source)
+- [x] **askEventAutoRespond** `quidproquo-core/src/actions/event/askEventAutoRespond.ts` · base is source-agnostic; each per-source processor narrows at its handler
+- [x] **askEventGetRecords** `quidproquo-core/src/actions/event/askEventGetRecords.ts` · base is source-agnostic; each per-source processor narrows at its handler
+- [x] **askEventGetStorySession** `quidproquo-core/src/actions/event/askEventGetStorySession.ts` · base is source-agnostic; each per-source processor narrows at its handler
+- [x] **askEventMatchStory** `quidproquo-core/src/actions/event/askEventMatchStory.ts` · base is source-agnostic; each per-source processor narrows at its handler
+- [x] **askEventResolveCaughtError** `quidproquo-core/src/actions/event/askEventResolveCaughtError.ts` · base is source-agnostic; each per-source processor narrows at its handler
+- [x] **askEventTransformEventParams** `quidproquo-core/src/actions/event/askEventTransformEventParams.ts` · base is source-agnostic; each per-source processor narrows at its handler
+- [x] **askEventTransformEventRecord** `quidproquo-core/src/actions/event/askEventTransformEventRecord.ts` · base is source-agnostic; each per-source processor narrows at its handler
+- [x] **askEventTransformEventRecordResponse** `quidproquo-core/src/actions/event/askEventTransformEventRecordResponse.ts` · base is source-agnostic; each per-source processor narrows at its handler
+- [x] **askEventTransformResponseResult** `quidproquo-core/src/actions/event/askEventTransformResponseResult.ts` · base is source-agnostic; each per-source processor narrows at its handler
 
 #### eventBus
 

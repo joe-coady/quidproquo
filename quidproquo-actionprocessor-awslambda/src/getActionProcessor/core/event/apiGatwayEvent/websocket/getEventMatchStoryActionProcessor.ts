@@ -1,21 +1,25 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
+  askEventMatchStoryBase,
+  createActionProcessor,
   ErrorTypeEnum,
   EventActionType,
-  EventMatchStoryActionProcessor,
+  ProcessorFor,
   QPQConfig,
 } from 'quidproquo-core';
 import { qpqWebServerUtils, WebSocketEventType } from 'quidproquo-webserver';
 
 import { EventInput, GLOBAL_WEBSOCKET_API_NAME, InternalEventRecord, MatchResult } from './types';
 
-const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProcessor<InternalEventRecord, MatchResult, EventInput> => {
+const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventMatchStoryBase> => {
   const userDirectoryConfig = qpqWebServerUtils.getWebsocketEntryByApiName(GLOBAL_WEBSOCKET_API_NAME, qpqConfig);
 
-  return async ({ qpqEventRecord }) => {
+  return async ({ qpqEventRecord: rawQpqEventRecord }) => {
+    // Registered for one event source only, so the base requester's
+    // source-agnostic payload is narrowed to this source's types here.
+    const qpqEventRecord = rawQpqEventRecord as InternalEventRecord;
+
     switch (qpqEventRecord.eventType) {
       case WebSocketEventType.Connect:
         return actionResult<MatchResult>({
@@ -35,6 +39,4 @@ const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProces
   };
 };
 
-export const getEventMatchStoryActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [EventActionType.MatchStory]: getProcessMatchStory(qpqConfig),
-});
+export const getEventMatchStoryActionProcessor = createActionProcessor(askEventMatchStoryBase, getProcessMatchStory);

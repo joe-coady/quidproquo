@@ -1,18 +1,15 @@
-import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
-  actionResult,
-  EventActionType,
-  EventGetRecordsActionProcessor,
-  QPQConfig,
-} from 'quidproquo-core';
+import { actionResult, askEventGetRecordsBase, createActionProcessor, EventActionType, ProcessorFor, QPQConfig } from 'quidproquo-core';
 
 import { getQpqAttributesFromCognitoStringMap } from '../../../../../logic/cognito/getQpqAttributesFromCognitoStringMap';
 import { getChallengeSessionFromCognitoTriggerEventSession } from '../utils';
 import { EventInput, InternalEventRecord } from './types';
 
-const getProcessGetRecords = (qpqConfig: QPQConfig): EventGetRecordsActionProcessor<EventInput, InternalEventRecord> => {
-  return async ({ eventParams: [event, context] }) => {
+const getProcessGetRecords = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventGetRecordsBase> => {
+  return async ({ eventParams }) => {
+    // Registered for one event source only, so the base requester's
+    // source-agnostic payload is narrowed to this source's types here.
+    const [event, context] = eventParams as EventInput;
+
     const internalEventRecord: InternalEventRecord = {
       userName: event.userName,
       session: getChallengeSessionFromCognitoTriggerEventSession(event.request.session),
@@ -23,6 +20,4 @@ const getProcessGetRecords = (qpqConfig: QPQConfig): EventGetRecordsActionProces
   };
 };
 
-export const getEventGetRecordsActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [EventActionType.GetRecords]: getProcessGetRecords(qpqConfig),
-});
+export const getEventGetRecordsActionProcessor = createActionProcessor(askEventGetRecordsBase, getProcessGetRecords);

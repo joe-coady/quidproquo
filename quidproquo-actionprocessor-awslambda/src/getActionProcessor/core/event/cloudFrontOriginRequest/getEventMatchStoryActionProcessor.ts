@@ -1,11 +1,11 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
+  askEventMatchStoryBase,
+  createActionProcessor,
   ErrorTypeEnum,
   EventActionType,
-  EventMatchStoryActionProcessor,
+  ProcessorFor,
   QPQConfig,
 } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
@@ -13,10 +13,14 @@ import { qpqWebServerUtils } from 'quidproquo-webserver';
 import { matchUrl } from '../../../../awsLambdaUtils';
 import { EventInput, InternalEventRecord, MatchResult } from './types';
 
-const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProcessor<InternalEventRecord, MatchResult, EventInput> => {
+const getProcessMatchStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventMatchStoryBase> => {
   const seoConfigs = qpqWebServerUtils.getAllSeo(qpqConfig);
 
-  return async ({ qpqEventRecord }) => {
+  return async ({ qpqEventRecord: rawQpqEventRecord }) => {
+    // Registered for one event source only, so the base requester's
+    // source-agnostic payload is narrowed to this source's types here.
+    const qpqEventRecord = rawQpqEventRecord as InternalEventRecord;
+
     // Sort the routes by string length
     // we don't sort them here for SEO... its the order they are defined.
     const sortedSeoConfigs = seoConfigs; // qpqWebServerUtils.sortPathMatchConfigs(seoConfigs);
@@ -41,6 +45,4 @@ const getProcessMatchStory = (qpqConfig: QPQConfig): EventMatchStoryActionProces
   };
 };
 
-export const getEventMatchStoryActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [EventActionType.MatchStory]: getProcessMatchStory(qpqConfig),
-});
+export const getEventMatchStoryActionProcessor = createActionProcessor(askEventMatchStoryBase, getProcessMatchStory);

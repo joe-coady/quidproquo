@@ -1,18 +1,23 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
+  askEventAutoRespondBase,
+  createActionProcessor,
   DeployEventStatusType,
   DeployEventType,
   EventActionType,
-  EventAutoRespondActionProcessor,
+  ProcessorFor,
   QPQConfig,
 } from 'quidproquo-core';
 
 import { InternalEventOutput, InternalEventRecord, MatchResult } from './types';
 
-const getProcessAutoRespond = (qpqConfig: QPQConfig): EventAutoRespondActionProcessor<InternalEventRecord, MatchResult, InternalEventOutput> => {
-  return async ({ qpqEventRecord, matchResult }) => {
+const getProcessAutoRespond = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventAutoRespondBase> => {
+  return async ({ qpqEventRecord: rawQpqEventRecord, matchResult: rawMatchResult }) => {
+    // Registered for one event source only, so the base requester's
+    // source-agnostic payload is narrowed to this source's types here.
+    const qpqEventRecord = rawQpqEventRecord as InternalEventRecord;
+    const matchResult = rawMatchResult as MatchResult;
+
     // exit if we don't know what deploy type this is, probably another stack
     const earlyExit =
       qpqEventRecord.deployEventType === DeployEventType.Unknown || qpqEventRecord.deployEventStatusType === DeployEventStatusType.Unknown;
@@ -22,6 +27,4 @@ const getProcessAutoRespond = (qpqConfig: QPQConfig): EventAutoRespondActionProc
   };
 };
 
-export const getEventAutoRespondActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [EventActionType.AutoRespond]: getProcessAutoRespond(qpqConfig),
-});
+export const getEventAutoRespondActionProcessor = createActionProcessor(askEventAutoRespondBase, getProcessAutoRespond);

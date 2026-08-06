@@ -1,4 +1,4 @@
-import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
+import { Action } from '../../types/Action';
 import { AnyMatchStoryResult, EventActionType } from './EventActionType';
 
 // payload
@@ -16,11 +16,3 @@ export interface EventAutoRespondAction<QpqEventRecord, MSR extends AnyMatchStor
 }
 
 // Functions
-export type EventAutoRespondActionProcessor<QpqEventRecord, MSR extends AnyMatchStoryResult, QpqEventRecordResponse> = ActionProcessor<
-  EventAutoRespondAction<QpqEventRecord, MSR>,
-  QpqEventRecordResponse | null
->;
-export type EventAutoRespondActionRequester<QpqEventRecord, MSR extends AnyMatchStoryResult, QpqEventRecordResponse> = ActionRequester<
-  EventAutoRespondAction<QpqEventRecord, MSR>,
-  QpqEventRecordResponse | null
->;

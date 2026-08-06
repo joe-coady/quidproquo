@@ -1,18 +1,14 @@
-import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
-  actionResult,
-  EventActionType,
-  EventGetRecordsActionProcessor,
-  QPQConfig,
-  qpqCoreUtils,
-} from 'quidproquo-core';
+import { actionResult, askEventGetRecordsBase, createActionProcessor, EventActionType, ProcessorFor, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 import { EmailSendEventType } from 'quidproquo-webserver';
 
 import { EventInput, InternalEventRecord } from './types';
 
-const getProcessGetRecords = (qpqConfig: QPQConfig): EventGetRecordsActionProcessor<EventInput, InternalEventRecord> => {
-  return async ({ eventParams: [customMessageTriggerEvent, context] }) => {
+const getProcessGetRecords = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventGetRecordsBase> => {
+  return async ({ eventParams }) => {
+    // Registered for one event source only, so the base requester's
+    // source-agnostic payload is narrowed to this source's types here.
+    const [customMessageTriggerEvent, context] = eventParams as EventInput;
+
     const internalEventRecord: InternalEventRecord = {
       eventType: EmailSendEventType.VerifyEmail,
 
@@ -41,6 +37,4 @@ const getProcessGetRecords = (qpqConfig: QPQConfig): EventGetRecordsActionProces
   };
 };
 
-export const getEventGetRecordsActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [EventActionType.GetRecords]: getProcessGetRecords(qpqConfig),
-});
+export const getEventGetRecordsActionProcessor = createActionProcessor(askEventGetRecordsBase, getProcessGetRecords);

@@ -1,18 +1,14 @@
-import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
-  actionResult,
-  EventActionType,
-  EventGetRecordsActionProcessor,
-  QPQConfig,
-  qpqCoreUtils,
-} from 'quidproquo-core';
+import { actionResult, askEventGetRecordsBase, createActionProcessor, EventActionType, ProcessorFor, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 import { StorageDriveEventType } from 'quidproquo-webserver';
 
 import { EventInput, GLOBAL_STORAGE_DRIVE_NAME, InternalEventRecord } from './types';
 
-const getProcessGetRecords = (qpqConfig: QPQConfig): EventGetRecordsActionProcessor<EventInput, InternalEventRecord> => {
-  return async ({ eventParams: [s3Event, context] }) => {
+const getProcessGetRecords = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventGetRecordsBase> => {
+  return async ({ eventParams }) => {
+    // Registered for one event source only, so the base requester's
+    // source-agnostic payload is narrowed to this source's types here.
+    const [s3Event, context] = eventParams as EventInput;
+
     const records = s3Event.Records.map((r) => {
       const internalEventRecord: InternalEventRecord = {
         driveName: GLOBAL_STORAGE_DRIVE_NAME,
@@ -28,6 +24,4 @@ const getProcessGetRecords = (qpqConfig: QPQConfig): EventGetRecordsActionProces
   };
 };
 
-export const getEventGetRecordsActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [EventActionType.GetRecords]: getProcessGetRecords(qpqConfig),
-});
+export const getEventGetRecordsActionProcessor = createActionProcessor(askEventGetRecordsBase, getProcessGetRecords);

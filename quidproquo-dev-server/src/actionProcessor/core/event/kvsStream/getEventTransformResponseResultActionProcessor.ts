@@ -1,22 +1,12 @@
-import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
-  actionResult,
-  EventActionType,
-  EventTransformResponseResultActionProcessor,
-  QPQConfig,
-} from 'quidproquo-core';
+import { actionResult, askEventTransformResponseResultBase, createActionProcessor, EventActionType, ProcessorFor, QPQConfig } from 'quidproquo-core';
 
 import { EventInput, EventOutput, InternalEventOutput } from './types';
 
-const getProcessTransformResponseResult = (
-  qpqConfig: QPQConfig,
-): EventTransformResponseResultActionProcessor<EventInput, InternalEventOutput, EventOutput> => {
+const getProcessTransformResponseResult = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventTransformResponseResultBase> => {
   return async () => actionResult<EventOutput>(void 0);
 };
 
-export const getEventTransformResponseResultActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [EventActionType.TransformResponseResult]: getProcessTransformResponseResult(qpqConfig),
-});
+export const getEventTransformResponseResultActionProcessor = createActionProcessor(
+  askEventTransformResponseResultBase,
+  getProcessTransformResponseResult,
+);

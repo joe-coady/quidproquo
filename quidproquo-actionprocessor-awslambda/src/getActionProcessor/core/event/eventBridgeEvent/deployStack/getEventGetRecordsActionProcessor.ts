@@ -1,11 +1,11 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
+  askEventGetRecordsBase,
+  createActionProcessor,
   DeployEventStatusType,
   DeployEventType,
   EventActionType,
-  EventGetRecordsActionProcessor,
+  ProcessorFor,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -18,8 +18,12 @@ const deployTypeMap: Record<string, DeployEventStatusType> = {
   DELETE_COMPLETE: DeployEventStatusType.Delete,
 };
 
-const getProcessGetRecords = (qpqConfig: QPQConfig): EventGetRecordsActionProcessor<EventInput, InternalEventRecord> => {
-  return async ({ eventParams: [eventBridgeEvent, context] }) => {
+const getProcessGetRecords = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventGetRecordsBase> => {
+  return async ({ eventParams }) => {
+    // Registered for one event source only, so the base requester's
+    // source-agnostic payload is narrowed to this source's types here.
+    const [eventBridgeEvent, context] = eventParams as EventInput;
+
     const status = eventBridgeEvent.detail['status-details'].status || '';
     const stackId = eventBridgeEvent.detail['stack-id'];
 
@@ -45,6 +49,4 @@ const getProcessGetRecords = (qpqConfig: QPQConfig): EventGetRecordsActionProces
   };
 };
 
-export const getEventGetRecordsActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [EventActionType.GetRecords]: getProcessGetRecords(qpqConfig),
-});
+export const getEventGetRecordsActionProcessor = createActionProcessor(askEventGetRecordsBase, getProcessGetRecords);

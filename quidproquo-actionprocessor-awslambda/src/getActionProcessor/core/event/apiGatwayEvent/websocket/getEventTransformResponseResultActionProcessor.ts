@@ -1,14 +1,14 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
+  askEventTransformResponseResultBase,
   askLogCreate,
   AskResponse,
+  createActionProcessor,
   EventActionType,
   EventTransformResponseResultActionPayload,
-  EventTransformResponseResultActionProcessor,
   getProcessCustomImplementation,
   LogLevelEnum,
+  ProcessorFor,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -28,13 +28,16 @@ export function* askTransformResponseStory({
   };
 }
 
-const getProcessTransformResponseResult = (
-  qpqConfig: QPQConfig,
-): EventTransformResponseResultActionProcessor<EventInput, InternalEventOutput, EventOutput> => {
+const getProcessTransformResponseResult = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventTransformResponseResultBase> => {
   // Create a custom runtime for errored responses so we can log them out
-  const errorCustomImplementation = getProcessCustomImplementation<
-    EventTransformResponseResultActionProcessor<EventInput, InternalEventOutput, EventOutput>
-  >(qpqConfig, askTransformResponseStory, 'Transform Errored Websocket Response', null, () => new Date().toISOString(), randomGuid);
+  const errorCustomImplementation = getProcessCustomImplementation<ProcessorFor<typeof askEventTransformResponseResultBase>>(
+    qpqConfig,
+    askTransformResponseStory,
+    'Transform Errored Websocket Response',
+    null,
+    () => new Date().toISOString(),
+    randomGuid,
+  );
 
   return async (payload, session, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
     if (payload.qpqEventRecordResponses.some((r) => !r.success)) {
@@ -48,8 +51,7 @@ const getProcessTransformResponseResult = (
   };
 };
 
-export const getEventTransformResponseResultActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [EventActionType.TransformResponseResult]: getProcessTransformResponseResult(qpqConfig),
-});
+export const getEventTransformResponseResultActionProcessor = createActionProcessor(
+  askEventTransformResponseResultBase,
+  getProcessTransformResponseResult,
+);

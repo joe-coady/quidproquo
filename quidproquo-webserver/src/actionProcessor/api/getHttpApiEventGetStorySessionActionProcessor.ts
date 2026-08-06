@@ -1,12 +1,12 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
+  askEventGetStorySessionBase,
+  createActionProcessor,
   EventActionType,
-  EventGetStorySessionActionProcessor,
   generateUuid,
   getProcessCustomImplementation,
   MatchStoryResult,
+  ProcessorFor,
   QPQConfig,
   StorySession,
 } from 'quidproquo-core';
@@ -17,7 +17,7 @@ import { HTTPEvent } from '../../types/HTTPEvent';
 
 type InternalMatchResult = MatchStoryResult<any, RouteOptions>;
 
-const getProcessGetStorySession = (qpqConfig: QPQConfig): EventGetStorySessionActionProcessor<any, HTTPEvent, InternalMatchResult> => {
+const getProcessGetStorySession = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventGetStorySessionBase> => {
   const getSession = getProcessCustomImplementation<any>(
     qpqConfig,
     askGetHttpApiEventStorySession,
@@ -29,7 +29,9 @@ const getProcessGetStorySession = (qpqConfig: QPQConfig): EventGetStorySessionAc
 
   return async ({ matchStoryResult, qpqEventRecord }, session, actionProcessorList, logger, updateSession, dynamicModuleLoader) => {
     const payload: GetHttpApiEventStorySessionPayload = {
-      event: qpqEventRecord,
+      // Registered only for the http api event source, so the base's source-agnostic
+      // record is an HTTPEvent here.
+      event: qpqEventRecord as HTTPEvent,
       routeAuthSettings: matchStoryResult.config?.routeAuthSettings,
       session,
     };
@@ -44,8 +46,4 @@ const getProcessGetStorySession = (qpqConfig: QPQConfig): EventGetStorySessionAc
   };
 };
 
-export const getHttpApiEventGetStorySessionActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [EventActionType.GetStorySession]: getProcessGetStorySession(qpqConfig),
-});
+export const getHttpApiEventGetStorySessionActionProcessor = createActionProcessor(askEventGetStorySessionBase, getProcessGetStorySession);

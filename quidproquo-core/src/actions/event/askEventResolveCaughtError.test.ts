@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { captureRequester, runStory, throwsError } from '../../testing';
 import { EventActionType } from './EventActionType';
-import { askEventResolveCaughtError } from './EventResolveCaughtErrorActionRequester';
+import { askEventResolveCaughtError } from './askEventResolveCaughtError';
 
 describe('askEventResolveCaughtError', () => {
   it('yields a ResolveCaughtError action with the supplied error', () => {

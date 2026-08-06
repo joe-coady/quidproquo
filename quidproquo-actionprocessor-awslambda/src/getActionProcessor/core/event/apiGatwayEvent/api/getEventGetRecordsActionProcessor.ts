@@ -1,10 +1,10 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
+  askEventGetRecordsBase,
+  createActionProcessor,
   EventActionType,
-  EventGetRecordsActionProcessor,
   HTTPMethod,
+  ProcessorFor,
   QPQConfig,
   qpqCoreUtils,
 } from 'quidproquo-core';
@@ -13,11 +13,15 @@ import { FileUploadErrorTypeEnum, HTTPEvent, qpqWebServerUtils } from 'quidproqu
 import { FileUploadValidationError, parseMultipartFormData } from '../../utils/parseMultipartFormData';
 import { EventInput, InternalEventRecord } from './types';
 
-const getProcessGetRecords = (qpqConfig: QPQConfig): EventGetRecordsActionProcessor<EventInput, InternalEventRecord> => {
+const getProcessGetRecords = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventGetRecordsBase> => {
   const serviceName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
   const fileUploadSettings = qpqWebServerUtils.getFileUploadSettings(qpqConfig);
 
-  return async ({ eventParams: [apiGatewayEvent, context] }) => {
+  return async ({ eventParams }) => {
+    // Registered for one event source only, so the base requester's
+    // source-agnostic payload is narrowed to this source's types here.
+    const [apiGatewayEvent, context] = eventParams as EventInput;
+
     // Initialize `path` by removing the service name prefix from `apiGatewayEvent.path`.
     // This adjustment is necessary because the API gateway routes requests to services based on
     // a base path that includes the service name. By subtracting `serviceName.length + 1` from the
@@ -58,6 +62,4 @@ const getProcessGetRecords = (qpqConfig: QPQConfig): EventGetRecordsActionProces
   };
 };
 
-export const getEventGetRecordsActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [EventActionType.GetRecords]: getProcessGetRecords(qpqConfig),
-});
+export const getEventGetRecordsActionProcessor = createActionProcessor(askEventGetRecordsBase, getProcessGetRecords);
