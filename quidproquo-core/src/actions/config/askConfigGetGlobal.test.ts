@@ -5,9 +5,9 @@ import { describe, expect, it } from 'vitest';
 import { runStory, StoryError, throwsError } from '../../testing';
 import { ErrorTypeEnum } from '../../types/ErrorTypeEnum';
 import { ConfigActionType } from './ConfigActionType';
-import { askConfigGetGlobal } from './ConfigGetGlobalActionRequester';
+import { askConfigGetGlobal } from './askConfigGetGlobal';
 
-describe('ConfigGetGlobalActionRequester', () => {
+describe('askConfigGetGlobal', () => {
   describe('askConfigGetGlobal', () => {
     it('should yield an action with correct type and payload', () => {
       const globalName = 'myGlobalVar';
