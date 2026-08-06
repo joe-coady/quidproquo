@@ -1,21 +1,4 @@
-import {
-  ConfigActionType,
-  DynamicFunctionsActionType,
-  DynamicFunctionsExecuteErrorTypeEnum,
-  DateActionType,
-  FileActionType,
-  GuidActionType,
-  InlineFunctionActionType,
-  KeyValueStoreActionType,
-  KeyValueStoreUpsertErrorTypeEnum,
-  KvsLogicalOperator,
-  KvsLogicalOperatorType,
-  KvsQueryCondition,
-  KvsQueryOperation,
-  runStory,
-  throwsError,
-  UserDirectoryActionType,
-} from 'quidproquo-core';
+import { askKeyValueStoreUpsertBase, ConfigActionType, DateActionType, DynamicFunctionsActionType, DynamicFunctionsExecuteErrorTypeEnum, FileActionType, GuidActionType, InlineFunctionActionType, KeyValueStoreActionType, KvsLogicalOperator, KvsLogicalOperatorType, KvsQueryCondition, KvsQueryOperation, runStory, throwsError, UserDirectoryActionType } from 'quidproquo-core';
 import { KvsQueryOperationType } from 'quidproquo-core';
 import { HTTPEvent } from 'quidproquo-webserver';
 
@@ -23,13 +6,7 @@ import { describe, expect, it } from 'vitest';
 
 import { createKvsUpdateMock } from '../../testing/kvsUpdateActionMock';
 
-import {
-  EVENT_DOC_EVENTS_STORE_NAME_GLOBAL,
-  EVENT_DOC_SCOPE_RESOLVER_GLOBAL,
-  EVENT_DOC_STORE_NAME_GLOBAL,
-  EVENT_DOC_TYPE_GLOBAL,
-  EVENT_DOC_USER_DIRECTORY_GLOBAL,
-} from '../../constants/eventDocGlobalNames';
+import { EVENT_DOC_EVENTS_STORE_NAME_GLOBAL, EVENT_DOC_SCOPE_RESOLVER_GLOBAL, EVENT_DOC_STORE_NAME_GLOBAL, EVENT_DOC_TYPE_GLOBAL, EVENT_DOC_USER_DIRECTORY_GLOBAL } from '../../constants/eventDocGlobalNames';
 import { buildEventDocStore } from '../../context/buildEventDocStore';
 import { appendEvent } from './appendEvent';
 import { create } from './create';
@@ -140,7 +117,7 @@ const buildMocks = (resolvedScope: string | null) => {
 
       const existingIndex = table.findIndex(sameRow);
       if (options?.ifNotExists && existingIndex >= 0) {
-        return throwsError(KeyValueStoreUpsertErrorTypeEnum.Conflict, `Item already exists in ${keyValueStoreName}`);
+        return throwsError(askKeyValueStoreUpsertBase.errorType.Conflict, `Item already exists in ${keyValueStoreName}`);
       }
 
       if (existingIndex >= 0) {

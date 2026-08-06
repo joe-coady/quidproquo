@@ -1,13 +1,12 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askKeyValueStoreDelete,
+  createActionProcessor,
   KeyValueStoreActionType,
-  KeyValueStoreDeleteActionProcessor,
-  KeyValueStoreDeleteErrorTypeEnum,
   KvsStreamEventType,
+  ProcessorFor,
   QPQConfig,
   validateScopedKvsKeyOrThrow,
 } from 'quidproquo-core';
@@ -17,7 +16,10 @@ import { emitKvsStreamEvent } from '../../../logic/kvsStream';
 import { toKvsStreamKeys } from '../../../logic/keyValueStore/toKvsStreamKeys';
 import { ResolvedDevServerConfig } from '../../../types';
 
-const getProcessKeyValueStoreDelete = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): KeyValueStoreDeleteActionProcessor => {
+const getProcessKeyValueStoreDelete = (
+  qpqConfig: QPQConfig,
+  devServerConfig: ResolvedDevServerConfig,
+): ProcessorFor<typeof askKeyValueStoreDelete> => {
   return async ({ keyValueStoreName, key, sortKey, options }, session) => {
     try {
       const scope = options?.scope;
@@ -52,15 +54,12 @@ const getProcessKeyValueStoreDelete = (qpqConfig: QPQConfig, devServerConfig: Re
       return actionResult(undefined);
     } catch (error: any) {
       return actionResultErrorFromCaughtError(error, {
-        InvalidScopeError: (error) => actionResultError(KeyValueStoreDeleteErrorTypeEnum.InvalidScope, error.message),
-        KvsStoreNotFoundError: (error) => actionResultError(KeyValueStoreDeleteErrorTypeEnum.StoreNotFound, error.message),
+        InvalidScopeError: (error) => actionResultError(askKeyValueStoreDelete.errorType.InvalidScope, error.message),
+        KvsStoreNotFoundError: (error) => actionResultError(askKeyValueStoreDelete.errorType.StoreNotFound, error.message),
       });
     }
   };
 };
 
-export const getKeyValueStoreDeleteActionProcessor =
-  (devServerConfig: ResolvedDevServerConfig): ActionProcessorListResolver =>
-  async (qpqConfig: QPQConfig, _dynamicModuleLoader: any): Promise<ActionProcessorList> => ({
-    [KeyValueStoreActionType.Delete]: getProcessKeyValueStoreDelete(qpqConfig, devServerConfig),
-  });
+export const getKeyValueStoreDeleteActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
+  createActionProcessor(askKeyValueStoreDelete, (qpqConfig) => getProcessKeyValueStoreDelete(qpqConfig, devServerConfig));

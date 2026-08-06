@@ -1,13 +1,15 @@
 import {
+  askKeyValueStoreDelete,
   buildTestQpqConfig,
+  createActionProcessor,
   defineKeyValueStore,
   ErrorTypeEnum,
   isErroredActionResult,
   KeyValueStoreActionType,
-  KeyValueStoreDeleteErrorTypeEnum,
   kvsKey,
   KvsStoreNotFoundError,
   noopDynamicModuleLoader,
+  ProcessorFor,
   resolveActionResult,
   resolveActionResultError,
 } from 'quidproquo-core';
@@ -75,7 +77,7 @@ describe('getKeyValueStoreDeleteActionProcessor', () => {
 
     const result = await invokeProcessor(process, { keyValueStoreName: 'store', key: 'a' });
 
-    expect(resolveActionResultError(result).errorType).toBe(KeyValueStoreDeleteErrorTypeEnum.StoreNotFound);
+    expect(resolveActionResultError(result).errorType).toBe(askKeyValueStoreDelete.errorType.StoreNotFound);
   });
 
   it('maps a generic error to a caught error', async () => {

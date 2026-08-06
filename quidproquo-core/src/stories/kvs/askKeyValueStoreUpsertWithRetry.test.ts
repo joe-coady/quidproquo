@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { KeyValueStoreActionType } from '../../actions/keyValueStore/KeyValueStoreActionType';
-import { KeyValueStoreUpsertErrorTypeEnum } from '../../actions/keyValueStore/KeyValueStoreUpsertActionRequester';
+import { askKeyValueStoreUpsertBase } from '../../actions/keyValueStore/askKeyValueStoreUpsert';
 import { PlatformActionType } from '../../actions/platform/PlatformActionType';
 import { runStory, StoryError, throwsError } from '../../testing/storyTesting';
 import { askKeyValueStoreUpsertWithRetry } from './askKeyValueStoreUpsertWithRetry';
@@ -22,7 +22,7 @@ describe('askKeyValueStoreUpsertWithRetry', () => {
     const delay = vi.fn();
 
     runStory(askKeyValueStoreUpsertWithRetry('widgets', item), {
-      [KeyValueStoreActionType.Upsert]: () => (++attempt < 3 ? throwsError(KeyValueStoreUpsertErrorTypeEnum.ServiceUnavailable, 'down') : undefined),
+      [KeyValueStoreActionType.Upsert]: () => (++attempt < 3 ? throwsError(askKeyValueStoreUpsertBase.errorType.ServiceUnavailable, 'down') : undefined),
       [PlatformActionType.Delay]: delay,
     });
 
@@ -33,14 +33,14 @@ describe('askKeyValueStoreUpsertWithRetry', () => {
   it('throws once retries are exhausted', () => {
     expect(() =>
       runStory(askKeyValueStoreUpsertWithRetry('widgets', item, { maxRetries: 1 }), {
-        [KeyValueStoreActionType.Upsert]: throwsError(KeyValueStoreUpsertErrorTypeEnum.ServiceUnavailable, 'down'),
+        [KeyValueStoreActionType.Upsert]: throwsError(askKeyValueStoreUpsertBase.errorType.ServiceUnavailable, 'down'),
         [PlatformActionType.Delay]: undefined,
       }),
     ).toThrow(StoryError);
   });
 
   it('does not retry a non-retryable error', () => {
-    const upsert = vi.fn(() => throwsError(KeyValueStoreUpsertErrorTypeEnum.ResourceNotFound, 'missing table'));
+    const upsert = vi.fn(() => throwsError(askKeyValueStoreUpsertBase.errorType.ResourceNotFound, 'missing table'));
 
     expect(() => runStory(askKeyValueStoreUpsertWithRetry('widgets', item), { [KeyValueStoreActionType.Upsert]: upsert })).toThrow(/missing table/);
     expect(upsert).toHaveBeenCalledTimes(1);

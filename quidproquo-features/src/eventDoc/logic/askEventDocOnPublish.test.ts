@@ -1,34 +1,11 @@
-import {
-  ConfigActionType,
-  DateActionType,
-  DynamicFunctionsActionType,
-  DynamicFunctionsExecuteErrorTypeEnum,
-  GuidActionType,
-  InlineFunctionActionType,
-  KeyValueStoreActionType,
-  KeyValueStoreUpsertErrorTypeEnum,
-  KvsLogicalOperator,
-  KvsLogicalOperatorType,
-  KvsQueryCondition,
-  KvsQueryOperation,
-  KvsQueryOperationType,
-  runStory,
-  throwsError,
-  UserDirectoryActionType,
-} from 'quidproquo-core';
+import { askKeyValueStoreUpsertBase, ConfigActionType, DateActionType, DynamicFunctionsActionType, DynamicFunctionsExecuteErrorTypeEnum, GuidActionType, InlineFunctionActionType, KeyValueStoreActionType, KvsLogicalOperator, KvsLogicalOperatorType, KvsQueryCondition, KvsQueryOperation, KvsQueryOperationType, runStory, throwsError, UserDirectoryActionType } from 'quidproquo-core';
 import { HTTPEvent } from 'quidproquo-webserver';
 
 import { describe, expect, it } from 'vitest';
 
 import { createKvsUpdateMock } from '../testing/kvsUpdateActionMock';
 
-import {
-  EVENT_DOC_EVENTS_STORE_NAME_GLOBAL,
-  EVENT_DOC_ON_PUBLISH_GLOBAL,
-  EVENT_DOC_STORE_NAME_GLOBAL,
-  EVENT_DOC_TYPE_GLOBAL,
-  EVENT_DOC_USER_DIRECTORY_GLOBAL,
-} from '../constants/eventDocGlobalNames';
+import { EVENT_DOC_EVENTS_STORE_NAME_GLOBAL, EVENT_DOC_ON_PUBLISH_GLOBAL, EVENT_DOC_STORE_NAME_GLOBAL, EVENT_DOC_TYPE_GLOBAL, EVENT_DOC_USER_DIRECTORY_GLOBAL } from '../constants/eventDocGlobalNames';
 import { buildEventDocStore } from '../context/buildEventDocStore';
 import { EventDocEffect, EventDocStatus } from '../models';
 import { appendEvent } from '../routes/controllers/appendEvent';
@@ -126,7 +103,7 @@ const buildMocks = (onPublish: string, onInlineExecute?: () => unknown) => {
       const existingIndex = table.findIndex(sameRow);
 
       if (options?.ifNotExists && existingIndex >= 0) {
-        return throwsError(KeyValueStoreUpsertErrorTypeEnum.Conflict, `Item already exists in ${keyValueStoreName}`);
+        return throwsError(askKeyValueStoreUpsertBase.errorType.Conflict, `Item already exists in ${keyValueStoreName}`);
       }
 
       if (existingIndex >= 0) {
@@ -230,7 +207,7 @@ describe('eventDoc onPublish hook', () => {
 
   it('propagates a hook failure without re-appending the event', () => {
     // A failing hook must surface as an error even though the event landed.
-    const throwsFromHook = () => throwsError(KeyValueStoreUpsertErrorTypeEnum.Conflict, 'read model write lost a race');
+    const throwsFromHook = () => throwsError(askKeyValueStoreUpsertBase.errorType.Conflict, 'read model write lost a race');
 
     const { mocks, inlineInvocations, tables } = buildMocks('syncTenantRecord', throwsFromHook);
     const summary = createDoc(mocks);

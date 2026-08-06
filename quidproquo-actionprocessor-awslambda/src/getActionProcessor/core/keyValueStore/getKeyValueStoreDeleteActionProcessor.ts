@@ -1,20 +1,21 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import { ActionProcessorList, ActionProcessorListResolver, QPQConfig } from 'quidproquo-core';
 import {
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askKeyValueStoreDelete,
+  createActionProcessor,
   getScopedKvsTranslatorOrThrow,
   KeyValueStoreActionType,
-  KeyValueStoreDeleteActionProcessor,
-  KeyValueStoreDeleteErrorTypeEnum,
+  ProcessorFor,
+  QPQConfig,
   resolveKvsStoreConfigOrThrow,
 } from 'quidproquo-core';
 
 import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
 import { deleteItem } from '../../../logic/dynamo';
 
-const getProcessKeyValueStoreDelete = (qpqConfig: QPQConfig): KeyValueStoreDeleteActionProcessor => {
+const getProcessKeyValueStoreDelete = (qpqConfig: QPQConfig): ProcessorFor<typeof askKeyValueStoreDelete> => {
   return async ({ keyValueStoreName, key, sortKey, options }) => {
     const dynamoTableName = getKvsDynamoTableNameFromConfig(keyValueStoreName, qpqConfig, 'kvs');
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
@@ -28,15 +29,13 @@ const getProcessKeyValueStoreDelete = (qpqConfig: QPQConfig): KeyValueStoreDelet
       return actionResult(void 0);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        InternalServerError: () => actionResultError(KeyValueStoreDeleteErrorTypeEnum.ServiceUnavailable, 'KVS Service Unavailable'),
-        ResourceNotFoundException: () => actionResultError(KeyValueStoreDeleteErrorTypeEnum.ResourceNotFound, 'KVS Resource Not Found'),
-        InvalidScopeError: (error) => actionResultError(KeyValueStoreDeleteErrorTypeEnum.InvalidScope, error.message),
-        KvsStoreNotFoundError: (error) => actionResultError(KeyValueStoreDeleteErrorTypeEnum.StoreNotFound, error.message),
+        InternalServerError: () => actionResultError(askKeyValueStoreDelete.errorType.ServiceUnavailable, 'KVS Service Unavailable'),
+        ResourceNotFoundException: () => actionResultError(askKeyValueStoreDelete.errorType.ResourceNotFound, 'KVS Resource Not Found'),
+        InvalidScopeError: (error) => actionResultError(askKeyValueStoreDelete.errorType.InvalidScope, error.message),
+        KvsStoreNotFoundError: (error) => actionResultError(askKeyValueStoreDelete.errorType.StoreNotFound, error.message),
       });
     }
   };
 };
 
-export const getKeyValueStoreDeleteActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [KeyValueStoreActionType.Delete]: getProcessKeyValueStoreDelete(qpqConfig),
-});
+export const getKeyValueStoreDeleteActionProcessor = createActionProcessor(askKeyValueStoreDelete, getProcessKeyValueStoreDelete);

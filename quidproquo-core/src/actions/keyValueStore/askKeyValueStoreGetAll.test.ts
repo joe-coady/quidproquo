@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
 import { KeyValueStoreActionType } from './KeyValueStoreActionType';
-import { askKeyValueStoreGetAll, KeyValueStoreGetAllErrorTypeEnum } from './KeyValueStoreGetAllActionRequester';
+import { askKeyValueStoreGetAll, askKeyValueStoreGetAllBase } from './askKeyValueStoreGetAll';
 
 describe('askKeyValueStoreGetAll', () => {
   it('yields a GetAll action with options', () => {
@@ -38,7 +38,7 @@ describe('askKeyValueStoreGetAll', () => {
   });
 
   it('namespaces its error enum values under the action type', () => {
-    expect(KeyValueStoreGetAllErrorTypeEnum.StoreNotFound).toBe(`${KeyValueStoreActionType.GetAll}-StoreNotFound`);
-    expect(KeyValueStoreGetAllErrorTypeEnum.InvalidScope).toBe(`${KeyValueStoreActionType.GetAll}-InvalidScope`);
+    expect(askKeyValueStoreGetAllBase.errorType.StoreNotFound).toBe(`${KeyValueStoreActionType.GetAll}-StoreNotFound`);
+    expect(askKeyValueStoreGetAllBase.errorType.InvalidScope).toBe(`${KeyValueStoreActionType.GetAll}-InvalidScope`);
   });
 });

@@ -1,4 +1,4 @@
-import { askKeyValueStoreUpsert, askThrowError, KeyValueStoreUpsertErrorTypeEnum, KeyValueStoreUpsertOptions } from '../../actions';
+import { askKeyValueStoreUpsert, askKeyValueStoreUpsertBase, askThrowError, KeyValueStoreUpsertOptions } from '../../actions';
 import { AskResponse } from '../../types';
 import { askRetry } from '../askRetry';
 
@@ -19,7 +19,7 @@ export function* askKeyValueStoreUpsertWithRetry<KvsItem>(
     },
     maxRetries,
     250,
-    [KeyValueStoreUpsertErrorTypeEnum.ServiceUnavailable],
+    [askKeyValueStoreUpsertBase.errorType.ServiceUnavailable],
   );
 
   if (!upsertResponse.success) {

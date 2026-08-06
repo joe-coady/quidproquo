@@ -1,12 +1,11 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askKeyValueStoreGetBase,
+  createActionProcessor,
   KeyValueStoreActionType,
-  KeyValueStoreGetActionProcessor,
-  KeyValueStoreGetErrorTypeEnum,
+  ProcessorFor,
   QPQConfig,
   validateScopedKvsKeyOrThrow,
 } from 'quidproquo-core';
@@ -14,7 +13,7 @@ import {
 import { getKvsRepository } from '../../../logic/keyValueStore/getKvsRepository';
 import { ResolvedDevServerConfig } from '../../../types';
 
-const getProcessKeyValueStoreGet = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): KeyValueStoreGetActionProcessor<any> => {
+const getProcessKeyValueStoreGet = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): ProcessorFor<typeof askKeyValueStoreGetBase> => {
   return async ({ keyValueStoreName, key, options }) => {
     try {
       const scope = options?.scope;
@@ -29,15 +28,12 @@ const getProcessKeyValueStoreGet = (qpqConfig: QPQConfig, devServerConfig: Resol
       return actionResult(await repository.get(keyValueStoreName, key, scope));
     } catch (error: any) {
       return actionResultErrorFromCaughtError(error, {
-        InvalidScopeError: (error) => actionResultError(KeyValueStoreGetErrorTypeEnum.InvalidScope, error.message),
-        KvsStoreNotFoundError: (error) => actionResultError(KeyValueStoreGetErrorTypeEnum.StoreNotFound, error.message),
+        InvalidScopeError: (error) => actionResultError(askKeyValueStoreGetBase.errorType.InvalidScope, error.message),
+        KvsStoreNotFoundError: (error) => actionResultError(askKeyValueStoreGetBase.errorType.StoreNotFound, error.message),
       });
     }
   };
 };
 
-export const getKeyValueStoreGetActionProcessor =
-  (devServerConfig: ResolvedDevServerConfig): ActionProcessorListResolver =>
-  async (qpqConfig: QPQConfig, _dynamicModuleLoader: any): Promise<ActionProcessorList> => ({
-    [KeyValueStoreActionType.Get]: getProcessKeyValueStoreGet(qpqConfig, devServerConfig),
-  });
+export const getKeyValueStoreGetActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
+  createActionProcessor(askKeyValueStoreGetBase, (qpqConfig) => getProcessKeyValueStoreGet(qpqConfig, devServerConfig));

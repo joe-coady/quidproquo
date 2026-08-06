@@ -1,12 +1,11 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askKeyValueStoreScanBase,
+  createActionProcessor,
   KeyValueStoreActionType,
-  KeyValueStoreScanActionProcessor,
-  KeyValueStoreScanErrorTypeEnum,
+  ProcessorFor,
   QPQConfig,
   resolveScopedPkAttributeOrThrow,
 } from 'quidproquo-core';
@@ -14,7 +13,10 @@ import {
 import { getKvsRepository } from '../../../logic/keyValueStore/getKvsRepository';
 import { ResolvedDevServerConfig } from '../../../types';
 
-const getProcessKeyValueStoreScan = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): KeyValueStoreScanActionProcessor<any> => {
+const getProcessKeyValueStoreScan = (
+  qpqConfig: QPQConfig,
+  devServerConfig: ResolvedDevServerConfig,
+): ProcessorFor<typeof askKeyValueStoreScanBase> => {
   return async ({ keyValueStoreName, filterCondition, nextPageKey, options }) => {
     try {
       const scope = options?.scope;
@@ -37,15 +39,12 @@ const getProcessKeyValueStoreScan = (qpqConfig: QPQConfig, devServerConfig: Reso
       return actionResult(result);
     } catch (error: any) {
       return actionResultErrorFromCaughtError(error, {
-        InvalidScopeError: (error) => actionResultError(KeyValueStoreScanErrorTypeEnum.InvalidScope, error.message),
-        KvsStoreNotFoundError: (error) => actionResultError(KeyValueStoreScanErrorTypeEnum.StoreNotFound, error.message),
+        InvalidScopeError: (error) => actionResultError(askKeyValueStoreScanBase.errorType.InvalidScope, error.message),
+        KvsStoreNotFoundError: (error) => actionResultError(askKeyValueStoreScanBase.errorType.StoreNotFound, error.message),
       });
     }
   };
 };
 
-export const getKeyValueStoreScanActionProcessor =
-  (devServerConfig: ResolvedDevServerConfig): ActionProcessorListResolver =>
-  async (qpqConfig: QPQConfig, _dynamicModuleLoader: any): Promise<ActionProcessorList> => ({
-    [KeyValueStoreActionType.Scan]: getProcessKeyValueStoreScan(qpqConfig, devServerConfig),
-  });
+export const getKeyValueStoreScanActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
+  createActionProcessor(askKeyValueStoreScanBase, (qpqConfig) => getProcessKeyValueStoreScan(qpqConfig, devServerConfig));

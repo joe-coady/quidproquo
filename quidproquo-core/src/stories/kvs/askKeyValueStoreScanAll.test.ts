@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { KeyValueStoreActionType } from '../../actions/keyValueStore/KeyValueStoreActionType';
-import { KeyValueStoreScanAction } from '../../actions/keyValueStore/KeyValueStoreScanActionTypes';
+import { askKeyValueStoreScanBase } from '../../actions/keyValueStore/askKeyValueStoreScan';
+import { ActionOf } from '../../types';
 import { runStory } from '../../testing/storyTesting';
 import { QpqPagedData } from '../../types';
 import { askKeyValueStoreScanAll } from './askKeyValueStoreScanAll';
@@ -14,7 +15,7 @@ describe('askKeyValueStoreScanAll', () => {
     };
 
     const result = runStory(askKeyValueStoreScanAll('items'), {
-      [KeyValueStoreActionType.Scan]: (action: KeyValueStoreScanAction) => pages[action.payload.nextPageKey ?? 'start'],
+      [KeyValueStoreActionType.Scan]: (action: ActionOf<typeof askKeyValueStoreScanBase>) => pages[action.payload.nextPageKey ?? 'start'],
     });
 
     expect(result).toEqual([1, 2, 3]);
@@ -34,7 +35,7 @@ describe('askKeyValueStoreScanAll', () => {
     };
 
     // Record the scope of each page request so we can prove none of them dropped it
-    const scanRecordingScope = (action: KeyValueStoreScanAction) => {
+    const scanRecordingScope = (action: ActionOf<typeof askKeyValueStoreScanBase>) => {
       scopes.push(action.payload.options?.scope ?? '(none)');
       return pages[action.payload.nextPageKey ?? 'start'];
     };

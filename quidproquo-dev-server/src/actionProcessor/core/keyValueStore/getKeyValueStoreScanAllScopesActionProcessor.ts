@@ -1,13 +1,12 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askKeyValueStoreScanAllScopesBase,
+  createActionProcessor,
   KeyValueStoreActionType,
-  KeyValueStoreScanAllScopesActionProcessor,
-  KeyValueStoreScanAllScopesErrorTypeEnum,
   KvsScopedItem,
+  ProcessorFor,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -32,7 +31,7 @@ import { ResolvedDevServerConfig } from '../../../types';
 const getProcessKeyValueStoreScanAllScopes = (
   qpqConfig: QPQConfig,
   devServerConfig: ResolvedDevServerConfig,
-): KeyValueStoreScanAllScopesActionProcessor<any> => {
+): ProcessorFor<typeof askKeyValueStoreScanAllScopesBase> => {
   return async ({ keyValueStoreName, filterCondition, nextPageKey }) => {
     try {
       const repository = getKvsRepository(qpqConfig, devServerConfig);
@@ -76,14 +75,11 @@ const getProcessKeyValueStoreScanAllScopes = (
       return actionResult({ items: [], nextPageKey: undefined });
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        KvsStoreNotFoundError: (error) => actionResultError(KeyValueStoreScanAllScopesErrorTypeEnum.StoreNotFound, error.message),
+        KvsStoreNotFoundError: (error) => actionResultError(askKeyValueStoreScanAllScopesBase.errorType.StoreNotFound, error.message),
       });
     }
   };
 };
 
-export const getKeyValueStoreScanAllScopesActionProcessor =
-  (devServerConfig: ResolvedDevServerConfig): ActionProcessorListResolver =>
-  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-    [KeyValueStoreActionType.ScanAllScopes]: getProcessKeyValueStoreScanAllScopes(qpqConfig, devServerConfig),
-  });
+export const getKeyValueStoreScanAllScopesActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
+  createActionProcessor(askKeyValueStoreScanAllScopesBase, (qpqConfig) => getProcessKeyValueStoreScanAllScopes(qpqConfig, devServerConfig));

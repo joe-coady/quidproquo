@@ -1,5 +1,12 @@
 import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { buildTestQpqConfig, defineKeyValueStore, KeyValueStoreActionType, KeyValueStoreQueryErrorTypeEnum } from 'quidproquo-core';
+import {
+  askKeyValueStoreQueryBase,
+  buildTestQpqConfig,
+  createActionProcessor,
+  defineKeyValueStore,
+  KeyValueStoreActionType,
+  ProcessorFor,
+} from 'quidproquo-core';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -43,6 +50,6 @@ describe('getKeyValueStoreQueryActionProcessor', () => {
 
     const [, error] = await invokeProcessor(processor, { keyValueStoreName: 'users', keyCondition: {} });
 
-    expect(error?.errorType).toBe(KeyValueStoreQueryErrorTypeEnum.StoreNotFound);
+    expect(error?.errorType).toBe(askKeyValueStoreQueryBase.errorType.StoreNotFound);
   });
 });

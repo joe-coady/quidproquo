@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
 import { KeyValueStoreActionType } from './KeyValueStoreActionType';
-import { askKeyValueStoreGet, KeyValueStoreGetErrorTypeEnum } from './KeyValueStoreGetActionRequester';
+import { askKeyValueStoreGet, askKeyValueStoreGetBase } from './askKeyValueStoreGet';
 
 describe('askKeyValueStoreGet', () => {
   it('yields a Get action for the key', () => {
@@ -36,7 +36,7 @@ describe('askKeyValueStoreGet', () => {
   });
 
   it('namespaces its error enum values under the action type', () => {
-    expect(KeyValueStoreGetErrorTypeEnum.StoreNotFound).toBe(`${KeyValueStoreActionType.Get}-StoreNotFound`);
-    expect(KeyValueStoreGetErrorTypeEnum.InvalidScope).toBe(`${KeyValueStoreActionType.Get}-InvalidScope`);
+    expect(askKeyValueStoreGetBase.errorType.StoreNotFound).toBe(`${KeyValueStoreActionType.Get}-StoreNotFound`);
+    expect(askKeyValueStoreGetBase.errorType.InvalidScope).toBe(`${KeyValueStoreActionType.Get}-InvalidScope`);
   });
 });

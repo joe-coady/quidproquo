@@ -1,5 +1,12 @@
 import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { buildTestQpqConfig, defineKeyValueStore, KeyValueStoreActionType, KeyValueStoreUpsertErrorTypeEnum } from 'quidproquo-core';
+import {
+  askKeyValueStoreUpsertBase,
+  buildTestQpqConfig,
+  createActionProcessor,
+  defineKeyValueStore,
+  KeyValueStoreActionType,
+  ProcessorFor,
+} from 'quidproquo-core';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -42,12 +49,12 @@ describe('getKeyValueStoreUpsertActionProcessor', () => {
 
     const [, error] = await invoke(processor);
 
-    expect(error?.errorType).toBe(KeyValueStoreUpsertErrorTypeEnum.StoreNotFound);
+    expect(error?.errorType).toBe(askKeyValueStoreUpsertBase.errorType.StoreNotFound);
   });
 
   it.each([
-    ['InternalServerError', KeyValueStoreUpsertErrorTypeEnum.ServiceUnavailable],
-    ['ResourceNotFoundException', KeyValueStoreUpsertErrorTypeEnum.ResourceNotFound],
+    ['InternalServerError', askKeyValueStoreUpsertBase.errorType.ServiceUnavailable],
+    ['ResourceNotFoundException', askKeyValueStoreUpsertBase.errorType.ResourceNotFound],
   ])('maps %s to the matching error type', async (errorName: string, expectedType: string) => {
     vi.mocked(putItem).mockRejectedValue(Object.assign(new Error('boom'), { name: errorName }));
     const processor = await resolveProcessor();

@@ -1,13 +1,15 @@
 import {
+  askKeyValueStoreUpsertBase,
   buildTestQpqConfig,
+  createActionProcessor,
   defineKeyValueStore,
   ErrorTypeEnum,
   isErroredActionResult,
   KeyValueStoreActionType,
-  KeyValueStoreUpsertErrorTypeEnum,
   kvsKey,
   KvsStoreNotFoundError,
   noopDynamicModuleLoader,
+  ProcessorFor,
   resolveActionResult,
   resolveActionResultError,
 } from 'quidproquo-core';
@@ -55,7 +57,7 @@ describe('getKeyValueStoreUpsertActionProcessor', () => {
 
     const result = await invokeProcessor(process, { keyValueStoreName: 'store', item: {} });
 
-    expect(resolveActionResultError(result).errorType).toBe(KeyValueStoreUpsertErrorTypeEnum.StoreNotFound);
+    expect(resolveActionResultError(result).errorType).toBe(askKeyValueStoreUpsertBase.errorType.StoreNotFound);
   });
 
   it('maps a ConditionalCheckFailedException from the repository to Conflict', async () => {
@@ -67,7 +69,7 @@ describe('getKeyValueStoreUpsertActionProcessor', () => {
     const result = await invokeProcessor(process, { keyValueStoreName: 'store', item: { id: 'a' }, options: { ifNotExists: true } });
 
     expect(isErroredActionResult(result)).toBe(true);
-    expect(resolveActionResultError(result).errorType).toBe(KeyValueStoreUpsertErrorTypeEnum.Conflict);
+    expect(resolveActionResultError(result).errorType).toBe(askKeyValueStoreUpsertBase.errorType.Conflict);
   });
 
   it('maps a generic error to a caught error', async () => {

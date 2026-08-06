@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
 import { KeyValueStoreActionType } from './KeyValueStoreActionType';
-import { askKeyValueStoreScan, KeyValueStoreScanErrorTypeEnum } from './KeyValueStoreScanActionRequester';
+import { askKeyValueStoreScan, askKeyValueStoreScanBase } from './askKeyValueStoreScan';
 
 describe('askKeyValueStoreScan', () => {
   it('yields a Scan action with filter condition and next page key', () => {
@@ -38,7 +38,7 @@ describe('askKeyValueStoreScan', () => {
   });
 
   it('namespaces its error enum values under the action type', () => {
-    expect(KeyValueStoreScanErrorTypeEnum.StoreNotFound).toBe(`${KeyValueStoreActionType.Scan}-StoreNotFound`);
-    expect(KeyValueStoreScanErrorTypeEnum.InvalidScope).toBe(`${KeyValueStoreActionType.Scan}-InvalidScope`);
+    expect(askKeyValueStoreScanBase.errorType.StoreNotFound).toBe(`${KeyValueStoreActionType.Scan}-StoreNotFound`);
+    expect(askKeyValueStoreScanBase.errorType.InvalidScope).toBe(`${KeyValueStoreActionType.Scan}-InvalidScope`);
   });
 });

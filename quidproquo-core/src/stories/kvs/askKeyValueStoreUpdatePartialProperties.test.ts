@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { KeyValueStoreActionType } from '../../actions/keyValueStore/KeyValueStoreActionType';
-import { KeyValueStoreUpdateAction } from '../../actions/keyValueStore/KeyValueStoreUpdateActionTypes';
+import { askKeyValueStoreUpdateBase } from '../../actions/keyValueStore/askKeyValueStoreUpdate';
+import { ActionOf } from '../../types';
 import { KvsUpdateActionType } from '../../actions/keyValueStore/types';
 import { runStory } from '../../testing/storyTesting';
 import { askKeyValueStoreUpdatePartialProperties, InvalidKvsPartialPropertyError } from './askKeyValueStoreUpdatePartialProperties';
@@ -15,7 +16,7 @@ interface Widget {
 
 describe('askKeyValueStoreUpdatePartialProperties', () => {
   it('sets valid properties, removes undefined ones, and skips the partition key', () => {
-    const update = vi.fn((action: KeyValueStoreUpdateAction<Widget>) => action.payload);
+    const update = vi.fn((action: ActionOf<typeof askKeyValueStoreUpdateBase>) => action.payload);
 
     const result = runStory(
       askKeyValueStoreUpdatePartialProperties<Widget, 'id'>('widgets', 'id', { id: 'w1', name: 'gear', count: 5, note: undefined }),
@@ -34,7 +35,7 @@ describe('askKeyValueStoreUpdatePartialProperties', () => {
   });
 
   it('excludes the sort key from the update operations and passes it through', () => {
-    const update = vi.fn((action: KeyValueStoreUpdateAction<Widget>) => action.payload);
+    const update = vi.fn((action: ActionOf<typeof askKeyValueStoreUpdateBase>) => action.payload);
 
     runStory(askKeyValueStoreUpdatePartialProperties<Widget, 'id', 'name'>('widgets', 'id', { id: 'w1', name: 'gear', count: 9 }, 'name'), {
       [KeyValueStoreActionType.Update]: update,
@@ -47,7 +48,7 @@ describe('askKeyValueStoreUpdatePartialProperties', () => {
   });
 
   it('forwards the options (including scope) to the update action', () => {
-    const update = vi.fn((action: KeyValueStoreUpdateAction<Widget>) => action.payload);
+    const update = vi.fn((action: ActionOf<typeof askKeyValueStoreUpdateBase>) => action.payload);
 
     runStory(askKeyValueStoreUpdatePartialProperties<Widget, 'id'>('widgets', 'id', { id: 'w1', count: 2 }, undefined, { scope: 'scope-a' }), {
       [KeyValueStoreActionType.Update]: update,
@@ -57,7 +58,7 @@ describe('askKeyValueStoreUpdatePartialProperties', () => {
   });
 
   it('throws InvalidKvsPartialPropertyError instead of silently dropping an unstorable value', () => {
-    const update = vi.fn((action: KeyValueStoreUpdateAction<Widget>) => action.payload);
+    const update = vi.fn((action: ActionOf<typeof askKeyValueStoreUpdateBase>) => action.payload);
 
     const act = () =>
       runStory(askKeyValueStoreUpdatePartialProperties<Widget, 'id'>('widgets', 'id', { id: 'w1', count: { nested: { deep: 1 } } as any }), {

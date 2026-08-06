@@ -1,13 +1,12 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askKeyValueStoreUpsertBase,
+  createActionProcessor,
   KeyValueStoreActionType,
-  KeyValueStoreUpsertActionProcessor,
-  KeyValueStoreUpsertErrorTypeEnum,
   KvsStreamEventType,
+  ProcessorFor,
   QPQConfig,
   validateScopedKvsItemOrThrow,
 } from 'quidproquo-core';
@@ -17,7 +16,10 @@ import { getKvsRepository } from '../../../logic/keyValueStore/getKvsRepository'
 import { toKvsCompositeKey, toKvsStreamKeys } from '../../../logic/keyValueStore/toKvsStreamKeys';
 import { ResolvedDevServerConfig } from '../../../types';
 
-const getProcessKeyValueStoreUpsert = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): KeyValueStoreUpsertActionProcessor<any> => {
+const getProcessKeyValueStoreUpsert = (
+  qpqConfig: QPQConfig,
+  devServerConfig: ResolvedDevServerConfig,
+): ProcessorFor<typeof askKeyValueStoreUpsertBase> => {
   return async ({ keyValueStoreName, item, options }, session) => {
     try {
       const scope = options?.scope;
@@ -48,16 +50,13 @@ const getProcessKeyValueStoreUpsert = (qpqConfig: QPQConfig, devServerConfig: Re
       return actionResult(result);
     } catch (error: any) {
       return actionResultErrorFromCaughtError(error, {
-        ConditionalCheckFailedException: () => actionResultError(KeyValueStoreUpsertErrorTypeEnum.Conflict, 'KVS item already exists'),
-        InvalidScopeError: (error) => actionResultError(KeyValueStoreUpsertErrorTypeEnum.InvalidScope, error.message),
-        KvsStoreNotFoundError: (error) => actionResultError(KeyValueStoreUpsertErrorTypeEnum.StoreNotFound, error.message),
+        ConditionalCheckFailedException: () => actionResultError(askKeyValueStoreUpsertBase.errorType.Conflict, 'KVS item already exists'),
+        InvalidScopeError: (error) => actionResultError(askKeyValueStoreUpsertBase.errorType.InvalidScope, error.message),
+        KvsStoreNotFoundError: (error) => actionResultError(askKeyValueStoreUpsertBase.errorType.StoreNotFound, error.message),
       });
     }
   };
 };
 
-export const getKeyValueStoreUpsertActionProcessor =
-  (devServerConfig: ResolvedDevServerConfig): ActionProcessorListResolver =>
-  async (qpqConfig: QPQConfig, _dynamicModuleLoader: any): Promise<ActionProcessorList> => ({
-    [KeyValueStoreActionType.Upsert]: getProcessKeyValueStoreUpsert(qpqConfig, devServerConfig),
-  });
+export const getKeyValueStoreUpsertActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
+  createActionProcessor(askKeyValueStoreUpsertBase, (qpqConfig) => getProcessKeyValueStoreUpsert(qpqConfig, devServerConfig));

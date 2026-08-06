@@ -1,20 +1,22 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
+  actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askKeyValueStoreQueryBase,
+  createActionProcessor,
   getScopedKvsTranslatorOrThrow,
+  KeyValueStoreActionType,
+  ProcessorFor,
   QPQConfig,
   resolveKvsStoreConfigOrThrow,
 } from 'quidproquo-core';
-import { actionResult, KeyValueStoreActionType, KeyValueStoreQueryActionProcessor, KeyValueStoreQueryErrorTypeEnum } from 'quidproquo-core';
 
 import { getKvsDynamoTableNameFromConfig } from '../../../awsNamingUtils';
 import { query } from '../../../logic/dynamo';
 import { getDynamoTableIndexByConfigAndQuery } from '../../../logic/dynamo/qpqDynamoOrm';
 
-const getProcessKeyValueStoreQuery = (qpqConfig: QPQConfig): KeyValueStoreQueryActionProcessor<any> => {
+const getProcessKeyValueStoreQuery = (qpqConfig: QPQConfig): ProcessorFor<typeof askKeyValueStoreQueryBase> => {
   return async ({ keyValueStoreName, keyCondition, options }) => {
     const dynamoTableName = getKvsDynamoTableNameFromConfig(keyValueStoreName, qpqConfig, 'kvs');
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
@@ -44,15 +46,13 @@ const getProcessKeyValueStoreQuery = (qpqConfig: QPQConfig): KeyValueStoreQueryA
       return actionResult(items);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        InternalServerError: () => actionResultError(KeyValueStoreQueryErrorTypeEnum.ServiceUnavailable, 'KVS Service Unavailable'),
-        ResourceNotFoundException: () => actionResultError(KeyValueStoreQueryErrorTypeEnum.ResourceNotFound, 'KVS Resource Not Found'),
-        InvalidScopeError: (error) => actionResultError(KeyValueStoreQueryErrorTypeEnum.InvalidScope, error.message),
-        KvsStoreNotFoundError: (error) => actionResultError(KeyValueStoreQueryErrorTypeEnum.StoreNotFound, error.message),
+        InternalServerError: () => actionResultError(askKeyValueStoreQueryBase.errorType.ServiceUnavailable, 'KVS Service Unavailable'),
+        ResourceNotFoundException: () => actionResultError(askKeyValueStoreQueryBase.errorType.ResourceNotFound, 'KVS Resource Not Found'),
+        InvalidScopeError: (error) => actionResultError(askKeyValueStoreQueryBase.errorType.InvalidScope, error.message),
+        KvsStoreNotFoundError: (error) => actionResultError(askKeyValueStoreQueryBase.errorType.StoreNotFound, error.message),
       });
     }
   };
 };
 
-export const getKeyValueStoreQueryActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [KeyValueStoreActionType.Query]: getProcessKeyValueStoreQuery(qpqConfig),
-});
+export const getKeyValueStoreQueryActionProcessor = createActionProcessor(askKeyValueStoreQueryBase, getProcessKeyValueStoreQuery);

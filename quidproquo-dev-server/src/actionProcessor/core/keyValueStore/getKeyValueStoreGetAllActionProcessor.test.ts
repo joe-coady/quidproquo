@@ -1,10 +1,12 @@
 import {
+  askKeyValueStoreGetAllBase,
   buildTestQpqConfig,
+  createActionProcessor,
   defineKeyValueStore,
   KeyValueStoreActionType,
-  KeyValueStoreGetAllErrorTypeEnum,
   KvsStoreNotFoundError,
   noopDynamicModuleLoader,
+  ProcessorFor,
   resolveActionResult,
   resolveActionResultError,
 } from 'quidproquo-core';
@@ -58,7 +60,7 @@ describe('getKeyValueStoreGetAllActionProcessor', () => {
 
     const result = await invokeProcessor(process, { keyValueStoreName: 'store', options: { scope: 'bad/scope' } });
 
-    expect(resolveActionResultError(result).errorType).toBe(KeyValueStoreGetAllErrorTypeEnum.InvalidScope);
+    expect(resolveActionResultError(result).errorType).toBe(askKeyValueStoreGetAllBase.errorType.InvalidScope);
     expect(repo.getAll).not.toHaveBeenCalled();
   });
 
@@ -68,6 +70,6 @@ describe('getKeyValueStoreGetAllActionProcessor', () => {
 
     const result = await invokeProcessor(process, { keyValueStoreName: 'store' });
 
-    expect(resolveActionResultError(result).errorType).toBe(KeyValueStoreGetAllErrorTypeEnum.StoreNotFound);
+    expect(resolveActionResultError(result).errorType).toBe(askKeyValueStoreGetAllBase.errorType.StoreNotFound);
   });
 });

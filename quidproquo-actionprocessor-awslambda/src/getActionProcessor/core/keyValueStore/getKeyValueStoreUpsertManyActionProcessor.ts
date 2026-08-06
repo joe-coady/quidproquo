@@ -1,14 +1,13 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askKeyValueStoreUpsertManyBase,
+  createActionProcessor,
   getScopedKvsTranslatorOrThrow,
   KeyValueStoreActionType,
-  KeyValueStoreUpsertManyActionProcessor,
-  KeyValueStoreUpsertManyErrorTypeEnum,
+  ProcessorFor,
   QPQConfig,
   resolveKvsStoreConfigOrThrow,
 } from 'quidproquo-core';
@@ -20,7 +19,7 @@ import { batchPutItems } from '../../../logic/dynamo';
 // retry inside batchPutItems. Streams emit one record per item no matter how it
 // was written, so downstream projectors see the same records as N single upserts.
 // Unconditional (no ifNotExists — BatchWriteItem carries no conditions).
-const getProcessKeyValueStoreUpsertMany = (qpqConfig: QPQConfig): KeyValueStoreUpsertManyActionProcessor<any> => {
+const getProcessKeyValueStoreUpsertMany = (qpqConfig: QPQConfig): ProcessorFor<typeof askKeyValueStoreUpsertManyBase> => {
   return async ({ keyValueStoreName, items, options }) => {
     const dynamoTableName = getKvsDynamoTableNameFromConfig(keyValueStoreName, qpqConfig, 'kvs');
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
@@ -37,7 +36,7 @@ const getProcessKeyValueStoreUpsertMany = (qpqConfig: QPQConfig): KeyValueStoreU
         const itemKey = [storeConfig.partitionKey, ...storeConfig.sortKeys].map((key) => String(item[key.key])).join('#');
         if (seenKeys.has(itemKey)) {
           return actionResultError(
-            KeyValueStoreUpsertManyErrorTypeEnum.DuplicateKey,
+            askKeyValueStoreUpsertManyBase.errorType.DuplicateKey,
             `Duplicate key [${itemKey}] in batch upsert to [${keyValueStoreName}]`,
           );
         }
@@ -57,19 +56,17 @@ const getProcessKeyValueStoreUpsertMany = (qpqConfig: QPQConfig): KeyValueStoreU
       return actionResult(void 0);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        InternalServerError: () => actionResultError(KeyValueStoreUpsertManyErrorTypeEnum.ServiceUnavailable, 'KVS Service Unavailable'),
-        ResourceNotFoundException: () => actionResultError(KeyValueStoreUpsertManyErrorTypeEnum.ResourceNotFound, 'KVS Resource Not Found'),
+        InternalServerError: () => actionResultError(askKeyValueStoreUpsertManyBase.errorType.ServiceUnavailable, 'KVS Service Unavailable'),
+        ResourceNotFoundException: () => actionResultError(askKeyValueStoreUpsertManyBase.errorType.ResourceNotFound, 'KVS Resource Not Found'),
         // Retries exhausted on UnprocessedItems — sustained throttle, a transient
         // fault: callers must see ServiceUnavailable, not a permanent failure.
         BatchWriteUnprocessedItemsError: () =>
-          actionResultError(KeyValueStoreUpsertManyErrorTypeEnum.ServiceUnavailable, 'KVS batch write throttled'),
-        InvalidScopeError: (error) => actionResultError(KeyValueStoreUpsertManyErrorTypeEnum.InvalidScope, error.message),
-        KvsStoreNotFoundError: (error) => actionResultError(KeyValueStoreUpsertManyErrorTypeEnum.StoreNotFound, error.message),
+          actionResultError(askKeyValueStoreUpsertManyBase.errorType.ServiceUnavailable, 'KVS batch write throttled'),
+        InvalidScopeError: (error) => actionResultError(askKeyValueStoreUpsertManyBase.errorType.InvalidScope, error.message),
+        KvsStoreNotFoundError: (error) => actionResultError(askKeyValueStoreUpsertManyBase.errorType.StoreNotFound, error.message),
       });
     }
   };
 };
 
-export const getKeyValueStoreUpsertManyActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [KeyValueStoreActionType.UpsertMany]: getProcessKeyValueStoreUpsertMany(qpqConfig),
-});
+export const getKeyValueStoreUpsertManyActionProcessor = createActionProcessor(askKeyValueStoreUpsertManyBase, getProcessKeyValueStoreUpsertMany);

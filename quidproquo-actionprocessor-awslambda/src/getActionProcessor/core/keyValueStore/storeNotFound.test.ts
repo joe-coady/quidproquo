@@ -1,10 +1,10 @@
 import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
 import {
+  askKeyValueStoreDelete,
+  askKeyValueStoreGetBase,
+  askKeyValueStoreQueryBase,
   buildTestQpqConfig,
   KeyValueStoreActionType,
-  KeyValueStoreDeleteErrorTypeEnum,
-  KeyValueStoreGetErrorTypeEnum,
-  KeyValueStoreQueryErrorTypeEnum,
 } from 'quidproquo-core';
 
 import { describe, expect, it, vi } from 'vitest';
@@ -34,7 +34,7 @@ describe('KVS store-not-found error shape', () => {
 
     const [, error] = await invokeProcessor(processor, { keyValueStoreName: 'missing-store', key: 'k' });
 
-    expect(error?.errorType).toBe(KeyValueStoreGetErrorTypeEnum.StoreNotFound);
+    expect(error?.errorType).toBe(askKeyValueStoreGetBase.errorType.StoreNotFound);
   });
 
   it('returns the typed StoreNotFound error from Delete', async () => {
@@ -42,7 +42,7 @@ describe('KVS store-not-found error shape', () => {
 
     const [, error] = await invokeProcessor(processor, { keyValueStoreName: 'missing-store', key: 'k' });
 
-    expect(error?.errorType).toBe(KeyValueStoreDeleteErrorTypeEnum.StoreNotFound);
+    expect(error?.errorType).toBe(askKeyValueStoreDelete.errorType.StoreNotFound);
   });
 
   it('returns the typed StoreNotFound error from a scoped Query', async () => {
@@ -54,6 +54,6 @@ describe('KVS store-not-found error shape', () => {
       options: { scope: 'tenant-a' },
     });
 
-    expect(error?.errorType).toBe(KeyValueStoreQueryErrorTypeEnum.StoreNotFound);
+    expect(error?.errorType).toBe(askKeyValueStoreQueryBase.errorType.StoreNotFound);
   });
 });

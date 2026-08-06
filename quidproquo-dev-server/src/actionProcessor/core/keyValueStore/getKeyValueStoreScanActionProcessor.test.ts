@@ -1,11 +1,13 @@
 import {
+  askKeyValueStoreScanBase,
   buildTestQpqConfig,
+  createActionProcessor,
   ErrorTypeEnum,
   isErroredActionResult,
   KeyValueStoreActionType,
-  KeyValueStoreScanErrorTypeEnum,
   KvsStoreNotFoundError,
   noopDynamicModuleLoader,
+  ProcessorFor,
   resolveActionResult,
   resolveActionResultError,
 } from 'quidproquo-core';
@@ -49,7 +51,7 @@ describe('getKeyValueStoreScanActionProcessor', () => {
 
     const result = await invokeProcessor(process, { keyValueStoreName: 'store' });
 
-    expect(resolveActionResultError(result).errorType).toBe(KeyValueStoreScanErrorTypeEnum.StoreNotFound);
+    expect(resolveActionResultError(result).errorType).toBe(askKeyValueStoreScanBase.errorType.StoreNotFound);
   });
 
   it('maps a generic error to a caught error', async () => {

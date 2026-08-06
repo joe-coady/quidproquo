@@ -1,50 +1,16 @@
-import {
-  ConfigActionType,
-  ContextActionType,
-  DateActionType,
-  DynamicFunctionsActionType,
-  FileActionType,
-  GuidActionType,
-  InlineFunctionActionType,
-  KeyValueStoreActionType,
-  KeyValueStoreUpsertErrorTypeEnum,
-  KvsLogicalOperator,
-  KvsLogicalOperatorType,
-  KvsQueryCondition,
-  KvsQueryOperation,
-  KvsQueryOperationType,
-  QpqContextIdentifier,
-  runStory,
-  storageScopeContext,
-  throwsError,
-  UserDirectoryActionType,
-} from 'quidproquo-core';
+import { askKeyValueStoreUpsertBase, ConfigActionType, ContextActionType, DateActionType, DynamicFunctionsActionType, FileActionType, GuidActionType, InlineFunctionActionType, KeyValueStoreActionType, KvsLogicalOperator, KvsLogicalOperatorType, KvsQueryCondition, KvsQueryOperation, KvsQueryOperationType, QpqContextIdentifier, runStory, storageScopeContext, throwsError, UserDirectoryActionType } from 'quidproquo-core';
 import { HTTPEvent } from 'quidproquo-webserver';
 
 import { describe, expect, it } from 'vitest';
 
 import { createKvsUpdateMock } from '../eventDoc/testing/kvsUpdateActionMock';
 
-import {
-  EVENT_DOC_EVENTS_STORE_NAME_GLOBAL,
-  EVENT_DOC_ON_PUBLISH_GLOBAL,
-  EVENT_DOC_SCOPE_RESOLVER_GLOBAL,
-  EVENT_DOC_STORE_NAME_GLOBAL,
-  EVENT_DOC_TYPE_GLOBAL,
-  EVENT_DOC_USER_DIRECTORY_GLOBAL,
-} from '../eventDoc/constants/eventDocGlobalNames';
+import { EVENT_DOC_EVENTS_STORE_NAME_GLOBAL, EVENT_DOC_ON_PUBLISH_GLOBAL, EVENT_DOC_SCOPE_RESOLVER_GLOBAL, EVENT_DOC_STORE_NAME_GLOBAL, EVENT_DOC_TYPE_GLOBAL, EVENT_DOC_USER_DIRECTORY_GLOBAL } from '../eventDoc/constants/eventDocGlobalNames';
 import { buildEventDocStore } from '../eventDoc/context/buildEventDocStore';
 import { EventDocEffect, EventDocEvent, EventDocOnPublishInput } from '../eventDoc/models';
 import { appendEvent } from '../eventDoc/routes/controllers/appendEvent';
 import { DEFAULT_TENANT_HEADER_NAME, TENANT_HEADER_NAME_GLOBAL } from './constants/tenantGlobalNames';
-import {
-  TENANT_DOC_TYPE,
-  TENANT_EVENTDOC_STORE,
-  TENANT_ON_PUBLISH_FN,
-  TENANT_RECORD_STORE,
-  TENANT_SCOPE_RESOLVER_FN,
-  USER_TENANT_LINKS_STORE,
-} from './constants/tenantStoreNames';
+import { TENANT_DOC_TYPE, TENANT_EVENTDOC_STORE, TENANT_ON_PUBLISH_FN, TENANT_RECORD_STORE, TENANT_SCOPE_RESOLVER_FN, USER_TENANT_LINKS_STORE } from './constants/tenantStoreNames';
 import { TenantEffect } from './fold/TenantEffect';
 import { tenantRegistryEventDoc } from './module/tenantRegistryEventDoc';
 import { askTenantOnPublish } from './logic/askTenantOnPublish';
@@ -177,7 +143,7 @@ const buildMocks = () => {
       const existingIndex = table.findIndex(sameRow(item));
 
       if (options?.ifNotExists && existingIndex >= 0) {
-        return throwsError(KeyValueStoreUpsertErrorTypeEnum.Conflict, `Item already exists in ${keyValueStoreName}`);
+        return throwsError(askKeyValueStoreUpsertBase.errorType.Conflict, `Item already exists in ${keyValueStoreName}`);
       }
 
       if (existingIndex >= 0) {

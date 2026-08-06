@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
 import { KeyValueStoreActionType } from './KeyValueStoreActionType';
-import { askKeyValueStoreUpdate, KeyValueStoreUpdateErrorTypeEnum } from './KeyValueStoreUpdateActionRequester';
+import { askKeyValueStoreUpdate, askKeyValueStoreUpdateBase } from './askKeyValueStoreUpdate';
 
 describe('askKeyValueStoreUpdate', () => {
   it('yields an Update action with updates, key, sort key and options', () => {
@@ -43,7 +43,7 @@ describe('askKeyValueStoreUpdate', () => {
   });
 
   it('namespaces its error enum values under the action type', () => {
-    expect(KeyValueStoreUpdateErrorTypeEnum.StoreNotFound).toBe(`${KeyValueStoreActionType.Update}-StoreNotFound`);
-    expect(KeyValueStoreUpdateErrorTypeEnum.InvalidScope).toBe(`${KeyValueStoreActionType.Update}-InvalidScope`);
+    expect(askKeyValueStoreUpdateBase.errorType.StoreNotFound).toBe(`${KeyValueStoreActionType.Update}-StoreNotFound`);
+    expect(askKeyValueStoreUpdateBase.errorType.InvalidScope).toBe(`${KeyValueStoreActionType.Update}-InvalidScope`);
   });
 });

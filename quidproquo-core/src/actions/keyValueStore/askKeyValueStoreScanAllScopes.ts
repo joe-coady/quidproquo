@@ -1,13 +1,38 @@
-import { createErrorEnumForAction } from '../../types';
+import { QpqPagedData } from '../../types/QpqPagedData';
+import { AskResponse } from '../../types/StorySession';
+import { createActionRequester } from '../../types/utils/createActionRequester';
 import { KeyValueStoreActionType } from './KeyValueStoreActionType';
-import { KeyValueStoreScanAllScopesActionRequester, KeyValueStoreScanAllScopesOptions } from './KeyValueStoreScanAllScopesActionTypes';
 import { KvsQueryOperation } from './types';
 
-export const KeyValueStoreScanAllScopesErrorTypeEnum = createErrorEnumForAction(KeyValueStoreActionType.ScanAllScopes, [
-  'ServiceUnavailable', // DynamoDB internal error / throttling
-  'ResourceNotFound', // the underlying table does not exist
-  'StoreNotFound', // the store is not declared in the qpq config (misconfiguration)
-]);
+// One row and the scope it lives under. `scope` is absent for an unscoped row.
+//
+// The scope is reported rather than dropped BECAUSE this crosses scopes: a caller that reads
+// every tenant's rows in one pass has to know which tenant each belongs to, or anything it
+// writes back lands in the wrong partition. Handing back bare items would make silent
+// cross-tenant corruption the easy mistake.
+export type KvsScopedItem<KvsItem> = {
+  scope?: string;
+  item: KvsItem;
+};
+
+export type KeyValueStoreScanAllScopesOptions = {
+  limit?: number;
+};
+
+export const askKeyValueStoreScanAllScopesBase = createActionRequester<QpqPagedData<KvsScopedItem<unknown>>>()({
+  actionType: KeyValueStoreActionType.ScanAllScopes,
+  errorTypes: [
+    'ServiceUnavailable', // DynamoDB internal error / throttling
+    'ResourceNotFound', // the underlying table does not exist
+    'StoreNotFound', // the store is not declared in the qpq config (misconfiguration)
+  ],
+  getPayload: (
+    keyValueStoreName: string,
+    filterCondition?: KvsQueryOperation,
+    nextPageKey?: string,
+    options?: KeyValueStoreScanAllScopesOptions,
+  ) => ({ keyValueStoreName, filterCondition, nextPageKey, options }),
+});
 
 /**
  * Read EVERY row in a store, across every scope, each paired with the scope it lives under.
@@ -38,17 +63,8 @@ export function* askKeyValueStoreScanAllScopes<KvsItem>(
   filterCondition?: KvsQueryOperation,
   nextPageKey?: string,
   options?: KeyValueStoreScanAllScopesOptions,
-): KeyValueStoreScanAllScopesActionRequester<KvsItem> {
-  return yield {
-    type: KeyValueStoreActionType.ScanAllScopes,
-    payload: {
-      keyValueStoreName,
-
-      filterCondition,
-
-      nextPageKey,
-
-      options,
-    },
-  };
+): AskResponse<QpqPagedData<KvsScopedItem<KvsItem>>> {
+  return (yield* askKeyValueStoreScanAllScopesBase(keyValueStoreName, filterCondition, nextPageKey, options)) as QpqPagedData<
+    KvsScopedItem<KvsItem>
+  >;
 }

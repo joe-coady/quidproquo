@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
 import { KeyValueStoreActionType } from './KeyValueStoreActionType';
-import { askKeyValueStoreDelete, KeyValueStoreDeleteErrorTypeEnum } from './KeyValueStoreDeleteActionRequester';
+import { askKeyValueStoreDelete } from './askKeyValueStoreDelete';
 
 describe('askKeyValueStoreDelete', () => {
   it('yields a Delete action with key, sort key and options', () => {
@@ -30,7 +30,7 @@ describe('askKeyValueStoreDelete', () => {
   });
 
   it('namespaces its error enum values under the action type', () => {
-    expect(KeyValueStoreDeleteErrorTypeEnum.StoreNotFound).toBe(`${KeyValueStoreActionType.Delete}-StoreNotFound`);
-    expect(KeyValueStoreDeleteErrorTypeEnum.InvalidScope).toBe(`${KeyValueStoreActionType.Delete}-InvalidScope`);
+    expect(askKeyValueStoreDelete.errorType.StoreNotFound).toBe(`${KeyValueStoreActionType.Delete}-StoreNotFound`);
+    expect(askKeyValueStoreDelete.errorType.InvalidScope).toBe(`${KeyValueStoreActionType.Delete}-InvalidScope`);
   });
 });

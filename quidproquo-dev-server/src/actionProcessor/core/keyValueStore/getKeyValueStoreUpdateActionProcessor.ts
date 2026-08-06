@@ -1,13 +1,12 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askKeyValueStoreUpdateBase,
+  createActionProcessor,
   KeyValueStoreActionType,
-  KeyValueStoreUpdateActionProcessor,
-  KeyValueStoreUpdateErrorTypeEnum,
   KvsStreamEventType,
+  ProcessorFor,
   QPQConfig,
   validateScopedKvsKeyOrThrow,
 } from 'quidproquo-core';
@@ -17,7 +16,10 @@ import { emitKvsStreamEvent } from '../../../logic/kvsStream';
 import { toKvsStreamKeys } from '../../../logic/keyValueStore/toKvsStreamKeys';
 import { ResolvedDevServerConfig } from '../../../types';
 
-const getProcessKeyValueStoreUpdate = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): KeyValueStoreUpdateActionProcessor<any> => {
+const getProcessKeyValueStoreUpdate = (
+  qpqConfig: QPQConfig,
+  devServerConfig: ResolvedDevServerConfig,
+): ProcessorFor<typeof askKeyValueStoreUpdateBase> => {
   return async ({ keyValueStoreName, key, sortKey, updates, options }, session) => {
     try {
       const scope = options?.scope;
@@ -46,15 +48,12 @@ const getProcessKeyValueStoreUpdate = (qpqConfig: QPQConfig, devServerConfig: Re
       return actionResult(result);
     } catch (error: any) {
       return actionResultErrorFromCaughtError(error, {
-        InvalidScopeError: (error) => actionResultError(KeyValueStoreUpdateErrorTypeEnum.InvalidScope, error.message),
-        KvsStoreNotFoundError: (error) => actionResultError(KeyValueStoreUpdateErrorTypeEnum.StoreNotFound, error.message),
+        InvalidScopeError: (error) => actionResultError(askKeyValueStoreUpdateBase.errorType.InvalidScope, error.message),
+        KvsStoreNotFoundError: (error) => actionResultError(askKeyValueStoreUpdateBase.errorType.StoreNotFound, error.message),
       });
     }
   };
 };
 
-export const getKeyValueStoreUpdateActionProcessor =
-  (devServerConfig: ResolvedDevServerConfig): ActionProcessorListResolver =>
-  async (qpqConfig: QPQConfig, _dynamicModuleLoader: any): Promise<ActionProcessorList> => ({
-    [KeyValueStoreActionType.Update]: getProcessKeyValueStoreUpdate(qpqConfig, devServerConfig),
-  });
+export const getKeyValueStoreUpdateActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
+  createActionProcessor(askKeyValueStoreUpdateBase, (qpqConfig) => getProcessKeyValueStoreUpdate(qpqConfig, devServerConfig));

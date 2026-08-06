@@ -1,13 +1,12 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askKeyValueStoreUpsertManyBase,
+  createActionProcessor,
   KeyValueStoreActionType,
-  KeyValueStoreUpsertManyActionProcessor,
-  KeyValueStoreUpsertManyErrorTypeEnum,
   KvsStreamEventType,
+  ProcessorFor,
   QPQConfig,
   validateScopedKvsItemOrThrow,
 } from 'quidproquo-core';
@@ -25,7 +24,7 @@ import { ResolvedDevServerConfig } from '../../../types';
 const getProcessKeyValueStoreUpsertMany = (
   qpqConfig: QPQConfig,
   devServerConfig: ResolvedDevServerConfig,
-): KeyValueStoreUpsertManyActionProcessor<any> => {
+): ProcessorFor<typeof askKeyValueStoreUpsertManyBase> => {
   return async ({ keyValueStoreName, items, options }, session) => {
     try {
       const scope = options?.scope;
@@ -43,7 +42,7 @@ const getProcessKeyValueStoreUpsertMany = (
         const itemKey = toKvsCompositeKey(qpqConfig, keyValueStoreName, item);
         if (seenKeys.has(itemKey)) {
           return actionResultError(
-            KeyValueStoreUpsertManyErrorTypeEnum.DuplicateKey,
+            askKeyValueStoreUpsertManyBase.errorType.DuplicateKey,
             `Duplicate key [${itemKey}] in batch upsert to [${keyValueStoreName}]`,
           );
         }
@@ -70,15 +69,12 @@ const getProcessKeyValueStoreUpsertMany = (
       return actionResult(void 0);
     } catch (error: any) {
       return actionResultErrorFromCaughtError(error, {
-        InvalidScopeError: (error) => actionResultError(KeyValueStoreUpsertManyErrorTypeEnum.InvalidScope, error.message),
-        KvsStoreNotFoundError: (error) => actionResultError(KeyValueStoreUpsertManyErrorTypeEnum.StoreNotFound, error.message),
+        InvalidScopeError: (error) => actionResultError(askKeyValueStoreUpsertManyBase.errorType.InvalidScope, error.message),
+        KvsStoreNotFoundError: (error) => actionResultError(askKeyValueStoreUpsertManyBase.errorType.StoreNotFound, error.message),
       });
     }
   };
 };
 
-export const getKeyValueStoreUpsertManyActionProcessor =
-  (devServerConfig: ResolvedDevServerConfig): ActionProcessorListResolver =>
-  async (qpqConfig: QPQConfig, _dynamicModuleLoader: any): Promise<ActionProcessorList> => ({
-    [KeyValueStoreActionType.UpsertMany]: getProcessKeyValueStoreUpsertMany(qpqConfig, devServerConfig),
-  });
+export const getKeyValueStoreUpsertManyActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
+  createActionProcessor(askKeyValueStoreUpsertManyBase, (qpqConfig) => getProcessKeyValueStoreUpsertMany(qpqConfig, devServerConfig));

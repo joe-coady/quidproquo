@@ -1,15 +1,14 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askKeyValueStoreScanAllScopesBase,
+  createActionProcessor,
   decomposeScopedKvsValue,
   KeyValueStoreActionType,
-  KeyValueStoreScanAllScopesActionProcessor,
-  KeyValueStoreScanAllScopesErrorTypeEnum,
   KvsScopedItem,
+  ProcessorFor,
   QPQConfig,
   resolveKvsStoreConfigOrThrow,
 } from 'quidproquo-core';
@@ -23,7 +22,7 @@ import { scan } from '../../../logic/dynamo';
 // The scope is composed into the partition key value, so each row is split back into the
 // scope it belongs to plus its raw key, exactly as the stream processor does. The caller gets
 // items indistinguishable from a scoped read, plus the scope beside them.
-const getProcessKeyValueStoreScanAllScopes = (qpqConfig: QPQConfig): KeyValueStoreScanAllScopesActionProcessor<any> => {
+const getProcessKeyValueStoreScanAllScopes = (qpqConfig: QPQConfig): ProcessorFor<typeof askKeyValueStoreScanAllScopesBase> => {
   return async ({ keyValueStoreName, filterCondition, nextPageKey }) => {
     const dynamoTableName = getKvsDynamoTableNameFromConfig(keyValueStoreName, qpqConfig, 'kvs');
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
@@ -49,16 +48,15 @@ const getProcessKeyValueStoreScanAllScopes = (qpqConfig: QPQConfig): KeyValueSto
       return actionResult({ items, nextPageKey: page.nextPageKey });
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        InternalServerError: () => actionResultError(KeyValueStoreScanAllScopesErrorTypeEnum.ServiceUnavailable, 'KVS Service Unavailable'),
-        ResourceNotFoundException: () => actionResultError(KeyValueStoreScanAllScopesErrorTypeEnum.ResourceNotFound, 'KVS Resource Not Found'),
-        KvsStoreNotFoundError: (error) => actionResultError(KeyValueStoreScanAllScopesErrorTypeEnum.StoreNotFound, error.message),
+        InternalServerError: () => actionResultError(askKeyValueStoreScanAllScopesBase.errorType.ServiceUnavailable, 'KVS Service Unavailable'),
+        ResourceNotFoundException: () => actionResultError(askKeyValueStoreScanAllScopesBase.errorType.ResourceNotFound, 'KVS Resource Not Found'),
+        KvsStoreNotFoundError: (error) => actionResultError(askKeyValueStoreScanAllScopesBase.errorType.StoreNotFound, error.message),
       });
     }
   };
 };
 
-export const getKeyValueStoreScanAllScopesActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [KeyValueStoreActionType.ScanAllScopes]: getProcessKeyValueStoreScanAllScopes(qpqConfig),
-});
+export const getKeyValueStoreScanAllScopesActionProcessor = createActionProcessor(
+  askKeyValueStoreScanAllScopesBase,
+  getProcessKeyValueStoreScanAllScopes,
+);

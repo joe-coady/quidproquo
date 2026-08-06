@@ -1,12 +1,14 @@
 import {
+  askKeyValueStoreUpsertManyBase,
   buildTestQpqConfig,
+  createActionProcessor,
   defineKeyValueStore,
   isErroredActionResult,
   KeyValueStoreActionType,
-  KeyValueStoreUpsertManyErrorTypeEnum,
   kvsKey,
   KvsStoreNotFoundError,
   noopDynamicModuleLoader,
+  ProcessorFor,
   resolveActionResultError,
 } from 'quidproquo-core';
 
@@ -69,6 +71,6 @@ describe('getKeyValueStoreUpsertManyActionProcessor', () => {
 
     const result = await invokeProcessor(process, { keyValueStoreName: 'store', items: [{ id: 'a' }] });
 
-    expect(resolveActionResultError(result).errorType).toBe(KeyValueStoreUpsertManyErrorTypeEnum.StoreNotFound);
+    expect(resolveActionResultError(result).errorType).toBe(askKeyValueStoreUpsertManyBase.errorType.StoreNotFound);
   });
 });

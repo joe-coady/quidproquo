@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { KeyValueStoreActionType } from '../../actions/keyValueStore/KeyValueStoreActionType';
-import { KeyValueStoreQueryAction } from '../../actions/keyValueStore/KeyValueStoreQueryActionTypes';
+import { askKeyValueStoreQueryBase } from '../../actions/keyValueStore/askKeyValueStoreQuery';
+import { ActionOf } from '../../types';
 import { KvsQueryOperationType } from '../../actions/keyValueStore/types';
 import { runStory } from '../../testing/storyTesting';
 import { QpqPagedData } from '../../types';
@@ -17,7 +18,7 @@ describe('askKeyValueStoreQueryAll', () => {
     };
 
     const result = runStory(askKeyValueStoreQueryAll('items', keyCondition), {
-      [KeyValueStoreActionType.Query]: (action: KeyValueStoreQueryAction) => pages[action.payload.options?.nextPageKey ?? 'first'],
+      [KeyValueStoreActionType.Query]: (action: ActionOf<typeof askKeyValueStoreQueryBase>) => pages[action.payload.options?.nextPageKey ?? 'first'],
     });
 
     expect(result).toEqual(['a', 'b', 'c']);
@@ -46,7 +47,7 @@ describe('askKeyValueStoreQueryAll', () => {
     };
 
     // Record the scope of each page request so we can prove none of them dropped it
-    const queryRecordingScope = (action: KeyValueStoreQueryAction) => {
+    const queryRecordingScope = (action: ActionOf<typeof askKeyValueStoreQueryBase>) => {
       scopes.push(action.payload.options?.scope ?? '(none)');
       return pages[action.payload.options?.nextPageKey ?? 'first'];
     };
