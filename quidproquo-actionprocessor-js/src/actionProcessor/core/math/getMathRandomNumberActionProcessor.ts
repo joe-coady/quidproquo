@@ -1,18 +1,9 @@
-import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
-  actionResult,
-  MathActionType,
-  MathRandomNumberActionProcessor,
-  QPQConfig,
-} from 'quidproquo-core';
+import { actionResult, askRandomNumber, createActionProcessor, ProcessorFor, QPQConfig } from 'quidproquo-core';
 
-const getProcessMathRandomNumber = (qpqConfig: QPQConfig): MathRandomNumberActionProcessor => {
+const getProcessMathRandomNumber = (qpqConfig: QPQConfig): ProcessorFor<typeof askRandomNumber> => {
   return async () => {
     return actionResult(Math.random());
   };
 };
 
-export const getMathRandomNumberActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [MathActionType.RandomNumber]: getProcessMathRandomNumber(qpqConfig),
-});
+export const getMathRandomNumberActionProcessor = createActionProcessor(askRandomNumber, getProcessMathRandomNumber);

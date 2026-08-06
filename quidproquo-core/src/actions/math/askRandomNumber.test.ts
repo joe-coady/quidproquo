@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { captureRequester, runStory, StoryError, throwsError } from '../../testing';
 import { MathActionType } from './MathActionType';
-import { askRandomNumber } from './MathRandomNumberActionRequester';
+import { askRandomNumber } from './askRandomNumber';
 
 describe('askRandomNumber', () => {
   it('yields a RandomNumber action', () => {

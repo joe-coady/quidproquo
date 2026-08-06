@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { MathActionType } from '../../actions/math/MathActionType';
-import { askRandomNumber } from '../../actions/math/MathRandomNumberActionRequester';
+import { askRandomNumber } from '../../actions/math/askRandomNumber';
 import { askStateDispatch } from '../../actions/state/StateDispatchActionRequester';
 import { askStateRead } from '../../actions/state/StateReadActionRequester';
 import { askStateDispatchEffect } from '../../logic/stateEffects/askStateDispatchEffect';

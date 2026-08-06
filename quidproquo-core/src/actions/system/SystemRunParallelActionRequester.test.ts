@@ -3,9 +3,9 @@ import { describe, expect, it } from 'vitest';
 import { runStory, StoryError, throwsError } from '../../testing';
 import { AskResponse } from '../../types';
 import { GuidActionType } from '../guid/GuidActionType';
-import { askNewGuid } from '../guid/GuidNewActionRequester';
+import { askNewGuid } from '../guid/askNewGuid';
 import { MathActionType } from '../math/MathActionType';
-import { askRandomNumber } from '../math/MathRandomNumberActionRequester';
+import { askRandomNumber } from '../math/askRandomNumber';
 import { askParallelDEPRECATED } from './SystemRunParallelActionRequester';
 
 describe('askParallelDEPRECATED', () => {

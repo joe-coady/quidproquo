@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
 import { PlatformActionType } from './PlatformActionType';
-import { askDelay } from './PlatformDelayActionRequester';
+import { askDelay } from './askDelay';
 
 describe('askDelay', () => {
   it('yields a Delay action with the delay in milliseconds', () => {

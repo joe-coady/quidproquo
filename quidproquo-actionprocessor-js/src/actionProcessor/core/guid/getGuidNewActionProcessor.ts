@@ -1,19 +1,9 @@
-import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
-  actionResult,
-  generateUuid,
-  GuidActionType,
-  GuidNewActionProcessor,
-  QPQConfig,
-} from 'quidproquo-core';
+import { actionResult, askNewGuid, createActionProcessor, generateUuid, ProcessorFor, QPQConfig } from 'quidproquo-core';
 
-const getProcessGuidNew = (qpqConfig: QPQConfig): GuidNewActionProcessor => {
+const getProcessGuidNew = (qpqConfig: QPQConfig): ProcessorFor<typeof askNewGuid> => {
   return async () => {
     return actionResult(generateUuid());
   };
 };
 
-export const getGuidNewActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [GuidActionType.New]: getProcessGuidNew(qpqConfig),
-});
+export const getGuidNewActionProcessor = createActionProcessor(askNewGuid, getProcessGuidNew);

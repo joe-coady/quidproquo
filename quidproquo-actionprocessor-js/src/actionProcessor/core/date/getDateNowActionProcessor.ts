@@ -1,19 +1,9 @@
-import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
-  actionResult,
-  DateActionType,
-  DateNowActionProcessor,
-  getQpqIsoDateTimeFromDate,
-  QPQConfig,
-} from 'quidproquo-core';
+import { actionResult, askDateNow, createActionProcessor, getQpqIsoDateTimeFromDate, ProcessorFor, QPQConfig } from 'quidproquo-core';
 
-const getProcessDateNow = (qpqConfig: QPQConfig): DateNowActionProcessor => {
+const getProcessDateNow = (qpqConfig: QPQConfig): ProcessorFor<typeof askDateNow> => {
   return async () => {
     return actionResult(getQpqIsoDateTimeFromDate(new Date()));
   };
 };
 
-export const getDateNowActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [DateActionType.Now]: getProcessDateNow(qpqConfig),
-});
+export const getDateNowActionProcessor = createActionProcessor(askDateNow, getProcessDateNow);

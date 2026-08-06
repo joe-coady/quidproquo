@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { captureRequester, runStory, StoryError, throwsError } from '../../testing';
 import { DateActionType } from './DateActionType';
-import { askDateNow } from './DateNowActionRequester';
+import { askDateNow } from './askDateNow';
 
 describe('askDateNow', () => {
   it('yields a Now action', () => {
