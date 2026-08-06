@@ -16,7 +16,6 @@ export interface EventGetStorySessionAction<EventParams extends Array<unknown>, 
   payload: EventGetStorySessionActionPayload<EventParams, QpqEventRecord, MSR>;
 }
 
-// Functions
 export type EventGetStorySessionActionProcessor<
   EventParams extends Array<unknown>,
   QpqEventRecord,

@@ -11,7 +11,6 @@ export interface EventGetRecordsAction<EventParams extends Array<unknown>> exten
   payload: EventGetRecordsActionPayload<EventParams>;
 }
 
-// Functions
 export type EventGetRecordsActionProcessor<EventParams extends Array<unknown>, QpqEventRecord> = ActionProcessor<
   EventGetRecordsAction<EventParams>,
   QpqEventRecord[]

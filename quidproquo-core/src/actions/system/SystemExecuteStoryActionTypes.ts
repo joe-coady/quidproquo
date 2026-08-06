@@ -15,7 +15,6 @@ export interface SystemExecuteStoryAction<StoryInput extends Array<any>> extends
   payload: SystemExecuteStoryActionPayload<StoryInput>;
 }
 
-// Functions
 export type SystemExecuteStoryActionProcessor<StoryInput extends Array<any>, StoryOutput> = ActionProcessor<
   SystemExecuteStoryAction<StoryInput>,
   StoryOutput

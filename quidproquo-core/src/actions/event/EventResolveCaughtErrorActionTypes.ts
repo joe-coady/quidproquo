@@ -7,4 +7,3 @@ export interface EventResolveCaughtErrorActionPayload {
 }
 
 // action
-// Functions

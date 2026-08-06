@@ -15,7 +15,6 @@ export interface EventTransformResponseResultAction<EventParams extends Array<un
   payload: EventTransformResponseResultActionPayload<EventParams, QpqEventRecordResponse>;
 }
 
-// Functions
 export type EventTransformResponseResultActionProcessor<EventParams extends Array<unknown>, QpqEventRecordResponse, EventResponse> = ActionProcessor<
   EventTransformResponseResultAction<EventParams, QpqEventRecordResponse>,
   EventResponse

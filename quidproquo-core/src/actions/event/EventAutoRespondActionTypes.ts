@@ -14,5 +14,3 @@ export interface EventAutoRespondAction<QpqEventRecord, MSR extends AnyMatchStor
   type: EventActionType.AutoRespond;
   payload: EventAutoRespondActionPayload<QpqEventRecord, MSR>;
 }
-
-// Functions

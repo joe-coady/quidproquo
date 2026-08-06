@@ -1,23 +1,9 @@
-import { SystemActionType, SystemExecuteStoryActionPayload, SystemExecuteStoryActionProcessor } from '../actions';
+import { askExecuteStoryBase } from '../actions';
 import { QPQConfig } from '../config';
 import { actionResult, actionResultError, isErroredActionResult, resolveActionResult, resolveActionResultError } from '../logic/actionLogic';
 import { processAction } from '../runtime';
 import { askRunParallel } from '../stories';
-import {
-  ActionProcessor,
-  ActionProcessorList,
-  ActionProcessorListResolver,
-  AskResponse,
-  AskResponseReturnType,
-  DynamicModuleLoader,
-  ErrorTypeEnum,
-  QPQError,
-  QpqLogger,
-  Story,
-  StorySession,
-  StorySessionUpdater,
-  StreamRegistry,
-} from '../types';
+import { ActionProcessor, AskResponse, AskResponseReturnType, createActionProcessor, ErrorTypeEnum, ProcessorFor, QPQError, Story } from '../types';
 
 export const getDateNow = () => new Date().toISOString();
 
@@ -93,16 +79,8 @@ export const getRun =
     return result;
   };
 
-const getProcessExecuteStory = <T extends Array<any>, R>(qpqConfig: QPQConfig): SystemExecuteStoryActionProcessor<T, R> => {
-  return async (
-    payload: SystemExecuteStoryActionPayload<T>,
-    session: StorySession,
-    actionProcessors: ActionProcessorList,
-    logger: QpqLogger,
-    updateSession: StorySessionUpdater,
-    dynamicModuleLoader: DynamicModuleLoader,
-    streamRegistry: StreamRegistry,
-  ): Promise<any> => {
+const getProcessExecuteStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askExecuteStoryBase> => {
+  return async (payload, session, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
     const story = await dynamicModuleLoader(payload.runtime);
     if (!story) {
       return actionResultError(ErrorTypeEnum.NotFound, `Unable to dynamically load: [${payload.runtime}]`);
@@ -120,7 +98,7 @@ const getProcessExecuteStory = <T extends Array<any>, R>(qpqConfig: QPQConfig): 
       ];
       const result = await story(...payload.params, getRun(qpqPromisifyRuntime));
 
-      return actionResult<R>(result);
+      return actionResult(result);
     } catch (error) {
       // Keep the original error type when a nested action failed, instead of
       // collapsing everything into a GenericError.
@@ -133,6 +111,4 @@ const getProcessExecuteStory = <T extends Array<any>, R>(qpqConfig: QPQConfig): 
   };
 };
 
-export const getSystemExecuteStoryActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [SystemActionType.ExecuteStory]: getProcessExecuteStory(qpqConfig),
-});
+export const getSystemExecuteStoryActionProcessor = createActionProcessor(askExecuteStoryBase, getProcessExecuteStory);

@@ -14,7 +14,6 @@ export interface EventMatchStoryAction<QpqEventRecord, EventParams extends Array
   payload: EventMatchStoryActionPayload<QpqEventRecord, EventParams>;
 }
 
-// Functions
 export type EventMatchStoryActionProcessor<QpqEventRecord, MSR extends AnyMatchStoryResult, EventParams extends Array<unknown>> = ActionProcessor<
   EventMatchStoryAction<QpqEventRecord, EventParams>,
   MSR

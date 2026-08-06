@@ -10,5 +10,3 @@ export interface EventTransformEventRecordResponseAction<EventRecord> extends Ac
   type: EventActionType.TransformEventRecordResponse;
   payload: EventTransformEventRecordResponseActionPayload<EventRecord>;
 }
-
-// Functions

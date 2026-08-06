@@ -11,6 +11,5 @@ export interface EventTransformEventParamsAction<T extends Array<unknown>> exten
   payload: EventTransformEventParamsActionPayload<T>;
 }
 
-// Functions
 export type EventTransformEventParamsActionProcessor<T extends Array<unknown>, TRes> = ActionProcessor<EventTransformEventParamsAction<T>, TRes>;
 export type EventTransformEventParamsActionRequester<T extends Array<unknown>, TRes> = ActionRequester<EventTransformEventParamsAction<T>, TRes>;
