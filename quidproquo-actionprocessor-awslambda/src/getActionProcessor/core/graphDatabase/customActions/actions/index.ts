@@ -1,3 +1,3 @@
+export * from './askGraphDatabaseForNeptuneGetEndpoints';
 export * from './GraphDatabaseForNeptuneActionType';
-export * from './GraphDatabaseForNeptuneGetEndpointsActionRequester';
 export * from './GraphDatabaseForNeptuneGetEndpointsActionTypes';

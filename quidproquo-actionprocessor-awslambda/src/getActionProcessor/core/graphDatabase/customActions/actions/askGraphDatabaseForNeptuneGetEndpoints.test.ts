@@ -3,7 +3,7 @@ import { captureRequester } from 'quidproquo-core';
 import { describe, expect, it } from 'vitest';
 
 import { GraphDatabaseForNeptuneActionType } from './GraphDatabaseForNeptuneActionType';
-import { askGraphDatabaseForNeptuneGetEndpoints } from './GraphDatabaseForNeptuneGetEndpointsActionRequester';
+import { askGraphDatabaseForNeptuneGetEndpoints } from './askGraphDatabaseForNeptuneGetEndpoints';
 
 describe('askGraphDatabaseForNeptuneGetEndpoints', () => {
   it('yields a GetEndpoints action carrying the database name', () => {

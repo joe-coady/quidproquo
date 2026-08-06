@@ -143,7 +143,7 @@ item commits only its note in this file, with a message like
 
 #### actions
 
-- [ ] **askGraphDatabaseForNeptuneGetEndpoints** `quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/customActions/actions/GraphDatabaseForNeptuneGetEndpointsActionRequester.ts` · processors: actionprocessor-awslambda
+- [x] **askGraphDatabaseForNeptuneGetEndpoints** `quidproquo-actionprocessor-awslambda/src/getActionProcessor/core/graphDatabase/customActions/actions/askGraphDatabaseForNeptuneGetEndpoints.ts`
 
 ### quidproquo-core
 

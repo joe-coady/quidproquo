@@ -1,11 +1,11 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import { ActionProcessorList, ActionProcessorListResolver, actionResult, actionResultErrorFromCaughtError, QPQConfig } from 'quidproquo-core';
+import { actionResult, actionResultErrorFromCaughtError, createActionProcessor, ProcessorFor, QPQConfig } from 'quidproquo-core';
 
 import { getConfigRuntimeResourceNameFromConfig } from '../../../../../awsNamingUtils';
 import { getNeptuneEndpoints } from '../../../../../logic/neptune';
-import { GraphDatabaseForNeptuneActionType, GraphDatabaseForNeptuneGetEndpointsActionProcessor } from '../actions';
+import { askGraphDatabaseForNeptuneGetEndpoints, GraphDatabaseForNeptuneActionType } from '../actions';
 
-const getProcessGetEndpoints = (qpqConfig: QPQConfig): GraphDatabaseForNeptuneGetEndpointsActionProcessor => {
+const getProcessGetEndpoints = (qpqConfig: QPQConfig): ProcessorFor<typeof askGraphDatabaseForNeptuneGetEndpoints> => {
   return async ({ graphDatabaseName }) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
@@ -21,8 +21,7 @@ const getProcessGetEndpoints = (qpqConfig: QPQConfig): GraphDatabaseForNeptuneGe
   };
 };
 
-export const getGraphDatabaseForNeptuneGetEndpointsActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [GraphDatabaseForNeptuneActionType.GetEndpoints]: getProcessGetEndpoints(qpqConfig),
-});
+export const getGraphDatabaseForNeptuneGetEndpointsActionProcessor = createActionProcessor(
+  askGraphDatabaseForNeptuneGetEndpoints,
+  getProcessGetEndpoints,
+);
