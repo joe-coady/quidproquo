@@ -1,13 +1,13 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
+  askGraphDatabaseInternalFieldNames,
+  createActionProcessor,
   GraphDatabaseActionType,
-  GraphDatabaseInternalFieldNamesActionProcessor,
+  ProcessorFor,
   QPQConfig,
 } from 'quidproquo-core';
 
-const getProcessInternalFieldNames = (qpqConfig: QPQConfig): GraphDatabaseInternalFieldNamesActionProcessor => {
+const getProcessInternalFieldNames = (qpqConfig: QPQConfig): ProcessorFor<typeof askGraphDatabaseInternalFieldNames> => {
   return async () => {
     return actionResult({
       internalEndNode: '`~end`',
@@ -19,8 +19,7 @@ const getProcessInternalFieldNames = (qpqConfig: QPQConfig): GraphDatabaseIntern
   };
 };
 
-export const getGraphDatabaseInternalFieldNamesActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [GraphDatabaseActionType.InternalFieldNames]: getProcessInternalFieldNames(qpqConfig),
-});
+export const getGraphDatabaseInternalFieldNamesActionProcessor = createActionProcessor(
+  askGraphDatabaseInternalFieldNames,
+  getProcessInternalFieldNames,
+);

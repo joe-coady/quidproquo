@@ -1,9 +1,10 @@
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
+  askGraphDatabaseExecuteOpenCypherQuery,
   getProcessCustomImplementation,
   GraphDatabaseActionType,
-  GraphDatabaseExecuteOpenCypherQueryActionProcessor,
+  ProcessorFor,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -14,7 +15,7 @@ import { askRunNeptuneOpenCypherQuery } from './stories';
 export const getGraphDatabaseExecuteOpenCypherQueryActionProcessor: ActionProcessorListResolver = async (
   qpqConfig: QPQConfig,
 ): Promise<ActionProcessorList> => ({
-  [GraphDatabaseActionType.ExecuteOpenCypherQuery]: getProcessCustomImplementation<GraphDatabaseExecuteOpenCypherQueryActionProcessor>(
+  [GraphDatabaseActionType.ExecuteOpenCypherQuery]: getProcessCustomImplementation<ProcessorFor<typeof askGraphDatabaseExecuteOpenCypherQuery>>(
     qpqConfig,
     askRunNeptuneOpenCypherQuery,
     'Neptune Cypher Query',

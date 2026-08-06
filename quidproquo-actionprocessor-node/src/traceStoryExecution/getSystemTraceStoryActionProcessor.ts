@@ -3,8 +3,11 @@ import {
   ActionProcessorListResolver,
   actionResult,
   actionResultError,
+  askTraceStory,
+  createActionProcessor,
   DynamicModuleLoader,
   ErrorTypeEnum,
+  ProcessorFor,
   QPQConfig,
   QpqFunctionRuntime,
   QpqLogger,
@@ -12,7 +15,6 @@ import {
   StorySessionUpdater,
   SystemActionType,
   SystemTraceStoryActionPayload,
-  SystemTraceStoryActionProcessor,
 } from 'quidproquo-core';
 
 import { traceStoryExecution } from './traceStoryExecution';
@@ -32,7 +34,7 @@ const getProcessTraceStory = (
   qpqConfig: QPQConfig,
   defaultScriptPatterns: string[],
   resolveOwnCodeMarkers?: OwnCodeMarkersResolver,
-): SystemTraceStoryActionProcessor => {
+): ProcessorFor<typeof askTraceStory> => {
   return async (
     payload: SystemTraceStoryActionPayload,
     session: StorySession,

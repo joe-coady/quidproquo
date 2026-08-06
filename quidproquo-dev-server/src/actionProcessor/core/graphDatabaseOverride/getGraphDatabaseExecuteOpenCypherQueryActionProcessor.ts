@@ -2,6 +2,7 @@ import { getServiceFunctionActionProcessor } from 'quidproquo-actionprocessor-aw
 import {
   ActionProcessorList,
   ActionProcessorListResolver,
+  askGraphDatabaseExecuteOpenCypherQuery,
   AskResponse,
   askThrowError,
   ErrorTypeEnum,
@@ -9,7 +10,7 @@ import {
   GraphCypherResponse,
   GraphDatabaseActionType,
   GraphDatabaseExecuteOpenCypherQueryActionPayload,
-  GraphDatabaseExecuteOpenCypherQueryActionProcessor,
+  ProcessorFor,
   QPQConfig,
   qpqCoreUtils,
 } from 'quidproquo-core';
@@ -48,7 +49,7 @@ export const getGraphDatabaseExecuteOpenCypherQueryActionProcessor: ActionProces
   qpqConfig: QPQConfig,
 ): Promise<ActionProcessorList> => {
   return {
-    [GraphDatabaseActionType.ExecuteOpenCypherQuery]: getProcessCustomImplementation<GraphDatabaseExecuteOpenCypherQueryActionProcessor>(
+    [GraphDatabaseActionType.ExecuteOpenCypherQuery]: getProcessCustomImplementation<ProcessorFor<typeof askGraphDatabaseExecuteOpenCypherQuery>>(
       qpqConfig,
       getGraphDatabaseExecuteOpenCypherStory(qpqConfig),
       'Neptune Cypher Query - dev server',

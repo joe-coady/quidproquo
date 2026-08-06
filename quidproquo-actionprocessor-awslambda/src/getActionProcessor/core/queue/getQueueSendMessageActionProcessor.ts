@@ -1,13 +1,17 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import { ActionProcessorList, ActionProcessorListResolver, QPQConfig, qpqCoreUtils, QueueMessage, StorySession } from 'quidproquo-core';
 import {
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askQueueSendMessagesBase,
+  createActionProcessor,
   generateUuid,
+  ProcessorFor,
+  QPQConfig,
+  qpqCoreUtils,
   QueueActionType,
-  QueueSendMessageActionProcessor,
-  QueueSendMessagesErrorTypeEnum,
+  QueueMessage,
+  StorySession,
   toCrossServiceSession,
 } from 'quidproquo-core';
 
@@ -19,7 +23,7 @@ type AnyQueueMessageWithSession = QueueMessage<any> & {
   storySession: StorySession;
 };
 
-const getProcessQueueSendMessage = (qpqConfig: QPQConfig): QueueSendMessageActionProcessor<any> => {
+const getProcessQueueSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeof askQueueSendMessagesBase> => {
   return async ({ queueName, queueMessages }, session) => {
     const sqsQueueName = getQueueRuntimeResourceNameFromConfig(queueName, qpqConfig);
     const isFifo = qpqCoreUtils.getQueueByName(qpqConfig, queueName)?.isFifo || false;
@@ -52,15 +56,13 @@ const getProcessQueueSendMessage = (qpqConfig: QPQConfig): QueueSendMessageActio
       return actionResult(void 0);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        AccessDenied: () => actionResultError(QueueSendMessagesErrorTypeEnum.AccessDenied, 'Access denied sending to queue'),
-        AccessDeniedException: () => actionResultError(QueueSendMessagesErrorTypeEnum.AccessDenied, 'Access denied sending to queue'),
-        QueueDoesNotExist: () => actionResultError(QueueSendMessagesErrorTypeEnum.QueueNotFound, `Queue not found: ${queueName}`),
-        RequestThrottled: () => actionResultError(QueueSendMessagesErrorTypeEnum.ServiceUnavailable, 'Queue throttled'),
+        AccessDenied: () => actionResultError(askQueueSendMessagesBase.errorType.AccessDenied, 'Access denied sending to queue'),
+        AccessDeniedException: () => actionResultError(askQueueSendMessagesBase.errorType.AccessDenied, 'Access denied sending to queue'),
+        QueueDoesNotExist: () => actionResultError(askQueueSendMessagesBase.errorType.QueueNotFound, `Queue not found: ${queueName}`),
+        RequestThrottled: () => actionResultError(askQueueSendMessagesBase.errorType.ServiceUnavailable, 'Queue throttled'),
       });
     }
   };
 };
 
-export const getQueueSendMessagesActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [QueueActionType.SendMessages]: getProcessQueueSendMessage(qpqConfig),
-});
+export const getQueueSendMessagesActionProcessor = createActionProcessor(askQueueSendMessagesBase, getProcessQueueSendMessage);

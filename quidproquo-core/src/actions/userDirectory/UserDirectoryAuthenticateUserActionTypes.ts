@@ -1,4 +1,3 @@
-import { ErrorThrowErrorAction } from '../error/ErrorThrowErrorActionRequesterTypes';
 import { AuthenticateUserResponse, UserDirectoryActionType } from './UserDirectoryActionType';
 
 export type AuthenticateUserRequest = {

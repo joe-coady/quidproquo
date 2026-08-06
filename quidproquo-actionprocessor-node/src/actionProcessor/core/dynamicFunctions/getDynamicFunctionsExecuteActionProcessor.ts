@@ -1,16 +1,17 @@
 import {
   ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
+  askDynamicFunctionExecuteBase,
   AskResponse,
+  createActionProcessor,
   createRuntime,
   DynamicFunctionsActionType,
   DynamicFunctionsExecuteActionPayload,
-  DynamicFunctionsExecuteActionProcessor,
   DynamicFunctionsExecuteErrorTypeEnum,
   DynamicModuleLoader,
   Nullable,
+  ProcessorFor,
   QPQConfig,
   qpqCoreUtils,
   QpqLogger,
@@ -35,7 +36,7 @@ const isStoryIterator = (value: unknown): value is AskResponse<unknown> => {
 
 const getErrorMessage = (error: unknown): string => (error instanceof Error ? error.message : String(error));
 
-const getProcessExecute = <R>(qpqConfig: QPQConfig): DynamicFunctionsExecuteActionProcessor<R> => {
+const getProcessExecute = <R>(qpqConfig: QPQConfig): ProcessorFor<typeof askDynamicFunctionExecuteBase> => {
   const moduleName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
 
   return async (
@@ -140,6 +141,4 @@ const getProcessExecute = <R>(qpqConfig: QPQConfig): DynamicFunctionsExecuteActi
   };
 };
 
-export const getDynamicFunctionsExecuteActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [DynamicFunctionsActionType.Execute]: getProcessExecute(qpqConfig),
-});
+export const getDynamicFunctionsExecuteActionProcessor = createActionProcessor(askDynamicFunctionExecuteBase, getProcessExecute);

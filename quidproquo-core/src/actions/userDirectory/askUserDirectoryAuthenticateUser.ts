@@ -1,6 +1,6 @@
 import { AskResponse } from '../../types/StorySession';
 import { createActionRequester } from '../../types/utils/createActionRequester';
-import { askThrowError } from '../error/ErrorThrowErrorActionRequester';
+import { askThrowError } from '../error/askThrowError';
 import { AuthenticateUserResponse, UserDirectoryActionType } from './UserDirectoryActionType';
 import { AuthenticateUserRequest } from './UserDirectoryAuthenticateUserActionTypes';
 

@@ -1,4 +1,3 @@
-import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
 import { StreamChunk, StreamDataType, StreamEncoding } from '../../types/StreamRegistry';
 import { StreamActionType } from './StreamActionType';
 
@@ -8,18 +7,6 @@ export interface StreamReadActionPayload {
   noWait?: boolean;
 }
 
-// Action
-export interface StreamReadAction extends Action<StreamReadActionPayload> {
-  type: StreamActionType.Read;
-  payload: StreamReadActionPayload;
-}
-
 // Processor always returns raw wire data (string)
-export type StreamReadActionProcessor = ActionProcessor<StreamReadAction, StreamChunk<string>>;
 
 // Requester: TReturn is the converted type, TQPQReturn is the raw wire type
-export type StreamReadActionRequester<E extends StreamEncoding = StreamEncoding, T = unknown> = ActionRequester<
-  StreamReadAction,
-  StreamChunk<StreamDataType<E, T>>,
-  StreamChunk<string>
->;

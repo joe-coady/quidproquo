@@ -20,10 +20,6 @@ export const askKeyValueStoreGetBase = createActionRequester<unknown>()({
 
 // The stored item's shape is only known to the caller, so the base returns unknown and
 // this story casts it to what the caller declared.
-export function* askKeyValueStoreGet<Value>(
-  keyValueStoreName: string,
-  key: string,
-  options?: KeyValueStoreGetOptions,
-): AskResponse<Value | null> {
+export function* askKeyValueStoreGet<Value>(keyValueStoreName: string, key: string, options?: KeyValueStoreGetOptions): AskResponse<Value | null> {
   return (yield* askKeyValueStoreGetBase(keyValueStoreName, key, options)) as Value | null;
 }

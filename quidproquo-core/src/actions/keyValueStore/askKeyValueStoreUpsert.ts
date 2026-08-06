@@ -32,10 +32,6 @@ export const askKeyValueStoreUpsertBase = createActionRequester<void>()({
 });
 
 // Generic so callers can pin the item shape they are writing at the call site.
-export function* askKeyValueStoreUpsert<KvsItem>(
-  keyValueStoreName: string,
-  item: KvsItem,
-  options?: KeyValueStoreUpsertOptions,
-): AskResponse<void> {
+export function* askKeyValueStoreUpsert<KvsItem>(keyValueStoreName: string, item: KvsItem, options?: KeyValueStoreUpsertOptions): AskResponse<void> {
   return yield* askKeyValueStoreUpsertBase(keyValueStoreName, item as KvsItemRecord, options);
 }

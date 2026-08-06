@@ -1,10 +1,9 @@
-import { askDynamicFunctionExecute } from './DynamicFunctionsExecuteActionRequester';
-import { DynamicFunctionResult, DynamicFunctions, DynamicFunctionsExecuteActionRequester } from './DynamicFunctionsExecuteActionTypes';
+import { askDynamicFunctionExecute } from './askDynamicFunctionExecute';
+import { AskResponse } from '../../types/StorySession';
+import { DynamicFunctionResult, DynamicFunctions } from './DynamicFunctionsExecuteActionTypes';
 
 export type DynamicFunctionCaller<TFunctions extends DynamicFunctions> = {
-  [TName in keyof TFunctions]: (
-    ...args: Parameters<TFunctions[TName]>
-  ) => DynamicFunctionsExecuteActionRequester<DynamicFunctionResult<TFunctions[TName]>>;
+  [TName in keyof TFunctions]: (...args: Parameters<TFunctions[TName]>) => AskResponse<DynamicFunctionResult<TFunctions[TName]>>;
 };
 
 // Typed sugar over askDynamicFunctionExecute: caller.someMember(a, b) yields the

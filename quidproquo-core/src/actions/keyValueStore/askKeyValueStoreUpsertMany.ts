@@ -22,7 +22,11 @@ export const askKeyValueStoreUpsertManyBase = createActionRequester<void>()({
     // depend on item position and never reproduce locally.
     'DuplicateKey',
   ],
-  getPayload: (keyValueStoreName: string, items: KvsItemRecord[], options?: KeyValueStoreUpsertManyOptions) => ({ keyValueStoreName, items, options }),
+  getPayload: (keyValueStoreName: string, items: KvsItemRecord[], options?: KeyValueStoreUpsertManyOptions) => ({
+    keyValueStoreName,
+    items,
+    options,
+  }),
 });
 
 // Generic so callers can pin the item shape they are writing at the call site.

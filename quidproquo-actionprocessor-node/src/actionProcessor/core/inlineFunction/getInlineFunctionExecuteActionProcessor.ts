@@ -1,39 +1,24 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
+  askInlineFunctionExecuteBase,
+  createActionProcessor,
   createRuntime,
-  DynamicModuleLoader,
   ErrorTypeEnum,
-  InlineFunctionActionType,
-  InlineFunctionExecuteActionPayload,
-  InlineFunctionExecuteActionProcessor,
+  ProcessorFor,
   QPQConfig,
   qpqCoreUtils,
-  QpqLogger,
   QpqRuntimeType,
-  StorySession,
-  StorySessionUpdater,
-  StreamRegistry,
 } from 'quidproquo-core';
 
 import { randomUUID } from 'crypto';
 
 const getDateNow = () => new Date().toISOString();
 
-const getProcessExecute = <R, T>(qpqConfig: QPQConfig): InlineFunctionExecuteActionProcessor<R, T> => {
+const getProcessExecute = (qpqConfig: QPQConfig): ProcessorFor<typeof askInlineFunctionExecuteBase> => {
   const moduleName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
 
-  return async (
-    payload: InlineFunctionExecuteActionPayload<T>,
-    session: StorySession,
-    actionProcessors: ActionProcessorList,
-    logger: QpqLogger,
-    updateSession: StorySessionUpdater,
-    dynamicModuleLoader: DynamicModuleLoader,
-    streamRegistry: StreamRegistry,
-  ): Promise<any> => {
+  return async (payload, session, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
     const inlineFunctions = qpqCoreUtils.getAllInlineFunctions(qpqConfig);
     const inlineFunction = inlineFunctions.find((f) => f.functionName === payload.functionName);
 
@@ -81,10 +66,8 @@ const getProcessExecute = <R, T>(qpqConfig: QPQConfig): InlineFunctionExecuteAct
       );
     }
 
-    return actionResult<R>(storyResult.result);
+    return actionResult(storyResult.result);
   };
 };
 
-export const getInlineFunctionExecuteActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [InlineFunctionActionType.Execute]: getProcessExecute(qpqConfig),
-});
+export const getInlineFunctionExecuteActionProcessor = createActionProcessor(askInlineFunctionExecuteBase, getProcessExecute);

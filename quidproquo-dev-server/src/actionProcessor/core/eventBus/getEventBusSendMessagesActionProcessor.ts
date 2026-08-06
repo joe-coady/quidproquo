@@ -1,12 +1,12 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
+  askEventBusSendMessagesBase,
+  createActionProcessor,
   ErrorTypeEnum,
   EventBusActionType,
-  EventBusSendMessageActionProcessor,
   generateUuid,
+  ProcessorFor,
   QPQConfig,
   qpqCoreUtils,
   QueueMessage,
@@ -28,7 +28,7 @@ export type AnyEventBusMessageWithSession = QueueMessage<any> & {
   targetFeature?: string;
 };
 
-const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): EventBusSendMessageActionProcessor<any> => {
+const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventBusSendMessagesBase> => {
   return async ({ eventBusName, eventBusMessages }, session) => {
     const eventBusConfig = qpqCoreUtils.getEventBusConfigByName(eventBusName, qpqConfig);
     if (!eventBusConfig) {
@@ -72,6 +72,4 @@ const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): EventBusSendMessag
   };
 };
 
-export const getEventBusSendMessagesActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [EventBusActionType.SendMessages]: getProcessEventBusSendMessage(qpqConfig),
-});
+export const getEventBusSendMessagesActionProcessor = createActionProcessor(askEventBusSendMessagesBase, getProcessEventBusSendMessage);

@@ -64,7 +64,5 @@ export function* askKeyValueStoreScanAllScopes<KvsItem>(
   nextPageKey?: string,
   options?: KeyValueStoreScanAllScopesOptions,
 ): AskResponse<QpqPagedData<KvsScopedItem<KvsItem>>> {
-  return (yield* askKeyValueStoreScanAllScopesBase(keyValueStoreName, filterCondition, nextPageKey, options)) as QpqPagedData<
-    KvsScopedItem<KvsItem>
-  >;
+  return (yield* askKeyValueStoreScanAllScopesBase(keyValueStoreName, filterCondition, nextPageKey, options)) as QpqPagedData<KvsScopedItem<KvsItem>>;
 }

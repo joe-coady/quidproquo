@@ -1,4 +1,3 @@
-import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
 import { DynamicFunctionsActionType } from './DynamicFunctionsActionType';
 
 // The full catalog of errors the Execute processor can produce itself. Errors
@@ -30,13 +29,3 @@ export interface DynamicFunctionsExecuteActionPayload {
   functionName: string;
   args: unknown[];
 }
-
-// Action
-export interface DynamicFunctionsExecuteAction extends Action<DynamicFunctionsExecuteActionPayload> {
-  type: DynamicFunctionsActionType.Execute;
-  payload: DynamicFunctionsExecuteActionPayload;
-}
-
-// Function Types
-export type DynamicFunctionsExecuteActionProcessor<R> = ActionProcessor<DynamicFunctionsExecuteAction, R>;
-export type DynamicFunctionsExecuteActionRequester<R> = ActionRequester<DynamicFunctionsExecuteAction, R>;

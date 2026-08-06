@@ -1,11 +1,11 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   AiActionType,
-  AiPromptActionProcessor,
+  askAiPrompt,
+  createActionProcessor,
   ErrorTypeEnum,
+  ProcessorFor,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -13,7 +13,7 @@ import { generateText, stepCountIs } from 'ai';
 
 import { createDriveFileResolver, prepareAiPromptCall, toCacheableMessages, toCacheableSystem, toSdkMessages } from './logic';
 
-const getProcessAiPrompt = (qpqConfig: QPQConfig): AiPromptActionProcessor => {
+const getProcessAiPrompt = (qpqConfig: QPQConfig): ProcessorFor<typeof askAiPrompt> => {
   return async (payload, session, actionProcessorList, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
     const prepared = prepareAiPromptCall(qpqConfig, payload, session, actionProcessorList, logger, dynamicModuleLoader, streamRegistry);
     if ('error' in prepared) {
@@ -64,6 +64,4 @@ const getProcessAiPrompt = (qpqConfig: QPQConfig): AiPromptActionProcessor => {
   };
 };
 
-export const getAiPromptActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [AiActionType.Prompt]: getProcessAiPrompt(qpqConfig),
-});
+export const getAiPromptActionProcessor = createActionProcessor(askAiPrompt, getProcessAiPrompt);

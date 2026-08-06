@@ -1,11 +1,11 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   AiActionType,
-  AiPromptStreamActionProcessor,
+  askAiPromptStream,
+  createActionProcessor,
   ErrorTypeEnum,
+  ProcessorFor,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -22,7 +22,7 @@ import {
   toSdkMessages,
 } from './logic';
 
-const getProcessAiPromptStream = (qpqConfig: QPQConfig): AiPromptStreamActionProcessor => {
+const getProcessAiPromptStream = (qpqConfig: QPQConfig): ProcessorFor<typeof askAiPromptStream> => {
   return async (payload, session, actionProcessorList, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
     const prepared = prepareAiPromptCall(qpqConfig, payload, session, actionProcessorList, logger, dynamicModuleLoader, streamRegistry);
     if ('error' in prepared) {
@@ -98,6 +98,4 @@ const getProcessAiPromptStream = (qpqConfig: QPQConfig): AiPromptStreamActionPro
   };
 };
 
-export const getAiPromptStreamActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [AiActionType.PromptStream]: getProcessAiPromptStream(qpqConfig),
-});
+export const getAiPromptStreamActionProcessor = createActionProcessor(askAiPromptStream, getProcessAiPromptStream);

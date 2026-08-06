@@ -1,5 +1,5 @@
-import { askThrowError } from '../../actions/error/ErrorThrowErrorActionRequester';
-import { askStreamClose } from '../../actions/stream/StreamCloseRequester';
+import { askThrowError } from '../../actions/error/askThrowError';
+import { askStreamClose } from '../../actions/stream/askStreamClose';
 import { AskResponse, QPQError } from '../../types';
 import { StreamHandle } from '../../types/StreamRegistry';
 

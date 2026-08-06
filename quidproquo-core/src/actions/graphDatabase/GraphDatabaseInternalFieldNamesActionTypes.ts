@@ -11,12 +11,3 @@ export type GraphDatabaseInternalFieldNames = {
 
 // Payload
 export type GraphDatabaseInternalFieldNamesActionPayload = undefined;
-
-// Action
-export interface GraphDatabaseInternalFieldNamesAction extends Action<GraphDatabaseInternalFieldNamesActionPayload> {
-  type: GraphDatabaseActionType.InternalFieldNames;
-}
-
-// Function Types
-export type GraphDatabaseInternalFieldNamesActionProcessor = ActionProcessor<GraphDatabaseInternalFieldNamesAction, GraphDatabaseInternalFieldNames>;
-export type GraphDatabaseInternalFieldNamesActionRequester = ActionRequester<GraphDatabaseInternalFieldNamesAction, GraphDatabaseInternalFieldNames>;

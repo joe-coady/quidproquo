@@ -1,9 +1,9 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
+  askContextReadBase,
   ContextActionType,
-  ContextReadActionProcessor,
+  createActionProcessor,
+  ProcessorFor,
   QPQConfig,
   QpqContext,
   QpqContextIdentifier,
@@ -15,13 +15,11 @@ const getContextValue = (context: QpqContext<any>, contextIdentifier: QpqContext
   return contextIdentifier.uniqueName in context ? context[contextIdentifier.uniqueName] : contextIdentifier.defaultValue;
 };
 
-const getProcessContextRead = (qpqConfig: QPQConfig): ContextReadActionProcessor<any> => {
+const getProcessContextRead = (qpqConfig: QPQConfig): ProcessorFor<typeof askContextReadBase> => {
   return async ({ contextIdentifier }, session) => {
     const context = contextIdentifier.local ? session.localContext || {} : session.context;
     return actionResult(getContextValue(context, contextIdentifier));
   };
 };
 
-export const getContextReadActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [ContextActionType.Read]: getProcessContextRead(qpqConfig),
-});
+export const getContextReadActionProcessor = createActionProcessor(askContextReadBase, getProcessContextRead);

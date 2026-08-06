@@ -1,5 +1,5 @@
-import { askStreamClose } from '../../actions/stream/StreamCloseRequester';
-import { askStreamRead } from '../../actions/stream/StreamReadRequester';
+import { askStreamClose } from '../../actions/stream/askStreamClose';
+import { askStreamRead } from '../../actions/stream/askStreamRead';
 import { AskResponse } from '../../types';
 import { StreamDataType, StreamEncoding, StreamHandle } from '../../types/StreamRegistry';
 import { askCatch } from '../system/askCatch';

@@ -20,7 +20,3 @@ export interface QueueSendMessageAction<T> extends Action<QueueSendMessageAction
   type: QueueActionType.SendMessages;
   payload: QueueSendMessageActionPayload<T>;
 }
-
-// Function Types
-export type QueueSendMessageActionProcessor<T> = ActionProcessor<QueueSendMessageAction<T>, void>;
-export type QueueSendMessageActionRequester<T> = ActionRequester<QueueSendMessageAction<T>, void>;

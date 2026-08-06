@@ -1,12 +1,11 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
+  askClaudeAiMessagesApi,
   ClaudeAiActionType,
-  ClaudeAiMessagesApiActionProcessor,
-  ClaudeAiMessagesApiErrorTypeEnum,
+  createActionProcessor,
   ErrorTypeEnum,
+  ProcessorFor,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -20,7 +19,7 @@ import Anthropic, {
   UnprocessableEntityError,
 } from '@anthropic-ai/sdk';
 
-const getProcessMessagesApi = (qpqConfig: QPQConfig): ClaudeAiMessagesApiActionProcessor => {
+const getProcessMessagesApi = (qpqConfig: QPQConfig): ProcessorFor<typeof askClaudeAiMessagesApi> => {
   return async ({ body, apiKey }) => {
     const anthropic = new Anthropic({ apiKey });
 
@@ -32,17 +31,17 @@ const getProcessMessagesApi = (qpqConfig: QPQConfig): ClaudeAiMessagesApiActionP
       // `status`), not name/code-keyed, so we map them directly rather than via
       // actionResultErrorFromCaughtError.
       if (error instanceof AuthenticationError) {
-        return actionResultError(ClaudeAiMessagesApiErrorTypeEnum.Unauthorized, 'Invalid API key.');
+        return actionResultError(askClaudeAiMessagesApi.errorType.Unauthorized, 'Invalid API key.');
       } else if (error instanceof PermissionDeniedError) {
-        return actionResultError(ClaudeAiMessagesApiErrorTypeEnum.PermissionDenied, 'The API key lacks permission for this request.');
+        return actionResultError(askClaudeAiMessagesApi.errorType.PermissionDenied, 'The API key lacks permission for this request.');
       } else if (error instanceof BadRequestError || error instanceof UnprocessableEntityError) {
-        return actionResultError(ClaudeAiMessagesApiErrorTypeEnum.InvalidRequest, 'The request was rejected as invalid.');
+        return actionResultError(askClaudeAiMessagesApi.errorType.InvalidRequest, 'The request was rejected as invalid.');
       } else if (error instanceof RateLimitError) {
-        return actionResultError(ClaudeAiMessagesApiErrorTypeEnum.RateLimited, 'Rate limited, please try again later.');
+        return actionResultError(askClaudeAiMessagesApi.errorType.RateLimited, 'Rate limited, please try again later.');
       } else if (error instanceof InternalServerError) {
-        return actionResultError(ClaudeAiMessagesApiErrorTypeEnum.ServerError, 'The Anthropic API returned a server error.');
+        return actionResultError(askClaudeAiMessagesApi.errorType.ServerError, 'The Anthropic API returned a server error.');
       } else if (error instanceof APIConnectionError) {
-        return actionResultError(ClaudeAiMessagesApiErrorTypeEnum.ConnectionError, 'Could not reach the Anthropic API.');
+        return actionResultError(askClaudeAiMessagesApi.errorType.ConnectionError, 'Could not reach the Anthropic API.');
       }
 
       console.log(error);
@@ -54,6 +53,4 @@ const getProcessMessagesApi = (qpqConfig: QPQConfig): ClaudeAiMessagesApiActionP
   };
 };
 
-export const getClaudeAiMessagesApiActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [ClaudeAiActionType.MessagesApi]: getProcessMessagesApi(qpqConfig),
-});
+export const getClaudeAiMessagesApiActionProcessor = createActionProcessor(askClaudeAiMessagesApi, getProcessMessagesApi);

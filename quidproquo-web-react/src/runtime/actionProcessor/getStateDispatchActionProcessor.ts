@@ -1,9 +1,17 @@
-import { ActionProcessorList, ActionProcessorListResolver, actionResult, StateActionType, StateDispatchActionProcessor } from 'quidproquo-core';
+import {
+  ActionProcessorList,
+  ActionProcessorListResolver,
+  actionResult,
+  askStateDispatchBase,
+  createActionProcessor,
+  ProcessorFor,
+  StateActionType,
+} from 'quidproquo-core';
 
 import { Dispatch } from 'react';
 
 const getProcessStateDispatch =
-  (dispatch: Dispatch<any>): StateDispatchActionProcessor<any> =>
+  (dispatch: Dispatch<any>): ProcessorFor<typeof askStateDispatchBase> =>
   async ({ action }) => {
     dispatch(action);
 

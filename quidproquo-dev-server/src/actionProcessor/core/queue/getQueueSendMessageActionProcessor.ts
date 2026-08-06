@@ -1,20 +1,22 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
+  actionResult,
   actionResultError,
+  askQueueSendMessagesBase,
+  createActionProcessor,
   ErrorTypeEnum,
   generateUuid,
+  ProcessorFor,
   QPQConfig,
   qpqCoreUtils,
+  QueueActionType,
   toCrossServiceSession,
 } from 'quidproquo-core';
-import { actionResult, QueueActionType, QueueSendMessageActionProcessor } from 'quidproquo-core';
 
 import { eventBus } from '../../../logic/eventBus';
 import { isDuplicateFifoMessage } from '../../../logic/fifoDeduplication';
 import { AnyQueueMessageWithSession } from '../event/queue/types';
 
-const getProcessQueueSendMessage = (qpqConfig: QPQConfig): QueueSendMessageActionProcessor<any> => {
+const getProcessQueueSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeof askQueueSendMessagesBase> => {
   return async ({ queueName, queueMessages }, session) => {
     const queueConfig = qpqCoreUtils.getQueueByName(qpqConfig, queueName);
     if (!queueConfig) {
@@ -56,6 +58,4 @@ const getProcessQueueSendMessage = (qpqConfig: QPQConfig): QueueSendMessageActio
   };
 };
 
-export const getQueueSendMessagesActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [QueueActionType.SendMessages]: getProcessQueueSendMessage(qpqConfig),
-});
+export const getQueueSendMessagesActionProcessor = createActionProcessor(askQueueSendMessagesBase, getProcessQueueSendMessage);

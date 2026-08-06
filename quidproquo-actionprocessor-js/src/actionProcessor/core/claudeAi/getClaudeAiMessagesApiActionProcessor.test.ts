@@ -1,8 +1,10 @@
 import {
+  askClaudeAiMessagesApi,
   buildTestQpqConfig,
   ClaudeAiActionType,
-  ClaudeAiMessagesApiErrorTypeEnum,
+  createActionProcessor,
   ErrorTypeEnum,
+  ProcessorFor,
   resolveActionResult,
   resolveActionResultError,
 } from 'quidproquo-core';
@@ -78,7 +80,7 @@ describe('getClaudeAiMessagesApiActionProcessor', () => {
     const result = await processor({ body, apiKey: 'sk-test' }, undefined as any);
 
     expect(resolveActionResultError(result)).toEqual({
-      errorType: ClaudeAiMessagesApiErrorTypeEnum.Unauthorized,
+      errorType: askClaudeAiMessagesApi.errorType.Unauthorized,
       errorText: 'Invalid API key.',
       errorStack: undefined,
     });

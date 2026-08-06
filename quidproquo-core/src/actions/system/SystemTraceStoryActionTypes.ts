@@ -1,5 +1,4 @@
 import { QpqExecutionTrace, StoryResult } from '../../types';
-import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
 import { SystemActionType } from './SystemActionType';
 
 // Replays a recorded StoryResult against the real story code (loaded through the
@@ -21,12 +20,4 @@ export interface SystemTraceStoryActionPayload {
   onlyOwnCode?: boolean;
 }
 
-// Action
-export interface SystemTraceStoryAction extends Action<SystemTraceStoryActionPayload> {
-  type: SystemActionType.TraceStory;
-  payload: SystemTraceStoryActionPayload;
-}
-
 // Functions
-export type SystemTraceStoryActionProcessor = ActionProcessor<SystemTraceStoryAction, QpqExecutionTrace>;
-export type SystemTraceStoryActionRequester = ActionRequester<SystemTraceStoryAction, QpqExecutionTrace>;

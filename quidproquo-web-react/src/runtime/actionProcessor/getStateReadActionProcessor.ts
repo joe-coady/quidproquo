@@ -1,7 +1,15 @@
-import { ActionProcessorList, ActionProcessorListResolver, actionResult, StateActionType, StateReadActionProcessor } from 'quidproquo-core';
+import {
+  ActionProcessorList,
+  ActionProcessorListResolver,
+  actionResult,
+  askStateReadBase,
+  createActionProcessor,
+  ProcessorFor,
+  StateActionType,
+} from 'quidproquo-core';
 
 const getProcessStateRead =
-  <State>(getCurrentState: () => State): StateReadActionProcessor<any> =>
+  <State>(getCurrentState: () => State): ProcessorFor<typeof askStateReadBase> =>
   async () => {
     return actionResult(getCurrentState());
   };

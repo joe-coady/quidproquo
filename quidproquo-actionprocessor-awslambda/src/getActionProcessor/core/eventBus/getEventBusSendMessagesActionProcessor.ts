@@ -1,16 +1,15 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askEventBusSendMessagesBase,
+  createActionProcessor,
   ErrorTypeEnum,
   EventBusActionType,
   EventBusMessage,
-  EventBusSendMessageActionProcessor,
-  EventBusSendMessagesErrorTypeEnum,
   generateUuid,
+  ProcessorFor,
   QPQConfig,
   qpqCoreUtils,
   StorySession,
@@ -25,7 +24,7 @@ type AnyEventBusMessageWithSession = EventBusMessage<any> & {
   storySession: StorySession;
 };
 
-const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): EventBusSendMessageActionProcessor<any> => {
+const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeof askEventBusSendMessagesBase> => {
   return async ({ eventBusName, eventBusMessages }, session) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
@@ -75,15 +74,14 @@ const getProcessEventBusSendMessage = (qpqConfig: QPQConfig): EventBusSendMessag
       return actionResult(void 0);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        AuthorizationErrorException: () => actionResultError(EventBusSendMessagesErrorTypeEnum.AccessDenied, 'Access denied publishing to event bus'),
-        NotFoundException: () => actionResultError(EventBusSendMessagesErrorTypeEnum.TopicNotFound, `Event bus topic not found: ${eventBusName}`),
-        InternalErrorException: () => actionResultError(EventBusSendMessagesErrorTypeEnum.ServiceUnavailable, 'Event bus service unavailable'),
-        ThrottledException: () => actionResultError(EventBusSendMessagesErrorTypeEnum.ServiceUnavailable, 'Event bus throttled'),
+        AuthorizationErrorException: () =>
+          actionResultError(askEventBusSendMessagesBase.errorType.AccessDenied, 'Access denied publishing to event bus'),
+        NotFoundException: () => actionResultError(askEventBusSendMessagesBase.errorType.TopicNotFound, `Event bus topic not found: ${eventBusName}`),
+        InternalErrorException: () => actionResultError(askEventBusSendMessagesBase.errorType.ServiceUnavailable, 'Event bus service unavailable'),
+        ThrottledException: () => actionResultError(askEventBusSendMessagesBase.errorType.ServiceUnavailable, 'Event bus throttled'),
       });
     }
   };
 };
 
-export const getEventBusSendMessagesActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [EventBusActionType.SendMessages]: getProcessEventBusSendMessage(qpqConfig),
-});
+export const getEventBusSendMessagesActionProcessor = createActionProcessor(askEventBusSendMessagesBase, getProcessEventBusSendMessage);

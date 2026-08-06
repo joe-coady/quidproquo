@@ -1,6 +1,6 @@
 import { ContextActionType } from '../actions/context/ContextActionType';
 import { ErrorActionType } from '../actions/error/ErrorActionType';
-import { askThrowError } from '../actions/error/ErrorThrowErrorActionRequester';
+import { askThrowError } from '../actions/error/askThrowError';
 import { SystemActionType } from '../actions/system/SystemActionType';
 import { ActionOverrideMap, askOverrideActions, getSuccessfulEitherActionResultIfRequired } from '../stories/system/askOverrideActions';
 import { Action, AskResponse, AskResponseReturnType, EitherActionResult, QPQError } from '../types';

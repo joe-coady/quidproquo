@@ -1,36 +1,23 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
+  askExecuteStoryBase,
+  createActionProcessor,
   createRuntime,
-  DynamicModuleLoader,
   ErrorTypeEnum,
   getUniqueKeyFromQpqFunctionRuntime,
+  ProcessorFor,
   QPQConfig,
   qpqCoreUtils,
-  QpqLogger,
   QpqRuntimeType,
-  StorySession,
-  StorySessionUpdater,
-  SystemActionType,
-  SystemExecuteStoryActionPayload,
-  SystemExecuteStoryActionProcessor,
 } from 'quidproquo-core';
 
 import { randomGuid } from '../../../awsLambdaUtils';
 import { getDateNow } from './getDateNow';
 
-const getProcessExecuteStory = <T extends Array<any>, R>(qpqConfig: QPQConfig): SystemExecuteStoryActionProcessor<T, R> => {
+const getProcessExecuteStory = (qpqConfig: QPQConfig): ProcessorFor<typeof askExecuteStoryBase> => {
   const moduleName = qpqCoreUtils.getApplicationModuleName(qpqConfig);
-  return async (
-    payload: SystemExecuteStoryActionPayload<T>,
-    session: StorySession,
-    actionProcessors: ActionProcessorList,
-    logger: QpqLogger,
-    updateSession: StorySessionUpdater,
-    dynamicModuleLoader: DynamicModuleLoader,
-  ): Promise<any> => {
+  return async (payload, session, actionProcessors, logger, updateSession, dynamicModuleLoader) => {
     const story = await dynamicModuleLoader(payload.runtime);
 
     if (!story) {
@@ -68,10 +55,8 @@ const getProcessExecuteStory = <T extends Array<any>, R>(qpqConfig: QPQConfig): 
       );
     }
 
-    return actionResult<R>(storyResult.result);
+    return actionResult(storyResult.result);
   };
 };
 
-export const getSystemExecuteStoryActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [SystemActionType.ExecuteStory]: getProcessExecuteStory(qpqConfig),
-});
+export const getSystemExecuteStoryActionProcessor = createActionProcessor(askExecuteStoryBase, getProcessExecuteStory);
