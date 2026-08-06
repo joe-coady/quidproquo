@@ -1,15 +1,14 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   ApplicationConfigInfo,
-  ConfigActionType,
-  ConfigGetApplicationInfoActionProcessor,
+  askConfigGetApplicationInfo,
+  createActionProcessor,
+  ProcessorFor,
   QPQConfig,
   qpqCoreUtils,
 } from 'quidproquo-core';
 
-const getProcessConfigGetApplicationConfig = (qpqConfig: QPQConfig): ConfigGetApplicationInfoActionProcessor => {
+const getProcessConfigGetApplicationConfig = (qpqConfig: QPQConfig): ProcessorFor<typeof askConfigGetApplicationInfo> => {
   return async () => {
     const appInfo: ApplicationConfigInfo = {
       environment: qpqCoreUtils.getApplicationModuleEnvironment(qpqConfig),
@@ -22,8 +21,4 @@ const getProcessConfigGetApplicationConfig = (qpqConfig: QPQConfig): ConfigGetAp
   };
 };
 
-export const getConfigGetApplicationInfoActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [ConfigActionType.GetApplicationInfo]: getProcessConfigGetApplicationConfig(qpqConfig),
-});
+export const getConfigGetApplicationInfoActionProcessor = createActionProcessor(askConfigGetApplicationInfo, getProcessConfigGetApplicationConfig);
