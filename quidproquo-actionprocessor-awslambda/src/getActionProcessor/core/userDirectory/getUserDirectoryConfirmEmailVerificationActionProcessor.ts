@@ -1,19 +1,18 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askUserDirectoryConfirmEmailVerification,
+  createActionProcessor,
+  ProcessorFor,
   QPQConfig,
   UserDirectoryActionType,
-  UserDirectoryConfirmEmailVerificationActionProcessor,
-  UserDirectoryConfirmEmailVerificationErrorTypeEnum,
 } from 'quidproquo-core';
 
 import { verifyUserEmail } from '../../../logic/cognito/verifyUserEmail';
 
-const getProcessConfirmEmailVerification = (qpqConfig: QPQConfig): UserDirectoryConfirmEmailVerificationActionProcessor => {
+const getProcessConfirmEmailVerification = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectoryConfirmEmailVerification> => {
   return async ({ code, accessToken }) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
@@ -24,18 +23,17 @@ const getProcessConfirmEmailVerification = (qpqConfig: QPQConfig): UserDirectory
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         CodeMismatchException: () =>
-          actionResultError(UserDirectoryConfirmEmailVerificationErrorTypeEnum.InvalidCode, 'Verification code is incorrect'),
+          actionResultError(askUserDirectoryConfirmEmailVerification.errorType.InvalidCode, 'Verification code is incorrect'),
         ExpiredCodeException: () =>
-          actionResultError(UserDirectoryConfirmEmailVerificationErrorTypeEnum.ExpiredCode, 'Verification code has expired'),
+          actionResultError(askUserDirectoryConfirmEmailVerification.errorType.ExpiredCode, 'Verification code has expired'),
         LimitExceededException: () =>
-          actionResultError(UserDirectoryConfirmEmailVerificationErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
+          actionResultError(askUserDirectoryConfirmEmailVerification.errorType.LimitExceeded, 'Too many attempts, please try again later'),
       });
     }
   };
 };
 
-export const getUserDirectoryConfirmEmailVerificationActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [UserDirectoryActionType.ConfirmEmailVerification]: getProcessConfirmEmailVerification(qpqConfig),
-});
+export const getUserDirectoryConfirmEmailVerificationActionProcessor = createActionProcessor(
+  askUserDirectoryConfirmEmailVerification,
+  getProcessConfirmEmailVerification,
+);

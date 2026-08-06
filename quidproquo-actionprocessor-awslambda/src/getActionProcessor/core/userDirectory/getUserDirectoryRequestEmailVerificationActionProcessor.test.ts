@@ -1,5 +1,11 @@
 import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { buildTestQpqConfig, UserDirectoryActionType, UserDirectoryRequestEmailVerificationErrorTypeEnum } from 'quidproquo-core';
+import {
+  askUserDirectoryRequestEmailVerification,
+  buildTestQpqConfig,
+  createActionProcessor,
+  ProcessorFor,
+  UserDirectoryActionType,
+} from 'quidproquo-core';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -51,7 +57,7 @@ describe('getUserDirectoryRequestEmailVerificationActionProcessor', () => {
 
     const [, error] = await invokeProcessor(processor, { userDirectoryName: 'users', accessToken: 'bad' });
 
-    expect(error?.errorType).toBe(UserDirectoryRequestEmailVerificationErrorTypeEnum.Unauthorized);
+    expect(error?.errorType).toBe(askUserDirectoryRequestEmailVerification.errorType.Unauthorized);
   });
 
   it('maps CodeDeliveryFailureException to the CodeDeliveryFailed error', async () => {
@@ -60,6 +66,6 @@ describe('getUserDirectoryRequestEmailVerificationActionProcessor', () => {
 
     const [, error] = await invokeProcessor(processor, { userDirectoryName: 'users', accessToken: 'tok' });
 
-    expect(error?.errorType).toBe(UserDirectoryRequestEmailVerificationErrorTypeEnum.CodeDeliveryFailed);
+    expect(error?.errorType).toBe(askUserDirectoryRequestEmailVerification.errorType.CodeDeliveryFailed);
   });
 });

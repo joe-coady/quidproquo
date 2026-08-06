@@ -1,17 +1,17 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
+  askUserDirectorySetAccessToken,
+  createActionProcessor,
   ErrorTypeEnum,
+  ProcessorFor,
   QPQConfig,
   UserDirectoryActionType,
-  UserDirectorySetAccessTokenActionProcessor,
 } from 'quidproquo-core';
 
 import { decodeAccessTokenForDev } from '../../../logic/auth/decodeAccessTokenForDev';
 
-const getProcessSetAccessToken = (_qpqConfig: QPQConfig): UserDirectorySetAccessTokenActionProcessor => {
+const getProcessSetAccessToken = (_qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectorySetAccessToken> => {
   return async ({ accessToken, userDirectoryName }, session, apl, logger, updateSession) => {
     const decodedAccessToken = decodeAccessTokenForDev(userDirectoryName, accessToken, false);
 
@@ -28,8 +28,4 @@ const getProcessSetAccessToken = (_qpqConfig: QPQConfig): UserDirectorySetAccess
   };
 };
 
-export const getUserDirectorySetAccessTokenActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [UserDirectoryActionType.SetAccessToken]: getProcessSetAccessToken(qpqConfig),
-});
+export const getUserDirectorySetAccessTokenActionProcessor = createActionProcessor(askUserDirectorySetAccessToken, getProcessSetAccessToken);

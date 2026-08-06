@@ -1,11 +1,11 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultErrorFromCaughtError,
+  askUserDirectoryRefreshToken,
+  createActionProcessor,
+  ProcessorFor,
   QPQConfig,
   UserDirectoryActionType,
-  UserDirectoryRefreshTokenActionProcessor,
 } from 'quidproquo-core';
 import { qpqWebServerUtils } from 'quidproquo-webserver';
 
@@ -13,7 +13,10 @@ import { createDevAuthResponse, resolveDevUserDirectory } from '../../../logic/a
 import { getDevUserByUserId, upsertDevUser } from '../../../logic/auth/jsonUserStore';
 import { ResolvedDevServerConfig } from '../../../types';
 
-const getProcessRefreshToken = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): UserDirectoryRefreshTokenActionProcessor => {
+const getProcessRefreshToken = (
+  qpqConfig: QPQConfig,
+  devServerConfig: ResolvedDevServerConfig,
+): ProcessorFor<typeof askUserDirectoryRefreshToken> => {
   return async ({ userDirectoryName, refreshToken }) => {
     try {
       // Keep the same user the refresh token was minted for, falling back to the dev user
@@ -35,8 +38,5 @@ const getProcessRefreshToken = (qpqConfig: QPQConfig, devServerConfig: ResolvedD
   };
 };
 
-export const getUserDirectoryRefreshTokenActionProcessor =
-  (devServerConfig: ResolvedDevServerConfig): ActionProcessorListResolver =>
-  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-    [UserDirectoryActionType.RefreshToken]: getProcessRefreshToken(qpqConfig, devServerConfig),
-  });
+export const getUserDirectoryRefreshTokenActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
+  createActionProcessor(askUserDirectoryRefreshToken, (qpqConfig) => getProcessRefreshToken(qpqConfig, devServerConfig));

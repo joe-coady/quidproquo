@@ -1,4 +1,3 @@
-import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
 import { AuthenticateUserResponse, UserDirectoryActionType } from './UserDirectoryActionType';
 
 // Payload
@@ -7,13 +6,3 @@ export interface UserDirectoryRefreshTokenActionPayload {
 
   refreshToken: string;
 }
-
-// Action
-export interface UserDirectoryRefreshTokenAction extends Action<UserDirectoryRefreshTokenActionPayload> {
-  type: UserDirectoryActionType.RefreshToken;
-  payload: UserDirectoryRefreshTokenActionPayload;
-}
-
-// Function Types
-export type UserDirectoryRefreshTokenActionProcessor = ActionProcessor<UserDirectoryRefreshTokenAction, AuthenticateUserResponse>;
-export type UserDirectoryRefreshTokenActionRequester = ActionRequester<UserDirectoryRefreshTokenAction, AuthenticateUserResponse>;

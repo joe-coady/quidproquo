@@ -1,12 +1,14 @@
 import {
+  askUserDirectoryGetUserAttributesByUserId,
   buildTestQpqConfig,
+  createActionProcessor,
   defineUserDirectory,
   isErroredActionResult,
   noopDynamicModuleLoader,
+  ProcessorFor,
   resolveActionResult,
   resolveActionResultError,
   UserDirectoryActionType,
-  UserDirectoryGetUserAttributesByUserIdErrorTypeEnum,
 } from 'quidproquo-core';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -52,6 +54,6 @@ describe('getUserDirectoryGetUserAttributesByUserIdActionProcessor', () => {
     const result = await invokeProcessor(process, { userDirectoryName: 'directory', userId: 'unknown' });
 
     expect(isErroredActionResult(result)).toBe(true);
-    expect(resolveActionResultError(result).errorType).toBe(UserDirectoryGetUserAttributesByUserIdErrorTypeEnum.UserNotFound);
+    expect(resolveActionResultError(result).errorType).toBe(askUserDirectoryGetUserAttributesByUserId.errorType.UserNotFound);
   });
 });

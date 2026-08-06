@@ -1,15 +1,14 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askUserDirectoryForgotPassword,
   AuthenticationDeliveryDetails,
+  createActionProcessor,
+  ProcessorFor,
   QPQConfig,
   UserDirectoryActionType,
-  UserDirectoryForgotPasswordActionProcessor,
-  UserDirectoryForgotPasswordErrorTypeEnum,
 } from 'quidproquo-core';
 
 import { getCFExportNameUserPoolClientIdFromConfig, getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
@@ -17,7 +16,7 @@ import { getExportedValue } from '../../../logic/cloudformation/getExportedValue
 import { forgotPassword } from '../../../logic/cognito/forgotPassword';
 import { resolveUsernameByPreferredUsername } from '../../../logic/cognito/resolveUsernameByPreferredUsername';
 
-const getProcessForgotPassword = (qpqConfig: QPQConfig): UserDirectoryForgotPasswordActionProcessor => {
+const getProcessForgotPassword = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectoryForgotPassword> => {
   return async ({ username, userDirectoryName }) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
@@ -33,16 +32,12 @@ const getProcessForgotPassword = (qpqConfig: QPQConfig): UserDirectoryForgotPass
       return actionResult(authResponse);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        UserNotFoundException: () => actionResultError(UserDirectoryForgotPasswordErrorTypeEnum.UserNotFound, 'No account found for this user'),
+        UserNotFoundException: () => actionResultError(askUserDirectoryForgotPassword.errorType.UserNotFound, 'No account found for this user'),
         LimitExceededException: () =>
-          actionResultError(UserDirectoryForgotPasswordErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
+          actionResultError(askUserDirectoryForgotPassword.errorType.LimitExceeded, 'Too many attempts, please try again later'),
       });
     }
   };
 };
 
-export const getUserDirectoryForgotPasswordActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [UserDirectoryActionType.ForgotPassword]: getProcessForgotPassword(qpqConfig),
-});
+export const getUserDirectoryForgotPasswordActionProcessor = createActionProcessor(askUserDirectoryForgotPassword, getProcessForgotPassword);

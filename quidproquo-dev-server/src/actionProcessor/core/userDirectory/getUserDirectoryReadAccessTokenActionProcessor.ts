@@ -1,17 +1,17 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
+  askUserDirectoryReadAccessToken,
+  createActionProcessor,
   ErrorTypeEnum,
+  ProcessorFor,
   QPQConfig,
   UserDirectoryActionType,
-  UserDirectoryReadAccessTokenActionProcessor,
 } from 'quidproquo-core';
 
 import { decodeAccessTokenForDev } from '../../../logic/auth/decodeAccessTokenForDev';
 
-const getProcessReadAccessToken = (_qpqConfig: QPQConfig): UserDirectoryReadAccessTokenActionProcessor => {
+const getProcessReadAccessToken = (_qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectoryReadAccessToken> => {
   return async ({ userDirectoryName, ignoreExpiration }, { decodedAccessToken, accessToken }) => {
     if (decodedAccessToken) {
       // Prod parity: the awslambda processor rejects a session-cached token that has
@@ -34,8 +34,4 @@ const getProcessReadAccessToken = (_qpqConfig: QPQConfig): UserDirectoryReadAcce
   };
 };
 
-export const getUserDirectoryReadAccessTokenActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [UserDirectoryActionType.ReadAccessToken]: getProcessReadAccessToken(qpqConfig),
-});
+export const getUserDirectoryReadAccessTokenActionProcessor = createActionProcessor(askUserDirectoryReadAccessToken, getProcessReadAccessToken);

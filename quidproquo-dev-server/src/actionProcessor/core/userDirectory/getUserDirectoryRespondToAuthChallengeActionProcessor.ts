@@ -1,11 +1,11 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultErrorFromCaughtError,
+  askUserDirectoryRespondToAuthChallenge,
+  createActionProcessor,
+  ProcessorFor,
   QPQConfig,
   UserDirectoryActionType,
-  UserDirectoryRespondToAuthChallengeActionProcessor,
 } from 'quidproquo-core';
 
 import { createDevAuthResponse, resolveDevUserDirectory } from '../../../logic/auth/devAuth';
@@ -15,7 +15,7 @@ import { ResolvedDevServerConfig } from '../../../types';
 const getProcessRespondToAuthChallenge = (
   qpqConfig: QPQConfig,
   devServerConfig: ResolvedDevServerConfig,
-): UserDirectoryRespondToAuthChallengeActionProcessor => {
+): ProcessorFor<typeof askUserDirectoryRespondToAuthChallenge> => {
   return async ({ userDirectoryName, authChallenge }) => {
     try {
       // Dev auth never issues challenges, but if one is answered, it always passes
@@ -29,8 +29,5 @@ const getProcessRespondToAuthChallenge = (
   };
 };
 
-export const getUserDirectoryRespondToAuthChallengeActionProcessor =
-  (devServerConfig: ResolvedDevServerConfig): ActionProcessorListResolver =>
-  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-    [UserDirectoryActionType.RespondToAuthChallenge]: getProcessRespondToAuthChallenge(qpqConfig, devServerConfig),
-  });
+export const getUserDirectoryRespondToAuthChallengeActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
+  createActionProcessor(askUserDirectoryRespondToAuthChallenge, (qpqConfig) => getProcessRespondToAuthChallenge(qpqConfig, devServerConfig));

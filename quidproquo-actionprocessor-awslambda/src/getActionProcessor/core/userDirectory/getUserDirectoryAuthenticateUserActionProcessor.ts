@@ -1,14 +1,13 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askUserDirectoryAuthenticateUserBase,
+  createActionProcessor,
+  ProcessorFor,
   QPQConfig,
   UserDirectoryActionType,
-  UserDirectoryAuthenticateUserActionProcessor,
-  UserDirectoryAuthenticateUserErrorTypeEnum,
 } from 'quidproquo-core';
 
 import { getCFExportNameUserPoolClientIdFromConfig, getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
@@ -16,7 +15,7 @@ import { getExportedValue } from '../../../logic/cloudformation/getExportedValue
 import { authenticateUser } from '../../../logic/cognito/authenticateUser';
 import { resolveUsernameByPreferredUsername } from '../../../logic/cognito/resolveUsernameByPreferredUsername';
 
-const getProcessAuthenticateUser = (qpqConfig: QPQConfig): UserDirectoryAuthenticateUserActionProcessor => {
+const getProcessAuthenticateUser = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectoryAuthenticateUserBase> => {
   return async (payload) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
     const userPoolId = await getExportedValue(getCFExportNameUserPoolIdFromConfig(payload.userDirectoryName, qpqConfig), region);
@@ -37,15 +36,15 @@ const getProcessAuthenticateUser = (qpqConfig: QPQConfig): UserDirectoryAuthenti
       return actionResult(authResponse);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        UserNotFoundException: () => actionResultError(UserDirectoryAuthenticateUserErrorTypeEnum.UserNotFound, 'Incorrect username or password'),
-        NotAuthorizedException: () => actionResultError(UserDirectoryAuthenticateUserErrorTypeEnum.UserNotFound, 'Incorrect username or password'),
+        UserNotFoundException: () => actionResultError(askUserDirectoryAuthenticateUserBase.errorType.UserNotFound, 'Incorrect username or password'),
+        NotAuthorizedException: () =>
+          actionResultError(askUserDirectoryAuthenticateUserBase.errorType.UserNotFound, 'Incorrect username or password'),
       });
     }
   };
 };
 
-export const getUserDirectoryAuthenticateUserActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [UserDirectoryActionType.AuthenticateUser]: getProcessAuthenticateUser(qpqConfig),
-});
+export const getUserDirectoryAuthenticateUserActionProcessor = createActionProcessor(
+  askUserDirectoryAuthenticateUserBase,
+  getProcessAuthenticateUser,
+);

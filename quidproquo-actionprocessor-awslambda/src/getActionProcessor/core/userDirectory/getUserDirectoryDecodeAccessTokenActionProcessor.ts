@@ -1,20 +1,19 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
+  askUserDirectoryDecodeAccessToken,
+  createActionProcessor,
+  ProcessorFor,
   QPQConfig,
   UserDirectoryActionType,
-  UserDirectoryDecodeAccessTokenActionProcessor,
-  UserDirectoryDecodeAccessTokenErrorTypeEnum,
 } from 'quidproquo-core';
 
 import { getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { decodeValidJwt } from '../../../logic/cognito/decodeValidJwt';
 
-const getProcessDecodeAccessToken = (qpqConfig: QPQConfig): UserDirectoryDecodeAccessTokenActionProcessor => {
+const getProcessDecodeAccessToken = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectoryDecodeAccessToken> => {
   return async ({ userDirectoryName, accessToken, ignoreExpiration }) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
@@ -23,7 +22,7 @@ const getProcessDecodeAccessToken = (qpqConfig: QPQConfig): UserDirectoryDecodeA
     const authInfo = await decodeValidJwt(userPoolId, region, ignoreExpiration, accessToken);
 
     if (!authInfo || !authInfo?.username) {
-      return actionResultError(UserDirectoryDecodeAccessTokenErrorTypeEnum.Unauthorized, 'Invalid access token');
+      return actionResultError(askUserDirectoryDecodeAccessToken.errorType.Unauthorized, 'Invalid access token');
     }
 
     return actionResult({
@@ -34,8 +33,4 @@ const getProcessDecodeAccessToken = (qpqConfig: QPQConfig): UserDirectoryDecodeA
   };
 };
 
-export const getUserDirectoryDecodeAccessTokenActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [UserDirectoryActionType.DecodeAccessToken]: getProcessDecodeAccessToken(qpqConfig),
-});
+export const getUserDirectoryDecodeAccessTokenActionProcessor = createActionProcessor(askUserDirectoryDecodeAccessToken, getProcessDecodeAccessToken);

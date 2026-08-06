@@ -1,21 +1,10 @@
-import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
-  actionResult,
-  QPQConfig,
-  UserDirectoryActionType,
-  UserDirectorySetPasswordActionProcessor,
-} from 'quidproquo-core';
+import { actionResult, askUserDirectorySetPassword, createActionProcessor, ProcessorFor, QPQConfig, UserDirectoryActionType } from 'quidproquo-core';
 
-const getProcessSetPassword = (_qpqConfig: QPQConfig): UserDirectorySetPasswordActionProcessor => {
+const getProcessSetPassword = (_qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectorySetPassword> => {
   return async () => {
     // Passwords are not stored in dev
     return actionResult(void 0);
   };
 };
 
-export const getUserDirectorySetPasswordActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [UserDirectoryActionType.SetPassword]: getProcessSetPassword(qpqConfig),
-});
+export const getUserDirectorySetPasswordActionProcessor = createActionProcessor(askUserDirectorySetPassword, getProcessSetPassword);

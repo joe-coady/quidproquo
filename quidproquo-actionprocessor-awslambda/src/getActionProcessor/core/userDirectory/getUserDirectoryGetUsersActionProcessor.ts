@@ -1,21 +1,20 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askUserDirectoryGetUsers,
+  createActionProcessor,
+  ProcessorFor,
   QPQConfig,
   UserDirectoryActionType,
-  UserDirectoryGetUsersActionProcessor,
-  UserDirectoryGetUsersErrorTypeEnum,
 } from 'quidproquo-core';
 
 import { getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { listPagedUsers } from '../../../logic/cognito/listPagedUsers';
 
-const getProcessGetUsers = (qpqConfig: QPQConfig): UserDirectoryGetUsersActionProcessor => {
+const getProcessGetUsers = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectoryGetUsers> => {
   return async ({ userDirectoryName, nextPageKey }) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
@@ -27,14 +26,12 @@ const getProcessGetUsers = (qpqConfig: QPQConfig): UserDirectoryGetUsersActionPr
       return actionResult(userAttributes);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        InvalidParameterException: () => actionResultError(UserDirectoryGetUsersErrorTypeEnum.InvalidPageKey, 'The supplied page key is invalid'),
+        InvalidParameterException: () => actionResultError(askUserDirectoryGetUsers.errorType.InvalidPageKey, 'The supplied page key is invalid'),
         TooManyRequestsException: () =>
-          actionResultError(UserDirectoryGetUsersErrorTypeEnum.LimitExceeded, 'Too many requests, please try again later'),
+          actionResultError(askUserDirectoryGetUsers.errorType.LimitExceeded, 'Too many requests, please try again later'),
       });
     }
   };
 };
 
-export const getUserDirectoryGetUsersActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [UserDirectoryActionType.GetUsers]: getProcessGetUsers(qpqConfig),
-});
+export const getUserDirectoryGetUsersActionProcessor = createActionProcessor(askUserDirectoryGetUsers, getProcessGetUsers);

@@ -1,15 +1,15 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
+  askUserDirectoryForgotPassword,
+  createActionProcessor,
+  ProcessorFor,
   QPQConfig,
   UserDirectoryActionType,
-  UserDirectoryForgotPasswordActionProcessor,
 } from 'quidproquo-core';
 
 import { resolveDevUsername } from '../../../logic/auth/devAuth';
 
-const getProcessForgotPassword = (_qpqConfig: QPQConfig): UserDirectoryForgotPasswordActionProcessor => {
+const getProcessForgotPassword = (_qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectoryForgotPassword> => {
   return async ({ username }) => {
     // No email is actually sent in dev
     return actionResult({
@@ -20,8 +20,4 @@ const getProcessForgotPassword = (_qpqConfig: QPQConfig): UserDirectoryForgotPas
   };
 };
 
-export const getUserDirectoryForgotPasswordActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [UserDirectoryActionType.ForgotPassword]: getProcessForgotPassword(qpqConfig),
-});
+export const getUserDirectoryForgotPasswordActionProcessor = createActionProcessor(askUserDirectoryForgotPassword, getProcessForgotPassword);

@@ -1,11 +1,11 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultErrorFromCaughtError,
+  askUserDirectorySetUserAttributes,
+  createActionProcessor,
+  ProcessorFor,
   QPQConfig,
   UserDirectoryActionType,
-  UserDirectorySetUserAttributesActionProcessor,
 } from 'quidproquo-core';
 
 import { resolveDevUserDirectory } from '../../../logic/auth/devAuth';
@@ -15,7 +15,7 @@ import { ResolvedDevServerConfig } from '../../../types';
 const getProcessSetUserAttributes = (
   qpqConfig: QPQConfig,
   devServerConfig: ResolvedDevServerConfig,
-): UserDirectorySetUserAttributesActionProcessor => {
+): ProcessorFor<typeof askUserDirectorySetUserAttributes> => {
   return async ({ userDirectoryName, username, userAttributes }) => {
     try {
       const userDirectory = resolveDevUserDirectory(userDirectoryName, qpqConfig);
@@ -28,8 +28,5 @@ const getProcessSetUserAttributes = (
   };
 };
 
-export const getUserDirectorySetUserAttributesActionProcessor =
-  (devServerConfig: ResolvedDevServerConfig): ActionProcessorListResolver =>
-  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-    [UserDirectoryActionType.SetUserAttributes]: getProcessSetUserAttributes(qpqConfig, devServerConfig),
-  });
+export const getUserDirectorySetUserAttributesActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
+  createActionProcessor(askUserDirectorySetUserAttributes, (qpqConfig) => getProcessSetUserAttributes(qpqConfig, devServerConfig));

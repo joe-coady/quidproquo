@@ -1,17 +1,17 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
+  askUserDirectoryReadAccessToken,
+  createActionProcessor,
   ErrorTypeEnum,
+  ProcessorFor,
   QPQConfig,
   UserDirectoryActionType,
-  UserDirectoryReadAccessTokenActionProcessor,
 } from 'quidproquo-core';
 
 import { decodeAccessToken } from '../../../logic/cognito/decodeAccessToken';
 
-const getProcessReadAccessToken = (qpqConfig: QPQConfig): UserDirectoryReadAccessTokenActionProcessor => {
+const getProcessReadAccessToken = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectoryReadAccessToken> => {
   return async ({ userDirectoryName, ignoreExpiration }, { decodedAccessToken, accessToken }) => {
     if (decodedAccessToken) {
       if (!ignoreExpiration && decodedAccessToken.exp < Math.floor(Date.now() / 1000)) {
@@ -32,8 +32,4 @@ const getProcessReadAccessToken = (qpqConfig: QPQConfig): UserDirectoryReadAcces
   };
 };
 
-export const getUserDirectoryReadAccessTokenActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [UserDirectoryActionType.ReadAccessToken]: getProcessReadAccessToken(qpqConfig),
-});
+export const getUserDirectoryReadAccessTokenActionProcessor = createActionProcessor(askUserDirectoryReadAccessToken, getProcessReadAccessToken);

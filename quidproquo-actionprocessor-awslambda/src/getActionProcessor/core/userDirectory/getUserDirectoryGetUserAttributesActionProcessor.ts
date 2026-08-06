@@ -1,14 +1,13 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askUserDirectoryGetUserAttributes,
+  createActionProcessor,
+  ProcessorFor,
   QPQConfig,
   UserDirectoryActionType,
-  UserDirectoryGetUserAttributesActionProcessor,
-  UserDirectoryGetUserAttributesErrorTypeEnum,
 } from 'quidproquo-core';
 
 import { getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
@@ -16,7 +15,7 @@ import { getExportedValue } from '../../../logic/cloudformation/getExportedValue
 import { getUserAttributes } from '../../../logic/cognito/getUserAttributes';
 import { resolveUsernameByPreferredUsername } from '../../../logic/cognito/resolveUsernameByPreferredUsername';
 
-const getProcessGetUserAttributes = (qpqConfig: QPQConfig): UserDirectoryGetUserAttributesActionProcessor => {
+const getProcessGetUserAttributes = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectoryGetUserAttributes> => {
   return async ({ userDirectoryName, username }) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
@@ -30,14 +29,10 @@ const getProcessGetUserAttributes = (qpqConfig: QPQConfig): UserDirectoryGetUser
       return actionResult(userAttributes);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        UserNotFoundException: () => actionResultError(UserDirectoryGetUserAttributesErrorTypeEnum.UserNotFound, 'User not found'),
+        UserNotFoundException: () => actionResultError(askUserDirectoryGetUserAttributes.errorType.UserNotFound, 'User not found'),
       });
     }
   };
 };
 
-export const getUserDirectoryGetUserAttributesActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [UserDirectoryActionType.GetUserAttributes]: getProcessGetUserAttributes(qpqConfig),
-});
+export const getUserDirectoryGetUserAttributesActionProcessor = createActionProcessor(askUserDirectoryGetUserAttributes, getProcessGetUserAttributes);

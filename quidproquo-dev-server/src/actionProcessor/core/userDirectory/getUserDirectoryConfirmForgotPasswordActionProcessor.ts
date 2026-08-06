@@ -1,11 +1,11 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultErrorFromCaughtError,
+  askUserDirectoryConfirmForgotPassword,
+  createActionProcessor,
+  ProcessorFor,
   QPQConfig,
   UserDirectoryActionType,
-  UserDirectoryConfirmForgotPasswordActionProcessor,
 } from 'quidproquo-core';
 
 import { createDevAuthResponse, resolveDevUserDirectory } from '../../../logic/auth/devAuth';
@@ -15,7 +15,7 @@ import { ResolvedDevServerConfig } from '../../../types';
 const getProcessConfirmForgotPassword = (
   qpqConfig: QPQConfig,
   devServerConfig: ResolvedDevServerConfig,
-): UserDirectoryConfirmForgotPasswordActionProcessor => {
+): ProcessorFor<typeof askUserDirectoryConfirmForgotPassword> => {
   return async ({ userDirectoryName, username }) => {
     try {
       // Any confirmation code is accepted in dev
@@ -29,8 +29,5 @@ const getProcessConfirmForgotPassword = (
   };
 };
 
-export const getUserDirectoryConfirmForgotPasswordActionProcessor =
-  (devServerConfig: ResolvedDevServerConfig): ActionProcessorListResolver =>
-  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-    [UserDirectoryActionType.ConfirmForgotPassword]: getProcessConfirmForgotPassword(qpqConfig, devServerConfig),
-  });
+export const getUserDirectoryConfirmForgotPasswordActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
+  createActionProcessor(askUserDirectoryConfirmForgotPassword, (qpqConfig) => getProcessConfirmForgotPassword(qpqConfig, devServerConfig));

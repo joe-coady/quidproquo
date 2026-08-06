@@ -1,21 +1,20 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askUserDirectoryGetUserAttributesByUserId,
+  createActionProcessor,
+  ProcessorFor,
   QPQConfig,
   UserDirectoryActionType,
-  UserDirectoryGetUserAttributesByUserIdActionProcessor,
-  UserDirectoryGetUserAttributesByUserIdErrorTypeEnum,
 } from 'quidproquo-core';
 
 import { getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { getUserAttributesBySub } from '../../../logic/cognito/getUserAttributesBySub';
 
-const getProcessGetUserAttributesByUserId = (qpqConfig: QPQConfig): UserDirectoryGetUserAttributesByUserIdActionProcessor => {
+const getProcessGetUserAttributesByUserId = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectoryGetUserAttributesByUserId> => {
   return async ({ userDirectoryName, userId }) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
@@ -27,14 +26,13 @@ const getProcessGetUserAttributesByUserId = (qpqConfig: QPQConfig): UserDirector
       return actionResult(userAttributes);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        USER_NOT_FOUND: () => actionResultError(UserDirectoryGetUserAttributesByUserIdErrorTypeEnum.UserNotFound, 'No user found for this userId'),
+        USER_NOT_FOUND: () => actionResultError(askUserDirectoryGetUserAttributesByUserId.errorType.UserNotFound, 'No user found for this userId'),
       });
     }
   };
 };
 
-export const getUserDirectoryGetUserAttributesByUserIdActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [UserDirectoryActionType.GetUserAttributesByUserId]: getProcessGetUserAttributesByUserId(qpqConfig),
-});
+export const getUserDirectoryGetUserAttributesByUserIdActionProcessor = createActionProcessor(
+  askUserDirectoryGetUserAttributesByUserId,
+  getProcessGetUserAttributesByUserId,
+);

@@ -1,15 +1,14 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askUserDirectoryCreateUser,
   AuthenticateUserResponse,
+  createActionProcessor,
+  ProcessorFor,
   QPQConfig,
   UserDirectoryActionType,
-  UserDirectoryCreateUserActionProcessor,
-  UserDirectoryCreateUserErrorTypeEnum,
 } from 'quidproquo-core';
 
 import { getCFExportNameUserPoolClientIdFromConfig, getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
@@ -17,7 +16,7 @@ import { getExportedValue } from '../../../logic/cloudformation/getExportedValue
 import { createUser } from '../../../logic/cognito/createUser';
 import { resolveUsernameByPreferredUsername } from '../../../logic/cognito/resolveUsernameByPreferredUsername';
 
-const getProcessCreateUser = (qpqConfig: QPQConfig): UserDirectoryCreateUserActionProcessor => {
+const getProcessCreateUser = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectoryCreateUser> => {
   return async (payload) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
@@ -27,7 +26,7 @@ const getProcessCreateUser = (qpqConfig: QPQConfig): UserDirectoryCreateUserActi
 
     const resolvedUsername = await resolveUsernameByPreferredUsername(userPoolId, region, payload.createUserRequest.email);
     if (resolvedUsername !== payload.createUserRequest.email) {
-      return actionResultError(UserDirectoryCreateUserErrorTypeEnum.Conflict, 'An account with this email already exists');
+      return actionResultError(askUserDirectoryCreateUser.errorType.Conflict, 'An account with this email already exists');
     }
 
     try {
@@ -36,16 +35,14 @@ const getProcessCreateUser = (qpqConfig: QPQConfig): UserDirectoryCreateUserActi
       return actionResult(authResponse);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        UsernameExistsException: () => actionResultError(UserDirectoryCreateUserErrorTypeEnum.Conflict, 'An account with this email already exists'),
+        UsernameExistsException: () => actionResultError(askUserDirectoryCreateUser.errorType.Conflict, 'An account with this email already exists'),
         InvalidPasswordException: () =>
-          actionResultError(UserDirectoryCreateUserErrorTypeEnum.InvalidPassword, 'Password does not meet the password policy'),
+          actionResultError(askUserDirectoryCreateUser.errorType.InvalidPassword, 'Password does not meet the password policy'),
         LimitExceededException: () =>
-          actionResultError(UserDirectoryCreateUserErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
+          actionResultError(askUserDirectoryCreateUser.errorType.LimitExceeded, 'Too many attempts, please try again later'),
       });
     }
   };
 };
 
-export const getUserDirectoryCreateUserActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [UserDirectoryActionType.CreateUser]: getProcessCreateUser(qpqConfig),
-});
+export const getUserDirectoryCreateUserActionProcessor = createActionProcessor(askUserDirectoryCreateUser, getProcessCreateUser);

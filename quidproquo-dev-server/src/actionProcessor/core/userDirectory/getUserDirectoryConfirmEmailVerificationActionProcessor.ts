@@ -1,21 +1,20 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
+  askUserDirectoryConfirmEmailVerification,
+  createActionProcessor,
+  ProcessorFor,
   QPQConfig,
   UserDirectoryActionType,
-  UserDirectoryConfirmEmailVerificationActionProcessor,
 } from 'quidproquo-core';
 
-const getProcessConfirmEmailVerification = (_qpqConfig: QPQConfig): UserDirectoryConfirmEmailVerificationActionProcessor => {
+const getProcessConfirmEmailVerification = (_qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectoryConfirmEmailVerification> => {
   return async () => {
     // Any verification code is accepted in dev
     return actionResult(void 0);
   };
 };
 
-export const getUserDirectoryConfirmEmailVerificationActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [UserDirectoryActionType.ConfirmEmailVerification]: getProcessConfirmEmailVerification(qpqConfig),
-});
+export const getUserDirectoryConfirmEmailVerificationActionProcessor = createActionProcessor(
+  askUserDirectoryConfirmEmailVerification,
+  getProcessConfirmEmailVerification,
+);

@@ -8,13 +8,3 @@ export interface UserDirectoryRespondToAuthChallengeActionPayload {
 
   authChallenge: AnyAuthChallenge;
 }
-
-// Action
-export interface UserDirectoryRespondToAuthChallengeAction extends Action<UserDirectoryRespondToAuthChallengeActionPayload> {
-  type: UserDirectoryActionType.RespondToAuthChallenge;
-  payload: UserDirectoryRespondToAuthChallengeActionPayload;
-}
-
-// Function Types
-export type UserDirectoryRespondToAuthChallengeActionProcessor = ActionProcessor<UserDirectoryRespondToAuthChallengeAction, AuthenticateUserResponse>;
-export type UserDirectoryRespondToAuthChallengeActionRequester = ActionRequester<UserDirectoryRespondToAuthChallengeAction, AuthenticateUserResponse>;

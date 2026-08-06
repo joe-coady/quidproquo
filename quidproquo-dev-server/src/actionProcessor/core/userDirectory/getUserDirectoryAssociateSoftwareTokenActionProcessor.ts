@@ -1,13 +1,13 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
+  askUserDirectoryAssociateSoftwareToken,
+  createActionProcessor,
+  ProcessorFor,
   QPQConfig,
   UserDirectoryActionType,
-  UserDirectoryAssociateSoftwareTokenActionProcessor,
 } from 'quidproquo-core';
 
-const getProcessAssociateSoftwareToken = (_qpqConfig: QPQConfig): UserDirectoryAssociateSoftwareTokenActionProcessor => {
+const getProcessAssociateSoftwareToken = (_qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectoryAssociateSoftwareToken> => {
   return async ({ session }) => {
     // Static base32 secret ~ MFA codes are never actually verified in dev
     return actionResult({
@@ -17,8 +17,7 @@ const getProcessAssociateSoftwareToken = (_qpqConfig: QPQConfig): UserDirectoryA
   };
 };
 
-export const getUserDirectoryAssociateSoftwareTokenActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [UserDirectoryActionType.AssociateSoftwareToken]: getProcessAssociateSoftwareToken(qpqConfig),
-});
+export const getUserDirectoryAssociateSoftwareTokenActionProcessor = createActionProcessor(
+  askUserDirectoryAssociateSoftwareToken,
+  getProcessAssociateSoftwareToken,
+);

@@ -1,18 +1,18 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultErrorFromCaughtError,
+  askUserDirectoryCreateUser,
+  createActionProcessor,
+  ProcessorFor,
   QPQConfig,
   UserDirectoryActionType,
-  UserDirectoryCreateUserActionProcessor,
 } from 'quidproquo-core';
 
 import { createDevAuthResponse, resolveDevUserDirectory } from '../../../logic/auth/devAuth';
 import { upsertDevUser } from '../../../logic/auth/jsonUserStore';
 import { ResolvedDevServerConfig } from '../../../types';
 
-const getProcessCreateUser = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): UserDirectoryCreateUserActionProcessor => {
+const getProcessCreateUser = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): ProcessorFor<typeof askUserDirectoryCreateUser> => {
   return async ({ userDirectoryName, createUserRequest }) => {
     try {
       // Signup just logs you straight in ~ store everything but the password
@@ -27,8 +27,5 @@ const getProcessCreateUser = (qpqConfig: QPQConfig, devServerConfig: ResolvedDev
   };
 };
 
-export const getUserDirectoryCreateUserActionProcessor =
-  (devServerConfig: ResolvedDevServerConfig): ActionProcessorListResolver =>
-  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-    [UserDirectoryActionType.CreateUser]: getProcessCreateUser(qpqConfig, devServerConfig),
-  });
+export const getUserDirectoryCreateUserActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
+  createActionProcessor(askUserDirectoryCreateUser, (qpqConfig) => getProcessCreateUser(qpqConfig, devServerConfig));

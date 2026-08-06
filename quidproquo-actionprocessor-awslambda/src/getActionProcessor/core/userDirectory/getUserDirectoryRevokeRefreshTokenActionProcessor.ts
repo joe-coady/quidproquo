@@ -1,21 +1,20 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askUserDirectoryRevokeRefreshToken,
+  createActionProcessor,
+  ProcessorFor,
   QPQConfig,
   UserDirectoryActionType,
-  UserDirectoryRevokeRefreshTokenActionProcessor,
-  UserDirectoryRevokeRefreshTokenErrorTypeEnum,
 } from 'quidproquo-core';
 
 import { getCFExportNameUserPoolClientIdFromConfig, getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { revokeRefreshToken } from '../../../logic/cognito/revokeRefreshToken';
 
-const getProcessRevokeRefreshToken = (qpqConfig: QPQConfig): UserDirectoryRevokeRefreshTokenActionProcessor => {
+const getProcessRevokeRefreshToken = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectoryRevokeRefreshToken> => {
   return async ({ userDirectoryName, refreshToken }) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
@@ -30,16 +29,15 @@ const getProcessRevokeRefreshToken = (qpqConfig: QPQConfig): UserDirectoryRevoke
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         NotAuthorizedException: () =>
-          actionResultError(UserDirectoryRevokeRefreshTokenErrorTypeEnum.Unauthorized, 'Refresh token is invalid or already revoked'),
+          actionResultError(askUserDirectoryRevokeRefreshToken.errorType.Unauthorized, 'Refresh token is invalid or already revoked'),
         TooManyRequestsException: () =>
-          actionResultError(UserDirectoryRevokeRefreshTokenErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
+          actionResultError(askUserDirectoryRevokeRefreshToken.errorType.LimitExceeded, 'Too many attempts, please try again later'),
       });
     }
   };
 };
 
-export const getUserDirectoryRevokeRefreshTokenActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [UserDirectoryActionType.RevokeRefreshToken]: getProcessRevokeRefreshToken(qpqConfig),
-});
+export const getUserDirectoryRevokeRefreshTokenActionProcessor = createActionProcessor(
+  askUserDirectoryRevokeRefreshToken,
+  getProcessRevokeRefreshToken,
+);

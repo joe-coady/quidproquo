@@ -1,16 +1,16 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
+  askUserDirectoryAssociateSoftwareToken,
+  createActionProcessor,
+  ProcessorFor,
   QPQConfig,
   UserDirectoryActionType,
-  UserDirectoryAssociateSoftwareTokenActionProcessor,
 } from 'quidproquo-core';
 
 import { associateSoftwareToken } from '../../../logic/cognito/associateSoftwareToken';
 
-const getProcessAssociateSoftwareToken = (qpqConfig: QPQConfig): UserDirectoryAssociateSoftwareTokenActionProcessor => {
+const getProcessAssociateSoftwareToken = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectoryAssociateSoftwareToken> => {
   return async ({ session }) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
@@ -20,8 +20,7 @@ const getProcessAssociateSoftwareToken = (qpqConfig: QPQConfig): UserDirectoryAs
   };
 };
 
-export const getUserDirectoryAssociateSoftwareTokenActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [UserDirectoryActionType.AssociateSoftwareToken]: getProcessAssociateSoftwareToken(qpqConfig),
-});
+export const getUserDirectoryAssociateSoftwareTokenActionProcessor = createActionProcessor(
+  askUserDirectoryAssociateSoftwareToken,
+  getProcessAssociateSoftwareToken,
+);

@@ -1,14 +1,13 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askUserDirectorySetUserAttributes,
+  createActionProcessor,
+  ProcessorFor,
   QPQConfig,
   UserDirectoryActionType,
-  UserDirectorySetUserAttributesActionProcessor,
-  UserDirectorySetUserAttributesErrorTypeEnum,
 } from 'quidproquo-core';
 
 import { getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
@@ -16,7 +15,7 @@ import { getExportedValue } from '../../../logic/cloudformation/getExportedValue
 import { resolveUsernameByPreferredUsername } from '../../../logic/cognito/resolveUsernameByPreferredUsername';
 import { setUserAttributes } from '../../../logic/cognito/setUserAttributes';
 
-const getProcessSetUserAttributes = (qpqConfig: QPQConfig): UserDirectorySetUserAttributesActionProcessor => {
+const getProcessSetUserAttributes = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectorySetUserAttributes> => {
   return async ({ userDirectoryName, username, userAttributes }) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
@@ -30,22 +29,18 @@ const getProcessSetUserAttributes = (qpqConfig: QPQConfig): UserDirectorySetUser
       return actionResult(void 0);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        UserNotFoundException: () => actionResultError(UserDirectorySetUserAttributesErrorTypeEnum.UserNotFound, 'No account found for this user'),
+        UserNotFoundException: () => actionResultError(askUserDirectorySetUserAttributes.errorType.UserNotFound, 'No account found for this user'),
         InvalidParameterException: () =>
-          actionResultError(UserDirectorySetUserAttributesErrorTypeEnum.InvalidAttributes, 'One or more attributes are invalid'),
+          actionResultError(askUserDirectorySetUserAttributes.errorType.InvalidAttributes, 'One or more attributes are invalid'),
         AliasExistsException: () =>
-          actionResultError(UserDirectorySetUserAttributesErrorTypeEnum.AliasExists, 'That email or phone number is already in use'),
+          actionResultError(askUserDirectorySetUserAttributes.errorType.AliasExists, 'That email or phone number is already in use'),
         LimitExceededException: () =>
-          actionResultError(UserDirectorySetUserAttributesErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
+          actionResultError(askUserDirectorySetUserAttributes.errorType.LimitExceeded, 'Too many attempts, please try again later'),
         TooManyRequestsException: () =>
-          actionResultError(UserDirectorySetUserAttributesErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
+          actionResultError(askUserDirectorySetUserAttributes.errorType.LimitExceeded, 'Too many attempts, please try again later'),
       });
     }
   };
 };
 
-export const getUserDirectorySetUserAttributesActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [UserDirectoryActionType.SetUserAttributes]: getProcessSetUserAttributes(qpqConfig),
-});
+export const getUserDirectorySetUserAttributesActionProcessor = createActionProcessor(askUserDirectorySetUserAttributes, getProcessSetUserAttributes);

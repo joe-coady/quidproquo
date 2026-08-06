@@ -1,14 +1,13 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askUserDirectoryConfirmForgotPassword,
+  createActionProcessor,
+  ProcessorFor,
   QPQConfig,
   UserDirectoryActionType,
-  UserDirectoryConfirmForgotPasswordActionProcessor,
-  UserDirectoryConfirmForgotPasswordErrorTypeEnum,
 } from 'quidproquo-core';
 
 import { getCFExportNameUserPoolClientIdFromConfig, getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
@@ -16,7 +15,7 @@ import { getExportedValue } from '../../../logic/cloudformation/getExportedValue
 import { confirmForgotPassword } from '../../../logic/cognito/confirmForgotPassword';
 import { resolveUsernameByPreferredUsername } from '../../../logic/cognito/resolveUsernameByPreferredUsername';
 
-const getProcessConfirmForgotPassword = (qpqConfig: QPQConfig): UserDirectoryConfirmForgotPasswordActionProcessor => {
+const getProcessConfirmForgotPassword = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectoryConfirmForgotPassword> => {
   return async ({ userDirectoryName, code, username, password }) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
@@ -32,19 +31,18 @@ const getProcessConfirmForgotPassword = (qpqConfig: QPQConfig): UserDirectoryCon
       return actionResult(authResponse);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        CodeMismatchException: () => actionResultError(UserDirectoryConfirmForgotPasswordErrorTypeEnum.InvalidCode, 'Confirmation code is incorrect'),
-        ExpiredCodeException: () => actionResultError(UserDirectoryConfirmForgotPasswordErrorTypeEnum.ExpiredCode, 'Confirmation code has expired'),
+        CodeMismatchException: () => actionResultError(askUserDirectoryConfirmForgotPassword.errorType.InvalidCode, 'Confirmation code is incorrect'),
+        ExpiredCodeException: () => actionResultError(askUserDirectoryConfirmForgotPassword.errorType.ExpiredCode, 'Confirmation code has expired'),
         InvalidPasswordException: () =>
-          actionResultError(UserDirectoryConfirmForgotPasswordErrorTypeEnum.InvalidNewPassword, 'New password does not meet the password policy'),
+          actionResultError(askUserDirectoryConfirmForgotPassword.errorType.InvalidNewPassword, 'New password does not meet the password policy'),
         LimitExceededException: () =>
-          actionResultError(UserDirectoryConfirmForgotPasswordErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
+          actionResultError(askUserDirectoryConfirmForgotPassword.errorType.LimitExceeded, 'Too many attempts, please try again later'),
       });
     }
   };
 };
 
-export const getUserDirectoryConfirmForgotPasswordActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [UserDirectoryActionType.ConfirmForgotPassword]: getProcessConfirmForgotPassword(qpqConfig),
-});
+export const getUserDirectoryConfirmForgotPasswordActionProcessor = createActionProcessor(
+  askUserDirectoryConfirmForgotPassword,
+  getProcessConfirmForgotPassword,
+);

@@ -1,5 +1,12 @@
 import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { buildTestQpqConfig, defineUserDirectory, UserDirectoryActionType, UserDirectoryAuthenticateUserErrorTypeEnum } from 'quidproquo-core';
+import {
+  askUserDirectoryAuthenticateUserBase,
+  buildTestQpqConfig,
+  createActionProcessor,
+  defineUserDirectory,
+  ProcessorFor,
+  UserDirectoryActionType,
+} from 'quidproquo-core';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -45,6 +52,6 @@ describe('getUserDirectoryAuthenticateUserActionProcessor', () => {
 
     const [, error] = await invoke(processor);
 
-    expect(error?.errorType).toBe(UserDirectoryAuthenticateUserErrorTypeEnum.UserNotFound);
+    expect(error?.errorType).toBe(askUserDirectoryAuthenticateUserBase.errorType.UserNotFound);
   });
 });

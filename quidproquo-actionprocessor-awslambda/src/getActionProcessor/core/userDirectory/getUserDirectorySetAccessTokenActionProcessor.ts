@@ -1,18 +1,18 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
+  askUserDirectorySetAccessToken,
+  createActionProcessor,
   DecodedAccessToken,
   ErrorTypeEnum,
+  ProcessorFor,
   QPQConfig,
   UserDirectoryActionType,
-  UserDirectorySetAccessTokenActionProcessor,
 } from 'quidproquo-core';
 
 import { decodeAccessToken } from '../../../logic/cognito';
 
-const getProcessSetAccessToken = (qpqConfig: QPQConfig): UserDirectorySetAccessTokenActionProcessor => {
+const getProcessSetAccessToken = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectorySetAccessToken> => {
   return async ({ accessToken, userDirectoryName }, session, apl, logger, updateSession) => {
     // decodeAccessToken throws on a missing/unverifiable/expired token; surface that
     // as a typed Unauthorized result (matching the dev-server processor and
@@ -34,8 +34,4 @@ const getProcessSetAccessToken = (qpqConfig: QPQConfig): UserDirectorySetAccessT
   };
 };
 
-export const getUserDirectorySetAccessTokenActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [UserDirectoryActionType.SetAccessToken]: getProcessSetAccessToken(qpqConfig),
-});
+export const getUserDirectorySetAccessTokenActionProcessor = createActionProcessor(askUserDirectorySetAccessToken, getProcessSetAccessToken);

@@ -1,18 +1,18 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultErrorFromCaughtError,
+  askUserDirectoryGetUsers,
+  createActionProcessor,
+  ProcessorFor,
   QPQConfig,
   UserDirectoryActionType,
-  UserDirectoryGetUsersActionProcessor,
 } from 'quidproquo-core';
 
 import { resolveDevUserDirectory } from '../../../logic/auth/devAuth';
 import { listDevUsers } from '../../../logic/auth/jsonUserStore';
 import { ResolvedDevServerConfig } from '../../../types';
 
-const getProcessGetUsers = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): UserDirectoryGetUsersActionProcessor => {
+const getProcessGetUsers = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): ProcessorFor<typeof askUserDirectoryGetUsers> => {
   return async ({ userDirectoryName }) => {
     try {
       const userDirectory = resolveDevUserDirectory(userDirectoryName, qpqConfig);
@@ -26,8 +26,5 @@ const getProcessGetUsers = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevSe
   };
 };
 
-export const getUserDirectoryGetUsersActionProcessor =
-  (devServerConfig: ResolvedDevServerConfig): ActionProcessorListResolver =>
-  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-    [UserDirectoryActionType.GetUsers]: getProcessGetUsers(qpqConfig, devServerConfig),
-  });
+export const getUserDirectoryGetUsersActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
+  createActionProcessor(askUserDirectoryGetUsers, (qpqConfig) => getProcessGetUsers(qpqConfig, devServerConfig));

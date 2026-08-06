@@ -1,16 +1,15 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
   AnyAuthChallenge,
+  askUserDirectoryRespondToAuthChallenge,
   AuthenticateUserChallenge,
+  createActionProcessor,
+  ProcessorFor,
   QPQConfig,
   UserDirectoryActionType,
-  UserDirectoryRespondToAuthChallengeActionProcessor,
-  UserDirectoryRespondToAuthChallengeErrorTypeEnum,
 } from 'quidproquo-core';
 
 import { ChallengeNameType } from '@aws-sdk/client-cognito-identity-provider';
@@ -66,7 +65,7 @@ const anyAuthChallengeToCognitoChallengeName = (authChallenge: AnyAuthChallenge)
   }
 };
 
-const getProcessRespondToAuthChallenge = (qpqConfig: QPQConfig): UserDirectoryRespondToAuthChallengeActionProcessor => {
+const getProcessRespondToAuthChallenge = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectoryRespondToAuthChallenge> => {
   return async ({ userDirectoryName, authChallenge }) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
@@ -97,25 +96,24 @@ const getProcessRespondToAuthChallenge = (qpqConfig: QPQConfig): UserDirectoryRe
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         CodeMismatchException: () =>
-          actionResultError(UserDirectoryRespondToAuthChallengeErrorTypeEnum.InvalidCode, 'The supplied code is incorrect'),
+          actionResultError(askUserDirectoryRespondToAuthChallenge.errorType.InvalidCode, 'The supplied code is incorrect'),
         EnableSoftwareTokenMFAException: () =>
-          actionResultError(UserDirectoryRespondToAuthChallengeErrorTypeEnum.InvalidCode, 'The supplied code is incorrect'),
-        ExpiredCodeException: () => actionResultError(UserDirectoryRespondToAuthChallengeErrorTypeEnum.ExpiredCode, 'The supplied code has expired'),
+          actionResultError(askUserDirectoryRespondToAuthChallenge.errorType.InvalidCode, 'The supplied code is incorrect'),
+        ExpiredCodeException: () => actionResultError(askUserDirectoryRespondToAuthChallenge.errorType.ExpiredCode, 'The supplied code has expired'),
         InvalidPasswordException: () =>
-          actionResultError(UserDirectoryRespondToAuthChallengeErrorTypeEnum.InvalidNewPassword, 'New password does not meet the password policy'),
+          actionResultError(askUserDirectoryRespondToAuthChallenge.errorType.InvalidNewPassword, 'New password does not meet the password policy'),
         NotAuthorizedException: () =>
-          actionResultError(UserDirectoryRespondToAuthChallengeErrorTypeEnum.Unauthorized, 'The challenge session is invalid or has expired'),
+          actionResultError(askUserDirectoryRespondToAuthChallenge.errorType.Unauthorized, 'The challenge session is invalid or has expired'),
         LimitExceededException: () =>
-          actionResultError(UserDirectoryRespondToAuthChallengeErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
+          actionResultError(askUserDirectoryRespondToAuthChallenge.errorType.LimitExceeded, 'Too many attempts, please try again later'),
         TooManyRequestsException: () =>
-          actionResultError(UserDirectoryRespondToAuthChallengeErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
+          actionResultError(askUserDirectoryRespondToAuthChallenge.errorType.LimitExceeded, 'Too many attempts, please try again later'),
       });
     }
   };
 };
 
-export const getUserDirectoryRespondToAuthChallengeActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [UserDirectoryActionType.RespondToAuthChallenge]: getProcessRespondToAuthChallenge(qpqConfig),
-});
+export const getUserDirectoryRespondToAuthChallengeActionProcessor = createActionProcessor(
+  askUserDirectoryRespondToAuthChallenge,
+  getProcessRespondToAuthChallenge,
+);

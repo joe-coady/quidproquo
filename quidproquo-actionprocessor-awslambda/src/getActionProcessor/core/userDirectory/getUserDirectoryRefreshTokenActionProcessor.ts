@@ -1,21 +1,20 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askUserDirectoryRefreshToken,
+  createActionProcessor,
+  ProcessorFor,
   QPQConfig,
   UserDirectoryActionType,
-  UserDirectoryRefreshTokenActionProcessor,
-  UserDirectoryRefreshTokenErrorTypeEnum,
 } from 'quidproquo-core';
 
 import { getCFExportNameUserPoolClientIdFromConfig, getCFExportNameUserPoolIdFromConfig } from '../../../awsNamingUtils';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 import { refreshToken as cognitoRefreshToken } from '../../../logic/cognito/refreshToken';
 
-const getProcessRefreshToken = (qpqConfig: QPQConfig): UserDirectoryRefreshTokenActionProcessor => {
+const getProcessRefreshToken = (qpqConfig: QPQConfig): ProcessorFor<typeof askUserDirectoryRefreshToken> => {
   return async ({ userDirectoryName, refreshToken }, session) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
@@ -24,7 +23,7 @@ const getProcessRefreshToken = (qpqConfig: QPQConfig): UserDirectoryRefreshToken
     const userPoolClientId = await getExportedValue(getCFExportNameUserPoolClientIdFromConfig(userDirectoryName, qpqConfig), region);
 
     if (!session.decodedAccessToken || !session.decodedAccessToken.username) {
-      return actionResultError(UserDirectoryRefreshTokenErrorTypeEnum.Unauthorized, 'Invalid accessToken');
+      return actionResultError(askUserDirectoryRefreshToken.errorType.Unauthorized, 'Invalid accessToken');
     }
 
     // NOTE: we intentionally do NOT gate on decodedAccessToken.wasValid here.
@@ -41,16 +40,12 @@ const getProcessRefreshToken = (qpqConfig: QPQConfig): UserDirectoryRefreshToken
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         NotAuthorizedException: () =>
-          actionResultError(UserDirectoryRefreshTokenErrorTypeEnum.Unauthorized, 'Refresh token is invalid or has expired'),
+          actionResultError(askUserDirectoryRefreshToken.errorType.Unauthorized, 'Refresh token is invalid or has expired'),
         TooManyRequestsException: () =>
-          actionResultError(UserDirectoryRefreshTokenErrorTypeEnum.LimitExceeded, 'Too many attempts, please try again later'),
+          actionResultError(askUserDirectoryRefreshToken.errorType.LimitExceeded, 'Too many attempts, please try again later'),
       });
     }
   };
 };
 
-export const getUserDirectoryRefreshTokenActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [UserDirectoryActionType.RefreshToken]: getProcessRefreshToken(qpqConfig),
-});
+export const getUserDirectoryRefreshTokenActionProcessor = createActionProcessor(askUserDirectoryRefreshToken, getProcessRefreshToken);

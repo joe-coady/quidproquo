@@ -1,4 +1,3 @@
-import { Action, ActionProcessor, ActionRequester } from '../../types/Action';
 import { UserDirectoryActionType } from './UserDirectoryActionType';
 
 export interface AssociateSoftwareTokenResult {
@@ -16,19 +15,3 @@ export interface UserDirectoryAssociateSoftwareTokenActionPayload {
 
   session: string;
 }
-
-// Action
-export interface UserDirectoryAssociateSoftwareTokenAction extends Action<UserDirectoryAssociateSoftwareTokenActionPayload> {
-  type: UserDirectoryActionType.AssociateSoftwareToken;
-  payload: UserDirectoryAssociateSoftwareTokenActionPayload;
-}
-
-// Function Types
-export type UserDirectoryAssociateSoftwareTokenActionProcessor = ActionProcessor<
-  UserDirectoryAssociateSoftwareTokenAction,
-  AssociateSoftwareTokenResult
->;
-export type UserDirectoryAssociateSoftwareTokenActionRequester = ActionRequester<
-  UserDirectoryAssociateSoftwareTokenAction,
-  AssociateSoftwareTokenResult
->;

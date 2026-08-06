@@ -1,13 +1,12 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askUserDirectoryGetUserAttributesByUserId,
+  createActionProcessor,
+  ProcessorFor,
   QPQConfig,
   UserDirectoryActionType,
-  UserDirectoryGetUserAttributesByUserIdActionProcessor,
-  UserDirectoryGetUserAttributesByUserIdErrorTypeEnum,
 } from 'quidproquo-core';
 
 import { resolveDevUserDirectory } from '../../../logic/auth/devAuth';
@@ -17,14 +16,14 @@ import { ResolvedDevServerConfig } from '../../../types';
 const getProcessGetUserAttributesByUserId = (
   qpqConfig: QPQConfig,
   devServerConfig: ResolvedDevServerConfig,
-): UserDirectoryGetUserAttributesByUserIdActionProcessor => {
+): ProcessorFor<typeof askUserDirectoryGetUserAttributesByUserId> => {
   return async ({ userDirectoryName, userId }) => {
     try {
       const userDirectory = resolveDevUserDirectory(userDirectoryName, qpqConfig);
       const user = await getDevUserByUserId(devServerConfig.runtimePath, userDirectory, userId);
 
       if (!user) {
-        return actionResultError(UserDirectoryGetUserAttributesByUserIdErrorTypeEnum.UserNotFound, `User not found [${userId}]`);
+        return actionResultError(askUserDirectoryGetUserAttributesByUserId.errorType.UserNotFound, `User not found [${userId}]`);
       }
 
       return actionResult(user);
@@ -34,8 +33,5 @@ const getProcessGetUserAttributesByUserId = (
   };
 };
 
-export const getUserDirectoryGetUserAttributesByUserIdActionProcessor =
-  (devServerConfig: ResolvedDevServerConfig): ActionProcessorListResolver =>
-  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-    [UserDirectoryActionType.GetUserAttributesByUserId]: getProcessGetUserAttributesByUserId(qpqConfig, devServerConfig),
-  });
+export const getUserDirectoryGetUserAttributesByUserIdActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
+  createActionProcessor(askUserDirectoryGetUserAttributesByUserId, (qpqConfig) => getProcessGetUserAttributesByUserId(qpqConfig, devServerConfig));
