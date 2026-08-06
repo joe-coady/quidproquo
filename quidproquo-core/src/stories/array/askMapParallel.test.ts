@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { ConfigActionType } from '../../actions/config/ConfigActionType';
-import { askConfigGetParameter } from '../../actions/config/ConfigGetParameterActionRequester';
-import { ConfigGetParameterAction } from '../../actions/config/ConfigGetParameterActionTypes';
+import { askConfigGetParameter } from '../../actions/config/askConfigGetParameter';
+import { ActionOf } from '../../types';
 import { runStory, StoryError, throwsError } from '../../testing/storyTesting';
 import { AskResponse } from '../../types';
 import { askMapParallel } from './askMapParallel';
@@ -19,7 +19,7 @@ const names: Record<string, string> = { 'name/a': 'Alice', 'name/b': 'Bob' };
 describe('askMapParallel', () => {
   it('maps every item through its action, preserving order', () => {
     const result = runStory(loadNames(['a', 'b']), {
-      [ConfigActionType.GetParameter]: (action: ConfigGetParameterAction) => names[action.payload.parameterName],
+      [ConfigActionType.GetParameter]: (action: ActionOf<typeof askConfigGetParameter>) => names[action.payload.parameterName],
     });
 
     expect(result).toEqual(['Alice', 'Bob']);

@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { ConfigActionType } from '../../actions/config/ConfigActionType';
-import { askConfigGetParameter } from '../../actions/config/ConfigGetParameterActionRequester';
-import { ConfigGetParameterAction } from '../../actions/config/ConfigGetParameterActionTypes';
+import { askConfigGetParameter } from '../../actions/config/askConfigGetParameter';
+import { ActionOf } from '../../types';
 import { runStory } from '../../testing/storyTesting';
 import { AskResponse } from '../../types';
 import { askArraySome } from './askArraySome';
@@ -17,7 +17,7 @@ function* anyEnabled(ids: string[]): AskResponse<boolean> {
 describe('askArraySome', () => {
   it('returns true and stops at the first match', () => {
     const flags: Record<string, string> = { 'enabled/a': 'no', 'enabled/b': 'yes', 'enabled/c': 'yes' };
-    const lookup = vi.fn((action: ConfigGetParameterAction) => flags[action.payload.parameterName]);
+    const lookup = vi.fn((action: ActionOf<typeof askConfigGetParameter>) => flags[action.payload.parameterName]);
 
     const result = runStory(anyEnabled(['a', 'b', 'c']), { [ConfigActionType.GetParameter]: lookup });
 

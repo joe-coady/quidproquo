@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { ConfigActionType } from '../../actions/config/ConfigActionType';
-import { askConfigGetParameter } from '../../actions/config/ConfigGetParameterActionRequester';
-import { ConfigGetParameterAction } from '../../actions/config/ConfigGetParameterActionTypes';
+import { askConfigGetParameter } from '../../actions/config/askConfigGetParameter';
+import { ActionOf } from '../../types';
 import { runStory } from '../../testing/storyTesting';
 import { AskResponse } from '../../types';
 import { askFilter } from './askFilter';
@@ -19,7 +19,7 @@ const statuses: Record<string, string> = { 'status/a': 'active', 'status/b': 'di
 describe('askFilter', () => {
   it('keeps items whose async predicate is true', () => {
     const result = runStory(keepActive(['a', 'b', 'c']), {
-      [ConfigActionType.GetParameter]: (action: ConfigGetParameterAction) => statuses[action.payload.parameterName],
+      [ConfigActionType.GetParameter]: (action: ActionOf<typeof askConfigGetParameter>) => statuses[action.payload.parameterName],
     });
 
     expect(result).toEqual(['a', 'c']);

@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { ConfigActionType } from '../actions/config/ConfigActionType';
-import { askConfigGetParameter } from '../actions/config/ConfigGetParameterActionRequester';
-import { ConfigGetParameterAction } from '../actions/config/ConfigGetParameterActionTypes';
+import { askConfigGetParameter } from '../actions/config/askConfigGetParameter';
+import { ActionOf } from '../types';
 import { DateActionType } from '../actions/date/DateActionType';
 import { askDateNow } from '../actions/date/DateNowActionRequester';
 import { GuidActionType } from '../actions/guid/GuidActionType';
@@ -55,7 +55,7 @@ describe('runStory', () => {
     }
 
     const result = runStory(story(), {
-      [ConfigActionType.GetParameter]: (action: ConfigGetParameterAction) => `value-for-${action.payload.parameterName}`,
+      [ConfigActionType.GetParameter]: (action: ActionOf<typeof askConfigGetParameter>) => `value-for-${action.payload.parameterName}`,
     });
 
     expect(result).toBe('value-for-db/host');

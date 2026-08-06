@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { ConfigActionType } from '../../actions/config/ConfigActionType';
-import { askConfigGetParameter } from '../../actions/config/ConfigGetParameterActionRequester';
-import { ConfigGetParameterAction } from '../../actions/config/ConfigGetParameterActionTypes';
+import { askConfigGetParameter } from '../../actions/config/askConfigGetParameter';
+import { ActionOf } from '../../types';
 import { runStory } from '../../testing/storyTesting';
 import { AskResponse } from '../../types';
 import { askReduce } from './askReduce';
@@ -19,7 +19,7 @@ const amounts: Record<string, string> = { 'amount/a': '10', 'amount/b': '5', 'am
 describe('askReduce', () => {
   it('accumulates the result across items', () => {
     const result = runStory(sumAmounts(['a', 'b', 'c']), {
-      [ConfigActionType.GetParameter]: (action: ConfigGetParameterAction) => amounts[action.payload.parameterName],
+      [ConfigActionType.GetParameter]: (action: ActionOf<typeof askConfigGetParameter>) => amounts[action.payload.parameterName],
     });
 
     expect(result).toBe(17);
