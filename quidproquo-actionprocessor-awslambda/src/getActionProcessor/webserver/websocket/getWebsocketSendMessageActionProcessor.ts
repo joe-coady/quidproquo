@@ -1,19 +1,12 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
-  actionResult,
-  actionResultError,
-  actionResultErrorFromCaughtError,
-  QPQConfig,
-} from 'quidproquo-core';
-import { WebsocketActionType, WebsocketSendMessageActionProcessor, WebsocketSendMessageErrorTypeEnum } from 'quidproquo-webserver';
+import { actionResult, actionResultError, actionResultErrorFromCaughtError, createActionProcessor, ProcessorFor, QPQConfig } from 'quidproquo-core';
+import { askWebsocketSendMessageBase, WebsocketActionType } from 'quidproquo-webserver';
 
 import { getCFExportNameWebsocketApiIdFromConfig } from '../../../awsNamingUtils';
 import { sendMessageToWebSocketConnection } from '../../../logic/apiGateway/sendMessageToWebSocketConnection';
 import { getExportedValue } from '../../../logic/cloudformation/getExportedValue';
 
-const getProcessSendMessage = (qpqConfig: QPQConfig): WebsocketSendMessageActionProcessor<any> => {
+const getProcessSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeof askWebsocketSendMessageBase> => {
   return async ({ connectionId, payload, websocketApiName }) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
@@ -25,13 +18,11 @@ const getProcessSendMessage = (qpqConfig: QPQConfig): WebsocketSendMessageAction
       return actionResult(void 0);
     } catch (error) {
       return actionResultErrorFromCaughtError(error, {
-        ThrottlingException: () => actionResultError(WebsocketSendMessageErrorTypeEnum.Throttled, 'Rate exceeded'),
-        GoneException: () => actionResultError(WebsocketSendMessageErrorTypeEnum.Disconnected, 'Connection no longer exists'),
+        ThrottlingException: () => actionResultError(askWebsocketSendMessageBase.errorType.Throttled, 'Rate exceeded'),
+        GoneException: () => actionResultError(askWebsocketSendMessageBase.errorType.Disconnected, 'Connection no longer exists'),
       });
     }
   };
 };
 
-export const getWebsocketSendMessageActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [WebsocketActionType.SendMessage]: getProcessSendMessage(qpqConfig),
-});
+export const getWebsocketSendMessageActionProcessor = createActionProcessor(askWebsocketSendMessageBase, getProcessSendMessage);

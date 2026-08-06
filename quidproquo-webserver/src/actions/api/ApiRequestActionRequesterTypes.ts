@@ -1,4 +1,4 @@
-import { Action, ActionProcessor, ActionRequester, HTTPMethod, HTTPNetworkResponse, HTTPRequestOptions, ResponseType } from 'quidproquo-core';
+import { Action, HTTPMethod, HTTPRequestOptions, ResponseType } from 'quidproquo-core';
 
 import { ApiActionType } from './ApiActionType';
 
@@ -21,7 +21,3 @@ export interface ApiRequestAction<T> extends Action<ApiRequestActionPayload<T>> 
   type: ApiActionType.Request;
   payload: ApiRequestActionPayload<T>;
 }
-
-// Function Types
-export type ApiRequestActionProcessor<T, R> = ActionProcessor<ApiRequestAction<T>, HTTPNetworkResponse<R>>;
-export type ApiRequestActionRequester<T, R> = ActionRequester<ApiRequestAction<T>, HTTPNetworkResponse<R>>;

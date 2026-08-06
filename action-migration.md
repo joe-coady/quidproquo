@@ -343,51 +343,51 @@ item commits only its note in this file, with a message like
 
 #### admin
 
-- [ ] **askAdminGetLog** `quidproquo-webserver/src/actions/admin/AdminGetLogActionRequester.ts` · no get*ActionProcessor found: grep the ActionType member
-- [ ] **askAdminGetLogMetadata** `quidproquo-webserver/src/actions/admin/AdminGetLogMetadataActionRequester.ts` · no get*ActionProcessor found: grep the ActionType member
-- [ ] **askAdminGetLogMetadataChildren** `quidproquo-webserver/src/actions/admin/AdminGetLogMetadataChildrenActionRequester.ts` · no get*ActionProcessor found: grep the ActionType member
-- [ ] **askAdminGetLogs** `quidproquo-webserver/src/actions/admin/AdminGetLogsActionRequester.ts` · no get*ActionProcessor found: grep the ActionType member
+- [x] **askAdminGetLog** `quidproquo-webserver/src/actions/admin/askAdminGetLog.ts` · no get*ActionProcessor found: grep the ActionType member
+- [x] **askAdminGetLogMetadata** `quidproquo-webserver/src/actions/admin/askAdminGetLogMetadata.ts` · no get*ActionProcessor found: grep the ActionType member
+- [x] **askAdminGetLogMetadataChildren** `quidproquo-webserver/src/actions/admin/askAdminGetLogMetadataChildren.ts` · no get*ActionProcessor found: grep the ActionType member
+- [x] **askAdminGetLogs** `quidproquo-webserver/src/actions/admin/askAdminGetLogs.ts` · no get*ActionProcessor found: grep the ActionType member
 
 #### api
 
-- [ ] **askApiRequest** `quidproquo-webserver/src/actions/api/ApiRequestActionRequester.ts` · generic return: base + casting story · no get*ActionProcessor found: grep the ActionType member
+- [x] **askApiRequest** `quidproquo-webserver/src/actions/api/askApiRequest.ts` · generic return: base + casting story · no get*ActionProcessor found: grep the ActionType member
 
 #### apiKeyValidation
 
-- [ ] **askApiKeyValidationValidate** `quidproquo-webserver/src/actions/apiKeyValidation/ApiKeyValidationValidateActionRequester.ts` · processors: actionprocessor-awslambda, dev-server
+- [x] **askApiKeyValidationValidate** `quidproquo-webserver/src/actions/apiKeyValidation/askApiKeyValidationValidate.ts` · processors: actionprocessor-awslambda, dev-server
 
 #### dns
 
-- [ ] **askDnsList** `quidproquo-webserver/src/actions/dns/DnsListActionRequester.ts` · processors: actionprocessor-js
+- [x] **askDnsList** `quidproquo-webserver/src/actions/dns/askDnsList.ts` · processors: actionprocessor-js
 
 #### email
 
-- [ ] **askEmailSendEmail** `quidproquo-webserver/src/actions/email/EmailSendEmailActionRequester.ts` · processors: actionprocessor-awslambda, dev-server
-- [ ] **askEmailSetDeliveryStatus** `quidproquo-webserver/src/actions/email/EmailSetDeliveryStatusActionRequester.ts` · processors: actionprocessor-awslambda, dev-server
+- [x] **askEmailSendEmail** `quidproquo-webserver/src/actions/email/askEmailSendEmail.ts` · processors: actionprocessor-awslambda, dev-server
+- [x] **askEmailSetDeliveryStatus** `quidproquo-webserver/src/actions/email/askEmailSetDeliveryStatus.ts` · processors: actionprocessor-awslambda, dev-server
 
 #### genericDataResource
 
-- [ ] **askPutGenericDataResource** / **askScanGenericDataResource** `quidproquo-webserver/src/actions/genericDataResource/GenericDataResourceActionRequester.ts` · has logic: base + story split · no get*ActionProcessor found: grep the ActionType member
+- [x] **askPutGenericDataResource** / **askScanGenericDataResource** `quidproquo-webserver/src/actions/genericDataResource/` · split into one file per requester; no processor in this repo
 
 #### openApiSpec
 
-- [ ] **askGetOpenApiSpec** `quidproquo-webserver/src/actions/openApiSpec/OpenApiSpecGetOpenApiSpecActionRequester.ts` · no get*ActionProcessor found: grep the ActionType member
+- [x] **askGetOpenApiSpec** `quidproquo-webserver/src/actions/openApiSpec/askGetOpenApiSpec.ts` · no get*ActionProcessor found: grep the ActionType member
 
 #### routeAuthValidation
 
-- [ ] **askRouteAuthValidationDecode** `quidproquo-webserver/src/actions/routeAuthValidation/RouteAuthValidationDecodeActionRequester.ts` · processors: webserver
+- [x] **askRouteAuthValidationDecode** `quidproquo-webserver/src/actions/routeAuthValidation/askRouteAuthValidationDecode.ts` · processors: webserver
 
 #### serviceFunction
 
-- [ ] **askServiceFunctionExecute** `quidproquo-webserver/src/actions/serviceFunction/ServiceFunctionExecuteActionRequester.ts` · processors: actionprocessor-awslambda, dev-server · generic return: base + casting story
+- [x] **askServiceFunctionExecute** `quidproquo-webserver/src/actions/serviceFunction/askServiceFunctionExecute.ts` · processors: actionprocessor-awslambda, dev-server · generic return: base + casting story
 
 #### webEntry
 
-- [ ] **askWebEntryInvalidateCache** `quidproquo-webserver/src/actions/webEntry/WebEntryInvalidateCacheActionRequester.ts` · processors: actionprocessor-awslambda
+- [x] **askWebEntryInvalidateCache** `quidproquo-webserver/src/actions/webEntry/askWebEntryInvalidateCache.ts` · processors: actionprocessor-awslambda
 
 #### websocket
 
-- [ ] **askWebsocketSendMessage** `quidproquo-webserver/src/actions/websocket/WebsocketSendMessageActionRequester.ts` · processors: actionprocessor-awslambda, dev-server · generic return: base + casting story
+- [x] **askWebsocketSendMessage** `quidproquo-webserver/src/actions/websocket/askWebsocketSendMessage.ts` · processors: actionprocessor-awslambda, dev-server · generic return: base + casting story
 
 ### quidproquo-xstate
 

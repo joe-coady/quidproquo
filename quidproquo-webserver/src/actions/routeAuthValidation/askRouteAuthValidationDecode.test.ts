@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { RouteAuthSettings } from '../../config/settings/route';
 import { HTTPEvent } from '../../types/HTTPEvent';
 import { RouteAuthValidationActionType } from './RouteAuthValidationActionType';
-import { askRouteAuthValidationDecode } from './RouteAuthValidationDecodeActionRequester';
+import { askRouteAuthValidationDecode } from './askRouteAuthValidationDecode';
 
 const event = { headers: {}, path: '/' } as unknown as HTTPEvent;
 const routeAuthSettings: RouteAuthSettings = { userDirectoryName: 'users' };

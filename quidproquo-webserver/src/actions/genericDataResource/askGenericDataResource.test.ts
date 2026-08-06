@@ -2,7 +2,8 @@ import { captureRequester } from 'quidproquo-core';
 
 import { describe, expect, it } from 'vitest';
 
-import { askPutGenericDataResource, askScanGenericDataResource } from './GenericDataResourceActionRequester';
+import { askPutGenericDataResource } from './askPutGenericDataResource';
+import { askScanGenericDataResource } from './askScanGenericDataResource';
 import GenericDataResourceActionTypeEnum from './GenericDataResourceActionTypeEnum';
 
 describe('askPutGenericDataResource', () => {

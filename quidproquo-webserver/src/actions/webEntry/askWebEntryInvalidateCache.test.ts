@@ -3,7 +3,7 @@ import { captureRequester } from 'quidproquo-core';
 import { describe, expect, it } from 'vitest';
 
 import { WebEntryActionType } from './WebEntryActionType';
-import { askWebEntryInvalidateCache } from './WebEntryInvalidateCacheActionRequester';
+import { askWebEntryInvalidateCache } from './askWebEntryInvalidateCache';
 
 describe('askWebEntryInvalidateCache', () => {
   it('yields an InvalidateCache action collecting the paths into an array', () => {

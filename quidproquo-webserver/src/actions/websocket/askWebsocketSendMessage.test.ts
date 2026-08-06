@@ -1,9 +1,9 @@
-import { captureRequester } from 'quidproquo-core';
+import { askWebsocketSendMessageBase, captureRequester, createActionProcessor, ProcessorFor } from 'quidproquo-core';
 
 import { describe, expect, it } from 'vitest';
 
 import { WebsocketActionType } from './WebsocketActionType';
-import { askWebsocketSendMessage, WebsocketSendMessageErrorTypeEnum } from './WebsocketSendMessageActionRequester';
+import { askWebsocketSendMessage, askWebsocketSendMessageBase } from './askWebsocketSendMessage';
 
 describe('askWebsocketSendMessage', () => {
   it('yields a SendMessage action with the api name, connection id and payload', () => {
@@ -16,9 +16,9 @@ describe('askWebsocketSendMessage', () => {
   });
 });
 
-describe('WebsocketSendMessageErrorTypeEnum', () => {
+describe('askWebsocketSendMessageBase.errorType', () => {
   it('namespaces each error name under the SendMessage action type', () => {
-    expect(WebsocketSendMessageErrorTypeEnum.Throttled).toBe(`${WebsocketActionType.SendMessage}-Throttled`);
-    expect(WebsocketSendMessageErrorTypeEnum.Disconnected).toBe(`${WebsocketActionType.SendMessage}-Disconnected`);
+    expect(askWebsocketSendMessageBase.errorType.Throttled).toBe(`${WebsocketActionType.SendMessage}-Throttled`);
+    expect(askWebsocketSendMessageBase.errorType.Disconnected).toBe(`${WebsocketActionType.SendMessage}-Disconnected`);
   });
 });

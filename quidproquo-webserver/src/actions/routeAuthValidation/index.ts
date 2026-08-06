@@ -1,3 +1,3 @@
+export * from './askRouteAuthValidationDecode';
 export * from './RouteAuthValidationActionType';
-export * from './RouteAuthValidationDecodeActionRequester';
 export * from './RouteAuthValidationDecodeActionTypes';

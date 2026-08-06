@@ -3,7 +3,7 @@ import { captureRequester } from 'quidproquo-core';
 import { describe, expect, it } from 'vitest';
 
 import { AdminActionType } from './AdminActionType';
-import { askAdminGetLogMetadataChildren } from './AdminGetLogMetadataChildrenActionRequester';
+import { askAdminGetLogMetadataChildren } from './askAdminGetLogMetadataChildren';
 
 describe('askAdminGetLogMetadataChildren', () => {
   it('yields a GetLogMetadataChildren action with the next page key', () => {

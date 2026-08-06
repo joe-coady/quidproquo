@@ -1,4 +1,4 @@
-import { AdminActionType } from 'quidproquo-webserver';
+import { AdminActionType, askAdminGetLog, askAdminGetLogs } from 'quidproquo-webserver';
 
 const webserverAdminActionComponentMap: Record<string, string[]> = {
   [AdminActionType.GetLog]: ['askAdminGetLog', 'correlationId'],

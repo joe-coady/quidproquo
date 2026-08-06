@@ -1,16 +1,16 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
+  createActionProcessor,
   EitherActionResult,
+  ProcessorFor,
   QPQConfig,
   qpqCoreUtils,
   StorySession,
   toCrossServiceSession,
 } from 'quidproquo-core';
-import { ExecuteServiceFunctionEvent, ServiceFunctionActionType, ServiceFunctionExecuteActionProcessor } from 'quidproquo-webserver';
+import { askServiceFunctionExecuteBase, ExecuteServiceFunctionEvent, ServiceFunctionActionType } from 'quidproquo-webserver';
 
 import { getConfigRuntimeResourceName } from '../../../awsNamingUtils';
 import { executeLambdaByName } from '../../../logic/lambda/executeLambdaByName';
@@ -21,7 +21,7 @@ type AnyExecuteServiceFunctionEventWithSession = ExecuteServiceFunctionEvent<any
   storySession: StorySession;
 };
 
-const getProcessExecute = (qpqConfig: QPQConfig): ServiceFunctionExecuteActionProcessor<any, any> => {
+const getProcessExecute = (qpqConfig: QPQConfig): ProcessorFor<typeof askServiceFunctionExecuteBase> => {
   return async ({ functionName, service, payload, isAsync }, session) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
@@ -33,7 +33,7 @@ const getProcessExecute = (qpqConfig: QPQConfig): ServiceFunctionExecuteActionPr
 
     const serviceFunctionEvent: AnyExecuteServiceFunctionEventWithSession = {
       functionName: functionName,
-      payload: payload,
+      payload: payload as any[],
       storySession: toCrossServiceSession(session),
     };
 
@@ -51,6 +51,4 @@ const getProcessExecute = (qpqConfig: QPQConfig): ServiceFunctionExecuteActionPr
   };
 };
 
-export const getServiceFunctionExecuteActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [ServiceFunctionActionType.Execute]: getProcessExecute(qpqConfig),
-});
+export const getServiceFunctionExecuteActionProcessor = createActionProcessor(askServiceFunctionExecuteBase, getProcessExecute);

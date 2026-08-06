@@ -1,11 +1,12 @@
 import {
   askLog,
   AskResponse,
+  askStateDispatchBase,
   getProcessCustomImplementation,
+  ProcessorFor,
   QPQConfig,
   StateActionType,
   StateDispatchActionPayload,
-  StateDispatchActionProcessor,
 } from 'quidproquo-core';
 
 import { randomUUID } from 'crypto';
@@ -27,7 +28,7 @@ export function* askStateDispatchToFrontend(payload: StateDispatchActionPayload<
 }
 
 export const getStateDispatch = (qpqConfig: QPQConfig) => ({
-  [StateActionType.Dispatch]: getProcessCustomImplementation<StateDispatchActionProcessor<any>>(
+  [StateActionType.Dispatch]: getProcessCustomImplementation<ProcessorFor<typeof askStateDispatchBase>>(
     qpqConfig,
     askStateDispatchToFrontend,
     'Send state dispatch to UI',

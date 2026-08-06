@@ -1,5 +1,5 @@
 import { ContextActionType, KeyValueStoreActionType, runStory, throwsError } from 'quidproquo-core';
-import { WebsocketActionType, WebsocketSendMessageErrorTypeEnum } from 'quidproquo-webserver';
+import { askWebsocketSendMessageBase, WebsocketActionType } from 'quidproquo-webserver';
 
 import { describe, expect, it } from 'vitest';
 
@@ -51,7 +51,7 @@ describe('askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend', () => 
         const connectionId = action.payload.connectionId;
         sends.push(connectionId);
         if (connectionId === 'direct') {
-          return throwsError(WebsocketSendMessageErrorTypeEnum.Disconnected, 'gone');
+          return throwsError(askWebsocketSendMessageBase.errorType.Disconnected, 'gone');
         }
         return undefined;
       },
@@ -91,7 +91,7 @@ describe('askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend', () => 
         const connectionId = action.payload.connectionId;
         sends.push(connectionId);
         if (connectionId === 'dead') {
-          return throwsError(WebsocketSendMessageErrorTypeEnum.Disconnected, 'Connection no longer exists');
+          return throwsError(askWebsocketSendMessageBase.errorType.Disconnected, 'Connection no longer exists');
         }
         return undefined;
       },
@@ -116,7 +116,7 @@ describe('askSendAnyWebSocketQueueEventMessageWithCorrelationToFrontend', () => 
         const connectionId = action.payload.connectionId;
         sends.push(connectionId);
         if (connectionId === 'busy') {
-          return throwsError(WebsocketSendMessageErrorTypeEnum.Throttled, 'slow down');
+          return throwsError(askWebsocketSendMessageBase.errorType.Throttled, 'slow down');
         }
         return undefined;
       },

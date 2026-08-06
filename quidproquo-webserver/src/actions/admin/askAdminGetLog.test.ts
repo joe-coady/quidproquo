@@ -3,7 +3,7 @@ import { captureRequester } from 'quidproquo-core';
 import { describe, expect, it } from 'vitest';
 
 import { AdminActionType } from './AdminActionType';
-import { askAdminGetLog } from './AdminGetLogActionRequester';
+import { askAdminGetLog } from './askAdminGetLog';
 
 describe('askAdminGetLog', () => {
   it('yields a GetLog action with the correlation id', () => {

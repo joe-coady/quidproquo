@@ -1,24 +1,24 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
+  createActionProcessor,
   DynamicModuleLoader,
+  ProcessorFor,
   QPQConfig,
   StoryResult,
   toCrossServiceSession,
 } from 'quidproquo-core';
-import { ServiceFunctionActionType, ServiceFunctionExecuteActionProcessor } from 'quidproquo-webserver';
+import { askServiceFunctionExecuteBase, ServiceFunctionActionType } from 'quidproquo-webserver';
 
 import { eventBus } from '../../../logic/eventBus';
 import { AnyExecuteServiceFunctionEventWithSession } from '../../core/event/node/serviceFunction/types';
 
-const getProcessExecute = (qpqConfig: QPQConfig, dynamicModuleLoader: DynamicModuleLoader): ServiceFunctionExecuteActionProcessor<any, any> => {
+const getProcessExecute = (qpqConfig: QPQConfig, dynamicModuleLoader: DynamicModuleLoader): ProcessorFor<typeof askServiceFunctionExecuteBase> => {
   return async ({ functionName, service, payload, isAsync }, session) => {
     const serviceFunctionEvent: AnyExecuteServiceFunctionEventWithSession = {
       functionName: functionName,
       serviceName: service,
-      payload: payload,
+      payload: payload as any[],
       storySession: toCrossServiceSession(session),
     };
 
@@ -43,9 +43,4 @@ const getProcessExecute = (qpqConfig: QPQConfig, dynamicModuleLoader: DynamicMod
   };
 };
 
-export const getServiceFunctionExecuteActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-  dynamicModuleLoader: DynamicModuleLoader,
-): Promise<ActionProcessorList> => ({
-  [ServiceFunctionActionType.Execute]: getProcessExecute(qpqConfig, dynamicModuleLoader),
-});
+export const getServiceFunctionExecuteActionProcessor = createActionProcessor(askServiceFunctionExecuteBase, getProcessExecute);

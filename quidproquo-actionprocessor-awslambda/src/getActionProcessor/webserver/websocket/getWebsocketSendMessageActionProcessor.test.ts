@@ -1,6 +1,6 @@
 import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { buildTestQpqConfig } from 'quidproquo-core';
-import { defineWebsocket, WebsocketActionType, WebsocketSendMessageErrorTypeEnum } from 'quidproquo-webserver';
+import { buildTestQpqConfig, createActionProcessor, ProcessorFor } from 'quidproquo-core';
+import { askWebsocketSendMessageBase, defineWebsocket, WebsocketActionType } from 'quidproquo-webserver';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -51,6 +51,6 @@ describe('getWebsocketSendMessageActionProcessor', () => {
 
     const [, error] = await invoke(processor);
 
-    expect(error?.errorType).toBe(WebsocketSendMessageErrorTypeEnum.Disconnected);
+    expect(error?.errorType).toBe(askWebsocketSendMessageBase.errorType.Disconnected);
   });
 });

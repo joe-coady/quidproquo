@@ -1,10 +1,10 @@
-import { ActionProcessorList, ActionProcessorListResolver, actionResult, QPQConfig } from 'quidproquo-core';
-import { EmailActionType, EmailSendEmailActionProcessor } from 'quidproquo-webserver';
+import { actionResult, createActionProcessor, ProcessorFor } from 'quidproquo-core';
+import { askEmailSendEmail, EmailActionType } from 'quidproquo-webserver';
 
 import { randomUUID } from 'crypto';
 
 // Local dev sends nothing: log what would have gone out and hand back a fake message id
-const getProcessSendEmail = (): EmailSendEmailActionProcessor => {
+const getProcessSendEmail = (): ProcessorFor<typeof askEmailSendEmail> => {
   return async (payload) => {
     console.log('[email] send skipped (dev server)', {
       from: payload.from,
@@ -24,6 +24,4 @@ const getProcessSendEmail = (): EmailSendEmailActionProcessor => {
   };
 };
 
-export const getEmailSendEmailActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [EmailActionType.SendEmail]: getProcessSendEmail(),
-});
+export const getEmailSendEmailActionProcessor = createActionProcessor(askEmailSendEmail, () => getProcessSendEmail());

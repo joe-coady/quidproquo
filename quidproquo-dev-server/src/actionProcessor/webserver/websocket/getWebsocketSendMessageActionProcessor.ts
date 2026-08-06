@@ -1,12 +1,5 @@
-import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
-  actionResult,
-  actionResultErrorFromCaughtError,
-  QPQConfig,
-  qpqCoreUtils,
-} from 'quidproquo-core';
-import { qpqWebServerUtils, WebsocketActionType, WebsocketSendMessageActionProcessor, WebsocketSendMessageErrorTypeEnum } from 'quidproquo-webserver';
+import { actionResult, actionResultErrorFromCaughtError, createActionProcessor, ProcessorFor, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
+import { askWebsocketSendMessageBase, qpqWebServerUtils, WebsocketActionType } from 'quidproquo-webserver';
 
 // The connection REGISTRY, not the implementation: webSocketImplementation imports
 // the event-processing pipeline (which includes these processors), so importing it
@@ -14,7 +7,7 @@ import { qpqWebServerUtils, WebsocketActionType, WebsocketSendMessageActionProce
 // connections both sides share.
 import { sendMessageToWebSocketConnection } from '../../../implementations/webSocket/webSocketConnectionRegistry';
 
-const getProcessSendMessage = (qpqConfig: QPQConfig): WebsocketSendMessageActionProcessor<any> => {
+const getProcessSendMessage = (qpqConfig: QPQConfig): ProcessorFor<typeof askWebsocketSendMessageBase> => {
   return async ({ connectionId, payload, websocketApiName }) => {
     const websocketConfig = qpqWebServerUtils.getWebsocketEntryByApiName(websocketApiName, qpqConfig);
     const service = websocketConfig.owner?.module || qpqCoreUtils.getApplicationModuleName(qpqConfig);
@@ -29,6 +22,4 @@ const getProcessSendMessage = (qpqConfig: QPQConfig): WebsocketSendMessageAction
   };
 };
 
-export const getWebsocketSendMessageActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [WebsocketActionType.SendMessage]: getProcessSendMessage(qpqConfig),
-});
+export const getWebsocketSendMessageActionProcessor = createActionProcessor(askWebsocketSendMessageBase, getProcessSendMessage);

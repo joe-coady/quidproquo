@@ -1,4 +1,4 @@
-import { EmailActionType } from 'quidproquo-webserver';
+import { askEmailSendEmail, askEmailSetDeliveryStatus, EmailActionType } from 'quidproquo-webserver';
 
 const webserverEmailActionComponentMap: Record<string, string[]> = {
   [EmailActionType.SendEmail]: ['askEmailSendEmail', 'from', 'to', 'cc', 'bcc', 'replyTo', 'subject'],

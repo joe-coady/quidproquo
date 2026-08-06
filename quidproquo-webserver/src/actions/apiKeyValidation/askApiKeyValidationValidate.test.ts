@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 import { ApiKeyReference } from '../../config/settings/apiKey';
 import { ApiKeyValidationActionType } from './ApiKeyValidationActionType';
-import { askApiKeyValidationValidate } from './ApiKeyValidationValidateActionRequester';
+import { askApiKeyValidationValidate } from './askApiKeyValidationValidate';
 
 describe('askApiKeyValidationValidate', () => {
   const references: ApiKeyReference[] = [{ name: 'primary' }];

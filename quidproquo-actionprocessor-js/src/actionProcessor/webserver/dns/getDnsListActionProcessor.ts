@@ -1,7 +1,7 @@
-import { ActionProcessorList, ActionProcessorListResolver, actionResult, QPQConfig } from 'quidproquo-core';
-import { DnsActionType, DnsListActionProcessor, qpqWebServerUtils } from 'quidproquo-webserver';
+import { actionResult, createActionProcessor, ProcessorFor, QPQConfig } from 'quidproquo-core';
+import { askDnsList, DnsActionType, qpqWebServerUtils } from 'quidproquo-webserver';
 
-const getProcessDnsList = (qpqConfig: QPQConfig): DnsListActionProcessor => {
+const getProcessDnsList = (qpqConfig: QPQConfig): ProcessorFor<typeof askDnsList> => {
   return async () => {
     const dnsList = qpqWebServerUtils.getDnsConfigs(qpqConfig).map((dc) => dc.dnsBase);
 
@@ -9,6 +9,4 @@ const getProcessDnsList = (qpqConfig: QPQConfig): DnsListActionProcessor => {
   };
 };
 
-export const getDnsListActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [DnsActionType.List]: getProcessDnsList(qpqConfig),
-});
+export const getDnsListActionProcessor = createActionProcessor(askDnsList, getProcessDnsList);

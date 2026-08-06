@@ -3,7 +3,7 @@ import { captureRequester } from 'quidproquo-core';
 import { describe, expect, it } from 'vitest';
 
 import { ServiceFunctionActionType } from './ServiceFunctionActionType';
-import { askServiceFunctionExecute } from './ServiceFunctionExecuteActionRequester';
+import { askServiceFunctionExecute } from './askServiceFunctionExecute';
 
 describe('askServiceFunctionExecute', () => {
   it('yields an Execute action with the service, function, payload and async flag', () => {

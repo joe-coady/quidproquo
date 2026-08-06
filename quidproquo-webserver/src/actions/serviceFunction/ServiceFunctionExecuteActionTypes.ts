@@ -1,4 +1,4 @@
-import { Action, ActionProcessor, ActionRequester } from 'quidproquo-core';
+import { Action } from 'quidproquo-core';
 
 import { ServiceFunctionActionType } from './ServiceFunctionActionType';
 
@@ -15,7 +15,3 @@ export interface ServiceFunctionExecuteAction<T> extends Action<ServiceFunctionE
   type: ServiceFunctionActionType.Execute;
   payload: ServiceFunctionExecuteActionPayload<T>;
 }
-
-// Function Types
-export type ServiceFunctionExecuteActionProcessor<R, T> = ActionProcessor<ServiceFunctionExecuteAction<T>, R>;
-export type ServiceFunctionExecuteActionRequester<R, T> = ActionRequester<ServiceFunctionExecuteAction<T>, R>;

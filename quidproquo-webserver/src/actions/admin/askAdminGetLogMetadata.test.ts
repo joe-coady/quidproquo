@@ -3,7 +3,7 @@ import { captureRequester } from 'quidproquo-core';
 import { describe, expect, it } from 'vitest';
 
 import { AdminActionType } from './AdminActionType';
-import { askAdminGetLogMetadata } from './AdminGetLogMetadataActionRequester';
+import { askAdminGetLogMetadata } from './askAdminGetLogMetadata';
 
 describe('askAdminGetLogMetadata', () => {
   it('yields a GetLogMetadata action with the correlation id', () => {

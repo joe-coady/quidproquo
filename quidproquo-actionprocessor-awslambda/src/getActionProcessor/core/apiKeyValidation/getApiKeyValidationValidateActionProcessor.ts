@@ -1,6 +1,6 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import { ActionProcessorList, ActionProcessorListResolver, actionResult, Nullable, QPQConfig } from 'quidproquo-core';
-import { ApiKeyReference, ApiKeyValidationActionType, ApiKeyValidationValidateActionProcessor } from 'quidproquo-webserver';
+import { actionResult, createActionProcessor, Nullable, ProcessorFor, QPQConfig } from 'quidproquo-core';
+import { ApiKeyReference, ApiKeyValidationActionType, askApiKeyValidationValidate } from 'quidproquo-webserver';
 
 import { timingSafeEqual } from 'crypto';
 
@@ -21,7 +21,7 @@ const safeEqual = (a: Nullable<string>, b: Nullable<string>): boolean => {
   return timingSafeEqual(aBuf, bBuf);
 };
 
-const getProcessApiKeyValidationValidate = (qpqConfig: QPQConfig): ApiKeyValidationValidateActionProcessor => {
+const getProcessApiKeyValidationValidate = (qpqConfig: QPQConfig): ProcessorFor<typeof askApiKeyValidationValidate> => {
   const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
   return async ({ apiKeyValue, apiKeyReferences }) => {
@@ -48,8 +48,4 @@ const getProcessApiKeyValidationValidate = (qpqConfig: QPQConfig): ApiKeyValidat
   };
 };
 
-export const getApiKeyValidationValidateActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [ApiKeyValidationActionType.Validate]: getProcessApiKeyValidationValidate(qpqConfig),
-});
+export const getApiKeyValidationValidateActionProcessor = createActionProcessor(askApiKeyValidationValidate, getProcessApiKeyValidationValidate);

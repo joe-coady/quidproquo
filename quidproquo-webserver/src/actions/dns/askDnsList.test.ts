@@ -3,7 +3,7 @@ import { captureRequester } from 'quidproquo-core';
 import { describe, expect, it } from 'vitest';
 
 import { DnsActionType } from './DnsActionType';
-import { askDnsList } from './DnsListActionRequester';
+import { askDnsList } from './askDnsList';
 
 describe('askDnsList', () => {
   it('yields a List action with no payload', () => {

@@ -1,4 +1,4 @@
-import { Action, ActionProcessor, ActionRequester } from 'quidproquo-core';
+import { Action } from 'quidproquo-core';
 
 import { WebsocketActionType } from './WebsocketActionType';
 
@@ -14,7 +14,3 @@ export interface WebsocketSendMessageAction<T> extends Action<WebsocketSendMessa
   type: WebsocketActionType.SendMessage;
   payload: WebsocketSendMessageActionPayload<T>;
 }
-
-// Function Types
-export type WebsocketSendMessageActionProcessor<T> = ActionProcessor<WebsocketSendMessageAction<T>, void>;
-export type WebsocketSendMessageActionRequester<T> = ActionRequester<WebsocketSendMessageAction<T>, void>;

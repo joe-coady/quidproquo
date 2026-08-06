@@ -1,15 +1,11 @@
-import { ActionProcessorList, ActionProcessorListResolver, actionResult, QPQConfig } from 'quidproquo-core';
-import { ApiKeyValidationActionType, ApiKeyValidationValidateActionProcessor } from 'quidproquo-webserver';
+import { actionResult, createActionProcessor, ProcessorFor, QPQConfig } from 'quidproquo-core';
+import { ApiKeyValidationActionType, askApiKeyValidationValidate } from 'quidproquo-webserver';
 
-const getProcessApiKeyValidationValidate = (_qpqConfig: QPQConfig): ApiKeyValidationValidateActionProcessor => {
+const getProcessApiKeyValidationValidate = (_qpqConfig: QPQConfig): ProcessorFor<typeof askApiKeyValidationValidate> => {
   return async () => {
     // Permissive dev mode - always return true
     return actionResult(true);
   };
 };
 
-export const getApiKeyValidationValidateActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [ApiKeyValidationActionType.Validate]: getProcessApiKeyValidationValidate(qpqConfig),
-});
+export const getApiKeyValidationValidateActionProcessor = createActionProcessor(askApiKeyValidationValidate, getProcessApiKeyValidationValidate);

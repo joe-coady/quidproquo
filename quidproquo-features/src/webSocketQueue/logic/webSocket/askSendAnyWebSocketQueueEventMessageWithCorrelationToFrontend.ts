@@ -1,5 +1,5 @@
 import { askCatch, AskResponse } from 'quidproquo-core';
-import { askWebsocketSendMessage, WebsocketSendMessageErrorTypeEnum } from 'quidproquo-webserver';
+import { askWebsocketSendMessage, askWebsocketSendMessageBase } from 'quidproquo-webserver';
 
 import { askWebsocketReadApiNameOrThrow, askWebsocketReadConnectionInfo } from '../../context';
 import { webSocketConnectionData } from '../../data';
@@ -33,7 +33,7 @@ function* askSendToConnectionCleaningUpStale(connectionId: string, payload: AnyW
     return true;
   }
 
-  if (result.error.errorType === WebsocketSendMessageErrorTypeEnum.Disconnected) {
+  if (result.error.errorType === askWebsocketSendMessageBase.errorType.Disconnected) {
     yield* webSocketConnectionData.askDeleteByConnectionId(connectionId);
   }
 

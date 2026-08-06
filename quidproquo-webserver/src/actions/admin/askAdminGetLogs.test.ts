@@ -3,7 +3,7 @@ import { captureRequester } from 'quidproquo-core';
 import { describe, expect, it } from 'vitest';
 
 import { AdminActionType } from './AdminActionType';
-import { askAdminGetLogs } from './AdminGetLogsActionRequester';
+import { askAdminGetLogs } from './askAdminGetLogs';
 
 describe('askAdminGetLogs', () => {
   it('yields a GetLogs action carrying the runtime type and time window', () => {

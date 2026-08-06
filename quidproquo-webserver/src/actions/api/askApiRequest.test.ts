@@ -3,7 +3,7 @@ import { captureRequester } from 'quidproquo-core';
 import { describe, expect, it } from 'vitest';
 
 import { ApiActionType } from './ApiActionType';
-import { askApiRequest } from './ApiRequestActionRequester';
+import { askApiRequest } from './askApiRequest';
 
 describe('askApiRequest', () => {
   it('yields a Request action defaulting the response type to json', () => {

@@ -1,17 +1,10 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
-  actionResult,
-  actionResultError,
-  actionResultErrorFromCaughtError,
-  QPQConfig,
-} from 'quidproquo-core';
-import { EmailActionType, EmailSendEmailActionProcessor, EmailSendEmailErrorTypeEnum } from 'quidproquo-webserver';
+import { actionResult, actionResultError, actionResultErrorFromCaughtError, createActionProcessor, ProcessorFor, QPQConfig } from 'quidproquo-core';
+import { askEmailSendEmail, EmailActionType } from 'quidproquo-webserver';
 
 import { sendEmail } from '../../../logic/sesV2/sendEmail';
 
-const getProcessSendEmail = (qpqConfig: QPQConfig): EmailSendEmailActionProcessor => {
+const getProcessSendEmail = (qpqConfig: QPQConfig): ProcessorFor<typeof askEmailSendEmail> => {
   return async (payload) => {
     const region = qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig);
 
@@ -21,18 +14,16 @@ const getProcessSendEmail = (qpqConfig: QPQConfig): EmailSendEmailActionProcesso
       return actionResult(messageId);
     } catch (error) {
       return actionResultErrorFromCaughtError(error, {
-        MessageRejected: () => actionResultError(EmailSendEmailErrorTypeEnum.MessageRejected, 'Message rejected'),
-        MailFromDomainNotVerifiedException: () => actionResultError(EmailSendEmailErrorTypeEnum.SenderNotVerified, 'Sender domain not verified'),
-        AccountSuspendedException: () => actionResultError(EmailSendEmailErrorTypeEnum.AccountSuspended, 'Email sending account suspended'),
-        SendingPausedException: () => actionResultError(EmailSendEmailErrorTypeEnum.SendingPaused, 'Email sending is paused'),
-        TooManyRequestsException: () => actionResultError(EmailSendEmailErrorTypeEnum.Throttled, 'Rate exceeded'),
-        LimitExceededException: () => actionResultError(EmailSendEmailErrorTypeEnum.LimitExceeded, 'Sending limit exceeded'),
-        BadRequestException: () => actionResultError(EmailSendEmailErrorTypeEnum.BadRequest, 'Invalid email request'),
+        MessageRejected: () => actionResultError(askEmailSendEmail.errorType.MessageRejected, 'Message rejected'),
+        MailFromDomainNotVerifiedException: () => actionResultError(askEmailSendEmail.errorType.SenderNotVerified, 'Sender domain not verified'),
+        AccountSuspendedException: () => actionResultError(askEmailSendEmail.errorType.AccountSuspended, 'Email sending account suspended'),
+        SendingPausedException: () => actionResultError(askEmailSendEmail.errorType.SendingPaused, 'Email sending is paused'),
+        TooManyRequestsException: () => actionResultError(askEmailSendEmail.errorType.Throttled, 'Rate exceeded'),
+        LimitExceededException: () => actionResultError(askEmailSendEmail.errorType.LimitExceeded, 'Sending limit exceeded'),
+        BadRequestException: () => actionResultError(askEmailSendEmail.errorType.BadRequest, 'Invalid email request'),
       });
     }
   };
 };
 
-export const getEmailSendEmailActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [EmailActionType.SendEmail]: getProcessSendEmail(qpqConfig),
-});
+export const getEmailSendEmailActionProcessor = createActionProcessor(askEmailSendEmail, getProcessSendEmail);

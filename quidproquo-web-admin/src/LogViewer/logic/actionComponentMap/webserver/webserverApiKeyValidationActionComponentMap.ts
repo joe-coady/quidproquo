@@ -1,4 +1,4 @@
-import { ApiKeyValidationActionType } from 'quidproquo-webserver';
+import { ApiKeyValidationActionType, askApiKeyValidationValidate } from 'quidproquo-webserver';
 
 const webserverApiKeyValidationActionComponentMap: Record<string, string[]> = {
   [ApiKeyValidationActionType.Validate]: ['askApiKeyValidationValidate', 'apiKeyValue', 'apiKeyReferences'],

@@ -1,4 +1,4 @@
-import { Action, ActionProcessor, ActionRequester, QPQBinaryData } from 'quidproquo-core';
+import { QPQBinaryData } from 'quidproquo-core';
 
 import { EmailActionType } from './EmailActionType';
 
@@ -15,13 +15,3 @@ export type EmailSendEmailActionPayload = {
   subject: string;
   attachments?: QPQBinaryData[];
 } & EmailSendEmailBody;
-
-// Action
-export interface EmailSendEmailAction extends Action<EmailSendEmailActionPayload> {
-  type: EmailActionType.SendEmail;
-  payload: EmailSendEmailActionPayload;
-}
-
-// Function Types
-export type EmailSendEmailActionProcessor = ActionProcessor<EmailSendEmailAction, string>;
-export type EmailSendEmailActionRequester = ActionRequester<EmailSendEmailAction, string>;
