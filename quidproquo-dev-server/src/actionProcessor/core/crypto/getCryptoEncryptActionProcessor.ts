@@ -1,13 +1,11 @@
 import { createLocalMasterKeyDataKeyProvider, envelopeEncrypt } from 'quidproquo-actionprocessor-node';
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
-  CryptoActionType,
-  CryptoEncryptActionProcessor,
-  CryptoEncryptErrorTypeEnum,
+  askCryptoEncrypt,
+  createActionProcessor,
+  ProcessorFor,
   QPQConfig,
   qpqCoreUtils,
 } from 'quidproquo-core';
@@ -15,12 +13,12 @@ import {
 import { getOrSeedCryptoMasterKey } from '../../../logic/cryptoKeys';
 import { ResolvedDevServerConfig } from '../../../types';
 
-const getProcessCryptoEncrypt = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): CryptoEncryptActionProcessor => {
+const getProcessCryptoEncrypt = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): ProcessorFor<typeof askCryptoEncrypt> => {
   return async ({ keyName, plaintext, context }) => {
     const cryptoKeyConfig = qpqCoreUtils.getAllCryptoKeyConfigs(qpqConfig).find((k) => k.keyName === keyName);
     if (!cryptoKeyConfig) {
       return actionResultError(
-        CryptoEncryptErrorTypeEnum.KeyNotConfigured,
+        askCryptoEncrypt.errorType.KeyNotConfigured,
         `Crypto key not configured: [${keyName}] - declare it with defineCryptoKey`,
       );
     }
@@ -36,8 +34,5 @@ const getProcessCryptoEncrypt = (qpqConfig: QPQConfig, devServerConfig: Resolved
   };
 };
 
-export const getCryptoEncryptActionProcessor =
-  (devServerConfig: ResolvedDevServerConfig): ActionProcessorListResolver =>
-  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-    [CryptoActionType.Encrypt]: getProcessCryptoEncrypt(qpqConfig, devServerConfig),
-  });
+export const getCryptoEncryptActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
+  createActionProcessor(askCryptoEncrypt, (qpqConfig) => getProcessCryptoEncrypt(qpqConfig, devServerConfig));

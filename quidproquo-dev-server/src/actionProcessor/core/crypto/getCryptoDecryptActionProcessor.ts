@@ -1,13 +1,11 @@
 import { createLocalMasterKeyDataKeyProvider, envelopeDecrypt } from 'quidproquo-actionprocessor-node';
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
-  CryptoActionType,
-  CryptoDecryptActionProcessor,
-  CryptoDecryptErrorTypeEnum,
+  askCryptoDecrypt,
+  createActionProcessor,
+  ProcessorFor,
   QPQConfig,
   qpqCoreUtils,
 } from 'quidproquo-core';
@@ -15,12 +13,12 @@ import {
 import { getOrSeedCryptoMasterKey } from '../../../logic/cryptoKeys';
 import { ResolvedDevServerConfig } from '../../../types';
 
-const getProcessCryptoDecrypt = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): CryptoDecryptActionProcessor => {
+const getProcessCryptoDecrypt = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): ProcessorFor<typeof askCryptoDecrypt> => {
   return async ({ keyName, ciphertext, context }) => {
     const cryptoKeyConfig = qpqCoreUtils.getAllCryptoKeyConfigs(qpqConfig).find((k) => k.keyName === keyName);
     if (!cryptoKeyConfig) {
       return actionResultError(
-        CryptoDecryptErrorTypeEnum.KeyNotConfigured,
+        askCryptoDecrypt.errorType.KeyNotConfigured,
         `Crypto key not configured: [${keyName}] - declare it with defineCryptoKey`,
       );
     }
@@ -35,15 +33,12 @@ const getProcessCryptoDecrypt = (qpqConfig: QPQConfig, devServerConfig: Resolved
       // as they are in prod - this is the only chance to catch scoping bugs
       // before deploy
       return actionResultErrorFromCaughtError(error, {
-        QpqCryptoContextMismatch: (e) => actionResultError(CryptoDecryptErrorTypeEnum.ContextMismatch, e.message),
-        QpqCryptoMalformedCiphertext: (e) => actionResultError(CryptoDecryptErrorTypeEnum.MalformedCiphertext, e.message),
+        QpqCryptoContextMismatch: (e) => actionResultError(askCryptoDecrypt.errorType.ContextMismatch, e.message),
+        QpqCryptoMalformedCiphertext: (e) => actionResultError(askCryptoDecrypt.errorType.MalformedCiphertext, e.message),
       });
     }
   };
 };
 
-export const getCryptoDecryptActionProcessor =
-  (devServerConfig: ResolvedDevServerConfig): ActionProcessorListResolver =>
-  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-    [CryptoActionType.Decrypt]: getProcessCryptoDecrypt(qpqConfig, devServerConfig),
-  });
+export const getCryptoDecryptActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
+  createActionProcessor(askCryptoDecrypt, (qpqConfig) => getProcessCryptoDecrypt(qpqConfig, devServerConfig));

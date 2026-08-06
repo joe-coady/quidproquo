@@ -1,12 +1,5 @@
 import { CRYPTO_BLOB_PREFIX_V1 } from 'quidproquo-actionprocessor-node';
-import {
-  ActionProcessor,
-  buildTestQpqConfig,
-  CryptoActionType,
-  CryptoDecryptErrorTypeEnum,
-  CryptoEncryptErrorTypeEnum,
-  defineCryptoKey,
-} from 'quidproquo-core';
+import { ActionProcessor, buildTestQpqConfig, CryptoActionType, askCryptoDecrypt, askCryptoEncrypt, defineCryptoKey } from 'quidproquo-core';
 
 import { existsSync } from 'fs';
 import { mkdtemp, rm } from 'fs/promises';
@@ -58,21 +51,21 @@ describe('getCryptoActionProcessor (dev server)', () => {
     const [ciphertext] = await invokeProcessor(encrypt, { keyName: 'my-key', plaintext: 'shhh', context: { tenantId: 'tenant-a' } });
 
     const [, error] = await invokeProcessor(decrypt, { keyName: 'my-key', ciphertext, context: { tenantId: 'tenant-b' } });
-    expect(error?.errorType).toBe(CryptoDecryptErrorTypeEnum.ContextMismatch);
+    expect(error?.errorType).toBe(askCryptoDecrypt.errorType.ContextMismatch);
   });
 
   it('fails with MalformedCiphertext for a non-blob input', async () => {
     const [, error] = await invokeProcessor(decrypt, { keyName: 'my-key', ciphertext: 'not-a-blob' });
 
-    expect(error?.errorType).toBe(CryptoDecryptErrorTypeEnum.MalformedCiphertext);
+    expect(error?.errorType).toBe(askCryptoDecrypt.errorType.MalformedCiphertext);
   });
 
   it('fails with KeyNotConfigured for an undeclared key', async () => {
     const [, encryptError] = await invokeProcessor(encrypt, { keyName: 'unknown-key', plaintext: 'shhh' });
-    expect(encryptError?.errorType).toBe(CryptoEncryptErrorTypeEnum.KeyNotConfigured);
+    expect(encryptError?.errorType).toBe(askCryptoEncrypt.errorType.KeyNotConfigured);
 
     const [, decryptError] = await invokeProcessor(decrypt, { keyName: 'unknown-key', ciphertext: 'anything' });
-    expect(decryptError?.errorType).toBe(CryptoDecryptErrorTypeEnum.KeyNotConfigured);
+    expect(decryptError?.errorType).toBe(askCryptoDecrypt.errorType.KeyNotConfigured);
   });
 
   it('decrypts values encrypted in an earlier processor instance (key persisted on disk)', async () => {

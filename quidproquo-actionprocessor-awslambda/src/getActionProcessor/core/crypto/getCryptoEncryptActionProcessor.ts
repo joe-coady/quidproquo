@@ -1,25 +1,23 @@
 import { envelopeEncrypt } from 'quidproquo-actionprocessor-node';
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
-  CryptoActionType,
-  CryptoEncryptActionProcessor,
-  CryptoEncryptErrorTypeEnum,
+  askCryptoEncrypt,
+  createActionProcessor,
+  ProcessorFor,
   QPQConfig,
 } from 'quidproquo-core';
 
 import { createKmsDataKeyProvider, resolveCryptoKeyAlias } from './utils';
 
-const getProcessCryptoEncrypt = (qpqConfig: QPQConfig): CryptoEncryptActionProcessor => {
+const getProcessCryptoEncrypt = (qpqConfig: QPQConfig): ProcessorFor<typeof askCryptoEncrypt> => {
   return async ({ keyName, plaintext, context }) => {
     const keyAlias = resolveCryptoKeyAlias(keyName, qpqConfig);
     if (!keyAlias) {
       return actionResultError(
-        CryptoEncryptErrorTypeEnum.KeyNotConfigured,
+        askCryptoEncrypt.errorType.KeyNotConfigured,
         `Crypto key not configured: [${keyName}] - declare it with defineCryptoKey`,
       );
     }
@@ -31,17 +29,15 @@ const getProcessCryptoEncrypt = (qpqConfig: QPQConfig): CryptoEncryptActionProce
       return actionResult(ciphertext);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        NotFoundException: () => actionResultError(CryptoEncryptErrorTypeEnum.KeyUnavailable, `Crypto key not found: [${keyName}]`),
-        DisabledException: () => actionResultError(CryptoEncryptErrorTypeEnum.KeyUnavailable, `Crypto key is disabled: [${keyName}]`),
+        NotFoundException: () => actionResultError(askCryptoEncrypt.errorType.KeyUnavailable, `Crypto key not found: [${keyName}]`),
+        DisabledException: () => actionResultError(askCryptoEncrypt.errorType.KeyUnavailable, `Crypto key is disabled: [${keyName}]`),
         KMSInvalidStateException: () =>
-          actionResultError(CryptoEncryptErrorTypeEnum.KeyUnavailable, `Crypto key is in an unusable state: [${keyName}]`),
-        AccessDeniedException: () => actionResultError(CryptoEncryptErrorTypeEnum.KeyUnavailable, `Access denied to crypto key: [${keyName}]`),
-        ThrottlingException: () => actionResultError(CryptoEncryptErrorTypeEnum.Throttling, 'Throttling: Rate exceeded'),
+          actionResultError(askCryptoEncrypt.errorType.KeyUnavailable, `Crypto key is in an unusable state: [${keyName}]`),
+        AccessDeniedException: () => actionResultError(askCryptoEncrypt.errorType.KeyUnavailable, `Access denied to crypto key: [${keyName}]`),
+        ThrottlingException: () => actionResultError(askCryptoEncrypt.errorType.Throttling, 'Throttling: Rate exceeded'),
       });
     }
   };
 };
 
-export const getCryptoEncryptActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [CryptoActionType.Encrypt]: getProcessCryptoEncrypt(qpqConfig),
-});
+export const getCryptoEncryptActionProcessor = createActionProcessor(askCryptoEncrypt, getProcessCryptoEncrypt);

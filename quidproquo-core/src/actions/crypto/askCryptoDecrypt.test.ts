@@ -4,9 +4,9 @@ import { describe, expect, it } from 'vitest';
 
 import { runStory, StoryError, throwsError } from '../../testing';
 import { CryptoActionType } from './CryptoActionType';
-import { askCryptoDecrypt, CryptoDecryptErrorTypeEnum } from './CryptoDecryptActionRequester';
+import { askCryptoDecrypt } from './askCryptoDecrypt';
 
-describe('CryptoDecryptActionRequester', () => {
+describe('askCryptoDecrypt', () => {
   describe('askCryptoDecrypt', () => {
     it('should yield an action with correct type and payload', () => {
       const keyName = 'my-crypto-key';
@@ -36,17 +36,17 @@ describe('CryptoDecryptActionRequester', () => {
     it('propagates a context mismatch as a thrown StoryError', () => {
       const runFailingStory = () =>
         runStory(askCryptoDecrypt('my-crypto-key', 'qpqcrypto:v1:abc123', { tenantId: 'tenant-b' }), {
-          [CryptoActionType.Decrypt]: throwsError(CryptoDecryptErrorTypeEnum.ContextMismatch, 'Crypto context mismatch'),
+          [CryptoActionType.Decrypt]: throwsError(askCryptoDecrypt.errorType.ContextMismatch, 'Crypto context mismatch'),
         });
 
       expect(runFailingStory).toThrow(StoryError);
-      expect(runFailingStory).toThrow(`${CryptoDecryptErrorTypeEnum.ContextMismatch}: Crypto context mismatch`);
+      expect(runFailingStory).toThrow(`${askCryptoDecrypt.errorType.ContextMismatch}: Crypto context mismatch`);
     });
   });
 
-  describe('CryptoDecryptErrorTypeEnum', () => {
+  describe('errorType', () => {
     it('lists every error the processor can produce, namespaced by the action type', () => {
-      expect(CryptoDecryptErrorTypeEnum).toEqual({
+      expect(askCryptoDecrypt.errorType).toEqual({
         KeyNotConfigured: `${CryptoActionType.Decrypt}-KeyNotConfigured`,
         ContextMismatch: `${CryptoActionType.Decrypt}-ContextMismatch`,
         MalformedCiphertext: `${CryptoActionType.Decrypt}-MalformedCiphertext`,

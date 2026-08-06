@@ -1,6 +1,6 @@
 import { envelopeEncrypt } from 'quidproquo-actionprocessor-node';
 import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { buildTestQpqConfig, CryptoActionType, CryptoDecryptErrorTypeEnum, defineCryptoKey } from 'quidproquo-core';
+import { buildTestQpqConfig, CryptoActionType, askCryptoDecrypt, defineCryptoKey } from 'quidproquo-core';
 
 import { randomBytes } from 'crypto';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -52,7 +52,7 @@ describe('getCryptoDecryptActionProcessor', () => {
 
     const [, error] = await invokeProcessor(processor, { keyName: 'my-key', ciphertext, context: { tenantId: 'tenant-b' } });
 
-    expect(error?.errorType).toBe(CryptoDecryptErrorTypeEnum.ContextMismatch);
+    expect(error?.errorType).toBe(askCryptoDecrypt.errorType.ContextMismatch);
     expect(getCachedUnwrappedDataKey).not.toHaveBeenCalled();
   });
 
@@ -61,7 +61,7 @@ describe('getCryptoDecryptActionProcessor', () => {
 
     const [, error] = await invokeProcessor(processor, { keyName: 'my-key', ciphertext: 'not-a-blob' });
 
-    expect(error?.errorType).toBe(CryptoDecryptErrorTypeEnum.MalformedCiphertext);
+    expect(error?.errorType).toBe(askCryptoDecrypt.errorType.MalformedCiphertext);
     expect(getCachedUnwrappedDataKey).not.toHaveBeenCalled();
   });
 
@@ -70,17 +70,17 @@ describe('getCryptoDecryptActionProcessor', () => {
 
     const [, error] = await invokeProcessor(processor, { keyName: 'unknown-key', ciphertext: 'anything' });
 
-    expect(error?.errorType).toBe(CryptoDecryptErrorTypeEnum.KeyNotConfigured);
+    expect(error?.errorType).toBe(askCryptoDecrypt.errorType.KeyNotConfigured);
   });
 
   it.each([
-    ['InvalidCiphertextException', CryptoDecryptErrorTypeEnum.MalformedCiphertext],
-    ['IncorrectKeyException', CryptoDecryptErrorTypeEnum.MalformedCiphertext],
-    ['NotFoundException', CryptoDecryptErrorTypeEnum.KeyUnavailable],
-    ['DisabledException', CryptoDecryptErrorTypeEnum.KeyUnavailable],
-    ['KMSInvalidStateException', CryptoDecryptErrorTypeEnum.KeyUnavailable],
-    ['AccessDeniedException', CryptoDecryptErrorTypeEnum.KeyUnavailable],
-    ['ThrottlingException', CryptoDecryptErrorTypeEnum.Throttling],
+    ['InvalidCiphertextException', askCryptoDecrypt.errorType.MalformedCiphertext],
+    ['IncorrectKeyException', askCryptoDecrypt.errorType.MalformedCiphertext],
+    ['NotFoundException', askCryptoDecrypt.errorType.KeyUnavailable],
+    ['DisabledException', askCryptoDecrypt.errorType.KeyUnavailable],
+    ['KMSInvalidStateException', askCryptoDecrypt.errorType.KeyUnavailable],
+    ['AccessDeniedException', askCryptoDecrypt.errorType.KeyUnavailable],
+    ['ThrottlingException', askCryptoDecrypt.errorType.Throttling],
   ])('maps %s to the matching error type', async (errorName: string, expectedType: string) => {
     const ciphertext = await buildCiphertext('shhh', undefined, randomBytes(32));
     vi.mocked(getCachedUnwrappedDataKey).mockRejectedValue(Object.assign(new Error('boom'), { name: errorName }));

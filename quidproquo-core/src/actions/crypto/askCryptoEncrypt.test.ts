@@ -4,9 +4,9 @@ import { describe, expect, it } from 'vitest';
 
 import { runStory, StoryError, throwsError } from '../../testing';
 import { CryptoActionType } from './CryptoActionType';
-import { askCryptoEncrypt, CryptoEncryptErrorTypeEnum } from './CryptoEncryptActionRequester';
+import { askCryptoEncrypt } from './askCryptoEncrypt';
 
-describe('CryptoEncryptActionRequester', () => {
+describe('askCryptoEncrypt', () => {
   describe('askCryptoEncrypt', () => {
     it('should yield an action with correct type and payload', () => {
       const keyName = 'my-crypto-key';
@@ -48,17 +48,17 @@ describe('CryptoEncryptActionRequester', () => {
     it('propagates a processor failure as a thrown StoryError', () => {
       const runFailingStory = () =>
         runStory(askCryptoEncrypt('missing-key', 'value'), {
-          [CryptoActionType.Encrypt]: throwsError(CryptoEncryptErrorTypeEnum.KeyNotConfigured, 'Crypto key not configured'),
+          [CryptoActionType.Encrypt]: throwsError(askCryptoEncrypt.errorType.KeyNotConfigured, 'Crypto key not configured'),
         });
 
       expect(runFailingStory).toThrow(StoryError);
-      expect(runFailingStory).toThrow(`${CryptoEncryptErrorTypeEnum.KeyNotConfigured}: Crypto key not configured`);
+      expect(runFailingStory).toThrow(`${askCryptoEncrypt.errorType.KeyNotConfigured}: Crypto key not configured`);
     });
   });
 
-  describe('CryptoEncryptErrorTypeEnum', () => {
+  describe('errorType', () => {
     it('lists every error the processor can produce, namespaced by the action type', () => {
-      expect(CryptoEncryptErrorTypeEnum).toEqual({
+      expect(askCryptoEncrypt.errorType).toEqual({
         KeyNotConfigured: `${CryptoActionType.Encrypt}-KeyNotConfigured`,
         KeyUnavailable: `${CryptoActionType.Encrypt}-KeyUnavailable`,
         Throttling: `${CryptoActionType.Encrypt}-Throttling`,

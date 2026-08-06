@@ -1,6 +1,6 @@
 import { CRYPTO_BLOB_PREFIX_V1 } from 'quidproquo-actionprocessor-node';
 import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { buildTestQpqConfig, CryptoActionType, CryptoEncryptErrorTypeEnum, defineCryptoKey } from 'quidproquo-core';
+import { buildTestQpqConfig, CryptoActionType, askCryptoEncrypt, defineCryptoKey } from 'quidproquo-core';
 
 import { randomBytes } from 'crypto';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -45,16 +45,16 @@ describe('getCryptoEncryptActionProcessor', () => {
 
     const [, error] = await invokeProcessor(processor, { keyName: 'unknown-key', plaintext: 'shhh' });
 
-    expect(error?.errorType).toBe(CryptoEncryptErrorTypeEnum.KeyNotConfigured);
+    expect(error?.errorType).toBe(askCryptoEncrypt.errorType.KeyNotConfigured);
     expect(getCachedGeneratedDataKey).not.toHaveBeenCalled();
   });
 
   it.each([
-    ['NotFoundException', CryptoEncryptErrorTypeEnum.KeyUnavailable],
-    ['DisabledException', CryptoEncryptErrorTypeEnum.KeyUnavailable],
-    ['KMSInvalidStateException', CryptoEncryptErrorTypeEnum.KeyUnavailable],
-    ['AccessDeniedException', CryptoEncryptErrorTypeEnum.KeyUnavailable],
-    ['ThrottlingException', CryptoEncryptErrorTypeEnum.Throttling],
+    ['NotFoundException', askCryptoEncrypt.errorType.KeyUnavailable],
+    ['DisabledException', askCryptoEncrypt.errorType.KeyUnavailable],
+    ['KMSInvalidStateException', askCryptoEncrypt.errorType.KeyUnavailable],
+    ['AccessDeniedException', askCryptoEncrypt.errorType.KeyUnavailable],
+    ['ThrottlingException', askCryptoEncrypt.errorType.Throttling],
   ])('maps %s to the matching error type', async (errorName: string, expectedType: string) => {
     vi.mocked(getCachedGeneratedDataKey).mockRejectedValue(Object.assign(new Error('boom'), { name: errorName }));
     const processor = await resolveProcessor();
