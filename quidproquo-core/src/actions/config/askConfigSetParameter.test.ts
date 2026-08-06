@@ -4,9 +4,9 @@ import { describe, expect, it } from 'vitest';
 
 import { runStory, StoryError, throwsError } from '../../testing';
 import { ConfigActionType } from './ConfigActionType';
-import { askConfigSetParameter, ConfigSetParameterErrorTypeEnum } from './ConfigSetParameterActionRequester';
+import { askConfigSetParameter } from './askConfigSetParameter';
 
-describe('ConfigSetParameterActionRequester', () => {
+describe('askConfigSetParameter', () => {
   describe('askConfigSetParameter', () => {
     it('should yield an action with correct type and payload', () => {
       const parameterName = 'my-parameter';
@@ -83,17 +83,17 @@ line3`;
     it('propagates a processor failure as a thrown StoryError', () => {
       const runFailingStory = () =>
         runStory(askConfigSetParameter('some-param', 'some-value'), {
-          [ConfigActionType.SetParameter]: throwsError(ConfigSetParameterErrorTypeEnum.QuotaExceeded, 'Parameter store limit hit'),
+          [ConfigActionType.SetParameter]: throwsError(askConfigSetParameter.errorType.QuotaExceeded, 'Parameter store limit hit'),
         });
 
       expect(runFailingStory).toThrow(StoryError);
-      expect(runFailingStory).toThrow(`${ConfigSetParameterErrorTypeEnum.QuotaExceeded}: Parameter store limit hit`);
+      expect(runFailingStory).toThrow(`${askConfigSetParameter.errorType.QuotaExceeded}: Parameter store limit hit`);
     });
   });
 
-  describe('ConfigSetParameterErrorTypeEnum', () => {
+  describe('errorType', () => {
     it('lists every error the processor can produce, namespaced by the action type', () => {
-      expect(ConfigSetParameterErrorTypeEnum).toEqual({
+      expect(askConfigSetParameter.errorType).toEqual({
         Throttling: `${ConfigActionType.SetParameter}-Throttling`,
         QuotaExceeded: `${ConfigActionType.SetParameter}-QuotaExceeded`,
       });

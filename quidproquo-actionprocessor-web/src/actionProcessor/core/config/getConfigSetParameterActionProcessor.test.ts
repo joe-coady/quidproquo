@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { buildTestQpqConfig, ConfigActionType, ConfigSetParameterErrorTypeEnum, ErrorTypeEnum, noopDynamicModuleLoader } from 'quidproquo-core';
+import { buildTestQpqConfig, ConfigActionType, askConfigSetParameter, ErrorTypeEnum, noopDynamicModuleLoader } from 'quidproquo-core';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -43,7 +43,7 @@ describe('getConfigSetParameterActionProcessor', () => {
 
     const [, error] = await processor({ parameterName: 'token', parameterValue: 'abc' });
 
-    expect(error?.errorType).toBe(ConfigSetParameterErrorTypeEnum.QuotaExceeded);
+    expect(error?.errorType).toBe(askConfigSetParameter.errorType.QuotaExceeded);
   });
 
   it('maps an unrecognised error to a generic error', async () => {

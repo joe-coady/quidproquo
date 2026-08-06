@@ -1,5 +1,5 @@
 import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { buildTestQpqConfig, ConfigActionType, ConfigSetParameterErrorTypeEnum, defineParameter } from 'quidproquo-core';
+import { buildTestQpqConfig, ConfigActionType, askConfigSetParameter, defineParameter } from 'quidproquo-core';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -34,8 +34,8 @@ describe('getConfigSetParameterActionProcessor', () => {
   });
 
   it.each([
-    ['ThrottlingException', ConfigSetParameterErrorTypeEnum.Throttling],
-    ['ParameterLimitExceeded', ConfigSetParameterErrorTypeEnum.QuotaExceeded],
+    ['ThrottlingException', askConfigSetParameter.errorType.Throttling],
+    ['ParameterLimitExceeded', askConfigSetParameter.errorType.QuotaExceeded],
   ])('maps %s to the matching error type', async (errorName: string, expectedType: string) => {
     vi.mocked(setParameter).mockRejectedValue(Object.assign(new Error('boom'), { name: errorName }));
     const processor = await resolveProcessor();

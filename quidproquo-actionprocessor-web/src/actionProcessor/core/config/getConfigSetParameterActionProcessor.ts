@@ -1,16 +1,14 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
-  ConfigActionType,
-  ConfigSetParameterActionProcessor,
-  ConfigSetParameterErrorTypeEnum,
+  askConfigSetParameter,
+  createActionProcessor,
+  ProcessorFor,
   QPQConfig,
 } from 'quidproquo-core';
 
-const getProcessConfigSetParameter = (qpqConfig: QPQConfig): ConfigSetParameterActionProcessor => {
+const getProcessConfigSetParameter = (qpqConfig: QPQConfig): ProcessorFor<typeof askConfigSetParameter> => {
   return async ({ parameterName, parameterValue }) => {
     try {
       // window.localStorage (not the bare global): Node exposes a non-functional
@@ -21,12 +19,10 @@ const getProcessConfigSetParameter = (qpqConfig: QPQConfig): ConfigSetParameterA
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
         QuotaExceededError: () =>
-          actionResultError(ConfigSetParameterErrorTypeEnum.QuotaExceeded, `Local Storage quota exceeded saving parameter '${parameterName}'.`),
+          actionResultError(askConfigSetParameter.errorType.QuotaExceeded, `Local Storage quota exceeded saving parameter '${parameterName}'.`),
       });
     }
   };
 };
 
-export const getConfigSetParameterActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [ConfigActionType.SetParameter]: getProcessConfigSetParameter(qpqConfig),
-});
+export const getConfigSetParameterActionProcessor = createActionProcessor(askConfigSetParameter, getProcessConfigSetParameter);

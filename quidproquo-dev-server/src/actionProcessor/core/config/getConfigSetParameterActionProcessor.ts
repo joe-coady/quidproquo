@@ -1,17 +1,9 @@
-import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
-  actionResult,
-  actionResultErrorFromCaughtError,
-  ConfigActionType,
-  ConfigSetParameterActionProcessor,
-  QPQConfig,
-} from 'quidproquo-core';
+import { actionResult, actionResultErrorFromCaughtError, askConfigSetParameter, createActionProcessor, ProcessorFor, QPQConfig } from 'quidproquo-core';
 
 import { setParameterValue } from '../../../logic/config';
 import { ResolvedDevServerConfig } from '../../../types';
 
-const getProcessConfigSetParameter = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): ConfigSetParameterActionProcessor => {
+const getProcessConfigSetParameter = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): ProcessorFor<typeof askConfigSetParameter> => {
   return async ({ parameterName, parameterValue }) => {
     try {
       await setParameterValue(devServerConfig.runtimePath, parameterName, qpqConfig, parameterValue);
@@ -22,8 +14,5 @@ const getProcessConfigSetParameter = (qpqConfig: QPQConfig, devServerConfig: Res
   };
 };
 
-export const getConfigSetParameterActionProcessor =
-  (devServerConfig: ResolvedDevServerConfig): ActionProcessorListResolver =>
-  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-    [ConfigActionType.SetParameter]: getProcessConfigSetParameter(qpqConfig, devServerConfig),
-  });
+export const getConfigSetParameterActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
+  createActionProcessor(askConfigSetParameter, (qpqConfig) => getProcessConfigSetParameter(qpqConfig, devServerConfig));
