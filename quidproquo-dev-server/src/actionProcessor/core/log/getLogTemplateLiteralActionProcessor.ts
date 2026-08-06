@@ -1,16 +1,8 @@
-import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
-  actionResult,
-  DecomposedStringPrimitive,
-  LogActionType,
-  LogTemplateLiteralActionProcessor,
-  QPQConfig,
-} from 'quidproquo-core';
+import { actionResult, askLogTemplateLiteral, createActionProcessor, DecomposedStringPrimitive, ProcessorFor, QPQConfig } from 'quidproquo-core';
 
 import chalk from 'chalk';
 
-const getProcessLogTemplateLiteral = (qpqConfig: QPQConfig): LogTemplateLiteralActionProcessor => {
+const getProcessLogTemplateLiteral = (qpqConfig: QPQConfig): ProcessorFor<typeof askLogTemplateLiteral> => {
   return async ({ messageParts: [strings, values] }) => {
     const message = values.reduce(
       (str: string, value: DecomposedStringPrimitive, index: number) => str + chalk.yellowBright(String(value)) + chalk.white(strings[index + 1]),
@@ -23,6 +15,4 @@ const getProcessLogTemplateLiteral = (qpqConfig: QPQConfig): LogTemplateLiteralA
   };
 };
 
-export const getLogTemplateLiteralActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [LogActionType.TemplateLiteral]: getProcessLogTemplateLiteral(qpqConfig),
-});
+export const getLogTemplateLiteralActionProcessor = createActionProcessor(askLogTemplateLiteral, getProcessLogTemplateLiteral);

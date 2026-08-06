@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { captureRequester, runStory, StoryError, throwsError } from '../../testing';
 import { LogActionType } from './LogActionType';
-import { askLogDisableEventHistory } from './LogDisableEventHistoryActionRequester';
+import { askLogDisableEventHistory } from './askLogDisableEventHistory';
 
 describe('askLogDisableEventHistory', () => {
   // Note the polarity: `enable` is whether event history is ENABLED for this

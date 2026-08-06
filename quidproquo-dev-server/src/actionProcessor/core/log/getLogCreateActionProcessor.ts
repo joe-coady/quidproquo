@@ -1,12 +1,4 @@
-import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
-  actionResult,
-  LogActionType,
-  LogCreateActionProcessor,
-  LogLevelEnum,
-  QPQConfig,
-} from 'quidproquo-core';
+import { actionResult, askLogCreate, createActionProcessor, LogLevelEnum, ProcessorFor, QPQConfig } from 'quidproquo-core';
 
 import chalk from 'chalk';
 
@@ -19,7 +11,7 @@ const logColors = {
   [LogLevelEnum.Trace]: chalk.gray,
 };
 
-const getProcessLogCreate = (qpqConfig: QPQConfig): LogCreateActionProcessor => {
+const getProcessLogCreate = (qpqConfig: QPQConfig): ProcessorFor<typeof askLogCreate> => {
   return async ({ msg, logLevel, data }) => {
     const colorize = logColors[logLevel] || chalk.white;
     const logMessage = colorize(`${LogLevelEnum[logLevel]}: ${msg}`);
@@ -34,6 +26,4 @@ const getProcessLogCreate = (qpqConfig: QPQConfig): LogCreateActionProcessor => 
   };
 };
 
-export const getLogCreateActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [LogActionType.Create]: getProcessLogCreate(qpqConfig),
-});
+export const getLogCreateActionProcessor = createActionProcessor(askLogCreate, getProcessLogCreate);

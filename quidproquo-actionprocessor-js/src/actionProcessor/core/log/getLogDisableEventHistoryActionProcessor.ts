@@ -1,13 +1,6 @@
-import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
-  actionResult,
-  LogActionType,
-  LogDisableEventHistoryActionProcessor,
-  QPQConfig,
-} from 'quidproquo-core';
+import { actionResult, askLogDisableEventHistory, createActionProcessor, ProcessorFor, QPQConfig } from 'quidproquo-core';
 
-const getProcessLogDisableEventHistory = (qpqConfig: QPQConfig): LogDisableEventHistoryActionProcessor => {
+const getProcessLogDisableEventHistory = (qpqConfig: QPQConfig): ProcessorFor<typeof askLogDisableEventHistory> => {
   return async ({ enable, reason }, session, _actionProcessors, logger) => {
     await logger.enableLogs(enable, reason, session.correlation || '');
 
@@ -15,6 +8,4 @@ const getProcessLogDisableEventHistory = (qpqConfig: QPQConfig): LogDisableEvent
   };
 };
 
-export const getLogDisableEventHistoryActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [LogActionType.DisableEventHistory]: getProcessLogDisableEventHistory(qpqConfig),
-});
+export const getLogDisableEventHistoryActionProcessor = createActionProcessor(askLogDisableEventHistory, getProcessLogDisableEventHistory);

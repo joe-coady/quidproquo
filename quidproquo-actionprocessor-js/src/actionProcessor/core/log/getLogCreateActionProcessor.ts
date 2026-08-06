@@ -1,6 +1,6 @@
-import { ActionProcessorList, ActionProcessorListResolver, actionResult, LogActionType, LogCreateActionProcessor, QPQConfig } from 'quidproquo-core';
+import { actionResult, askLogCreate, createActionProcessor, ProcessorFor, QPQConfig } from 'quidproquo-core';
 
-const getProcessLogCreate = (qpqConfig: QPQConfig): LogCreateActionProcessor => {
+const getProcessLogCreate = (qpqConfig: QPQConfig): ProcessorFor<typeof askLogCreate> => {
   return async ({ msg, logLevel, data }) => {
     // Presence check, not truthiness: falsy payloads like 0 or false still get logged.
     if (data !== undefined) {
@@ -13,6 +13,4 @@ const getProcessLogCreate = (qpqConfig: QPQConfig): LogCreateActionProcessor => 
   };
 };
 
-export const getLogCreateActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [LogActionType.Create]: getProcessLogCreate(qpqConfig),
-});
+export const getLogCreateActionProcessor = createActionProcessor(askLogCreate, getProcessLogCreate);
