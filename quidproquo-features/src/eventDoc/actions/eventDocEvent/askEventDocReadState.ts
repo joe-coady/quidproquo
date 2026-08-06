@@ -1,5 +1,6 @@
+import { createActionRequester } from 'quidproquo-core';
+
 import { EventDocActionType } from './EventDocActionType';
-import { EventDocReadStateActionRequester } from './EventDocReadStateActionRequesterTypes';
 
 // Pure: only yields the declarative ReadState action — the enclosing slot binding
 // answers with the doc's current folded state (the read counterpart of
@@ -9,8 +10,6 @@ import { EventDocReadStateActionRequester } from './EventDocReadStateActionReque
 // - fail loudly outside a binding: no default processor ships, so an unbound read is
 //   a runtime error, never a silent default.
 // Call through a per-doc createEventDocStateReader for a typed result.
-export function* askEventDocReadState(): EventDocReadStateActionRequester {
-  return yield {
-    type: EventDocActionType.ReadState,
-  };
-}
+export const askEventDocReadState = createActionRequester<unknown>()({
+  actionType: EventDocActionType.ReadState,
+});

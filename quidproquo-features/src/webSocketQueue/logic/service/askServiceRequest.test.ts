@@ -3,7 +3,7 @@ import { captureRequester } from 'quidproquo-core';
 import { describe, expect, it } from 'vitest';
 
 import { ServiceActionType } from './ServiceActionType';
-import { askServiceRequest } from './ServiceRequestActionRequester';
+import { askServiceRequest } from './askServiceRequest';
 
 describe('askServiceRequest', () => {
   it('yields a Request action with the service name, method and payload', () => {

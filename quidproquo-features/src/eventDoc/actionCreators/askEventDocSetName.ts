@@ -1,6 +1,6 @@
 import { AskResponse } from 'quidproquo-core';
 
-import { askApplyEventDocEvent } from '../actions/eventDocEvent/EventDocApplyEventActionRequester';
+import { askApplyEventDocEvent } from '../actions/eventDocEvent/askApplyEventDocEvent';
 import { EventDocSetNameEffect } from '../effects/EventDocSetNameEffect';
 import { EventDocEffect } from '../models';
 

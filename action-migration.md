@@ -318,14 +318,14 @@ item commits only its note in this file, with a message like
 
 #### eventDocEvent
 
-- [ ] **askApplyEventDocEvent** `quidproquo-features/src/eventDoc/actions/eventDocEvent/EventDocApplyEventActionRequester.ts` · generic return: base + casting story · no get*ActionProcessor found: grep the ActionType member
-- [ ] **askApplyTransientEventDocEvent** `quidproquo-features/src/eventDoc/actions/eventDocEvent/EventDocApplyTransientEventActionRequester.ts` · generic return: base + casting story · no get*ActionProcessor found: grep the ActionType member
-- [ ] **askEventDocReadIdentity** `quidproquo-features/src/eventDoc/actions/eventDocEvent/EventDocReadIdentityActionRequester.ts` · has logic: base + story split · no get*ActionProcessor found: grep the ActionType member
-- [ ] **askEventDocReadState** `quidproquo-features/src/eventDoc/actions/eventDocEvent/EventDocReadStateActionRequester.ts` · has logic: base + story split · no get*ActionProcessor found: grep the ActionType member
+- [x] **askApplyEventDocEvent** `quidproquo-features/src/eventDoc/actions/eventDocEvent/askApplyEventDocEvent.ts` · generic return: base + casting story · no get*ActionProcessor found: grep the ActionType member
+- [x] **askApplyTransientEventDocEvent** `quidproquo-features/src/eventDoc/actions/eventDocEvent/askApplyTransientEventDocEvent.ts` · generic return: base + casting story · no get*ActionProcessor found: grep the ActionType member
+- [x] **askEventDocReadIdentity** `quidproquo-features/src/eventDoc/actions/eventDocEvent/askEventDocReadIdentity.ts` · has logic: base + story split · no get*ActionProcessor found: grep the ActionType member
+- [x] **askEventDocReadState** `quidproquo-features/src/eventDoc/actions/eventDocEvent/askEventDocReadState.ts` · has logic: base + story split · no get*ActionProcessor found: grep the ActionType member
 
 #### service
 
-- [ ] **askServiceRequest** `quidproquo-features/src/webSocketQueue/logic/service/ServiceRequestActionRequester.ts` · processors: web-react · generic return: base + casting story
+- [x] **askServiceRequest** `quidproquo-features/src/webSocketQueue/logic/service/askServiceRequest.ts` · processors: web-react · generic return: base + casting story
 
 ### quidproquo-web
 

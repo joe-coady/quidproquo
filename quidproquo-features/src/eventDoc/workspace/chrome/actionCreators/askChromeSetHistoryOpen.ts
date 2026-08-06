@@ -1,6 +1,6 @@
 import { AskResponse } from 'quidproquo-core';
 
-import { askApplyEventDocEvent } from '../../../actions/eventDocEvent/EventDocApplyEventActionRequester';
+import { askApplyEventDocEvent } from '../../../actions/eventDocEvent/askApplyEventDocEvent';
 import { EventDocWorkspaceChromeEffect } from '../effects/EventDocWorkspaceChromeEffect';
 import { EventDocWorkspaceChromeSetHistoryOpenEffect } from '../effects/EventDocWorkspaceChromeSetHistoryOpenEffect';
 

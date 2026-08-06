@@ -1,7 +1,11 @@
-import { Effect } from 'quidproquo-core';
+import { AskResponse, createActionRequester, Effect } from 'quidproquo-core';
 
 import { EventDocActionType } from './EventDocActionType';
-import { EventDocApplyTransientEventActionRequester } from './EventDocApplyTransientEventActionRequesterTypes';
+
+export const askApplyTransientEventDocEventBase = createActionRequester<void>()({
+  actionType: EventDocActionType.ApplyTransientEvent,
+  getPayload: (transientKey: string, eventType: string, data: unknown) => ({ transientKey, eventType, data }),
+});
 
 // The never-saved sibling of askApplyEventDocEvent: yields the declarative
 // ApplyTransientEvent action, and the workspace bind routes it into the bound slot's
@@ -23,9 +27,6 @@ export function* askApplyTransientEventDocEvent<E extends Effect<string, any>>(
   transientKey: string,
   eventType: E['type'],
   data: E['payload'],
-): EventDocApplyTransientEventActionRequester {
-  return yield {
-    type: EventDocActionType.ApplyTransientEvent,
-    payload: { transientKey, eventType, data },
-  };
+): AskResponse<void> {
+  return yield* askApplyTransientEventDocEventBase(transientKey, eventType, data);
 }

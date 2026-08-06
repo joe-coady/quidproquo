@@ -1,7 +1,11 @@
-import { Effect } from 'quidproquo-core';
+import { AskResponse, createActionRequester, Effect } from 'quidproquo-core';
 
 import { EventDocActionType } from './EventDocActionType';
-import { EventDocApplyEventActionRequester } from './EventDocApplyEventActionRequesterTypes';
+
+export const askApplyEventDocEventBase = createActionRequester<void>()({
+  actionType: EventDocActionType.ApplyEvent,
+  getPayload: (eventType: string, data: unknown) => ({ eventType, data }),
+});
 
 // Pure: only yields the declarative ApplyEvent action — a registered processor decides
 // HOW (and stamps the editor's schema version + provenance). No side effects, so the
@@ -16,9 +20,6 @@ import { EventDocApplyEventActionRequester } from './EventDocApplyEventActionReq
 // member/payload pairing would type itself instead of being checked against the
 // declared effect. The explicit generic is the check; creators are the only call
 // sites, so the one-line ceremony stays quarantined there.
-export function* askApplyEventDocEvent<E extends Effect<string, any>>(eventType: E['type'], data: E['payload']): EventDocApplyEventActionRequester {
-  return yield {
-    type: EventDocActionType.ApplyEvent,
-    payload: { eventType, data },
-  };
+export function* askApplyEventDocEvent<E extends Effect<string, any>>(eventType: E['type'], data: E['payload']): AskResponse<void> {
+  return yield* askApplyEventDocEventBase(eventType, data);
 }

@@ -1,6 +1,6 @@
 import { AskResponse } from 'quidproquo-core';
 
-import { askServiceRequest } from './ServiceRequestActionRequester';
+import { askServiceRequest } from './askServiceRequest';
 
 export interface ServiceRequester<TPayload, TResponse> {
   (payload: TPayload): AskResponse<TResponse>;

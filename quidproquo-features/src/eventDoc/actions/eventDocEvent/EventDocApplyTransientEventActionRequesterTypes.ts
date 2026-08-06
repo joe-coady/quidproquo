@@ -1,5 +1,3 @@
-import { Action, ActionProcessor, ActionRequester } from 'quidproquo-core';
-
 import { EventDocActionType } from './EventDocActionType';
 
 // Target model is the processor's ambient context, not the payload, so the verb stays
@@ -12,10 +10,4 @@ export type EventDocApplyTransientEventActionPayload = {
   data: unknown;
 };
 
-export interface EventDocApplyTransientEventAction extends Action<EventDocApplyTransientEventActionPayload> {
-  type: EventDocActionType.ApplyTransientEvent;
-}
-
 // void: the web processor surfaces failures as UI error state, so applying never throws.
-export type EventDocApplyTransientEventActionProcessor = ActionProcessor<EventDocApplyTransientEventAction, void>;
-export type EventDocApplyTransientEventActionRequester = ActionRequester<EventDocApplyTransientEventAction, void>;

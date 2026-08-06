@@ -1,6 +1,6 @@
 import { AskResponse } from 'quidproquo-core';
 
-import { askEventDocReadState } from '../actions/eventDocEvent/EventDocReadStateActionRequester';
+import { askEventDocReadState } from '../actions/eventDocEvent/askEventDocReadState';
 
 // Mints a doc type's typed read verb — the ONE home of the unknown→TView assertion:
 //

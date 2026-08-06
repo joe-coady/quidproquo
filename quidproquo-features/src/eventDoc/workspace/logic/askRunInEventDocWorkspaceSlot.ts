@@ -1,11 +1,11 @@
-import { askOverrideActions, AskResponse, AskResponseReturnType, getSuccessfulEitherActionResultIfRequired } from 'quidproquo-core';
+import { ActionOf, askOverrideActions, AskResponse, AskResponseReturnType, getSuccessfulEitherActionResultIfRequired } from 'quidproquo-core';
 
 import {
+  askApplyEventDocEventBase,
+  askApplyTransientEventDocEventBase,
+  askEventDocReadIdentity,
+  askEventDocReadState,
   EventDocActionType,
-  EventDocApplyEventAction,
-  EventDocApplyTransientEventAction,
-  EventDocReadIdentityAction,
-  EventDocReadStateAction,
 } from '../../actions';
 import { EventDocWorkspaceSlotBinding } from '../types/EventDocWorkspaceSlotBinding';
 import { askEventDocWorkspaceCommitEvent } from './askEventDocWorkspaceCommitEvent';
@@ -16,7 +16,7 @@ import { askEventDocWorkspaceReadState } from './askEventDocWorkspaceReadState';
 // commit story in its place) so nothing re-bubbles: an outer bind never sees an inner
 // bind's commits, meaning innermost wins with zero extra logic.
 const getApplyEventOverride = (binding: EventDocWorkspaceSlotBinding) =>
-  function* overrideApplyEvent(action: EventDocApplyEventAction): AskResponse<unknown> {
+  function* overrideApplyEvent(action: ActionOf<typeof askApplyEventDocEventBase>): AskResponse<unknown> {
     // Action payloads are optional at the type level only; the requester always builds
     // one, so a missing payload is a malformed action and safe to ignore.
     if (action.payload) {
@@ -30,7 +30,7 @@ const getApplyEventOverride = (binding: EventDocWorkspaceSlotBinding) =>
 // Same consume-and-answer-void pattern for the transient sibling: the commit lands in
 // the bound slot's transient group under the action's transientKey.
 const getApplyTransientEventOverride = (binding: EventDocWorkspaceSlotBinding) =>
-  function* overrideApplyTransientEvent(action: EventDocApplyTransientEventAction): AskResponse<unknown> {
+  function* overrideApplyTransientEvent(action: ActionOf<typeof askApplyTransientEventDocEventBase>): AskResponse<unknown> {
     // Action payloads are optional at the type level only; the requester always builds
     // one, so a missing payload is a malformed action and safe to ignore.
     if (action.payload) {
@@ -46,7 +46,7 @@ const getApplyTransientEventOverride = (binding: EventDocWorkspaceSlotBinding) =
 // runtime state before returning and the view selector folds the pending tail, so
 // read-your-own-writes holds within a story.
 const getReadStateOverride = (binding: EventDocWorkspaceSlotBinding) =>
-  function* overrideReadState(action: EventDocReadStateAction): AskResponse<unknown> {
+  function* overrideReadState(action: ActionOf<typeof askEventDocReadState>): AskResponse<unknown> {
     const state = yield* askEventDocWorkspaceReadState();
 
     // We produce the view ourselves, so shape it for returnErrors.
@@ -56,7 +56,7 @@ const getReadStateOverride = (binding: EventDocWorkspaceSlotBinding) =>
 // Answers askEventDocReadIdentity with the bound slot's document identity (null until
 // the workspace initialises the slot; always null for unsaved docs).
 const getReadIdentityOverride = (binding: EventDocWorkspaceSlotBinding) =>
-  function* overrideReadIdentity(action: EventDocReadIdentityAction): AskResponse<unknown> {
+  function* overrideReadIdentity(action: ActionOf<typeof askEventDocReadIdentity>): AskResponse<unknown> {
     const state = yield* askEventDocWorkspaceReadState();
 
     // We produce the identity ourselves, so shape it for returnErrors.
