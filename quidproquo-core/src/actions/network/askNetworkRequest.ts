@@ -1,0 +1,44 @@
+import { AskResponse } from '../../types/StorySession';
+import { createActionRequester } from '../../types/utils/createActionRequester';
+import { HTTPMethod, HTTPNetworkResponse, HTTPRequestOptions, NetworkActionType, ResponseType } from './NetworkActionType';
+
+// Named because the processor layer (executeNetworkRequest) and the web-react hooks
+// build and consume this payload directly, without going through the requester.
+export type NetworkRequestActionPayload<T> = {
+  url: string;
+  method: HTTPMethod;
+
+  body?: T;
+  basePath?: string;
+  params?: Record<string, string>;
+  headers?: Record<string, string>;
+  responseType: ResponseType;
+};
+
+export const askNetworkRequestBase = createActionRequester<HTTPNetworkResponse<unknown>>()({
+  actionType: NetworkActionType.Request,
+  errorTypes: [
+    'Timeout', // the request exceeded the request timeout and was aborted
+  ],
+  getPayload: (method: HTTPMethod, url: string, httpRequestOptions?: HTTPRequestOptions<unknown>): NetworkRequestActionPayload<unknown> => ({
+    url,
+    method,
+
+    body: httpRequestOptions?.body,
+    headers: httpRequestOptions?.headers,
+    basePath: httpRequestOptions?.basePath,
+    params: httpRequestOptions?.params,
+    responseType: httpRequestOptions?.responseType || 'json',
+  }),
+});
+
+// The request and response body types are only known to the caller, so the base takes
+// and returns unknown and this story casts to what the caller declared.
+export function* askNetworkRequest<T, R>(
+  method: HTTPMethod,
+  url: string,
+
+  httpRequestOptions?: HTTPRequestOptions<T>,
+): AskResponse<HTTPNetworkResponse<R>> {
+  return (yield* askNetworkRequestBase(method, url, httpRequestOptions)) as HTTPNetworkResponse<R>;
+}

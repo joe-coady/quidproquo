@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { captureRequester, runStory, StoryError, throwsError } from '../../testing';
 import { NetworkActionType } from './NetworkActionType';
-import { askNetworkRequest, NetworkRequestErrorTypeEnum } from './NetworkRequestActionRequester';
+import { askNetworkRequest, askNetworkRequestBase } from './askNetworkRequest';
 
 describe('askNetworkRequest', () => {
   it('yields a Request action with the supplied options', () => {
@@ -38,17 +38,17 @@ describe('askNetworkRequest', () => {
   it('propagates a request timeout as a thrown StoryError', () => {
     const runFailingStory = () =>
       runStory(askNetworkRequest('GET', 'https://api.test/slow'), {
-        [NetworkActionType.Request]: throwsError(NetworkRequestErrorTypeEnum.Timeout, 'Network request timed out'),
+        [NetworkActionType.Request]: throwsError(askNetworkRequestBase.errorType.Timeout, 'Network request timed out'),
       });
 
     expect(runFailingStory).toThrow(StoryError);
-    expect(runFailingStory).toThrow(`${NetworkRequestErrorTypeEnum.Timeout}: Network request timed out`);
+    expect(runFailingStory).toThrow(`${askNetworkRequestBase.errorType.Timeout}: Network request timed out`);
   });
 });
 
-describe('NetworkRequestErrorTypeEnum', () => {
+describe('errorType', () => {
   it('lists every error the processor can produce, namespaced by the action type', () => {
-    expect(NetworkRequestErrorTypeEnum).toEqual({
+    expect(askNetworkRequestBase.errorType).toEqual({
       Timeout: `${NetworkActionType.Request}-Timeout`,
     });
   });

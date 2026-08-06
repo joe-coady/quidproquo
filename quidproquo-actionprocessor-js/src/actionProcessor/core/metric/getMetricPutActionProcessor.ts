@@ -1,14 +1,7 @@
-import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
-  actionResult,
-  MetricActionType,
-  MetricPutActionProcessor,
-  QPQConfig,
-} from 'quidproquo-core';
+import { actionResult, askMetricPut, createActionProcessor, ProcessorFor, QPQConfig } from 'quidproquo-core';
 
 // Dev-visible stand-in for the AWS EMF processor - keeps stories portable across runtimes
-const getProcessMetricPut = (qpqConfig: QPQConfig): MetricPutActionProcessor => {
+const getProcessMetricPut = (qpqConfig: QPQConfig): ProcessorFor<typeof askMetricPut> => {
   return async ({ metricName, value, unit }) => {
     console.log(`metric: ${metricName}=${value}${unit ? ` ${unit}` : ''}`);
 
@@ -16,6 +9,4 @@ const getProcessMetricPut = (qpqConfig: QPQConfig): MetricPutActionProcessor => 
   };
 };
 
-export const getMetricPutActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [MetricActionType.Put]: getProcessMetricPut(qpqConfig),
-});
+export const getMetricPutActionProcessor = createActionProcessor(askMetricPut, getProcessMetricPut);

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
 import { MetricActionType } from './MetricActionType';
-import { askMetricPut } from './MetricPutActionRequester';
+import { askMetricPut } from './askMetricPut';
 import { MetricUnit } from './MetricUnit';
 
 describe('askMetricPut', () => {

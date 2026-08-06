@@ -1,4 +1,4 @@
-import { ErrorTypeEnum, GraphDatabaseInstanceType, NetworkActionType, NetworkRequestAction, runStory, StoryError } from 'quidproquo-core';
+import { ActionOf, askNetworkRequestBase, ErrorTypeEnum, GraphDatabaseInstanceType, NetworkActionType, runStory, StoryError } from 'quidproquo-core';
 
 import { describe, expect, it } from 'vitest';
 
@@ -19,7 +19,7 @@ describe('askRunNeptuneOpenCypherQuery', () => {
 
     const result = runStory(askRunNeptuneOpenCypherQuery(payload), {
       [GraphDatabaseForNeptuneActionType.GetEndpoints]: { readEndpoint: 'http://read', writeEndpoint: 'http://write' },
-      [NetworkActionType.Request]: (action: NetworkRequestAction<any>) => {
+      [NetworkActionType.Request]: (action: ActionOf<typeof askNetworkRequestBase>) => {
         requestedUrl = action.payload.url;
         requestedBody = action.payload.body;
         return { status: 200, data: { results: [{ count: 5 }] } };

@@ -1,20 +1,11 @@
-import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
-  actionResult,
-  MetricActionType,
-  MetricPutActionProcessor,
-  MetricUnit,
-  QPQConfig,
-  qpqCoreUtils,
-} from 'quidproquo-core';
+import { actionResult, askMetricPut, createActionProcessor, MetricUnit, ProcessorFor, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
 // Emits the metric as a CloudWatch Embedded Metric Format (EMF) log line: CloudWatch
 // extracts metrics from the function's log stream - no api calls, no extra IAM, no
 // latency on the story. Cost: each unique metricName x dimension-combination is one
 // custom metric (~$0.30/mo) - the standard dimensions are service/environment(/feature),
 // so keep payload dimensions low-cardinality (never per-user / per-request ids).
-const getProcessMetricPut = (qpqConfig: QPQConfig): MetricPutActionProcessor => {
+const getProcessMetricPut = (qpqConfig: QPQConfig): ProcessorFor<typeof askMetricPut> => {
   // The namespace is the deployed app instance - app/environment(/feature) - mirroring how
   // every qpq resource name embeds the deployment identity. Apps sharing an account can't
   // merge same-named metrics, per-developer feature sandboxes (e.g. qpq/docgen/development/jane)
@@ -54,6 +45,4 @@ const getProcessMetricPut = (qpqConfig: QPQConfig): MetricPutActionProcessor => 
   };
 };
 
-export const getMetricPutActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [MetricActionType.Put]: getProcessMetricPut(qpqConfig),
-});
+export const getMetricPutActionProcessor = createActionProcessor(askMetricPut, getProcessMetricPut);

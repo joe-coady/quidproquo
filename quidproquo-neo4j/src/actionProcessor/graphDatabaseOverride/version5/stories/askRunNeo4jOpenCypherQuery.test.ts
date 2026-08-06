@@ -1,9 +1,10 @@
 import {
+  ActionOf,
+  askNetworkRequestBase,
   ConfigActionType,
   ErrorTypeEnum,
   GraphDatabaseInstanceType,
   NetworkActionType,
-  NetworkRequestAction,
   runStory,
   StoryError,
 } from 'quidproquo-core';
@@ -26,12 +27,12 @@ const okResponse = {
 
 describe('askRunNeo4jOpenCypherQuery', () => {
   it('builds the neo4j request and returns the converted cypher response', () => {
-    let requested: NetworkRequestAction<any>['payload'] | undefined;
+    let requested: ActionOf<typeof askNetworkRequestBase>['payload'] | undefined;
 
     const result = runStory(askRunNeo4jOpenCypherQuery(payload), {
       [ConfigActionType.GetParameter]: 'my-instance',
       [ConfigActionType.GetSecret]: 'sekret',
-      [NetworkActionType.Request]: (action: NetworkRequestAction<any>) => {
+      [NetworkActionType.Request]: (action: ActionOf<typeof askNetworkRequestBase>) => {
         requested = action.payload;
         return okResponse;
       },
