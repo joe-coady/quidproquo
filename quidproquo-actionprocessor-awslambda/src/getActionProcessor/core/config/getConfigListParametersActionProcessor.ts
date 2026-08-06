@@ -1,20 +1,10 @@
-import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
-  actionResult,
-  ConfigActionType,
-  ConfigListParametersActionProcessor,
-  QPQConfig,
-  qpqCoreUtils,
-} from 'quidproquo-core';
+import { actionResult, askConfigListParameters, createActionProcessor, ProcessorFor, QPQConfig, qpqCoreUtils } from 'quidproquo-core';
 
-const getProcessConfigListParameters = (qpqConfig: QPQConfig): ConfigListParametersActionProcessor => {
+const getProcessConfigListParameters = (qpqConfig: QPQConfig): ProcessorFor<typeof askConfigListParameters> => {
   const paramConfigs = qpqCoreUtils.getOwnedParameterConfigs(qpqConfig).map((pc) => pc.key);
   return async () => {
     return actionResult(paramConfigs);
   };
 };
 
-export const getConfigListParametersActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [ConfigActionType.ListParameters]: getProcessConfigListParameters(qpqConfig),
-});
+export const getConfigListParametersActionProcessor = createActionProcessor(askConfigListParameters, getProcessConfigListParameters);
