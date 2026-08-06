@@ -1,20 +1,18 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
-  ConfigActionType,
-  ConfigGetParametersActionProcessor,
-  ConfigGetParametersErrorTypeEnum,
+  askConfigGetParameters,
+  createActionProcessor,
+  ProcessorFor,
   QPQConfig,
 } from 'quidproquo-core';
 
 import { getParameters } from '../../../logic/parametersManager/getParameters';
 import { resolveParameterKey } from '../../../runtimeConfig/resolveParameterKey';
 
-const getProcessConfigGetParameters = (qpqConfig: QPQConfig): ConfigGetParametersActionProcessor => {
+const getProcessConfigGetParameters = (qpqConfig: QPQConfig): ProcessorFor<typeof askConfigGetParameters> => {
   return async ({ parameterNames }) => {
     const awsParameterKeys = parameterNames.map((pn) => resolveParameterKey(pn, qpqConfig));
 
@@ -23,12 +21,10 @@ const getProcessConfigGetParameters = (qpqConfig: QPQConfig): ConfigGetParameter
       return actionResult(parameterValues);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        ThrottlingException: () => actionResultError(ConfigGetParametersErrorTypeEnum.Throttling, 'Throttling: Rate exceeded'),
+        ThrottlingException: () => actionResultError(askConfigGetParameters.errorType.Throttling, 'Throttling: Rate exceeded'),
       });
     }
   };
 };
 
-export const getConfigGetParametersActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [ConfigActionType.GetParameters]: getProcessConfigGetParameters(qpqConfig),
-});
+export const getConfigGetParametersActionProcessor = createActionProcessor(askConfigGetParameters, getProcessConfigGetParameters);

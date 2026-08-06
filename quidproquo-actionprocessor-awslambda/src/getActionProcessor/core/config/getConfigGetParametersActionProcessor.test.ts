@@ -1,5 +1,5 @@
 import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { buildTestQpqConfig, ConfigActionType, ConfigGetParametersErrorTypeEnum, defineParameter } from 'quidproquo-core';
+import { buildTestQpqConfig, ConfigActionType, askConfigGetParameters, defineParameter } from 'quidproquo-core';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -39,6 +39,6 @@ describe('getConfigGetParametersActionProcessor', () => {
 
     const [, error] = await invokeProcessor(processor, { parameterNames: ['a'] });
 
-    expect(error?.errorType).toBe(ConfigGetParametersErrorTypeEnum.Throttling);
+    expect(error?.errorType).toBe(askConfigGetParameters.errorType.Throttling);
   });
 });

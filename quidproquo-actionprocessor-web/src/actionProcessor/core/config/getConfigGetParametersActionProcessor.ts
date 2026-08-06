@@ -1,15 +1,6 @@
-import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
-  actionResult,
-  actionResultError,
-  ConfigActionType,
-  ConfigGetParametersActionProcessor,
-  ErrorTypeEnum,
-  QPQConfig,
-} from 'quidproquo-core';
+import { actionResult, actionResultError, askConfigGetParameters, createActionProcessor, ErrorTypeEnum, ProcessorFor, QPQConfig } from 'quidproquo-core';
 
-const getProcessConfigGetParameters = (qpqConfig: QPQConfig): ConfigGetParametersActionProcessor => {
+const getProcessConfigGetParameters = (qpqConfig: QPQConfig): ProcessorFor<typeof askConfigGetParameters> => {
   return async ({ parameterNames }) => {
     // window.localStorage (not the bare global): Node exposes a non-functional
     // localStorage global that shadows jsdom's in tests.
@@ -23,10 +14,8 @@ const getProcessConfigGetParameters = (qpqConfig: QPQConfig): ConfigGetParameter
       return actionResultError(ErrorTypeEnum.NotFound, `Parameters not found in Local Storage: ${missingNames.join(', ')}`);
     }
 
-    return actionResult(parameterValues.map((param) => param.value));
+    return actionResult(parameterValues.map((param) => param.value as string));
   };
 };
 
-export const getConfigGetParametersActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [ConfigActionType.GetParameters]: getProcessConfigGetParameters(qpqConfig),
-});
+export const getConfigGetParametersActionProcessor = createActionProcessor(askConfigGetParameters, getProcessConfigGetParameters);

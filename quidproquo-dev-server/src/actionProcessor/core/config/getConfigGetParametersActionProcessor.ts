@@ -1,17 +1,9 @@
-import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
-  actionResult,
-  actionResultErrorFromCaughtError,
-  ConfigActionType,
-  ConfigGetParametersActionProcessor,
-  QPQConfig,
-} from 'quidproquo-core';
+import { actionResult, actionResultErrorFromCaughtError, askConfigGetParameters, createActionProcessor, ProcessorFor, QPQConfig } from 'quidproquo-core';
 
 import { getOrSeedParameterValue } from '../../../logic/config';
 import { ResolvedDevServerConfig } from '../../../types';
 
-const getProcessConfigGetParameters = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): ConfigGetParametersActionProcessor => {
+const getProcessConfigGetParameters = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): ProcessorFor<typeof askConfigGetParameters> => {
   return async ({ parameterNames }) => {
     try {
       // Sequential on purpose: seeding two parameters in the same service file
@@ -28,8 +20,5 @@ const getProcessConfigGetParameters = (qpqConfig: QPQConfig, devServerConfig: Re
   };
 };
 
-export const getConfigGetParametersActionProcessor =
-  (devServerConfig: ResolvedDevServerConfig): ActionProcessorListResolver =>
-  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-    [ConfigActionType.GetParameters]: getProcessConfigGetParameters(qpqConfig, devServerConfig),
-  });
+export const getConfigGetParametersActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
+  createActionProcessor(askConfigGetParameters, (qpqConfig) => getProcessConfigGetParameters(qpqConfig, devServerConfig));

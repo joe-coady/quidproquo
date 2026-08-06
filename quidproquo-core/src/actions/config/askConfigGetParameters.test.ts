@@ -4,9 +4,9 @@ import { describe, expect, it } from 'vitest';
 
 import { runStory, StoryError, throwsError } from '../../testing';
 import { ConfigActionType } from './ConfigActionType';
-import { askConfigGetParameters, ConfigGetParametersErrorTypeEnum } from './ConfigGetParametersActionRequester';
+import { askConfigGetParameters } from './askConfigGetParameters';
 
-describe('ConfigGetParametersActionRequester', () => {
+describe('askConfigGetParameters', () => {
   describe('askConfigGetParameters', () => {
     it('should yield an action with correct type and payload', () => {
       const parameterNames = ['param1', 'param2', 'param3'];
@@ -85,22 +85,22 @@ describe('ConfigGetParametersActionRequester', () => {
     it('propagates a processor failure as a thrown StoryError', () => {
       const runFailingStory = () =>
         runStory(askConfigGetParameters(['p1', 'p2']), {
-          [ConfigActionType.GetParameters]: throwsError(ConfigGetParametersErrorTypeEnum.Throttling, 'Rate exceeded'),
+          [ConfigActionType.GetParameters]: throwsError(askConfigGetParameters.errorType.Throttling, 'Rate exceeded'),
         });
 
       expect(runFailingStory).toThrow(StoryError);
-      expect(runFailingStory).toThrow(`${ConfigGetParametersErrorTypeEnum.Throttling}: Rate exceeded`);
+      expect(runFailingStory).toThrow(`${askConfigGetParameters.errorType.Throttling}: Rate exceeded`);
     });
   });
 
-  describe('ConfigGetParametersErrorTypeEnum', () => {
+  describe('errorType', () => {
     it('should have Throttling error type', () => {
-      expect(ConfigGetParametersErrorTypeEnum.Throttling).toBeDefined();
-      expect(ConfigGetParametersErrorTypeEnum.Throttling).toContain('Throttling');
+      expect(askConfigGetParameters.errorType.Throttling).toBeDefined();
+      expect(askConfigGetParameters.errorType.Throttling).toContain('Throttling');
     });
 
     it('should be prefixed with the action type', () => {
-      expect(ConfigGetParametersErrorTypeEnum.Throttling).toContain(ConfigActionType.GetParameters);
+      expect(askConfigGetParameters.errorType.Throttling).toContain(ConfigActionType.GetParameters);
     });
   });
 });
