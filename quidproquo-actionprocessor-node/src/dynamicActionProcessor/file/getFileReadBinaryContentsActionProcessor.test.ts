@@ -1,4 +1,4 @@
-import { ErrorTypeEnum, FileActionType, FileReadBinaryContentsErrorTypeEnum, resolveActionResult, resolveActionResultError } from 'quidproquo-core';
+import { askFileReadBinaryContents, ErrorTypeEnum, FileActionType, resolveActionResult, resolveActionResultError } from 'quidproquo-core';
 
 import * as fs from 'fs/promises';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -33,7 +33,7 @@ describe('getFileReadBinaryContentsActionProcessor', () => {
 
     const result = await invoke();
 
-    expect(resolveActionResultError(result).errorType).toBe(FileReadBinaryContentsErrorTypeEnum.FileNotFound);
+    expect(resolveActionResultError(result).errorType).toBe(askFileReadBinaryContents.errorType.FileNotFound);
   });
 
   it('returns GenericError for any other failure', async () => {

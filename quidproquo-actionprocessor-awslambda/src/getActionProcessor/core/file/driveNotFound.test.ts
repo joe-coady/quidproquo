@@ -1,11 +1,5 @@
 import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import {
-  buildTestQpqConfig,
-  FileActionType,
-  FileDeleteErrorTypeEnum,
-  FileIsColdStorageErrorTypeEnum,
-  FileWriteTextContentsErrorTypeEnum,
-} from 'quidproquo-core';
+import { askFileDelete, askFileIsColdStorage, askFileWriteTextContents, buildTestQpqConfig, FileActionType } from 'quidproquo-core';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -33,7 +27,7 @@ describe('file drive-not-found error shape', () => {
 
     const [, error] = await invokeProcessor(processor, { drive: 'missing-drive', filepaths: ['a.txt'] });
 
-    expect(error?.errorType).toBe(FileDeleteErrorTypeEnum.DriveNotFound);
+    expect(error?.errorType).toBe(askFileDelete.errorType.DriveNotFound);
   });
 
   it('returns the typed DriveNotFound error from IsColdStorage', async () => {
@@ -41,7 +35,7 @@ describe('file drive-not-found error shape', () => {
 
     const [, error] = await invokeProcessor(processor, { drive: 'missing-drive', filepath: 'a.txt' });
 
-    expect(error?.errorType).toBe(FileIsColdStorageErrorTypeEnum.DriveNotFound);
+    expect(error?.errorType).toBe(askFileIsColdStorage.errorType.DriveNotFound);
   });
 
   it('returns the typed DriveNotFound error from WriteTextContents', async () => {
@@ -49,6 +43,6 @@ describe('file drive-not-found error shape', () => {
 
     const [, error] = await invokeProcessor(processor, { drive: 'missing-drive', filepath: 'a.txt', data: 'x' });
 
-    expect(error?.errorType).toBe(FileWriteTextContentsErrorTypeEnum.DriveNotFound);
+    expect(error?.errorType).toBe(askFileWriteTextContents.errorType.DriveNotFound);
   });
 });

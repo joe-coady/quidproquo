@@ -1,11 +1,4 @@
-import {
-  ErrorTypeEnum,
-  FileActionType,
-  FileExistsErrorTypeEnum,
-  isErroredActionResult,
-  resolveActionResult,
-  resolveActionResultError,
-} from 'quidproquo-core';
+import { askFileExists, ErrorTypeEnum, FileActionType, isErroredActionResult, resolveActionResult, resolveActionResultError } from 'quidproquo-core';
 
 import * as fs from 'fs/promises';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -45,7 +38,7 @@ describe('getFileExistsActionProcessor', () => {
 
     const result = await runExists();
 
-    expect(resolveActionResultError(result).errorType).toBe(FileExistsErrorTypeEnum.AccessDenied);
+    expect(resolveActionResultError(result).errorType).toBe(askFileExists.errorType.AccessDenied);
   });
 
   it('returns GenericError for any other failure', async () => {

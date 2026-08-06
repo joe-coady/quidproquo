@@ -1,12 +1,11 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askFileGenerateTemporaryUploadSecureUrl,
+  createActionProcessor,
   FileActionType,
-  FileGenerateTemporaryUploadSecureUrlActionProcessor,
-  FileGenerateTemporaryUploadSecureUrlErrorTypeEnum,
+  ProcessorFor,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -21,11 +20,11 @@ const maxExpirationMs = 7 * 24 * 60 * 60 * 1000;
 const getProcessFileGenerateTemporaryUploadSecureUrl = (
   qpqConfig: QPQConfig,
   config: FileStorageConfig,
-): FileGenerateTemporaryUploadSecureUrlActionProcessor => {
+): ProcessorFor<typeof askFileGenerateTemporaryUploadSecureUrl> => {
   return async ({ drive, filepath, expirationMs, contentType, scope }) => {
     if (expirationMs > maxExpirationMs) {
       return actionResultError(
-        FileGenerateTemporaryUploadSecureUrlErrorTypeEnum.ExpirationTooLong,
+        askFileGenerateTemporaryUploadSecureUrl.errorType.ExpirationTooLong,
         'Expiration exceeds the 7 day maximum for presigned URLs',
       );
     }
@@ -55,14 +54,11 @@ const getProcessFileGenerateTemporaryUploadSecureUrl = (
       // Name-keyed, not instanceof: under npm link / module federation the
       // error can come from another copy of quidproquo-core.
       return actionResultErrorFromCaughtError(error, {
-        InvalidScopeError: (error) => actionResultError(FileGenerateTemporaryUploadSecureUrlErrorTypeEnum.InvalidScope, error.message),
+        InvalidScopeError: (error) => actionResultError(askFileGenerateTemporaryUploadSecureUrl.errorType.InvalidScope, error.message),
       });
     }
   };
 };
 
-export const getFileGenerateTemporaryUploadSecureUrlActionProcessor =
-  (config: FileStorageConfig): ActionProcessorListResolver =>
-  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-    [FileActionType.GenerateTemporaryUploadSecureUrl]: getProcessFileGenerateTemporaryUploadSecureUrl(qpqConfig, config),
-  });
+export const getFileGenerateTemporaryUploadSecureUrlActionProcessor = (config: FileStorageConfig) =>
+  createActionProcessor(askFileGenerateTemporaryUploadSecureUrl, (qpqConfig) => getProcessFileGenerateTemporaryUploadSecureUrl(qpqConfig, config));

@@ -1,4 +1,4 @@
-import { FileActionType, FileDeleteErrorTypeEnum } from 'quidproquo-core';
+import { askFileDelete, FileActionType } from 'quidproquo-core';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -34,7 +34,7 @@ describe('getProcessFileDelete', () => {
 
     const [, error] = await invoke({ drive: 'assets', filepaths: ['a.txt'] });
 
-    expect(error?.errorType).toBe(FileDeleteErrorTypeEnum.AccessDenied);
+    expect(error?.errorType).toBe(askFileDelete.errorType.AccessDenied);
   });
 
   it('maps NoSuchBucket to a drive not found error', async () => {
@@ -42,6 +42,6 @@ describe('getProcessFileDelete', () => {
 
     const [, error] = await invoke({ drive: 'assets', filepaths: ['a.txt'] });
 
-    expect(error?.errorType).toBe(FileDeleteErrorTypeEnum.DriveNotFound);
+    expect(error?.errorType).toBe(askFileDelete.errorType.DriveNotFound);
   });
 });

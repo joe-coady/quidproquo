@@ -1,12 +1,11 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askFileReadBinaryContents,
+  createActionProcessor,
   FileActionType,
-  FileReadBinaryContentsActionProcessor,
-  FileReadBinaryContentsErrorTypeEnum,
+  ProcessorFor,
   QPQBinaryData,
   QPQConfig,
 } from 'quidproquo-core';
@@ -19,7 +18,7 @@ import { resolveFilePath } from './utils';
 
 const getProcessFileReadBinaryContents =
   (config: FileStorageConfig) =>
-  (qpqConfig: QPQConfig): FileReadBinaryContentsActionProcessor => {
+  (qpqConfig: QPQConfig): ProcessorFor<typeof askFileReadBinaryContents> => {
     return async ({ drive, filepath, scope }) => {
       try {
         const fullPath = resolveFilePath(config, qpqConfig, drive, filepath, scope);
@@ -35,15 +34,12 @@ const getProcessFileReadBinaryContents =
         return actionResult(binaryData);
       } catch (error: unknown) {
         return actionResultErrorFromCaughtError(error, {
-          InvalidScopeError: (error) => actionResultError(FileReadBinaryContentsErrorTypeEnum.InvalidScope, error.message),
-          ENOENT: () => actionResultError(FileReadBinaryContentsErrorTypeEnum.FileNotFound, `File not found: ${filepath}`), // node fs code
+          InvalidScopeError: (error) => actionResultError(askFileReadBinaryContents.errorType.InvalidScope, error.message),
+          ENOENT: () => actionResultError(askFileReadBinaryContents.errorType.FileNotFound, `File not found: ${filepath}`), // node fs code
         });
       }
     };
   };
 
-export const getFileReadBinaryContentsActionProcessor =
-  (config: FileStorageConfig): ActionProcessorListResolver =>
-  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-    [FileActionType.ReadBinaryContents]: getProcessFileReadBinaryContents(config)(qpqConfig),
-  });
+export const getFileReadBinaryContentsActionProcessor = (config: FileStorageConfig) =>
+  createActionProcessor(askFileReadBinaryContents, (qpqConfig) => getProcessFileReadBinaryContents(config)(qpqConfig));

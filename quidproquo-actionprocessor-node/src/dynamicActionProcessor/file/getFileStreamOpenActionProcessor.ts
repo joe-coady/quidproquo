@@ -1,12 +1,11 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askFileStreamOpenBase,
+  createActionProcessor,
   FileActionType,
-  FileStreamOpenActionProcessor,
-  FileStreamOpenErrorTypeEnum,
+  ProcessorFor,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -30,7 +29,7 @@ async function* binaryStreamIterator(stream: Readable): AsyncIterableIterator<st
   }
 }
 
-const getProcessFileStreamOpen = (qpqConfig: QPQConfig, config: FileStorageConfig): FileStreamOpenActionProcessor => {
+const getProcessFileStreamOpen = (qpqConfig: QPQConfig, config: FileStorageConfig): ProcessorFor<typeof askFileStreamOpenBase> => {
   return async (
     { drive, filepath, encoding, chunkSize, scope },
     session,
@@ -53,15 +52,12 @@ const getProcessFileStreamOpen = (qpqConfig: QPQConfig, config: FileStorageConfi
       return actionResult({ id: streamId, encoding });
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        InvalidScopeError: (error) => actionResultError(FileStreamOpenErrorTypeEnum.InvalidScope, error.message),
-        ENOENT: () => actionResultError(FileStreamOpenErrorTypeEnum.FileNotFound, `File not found: ${filepath}`), // node fs code
+        InvalidScopeError: (error) => actionResultError(askFileStreamOpenBase.errorType.InvalidScope, error.message),
+        ENOENT: () => actionResultError(askFileStreamOpenBase.errorType.FileNotFound, `File not found: ${filepath}`), // node fs code
       });
     }
   };
 };
 
-export const getFileStreamOpenActionProcessor =
-  (config: FileStorageConfig): ActionProcessorListResolver =>
-  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-    [FileActionType.StreamOpen]: getProcessFileStreamOpen(qpqConfig, config),
-  });
+export const getFileStreamOpenActionProcessor = (config: FileStorageConfig) =>
+  createActionProcessor(askFileStreamOpenBase, (qpqConfig) => getProcessFileStreamOpen(qpqConfig, config));

@@ -1,4 +1,4 @@
-import { FileActionType, FileGenerateTemporarySecureUrlErrorTypeEnum, FileGenerateTemporaryUploadSecureUrlErrorTypeEnum } from 'quidproquo-core';
+import { askFileGenerateTemporarySecureUrl, askFileGenerateTemporaryUploadSecureUrl, FileActionType } from 'quidproquo-core';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -27,7 +27,7 @@ describe('InvalidScopeError realm safety (name-keyed, not instanceof)', () => {
 
     const [, error] = await invokeProcessor(processor, { drive: 'assets', filepath: 'a.txt', expirationMs: 1000, scope: 'bad' });
 
-    expect(error?.errorType).toBe(FileGenerateTemporarySecureUrlErrorTypeEnum.InvalidScope);
+    expect(error?.errorType).toBe(askFileGenerateTemporarySecureUrl.errorType.InvalidScope);
   });
 
   it('maps a foreign-realm InvalidScopeError in generate upload secure url', async () => {
@@ -41,6 +41,6 @@ describe('InvalidScopeError realm safety (name-keyed, not instanceof)', () => {
       { session: { correlation: 'corr-1' } },
     );
 
-    expect(error?.errorType).toBe(FileGenerateTemporaryUploadSecureUrlErrorTypeEnum.InvalidScope);
+    expect(error?.errorType).toBe(askFileGenerateTemporaryUploadSecureUrl.errorType.InvalidScope);
   });
 });

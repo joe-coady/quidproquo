@@ -1,4 +1,4 @@
-import { ErrorTypeEnum, FileActionType, FileReadTextContentsErrorTypeEnum, resolveActionResult, resolveActionResultError } from 'quidproquo-core';
+import { askFileReadTextContents, ErrorTypeEnum, FileActionType, resolveActionResult, resolveActionResultError } from 'quidproquo-core';
 
 import * as fs from 'fs/promises';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -28,7 +28,7 @@ describe('getFileReadTextContentsActionProcessor', () => {
 
     const result = await invoke();
 
-    expect(resolveActionResultError(result).errorType).toBe(FileReadTextContentsErrorTypeEnum.FileNotFound);
+    expect(resolveActionResultError(result).errorType).toBe(askFileReadTextContents.errorType.FileNotFound);
   });
 
   it('returns GenericError for any other failure', async () => {

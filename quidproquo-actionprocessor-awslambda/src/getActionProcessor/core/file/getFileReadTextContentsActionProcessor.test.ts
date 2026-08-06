@@ -1,4 +1,4 @@
-import { FileActionType, FileReadTextContentsErrorTypeEnum } from 'quidproquo-core';
+import { askFileReadTextContents, FileActionType } from 'quidproquo-core';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -32,7 +32,7 @@ describe('getProcessFileReadTextContents', () => {
 
     const [, error] = await invoke({ drive: 'assets', filepath: 'a.txt' });
 
-    expect(error?.errorType).toBe(FileReadTextContentsErrorTypeEnum.InvalidStorageClass);
+    expect(error?.errorType).toBe(askFileReadTextContents.errorType.InvalidStorageClass);
   });
 
   it('maps NoSuchKey to the action-typed FileNotFound error', async () => {
@@ -40,6 +40,6 @@ describe('getProcessFileReadTextContents', () => {
 
     const [, error] = await invoke({ drive: 'assets', filepath: 'a.txt' });
 
-    expect(error?.errorType).toBe(FileReadTextContentsErrorTypeEnum.FileNotFound);
+    expect(error?.errorType).toBe(askFileReadTextContents.errorType.FileNotFound);
   });
 });

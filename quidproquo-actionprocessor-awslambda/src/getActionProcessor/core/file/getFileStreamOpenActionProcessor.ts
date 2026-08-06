@@ -1,15 +1,14 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askFileStreamOpenBase,
   composeScopedFilePath,
+  createActionProcessor,
   ErrorTypeEnum,
   FileActionType,
-  FileStreamOpenActionProcessor,
-  FileStreamOpenErrorTypeEnum,
+  ProcessorFor,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -38,7 +37,7 @@ async function* chunkedReadableIterator(stream: Readable, chunkSize: number, tra
   }
 }
 
-const getProcessFileStreamOpen = (qpqConfig: QPQConfig): FileStreamOpenActionProcessor => {
+const getProcessFileStreamOpen = (qpqConfig: QPQConfig): ProcessorFor<typeof askFileStreamOpenBase> => {
   return async (
     { drive, filepath, encoding, chunkSize, scope },
     session,
@@ -74,15 +73,13 @@ const getProcessFileStreamOpen = (qpqConfig: QPQConfig): FileStreamOpenActionPro
       return actionResult({ id: streamId, encoding });
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        InvalidObjectState: () => actionResultError(FileStreamOpenErrorTypeEnum.InvalidStorageClass, 'File is in the wrong storage class'),
-        NoSuchKey: () => actionResultError(FileStreamOpenErrorTypeEnum.FileNotFound, `File not found: ${filepath}`),
-        NotFound: () => actionResultError(FileStreamOpenErrorTypeEnum.FileNotFound, `File not found: ${filepath}`),
-        InvalidScopeError: (error) => actionResultError(FileStreamOpenErrorTypeEnum.InvalidScope, error.message),
+        InvalidObjectState: () => actionResultError(askFileStreamOpenBase.errorType.InvalidStorageClass, 'File is in the wrong storage class'),
+        NoSuchKey: () => actionResultError(askFileStreamOpenBase.errorType.FileNotFound, `File not found: ${filepath}`),
+        NotFound: () => actionResultError(askFileStreamOpenBase.errorType.FileNotFound, `File not found: ${filepath}`),
+        InvalidScopeError: (error) => actionResultError(askFileStreamOpenBase.errorType.InvalidScope, error.message),
       });
     }
   };
 };
 
-export const getFileStreamOpenActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [FileActionType.StreamOpen]: getProcessFileStreamOpen(qpqConfig),
-});
+export const getFileStreamOpenActionProcessor = createActionProcessor(askFileStreamOpenBase, getProcessFileStreamOpen);

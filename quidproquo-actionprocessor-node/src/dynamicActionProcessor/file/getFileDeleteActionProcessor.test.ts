@@ -1,4 +1,4 @@
-import { ErrorTypeEnum, FileActionType, FileDeleteErrorTypeEnum, resolveActionResult, resolveActionResultError } from 'quidproquo-core';
+import { askFileDelete, ErrorTypeEnum, FileActionType, resolveActionResult, resolveActionResultError } from 'quidproquo-core';
 
 import * as fs from 'fs/promises';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -36,7 +36,7 @@ describe('getFileDeleteActionProcessor', () => {
 
     const result = await invoke(['a.txt']);
 
-    expect(resolveActionResultError(result).errorType).toBe(FileDeleteErrorTypeEnum.AccessDenied);
+    expect(resolveActionResultError(result).errorType).toBe(askFileDelete.errorType.AccessDenied);
   });
 
   it('returns GenericError when every deletion fails for another reason', async () => {

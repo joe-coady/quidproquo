@@ -1,12 +1,11 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
+  askFileDelete,
+  createActionProcessor,
   ErrorTypeEnum,
   FileActionType,
-  FileDeleteActionProcessor,
-  FileDeleteErrorTypeEnum,
+  ProcessorFor,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -15,7 +14,7 @@ import * as fs from 'fs/promises';
 import { FileStorageConfig } from './types';
 import { resolveFilePath } from './utils';
 
-const getProcessFileDelete = (qpqConfig: QPQConfig, config: FileStorageConfig): FileDeleteActionProcessor => {
+const getProcessFileDelete = (qpqConfig: QPQConfig, config: FileStorageConfig): ProcessorFor<typeof askFileDelete> => {
   return async ({ drive, filepaths, scope }) => {
     const deletedFiles: string[] = [];
     const errors: { filepath: string; error: any }[] = [];
@@ -42,13 +41,13 @@ const getProcessFileDelete = (qpqConfig: QPQConfig, config: FileStorageConfig): 
     // can come from another copy of quidproquo-core.
     const invalidScope = errors.find(({ error }) => error?.name === 'InvalidScopeError');
     if (invalidScope) {
-      return actionResultError(FileDeleteErrorTypeEnum.InvalidScope, invalidScope.error.message);
+      return actionResultError(askFileDelete.errorType.InvalidScope, invalidScope.error.message);
     }
 
     if (errors.length > 0 && deletedFiles.length === 0) {
       // EACCES maps to the same typed error the S3 processor returns for AccessDenied
       if (errors.some(({ error }) => error.code === 'EACCES')) {
-        return actionResultError(FileDeleteErrorTypeEnum.AccessDenied, 'Access denied deleting files');
+        return actionResultError(askFileDelete.errorType.AccessDenied, 'Access denied deleting files');
       }
       return actionResultError(
         ErrorTypeEnum.GenericError,
@@ -60,8 +59,5 @@ const getProcessFileDelete = (qpqConfig: QPQConfig, config: FileStorageConfig): 
   };
 };
 
-export const getFileDeleteActionProcessor =
-  (config: FileStorageConfig): ActionProcessorListResolver =>
-  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-    [FileActionType.Delete]: getProcessFileDelete(qpqConfig, config),
-  });
+export const getFileDeleteActionProcessor = (config: FileStorageConfig) =>
+  createActionProcessor(askFileDelete, (qpqConfig) => getProcessFileDelete(qpqConfig, config));

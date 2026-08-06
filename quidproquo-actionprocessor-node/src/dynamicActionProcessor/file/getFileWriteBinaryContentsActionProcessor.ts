@@ -1,12 +1,11 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askFileWriteBinaryContents,
+  createActionProcessor,
   FileActionType,
-  FileWriteBinaryContentsActionProcessor,
-  FileWriteBinaryContentsErrorTypeEnum,
+  ProcessorFor,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -17,7 +16,7 @@ import { ensureParentDirectoryExists, resolveFilePath } from './utils';
 
 const getProcessFileWriteBinaryContents =
   (config: FileStorageConfig) =>
-  (qpqConfig: QPQConfig): FileWriteBinaryContentsActionProcessor => {
+  (qpqConfig: QPQConfig): ProcessorFor<typeof askFileWriteBinaryContents> => {
     return async ({ drive, filepath, data, scope }) => {
       try {
         const fullPath = resolveFilePath(config, qpqConfig, drive, filepath, scope);
@@ -40,15 +39,12 @@ const getProcessFileWriteBinaryContents =
         return actionResult(void 0);
       } catch (error: unknown) {
         return actionResultErrorFromCaughtError(error, {
-          InvalidScopeError: (error) => actionResultError(FileWriteBinaryContentsErrorTypeEnum.InvalidScope, error.message),
-          EACCES: () => actionResultError(FileWriteBinaryContentsErrorTypeEnum.AccessDenied, `Access denied writing file: ${filepath}`), // node fs code
+          InvalidScopeError: (error) => actionResultError(askFileWriteBinaryContents.errorType.InvalidScope, error.message),
+          EACCES: () => actionResultError(askFileWriteBinaryContents.errorType.AccessDenied, `Access denied writing file: ${filepath}`), // node fs code
         });
       }
     };
   };
 
-export const getFileWriteBinaryContentsActionProcessor =
-  (config: FileStorageConfig): ActionProcessorListResolver =>
-  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-    [FileActionType.WriteBinaryContents]: getProcessFileWriteBinaryContents(config)(qpqConfig),
-  });
+export const getFileWriteBinaryContentsActionProcessor = (config: FileStorageConfig) =>
+  createActionProcessor(askFileWriteBinaryContents, (qpqConfig) => getProcessFileWriteBinaryContents(config)(qpqConfig));

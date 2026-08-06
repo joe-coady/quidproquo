@@ -1,21 +1,20 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askFileReadTextContents,
   composeScopedFilePath,
+  createActionProcessor,
   FileActionType,
-  FileReadTextContentsActionProcessor,
-  FileReadTextContentsErrorTypeEnum,
+  ProcessorFor,
   QPQConfig,
 } from 'quidproquo-core';
 
 import { readTextFile } from '../../../logic/s3/s3Utils';
 import { resolveStorageDriveBucketName } from './utils';
 
-const getProcessFileReadTextContents = (qpqConfig: QPQConfig): FileReadTextContentsActionProcessor => {
+const getProcessFileReadTextContents = (qpqConfig: QPQConfig): ProcessorFor<typeof askFileReadTextContents> => {
   return async ({ drive, filepath, scope }) => {
     try {
       const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
@@ -24,15 +23,13 @@ const getProcessFileReadTextContents = (qpqConfig: QPQConfig): FileReadTextConte
       return actionResult(await readTextFile(s3BucketName, key, qpqConfigAwsUtils.getApplicationModuleDeployRegion(qpqConfig)));
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        InvalidObjectState: () => actionResultError(FileReadTextContentsErrorTypeEnum.InvalidStorageClass, 'File is in the wrong storage class'),
-        NoSuchKey: () => actionResultError(FileReadTextContentsErrorTypeEnum.FileNotFound, `File not found: ${filepath}`),
-        NotFound: () => actionResultError(FileReadTextContentsErrorTypeEnum.FileNotFound, `File not found: ${filepath}`),
-        InvalidScopeError: (error) => actionResultError(FileReadTextContentsErrorTypeEnum.InvalidScope, error.message),
+        InvalidObjectState: () => actionResultError(askFileReadTextContents.errorType.InvalidStorageClass, 'File is in the wrong storage class'),
+        NoSuchKey: () => actionResultError(askFileReadTextContents.errorType.FileNotFound, `File not found: ${filepath}`),
+        NotFound: () => actionResultError(askFileReadTextContents.errorType.FileNotFound, `File not found: ${filepath}`),
+        InvalidScopeError: (error) => actionResultError(askFileReadTextContents.errorType.InvalidScope, error.message),
       });
     }
   };
 };
 
-export const getFileReadTextContentsActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [FileActionType.ReadTextContents]: getProcessFileReadTextContents(qpqConfig),
-});
+export const getFileReadTextContentsActionProcessor = createActionProcessor(askFileReadTextContents, getProcessFileReadTextContents);

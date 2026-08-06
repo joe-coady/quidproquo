@@ -1,4 +1,4 @@
-import { ErrorTypeEnum, FileActionType, FileGenerateTemporarySecureUrlErrorTypeEnum } from 'quidproquo-core';
+import { askFileGenerateTemporarySecureUrl, ErrorTypeEnum, FileActionType } from 'quidproquo-core';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -36,7 +36,7 @@ describe('getProcessFileGenerateTemporarySecureUrl', () => {
   it('rejects an expiration over the 7 day maximum', async () => {
     const [, error] = await invoke({ drive: 'assets', filepath: 'a.txt', expirationMs: sevenDaysMs + 1 });
 
-    expect(error?.errorType).toBe(FileGenerateTemporarySecureUrlErrorTypeEnum.ExpirationTooLong);
+    expect(error?.errorType).toBe(askFileGenerateTemporarySecureUrl.errorType.ExpirationTooLong);
     expect(generatePresignedUrl).not.toHaveBeenCalled();
   });
 

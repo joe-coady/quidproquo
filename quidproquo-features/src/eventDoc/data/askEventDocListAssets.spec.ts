@@ -1,4 +1,4 @@
-import { FileActionType, FileListDirectoryErrorTypeEnum, runStory, throwsError } from 'quidproquo-core';
+import { askFileListDirectory, FileActionType, runStory, throwsError } from 'quidproquo-core';
 
 import { describe, expect, it } from 'vitest';
 
@@ -29,7 +29,7 @@ describe('askEventDocListAssets', () => {
     // A doc that never uploaded anything: S3 lists an absent prefix as empty, a filesystem drive
     // raises DirectoryNotFound. Exporting such a doc must not fail on either.
     const guids = runStory(listAssets('doc-1'), {
-      [FileActionType.ListDirectory]: () => throwsError(FileListDirectoryErrorTypeEnum.DirectoryNotFound, 'Directory not found: doc-1/assets'),
+      [FileActionType.ListDirectory]: () => throwsError(askFileListDirectory.errorType.DirectoryNotFound, 'Directory not found: doc-1/assets'),
     });
 
     expect(guids).toEqual([]);
@@ -38,7 +38,7 @@ describe('askEventDocListAssets', () => {
   it('propagates any other listing failure', () => {
     expect(() =>
       runStory(listAssets('doc-1'), {
-        [FileActionType.ListDirectory]: () => throwsError(FileListDirectoryErrorTypeEnum.AccessDenied, 'nope'),
+        [FileActionType.ListDirectory]: () => throwsError(askFileListDirectory.errorType.AccessDenied, 'nope'),
       }),
     ).toThrow();
   });

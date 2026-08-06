@@ -1,14 +1,13 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askFileWriteObjectJsonBase,
   composeScopedFilePath,
+  createActionProcessor,
   FileActionType,
-  FileWriteObjectJsonActionProcessor,
-  FileWriteObjectJsonErrorTypeEnum,
+  ProcessorFor,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -16,7 +15,7 @@ import { getS3BucketStorageClassFromStorageDriveTier } from '../../../awsLambdaU
 import { writeTextFile } from '../../../logic/s3/s3Utils';
 import { resolveStorageDriveBucketName } from './utils';
 
-const getProcessFileWriteObjectJson = (qpqConfig: QPQConfig): FileWriteObjectJsonActionProcessor<object> => {
+const getProcessFileWriteObjectJson = (qpqConfig: QPQConfig): ProcessorFor<typeof askFileWriteObjectJsonBase> => {
   return async ({ drive, filepath, data, storageDriveAdvancedWriteOptions, scope }) => {
     const dataJson = JSON.stringify(data);
 
@@ -33,16 +32,14 @@ const getProcessFileWriteObjectJson = (qpqConfig: QPQConfig): FileWriteObjectJso
       return actionResult(void 0);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        AccessDenied: () => actionResultError(FileWriteObjectJsonErrorTypeEnum.AccessDenied, 'Access denied writing file'),
-        Forbidden: () => actionResultError(FileWriteObjectJsonErrorTypeEnum.AccessDenied, 'Access denied writing file'),
-        NoSuchBucket: () => actionResultError(FileWriteObjectJsonErrorTypeEnum.DriveNotFound, `Storage drive not found: ${drive}`),
-        StorageDriveNotFoundError: (error) => actionResultError(FileWriteObjectJsonErrorTypeEnum.DriveNotFound, error.message),
-        InvalidScopeError: (error) => actionResultError(FileWriteObjectJsonErrorTypeEnum.InvalidScope, error.message),
+        AccessDenied: () => actionResultError(askFileWriteObjectJsonBase.errorType.AccessDenied, 'Access denied writing file'),
+        Forbidden: () => actionResultError(askFileWriteObjectJsonBase.errorType.AccessDenied, 'Access denied writing file'),
+        NoSuchBucket: () => actionResultError(askFileWriteObjectJsonBase.errorType.DriveNotFound, `Storage drive not found: ${drive}`),
+        StorageDriveNotFoundError: (error) => actionResultError(askFileWriteObjectJsonBase.errorType.DriveNotFound, error.message),
+        InvalidScopeError: (error) => actionResultError(askFileWriteObjectJsonBase.errorType.InvalidScope, error.message),
       });
     }
   };
 };
 
-export const getFileWriteObjectJsonActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [FileActionType.WriteObjectJson]: getProcessFileWriteObjectJson(qpqConfig),
-});
+export const getFileWriteObjectJsonActionProcessor = createActionProcessor(askFileWriteObjectJsonBase, getProcessFileWriteObjectJson);

@@ -1,14 +1,13 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askFileListDirectory,
   composeScopedFilePath,
+  createActionProcessor,
   FileActionType,
-  FileListDirectoryActionProcessor,
-  FileListDirectoryErrorTypeEnum,
+  ProcessorFor,
   QPQConfig,
   stripScopedFilePath,
 } from 'quidproquo-core';
@@ -16,7 +15,7 @@ import {
 import { listFiles } from '../../../logic/s3/s3Utils';
 import { resolveStorageDriveBucketName } from './utils';
 
-const getProcessFileListDirectory = (qpqConfig: QPQConfig): FileListDirectoryActionProcessor => {
+const getProcessFileListDirectory = (qpqConfig: QPQConfig): ProcessorFor<typeof askFileListDirectory> => {
   return async ({ drive, folderPath, maxFiles, pageToken, scope }) => {
     try {
       const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
@@ -42,16 +41,14 @@ const getProcessFileListDirectory = (qpqConfig: QPQConfig): FileListDirectoryAct
       });
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        AccessDenied: () => actionResultError(FileListDirectoryErrorTypeEnum.AccessDenied, 'Access denied listing directory'),
-        Forbidden: () => actionResultError(FileListDirectoryErrorTypeEnum.AccessDenied, 'Access denied listing directory'),
-        NoSuchBucket: () => actionResultError(FileListDirectoryErrorTypeEnum.DriveNotFound, `Storage drive not found: ${drive}`),
-        StorageDriveNotFoundError: (error) => actionResultError(FileListDirectoryErrorTypeEnum.DriveNotFound, error.message),
-        InvalidScopeError: (error) => actionResultError(FileListDirectoryErrorTypeEnum.InvalidScope, error.message),
+        AccessDenied: () => actionResultError(askFileListDirectory.errorType.AccessDenied, 'Access denied listing directory'),
+        Forbidden: () => actionResultError(askFileListDirectory.errorType.AccessDenied, 'Access denied listing directory'),
+        NoSuchBucket: () => actionResultError(askFileListDirectory.errorType.DriveNotFound, `Storage drive not found: ${drive}`),
+        StorageDriveNotFoundError: (error) => actionResultError(askFileListDirectory.errorType.DriveNotFound, error.message),
+        InvalidScopeError: (error) => actionResultError(askFileListDirectory.errorType.InvalidScope, error.message),
       });
     }
   };
 };
 
-export const getFileListDirectoryActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [FileActionType.ListDirectory]: getProcessFileListDirectory(qpqConfig),
-});
+export const getFileListDirectoryActionProcessor = createActionProcessor(askFileListDirectory, getProcessFileListDirectory);

@@ -1,4 +1,4 @@
-import { FileActionType, FileReadObjectJsonErrorTypeEnum } from 'quidproquo-core';
+import { askFileReadObjectJsonBase, FileActionType } from 'quidproquo-core';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -32,7 +32,7 @@ describe('getProcessFileReadObjectJson', () => {
 
     const [, error] = await invoke({ drive: 'assets', filepath: 'a.json' });
 
-    expect(error?.errorType).toBe(FileReadObjectJsonErrorTypeEnum.InvalidStorageClass);
+    expect(error?.errorType).toBe(askFileReadObjectJsonBase.errorType.InvalidStorageClass);
   });
 
   it('maps NoSuchKey to the action-typed FileNotFound error', async () => {
@@ -40,7 +40,7 @@ describe('getProcessFileReadObjectJson', () => {
 
     const [, error] = await invoke({ drive: 'assets', filepath: 'a.json' });
 
-    expect(error?.errorType).toBe(FileReadObjectJsonErrorTypeEnum.FileNotFound);
+    expect(error?.errorType).toBe(askFileReadObjectJsonBase.errorType.FileNotFound);
   });
 
   it('maps a JSON.parse failure to the action-typed InvalidJson error', async () => {
@@ -48,6 +48,6 @@ describe('getProcessFileReadObjectJson', () => {
 
     const [, error] = await invoke({ drive: 'assets', filepath: 'a.json' });
 
-    expect(error?.errorType).toBe(FileReadObjectJsonErrorTypeEnum.InvalidJson);
+    expect(error?.errorType).toBe(askFileReadObjectJsonBase.errorType.InvalidJson);
   });
 });

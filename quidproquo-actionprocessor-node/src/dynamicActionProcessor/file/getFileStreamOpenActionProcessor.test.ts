@@ -1,8 +1,8 @@
 import {
+  askFileStreamOpenBase,
   createStreamRegistry,
   ErrorTypeEnum,
   FileActionType,
-  FileStreamOpenErrorTypeEnum,
   resolveActionResult,
   resolveActionResultError,
   StreamRegistry,
@@ -57,7 +57,7 @@ describe('getFileStreamOpenActionProcessor', () => {
 
     const result = await invoke({ encoding: 'text' }, createStreamRegistry());
 
-    expect(resolveActionResultError(result).errorType).toBe(FileStreamOpenErrorTypeEnum.FileNotFound);
+    expect(resolveActionResultError(result).errorType).toBe(askFileStreamOpenBase.errorType.FileNotFound);
   });
 
   it('returns GenericError for any other failure', async () => {

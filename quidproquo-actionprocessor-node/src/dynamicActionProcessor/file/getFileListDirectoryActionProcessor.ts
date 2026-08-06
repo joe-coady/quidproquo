@@ -1,14 +1,13 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askFileListDirectory,
+  createActionProcessor,
   DirectoryList,
   FileActionType,
   FileInfo,
-  FileListDirectoryActionProcessor,
-  FileListDirectoryErrorTypeEnum,
+  ProcessorFor,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -20,7 +19,7 @@ import { resolveFilePath } from './utils';
 
 const getProcessFileListDirectory =
   (config: FileStorageConfig) =>
-  (qpqConfig: QPQConfig): FileListDirectoryActionProcessor => {
+  (qpqConfig: QPQConfig): ProcessorFor<typeof askFileListDirectory> => {
     return async ({ drive, folderPath, maxFiles, pageToken, scope }) => {
       try {
         const fullPath = resolveFilePath(config, qpqConfig, drive, folderPath || '', scope);
@@ -59,17 +58,14 @@ const getProcessFileListDirectory =
         return actionResult(result);
       } catch (error: unknown) {
         return actionResultErrorFromCaughtError(error, {
-          InvalidScopeError: (error) => actionResultError(FileListDirectoryErrorTypeEnum.InvalidScope, error.message),
-          ENOENT: () => actionResultError(FileListDirectoryErrorTypeEnum.DirectoryNotFound, `Directory not found: ${folderPath}`), // node fs code
-          ENOTDIR: () => actionResultError(FileListDirectoryErrorTypeEnum.NotADirectory, `Path is not a directory: ${folderPath}`), // node fs code
-          EACCES: () => actionResultError(FileListDirectoryErrorTypeEnum.AccessDenied, `Access denied listing directory: ${folderPath}`), // node fs code
+          InvalidScopeError: (error) => actionResultError(askFileListDirectory.errorType.InvalidScope, error.message),
+          ENOENT: () => actionResultError(askFileListDirectory.errorType.DirectoryNotFound, `Directory not found: ${folderPath}`), // node fs code
+          ENOTDIR: () => actionResultError(askFileListDirectory.errorType.NotADirectory, `Path is not a directory: ${folderPath}`), // node fs code
+          EACCES: () => actionResultError(askFileListDirectory.errorType.AccessDenied, `Access denied listing directory: ${folderPath}`), // node fs code
         });
       }
     };
   };
 
-export const getFileListDirectoryActionProcessor =
-  (config: FileStorageConfig): ActionProcessorListResolver =>
-  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-    [FileActionType.ListDirectory]: getProcessFileListDirectory(config)(qpqConfig),
-  });
+export const getFileListDirectoryActionProcessor = (config: FileStorageConfig) =>
+  createActionProcessor(askFileListDirectory, (qpqConfig) => getProcessFileListDirectory(config)(qpqConfig));

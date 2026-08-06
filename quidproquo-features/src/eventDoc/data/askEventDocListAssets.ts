@@ -1,4 +1,4 @@
-import { askCatch, askFileListAllDirectory, AskResponse, askThrowError, ErrorTypeEnum, FileListDirectoryErrorTypeEnum } from 'quidproquo-core';
+import { askCatch, askFileListAllDirectory, askFileListDirectory, AskResponse, askThrowError, ErrorTypeEnum } from 'quidproquo-core';
 
 import { askEventDocResolveStore } from '../context/askEventDocResolveStore';
 import { askEventDocResolveScope } from './askEventDocResolveScope';
@@ -25,7 +25,7 @@ export function* askEventDocListAssets(docId: string): AskResponse<string[]> {
   const listed = yield* askCatch(askFileListAllDirectory(storageDriveName, eventDocAssetFolderPath(docId), scope));
 
   if (!listed.success) {
-    if (listed.error.errorType === FileListDirectoryErrorTypeEnum.DirectoryNotFound) {
+    if (listed.error.errorType === askFileListDirectory.errorType.DirectoryNotFound) {
       return [];
     }
 

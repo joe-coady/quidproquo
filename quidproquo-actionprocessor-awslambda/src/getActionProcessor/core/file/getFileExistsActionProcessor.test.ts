@@ -1,4 +1,4 @@
-import { FileActionType, FileExistsErrorTypeEnum } from 'quidproquo-core';
+import { askFileExists, FileActionType } from 'quidproquo-core';
 
 import { describe, expect, it, vi } from 'vitest';
 
@@ -33,6 +33,6 @@ describe('getProcessFileExists', () => {
 
     const [, error] = await invoke({ drive: 'assets', filepath: 'a.txt' });
 
-    expect(error?.errorType).toBe(FileExistsErrorTypeEnum.AccessDenied);
+    expect(error?.errorType).toBe(askFileExists.errorType.AccessDenied);
   });
 });

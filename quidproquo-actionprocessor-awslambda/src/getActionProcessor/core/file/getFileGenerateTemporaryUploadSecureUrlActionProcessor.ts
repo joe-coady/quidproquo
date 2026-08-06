@@ -1,11 +1,14 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import { ActionProcessorList, ActionProcessorListResolver, actionResultError, actionResultErrorFromCaughtError, QPQConfig } from 'quidproquo-core';
 import {
   actionResult,
+  actionResultError,
+  actionResultErrorFromCaughtError,
+  askFileGenerateTemporaryUploadSecureUrl,
   composeScopedFilePath,
+  createActionProcessor,
   FileActionType,
-  FileGenerateTemporaryUploadSecureUrlActionProcessor,
-  FileGenerateTemporaryUploadSecureUrlErrorTypeEnum,
+  ProcessorFor,
+  QPQConfig,
 } from 'quidproquo-core';
 
 import { generatePresignedUploadUrl } from '../../../logic/s3/generatePresignedUploadUrl';
@@ -14,11 +17,11 @@ import { resolveStorageDriveBucketName } from './utils';
 // SigV4 presigned URLs cannot expire more than 7 days in the future
 const maxExpirationMs = 7 * 24 * 60 * 60 * 1000;
 
-const getProcessFileGenerateTemporaryUploadSecureUrl = (qpqConfig: QPQConfig): FileGenerateTemporaryUploadSecureUrlActionProcessor => {
+const getProcessFileGenerateTemporaryUploadSecureUrl = (qpqConfig: QPQConfig): ProcessorFor<typeof askFileGenerateTemporaryUploadSecureUrl> => {
   return async ({ drive, filepath, expirationMs, contentType, contentDisposition, scope }, session) => {
     if (expirationMs > maxExpirationMs) {
       return actionResultError(
-        FileGenerateTemporaryUploadSecureUrlErrorTypeEnum.ExpirationTooLong,
+        askFileGenerateTemporaryUploadSecureUrl.errorType.ExpirationTooLong,
         'Expiration exceeds the 7 day maximum for presigned URLs',
       );
     }
@@ -40,14 +43,13 @@ const getProcessFileGenerateTemporaryUploadSecureUrl = (qpqConfig: QPQConfig): F
       // Name-keyed, not instanceof: under npm link / module federation the
       // error can come from another copy of quidproquo-core.
       return actionResultErrorFromCaughtError(error, {
-        InvalidScopeError: (error) => actionResultError(FileGenerateTemporaryUploadSecureUrlErrorTypeEnum.InvalidScope, error.message),
+        InvalidScopeError: (error) => actionResultError(askFileGenerateTemporaryUploadSecureUrl.errorType.InvalidScope, error.message),
       });
     }
   };
 };
 
-export const getFileGenerateTemporaryUploadSecureUrlActionProcessor: ActionProcessorListResolver = async (
-  qpqConfig: QPQConfig,
-): Promise<ActionProcessorList> => ({
-  [FileActionType.GenerateTemporaryUploadSecureUrl]: getProcessFileGenerateTemporaryUploadSecureUrl(qpqConfig),
-});
+export const getFileGenerateTemporaryUploadSecureUrlActionProcessor = createActionProcessor(
+  askFileGenerateTemporaryUploadSecureUrl,
+  getProcessFileGenerateTemporaryUploadSecureUrl,
+);

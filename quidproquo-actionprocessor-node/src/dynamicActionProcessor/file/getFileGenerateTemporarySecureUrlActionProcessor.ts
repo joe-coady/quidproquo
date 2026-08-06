@@ -1,12 +1,11 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askFileGenerateTemporarySecureUrl,
+  createActionProcessor,
   FileActionType,
-  FileGenerateTemporarySecureUrlActionProcessor,
-  FileGenerateTemporarySecureUrlErrorTypeEnum,
+  ProcessorFor,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -18,11 +17,14 @@ import { resolveFilePath } from './utils';
 // in production fails the same way on the dev server.
 const maxExpirationMs = 7 * 24 * 60 * 60 * 1000;
 
-const getProcessFileGenerateTemporarySecureUrl = (qpqConfig: QPQConfig, config: FileStorageConfig): FileGenerateTemporarySecureUrlActionProcessor => {
+const getProcessFileGenerateTemporarySecureUrl = (
+  qpqConfig: QPQConfig,
+  config: FileStorageConfig,
+): ProcessorFor<typeof askFileGenerateTemporarySecureUrl> => {
   return async ({ drive, filepath, expirationMs, scope }) => {
     if (expirationMs > maxExpirationMs) {
       return actionResultError(
-        FileGenerateTemporarySecureUrlErrorTypeEnum.ExpirationTooLong,
+        askFileGenerateTemporarySecureUrl.errorType.ExpirationTooLong,
         'Expiration exceeds the 7 day maximum for presigned URLs',
       );
     }
@@ -47,14 +49,11 @@ const getProcessFileGenerateTemporarySecureUrl = (qpqConfig: QPQConfig, config: 
       // Name-keyed, not instanceof: under npm link / module federation the
       // error can come from another copy of quidproquo-core.
       return actionResultErrorFromCaughtError(error, {
-        InvalidScopeError: (error) => actionResultError(FileGenerateTemporarySecureUrlErrorTypeEnum.InvalidScope, error.message),
+        InvalidScopeError: (error) => actionResultError(askFileGenerateTemporarySecureUrl.errorType.InvalidScope, error.message),
       });
     }
   };
 };
 
-export const getFileGenerateTemporarySecureUrlActionProcessor =
-  (config: FileStorageConfig): ActionProcessorListResolver =>
-  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-    [FileActionType.GenerateTemporarySecureUrl]: getProcessFileGenerateTemporarySecureUrl(qpqConfig, config),
-  });
+export const getFileGenerateTemporarySecureUrlActionProcessor = (config: FileStorageConfig) =>
+  createActionProcessor(askFileGenerateTemporarySecureUrl, (qpqConfig) => getProcessFileGenerateTemporarySecureUrl(qpqConfig, config));

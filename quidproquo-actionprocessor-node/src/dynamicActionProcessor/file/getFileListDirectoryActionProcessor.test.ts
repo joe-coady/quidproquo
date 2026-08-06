@@ -1,4 +1,4 @@
-import { FileActionType, FileListDirectoryErrorTypeEnum, resolveActionResult, resolveActionResultError } from 'quidproquo-core';
+import { askFileListDirectory, FileActionType, resolveActionResult, resolveActionResultError } from 'quidproquo-core';
 
 import * as fs from 'fs/promises';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -56,7 +56,7 @@ describe('getFileListDirectoryActionProcessor', () => {
 
     const result = await invoke({ folderPath: 'nope', maxFiles: 10 });
 
-    expect(resolveActionResultError(result).errorType).toBe(FileListDirectoryErrorTypeEnum.DirectoryNotFound);
+    expect(resolveActionResultError(result).errorType).toBe(askFileListDirectory.errorType.DirectoryNotFound);
   });
 
   it('returns NotADirectory when the path is not a directory', async () => {
@@ -64,7 +64,7 @@ describe('getFileListDirectoryActionProcessor', () => {
 
     const result = await invoke({ folderPath: 'file.txt', maxFiles: 10 });
 
-    expect(resolveActionResultError(result).errorType).toBe(FileListDirectoryErrorTypeEnum.NotADirectory);
+    expect(resolveActionResultError(result).errorType).toBe(askFileListDirectory.errorType.NotADirectory);
   });
 
   it('returns AccessDenied when permission is denied', async () => {
@@ -72,6 +72,6 @@ describe('getFileListDirectoryActionProcessor', () => {
 
     const result = await invoke({ folderPath: 'x', maxFiles: 10 });
 
-    expect(resolveActionResultError(result).errorType).toBe(FileListDirectoryErrorTypeEnum.AccessDenied);
+    expect(resolveActionResultError(result).errorType).toBe(askFileListDirectory.errorType.AccessDenied);
   });
 });

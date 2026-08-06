@@ -1,12 +1,11 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askFileWriteTextContents,
+  createActionProcessor,
   FileActionType,
-  FileWriteTextContentsActionProcessor,
-  FileWriteTextContentsErrorTypeEnum,
+  ProcessorFor,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -15,7 +14,7 @@ import * as fs from 'fs/promises';
 import { FileStorageConfig } from './types';
 import { ensureParentDirectoryExists, resolveFilePath } from './utils';
 
-const getProcessFileWriteTextContents = (qpqConfig: QPQConfig, config: FileStorageConfig): FileWriteTextContentsActionProcessor => {
+const getProcessFileWriteTextContents = (qpqConfig: QPQConfig, config: FileStorageConfig): ProcessorFor<typeof askFileWriteTextContents> => {
   return async ({ drive, filepath, data, scope }) => {
     try {
       const fullPath = resolveFilePath(config, qpqConfig, drive, filepath, scope);
@@ -24,15 +23,12 @@ const getProcessFileWriteTextContents = (qpqConfig: QPQConfig, config: FileStora
       return actionResult(void 0);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        InvalidScopeError: (error) => actionResultError(FileWriteTextContentsErrorTypeEnum.InvalidScope, error.message),
-        EACCES: () => actionResultError(FileWriteTextContentsErrorTypeEnum.AccessDenied, `Access denied writing file: ${filepath}`), // node fs code
+        InvalidScopeError: (error) => actionResultError(askFileWriteTextContents.errorType.InvalidScope, error.message),
+        EACCES: () => actionResultError(askFileWriteTextContents.errorType.AccessDenied, `Access denied writing file: ${filepath}`), // node fs code
       });
     }
   };
 };
 
-export const getFileWriteTextContentsActionProcessor =
-  (config: FileStorageConfig): ActionProcessorListResolver =>
-  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-    [FileActionType.WriteTextContents]: getProcessFileWriteTextContents(qpqConfig, config),
-  });
+export const getFileWriteTextContentsActionProcessor = (config: FileStorageConfig) =>
+  createActionProcessor(askFileWriteTextContents, (qpqConfig) => getProcessFileWriteTextContents(qpqConfig, config));

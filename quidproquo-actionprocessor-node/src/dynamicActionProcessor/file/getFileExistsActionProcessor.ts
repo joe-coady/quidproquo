@@ -1,12 +1,11 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askFileExists,
+  createActionProcessor,
   FileActionType,
-  FileExistsActionProcessor,
-  FileExistsErrorTypeEnum,
+  ProcessorFor,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -15,7 +14,7 @@ import * as fs from 'fs/promises';
 import { FileStorageConfig } from './types';
 import { resolveFilePath } from './utils';
 
-const getProcessFileExists = (qpqConfig: QPQConfig, config: FileStorageConfig): FileExistsActionProcessor => {
+const getProcessFileExists = (qpqConfig: QPQConfig, config: FileStorageConfig): ProcessorFor<typeof askFileExists> => {
   return async ({ drive, filepath, scope }) => {
     try {
       const fullPath = resolveFilePath(config, qpqConfig, drive, filepath, scope);
@@ -29,7 +28,7 @@ const getProcessFileExists = (qpqConfig: QPQConfig, config: FileStorageConfig): 
           return actionResult(false);
         }
         if (error.code === 'EACCES') {
-          return actionResultError(FileExistsErrorTypeEnum.AccessDenied, `Access denied checking file existence: ${filepath}`);
+          return actionResultError(askFileExists.errorType.AccessDenied, `Access denied checking file existence: ${filepath}`);
         }
         throw error;
       }
@@ -37,14 +36,11 @@ const getProcessFileExists = (qpqConfig: QPQConfig, config: FileStorageConfig): 
       // Name-keyed, not instanceof: under npm link / module federation the
       // error can come from another copy of quidproquo-core.
       return actionResultErrorFromCaughtError(error, {
-        InvalidScopeError: (error) => actionResultError(FileExistsErrorTypeEnum.InvalidScope, error.message),
+        InvalidScopeError: (error) => actionResultError(askFileExists.errorType.InvalidScope, error.message),
       });
     }
   };
 };
 
-export const getFileExistsActionProcessor =
-  (config: FileStorageConfig): ActionProcessorListResolver =>
-  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-    [FileActionType.Exists]: getProcessFileExists(qpqConfig, config),
-  });
+export const getFileExistsActionProcessor = (config: FileStorageConfig) =>
+  createActionProcessor(askFileExists, (qpqConfig) => getProcessFileExists(qpqConfig, config));

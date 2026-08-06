@@ -1,21 +1,20 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askFileReadObjectJsonBase,
   composeScopedFilePath,
+  createActionProcessor,
   FileActionType,
-  FileReadObjectJsonActionProcessor,
-  FileReadObjectJsonErrorTypeEnum,
+  ProcessorFor,
   QPQConfig,
 } from 'quidproquo-core';
 
 import { readTextFile } from '../../../logic/s3/s3Utils';
 import { resolveStorageDriveBucketName } from './utils';
 
-const getProcessFileReadObjectJson = (qpqConfig: QPQConfig): FileReadObjectJsonActionProcessor<object> => {
+const getProcessFileReadObjectJson = (qpqConfig: QPQConfig): ProcessorFor<typeof askFileReadObjectJsonBase> => {
   return async ({ drive, filepath, scope }) => {
     try {
       const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
@@ -28,16 +27,14 @@ const getProcessFileReadObjectJson = (qpqConfig: QPQConfig): FileReadObjectJsonA
       return actionResult(obj);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        InvalidObjectState: () => actionResultError(FileReadObjectJsonErrorTypeEnum.InvalidStorageClass, 'File is in the wrong storage class'),
-        NoSuchKey: () => actionResultError(FileReadObjectJsonErrorTypeEnum.FileNotFound, `File not found: ${filepath}`),
-        NotFound: () => actionResultError(FileReadObjectJsonErrorTypeEnum.FileNotFound, `File not found: ${filepath}`),
-        SyntaxError: () => actionResultError(FileReadObjectJsonErrorTypeEnum.InvalidJson, `Invalid JSON in file: ${filepath}`), // JSON.parse failure
-        InvalidScopeError: (error) => actionResultError(FileReadObjectJsonErrorTypeEnum.InvalidScope, error.message),
+        InvalidObjectState: () => actionResultError(askFileReadObjectJsonBase.errorType.InvalidStorageClass, 'File is in the wrong storage class'),
+        NoSuchKey: () => actionResultError(askFileReadObjectJsonBase.errorType.FileNotFound, `File not found: ${filepath}`),
+        NotFound: () => actionResultError(askFileReadObjectJsonBase.errorType.FileNotFound, `File not found: ${filepath}`),
+        SyntaxError: () => actionResultError(askFileReadObjectJsonBase.errorType.InvalidJson, `Invalid JSON in file: ${filepath}`), // JSON.parse failure
+        InvalidScopeError: (error) => actionResultError(askFileReadObjectJsonBase.errorType.InvalidScope, error.message),
       });
     }
   };
 };
 
-export const getFileReadObjectJsonActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [FileActionType.ReadObjectJson]: getProcessFileReadObjectJson(qpqConfig),
-});
+export const getFileReadObjectJsonActionProcessor = createActionProcessor(askFileReadObjectJsonBase, getProcessFileReadObjectJson);

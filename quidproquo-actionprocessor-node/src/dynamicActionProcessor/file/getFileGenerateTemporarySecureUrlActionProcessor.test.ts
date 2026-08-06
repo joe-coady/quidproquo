@@ -1,10 +1,4 @@
-import {
-  ErrorTypeEnum,
-  FileActionType,
-  FileGenerateTemporarySecureUrlErrorTypeEnum,
-  resolveActionResult,
-  resolveActionResultError,
-} from 'quidproquo-core';
+import { askFileGenerateTemporarySecureUrl, ErrorTypeEnum, FileActionType, resolveActionResult, resolveActionResultError } from 'quidproquo-core';
 
 import { describe, expect, it } from 'vitest';
 
@@ -40,6 +34,6 @@ describe('getFileGenerateTemporarySecureUrlActionProcessor', () => {
     const eightDaysMs = 8 * 24 * 60 * 60 * 1000;
     const result = await invoke('a.txt', eightDaysMs);
 
-    expect(resolveActionResultError(result).errorType).toBe(FileGenerateTemporarySecureUrlErrorTypeEnum.ExpirationTooLong);
+    expect(resolveActionResultError(result).errorType).toBe(askFileGenerateTemporarySecureUrl.errorType.ExpirationTooLong);
   });
 });

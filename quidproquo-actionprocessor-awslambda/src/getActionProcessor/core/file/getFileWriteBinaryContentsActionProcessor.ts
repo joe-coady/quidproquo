@@ -1,14 +1,13 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askFileWriteBinaryContents,
   composeScopedFilePath,
+  createActionProcessor,
   FileActionType,
-  FileWriteBinaryContentsActionProcessor,
-  FileWriteBinaryContentsErrorTypeEnum,
+  ProcessorFor,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -16,7 +15,7 @@ import { getS3BucketStorageClassFromStorageDriveTier } from '../../../awsLambdaU
 import { writeBinaryFile } from '../../../logic/s3/s3Utils';
 import { resolveStorageDriveBucketName } from './utils';
 
-const getProcessFileWriteBinaryContents = (qpqConfig: QPQConfig): FileWriteBinaryContentsActionProcessor => {
+const getProcessFileWriteBinaryContents = (qpqConfig: QPQConfig): ProcessorFor<typeof askFileWriteBinaryContents> => {
   return async ({ drive, filepath, data, storageDriveAdvancedWriteOptions, scope }) => {
     try {
       const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
@@ -31,16 +30,14 @@ const getProcessFileWriteBinaryContents = (qpqConfig: QPQConfig): FileWriteBinar
       return actionResult(void 0);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        AccessDenied: () => actionResultError(FileWriteBinaryContentsErrorTypeEnum.AccessDenied, 'Access denied writing file'),
-        Forbidden: () => actionResultError(FileWriteBinaryContentsErrorTypeEnum.AccessDenied, 'Access denied writing file'),
-        NoSuchBucket: () => actionResultError(FileWriteBinaryContentsErrorTypeEnum.DriveNotFound, `Storage drive not found: ${drive}`),
-        StorageDriveNotFoundError: (error) => actionResultError(FileWriteBinaryContentsErrorTypeEnum.DriveNotFound, error.message),
-        InvalidScopeError: (error) => actionResultError(FileWriteBinaryContentsErrorTypeEnum.InvalidScope, error.message),
+        AccessDenied: () => actionResultError(askFileWriteBinaryContents.errorType.AccessDenied, 'Access denied writing file'),
+        Forbidden: () => actionResultError(askFileWriteBinaryContents.errorType.AccessDenied, 'Access denied writing file'),
+        NoSuchBucket: () => actionResultError(askFileWriteBinaryContents.errorType.DriveNotFound, `Storage drive not found: ${drive}`),
+        StorageDriveNotFoundError: (error) => actionResultError(askFileWriteBinaryContents.errorType.DriveNotFound, error.message),
+        InvalidScopeError: (error) => actionResultError(askFileWriteBinaryContents.errorType.InvalidScope, error.message),
       });
     }
   };
 };
 
-export const getFileWriteBinaryContentsActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [FileActionType.WriteBinaryContents]: getProcessFileWriteBinaryContents(qpqConfig),
-});
+export const getFileWriteBinaryContentsActionProcessor = createActionProcessor(askFileWriteBinaryContents, getProcessFileWriteBinaryContents);

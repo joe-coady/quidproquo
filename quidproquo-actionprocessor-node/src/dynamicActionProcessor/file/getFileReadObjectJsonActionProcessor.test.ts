@@ -1,4 +1,4 @@
-import { ErrorTypeEnum, FileActionType, FileReadObjectJsonErrorTypeEnum, resolveActionResult, resolveActionResultError } from 'quidproquo-core';
+import { askFileReadObjectJsonBase, ErrorTypeEnum, FileActionType, resolveActionResult, resolveActionResultError } from 'quidproquo-core';
 
 import * as fs from 'fs/promises';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -28,7 +28,7 @@ describe('getFileReadObjectJsonActionProcessor', () => {
 
     const result = await invoke();
 
-    expect(resolveActionResultError(result).errorType).toBe(FileReadObjectJsonErrorTypeEnum.FileNotFound);
+    expect(resolveActionResultError(result).errorType).toBe(askFileReadObjectJsonBase.errorType.FileNotFound);
   });
 
   it('returns the action-typed InvalidJson when the json is invalid', async () => {
@@ -37,7 +37,7 @@ describe('getFileReadObjectJsonActionProcessor', () => {
     const result = await invoke();
 
     const error = resolveActionResultError(result);
-    expect(error.errorType).toBe(FileReadObjectJsonErrorTypeEnum.InvalidJson);
+    expect(error.errorType).toBe(askFileReadObjectJsonBase.errorType.InvalidJson);
     expect(error.errorText).toContain('Invalid JSON');
   });
 

@@ -1,9 +1,9 @@
 import {
+  askFileDelete,
+  askFileExists,
+  askFileGenerateTemporarySecureUrl,
+  askFileGenerateTemporaryUploadSecureUrl,
   FileActionType,
-  FileDeleteErrorTypeEnum,
-  FileExistsErrorTypeEnum,
-  FileGenerateTemporarySecureUrlErrorTypeEnum,
-  FileGenerateTemporaryUploadSecureUrlErrorTypeEnum,
   resolveActionResultError,
 } from 'quidproquo-core';
 
@@ -30,7 +30,7 @@ describe('InvalidScopeError realm safety (name-keyed, not instanceof)', () => {
   it('maps a foreign-realm InvalidScopeError in file exists', async () => {
     const result = await runFileAction(getFileExistsActionProcessor(fileConfig), FileActionType.Exists, { filepath: 'a.txt', scope: 'bad' });
 
-    expect(resolveActionResultError(result).errorType).toBe(FileExistsErrorTypeEnum.InvalidScope);
+    expect(resolveActionResultError(result).errorType).toBe(askFileExists.errorType.InvalidScope);
   });
 
   it('maps a foreign-realm InvalidScopeError in generate secure url', async () => {
@@ -40,7 +40,7 @@ describe('InvalidScopeError realm safety (name-keyed, not instanceof)', () => {
       scope: 'bad',
     });
 
-    expect(resolveActionResultError(result).errorType).toBe(FileGenerateTemporarySecureUrlErrorTypeEnum.InvalidScope);
+    expect(resolveActionResultError(result).errorType).toBe(askFileGenerateTemporarySecureUrl.errorType.InvalidScope);
   });
 
   it('maps a foreign-realm InvalidScopeError in generate upload secure url', async () => {
@@ -50,7 +50,7 @@ describe('InvalidScopeError realm safety (name-keyed, not instanceof)', () => {
       { filepath: 'a.txt', expirationMs: 1000, contentType: 'text/plain', scope: 'bad' },
     );
 
-    expect(resolveActionResultError(result).errorType).toBe(FileGenerateTemporaryUploadSecureUrlErrorTypeEnum.InvalidScope);
+    expect(resolveActionResultError(result).errorType).toBe(askFileGenerateTemporaryUploadSecureUrl.errorType.InvalidScope);
   });
 
   it('maps a foreign-realm InvalidScopeError in file delete', async () => {
@@ -59,6 +59,6 @@ describe('InvalidScopeError realm safety (name-keyed, not instanceof)', () => {
       scope: 'bad',
     });
 
-    expect(resolveActionResultError(result).errorType).toBe(FileDeleteErrorTypeEnum.InvalidScope);
+    expect(resolveActionResultError(result).errorType).toBe(askFileDelete.errorType.InvalidScope);
   });
 });

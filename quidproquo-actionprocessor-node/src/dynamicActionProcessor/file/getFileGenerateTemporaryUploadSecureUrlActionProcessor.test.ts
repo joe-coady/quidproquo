@@ -1,7 +1,7 @@
 import {
+  askFileGenerateTemporaryUploadSecureUrl,
   ErrorTypeEnum,
   FileActionType,
-  FileGenerateTemporaryUploadSecureUrlErrorTypeEnum,
   resolveActionResult,
   resolveActionResultError,
 } from 'quidproquo-core';
@@ -50,6 +50,6 @@ describe('getFileGenerateTemporaryUploadSecureUrlActionProcessor', () => {
     const eightDaysMs = 8 * 24 * 60 * 60 * 1000;
     const result = await invoke('a.png', eightDaysMs);
 
-    expect(resolveActionResultError(result).errorType).toBe(FileGenerateTemporaryUploadSecureUrlErrorTypeEnum.ExpirationTooLong);
+    expect(resolveActionResultError(result).errorType).toBe(askFileGenerateTemporaryUploadSecureUrl.errorType.ExpirationTooLong);
   });
 });

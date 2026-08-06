@@ -1,12 +1,11 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askFileReadObjectJsonBase,
+  createActionProcessor,
   FileActionType,
-  FileReadObjectJsonActionProcessor,
-  FileReadObjectJsonErrorTypeEnum,
+  ProcessorFor,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -17,7 +16,7 @@ import { resolveFilePath } from './utils';
 
 const getProcessFileReadObjectJson =
   (config: FileStorageConfig) =>
-  (qpqConfig: QPQConfig): FileReadObjectJsonActionProcessor<any> => {
+  (qpqConfig: QPQConfig): ProcessorFor<typeof askFileReadObjectJsonBase> => {
     return async ({ drive, filepath, scope }) => {
       try {
         const fullPath = resolveFilePath(config, qpqConfig, drive, filepath, scope);
@@ -26,16 +25,13 @@ const getProcessFileReadObjectJson =
         return actionResult(jsonObject);
       } catch (error: unknown) {
         return actionResultErrorFromCaughtError(error, {
-          InvalidScopeError: (error) => actionResultError(FileReadObjectJsonErrorTypeEnum.InvalidScope, error.message),
-          ENOENT: () => actionResultError(FileReadObjectJsonErrorTypeEnum.FileNotFound, `File not found: ${filepath}`), // node fs code
-          SyntaxError: () => actionResultError(FileReadObjectJsonErrorTypeEnum.InvalidJson, `Invalid JSON in file: ${filepath}`), // JSON.parse failure
+          InvalidScopeError: (error) => actionResultError(askFileReadObjectJsonBase.errorType.InvalidScope, error.message),
+          ENOENT: () => actionResultError(askFileReadObjectJsonBase.errorType.FileNotFound, `File not found: ${filepath}`), // node fs code
+          SyntaxError: () => actionResultError(askFileReadObjectJsonBase.errorType.InvalidJson, `Invalid JSON in file: ${filepath}`), // JSON.parse failure
         });
       }
     };
   };
 
-export const getFileReadObjectJsonActionProcessor =
-  (config: FileStorageConfig): ActionProcessorListResolver =>
-  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-    [FileActionType.ReadObjectJson]: getProcessFileReadObjectJson(config)(qpqConfig),
-  });
+export const getFileReadObjectJsonActionProcessor = (config: FileStorageConfig) =>
+  createActionProcessor(askFileReadObjectJsonBase, (qpqConfig) => getProcessFileReadObjectJson(config)(qpqConfig));

@@ -1,19 +1,20 @@
 import { qpqConfigAwsUtils } from 'quidproquo-config-aws';
-import { ActionProcessorList, ActionProcessorListResolver, QPQConfig } from 'quidproquo-core';
 import {
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askFileDelete,
   composeScopedFilePath,
+  createActionProcessor,
   FileActionType,
-  FileDeleteActionProcessor,
-  FileDeleteErrorTypeEnum,
+  ProcessorFor,
+  QPQConfig,
 } from 'quidproquo-core';
 
 import { deleteFiles } from '../../../logic/s3/s3Utils';
 import { resolveStorageDriveBucketName } from './utils';
 
-const getProcessFileDelete = (qpqConfig: QPQConfig): FileDeleteActionProcessor => {
+const getProcessFileDelete = (qpqConfig: QPQConfig): ProcessorFor<typeof askFileDelete> => {
   return async ({ drive, filepaths, scope }) => {
     try {
       const s3BucketName = resolveStorageDriveBucketName(drive, qpqConfig);
@@ -26,15 +27,13 @@ const getProcessFileDelete = (qpqConfig: QPQConfig): FileDeleteActionProcessor =
       return actionResult(errored);
     } catch (error: unknown) {
       return actionResultErrorFromCaughtError(error, {
-        AccessDenied: () => actionResultError(FileDeleteErrorTypeEnum.AccessDenied, 'Access denied deleting files'),
-        NoSuchBucket: () => actionResultError(FileDeleteErrorTypeEnum.DriveNotFound, `Storage drive not found: ${drive}`),
-        StorageDriveNotFoundError: (error) => actionResultError(FileDeleteErrorTypeEnum.DriveNotFound, error.message),
-        InvalidScopeError: (error) => actionResultError(FileDeleteErrorTypeEnum.InvalidScope, error.message),
+        AccessDenied: () => actionResultError(askFileDelete.errorType.AccessDenied, 'Access denied deleting files'),
+        NoSuchBucket: () => actionResultError(askFileDelete.errorType.DriveNotFound, `Storage drive not found: ${drive}`),
+        StorageDriveNotFoundError: (error) => actionResultError(askFileDelete.errorType.DriveNotFound, error.message),
+        InvalidScopeError: (error) => actionResultError(askFileDelete.errorType.InvalidScope, error.message),
       });
     }
   };
 };
 
-export const getFileDeleteActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [FileActionType.Delete]: getProcessFileDelete(qpqConfig),
-});
+export const getFileDeleteActionProcessor = createActionProcessor(askFileDelete, getProcessFileDelete);

@@ -1,12 +1,11 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   actionResultErrorFromCaughtError,
+  askFileWriteObjectJsonBase,
+  createActionProcessor,
   FileActionType,
-  FileWriteObjectJsonActionProcessor,
-  FileWriteObjectJsonErrorTypeEnum,
+  ProcessorFor,
   QPQConfig,
 } from 'quidproquo-core';
 
@@ -17,7 +16,7 @@ import { ensureParentDirectoryExists, resolveFilePath } from './utils';
 
 const getProcessFileWriteObjectJson =
   (config: FileStorageConfig) =>
-  (qpqConfig: QPQConfig): FileWriteObjectJsonActionProcessor<any> => {
+  (qpqConfig: QPQConfig): ProcessorFor<typeof askFileWriteObjectJsonBase> => {
     return async ({ drive, filepath, data, scope }) => {
       try {
         const fullPath = resolveFilePath(config, qpqConfig, drive, filepath, scope);
@@ -27,15 +26,12 @@ const getProcessFileWriteObjectJson =
         return actionResult(void 0);
       } catch (error: unknown) {
         return actionResultErrorFromCaughtError(error, {
-          InvalidScopeError: (error) => actionResultError(FileWriteObjectJsonErrorTypeEnum.InvalidScope, error.message),
-          EACCES: () => actionResultError(FileWriteObjectJsonErrorTypeEnum.AccessDenied, `Access denied writing file: ${filepath}`), // node fs code
+          InvalidScopeError: (error) => actionResultError(askFileWriteObjectJsonBase.errorType.InvalidScope, error.message),
+          EACCES: () => actionResultError(askFileWriteObjectJsonBase.errorType.AccessDenied, `Access denied writing file: ${filepath}`), // node fs code
         });
       }
     };
   };
 
-export const getFileWriteObjectJsonActionProcessor =
-  (config: FileStorageConfig): ActionProcessorListResolver =>
-  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-    [FileActionType.WriteObjectJson]: getProcessFileWriteObjectJson(config)(qpqConfig),
-  });
+export const getFileWriteObjectJsonActionProcessor = (config: FileStorageConfig) =>
+  createActionProcessor(askFileWriteObjectJsonBase, (qpqConfig) => getProcessFileWriteObjectJson(config)(qpqConfig));
