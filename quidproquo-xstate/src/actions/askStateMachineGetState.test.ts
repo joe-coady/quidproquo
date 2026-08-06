@@ -3,7 +3,7 @@ import { captureRequester } from 'quidproquo-core';
 import { describe, expect, it } from 'vitest';
 
 import { StateMachineActionType } from './StateMachineActionType';
-import { askStateMachineGetState } from './StateMachineGetStateActionRequester';
+import { askStateMachineGetState } from './askStateMachineGetState';
 
 describe('askStateMachineGetState', () => {
   it('yields a GetState action carrying the name and id', () => {

@@ -3,7 +3,7 @@ import { captureRequester } from 'quidproquo-core';
 import { describe, expect, it } from 'vitest';
 
 import { WindowActionType } from './WindowActionType';
-import { askWindowGetLocation } from './WindowGetLocationActionRequester';
+import { askWindowGetLocation } from './askWindowGetLocation';
 
 describe('askWindowGetLocation', () => {
   it('yields a GetLocation action', () => {

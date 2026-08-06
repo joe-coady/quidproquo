@@ -1,4 +1,4 @@
-import { Action, ActionProcessor, ActionRequester } from 'quidproquo-core';
+import { Action } from 'quidproquo-core';
 
 import { StateMachineActionType } from './StateMachineActionType';
 
@@ -12,6 +12,3 @@ export interface StateMachineCreateAction<T> extends Action<StateMachineCreateAc
   type: StateMachineActionType.Create;
   payload: StateMachineCreateActionPayload<T>;
 }
-
-export type StateMachineCreateActionProcessor<T> = ActionProcessor<StateMachineCreateAction<T>, T>;
-export type StateMachineCreateActionRequester<T> = ActionRequester<StateMachineCreateAction<T>, T>;

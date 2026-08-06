@@ -1,16 +1,16 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   askKeyValueStoreUpsert,
+  createActionProcessor,
   ErrorTypeEnum,
+  ProcessorFor,
   QPQConfig,
 } from 'quidproquo-core';
 
 import { createActor, createMachine, Snapshot } from 'xstate';
 
-import { StateMachineActionType, StateMachineSendEventActionProcessor } from '../actions';
+import { askStateMachineSendEventBase, StateMachineActionType } from '../actions';
 import { getStateMachineByName } from '../config';
 import { StateMachineEntity } from '../models/StateMachineEntity';
 import { createFiredActionRecorder } from './utils/createFiredActionRecorder';
@@ -18,7 +18,7 @@ import { createStateMachineStoryResolver } from './utils/createStateMachineStory
 import { loadStateMachineEntity } from './utils/loadStateMachineEntity';
 import { runFiredActionStories } from './utils/runFiredActionStories';
 
-const getProcessStateMachineSendEvent = (qpqConfig: QPQConfig): StateMachineSendEventActionProcessor<StateMachineEntity> => {
+const getProcessStateMachineSendEvent = (qpqConfig: QPQConfig): ProcessorFor<typeof askStateMachineSendEventBase> => {
   return async (payload, session, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
     const smConfig = getStateMachineByName(qpqConfig, payload.stateMachineName);
     if (!smConfig) {
@@ -101,6 +101,4 @@ const getProcessStateMachineSendEvent = (qpqConfig: QPQConfig): StateMachineSend
   };
 };
 
-export const getStateMachineSendEventActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [StateMachineActionType.SendEvent]: getProcessStateMachineSendEvent(qpqConfig),
-});
+export const getStateMachineSendEventActionProcessor = createActionProcessor(askStateMachineSendEventBase, getProcessStateMachineSendEvent);

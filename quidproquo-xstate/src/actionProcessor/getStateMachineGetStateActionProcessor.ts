@@ -1,13 +1,13 @@
-import { ActionProcessorList, ActionProcessorListResolver, actionResult, actionResultError, ErrorTypeEnum, QPQConfig } from 'quidproquo-core';
+import { actionResult, actionResultError, createActionProcessor, ErrorTypeEnum, ProcessorFor, QPQConfig } from 'quidproquo-core';
 
 import { createActor, createMachine, Snapshot } from 'xstate';
 
-import { StateMachineActionType, StateMachineGetStateActionProcessor } from '../actions';
+import { askStateMachineGetState, StateMachineActionType } from '../actions';
 import { getStateMachineByName } from '../config';
 import { createStateMachineStoryResolver } from './utils/createStateMachineStoryResolver';
 import { loadStateMachineEntity } from './utils/loadStateMachineEntity';
 
-const getProcessStateMachineGetState = (qpqConfig: QPQConfig): StateMachineGetStateActionProcessor => {
+const getProcessStateMachineGetState = (qpqConfig: QPQConfig): ProcessorFor<typeof askStateMachineGetState> => {
   return async (payload, session, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
     const smConfig = getStateMachineByName(qpqConfig, payload.stateMachineName);
     if (!smConfig) {
@@ -52,6 +52,4 @@ const getProcessStateMachineGetState = (qpqConfig: QPQConfig): StateMachineGetSt
   };
 };
 
-export const getStateMachineGetStateActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [StateMachineActionType.GetState]: getProcessStateMachineGetState(qpqConfig),
-});
+export const getStateMachineGetStateActionProcessor = createActionProcessor(askStateMachineGetState, getProcessStateMachineGetState);

@@ -1,3 +1,3 @@
+export * from './askWindowGetLocation';
 export * from './WindowActionType';
-export * from './WindowGetLocationActionRequester';
 export * from './WindowGetLocationActionRequesterTypes';

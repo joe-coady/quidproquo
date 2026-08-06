@@ -331,13 +331,13 @@ item commits only its note in this file, with a message like
 
 #### queryParams
 
-- [ ] **askQueryParamsGet** `quidproquo-web/src/actions/queryParams/QueryParamsGetActionRequester.ts` · processors: actionprocessor-web
-- [ ] **askQueryParamsGetAll** `quidproquo-web/src/actions/queryParams/QueryParamsGetAllActionRequester.ts` · processors: actionprocessor-web
-- [ ] **askQueryParamsSet** `quidproquo-web/src/actions/queryParams/QueryParamsSetActionRequester.ts` · processors: actionprocessor-web
+- [x] **askQueryParamsGet** `quidproquo-web/src/actions/queryParams/askQueryParamsGet.ts` · processors: actionprocessor-web
+- [x] **askQueryParamsGetAll** `quidproquo-web/src/actions/queryParams/askQueryParamsGetAll.ts` · processors: actionprocessor-web
+- [x] **askQueryParamsSet** `quidproquo-web/src/actions/queryParams/askQueryParamsSet.ts` · processors: actionprocessor-web
 
 #### window
 
-- [ ] **askWindowGetLocation** `quidproquo-web/src/actions/window/WindowGetLocationActionRequester.ts` · processors: actionprocessor-web
+- [x] **askWindowGetLocation** `quidproquo-web/src/actions/window/askWindowGetLocation.ts` · processors: actionprocessor-web
 
 ### quidproquo-webserver
 
@@ -393,9 +393,9 @@ item commits only its note in this file, with a message like
 
 #### actions
 
-- [ ] **askStateMachineCreate** `quidproquo-xstate/src/actions/StateMachineCreateActionRequester.ts` · processors: xstate · generic return: base + casting story
-- [ ] **askStateMachineGet** `quidproquo-xstate/src/actions/StateMachineGetActionRequester.ts` · processors: xstate · generic return: base + casting story
-- [ ] **askStateMachineGetState** `quidproquo-xstate/src/actions/StateMachineGetStateActionRequester.ts` · processors: xstate
-- [ ] **askStateMachineSendEvent** `quidproquo-xstate/src/actions/StateMachineSendEventActionRequester.ts` · processors: xstate · generic return: base + casting story
+- [x] **askStateMachineCreate** `quidproquo-xstate/src/actions/askStateMachineCreate.ts` · processors: xstate · generic return: base + casting story
+- [x] **askStateMachineGet** `quidproquo-xstate/src/actions/askStateMachineGet.ts` · processors: xstate · generic return: base + casting story
+- [x] **askStateMachineGetState** `quidproquo-xstate/src/actions/askStateMachineGetState.ts` · processors: xstate
+- [x] **askStateMachineSendEvent** `quidproquo-xstate/src/actions/askStateMachineSendEvent.ts` · processors: xstate · generic return: base + casting story
 
 

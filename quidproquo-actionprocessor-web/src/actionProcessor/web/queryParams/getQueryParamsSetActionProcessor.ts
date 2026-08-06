@@ -1,7 +1,7 @@
-import { ActionProcessorList, ActionProcessorListResolver, actionResult, QPQConfig } from 'quidproquo-core';
-import { QueryParamsActionType, QueryParamsSetActionProcessor } from 'quidproquo-web';
+import { actionResult, createActionProcessor, ProcessorFor, QPQConfig } from 'quidproquo-core';
+import { askQueryParamsSet, QueryParamsActionType } from 'quidproquo-web';
 
-const getProcessQueryParamsSet = (qpqConfig: QPQConfig): QueryParamsSetActionProcessor => {
+const getProcessQueryParamsSet = (qpqConfig: QPQConfig): ProcessorFor<typeof askQueryParamsSet> => {
   return async ({ key, values, createHistoryEntry }) => {
     const url = new URL(window.location.href);
     const urlParams = new URLSearchParams(url.search);
@@ -24,6 +24,4 @@ const getProcessQueryParamsSet = (qpqConfig: QPQConfig): QueryParamsSetActionPro
   };
 };
 
-export const getQueryParamsSetActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [QueryParamsActionType.Set]: getProcessQueryParamsSet(qpqConfig),
-});
+export const getQueryParamsSetActionProcessor = createActionProcessor(askQueryParamsSet, getProcessQueryParamsSet);

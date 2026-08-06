@@ -1,7 +1,7 @@
-import { ActionProcessorList, ActionProcessorListResolver, actionResult, QPQConfig } from 'quidproquo-core';
-import { WindowActionType, WindowGetLocationActionProcessor } from 'quidproquo-web';
+import { actionResult, createActionProcessor, ProcessorFor, QPQConfig } from 'quidproquo-core';
+import { askWindowGetLocation, WindowActionType } from 'quidproquo-web';
 
-const getProcessWindowGetLocation = (qpqConfig: QPQConfig): WindowGetLocationActionProcessor => {
+const getProcessWindowGetLocation = (qpqConfig: QPQConfig): ProcessorFor<typeof askWindowGetLocation> => {
   return async () => {
     const { href, origin, protocol, host, hostname, port, pathname, search, hash } = window.location;
 
@@ -10,6 +10,4 @@ const getProcessWindowGetLocation = (qpqConfig: QPQConfig): WindowGetLocationAct
   };
 };
 
-export const getWindowGetLocationActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [WindowActionType.GetLocation]: getProcessWindowGetLocation(qpqConfig),
-});
+export const getWindowGetLocationActionProcessor = createActionProcessor(askWindowGetLocation, getProcessWindowGetLocation);

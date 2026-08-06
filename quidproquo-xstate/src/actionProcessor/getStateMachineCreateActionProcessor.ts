@@ -1,23 +1,23 @@
 import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
   actionResult,
   actionResultError,
   askKeyValueStoreUpsert,
+  createActionProcessor,
   ErrorTypeEnum,
+  ProcessorFor,
   QPQConfig,
 } from 'quidproquo-core';
 
 import { createActor, createMachine } from 'xstate';
 
-import { StateMachineActionType, StateMachineCreateActionProcessor } from '../actions';
+import { askStateMachineCreateBase, StateMachineActionType } from '../actions';
 import { getStateMachineByName } from '../config';
 import { StateMachineEntity } from '../models/StateMachineEntity';
 import { createFiredActionRecorder } from './utils/createFiredActionRecorder';
 import { createStateMachineStoryResolver } from './utils/createStateMachineStoryResolver';
 import { runFiredActionStories } from './utils/runFiredActionStories';
 
-const getProcessStateMachineCreate = (qpqConfig: QPQConfig): StateMachineCreateActionProcessor<Record<string, unknown>> => {
+const getProcessStateMachineCreate = (qpqConfig: QPQConfig): ProcessorFor<typeof askStateMachineCreateBase> => {
   return async (payload, session, actionProcessors, logger, updateSession, dynamicModuleLoader, streamRegistry) => {
     const smConfig = getStateMachineByName(qpqConfig, payload.stateMachineName);
     if (!smConfig) {
@@ -47,7 +47,7 @@ const getProcessStateMachineCreate = (qpqConfig: QPQConfig): StateMachineCreateA
     const initialSnapshot = actor.getPersistedSnapshot();
     actor.stop();
 
-    const entity: StateMachineEntity = { ...payload.item, id: payload.id };
+    const entity: StateMachineEntity = { ...(payload.item as Record<string, unknown>), id: payload.id };
     entity[smConfig.stateField] = initialSnapshot;
 
     const upsertResult = await resolveStory(function* askPersistEntity() {
@@ -66,6 +66,4 @@ const getProcessStateMachineCreate = (qpqConfig: QPQConfig): StateMachineCreateA
   };
 };
 
-export const getStateMachineCreateActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [StateMachineActionType.Create]: getProcessStateMachineCreate(qpqConfig),
-});
+export const getStateMachineCreateActionProcessor = createActionProcessor(askStateMachineCreateBase, getProcessStateMachineCreate);

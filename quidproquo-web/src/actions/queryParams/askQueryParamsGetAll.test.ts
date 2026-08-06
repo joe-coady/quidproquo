@@ -3,7 +3,7 @@ import { captureRequester } from 'quidproquo-core';
 import { describe, expect, it } from 'vitest';
 
 import { QueryParamsActionType } from './QueryParamsActionType';
-import { askQueryParamsGetAll } from './QueryParamsGetAllActionRequester';
+import { askQueryParamsGetAll } from './askQueryParamsGetAll';
 
 describe('askQueryParamsGetAll', () => {
   it('yields a GetAll action', () => {

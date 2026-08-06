@@ -3,7 +3,7 @@ import { captureRequester } from 'quidproquo-core';
 import { describe, expect, it } from 'vitest';
 
 import { StateMachineActionType } from './StateMachineActionType';
-import { askStateMachineSendEvent } from './StateMachineSendEventActionRequester';
+import { askStateMachineSendEvent } from './askStateMachineSendEvent';
 
 describe('askStateMachineSendEvent', () => {
   it('yields a SendEvent action carrying the name, id and event', () => {
