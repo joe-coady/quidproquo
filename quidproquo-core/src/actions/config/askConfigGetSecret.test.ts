@@ -4,9 +4,9 @@ import { describe, expect, it } from 'vitest';
 
 import { runStory, StoryError, throwsError } from '../../testing';
 import { ConfigActionType } from './ConfigActionType';
-import { askConfigGetSecret, ConfigGetSecretErrorTypeEnum } from './ConfigGetSecretActionRequester';
+import { askConfigGetSecret } from './askConfigGetSecret';
 
-describe('ConfigGetSecretActionRequester', () => {
+describe('askConfigGetSecret', () => {
   describe('askConfigGetSecret', () => {
     it('should yield an action with correct type and payload', () => {
       const secretName = 'my-secret-key';
@@ -58,17 +58,17 @@ describe('ConfigGetSecretActionRequester', () => {
     it('propagates a processor failure as a thrown StoryError', () => {
       const runFailingStory = () =>
         runStory(askConfigGetSecret('missing-secret'), {
-          [ConfigActionType.GetSecret]: throwsError(ConfigGetSecretErrorTypeEnum.ResourceNotFound, 'Secret not found'),
+          [ConfigActionType.GetSecret]: throwsError(askConfigGetSecret.errorType.ResourceNotFound, 'Secret not found'),
         });
 
       expect(runFailingStory).toThrow(StoryError);
-      expect(runFailingStory).toThrow(`${ConfigGetSecretErrorTypeEnum.ResourceNotFound}: Secret not found`);
+      expect(runFailingStory).toThrow(`${askConfigGetSecret.errorType.ResourceNotFound}: Secret not found`);
     });
   });
 
-  describe('ConfigGetSecretErrorTypeEnum', () => {
+  describe('errorType', () => {
     it('lists every error the processor can produce, namespaced by the action type', () => {
-      expect(ConfigGetSecretErrorTypeEnum).toEqual({
+      expect(askConfigGetSecret.errorType).toEqual({
         ResourceNotFound: `${ConfigActionType.GetSecret}-ResourceNotFound`,
         Throttling: `${ConfigActionType.GetSecret}-Throttling`,
       });

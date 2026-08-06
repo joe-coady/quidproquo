@@ -5,6 +5,9 @@ assembled quickly.
 
 ## vNext
 
+- `ConfigGetSecretErrorTypeEnum` (`quidproquo-core`) is removed; use `askConfigGetSecret.errorTypeEnum` instead (e.g. `askConfigGetSecret.errorTypeEnum.ResourceNotFound`).
+- `ConfigGetSecretActionPayload`, `ConfigGetSecretAction`, `ConfigGetSecretActionProcessor`, and `ConfigGetSecretActionRequester` types (`quidproquo-core`) are removed; a processor should type its handler as `ProcessorFor<typeof askConfigGetSecret>` instead.
+
 ## 0.1.16
 
 - `defineWebsocket`'s `uniqueKey` (`quidproquo-webserver`) changes from `` `${apiSubdomain}.${rootDomain}` `` to `apiSubdomain` alone. This is the setting's CDK construct/logical id, so a service redeploying after this change will rename (recreate) its WebSocket API resources; no code change is required, but expect a resource replacement on the next deploy.

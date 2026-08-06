@@ -1,5 +1,5 @@
 import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { buildTestQpqConfig, ConfigActionType, ConfigGetSecretErrorTypeEnum, defineSecret } from 'quidproquo-core';
+import { askConfigGetSecret, buildTestQpqConfig, ConfigActionType, defineSecret } from 'quidproquo-core';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -34,8 +34,8 @@ describe('getConfigGetSecretActionProcessor', () => {
   });
 
   it.each([
-    ['ResourceNotFoundException', ConfigGetSecretErrorTypeEnum.ResourceNotFound],
-    ['ThrottlingException', ConfigGetSecretErrorTypeEnum.Throttling],
+    ['ResourceNotFoundException', askConfigGetSecret.errorType.ResourceNotFound],
+    ['ThrottlingException', askConfigGetSecret.errorType.Throttling],
   ])('maps %s to the matching error type', async (errorName: string, expectedType: string) => {
     vi.mocked(getSecret).mockRejectedValue(Object.assign(new Error('boom'), { name: errorName }));
     const processor = await resolveProcessor();

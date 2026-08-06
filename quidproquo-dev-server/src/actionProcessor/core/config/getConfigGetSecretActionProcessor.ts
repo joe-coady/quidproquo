@@ -1,17 +1,9 @@
-import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
-  actionResult,
-  actionResultErrorFromCaughtError,
-  ConfigActionType,
-  ConfigGetSecretActionProcessor,
-  QPQConfig,
-} from 'quidproquo-core';
+import { actionResult, actionResultErrorFromCaughtError, askConfigGetSecret, createActionProcessor, ProcessorFor, QPQConfig } from 'quidproquo-core';
 
 import { getOrSeedSecretValue } from '../../../logic/config';
 import { ResolvedDevServerConfig } from '../../../types';
 
-const getProcessConfigGetSecret = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): ConfigGetSecretActionProcessor => {
+const getProcessConfigGetSecret = (qpqConfig: QPQConfig, devServerConfig: ResolvedDevServerConfig): ProcessorFor<typeof askConfigGetSecret> => {
   return async ({ secretName }) => {
     try {
       const secretValue = await getOrSeedSecretValue(devServerConfig.runtimePath, secretName, qpqConfig);
@@ -22,8 +14,5 @@ const getProcessConfigGetSecret = (qpqConfig: QPQConfig, devServerConfig: Resolv
   };
 };
 
-export const getConfigGetSecretActionProcessor =
-  (devServerConfig: ResolvedDevServerConfig): ActionProcessorListResolver =>
-  async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-    [ConfigActionType.GetSecret]: getProcessConfigGetSecret(qpqConfig, devServerConfig),
-  });
+export const getConfigGetSecretActionProcessor = (devServerConfig: ResolvedDevServerConfig) =>
+  createActionProcessor(askConfigGetSecret, (qpqConfig) => getProcessConfigGetSecret(qpqConfig, devServerConfig));
