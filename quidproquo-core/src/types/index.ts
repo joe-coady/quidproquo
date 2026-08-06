@@ -1,4 +1,5 @@
 export * from './Action';
+export * from './ActionRequesterFunction';
 export * from './authChallenge';
 export * from './BoundLogicStory';
 export * from './ConfigUrlDefinition';
