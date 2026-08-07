@@ -22,15 +22,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/joe-coady/quidproquo.git"
+    "url": "git+https://github.com/qpqjs/quidproquo.git"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/joe-coady/quidproquo/issues"
+    "url": "https://github.com/qpqjs/quidproquo/issues"
   },
-  "homepage": "https://github.com/joe-coady/quidproquo#readme",
+  "homepage": "https://github.com/qpqjs/quidproquo#readme",
   "dependencies": {
     "quidproquo-core": "0.1.16"
   },

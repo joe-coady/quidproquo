@@ -85,13 +85,13 @@ processors provided by this library.
 ## Documentation
 
 For more detailed information on using the `quidproquo-actionprocessor-awslambda` library, please refer to the
-[quidproquo-actionprocessor-awslambda documentation](https://github.com/joe-coady/quidproquo/tree/main/packages/quidproquo-actionprocessor-awslambda).
+[quidproquo-actionprocessor-awslambda documentation](https://github.com/qpqjs/quidproquo/tree/main/packages/quidproquo-actionprocessor-awslambda).
 
 ## Contributing
 
 If you'd like to contribute to the development of `quidproquo-actionprocessor-awslambda`, please refer to the
-[contributing guidelines](https://github.com/joe-coady/quidproquo/blob/main/CONTRIBUTING.md) for more information.
+[contributing guidelines](https://github.com/qpqjs/quidproquo/blob/main/CONTRIBUTING.md) for more information.
 
 ## License
 
-`quidproquo-actionprocessor-awslambda` is licensed under the [MIT License](https://github.com/joe-coady/quidproquo/blob/main/LICENSE).
+`quidproquo-actionprocessor-awslambda` is licensed under the [MIT License](https://github.com/qpqjs/quidproquo/blob/main/LICENSE).

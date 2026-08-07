@@ -68,13 +68,13 @@ Once you have the package installed, you can start building your application usi
 ## Documentation
 
 For more detailed information on using quidproquo-core, please refer to the
-[quidproquo-core documentation](https://github.com/joe-coady/quidproquo/tree/main/packages/quidproquo-core).
+[quidproquo-core documentation](https://github.com/qpqjs/quidproquo/tree/main/packages/quidproquo-core).
 
 ## Contributing
 
 If you'd like to contribute to the development of quidproquo-core, please refer to the
-[contributing guidelines](https://github.com/joe-coady/quidproquo/blob/main/CONTRIBUTING.md) for more information.
+[contributing guidelines](https://github.com/qpqjs/quidproquo/blob/main/CONTRIBUTING.md) for more information.
 
 ## License
 
-quidproquo-core is licensed under the [MIT License](https://github.com/joe-coady/quidproquo/blob/main/LICENSE).
+quidproquo-core is licensed under the [MIT License](https://github.com/qpqjs/quidproquo/blob/main/LICENSE).

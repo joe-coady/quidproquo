@@ -26,7 +26,7 @@ export function Footer() {
             <InstallChip />
             <a
               className="btn btn--ghost"
-              href="https://github.com/joe-coady/quidproquo"
+              href="https://github.com/qpqjs/quidproquo"
               rel="noreferrer"
               target="_blank"
             >

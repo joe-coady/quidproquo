@@ -100,11 +100,11 @@ under the `DateActionType.Now` action type, which can be used in our `quidproquo
 ## Contribution and Development
 
 If you'd like to contribute to the development of `quidproquo-actionprocessor-js`, please refer to the
-[contributing guidelines](https://github.com/joe-coady/quidproquo/blob/main/CONTRIBUTING.md) for more information.
+[contributing guidelines](https://github.com/qpqjs/quidproquo/blob/main/CONTRIBUTING.md) for more information.
 
 ## License
 
-`quidproquo-actionprocessor-js` is licensed under the [MIT License](https://github.com/joe-coady/quidproquo/blob/main/LICENSE).
+`quidproquo-actionprocessor-js` is licensed under the [MIT License](https://github.com/qpqjs/quidproquo/blob/main/LICENSE).
 
 ## Warning: Not for Production
 

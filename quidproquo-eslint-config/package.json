@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/joe-coady/quidproquo.git"
+    "url": "git+https://github.com/qpqjs/quidproquo.git"
   },
   "keywords": [
     "eslint"

@@ -38,7 +38,7 @@ export function NavBar() {
         <div className="nav__actions">
           <a
             className="btn btn--ghost btn--sm"
-            href="https://github.com/joe-coady/quidproquo"
+            href="https://github.com/qpqjs/quidproquo"
             rel="noreferrer"
             target="_blank"
           >

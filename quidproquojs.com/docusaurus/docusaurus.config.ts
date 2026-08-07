@@ -43,7 +43,7 @@ const config: Config = {
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'joe-coady', // Usually your GitHub org/user name.
+  organizationName: 'qpqjs', // Usually your GitHub org/user name.
   projectName: 'quidproquo', // Usually your repo name.
 
   onBrokenLinks: 'throw',
@@ -84,7 +84,7 @@ const config: Config = {
           routeBasePath: '/',
           sidebarPath: './sidebars.ts',
           editUrl:
-            'https://github.com/joe-coady/quidproquo/tree/main/quidproquojs.com/docusaurus/',
+            'https://github.com/qpqjs/quidproquo/tree/main/quidproquojs.com/docusaurus/',
         },
         blog: false,
         theme: {
@@ -129,7 +129,7 @@ const config: Config = {
           position: 'right',
         },
         {
-          href: 'https://github.com/joe-coady/quidproquo',
+          href: 'https://github.com/qpqjs/quidproquo',
           label: 'GitHub',
           position: 'right',
         },
@@ -160,7 +160,7 @@ const config: Config = {
           items: [
             {
               label: 'GitHub',
-              href: 'https://github.com/joe-coady/quidproquo',
+              href: 'https://github.com/qpqjs/quidproquo',
             },
             {
               label: 'quidproquojs.com',

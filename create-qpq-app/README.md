@@ -1,6 +1,6 @@
 # create-qpq-app
 
-Scaffold a new [quidproquo](https://github.com/joe-coady/quidproquo) app:
+Scaffold a new [quidproquo](https://github.com/qpqjs/quidproquo) app:
 
 ```bash
 npx create-qpq-app my-app
