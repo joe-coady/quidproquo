@@ -11,15 +11,21 @@ Reads the current value of a [secret](../../../config/core/secret.md) by name an
 - **On AWS:** fetches the value from AWS Secrets Manager (`secretsmanager:GetSecretValue`). The secret itself is provisioned by [defineSecret](../../../config/core/secret.md).
 
 ```typescript
-import { askConfigGetSecret, askClaudeAiMessagesApi } from 'quidproquo-core';
+import { askConfigGetSecret, askNetworkRequest } from 'quidproquo-core';
 
-export function* askCallExternalApi(prompt: string) {
-  const apiKey = yield* askConfigGetSecret('anthropic-api-key');
+interface Charge {
+  id: string;
+}
 
-  return yield* askClaudeAiMessagesApi(
-    { model: 'claude-sonnet-4-6', max_tokens: 512, messages: [{ role: 'user', content: prompt }] },
-    apiKey,
-  );
+export function* askCreateCharge(amountCents: number) {
+  const apiKey = yield* askConfigGetSecret('payment-provider-api-key');
+
+  const response = yield* askNetworkRequest<{ amount: number }, Charge>('POST', 'https://api.example.com/charges', {
+    headers: { Authorization: `Bearer ${apiKey}` },
+    body: { amount: amountCents },
+  });
+
+  return response.data;
 }
 ```
 

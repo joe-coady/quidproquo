@@ -1,12 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  ClaudeAIModelSize,
   defineActionProcessors,
   defineAi,
   defineApiBuildPath,
   defineApplication,
-  defineClaudeAI,
   defineDeployEvent,
   defineEnvironmentSettings,
   defineEventBus,
@@ -32,7 +30,6 @@ import {
   flattenQpqConfig,
   getActionProcessorSources,
   getAllAiConfigs,
-  getAllClaudeAiConfigs,
   getAllEventBusConfigs,
   getAllGraphDatabaseConfigs,
   getAllInlineFunctions,
@@ -521,17 +518,15 @@ describe('qpqCoreUtils', () => {
   });
 
   describe('simple type filters', () => {
-    it('lists ai, claude ai, virtual network, notify error and deploy event configs', () => {
+    it('lists ai, virtual network, notify error and deploy event configs', () => {
       const config = buildTestQpqConfig([
         defineAi('assistant', {}),
-        defineClaudeAI('claude', { modelSize: ClaudeAIModelSize.Large }),
         defineVirtualNetwork('vpc'),
         defineNotifyError('alarms', { onAlarm: {} }),
         defineDeployEvent('postDeploy', '/d/run::handler'),
       ]);
 
       expect(getAllAiConfigs(config).map((a) => a.aiName)).toEqual(['assistant']);
-      expect(getAllClaudeAiConfigs(config)[0].modelSize).toBe(ClaudeAIModelSize.Large);
       expect(getVirualNetworkConfigs(config).map((v) => v.name)).toEqual(['vpc']);
       expect(getNotifyErrorConfigs(config).map((n) => n.name)).toEqual(['alarms']);
       expect(getDeployEventConfigs(config).map((d) => d.name)).toEqual(['postDeploy']);

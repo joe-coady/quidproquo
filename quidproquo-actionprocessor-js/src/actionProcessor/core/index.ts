@@ -1,6 +1,5 @@
 import { ActionProcessorList, ActionProcessorListResolver, DynamicModuleLoader, QPQConfig } from 'quidproquo-core';
 
-import { getClaudeAiActionProcessor } from './claudeAi';
 import { getConfigActionProcessor } from './config';
 import { getContextActionProcessor } from './context';
 import { getDateActionProcessor } from './date';
@@ -13,7 +12,6 @@ import { getNetworkActionProcessor } from './network';
 import { getPlatformActionProcessor } from './platform';
 import { getSystemActionProcessor } from './system';
 
-export * from './claudeAi';
 export * from './config';
 export * from './context';
 export * from './date';
@@ -37,7 +35,6 @@ export const getCoreActionProcessor: ActionProcessorListResolver = async (
 ): Promise<ActionProcessorList> => ({
   ...(await getConfigActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getContextActionProcessor(qpqConfig, dynamicModuleLoader)),
-  ...(await getClaudeAiActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getDateActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getErrorActionProcessor(qpqConfig, dynamicModuleLoader)),
   ...(await getGuidActionProcessor(qpqConfig, dynamicModuleLoader)),

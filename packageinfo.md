@@ -56,7 +56,6 @@ judged *only against the slice of the library we actually use* — not the libra
 - [ ] `javascript-time-ago` - 28/100 - localized relative-time formatting
 - [ ] `jotai` - 28/100 - atom state in web-react runtime
 - [ ] `node-match-path` - 31/100 - route path matching / param extraction
-- [ ] `@anthropic-ai/sdk` - 35/100 - Claude API types/client
 - [ ] `chokidar` - 35/100 - file watching (dev-server)
 - [ ] `eslint-plugin-simple-import-sort` - 35/100 - import-sort lint rule
 - [ ] `react-router-dom` - 35/100 - admin SPA routing
@@ -408,22 +407,6 @@ Matches URL paths against parameterized route patterns and extracts path paramet
 Used in awsLambdaUtils.ts for matchUrl(), which converts route patterns from AWS CloudFormation notation ({paramName}) to Express-style notation (:paramName), then calls match() to test if a URL matches the pattern and extract parameters. Called during event matching in API Gateway (matching request paths to route handlers), CloudFront origin requests, and SQS queue type matching. Returns an object with didMatch boolean and optional params dictionary.
 
 **Write our own?** Moderate. Path matching is essentially regex construction for parameterized patterns (parsing curly braces, extracting param names, building regex with capture groups, extracting matches). The regex escaping and parameter extraction require care to handle special characters and multiple parameters.
-
-### `[ ]` `@anthropic-ai/sdk`
-
-**Category:** runtime &nbsp;·&nbsp; **DIY difficulty:** 35/100 &nbsp;·&nbsp; **Used in:** `quidproquo-core`, `quidproquo-webserver`, `quidproquo-neo4j`, `quidproquo-actionprocessor-js`
-
-Official TypeScript SDK for the Anthropic Claude API, providing client libraries for calling Claude models.
-
-The quidproquo repo uses the SDK in two main ways:
-
-1) In quidproquo-core and quidproquo-actionprocessor-js: Instantiates an Anthropic client with `new Anthropic({ apiKey })` and calls `anthropic.messages.create(body)` with Anthropic.Messages.MessageCreateParamsNonStreaming parameters to execute direct Messages API calls. The SDK types are used to define action payloads (ClaudeAiMessagesApiActionPayload uses `Anthropic.Messages.MessageCreateParamsNonStreaming`) and catch AuthenticationError exceptions.
-
-2) In quidproquo-webserver: Constructs detailed multi-part Anthropic message content with text blocks (type: 'text') and system prompts, calling the same messages.create() API to send Claude requests in the log chat message service.
-
-quidproquo-neo4j declares the dependency in package.json but does not actually import or use it in any source files.
-
-**Write our own?** Implementing a direct HTTP client wrapper for the Messages API would require handling API authentication, request/response serialization, error handling with typed exceptions, and maintenance as Claude model versions and parameters evolve. Moderate effort (~1-2 weeks) for a basic wrapper covering just the features we use.
 
 ### `[ ]` `chokidar`
 

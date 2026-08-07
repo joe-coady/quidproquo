@@ -5,6 +5,7 @@ assembled quickly.
 
 ## vNext
 
+- `askClaudeAiMessagesApi`, `ClaudeAiActionType`, `defineClaudeAI`, `ClaudeAIModelSize`, `ClaudeAIQPQConfigSetting`, `QPQConfigAdvancedClaudeAISettings`, and `getAllClaudeAiConfigs` (`quidproquo-core`) are removed with no direct replacement. Use the provider-agnostic `askAiPrompt`/`askAiPromptStream` actions with `defineAi` instead, or call the Anthropic API yourself via `askNetworkRequest`.
 - `ConfigGetSecretErrorTypeEnum` (`quidproquo-core`) is removed; use `askConfigGetSecret.errorTypeEnum` instead (e.g. `askConfigGetSecret.errorTypeEnum.ResourceNotFound`).
 - `ConfigGetSecretActionPayload`, `ConfigGetSecretAction`, `ConfigGetSecretActionProcessor`, and `ConfigGetSecretActionRequester` types (`quidproquo-core`) are removed; a processor should type its handler as `ProcessorFor<typeof askConfigGetSecret>` instead.
 

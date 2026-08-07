@@ -1,6 +1,5 @@
 import {
   buildTestQpqConfig,
-  ClaudeAiActionType,
   ConfigActionType,
   ContextActionType,
   DateActionType,
@@ -23,7 +22,6 @@ describe('getCoreActionProcessor', () => {
     const apl = await getCoreActionProcessor(buildTestQpqConfig(), async () => null);
 
     const expectedActionTypes = [
-      ClaudeAiActionType.MessagesApi,
       ConfigActionType.GetApplicationInfo,
       ConfigActionType.GetGlobal,
       ContextActionType.List,

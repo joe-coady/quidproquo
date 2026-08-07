@@ -618,9 +618,6 @@ part of a documented config/action surface) must be covered by the docs site at 
 ### quidproquo-actionprocessor-js
 
 - [ ] quidproquo-actionprocessor-js/eslint.config.mjs
-- [ ] quidproquo-actionprocessor-js/src/actionProcessor/core/claudeAi/getClaudeAiMessagesApiActionProcessor.test.ts
-- [ ] quidproquo-actionprocessor-js/src/actionProcessor/core/claudeAi/getClaudeAiMessagesApiActionProcessor.ts
-- [ ] quidproquo-actionprocessor-js/src/actionProcessor/core/claudeAi/index.ts
 - [ ] quidproquo-actionprocessor-js/src/actionProcessor/core/config/getConfigGetApplicationInfoActionProcessor.test.ts
 - [ ] quidproquo-actionprocessor-js/src/actionProcessor/core/config/getConfigGetApplicationInfoActionProcessor.ts
 - [ ] quidproquo-actionprocessor-js/src/actionProcessor/core/config/getConfigGetGlobalActionProcessor.test.ts
@@ -932,11 +929,6 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [x] quidproquo-core/src/actions/ai/types/AiStreamToolResult.ts
 - [x] quidproquo-core/src/actions/ai/types/AiStreamUsage.ts
 - [x] quidproquo-core/src/actions/ai/types/index.ts
-- [x] quidproquo-core/src/actions/claudeAi/ClaudeAiActionType.ts
-- [x] quidproquo-core/src/actions/claudeAi/ClaudeAiMessagesApiActionTypes.ts
-- [x] quidproquo-core/src/actions/claudeAi/ClaudeAiMessagesApiRequester.test.ts
-- [x] quidproquo-core/src/actions/claudeAi/ClaudeAiMessagesApiRequester.ts
-- [x] quidproquo-core/src/actions/claudeAi/index.ts
 - [x] quidproquo-core/src/actions/config/ConfigActionType.test.ts
 - [x] quidproquo-core/src/actions/config/ConfigActionType.ts
 - [x] quidproquo-core/src/actions/config/ConfigGetApplicationInfoActionRequester.test.ts
@@ -953,7 +945,7 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [x] quidproquo-core/src/actions/config/ConfigGetParametersActionTypes.ts
 - [x] quidproquo-core/src/actions/config/ConfigGetSecretActionRequester.test.ts
 - [x] quidproquo-core/src/actions/config/ConfigGetSecretActionRequester.ts
-  - Deferred (design): secret values and credential payloads (e.g. claudeAi apiKey) persist unredacted in StoryResult history and are serialized to S3 by the log writer. Needs a core redaction mechanism (per-action sensitive marker in resolveStory history) plus admin log-viewer awareness. See resolveStory.ts:93-101, resolveStoryWithLogs.ts:81, awslambda lambdaHandlers/helpers/logger.ts:20.
+  - Deferred (design): secret values and credential payloads (e.g. an askConfigGetSecret result passed on to another action) persist unredacted in StoryResult history and are serialized to S3 by the log writer. Needs a core redaction mechanism (per-action sensitive marker in resolveStory history) plus admin log-viewer awareness. See resolveStory.ts:93-101, resolveStoryWithLogs.ts:81, awslambda lambdaHandlers/helpers/logger.ts:20.
 - [x] quidproquo-core/src/actions/config/ConfigGetSecretActionTypes.ts
 - [x] quidproquo-core/src/actions/config/ConfigListParametersActionRequester.test.ts
 - [x] quidproquo-core/src/actions/config/ConfigListParametersActionRequester.ts
@@ -1268,8 +1260,6 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [x] quidproquo-core/src/config/settings/applicationVersion.ts
 - [x] quidproquo-core/src/config/settings/bundleOptions.test.ts
 - [x] quidproquo-core/src/config/settings/bundleOptions.ts
-- [x] quidproquo-core/src/config/settings/claudeAi.test.ts
-- [x] quidproquo-core/src/config/settings/claudeAi.ts
 - [x] quidproquo-core/src/config/settings/configValue.test.ts
 - [x] quidproquo-core/src/config/settings/configValue.ts
 - [x] quidproquo-core/src/config/settings/definePromiseMode.test.ts
@@ -2698,7 +2688,6 @@ part of a documented config/action surface) must be covered by the docs site at 
 - [ ] quidproquo-web-admin/src/LogViewer/LogDialog/tabs/TreeTab/index.ts
 - [ ] quidproquo-web-admin/src/LogViewer/LogDialog/tabs/TreeTab/TreeTab.tsx
 - [ ] quidproquo-web-admin/src/LogViewer/logic/actionComponentMap/core/coreAiActionComponentMap.ts
-- [ ] quidproquo-web-admin/src/LogViewer/logic/actionComponentMap/core/coreClaudeAiActionComponentMap.ts
 - [ ] quidproquo-web-admin/src/LogViewer/logic/actionComponentMap/core/coreConfigActionComponentMap.ts
 - [ ] quidproquo-web-admin/src/LogViewer/logic/actionComponentMap/core/coreContextActionComponentMap.ts
 - [ ] quidproquo-web-admin/src/LogViewer/logic/actionComponentMap/core/coreDateActionComponentMap.ts

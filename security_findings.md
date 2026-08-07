@@ -212,10 +212,10 @@
 
 ## quidproquo-actionprocessor-js/src/actionProcessor/core/claudeAi/getClaudeAiMessagesApiActionProcessor.ts
 - **Severity**: low
-- **Issue**: the Anthropic apiKey travels inside the action payload; any payload-persisting log/event-history layer could persist the secret.
+- **Issue**: the Anthropic apiKey travelled inside the action payload; any payload-persisting log/event-history layer could persist the secret.
 - **Where**: processor payload { body, apiKey }.
 - **Suggested fix**: resolve the key processor-side from config/secrets, or guarantee payload redaction in the logging layer.
-- **Status**: recorded (cross-package contract change)
+- **Status**: moot — the whole claudeAi action/processor was deleted (superseded by the ai actions, which resolve credentials processor-side). The general "secrets in payloads" concern is still tracked in future_work/check_for_security.md.
 
 ## quidproquo-actionprocessor-js (uuidv7 dependency)
 - **Severity**: low

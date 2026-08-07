@@ -5,7 +5,7 @@ import { getDynamicFunctionsActionProcessor } from './dynamicFunctions';
 import { getInlineFunctionActionProcessor } from './inlineFunction';
 import { getStreamActionProcessor } from './stream';
 
-// The shared core processors (config, context, claudeAi, date, error, guid, log,
+// The shared core processors (config, context, date, error, guid, log,
 // math, network, platform, system, customActions) are owned by
 // quidproquo-actionprocessor-js. Node builds on top of js and only adds the
 // processors that need a Node runtime (stream, inlineFunction, dynamicFunctions).

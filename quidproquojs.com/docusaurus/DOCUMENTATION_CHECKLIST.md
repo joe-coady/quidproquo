@@ -39,12 +39,6 @@ This checklist tracks documentation progress for every feature in the Quidproquo
 
 ## Core Actions (`quidproquo-core/src/actions`)
 
-### Claude AI Actions
-- [x] ClaudeAiMessagesApi - Send messages to Claude AI
-  - [x] Action types and payloads
-  - [x] Usage examples
-  - [x] Integration patterns
-
 ### Config Actions
 - [x] ConfigGetApplicationInfo - Get application metadata
 - [x] ConfigGetGlobal - Retrieve global configuration values
@@ -229,7 +223,6 @@ This checklist tracks documentation progress for every feature in the Quidproquo
 - [ ] API build path settings
 - [ ] Application module configuration
 - [ ] Application name and version
-- [ ] Claude AI integration settings
 - [ ] Config values and defaults
 - [ ] Promise mode configuration
 - [ ] Deploy event handling

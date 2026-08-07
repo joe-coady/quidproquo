@@ -5,7 +5,6 @@ import {
   ApplicationQPQConfigSetting,
   BackendBundleOptions,
   BackendBundleOptionsQPQConfigSetting,
-  ClaudeAIQPQConfigSetting,
   CryptoKeyQPQConfigSetting,
   defineJavascriptRuntime,
   DeployEventsQPQConfigSetting,
@@ -261,12 +260,6 @@ export const getAllAiConfigs = (qpqConfig: QPQConfig): AiQPQConfigSetting[] => {
 // Always resolves - falls back to the defineJavascriptRuntime defaults when no setting is present
 export const getJavascriptRuntimeConfig = (qpqConfig: QPQConfig): JavascriptRuntimeQPQConfigSetting => {
   return getConfigSetting<JavascriptRuntimeQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.javascriptRuntime) ?? defineJavascriptRuntime();
-};
-
-export const getAllClaudeAiConfigs = (qpqConfig: QPQConfig): ClaudeAIQPQConfigSetting[] => {
-  const claudeAis = getConfigSettings<ClaudeAIQPQConfigSetting>(qpqConfig, QPQCoreConfigSettingType.claudeAi);
-
-  return claudeAis;
 };
 
 export const getOwnedEventBusConfigs = (qpqConfig: QPQConfig): EventBusQPQConfigSetting[] => {

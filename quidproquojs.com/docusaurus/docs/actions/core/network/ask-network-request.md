@@ -92,4 +92,4 @@ if (outcome.success) {
 
 ## Related
 
-- [askAiPrompt](../ai/ask-ai-prompt.md) and [askClaudeAiMessagesApi](../claude-ai/ask-claude-ai-messages-api.md) — call model providers without hand-rolling the HTTP request.
+- [askAiPrompt](../ai/ask-ai-prompt.md) — call model providers without hand-rolling the HTTP request.

@@ -1,5 +1,4 @@
 import coreAiActionComponentMap from './coreAiActionComponentMap';
-import coreClaudeAiActionComponentMap from './coreClaudeAiActionComponentMap';
 import coreConfigActionComponentMap from './coreConfigActionComponentMap';
 import coreContextActionComponentMap from './coreContextActionComponentMap';
 import coreCryptoActionComponentMap from './coreCryptoActionComponentMap';
@@ -24,7 +23,6 @@ import coreUserDirectoryActionComponentMap from './coreUserDirectoryActionCompon
 export default {
   ...coreDeployEventActionComponentMap,
   ...coreAiActionComponentMap,
-  ...coreClaudeAiActionComponentMap,
   ...coreConfigActionComponentMap,
   ...coreContextActionComponentMap,
   ...coreCryptoActionComponentMap,

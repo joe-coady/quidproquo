@@ -37,7 +37,6 @@
     "typescript": "^5.8.2"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.19.1",
     "immer": "^10.1.1"
   }
 }

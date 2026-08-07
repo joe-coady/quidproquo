@@ -22,7 +22,6 @@ export enum QPQCoreConfigSettingType {
   environmentSettings = '@quidproquo-core/config/EnvironmentSettings',
   serviceSettings = '@quidproquo-core/config/ServiceSettings',
   deployEvent = '@quidproquo-core/config/DeployEvent',
-  claudeAi = '@quidproquo-core/config/ClaudeAi',
   graphDatabase = '@quidproquo-core/config/GraphDatabase',
   virtualNetwork = '@quidproquo-core/config/VirtualNetwork',
   notifyError = '@quidproquo-core/config/notifyError',
