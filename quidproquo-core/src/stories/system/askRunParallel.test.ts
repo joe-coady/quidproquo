@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { DateActionType } from '../../actions/date/DateActionType';
 import { askDateNow } from '../../actions/date/askDateNow';
-import { GuidActionType } from '../../actions/guid/GuidActionType';
+import { DateActionType } from '../../actions/date/DateActionType';
 import { askNewGuid } from '../../actions/guid/askNewGuid';
-import { MathActionType } from '../../actions/math/MathActionType';
+import { GuidActionType } from '../../actions/guid/GuidActionType';
 import { askRandomNumber } from '../../actions/math/askRandomNumber';
+import { MathActionType } from '../../actions/math/MathActionType';
 import { expectError, runStory, throwsError } from '../../testing/storyTesting';
 import { AskResponse, EitherActionResult } from '../../types';
 import { askCatch } from './askCatch';

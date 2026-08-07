@@ -8,8 +8,7 @@ export type ScanAllScopesPageKey = {
   inner?: string;
 };
 
-export const encodeScanAllScopesPageKey = (pageKey: ScanAllScopesPageKey): string =>
-  Buffer.from(JSON.stringify(pageKey), 'utf8').toString('base64');
+export const encodeScanAllScopesPageKey = (pageKey: ScanAllScopesPageKey): string => Buffer.from(JSON.stringify(pageKey), 'utf8').toString('base64');
 
 export const decodeScanAllScopesPageKey = (encoded?: string): ScanAllScopesPageKey => {
   if (!encoded) {

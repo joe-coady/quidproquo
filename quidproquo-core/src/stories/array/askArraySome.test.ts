@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { ConfigActionType } from '../../actions/config/ConfigActionType';
 import { askConfigGetParameter } from '../../actions/config/askConfigGetParameter';
-import { ActionOf } from '../../types';
+import { ConfigActionType } from '../../actions/config/ConfigActionType';
 import { runStory } from '../../testing/storyTesting';
+import { ActionOf } from '../../types';
 import { AskResponse } from '../../types';
 import { askArraySome } from './askArraySome';
 

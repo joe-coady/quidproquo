@@ -11,9 +11,9 @@ import {
   validateScopedKvsItemOrThrow,
 } from 'quidproquo-core';
 
-import { emitKvsStreamEvent } from '../../../logic/kvsStream';
 import { getKvsRepository } from '../../../logic/keyValueStore/getKvsRepository';
 import { toKvsCompositeKey, toKvsStreamKeys } from '../../../logic/keyValueStore/toKvsStreamKeys';
+import { emitKvsStreamEvent } from '../../../logic/kvsStream';
 import { ResolvedDevServerConfig } from '../../../types';
 
 // The batch sibling of Upsert: ONE action over the same repository the single

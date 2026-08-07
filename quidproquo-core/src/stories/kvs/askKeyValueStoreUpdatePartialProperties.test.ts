@@ -1,10 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { KeyValueStoreActionType } from '../../actions/keyValueStore/KeyValueStoreActionType';
 import { askKeyValueStoreUpdateBase } from '../../actions/keyValueStore/askKeyValueStoreUpdate';
-import { ActionOf } from '../../types';
+import { KeyValueStoreActionType } from '../../actions/keyValueStore/KeyValueStoreActionType';
 import { KvsUpdateActionType } from '../../actions/keyValueStore/types';
 import { runStory } from '../../testing/storyTesting';
+import { ActionOf } from '../../types';
 import { askKeyValueStoreUpdatePartialProperties, InvalidKvsPartialPropertyError } from './askKeyValueStoreUpdatePartialProperties';
 
 interface Widget {

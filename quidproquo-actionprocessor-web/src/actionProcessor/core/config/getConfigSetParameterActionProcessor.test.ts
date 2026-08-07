@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { buildTestQpqConfig, ConfigActionType, askConfigSetParameter, ErrorTypeEnum, noopDynamicModuleLoader } from 'quidproquo-core';
+import { askConfigSetParameter, buildTestQpqConfig, ConfigActionType, ErrorTypeEnum, noopDynamicModuleLoader } from 'quidproquo-core';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 

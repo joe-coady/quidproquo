@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { ConfigActionType } from '../actions/config/ConfigActionType';
 import { askConfigGetParameter } from '../actions/config/askConfigGetParameter';
+import { ConfigActionType } from '../actions/config/ConfigActionType';
 import { GuidActionType } from '../actions/guid/GuidActionType';
 import { PlatformActionType } from '../actions/platform/PlatformActionType';
 import { expectError, runStory, throwsError } from '../testing/storyTesting';

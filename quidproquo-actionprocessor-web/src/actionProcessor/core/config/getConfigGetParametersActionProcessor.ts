@@ -1,4 +1,12 @@
-import { actionResult, actionResultError, askConfigGetParameters, createActionProcessor, ErrorTypeEnum, ProcessorFor, QPQConfig } from 'quidproquo-core';
+import {
+  actionResult,
+  actionResultError,
+  askConfigGetParameters,
+  createActionProcessor,
+  ErrorTypeEnum,
+  ProcessorFor,
+  QPQConfig,
+} from 'quidproquo-core';
 
 const getProcessConfigGetParameters = (qpqConfig: QPQConfig): ProcessorFor<typeof askConfigGetParameters> => {
   return async ({ parameterNames }) => {

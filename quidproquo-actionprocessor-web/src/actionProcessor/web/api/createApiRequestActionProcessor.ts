@@ -1,5 +1,5 @@
-import { ActionProcessorList, ActionProcessorListResolver, actionResult, Nullable } from 'quidproquo-core';
-import { ApiActionType, ApiRequestActionProcessor, preformNetworkRequest } from 'quidproquo-webserver';
+import { ActionProcessorList, ActionProcessorListResolver, actionResult, Nullable, ProcessorFor } from 'quidproquo-core';
+import { ApiActionType, askApiRequestBase, preformNetworkRequest } from 'quidproquo-webserver';
 
 export type ApiRequestActionProcessorOptions = {
   // Resolve the base url for a given service. The default ignores the service name
@@ -16,9 +16,7 @@ const defaultResolveServiceBaseUrl = (_service: string): string => {
   return `${protocol}//api.${hostname}${port ? `:${port}` : ''}`;
 };
 
-// any/any: the processor serves every ApiRequestAction<T> regardless of body/response
-// type, and T is contravariant in the action, so no single unknown-based signature fits.
-const getProcessApiRequest = (options?: ApiRequestActionProcessorOptions): ApiRequestActionProcessor<any, any> => {
+const getProcessApiRequest = (options?: ApiRequestActionProcessorOptions): ProcessorFor<typeof askApiRequestBase> => {
   return async ({ service, endpoint, method, body, params, headers, responseType }) => {
     const basePath = (options?.resolveServiceBaseUrl ?? defaultResolveServiceBaseUrl)(service);
 

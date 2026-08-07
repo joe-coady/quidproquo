@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { MathActionType } from '../../actions/math/MathActionType';
 import { askRandomNumber } from '../../actions/math/askRandomNumber';
+import { MathActionType } from '../../actions/math/MathActionType';
 import { runStory } from '../../testing/storyTesting';
 import { askExecuteIf } from './askExecuteIf';
 

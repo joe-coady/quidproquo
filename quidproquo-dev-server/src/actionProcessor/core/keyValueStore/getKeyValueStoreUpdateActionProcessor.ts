@@ -12,8 +12,8 @@ import {
 } from 'quidproquo-core';
 
 import { getKvsRepository } from '../../../logic/keyValueStore/getKvsRepository';
-import { emitKvsStreamEvent } from '../../../logic/kvsStream';
 import { toKvsStreamKeys } from '../../../logic/keyValueStore/toKvsStreamKeys';
+import { emitKvsStreamEvent } from '../../../logic/kvsStream';
 import { ResolvedDevServerConfig } from '../../../types';
 
 const getProcessKeyValueStoreUpdate = (
