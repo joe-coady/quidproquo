@@ -1,6 +1,19 @@
-# eslint config
+# quidproquo-eslint-config
 
-Not for prod
+The shared ESLint configuration for [quidproquo](https://github.com/qpqjs/quidproquo) projects, bundled with a small plugin that enforces the framework's `ask` naming contract.
+
+```bash
+npm install --save-dev quidproquo-eslint-config
+```
+
+```js
+// eslint.config.mjs
+import qpqConfig from 'quidproquo-eslint-config';
+
+export default [...qpqConfig];
+```
+
+`eslint` and `prettier` are peer dependencies. Beyond the qpq rules below, the config sets the house style, including import sorting that groups quidproquo packages separately from external dependencies.
 
 ## qpq rules
 
@@ -53,3 +66,15 @@ literals. Not auto-fixable, rename the function or make it a generator.
 
 Tests live next to the rules (`plugin/rules/*.test.mjs`) and run with the repo's
 vitest suite: `npx vitest run --project quidproquo-eslint-config`.
+
+## Status
+
+Pre-1.0 and under active development. Rules and settings change between releases.
+
+## Documentation
+
+[docs.quidproquojs.com](https://docs.quidproquojs.com)
+
+## License
+
+MIT. See [LICENSE](https://github.com/qpqjs/quidproquo/blob/main/LICENSE).

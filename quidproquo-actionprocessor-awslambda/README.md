@@ -1,97 +1,47 @@
 # quidproquo-actionprocessor-awslambda
 
-The `quidproquo-actionprocessor-awslambda` library is a key component of the quidproquo framework, providing a set of generic action processors for
-AWS Lambda. This library serves as the bridge between the core quidproquo functionality and the AWS Lambda runtime, enabling the execution of
-quidproquo-based applications on the AWS Lambda platform.
+The AWS runtime for [quidproquo](https://github.com/qpqjs/quidproquo).
 
-## WARNING: NOT FOR PRODUCTION
+A qpq story yields actions, and a **processor** is the function that actually carries one out. This package maps the qpq action catalogue onto AWS services, and supplies the Lambda handlers that turn an AWS event into a story execution.
 
-**This project is currently under active development and should not be used in production environments. The APIs and functionality are subject to
-change without notice.**
+You do not usually install this yourself. It arrives as a dependency of `quidproquo-deploy-awscdk` and the CLI.
 
-## Key Features
+## Actions to services
 
-1. **Action-Oriented Architecture**: The `quidproquo-actionprocessor-awslambda` library aligns with the action-oriented architecture of the quidproquo
-   framework, allowing for the seamless execution of quidproquo actions within the AWS Lambda environment.
+| Action domain | AWS service |
+| --- | --- |
+| `keyValueStore` | DynamoDB |
+| `file` | S3 |
+| `userDirectory` | Cognito |
+| `queue` | SQS |
+| `eventBus` | SNS |
+| `email` | SES v2 |
+| `config` | SSM Parameter Store and Secrets Manager |
+| `crypto` | KMS |
+| `ai` | Bedrock |
+| `graphDatabase` | Neptune, over openCypher |
+| `metric` | CloudWatch, written as embedded metric format log lines rather than api calls |
 
-2. **Event Handling**: The library provides specialized action processors for handling various event types, such as API Gateway events, CloudFront
-   events, SQS events, and more. This enables the integration of quidproquo-based applications with a wide range of AWS services.
+Everything platform-neutral (dates, guids, http, logging) comes from `quidproquo-actionprocessor-js`, and the Node-specific pieces from `quidproquo-actionprocessor-node`.
 
-3. **Configuration Management**: The library includes action processors for managing quidproquo configuration, including the retrieval of secrets,
-   parameters, and global values from AWS services like Secrets Manager and Systems Manager Parameter Store.
+## Lambda entry points
 
-4. **File Management**: The library offers action processors for interacting with Amazon S3, allowing for the reading, writing, and management of
-   files and directories within the quidproquo application.
+The handlers in `src/lambdas/` are the other half of the package. Each one adapts a specific AWS event into a story run: API Gateway requests and websocket frames, CloudFront viewer and origin requests, S3 object events, SQS messages, DynamoDB streams, EventBridge schedules and deploy hooks, and the Cognito trigger set for custom auth flows.
 
-5. **User Directory Integration**: The library includes action processors for integrating with Amazon Cognito, enabling user authentication, user
-   management, and access control within quidproquo-based applications.
+There is also a dynamic module loader, which lets a Lambda pull the service's business logic at runtime instead of baking it into the deployment package. That keeps functions warm across deploys and makes rollbacks close to instant.
 
-6. **Event Bus Integration**: The library provides action processors for publishing and subscribing to events using Amazon EventBridge, facilitating
-   cross-service communication and event-driven architectures.
+## Naming and config
 
-7. **Key-Value Store Integration**: The library includes action processors for interacting with Amazon DynamoDB, enabling the use of key-value stores
-   within quidproquo applications.
+`awsNamingUtils` derives every resource name from the account, region, and qpq config, so names are consistent between what the CDK package creates and what the processors look up at runtime. Nothing needs to be passed by hand between the two.
 
-8. **Logging and Observability**: The library integrates with the quidproquo logging and observability features, ensuring that application logs and
-   metrics are captured and made available for monitoring and troubleshooting.
+## Status
 
-9. **Extensibility**: The library is designed to be highly extensible, allowing developers to create custom action processors to meet their specific
-   requirements.
-
-## Key Concepts
-
-1. **Action Processors**: Action processors are the core components of the `quidproquo-actionprocessor-awslambda` library, responsible for executing
-   quidproquo actions within the AWS Lambda environment. These processors handle the integration with various AWS services and ensure the correct
-   execution of quidproquo actions.
-
-2. **Event Handling**: The library provides specialized action processors for handling different event types, such as API Gateway events, CloudFront
-   events, SQS events, and more. These processors transform the event data into a format that can be consumed by the quidproquo runtime and execute
-   the appropriate quidproquo actions.
-
-3. **Configuration Management**: The library includes action processors for retrieving and managing quidproquo configuration data, such as secrets,
-   parameters, and global values, from AWS services like Secrets Manager and Systems Manager Parameter Store.
-
-4. **File Management**: The file management action processors enable the reading, writing, and management of files and directories within the
-   quidproquo application, using Amazon S3 as the underlying storage service.
-
-5. **User Directory Integration**: The user directory integration action processors handle the integration with Amazon Cognito, allowing for user
-   authentication, user management, and access control within quidproquo-based applications.
-
-6. **Event Bus Integration**: The event bus integration action processors facilitate the publishing and subscribing of events using Amazon
-   EventBridge, enabling cross-service communication and event-driven architectures within quidproquo applications.
-
-7. **Key-Value Store Integration**: The key-value store integration action processors provide the ability to interact with Amazon DynamoDB, allowing
-   quidproquo applications to leverage key-value stores for data storage and retrieval.
-
-8. **Logging and Observability**: The library integrates with the quidproquo logging and observability features, ensuring that application logs and
-   metrics are captured and made available for monitoring and troubleshooting.
-
-9. **Extensibility**: The `quidproquo-actionprocessor-awslambda` library is designed to be highly extensible, allowing developers to create custom
-   action processors to meet their specific requirements. This enables the integration of quidproquo-based applications with a wide range of AWS
-   services and third-party tools.
-
-## Getting Started
-
-To use the `quidproquo-actionprocessor-awslambda` library, you'll need to install the package and its dependencies. You can do this using your
-preferred package manager, such as npm or yarn:
-
-```
-npm install quidproquo-actionprocessor-awslambda
-```
-
-Once you have the package installed, you can start building your quidproquo-based applications on the AWS Lambda platform, leveraging the action
-processors provided by this library.
+Pre-1.0. The whole `quidproquo-*` family releases in lockstep, so versions that share a number were built and tested together. Expect APIs to move between releases, and pin your versions.
 
 ## Documentation
 
-For more detailed information on using the `quidproquo-actionprocessor-awslambda` library, please refer to the
-[quidproquo-actionprocessor-awslambda documentation](https://github.com/qpqjs/quidproquo/tree/main/packages/quidproquo-actionprocessor-awslambda).
-
-## Contributing
-
-If you'd like to contribute to the development of `quidproquo-actionprocessor-awslambda`, please refer to the
-[contributing guidelines](https://github.com/qpqjs/quidproquo/blob/main/CONTRIBUTING.md) for more information.
+[docs.quidproquojs.com](https://docs.quidproquojs.com)
 
 ## License
 
-`quidproquo-actionprocessor-awslambda` is licensed under the [MIT License](https://github.com/qpqjs/quidproquo/blob/main/LICENSE).
+MIT. See [LICENSE](https://github.com/qpqjs/quidproquo/blob/main/LICENSE).

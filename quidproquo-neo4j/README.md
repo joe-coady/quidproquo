@@ -1,62 +1,31 @@
 # quidproquo-neo4j
 
-1. Go to [https://neo4j.com/product/auradb/](https://neo4j.com/product/auradb/)
-2. Select **Start Free** to set up a free database.
-3. Create an account (I used Sign in with Google).
-4. Agree to the Terms of Service and Privacy Policy.
-5. Choose an instance type; for development, I used **AuraDB Free** since it’s free.
-6. Save the credentials for `Instance01` (we will need this later).
-7. Wait for `Instance01` to create (this could take a few minutes).
-8. Add the database to your QPQ config, give it a name; I will call mine `graph`.
+Neo4j behind the graph database actions in [quidproquo](https://github.com/qpqjs/quidproquo).
 
-```
-import { defineGraphDatabaseNeo4j } from 'quidproquo-neo4j';
+Core defines `graphDatabase` actions in platform-neutral terms. This package supplies the processors that answer them with Neo4j, so a story written against `askGraphDatabase*` runs unchanged whether the graph is Neo4j here or Neptune on AWS.
 
-export default [
-    // other config
-    defineGraphDatabaseNeo4j('graph', apiBuildPath)
-];
+```bash
+npm install quidproquo-neo4j
 ```
 
-9. Deploy your service.
-10. Once the Neo4j database is created, under the name, you should see an instance ID. It will also be in the connection URI at the bottom, like this:
+## What is in here
 
-`neo4j+s://XXXXXXXX.databases.neo4j.io`.
+- **Processors** that override the graph database actions with a Neo4j implementation
+- **Config settings** for declaring the connection
+- **Scheduled event entries** for the background work a graph deployment needs
 
-11. Note that instance ID down, we will need it for our config.
-12. On your deployed site, update the parameter `neo4j-${databaseName}-instance` with the instance ID we just got.
-13. Update the secret `neo4j-${databaseName}-password` with the password we downloaded earlier.
-14. You should then be able to run queries using QPQ.
+## Adding it to a service
 
-```
-const responseA = yield* askGraphDatabaseExecuteOpenCypherQuery(
-    'graph',
-    GraphDatabaseInstanceType.Write,
-    `
-        CREATE (p:Person $personProps)
-        CREATE (b:Backpack $backpackProps)
-        CREATE (p)-[:OWNS]->(b)
-        RETURN p, b
-    `,
-    {
-        personProps: { id: '1234', name: 'Joe', age: 30 },
-        backpackProps: { brand: 'Fun', color: 'Red' },
-    }
-);
+Add the config setting to your service config and register the processor override in the runtime your service uses. Everything above that, the stories and the queries, stays the same.
 
-const responseB = yield* askGraphDatabaseExecuteOpenCypherQuery(
-    'graph',
-    GraphDatabaseInstanceType.Read,
-    'MATCH (a) RETURN a LIMIT 10'
-);
-```
+## Status
 
-# Notes
+Pre-1.0. The whole `quidproquo-*` family releases in lockstep, so versions that share a number were built and tested together. Expect APIs to move between releases, and pin your versions.
 
-To set a version, you can pass it via the config
+## Documentation
 
-```
-import { defineGraphDatabaseNeo4j, Neo4jVersion } from  'quidproquo-neo4j';
+[docs.quidproquojs.com](https://docs.quidproquojs.com)
 
-defineGraphDatabaseNeo4j('graph', apiBuildPath, Neo4jVersion.Version5)
-```
+## License
+
+MIT. See [LICENSE](https://github.com/qpqjs/quidproquo/blob/main/LICENSE).

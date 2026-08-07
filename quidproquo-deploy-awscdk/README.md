@@ -1,81 +1,44 @@
 # quidproquo-deploy-awscdk
 
-The `quidproquo-deploy-awscdk` library is a key component of the quidproquo framework, providing a set of constructs and utilities for deploying
-quidproquo-based applications on the AWS Cloud using the AWS CDK (Cloud Development Kit).
+Turns a [quidproquo](https://github.com/qpqjs/quidproquo) config into AWS CDK stacks.
 
-## WARNING: NOT FOR PRODUCTION
+You declare resources in your service config (`defineKeyValueStore`, `defineQueue`, `defineRoute`, and so on). This package reads that config and synthesises the infrastructure to back it, wired to the Lambda handlers in `quidproquo-actionprocessor-awslambda`.
 
-**This project is currently under active development and should not be used in production environments. The APIs and functionality are subject to
-change without notice.**
-
-## Key Features
-
-1. **Construct-based Deployment**: The `quidproquo-deploy-awscdk` library provides a set of custom constructs that encapsulate the deployment of
-   various quidproquo components, such as APIs, queues, storage drives, and more, on the AWS platform.
-
-2. **Seamless Integration**: The constructs in this library are designed to work seamlessly with the core quidproquo functionality, ensuring a
-   consistent and cohesive development experience.
-
-3. **Extensibility**: The library is designed to be highly extensible, allowing developers to create custom constructs or modify existing ones to meet
-   their specific requirements.
-
-4. **Automated Provisioning**: The library handles the provisioning of various AWS resources, such as Lambda functions, API Gateways, DynamoDB tables,
-   and more, based on the quidproquo configuration.
-
-5. **Dependency Management**: The library manages the dependencies between various quidproquo components, ensuring that the deployment process is
-   efficient and reliable.
-
-6. **Logging and Observability**: The library integrates with the quidproquo logging and observability features, ensuring that deployment-related logs
-   and metrics are captured and made available for monitoring and troubleshooting.
-
-7. **Reusable Constructs**: The library provides a set of reusable constructs that can be used across multiple quidproquo-based applications,
-   promoting code reuse and consistency.
-
-## Key Concepts
-
-1. **Constructs**: Constructs are the fundamental building blocks of the `quidproquo-deploy-awscdk` library. They represent the various AWS resources
-   and configurations required to deploy a quidproquo-based application.
-
-2. **Stacks**: Stacks are higher-level constructs that group related resources and configurations together, ensuring a cohesive and organized
-   deployment process.
-
-3. **Dependency Management**: The library manages the dependencies between various quidproquo components, ensuring that the deployment process is
-   efficient and reliable.
-
-4. **Naming Conventions**: The library follows a consistent naming convention for the provisioned AWS resources, ensuring that they are easily
-   identifiable and traceable.
-
-5. **Extensibility**: The library is designed to be highly extensible, allowing developers to create custom constructs or modify existing ones to meet
-   their specific requirements.
-
-6. **Logging and Observability**: The library integrates with the quidproquo logging and observability features, ensuring that deployment-related logs
-   and metrics are captured and made available for monitoring and troubleshooting.
-
-7. **Reusable Constructs**: The library provides a set of reusable constructs that can be used across multiple quidproquo-based applications,
-   promoting code reuse and consistency.
-
-## Getting Started
-
-To use the `quidproquo-deploy-awscdk` library, you'll need to install the package and its dependencies. You can do this using your preferred package
-manager, such as npm or yarn:
-
-```
+```bash
 npm install quidproquo-deploy-awscdk
 ```
 
-Once you have the package installed, you can start building your quidproquo-based applications on the AWS platform, leveraging the constructs and
-utilities provided by this library.
+In practice you drive it through the [`qpq` CLI](https://www.npmjs.com/package/quidproquo-cli) rather than calling it directly.
+
+## The stacks
+
+A service deploys as a set of stacks rather than one, so that slow-moving infrastructure and fast-moving code are not redeployed together:
+
+| Stack | Holds |
+| --- | --- |
+| `BootstrapQpqServiceStack` | The account groundwork: the apex domain, hosted zone, and shared certificates |
+| `AccountQpqStack` | Account-level settings: budgets, CloudTrail, security services |
+| `InfQpqServiceStack` | The service's data infrastructure: tables, buckets, queues, topics, user directories |
+| `ApiQpqServiceStack` | The api: Lambdas, routes, websockets, api gateway |
+| `WebQpqServiceStack` | The website: static hosting and CloudFront |
+| `DomainQpqServiceStack` | Dns records for the service |
+| `DomainCertificateStack` | ACM certificates, including the us-east-1 ones CloudFront requires |
+| `WafCloudFrontWebAclStack` | Web ACLs in front of CloudFront |
+
+Each phase deploys on its own. There are no cross-stack references between them, so a code-only change touches the api stack and leaves the rest alone.
+
+## How names line up
+
+Resource names are derived from the account, region, and config name. The runtime processors derive them exactly the same way, so a Lambda finds its table without anything being passed in at deploy time.
+
+## Status
+
+Pre-1.0. The whole `quidproquo-*` family releases in lockstep, so versions that share a number were built and tested together. Expect APIs to move between releases, and pin your versions.
 
 ## Documentation
 
-For more detailed information on using the `quidproquo-deploy-awscdk` library, please refer to the
-[quidproquo-deploy-awscdk documentation](https://github.com/qpqjs/quidproquo/tree/main/packages/quidproquo-deploy-awscdk).
-
-## Contributing
-
-If you'd like to contribute to the development of `quidproquo-deploy-awscdk`, please refer to the
-[contributing guidelines](https://github.com/qpqjs/quidproquo/blob/main/CONTRIBUTING.md) for more information.
+[docs.quidproquojs.com](https://docs.quidproquojs.com)
 
 ## License
 
-`quidproquo-deploy-awscdk` is licensed under the [MIT License](https://github.com/qpqjs/quidproquo/blob/main/LICENSE).
+MIT. See [LICENSE](https://github.com/qpqjs/quidproquo/blob/main/LICENSE).

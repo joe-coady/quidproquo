@@ -8,9 +8,16 @@ cd my-app
 npm run dev
 ```
 
-You get a full QPQ workspace with five services (`admin`, `auth`, `design`,
-`shell` and `todo`) that builds, runs locally on the QPQ dev server, and
-deploys as a single docker image with `npm run deploy`.
+You get a full workspace with five services (`admin`, `auth`, `design`, `shell` and `todo`) that builds, runs locally on the qpq dev server, and deploys as a single docker image with `npm run deploy`.
+
+The api comes up on `http://localhost:8080` and the web on `http://localhost:3080`:
+
+```bash
+curl http://localhost:8080/api/shell/v1/health
+# {"status":"healthy","service":"shell","checkedAt":"..."}
+```
+
+Node.js 24 or newer is required. Docker is only needed to deploy.
 
 ## Options
 
@@ -23,11 +30,22 @@ npx create-qpq-app <app-name> [options]
 --no-install                         skip npm install
 ```
 
+Pass `--language javascript` and you get the same app with type annotations stripped and JSX preserved, running on the same toolchain.
+
 ## How it works
 
-The template is a snapshot of quidproquojs.com — a real, continuously-built
-QPQ workspace — captured into this package at publish time. Scaffolding runs
-a pipeline of self-contained steps (prune the docs site, prune the website
-app, apply your app's identity/domain, pin quidproquo versions, git init,
-install). The generated app pins the `quidproquo-*` versions this package was
-published with; the whole family releases in lockstep.
+The template is a snapshot of quidproquojs.com, a real and continuously built qpq workspace, captured into this package at publish time. Scaffolding runs a pipeline of self-contained steps: prune the docs site, prune the website app, apply your app's identity and domain, pin the quidproquo versions, git init, install.
+
+The generated app pins the `quidproquo-*` versions this package was published with. The whole family releases in lockstep, so those versions are always a set that was built and tested together.
+
+## Status
+
+Pre-1.0 and under active development. The generated app changes shape between releases.
+
+## Documentation
+
+[docs.quidproquojs.com](https://docs.quidproquojs.com)
+
+## License
+
+MIT. See [LICENSE](https://github.com/qpqjs/quidproquo/blob/main/LICENSE).

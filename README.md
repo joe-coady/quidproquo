@@ -1,100 +1,198 @@
-# quid-pro-quo
+<div align="center">
 
-JS Library for building web servers using pure functions and generators.
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/qpqjs/quidproquo/main/assets/qpq-lockup-dark.svg">
+  <img src="https://raw.githubusercontent.com/qpqjs/quidproquo/main/assets/qpq-lockup.svg" alt="quidproquo" width="440">
+</picture>
 
-## See
+<p><strong>Build web applications out of pure functions.</strong></p>
 
-- [quidproquo](https://www.npmjs.com/package/quidproquo)
-- [quidproquo-core](https://www.npmjs.com/package/quidproquo-core)
-- [quidproquo-tsconfig](https://www.npmjs.com/package/quidproquo-tsconfig)
-- [quidproquo-webserver](https://www.npmjs.com/package/quidproquo-webserver)
-- [quidproquo-web-admin](https://www.npmjs.com/package/quidproquo-web-admin)
-- [quidproquo-config-aws](https://www.npmjs.com/package/quidproquo-config-aws)
-- [quidproquo-deploy-awscdk](https://www.npmjs.com/package/quidproquo-deploy-awscdk)
-- [quidproquo-deploy-webpack](https://www.npmjs.com/package/quidproquo-deploy-webpack)
-- [quidproquo-actionprocessor-awslambda](https://www.npmjs.com/package/quidproquo-actionprocessor-awslambda)
-- [quidproquo-actionprocessor-node](https://www.npmjs.com/package/quidproquo-actionprocessor-node)
+[![npm](https://img.shields.io/npm/v/quidproquo.svg?color=0a7bbb&label=npm)](https://www.npmjs.com/package/quidproquo)
+[![license](https://img.shields.io/badge/license-MIT-0a7bbb.svg)](https://github.com/qpqjs/quidproquo/blob/main/LICENSE)
+[![node](https://img.shields.io/badge/node-%3E%3D24-0a7bbb.svg)](https://nodejs.org)
 
-### Note
+[Getting started](#getting-started) &nbsp;·&nbsp; [How it works](#how-it-works) &nbsp;·&nbsp; [Packages](#packages) &nbsp;·&nbsp; [Docs](https://docs.quidproquojs.com)
 
-Currently under development ~ Not for production
+</div>
 
-#### Todo:
+---
 
-- Remove auth tokens from session, use decoded token
-- Use module federation to dynamically load
-  - actions
-  - stories
-  - business logic.
-- Move into @quidproquo/\* packaged namespace
-- OpenApi support for controllers (validation)
+Business logic in quidproquo is written as generator functions called **stories**. A story never calls the clock, the database, or the network directly. It yields a typed action describing what it wants, and the runtime hands that action to whichever implementation fits the platform it is running on.
 
-### optimizations:
+The same story runs on AWS Lambda, in a Node process, in a browser, or against fixtures in a test, with no changes to the code.
 
-- Seems that Execute story takes longer then the sum of its action parts by a fair bit
-  - investigate this, i suspect it takes time to write the logs, however, logs do not need to be written in sync
-    - we can queue them up, and let the owner lambda hold onto them until they are done, so we can do other things
-    - it may shave 100ms off function calls
+```typescript
+function* askGreet(name: string): AskResponse<string> {
+  const now = yield* askDateNow();
+  return `hello ${name}, it is ${now}`;
+}
+```
 
-### Cleanup
+`askDateNow()` does not read the clock. It yields `{ type: '@quidproquo-core/Date/Now' }` and suspends, and the runtime resolves it and resumes the generator with the answer.
 
-- apiBuildPath - remove from all configs, pull from just the base config
-- aws region being passed into qpqconfig - should be from the awsconfig
-- linting / import orders for qpq packages
-  - eslint
-    - import order
-    - linting
-    - prettier
+## Getting started
 
-#### Must haves
+```bash
+npx create-qpq-app myapp
+cd myapp
+npm run dev
+```
 
-- void response should be 204?
-- Remove aws region being passed into QpqConfig
-- QPQ Types package ~ Web / Node
-- Reduce the log lifetime for lambda to a week or two by default
-- Local Dev
-- AWS Migration scripts to copy resources between accounts / services
-- (if !fedmod logic) - create dynamic loaders for each lambda type to reduce lambda build sizes
-- ESLint plugin to make sure user yield\* before an askGenerator
+That scaffolds a complete working app (five services, a local dev server, and a one-image docker deploy), installs it, builds it, and makes the first commit. `npm run dev` runs the backend and every frontend dev server in one process, so one ctrl+c stops everything.
 
-### Federated Module Implementation Attempt
+The api comes up on `http://localhost:8080` and the web on `http://localhost:3080`. Check it is alive:
 
-#### Objective
+```bash
+curl http://localhost:8080/api/shell/v1/health
+# {"status":"healthy","service":"shell","checkedAt":"..."}
+```
 
-- Develop the business logic on the application side and upload it to S3.
-- Use AWS CDK to create generic Lambda functions with a module loader method capable of retrieving client logic from S3, mounting it in the Lambda
-  runtime, and executing it via an execution story. This approach ensures that Lambdas remain hot, enables A/B testing, and allows for near-instant
-  deployments and rollbacks.
+You need **Node.js 24 or newer**. Docker is only needed when you deploy, not for local dev.
 
-#### Attempts and Challenges
+<details>
+<summary>Scaffolder options</summary>
 
-1. **Single JS File with Webpack**:
+```bash
+npx create-qpq-app <app-name> [options]
 
-   - Attempted to build the business logic as a single JavaScript file using Webpack.
-   - Created a custom plugin to wrap the output file with a function to evaluate and return exported members.
-   - Encountered issues with Webpack bundling, resulting in runtime chunks and separate chunks for services like `reactMediaPlayer`. The concept
-     seemed sound, but the execution was unsuccessful.
+--language <typescript|javascript>   skip the language prompt
+--domain <domain>                    app domain (default: <app-name>.example.com)
+--no-git                             skip git init
+--no-install                         skip npm install
+```
 
-2. **Module Federation V2**:
+Pass `--language javascript` and you get the same app with type annotations stripped and JSX preserved, running on the same toolchain.
 
-   - Tried using Module Federation V2, but faced difficulties in the Node environment.
+</details>
 
-3. **Custom Runtime Plugin**:
-   - Developed a custom runtime plugin but struggled to determine the correct method for mounting downloaded code or streaming from S3.
-   - Reference: [Module Federation Plugin](https://module-federation.io/plugin/dev/index.html)
-   - Expected a straightforward process of building the business logic with entries exported via federation and dynamically loading them into the
-     runtime. However, encountered errors such as `(i.init is not a function)` after significant time investment.
+## How it works
 
-#### Relevant Links
+Here is the health route the scaffolded app ships with:
 
-- [Module Federation](https://module-federation.io/)
-- [Module Federation Runtime Guide](https://module-federation.io/guide/basic/runtime.html)
-- [Next.js SSR Streaming Example](https://github.com/module-federation/nextjs-ssr/blob/main/streaming/src/templates/loadScript.js)
+```typescript
+import { askDateNow, AskResponse, HTTPEvent, HTTPEventResponse, qpqWebServerUtils } from 'quidproquo';
+import { dynamicRoute } from 'quidproquo-features';
 
-Explored the possibility of dynamically loading JavaScript from S3 using `require` instead of federation. However, Lambda’s limitations on overriding
-`require` presented challenges.
+export const health = dynamicRoute(
+  ['GET', '/health'],
+  function* healthCheck(event: HTTPEvent): AskResponse<HTTPEventResponse> {
+    const checkedAt = yield* askDateNow();
 
-#### Future Direction
+    return qpqWebServerUtils.toJsonEventResponse({
+      status: 'healthy',
+      service: 'shell',
+      checkedAt,
+    });
+  },
+);
+```
 
-- Plan to wait for a viable solution, as there is considerable interest in dynamically loading JavaScript from S3 into Lambda, but no reliable
-  solutions are currently available.
+Locally the clock is answered by the dev server, in production by whatever platform you deployed to, and in a test by a fixed timestamp you supply. That is why every function you call from a story is named `ask*`: it is a request, it has an answer, and it must be called with `yield*`.
+
+| Term | What it is |
+| --- | --- |
+| **Action** | A plain, serializable object with a type and an optional payload |
+| **Requester** | The `ask*` generator your story calls to yield an action |
+| **Story** | A generator function composing requesters into business logic |
+| **Processor** | The platform-specific function that actually performs an action |
+| **Runtime** | The loop that runs a story, routes each yielded action to a processor, and logs the whole thing |
+
+Three things fall out of that arrangement:
+
+- **Tests need no infrastructure.** Mock actions by type and assert on the result.
+  ```typescript
+  const result = runStory(askGreet('world'), { [DateActionType.Now]: '2026-01-01T00:00:00.000Z' });
+  ```
+- **Moving platforms is a config change.** The stories do not know or care which processor set answered them.
+- **Every run leaves a complete log.** Because all side effects pass through the runtime, you get execution logs, replay, and statement-level traces without instrumenting anything. That is what the [admin console](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-web-admin) reads.
+
+The [ESLint plugin](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-eslint-config) enforces both halves of the `ask` contract: always `yield*` an ask call, never name a plain function `ask*`.
+
+## Packages
+
+**Start here**
+
+| Package | Description |
+| --- | --- |
+| [create-qpq-app](https://github.com/qpqjs/quidproquo/tree/main/create-qpq-app) | Scaffolder. `npx create-qpq-app my-app` |
+| [quidproquo](https://github.com/qpqjs/quidproquo/tree/main/quidproquo) | The main entry point. Re-exports core and webserver |
+| [quidproquo-cli](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-cli) | The `qpq` CLI: dev, build, deploy and teardown |
+
+**Framework**
+
+| Package | Description |
+| --- | --- |
+| [quidproquo-core](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-core) | Actions, stories, the runtime, and the config system |
+| [quidproquo-webserver](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-webserver) | Routes, apis, websockets, dns, email, and the web-side config |
+| [quidproquo-features](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-features) | Ready-made features: admin, auth users, tenants, event documents |
+
+**Runtimes**
+
+| Package | Description |
+| --- | --- |
+| [quidproquo-actionprocessor-js](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-actionprocessor-js) | Processors that need no platform at all |
+| [quidproquo-actionprocessor-node](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-actionprocessor-node) | Node processors |
+| [quidproquo-actionprocessor-awslambda](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-actionprocessor-awslambda) | AWS processors and the Lambda entry handlers |
+| [quidproquo-actionprocessor-web](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-actionprocessor-web) | Browser processors |
+| [quidproquo-dev-server](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-dev-server) | Runs your whole app locally on real code paths |
+
+**Frontend**
+
+| Package | Description |
+| --- | --- |
+| [quidproquo-web](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-web) | Browser utilities, no UI framework required |
+| [quidproquo-web-react](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-web-react) | React bindings: state store, hooks, auth, websockets |
+| [quidproquo-web-admin](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-web-admin) | The admin console: logs, traces, config, maintenance |
+
+**Build and deploy**
+
+| Package | Description |
+| --- | --- |
+| [quidproquo-config-aws](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-config-aws) | AWS-specific config settings |
+| [quidproquo-deploy-awscdk](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-deploy-awscdk) | Turns a qpq config into CDK stacks |
+| [quidproquo-deploy-rspack](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-deploy-rspack) | Rspack bundling for services and federated remotes |
+| [quidproquo-deploy-webpack](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-deploy-webpack) | The same, on webpack |
+
+**Tooling**
+
+| Package | Description |
+| --- | --- |
+| [quidproquo-tsconfig](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-tsconfig) | Shared TypeScript config |
+| [quidproquo-eslint-config](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-eslint-config) | Shared ESLint config and the qpq lint rules |
+| [quidproquo-testing](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-testing) | Generator assertions and vitest matchers |
+
+**Integrations**
+
+| Package | Description |
+| --- | --- |
+| [quidproquo-neo4j](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-neo4j) | Neo4j behind the graph database actions |
+| [quidproquo-xstate](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-xstate) | XState machines as qpq actions |
+
+## Working on the framework
+
+The repo is an npm workspace. From the root:
+
+```bash
+npm install
+npm run build          # build every package
+npm run build:lite     # only what changed since the last build
+npm run test           # vitest across the workspace
+npm run lint           # eslint across the workspace
+npm run validate       # lint, build, test, and typecheck the test suite
+```
+
+Target a single package with `-w`, for example `npm run watch -w quidproquo-core`.
+
+Tests run on vitest and alias sibling packages to their `src`, so you do not need to build before running them.
+
+## Status
+
+Pre-1.0. The whole family releases in lockstep, so any set of `quidproquo-*` versions that share a number was built and tested together. Expect APIs to move between releases, and pin your versions.
+
+## Documentation
+
+Full docs, including the action reference, live at **[docs.quidproquojs.com](https://docs.quidproquojs.com)**. The site is built from [quidproquojs.com/docusaurus](https://github.com/qpqjs/quidproquo/tree/main/quidproquojs.com/docusaurus) in this repo, and the app around it is a real qpq workspace that doubles as the `create-qpq-app` template.
+
+## License
+
+MIT. See [LICENSE](https://github.com/qpqjs/quidproquo/blob/main/LICENSE).

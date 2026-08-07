@@ -1,80 +1,90 @@
 # quidproquo-core
 
-The `quidproquo-core` library is the heart of the quidproquo framework. It provides the fundamental building blocks and abstractions that enable the
-creation of scalable, event-driven web applications. This library is not intended to be used directly, but rather serves as a foundation for other
-quidproquo packages.
+The heart of the [quidproquo](https://github.com/qpqjs/quidproquo) framework: the action catalogue, the story runtime, and the config system that everything else builds on.
 
-## WARNING: NOT FOR PRODUCTION
+Most applications should install [`quidproquo`](https://www.npmjs.com/package/quidproquo) instead, which re-exports this package along with `quidproquo-webserver`. Install this one directly only if you want core without the web server.
 
-**This project is currently under active development and should not be used in production environments. The APIs and functionality are subject to
-change without notice.**
-
-## Key Features
-
-1. **Action-Oriented Architecture**: The core of quidproquo-core is an action-oriented architecture, where all application logic is encapsulated in
-   small, reusable actions. These actions can be composed together to create complex workflows.
-
-2. **Asynchronous Execution**: Actions in quidproquo-core are executed asynchronously using generators, allowing for efficient and non-blocking
-   execution of application logic.
-
-3. **Dependency Injection**: The framework provides a built-in dependency injection system, allowing for easy composition and testing of application
-   components.
-
-4. **Extensibility**: The core library is designed to be highly extensible, with well-defined extension points and a modular architecture.
-
-5. **Error Handling**: The framework includes a robust error handling system, with support for different error types and the ability to handle errors
-   at various levels of the application.
-
-6. **Logging and Observability**: The core library provides built-in support for logging and observability, making it easier to debug and monitor
-   applications built with quidproquo.
-
-7. **Testability**: The action-oriented architecture and asynchronous execution model of quidproquo-core make it highly testable, with support for
-   unit, integration, and end-to-end testing.
-
-## Key Concepts
-
-1. **Actions**: Actions are the fundamental building blocks of quidproquo-core. They represent small, reusable pieces of application logic that can be
-   composed together to create complex workflows.
-
-2. **Generators**: Generators are used to implement the asynchronous execution model of quidproquo-core. Actions are defined as generator functions,
-   which can yield other actions or return values.
-
-3. **Dependency Injection**: The core library provides a built-in dependency injection system, allowing for easy composition and testing of
-   application components.
-
-4. **Contexts**: Contexts are used to manage the state and dependencies of a particular execution context, such as a user session or a background
-   task.
-
-5. **Errors**: The framework includes a robust error handling system, with support for different error types and the ability to handle errors at
-   various levels of the application.
-
-6. **Logging and Observability**: The core library provides built-in support for logging and observability, making it easier to debug and monitor
-   applications built with quidproquo.
-
-7. **Testing**: The action-oriented architecture and asynchronous execution model of quidproquo-core make it highly testable, with support for unit,
-   integration, and end-to-end testing.
-
-## Getting Started
-
-To use quidproquo-core, you'll need to install the package and its dependencies. You can do this using your preferred package manager, such as npm or
-yarn:
-
-```
+```bash
 npm install quidproquo-core
 ```
 
-Once you have the package installed, you can start building your application using the core concepts and features provided by the library.
+## How it works
+
+An **action** is a plain object with a type and an optional payload. A **requester** is the `ask*` generator your code calls to yield one. Here is the whole of `askDateNow`:
+
+```typescript
+export function* askDateNow(): DateNowActionRequester {
+  return yield { type: DateActionType.Now };
+}
+```
+
+It never calls `new Date()`. A **story** composes requesters:
+
+```typescript
+function* askGreet(name: string): AskResponse<string> {
+  const now = yield* askDateNow();
+  return `hello ${name}, it is ${now}`;
+}
+```
+
+The **runtime** drives the story, takes each yielded action, looks up the **processor** registered for that action type, awaits the result, and resumes the generator with it. Processors live in the `quidproquo-actionprocessor-*` packages, one set per platform. Swap the set and the same story runs somewhere else.
+
+Every action that passes through the runtime is recorded, which is where the execution logs, replay, and tracing come from.
+
+## What is in here
+
+**Actions**, grouped by domain in `src/actions/`:
+
+| Domain | Covers |
+| --- | --- |
+| `config` | Parameters, secrets, globals |
+| `keyValueStore` | Key value storage, queries, and streams |
+| `file` | Object storage: read, write, list, signed urls |
+| `userDirectory` | Sign in, sign up, tokens, user management |
+| `eventBus`, `queue` | Publish and subscribe, message queues |
+| `network` | HTTP requests |
+| `graphDatabase` | Graph queries |
+| `ai` | Prompting and streaming completions |
+| `crypto` | Encrypt and decrypt against a managed key |
+| `date`, `guid`, `math` | The non-deterministic primitives a story must not call directly |
+| `log`, `metric`, `event` | Observability |
+| `state` | Reducer-driven state for frontend modules |
+| `stream`, `system`, `platform` | Streams, process, and platform utilities |
+| `dynamicFunctions`, `inlineFunction` | Calling code that is resolved at runtime |
+| `error`, `context` | Error handling and execution context |
+
+**Stories** in `src/stories/`: the composable helpers, including `askCatch` for try/finally semantics and `askRunParallel` for concurrency.
+
+**Config** in `src/config/`: the `define*` helpers that declare resources (key value stores, queues, secrets, and so on). A qpq config is a plain array of settings, which is what the deploy packages read to build infrastructure.
+
+**Testing** in `src/testing/`: `runStory` runs a story with actions mocked by type, so you can assert on behaviour without a runtime or any infrastructure.
+
+```typescript
+import { DateActionType, runStory } from 'quidproquo-core';
+
+const result = runStory(askGreet('world'), {
+  [DateActionType.Now]: '2026-01-01T00:00:00.000Z',
+});
+
+expect(result).toBe('hello world, it is 2026-01-01T00:00:00.000Z');
+```
+
+A mock can be a literal value or a function, and a function mock is re-invoked per matching action, so it can be stateful.
+
+## Conventions worth knowing
+
+- Anything named `ask*` is a generator and must be called with `yield*`. The [ESLint plugin](https://github.com/qpqjs/quidproquo/tree/main/quidproquo-eslint-config) enforces this and auto-fixes a missing `yield*`.
+- Stories must be deterministic. No `Date.now()`, `Math.random()`, or `crypto.randomUUID()`. Yield `askDateNow()` or `askNewGuid()` so logs replay and tests stay stable.
+- Throw with `return yield* askThrowError(...)`, which tells TypeScript that control stops there.
+
+## Status
+
+Pre-1.0. The whole `quidproquo-*` family releases in lockstep, so versions that share a number were built and tested together. Expect APIs to move between releases, and pin your versions.
 
 ## Documentation
 
-For more detailed information on using quidproquo-core, please refer to the
-[quidproquo-core documentation](https://github.com/qpqjs/quidproquo/tree/main/packages/quidproquo-core).
-
-## Contributing
-
-If you'd like to contribute to the development of quidproquo-core, please refer to the
-[contributing guidelines](https://github.com/qpqjs/quidproquo/blob/main/CONTRIBUTING.md) for more information.
+[docs.quidproquojs.com](https://docs.quidproquojs.com)
 
 ## License
 
-quidproquo-core is licensed under the [MIT License](https://github.com/qpqjs/quidproquo/blob/main/LICENSE).
+MIT. See [LICENSE](https://github.com/qpqjs/quidproquo/blob/main/LICENSE).
