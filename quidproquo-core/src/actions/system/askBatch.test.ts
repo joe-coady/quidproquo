@@ -37,6 +37,12 @@ describe('askBatch', () => {
     expect(result).toEqual([]);
   });
 
+  it('yields no action at all for an empty batch, so nothing hits the story log', () => {
+    const step = askBatch([]).next();
+
+    expect(step).toEqual({ done: true, value: [] });
+  });
+
   it('propagates a failing batched action as a thrown error', () => {
     const run = () =>
       runStory(

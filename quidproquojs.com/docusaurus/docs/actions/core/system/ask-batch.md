@@ -45,6 +45,7 @@ function* askBatch<TReturn extends Array<any> = any[]>(
 
 ## Notes
 
+- An empty batch (`[]`) returns `[]` immediately without yielding anything, so it never touches the story log.
 - A batch of exactly one action is short-circuited: the single action is yielded directly instead of being wrapped, so there is no batching overhead for the trivial case.
 - On the JS/Node processor the batched actions run via `Promise.all` — they execute concurrently, so only use `askBatch` for actions that are independent of each other.
 - If a batched action fails and is not individually protected by [askCatch](./ask-catch.md), the failure surfaces as the batch's error and propagates to your story. When wrapped in `askCatch`, failures come back per-action as `EitherActionResult` values instead.
