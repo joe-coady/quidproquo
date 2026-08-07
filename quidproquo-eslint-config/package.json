@@ -3,6 +3,9 @@
   "version": "0.1.16",
   "description": "eslint config for quidproquo projects.",
   "main": "eslint.config.mjs",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "test": "",
     "clean": "",

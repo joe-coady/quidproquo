@@ -13,6 +13,9 @@
     "lib/**/*",
     "template"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",

@@ -3,6 +3,9 @@
   "version": "0.1.16",
   "description": "",
   "main": "tsconfig.base.json",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "test": "",
     "clean": "",
