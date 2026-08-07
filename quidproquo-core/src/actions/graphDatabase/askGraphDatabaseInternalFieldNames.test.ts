@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
-import { GraphDatabaseActionType } from './GraphDatabaseActionType';
 import { askGraphDatabaseInternalFieldNames } from './askGraphDatabaseInternalFieldNames';
+import { GraphDatabaseActionType } from './GraphDatabaseActionType';
 
 describe('askGraphDatabaseInternalFieldNames', () => {
   it('yields an InternalFieldNames action with no payload', () => {

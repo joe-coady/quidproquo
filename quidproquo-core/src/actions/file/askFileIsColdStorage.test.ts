@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
-import { FileActionType } from './FileActionType';
 import { askFileIsColdStorage } from './askFileIsColdStorage';
+import { FileActionType } from './FileActionType';
 
 describe('askFileIsColdStorage', () => {
   it('yields an IsColdStorage action carrying the drive and filepath', () => {

@@ -1,10 +1,10 @@
 import { EventDocEventPayload } from '../../../../../../../eventDoc/models/EventDocEventPayload';
-import { MaintenanceUpdateData } from '../../../events/effects/MaintenanceUpdateData';
 import { deriveMaintenanceCurrentState } from '../../../../logic/deriveMaintenanceCurrentState';
 import { hasEtaAnnouncement } from '../../../../logic/hasEtaAnnouncement';
+import { MaintenanceUpdateData } from '../../../events/effects/MaintenanceUpdateData';
 import { MaintenanceLevel } from '../../../types/MaintenanceLevel';
-import { MaintenanceState } from '../MaintenanceState';
 import { MaintenanceType } from '../../../types/MaintenanceType';
+import { MaintenanceState } from '../MaintenanceState';
 import { MaintenanceUpdateEntry } from '../MaintenanceUpdateEntry';
 
 // Append one full status snapshot; provenance (timestamps, author) comes off the

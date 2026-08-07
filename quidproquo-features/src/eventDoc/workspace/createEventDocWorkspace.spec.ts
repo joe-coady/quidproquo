@@ -19,7 +19,15 @@ import { describe, expect, it } from 'vitest';
 import { askApplyEventDocEvent, askApplyTransientEventDocEvent, askEventDocReadIdentity, askEventDocReadState } from '../actions';
 import { createEventDocStateReader } from '../definition';
 import { buildEventDocFoldReducer, buildVersionRoutedReducer, createEventDocInitialDocumentState, foldEventDocLogStep } from '../fold';
-import { EventDocDocument, EventDocEffect, EventDocEvent, EventDocEventInput, EventDocEventPayload, EventDocSnapshotBase, EventDocStatus } from '../models';
+import {
+  EventDocDocument,
+  EventDocEffect,
+  EventDocEvent,
+  EventDocEventInput,
+  EventDocEventPayload,
+  EventDocSnapshotBase,
+  EventDocStatus,
+} from '../models';
 import { EventDocEditorValidator } from '../validation';
 import { getSlotLiveEvents } from './logic/getSlotLiveEvents';
 import { getSlotTransientEvents } from './logic/getSlotTransientEvents';
@@ -951,10 +959,7 @@ describe('createEventDocWorkspace built-in verbs', () => {
 
   it('the history panel pages the saved log newest-first and walks older on demand', () => {
     // 60 saved events: one page (50) plus a tail, so the cursor genuinely continues.
-    const manyEvents = [
-      initStateEvent(),
-      ...Array.from({ length: 59 }, (_, i) => serverEvent(NoteEvent.SetTitle, { title: `t${i + 1}` }, i + 1)),
-    ];
+    const manyEvents = [initStateEvent(), ...Array.from({ length: 59 }, (_, i) => serverEvent(NoteEvent.SetTitle, { title: `t${i + 1}` }, i + 1))];
 
     const firstPageOnly = (() => {
       const fake = createFakeTransport(manyEvents);

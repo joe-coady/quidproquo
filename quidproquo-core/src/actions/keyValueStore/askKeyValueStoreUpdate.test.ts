@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
-import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 import { askKeyValueStoreUpdate, askKeyValueStoreUpdateBase } from './askKeyValueStoreUpdate';
+import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 
 describe('askKeyValueStoreUpdate', () => {
   it('yields an Update action with updates, key, sort key and options', () => {

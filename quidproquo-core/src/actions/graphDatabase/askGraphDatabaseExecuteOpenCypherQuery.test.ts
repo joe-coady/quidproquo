@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
-import { GraphDatabaseActionType } from './GraphDatabaseActionType';
 import { askGraphDatabaseExecuteOpenCypherQuery } from './askGraphDatabaseExecuteOpenCypherQuery';
-import { GraphDatabaseInstanceType } from './GraphDatabaseExecuteOpenCypherQueryActionTypes';
+import { GraphDatabaseInstanceType } from './askGraphDatabaseExecuteOpenCypherQuery';
+import { GraphDatabaseActionType } from './GraphDatabaseActionType';
 
 describe('askGraphDatabaseExecuteOpenCypherQuery', () => {
   it('yields an ExecuteOpenCypherQuery action with the name, query, params and instance', () => {

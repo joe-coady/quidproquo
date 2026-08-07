@@ -3,7 +3,6 @@ import { AiActionType } from './AiActionType';
 import { AiMessage } from './AiMessage';
 import { AiModel } from './AiModel';
 import { AiReasoningConfig } from './AiReasoningConfig';
-import { AiPromptActionResult } from './AiPromptActionTypes';
 
 export type AskAiPromptOptions = {
   system?: string;
@@ -12,6 +11,10 @@ export type AskAiPromptOptions = {
   reasoning?: AiReasoningConfig;
   caching?: boolean;
 };
+
+export interface AiPromptActionResult {
+  text: string;
+}
 
 export const askAiPrompt = createActionRequester<AiPromptActionResult>()({
   actionType: AiActionType.Prompt,

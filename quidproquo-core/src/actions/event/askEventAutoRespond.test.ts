@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester, runStory, throwsError } from '../../testing';
-import { EventActionType } from './EventActionType';
 import { askEventAutoRespond } from './askEventAutoRespond';
+import { EventActionType } from './EventActionType';
 
 describe('askEventAutoRespond', () => {
   it('yields an AutoRespond action with the record and match result', () => {

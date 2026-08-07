@@ -10,15 +10,10 @@ import { eventDocWorkspaceEventsEndpoint } from './eventDocWorkspaceEventsEndpoi
 // when the server has no usable snapshot). Only the FIRST page carries the base —
 // paging continues through the plain events page with afterEventId = base.eventId,
 // so the base is resolved exactly once per load.
-export function* askEventDocWorkspaceApiFetchBootstrapPage(
-  identity: EventDocWorkspaceDocumentIdentity,
-): AskResponse<EventDocEventBootstrapPage> {
-  const response = yield* askApiRequest<void, EventDocEventBootstrapPage>(
-    identity.serviceName,
-    'GET',
-    eventDocWorkspaceEventsEndpoint(identity),
-    { params: { includeBase: 'true' } },
-  );
+export function* askEventDocWorkspaceApiFetchBootstrapPage(identity: EventDocWorkspaceDocumentIdentity): AskResponse<EventDocEventBootstrapPage> {
+  const response = yield* askApiRequest<void, EventDocEventBootstrapPage>(identity.serviceName, 'GET', eventDocWorkspaceEventsEndpoint(identity), {
+    params: { includeBase: 'true' },
+  });
 
   if (response.status < 200 || response.status >= 300) {
     return yield* askThrowError(ErrorTypeEnum.GenericError, `Failed to load events (${response.status})`);

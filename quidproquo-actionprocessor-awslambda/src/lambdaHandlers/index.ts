@@ -1,4 +1,3 @@
-export * from './getDynamoStreamEvent_kvsStreamEvent';
 export * from './getAnyExecuteServiceFunctionEvent_serviceFunction';
 export * from './getApiGatewayEventHandler';
 export * from './getApiGatewayEventHandler_redirect';
@@ -9,6 +8,7 @@ export * from './getCustomMessageTriggerEvent_createAuthChallenge';
 export * from './getCustomMessageTriggerEvent_customMessage';
 export * from './getCustomMessageTriggerEvent_defineAuthChallenge';
 export * from './getCustomMessageTriggerEvent_verifyAuthChallenge';
+export * from './getDynamoStreamEvent_kvsStreamEvent';
 export * from './getEventBridgeEvent_recurringSchedule';
 export * from './getEventBridgeEvent_stackDeploy';
 export * from './getS3Event_fileEvent';

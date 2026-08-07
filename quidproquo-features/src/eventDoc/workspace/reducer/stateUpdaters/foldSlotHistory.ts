@@ -12,5 +12,8 @@ import { foldHistoryEventsIntoAccumulator } from './foldHistoryEventsIntoAccumul
 // the slot's initial view state otherwise. NOT foldEventDocLog — that climbs to the
 // latest version at the end, and the stored view must stay at the last folded event's
 // version (the migrate-to-latest belongs to the read side).
-export const foldSlotHistory = (slot: EventDocWorkspaceSlotFoldConfig, history: EventDocEvent[], base: Nullable<EventDocSnapshotBase> = null): unknown =>
-  foldHistoryEventsIntoAccumulator(slot, base ? base.state : slot.createInitialViewState(), history);
+export const foldSlotHistory = (
+  slot: EventDocWorkspaceSlotFoldConfig,
+  history: EventDocEvent[],
+  base: Nullable<EventDocSnapshotBase> = null,
+): unknown => foldHistoryEventsIntoAccumulator(slot, base ? base.state : slot.createInitialViewState(), history);

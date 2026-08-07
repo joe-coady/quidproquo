@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester, runStory, StoryError, throwsError } from '../../testing';
-import { NetworkActionType } from './NetworkActionType';
 import { askNetworkRequest, askNetworkRequestBase } from './askNetworkRequest';
+import { NetworkActionType } from './NetworkActionType';
 
 describe('askNetworkRequest', () => {
   it('yields a Request action with the supplied options', () => {

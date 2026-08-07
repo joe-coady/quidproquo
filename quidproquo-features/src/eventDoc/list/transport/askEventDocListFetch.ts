@@ -24,9 +24,9 @@ export function* askEventDocListFetch(
   }
 
   const response = yield* askApiRequest<void, QpqPagedData<EventDocSummary>>(
-      serviceName,
-      'GET',
-      eventDocListCollectionEndpoint(basePath),
+    serviceName,
+    'GET',
+    eventDocListCollectionEndpoint(basePath),
     Object.keys(params).length > 0 ? { params } : undefined,
   );
 

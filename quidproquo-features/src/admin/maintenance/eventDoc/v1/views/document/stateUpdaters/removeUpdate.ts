@@ -1,6 +1,6 @@
 import { EventDocEventPayload } from '../../../../../../../eventDoc/models/EventDocEventPayload';
-import { MaintenanceRemoveUpdateData } from '../../../events/effects/MaintenanceRemoveUpdateEffect';
 import { deriveMaintenanceCurrentState } from '../../../../logic/deriveMaintenanceCurrentState';
+import { MaintenanceRemoveUpdateData } from '../../../events/effects/MaintenanceRemoveUpdateEffect';
 import { MaintenanceState } from '../MaintenanceState';
 
 // Removing an entry re-derives — deleting the newest update rolls the whole

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
-import { UserDirectoryActionType } from './UserDirectoryActionType';
 import { askUserDirectoryConfirmEmailVerification } from './askUserDirectoryConfirmEmailVerification';
+import { UserDirectoryActionType } from './UserDirectoryActionType';
 
 describe('askUserDirectoryConfirmEmailVerification', () => {
   it('yields a ConfirmEmailVerification action carrying the code and access token', () => {

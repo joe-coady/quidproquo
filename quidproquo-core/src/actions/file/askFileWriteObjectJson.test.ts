@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import { StorageDriveTier } from '../../config';
 import { captureRequester } from '../../testing';
-import { FileActionType } from './FileActionType';
 import { askFileWriteObjectJson } from './askFileWriteObjectJson';
+import { FileActionType } from './FileActionType';
 
 describe('askFileWriteObjectJson', () => {
   it('yields a WriteObjectJson action carrying the drive, filepath, data and write options', () => {

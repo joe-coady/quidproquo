@@ -2,10 +2,10 @@ import { QpqReducer } from 'quidproquo-core';
 
 import { describe, expect, it } from 'vitest';
 
-import { EventDocMigration } from './EventDocMigration';
 import { createEventDocDefinition } from '../definition/createEventDocDefinition';
 import { EventDocDocument, EventDocEffect, EventDocEvent, EventDocLink, EventDocLinkMode } from '../models';
 import { createEventDocInitialDocumentState } from './createEventDocInitialDocumentState';
+import { EventDocMigration } from './EventDocMigration';
 
 // Sortable event ids are opaque strings ordered lexicographically; padded counters stand in.
 const eventId = (n: number): string => String(n).padStart(4, '0');
@@ -141,7 +141,9 @@ describe('collectEventDocReferences', () => {
         { version: 1, views: { document: styleDocumentV1 } },
         {
           version: 2,
-          views: { document: { foldReducer: reducerV2, migrateFromPrevious: ((state: StyleDocV1) => ({ ...state, styles: [] })) as EventDocMigration } },
+          views: {
+            document: { foldReducer: reducerV2, migrateFromPrevious: ((state: StyleDocV1) => ({ ...state, styles: [] })) as EventDocMigration },
+          },
         },
       ],
       references: (view) => view.styles,

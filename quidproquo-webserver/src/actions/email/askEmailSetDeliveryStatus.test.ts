@@ -2,9 +2,9 @@ import { captureRequester } from 'quidproquo-core';
 
 import { describe, expect, it } from 'vitest';
 
+import { askEmailSetDeliveryStatus } from './askEmailSetDeliveryStatus';
 import { EmailActionType } from './EmailActionType';
 import { EmailDeliveryStatus } from './EmailDeliveryStatus';
-import { askEmailSetDeliveryStatus } from './askEmailSetDeliveryStatus';
 
 describe('askEmailSetDeliveryStatus', () => {
   it('yields a SetDeliveryStatus action with the messageId, status and reason', () => {

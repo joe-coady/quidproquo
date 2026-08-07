@@ -1,4 +1,5 @@
 import { createActionRequester, StoryResult } from 'quidproquo-core';
+
 import { AdminActionType } from './AdminActionType';
 
 export const askAdminGetLog = createActionRequester<StoryResult<any>>()({

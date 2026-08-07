@@ -47,9 +47,12 @@ describe('createEventDocBackend', () => {
   });
 
   it('throws at build time for a definition with no identity', () => {
-    const identityless: EventDocFunctions = { foldSnapshotViews: () => null,
-  foldDocumentState: () => null,
-  collectReferencesFromState: () => [], collectReferences: () => [] };
+    const identityless: EventDocFunctions = {
+      foldSnapshotViews: () => null,
+      foldDocumentState: () => null,
+      collectReferencesFromState: () => [],
+      collectReferences: () => [],
+    };
 
     expect(() => createEventDocBackend(identityless)).toThrow('no identity');
   });

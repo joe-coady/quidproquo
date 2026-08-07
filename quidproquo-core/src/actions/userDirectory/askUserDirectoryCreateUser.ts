@@ -1,6 +1,11 @@
 import { createActionRequester } from '../../types';
-import { AuthenticateUserResponse, UserDirectoryActionType } from './UserDirectoryActionType';
-import { CreateUserRequest } from './UserDirectoryCreateUserActionTypes';
+import { AuthenticateUserResponse, UserAttributes, UserDirectoryActionType } from './UserDirectoryActionType';
+
+export interface CreateUserRequest extends Omit<UserAttributes, 'userId'> {
+  email: string;
+  emailVerified: boolean;
+  password: string;
+}
 
 export const askUserDirectoryCreateUser = createActionRequester<AuthenticateUserResponse>()({
   actionType: UserDirectoryActionType.CreateUser,

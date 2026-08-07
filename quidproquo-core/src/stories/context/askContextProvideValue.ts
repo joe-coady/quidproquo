@@ -1,8 +1,8 @@
 import { askThrowError } from '../../actions';
 import { ContextActionType, ContextReadActionPayload } from '../../actions/context';
-import { ContextListAction } from '../../actions/context/ContextListActionTypes';
-import { ContextReadAction } from '../../actions/context/ContextReadActionTypes';
-import { AskResponse, AskResponseReturnType, EitherActionResult, QpqContext, QpqContextIdentifier } from '../../types';
+import { askContextList } from '../../actions/context/askContextList';
+import { ContextReadAction } from '../../actions/context/askContextRead';
+import { ActionOf, AskResponse, AskResponseReturnType, EitherActionResult, QpqContext, QpqContextIdentifier } from '../../types';
 import { askOverrideActions, getSuccessfulEitherActionResultIfRequired } from '../system/askOverrideActions';
 
 export function* askContextProvideValue<R, T extends AskResponse<any>>(
@@ -24,7 +24,7 @@ export function* askContextProvideValue<R, T extends AskResponse<any>>(
       return yield action;
     },
 
-    [ContextActionType.List]: function* (action: ContextListAction) {
+    [ContextActionType.List]: function* (action: ActionOf<typeof askContextList>) {
       // Local context is not part of the cross-service context list; stay transparent.
       if (contextIdentifier.local) {
         return yield action;

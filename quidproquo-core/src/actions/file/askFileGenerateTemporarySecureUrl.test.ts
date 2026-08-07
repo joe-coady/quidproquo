@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
-import { FileActionType } from './FileActionType';
 import { askFileGenerateTemporarySecureUrl } from './askFileGenerateTemporarySecureUrl';
+import { FileActionType } from './FileActionType';
 
 describe('askFileGenerateTemporarySecureUrl', () => {
   it('yields a GenerateTemporarySecureUrl action carrying the drive, filepath and expiry', () => {

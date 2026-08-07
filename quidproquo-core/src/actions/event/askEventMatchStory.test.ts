@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester, runStory, throwsError } from '../../testing';
-import { EventActionType } from './EventActionType';
 import { askEventMatchStory } from './askEventMatchStory';
+import { EventActionType } from './EventActionType';
 
 describe('askEventMatchStory', () => {
   it('yields a MatchStory action with the record and event params', () => {

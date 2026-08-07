@@ -1,7 +1,11 @@
 import { createActionRequester } from 'quidproquo-core';
 
 import { GraphDatabaseForNeptuneActionType } from './GraphDatabaseForNeptuneActionType';
-import { GraphDatabaseEndpoints } from './GraphDatabaseForNeptuneGetEndpointsActionTypes';
+
+export type GraphDatabaseEndpoints = {
+  readEndpoint?: string;
+  writeEndpoint?: string;
+};
 
 export const askGraphDatabaseForNeptuneGetEndpoints = createActionRequester<GraphDatabaseEndpoints>()({
   actionType: GraphDatabaseForNeptuneActionType.GetEndpoints,

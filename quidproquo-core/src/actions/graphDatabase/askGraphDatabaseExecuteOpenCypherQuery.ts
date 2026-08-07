@@ -1,7 +1,18 @@
+import { GraphCypherResponse } from '../../config';
 import { createActionRequester } from '../../types';
 import { GraphDatabaseActionType } from './GraphDatabaseActionType';
-import { GraphCypherResponse } from '../../config';
-import { GraphDatabaseExecuteOpenCypherQueryActionPayload, GraphDatabaseInstanceType } from './GraphDatabaseExecuteOpenCypherQueryActionTypes';
+
+export enum GraphDatabaseInstanceType {
+  Read = 'read',
+  Write = 'write',
+}
+
+export interface GraphDatabaseExecuteOpenCypherQueryActionPayload {
+  graphDatabaseName: string;
+  openCypherQuery: string;
+  params?: Record<string, any>;
+  instance: GraphDatabaseInstanceType;
+}
 
 export const askGraphDatabaseExecuteOpenCypherQuery = createActionRequester<GraphCypherResponse>()({
   actionType: GraphDatabaseActionType.ExecuteOpenCypherQuery,

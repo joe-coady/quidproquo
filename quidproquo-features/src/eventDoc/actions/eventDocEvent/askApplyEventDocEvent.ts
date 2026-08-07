@@ -2,6 +2,13 @@ import { AskResponse, createActionRequester, Effect } from 'quidproquo-core';
 
 import { EventDocActionType } from './EventDocActionType';
 
+// Target model is the processor's ambient context, not the payload, so the verb stays pure.
+// version isn't here — the editor stamps its configured schema version on every event.
+export type EventDocApplyEventActionPayload = {
+  eventType: string;
+  data: unknown;
+};
+
 export const askApplyEventDocEventBase = createActionRequester<void>()({
   actionType: EventDocActionType.ApplyEvent,
   getPayload: (eventType: string, data: unknown) => ({ eventType, data }),

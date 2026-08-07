@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import { captureRequester, runStory, StoryError, throwsError } from '../../testing';
 import { ErrorTypeEnum } from '../../types/ErrorTypeEnum';
-import { InlineFunctionActionType } from './InlineFunctionActionType';
 import { askInlineFunctionExecute } from './askInlineFunctionExecute';
+import { InlineFunctionActionType } from './InlineFunctionActionType';
 
 describe('askInlineFunctionExecute', () => {
   it('yields an Execute action with the function name and payload', () => {

@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest';
-
 import { QpqIsoDateTime } from 'quidproquo-core';
+
+import { describe, expect, it } from 'vitest';
 
 import { EventDocEvent } from '../../eventDoc/models';
 import { findEventDocLogDivergence } from './findEventDocLogDivergence';

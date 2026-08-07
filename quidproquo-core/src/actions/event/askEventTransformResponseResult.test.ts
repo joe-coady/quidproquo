@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester, runStory, throwsError } from '../../testing';
-import { EventActionType } from './EventActionType';
 import { askEventTransformResponseResult } from './askEventTransformResponseResult';
+import { EventActionType } from './EventActionType';
 
 describe('askEventTransformResponseResult', () => {
   it('yields a TransformResponseResult action with the responses and collected params', () => {

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
-import { UserDirectoryActionType } from './UserDirectoryActionType';
 import { askUserDirectoryGetUserAttributes } from './askUserDirectoryGetUserAttributes';
+import { UserDirectoryActionType } from './UserDirectoryActionType';
 
 describe('askUserDirectoryGetUserAttributes', () => {
   it('yields a GetUserAttributes action carrying the directory and username', () => {

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
-import { FileActionType } from './FileActionType';
 import { askFileStreamOpen } from './askFileStreamOpen';
+import { FileActionType } from './FileActionType';
 
 describe('askFileStreamOpen', () => {
   it('yields a StreamOpen action carrying drive, path, encoding and chunk size', () => {

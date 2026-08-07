@@ -443,7 +443,12 @@ describe('projectEventDocSummary incremental snapshots', () => {
     const { mocks, tables, foldCalls, upserts } = buildMocks('doc-1', 'template', { functionsName: FOLD_FN });
     tables[SNAPSHOTS_STORE] = [
       { pk: 'doc-1#summary', sk: eventId(1), type: 'template', data: { type: 'inline', snapshot: { name: 'from-seed' } } },
-      { pk: 'doc-1#document', sk: eventId(1), type: 'template', data: { type: 'inline', snapshot: { seedDocument: true }, views: ['document', 'summary'] } },
+      {
+        pk: 'doc-1#document',
+        sk: eventId(1),
+        type: 'template',
+        data: { type: 'inline', snapshot: { seedDocument: true }, views: ['document', 'summary'] },
+      },
     ];
 
     runStory(projectEventDocSummary(streamRecord(undefined)), mocks);

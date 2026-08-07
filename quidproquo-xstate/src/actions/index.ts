@@ -3,7 +3,3 @@ export * from './askStateMachineGet';
 export * from './askStateMachineGetState';
 export * from './askStateMachineSendEvent';
 export * from './StateMachineActionType';
-export * from './StateMachineCreateActionTypes';
-export * from './StateMachineGetActionTypes';
-export * from './StateMachineGetStateActionTypes';
-export * from './StateMachineSendEventActionTypes';

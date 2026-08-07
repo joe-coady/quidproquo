@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
-import { StateActionType } from './StateActionType';
 import { askStateDispatch } from './askStateDispatch';
+import { StateActionType } from './StateActionType';
 
 describe('askStateDispatch', () => {
   it('yields a Dispatch action wrapping the dispatched action', () => {

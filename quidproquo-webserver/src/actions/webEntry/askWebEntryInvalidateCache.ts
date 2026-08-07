@@ -1,4 +1,5 @@
 import { createActionRequester } from 'quidproquo-core';
+
 import { WebEntryActionType } from './WebEntryActionType';
 
 export const askWebEntryInvalidateCache = createActionRequester<void>()({

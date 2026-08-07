@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester, runStory, StoryError, throwsError } from '../../testing';
-import { SystemActionType } from './SystemActionType';
 import { askTraceStory } from './askTraceStory';
+import { SystemActionType } from './SystemActionType';
 
 const storyResult = { correlation: 'corr-1', moduleName: 'svc' } as any;
 

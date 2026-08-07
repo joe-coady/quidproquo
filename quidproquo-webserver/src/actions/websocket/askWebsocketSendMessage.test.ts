@@ -2,8 +2,8 @@ import { askWebsocketSendMessageBase, captureRequester, createActionProcessor, P
 
 import { describe, expect, it } from 'vitest';
 
-import { WebsocketActionType } from './WebsocketActionType';
 import { askWebsocketSendMessage, askWebsocketSendMessageBase } from './askWebsocketSendMessage';
+import { WebsocketActionType } from './WebsocketActionType';
 
 describe('askWebsocketSendMessage', () => {
   it('yields a SendMessage action with the api name, connection id and payload', () => {

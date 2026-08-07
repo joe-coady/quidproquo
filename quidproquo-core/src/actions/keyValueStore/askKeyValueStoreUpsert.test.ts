@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
-import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 import { askKeyValueStoreUpsert, askKeyValueStoreUpsertBase } from './askKeyValueStoreUpsert';
+import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 
 describe('askKeyValueStoreUpsert', () => {
   it('yields an Upsert action with the item and options', () => {

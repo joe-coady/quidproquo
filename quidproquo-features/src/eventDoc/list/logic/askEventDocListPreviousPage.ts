@@ -1,8 +1,8 @@
 import { AskResponse, askStateRead } from 'quidproquo-core';
 
 import { askUIEventDocListSetPageIndex } from '../actionCreators/askUIEventDocListSetPageIndex';
-import { askEventDocListLoad } from './askEventDocListLoad';
 import type { EventDocListState } from '../types/EventDocListState';
+import { askEventDocListLoad } from './askEventDocListLoad';
 
 // Walk back one page, re-fetching it from the cursor recorded when it was first visited.
 //

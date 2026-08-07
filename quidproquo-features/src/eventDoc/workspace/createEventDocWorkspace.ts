@@ -1,11 +1,11 @@
 import { defaultEventDocEventValidator } from '../validation';
 import { eventDocWorkspaceChromeSlot } from './chrome/eventDocWorkspaceChromeSlot';
 import { bindEventDocWorkspaceApi } from './logic/bindEventDocWorkspaceApi';
+import { createEventDocWorkspaceBuiltInApi } from './logic/createEventDocWorkspaceBuiltInApi';
+import { createEventDocWorkspaceSnapshot } from './logic/createEventDocWorkspaceSnapshot';
 import { foldSlotPendingTail } from './logic/foldSlotPendingTail';
 import { getSlotHistoryView } from './logic/getSlotHistoryView';
 import { getSlotPending } from './logic/getSlotPending';
-import { createEventDocWorkspaceBuiltInApi } from './logic/createEventDocWorkspaceBuiltInApi';
-import { createEventDocWorkspaceSnapshot } from './logic/createEventDocWorkspaceSnapshot';
 import { createEventDocWorkspaceReducer } from './reducer/createEventDocWorkspaceReducer';
 import { createEventDocWorkspaceSelectors } from './selectors/createEventDocWorkspaceSelectors';
 import { EventDocWorkspaceDefinition } from './types/EventDocWorkspaceDefinition';

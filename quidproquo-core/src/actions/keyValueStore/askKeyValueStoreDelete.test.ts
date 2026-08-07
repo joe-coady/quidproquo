@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
-import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 import { askKeyValueStoreDelete } from './askKeyValueStoreDelete';
+import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 
 describe('askKeyValueStoreDelete', () => {
   it('yields a Delete action with key, sort key and options', () => {

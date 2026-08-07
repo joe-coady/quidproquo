@@ -1,10 +1,10 @@
 import { createActionRequester } from '../../types';
+import { StreamHandle } from '../../types/StreamRegistry';
 import { AiActionType } from './AiActionType';
 import { AiMessage } from './AiMessage';
 import { AiModel } from './AiModel';
 import { AiReasoningConfig } from './AiReasoningConfig';
-import { AiStreamPart } from './AiPromptStreamActionTypes';
-import { StreamHandle } from '../../types/StreamRegistry';
+import { AiStreamPart } from './types';
 
 export type AskAiPromptStreamOptions = {
   system?: string;

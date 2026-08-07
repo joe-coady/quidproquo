@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester, runStory, StoryError, throwsError } from '../../testing';
-import { FileActionType, FileInfo } from './FileActionType';
-import { askFileListAllDirectory, askFileListDirectory } from './askFileListDirectory';
 import { ActionOf } from '../../types';
+import { askFileListAllDirectory, askFileListDirectory } from './askFileListDirectory';
+import { FileActionType, FileInfo } from './FileActionType';
 
 describe('askFileListDirectory', () => {
   it('yields a ListDirectory action carrying the drive, folder, page token and max files', () => {

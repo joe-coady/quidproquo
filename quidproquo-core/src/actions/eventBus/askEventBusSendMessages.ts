@@ -1,7 +1,20 @@
+import { CrossModuleMessage } from '../../types';
 import { AskResponse } from '../../types/StorySession';
 import { createActionRequester } from '../../types/utils/createActionRequester';
 import { EventBusActionType } from './EventBusActionType';
-import { EventBusSendMessageOptions } from './EventBusSendMessageActionTypes';
+
+export type EventBusMessage<T> = CrossModuleMessage<T> & {
+  /** FIFO event buses only: message group for ordering. Defaults to the event bus name (global ordering). */
+  groupId?: string;
+
+  /** FIFO event buses only: dedup id (5-min SNS window). Defaults to a generated uuid (no dedup). */
+  deduplicationId?: string;
+};
+
+export interface EventBusSendMessageOptions<T> {
+  eventBusName: string;
+  eventBusMessages: EventBusMessage<T>[];
+}
 
 export const askEventBusSendMessagesBase = createActionRequester<void>()({
   actionType: EventBusActionType.SendMessages,

@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester, runStory, StoryError, throwsError } from '../../testing';
-import { DynamicFunctionsActionType } from './DynamicFunctionsActionType';
 import { askDynamicFunctionExecute } from './askDynamicFunctionExecute';
-import { DynamicFunctionsExecuteErrorTypeEnum } from './DynamicFunctionsExecuteActionTypes';
+import { DynamicFunctionsExecuteErrorTypeEnum } from './askDynamicFunctionExecute';
+import { DynamicFunctionsActionType } from './DynamicFunctionsActionType';
 
 describe('askDynamicFunctionExecute', () => {
   it('yields an Execute action with the name, member and positional args', () => {

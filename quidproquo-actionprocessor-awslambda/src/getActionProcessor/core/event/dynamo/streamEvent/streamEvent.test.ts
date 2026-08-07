@@ -89,9 +89,7 @@ describe('dynamo/streamEvent getEventGetRecordsActionProcessor', () => {
       buildStreamRecord('INSERT', 'doc-1', '0001', { marker: { S: 'unscoped-only' } }),
     ]);
 
-    expect(
-      records.map((record) => [record.scope, record.keys.pk, record.newImage.marker]),
-    ).toEqual([
+    expect(records.map((record) => [record.scope, record.keys.pk, record.newImage.marker])).toEqual([
       // Order is first appearance in the batch; the value is that pair's last change.
       ['tenant-a', 'doc-1', 'a1-last'],
       ['tenant-b', 'doc-1', 'b1-last'],

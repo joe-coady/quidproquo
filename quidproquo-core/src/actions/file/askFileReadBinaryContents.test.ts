@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
-import { FileActionType } from './FileActionType';
 import { askFileReadBinaryContents } from './askFileReadBinaryContents';
+import { FileActionType } from './FileActionType';
 
 describe('askFileReadBinaryContents', () => {
   it('yields a ReadBinaryContents action carrying the drive and filepath', () => {

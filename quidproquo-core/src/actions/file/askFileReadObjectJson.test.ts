@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
-import { FileActionType } from './FileActionType';
 import { askFileReadObjectJson } from './askFileReadObjectJson';
+import { FileActionType } from './FileActionType';
 
 describe('askFileReadObjectJson', () => {
   it('yields a ReadObjectJson action carrying the drive and filepath', () => {

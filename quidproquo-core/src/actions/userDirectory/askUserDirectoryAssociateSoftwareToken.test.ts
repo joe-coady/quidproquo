@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
-import { UserDirectoryActionType } from './UserDirectoryActionType';
 import { askUserDirectoryAssociateSoftwareToken } from './askUserDirectoryAssociateSoftwareToken';
+import { UserDirectoryActionType } from './UserDirectoryActionType';
 
 describe('askUserDirectoryAssociateSoftwareToken', () => {
   it('yields an AssociateSoftwareToken action carrying the directory and session', () => {

@@ -1,18 +1,18 @@
-import { runStory } from 'quidproquo-core';
+import { ActionOf, runStory } from 'quidproquo-core';
 
 import { describe, expect, it } from 'vitest';
 
 import { AdminSessionActionType } from '../../actions/AdminSessionActionType';
-import { ApplySessionEventAction } from '../../actions/ApplySessionEventActionTypes';
+import { askApplySessionEventBase } from '../../actions/askApplySessionEvent';
 import { AdminSessionEventType } from '../../effects/session/AdminSessionEventType';
 import { askSendChatMessage } from './askSendChatMessage';
 
 describe('askSendChatMessage', () => {
   it('records a chatMessageSent session event for a non-blank message', () => {
-    const applied: ApplySessionEventAction['payload'][] = [];
+    const applied: ActionOf<typeof askApplySessionEventBase>['payload'][] = [];
 
     runStory(askSendChatMessage('corr-1', 'what happened here?'), {
-      [AdminSessionActionType.applyEvent]: (action: ApplySessionEventAction) => {
+      [AdminSessionActionType.applyEvent]: (action: ActionOf<typeof askApplySessionEventBase>) => {
         applied.push(action.payload);
       },
     });
@@ -21,10 +21,10 @@ describe('askSendChatMessage', () => {
   });
 
   it('records nothing for a blank message', () => {
-    const applied: ApplySessionEventAction['payload'][] = [];
+    const applied: ActionOf<typeof askApplySessionEventBase>['payload'][] = [];
 
     runStory(askSendChatMessage('corr-1', '   '), {
-      [AdminSessionActionType.applyEvent]: (action: ApplySessionEventAction) => {
+      [AdminSessionActionType.applyEvent]: (action: ActionOf<typeof askApplySessionEventBase>) => {
         applied.push(action.payload);
       },
     });

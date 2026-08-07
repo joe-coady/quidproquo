@@ -1,18 +1,9 @@
-import {
-  ActionProcessorList,
-  ActionProcessorListResolver,
-  actionResult,
-  ContextActionType,
-  ContextListActionProcessor,
-  QPQConfig,
-} from 'quidproquo-core';
+import { actionResult, askContextList, createActionProcessor, ProcessorFor, QPQConfig } from 'quidproquo-core';
 
-const getProcessContextList = (qpqConfig: QPQConfig): ContextListActionProcessor => {
+const getProcessContextList = (qpqConfig: QPQConfig): ProcessorFor<typeof askContextList> => {
   return async (payload, session) => {
     return actionResult(session.context);
   };
 };
 
-export const getContextListActionProcessor: ActionProcessorListResolver = async (qpqConfig: QPQConfig): Promise<ActionProcessorList> => ({
-  [ContextActionType.List]: getProcessContextList(qpqConfig),
-});
+export const getContextListActionProcessor = createActionProcessor(askContextList, getProcessContextList);

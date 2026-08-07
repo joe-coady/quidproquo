@@ -3,8 +3,8 @@ import { expectGenerator } from 'quidproquo-testing';
 import { describe, expect, it } from 'vitest';
 
 import { runStory, StoryError, throwsError } from '../../testing';
-import { ConfigActionType } from './ConfigActionType';
 import { askConfigGetSecret } from './askConfigGetSecret';
+import { ConfigActionType } from './ConfigActionType';
 
 describe('askConfigGetSecret', () => {
   describe('askConfigGetSecret', () => {

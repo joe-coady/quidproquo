@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester, runStory, StoryError, throwsError } from '../../testing';
-import { SystemActionType } from './SystemActionType';
 import { askGetRuntimeCorrelation } from './askGetRuntimeCorrelation';
+import { SystemActionType } from './SystemActionType';
 
 describe('askGetRuntimeCorrelation', () => {
   it('yields a GetRuntimeCorrelation action with no payload', () => {

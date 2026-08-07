@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
-import { UserDirectoryActionType } from './UserDirectoryActionType';
 import { askUserDirectoryReadAccessToken } from './askUserDirectoryReadAccessToken';
+import { UserDirectoryActionType } from './UserDirectoryActionType';
 
 describe('askUserDirectoryReadAccessToken', () => {
   it('yields a ReadAccessToken action carrying the directory and expiration flag', () => {

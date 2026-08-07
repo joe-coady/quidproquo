@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
-import { UserDirectoryActionType } from './UserDirectoryActionType';
 import { askUserDirectoryCreateUser } from './askUserDirectoryCreateUser';
-import { CreateUserRequest } from './UserDirectoryCreateUserActionTypes';
+import { CreateUserRequest } from './askUserDirectoryCreateUser';
+import { UserDirectoryActionType } from './UserDirectoryActionType';
 
 describe('askUserDirectoryCreateUser', () => {
   const createUserRequest: CreateUserRequest = { email: 'a@b.com', emailVerified: true, password: 'pw' };

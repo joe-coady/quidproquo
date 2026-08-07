@@ -2,8 +2,8 @@ import { askEmailSendEmail, captureRequester, createActionProcessor, ProcessorFo
 
 import { describe, expect, it } from 'vitest';
 
-import { EmailActionType } from './EmailActionType';
 import { askEmailSendEmail } from './askEmailSendEmail';
+import { EmailActionType } from './EmailActionType';
 
 describe('askEmailSendEmail', () => {
   it('yields a SendEmail action with the payload verbatim, including attachments', () => {

@@ -4,8 +4,8 @@ import { describe, expect, it } from 'vitest';
 
 import { runStory, StoryError, throwsError } from '../../testing';
 import { ErrorTypeEnum } from '../../types/ErrorTypeEnum';
-import { ConfigActionType } from './ConfigActionType';
 import { askConfigGetGlobal } from './askConfigGetGlobal';
+import { ConfigActionType } from './ConfigActionType';
 
 describe('askConfigGetGlobal', () => {
   describe('askConfigGetGlobal', () => {

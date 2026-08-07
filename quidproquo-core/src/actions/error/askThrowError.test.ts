@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
-import { ErrorActionType } from './ErrorActionType';
 import { askThrowError } from './askThrowError';
+import { ErrorActionType } from './ErrorActionType';
 
 describe('askThrowError', () => {
   it('yields a ThrowError action carrying the error fields', () => {

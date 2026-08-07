@@ -4,8 +4,8 @@ import { describe, expect, it } from 'vitest';
 
 import { runStory, StoryError, throwsError } from '../../testing';
 import { ErrorTypeEnum } from '../../types/ErrorTypeEnum';
-import { ConfigActionType } from './ConfigActionType';
 import { askConfigGetApplicationInfo } from './askConfigGetApplicationInfo';
+import { ConfigActionType } from './ConfigActionType';
 
 describe('askConfigGetApplicationInfo', () => {
   const standardGetApplicationInfoAction = { type: ConfigActionType.GetApplicationInfo };

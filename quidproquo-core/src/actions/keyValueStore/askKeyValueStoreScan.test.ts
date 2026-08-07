@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
-import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 import { askKeyValueStoreScan, askKeyValueStoreScanBase } from './askKeyValueStoreScan';
+import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 
 describe('askKeyValueStoreScan', () => {
   it('yields a Scan action with filter condition and next page key', () => {

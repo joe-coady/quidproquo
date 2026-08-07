@@ -2,10 +2,10 @@ import { describe, expect, it } from 'vitest';
 
 import { runStory, StoryError, throwsError } from '../../testing';
 import { AskResponse } from '../../types';
-import { GuidActionType } from '../guid/GuidActionType';
 import { askNewGuid } from '../guid/askNewGuid';
-import { MathActionType } from '../math/MathActionType';
+import { GuidActionType } from '../guid/GuidActionType';
 import { askRandomNumber } from '../math/askRandomNumber';
+import { MathActionType } from '../math/MathActionType';
 import { askParallelDEPRECATED } from './askParallelDEPRECATED';
 
 describe('askParallelDEPRECATED', () => {

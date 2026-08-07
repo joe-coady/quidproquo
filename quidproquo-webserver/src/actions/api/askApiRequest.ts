@@ -1,7 +1,23 @@
-import { AskResponse, createActionRequester, HTTPMethod, HTTPNetworkResponse } from 'quidproquo-core';
+import { Action, AskResponse, createActionRequester, HTTPMethod, HTTPNetworkResponse, HTTPRequestOptions, ResponseType } from 'quidproquo-core';
 
 import { ApiActionType } from './ApiActionType';
-import { ApiRequestOptions } from './ApiRequestActionRequesterTypes';
+
+// basePath is resolved by the processor, so it is omitted from the caller options
+export type ApiRequestOptions<T> = Omit<HTTPRequestOptions<T>, 'basePath'>;
+export interface ApiRequestActionPayload<T> {
+  service: string;
+  endpoint: string;
+  method: HTTPMethod;
+  body?: T;
+  params?: Record<string, string>;
+  headers?: Record<string, string>;
+  responseType: ResponseType;
+}
+
+export interface ApiRequestAction<T> extends Action<ApiRequestActionPayload<T>> {
+  type: ApiActionType.Request;
+  payload: ApiRequestActionPayload<T>;
+}
 
 export const askApiRequestBase = createActionRequester<HTTPNetworkResponse<unknown>>()({
   actionType: ApiActionType.Request,

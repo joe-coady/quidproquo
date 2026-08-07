@@ -1,9 +1,9 @@
-import { ContextActionType, DateActionType, GuidActionType, NetworkActionType, runStory, StateActionType } from 'quidproquo-core';
+import { ActionOf, ContextActionType, DateActionType, GuidActionType, NetworkActionType, runStory, StateActionType } from 'quidproquo-core';
 
 import { describe, expect, it } from 'vitest';
 
 import { AdminSessionActionType } from '../../actions/AdminSessionActionType';
-import { ApplySessionEventAction } from '../../actions/ApplySessionEventActionTypes';
+import { askApplySessionEventBase } from '../../actions/askApplySessionEvent';
 import { createInitialAdminAppState } from '../../AdminAppState';
 import { AdminSessionEventType } from '../../effects/session/AdminSessionEventType';
 import { VolatileEffect } from '../../effects/volatile/VolatileEffect';
@@ -11,7 +11,7 @@ import { askRunLogSearch } from './askRunLogSearch';
 
 describe('askRunLogSearch', () => {
   it('records the search intent and loads results into the volatile cache', () => {
-    const applied: ApplySessionEventAction['payload'][] = [];
+    const applied: ActionOf<typeof askApplySessionEventBase>['payload'][] = [];
     const dispatched: { type: string; payload: unknown }[] = [];
     const requestBodies: { runtimeType: string; nextPageKey?: string }[] = [];
 
@@ -22,7 +22,7 @@ describe('askRunLogSearch', () => {
       [ContextActionType.Read]: { api: 'https://api', ws: 'wss://api' },
       [DateActionType.Now]: '2026-07-07T00:00:00.000Z',
       [GuidActionType.New]: 'req-guid',
-      [AdminSessionActionType.applyEvent]: (action: ApplySessionEventAction) => {
+      [AdminSessionActionType.applyEvent]: (action: ActionOf<typeof askApplySessionEventBase>) => {
         applied.push(action.payload);
       },
       [StateActionType.Dispatch]: (action: { payload: { action: { type: string; payload: unknown } } }) => {

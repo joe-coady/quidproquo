@@ -3,8 +3,8 @@ import { Nullable, QpqIsoDateTime } from 'quidproquo-core';
 
 import { askEventDocGetById } from '../data/askEventDocGetById';
 import { EventDocVersionState } from '../models';
-import { askEventDocDocumentStateAsOf } from './askEventDocDocumentStateAsOf';
 import { effectiveAsOf } from './selectors/effectiveAsOf';
+import { askEventDocDocumentStateAsOf } from './askEventDocDocumentStateAsOf';
 
 /**
  * The version published and effective at `clock`, together with the document state at

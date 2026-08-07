@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester, runStory, StoryError, throwsError } from '../../testing';
-import { SystemActionType } from './SystemActionType';
 import { askExecuteStory } from './askExecuteStory';
+import { SystemActionType } from './SystemActionType';
 
 describe('askExecuteStory', () => {
   it('yields an ExecuteStory action with runtime, params and session', () => {

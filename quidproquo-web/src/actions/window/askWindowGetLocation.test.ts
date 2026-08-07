@@ -2,8 +2,8 @@ import { captureRequester } from 'quidproquo-core';
 
 import { describe, expect, it } from 'vitest';
 
-import { WindowActionType } from './WindowActionType';
 import { askWindowGetLocation } from './askWindowGetLocation';
+import { WindowActionType } from './WindowActionType';
 
 describe('askWindowGetLocation', () => {
   it('yields a GetLocation action', () => {

@@ -196,7 +196,9 @@ describe('render route', () => {
       runStory(render(httpEvent({}), { id: DOC_ID }), {
         [ConfigActionType.GetGlobal]: (action: { payload: { globalName: string } }) => globals[action.payload.globalName],
         [KeyValueStoreActionType.Query]: (action: { payload: { keyValueStoreName: string } }) =>
-          action.payload.keyValueStoreName === store.eventsStoreName ? { items: storedEvents, nextPageKey: undefined } : { items: [], nextPageKey: undefined },
+          action.payload.keyValueStoreName === store.eventsStoreName
+            ? { items: storedEvents, nextPageKey: undefined }
+            : { items: [], nextPageKey: undefined },
         [DynamicFunctionsActionType.Execute]: throwsError(
           DynamicFunctionsExecuteErrorTypeEnum.DynamicFunctionsNotFound,
           `Dynamic functions not found: [${FUNCTIONS_NAME}]`,
@@ -213,7 +215,9 @@ describe('render route', () => {
       runStory(render(httpEvent({}), { id: DOC_ID }), {
         [ConfigActionType.GetGlobal]: (action: { payload: { globalName: string } }) => globals[action.payload.globalName],
         [KeyValueStoreActionType.Query]: (action: { payload: { keyValueStoreName: string } }) =>
-          action.payload.keyValueStoreName === store.eventsStoreName ? { items: storedEvents, nextPageKey: undefined } : { items: [], nextPageKey: undefined },
+          action.payload.keyValueStoreName === store.eventsStoreName
+            ? { items: storedEvents, nextPageKey: undefined }
+            : { items: [], nextPageKey: undefined },
         [DynamicFunctionsActionType.Execute]: throwsError(
           DynamicFunctionsExecuteErrorTypeEnum.ModuleLoadFailed,
           `Unable to dynamically load dynamic functions: [${FUNCTIONS_NAME}]`,

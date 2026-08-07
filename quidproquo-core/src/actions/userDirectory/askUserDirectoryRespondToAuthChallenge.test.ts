@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
+import { askUserDirectoryRespondToAuthChallenge } from './askUserDirectoryRespondToAuthChallenge';
 import { AnyAuthChallenge, AuthenticateUserChallenge } from './types';
 import { UserDirectoryActionType } from './UserDirectoryActionType';
-import { askUserDirectoryRespondToAuthChallenge } from './askUserDirectoryRespondToAuthChallenge';
 
 describe('askUserDirectoryRespondToAuthChallenge', () => {
   const authChallenge: AnyAuthChallenge = {

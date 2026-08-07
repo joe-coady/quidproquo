@@ -1,7 +1,12 @@
 import { AskResponse, createActionRequester } from 'quidproquo-core';
 
 import { StateMachineActionType } from './StateMachineActionType';
-import { StateMachineEvent } from './StateMachineSendEventActionTypes';
+
+/** An event sent to a state machine; extra fields ride along to guard and action stories. */
+export type StateMachineEvent = {
+  type: string;
+  [key: string]: unknown;
+};
 
 export const askStateMachineSendEventBase = createActionRequester<unknown>()({
   actionType: StateMachineActionType.SendEvent,

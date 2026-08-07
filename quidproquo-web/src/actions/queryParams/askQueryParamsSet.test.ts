@@ -2,8 +2,8 @@ import { captureRequester } from 'quidproquo-core';
 
 import { describe, expect, it } from 'vitest';
 
-import { QueryParamsActionType } from './QueryParamsActionType';
 import { askQueryParamsSet } from './askQueryParamsSet';
+import { QueryParamsActionType } from './QueryParamsActionType';
 
 describe('askQueryParamsSet', () => {
   it('defaults createHistoryEntry to false when omitted', () => {

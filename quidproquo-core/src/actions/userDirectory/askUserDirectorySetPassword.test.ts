@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
-import { UserDirectoryActionType } from './UserDirectoryActionType';
 import { askUserDirectorySetPassword } from './askUserDirectorySetPassword';
+import { UserDirectoryActionType } from './UserDirectoryActionType';
 
 describe('askUserDirectorySetPassword', () => {
   it('yields a SetPassword action carrying the directory, username and new password', () => {

@@ -3,8 +3,8 @@ import { describe, expect, it } from 'vitest';
 import { createContextIdentifier } from '../../logic/context/createContextIdentifier';
 import { captureRequester, runStory, StoryError, throwsError } from '../../testing';
 import { ErrorTypeEnum } from '../../types/ErrorTypeEnum';
-import { ContextActionType } from './ContextActionType';
 import { askContextRead } from './askContextRead';
+import { ContextActionType } from './ContextActionType';
 
 describe('askContextRead', () => {
   it('yields a Read action with the supplied context identifier', () => {

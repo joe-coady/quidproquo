@@ -2,7 +2,19 @@ import { AskResponse } from '../../types/StorySession';
 import { createActionRequester } from '../../types/utils/createActionRequester';
 import { askThrowError } from '../error/askThrowError';
 import { AuthenticateUserResponse, UserDirectoryActionType } from './UserDirectoryActionType';
-import { AuthenticateUserRequest } from './UserDirectoryAuthenticateUserActionTypes';
+
+export type AuthenticateUserRequest = {
+  email: string;
+} & (
+  | {
+      [key: string]: any;
+      isCustom: true;
+    }
+  | {
+      password: string;
+      isCustom: false;
+    }
+);
 
 export const askUserDirectoryAuthenticateUserBase = createActionRequester<AuthenticateUserResponse>()({
   actionType: UserDirectoryActionType.AuthenticateUser,

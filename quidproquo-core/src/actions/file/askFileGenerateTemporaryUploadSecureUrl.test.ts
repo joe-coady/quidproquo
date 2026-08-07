@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
-import { FileActionType } from './FileActionType';
 import { askFileGenerateTemporaryUploadSecureUrl } from './askFileGenerateTemporaryUploadSecureUrl';
+import { FileActionType } from './FileActionType';
 
 describe('askFileGenerateTemporaryUploadSecureUrl', () => {
   it('yields a GenerateTemporaryUploadSecureUrl action carrying the advanced content type', () => {

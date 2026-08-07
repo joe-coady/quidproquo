@@ -4,8 +4,8 @@ import { askEventDocEventListAll } from '../data/askEventDocEventListAll';
 import { askEventDocSnapshotSeedLatest } from '../data/askEventDocSnapshotSeedLatest';
 import { askEventDocSnapshotViewsWrite } from '../data/askEventDocSnapshotViewsWrite';
 import { askEventDocSummaryViewWrite } from '../data/askEventDocSummaryViewWrite';
-import { EVENT_DOC_SUMMARY_VIEW } from '../definition/types/EventDocLatestViews';
 import { EventDocInvokableFunctions } from '../definition/types/EventDocInvokableFunctions';
+import { EVENT_DOC_SUMMARY_VIEW } from '../definition/types/EventDocLatestViews';
 import { EventDocSnapshotViews, EventDocSummaryView } from '../models';
 import { askEventDocSummaryRederive } from './askEventDocSummaryRederive';
 

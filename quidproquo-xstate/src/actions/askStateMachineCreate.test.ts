@@ -2,8 +2,8 @@ import { captureRequester } from 'quidproquo-core';
 
 import { describe, expect, it } from 'vitest';
 
-import { StateMachineActionType } from './StateMachineActionType';
 import { askStateMachineCreate } from './askStateMachineCreate';
+import { StateMachineActionType } from './StateMachineActionType';
 
 describe('askStateMachineCreate', () => {
   it('yields a Create action carrying the name, id and item', () => {

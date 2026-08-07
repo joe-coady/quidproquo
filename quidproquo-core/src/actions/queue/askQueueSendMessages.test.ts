@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
-import { QueueActionType } from './QueueActionType';
 import { askQueueSendMessages } from './askQueueSendMessages';
+import { QueueActionType } from './QueueActionType';
 
 describe('askQueueSendMessages', () => {
   it('yields a SendMessages action with the queue name and collected messages', () => {

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester, runStory, StoryError, throwsError } from '../../testing';
-import { MathActionType } from './MathActionType';
 import { askRandomNumber } from './askRandomNumber';
+import { MathActionType } from './MathActionType';
 
 describe('askRandomNumber', () => {
   it('yields a RandomNumber action', () => {

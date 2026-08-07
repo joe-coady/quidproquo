@@ -1,6 +1,6 @@
 import { envelopeEncrypt } from 'quidproquo-actionprocessor-node';
 import { defineAwsServiceAccountInfo } from 'quidproquo-config-aws';
-import { buildTestQpqConfig, CryptoActionType, askCryptoDecrypt, defineCryptoKey } from 'quidproquo-core';
+import { askCryptoDecrypt, buildTestQpqConfig, CryptoActionType, defineCryptoKey } from 'quidproquo-core';
 
 import { randomBytes } from 'crypto';
 import { beforeEach, describe, expect, it, vi } from 'vitest';

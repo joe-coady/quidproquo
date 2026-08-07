@@ -2,8 +2,8 @@ import { captureRequester } from 'quidproquo-core';
 
 import { describe, expect, it } from 'vitest';
 
-import { OpenApiSpecActionType } from './OpenApiSpecActionType';
 import { askGetOpenApiSpec } from './askGetOpenApiSpec';
+import { OpenApiSpecActionType } from './OpenApiSpecActionType';
 
 describe('askGetOpenApiSpec', () => {
   it('yields a GetOpenApiSpec action with no payload', () => {

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
-import { FileActionType } from './FileActionType';
 import { askFileDelete } from './askFileDelete';
+import { FileActionType } from './FileActionType';
 
 describe('askFileDelete', () => {
   it('yields a Delete action carrying the drive and filepaths', () => {

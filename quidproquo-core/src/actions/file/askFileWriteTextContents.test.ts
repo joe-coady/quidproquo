@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import { StorageDriveTier } from '../../config';
 import { captureRequester } from '../../testing';
-import { FileActionType } from './FileActionType';
 import { askFileWriteTextContents } from './askFileWriteTextContents';
+import { FileActionType } from './FileActionType';
 
 describe('askFileWriteTextContents', () => {
   it('yields a WriteTextContents action carrying the drive, filepath, data and write options', () => {

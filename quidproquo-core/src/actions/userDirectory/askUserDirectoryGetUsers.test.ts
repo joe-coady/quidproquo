@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
-import { UserDirectoryActionType } from './UserDirectoryActionType';
 import { askUserDirectoryGetUsers } from './askUserDirectoryGetUsers';
+import { UserDirectoryActionType } from './UserDirectoryActionType';
 
 describe('askUserDirectoryGetUsers', () => {
   it('yields a GetUsers action carrying the directory and page key', () => {

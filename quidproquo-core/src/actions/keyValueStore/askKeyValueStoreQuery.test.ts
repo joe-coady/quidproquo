@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
-import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 import { askKeyValueStoreQuery, askKeyValueStoreQueryBase } from './askKeyValueStoreQuery';
+import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 
 describe('askKeyValueStoreQuery', () => {
   it('yields a Query action with the key condition and options', () => {

@@ -4,7 +4,7 @@ import { EventDocEvent } from 'quidproquo-features';
 import { askUISessionLogEventAppended } from '../actionCreators/sessionLog/askUISessionLogEventAppended';
 import { adminSessionSchemaVersion } from '../constants/adminSessionSchemaVersion';
 import { localSessionEventActor } from '../constants/localSessionEventActor';
-import { ApplySessionEventActionPayload } from './ApplySessionEventActionTypes';
+import { ApplySessionEventActionPayload } from './askApplySessionEvent';
 
 // The seam between pure yield and the event log: stamps local metadata and
 // appends optimistically (index assignment + coalescing live in the reducer);

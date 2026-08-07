@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
-import { UserDirectoryActionType } from './UserDirectoryActionType';
 import { askUserDirectoryRefreshToken } from './askUserDirectoryRefreshToken';
+import { UserDirectoryActionType } from './UserDirectoryActionType';
 
 describe('askUserDirectoryRefreshToken', () => {
   it('yields a RefreshToken action carrying the directory and refresh token', () => {

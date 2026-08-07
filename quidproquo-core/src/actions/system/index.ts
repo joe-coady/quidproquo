@@ -4,6 +4,3 @@ export * from './askGetRuntimeCorrelation';
 export * from './askParallelDEPRECATED';
 export * from './askTraceStory';
 export * from './SystemActionType';
-export * from './SystemExecuteStoryActionTypes';
-export * from './SystemRunParallelActionTypes';
-export * from './SystemTraceStoryActionTypes';

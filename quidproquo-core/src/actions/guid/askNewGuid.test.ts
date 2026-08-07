@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester, runStory, StoryError, throwsError } from '../../testing';
-import { GuidActionType } from './GuidActionType';
 import { askNewGuid } from './askNewGuid';
+import { GuidActionType } from './GuidActionType';
 
 describe('askNewGuid', () => {
   it('yields a New action', () => {

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
-import { StateActionType } from './StateActionType';
 import { askStateRead } from './askStateRead';
+import { StateActionType } from './StateActionType';
 
 describe('askStateRead', () => {
   it('yields a Read action scoped to the given path', () => {

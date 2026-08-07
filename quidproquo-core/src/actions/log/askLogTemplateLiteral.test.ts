@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester, runStory, StoryError, throwsError } from '../../testing';
-import { LogActionType } from './LogActionType';
 import { askLogTemplateLiteral } from './askLogTemplateLiteral';
+import { LogActionType } from './LogActionType';
 
 describe('askLogTemplateLiteral', () => {
   it('yields a TemplateLiteral action splitting strings and variables into messageParts', () => {

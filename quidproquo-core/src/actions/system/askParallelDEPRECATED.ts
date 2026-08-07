@@ -1,8 +1,8 @@
 // NOTE: System actions have no platform specific processors and/or requestors
 // and therefore do not need to implement a SystemActionProcessor.ts
 
-import { askBatch } from './askBatch';
 import { AskResponse } from '../../types/StorySession';
+import { askBatch } from './askBatch';
 
 /**
  * @deprecated since version X.X. Please use {@link askRunParallel} instead.
@@ -11,7 +11,7 @@ import { AskResponse } from '../../types/StorySession';
  * improved performance and better type support.
  *
  * @param {Array<any>} stories - An array of stories to be run in parallel.
- * @returns {SystemRunParallelActionRequester} A requester for running actions in parallel.
+ * @returns {AskResponse<any[]>} The result of each story, in the order they were given.
  */
 export function* askParallelDEPRECATED(stories: Array<any>): AskResponse<any[]> {
   const itt = stories.map((s: any) => s[0](...s.slice(1)));

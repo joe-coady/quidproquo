@@ -3,8 +3,8 @@ import { askCatch, AskResponse, askStateRead } from 'quidproquo-core';
 import { askUIEventDocListPageLoaded } from '../actionCreators/askUIEventDocListPageLoaded';
 import { askUIEventDocListSetError } from '../actionCreators/askUIEventDocListSetError';
 import { askUIEventDocListSetLoading } from '../actionCreators/askUIEventDocListSetLoading';
-import type { EventDocListState } from '../types/EventDocListState';
 import { askEventDocListFetch } from '../transport/askEventDocListFetch';
+import type { EventDocListState } from '../types/EventDocListState';
 
 // Load the page the walk is currently on.
 //

@@ -1,10 +1,10 @@
-import { ContextActionType, DateActionType, GuidActionType, NetworkActionType, runStory, StateActionType } from 'quidproquo-core';
+import { ActionOf, ContextActionType, DateActionType, GuidActionType, NetworkActionType, runStory, StateActionType } from 'quidproquo-core';
 import { QueryParamsActionType } from 'quidproquo-web';
 
 import { describe, expect, it } from 'vitest';
 
 import { AdminSessionActionType } from '../../actions/AdminSessionActionType';
-import { ApplySessionEventAction } from '../../actions/ApplySessionEventActionTypes';
+import { askApplySessionEventBase } from '../../actions/askApplySessionEvent';
 import { adminUserContext } from '../../contexts/adminUserContext';
 import { AdminSessionEventType } from '../../effects/session/AdminSessionEventType';
 import { makeInitStateEvent } from '../../testHelpers/makeSessionEvent';
@@ -13,7 +13,7 @@ import { askStartSession } from './askStartSession';
 const initEvent = makeInitStateEvent('doc-1', 'joe — 2026-07-07T00:00:00.000Z');
 
 const baseMocks = (
-  applied: ApplySessionEventAction['payload'][],
+  applied: ActionOf<typeof askApplySessionEventBase>['payload'][],
   dispatched: { type: string; payload: unknown }[],
   networkCalls: { url: string; body?: unknown }[],
 ) => ({
@@ -34,14 +34,14 @@ const baseMocks = (
   [StateActionType.Dispatch]: (action: { payload: { action: { type: string; payload: unknown } } }) => {
     dispatched.push(action.payload.action);
   },
-  [AdminSessionActionType.applyEvent]: (action: ApplySessionEventAction) => {
+  [AdminSessionActionType.applyEvent]: (action: ActionOf<typeof askApplySessionEventBase>) => {
     applied.push(action.payload);
   },
 });
 
 describe('askStartSession', () => {
   it('creates the session doc, seeds the log, and records sessionStarted from the URL', () => {
-    const applied: ApplySessionEventAction['payload'][] = [];
+    const applied: ActionOf<typeof askApplySessionEventBase>['payload'][] = [];
     const dispatched: { type: string; payload: unknown }[] = [];
     const networkCalls: { url: string; body?: unknown }[] = [];
 
@@ -65,7 +65,7 @@ describe('askStartSession', () => {
   });
 
   it('does not record a correlationOpened event without a deep link', () => {
-    const applied: ApplySessionEventAction['payload'][] = [];
+    const applied: ActionOf<typeof askApplySessionEventBase>['payload'][] = [];
 
     runStory(askStartSession(), {
       ...baseMocks(applied, [], []),

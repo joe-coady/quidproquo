@@ -1,9 +1,9 @@
-import { PlatformActionType, runStory, StateActionType } from 'quidproquo-core';
+import { ActionOf, PlatformActionType, runStory, StateActionType } from 'quidproquo-core';
 
 import { describe, expect, it } from 'vitest';
 
 import { AdminSessionActionType } from '../../actions/AdminSessionActionType';
-import { ApplySessionEventAction } from '../../actions/ApplySessionEventActionTypes';
+import { askApplySessionEventBase } from '../../actions/askApplySessionEvent';
 import { createInitialAdminAppState } from '../../AdminAppState';
 import { AdminSessionEventType } from '../../effects/session/AdminSessionEventType';
 import { makeSessionEvent } from '../../testHelpers/makeSessionEvent';
@@ -12,14 +12,14 @@ import { askEndSession } from './askEndSession';
 
 describe('askEndSession', () => {
   it('records sessionEnded and returns once the pending buffer drains', () => {
-    const applied: ApplySessionEventAction['payload'][] = [];
+    const applied: ActionOf<typeof askApplySessionEventBase>['payload'][] = [];
 
     const state = createInitialAdminAppState();
     state.sessionLog = { ...state.sessionLog, docId: 'doc-1' };
 
     runStory(askEndSession(), {
       [StateActionType.Read]: state,
-      [AdminSessionActionType.applyEvent]: (action: ApplySessionEventAction) => {
+      [AdminSessionActionType.applyEvent]: (action: ActionOf<typeof askApplySessionEventBase>) => {
         applied.push(action.payload);
       },
     });
@@ -28,11 +28,11 @@ describe('askEndSession', () => {
   });
 
   it('does nothing when no session doc exists', () => {
-    const applied: ApplySessionEventAction['payload'][] = [];
+    const applied: ActionOf<typeof askApplySessionEventBase>['payload'][] = [];
 
     runStory(askEndSession(), {
       [StateActionType.Read]: createInitialAdminAppState(),
-      [AdminSessionActionType.applyEvent]: (action: ApplySessionEventAction) => {
+      [AdminSessionActionType.applyEvent]: (action: ActionOf<typeof askApplySessionEventBase>) => {
         applied.push(action.payload);
       },
     });
@@ -41,7 +41,7 @@ describe('askEndSession', () => {
   });
 
   it('does not double-end an already ended session', () => {
-    const applied: ApplySessionEventAction['payload'][] = [];
+    const applied: ActionOf<typeof askApplySessionEventBase>['payload'][] = [];
 
     const state = createInitialAdminAppState();
     state.sessionLog = {
@@ -52,7 +52,7 @@ describe('askEndSession', () => {
 
     runStory(askEndSession(), {
       [StateActionType.Read]: state,
-      [AdminSessionActionType.applyEvent]: (action: ApplySessionEventAction) => {
+      [AdminSessionActionType.applyEvent]: (action: ActionOf<typeof askApplySessionEventBase>) => {
         applied.push(action.payload);
       },
       [PlatformActionType.Delay]: undefined,

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
-import { UserDirectoryActionType } from './UserDirectoryActionType';
 import { askUserDirectorySetAccessToken } from './askUserDirectorySetAccessToken';
+import { UserDirectoryActionType } from './UserDirectoryActionType';
 
 describe('askUserDirectorySetAccessToken', () => {
   it('yields a SetAccessToken action carrying the token and directory', () => {

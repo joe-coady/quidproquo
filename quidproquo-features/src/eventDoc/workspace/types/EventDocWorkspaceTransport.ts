@@ -24,6 +24,9 @@ export type EventDocWorkspaceEventsPageRequest = {
 export type EventDocWorkspaceTransport = {
   askFetchBootstrap: (identity: EventDocWorkspaceDocumentIdentity) => AskResponse<EventDocWorkspaceBootstrap>;
   askFetchEvents: (identity: EventDocWorkspaceDocumentIdentity, afterEventId?: string) => AskResponse<EventDocEvent[]>;
-  askFetchEventsPage: (identity: EventDocWorkspaceDocumentIdentity, request?: EventDocWorkspaceEventsPageRequest) => AskResponse<QpqPagedData<EventDocEvent>>;
+  askFetchEventsPage: (
+    identity: EventDocWorkspaceDocumentIdentity,
+    request?: EventDocWorkspaceEventsPageRequest,
+  ) => AskResponse<QpqPagedData<EventDocEvent>>;
   askAppendEvent: (identity: EventDocWorkspaceDocumentIdentity, input: EventDocEventInput) => AskResponse<EventDocEvent>;
 };

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
-import { FileActionType } from './FileActionType';
 import { askFileExists } from './askFileExists';
+import { FileActionType } from './FileActionType';
 
 describe('askFileExists', () => {
   it('yields an Exists action carrying the drive and filepath', () => {

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
-import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 import { askKeyValueStoreGetAll, askKeyValueStoreGetAllBase } from './askKeyValueStoreGetAll';
+import { KeyValueStoreActionType } from './KeyValueStoreActionType';
 
 describe('askKeyValueStoreGetAll', () => {
   it('yields a GetAll action with options', () => {

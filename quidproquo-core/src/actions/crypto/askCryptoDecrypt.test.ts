@@ -3,8 +3,8 @@ import { expectGenerator } from 'quidproquo-testing';
 import { describe, expect, it } from 'vitest';
 
 import { runStory, StoryError, throwsError } from '../../testing';
-import { CryptoActionType } from './CryptoActionType';
 import { askCryptoDecrypt } from './askCryptoDecrypt';
+import { CryptoActionType } from './CryptoActionType';
 
 describe('askCryptoDecrypt', () => {
   describe('askCryptoDecrypt', () => {

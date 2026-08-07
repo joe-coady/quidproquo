@@ -1,6 +1,6 @@
-import { askDynamicFunctionExecute } from './askDynamicFunctionExecute';
 import { AskResponse } from '../../types/StorySession';
-import { DynamicFunctionResult, DynamicFunctions } from './DynamicFunctionsExecuteActionTypes';
+import { askDynamicFunctionExecute } from './askDynamicFunctionExecute';
+import { DynamicFunctionResult, DynamicFunctions } from './askDynamicFunctionExecute';
 
 export type DynamicFunctionCaller<TFunctions extends DynamicFunctions> = {
   [TName in keyof TFunctions]: (...args: Parameters<TFunctions[TName]>) => AskResponse<DynamicFunctionResult<TFunctions[TName]>>;

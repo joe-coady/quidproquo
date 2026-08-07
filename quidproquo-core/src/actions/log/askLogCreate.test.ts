@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import { captureRequester, runStory, StoryError, throwsError } from '../../testing';
 import { LogLevelEnum } from '../../types/LogLevelEnum';
-import { LogActionType } from './LogActionType';
 import { askLogCreate } from './askLogCreate';
+import { LogActionType } from './LogActionType';
 
 describe('askLogCreate', () => {
   it('yields a Create action with the level, message and data', () => {

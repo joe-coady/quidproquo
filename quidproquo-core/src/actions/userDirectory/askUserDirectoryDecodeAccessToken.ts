@@ -1,6 +1,6 @@
 import { createActionRequester } from '../../types';
-import { UserDirectoryActionType } from './UserDirectoryActionType';
 import { DecodedAccessToken } from '../../types/StorySession';
+import { UserDirectoryActionType } from './UserDirectoryActionType';
 
 export const askUserDirectoryDecodeAccessToken = createActionRequester<DecodedAccessToken>()({
   actionType: UserDirectoryActionType.DecodeAccessToken,

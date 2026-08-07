@@ -2,8 +2,8 @@ import { captureRequester } from 'quidproquo-core';
 
 import { describe, expect, it } from 'vitest';
 
-import { WebEntryActionType } from './WebEntryActionType';
 import { askWebEntryInvalidateCache } from './askWebEntryInvalidateCache';
+import { WebEntryActionType } from './WebEntryActionType';
 
 describe('askWebEntryInvalidateCache', () => {
   it('yields an InvalidateCache action collecting the paths into an array', () => {

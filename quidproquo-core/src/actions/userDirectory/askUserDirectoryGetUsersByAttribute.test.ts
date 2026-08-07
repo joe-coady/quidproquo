@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
-import { UserDirectoryActionType } from './UserDirectoryActionType';
 import { askUserDirectoryGetUsersByAttribute } from './askUserDirectoryGetUsersByAttribute';
+import { UserDirectoryActionType } from './UserDirectoryActionType';
 
 describe('askUserDirectoryGetUsersByAttribute', () => {
   it('yields a GetUsersByAttribute action carrying every field', () => {

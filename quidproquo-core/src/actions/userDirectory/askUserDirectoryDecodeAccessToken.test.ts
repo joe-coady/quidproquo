@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
-import { UserDirectoryActionType } from './UserDirectoryActionType';
 import { askUserDirectoryDecodeAccessToken } from './askUserDirectoryDecodeAccessToken';
+import { UserDirectoryActionType } from './UserDirectoryActionType';
 
 describe('askUserDirectoryDecodeAccessToken', () => {
   it('yields a DecodeAccessToken action carrying the token and expiration flag', () => {

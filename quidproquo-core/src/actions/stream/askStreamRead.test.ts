@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
 import { StreamChunk, StreamHandle } from '../../types/StreamRegistry';
-import { StreamActionType } from './StreamActionType';
 import { askStreamRead } from './askStreamRead';
+import { StreamActionType } from './StreamActionType';
 
 const handle = <E extends 'text' | 'binary' | 'json'>(encoding: E): StreamHandle<E> => ({ id: 'stream-1', encoding });
 

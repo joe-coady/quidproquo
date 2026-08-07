@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
 import { StreamHandle } from '../../types/StreamRegistry';
-import { StreamActionType } from './StreamActionType';
 import { askStreamClose } from './askStreamClose';
+import { StreamActionType } from './StreamActionType';
 
 describe('askStreamClose', () => {
   it('yields a Close action carrying the stream id', () => {

@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 import Anthropic from '@anthropic-ai/sdk';
 
 import { captureRequester, runStory, StoryError, throwsError } from '../../testing';
-import { ClaudeAiActionType } from './ClaudeAiActionType';
 import { askClaudeAiMessagesApi } from './askClaudeAiMessagesApi';
+import { ClaudeAiActionType } from './ClaudeAiActionType';
 
 describe('askClaudeAiMessagesApi', () => {
   const body: Anthropic.Messages.MessageCreateParamsNonStreaming = {

@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import { captureRequester } from '../../testing';
 import { ErrorActionType } from '../error/ErrorActionType';
-import { UserDirectoryActionType } from './UserDirectoryActionType';
 import { askUserDirectoryAuthenticateUser, askUserDirectoryAuthenticateUserBase } from './askUserDirectoryAuthenticateUser';
+import { UserDirectoryActionType } from './UserDirectoryActionType';
 
 describe('askUserDirectoryAuthenticateUser', () => {
   it('yields a standard authentication request carrying email and password', () => {

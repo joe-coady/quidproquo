@@ -11,7 +11,4 @@ export type EventDocWorkspaceAppendFullHistoryPayload = {
   nextPageKey?: string;
 };
 
-export type EventDocWorkspaceAppendFullHistoryEffect = Effect<
-  EventDocWorkspaceEffect.AppendFullHistory,
-  EventDocWorkspaceAppendFullHistoryPayload
->;
+export type EventDocWorkspaceAppendFullHistoryEffect = Effect<EventDocWorkspaceEffect.AppendFullHistory, EventDocWorkspaceAppendFullHistoryPayload>;

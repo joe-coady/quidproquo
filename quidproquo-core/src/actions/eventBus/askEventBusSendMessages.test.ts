@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
 import { captureRequester, runStory, StoryError, throwsError } from '../../testing';
-import { EventBusActionType } from './EventBusActionType';
 import { askEventBusSendMessages, askEventBusSendMessagesBase } from './askEventBusSendMessages';
-import { EventBusSendMessageOptions } from './EventBusSendMessageActionTypes';
+import { EventBusSendMessageOptions } from './askEventBusSendMessages';
+import { EventBusActionType } from './EventBusActionType';
 
 describe('askEventBusSendMessages', () => {
   it('yields a SendMessages action with the supplied options as payload', () => {
